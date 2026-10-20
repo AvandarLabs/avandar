@@ -60,7 +60,7 @@ a full crawl, which makes the HDX drive viable for the first time.
   design.
 - **Socrata drives above 10,000 assets.** The Discovery API caps
   `offset + limit` at 10,000. NYC has 3,021 assets. A larger drive fails
-  with a clear error; `scroll_id` support is a follow-up (section 9.3).
+  with a clear error; `scroll_id` support is a follow-up (section 9.2).
 - **Incremental runs for Parquet pipelines.** `world-bank__wdi` moves onto
   the new engine but stays full-run only (section 5.4).
 - **A cancel API, scheduling, or run history table.** Cancelling is killing
@@ -309,7 +309,7 @@ full-run only:
 
 Supporting several drives or incremental runs for a Parquet pipeline needs a
 drive column that both row kinds share. That is a follow-up if a second Parquet
-pipeline ever needs it (section 9.4).
+pipeline ever needs it (section 9.2).
 
 ### 5.5 Loading a page
 
@@ -385,8 +385,11 @@ hardcoded `socrata` and `hdx` filters.
 
 ### 5.8 Socrata pipeline
 
-- **`SocrataDiscoveryClient.search`** gains an `order` parameter, and
-  `SocrataDiscoveryResult` gains `updatedAt` and `createdAt`.
+- **`SocrataDiscoveryClient.search`** gains an `order` parameter and returns
+  `{ results, resultSetSize }` instead of a bare array, so `extract` can check
+  a drive's size before paging. `SocrataDiscoveryResult` gains `updatedAt` and
+  `createdAt`. The Socrata pipeline is the only caller, so nothing else
+  changes.
 - **`extract`** pages a drive with `order=updatedAt ASC`, `limit=1000`, and
   `offset`. The API has no date filter, so it filters client-side: it skips
   results before `since` and stops at the first result at or after `until`.
@@ -472,73 +475,221 @@ ava pipeline run socrata --incremental
 
 ## 8. Testing
 
-Red/green TDD throughout. Each item names the claim a test proves.
+Red/green TDD throughout: every behavior below gets a failing test before the
+code that makes it pass. Each test has an id so the implementation plan can
+point at it, and each names the claim it proves. The "Spec" column names the
+section whose behavior it covers.
 
-**`@avandar/etl` engine core**, with an in-memory fake behind the engine's
-internal listings store interface:
+### 8.1 `@avandar/etl` engine core
 
-- Incremental mode starts each drive at its own high-water mark, and a drive
-  with no rows starts from no lower bound.
-- An explicit `since` overrides the high-water mark. `until` excludes
-  connections at exactly `until`.
-- A run killed after page N, then rerun incrementally, writes every
-  connection exactly once in total.
-- `limit` counts connections across drives and trims the last page.
-- An out-of-order page throws and writes nothing from that page.
-- A failing drive is reported as failed and the next drive still runs.
-  `run()` rejects only when every drive fails.
-- A full rerun with no source changes writes zero rows.
-- A relation whose mapping changed is rewritten even when
-  `date_of_last_update` did not change.
-- The engine never sends a cache column in an upsert.
-- A Parquet relation with an unchanged SHA-256 is not uploaded again.
+Unit tests in `packages/node/etl`, driving `EtlEngine.run()` with in-memory
+fakes behind the engine's internal listings store and object store
+interfaces, so no test needs Supabase.
 
-**`@avandar/etl` Supabase store**, as an integration test against the local
-switched Supabase, in a separate vitest config so `pnpm test` does not need a
-running stack:
+**Windows and run modes**
 
-- The upsert conflict targets, the high-water mark query, and the relation
-  column replacement work against the real schema.
+| Id | Claim | Spec |
+| --- | --- | --- |
+| E1 | Incremental mode starts each drive at that drive's own high-water mark | 5.3 |
+| E2 | Incremental mode starts a drive with no rows at no lower bound | 5.3 |
+| E3 | Full mode ignores the high-water mark and starts at no lower bound | 5.3 |
+| E4 | An explicit `since` overrides the high-water mark in incremental mode | 5.3 |
+| E5 | An explicit `since` sets the lower bound in full mode | 5.3 |
+| E6 | `until` is passed to `extract`, and a connection at exactly `until` is not written | 5.3 |
+| E7 | The lower bound is inclusive: a connection at exactly the high-water mark is fetched and, when unchanged, not rewritten | 5.3 |
+| E8 | A custom `readHighWaterMark` is called with the drive and drive key, and its value is the window's lower bound | 5.3 |
+| E9 | `--incremental` on an engine with no `incremental` config rejects before `listDrives` or `extract` is called | 5.3, 7 |
 
-**`apps/pipeline-server`:**
+**Ordering, repeats, and limits**
 
-- HDX `searchDatasets` builds the `fq` and `sort` for a window, and keyset
-  paging skips the boundary rows it already returned.
-- HDX timestamps parse as UTC and round down to milliseconds.
-- Socrata `extract` skips results before `since`, stops at `until`, and
-  deduplicates across the overlapping pages.
-- A Socrata drive reporting more than 10,000 results fails with the limit
-  in the message.
-- The shared options parser rejects `--incremental --since`, a timezone-less
-  timestamp, and `since` at or after `until`.
+| Id | Claim | Spec |
+| --- | --- | --- |
+| E10 | A connection older than the one before it throws `OutOfOrderConnectionError` naming the drive | 5.3 |
+| E11 | Nothing from the out-of-order page is written, and earlier pages stay written | 5.3, 7 |
+| E12 | A repeated connection id within one drive is dropped before the order check, so it neither writes twice nor throws | 5.3 |
+| E13 | The same connection id in two different drives is not treated as a repeat | 5.3 |
+| E14 | `limit` counts connections across drives: with limit 5 and drives of 3 and 4, the second drive writes 2 | 5.3 |
+| E15 | Once the limit is reached, `extract` is not asked for another page and later drives are not crawled | 5.3 |
+| E16 | Drives are crawled in `listDrives` order, and a drive's first page is not requested until the previous drive finished | 5.3 |
+| E17 | Without `incremental` config, pages are not order-checked | 5.4 |
 
-**`apps/ava-cli`:**
+**Resuming**
 
-- `ava pipeline run` sends `mode`, `since`, and `until` to the server and to
-  the local runner.
-- `ava pipeline reset` scopes rows by `pipeline_name`.
+| Id | Claim | Spec |
+| --- | --- | --- |
+| E18 | A run that throws after page 2 of 4, rerun in incremental mode, writes every connection exactly once in total across both runs | 5.3 |
+| E19 | A run stopped by `limit`, rerun in incremental mode, continues at the next connection | 5.3 |
+| E20 | A connection that yields zero relations writes no row and does not move the high-water mark | 5.3 |
+| E21 | After a resume, connections that share the high-water mark timestamp but were not written before are written | 5.3 |
 
-**Manual, against the switched local Supabase:**
+**Failures and the report**
 
-- `ava pipeline run socrata --local --limit 50`, then `--incremental`,
-  continues where the limit stopped.
-- Adding a second Socrata drive and running `--incremental` crawls the new
-  drive from scratch while NYC fetches only its newest items.
-- `ava pipeline run hdx --local --limit 2000` completes within HDX's rate
-  limit.
+| Id | Claim | Spec |
+| --- | --- | --- |
+| E22 | A drive whose `extract` throws is reported `failed` with its error, and the next drive still runs | 5.3, 7 |
+| E23 | `run()` resolves with a report when at least one drive succeeds | 5.3 |
+| E24 | `run()` rejects, naming every drive's error, when every drive fails | 5.3, 7 |
+| E25 | A failed upsert fails that drive at that page, and its earlier pages stay written | 7 |
+| E26 | The report gives each drive's key, window, connections fetched, relations written, relations unchanged, and newest timestamp | 5.3 |
 
-## 9. Open questions and follow-ups
+**Loading**
 
-1. **The bucket name.** `world-bank__wdi` uploads to `opendata` (or
-   `SUPABASE_OPENDATA_BUCKET`), and the bucket migration created
-   `open-data-catalog`. The engine takes the bucket as config either way.
-   Which bucket should `pipeline-server` pass?
-2. **Which HDX datasets are in scope.** A full HDX crawl writes one row per
-   readable resource of up to 28k datasets. Should the drive filter to some
-   organizations or tags first (CKAN `fq` supports both), or index everything?
-3. **Socrata `scroll_id`** for drives over 10,000 assets. It walks results in
+| Id | Claim | Spec |
+| --- | --- | --- |
+| L1 | A full rerun with no source changes writes zero rows | 5.5 |
+| L2 | A relation whose mapping changed is rewritten even when its source timestamp did not change | 5.5 |
+| L3 | Rows that differ only in `pipeline_run_id` or `date_of_last_sync` count as unchanged | 5.5 |
+| L4 | Every written row carries this run's `pipeline_name`, `pipeline_run_id`, and `date_of_last_sync` | 5.1, 5.5 |
+| L5 | `date_of_last_update` is the relation's `sourceUpdatedAt` | 5.1 |
+| L6 | An `api_resource` row carries `api_service` from the engine's `service` and the relation's API fields, and no Parquet column | 5.1 |
+| L7 | A `pipeline_parquet` row carries `parquet_file_name` and no API column | 5.1 |
+| L8 | No upsert payload contains `cached_object_path`, `cached_source_version`, `cached_at`, or any column outside the contract | 5.1 |
+| L9 | A page of 450 relations is read back in chunks of at most 200 keys and all 450 are compared | 5.5 |
+| L10 | Changed relations are upserted oldest connection first, so a failure in a later chunk leaves the earlier chunks written | 5.5 |
+| L11 | Writing a relation with columns replaces that listing's whole column set: a column the relation no longer has is deleted | 5.1, 5.5 |
+| L12 | An unchanged relation's columns are not rewritten | 5.5 |
+| L13 | A Parquet relation is uploaded to `<bucket>/<pipeline name>/datasets/<table>.parquet` before its row is written | 5.1, 5.5 |
+| L14 | A Parquet relation whose SHA-256 matches the stored `metadata.parquet_sha256` is not uploaded again | 5.5 |
+| L15 | A Parquet relation whose SHA-256 changed is uploaded and its row records the new hash | 5.5 |
+| L16 | A Parquet relation with no `output.bucket` configured rejects with an error naming the setting | 5.2 |
+| L17 | Missing Supabase credentials reject with an error naming the missing setting, before any extract | 5.2 |
+
+### 8.2 `@avandar/etl` Supabase stores
+
+An integration suite against the local switched Supabase stack, in its own
+vitest config (`packages/node/etl/vitest.supabase.config.ts`) so the default
+`pnpm test` does not need a running stack. Fixtures use `pgtap-fixture`-style
+synthetic names and `.invalid` hosts, and every test deletes what it inserted.
+
+| Id | Claim | Spec |
+| --- | --- | --- |
+| S1 | Upserting the same `api_resource` relation twice leaves one row, on the `(api_service, api_base_url, external_dataset_id, api_resource_id)` key | 5.1 |
+| S2 | Upserting the same `pipeline_parquet` relation twice leaves one row, on the `(parquet_file_name, pipeline_name)` key | 5.1 |
+| S3 | The default high-water mark is the newest `date_of_last_update` for this pipeline and drive, ignoring other pipelines and other drives | 5.3 |
+| S4 | Reading existing rows by key returns the stored values in the shape the change check compares | 5.5 |
+| S5 | Replacing a listing's relation columns removes the old set and writes the new one | 5.1 |
+| S6 | An upsert leaves an existing row's cache columns untouched | 5.1 |
+| S7 | A Parquet object uploads to the configured bucket path and replaces an existing object | 5.1 |
+
+### 8.3 Database (pgTAP and migration upgrade test)
+
+| Id | Claim | Where | Spec |
+| --- | --- | --- | --- |
+| D1 | An `api_resource` row with `pipeline_name` and `pipeline_run_id` inserts | `supabase/tests/database/data_catalog_listings_access.test.sql` | 5.6 |
+| D2 | An `api_resource` row with no `pipeline_name` still inserts | same | 5.6 |
+| D3 | An `api_resource` row with `parquet_file_name` is still rejected | same | 5.6 |
+| D4 | The `(pipeline_name, api_base_url, date_of_last_update)` index exists | same | 5.6 |
+| D5 | The backfill sets `pipeline_name` to `socrata` on Socrata rows and `hdx` on `ckan` rows at `https://data.humdata.org` | `supabase/migration-upgrade-tests/data_catalog_listings_pipeline_name.{prelude,assertions}.sql` | 5.6 |
+| D6 | The backfill leaves a `ckan` row on another host, and `pipeline_parquet` rows, unchanged | same | 5.6 |
+
+### 8.4 `shared/connectors/open-data` clients
+
+| Id | Claim | Spec |
+| --- | --- | --- |
+| C1 | `CkanDiscoveryClient.searchDatasets` sends `sort=metadata_modified asc,name asc` and `rows=1000` | 5.7 |
+| C2 | A window becomes `fq=metadata_modified:[<since> TO <until>}`, with `*` for a missing bound | 5.7 |
+| C3 | Window bounds are rounded down to whole milliseconds and sent as UTC with `Z` | 5.7 |
+| C4 | The response parses into full datasets including `resources[]` and `metadata_modified` | 5.7 |
+| C5 | A naive `metadata_modified` such as `2026-10-20T13:47:48.858245` parses as that instant in UTC | 5.7 |
+| C6 | `SocrataDiscoveryClient.search` sends `order` when given, e.g. `updatedAt ASC` | 5.8 |
+| C7 | Each Socrata result carries `updatedAt` and `createdAt` | 5.8 |
+| C8 | `search` returns the total result count (`resultSetSize`) alongside the results | 5.8 |
+
+### 8.5 `apps/pipeline-server`
+
+**HDX**
+
+| Id | Claim | Spec |
+| --- | --- | --- |
+| H1 | `extract` pages with keyset paging: the next request starts at the last page's newest `metadata_modified` | 5.7 |
+| H2 | The next page skips rows at or before the last `(metadata_modified, name)` pair, so no dataset is returned twice | 5.7 |
+| H3 | `extract` stops when a page returns fewer than 1,000 rows | 5.7 |
+| H4 | `transform` returns one `ApiResourceRelation` per readable resource, with `sourceUpdatedAt` set to the dataset's `metadata_modified` | 5.7 |
+| H5 | A dataset with no readable resource transforms to zero relations | 5.7 |
+| H6 | The HDX HTTP client retries a 429 up to 3 times with exponential backoff from 5 seconds, then throws | 5.7, 7 |
+| H7 | The HDX HTTP client does not retry a 4xx other than 429 | 5.7 |
+
+**Socrata**
+
+| Id | Claim | Spec |
+| --- | --- | --- |
+| P1 | `extract` requests `order=updatedAt ASC` with `limit=1000` | 5.8 |
+| P2 | Every page after the first starts 20 results before the previous page ended | 5.8 |
+| P3 | `extract` skips results before `since` | 5.8 |
+| P4 | `extract` stops at the first result at or after `until` and requests no further page | 5.8 |
+| P5 | A drive whose total is over 10,000 fails with an error naming the drive and the limit, before paging | 5.8, 7 |
+| P6 | `transform` returns one relation per dataset, with `sourceUpdatedAt` set to `updatedAt` | 5.8 |
+
+**`world-bank__wdi`**
+
+| Id | Claim | Spec |
+| --- | --- | --- |
+| W1 | `transform` returns one `PipelineParquetRelation` per input CSV, with the display fields and year coverage the current hand-written load produces | 5.4 |
+| W2 | `run({ mode: "incremental" })` rejects without reading the input directory | 5.4 |
+
+**Run options and wiring**
+
+| Id | Claim | Spec |
+| --- | --- | --- |
+| O1 | The shared options parser accepts each valid combination in the 5.9 table | 5.9 |
+| O2 | It rejects `--incremental` together with `--since` | 5.9 |
+| O3 | It rejects a `--since` or `--until` with no timezone | 5.9 |
+| O4 | It rejects `since` at or after `until` | 5.9 |
+| O5 | It rejects a `limit` that is not a positive integer | 5.9 |
+| O6 | `POST /<name>/run` passes the parsed `mode`, `since`, `until`, and `limit` to the pipeline's `run` | 5.9 |
+| O7 | `POST /<name>/run` answers 400 and does not run the pipeline when the options are invalid | 5.9 |
+| O8 | `scripts/runPipelineOnce.ts` reads `--incremental`, `--since`, `--until`, and `--limit` into the same options | 5.9 |
+
+### 8.6 `apps/ava-cli`
+
+| Id | Claim | Spec |
+| --- | --- | --- |
+| A1 | `ava pipeline run --incremental --until T` sends `mode` and `until` in the server request body | 5.9 |
+| A2 | `ava pipeline run --local --since T` passes `since` to the local runner | 5.9 |
+| A3 | `ava pipeline run --incremental --since T` is rejected before any request | 5.9 |
+| A4 | `ava pipeline run` prints one line per drive from the report, including a failed drive's error | 5.9 |
+| A5 | `ava pipeline reset socrata` selects rows by `pipeline_name = socrata`, with no `api_service` filter | 5.6 |
+| A6 | `ava pipeline reset` for a pipeline with no listings still reports nothing to delete | 5.6 |
+
+### 8.7 Build checks
+
+| Id | Claim | Spec |
+| --- | --- | --- |
+| B1 | `pnpm --filter @avandar/etl build` emits declarations with no `TS2527`, `TS2742`, or `TS7056` errors | 5.10 |
+| B2 | `tsc` passes for `packages/node/etl`, `apps/pipeline-server`, `apps/ava-cli`, and `shared` | all |
+
+### 8.8 Manual verification against the switched local Supabase
+
+| Id | Claim | Spec |
+| --- | --- | --- |
+| M1 | `ava pipeline run socrata --local --limit 50`, then `--incremental`, continues where the limit stopped, and the report shows the window starting at the stored high-water mark | 5.3 |
+| M2 | A full `ava pipeline run socrata --local` right after a full run reports zero relations written | 5.5 |
+| M3 | Adding a second Socrata drive and running `--incremental` crawls the new drive from no lower bound while NYC's window starts at its high-water mark | 2, 5.3 |
+| M4 | Killing `ava pipeline run hdx --local` partway, then rerunning with `--incremental`, finishes without rewriting what the first run wrote | 5.3 |
+| M5 | `ava pipeline run hdx --local --limit 2000` finishes without a 429 failure | 5.7 |
+| M6 | `ava pipeline run world-bank__wdi --local` writes the same listings, columns, and objects it wrote before the refactor | 5.4 |
+| M7 | `ava pipeline reset socrata`, then `ava pipeline run socrata --local --incremental`, crawls from scratch | 5.6 |
+
+## 9. Decisions and follow-ups
+
+### 9.1 Decisions taken by default
+
+These were left open in review and take the conservative default. Either can
+be changed later without touching the engine, because both are configuration
+the pipeline server passes in.
+
+1. **Bucket.** `pipeline-server` passes `SUPABASE_OPENDATA_BUCKET`, falling
+   back to `opendata`, which is exactly what `world-bank__wdi` uploads to
+   today. Moving to the `open-data-catalog` bucket is a separate change.
+2. **HDX scope.** The HDX drive indexes every dataset, with no organization or
+   tag filter. A run can still be capped with `--limit`, and a filter is a
+   one-line `fq` addition if one is wanted later.
+
+### 9.2 Follow-ups
+
+1. **Socrata `scroll_id`** for drives over 10,000 assets. It walks results in
    id order, not time order, so such a drive would always need a full scan.
-4. **A shared drive column** for `pipeline_parquet` rows, if a Parquet
+2. **A shared drive column** for `pipeline_parquet` rows, if a Parquet
    pipeline ever needs several drives or incremental runs.
-5. **Deletions.** A full run could mark rows it no longer sees, at least for
+3. **Deletions.** A full run could mark rows it no longer sees, at least for
    Socrata, whose full scan does show deletions. Separate design.
