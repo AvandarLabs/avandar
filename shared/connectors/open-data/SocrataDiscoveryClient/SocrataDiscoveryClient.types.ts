@@ -5,6 +5,17 @@ export type SocrataDiscoveryResult = {
   name: string;
   /** The portal domain this result lives on, e.g. "data.cityofnewyork.us". */
   domain: string;
+  /** When the asset was created, as ISO 8601 with a time zone. */
+  createdAt: string;
+  /** When the asset last changed in any way, as ISO 8601 with a time zone. */
+  updatedAt: string;
+};
+
+/** One page of a Discovery API search, with the search's total size. */
+export type SocrataDiscoverySearchPage = {
+  results: SocrataDiscoveryResult[];
+  /** How many assets match the whole search, across every page. */
+  resultSetSize: number;
 };
 
 /** Searches Socrata's cross-portal Discovery API for candidate datasets. */
@@ -22,5 +33,7 @@ export type SocrataDiscoveryClient = {
     limit?: number;
     /** Pages past the first `limit` results, for enumerating a large domain. */
     offset?: number;
-  }) => Promise<SocrataDiscoveryResult[]>;
+    /** e.g. `updatedAt ASC`. Omitted sorts by relevance. */
+    order?: string;
+  }) => Promise<SocrataDiscoverySearchPage>;
 };

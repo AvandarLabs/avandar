@@ -17,12 +17,17 @@ function _discoveryOver(size: number): SocrataDiscoveryClient {
         datasetId: `id${index}`,
         name: `Dataset ${index}`,
         domain: "data.cityofnewyork.us",
+        createdAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-01T00:00:00.000Z",
       };
     },
   );
   return {
     search: vi.fn(async ({ limit = 100, offset = 0 }) => {
-      return catalog.slice(offset, offset + limit);
+      return {
+        results: catalog.slice(offset, offset + limit),
+        resultSetSize: size,
+      };
     }),
   };
 }

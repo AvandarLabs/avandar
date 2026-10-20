@@ -14,6 +14,8 @@ describe("makeListingRowFromSocrataResult", () => {
       datasetId: "erm2-nwe9",
       name: "311 Service Requests from 2020 to Present",
       domain: "data.cityofnewyork.us",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
     };
 
     expect(

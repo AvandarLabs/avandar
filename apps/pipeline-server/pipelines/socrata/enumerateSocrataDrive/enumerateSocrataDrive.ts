@@ -28,17 +28,17 @@ export async function enumerateSocrataDrive(params: {
   // previous page's result count, so this cannot run concurrently.
   while (rows.length < limit) {
     const pageSize = Math.min(SOCRATA_PAGE_SIZE, limit - rows.length);
-    const page = await discovery.search({
+    const { results } = await discovery.search({
       domains: [domain],
       limit: pageSize,
       offset: rows.length,
     });
     rows.push(
-      ...page.map((result) => {
+      ...results.map((result) => {
         return makeListingRowFromSocrataResult({ drive, result });
       }),
     );
-    if (page.length < pageSize) {
+    if (results.length < pageSize) {
       break;
     }
   }

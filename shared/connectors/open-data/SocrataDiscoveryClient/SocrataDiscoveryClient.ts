@@ -2,7 +2,7 @@ import { SocrataDiscoveryResponseSchema } from "$/connectors/open-data/SocrataDi
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type {
   SocrataDiscoveryClient,
-  SocrataDiscoveryResult,
+  SocrataDiscoverySearchPage,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types.ts";
 
 const DISCOVERY_BASE_URL = "https://api.us.socrata.com/api/catalog/v1";
@@ -25,7 +25,8 @@ export function createSocrataDiscoveryClient(
       domains,
       limit,
       offset,
-    }): Promise<SocrataDiscoveryResult[]> => {
+      order,
+    }): Promise<SocrataDiscoverySearchPage> => {
       const params = new URLSearchParams();
       if (query !== undefined) {
         params.set("q", query);
@@ -39,17 +40,25 @@ export function createSocrataDiscoveryClient(
       if (offset !== undefined) {
         params.set("offset", String(offset));
       }
+      if (order !== undefined) {
+        params.set("order", order);
+      }
       const body = await http.get(
         `${DISCOVERY_BASE_URL}?${params.toString()}`,
       );
       const parsed = SocrataDiscoveryResponseSchema.parse(body);
-      return parsed.results.map((result) => {
-        return {
-          datasetId: result.resource.id,
-          name: result.resource.name,
-          domain: result.metadata.domain,
-        };
-      });
+      return {
+        results: parsed.results.map((result) => {
+          return {
+            datasetId: result.resource.id,
+            name: result.resource.name,
+            domain: result.metadata.domain,
+            createdAt: result.resource.createdAt,
+            updatedAt: result.resource.updatedAt,
+          };
+        }),
+        resultSetSize: parsed.resultSetSize,
+      };
     },
   };
 }

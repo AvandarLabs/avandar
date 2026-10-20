@@ -13,10 +13,13 @@ function _http(overrides: Partial<OpenDataHttp> = {}): OpenDataHttp {
             resource: {
               id: "akvg-8vrb",
               name: "CDC Wastewater Data for Measles",
+              createdAt: "2025-03-01T00:00:00.000Z",
+              updatedAt: "2026-10-19T08:30:00.000Z",
             },
             metadata: { domain: "data.cdc.gov" },
           },
         ],
+        resultSetSize: 1,
       };
     }),
     getBytes: vi.fn(),
@@ -48,20 +51,66 @@ describe("SocrataDiscoveryClient.search", () => {
     );
   });
 
-  it("returns a flattened, typed result list", async () => {
+  it("returns typed results with their timestamps and the total count", async () => {
     const http = _http();
 
-    const results = await createSocrataDiscoveryClient(http).search({
+    const page = await createSocrataDiscoveryClient(http).search({
       query: "measles",
     });
 
-    expect(results).toEqual([
-      {
-        datasetId: "akvg-8vrb",
-        name: "CDC Wastewater Data for Measles",
-        domain: "data.cdc.gov",
-      },
-    ]);
+    expect(page).toEqual({
+      results: [
+        {
+          datasetId: "akvg-8vrb",
+          name: "CDC Wastewater Data for Measles",
+          domain: "data.cdc.gov",
+          createdAt: "2025-03-01T00:00:00.000Z",
+          updatedAt: "2026-10-19T08:30:00.000Z",
+        },
+      ],
+      resultSetSize: 1,
+    });
+  });
+
+  it("sends an order when given", async () => {
+    const http = _http();
+
+    await createSocrataDiscoveryClient(http).search({
+      domains: ["data.cityofnewyork.us"],
+      order: "updatedAt ASC",
+    });
+
+    const sentUrl = new URL(String(vi.mocked(http.get).mock.calls[0]?.[0]));
+    expect(sentUrl.searchParams.get("order")).toBe("updatedAt ASC");
+  });
+
+  it.each([
+    ["missing", undefined],
+    ["not a date", "yesterday"],
+    ["a date with no time zone", "2026-10-19T08:30:00"],
+  ])("rejects a result whose updatedAt is %s", async (_label, updatedAt) => {
+    const http = _http({
+      get: vi.fn(async () => {
+        return {
+          results: [
+            {
+              resource: {
+                id: "akvg-8vrb",
+                name: "CDC Wastewater Data for Measles",
+                createdAt: "2025-03-01T00:00:00.000Z",
+                updatedAt,
+              },
+              metadata: { domain: "data.cdc.gov" },
+            },
+          ],
+          resultSetSize: 1,
+        };
+      }),
+    });
+
+    await expect(
+      createSocrataDiscoveryClient(http).search({ query: "measles" }),
+    ).rejects.toThrow();
   });
 
   it("passes a limit through when given", async () => {
