@@ -33,3 +33,10 @@ run_migration_replay \
   "$repo_root/supabase/migration-upgrade-tests/dashboard_snapshot_revision.prelude.sql" \
   "$repo_root/supabase/migrations/20260816020100_add_dashboard_snapshot_revision.sql" \
   "$repo_root/supabase/migration-upgrade-tests/dashboard_snapshot_revision.assertions.sql"
+
+# API listing pipeline backfill: name the pipeline on Socrata and HDX
+# listings, and leave every other row alone.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/data_catalog_listings_pipeline_name.prelude.sql" \
+  "$repo_root/supabase/migrations/20261020174732_backfill_api_listing_pipeline_name.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/data_catalog_listings_pipeline_name.assertions.sql"
