@@ -938,15 +938,21 @@ Every sentence contributes one of six things: a technical fact, evidence, a
 consequence, a decision, a transition, or a scope boundary. Delete or rewrite
 sentences that only make the document sound engaging.
 
-Importance claims name their reason in the same sentence. Replace a bare label
-such as `important`, `critical`, `central`, or `load-bearing` with the behavior,
-dependency, or failure, or connect the label directly to that reason.
+Importance claims name their reason in the same sentence, wherever in it the
+label sits. Replace a bare label such as `important`, `critical`, `central`, or
+`load-bearing` with the behavior, dependency, or failure, or connect the label
+directly to that reason. A label attached to a clause that merely enumerates
+its parts is still bare: `two parts, and both are load-bearing: (1)... (2)...`
+numbers the parts without saying what breaks if either is missing, so the
+label has not earned its place. Each item needs its own stated consequence,
+not just its own number.
 
 | Remove | Write instead |
 | --- | --- |
 | Reader coaching: `This one is worth dwelling on.` | State the finding: `The existing unit test hid the defect.` |
 | Inflated significance: `This strand is the point of the branch.` | State the coverage gap: `No existing test covered these failures.` |
 | Vague importance: `The separator row is load-bearing.` | State the behavior and failure: `The separator row distinguishes a table from a paragraph; without it, the parser renders the pipes as body text.` |
+| Tag-on importance before a list: `The argument has two parts, and both are load-bearing: (1) service_role is unreachable from a browser; (2) the one caller scopes the id by workspace.` | State what fails without each part: `(1) ...; (2) .... Without (1), any authenticated session could call this directly; without (2), nothing scopes the id to the caller's workspace.` |
 | Suspense: `That change surfaced a second, subtler property.` | Name the property and its effect. |
 | Dramatic metaphor or anthropomorphism: `The import got further and then died.` | Name the component and failure: `DuckDB aborted the import after the preview succeeded.` |
 | Punchline contrast: `This looks redundant and is not.` | State why both statements are required. |
@@ -1018,9 +1024,13 @@ own draft.
    Check every solved-problem section for `The Problem` and `The Solution`,
    every repository code excerpt for its project-relative file label AND its
    enclosing signature, and every paragraph and caption against
-   [Factual prose](#factual-prose). Read the draft once looking only for the
-   tells in that table; they cluster at the start of sections and in the
-   sentence before a diagram.
+   [Factual prose](#factual-prose). Then read the draft once more, sentence by
+   sentence, looking only for the tells in that table. They cluster at the
+   start of sections and in the sentence before a diagram, but a tell buried
+   mid-paragraph is just as much a defect; the clustering is where to expect
+   more of them, not where to stop looking. A label attached to an
+   enumeration's lead-in clause is easy to skip on a skim read precisely
+   because it sits mid-sentence rather than as the sentence's main claim.
 
 6. **List every UI element the document names,** and confirm each
    non-obvious one has its zoomed-in or annotated capture, per
