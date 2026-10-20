@@ -100,4 +100,16 @@ describe("buildListingRowFromRelation", () => {
       return _build(API_RELATION, { service: undefined });
     }).toThrow("service");
   });
+
+  it("names the relation when its source time is not a valid date", () => {
+    expect(() => {
+      return _build({ ...API_RELATION, sourceUpdatedAt: new Date("nope") });
+    }).toThrow(/Rodent Inspections.*abcd-1234/);
+  });
+
+  it("names the relation when a coverage date is not a valid date", () => {
+    expect(() => {
+      return _build({ ...API_RELATION, coverageEndDate: new Date("nope") });
+    }).toThrow(/Rodent Inspections.*abcd-1234/);
+  });
 });

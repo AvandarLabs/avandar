@@ -33,14 +33,31 @@ function _stableStringify(value: unknown): string {
   return JSON.stringify(value);
 }
 
+/**
+ * Passes a value through JSON the way supabase-js writes it and Postgres
+ * returns it: `undefined` keys vanish, `undefined` array entries become
+ * `null`, and a `Date` becomes its ISO string.
+ */
+function _roundTripThroughJson(value: unknown): unknown {
+  const json = JSON.stringify(value);
+  return json === undefined ? null : JSON.parse(json);
+}
+
+/** An instant as milliseconds, or the raw text when it does not parse. */
+function _normalizeTimestamp(value: unknown): string {
+  const text = String(value);
+  const time = Date.parse(text);
+  return Number.isNaN(time) ? `raw:${text}` : String(time);
+}
+
 function _normalize(column: keyof ListingRowValues, value: unknown): string {
   if (value === null || value === undefined) {
     return "null";
   }
   if (TIMESTAMP_COLUMNS.has(column)) {
-    return String(Date.parse(String(value)));
+    return _normalizeTimestamp(value);
   }
-  return _stableStringify(value);
+  return _stableStringify(_roundTripThroughJson(value));
 }
 
 /**

@@ -20,8 +20,19 @@ type _SharedColumns = Omit<
   | "parquet_file_name"
 >;
 
-function _toIsoOrNull(date: Date | undefined): string | null {
-  return date === undefined ? null : date.toISOString();
+type _DateField = "sourceUpdatedAt" | "coverageStartDate" | "coverageEndDate";
+
+function _readIsoOrNull(relation: Relation, field: _DateField): string | null {
+  const date = relation[field];
+  if (date === undefined) {
+    return null;
+  }
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(
+      `Relation "${relation.displayName}" (external dataset id "${relation.externalDatasetId}") has an invalid ${field}.`,
+    );
+  }
+  return date.toISOString();
 }
 
 function _buildSharedColumns(args: _BuildArgs): _SharedColumns {
@@ -32,7 +43,7 @@ function _buildSharedColumns(args: _BuildArgs): _SharedColumns {
     display_name: relation.displayName,
     external_organization_name: relation.externalOrganizationName,
     external_dataset_id: relation.externalDatasetId,
-    date_of_last_update: _toIsoOrNull(relation.sourceUpdatedAt),
+    date_of_last_update: _readIsoOrNull(relation, "sourceUpdatedAt"),
     date_of_last_sync: args.syncedAt.toISOString(),
     external_service_name: relation.externalServiceName ?? null,
     source_url: relation.sourceUrl ?? null,
@@ -42,8 +53,8 @@ function _buildSharedColumns(args: _BuildArgs): _SharedColumns {
     description: relation.description ?? null,
     notes: relation.notes ?? null,
     metadata: relation.metadata ?? null,
-    coverage_start_date: _toIsoOrNull(relation.coverageStartDate),
-    coverage_end_date: _toIsoOrNull(relation.coverageEndDate),
+    coverage_start_date: _readIsoOrNull(relation, "coverageStartDate"),
+    coverage_end_date: _readIsoOrNull(relation, "coverageEndDate"),
   };
 }
 
@@ -58,7 +69,8 @@ function _buildSharedColumns(args: _BuildArgs): _SharedColumns {
  * @param args.driveKey - Written to `api_base_url` on an `api_resource` row.
  * @param args.syncedAt - Written to `date_of_last_sync`.
  * @returns The row.
- * @throws When an `api_resource` relation has no `service` to write.
+ * @throws When an `api_resource` relation has no `service` to write, or when
+ * one of the relation's dates is invalid.
  */
 export function buildListingRowFromRelation(
   args: _BuildArgs,

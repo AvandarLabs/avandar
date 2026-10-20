@@ -280,4 +280,24 @@ describe("createInMemoryListingsStore", () => {
       store.readHighWaterMark({ pipelineName: "socrata", apiBaseUrl: DRIVE }),
     ).resolves.toBeUndefined();
   });
+
+  it("stores and returns rows the way Postgres would, as JSON", async () => {
+    const store = createInMemoryListingsStore();
+
+    const [stored] = await store.upsertRows([
+      _row({
+        metadata: {
+          kept: 1,
+          dropped: undefined,
+          when: new Date("2026-10-19T08:30:00.000Z"),
+        },
+      }),
+    ]);
+
+    expect(stored?.metadata).toEqual({
+      kept: 1,
+      when: "2026-10-19T08:30:00.000Z",
+    });
+    expect(Object.keys(stored?.metadata ?? {})).not.toContain("dropped");
+  });
 });

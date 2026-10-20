@@ -22,6 +22,15 @@ export type InMemoryListingsStore = ListingsStore &
     getUpsertBatches: () => ReadonlyArray<readonly ListingRowValues[]>;
   }>;
 
+/**
+ * Copies a value through JSON, so it crosses the store boundary the way a
+ * Postgres write and read does: `undefined` keys vanish and a `Date` becomes
+ * its ISO string. `undefined` stays `undefined`.
+ */
+function _copyThroughJson<T>(value: T): T {
+  return value === undefined ? value : JSON.parse(JSON.stringify(value));
+}
+
 function _readHighWaterMark(args: {
   rows: Iterable<StoredListingRow>;
   pipelineName: string;
@@ -63,7 +72,7 @@ function _throwOnRepeatedKey(rows: readonly ListingRowValues[]): void {
  * or the engine without Supabase. It behaves like Postgres where a pipeline
  * can tell the difference: upserts keep a row's id and merge over any columns
  * outside the contract, a batch with a repeated key fails whole, and every
- * row crosses the store boundary as a copy.
+ * row crosses the store boundary as a JSON copy.
  *
  * @param options.rows - Rows to start with.
  * @returns The store.
@@ -73,7 +82,7 @@ export function createInMemoryListingsStore(
 ): InMemoryListingsStore {
   const rowsByKey = new Map<string, StoredListingRow>(
     (options.rows ?? []).map((row) => {
-      return [buildListingKeyFromRow(row), structuredClone(row)];
+      return [buildListingKeyFromRow(row), _copyThroughJson(row)];
     }),
   );
   const columnsByListingId = new Map<string, readonly RelationColumnRow[]>();
@@ -95,7 +104,7 @@ export function createInMemoryListingsStore(
           return buildListingKeyFromRow(row);
         }),
       );
-      return structuredClone(
+      return _copyThroughJson(
         [...keys].flatMap((key) => {
           const stored = rowsByKey.get(key);
           return stored === undefined ? [] : [stored];
@@ -104,14 +113,14 @@ export function createInMemoryListingsStore(
     },
     upsertRows: async (rows) => {
       _throwOnRepeatedKey(rows);
-      upsertBatches.push(structuredClone([...rows]));
-      return structuredClone(
+      upsertBatches.push(_copyThroughJson([...rows]));
+      return _copyThroughJson(
         rows.map((row) => {
           const key = buildListingKeyFromRow(row);
           const existing = rowsByKey.get(key);
           const stored = {
             ...existing,
-            ...structuredClone(row),
+            ..._copyThroughJson(row),
             id: existing?.id ?? randomUUID(),
           };
           rowsByKey.set(key, stored);
@@ -120,19 +129,19 @@ export function createInMemoryListingsStore(
       );
     },
     replaceRelationColumns: async ({ listingId, columns }) => {
-      columnsByListingId.set(listingId, structuredClone([...columns]));
+      columnsByListingId.set(listingId, _copyThroughJson([...columns]));
     },
     getRows: () => {
-      return structuredClone([...rowsByKey.values()]);
+      return _copyThroughJson([...rowsByKey.values()]);
     },
     getRelationColumns: (listingId) => {
-      return structuredClone(columnsByListingId.get(listingId));
+      return _copyThroughJson(columnsByListingId.get(listingId));
     },
     getReadBatchSizes: () => {
       return [...readBatchSizes];
     },
     getUpsertBatches: () => {
-      return structuredClone(upsertBatches);
+      return _copyThroughJson(upsertBatches);
     },
   };
 }

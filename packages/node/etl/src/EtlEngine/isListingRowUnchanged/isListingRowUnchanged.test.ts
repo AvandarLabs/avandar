@@ -94,4 +94,76 @@ describe("isListingRowUnchanged", () => {
       }),
     ).toBe(false);
   });
+
+  it("reads a metadata round trip through JSON as unchanged", () => {
+    const metadata = {
+      kept: 1,
+      dropped: undefined,
+      when: new Date("2026-10-19T08:30:00.000Z"),
+      list: [1, undefined],
+    };
+
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ metadata: JSON.parse(JSON.stringify(metadata)) }),
+        next: _row({ metadata }),
+      }),
+    ).toBe(true);
+  });
+
+  it("treats a later date_of_last_update as a change", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored(),
+        next: _row({ date_of_last_update: "2026-10-19T08:30:01.000Z" }),
+      }),
+    ).toBe(false);
+  });
+
+  it("treats a coverage date going from null to a value as a change", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored(),
+        next: _row({ coverage_start_date: "2020-01-01T00:00:00.000Z" }),
+      }),
+    ).toBe(false);
+  });
+
+  it("treats a changed metadata value as a change", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored(),
+        next: _row({
+          metadata: { table: { name: "a", row_count: 3 }, parquet_sha256: "x" },
+        }),
+      }),
+    ).toBe(false);
+  });
+
+  it("treats reordered canonical_urls as a change", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ canonical_urls: ["https://a.test", "https://b.test"] }),
+        next: _row({ canonical_urls: ["https://b.test", "https://a.test"] }),
+      }),
+    ).toBe(false);
+  });
+
+  it("treats two different unparseable timestamps as a change", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ date_of_last_update: "not a date" }),
+        next: _row({ date_of_last_update: "also not a date" }),
+      }),
+    ).toBe(false);
+  });
+
+  it("treats two equal unparseable timestamps as unchanged", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ date_of_last_update: "not a date" }),
+        next: _row({ date_of_last_update: "not a date" }),
+      }),
+    ).toBe(true);
+  });
 });
