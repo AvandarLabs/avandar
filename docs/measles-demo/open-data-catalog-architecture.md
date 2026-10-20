@@ -349,7 +349,7 @@ federated index *across* drives:
 | | Socrata | CKAN |
 | --- | --- | --- |
 | One drive | One portal's base URL (`data.cityofnewyork.us`) | One deployment's base URL (`data.humdata.org`) |
-| Enumerate everything in one drive | `SocrataDiscoveryClient.search({domains: [drive]})` with no query (new - see 6.3) | `package_list` action against that one deployment (new - `CkanDiscoveryClient`, see 6.3) |
+| Enumerate everything in one drive | `SocrataDiscoveryClient.search({domains: [drive]})` with no query (new - see 6.3) | `package_search` action against that one deployment, paged by keyset (new - `CkanDiscoveryClient.searchDatasets`, see 6.3) |
 | Enumerate across drives in one call | Yes - `api.us.socrata.com/api/catalog/v1`, CORS-open, federates every opted-in portal | No - each CKAN deployment only knows its own datasets; there is no cross-deployment CKAN index |
 
 So the pipeline's drive registry (6.2) always enumerates one drive at a time
@@ -421,9 +421,12 @@ Neither existing client can enumerate "everything in this drive" today:
 - **CKAN has no listing client at all.** `CkanClient` only reads one *named*
   dataset (`getPackage`). A new `CkanDiscoveryClient`, mirroring
   `SocrataDiscoveryClient`'s separate-module shape, wraps CKAN's
-  `package_list` action (`GET {baseUrl}/api/3/action/package_list`) to
-  return every dataset slug in one drive. `package_list` takes no domain
-  parameter - a CKAN drive has nothing else to scope by, matching 6.1.
+  `package_search` action (`GET {baseUrl}/api/3/action/package_search`) via
+  `searchDatasets`, which returns full dataset records, including their
+  resources, one page at a time. It sorts by `metadata_modified` and `name`
+  and pages by keyset, so a run can resume from the newest dataset it holds.
+  `package_search` takes no domain parameter - a CKAN drive has nothing else
+  to scope by, matching 6.1.
 
 ### 6.4 Which resources become rows
 
@@ -515,7 +518,7 @@ Prebuilding a Parquet file is not symmetric across `access_kind`:
   write-back cache (section 5) builds the Parquet object lazily on first live
   query instead.
 - `access_kind = 'pipeline_parquet'` (`world-bank__wdi` and any future
-  `EtlEngine`-based pipeline): prebuilding Parquet is mandatory. A
+  pipeline that loads Parquet): prebuilding Parquet is mandatory. A
   `pipeline_parquet` row with no corresponding Parquet object is invalid data,
   not a lazily-filled cache miss - nothing else will ever populate it. This
   is also what the `data_catalog_listings__pipeline_access_complete` CHECK
