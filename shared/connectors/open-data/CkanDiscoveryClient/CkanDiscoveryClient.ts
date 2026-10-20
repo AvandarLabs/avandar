@@ -5,7 +5,6 @@ import {
 import { CkanPackageSchema } from "$/connectors/open-data/CkanClient/CkanClient.schemas.ts";
 import { createCkanPackageFromWire } from "$/connectors/open-data/CkanClient/createCkanPackageFromWire/createCkanPackageFromWire.ts";
 import {
-  CkanPackageListResultSchema,
   CkanPackageSearchResultSchema,
   CkanPackageSearchSortKeySchema,
 } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.schemas.ts";
@@ -128,7 +127,7 @@ function _buildSearchPage(
 }
 
 /**
- * Lists and searches CKAN datasets over an injected HTTP layer.
+ * Searches CKAN datasets over an injected HTTP layer.
  *
  * Stateless, mirroring `CkanClient`'s shape: every call takes its base URL
  * as an argument, so one client serves any number of CKAN deployments.
@@ -140,19 +139,6 @@ export function createCkanDiscoveryClient(
   http: Readonly<OpenDataHttp>,
 ): CkanDiscoveryClient {
   return {
-    listDatasets: async ({ baseUrl }): Promise<string[]> => {
-      const url = buildCkanActionUrl({
-        baseUrl,
-        action: "package_list",
-        query: {},
-      });
-      const result = unwrapCkanActionEnvelope(
-        "package_list",
-        await http.get(url),
-      );
-      return CkanPackageListResultSchema.parse(result);
-    },
-
     searchDatasets: async (params): Promise<CkanDatasetSearchPage> => {
       const url = buildCkanActionUrl({
         baseUrl: params.baseUrl,

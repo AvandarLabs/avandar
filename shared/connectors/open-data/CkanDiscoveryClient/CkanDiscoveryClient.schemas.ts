@@ -1,8 +1,5 @@
 import { z } from "zod";
 
-/** `package_list`'s successful result: every dataset slug, unpaginated. */
-export const CkanPackageListResultSchema = z.array(z.string());
-
 /**
  * `package_search`'s successful result. Each result is left unvalidated here
  * so that one bad dataset is skipped on its own instead of failing the page.

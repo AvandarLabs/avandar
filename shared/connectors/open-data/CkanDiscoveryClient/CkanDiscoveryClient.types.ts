@@ -36,16 +36,8 @@ export type CkanDatasetSearchPage = Readonly<{
   resultCount: number;
 }>;
 
-/** Lists and searches the datasets in one CKAN deployment. */
+/** Searches one CKAN deployment's datasets. */
 export type CkanDiscoveryClient = {
-  /**
-   * Reads `package_list`, which returns every dataset's slug in this one
-   * CKAN deployment. CKAN has no cross-deployment index - unlike Socrata's
-   * Discovery API, there is no `domains`-style parameter here, because a
-   * CKAN drive has nothing else to scope by.
-   */
-  listDatasets: (params: { baseUrl: string }) => Promise<string[]>;
-
   /**
    * Reads one page of `package_search`, sorted by `metadata_modified` then
    * `name`, as full datasets with their resources. `after` asks for the

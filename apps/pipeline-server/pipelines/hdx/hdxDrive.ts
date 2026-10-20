@@ -18,15 +18,16 @@ export type HdxDrive = {
   organizationName: string;
 };
 
+/** HDX's one CKAN deployment. */
+export const HDX_BASE_URL = "https://data.humdata.org";
+
 /**
- * Undefined by default. Before setting this, confirm HDX's real dataset
- * count is small enough to fully enumerate in one run (`ava pipeline run
- * hdx` has no retry/backoff for a rate limit, and makes one sequential
- * metadata request per CKAN dataset) - HDX was tried here first and
- * removed: its real catalog is 42,000+ datasets, and its rate limiter
- * rejects a sequential crawl after roughly 150 requests with no
- * `Retry-After` header, so a full HDX enumeration cannot succeed with this
- * pipeline's current design. See `open-data-catalog-architecture.md`
- * section 7's "deliberately deferred" list.
+ * The HDX drive the `hdx` pipeline crawls. `package_search` returns 1,000
+ * full datasets per request, sorted by `metadata_modified`, so a full crawl
+ * of HDX is about 30 requests and an incremental run reads only what
+ * changed. Set it to `undefined` to switch the pipeline off.
  */
-export const HDX_DRIVE: HdxDrive | undefined = undefined;
+export const HDX_DRIVE: HdxDrive | undefined = {
+  baseUrl: HDX_BASE_URL,
+  organizationName: "Humanitarian Data Exchange",
+};

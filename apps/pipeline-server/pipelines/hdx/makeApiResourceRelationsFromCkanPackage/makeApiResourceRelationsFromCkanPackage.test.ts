@@ -1,4 +1,4 @@
-import { makeCkanListingRowsFromPackage } from "@pipelines/hdx/makeCkanListingRowsFromPackage/makeCkanListingRowsFromPackage";
+import { makeApiResourceRelationsFromCkanPackage } from "@pipelines/hdx/makeApiResourceRelationsFromCkanPackage/makeApiResourceRelationsFromCkanPackage";
 import { describe, expect, it } from "vitest";
 import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
@@ -8,8 +8,8 @@ const CKAN_DRIVE: HdxDrive = {
   organizationName: "Humanitarian Data Exchange",
 };
 
-describe("makeCkanListingRowsFromPackage", () => {
-  it("builds one row per readable resource, excluding unreadable ones", () => {
+describe("makeApiResourceRelationsFromCkanPackage", () => {
+  it("builds one relation per readable resource, dated by metadata_modified", () => {
     const ckanPackage: CkanPackage = {
       id: "c3429f0e",
       name: "movement-range-maps",
@@ -54,36 +54,34 @@ describe("makeCkanListingRowsFromPackage", () => {
       ],
     };
 
-    const rows = makeCkanListingRowsFromPackage({
+    const relations = makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
       ckanPackage,
     });
 
-    expect(rows).toEqual([
+    expect(relations).toEqual([
       {
-        access_kind: "api_resource",
-        api_service: "ckan",
-        api_base_url: "https://data.humdata.org",
-        external_dataset_id: "movement-range-maps",
-        api_resource_id: "csv-1",
-        api_resource_format: "CSV",
-        display_name: "data.csv",
-        external_organization_name: "Humanitarian Data Exchange",
+        kind: "api_resource",
+        externalDatasetId: "movement-range-maps",
+        apiResourceId: "csv-1",
+        apiResourceFormat: "CSV",
+        displayName: "data.csv",
+        externalOrganizationName: "Humanitarian Data Exchange",
+        sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
       },
       {
-        access_kind: "api_resource",
-        api_service: "ckan",
-        api_base_url: "https://data.humdata.org",
-        external_dataset_id: "movement-range-maps",
-        api_resource_id: "parquet-1",
-        api_resource_format: "PARQUET",
-        display_name: "data.parquet",
-        external_organization_name: "Humanitarian Data Exchange",
+        kind: "api_resource",
+        externalDatasetId: "movement-range-maps",
+        apiResourceId: "parquet-1",
+        apiResourceFormat: "PARQUET",
+        displayName: "data.parquet",
+        externalOrganizationName: "Humanitarian Data Exchange",
+        sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
       },
     ]);
   });
 
-  it("returns no rows when the dataset has no readable resource", () => {
+  it("returns no relations when the dataset has no readable resource", () => {
     const ckanPackage: CkanPackage = {
       id: "c3429f0e",
       name: "docs-only-dataset",
@@ -105,7 +103,10 @@ describe("makeCkanListingRowsFromPackage", () => {
     };
 
     expect(
-      makeCkanListingRowsFromPackage({ drive: CKAN_DRIVE, ckanPackage }),
+      makeApiResourceRelationsFromCkanPackage({
+        drive: CKAN_DRIVE,
+        ckanPackage,
+      }),
     ).toEqual([]);
   });
 });
