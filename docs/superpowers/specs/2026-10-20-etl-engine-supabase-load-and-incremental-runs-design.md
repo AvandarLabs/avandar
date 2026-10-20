@@ -248,11 +248,14 @@ For each drive from `listDrives()`, in order:
    1. **Drop repeats.** A connection whose `getConnectionId` was already seen
       in this drive during this run is dropped. This happens before the order
       check, so a source that overlaps its pages on purpose (Socrata, section
-      5.8) never trips it.
+      5.8) never trips it. *Superseded in part: repeats are deduped by id and
+      timestamp, and a repeated listing key fails the drive. See section 10,
+      items 4 and 7.*
    2. **Check order.** In a pipeline with `incremental` config, every
       connection's timestamp must be at or after the previous one in this drive.
       A violation throws `OutOfOrderConnectionError` naming the drive, because a
-      gap would make the stored high-water mark lie.
+      gap would make the stored high-water mark lie. *See section 10, item 8,
+      for the timestamp checks added to this step.*
    3. **Apply the limit.** `limit` counts connections across the whole run.
       The engine trims the page at the limit and stops fetching after it.
    4. **Transform** each connection into relations.
@@ -261,7 +264,9 @@ For each drive from `listDrives()`, in order:
    as `failed` with its error, and the next drive still runs.
 
 `run()` resolves to the report. It rejects only if every drive failed, so a
-partial run still reports what succeeded.
+partial run still reports what succeeded. *Superseded in part: the rejection
+carries the report, and invalid options are rejected with their own error. See
+section 10, items 9 and 10.*
 
 ```ts
 type EtlRunReport = {
@@ -324,7 +329,8 @@ pipeline ever needs it (section 9.2).
 For one page of relations, in this order:
 
 1. **Read the existing rows** for the page's keys from the listings table, in
-   chunks of 200 keys so the request URL stays short.
+   chunks of 200 keys so the request URL stays short. *Superseded: reads are
+   sub-chunked and a truncated read throws. See section 10, item 6.*
 2. **Parquet relations:** convert each CSV to ZSTD Parquet with the existing
    `transformedCsvsToParquetBlobs`, then compute the Parquet bytes' SHA-256.
    If the existing row's `metadata.parquet_sha256` matches, skip the upload.
@@ -335,18 +341,22 @@ For one page of relations, in this order:
    `row_count`, `column_names`), and `parquet_sha256`. It also appends the
    object's public URL to `canonical_urls`, and derives the relation columns
    from the Parquet file's `DESCRIBE`. These are what `world-bank__wdi`
-   writes by hand today.
+   writes by hand today. *Superseded in part: the engine also manages
+   `relation_columns_sha256`, and the upload skip checks more than the hash.
+   See section 10, items 1 and 2.*
 3. **Compare.** A relation is *unchanged* when every column the engine writes,
    except `pipeline_run_id` and `date_of_last_sync`, equals the stored value.
    Comparing all written columns, not just `date_of_last_update`, means a
    change to a pipeline's own mapping code is picked up by the next full run
-   even when the source did not change.
+   even when the source did not change. *See section 10, item 3, for how
+   values are compared.*
 4. **Upsert only the changed relations**, setting `pipeline_name`,
    `pipeline_run_id`, and `date_of_last_sync` to this run's values. Chunks are
    written oldest connection first, so a crash between chunks still leaves an
    oldest-first prefix.
 5. **Replace relation columns** for each written relation that declares
-   columns.
+   columns. *Superseded: steps 4 and 5 are now three writes per chunk. See
+   section 10, item 1.*
 
 Full and incremental runs load pages the same way. The mode only changes the
 window.
@@ -382,6 +392,8 @@ hardcoded `socrata` and `hdx` filters.
   `fq=metadata_modified:[<since> TO <until>}`. It returns full dataset records,
   including `resources[]`, so no `package_show` call is needed per dataset.
   `listDatasets` (`package_list`) is removed if nothing else uses it.
+  *Superseded: `searchDatasets` returns a page object, not a bare list of
+  datasets. See section 10, item 12.*
 - **Paging is keyset, not `start`:** each next page asks for datasets
   strictly after the last page's `(metadata_modified, name)` pair, with a
   Solr filter on both fields:
@@ -406,7 +418,8 @@ hardcoded `socrata` and `hdx` filters.
 
 - **`SocrataDiscoveryClient.search`** gains an `order` parameter and returns
   `{ results, resultSetSize }` instead of a bare array, so `extract` can check
-  a drive's size before paging. `SocrataDiscoveryResult` gains `updatedAt` and
+  a drive's size before paging. *Superseded: it also returns
+  `skippedResults`. See section 10, item 13.* `SocrataDiscoveryResult` gains `updatedAt` and
   `createdAt`. The Socrata pipeline is the only caller, so nothing else
   changes.
 - **`extract`** pages a drive with `order=updatedAt ASC`, `limit=1000`, and
@@ -489,12 +502,12 @@ ava pipeline run socrata --incremental
 | Failure | Behavior |
 | --- | --- |
 | A drive's request fails or times out | That drive is `failed` in the report. Pages written before the failure stay, so the next incremental run resumes after them. Other drives still run. |
-| Every drive fails | `run()` rejects with all drive errors. |
+| Every drive fails | `run()` rejects with all drive errors. *Superseded: the error also carries the report. See section 10, item 10.* |
 | Source returns a connection out of order | `OutOfOrderConnectionError` for that drive. Nothing from the bad page is written. |
 | HDX 429 | Retried up to 3 times with backoff, then the drive fails. |
 | Socrata drive over 10,000 assets | The drive fails with an error naming the limit. |
-| Upsert or upload error | The drive fails at that page. Earlier pages and earlier chunks stay written. |
-| `--incremental` on a pipeline without incremental config | Rejected before any request, naming the pipeline. |
+| Upsert or upload error | The drive fails at that page. Earlier pages and earlier chunks stay written. *See section 10, items 1 and 5, for what a failed column write leaves behind.* |
+| `--incremental` on a pipeline without incremental config | Rejected before any request, naming the pipeline. *Extended: see section 10, item 9.* |
 | Invalid `--since`, `--until`, or both lower bounds | Rejected by the shared options parser in the CLI, server, and runner. |
 | Process killed | No cleanup is needed. The table holds an oldest-first prefix, and the next run resumes from it. |
 
@@ -531,7 +544,7 @@ interfaces, so no test needs Supabase.
 | --- | --- | --- |
 | E10 | A connection older than the one before it throws `OutOfOrderConnectionError` naming the drive | 5.3 |
 | E11 | Nothing from the out-of-order page is written, and earlier pages stay written | 5.3, 7 |
-| E12 | A repeated connection id within one drive is dropped before the order check, so it neither writes twice nor throws | 5.3 |
+| E12 | A repeated connection id within one drive is dropped before the order check, so it neither writes twice nor throws. *Now: same id and same timestamp. See section 10, item 7.* | 5.3 |
 | E13 | The same connection id in two different drives is not treated as a repeat | 5.3 |
 | E14 | `limit` counts connections across drives: with limit 5 and drives of 3 and 4, the second drive writes 2 | 5.3 |
 | E15 | Once the limit is reached, `extract` is not asked for another page, and later drives are reported `skipped` without being crawled | 5.3 |
@@ -615,11 +628,11 @@ synthetic names and `.invalid` hosts, and every test deletes what it inserted.
 | C2 | A window becomes `fq=metadata_modified:[<since> TO <until>}`, with `*` for a missing bound | 5.7 |
 | C2b | A cursor becomes the two-field keyset filter on `metadata_modified` and `name` | 5.7 |
 | C3 | Window bounds are rounded down to whole milliseconds and sent as UTC with `Z` | 5.7 |
-| C4 | The response parses into full datasets including `resources[]` and `metadata_modified` | 5.7 |
+| C4 | The response parses into full datasets including `resources[]` and `metadata_modified`. *Returned as a page object. See section 10, item 12.* | 5.7 |
 | C5 | A naive `metadata_modified` such as `2026-10-20T13:47:48.858245` parses as that instant in UTC | 5.7 |
 | C6 | `SocrataDiscoveryClient.search` sends `order` when given, e.g. `updatedAt ASC` | 5.8 |
 | C7 | Each Socrata result carries `updatedAt` and `createdAt` | 5.8 |
-| C8 | `search` returns the total result count (`resultSetSize`) alongside the results | 5.8 |
+| C8 | `search` returns the total result count (`resultSetSize`) alongside the results. *Also `skippedResults`. See section 10, item 13.* | 5.8 |
 
 ### 8.5 `apps/pipeline-server`
 
@@ -723,3 +736,77 @@ the pipeline server passes in.
    pipeline ever needs several drives or incremental runs.
 3. **Deletions.** A full run could mark rows it no longer sees, at least for
    Socrata, whose full scan does show deletions. Separate design.
+
+## 10. Decisions made during implementation
+
+These decisions, taken during review, changed or extended the sections above.
+Where an earlier statement is superseded, it carries a note pointing here.
+
+1. **Relation column fingerprint.** A relation that declares `columns` gets an
+   engine-managed `metadata.relation_columns_sha256`, the SHA-256 of its
+   declared columns, and it is part of the change check. Each chunk is written
+   in three steps: upsert the rows without the fingerprint, replace their
+   columns, then upsert the rows again with the fingerprint. A failed or killed
+   column write is repaired by the next run whose window refetches the
+   connection, which on an incremental pipeline may need a full run. Only the
+   Parquet relations of the full-only `world-bank__wdi` declare columns today.
+2. **Parquet upload skip.** The upload is skipped only when the stored hash,
+   bucket, and object path all match, so a bucket change re-uploads. An object
+   deleted outside the pipeline is not re-uploaded while its hash matches, and
+   `ava pipeline reset` recovers it.
+3. **Change check values.** The check compares values the way Postgres stores
+   them: non-timestamp columns go through a JSON round trip (undefined keys
+   dropped, dates as ISO strings), and unparseable timestamps compare by raw
+   text.
+4. **Repeated listing key.** A page that yields the same listing key twice
+   fails its drive before any read or write, naming the key and both
+   relations.
+5. **Upserts.** Both stores reject a call that mixes relation kinds or repeats a
+   listing key, so each upsert is single-kind and all-or-nothing.
+6. **Bounded reads.** The Supabase store reads existing rows in sub-chunks of 25
+   rows, filtered by dataset and resource ids, to stay under the request URL
+   limit of about 8 KB. A read that returns 1000 or more rows throws instead of
+   silently using a truncated result.
+7. **Repeat dedupe.** When a pipeline provides a timestamp reader, repeats are
+   matched on connection id and timestamp, so a connection modified during the
+   crawl is processed again. Without one, repeats match on id alone. E12 now
+   means: the same id with the same timestamp is dropped.
+8. **Invalid timestamps.** A connection with an invalid timestamp fails the
+   drive. With `incremental` config, a relation whose `sourceUpdatedAt` is later
+   than its connection's timestamp also fails the drive, because it would move
+   the high-water mark past rows that were never written.
+9. **Run errors.** `EtlRunFailedError`, thrown when every drive failed, carries
+   `report`, `errors`, and `cause` (an `AggregateError`). A new exported
+   `EtlRunOptionsError` covers invalid options: `incremental` on a full-only
+   engine, `since` or `until` on an engine without `incremental` config, and a
+   `limit` that is not an integer of 0 or more. The CLI and the server require a
+   positive integer. The pipeline server maps `EtlRunOptionsError` to HTTP 400.
+10. **Report on total failure.** When every drive fails, the server answers 500
+    with `{ ok: false, error, report }`, the local runner prints the report as
+    its last stdout line and exits 1, and `ava pipeline run` prints the report
+    before failing.
+11. **Strict input.** The local runner parses flags strictly: `--limit=5` works,
+    and unknown or repeated flags fail. The server rejects unknown body keys.
+    Impossible dates such as February 30 and non-decimal limits are rejected.
+12. **CKAN search page.** `searchDatasets` returns `{ datasets,
+    skippedDatasets, nextCursor, resultCount }`. A dataset that fails
+    validation is skipped and logged instead of blocking the crawl, and the
+    cursor advances from the last raw row. Filters carry a `+` prefix so they
+    stay required on a CKAN whose default operator is OR. This was verified
+    against live HDX.
+13. **Socrata search results.** `search` validates each result separately and
+    returns `skippedResults`. Malformed results are logged, and paging counts
+    raw positions. A drive fails when a page shares no (id, updatedAt) pair with
+    the previous page's 20-row overlap: more than 20 datasets shifted between
+    requests and a silent gap could follow. This can rarely fail a drive
+    spuriously, and the next run resumes.
+14. **HDX paging.** Paging is a loop rather than recursion, so earlier pages can
+    be released. A short first page on a crawl from the start logs a warning,
+    since the server may cap its row count.
+15. **Reset selection.** `ava pipeline reset` selects listings by
+    `pipeline_name` only. Listings written before the backfill migration are not
+    selected until it has run.
+16. **Known caveats.** An explicit `since` later than a drive's high-water mark
+    leaves a gap that only a run reaching back over it fills. Relation column
+    replacement is a delete then an insert, two requests, so a listing can show
+    no columns until the next run repairs it.
