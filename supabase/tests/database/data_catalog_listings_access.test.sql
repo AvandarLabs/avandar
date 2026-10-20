@@ -10,7 +10,7 @@
 
 begin;
 
-select plan(22);
+select plan(26);
 
 -- ---------------------------------------------------------------------------
 -- The three pipeline columns become nullable, because only a pipeline-produced
@@ -173,6 +173,55 @@ select throws_ok(
   '23514',
   null,
   'a pipeline listing carrying an API column is refused'
+);
+
+-- ---------------------------------------------------------------------------
+-- A drive-index pipeline records itself on the API listings it writes, so
+-- `pipeline_name` and `pipeline_run_id` are allowed on an `api_resource` row.
+-- They stay optional, because a hand-curated API listing has no pipeline.
+-- ---------------------------------------------------------------------------
+
+select lives_ok(
+  $$insert into public.data_catalog_listings
+      (display_name, external_organization_name, access_kind, api_service,
+       api_base_url, external_dataset_id, api_resource_id, api_resource_format,
+       pipeline_name, pipeline_run_id)
+    values ('Pipeline-written API listing', 'OCHA', 'api_resource', 'ckan',
+            'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-p',
+            'pgtap-fixture-resource-p', 'CSV',
+            'pgtap-fixture-pipeline', 'run-5')$$,
+  'an api_resource row may name the pipeline and run that wrote it'
+);
+
+select lives_ok(
+  $$insert into public.data_catalog_listings
+      (display_name, external_organization_name, access_kind, api_service,
+       api_base_url, external_dataset_id, api_resource_id, api_resource_format)
+    values ('Hand-curated API listing', 'OCHA', 'api_resource', 'ckan',
+            'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-q',
+            'pgtap-fixture-resource-q', 'CSV')$$,
+  'an api_resource row with no pipeline still inserts'
+);
+
+select throws_ok(
+  $$insert into public.data_catalog_listings
+      (display_name, external_organization_name, access_kind, api_service,
+       api_base_url, external_dataset_id, api_resource_id, api_resource_format,
+       parquet_file_name)
+    values ('API listing with an object', 'OCHA', 'api_resource', 'ckan',
+            'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-r',
+            'pgtap-fixture-resource-r', 'CSV', 'pgtap-fixture-r.parquet')$$,
+  '23514',
+  null,
+  'an api_resource row naming a Parquet object is still refused'
+);
+
+select has_index(
+  'public',
+  'data_catalog_listings',
+  'data_catalog_listings__pipeline_drive_last_update',
+  array['pipeline_name', 'api_base_url', 'date_of_last_update'],
+  'the high-water mark query has an index on pipeline, drive, and last update'
 );
 
 select throws_ok(

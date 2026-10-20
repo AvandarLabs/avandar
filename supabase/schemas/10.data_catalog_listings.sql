@@ -14,8 +14,9 @@ create table public.data_catalog_listings (
   -- The date the last time this open dataset was synced with its raw
   -- data source.
   date_of_last_sync timestamptz,
-  -- The date the last time this open dataset was updated. This is data
-  -- provided by the dataset or its API.
+  -- When the source last modified this listing's dataset, as its API reports
+  -- it. Incremental pipeline runs resume from the newest value per pipeline
+  -- and drive (`api_base_url`).
   date_of_last_update timestamptz,
   -- Coverage start date of the dataset
   coverage_start_date timestamptz,
@@ -26,11 +27,11 @@ create table public.data_catalog_listings (
   parquet_file_name text,
   -- Display name of the dataset to be shown in the data catalog UI
   display_name text not null,
-  -- Name of the pipeline that syncs this dataset. Null on an `api_resource`
-  -- listing, which no pipeline produces.
+  -- Name of the pipeline that last wrote this listing. Null on a listing no
+  -- pipeline produces, such as a hand-curated `api_resource` listing.
   pipeline_name text,
-  -- ID of the pipeline run that synced this dataset. Null on an
-  -- `api_resource` listing, for the same reason as `pipeline_name`.
+  -- ID of the pipeline run that last wrote this listing. Null whenever
+  -- `pipeline_name` is.
   pipeline_run_id text,
   -- External organization this dataset comes from (e.g. World Bank)
   external_organization_name text not null,
@@ -107,7 +108,7 @@ create table public.data_catalog_listings (
     )
   ),
   -- An API listing names its service, instance, dataset and resource, and
-  -- carries no pipeline column.
+  -- carries no Parquet object. It may name the pipeline that wrote it.
   constraint data_catalog_listings__api_access_complete check (
     access_kind <> 'api_resource' or
     (
@@ -116,9 +117,7 @@ create table public.data_catalog_listings (
       api_resource_id is not null and
       api_resource_format is not null and
       external_dataset_id is not null and
-      parquet_file_name is null and
-      pipeline_name is null and
-      pipeline_run_id is null
+      parquet_file_name is null
     )
   ),
   -- A cache is written atomically or not at all: either every column is set,
@@ -162,6 +161,14 @@ create unique index data_catalog_listings__api_resource_unique on public.data_ca
   api_base_url,
   external_dataset_id,
   api_resource_id
+);
+
+-- Serves the incremental-run high-water mark: the newest
+-- `date_of_last_update` for one pipeline's one drive (`api_base_url`).
+create index data_catalog_listings__pipeline_drive_last_update on public.data_catalog_listings (
+  pipeline_name,
+  api_base_url,
+  date_of_last_update
 );
 
 -- Enable row level security

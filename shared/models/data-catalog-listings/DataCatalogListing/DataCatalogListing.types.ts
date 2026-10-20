@@ -16,7 +16,11 @@ export type DataCatalogListingRead = {
   /** When this dataset was last synced from its raw source. */
   dateOfLastSync: string | undefined;
 
-  /** Last update date from the dataset or API. */
+  /**
+   * When the source last modified this dataset, as its API reports it.
+   * Incremental pipeline runs resume from the newest value per pipeline and
+   * drive.
+   */
   dateOfLastUpdate: string | undefined;
 
   coverageStartDate: string | undefined;
@@ -32,13 +36,13 @@ export type DataCatalogListingRead = {
   /** Display name shown in the catalog UI. */
   displayName: string;
 
-  /** Undefined on an `api_resource` entry, which no pipeline produces. */
+  /**
+   * The pipeline that last wrote this listing. Undefined on a listing no
+   * pipeline produces, such as a hand-curated `api_resource` listing.
+   */
   pipelineName: string | undefined;
 
-  /**
-   * Undefined on an `api_resource` entry, for the same reason as
-   * `pipelineName`.
-   */
+  /** The pipeline run that last wrote this listing, when there is one. */
   pipelineRunId: string | undefined;
 
   externalOrganizationName: string;
