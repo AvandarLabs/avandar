@@ -3,7 +3,12 @@ import type { EtlRunWindow } from "@etl/EtlEngine/EtlEngine.types";
 
 /** What one drive's crawl has seen so far. */
 export type ConnectionSelectionState = Readonly<{
-  /** Every connection id this drive has returned during this run. */
+  /**
+   * A repeat key for every connection this drive has returned during this
+   * run: the connection id, paired with its timestamp when timestamps are
+   * read. A connection modified during the crawl reappears with a newer
+   * timestamp and a new key, so it is processed again rather than dropped.
+   */
   seenIds: ReadonlySet<string>;
   /** The timestamp of the last connection seen, when timestamps are read. */
   lastTimestamp: Date | undefined;
@@ -11,18 +16,36 @@ export type ConnectionSelectionState = Readonly<{
   remaining: number;
 }>;
 
+function _buildRepeatKeyReader<TConnection>(args: {
+  getConnectionId: (connection: TConnection) => string;
+  getConnectionTimestamp: ((connection: TConnection) => Date) | undefined;
+}): (connection: TConnection) => string {
+  const { getConnectionId, getConnectionTimestamp } = args;
+  if (getConnectionTimestamp === undefined) {
+    return getConnectionId;
+  }
+  return (connection) => {
+    // A JSON pair cannot collide the way a joined string could when an id
+    // contains the separator.
+    return JSON.stringify([
+      getConnectionId(connection),
+      getConnectionTimestamp(connection).getTime(),
+    ]);
+  };
+}
+
 function _dropRepeats<TConnection>(args: {
   page: readonly TConnection[];
   seenIds: ReadonlySet<string>;
-  getConnectionId: (connection: TConnection) => string;
+  getRepeatKey: (connection: TConnection) => string;
 }): Readonly<{ unseen: TConnection[]; knownIds: ReadonlySet<string> }> {
   const knownIds = new Set(args.seenIds);
   const unseen = args.page.filter((connection) => {
-    const id = args.getConnectionId(connection);
-    if (knownIds.has(id)) {
+    const repeatKey = args.getRepeatKey(connection);
+    if (knownIds.has(repeatKey)) {
       return false;
     }
-    knownIds.add(id);
+    knownIds.add(repeatKey);
     return true;
   });
   return { unseen, knownIds };
@@ -71,7 +94,9 @@ function _isInWindow(timestamp: Date, window: EtlRunWindow): boolean {
 /**
  * Picks which of a page's connections to process: repeats are dropped,
  * then (when timestamps are read) the rest must be oldest first and inside
- * the window, then the page is trimmed to the run's remaining limit.
+ * the window, then the page is trimmed to the run's remaining limit. When
+ * timestamps are read, a repeat is the same id at the same timestamp, so a
+ * connection that reappears with a newer timestamp is kept.
  *
  * @returns The connections to process and the drive's updated state.
  * @throws OutOfOrderConnectionError when a connection is older than the one
@@ -94,7 +119,7 @@ export function selectPageConnections<TConnection>(args: {
   const { unseen, knownIds } = _dropRepeats({
     page: args.page,
     seenIds: state.seenIds,
-    getConnectionId,
+    getRepeatKey: _buildRepeatKeyReader(args),
   });
   const lastTimestamp =
     getConnectionTimestamp === undefined

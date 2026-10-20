@@ -462,6 +462,32 @@ describe("createEtlEngine", () => {
       expect(recorder.transforms).toEqual(["c1", "c2", "c3", "c4"]);
     });
 
+    it("writes a connection again when it reappears with a newer timestamp", async () => {
+      const recorder = _recorder();
+      const listings = createInMemoryListingsStore();
+
+      await _run(
+        _config({
+          drives: [
+            _drive("a", [
+              [_connection("c1", 1), _connection("c2", 2)],
+              [_connection("c3", 3), _connection("c2", 4)],
+            ]),
+          ],
+          recorder,
+          stores: _stores(listings),
+        }),
+      );
+
+      const storedC2 = listings.getRows().find((row) => {
+        return row.external_dataset_id === "c2";
+      });
+      expect([recorder.transforms, storedC2?.date_of_last_update]).toEqual([
+        ["c1", "c2", "c3", "c2"],
+        _at(4).toISOString(),
+      ]);
+    });
+
     it("does not treat the same connection id in two drives as a repeat", async () => {
       const listings = createInMemoryListingsStore();
 
@@ -844,6 +870,34 @@ describe("createEtlEngine", () => {
         report.drives[0]?.relationsWritten,
         _datasetIds(listings),
       ]).toEqual(["failed", 1, ["a1", "b1"]]);
+    });
+
+    it("fails a drive at a relation updated later than its connection", async () => {
+      const listings = createInMemoryListingsStore();
+
+      const error = await _runFailure(
+        _config({
+          drives: [
+            _drive("a", [[_connection("c1", 1)], [_connection("c2", 2)]]),
+          ],
+          recorder: _recorder(),
+          stores: _stores(listings),
+          transform: ({ connection }) => {
+            return _relationsFor(connection).map((relation) => {
+              return connection.id === "c2"
+                ? { ...relation, sourceUpdatedAt: _at(9) }
+                : relation;
+            });
+          },
+        }),
+      );
+
+      expect([error.report.drives[0]?.error, _datasetIds(listings)]).toEqual([
+        expect.stringContaining(
+          `Drive a returned c2 with a relation updated at ${_at(9).toISOString()}, later than the connection's timestamp ${_at(2).toISOString()}.`,
+        ),
+        ["c1"],
+      ]);
     });
 
     it("reports each drive's window, counts, and newest timestamp", async () => {

@@ -9,6 +9,7 @@ import type {
   EtlRunOptions,
   EtlRunWindow,
   EtlStores,
+  Relation,
 } from "@etl/EtlEngine/EtlEngine.types";
 import type { ConnectionSelectionState } from "@etl/EtlEngine/selectPageConnections/selectPageConnections";
 
@@ -153,6 +154,59 @@ async function _buildDriveWindow<TDrive, TConnection>(
   return resolveRunWindow({ options, highWaterMark });
 }
 
+/**
+ * Throws when a relation's `sourceUpdatedAt` is later than its connection's
+ * timestamp. `date_of_last_update` is the default high-water mark, so such a
+ * row would move it past connections not yet written.
+ */
+function _assertRelationsNotNewer<TDrive, TConnection>(args: {
+  pagesArgs: _PagesArgs<TDrive, TConnection>;
+  connection: TConnection;
+  relations: readonly Relation[];
+}): void {
+  const { config, driveKey } = args.pagesArgs;
+  const getConnectionTimestamp = config.incremental?.getConnectionTimestamp;
+  if (getConnectionTimestamp === undefined) {
+    return;
+  }
+  const connectionTime = getConnectionTimestamp(args.connection);
+  const newerUpdate = args.relations
+    .map((relation) => {
+      return relation.sourceUpdatedAt;
+    })
+    .find((updatedAt) => {
+      return (
+        updatedAt !== undefined &&
+        updatedAt.getTime() > connectionTime.getTime()
+      );
+    });
+  if (newerUpdate !== undefined) {
+    throw new Error(
+      `Drive ${driveKey} returned ${config.getConnectionId(args.connection)} with a relation updated at ${newerUpdate.toISOString()}, later than the connection's timestamp ${connectionTime.toISOString()}. A relation's sourceUpdatedAt must not be later than its connection's timestamp, or the high-water mark would pass connections not yet written.`,
+    );
+  }
+}
+
+async function _transformConnections<TDrive, TConnection>(
+  args: _PagesArgs<TDrive, TConnection> &
+    Readonly<{ connections: readonly TConnection[] }>,
+): Promise<Relation[]> {
+  const { config } = args;
+  const relationsByConnection = await promiseMapSequential(
+    args.connections,
+    async (connection) => {
+      const relations = await config.transform({
+        drive: args.drive,
+        connection,
+        pipelineRunId: args.pipelineRunId,
+      });
+      _assertRelationsNotNewer({ pagesArgs: args, connection, relations });
+      return relations;
+    },
+  );
+  return relationsByConnection.flat();
+}
+
 async function _processPage<TDrive, TConnection>(
   args: _PagesArgs<TDrive, TConnection> &
     Readonly<{ page: readonly TConnection[]; progress: _DriveProgress }>,
@@ -167,15 +221,8 @@ async function _processPage<TDrive, TConnection>(
     getConnectionId: config.getConnectionId,
     getConnectionTimestamp,
   });
-  const relations = await promiseMapSequential(connections, (connection) => {
-    return config.transform({
-      drive: args.drive,
-      connection,
-      pipelineRunId: args.pipelineRunId,
-    });
-  });
   const loaded = await loadRelationsPage({
-    relations: relations.flat(),
+    relations: await _transformConnections({ ...args, connections }),
     context: {
       pipelineName: config.name,
       pipelineRunId: args.pipelineRunId,

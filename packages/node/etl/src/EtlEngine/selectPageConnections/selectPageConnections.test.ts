@@ -75,13 +75,38 @@ describe("selectPageConnections", () => {
     }).toThrow(OutOfOrderConnectionError);
   });
 
-  it("drops a repeated connection before checking order", () => {
+  it("drops a connection seen with the same timestamp before checking order", () => {
+    const first = _select({ page: [_connection("b", 1), _connection("x", 2)] });
+
     const { connections } = _select({
       page: [_connection("b", 1), _connection("c", 3)],
-      state: _state({ seenIds: new Set(["b"]), lastTimestamp: _at(2) }),
+      state: first.state,
     });
 
     expect(_ids(connections)).toEqual(["c"]);
+  });
+
+  it("keeps a connection that reappears with a newer timestamp", () => {
+    const first = _select({ page: [_connection("a", 1), _connection("b", 2)] });
+
+    const { connections } = _select({
+      page: [_connection("c", 3), _connection("a", 4)],
+      state: first.state,
+    });
+
+    expect(_ids(connections)).toEqual(["c", "a"]);
+  });
+
+  it("drops a repeated id at any timestamp without a timestamp reader", () => {
+    const first = _select({ page: [_connection("a", 1)], isOrdered: false });
+
+    const { connections } = _select({
+      page: [_connection("a", 4), _connection("b", 2)],
+      state: first.state,
+      isOrdered: false,
+    });
+
+    expect(_ids(connections)).toEqual(["b"]);
   });
 
   it("drops a connection repeated within one page", () => {
@@ -157,13 +182,24 @@ describe("selectPageConnections", () => {
     }).toThrow(OutOfOrderConnectionError);
   });
 
-  it("adds this page's ids to the seen ids", () => {
-    const { state } = _select({
+  it("treats this page's and earlier pages' connections as repeats later", () => {
+    const first = _select({ page: [_connection("x", 0)] });
+    const second = _select({
       page: [_connection("a", 1), _connection("b", 2)],
-      state: _state({ seenIds: new Set(["x"]) }),
+      state: first.state,
     });
 
-    expect([...state.seenIds].sort()).toEqual(["a", "b", "x"]);
+    const { connections } = _select({
+      page: [
+        _connection("x", 0),
+        _connection("a", 1),
+        _connection("b", 2),
+        _connection("c", 3),
+      ],
+      state: second.state,
+    });
+
+    expect(_ids(connections)).toEqual(["c"]);
   });
 
   it("does not mutate the state it was given", () => {
