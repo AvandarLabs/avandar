@@ -57,15 +57,19 @@ function _warnAboutSkippedDatasets(
 }
 
 /**
- * Warns when the first page is short but not empty. That normally means the
- * window holds fewer datasets than one page, but a server whose `rows_max`
- * is below the page size would also end the crawl here, silently.
+ * Warns when a crawl from the start gets a short, non-empty first page. HDX
+ * holds far more datasets than one page, so that suggests a server whose
+ * `rows_max` is below the page size, which would end the crawl there
+ * silently. A window with a lower bound often holds less than a page, so it
+ * is not warned about.
  */
 function _warnIfFirstPageIsShort(
   args: _ExtractArgs,
   page: CkanDatasetSearchPage,
 ): void {
-  if (page.resultCount < args.pageSize && page.nextCursor !== undefined) {
+  const isCrawlFromStart = args.window.since === undefined;
+  const isShortPage = page.resultCount < args.pageSize;
+  if (isCrawlFromStart && isShortPage && page.nextCursor !== undefined) {
     console.warn(
       `[hdx] drive ${args.drive.baseUrl}: the first page held ` +
         `${String(page.resultCount)} of ${String(args.pageSize)} rows, so ` +
@@ -140,8 +144,9 @@ async function* _pages(
  * strictly after the previous page's last `(metadata_modified, name)` pair,
  * so a dataset modified mid-crawl is neither skipped nor repeated. A
  * dataset that failed validation is logged with `console.warn` and left
- * out, and paging still moves past it. A short first page is logged too,
- * since a server row cap below the page size would end the crawl there.
+ * out, and paging still moves past it. A short first page on a crawl from
+ * the start is logged too, since a server row cap below the page size would
+ * end the crawl there.
  *
  * @throws When a full page has nothing after the cursor, which would
  * otherwise request the same page forever.

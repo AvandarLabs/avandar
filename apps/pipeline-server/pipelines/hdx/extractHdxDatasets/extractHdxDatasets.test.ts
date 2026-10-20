@@ -89,6 +89,15 @@ function _keysetDiscovery(
   };
 }
 
+/** A fake `package_search` that returns one row per page, then stops. */
+function _cappedDiscovery(): CkanDiscoveryClient {
+  return {
+    searchDatasets: vi.fn(async () => {
+      return _page([CATALOG[0]!]);
+    }),
+  };
+}
+
 async function _collect(
   discovery: CkanDiscoveryClient,
   window: EtlRunWindow = OPEN_WINDOW,
@@ -222,20 +231,26 @@ describe("extractHdxDatasets", () => {
     ]);
   });
 
-  it("warns when the first page is short, since a server row cap would end the crawl there", async () => {
+  it("warns when a crawl from the start gets a short first page, since a server row cap would end it there", async () => {
     const warn = _silenceWarnings();
-    const capped: CkanDiscoveryClient = {
-      searchDatasets: vi.fn(async () => {
-        return _page([CATALOG[0]!]);
-      }),
-    };
 
-    const pages = await _collect(capped);
+    const pages = await _collect(_cappedDiscovery());
 
     expect(_names(pages)).toEqual(["a"]);
     expect(warn).toHaveBeenCalledWith(
       expect.stringMatching(/https:\/\/data\.humdata\.org.*1 of 2 rows/),
     );
+  });
+
+  it("does not warn about a short first page when the window has a lower bound", async () => {
+    const warn = _silenceWarnings();
+
+    await _collect(_cappedDiscovery(), {
+      since: new Date("2026-10-01T00:00:00.000Z"),
+      until: undefined,
+    });
+
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it("pages on from an invalid dataset that ends a page, and warns about it", async () => {
