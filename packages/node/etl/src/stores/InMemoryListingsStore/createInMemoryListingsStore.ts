@@ -32,11 +32,16 @@ function _copyThroughJson<T>(value: T): T {
   return value === undefined ? value : JSON.parse(JSON.stringify(value));
 }
 
+/**
+ * The newest parseable `date_of_last_update` no later than now, as the
+ * Supabase store reads it: a later date is a bad source timestamp.
+ */
 function _readHighWaterMark(args: {
   rows: Iterable<StoredListingRow>;
   pipelineName: string;
   apiBaseUrl: string;
 }): Date | undefined {
+  const now = Date.now();
   const times = [...args.rows].flatMap((row) => {
     if (
       row.pipeline_name !== args.pipelineName ||
@@ -46,7 +51,7 @@ function _readHighWaterMark(args: {
       return [];
     }
     const time = Date.parse(row.date_of_last_update);
-    return Number.isNaN(time) ? [] : [time];
+    return Number.isNaN(time) || time > now ? [] : [time];
   });
   return times.length === 0 ?
       undefined

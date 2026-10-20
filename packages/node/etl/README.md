@@ -127,6 +127,8 @@ last stored timestamp are fetched again and skipped if unchanged.
 **The high-water mark** defaults to `max(date_of_last_update)` for the
 pipeline's rows with `api_base_url` equal to the drive key. Override it with
 `incremental.readHighWaterMark`.
+Dates later than now are ignored, so one future-dated source timestamp
+cannot make incremental runs skip real changes until the clock catches up.
 
 **Repeats.**
 

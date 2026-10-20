@@ -49,7 +49,7 @@ export type RelationColumnRow = Readonly<{
 export type ListingsStore = Readonly<{
   /**
    * The newest `date_of_last_update` among one pipeline's rows for one
-   * drive, or `undefined` when there is none.
+   * drive, ignoring dates later than now, or `undefined` when there is none.
    */
   readHighWaterMark: (args: {
     pipelineName: string;

@@ -78,6 +78,19 @@ describe("createInMemoryListingsStore", () => {
     ).resolves.toEqual(new Date("2026-10-05T00:00:00.000Z"));
   });
 
+  it("ignores a date_of_last_update later than now", async () => {
+    const store = createInMemoryListingsStore({
+      rows: [
+        _stored("a", { date_of_last_update: "2026-10-05T00:00:00.000Z" }),
+        _stored("future", { date_of_last_update: "2999-01-01T00:00:00.000Z" }),
+      ],
+    });
+
+    await expect(
+      store.readHighWaterMark({ pipelineName: "socrata", apiBaseUrl: DRIVE }),
+    ).resolves.toEqual(new Date("2026-10-05T00:00:00.000Z"));
+  });
+
   it("has no high-water mark for a drive with no dated rows", async () => {
     const store = createInMemoryListingsStore({ rows: [_stored("a")] });
 

@@ -124,6 +124,11 @@ function _toStoredRows(data: unknown[] | null): StoredListingRow[] {
   return (data ?? []) as StoredListingRow[];
 }
 
+/**
+ * The newest `date_of_last_update` no later than now. A later date is a bad
+ * source timestamp, and counting it would make incremental runs skip real
+ * changes until the clock caught up.
+ */
 async function _readHighWaterMark(
   args: SupabaseListingsStoreOptions & {
     pipelineName: string;
@@ -136,6 +141,7 @@ async function _readHighWaterMark(
     .eq("pipeline_name", args.pipelineName)
     .eq("api_base_url", args.apiBaseUrl)
     .not("date_of_last_update", "is", null)
+    .lte("date_of_last_update", new Date().toISOString())
     .order("date_of_last_update", { ascending: false })
     .limit(1);
   _throwOnError({

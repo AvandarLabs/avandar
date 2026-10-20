@@ -212,6 +212,26 @@ describe("createSupabaseListingsStore", () => {
     ).resolves.toEqual(new Date("2026-10-05T00:00:00.000Z"));
   });
 
+  it("ignores a date_of_last_update later than now", async () => {
+    await store.upsertRows([
+      _apiRow({
+        external_dataset_id: "a",
+        date_of_last_update: "2026-10-05T00:00:00.000Z",
+      }),
+      _apiRow({
+        external_dataset_id: "future",
+        date_of_last_update: "2999-01-01T00:00:00.000Z",
+      }),
+    ]);
+
+    await expect(
+      store.readHighWaterMark({
+        pipelineName: PIPELINE_NAME,
+        apiBaseUrl: DRIVE,
+      }),
+    ).resolves.toEqual(new Date("2026-10-05T00:00:00.000Z"));
+  });
+
   it("reads back a written row that the change check sees as unchanged", async () => {
     const row = _apiRow();
     await store.upsertRows([row]);
