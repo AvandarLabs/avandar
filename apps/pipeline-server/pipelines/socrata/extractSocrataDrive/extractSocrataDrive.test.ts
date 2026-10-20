@@ -62,6 +62,41 @@ function _discoveryOver(
   };
 }
 
+/**
+ * A discovery client whose catalog changes once, between the first and the
+ * second search, the way a portal does when datasets are edited mid-crawl.
+ */
+function _discoveryChangingAfterFirstPage(
+  catalog: readonly SocrataDiscoveryResult[],
+  options: {
+    changeCatalog: (
+      catalog: readonly SocrataDiscoveryResult[],
+    ) => SocrataDiscoveryResult[];
+    invalidIds?: readonly string[];
+  },
+): SocrataDiscoveryClient {
+  const before = _discoveryOver(catalog, options);
+  const after = _discoveryOver(options.changeCatalog(catalog), options);
+  let callCount = 0;
+  return {
+    search: vi.fn(async (params) => {
+      callCount += 1;
+      return callCount === 1 ? before.search(params) : after.search(params);
+    }),
+  };
+}
+
+/** Moves the first `count` datasets to the end, as if just modified. */
+function _modifyFirst(count: number) {
+  return (catalog: readonly SocrataDiscoveryResult[]) => {
+    const modified = catalog.slice(0, count).map((result, index) => {
+      const updatedAt = _at(catalog.length + index).toISOString();
+      return { ...result, updatedAt };
+    });
+    return [...catalog.slice(count), ...modified];
+  };
+}
+
 async function _collect(
   window: EtlRunWindow,
   discovery: SocrataDiscoveryClient,
@@ -152,5 +187,54 @@ describe("extractSocrataDrive", () => {
         /https:\/\/data\.cityofnewyork\.us.*ds-5.*updatedAt: Invalid/,
       ),
     );
+  });
+
+  it("fails when more datasets move than the page overlap covers", async () => {
+    const discovery = _discoveryChangingAfterFirstPage(_catalog(1500), {
+      changeCatalog: _modifyFirst(21),
+    });
+
+    await expect(_collect(OPEN_WINDOW, discovery)).rejects.toThrow(
+      "Socrata drive https://data.cityofnewyork.us lost its page overlap at offset 980",
+    );
+  });
+
+  it("continues when fewer datasets move than the page overlap covers", async () => {
+    const discovery = _discoveryChangingAfterFirstPage(_catalog(1500), {
+      changeCatalog: _modifyFirst(19),
+    });
+
+    const pages = await _collect(OPEN_WINDOW, discovery);
+
+    expect(pages.flat().length).toBe(1520);
+  });
+
+  it("continues when the overlap is reshuffled but still present", async () => {
+    const discovery = _discoveryChangingAfterFirstPage(_catalog(1500), {
+      changeCatalog: (catalog) => {
+        return [
+          ...catalog.slice(0, 980),
+          ...catalog.slice(980, 990).reverse(),
+          ...catalog.slice(990),
+        ];
+      },
+    });
+
+    await expect(_collect(OPEN_WINDOW, discovery)).resolves.toHaveLength(2);
+  });
+
+  it("counts a skipped result's id as part of the overlap", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {
+      return undefined;
+    });
+    const invalidIds = Array.from({ length: 10 }, (_, index) => {
+      return `ds-${990 + index}`;
+    });
+    const discovery = _discoveryChangingAfterFirstPage(_catalog(1500), {
+      changeCatalog: _modifyFirst(10),
+      invalidIds,
+    });
+
+    await expect(_collect(OPEN_WINDOW, discovery)).resolves.toHaveLength(2);
   });
 });

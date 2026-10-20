@@ -13,6 +13,11 @@ export const SOCRATA_PAGE_SIZE = 1000;
  * mid-crawl moves to the end of the ascending order and shifts every later
  * result one place earlier, which would skip a result at a page boundary.
  * The engine drops the repeats this causes.
+ *
+ * This assumes at most this many datasets shift between two page fetches,
+ * and that the order of equal `updatedAt` values is stable enough between
+ * requests. The overlap check in `extractSocrataDrive` turns a violation
+ * into a failed drive rather than a silent gap.
  */
 export const SOCRATA_PAGE_OVERLAP = 20;
 
@@ -31,7 +36,58 @@ type SocrataRawPage = Readonly<{
   /** Valid plus skipped results: the page's length in the server's order. */
   rawCount: number;
   resultSetSize: number;
+  /** Every dataset id on the page, valid or skipped. */
+  datasetIds: ReadonlySet<string>;
+  /** The ids the next page must share at least one of. */
+  overlapIds: ReadonlySet<string>;
 }>;
+
+/**
+ * The ids of a page's last `SOCRATA_PAGE_OVERLAP` raw rows. The client does
+ * not say where among the valid results a skipped one sat, so this takes the
+ * last `SOCRATA_PAGE_OVERLAP` valid ids plus every skipped id: a small
+ * superset whenever the page skipped a result.
+ */
+function _getOverlapIds(
+  results: readonly SocrataDiscoveryResult[],
+  skippedIds: readonly string[],
+): ReadonlySet<string> {
+  const tailIds = results.slice(-SOCRATA_PAGE_OVERLAP).map((result) => {
+    return result.datasetId;
+  });
+  return new Set([...tailIds, ...skippedIds]);
+}
+
+/**
+ * Fails the drive when a page shares no dataset with the previous page's
+ * overlap. More datasets moved or were deleted between the two fetches than
+ * the overlap covers, so some were skipped at the boundary, and the
+ * high-water mark would move past them for good. The prefix already loaded
+ * is complete, so the next run resumes safely. This is fail-safe on
+ * purpose: it may also fail a drive where nothing was skipped, such as when
+ * exactly the whole overlap moved.
+ */
+function _assertOverlapKept(args: {
+  drive: Readonly<ConfiguredDrive>;
+  offset: number;
+  previousOverlapIds: ReadonlySet<string> | undefined;
+  datasetIds: ReadonlySet<string>;
+}): void {
+  const { previousOverlapIds, datasetIds } = args;
+  if (previousOverlapIds === undefined) {
+    return;
+  }
+  const hasOverlap = [...previousOverlapIds].some((datasetId) => {
+    return datasetIds.has(datasetId);
+  });
+  if (!hasOverlap) {
+    throw new Error(
+      `Socrata drive ${args.drive.baseUrl} lost its page overlap at offset ` +
+        `${String(args.offset)}: more than ${String(SOCRATA_PAGE_OVERLAP)} ` +
+        "datasets changed between page fetches, so some may have been missed.",
+    );
+  }
+}
 
 function _isBefore(
   result: SocrataDiscoveryResult,
@@ -78,21 +134,36 @@ async function _fetchPage(
       `[socrata] drive ${drive.baseUrl}: skipped dataset ${skipped.datasetId ?? "(no id)"}: ${skipped.reason}`,
     );
   });
+  const skippedIds = skippedResults.flatMap((skipped) => {
+    return skipped.datasetId === undefined ? [] : [skipped.datasetId];
+  });
   return {
     results,
     rawCount: results.length + skippedResults.length,
     resultSetSize,
+    datasetIds: new Set([
+      ...results.map((result) => {
+        return result.datasetId;
+      }),
+      ...skippedIds,
+    ]),
+    overlapIds: _getOverlapIds(results, skippedIds),
   };
 }
 
 async function* _pagesFrom(
-  args: ExtractSocrataDriveArgs & Readonly<{ offset: number }>,
+  args: ExtractSocrataDriveArgs &
+    Readonly<{
+      offset: number;
+      previousOverlapIds: ReadonlySet<string> | undefined;
+    }>,
 ): AsyncGenerator<readonly SocrataDiscoveryResult[]> {
   const limit = Math.min(SOCRATA_PAGE_SIZE, SOCRATA_MAX_RESULTS - args.offset);
-  const { results, rawCount, resultSetSize } = await _fetchPage({
-    ...args,
-    limit,
-  });
+  const page = await _fetchPage({ ...args, limit });
+  _assertOverlapKept({ ...args, datasetIds: page.datasetIds });
+  const { results, rawCount, resultSetSize } = page;
+  // The engine filters by the window too. This filter exists so the crawl
+  // can stop early at `until`.
   const afterSince = results.filter((result) => {
     return !_isBefore(result, args.window.since);
   });
@@ -108,6 +179,7 @@ async function* _pagesFrom(
   yield* _pagesFrom({
     ...args,
     offset: args.offset + rawCount - SOCRATA_PAGE_OVERLAP,
+    previousOverlapIds: page.overlapIds,
   });
 }
 
@@ -118,10 +190,11 @@ async function* _pagesFrom(
  * at or after `until`. A result that failed validation is logged with
  * `console.warn` and left out.
  *
- * @throws When the drive has more results than the Discovery API can page.
+ * @throws When the drive has more results than the Discovery API can page,
+ * or when a page shares no dataset with the previous page's overlap.
  */
 export function extractSocrataDrive(
   args: ExtractSocrataDriveArgs,
 ): AsyncGenerator<readonly SocrataDiscoveryResult[]> {
-  return _pagesFrom({ ...args, offset: 0 });
+  return _pagesFrom({ ...args, offset: 0, previousOverlapIds: undefined });
 }
