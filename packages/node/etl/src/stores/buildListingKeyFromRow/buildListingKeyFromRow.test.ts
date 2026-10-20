@@ -46,7 +46,15 @@ describe("buildListingKeyFromRow", () => {
     );
   });
 
-  it("keys a Parquet row by pipeline and file name", () => {
+  it("gives an API row the same key whatever pipeline name it carries", () => {
+    expect(buildListingKeyFromRow(_apiRow())).toBe(
+      buildListingKeyFromRow(
+        _apiRow({ pipeline_name: "other-pipeline", pipeline_run_id: "run-9" }),
+      ),
+    );
+  });
+
+  it("keys a Parquet row by file name within one pipeline", () => {
     const parquetRow = _apiRow({
       access_kind: "pipeline_parquet",
       pipeline_name: "world-bank__wdi",
@@ -62,6 +70,22 @@ describe("buildListingKeyFromRow", () => {
         ...parquetRow,
         parquet_file_name: "WDISeries.parquet",
       }),
+    );
+  });
+
+  it("gives one Parquet file name different keys in different pipelines", () => {
+    const parquetRow = _apiRow({
+      access_kind: "pipeline_parquet",
+      pipeline_name: "world-bank__wdi",
+      api_service: null,
+      api_base_url: null,
+      api_resource_id: null,
+      api_resource_format: null,
+      parquet_file_name: "WDICSV.parquet",
+    });
+
+    expect(buildListingKeyFromRow(parquetRow)).not.toBe(
+      buildListingKeyFromRow({ ...parquetRow, pipeline_name: "other-wdi" }),
     );
   });
 });

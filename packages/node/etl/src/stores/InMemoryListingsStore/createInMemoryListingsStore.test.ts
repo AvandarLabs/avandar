@@ -2,6 +2,7 @@ import { createInMemoryListingsStore } from "@etl/stores/InMemoryListingsStore/c
 import { describe, expect, it } from "vitest";
 import type {
   ListingRowValues,
+  RelationColumnRow,
   StoredListingRow,
 } from "@etl/stores/EtlStores.types";
 
@@ -43,6 +44,15 @@ function _stored(
   return {
     ..._row({ external_dataset_id: id, api_resource_id: id, ...overrides }),
     id,
+  };
+}
+
+function _column(name: string, displayOrder: number): RelationColumnRow {
+  return {
+    column_name: name,
+    display_order: displayOrder,
+    original_data_type: "VARCHAR",
+    cast_data_type: "VARCHAR",
   };
 }
 
@@ -143,5 +153,131 @@ describe("createInMemoryListingsStore", () => {
         return column.column_name;
       }),
     ).toEqual(["c"]);
+  });
+
+  it("fails the whole batch when two rows share a key", async () => {
+    const store = createInMemoryListingsStore();
+
+    await expect(
+      store.upsertRows([
+        _row({ external_dataset_id: "a", api_resource_id: "a" }),
+        _row({ external_dataset_id: "b", api_resource_id: "b" }),
+        _row({
+          external_dataset_id: "a",
+          api_resource_id: "a",
+          display_name: "Again",
+        }),
+      ]),
+    ).rejects.toThrow(
+      "ON CONFLICT DO UPDATE command cannot affect row a second time",
+    );
+    expect([store.getRows().length, store.getUpsertBatches().length]).toEqual([
+      0, 0,
+    ]);
+  });
+
+  it("returns a stored row once when several rows match its key", async () => {
+    const store = createInMemoryListingsStore({ rows: [_stored("a")] });
+
+    const matches = await store.readRowsMatching([
+      _row({ external_dataset_id: "a", api_resource_id: "a" }),
+      _row({
+        external_dataset_id: "a",
+        api_resource_id: "a",
+        display_name: "Again",
+      }),
+    ]);
+
+    expect(matches).toHaveLength(1);
+  });
+
+  it("is not changed by editing a seed row afterwards", async () => {
+    const metadata = { count: 1 };
+    const seed = _stored("a", { metadata });
+    const store = createInMemoryListingsStore({ rows: [seed] });
+
+    metadata.count = 2;
+
+    expect(store.getRows()[0]?.metadata).toEqual({ count: 1 });
+  });
+
+  it("is not changed by editing an upserted row afterwards", async () => {
+    const metadata = { count: 1 };
+    const store = createInMemoryListingsStore();
+    await store.upsertRows([_row({ metadata })]);
+
+    metadata.count = 2;
+
+    expect(store.getRows()[0]?.metadata).toEqual({ count: 1 });
+  });
+
+  it("is not changed by editing the rows an upsert returns", async () => {
+    const store = createInMemoryListingsStore();
+    const [stored] = await store.upsertRows([_row({ metadata: { count: 1 } })]);
+
+    Object.assign(stored?.metadata ?? {}, { count: 2 });
+
+    expect(store.getRows()[0]?.metadata).toEqual({ count: 1 });
+  });
+
+  it("is not changed by editing the rows a read returns", async () => {
+    const store = createInMemoryListingsStore({
+      rows: [_stored("a", { metadata: { count: 1 } })],
+    });
+    const [matched] = await store.readRowsMatching([
+      _row({ external_dataset_id: "a", api_resource_id: "a" }),
+    ]);
+
+    Object.assign(matched?.metadata ?? {}, { count: 2 });
+    Object.assign(store.getRows()[0]?.metadata ?? {}, { count: 3 });
+
+    expect(store.getRows()[0]?.metadata).toEqual({ count: 1 });
+  });
+
+  it("is not changed by editing a relation column list afterwards", async () => {
+    const store = createInMemoryListingsStore();
+    const columns: RelationColumnRow[] = [_column("a", 0)];
+    await store.replaceRelationColumns({ listingId: "listing-1", columns });
+
+    columns.push(_column("b", 1));
+
+    expect(store.getRelationColumns("listing-1")).toHaveLength(1);
+  });
+
+  it("is not changed by editing the relation columns a read returns", async () => {
+    const store = createInMemoryListingsStore();
+    await store.replaceRelationColumns({
+      listingId: "listing-1",
+      columns: [_column("a", 0)],
+    });
+
+    Object.assign(store.getRelationColumns("listing-1")?.[0] ?? {}, {
+      column_name: "z",
+    });
+
+    expect(store.getRelationColumns("listing-1")?.[0]?.column_name).toBe("a");
+  });
+
+  it("ignores a stored row whose date does not parse", async () => {
+    const store = createInMemoryListingsStore({
+      rows: [
+        _stored("a", { date_of_last_update: "not a date" }),
+        _stored("b", { date_of_last_update: "2026-10-05T00:00:00.000Z" }),
+      ],
+    });
+
+    await expect(
+      store.readHighWaterMark({ pipelineName: "socrata", apiBaseUrl: DRIVE }),
+    ).resolves.toEqual(new Date("2026-10-05T00:00:00.000Z"));
+  });
+
+  it("has no high-water mark when no stored date parses", async () => {
+    const store = createInMemoryListingsStore({
+      rows: [_stored("a", { date_of_last_update: "not a date" })],
+    });
+
+    await expect(
+      store.readHighWaterMark({ pipelineName: "socrata", apiBaseUrl: DRIVE }),
+    ).resolves.toBeUndefined();
   });
 });

@@ -55,11 +55,20 @@ export type ListingsStore = Readonly<{
     pipelineName: string;
     apiBaseUrl: string;
   }) => Promise<Date | undefined>;
-  /** The stored rows that share a conflict key with any of `rows`. */
+  /**
+   * The stored rows that share a conflict key with any of `rows`. The result
+   * is in no particular order and has at most one entry per key, so callers
+   * match rows to their stored counterpart with `buildListingKeyFromRow`.
+   */
   readRowsMatching: (
     rows: readonly ListingRowValues[],
   ) => Promise<readonly StoredListingRow[]>;
-  /** Inserts or replaces `rows` on their conflict keys. */
+  /**
+   * Inserts or replaces `rows` on their conflict keys, and returns the stored
+   * rows. The result is in no particular order and has at most one entry per
+   * key, so callers match rows with `buildListingKeyFromRow`. Two rows in one
+   * call that share a key fail the whole call.
+   */
   upsertRows: (
     rows: readonly ListingRowValues[],
   ) => Promise<readonly StoredListingRow[]>;

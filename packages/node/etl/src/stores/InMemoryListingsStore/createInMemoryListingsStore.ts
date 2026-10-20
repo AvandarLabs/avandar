@@ -10,15 +10,15 @@ import type {
 /** A listings store held in memory, plus accessors for asserting on it. */
 export type InMemoryListingsStore = ListingsStore &
   Readonly<{
-    /** Every stored row, in the order its key was first written. */
+    /** A copy of every stored row, in the order its key was first written. */
     getRows: () => readonly StoredListingRow[];
-    /** One listing's relation columns, as last replaced. */
+    /** A copy of one listing's relation columns, as last replaced. */
     getRelationColumns: (
       listingId: string,
     ) => readonly RelationColumnRow[] | undefined;
     /** How many rows each `readRowsMatching` call asked for, in call order. */
     getReadBatchSizes: () => readonly number[];
-    /** Every `upsertRows` payload, in call order. */
+    /** A copy of every stored `upsertRows` payload, in call order. */
     getUpsertBatches: () => ReadonlyArray<readonly ListingRowValues[]>;
   }>;
 
@@ -27,25 +27,43 @@ function _readHighWaterMark(args: {
   pipelineName: string;
   apiBaseUrl: string;
 }): Date | undefined {
-  const newest = [...args.rows].reduce<number | undefined>((max, row) => {
-    const isInDrive =
-      row.pipeline_name === args.pipelineName &&
-      row.api_base_url === args.apiBaseUrl &&
-      row.date_of_last_update !== null;
-    if (!isInDrive) {
-      return max;
+  const times = [...args.rows].flatMap((row) => {
+    if (
+      row.pipeline_name !== args.pipelineName ||
+      row.api_base_url !== args.apiBaseUrl ||
+      row.date_of_last_update === null
+    ) {
+      return [];
     }
-    const time = Date.parse(row.date_of_last_update ?? "");
-    return max === undefined || time > max ? time : max;
-  }, undefined);
-  return newest === undefined ? undefined : new Date(newest);
+    const time = Date.parse(row.date_of_last_update);
+    return Number.isNaN(time) ? [] : [time];
+  });
+  return times.length === 0 ?
+      undefined
+    : new Date(
+        times.reduce((newest, time) => {
+          return Math.max(newest, time);
+        }),
+      );
+}
+
+function _throwOnRepeatedKey(rows: readonly ListingRowValues[]): void {
+  const keys = rows.map((row) => {
+    return buildListingKeyFromRow(row);
+  });
+  if (new Set(keys).size < keys.length) {
+    throw new Error(
+      "ON CONFLICT DO UPDATE command cannot affect row a second time",
+    );
+  }
 }
 
 /**
  * Creates a listings store that keeps rows in memory, for testing a pipeline
- * or the engine without Supabase. Upserts keep a row's id and merge over any
- * columns outside the contract, the way Postgres keeps columns an upsert
- * does not name.
+ * or the engine without Supabase. It behaves like Postgres where a pipeline
+ * can tell the difference: upserts keep a row's id and merge over any columns
+ * outside the contract, a batch with a repeated key fails whole, and every
+ * row crosses the store boundary as a copy.
  *
  * @param options.rows - Rows to start with.
  * @returns The store.
@@ -55,7 +73,7 @@ export function createInMemoryListingsStore(
 ): InMemoryListingsStore {
   const rowsByKey = new Map<string, StoredListingRow>(
     (options.rows ?? []).map((row) => {
-      return [buildListingKeyFromRow(row), row];
+      return [buildListingKeyFromRow(row), structuredClone(row)];
     }),
   );
   const columnsByListingId = new Map<string, readonly RelationColumnRow[]>();
@@ -72,39 +90,49 @@ export function createInMemoryListingsStore(
     },
     readRowsMatching: async (rows) => {
       readBatchSizes.push(rows.length);
-      return rows.flatMap((row) => {
-        const stored = rowsByKey.get(buildListingKeyFromRow(row));
-        return stored === undefined ? [] : [stored];
-      });
+      const keys = new Set(
+        rows.map((row) => {
+          return buildListingKeyFromRow(row);
+        }),
+      );
+      return structuredClone(
+        [...keys].flatMap((key) => {
+          const stored = rowsByKey.get(key);
+          return stored === undefined ? [] : [stored];
+        }),
+      );
     },
     upsertRows: async (rows) => {
-      upsertBatches.push([...rows]);
-      return rows.map((row) => {
-        const key = buildListingKeyFromRow(row);
-        const existing = rowsByKey.get(key);
-        const stored = {
-          ...existing,
-          ...row,
-          id: existing?.id ?? randomUUID(),
-        };
-        rowsByKey.set(key, stored);
-        return stored;
-      });
+      _throwOnRepeatedKey(rows);
+      upsertBatches.push(structuredClone([...rows]));
+      return structuredClone(
+        rows.map((row) => {
+          const key = buildListingKeyFromRow(row);
+          const existing = rowsByKey.get(key);
+          const stored = {
+            ...existing,
+            ...structuredClone(row),
+            id: existing?.id ?? randomUUID(),
+          };
+          rowsByKey.set(key, stored);
+          return stored;
+        }),
+      );
     },
     replaceRelationColumns: async ({ listingId, columns }) => {
-      columnsByListingId.set(listingId, [...columns]);
+      columnsByListingId.set(listingId, structuredClone([...columns]));
     },
     getRows: () => {
-      return [...rowsByKey.values()];
+      return structuredClone([...rowsByKey.values()]);
     },
     getRelationColumns: (listingId) => {
-      return columnsByListingId.get(listingId);
+      return structuredClone(columnsByListingId.get(listingId));
     },
     getReadBatchSizes: () => {
       return [...readBatchSizes];
     },
     getUpsertBatches: () => {
-      return [...upsertBatches];
+      return structuredClone(upsertBatches);
     },
   };
 }
