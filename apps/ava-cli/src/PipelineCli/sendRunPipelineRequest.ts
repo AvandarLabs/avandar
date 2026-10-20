@@ -1,7 +1,7 @@
 import { getPipelineServerClientConfig } from "@ava-cli/PipelineCli/getPipelineServerClientConfig";
 import { PipelineRunFailedError } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunFailedError";
-import { PipelineRunReportSchema } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
-import type { PipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
+import { readPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/readPipelineRunReport";
+import type { ReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
 import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
 
 /** HTTP status the server answers for invalid run options. */
@@ -10,7 +10,7 @@ const _BAD_REQUEST_STATUS = 400;
 /** What an error response says: its message, and a report if it sent one. */
 type _ErrorBody = Readonly<{
   message: string;
-  report: PipelineRunReport | undefined;
+  report: ReceivedPipelineRunReport | undefined;
 }>;
 
 /** The parsed JSON of an error body, or `undefined` if it is not JSON. */
@@ -34,12 +34,13 @@ function _readJsonErrorMessage(json: unknown): string | undefined {
  * The run report of a JSON error body, sent when every drive failed, or
  * `undefined` if it has none.
  */
-function _readJsonErrorReport(json: unknown): PipelineRunReport | undefined {
+function _readJsonErrorReport(
+  json: unknown,
+): ReceivedPipelineRunReport | undefined {
   if (typeof json !== "object" || json === null || !("report" in json)) {
     return undefined;
   }
-  const result = PipelineRunReportSchema.safeParse(json.report);
-  return result.success ? result.data : undefined;
+  return readPipelineRunReport(json.report);
 }
 
 /**
@@ -96,10 +97,60 @@ function _buildRunBody(
   return Object.keys(body).length === 0 ? undefined : body;
 }
 
+/** The error code under a failed `fetch`, such as `ECONNREFUSED`. */
+function _getFetchErrorCode(error: unknown): string | undefined {
+  const cause: unknown =
+    error instanceof Error && "cause" in error
+      ? (error as Error & { cause?: unknown }).cause
+      : undefined;
+  return cause !== null &&
+    typeof cause === "object" &&
+    "code" in cause &&
+    typeof (cause as { code: unknown }).code === "string"
+    ? (cause as { code: string }).code
+    : undefined;
+}
+
+/**
+ * Posts the run request. A refused connection throws a message that says
+ * how to start the server or run locally instead.
+ */
+async function _postRunRequest(
+  args: Readonly<{
+    url: string;
+    baseURL: string;
+    serverSecret: string;
+    body: Record<string, unknown> | undefined;
+  }>,
+): Promise<Response> {
+  const { body } = args;
+  try {
+    return await fetch(args.url, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${args.serverSecret}`,
+        // Fastify rejects an empty body sent as JSON, so a body is only sent
+        // when there is an option to carry.
+        ...(body === undefined ? {} : { "content-type": "application/json" }),
+      },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    });
+  } catch (error: unknown) {
+    if (_getFetchErrorCode(error) === "ECONNREFUSED") {
+      throw new Error(
+        `Cannot reach pipeline server at ${args.baseURL}. Start it with ` +
+          "`pnpm dev:pipeline-server` from the repo root, or run without a " +
+          "server: `ava pipeline run <name> --local`.",
+      );
+    }
+    throw error;
+  }
+}
+
 /**
  * Asks the pipeline server to run a pipeline.
  *
- * @returns The run's report.
+ * @returns The run's report, as received.
  * @throws With the server's own message when it rejects the options (400),
  * and with the status line plus that message for any other failure.
  * @throws PipelineRunFailedError, carrying the report, when every drive
@@ -108,50 +159,21 @@ function _buildRunBody(
 export async function sendRunPipelineRequest(options: {
   pipelineName: string;
   runOptions: PipelineRunRequestOptions;
-}): Promise<PipelineRunReport> {
+}): Promise<ReceivedPipelineRunReport> {
   const config = getPipelineServerClientConfig();
   const encodedPipelineName: string = encodeURIComponent(options.pipelineName);
   const url: string = `${config.baseURL}/${encodedPipelineName}/run`;
   const body = _buildRunBody(options.runOptions);
-  let res: Response;
-  try {
-    res = await fetch(url, {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${config.serverSecret}`,
-        // Fastify rejects an empty body sent as JSON, so a body is only sent
-        // when there is an option to carry.
-        ...(body === undefined ? {} : { "content-type": "application/json" }),
-      },
-      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    });
-  } catch (error: unknown) {
-    const cause: unknown =
-      error instanceof Error && "cause" in error
-        ? (error as Error & { cause?: unknown }).cause
-        : undefined;
-    const code: unknown =
-      cause !== null &&
-      typeof cause === "object" &&
-      "code" in cause &&
-      typeof (cause as { code: unknown }).code === "string"
-        ? (cause as { code: string }).code
-        : undefined;
-
-    if (code === "ECONNREFUSED") {
-      throw new Error(
-        `Cannot reach pipeline server at ${config.baseURL}. Start it with ` +
-          "`pnpm dev:pipeline-server` from the repo root, or run without a " +
-          "server: `ava pipeline run <name> --local`.",
-      );
-    }
-
-    throw error;
-  }
+  const res: Response = await _postRunRequest({
+    url,
+    baseURL: config.baseURL,
+    serverSecret: config.serverSecret,
+    body,
+  });
 
   if (!res.ok) {
     await _throwResponseError(res);
   }
 
-  return PipelineRunReportSchema.parse(await res.json());
+  return readPipelineRunReport(await res.json());
 }

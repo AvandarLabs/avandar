@@ -3,9 +3,9 @@ import {
   runPipelineLocal,
 } from "@ava-cli/PipelineCli/runPipelineLocal";
 import { PipelineRunFailedError } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunFailedError";
-import { PipelineRunReportSchema } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
-import type { PipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
-import { printPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
+import type { ReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
+import { printReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
+import { readPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/readPipelineRunReport";
 import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
 import { sendRunPipelineRequest } from "@ava-cli/PipelineCli/sendRunPipelineRequest";
 import { printError, printInfo } from "@ava-cli/utils/cliOutput/cliOutput";
@@ -19,9 +19,19 @@ function _assertOneLowerBound(runOptions: PipelineRunRequestOptions): void {
   }
 }
 
-/** Parses the local runner's report line. */
-function _parseReportJson(reportJson: string): PipelineRunReport {
-  return PipelineRunReportSchema.parse(JSON.parse(reportJson));
+/**
+ * Reads the local runner's report line.
+ *
+ * @throws With the line itself when it is not JSON.
+ */
+function _readReportLine(reportLine: string): ReceivedPipelineRunReport {
+  let json: unknown;
+  try {
+    json = JSON.parse(reportLine);
+  } catch {
+    throw new Error(`The local runner did not print a report: ${reportLine}`);
+  }
+  return readPipelineRunReport(json);
 }
 
 /**
@@ -33,7 +43,7 @@ function _parseReportJson(reportJson: string): PipelineRunReport {
 function _runLocally(args: {
   name: string;
   runOptions: PipelineRunRequestOptions;
-}): PipelineRunReport {
+}): ReceivedPipelineRunReport {
   const repoRoot: string | undefined = findAvandarRepoRoot();
   if (repoRoot === undefined) {
     throw new Error(
@@ -48,14 +58,14 @@ function _runLocally(args: {
     runOptions: args.runOptions,
   });
   if (localResult.ok) {
-    return _parseReportJson(localResult.reportJson);
+    return _readReportLine(localResult.reportJson);
   }
   if (localResult.reportJson === "") {
     throw new Error(localResult.errorText);
   }
   throw new PipelineRunFailedError({
     message: localResult.errorText,
-    report: _parseReportJson(localResult.reportJson),
+    report: _readReportLine(localResult.reportJson),
   });
 }
 
@@ -88,16 +98,16 @@ export async function runPipelineCommand(options: {
   try {
     _assertOneLowerBound(runOptions);
     printInfo(`Running pipeline: ${name}`);
-    const report: PipelineRunReport = local
+    const report: ReceivedPipelineRunReport = local
       ? _runLocally({ name, runOptions })
       : await sendRunPipelineRequest({ pipelineName: name, runOptions });
-    printPipelineRunReport(report);
+    printReceivedPipelineRunReport(report);
   } catch (error: unknown) {
     const message: string =
       error instanceof Error ? error.message : String(error);
 
     if (error instanceof PipelineRunFailedError) {
-      printPipelineRunReport(error.report);
+      printReceivedPipelineRunReport(error.report);
     }
     printError(`Failed to run pipeline: ${name}`);
     printError(message);

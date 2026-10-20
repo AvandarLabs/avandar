@@ -20,5 +20,6 @@ export function getEtlRunFailedReport(
   ) {
     return undefined;
   }
+  // Safe: only `EtlRunFailedError` is named so, and it always sets `report`.
   return error.report as EtlRunReport;
 }

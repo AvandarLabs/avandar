@@ -10,6 +10,13 @@ vi.mock("node:child_process", () => {
   };
 });
 
+/** A report line as the runner prints it. */
+const REPORT_LINE = JSON.stringify({
+  pipelineRunId: "00000000-0000-4000-8000-000000000001",
+  mode: "full",
+  drives: [],
+});
+
 /** A `spawnSync` result with the given exit status and output. */
 function _spawnResult(args: {
   status: number;
@@ -88,7 +95,7 @@ describe("runPipelineLocal", () => {
     vi.mocked(spawnSync).mockReturnValueOnce(
       _spawnResult({
         status: 1,
-        stdout: 'log line\n{"pipelineRunId":"r"}\n',
+        stdout: `log line\n${REPORT_LINE}\n`,
         stderr: "Every drive failed.\n",
       }),
     );
@@ -101,8 +108,30 @@ describe("runPipelineLocal", () => {
 
     expect(result).toEqual({
       ok: false,
-      reportJson: '{"pipelineRunId":"r"}',
+      reportJson: REPORT_LINE,
       errorText: "Every drive failed.\nlog line",
+    });
+  });
+
+  it("keeps a failed run's whole output as error text when its JSON is not a report", () => {
+    vi.mocked(spawnSync).mockReturnValueOnce(
+      _spawnResult({
+        status: 1,
+        stdout: '{"level":"error"}\n',
+        stderr: "Error: boom\n",
+      }),
+    );
+
+    const result = runPipelineLocal({
+      pipelineName: "hdx",
+      repoRoot: "/repo",
+      runOptions: {},
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      reportJson: "",
+      errorText: 'Error: boom\n{"level":"error"}',
     });
   });
 

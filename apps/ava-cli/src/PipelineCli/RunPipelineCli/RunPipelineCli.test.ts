@@ -348,4 +348,28 @@ describe("runPipelineCommand", () => {
       "error: HTTP GET request failed with status 429.",
     );
   });
+  it("names the runner's last line when a local run prints no report", async () => {
+    vi.mocked(runPipelineLocal).mockReturnValueOnce({
+      ok: true,
+      reportJson: "done",
+      errorText: "",
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+
+    await expect(
+      runPipelineCommand({ name: "socrata", local: true }),
+    ).rejects.toThrow(/^The local runner did not print a report: done$/);
+  });
+
+  it("prints a report it cannot read as raw JSON instead of failing", async () => {
+    _mockFetch(async () => {
+      return new Response('{"pipelineRunId":5}', { status: 200 });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({ name: "socrata", local: false });
+
+    expect(_getCombinedLogs()).toContain('{"pipelineRunId":5}');
+  });
 });

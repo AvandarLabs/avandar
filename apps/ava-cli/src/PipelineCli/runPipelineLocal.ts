@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { PipelineRunReportSchema } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
 import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
 
 /**
@@ -30,9 +31,9 @@ export function findAvandarRepoRoot(): string | undefined {
 export type RunPipelineLocalResult = Readonly<{
   ok: boolean;
   /**
-   * Last line of stdout when ok: the run report as JSON. A run where every
-   * drive failed also ends stdout with its report, so a failed run carries
-   * it too. Otherwise empty.
+   * Last line of stdout when ok: the run report as JSON. A failed run
+   * carries it too when its last line is a report, as when every drive
+   * failed. Otherwise empty.
    */
   reportJson: string;
   errorText: string;
@@ -53,11 +54,21 @@ function _buildRunArgs(runOptions: PipelineRunRequestOptions): string[] {
   ];
 }
 
-/** Whether a line is a JSON object, as the runner prints its report. */
-function _isJsonObjectLine(line: string): boolean {
+/** Stdout split into its last line and everything printed before it. */
+function _splitLastStdoutLine(
+  stdout: string,
+): Readonly<{ earlierOutput: string; lastLine: string }> {
+  const lines = stdout.trim().split("\n");
+  return {
+    earlierOutput: lines.slice(0, -1).join("\n"),
+    lastLine: lines[lines.length - 1] ?? "",
+  };
+}
+
+/** Whether a line is a run report as JSON, as the runner prints it. */
+function _isReportLine(line: string): boolean {
   try {
-    const json: unknown = JSON.parse(line);
-    return typeof json === "object" && json !== null;
+    return PipelineRunReportSchema.safeParse(JSON.parse(line)).success;
   } catch {
     return false;
   }
@@ -65,17 +76,17 @@ function _isJsonObjectLine(line: string): boolean {
 
 /**
  * The result of a run that exited non-zero. When stdout ends with a report,
- * it is returned on its own and left out of the error text.
+ * it is returned on its own and left out of the error text. Otherwise the
+ * error text keeps all of stdout.
  */
 function _buildFailedResult(args: {
   stdout: string;
   stderr: string;
   status: number | null;
 }): RunPipelineLocalResult {
-  const lines = args.stdout.trim().split("\n");
-  const lastLine = lines[lines.length - 1] ?? "";
-  const hasReport = _isJsonObjectLine(lastLine);
-  const output = hasReport ? lines.slice(0, -1).join("\n") : args.stdout;
+  const { earlierOutput, lastLine } = _splitLastStdoutLine(args.stdout);
+  const hasReport = _isReportLine(lastLine);
+  const output = hasReport ? earlierOutput : args.stdout;
   const combined = [args.stderr.trim(), output.trim()]
     .filter((text) => {
       return text !== "";
@@ -131,12 +142,9 @@ export function runPipelineLocal(options: {
     return _buildFailedResult({ stdout, stderr, status: spawnResult.status });
   }
 
-  const lines = stdout.trim().split("\n");
-  const lastLine = lines[lines.length - 1] ?? "";
-
   return {
     ok: true,
-    reportJson: lastLine,
+    reportJson: _splitLastStdoutLine(stdout).lastLine,
     errorText: "",
   };
 }

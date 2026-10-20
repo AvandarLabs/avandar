@@ -1,4 +1,7 @@
-import { printPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
+import {
+  printPipelineRunReport,
+  printReceivedPipelineRunReport,
+} from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
 import { Acclimate } from "@avandar/acclimate";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
@@ -11,6 +14,12 @@ const DRIVE = {
   relationsUnchanged: 117,
   newestTimestamp: "2026-10-20T12:00:00.000Z",
   status: "ok",
+} as const;
+
+const FAILED_DRIVE = {
+  ...DRIVE,
+  status: "failed",
+  error: "HTTP GET request failed with status 429.",
 } as const;
 
 function _report(drives: PipelineRunReport["drives"]): PipelineRunReport {
@@ -29,6 +38,7 @@ function _logs(): string {
 
 describe("printPipelineRunReport", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.spyOn(Acclimate, "log").mockImplementation(() => {});
   });
 
@@ -40,25 +50,41 @@ describe("printPipelineRunReport", () => {
     );
   });
 
-  it("prints one line per drive with its window and counts", () => {
+  it("prints a drive's key, then its window and counts on indented lines", () => {
     printPipelineRunReport(_report([DRIVE]));
 
     expect(_logs()).toContain(
-      "https://data.cityofnewyork.us  2026-10-01T00:00:00.000Z to now  " +
-        "fetched 120, written 3, unchanged 117, newest 2026-10-20T12:00:00.000Z",
+      "ok      https://data.cityofnewyork.us\n" +
+        "        2026-10-01T00:00:00.000Z to now\n" +
+        "        fetched 120, written 3, unchanged 117, " +
+        "newest 2026-10-20T12:00:00.000Z",
     );
   });
 
-  it("prints a failed drive's error", () => {
+  it("keeps every line of a drive with a full window within 80 columns", () => {
     printPipelineRunReport(
       _report([
         {
           ...DRIVE,
-          status: "failed",
-          error: "HTTP GET request failed with status 429.",
+          window: {
+            since: "2026-10-01T00:00:00.000Z",
+            until: "2026-10-20T00:00:00.000Z",
+          },
         },
       ]),
     );
+
+    const lineLengths = _logs()
+      .replace(/\|\w+\|/g, "")
+      .split("\n")
+      .map((line) => {
+        return line.length;
+      });
+    expect(Math.max(...lineLengths)).toBeLessThanOrEqual(80);
+  });
+
+  it("prints a failed drive's error", () => {
+    printPipelineRunReport(_report([FAILED_DRIVE]));
 
     expect(_logs()).toContain(
       "error: HTTP GET request failed with status 429.",
@@ -71,9 +97,49 @@ describe("printPipelineRunReport", () => {
     expect(_logs()).toContain("(limit reached)");
   });
 
+  it("prints a status it does not know as is", () => {
+    printPipelineRunReport(_report([{ ...DRIVE, status: "paused" }]));
+
+    expect(_logs()).toContain("paused  https://data.cityofnewyork.us");
+  });
+
   it("says when no drive is configured", () => {
     printPipelineRunReport(_report([]));
 
     expect(_logs()).toContain("No drives are configured");
+  });
+
+  it("prints the header green when no drive failed", () => {
+    printPipelineRunReport(_report([DRIVE]));
+
+    expect(_logs()).toContain("|green|Pipeline run");
+  });
+
+  it("prints the header yellow when some drives failed", () => {
+    printPipelineRunReport(_report([DRIVE, FAILED_DRIVE]));
+
+    expect(_logs()).toContain("|yellow|Pipeline run");
+  });
+
+  it("prints the header red when every drive failed", () => {
+    printPipelineRunReport(_report([FAILED_DRIVE]));
+
+    expect(_logs()).toContain("|red|Pipeline run");
+  });
+});
+
+describe("printReceivedPipelineRunReport", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(Acclimate, "log").mockImplementation(() => {});
+  });
+
+  it("prints a report it could not read as its raw JSON", () => {
+    printReceivedPipelineRunReport({
+      isReadable: false,
+      json: '{"pipelineRunId":5}',
+    });
+
+    expect(_logs()).toContain('{"pipelineRunId":5}');
   });
 });

@@ -42,4 +42,11 @@ describe("PipelineRunReportSchema", () => {
 
     expect(PipelineRunReportSchema.safeParse(report).success).toBe(false);
   });
+  it("accepts a mode and a drive status it does not know", () => {
+    const report = JSON.parse(JSON.stringify(ENGINE_REPORT));
+    report.mode = "backfill";
+    report.drives[0].status = "paused";
+
+    expect(PipelineRunReportSchema.safeParse(report).success).toBe(true);
+  });
 });
