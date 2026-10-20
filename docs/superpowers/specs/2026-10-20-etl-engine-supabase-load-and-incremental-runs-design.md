@@ -98,7 +98,7 @@ Two more terms:
 | Socrata crawl | Discovery API with default (relevance) order and `offset` paging. Results carry no timestamps. |
 | Timestamps on rows | Neither drive-index pipeline sets `date_of_last_update` or `date_of_last_sync`. Nothing records how fresh a row is. |
 | Pipeline lineage on rows | The `data_catalog_listings__api_access_complete` check forces `pipeline_name` and `pipeline_run_id` to be `NULL` on every `api_resource` row, so an HDX or Socrata row cannot say which pipeline wrote it. `ava pipeline reset` works around this by matching on `api_service` and `api_base_url`. |
-| `world-bank__wdi` load | Hand-codes the Parquet upload, the listing upsert, and the relation column rewrite (`catalogOpenDataInsert.ts`). Uploads to `SUPABASE_OPENDATA_BUCKET` or `opendata`, while the bucket migration created `open-data-catalog`. |
+| `world-bank__wdi` load | Hand-codes the Parquet upload, the listing upsert, and the relation column rewrite (`catalogOpenDataInsert.ts`). Uploads to the public `opendata` bucket (or `SUPABASE_OPENDATA_BUCKET`). The private `open-data-catalog` bucket is a different thing: the app's write-back cache for `api_resource` listings. |
 
 ### What the source APIs support
 
@@ -167,7 +167,7 @@ const engine = EtlEngine.create({
   output: {
     listingsTable: "data_catalog_listings",
     relationColumnsTable: "data_catalog_listings__relation_columns",
-    bucket: "open-data-catalog",         // only required if a relation is pipeline_parquet
+    bucket: "opendata",                  // only required if a relation is pipeline_parquet
   },
 
   listDrives: () => readonly Drive[],    // crawled in this order, one after another
@@ -179,10 +179,11 @@ const engine = EtlEngine.create({
 
   incremental?: {
     getConnectionTimestamp: (connection) => Date,
-    readHighWaterMark?: (args: { drive, driveKey, supabase, output }) => Promise<Date | undefined>,
+    readHighWaterMark?: (args: { drive, driveKey, readDefaultHighWaterMark }) => Promise<Date | undefined>,
   },
 });
 
+// `stores` (optional) replaces the Supabase-backed stores, for tests.
 const report: EtlRunReport = await engine.run({
   mode: "full" | "incremental",
   since?: Date,
@@ -219,6 +220,13 @@ type PipelineParquetRelation = {
 `extract` pages through a drive's connections and knows nothing about rows;
 `transform` turns one connection into zero or more relations (an HDX dataset
 with no readable resource yields none). Neither ever sees a Supabase client.
+
+`EtlEngine.create` is a plain generic factory function, not an
+`@avandar/modules` factory: a module's state type comes from a builder
+annotation and cannot be generic over a pipeline's drive and connection
+types. It also accepts an optional `stores` override (an in-memory listings
+store and object store, exported by the package) so pipelines and the engine
+itself can be tested without Supabase.
 
 The engine keeps its existing static helpers (`storeExtractedData`,
 `getLoadParquetPathForTable`) and the `etl-output/<pipeline>/<run>/` directory
@@ -266,7 +274,7 @@ type EtlRunReport = {
     relationsWritten: number;
     relationsUnchanged: number;
     newestTimestamp: Date | undefined;
-    status: "ok" | "failed";
+    status: "ok" | "failed" | "skipped"; // skipped: the limit was reached first
     error?: string;
   }>;
 };
@@ -315,13 +323,19 @@ pipeline ever needs it (section 9.2).
 
 For one page of relations, in this order:
 
-1. **Parquet relations:** convert each CSV to ZSTD Parquet with the existing
+1. **Read the existing rows** for the page's keys from the listings table, in
+   chunks of 200 keys so the request URL stays short.
+2. **Parquet relations:** convert each CSV to ZSTD Parquet with the existing
    `transformedCsvsToParquetBlobs`, then compute the Parquet bytes' SHA-256.
    If the existing row's `metadata.parquet_sha256` matches, skip the upload.
    Otherwise upload with `upsert: true`. The object is uploaded before its
-   row is written, so a row never points at a missing object.
-2. **Read the existing rows** for the page's keys from the listings table, in
-   chunks of 200 keys so the request URL stays short.
+   row is written, so a row never points at a missing object. The engine
+   adds these metadata keys to every Parquet row, merged over the relation's
+   own `metadata`: `open_data_bucket`, `storage_object_path`, `table` (`name`,
+   `row_count`, `column_names`), and `parquet_sha256`. It also appends the
+   object's public URL to `canonical_urls`, and derives the relation columns
+   from the Parquet file's `DESCRIBE`. These are what `world-bank__wdi`
+   writes by hand today.
 3. **Compare.** A relation is *unchanged* when every column the engine writes,
    except `pipeline_run_id` and `date_of_last_sync`, equals the stored value.
    Comparing all written columns, not just `date_of_last_update`, means a
@@ -368,10 +382,15 @@ hardcoded `socrata` and `hdx` filters.
   `fq=metadata_modified:[<since> TO <until>}`. It returns full dataset records,
   including `resources[]`, so no `package_show` call is needed per dataset.
   `listDatasets` (`package_list`) is removed if nothing else uses it.
-- **Paging is keyset, not `start`:** each next page re-queries from the last
-  page's `metadata_modified` (inclusive) and skips rows at or before the last
-  `(metadata_modified, name)` pair. Offset paging would skip or repeat
-  datasets that change during the crawl.
+- **Paging is keyset, not `start`:** each next page asks for datasets
+  strictly after the last page's `(metadata_modified, name)` pair, with a
+  Solr filter on both fields:
+  `metadata_modified:{T TO <until>} OR (metadata_modified:"T" AND name:{"N" TO *])`.
+  Filtering on the timestamp alone would loop forever on a full page of
+  datasets that share one timestamp. `extract` also drops any row at or
+  before the pair, and stops with an error if a full page has nothing after
+  it. Offset paging would skip or repeat datasets that change during the
+  crawl.
 - **Timestamps:** `metadata_modified` is naive UTC with microseconds. It is
   parsed as UTC. Query bounds are rounded down to milliseconds, which matches
   the search index's precision and only widens the inclusive lower bound.
@@ -426,12 +445,18 @@ ava pipeline run <name> [--local] [--limit <n>] [--incremental]
   timezone is rejected rather than guessed.
 - The same options travel to the server as the JSON body of
   `POST /<name>/run` and to `scripts/runPipelineOnce.ts` as flags. One shared
-  parser validates them in all three places, replacing
-  `parsePipelineRunLimit`.
+  parser (`apps/pipeline-server/pipelines/shared/parsePipelineRunOptions`)
+  validates them in both, replacing `parsePipelineRunLimit`.
 - `PipelineRunOptions` becomes `{ mode, since, until, limit }`.
-- The CLI prints the report: one line per drive with its window, counts,
-  newest timestamp, and status. `run()` still returns the run id as the last
-  line of stdout for `--local`.
+- Every pipeline's `run()` resolves to the `EtlRunReport`. The server answers
+  `POST /<name>/run` with it as JSON, and `scripts/runPipelineOnce.ts` prints
+  it as JSON on the last line of stdout. The CLI parses it from either and
+  prints the run id, then one line per drive with its window, counts, newest
+  timestamp, and status.
+- The CLI itself only checks that `--incremental` and `--since` are not
+  combined, so that obvious mistake fails before any request. The format
+  rules are enforced by the shared parser in the server and the runner, so
+  the CLI does not duplicate them.
 
 ### 5.10 `@avandar/etl` packaging
 
@@ -509,7 +534,7 @@ interfaces, so no test needs Supabase.
 | E12 | A repeated connection id within one drive is dropped before the order check, so it neither writes twice nor throws | 5.3 |
 | E13 | The same connection id in two different drives is not treated as a repeat | 5.3 |
 | E14 | `limit` counts connections across drives: with limit 5 and drives of 3 and 4, the second drive writes 2 | 5.3 |
-| E15 | Once the limit is reached, `extract` is not asked for another page and later drives are not crawled | 5.3 |
+| E15 | Once the limit is reached, `extract` is not asked for another page, and later drives are reported `skipped` without being crawled | 5.3 |
 | E16 | Drives are crawled in `listDrives` order, and a drive's first page is not requested until the previous drive finished | 5.3 |
 | E17 | Without `incremental` config, pages are not order-checked | 5.4 |
 
@@ -588,6 +613,7 @@ synthetic names and `.invalid` hosts, and every test deletes what it inserted.
 | --- | --- | --- |
 | C1 | `CkanDiscoveryClient.searchDatasets` sends `sort=metadata_modified asc,name asc` and `rows=1000` | 5.7 |
 | C2 | A window becomes `fq=metadata_modified:[<since> TO <until>}`, with `*` for a missing bound | 5.7 |
+| C2b | A cursor becomes the two-field keyset filter on `metadata_modified` and `name` | 5.7 |
 | C3 | Window bounds are rounded down to whole milliseconds and sent as UTC with `Z` | 5.7 |
 | C4 | The response parses into full datasets including `resources[]` and `metadata_modified` | 5.7 |
 | C5 | A naive `metadata_modified` such as `2026-10-20T13:47:48.858245` parses as that instant in UTC | 5.7 |
@@ -601,8 +627,9 @@ synthetic names and `.invalid` hosts, and every test deletes what it inserted.
 
 | Id | Claim | Spec |
 | --- | --- | --- |
-| H1 | `extract` pages with keyset paging: the next request starts at the last page's newest `metadata_modified` | 5.7 |
-| H2 | The next page skips rows at or before the last `(metadata_modified, name)` pair, so no dataset is returned twice | 5.7 |
+| H1 | `extract` pages with keyset paging: the next request asks for datasets after the last page's final `(metadata_modified, name)` pair | 5.7 |
+| H2 | Rows at or before that pair are dropped, so no dataset is returned twice | 5.7 |
+| H2b | A full page with nothing after the cursor stops with an error instead of looping | 5.7 |
 | H3 | `extract` stops when a page returns fewer than 1,000 rows | 5.7 |
 | H4 | `transform` returns one `ApiResourceRelation` per readable resource, with `sourceUpdatedAt` set to the dataset's `metadata_modified` | 5.7 |
 | H5 | A dataset with no readable resource transforms to zero relations | 5.7 |
@@ -680,7 +707,10 @@ the pipeline server passes in.
 
 1. **Bucket.** `pipeline-server` passes `SUPABASE_OPENDATA_BUCKET`, falling
    back to `opendata`, which is exactly what `world-bank__wdi` uploads to
-   today. Moving to the `open-data-catalog` bucket is a separate change.
+   today. `opendata` is the public bucket for prebuilt Parquet, which is what
+   the engine writes. The private `open-data-catalog` bucket is the app's
+   write-back cache for `api_resource` listings, which the engine never
+   touches, so it is not a candidate.
 2. **HDX scope.** The HDX drive indexes every dataset, with no organization or
    tag filter. A run can still be capped with `--limit`, and a filter is a
    one-line `fq` addition if one is wanted later.
