@@ -674,9 +674,6 @@ importers:
 
   packages/node/etl:
     dependencies:
-      '@avandar/modules':
-        specifier: workspace:*
-        version: link:../../shared/modules
       '@avandar/utils':
         specifier: workspace:*
         version: link:../../shared/utils

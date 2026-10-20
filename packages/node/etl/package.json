@@ -28,7 +28,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@avandar/modules": "workspace:*",
     "@avandar/utils": "workspace:*"
   },
   "devDependencies": {
