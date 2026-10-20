@@ -1,6 +1,6 @@
 import { runPipelineLocal } from "@ava-cli/PipelineCli/runPipelineLocal";
 import { Acclimate } from "@avandar/acclimate";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const REPORT = {
   pipelineRunId: "00000000-0000-4000-8000-000000000001",
@@ -82,6 +82,10 @@ describe("runPipelineCommand", () => {
     process.env.AVA_PIPELINE_SERVER_SECRET = "secret";
 
     vi.spyOn(Acclimate, "log").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    process.exitCode = undefined;
   });
 
   it("runs a pipeline", async () => {
@@ -310,7 +314,7 @@ describe("runPipelineCommand", () => {
       "--since must be earlier than --until.",
     );
   });
-  it("prints the report and fails when the server says every drive failed", async () => {
+  it("prints the report and exits 1 without throwing when the server says every drive failed", async () => {
     _mockFetch(async () => {
       return new Response(
         JSON.stringify({
@@ -324,15 +328,18 @@ describe("runPipelineCommand", () => {
 
     const { runPipelineCommand } = await import("./RunPipelineCli");
 
-    await expect(
-      runPipelineCommand({ name: "socrata", local: false }),
-    ).rejects.toThrow(/^500 Internal Server Error: Every drive failed\.$/);
+    await runPipelineCommand({ name: "socrata", local: false });
+
+    expect(process.exitCode).toBe(1);
     expect(_getCombinedLogs()).toContain(
       "error: HTTP GET request failed with status 429.",
     );
+    expect(_getCombinedLogs()).toContain(
+      "500 Internal Server Error: Every drive failed.",
+    );
   });
 
-  it("prints the report and fails when a local run says every drive failed", async () => {
+  it("prints the report and exits 1 without throwing when a local run says every drive failed", async () => {
     vi.mocked(runPipelineLocal).mockReturnValueOnce({
       ok: false,
       reportJson: JSON.stringify(FAILED_REPORT),
@@ -341,12 +348,13 @@ describe("runPipelineCommand", () => {
 
     const { runPipelineCommand } = await import("./RunPipelineCli");
 
-    await expect(
-      runPipelineCommand({ name: "socrata", local: true }),
-    ).rejects.toThrow(/^Every drive failed\.$/);
+    await runPipelineCommand({ name: "socrata", local: true });
+
+    expect(process.exitCode).toBe(1);
     expect(_getCombinedLogs()).toContain(
       "error: HTTP GET request failed with status 429.",
     );
+    expect(_getCombinedLogs()).toContain("Every drive failed.");
   });
   it("names the runner's last line when a local run prints no report", async () => {
     vi.mocked(runPipelineLocal).mockReturnValueOnce({

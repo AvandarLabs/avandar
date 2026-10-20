@@ -71,6 +71,8 @@ function _runLocally(args: {
 
 /**
  * Runs a pipeline, on the pipeline-server or locally through vite-node.
+ * When every drive failed, it prints the report and sets the exit code to 1
+ * instead of throwing. Any other error is printed and rethrown.
  *
  * @param options.name - The pipeline's directory name.
  * @param options.local - Run it in-process instead of on the server.
@@ -111,6 +113,12 @@ export async function runPipelineCommand(options: {
     }
     printError(`Failed to run pipeline: ${name}`);
     printError(message);
+    // The report already says why every drive failed, so the run only sets
+    // a failing exit code: a thrown error would add a stack trace after it.
+    if (error instanceof PipelineRunFailedError) {
+      process.exitCode = 1;
+      return;
+    }
     throw error;
   }
 }
