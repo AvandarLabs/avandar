@@ -2,6 +2,7 @@ import {
   findAvandarRepoRoot,
   runPipelineLocal,
 } from "@ava-cli/PipelineCli/runPipelineLocal";
+import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
 import { sendRunPipelineRequest } from "@ava-cli/PipelineCli/sendRunPipelineRequest";
 import {
   printError,
@@ -10,47 +11,69 @@ import {
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
 
+function _assertOneLowerBound(runOptions: PipelineRunRequestOptions): void {
+  if (runOptions.incremental === true && runOptions.since !== undefined) {
+    throw new Error(
+      "Pass either --incremental or --since, not both: they name two different lower bounds.",
+    );
+  }
+}
+
+function _runLocally(args: {
+  name: string;
+  runOptions: PipelineRunRequestOptions;
+}): string {
+  const repoRoot: string | undefined = findAvandarRepoRoot();
+  if (repoRoot === undefined) {
+    throw new Error(
+      "Could not find the Avandar repo root (look for " +
+        "pnpm-workspace.yaml and apps/pipeline-server/pipelines). " +
+        "Run this command from inside the repository.",
+    );
+  }
+  const localResult = runPipelineLocal({
+    pipelineName: args.name,
+    repoRoot,
+    runOptions: args.runOptions,
+  });
+  if (!localResult.ok) {
+    throw new Error(localResult.errorText);
+  }
+  return localResult.pipelineRunId;
+}
+
 /**
  * Runs a pipeline, on the pipeline-server or locally through vite-node.
  *
  * @param options.name - The pipeline's directory name.
  * @param options.local - Run it in-process instead of on the server.
+ * @param options.incremental - Resume each drive from its high-water mark.
+ * @param options.since - Only process what changed at or after this time.
+ * @param options.until - Only process what changed before this time.
  * @param options.limit - Process at most this many datasets.
  */
 export async function runPipelineCommand(options: {
   name: string;
   local: boolean;
+  incremental?: boolean;
+  since?: string;
+  until?: string;
   limit?: number;
 }): Promise<void> {
-  const { name, local, limit } = options;
+  const { name, local } = options;
+  const runOptions: PipelineRunRequestOptions = {
+    incremental: options.incremental,
+    since: options.since,
+    until: options.until,
+    limit: options.limit,
+  };
 
   try {
+    _assertOneLowerBound(runOptions);
     printInfo(`Running pipeline: ${name}`);
-    if (local) {
-      const repoRoot: string | undefined = findAvandarRepoRoot();
-      if (repoRoot === undefined) {
-        throw new Error(
-          "Could not find the Avandar repo root (look for " +
-            "pnpm-workspace.yaml and apps/pipeline-server/pipelines). " +
-            "Run this command from inside the repository.",
-        );
-      }
-      const localResult = runPipelineLocal({
-        pipelineName: name,
-        repoRoot,
-        limit,
-      });
-      if (!localResult.ok) {
-        throw new Error(localResult.errorText);
-      }
-      printSuccess(localResult.pipelineRunId);
-      return;
-    }
-
-    const result: string = await sendRunPipelineRequest({
-      pipelineName: name,
-      limit,
-    });
+    const result: string = local
+      ? _runLocally({ name, runOptions })
+      : await sendRunPipelineRequest({ pipelineName: name, runOptions });
     printSuccess(result);
   } catch (error: unknown) {
     const message: string =
@@ -83,6 +106,32 @@ export const RunPipelineCli = Acclimate.createCLI("run")
       "Run the pipeline TypeScript module locally (no HTTP server required).",
   })
   .addOption({
+    name: "--incremental",
+    type: "boolean",
+    required: false,
+    defaultValue: false,
+    description:
+      "Only process what was created or changed since the newest timestamp " +
+      "already stored for each drive. Also continues a cancelled or limited run.",
+  })
+  .addOption({
+    name: "--since",
+    type: "string",
+    required: false,
+    description:
+      "Only process what changed at or after this ISO 8601 timestamp with a " +
+      "timezone, such as 2026-10-01T00:00:00Z. Cannot be combined with " +
+      "--incremental. A --since later than a drive's last stored update " +
+      "leaves a gap that only a run reaching back over it fills.",
+  })
+  .addOption({
+    name: "--until",
+    type: "string",
+    required: false,
+    description:
+      "Only process what changed before this ISO 8601 timestamp with a timezone.",
+  })
+  .addOption({
     name: "--limit",
     type: "number",
     required: false,
@@ -100,11 +149,16 @@ export const RunPipelineCli = Acclimate.createCLI("run")
     },
   })
   .action(
-    ({
-      name,
-      local,
-      limit,
-    }: Readonly<{ name: string; local: boolean; limit?: number }>) => {
-      return runPipelineCommand({ name, local, limit });
+    (
+      args: Readonly<{
+        name: string;
+        local: boolean;
+        incremental: boolean;
+        since?: string;
+        until?: string;
+        limit?: number;
+      }>,
+    ) => {
+      return runPipelineCommand(args);
     },
   );

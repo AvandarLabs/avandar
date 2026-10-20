@@ -127,7 +127,7 @@ describe("runPipelineCommand", () => {
     ]);
   });
 
-  it("sends no body when no limit is given", async () => {
+  it("sends no body when no option is given", async () => {
     const fetchMock = _mockFetch(async () => {
       return new Response("run-id", { status: 200 });
     });
@@ -145,7 +145,112 @@ describe("runPipelineCommand", () => {
     expect(vi.mocked(runPipelineLocal)).toHaveBeenCalledWith({
       pipelineName: "hdx",
       repoRoot: "/repo",
-      limit: 3,
+      runOptions: { limit: 3 },
     });
+  });
+
+  it("sends incremental and until to the pipeline server", async () => {
+    const fetchMock = _mockFetch(async () => {
+      return new Response("run-id", { status: 200 });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({
+      name: "socrata",
+      local: false,
+      incremental: true,
+      until: "2026-10-15T00:00:00Z",
+    });
+
+    expect(fetchMock.mock.calls[0]?.[1]?.body).toBe(
+      '{"incremental":true,"until":"2026-10-15T00:00:00Z"}',
+    );
+  });
+
+  it("sends only the keys the server accepts", async () => {
+    const fetchMock = _mockFetch(async () => {
+      return new Response("run-id", { status: 200 });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({
+      name: "socrata",
+      local: false,
+      incremental: false,
+      since: "2026-10-01T00:00:00Z",
+      limit: 2,
+    });
+
+    expect(fetchMock.mock.calls[0]?.[1]?.body).toBe(
+      '{"since":"2026-10-01T00:00:00Z","limit":2}',
+    );
+  });
+
+  it("passes since to a local run", async () => {
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({
+      name: "socrata",
+      local: true,
+      since: "2026-10-01T00:00:00Z",
+    });
+
+    expect(vi.mocked(runPipelineLocal)).toHaveBeenCalledWith({
+      pipelineName: "socrata",
+      repoRoot: "/repo",
+      runOptions: { since: "2026-10-01T00:00:00Z" },
+    });
+  });
+
+  it("rejects incremental with since before sending anything", async () => {
+    const fetchMock = _mockFetch(async () => {
+      return new Response("run-id", { status: 200 });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+
+    await expect(
+      runPipelineCommand({
+        name: "socrata",
+        local: false,
+        incremental: true,
+        since: "2026-10-01T00:00:00Z",
+      }),
+    ).rejects.toThrow("not both");
+    expect([
+      fetchMock.mock.calls.length,
+      vi.mocked(runPipelineLocal).mock.calls.length,
+    ]).toEqual([0, 0]);
+  });
+
+  it("rejects incremental with since before a local run too", async () => {
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+
+    await expect(
+      runPipelineCommand({
+        name: "socrata",
+        local: true,
+        incremental: true,
+        since: "2026-10-01T00:00:00Z",
+      }),
+    ).rejects.toThrow("not both");
+    expect(vi.mocked(runPipelineLocal)).not.toHaveBeenCalled();
+  });
+
+  it("shows the server's own message when it answers 400", async () => {
+    _mockFetch(async () => {
+      return new Response(
+        JSON.stringify({ ok: false, error: "--since must be earlier than --until." }),
+        { status: 400, statusText: "Bad Request" },
+      );
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+
+    await expect(
+      runPipelineCommand({ name: "socrata", local: false, until: "x" }),
+    ).rejects.toThrow(/^--since must be earlier than --until\.$/);
+    expect(_getCombinedLogs()).toContain(
+      "--since must be earlier than --until.",
+    );
   });
 });

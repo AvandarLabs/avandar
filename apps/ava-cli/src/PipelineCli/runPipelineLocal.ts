@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
+import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
 
 /**
  * Walks up from `process.cwd()` until a directory contains both
@@ -34,12 +35,27 @@ export type RunPipelineLocalResult = Readonly<{
 }>;
 
 /**
+ * The flags `scripts/runPipelineOnce.ts` accepts for the given options. It
+ * parses argv strictly, so only these four flags are ever passed.
+ */
+function _buildRunArgs(runOptions: PipelineRunRequestOptions): string[] {
+  return [
+    ...(runOptions.incremental === true ? ["--incremental"] : []),
+    ...(runOptions.since === undefined ? [] : ["--since", runOptions.since]),
+    ...(runOptions.until === undefined ? [] : ["--until", runOptions.until]),
+    ...(runOptions.limit === undefined
+      ? []
+      : ["--limit", String(runOptions.limit)]),
+  ];
+}
+
+/**
  * Runs a pipeline module via `pnpm exec vite-node` (no HTTP server).
  */
 export function runPipelineLocal(options: {
   pipelineName: string;
   repoRoot: string;
-  limit?: number;
+  runOptions: PipelineRunRequestOptions;
 }): RunPipelineLocalResult {
   const scriptPath = join(options.repoRoot, "scripts", "runPipelineOnce.ts");
 
@@ -52,9 +68,7 @@ export function runPipelineLocal(options: {
       "vite.script.config.ts",
       scriptPath,
       options.pipelineName,
-      ...(options.limit === undefined
-        ? []
-        : ["--limit", String(options.limit)]),
+      ..._buildRunArgs(options.runOptions),
     ],
     {
       cwd: options.repoRoot,
