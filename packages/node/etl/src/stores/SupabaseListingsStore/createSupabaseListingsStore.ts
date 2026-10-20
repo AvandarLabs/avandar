@@ -1,6 +1,7 @@
 import { assertOneListingKind } from "@etl/stores/assertOneListingKind";
 import { buildListingKeyFromRow } from "@etl/stores/buildListingKeyFromRow/buildListingKeyFromRow";
 import { LISTING_CONTRACT_COLUMNS } from "@etl/stores/listingContractColumns";
+import { splitIntoChunks } from "@etl/utils/splitIntoChunks/splitIntoChunks";
 import type {
   ListingRowValues,
   ListingsStore,
@@ -38,7 +39,10 @@ export type SupabaseListingsStoreOptions = Readonly<{
   relationColumnsTable: string;
 }>;
 
-type _KeyColumn = "external_dataset_id" | "api_resource_id" | "parquet_file_name";
+type _KeyColumn =
+  | "external_dataset_id"
+  | "api_resource_id"
+  | "parquet_file_name";
 
 type _SupabaseError = Readonly<{
   message: string;
@@ -94,18 +98,7 @@ function _uniqueValues(
   ];
 }
 
-function _splitIntoReadChunks<T>(items: readonly T[]): T[][] {
-  return Array.from(
-    { length: Math.ceil(items.length / ROWS_PER_READ) },
-    (_, index) => {
-      return items.slice(index * ROWS_PER_READ, (index + 1) * ROWS_PER_READ);
-    },
-  );
-}
-
-function _pickContractColumns(
-  row: ListingRowValues,
-): Record<string, unknown> {
+function _pickContractColumns(row: ListingRowValues): Record<string, unknown> {
   return Object.fromEntries(
     LISTING_CONTRACT_COLUMNS.map((column) => {
       return [column, row[column]];
@@ -166,19 +159,22 @@ async function _readChunk(args: {
     .from(options.listingsTable)
     .select(SELECT_COLUMNS);
   const query =
-    first.access_kind === "api_resource" ?
-      base
-        .eq("access_kind", "api_resource")
-        .eq("api_service", first.api_service ?? "")
-        .eq("api_base_url", first.api_base_url ?? "")
-        .in("external_dataset_id", _uniqueValues(rows, "external_dataset_id"))
-        .in("api_resource_id", _uniqueValues(rows, "api_resource_id"))
-    : base
-        .eq("access_kind", "pipeline_parquet")
-        .eq("pipeline_name", first.pipeline_name)
-        .in("parquet_file_name", _uniqueValues(rows, "parquet_file_name"));
+    first.access_kind === "api_resource"
+      ? base
+          .eq("access_kind", "api_resource")
+          .eq("api_service", first.api_service ?? "")
+          .eq("api_base_url", first.api_base_url ?? "")
+          .in("external_dataset_id", _uniqueValues(rows, "external_dataset_id"))
+          .in("api_resource_id", _uniqueValues(rows, "api_resource_id"))
+      : base
+          .eq("access_kind", "pipeline_parquet")
+          .eq("pipeline_name", first.pipeline_name)
+          .in("parquet_file_name", _uniqueValues(rows, "parquet_file_name"));
   const { data, error } = await query;
-  _throwOnError({ error, action: `reading rows from ${options.listingsTable}` });
+  _throwOnError({
+    error,
+    action: `reading rows from ${options.listingsTable}`,
+  });
   const stored = _toStoredRows(data);
   if (stored.length >= POSTGREST_MAX_ROWS) {
     throw new Error(
@@ -196,14 +192,18 @@ async function _readRowsMatching(args: {
   // ids, so it can return a stored row nobody asked for. The key filter keeps
   // only the ones asked for.
   const groups = _groupBy(args.rows, (row) => {
-    return row.access_kind === "api_resource" ?
-        JSON.stringify([row.access_kind, row.api_service, row.api_base_url])
+    return row.access_kind === "api_resource"
+      ? JSON.stringify([row.access_kind, row.api_service, row.api_base_url])
       : JSON.stringify([row.access_kind, row.pipeline_name]);
   });
   const stored = await Promise.all(
-    [...groups.values()].flatMap(_splitIntoReadChunks).map((rows) => {
-      return _readChunk({ options: args.options, rows });
-    }),
+    [...groups.values()]
+      .flatMap((group) => {
+        return splitIntoChunks(group, ROWS_PER_READ);
+      })
+      .map((rows) => {
+        return _readChunk({ options: args.options, rows });
+      }),
   );
   const wantedKeys = new Set(args.rows.map(buildListingKeyFromRow));
   return stored.flat().filter((row) => {
@@ -225,9 +225,9 @@ async function _upsertRows(args: {
     .from(args.options.listingsTable)
     .upsert(args.rows.map(_pickContractColumns), {
       onConflict:
-        first.access_kind === "api_resource" ?
-          API_RESOURCE_CONFLICT
-        : PIPELINE_PARQUET_CONFLICT,
+        first.access_kind === "api_resource"
+          ? API_RESOURCE_CONFLICT
+          : PIPELINE_PARQUET_CONFLICT,
     })
     .select(SELECT_COLUMNS);
   _throwOnError({

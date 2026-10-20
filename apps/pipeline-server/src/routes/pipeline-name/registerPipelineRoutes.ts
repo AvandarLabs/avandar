@@ -1,3 +1,4 @@
+import { ETL_RUN_OPTIONS_ERROR_NAME } from "@avandar/etl";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import { getEtlRunFailedReport } from "@pipelines/shared/getEtlRunFailedReport/getEtlRunFailedReport";
 import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
@@ -74,9 +75,6 @@ const RUN_BODY_SCHEMA = {
   type: "object",
   propertyNames: { enum: ["incremental", "since", "until", "limit"] },
 } as const;
-
-/** The engine's options error, matched by name in case it loads twice. */
-const ETL_RUN_OPTIONS_ERROR_NAME = "EtlRunOptionsError";
 
 function _getRunErrorStatus(error: unknown): 400 | 500 {
   return error instanceof Error && error.name === ETL_RUN_OPTIONS_ERROR_NAME

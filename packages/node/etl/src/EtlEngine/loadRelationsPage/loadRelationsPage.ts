@@ -4,6 +4,7 @@ import { buildListingRowFromRelation } from "@etl/EtlEngine/buildListingRowFromR
 import { isListingRowUnchanged } from "@etl/EtlEngine/isListingRowUnchanged/isListingRowUnchanged";
 import { prepareParquetRelation } from "@etl/EtlEngine/prepareParquetRelation/prepareParquetRelation";
 import { buildListingKeyFromRow } from "@etl/stores/buildListingKeyFromRow/buildListingKeyFromRow";
+import { splitIntoChunks } from "@etl/utils/splitIntoChunks/splitIntoChunks";
 import type {
   EtlPipelineRunId,
   EtlStores,
@@ -63,18 +64,6 @@ type _BuildRowAndColumnsArgs = Readonly<{
   stored: StoredListingRow | undefined;
   context: LoadRelationsPageContext;
 }>;
-
-function _splitIntoChunks<T>(items: readonly T[]): T[][] {
-  return Array.from(
-    { length: Math.ceil(items.length / LISTING_CHUNK_SIZE) },
-    (_, index) => {
-      return items.slice(
-        index * LISTING_CHUNK_SIZE,
-        (index + 1) * LISTING_CHUNK_SIZE,
-      );
-    },
-  );
-}
 
 /** Splits relations into consecutive runs that share one listing kind. */
 function _splitIntoRunsOfOneKind(
@@ -185,7 +174,7 @@ async function _readStoredRowsByKey(args: {
   listings: ListingsStore;
 }): Promise<Map<string, StoredListingRow>> {
   const storedChunks = await promiseMapSequential(
-    _splitIntoChunks(args.rows),
+    splitIntoChunks(args.rows, LISTING_CHUNK_SIZE),
     (chunk) => {
       return args.listings.readRowsMatching(chunk);
     },
@@ -282,7 +271,7 @@ async function _writeChangedRelations(args: {
   // the page's oldest-first order across kinds.
   const chunks = _splitIntoRunsOfOneKind(args.changedRelations).flatMap(
     (run) => {
-      return _splitIntoChunks(run);
+      return splitIntoChunks(run, LISTING_CHUNK_SIZE);
     },
   );
   // Sequential on purpose: chunks go oldest connection first, so a failure

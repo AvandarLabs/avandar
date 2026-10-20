@@ -1,6 +1,12 @@
 export { EtlEngine } from "@etl/EtlEngine/EtlEngine";
-export { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
-export { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
+export {
+  ETL_RUN_FAILED_ERROR_NAME,
+  EtlRunFailedError,
+} from "@etl/EtlEngine/EtlRunFailedError";
+export {
+  ETL_RUN_OPTIONS_ERROR_NAME,
+  EtlRunOptionsError,
+} from "@etl/EtlEngine/EtlRunOptionsError";
 export { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionError";
 export type {
   ApiResourceRelation,

@@ -1,7 +1,5 @@
+import { ETL_RUN_FAILED_ERROR_NAME } from "@avandar/etl";
 import type { EtlRunReport } from "@avandar/etl";
-
-/** The name of the engine's error for a run where every drive failed. */
-const _ETL_RUN_FAILED_ERROR_NAME = "EtlRunFailedError";
 
 /**
  * The report an `EtlRunFailedError` carries, so a run where every drive
@@ -15,7 +13,7 @@ export function getEtlRunFailedReport(
 ): EtlRunReport | undefined {
   if (
     !(error instanceof Error) ||
-    error.name !== _ETL_RUN_FAILED_ERROR_NAME ||
+    error.name !== ETL_RUN_FAILED_ERROR_NAME ||
     !("report" in error)
   ) {
     return undefined;

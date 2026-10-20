@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { ETL_RUN_OPTIONS_ERROR_NAME } from "@avandar/etl";
 import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
 import { readRawPipelineRunOptionsFromArgv } from "@pipelines/shared/readRawPipelineRunOptionsFromArgv/readRawPipelineRunOptionsFromArgv";
 import { runPipelineAndPrintReport } from "@pipelines/shared/runPipelineAndPrintReport/runPipelineAndPrintReport";
@@ -27,9 +28,6 @@ function _loadPipelinesEnvFile(rootDir: string): void {
   }
 }
 
-/** The engine's options error, matched by name in case it loads twice. */
-const _ETL_RUN_OPTIONS_ERROR_NAME = "EtlRunOptionsError";
-
 /** Prints why the options were rejected and the usage line, then exits 1. */
 function _exitWithUsage(error: unknown): never {
   console.error(error instanceof Error ? error.message : String(error));
@@ -49,7 +47,7 @@ async function _runPipeline(
   try {
     await runPipelineAndPrintReport({ run, options });
   } catch (error: unknown) {
-    if (error instanceof Error && error.name === _ETL_RUN_OPTIONS_ERROR_NAME) {
+    if (error instanceof Error && error.name === ETL_RUN_OPTIONS_ERROR_NAME) {
       _exitWithUsage(error);
     }
     throw error;

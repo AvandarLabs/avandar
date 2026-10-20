@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
-import { basename, dirname, join } from "node:path";
-import { getEtlLoadDir } from "@etl/EtlEngine/etlPaths";
+import { basename, dirname } from "node:path";
+import { getLoadParquetPathForTable } from "@etl/EtlEngine/etlFileHelpers";
 import { transformedCsvsToParquetBlobs } from "@etl/EtlEngine/transformedCsvsToParquetBlobs";
 import { duckDbDescribeColumnTypeToSniffable } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 import { NodeDuckDb } from "@etl/NodeDuckDb/NodeDuckDb";
@@ -85,9 +85,7 @@ async function _convertCsvToParquetBytes(
     );
   });
   if (blob === undefined) {
-    throw new Error(
-      `No Parquet was produced for "${relation.tableBaseName}".`,
-    );
+    throw new Error(`No Parquet was produced for "${relation.tableBaseName}".`);
   }
   return new Uint8Array(await blob.arrayBuffer());
 }
@@ -99,9 +97,12 @@ async function _buildParquetFile(args: {
 }): Promise<_ParquetFile> {
   const { relation } = args;
   const bytes = await _convertCsvToParquetBytes(relation);
-  const loadDir = getEtlLoadDir(args.pipelineName, args.pipelineRunId);
-  await mkdir(loadDir, { recursive: true });
-  const parquetPath = join(loadDir, `${relation.tableBaseName}.parquet`);
+  const parquetPath = getLoadParquetPathForTable({
+    pipelineName: args.pipelineName,
+    pipelineRunId: args.pipelineRunId,
+    tableBaseName: relation.tableBaseName,
+  });
+  await mkdir(dirname(parquetPath), { recursive: true });
   await writeFile(parquetPath, bytes);
   return {
     bytes,
