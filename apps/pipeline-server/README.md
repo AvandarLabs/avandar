@@ -27,12 +27,25 @@ response.
 ## Running one pipeline
 
 ```bash
-ava pipeline run socrata --local            # in-process, no server needed
-ava pipeline run socrata --local --limit 10 # stop after 10 datasets
+ava pipeline run socrata --local                # full run: write every listing that changed
+ava pipeline run socrata --local --incremental  # per drive, only what changed since the last run
+ava pipeline run socrata --local --since 2026-10-01T00:00:00Z --until 2026-10-08T00:00:00Z
+ava pipeline run socrata --local --limit 10     # stop after 10 datasets
+ava pipeline reset socrata                      # delete this pipeline's listings
 ```
 
-`--limit` is supported by `hdx` and `socrata`. `world-bank__wdi` rejects it,
-because it loads every CSV in its input directory.
+`--incremental` starts each drive at the newest `date_of_last_update`
+already stored for it, so it also continues a run that was cancelled or
+stopped by `--limit`. `--since` and `--until` take ISO 8601 timestamps with a
+timezone, and `--since` cannot be combined with `--incremental`.
+`world-bank__wdi` supports full runs only: its sources carry no modification
+time, so `--incremental`, `--since`, and `--until` are rejected. `--limit`
+must be a positive integer. Invalid options are rejected before anything
+runs (HTTP 400 from the server). Every run prints one line per drive: its
+window, how many datasets it fetched, and how many listings it wrote or left
+unchanged. When every drive fails, the report is still printed before the
+command exits with an error. `ava pipeline reset` selects listings by their
+`pipeline_name`.
 
 ## Local development
 

@@ -376,7 +376,10 @@ export type HdxDrive = {
   organizationName: string;
 };
 
-export const HDX_DRIVE: HdxDrive | undefined = undefined;
+export const HDX_DRIVE: HdxDrive | undefined = {
+  baseUrl: "https://data.humdata.org",
+  organizationName: "Humanitarian Data Exchange",
+};
 ```
 
 `apps/pipeline-server/pipelines/socrata/configuredDrives/configuredDrives.ts` -
@@ -475,23 +478,27 @@ when it happens.
 
 ### 6.6 Where this runs
 
-Two pipelines, `apps/pipeline-server/pipelines/hdx/` and
-`apps/pipeline-server/pipelines/socrata/`, each discoverable and runnable the
-same way `world-bank__wdi` already is (`ava pipeline run hdx` / `ava pipeline
-run socrata` - presence of `run.ts` is the only registration step this repo
-requires). The upsert against `data_catalog_listings` is identical for both,
-so it lives once, shared, in
-`apps/pipeline-server/pipelines/shared/upsertDataCatalogListingRows/`. Unlike
-every `EtlEngine`-based pipeline, neither uses `EtlEngine.create(...)`: that
-abstraction is for extracting, transforming, and loading *data* into Parquet,
-and these pipelines do neither - they only enumerate drives and upsert
-metadata rows. Each `run.ts` is a plain async function for that reason, not a
-deviation anyone needs to reconcile with the EtlEngine pattern later.
+Three pipelines run on `@avandar/etl`'s `EtlEngine`: `hdx`, `socrata`, and
+`world-bank__wdi`, each runnable with `ava pipeline run <name>` (the
+presence of `run.ts` is the only registration step). Each supplies its
+drives, an `extract` that pages through a drive's datasets, and a
+`transform` that turns a dataset into listings. The engine does the load:
+it writes `data_catalog_listings` rows and relation columns, and Parquet
+objects for `world-bank__wdi`, writing only rows that changed.
 
-Both pipelines send every request through an `HttpClientFactory` client with
-`withRateLimit({ minTimeMs: 1000 })`, so each makes at most one request per
-second. The Socrata pipeline shares one client across all of its drives,
-because every drive is enumerated through the same Discovery API host.
+`hdx` and `socrata` crawl each drive oldest-modified first (`hdx` by
+`metadata_modified` with `package_search` keyset paging, `socrata` by
+`updatedAt`) and save each page before fetching the next. `ava pipeline run
+<name> --incremental` therefore resumes each drive from the newest
+`date_of_last_update` it already holds, whether the last run finished, was
+cancelled, or stopped at `--limit`. See the
+[engine spec](../superpowers/specs/2026-10-20-etl-engine-supabase-load-and-incremental-runs-design.md).
+
+Both send every request through an `HttpClientFactory` client with
+`withRateLimit({ minTimeMs: 1000 })`. HDX also retries an HTTP 429 three
+times with exponential backoff, since it sends no `Retry-After`. The Socrata
+pipeline shares one client across all of its drives, because every drive is
+read through the same Discovery API host.
 
 ### 6.7 What every pipeline must write
 
@@ -515,9 +522,9 @@ Prebuilding a Parquet file is not symmetric across `access_kind`:
   constraint (`supabase/schemas/10.data_catalog_listings.sql`) enforces at the
   database level for the columns it covers.
 
-Today both halves of this invariant are upheld by convention (each pipeline's
-own code), not by a shared enforcement mechanism outside that CHECK
-constraint. See section 7's deferred list for enforcing it programmatically.
+The engine upholds both halves: it writes a listing for every relation a
+pipeline's `transform` returns, and it uploads a `pipeline_parquet`
+relation's object before writing the row that points at it.
 
 ## 7. What this spec builds vs. what it does not
 
@@ -561,14 +568,10 @@ constraint. See section 7's deferred list for enforcing it programmatically.
    (`OpenDatasetParquetStorageClient`) onto the new private bucket. Not
    needed for Socrata or the cache, and a separate decision touching live
    production catalog rows.
-6. Retry and backoff for the drive index pipelines' HTTP calls. Both
-   pipelines are rate-limited to one request per second (section 6.6), but a
-   request that is still rejected fails its drive's run: nothing retries it.
-   Discovered necessary, not hypothetical: a live dry run against HDX's real
-   CKAN catalog (42,000+ datasets) hit its rate limiter after ~150 sequential
-   requests with no `Retry-After` header, which is why `HDX_DRIVE` stays
-   `undefined`. A deployer adding any drive should first confirm its real
-   total dataset count can be enumerated in one run.
+6. Retry and backoff beyond HTTP 429. HDX's client retries a 429 with
+   exponential backoff, and both drive-index pipelines resume an interrupted
+   drive with `--incremental`, so a rate-limited run loses nothing it already
+   saved. Other transient failures still fail the drive for that run.
 
 ## 8. Testing references to add
 
