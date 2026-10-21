@@ -185,6 +185,32 @@ create unique index "catalog_entries__open_data__api_resource_unique" on "catalo
 where
   "access_kind" = 'api_resource';
 `,
+  "20261021204651_add_pipeline_scope_checkpoints.sql": `-- SQLite override. The Postgres column is \`text[] not null default '{}'::text[]\`.
+-- sqlglot renders that default as \`CAST('{}' AS ARRAY<TEXT>)\`, and transpile.ts
+-- strips every \`DEFAULT <fn>(...)\`, so the generated column is \`TEXT NOT NULL\`
+-- with no default. SQLite refuses to add a NOT NULL column with no default to a
+-- table that already holds rows. \`data_catalog_listings\` is listed in
+-- apps/desktop/sync/syncable-tables.ts, and the desktop applies migrations to a
+-- saved database that already holds synced listings, so the generated statement
+-- would fail and roll back the whole migration batch on every existing install.
+--
+-- The default is \`'[]'\` rather than \`'{}'\` because the mirror stores arrays as
+-- JSON text: \`_bindValues\` in
+-- apps/desktop/main/services/SnapshotBootstrap/SnapshotBootstrap.ts and
+-- \`_serializeRowValues\` in
+-- packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts both
+-- \`JSON.stringify\` every array value they write.
+--
+-- The migration's \`pipeline_scope_checkpoints\` table is not created here. It is
+-- in \`EXCLUDED_TABLES\` in apps/desktop/sync/syncable-tables.ts, so its CREATE
+-- TABLE, primary key, RLS, grants, and trigger have no place in the mirror.
+--
+-- apps/desktop/scripts/gen-sqlite-migrations does not flag this case:
+-- partition.ts routes only ADD CONSTRAINT and ALTER COLUMN to needsHandEdit,
+-- and this statement is ADD COLUMN.
+--
+alter table "data_catalog_listings" add column "pipeline_scope_keys" text not null default '[]';
+`,
 };
 
 /**
