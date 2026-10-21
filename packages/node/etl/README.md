@@ -145,7 +145,8 @@ checkpoint records what was crawled, not what was written, so a scope
 whose connections all produce no relations still advances. It never moves
 backward, ignores timestamps later than the run's start, and does not
 move during a crawl whose explicit `since` is later than it, which would
-leave a gap. A pipeline with `incremental` config reads each crawl's
+leave a gap. A crawl with an explicit `since` and no stored checkpoint does
+not create one. A pipeline with `incremental` config reads each crawl's
 checkpoint on every run, full runs included, so a failed checkpoint read
 fails that crawl in a full run too.
 

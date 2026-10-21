@@ -1,7 +1,7 @@
 /**
  * A source returned a connection older than the one before it in the same
- * drive. Writing past it would leave a gap behind the stored high-water mark,
- * so the drive stops at this page.
+ * crawl. Writing past it would leave a gap behind the scope's stored
+ * checkpoint, so the crawl stops at this page.
  */
 export class OutOfOrderConnectionError extends Error {
   /** The drive whose source returned connections out of order. */

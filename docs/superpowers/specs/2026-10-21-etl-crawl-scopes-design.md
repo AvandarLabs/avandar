@@ -386,8 +386,8 @@ workspace dataset's link to its source.
 - **With `--scope`:** works on that key across every drive, live or
   retired. It asks reset's existing question about listings workspaces use.
   If the user chooses to delete them, the CLI deletes those workspace
-  datasets first, as reset does today. Then it calls the prune RPC for each
-  drive. The listings the workspaces used are no longer in use by then, so
+  datasets first, as reset does today. Then it calls the prune RPC once,
+  with a null drive key, meaning every drive. The listings the workspaces used are no longer in use by then, so
   the RPC deletes them.
 
 ### 5.8 Pipelines
@@ -465,6 +465,9 @@ Declarative schema files, with a generated migration:
   `api_base_url`.
 - `supabase/schemas/50.rpc_data_catalog_listings__prune_pipeline_scope.sql`:
   the RPC, `security invoker`, `execute` granted to `service_role` only.
+- `supabase/schemas/50.rpc_data_catalog_listings__list_pipeline_scopes.sql`:
+  the RPC that lists a pipeline's stored drive and scope pairs, with the
+  same security and grants.
 
 A hand-written data migration after it moves existing data over:
 
@@ -538,9 +541,9 @@ run(options)
 | Checkpoint read fails | That crawl fails before fetching. A pipeline with incremental config reads every crawl's checkpoint on every run, so this fails the crawl in a full run too. |
 | Checkpoint write fails | That crawl fails. Rows already written stay, and the next run re-crawls from the last stored checkpoint. |
 | Incremental config without `checkpointsTable` | `run` throws before listing drives |
-| `listScopes()` for prune or reset hits an invalid drive or scope | Throws, and prune or reset stops before reading or deleting anything |
+| `listScopes()` for prune hits an invalid drive or scope | Throws, and prune stops before reading or deleting anything |
 | Prune RPC fails partway through its pairs | Each pair is its own transaction. Finished pairs stay done, the failing pair changed nothing, and re-running prune picks up the rest. |
-| `--local` prune or reset against staging or production | Refused before reading anything |
+| `--local` prune against staging or production | Refused before reading anything |
 
 ## 8. Testing
 
@@ -629,8 +632,10 @@ Taken by default in this spec:
 8. Prune and reset read live scopes from the same environment's pipeline
    server. `--local` is development-only.
 9. `run --scope` takes a comma-separated list.
-10. The derived high-water mark, its store method, its override hook, and
-    its index are removed rather than kept as a fallback.
+10. The derived high-water mark, its store method, and its override hook
+    are removed rather than kept as a fallback. Its index is kept, because
+    the prune and list RPCs and the checkpoint seed filter on
+    `pipeline_name` and `api_base_url` (see 5.9).
 
 ## 10. Follow-ups
 

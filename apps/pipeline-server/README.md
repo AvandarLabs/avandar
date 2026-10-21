@@ -31,7 +31,7 @@ ava pipeline run socrata --local                # full run: write every listing 
 ava pipeline run socrata --local --incremental  # per scope, only what changed since the last run
 ava pipeline run socrata --local --since 2026-10-01T00:00:00Z --until 2026-10-08T00:00:00Z
 ava pipeline run socrata --local --limit 10     # stop after 10 datasets
-ava pipeline reset socrata                      # delete this pipeline's listings
+ava pipeline reset socrata                      # delete this pipeline's checkpoints and listings
 ava pipeline run hdx --local --incremental --scope format:parquet  # one scope only
 ava pipeline reset hdx --scope format:parquet    # forget one scope: its next run starts from the beginning
 ava pipeline prune-retired-scopes hdx --dry-run  # what removing undeclared scopes would delete

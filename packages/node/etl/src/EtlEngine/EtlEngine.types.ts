@@ -14,15 +14,15 @@ export type PromisedOrValue<T> = Promise<T> | T;
 export type EtlPipelineRunId = UUID<"PipelineRun">;
 
 /**
- * How a run picks a drive's lower bound when no `since` is given: `full` has
- * none, and `incremental` starts at the drive's high-water mark.
+ * How a run picks a crawl's lower bound when no `since` is given: `full` has
+ * none, and `incremental` starts at the scope's checkpoint.
  */
 export type EtlRunMode = "full" | "incremental";
 
 /** Options for one `run()`. */
 export type EtlRunOptions = Readonly<{
   mode: EtlRunMode;
-  /** Inclusive lower bound on source timestamps. Beats the high-water mark. */
+  /** Inclusive lower bound on source timestamps. Beats the checkpoint. */
   since?: Date;
   /** Exclusive upper bound on source timestamps. */
   until?: Date;

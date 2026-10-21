@@ -76,8 +76,8 @@ function _getOverlapKeys(
 /**
  * Fails the drive when a page shares no dataset with the previous page's
  * overlap. More datasets moved or were deleted between the two fetches than
- * the overlap covers, so some were skipped at the boundary, and the
- * high-water mark would move past them for good. The prefix already loaded
+ * the overlap covers, so some were skipped at the boundary, and the scope's
+ * checkpoint would move past them for good. The prefix already loaded
  * is complete, so the next run resumes safely. This is fail-safe on
  * purpose: it may also fail a drive where nothing was skipped, such as when
  * exactly the whole overlap moved.
