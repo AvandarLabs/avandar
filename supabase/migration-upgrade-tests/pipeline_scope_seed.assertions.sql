@@ -1,6 +1,7 @@
 -- Verify the seed gives each pipeline listing the scope that produced it,
--- leaves keyed and hand-curated listings alone, and seeds one checkpoint per
--- incremental drive and scope from the newest non-future update.
+-- leaves keyed, hand-curated, and other-format HDX listings alone, and seeds
+-- one checkpoint per incremental drive and scope from the newest non-future
+-- update, and none for a drive whose listings carry no date.
 do $$
 begin
   if (
@@ -40,20 +41,57 @@ begin
 
   if (
     select pipeline_scope_keys from public.data_catalog_listings
+    where external_dataset_id = 'pgtap-fixture-hdx-parquet-keyed'
+  ) is distinct from array['format:parquet@2'] then
+    raise exception 'an HDX Parquet listing that already had scope keys was changed';
+  end if;
+
+  if (
+    select pipeline_scope_keys from public.data_catalog_listings
+    where external_dataset_id = 'pgtap-fixture-socrata-keyed'
+  ) is distinct from array['category:health'] then
+    raise exception 'a Socrata listing that already had scope keys was changed';
+  end if;
+
+  if (
+    select pipeline_scope_keys from public.data_catalog_listings
     where external_dataset_id = 'pgtap-fixture-curated'
   ) is distinct from '{}'::text[] then
     raise exception 'a listing with no pipeline was given a scope key';
   end if;
 
   if (
-    select array_agg(scope_key || '=' || high_water_mark::text order by scope_key)
+    select pipeline_scope_keys from public.data_catalog_listings
+    where external_dataset_id = 'pgtap-fixture-hdx-xlsx'
+  ) is distinct from '{}'::text[] then
+    raise exception 'an HDX listing in another format was given a scope key';
+  end if;
+
+  if (
+    select count(*) from public.data_catalog_listings
+    where
+      api_base_url = 'https://pgtap-fixture-socrata-undated.invalid' and
+      pipeline_scope_keys = array['all']
+  ) <> 2 then
+    raise exception 'an undated Socrata listing was not keyed all';
+  end if;
+
+  if (
+    select array_agg(scope_key order by scope_key)
     from public.pipeline_scope_checkpoints
     where pipeline_name = 'hdx' and drive_key = 'https://pgtap-fixture-hdx.invalid'
-  ) is distinct from array[
-    'format:csv=2026-10-05 00:00:00+00',
-    'format:parquet=2026-10-05 00:00:00+00'
-  ] then
-    raise exception 'the HDX drive did not get both scope checkpoints at its newest non-future update';
+  ) is distinct from array['format:csv', 'format:parquet'] then
+    raise exception 'the HDX drive did not get both scope checkpoints';
+  end if;
+
+  if exists (
+    select 1 from public.pipeline_scope_checkpoints
+    where
+      pipeline_name = 'hdx' and
+      drive_key = 'https://pgtap-fixture-hdx.invalid' and
+      high_water_mark is distinct from '2026-10-05T00:00:00Z'::timestamptz
+  ) then
+    raise exception 'an HDX scope checkpoint is not at its drive''s newest non-future update';
   end if;
 
   if (
@@ -78,6 +116,13 @@ begin
     where drive_key = 'https://pgtap-fixture-curated.invalid'
   ) then
     raise exception 'a drive with no pipeline got a checkpoint';
+  end if;
+
+  if exists (
+    select 1 from public.pipeline_scope_checkpoints
+    where drive_key = 'https://pgtap-fixture-socrata-undated.invalid'
+  ) then
+    raise exception 'a drive whose listings carry no date got a checkpoint';
   end if;
 end;
 $$;

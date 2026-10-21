@@ -36,16 +36,48 @@ values
    'https://pgtap-fixture-curated.invalid', 'pgtap-fixture-curated',
    'pgtap-fixture-curated-r', 'CSV', null, null, '2026-09-01T00:00:00Z');
 
--- A listing a scoped pipeline already wrote keeps its keys.
+-- API listings the way production holds them from before the engine wrote
+-- them: migration `20261020174732` backfilled `pipeline_name`, but the run id
+-- and `date_of_last_update` are null. A drive with only such listings has no
+-- date to seed a checkpoint from.
 insert into public.data_catalog_listings
   (display_name, external_organization_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format,
-   pipeline_name, pipeline_run_id, pipeline_scope_keys)
+   pipeline_name)
+values
+  ('pgtap-fixture socrata undated', 'City of New York', 'api_resource',
+   'socrata', 'https://pgtap-fixture-socrata-undated.invalid',
+   'pgtap-fixture-socrata-undated', 'pgtap-fixture-socrata-undated-r', 'CSV',
+   'socrata'),
+  ('pgtap-fixture socrata undated 2', 'City of New York', 'api_resource',
+   'socrata', 'https://pgtap-fixture-socrata-undated.invalid',
+   'pgtap-fixture-socrata-undated-2', 'pgtap-fixture-socrata-undated-2-r',
+   'CSV', 'socrata'),
+  -- An HDX listing in a format no HDX scope covers gets no scope key.
+  ('pgtap-fixture hdx xlsx', 'HDX', 'api_resource', 'ckan',
+   'https://pgtap-fixture-hdx.invalid', 'pgtap-fixture-hdx-xlsx',
+   'pgtap-fixture-hdx-xlsx-r', 'XLSX', 'hdx');
+
+-- Listings a scoped pipeline already wrote keep their keys. The dated ones
+-- are older than their drive's newest update, so they leave its checkpoint
+-- where the listings above put it.
+insert into public.data_catalog_listings
+  (display_name, external_organization_name, access_kind, api_service,
+   api_base_url, external_dataset_id, api_resource_id, api_resource_format,
+   pipeline_name, pipeline_run_id, date_of_last_update, pipeline_scope_keys)
 values
   ('pgtap-fixture hdx keyed', 'HDX', 'api_resource', 'ckan',
    'https://pgtap-fixture-hdx.invalid', 'pgtap-fixture-hdx-keyed',
-   'pgtap-fixture-hdx-keyed-r', 'CSV', 'hdx', 'run-2',
-   array['format:csv@2']);
+   'pgtap-fixture-hdx-keyed-r', 'CSV', 'hdx', 'run-2', null,
+   array['format:csv@2']),
+  ('pgtap-fixture hdx parquet keyed', 'HDX', 'api_resource', 'ckan',
+   'https://pgtap-fixture-hdx.invalid', 'pgtap-fixture-hdx-parquet-keyed',
+   'pgtap-fixture-hdx-parquet-keyed-r', 'PARQUET', 'hdx', 'run-2',
+   '2026-09-15T00:00:00Z', array['format:parquet@2']),
+  ('pgtap-fixture socrata keyed', 'City of New York', 'api_resource',
+   'socrata', 'https://pgtap-fixture-socrata.invalid',
+   'pgtap-fixture-socrata-keyed', 'pgtap-fixture-socrata-keyed-r', 'CSV',
+   'socrata', 'run-2', '2026-08-01T00:00:00Z', array['category:health']);
 
 insert into public.data_catalog_listings
   (display_name, external_organization_name, parquet_file_name,

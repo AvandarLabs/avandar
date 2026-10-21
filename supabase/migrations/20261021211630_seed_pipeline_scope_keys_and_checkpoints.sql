@@ -3,9 +3,12 @@
 -- newest update its listings hold, so the first scoped run resumes instead of
 -- crawling from the start. The keys must match the pipelines' code: `all` is
 -- the engine's default scope, and the `hdx` pipeline's scopes are
--- `format:csv` and `format:parquet` (pinned by `hdxScopes.test.ts`). Only
--- listings with no scope key yet, and drives and scopes with no checkpoint
--- yet, are touched, so this is safe to replay.
+-- `format:csv` and `format:parquet` (pinned by `hdxScopes.test.ts`). An HDX
+-- listing in any other format stays `{}`, because the HDX pipeline only ever
+-- wrote CSV and PARQUET. A drive whose listings carry no date gets no
+-- checkpoint, so its first scoped run crawls from the start. Only listings
+-- with no scope key yet, and drives and scopes with no checkpoint yet, are
+-- touched, so this is safe to replay.
 update public.data_catalog_listings
 set
   pipeline_scope_keys = array['format:csv']
