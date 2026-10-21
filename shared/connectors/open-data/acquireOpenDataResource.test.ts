@@ -46,6 +46,7 @@ function _entry(
     cachedObjectPath: undefined,
     cachedSourceVersion: undefined,
     cachedAt: undefined,
+    pipelineScopeKeys: [],
     ...overrides,
   };
 }

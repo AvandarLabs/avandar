@@ -106,6 +106,12 @@ export type DataCatalogListingRead = {
 
   /** When the cache was last written. Informational only. */
   cachedAt: string | undefined;
+
+  /**
+   * The scopes of `pipelineName` that produce this listing. Empty on a
+   * listing no scoped pipeline wrote.
+   */
+  pipelineScopeKeys: string[];
 };
 
 /**

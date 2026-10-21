@@ -177,6 +177,9 @@ export const EXCLUDED_TABLES = [
   // desktop shell cannot proxy a live Postgres connection either.
   "db_connections",
   "db_connections__postgres",
+  // Pipeline crawl state, written by the pipeline server with the service
+  // role. Nothing the desktop renders.
+  "pipeline_scope_checkpoints",
 ] as const;
 
 /**

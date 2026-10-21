@@ -27,6 +27,7 @@ const SHARED_DB_COLUMNS = {
   cached_object_path: null,
   cached_source_version: null,
   cached_at: null,
+  pipeline_scope_keys: [] as string[],
 } as const;
 
 function _pipelineDBRow(): DataCatalogListingModel["DBRead"] {

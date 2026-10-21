@@ -354,6 +354,7 @@ export type Database = {
           parquet_file_name: string | null
           pipeline_name: string | null
           pipeline_run_id: string | null
+          pipeline_scope_keys: string[]
           source_url: string | null
           update_frequency: string | null
           updated_at: string
@@ -387,6 +388,7 @@ export type Database = {
           parquet_file_name?: string | null
           pipeline_name?: string | null
           pipeline_run_id?: string | null
+          pipeline_scope_keys?: string[]
           source_url?: string | null
           update_frequency?: string | null
           updated_at?: string
@@ -420,6 +422,7 @@ export type Database = {
           parquet_file_name?: string | null
           pipeline_name?: string | null
           pipeline_run_id?: string | null
+          pipeline_scope_keys?: string[]
           source_url?: string | null
           update_frequency?: string | null
           updated_at?: string
@@ -1228,6 +1231,36 @@ export type Database = {
           },
         ]
       }
+      pipeline_scope_checkpoints: {
+        Row: {
+          created_at: string
+          drive_key: string
+          high_water_mark: string
+          pipeline_name: string
+          pipeline_run_id: string
+          scope_key: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          drive_key: string
+          high_water_mark: string
+          pipeline_name: string
+          pipeline_run_id: string
+          scope_key: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          drive_key?: string
+          high_water_mark?: string
+          pipeline_name?: string
+          pipeline_run_id?: string
+          scope_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       resource_shares: {
         Row: {
           created_at: string
@@ -1809,6 +1842,27 @@ export type Database = {
       maps__owner_id_matches_stored: {
         Args: { p_map_id: string; p_owner_id: string }
         Returns: boolean
+      }
+      rpc_data_catalog_listings__list_pipeline_scopes: {
+        Args: { p_pipeline_name: string }
+        Returns: {
+          drive_key: string
+          scope_key: string
+        }[]
+      }
+      rpc_data_catalog_listings__prune_pipeline_scope: {
+        Args: {
+          p_drive_key: string
+          p_is_dry_run: boolean
+          p_pipeline_name: string
+          p_scope_key: string
+        }
+        Returns: {
+          checkpoints_deleted: number
+          listings_deleted: number
+          listings_detached: number
+          listings_kept_in_use: number
+        }[]
       }
       rpc_datasets__add_csv_file_dataset: {
         Args: {

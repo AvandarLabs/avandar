@@ -46,6 +46,7 @@ const DBReadSchema = z.object({
   cached_object_path: z.string().nullable(),
   cached_source_version: z.string().nullable(),
   cached_at: z.iso.datetime({ offset: true }).nullable(),
+  pipeline_scope_keys: z.array(z.string()),
 });
 
 export const DataCatalogListingParsers =
