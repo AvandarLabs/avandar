@@ -26,9 +26,9 @@ export function isCrawlContiguousWithCheckpoint(args: {
 /**
  * Where a checkpoint moves after a page has loaded: to the page's newest
  * connection timestamp that is no later than `syncedAt`, when that is later
- * than the current checkpoint. A timestamp later than the sync time is a bad
- * source timestamp, and following it would skip real changes until the
- * clock caught up.
+ * than the current checkpoint. A timestamp that is not a valid date, or later
+ * than the sync time, is ignored. Both are bad source timestamps, and
+ * following a late one would skip real changes until the clock caught up.
  *
  * @param args.current - The checkpoint before the page.
  * @param args.pageTimestamps - The timestamps of the page's connections.
@@ -41,26 +41,26 @@ export function getAdvancedCheckpoint(args: {
   syncedAt: Date;
 }): Date | undefined {
   const syncedTime = args.syncedAt.getTime();
-  const newest = args.pageTimestamps.reduce<Date | undefined>(
+  const newestTimestamp = args.pageTimestamps.reduce<Date | undefined>(
     (latest, timestamp) => {
-      const time = timestamp.getTime();
-      if (time > syncedTime) {
+      const timestampTime = timestamp.getTime();
+      if (Number.isNaN(timestampTime) || timestampTime > syncedTime) {
         return latest;
       }
-      return latest === undefined || time > latest.getTime()
+      return latest === undefined || timestampTime > latest.getTime()
         ? timestamp
         : latest;
     },
     undefined,
   );
-  if (newest === undefined) {
+  if (newestTimestamp === undefined) {
     return undefined;
   }
   if (
     args.current !== undefined &&
-    newest.getTime() <= args.current.getTime()
+    newestTimestamp.getTime() <= args.current.getTime()
   ) {
     return undefined;
   }
-  return newest;
+  return newestTimestamp;
 }

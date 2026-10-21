@@ -87,6 +87,26 @@ describe("getAdvancedCheckpoint", () => {
     ).toEqual(_at(2));
   });
 
+  it("uses a timestamp exactly equal to the sync time", () => {
+    expect(
+      getAdvancedCheckpoint({
+        current: undefined,
+        pageTimestamps: [_at(30)],
+        syncedAt: SYNCED_AT,
+      }),
+    ).toEqual(_at(30));
+  });
+
+  it("ignores a timestamp that is not a valid date", () => {
+    expect(
+      getAdvancedCheckpoint({
+        current: undefined,
+        pageTimestamps: [new Date(Number.NaN), _at(2)],
+        syncedAt: SYNCED_AT,
+      }),
+    ).toEqual(_at(2));
+  });
+
   it("does not move for a page no later than the checkpoint", () => {
     expect([
       getAdvancedCheckpoint({

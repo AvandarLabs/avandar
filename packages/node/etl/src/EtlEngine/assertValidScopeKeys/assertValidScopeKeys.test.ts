@@ -4,14 +4,17 @@ import { describe, expect, it } from "vitest";
 const DRIVE_KEY = "https://data.humdata.org";
 
 describe("assertValidScopeKeys", () => {
-  it.each([["all"], ["format:csv"], ["format:csv@2"], ["category.health-v_1"]])(
-    "accepts %s",
-    (scopeKey) => {
-      expect(() => {
-        assertValidScopeKeys({ driveKey: DRIVE_KEY, scopeKeys: [scopeKey] });
-      }).not.toThrow();
-    },
-  );
+  it.each([
+    ["all"],
+    ["format:csv"],
+    ["format:csv@2"],
+    ["category.health-v_1"],
+    ["a".repeat(64)],
+  ])("accepts %s", (scopeKey) => {
+    expect(() => {
+      assertValidScopeKeys({ driveKey: DRIVE_KEY, scopeKeys: [scopeKey] });
+    }).not.toThrow();
+  });
 
   it.each([
     [""],
