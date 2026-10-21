@@ -162,6 +162,62 @@ describe("CkanDiscoveryClient.searchDatasets", () => {
     expect(_sentQuery(http).get("fq")).toContain('name:{"a\\"b\\\\c" TO *]');
   });
 
+  it("narrows to datasets with a resource in one of the given formats", async () => {
+    const http = _searchHttp();
+
+    await createCkanDiscoveryClient(http).searchDatasets({
+      baseUrl: BASE_URL,
+      rows: 100,
+      resourceFormats: ["CSV", "Parquet"],
+    });
+
+    expect(_sentQuery(http).get("fq")).toBe(
+      '+metadata_modified:[* TO *] +res_format:("CSV" OR "Parquet")',
+    );
+  });
+
+  it("keeps the format filter after a cursor", async () => {
+    const http = _searchHttp();
+
+    await createCkanDiscoveryClient(http).searchDatasets({
+      baseUrl: BASE_URL,
+      rows: 100,
+      after: {
+        modifiedAt: new Date("2026-10-01T00:00:00.000Z"),
+        name: "a",
+      },
+      resourceFormats: ["CSV"],
+    });
+
+    expect(_sentQuery(http).get("fq")).toMatch(/\) \+res_format:\("CSV"\)$/);
+  });
+
+  it.each([['CSV" OR name:*'], ["CSV)"], ["C\\SV"], [""]])(
+    "rejects the resource format %j before sending a request",
+    async (format) => {
+      const http = _searchHttp();
+
+      await expect(
+        createCkanDiscoveryClient(http).searchDatasets({
+          baseUrl: BASE_URL,
+          rows: 100,
+          resourceFormats: [format],
+        }),
+      ).rejects.toThrow("may only hold letters, digits, spaces");
+      expect(http.get).not.toHaveBeenCalled();
+    },
+  );
+
+  it("rejects an empty format list, which would match nothing", async () => {
+    await expect(
+      createCkanDiscoveryClient(_searchHttp()).searchDatasets({
+        baseUrl: BASE_URL,
+        rows: 100,
+        resourceFormats: [],
+      }),
+    ).rejects.toThrow("at least one resource format");
+  });
+
   it("returns full datasets, resources included", async () => {
     const http = _searchHttp([_wireDataset()]);
 

@@ -46,6 +46,8 @@ export type CkanDiscoveryClient = {
    *
    * @throws When a result has no usable `name` or `metadata_modified`,
    * because the page's cursor could not then be placed safely.
+   * @throws Before any request, when `resourceFormats` is empty or holds a
+   * character other than letters, digits, spaces, and `.`, `_`, `-`.
    */
   searchDatasets: (params: {
     baseUrl: string;
@@ -55,5 +57,11 @@ export type CkanDiscoveryClient = {
     modifiedBefore?: Date;
     after?: CkanDatasetSearchCursor;
     rows: number;
+    /**
+     * Only datasets with at least one resource in one of these formats,
+     * spelled exactly as CKAN labels them: `res_format` is case-sensitive,
+     * so on HDX `CSV` matches and `csv` does not.
+     */
+    resourceFormats?: readonly string[];
   }) => Promise<CkanDatasetSearchPage>;
 };

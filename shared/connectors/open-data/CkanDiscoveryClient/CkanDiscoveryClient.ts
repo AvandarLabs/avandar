@@ -56,6 +56,42 @@ function _buildModifiedFilter(params: {
   );
 }
 
+/** A `res_format` value that is safe inside double quotes. */
+const SAFE_RESOURCE_FORMAT = /^[A-Za-z0-9 ._-]+$/;
+
+/**
+ * Builds the `res_format` clause of `package_search`'s `fq`, or `undefined`
+ * when no format is asked for. Like the time clause, it is marked required
+ * with `+`, so it narrows the match on a deployment whose default operator
+ * is OR.
+ *
+ * @throws When the list is empty, or a format holds a character that could
+ * break out of its quotes.
+ */
+function _buildResourceFormatFilter(
+  resourceFormats: readonly string[] | undefined,
+): string | undefined {
+  if (resourceFormats === undefined) {
+    return undefined;
+  }
+  if (resourceFormats.length === 0) {
+    throw new Error(
+      "A CKAN search by format needs at least one resource format.",
+    );
+  }
+  resourceFormats.forEach((format) => {
+    if (!SAFE_RESOURCE_FORMAT.test(format)) {
+      throw new Error(
+        `CKAN resource format ${JSON.stringify(format)} may only hold letters, digits, spaces, and . _ -.`,
+      );
+    }
+  });
+  const quotedFormats = resourceFormats.map((format) => {
+    return `"${format}"`;
+  });
+  return `+res_format:(${quotedFormats.join(" OR ")})`;
+}
+
 /** Summarizes a validation failure on one line, field paths first. */
 function _buildIssueSummary(error: z.ZodError): string {
   return error.issues
@@ -145,7 +181,14 @@ export function createCkanDiscoveryClient(
         action: "package_search",
         query: {
           q: "*:*",
-          fq: _buildModifiedFilter(params),
+          fq: [
+            _buildModifiedFilter(params),
+            _buildResourceFormatFilter(params.resourceFormats),
+          ]
+            .filter((clause) => {
+              return clause !== undefined;
+            })
+            .join(" "),
           sort: "metadata_modified asc,name asc",
           rows: String(params.rows),
           facet: "false",
