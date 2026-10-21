@@ -353,7 +353,47 @@ describe("registerRunPipelineRoutes", () => {
     ]);
   });
 
+  it("returns 400 for a pipeline name that is not a folder name", async () => {
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/..%2Fhdx/run",
+      headers: { authorization: AUTH_HEADER },
+    });
+
+    expect([
+      res.statusCode,
+      res.json().ok,
+      vi.mocked(run).mock.calls.length,
+    ]).toEqual([400, false, 0]);
+  });
+
   describe("GET /:pipelineName/scopes", () => {
+    it("returns 400 for a pipeline name that is not a folder name", async () => {
+      server = await _createServer();
+
+      const res = await server.inject({
+        method: "GET",
+        url: "/HDX/scopes",
+        headers: { authorization: AUTH_HEADER },
+      });
+
+      expect([
+        res.statusCode,
+        res.json(),
+        vi.mocked(listScopes).mock.calls,
+      ]).toEqual([
+        400,
+        {
+          ok: false,
+          error:
+            'Pipeline name "HDX" may only hold lowercase letters, digits, "_" and "-".',
+        },
+        [],
+      ]);
+    });
+
     it("returns 401 when auth is missing", async () => {
       server = await _createServer();
 

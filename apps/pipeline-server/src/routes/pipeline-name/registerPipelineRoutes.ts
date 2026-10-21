@@ -1,4 +1,8 @@
 import { ETL_RUN_OPTIONS_ERROR_NAME } from "@avandar/etl";
+import {
+  assertValidPipelineName,
+  INVALID_PIPELINE_NAME_ERROR_NAME,
+} from "@pipeline-server/routes/pipeline-name/buildPipelineModuleUrl/buildPipelineModuleUrl";
 import { listScopes } from "@pipeline-server/routes/pipeline-name/listScopes/listScopes";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import { getEtlRunFailedReport } from "@pipelines/shared/getEtlRunFailedReport/getEtlRunFailedReport";
@@ -84,8 +88,14 @@ const RUN_BODY_SCHEMA = {
   propertyNames: { enum: ["incremental", "since", "until", "limit", "scopes"] },
 } as const;
 
-function _getRunErrorStatus(error: unknown): 400 | 500 {
-  return error instanceof Error && error.name === ETL_RUN_OPTIONS_ERROR_NAME
+/** Errors the caller can fix answer 400. Anything else answers 500. */
+const _CLIENT_ERROR_NAMES: ReadonlySet<string> = new Set([
+  ETL_RUN_OPTIONS_ERROR_NAME,
+  INVALID_PIPELINE_NAME_ERROR_NAME,
+]);
+
+function _getErrorStatus(error: unknown): 400 | 500 {
+  return error instanceof Error && _CLIENT_ERROR_NAMES.has(error.name)
     ? 400
     : 500;
 }
@@ -111,6 +121,7 @@ async function _runPipeline(
   }
 
   try {
+    assertValidPipelineName(request.params.pipelineName);
     const report = await run({
       pipelineName: request.params.pipelineName,
       ...options,
@@ -122,7 +133,7 @@ async function _runPipeline(
     // When every crawl failed, the report still says what each crawl did.
     const report = getEtlRunFailedReport(error);
 
-    return await reply.status(_getRunErrorStatus(error)).send({
+    return await reply.status(_getErrorStatus(error)).send({
       ok: false,
       error: message,
       ...(report === undefined ? {} : { report }),
@@ -135,12 +146,15 @@ async function _listPipelineScopes(
   reply: FastifyReply,
 ): Promise<FastifyReply> {
   try {
+    assertValidPipelineName(request.params.pipelineName);
     const drives = await listScopes(request.params.pipelineName);
     return await reply.send({ drives });
   } catch (error: unknown) {
     const message: string =
       error instanceof Error ? error.message : "Unknown error";
-    return await reply.status(500).send({ ok: false, error: message });
+    return await reply
+      .status(_getErrorStatus(error))
+      .send({ ok: false, error: message });
   }
 }
 
@@ -148,11 +162,13 @@ async function _listPipelineScopes(
  * Registers `POST /:pipelineName/run`, which answers with the run's report
  * as JSON. Auth is checked before the body is validated, so an
  * unauthenticated caller gets 401 whatever it sends. Invalid options answer
- * 400, and the pipeline does not run. A run where every crawl failed answers
- * 500 with the error and the report.
+ * 400, and the pipeline does not run. So does a pipeline name that is not a
+ * plain folder name of lowercase letters, digits, `_` and `-`. A run where
+ * every crawl failed answers 500 with the error and the report.
  *
  * Also registers `GET /:pipelineName/scopes`, which answers with
- * `{ drives }`, each drive's live scope keys, behind the same auth.
+ * `{ drives }`, each drive's live scope keys, behind the same auth. It
+ * answers 400 for an invalid pipeline name and 500 for any other error.
  */
 export const registerPipelineRoutes: FastifyPluginAsync = async (server) => {
   server.post(
