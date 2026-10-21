@@ -5,7 +5,7 @@
 
 begin;
 
-select plan(9);
+select plan(11);
 
 -- ---------------------------------------------------------------------------
 -- The checkpoints table: one row per pipeline, drive, and scope, reachable by
@@ -49,10 +49,28 @@ select table_privs_are(
   'an anonymous visitor has no access to checkpoints'
 );
 
-select has_trigger(
+select ok(
+  (
+    select relrowsecurity
+    from pg_class
+    where oid = 'public.pipeline_scope_checkpoints'::regclass
+  ),
+  'row level security is enabled on checkpoints'
+);
+
+select policies_are(
   'public',
   'pipeline_scope_checkpoints',
-  'tr_pipeline_scope_checkpoints__set_updated_at',
+  array[]::name[],
+  'checkpoints have no policies, so only the service role reaches them'
+);
+
+select trigger_is(
+  'public',
+  'pipeline_scope_checkpoints',
+  'tr__pipeline_scope_checkpoints__set_updated_at',
+  'public',
+  'util__set_updated_at',
   'updated_at is maintained on every update'
 );
 
@@ -92,6 +110,7 @@ select has_index(
   'public',
   'data_catalog_listings',
   'data_catalog_listings__pipeline_drive_last_update',
+  array['pipeline_name', 'api_base_url', 'date_of_last_update'],
   'listings keep their pipeline and drive index'
 );
 

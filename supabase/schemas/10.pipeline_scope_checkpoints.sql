@@ -34,6 +34,6 @@ select
 update,
 delete on table public.pipeline_scope_checkpoints to service_role;
 
-create trigger tr_pipeline_scope_checkpoints__set_updated_at before
+create trigger tr__pipeline_scope_checkpoints__set_updated_at before
 update on public.pipeline_scope_checkpoints for each row
 execute function public.util__set_updated_at ();

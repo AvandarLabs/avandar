@@ -25,6 +25,6 @@ grant select on table "public"."pipeline_scope_checkpoints" to "service_role";
 
 grant update on table "public"."pipeline_scope_checkpoints" to "service_role";
 
-CREATE TRIGGER tr_pipeline_scope_checkpoints__set_updated_at BEFORE UPDATE ON public.pipeline_scope_checkpoints FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
+CREATE TRIGGER tr__pipeline_scope_checkpoints__set_updated_at BEFORE UPDATE ON public.pipeline_scope_checkpoints FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
 
 
