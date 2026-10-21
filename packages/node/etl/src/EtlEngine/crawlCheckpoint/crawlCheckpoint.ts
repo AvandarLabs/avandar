@@ -50,12 +50,12 @@ export async function readCrawlStart(args: {
   const { store, options } = args;
   if (store === undefined) {
     return {
-      window: resolveRunWindow({ options, highWaterMark: undefined }),
+      window: resolveRunWindow({ options, checkpoint: undefined }),
       checkpoint: undefined,
     };
   }
   const stored = await store.read(args.key);
-  const window = resolveRunWindow({ options, highWaterMark: stored });
+  const window = resolveRunWindow({ options, checkpoint: stored });
   return {
     window,
     checkpoint: {

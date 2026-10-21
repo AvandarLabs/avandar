@@ -167,7 +167,7 @@ export function buildUncrawledCrawlResult(args: {
     // With no checkpoint read, the window is the run's own bounds.
     window: resolveRunWindow({
       options: args.options,
-      highWaterMark: undefined,
+      checkpoint: undefined,
     }),
     counts: NO_CRAWL_COUNTS,
     outcome: args.outcome,

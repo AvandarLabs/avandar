@@ -1,43 +1,43 @@
 import { resolveRunWindow } from "@etl/EtlEngine/resolveRunWindow/resolveRunWindow";
 import { describe, expect, it } from "vitest";
 
-const HIGH_WATER_MARK = new Date("2026-10-01T00:00:00.000Z");
+const CHECKPOINT = new Date("2026-10-01T00:00:00.000Z");
 const SINCE = new Date("2026-09-01T00:00:00.000Z");
 const UNTIL = new Date("2026-10-15T00:00:00.000Z");
 
 describe("resolveRunWindow", () => {
-  it("starts an incremental run at the high-water mark", () => {
+  it("starts an incremental run at the checkpoint", () => {
     expect(
       resolveRunWindow({
         options: { mode: "incremental" },
-        highWaterMark: HIGH_WATER_MARK,
+        checkpoint: CHECKPOINT,
       }),
-    ).toEqual({ since: HIGH_WATER_MARK, until: undefined });
+    ).toEqual({ since: CHECKPOINT, until: undefined });
   });
 
-  it("starts an incremental run with no high-water mark at no lower bound", () => {
+  it("starts an incremental run with no checkpoint at no lower bound", () => {
     expect(
       resolveRunWindow({
         options: { mode: "incremental" },
-        highWaterMark: undefined,
+        checkpoint: undefined,
       }),
     ).toEqual({ since: undefined, until: undefined });
   });
 
-  it("starts a full run at no lower bound even when there is a high-water mark", () => {
+  it("starts a full run at no lower bound even when there is a checkpoint", () => {
     expect(
       resolveRunWindow({
         options: { mode: "full" },
-        highWaterMark: HIGH_WATER_MARK,
+        checkpoint: CHECKPOINT,
       }),
     ).toEqual({ since: undefined, until: undefined });
   });
 
-  it("lets an explicit since win over the high-water mark", () => {
+  it("lets an explicit since win over the checkpoint", () => {
     expect(
       resolveRunWindow({
         options: { mode: "incremental", since: SINCE },
-        highWaterMark: HIGH_WATER_MARK,
+        checkpoint: CHECKPOINT,
       }).since,
     ).toEqual(SINCE);
   });
@@ -46,7 +46,7 @@ describe("resolveRunWindow", () => {
     expect(
       resolveRunWindow({
         options: { mode: "full", since: SINCE },
-        highWaterMark: undefined,
+        checkpoint: undefined,
       }).since,
     ).toEqual(SINCE);
   });
@@ -55,7 +55,7 @@ describe("resolveRunWindow", () => {
     expect(
       resolveRunWindow({
         options: { mode: "full", until: UNTIL },
-        highWaterMark: undefined,
+        checkpoint: undefined,
       }).until,
     ).toEqual(UNTIL);
   });

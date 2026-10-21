@@ -9,16 +9,16 @@ import type {
  * lower bound. `until` always passes through.
  *
  * @param args.options - The run's options.
- * @param args.highWaterMark - The scope's checkpoint, if it was read.
+ * @param args.checkpoint - The scope's checkpoint, if it was read.
  * @returns The window.
  */
 export function resolveRunWindow(args: {
   options: EtlRunOptions;
-  highWaterMark: Date | undefined;
+  checkpoint: Date | undefined;
 }): EtlRunWindow {
-  const { options, highWaterMark } = args;
+  const { options, checkpoint } = args;
   const since =
     options.since ??
-    (options.mode === "incremental" ? highWaterMark : undefined);
+    (options.mode === "incremental" ? checkpoint : undefined);
   return { since, until: options.until };
 }
