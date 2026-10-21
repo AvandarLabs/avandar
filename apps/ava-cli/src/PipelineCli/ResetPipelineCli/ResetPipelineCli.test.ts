@@ -245,7 +245,10 @@ describe("resetPipelineCommand", () => {
 
     await resetPipelineCommand({ name: "world-bank__wdi" });
 
-    expect(_getDeletes(requests)[0]?.params.toString()).toBe(
+    const listingsDelete = _getDeletes(requests).find((request) => {
+      return request.table === "data_catalog_listings";
+    });
+    expect(listingsDelete?.params.toString()).toBe(
       "pipeline_name=eq.world-bank__wdi",
     );
   });
@@ -354,6 +357,47 @@ describe("resetPipelineCommand", () => {
           return request.method === "POST";
         }).length,
       ]).toEqual([0, 1]);
+    });
+
+    it("keeps the workspace datasets of in-use listings when asked to", async () => {
+      vi.mocked(promptForInUseListingsChoice).mockResolvedValueOnce("keep");
+      const requests = _mockPostgrest({
+        listingCount: 0,
+        inUseRows: [IN_USE_ROW],
+        pruneCounts: { ...NO_PRUNE, listings_kept_in_use: 1 },
+      });
+
+      await resetPipelineCommand({ name: "hdx", scope: "format:parquet" });
+
+      expect(
+        requests
+          .filter((request) => {
+            return request.method === "DELETE" || request.method === "POST";
+          })
+          .map((request) => {
+            return `${request.method} ${request.table}`;
+          }),
+      ).toEqual([
+        "POST rpc/rpc_data_catalog_listings__prune_pipeline_scope",
+        "POST rpc/rpc_data_catalog_listings__prune_pipeline_scope",
+      ]);
+    });
+
+    it("changes nothing when the reset is declined", async () => {
+      vi.mocked(promptToConfirmReset).mockResolvedValueOnce(false);
+      const requests = _mockPostgrest({
+        listingCount: 0,
+        pruneCounts: { ...NO_PRUNE, listings_deleted: 3 },
+      });
+
+      await resetPipelineCommand({ name: "hdx", scope: "format:parquet" });
+
+      expect([
+        requests.filter((request) => {
+          return request.method === "POST";
+        }).length,
+        _getDeletes(requests).length,
+      ]).toEqual([1, 0]);
     });
 
     it("deletes the workspace datasets of in-use listings first when asked to", async () => {
