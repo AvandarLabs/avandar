@@ -88,6 +88,11 @@ create table public.data_catalog_listings (
   -- When the cache was last written. Informational only:
   -- cached_source_version is what correctness depends on.
   cached_at timestamptz,
+  -- The scopes of `pipeline_name` that produce this listing, in the order
+  -- they first wrote it. `@avandar/etl` adds a crawl's scope key when it
+  -- writes the row, and pruning a retired scope removes it. Empty on a
+  -- listing no scoped pipeline wrote.
+  pipeline_scope_keys text[] not null default '{}',
   constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name),
   -- A pipeline listing carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning
@@ -163,8 +168,9 @@ create unique index data_catalog_listings__api_resource_unique on public.data_ca
   api_resource_id
 );
 
--- Serves the incremental-run high-water mark: the newest
--- `date_of_last_update` for one pipeline's one drive (`api_base_url`).
+-- Serves lookups of one pipeline's listings on one drive (`api_base_url`):
+-- listing and pruning a pipeline's scopes, and seeding checkpoints from the
+-- newest `date_of_last_update`.
 create index data_catalog_listings__pipeline_drive_last_update on public.data_catalog_listings (
   pipeline_name,
   api_base_url,

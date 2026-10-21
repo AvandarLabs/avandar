@@ -34,6 +34,8 @@ with public_tables as (
       'data_catalog_listings',
       'db_connections',
       'db_connections__postgres',
+      -- Service role only: no `authenticated` grant at all.
+      'pipeline_scope_checkpoints',
       'subscriptions',
       'usage_analytics_events',
       'user_group_memberships',
