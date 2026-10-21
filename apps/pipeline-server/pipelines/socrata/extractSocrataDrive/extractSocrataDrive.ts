@@ -126,21 +126,22 @@ function _takeBeforeUntil(
 /**
  * The Discovery API filters for a scope, or none for a scope that is the
  * whole drive. Categories and tags are the drive's own, so the search runs
- * in the drive's search context.
+ * in the drive's search context. An empty `categories` or `tags` list is no
+ * filter, as in the Discovery client.
  */
 function _buildScopeFilters(args: ExtractSocrataDriveArgs): Readonly<{
   searchContext?: string;
   categories?: readonly string[];
   tags?: readonly string[];
 }> {
-  const { categories, tags } = args.scope;
-  if (categories === undefined && tags === undefined) {
+  const { categories = [], tags = [] } = args.scope;
+  if (categories.length === 0 && tags.length === 0) {
     return {};
   }
   return {
     searchContext: new URL(args.drive.baseUrl).host,
-    ...(categories === undefined ? {} : { categories }),
-    ...(tags === undefined ? {} : { tags }),
+    ...(categories.length > 0 ? { categories } : {}),
+    ...(tags.length > 0 ? { tags } : {}),
   };
 }
 

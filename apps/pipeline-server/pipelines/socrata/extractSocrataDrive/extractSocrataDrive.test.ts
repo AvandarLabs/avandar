@@ -166,6 +166,22 @@ describe("extractSocrataDrive", () => {
     ]);
   });
 
+  it("treats an empty categories list as no filter and sends no searchContext", async () => {
+    const discovery = _discoveryOver(_catalog(10));
+
+    await _collect(OPEN_WINDOW, discovery, {
+      key: "category:none",
+      categories: [],
+    });
+
+    expect(vi.mocked(discovery.search)).toHaveBeenCalledWith({
+      domains: ["data.cityofnewyork.us"],
+      order: "updatedAt ASC",
+      limit: 1000,
+      offset: 0,
+    });
+  });
+
   it("starts each page 20 results before the previous page ended", async () => {
     const discovery = _discoveryOver(_catalog(1500));
 
