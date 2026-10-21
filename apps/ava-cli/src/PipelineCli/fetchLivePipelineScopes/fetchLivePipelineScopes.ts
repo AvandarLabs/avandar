@@ -17,6 +17,30 @@ const LiveScopesBodySchema = z.object({
   ),
 });
 
+/** How much of an unreadable answer an error message quotes. */
+const MAX_QUOTED_LENGTH = 200;
+
+/**
+ * Parses what the server or the local script answered. Throws an error that
+ * names the pipeline, the source, and the start of the text, with the JSON
+ * or schema error as its `cause`.
+ */
+function _parseLiveScopesBody(args: {
+  text: string;
+  pipelineName: string;
+  source: string;
+}): readonly LiveDriveScopes[] {
+  try {
+    return LiveScopesBodySchema.parse(JSON.parse(args.text)).drives;
+  } catch (error: unknown) {
+    const quoted = args.text.trim().slice(0, MAX_QUOTED_LENGTH);
+    throw new Error(
+      `Could not read the ${args.pipelineName} pipeline's scopes from ${args.source}. It answered: ${JSON.stringify(quoted)}`,
+      { cause: error },
+    );
+  }
+}
+
 async function _fetchServerScopes(
   pipelineName: string,
 ): Promise<readonly LiveDriveScopes[]> {
@@ -31,7 +55,11 @@ async function _fetchServerScopes(
       `The pipeline server answered ${response.status} listing the ${pipelineName} pipeline's scopes: ${text}`,
     );
   }
-  return LiveScopesBodySchema.parse(JSON.parse(text)).drives;
+  return _parseLiveScopesBody({
+    text,
+    pipelineName,
+    source: "the pipeline server",
+  });
 }
 
 function _readLocalScopes(pipelineName: string): readonly LiveDriveScopes[] {
@@ -62,7 +90,11 @@ function _readLocalScopes(pipelineName: string): readonly LiveDriveScopes[] {
     );
   }
   const lastLine = (spawnResult.stdout ?? "").trim().split("\n").at(-1) ?? "";
-  return LiveScopesBodySchema.parse(JSON.parse(lastLine)).drives;
+  return _parseLiveScopesBody({
+    text: lastLine,
+    pipelineName,
+    source: "scripts/listPipelineScopes.ts",
+  });
 }
 
 /**

@@ -90,7 +90,12 @@ async function _pruneAll(args: {
   // Sequential on purpose: each prune is its own transaction, so a failure
   // leaves the earlier ones done and a rerun picks up the rest.
   await promiseMapSequential(args.plans, async (plan) => {
-    const counts = await _pruneOne({ ...args, retired: plan, isDryRun: false });
+    const counts = await _pruneOne({
+      target: args.target,
+      name: args.name,
+      retired: plan,
+      isDryRun: false,
+    });
     printSuccess(`Pruned ${_formatPrune({ ...plan, counts })}`);
   });
 }

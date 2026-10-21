@@ -86,6 +86,10 @@ const RETIRED = {
   drive_key: "https://data.humdata.org",
   scope_key: "format:parquet",
 };
+const OTHER_RETIRED = {
+  drive_key: "https://retired.invalid",
+  scope_key: "all",
+};
 const LIVE = { drive_key: "https://data.humdata.org", scope_key: "format:csv" };
 
 describe("pruneRetiredScopesCommand", () => {
@@ -168,6 +172,38 @@ describe("pruneRetiredScopesCommand", () => {
     expect([posts, vi.mocked(fetchLivePipelineScopes).mock.calls]).toEqual([
       [],
       [],
+    ]);
+  });
+
+  it("prunes nothing and rethrows when the live scopes cannot be read", async () => {
+    vi.mocked(fetchLivePipelineScopes).mockRejectedValueOnce(
+      new Error("server down"),
+    );
+    const posts = _mockScopeRpcs([LIVE, RETIRED]);
+
+    await expect(
+      pruneRetiredScopesCommand({ name: "hdx", isDryRun: false, local: false }),
+    ).rejects.toThrow("server down");
+    expect(_pruneCalls(posts)).toEqual([]);
+  });
+
+  it("dry-runs only the scope named by --scope", async () => {
+    const posts = _mockScopeRpcs([LIVE, RETIRED, OTHER_RETIRED]);
+
+    await pruneRetiredScopesCommand({
+      name: "hdx",
+      scope: "all",
+      isDryRun: true,
+      local: false,
+    });
+
+    expect(_pruneCalls(posts)).toEqual([
+      {
+        p_pipeline_name: "hdx",
+        p_scope_key: "all",
+        p_drive_key: "https://retired.invalid",
+        p_is_dry_run: true,
+      },
     ]);
   });
 });

@@ -14,6 +14,18 @@ vi.mock("@ava-cli/PipelineCli/runPipelineLocal", () => {
   };
 });
 
+/** A successful `spawnSync` result that printed `stdout`. */
+function _spawnResultWithStdout(stdout: string): ReturnType<typeof spawnSync> {
+  return {
+    pid: 1,
+    output: [],
+    signal: null,
+    status: 0,
+    stdout,
+    stderr: "",
+  };
+}
+
 const BODY = {
   drives: [
     {
@@ -89,6 +101,61 @@ describe("fetchLivePipelineScopes", () => {
         "/repo/scripts/listPipelineScopes.ts",
         "hdx",
       ],
+    ]);
+  });
+
+  it("explains empty local script output, naming the pipeline and source", async () => {
+    vi.mocked(spawnSync).mockReturnValue(_spawnResultWithStdout(""));
+
+    await expect(
+      fetchLivePipelineScopes({ pipelineName: "hdx", local: true }),
+    ).rejects.toThrow(
+      /hdx pipeline's scopes from scripts\/listPipelineScopes\.ts.*: ""$/,
+    );
+  });
+
+  it("explains a local last line that is not JSON, keeping the cause", async () => {
+    vi.mocked(spawnSync).mockReturnValue(
+      _spawnResultWithStdout("{}\nDone in 2s.\n"),
+    );
+
+    const error = await fetchLivePipelineScopes({
+      pipelineName: "hdx",
+      local: true,
+    }).catch((caught: unknown) => {
+      return caught;
+    });
+
+    expect([
+      (error as Error).message,
+      (error as Error).cause instanceof SyntaxError,
+    ]).toEqual([expect.stringContaining('"Done in 2s."'), true]);
+  });
+
+  it("explains a 200 server response with an HTML body, trimmed", async () => {
+    const html = `<!doctype html><html>${"x".repeat(500)}</html>`;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        return new Response(html, { status: 200 });
+      }),
+    );
+
+    const error = await fetchLivePipelineScopes({
+      pipelineName: "hdx",
+      local: false,
+    }).catch((caught: unknown) => {
+      return caught;
+    });
+
+    expect([
+      (error as Error).message,
+      (error as Error).message.includes(html),
+      (error as Error).cause instanceof SyntaxError,
+    ]).toEqual([
+      expect.stringMatching(/hdx pipeline's scopes from the pipeline server.*<!doctype html>/),
+      false,
+      true,
     ]);
   });
 });
