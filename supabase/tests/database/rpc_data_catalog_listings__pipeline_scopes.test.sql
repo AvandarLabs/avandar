@@ -67,6 +67,10 @@ values
    'api_resource', 'ckan', 'https://pgtap-fixture-b.invalid',
    'pgtap-fixture-other-drive', 'r4', 'CSV', 'pgtap-fixture-pipeline', 'run-1',
    array['old']),
+  ('e7004009-0000-4000-8000-000000000009'::uuid, 'other drive shared',
+   'Fixture Org', 'api_resource', 'ckan', 'https://pgtap-fixture-b.invalid',
+   'pgtap-fixture-other-drive-shared', 'r9', 'CSV', 'pgtap-fixture-pipeline',
+   'run-1', array['old', 'new']),
   ('e7004005-0000-4000-8000-000000000005'::uuid, 'other scope', 'Fixture Org',
    'api_resource', 'ckan', 'https://pgtap-fixture-a.invalid',
    'pgtap-fixture-other-scope', 'r5', 'CSV', 'pgtap-fixture-pipeline', 'run-1',
@@ -119,7 +123,7 @@ values
   ('pgtap-fixture-pipeline', 'https://pgtap-fixture-c.invalid',
    'checkpoint-only', '2026-10-01T00:00:00Z', 'run-1');
 
-select plan(19);
+select plan(21);
 
 -- ---------------------------------------------------------------------------
 -- Listing stored scopes
@@ -132,6 +136,7 @@ select results_eq(
     ('https://pgtap-fixture-a.invalid', 'listing-only'),
     ('https://pgtap-fixture-a.invalid', 'new'),
     ('https://pgtap-fixture-a.invalid', 'old'),
+    ('https://pgtap-fixture-b.invalid', 'new'),
     ('https://pgtap-fixture-b.invalid', 'old'),
     ('https://pgtap-fixture-c.invalid', 'checkpoint-only')$$,
   'lists every drive and scope pair from listings and checkpoints once, ordered'
@@ -147,6 +152,14 @@ select throws_ok(
   'P0001',
   'rpc_data_catalog_listings__prune_pipeline_scope needs a pipeline name, a scope key, and a dry-run flag',
   'a prune without a scope key is refused'
+);
+
+select throws_ok(
+  $$select * from public.rpc_data_catalog_listings__prune_pipeline_scope(
+      'pgtap-fixture-pipeline', 'old', null, null)$$,
+  'P0001',
+  'rpc_data_catalog_listings__prune_pipeline_scope needs a pipeline name, a scope key, and a dry-run flag',
+  'a prune without a dry-run flag is refused'
 );
 
 -- ---------------------------------------------------------------------------
@@ -166,7 +179,7 @@ select is(
     from public.data_catalog_listings
     where pipeline_name = 'pgtap-fixture-pipeline'
   ),
-  7,
+  8,
   'a dry run deletes no listing'
 );
 
@@ -236,11 +249,23 @@ select is(
 -- ---------------------------------------------------------------------------
 
 -- Deleted: the drive B listing and the drive-less `pipeline_parquet` listing.
+-- Detached: the drive B listing `new` also produces, which the drive A prune
+-- above left alone.
 select results_eq(
   $$select * from public.rpc_data_catalog_listings__prune_pipeline_scope(
       'pgtap-fixture-pipeline', 'old', null, false)$$,
-  $$values (2, 1, 0, 1)$$,
+  $$values (2, 1, 1, 1)$$,
   'a null drive prunes the scope on every drive'
+);
+
+select is(
+  (
+    select pipeline_scope_keys
+    from public.data_catalog_listings
+    where external_dataset_id = 'pgtap-fixture-other-drive-shared'
+  ),
+  array['new'],
+  'a null-drive prune detaches the scope from a shared listing on another drive'
 );
 
 select is(
