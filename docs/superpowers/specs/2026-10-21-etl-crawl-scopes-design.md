@@ -629,7 +629,7 @@ Taken by default in this spec:
    pipeline can slice differently.
 7. Prune confirms with reset's interactive prompt rather than a `--confirm`
    flag.
-8. Prune and reset read live scopes from the same environment's pipeline
+8. Prune reads live scopes from the same environment's pipeline
    server. `--local` is development-only.
 9. `run --scope` takes a comma-separated list.
 10. The derived high-water mark, its store method, and its override hook
