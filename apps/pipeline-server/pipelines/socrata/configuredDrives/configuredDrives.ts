@@ -1,3 +1,13 @@
+import type { EtlScope } from "@avandar/etl";
+
+/**
+ * One Socrata scope: a drive's datasets in any of `categories` or with any
+ * of `tags`, both spelled as the portal names them. A scope with neither is
+ * the whole drive.
+ */
+export type SocrataScope = EtlScope &
+  Readonly<{ categories?: readonly string[]; tags?: readonly string[] }>;
+
 /**
  * One Socrata portal (drive) the metacatalog pipeline enumerates. No
  * `apiService` field: unlike the HDX pipeline's registry shape, every drive
@@ -15,6 +25,13 @@ export type ConfiguredDrive = {
    * registry names it once per drive instead.
    */
   organizationName: string;
+  /**
+   * The drive's scopes, crawled in this order. Omit to index the whole
+   * portal as one scope, `all`. Replacing `all` with category or tag scopes
+   * retires `all`, and `ava pipeline prune-retired-scopes` then removes the
+   * datasets outside them.
+   */
+  scopes?: readonly SocrataScope[];
 };
 
 /**

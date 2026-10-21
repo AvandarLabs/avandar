@@ -113,4 +113,53 @@ describe("createSocrataEtlEngine", () => {
       listings.getRows().length,
     ]).toEqual([3, 5]);
   });
+
+  it("crawls each of a drive's scopes and records them on its rows", async () => {
+    const listings = createInMemoryListingsStore();
+    const discovery = _discoveryOver(_catalog(1));
+
+    await createSocrataEtlEngine({
+      output: OUTPUT,
+      discovery,
+      drives: [
+        {
+          ...DRIVE,
+          scopes: [
+            { key: "category:education", categories: ["Education"] },
+            { key: "tag:doe", tags: ["doe"] },
+          ],
+        },
+      ],
+      stores: {
+        listings,
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+      },
+    }).run({ mode: "full" });
+
+    expect([
+      vi.mocked(discovery.search).mock.calls.map(([params]) => {
+        return [params.categories, params.tags];
+      }),
+      listings.getRows().map((row) => {
+        return row.pipeline_scope_keys;
+      }),
+    ]).toEqual([
+      [
+        [["Education"], undefined],
+        [undefined, ["doe"]],
+      ],
+      [["category:education", "tag:doe"]],
+    ]);
+  });
+
+  it("lists all as the scope of a drive without scopes", async () => {
+    const scopes = await createSocrataEtlEngine({
+      output: OUTPUT,
+      discovery: _discoveryOver([]),
+      drives: [DRIVE],
+    }).listScopes();
+
+    expect(scopes).toEqual([{ driveKey: DRIVE.baseUrl, scopeKeys: ["all"] }]);
+  });
 });

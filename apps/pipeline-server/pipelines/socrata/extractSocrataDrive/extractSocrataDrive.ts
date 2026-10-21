@@ -3,7 +3,10 @@ import type {
   SocrataDiscoveryClient,
   SocrataDiscoveryResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
-import type { ConfiguredDrive } from "@pipelines/socrata/configuredDrives/configuredDrives";
+import type {
+  ConfiguredDrive,
+  SocrataScope,
+} from "@pipelines/socrata/configuredDrives/configuredDrives";
 
 /** One Discovery API page. */
 export const SOCRATA_PAGE_SIZE = 1000;
@@ -26,6 +29,7 @@ export const SOCRATA_MAX_RESULTS = 10_000;
 
 type ExtractSocrataDriveArgs = Readonly<{
   drive: Readonly<ConfiguredDrive>;
+  scope: Readonly<SocrataScope>;
   window: EtlRunWindow;
   discovery: SocrataDiscoveryClient;
 }>;
@@ -120,6 +124,27 @@ function _takeBeforeUntil(
 }
 
 /**
+ * The Discovery API filters for a scope, or none for a scope that is the
+ * whole drive. Categories and tags are the drive's own, so the search runs
+ * in the drive's search context.
+ */
+function _buildScopeFilters(args: ExtractSocrataDriveArgs): Readonly<{
+  searchContext?: string;
+  categories?: readonly string[];
+  tags?: readonly string[];
+}> {
+  const { categories, tags } = args.scope;
+  if (categories === undefined && tags === undefined) {
+    return {};
+  }
+  return {
+    searchContext: new URL(args.drive.baseUrl).host,
+    ...(categories === undefined ? {} : { categories }),
+    ...(tags === undefined ? {} : { tags }),
+  };
+}
+
+/**
  * Fetches one page, fails a drive the Discovery API cannot page through, and
  * warns about each result that failed validation.
  */
@@ -130,6 +155,7 @@ async function _fetchPage(
   const { results, skippedResults, resultSetSize } =
     await args.discovery.search({
       domains: [new URL(drive.baseUrl).host],
+      ..._buildScopeFilters(args),
       order: "updatedAt ASC",
       limit,
       offset,
@@ -200,7 +226,8 @@ async function* _pagesFrom(
  * The Discovery API has no date filter, so the window is applied here: a
  * result before `since` is skipped, and the crawl stops at the first result
  * at or after `until`. A result that failed validation is logged with
- * `console.warn` and left out.
+ * `console.warn` and left out. A scope with categories or tags is narrowed
+ * at the source.
  *
  * @throws When the drive has more results than the Discovery API can page,
  * or when a page shares no dataset with the previous page's overlap.

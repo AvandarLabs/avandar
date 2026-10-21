@@ -1,4 +1,4 @@
-import { EtlEngine } from "@avandar/etl";
+import { ETL_DEFAULT_SCOPE, EtlEngine } from "@avandar/etl";
 import { CONFIGURED_DRIVES } from "@pipelines/socrata/configuredDrives/configuredDrives";
 import { extractSocrataDrive } from "@pipelines/socrata/extractSocrataDrive/extractSocrataDrive";
 import { makeApiResourceRelationFromSocrataResult } from "@pipelines/socrata/makeApiResourceRelationFromSocrataResult/makeApiResourceRelationFromSocrataResult";
@@ -11,7 +11,10 @@ import type {
   SocrataDiscoveryClient,
   SocrataDiscoveryResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
-import type { ConfiguredDrive } from "@pipelines/socrata/configuredDrives/configuredDrives";
+import type {
+  ConfiguredDrive,
+  SocrataScope,
+} from "@pipelines/socrata/configuredDrives/configuredDrives";
 
 /**
  * Creates the Socrata pipeline's engine. Each configured drive is crawled
@@ -31,7 +34,11 @@ export function createSocrataEtlEngine(
     }>,
 ): EtlEngineInstance {
   const { discovery, drives = CONFIGURED_DRIVES, ...destination } = args;
-  return EtlEngine.create<ConfiguredDrive, SocrataDiscoveryResult>({
+  return EtlEngine.create<
+    ConfiguredDrive,
+    SocrataDiscoveryResult,
+    SocrataScope
+  >({
     ...destination,
     name: "socrata",
     service: "socrata",
@@ -41,8 +48,11 @@ export function createSocrataEtlEngine(
     getDriveKey: (drive) => {
       return drive.baseUrl;
     },
-    extract: ({ drive, window }) => {
-      return extractSocrataDrive({ drive, window, discovery });
+    listScopes: (drive) => {
+      return drive.scopes ?? [ETL_DEFAULT_SCOPE];
+    },
+    extract: ({ drive, scope, window }) => {
+      return extractSocrataDrive({ drive, scope, window, discovery });
     },
     getConnectionId: (result) => {
       return result.datasetId;

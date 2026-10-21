@@ -5,7 +5,10 @@ import type {
   SocrataDiscoveryClient,
   SocrataDiscoveryResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
-import type { ConfiguredDrive } from "@pipelines/socrata/configuredDrives/configuredDrives";
+import type {
+  ConfiguredDrive,
+  SocrataScope,
+} from "@pipelines/socrata/configuredDrives/configuredDrives";
 
 const DRIVE: ConfiguredDrive = {
   baseUrl: "https://data.cityofnewyork.us",
@@ -100,11 +103,13 @@ function _modifyFirst(count: number) {
 async function _collect(
   window: EtlRunWindow,
   discovery: SocrataDiscoveryClient,
+  scope: SocrataScope = { key: "all" },
 ) {
   const pages: SocrataDiscoveryResult[][] = [];
   // Sequential on purpose: the generator pages one request at a time.
   for await (const page of extractSocrataDrive({
     drive: DRIVE,
+    scope,
     window,
     discovery,
   })) {
@@ -131,6 +136,34 @@ describe("extractSocrataDrive", () => {
       limit: 1000,
       offset: 0,
     });
+  });
+
+  it("narrows a category scope at the source, in the drive's own search context", async () => {
+    const discovery = _discoveryOver(_catalog(10));
+
+    await _collect(OPEN_WINDOW, discovery, {
+      key: "category:education",
+      categories: ["Education"],
+    });
+
+    expect(vi.mocked(discovery.search)).toHaveBeenCalledWith({
+      domains: ["data.cityofnewyork.us"],
+      searchContext: "data.cityofnewyork.us",
+      categories: ["Education"],
+      order: "updatedAt ASC",
+      limit: 1000,
+      offset: 0,
+    });
+  });
+
+  it("sends a tag scope's tags", async () => {
+    const discovery = _discoveryOver(_catalog(10));
+
+    await _collect(OPEN_WINDOW, discovery, { key: "tag:doe", tags: ["doe"] });
+
+    expect(vi.mocked(discovery.search).mock.calls[0]?.[0].tags).toEqual([
+      "doe",
+    ]);
   });
 
   it("starts each page 20 results before the previous page ended", async () => {
