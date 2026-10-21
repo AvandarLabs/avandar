@@ -94,3 +94,29 @@ export type ObjectStore = Readonly<{
   /** The public URL an object at `path` is served from. */
   getPublicUrl: (path: string) => string;
 }>;
+
+/** Identifies one checkpoint: one scope of one drive of one pipeline. */
+export type CheckpointKey = Readonly<{
+  pipelineName: string;
+  driveKey: string;
+  scopeKey: string;
+}>;
+
+/** A checkpoint's value and the run that wrote it. */
+export type StoredCheckpoint = CheckpointKey &
+  Readonly<{
+    /** The newest source timestamp the scope's crawls have loaded up to. */
+    highWaterMark: Date;
+    pipelineRunId: string;
+  }>;
+
+/**
+ * Where incremental crawls keep their checkpoints. Every connection in a
+ * scope with a source timestamp before its checkpoint has been loaded.
+ */
+export type CheckpointStore = Readonly<{
+  /** Resolves to the checkpoint, or `undefined` when the scope has none. */
+  read: (key: CheckpointKey) => Promise<Date | undefined>;
+  /** Creates the checkpoint, or replaces its value and run id. */
+  write: (checkpoint: StoredCheckpoint) => Promise<void>;
+}>;

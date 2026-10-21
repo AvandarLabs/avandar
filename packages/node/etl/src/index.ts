@@ -29,11 +29,14 @@ export type {
   RelationDescription,
 } from "@etl/EtlEngine/EtlEngine.types";
 export type {
+  CheckpointKey,
+  CheckpointStore,
   ListingAccessKind,
   ListingRowValues,
   ListingsStore,
   ObjectStore,
   RelationColumnRow,
+  StoredCheckpoint,
   StoredListingRow,
 } from "@etl/stores/EtlStores.types";
 export { LISTING_CONTRACT_COLUMNS } from "@etl/stores/listingContractColumns";
@@ -41,6 +44,10 @@ export {
   createInMemoryListingsStore,
   type InMemoryListingsStore,
 } from "@etl/stores/InMemoryListingsStore/createInMemoryListingsStore";
+export {
+  createInMemoryCheckpointStore,
+  type InMemoryCheckpointStore,
+} from "@etl/stores/InMemoryCheckpointStore/createInMemoryCheckpointStore";
 export {
   createInMemoryObjectStore,
   type InMemoryObjectStore,
