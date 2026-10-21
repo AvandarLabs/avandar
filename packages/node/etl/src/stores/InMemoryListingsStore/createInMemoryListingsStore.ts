@@ -32,36 +32,6 @@ function _copyThroughJson<T>(value: T): T {
   return value === undefined ? value : JSON.parse(JSON.stringify(value));
 }
 
-/**
- * The newest parseable `date_of_last_update` no later than now, as the
- * Supabase store reads it: a later date is a bad source timestamp.
- */
-function _readHighWaterMark(args: {
-  rows: Iterable<StoredListingRow>;
-  pipelineName: string;
-  apiBaseUrl: string;
-}): Date | undefined {
-  const now = Date.now();
-  const times = [...args.rows].flatMap((row) => {
-    if (
-      row.pipeline_name !== args.pipelineName ||
-      row.api_base_url !== args.apiBaseUrl ||
-      row.date_of_last_update === null
-    ) {
-      return [];
-    }
-    const time = Date.parse(row.date_of_last_update);
-    return Number.isNaN(time) || time > now ? [] : [time];
-  });
-  return times.length === 0 ?
-      undefined
-    : new Date(
-        times.reduce((newest, time) => {
-          return Math.max(newest, time);
-        }),
-      );
-}
-
 function _throwOnRepeatedKey(rows: readonly ListingRowValues[]): void {
   const keys = rows.map((row) => {
     return buildListingKeyFromRow(row);
@@ -97,13 +67,6 @@ export function createInMemoryListingsStore(
   const upsertBatches: Array<readonly ListingRowValues[]> = [];
 
   return {
-    readHighWaterMark: async ({ pipelineName, apiBaseUrl }) => {
-      return _readHighWaterMark({
-        rows: rowsByKey.values(),
-        pipelineName,
-        apiBaseUrl,
-      });
-    },
     readRowsMatching: async (rows) => {
       readBatchSizes.push(rows.length);
       const keys = new Set(

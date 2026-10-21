@@ -1,7 +1,10 @@
-import { createInMemoryListingsStore } from "@avandar/etl";
+import {
+  createInMemoryCheckpointStore,
+  createInMemoryListingsStore,
+} from "@avandar/etl";
 import { createSocrataEtlEngine } from "@pipelines/socrata/createSocrataEtlEngine/createSocrataEtlEngine";
 import { describe, expect, it, vi } from "vitest";
-import type { InMemoryListingsStore } from "@avandar/etl";
+import type { EtlStores } from "@avandar/etl";
 import type {
   SocrataDiscoveryClient,
   SocrataDiscoveryResult,
@@ -43,22 +46,27 @@ function _discoveryOver(
 }
 
 function _engine(
-  listings: InMemoryListingsStore,
+  stores: EtlStores,
   catalog: readonly SocrataDiscoveryResult[],
 ) {
   return createSocrataEtlEngine({
     output: OUTPUT,
     discovery: _discoveryOver(catalog),
     drives: [DRIVE],
-    stores: { listings, objects: undefined },
+    stores,
   });
 }
 
 describe("createSocrataEtlEngine", () => {
   it("writes one listing per dataset, dated by its updatedAt", async () => {
     const listings = createInMemoryListingsStore();
+    const stores = {
+      listings,
+      objects: undefined,
+      checkpoints: createInMemoryCheckpointStore(),
+    };
 
-    await _engine(listings, _catalog(3)).run({ mode: "full" });
+    await _engine(stores, _catalog(3)).run({ mode: "full" });
 
     expect(
       listings.getRows().map((row) => {
@@ -73,8 +81,13 @@ describe("createSocrataEtlEngine", () => {
 
   it("writes each dataset once across overlapping pages", async () => {
     const listings = createInMemoryListingsStore();
+    const stores = {
+      listings,
+      objects: undefined,
+      checkpoints: createInMemoryCheckpointStore(),
+    };
 
-    await _engine(listings, _catalog(1500)).run({ mode: "full" });
+    await _engine(stores, _catalog(1500)).run({ mode: "full" });
 
     const upserted = listings.getUpsertBatches().reduce((sum, batch) => {
       return sum + batch.length;
@@ -82,11 +95,16 @@ describe("createSocrataEtlEngine", () => {
     expect([listings.getRows().length, upserted]).toEqual([1500, 1500]);
   });
 
-  it("continues an incremental run from the newest stored dataset", async () => {
+  it("continues an incremental run from its checkpoint", async () => {
     const listings = createInMemoryListingsStore();
-    await _engine(listings, _catalog(5)).run({ mode: "full", limit: 2 });
+    const stores = {
+      listings,
+      objects: undefined,
+      checkpoints: createInMemoryCheckpointStore(),
+    };
+    await _engine(stores, _catalog(5)).run({ mode: "full", limit: 2 });
 
-    const report = await _engine(listings, _catalog(5)).run({
+    const report = await _engine(stores, _catalog(5)).run({
       mode: "incremental",
     });
 

@@ -50,14 +50,6 @@ export type RelationColumnRow = Readonly<{
 /** Reads and writes the listings table and the relation columns table. */
 export type ListingsStore = Readonly<{
   /**
-   * The newest `date_of_last_update` among one pipeline's rows for one
-   * drive, ignoring dates later than now, or `undefined` when there is none.
-   */
-  readHighWaterMark: (args: {
-    pipelineName: string;
-    apiBaseUrl: string;
-  }) => Promise<Date | undefined>;
-  /**
    * The stored rows that share a conflict key with any of `rows`. The result
    * is in no particular order and has at most one entry per key, so callers
    * match rows to their stored counterpart with `buildListingKeyFromRow`.

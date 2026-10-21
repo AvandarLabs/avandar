@@ -34,6 +34,12 @@ describe("getPipelineEtlDestination", () => {
     expect(getPipelineEtlDestination().output.bucket).toBe("opendata");
   });
 
+  it("keeps checkpoints in pipeline_scope_checkpoints", () => {
+    expect(getPipelineEtlDestination().output.checkpointsTable).toBe(
+      "pipeline_scope_checkpoints",
+    );
+  });
+
   it("treats blank Supabase credentials as unset", () => {
     vi.stubEnv("SUPABASE_URL", "");
     vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "  ");

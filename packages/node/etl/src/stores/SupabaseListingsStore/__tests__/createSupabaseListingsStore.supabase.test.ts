@@ -182,57 +182,6 @@ describe("createSupabaseListingsStore", () => {
     expect(data).toEqual({ cached_object_path: null });
   });
 
-  it("reads the newest date_of_last_update for one pipeline and drive only", async () => {
-    await store.upsertRows([
-      _apiRow({
-        external_dataset_id: "a",
-        date_of_last_update: "2026-10-01T00:00:00.000Z",
-      }),
-      _apiRow({
-        external_dataset_id: "b",
-        date_of_last_update: "2026-10-05T00:00:00.000Z",
-      }),
-      _apiRow({ external_dataset_id: "undated", date_of_last_update: null }),
-      _apiRow({
-        external_dataset_id: "c",
-        date_of_last_update: "2026-10-09T00:00:00.000Z",
-        api_base_url: OTHER_DRIVE,
-      }),
-      _apiRow({
-        external_dataset_id: "d",
-        date_of_last_update: "2026-10-12T00:00:00.000Z",
-        pipeline_name: OTHER_PIPELINE_NAME,
-      }),
-    ]);
-
-    await expect(
-      store.readHighWaterMark({
-        pipelineName: PIPELINE_NAME,
-        apiBaseUrl: DRIVE,
-      }),
-    ).resolves.toEqual(new Date("2026-10-05T00:00:00.000Z"));
-  });
-
-  it("ignores a date_of_last_update later than now", async () => {
-    await store.upsertRows([
-      _apiRow({
-        external_dataset_id: "a",
-        date_of_last_update: "2026-10-05T00:00:00.000Z",
-      }),
-      _apiRow({
-        external_dataset_id: "future",
-        date_of_last_update: "2999-01-01T00:00:00.000Z",
-      }),
-    ]);
-
-    await expect(
-      store.readHighWaterMark({
-        pipelineName: PIPELINE_NAME,
-        apiBaseUrl: DRIVE,
-      }),
-    ).resolves.toEqual(new Date("2026-10-05T00:00:00.000Z"));
-  });
-
   it("reads back a written row that the change check sees as unchanged", async () => {
     const row = _apiRow();
     await store.upsertRows([row]);

@@ -1,7 +1,11 @@
 import type { UUID } from "@avandar/utils";
 import type { TransformedColumnDescription } from "@etl/EtlEngine/transformedCsvsToParquetBlobs";
 import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
-import type { ListingsStore, ObjectStore } from "@etl/stores/EtlStores.types";
+import type {
+  CheckpointStore,
+  ListingsStore,
+  ObjectStore,
+} from "@etl/stores/EtlStores.types";
 
 /** A value, or a promise of one. */
 export type PromisedOrValue<T> = Promise<T> | T;
@@ -50,7 +54,7 @@ export type RelationDescription = Readonly<{
   externalOrganizationName: string;
   /**
    * The connection's source modification time, written to
-   * `date_of_last_update`. The default high-water mark reads it back.
+   * `date_of_last_update`.
    */
   sourceUpdatedAt: Date | undefined;
   externalServiceName?: string;
@@ -101,6 +105,11 @@ export type Relation = ApiResourceRelation | PipelineParquetRelation;
 export type EtlOutput = Readonly<{
   listingsTable: string;
   relationColumnsTable: string;
+  /**
+   * The checkpoints table. Required when the config has `incremental`,
+   * because incremental crawls resume from it.
+   */
+  checkpointsTable?: string;
   /** Required only when a pipeline returns `pipeline_parquet` relations. */
   bucket?: string;
 }>;
@@ -120,19 +129,17 @@ export type EtlStores = Readonly<{
   listings: ListingsStore;
   /** Undefined when no bucket is configured. */
   objects: ObjectStore | undefined;
+  /** Required when the config has `incremental`. */
+  checkpoints?: CheckpointStore;
 }>;
 
-/** What a pipeline adds to support incremental runs. */
-export type EtlIncrementalConfig<TDrive, TConnection> = Readonly<{
+/**
+ * What a pipeline adds to support incremental runs. `_TDrive` is unused. It
+ * keeps the type's parameters in step with `EtlEngineConfig`'s.
+ */
+export type EtlIncrementalConfig<_TDrive, TConnection> = Readonly<{
   /** Modification time, or creation time when the source has no other. */
   getConnectionTimestamp: (connection: TConnection) => Date;
-  /** Overrides how a drive's high-water mark is read. */
-  readHighWaterMark?: (args: {
-    drive: TDrive;
-    driveKey: string;
-    /** `max(date_of_last_update)` for this pipeline and drive. */
-    readDefaultHighWaterMark: () => Promise<Date | undefined>;
-  }) => Promise<Date | undefined>;
 }>;
 
 /** Everything one pipeline gives the engine. */
@@ -201,6 +208,8 @@ export type EtlEngineInstance = Readonly<{
    * or more.
    * @throws Before listing drives, when no `stores` are given and
    * `supabase.url` or `supabase.serviceRoleKey` is missing.
+   * @throws Before listing drives, when the config has `incremental` and
+   * there is no checkpoint store.
    * @throws Whatever `listDrives` throws.
    * @throws EtlRunFailedError when every drive failed.
    */

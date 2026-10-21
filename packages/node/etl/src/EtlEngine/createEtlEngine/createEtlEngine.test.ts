@@ -2,21 +2,23 @@ import { createEtlEngine } from "@etl/EtlEngine/createEtlEngine/createEtlEngine"
 import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
 import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
 import { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionError";
+import { createInMemoryCheckpointStore } from "@etl/stores/InMemoryCheckpointStore/createInMemoryCheckpointStore";
 import { createInMemoryListingsStore } from "@etl/stores/InMemoryListingsStore/createInMemoryListingsStore";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import type {
   ApiResourceRelation,
   EtlEngineConfig,
-  EtlIncrementalConfig,
   EtlRunOptions,
   EtlRunReport,
   EtlRunWindow,
   EtlStores,
 } from "@etl/EtlEngine/EtlEngine.types";
 import type {
+  CheckpointStore,
   ListingsStore,
-  StoredListingRow,
+  StoredCheckpoint,
 } from "@etl/stores/EtlStores.types";
+import type { InMemoryCheckpointStore } from "@etl/stores/InMemoryCheckpointStore/createInMemoryCheckpointStore";
 import type { InMemoryListingsStore } from "@etl/stores/InMemoryListingsStore/createInMemoryListingsStore";
 
 type FakeConnection = Readonly<{
@@ -102,10 +104,6 @@ function _config(args: {
   recorder: Recorder;
   stores?: EtlStores;
   isIncremental?: boolean;
-  readHighWaterMark?: EtlIncrementalConfig<
-    FakeDrive,
-    FakeConnection
-  >["readHighWaterMark"];
   supabase?: FakeConfig["supabase"];
   getDriveKey?: FakeConfig["getDriveKey"];
   transform?: FakeConfig["transform"];
@@ -117,6 +115,7 @@ function _config(args: {
     output: {
       listingsTable: "data_catalog_listings",
       relationColumnsTable: "data_catalog_listings__relation_columns",
+      checkpointsTable: "pipeline_scope_checkpoints",
     },
     stores: args.stores,
     listDrives: () => {
@@ -148,49 +147,52 @@ function _config(args: {
             getConnectionTimestamp: (connection) => {
               return connection.modifiedAt;
             },
-            readHighWaterMark: args.readHighWaterMark,
           },
   };
 }
 
-function _stores(
-  listings: ListingsStore = createInMemoryListingsStore(),
-): EtlStores {
-  return { listings, objects: undefined };
+/**
+ * One checkpoint store per listings store, so two runs over the same
+ * listings, as a resume is, also share their checkpoints.
+ */
+const CHECKPOINTS_BY_LISTINGS = new WeakMap<
+  ListingsStore,
+  InMemoryCheckpointStore
+>();
+
+function _checkpointsFor(listings: ListingsStore): InMemoryCheckpointStore {
+  const existing = CHECKPOINTS_BY_LISTINGS.get(listings);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const created = createInMemoryCheckpointStore();
+  CHECKPOINTS_BY_LISTINGS.set(listings, created);
+  return created;
 }
 
-function _storedRow(args: {
-  id: string;
-  driveKey: string;
-  minute: number;
-}): StoredListingRow {
+function _stores(
+  listings: ListingsStore = createInMemoryListingsStore(),
+  checkpoints: CheckpointStore = _checkpointsFor(listings),
+): EtlStores {
+  return { listings, objects: undefined, checkpoints };
+}
+
+function _checkpoint(driveKey: string, minute: number): StoredCheckpoint {
   return {
-    id: `listing-${args.id}`,
-    access_kind: "api_resource",
-    pipeline_name: PIPELINE_NAME,
-    pipeline_run_id: "earlier-run",
-    display_name: `Dataset ${args.id}`,
-    external_organization_name: "Fake Org",
-    external_dataset_id: args.id,
-    date_of_last_update: _at(args.minute).toISOString(),
-    date_of_last_sync: "2026-10-01T00:00:00.000Z",
-    external_service_name: null,
-    source_url: null,
-    canonical_urls: null,
-    license: null,
-    update_frequency: null,
-    description: null,
-    notes: null,
-    metadata: null,
-    coverage_start_date: null,
-    coverage_end_date: null,
-    api_service: "socrata",
-    api_base_url: args.driveKey,
-    api_resource_id: `${args.id}-r0`,
-    api_resource_format: "CSV",
-    parquet_file_name: null,
-    pipeline_scope_keys: ["all"],
+    pipelineName: PIPELINE_NAME,
+    driveKey,
+    scopeKey: "all",
+    highWaterMark: _at(minute),
+    pipelineRunId: "earlier-run",
   };
+}
+
+function _checkpointValues(
+  checkpoints: InMemoryCheckpointStore,
+): Array<[string, Date]> {
+  return checkpoints.getCheckpoints().map((checkpoint) => {
+    return [checkpoint.driveKey, checkpoint.highWaterMark];
+  });
 }
 
 function _datasetIds(listings: InMemoryListingsStore): string[] {
@@ -238,20 +240,17 @@ function _statusesOf(
 
 describe("createEtlEngine", () => {
   describe("windows", () => {
-    it("starts each drive of an incremental run at its own high-water mark", async () => {
+    it("starts each drive of an incremental run at its own checkpoint", async () => {
       const recorder = _recorder();
-      const listings = createInMemoryListingsStore({
-        rows: [
-          _storedRow({ id: "a1", driveKey: "a", minute: 10 }),
-          _storedRow({ id: "b1", driveKey: "b", minute: 20 }),
-        ],
+      const checkpoints = createInMemoryCheckpointStore({
+        checkpoints: [_checkpoint("a", 10), _checkpoint("b", 20)],
       });
 
       await _run(
         _config({
           drives: [_drive("a", [[]]), _drive("b", [[]])],
           recorder,
-          stores: _stores(listings),
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
         }),
         { mode: "incremental" },
       );
@@ -262,7 +261,7 @@ describe("createEtlEngine", () => {
       ]).toEqual([_at(10), _at(20)]);
     });
 
-    it("starts an incremental drive with no rows at no lower bound", async () => {
+    it("starts an incremental drive with no checkpoint at no lower bound", async () => {
       const recorder = _recorder();
 
       await _run(
@@ -275,43 +274,39 @@ describe("createEtlEngine", () => {
       expect(recorder.windows.get("a")?.since).toBeUndefined();
     });
 
-    it("ignores the high-water mark in a full run", async () => {
+    it("ignores the checkpoint in a full run", async () => {
       const recorder = _recorder();
-      const listings = createInMemoryListingsStore({
-        rows: [_storedRow({ id: "a1", driveKey: "a", minute: 10 })],
+      const checkpoints = createInMemoryCheckpointStore({
+        checkpoints: [_checkpoint("a", 10)],
       });
 
       await _run(
         _config({
           drives: [_drive("a", [[]])],
           recorder,
-          stores: _stores(listings),
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
         }),
       );
 
       expect(recorder.windows.get("a")?.since).toBeUndefined();
     });
 
-    it("lets an explicit since win without reading the high-water mark", async () => {
+    it("lets an explicit since win over the checkpoint", async () => {
       const recorder = _recorder();
-      const readHighWaterMark = vi.fn(async () => {
-        return _at(30);
+      const checkpoints = createInMemoryCheckpointStore({
+        checkpoints: [_checkpoint("a", 30)],
       });
 
       await _run(
         _config({
           drives: [_drive("a", [[]])],
           recorder,
-          stores: _stores(),
-          readHighWaterMark,
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
         }),
         { mode: "incremental", since: _at(5) },
       );
 
-      expect([
-        recorder.windows.get("a")?.since,
-        readHighWaterMark.mock.calls.length,
-      ]).toEqual([_at(5), 0]);
+      expect(recorder.windows.get("a")?.since).toEqual(_at(5));
     });
 
     it("uses an explicit since as a full run's lower bound", async () => {
@@ -347,7 +342,7 @@ describe("createEtlEngine", () => {
       ]);
     });
 
-    it("fetches the connection at the high-water mark again without rewriting it", async () => {
+    it("fetches the connection at the checkpoint again without rewriting it", async () => {
       const listings = createInMemoryListingsStore();
       const drives = [
         _drive("a", [[_connection("c1", 1), _connection("c2", 5)]]),
@@ -367,30 +362,6 @@ describe("createEtlEngine", () => {
       ]).toEqual([0, 1]);
     });
 
-    it("passes the drive to a custom readHighWaterMark and uses its value", async () => {
-      const recorder = _recorder();
-      const readHighWaterMark = vi.fn(async () => {
-        return _at(30);
-      });
-
-      await _run(
-        _config({
-          drives: [_drive("a", [[]])],
-          recorder,
-          stores: _stores(),
-          readHighWaterMark,
-        }),
-        { mode: "incremental" },
-      );
-
-      expect(readHighWaterMark).toHaveBeenCalledWith(
-        expect.objectContaining({
-          driveKey: "a",
-          drive: expect.objectContaining({ key: "a" }),
-        }),
-      );
-      expect(recorder.windows.get("a")?.since).toEqual(_at(30));
-    });
   });
 
   describe("ordering and limits", () => {
@@ -665,7 +636,7 @@ describe("createEtlEngine", () => {
       ]).toEqual([1, 4]);
     });
 
-    it("does not move the high-water mark for a connection with no relations", async () => {
+    it("advances the checkpoint past a connection with no relations", async () => {
       const listings = createInMemoryListingsStore();
 
       await _run(
@@ -678,16 +649,13 @@ describe("createEtlEngine", () => {
         }),
       );
 
-      expect(_datasetIds(listings)).toEqual(["c1"]);
-      await expect(
-        listings.readHighWaterMark({
-          pipelineName: PIPELINE_NAME,
-          apiBaseUrl: "a",
-        }),
-      ).resolves.toEqual(_at(1));
+      expect([
+        _datasetIds(listings),
+        _checkpointValues(_checkpointsFor(listings)),
+      ]).toEqual([["c1"], [["a", _at(2)]]]);
     });
 
-    it("writes a connection that shares the high-water mark's timestamp on resume", async () => {
+    it("writes a connection that shares the checkpoint's timestamp on resume", async () => {
       const listings = createInMemoryListingsStore();
       const drives = [
         _drive("a", [
@@ -711,6 +679,204 @@ describe("createEtlEngine", () => {
         report.drives[0]?.relationsWritten,
         _datasetIds(listings),
       ]).toEqual([1, ["c1", "c2", "c3"]]);
+    });
+  });
+
+  describe("checkpoints", () => {
+    it("advances the checkpoint after each loaded page", async () => {
+      const listings = createInMemoryListingsStore();
+      const checkpoints = _checkpointsFor(listings);
+
+      await _run(
+        _config({
+          drives: [
+            _drive("a", [
+              [_connection("c1", 1), _connection("c2", 2)],
+              [_connection("c3", 3)],
+            ]),
+          ],
+          recorder: _recorder(),
+          stores: _stores(listings),
+        }),
+      );
+
+      expect([
+        _checkpointValues(checkpoints),
+        checkpoints.getWriteCount(),
+      ]).toEqual([[["a", _at(3)]], 2]);
+    });
+
+    it("resumes a failed crawl from its last loaded page", async () => {
+      const listings = createInMemoryListingsStore();
+      const pages: FakePage[] = [
+        [_connection("c1", 1), _connection("c2", 2)],
+        [_connection("c3", 3)],
+      ];
+      await _run(
+        _config({
+          drives: [_drive("a", pages, 1)],
+          recorder: _recorder(),
+          stores: _stores(listings),
+        }),
+      ).catch(() => {
+        return undefined;
+      });
+      const recorder = _recorder();
+
+      await _run(
+        _config({
+          drives: [_drive("a", pages)],
+          recorder,
+          stores: _stores(listings),
+        }),
+        { mode: "incremental" },
+      );
+
+      expect(recorder.windows.get("a")?.since).toEqual(_at(2));
+    });
+
+    it("keeps a future-dated connection from moving the checkpoint", async () => {
+      const listings = createInMemoryListingsStore();
+      const futureConnection: FakeConnection = {
+        id: "future",
+        modifiedAt: new Date("2099-01-01T00:00:00.000Z"),
+        relationCount: 1,
+      };
+
+      await _run(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 1), futureConnection]])],
+          recorder: _recorder(),
+          stores: _stores(listings),
+        }),
+      );
+
+      expect(_checkpointValues(_checkpointsFor(listings))).toEqual([
+        ["a", _at(1)],
+      ]);
+    });
+
+    it("does not advance the checkpoint from a since later than it", async () => {
+      const checkpoints = createInMemoryCheckpointStore({
+        checkpoints: [_checkpoint("a", 5)],
+      });
+
+      await _run(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 11)]])],
+          recorder: _recorder(),
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
+        }),
+        { mode: "full", since: _at(10) },
+      );
+
+      expect(_checkpointValues(checkpoints)).toEqual([["a", _at(5)]]);
+    });
+
+    it("does not create a checkpoint from an explicit since", async () => {
+      const checkpoints = createInMemoryCheckpointStore();
+
+      await _run(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 11)]])],
+          recorder: _recorder(),
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
+        }),
+        { mode: "full", since: _at(10) },
+      );
+
+      expect(checkpoints.getCheckpoints()).toEqual([]);
+    });
+
+    it("advances the checkpoint from a since at or before it", async () => {
+      const checkpoints = createInMemoryCheckpointStore({
+        checkpoints: [_checkpoint("a", 5)],
+      });
+
+      await _run(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 6)]])],
+          recorder: _recorder(),
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
+        }),
+        { mode: "full", since: _at(5) },
+      );
+
+      expect(_checkpointValues(checkpoints)).toEqual([["a", _at(6)]]);
+    });
+
+    it("never moves the checkpoint backward", async () => {
+      const checkpoints = createInMemoryCheckpointStore({
+        checkpoints: [_checkpoint("a", 10)],
+      });
+
+      await _run(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 2), _connection("c2", 3)]])],
+          recorder: _recorder(),
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
+        }),
+        { mode: "full", since: _at(1) },
+      );
+
+      expect([
+        _checkpointValues(checkpoints),
+        checkpoints.getWriteCount(),
+      ]).toEqual([[["a", _at(10)]], 0]);
+    });
+
+    it("advances the checkpoint in a full run from the start", async () => {
+      const checkpoints = createInMemoryCheckpointStore();
+
+      await _run(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 1)]])],
+          recorder: _recorder(),
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
+        }),
+      );
+
+      expect(_checkpointValues(checkpoints)).toEqual([["a", _at(1)]]);
+    });
+
+    it("writes no checkpoint for a pipeline without incremental config", async () => {
+      const checkpoints = createInMemoryCheckpointStore();
+
+      await _run(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 1)]])],
+          recorder: _recorder(),
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
+          isIncremental: false,
+        }),
+      );
+
+      expect(checkpoints.getWriteCount()).toBe(0);
+    });
+
+    it("fails a drive whose checkpoint cannot be written and keeps its rows", async () => {
+      const listings = createInMemoryListingsStore();
+      const failingCheckpoints: CheckpointStore = {
+        read: async () => {
+          return undefined;
+        },
+        write: async () => {
+          throw new Error("checkpoint write failed");
+        },
+      };
+
+      const error = await _runFailure(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 1)]])],
+          recorder: _recorder(),
+          stores: _stores(listings, failingCheckpoints),
+        }),
+      );
+
+      expect([error.report.drives[0]?.error, _datasetIds(listings)]).toEqual([
+        "checkpoint write failed",
+        ["c1"],
+      ]);
     });
   });
 
@@ -817,7 +983,19 @@ describe("createEtlEngine", () => {
       ]);
     });
 
-    it("reports a drive whose high-water mark cannot be read as failed and still crawls the next one", async () => {
+    it("reports a drive whose checkpoint cannot be read as failed and still crawls the next one", async () => {
+      const checkpoints: CheckpointStore = {
+        read: async ({ driveKey }) => {
+          if (driveKey === "a") {
+            throw new Error("checkpoint unavailable");
+          }
+          return undefined;
+        },
+        write: async () => {
+          return undefined;
+        },
+      };
+
       const report = await _run(
         _config({
           drives: [
@@ -825,19 +1003,13 @@ describe("createEtlEngine", () => {
             _drive("b", [[_connection("b1", 1)]]),
           ],
           recorder: _recorder(),
-          stores: _stores(),
-          readHighWaterMark: async ({ driveKey }) => {
-            if (driveKey === "a") {
-              throw new Error("high-water mark unavailable");
-            }
-            return undefined;
-          },
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
         }),
         { mode: "incremental" },
       );
 
       expect(_statusesOf(report)).toEqual([
-        ["a", "failed", "high-water mark unavailable"],
+        ["a", "failed", "checkpoint unavailable"],
         ["b", "ok", undefined],
       ]);
     });
@@ -987,6 +1159,24 @@ describe("createEtlEngine", () => {
           }),
         ),
       ).rejects.toThrow("supabase.url");
+      expect(recorder.events).toEqual([]);
+    });
+
+    it("rejects an incremental pipeline with no checkpoint store before listing drives", async () => {
+      const recorder = _recorder();
+
+      const run = _run(
+        _config({
+          drives: [_drive("a", [[]])],
+          recorder,
+          stores: {
+            listings: createInMemoryListingsStore(),
+            objects: undefined,
+          },
+        }),
+      );
+
+      await expect(run).rejects.toThrow("needs somewhere to keep its checkpoints");
       expect(recorder.events).toEqual([]);
     });
 

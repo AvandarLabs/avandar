@@ -35,7 +35,10 @@ type _ParquetFile = Readonly<{
 
 type _PrepareParquetRelationArgs = Readonly<{
   relation: PipelineParquetRelation;
-  /** The relation's row from `buildListingRowFromRelation`. */
+  /**
+   * The relation's row from `buildListingRowFromRelation`, with the stored
+   * row's scope keys merged in.
+   */
   row: ListingRowValues;
   /** The row already stored under the same conflict key, if any. */
   stored: StoredListingRow | undefined;

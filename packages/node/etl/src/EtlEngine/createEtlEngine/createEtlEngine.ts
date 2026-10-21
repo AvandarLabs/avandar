@@ -3,6 +3,7 @@ import { promiseReduce } from "@avandar/utils";
 import { crawlDrive } from "@etl/EtlEngine/crawlDrive/crawlDrive";
 import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
 import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
+import { createSupabaseCheckpointStore } from "@etl/stores/SupabaseCheckpointStore/createSupabaseCheckpointStore";
 import { createSupabaseListingsStore } from "@etl/stores/SupabaseListingsStore/createSupabaseListingsStore";
 import { createSupabaseObjectStore } from "@etl/stores/SupabaseObjectStore/createSupabaseObjectStore";
 import { createClient } from "@supabase/supabase-js";
@@ -75,6 +76,13 @@ function _createSupabaseStores(destination: EtlDestination): EtlStores {
       output.bucket === undefined
         ? undefined
         : createSupabaseObjectStore({ client, bucket: output.bucket }),
+    checkpoints:
+      output.checkpointsTable === undefined
+        ? undefined
+        : createSupabaseCheckpointStore({
+            client,
+            checkpointsTable: output.checkpointsTable,
+          }),
   };
 }
 
@@ -108,6 +116,25 @@ async function _crawlDrivesInOrder<TDrive, TConnection>(
 }
 
 /**
+ * The stores a run writes through: the config's own, or Supabase-backed
+ * ones.
+ *
+ * @throws When the config has `incremental` and there is no checkpoint
+ * store to resume from.
+ */
+function _resolveStores<TDrive, TConnection>(
+  config: EtlEngineConfig<TDrive, TConnection>,
+): EtlStores {
+  const stores = config.stores ?? _createSupabaseStores(config);
+  if (config.incremental !== undefined && stores.checkpoints === undefined) {
+    throw new Error(
+      `The ${config.name} pipeline supports incremental runs, so EtlEngine needs somewhere to keep its checkpoints: set output.checkpointsTable, or stores.checkpoints in tests.`,
+    );
+  }
+  return stores;
+}
+
+/**
  * Creates one pipeline's engine. `run()` crawls every drive in
  * `listDrives` order, one page at a time, and loads each page into the
  * configured listings table and bucket before fetching the next. A failed
@@ -124,7 +151,7 @@ export function createEtlEngine<TDrive, TConnection>(
   return {
     run: async (options) => {
       _assertCanRun({ config, options });
-      const stores = config.stores ?? _createSupabaseStores(config);
+      const stores = _resolveStores(config);
       const pipelineRunId = randomUUID() as EtlPipelineRunId;
       const drives = await config.listDrives();
       const results = await _crawlDrivesInOrder({

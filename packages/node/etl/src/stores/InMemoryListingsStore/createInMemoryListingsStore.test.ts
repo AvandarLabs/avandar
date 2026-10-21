@@ -58,48 +58,6 @@ function _column(name: string, displayOrder: number): RelationColumnRow {
 }
 
 describe("createInMemoryListingsStore", () => {
-  it("reads the newest date_of_last_update for one pipeline and drive", async () => {
-    const store = createInMemoryListingsStore({
-      rows: [
-        _stored("a", { date_of_last_update: "2026-10-01T00:00:00.000Z" }),
-        _stored("b", { date_of_last_update: "2026-10-05T00:00:00.000Z" }),
-        _stored("c", {
-          date_of_last_update: "2026-10-09T00:00:00.000Z",
-          api_base_url: "https://data.cityofchicago.org",
-        }),
-        _stored("d", {
-          date_of_last_update: "2026-10-12T00:00:00.000Z",
-          pipeline_name: "hdx",
-        }),
-      ],
-    });
-
-    await expect(
-      store.readHighWaterMark({ pipelineName: "socrata", apiBaseUrl: DRIVE }),
-    ).resolves.toEqual(new Date("2026-10-05T00:00:00.000Z"));
-  });
-
-  it("ignores a date_of_last_update later than now", async () => {
-    const store = createInMemoryListingsStore({
-      rows: [
-        _stored("a", { date_of_last_update: "2026-10-05T00:00:00.000Z" }),
-        _stored("future", { date_of_last_update: "2999-01-01T00:00:00.000Z" }),
-      ],
-    });
-
-    await expect(
-      store.readHighWaterMark({ pipelineName: "socrata", apiBaseUrl: DRIVE }),
-    ).resolves.toEqual(new Date("2026-10-05T00:00:00.000Z"));
-  });
-
-  it("has no high-water mark for a drive with no dated rows", async () => {
-    const store = createInMemoryListingsStore({ rows: [_stored("a")] });
-
-    await expect(
-      store.readHighWaterMark({ pipelineName: "socrata", apiBaseUrl: DRIVE }),
-    ).resolves.toBeUndefined();
-  });
-
   it("keeps a row's id when the same key is upserted again", async () => {
     const store = createInMemoryListingsStore();
     const [first] = await store.upsertRows([_row()]);
@@ -291,29 +249,6 @@ describe("createInMemoryListingsStore", () => {
     });
 
     expect(store.getRelationColumns("listing-1")?.[0]?.column_name).toBe("a");
-  });
-
-  it("ignores a stored row whose date does not parse", async () => {
-    const store = createInMemoryListingsStore({
-      rows: [
-        _stored("a", { date_of_last_update: "not a date" }),
-        _stored("b", { date_of_last_update: "2026-10-05T00:00:00.000Z" }),
-      ],
-    });
-
-    await expect(
-      store.readHighWaterMark({ pipelineName: "socrata", apiBaseUrl: DRIVE }),
-    ).resolves.toEqual(new Date("2026-10-05T00:00:00.000Z"));
-  });
-
-  it("has no high-water mark when no stored date parses", async () => {
-    const store = createInMemoryListingsStore({
-      rows: [_stored("a", { date_of_last_update: "not a date" })],
-    });
-
-    await expect(
-      store.readHighWaterMark({ pipelineName: "socrata", apiBaseUrl: DRIVE }),
-    ).resolves.toBeUndefined();
   });
 
   it("stores and returns rows the way Postgres would, as JSON", async () => {

@@ -1,8 +1,16 @@
 import { promiseMapSequential } from "@avandar/utils";
+import {
+  advanceCrawlCheckpoint,
+  readCrawlStart,
+} from "@etl/EtlEngine/crawlCheckpoint/crawlCheckpoint";
 import { ETL_DEFAULT_SCOPE } from "@etl/EtlEngine/etlScopes";
 import { loadRelationsPage } from "@etl/EtlEngine/loadRelationsPage/loadRelationsPage";
 import { resolveRunWindow } from "@etl/EtlEngine/resolveRunWindow/resolveRunWindow";
 import { selectPageConnections } from "@etl/EtlEngine/selectPageConnections/selectPageConnections";
+import type {
+  CrawlCheckpoint,
+  CrawlStart,
+} from "@etl/EtlEngine/crawlCheckpoint/crawlCheckpoint";
 import type {
   EtlDriveReport,
   EtlEngineConfig,
@@ -12,6 +20,7 @@ import type {
   EtlStores,
   Relation,
 } from "@etl/EtlEngine/EtlEngine.types";
+import type { LoadRelationsPageContext } from "@etl/EtlEngine/loadRelationsPage/loadRelationsPage";
 import type { ConnectionSelectionState } from "@etl/EtlEngine/selectPageConnections/selectPageConnections";
 
 /** What one drive's crawl needs. */
@@ -45,7 +54,7 @@ type _DriveArgs<TDrive, TConnection> = CrawlDriveArgs<TDrive, TConnection> &
   Readonly<{ driveKey: string }>;
 
 type _PagesArgs<TDrive, TConnection> = _DriveArgs<TDrive, TConnection> &
-  Readonly<{ window: EtlRunWindow }>;
+  CrawlStart;
 
 type _DriveCounts = Readonly<{
   connectionsFetched: number;
@@ -55,7 +64,10 @@ type _DriveCounts = Readonly<{
 }>;
 
 type _DriveProgress = _DriveCounts &
-  Readonly<{ selection: ConnectionSelectionState }>;
+  Readonly<{
+    selection: ConnectionSelectionState;
+    checkpoint: CrawlCheckpoint | undefined;
+  }>;
 
 /**
  * How a drive's crawl ended. A failure is its own variant, so a drive that
@@ -79,10 +91,18 @@ const NO_DRIVE_COUNTS: _DriveCounts = {
   newestTimestamp: undefined,
 };
 
-function _createProgress(remaining: number): _DriveProgress {
+function _createProgress(args: {
+  remaining: number;
+  checkpoint: CrawlCheckpoint | undefined;
+}): _DriveProgress {
   return {
     ...NO_DRIVE_COUNTS,
-    selection: { seenIds: new Set(), lastTimestamp: undefined, remaining },
+    selection: {
+      seenIds: new Set(),
+      lastTimestamp: undefined,
+      remaining: args.remaining,
+    },
+    checkpoint: args.checkpoint,
   };
 }
 
@@ -118,7 +138,7 @@ function _buildUncrawledDriveResult(args: {
 }): CrawlDriveResult {
   return _buildDriveResult({
     driveKey: args.driveKey,
-    // With no high-water mark read, the window is the run's own bounds.
+    // With no checkpoint read, the window is the run's own bounds.
     window: resolveRunWindow({
       options: args.options,
       highWaterMark: undefined,
@@ -128,37 +148,31 @@ function _buildUncrawledDriveResult(args: {
   });
 }
 
-async function _buildDriveWindow<TDrive, TConnection>(
+/**
+ * Reads the drive's checkpoint, and its window from it. Only a pipeline with
+ * incremental config keeps checkpoints.
+ */
+function _readDriveStart<TDrive, TConnection>(
   args: _DriveArgs<TDrive, TConnection>,
-): Promise<EtlRunWindow> {
-  const { config, options } = args;
-  // An explicit since wins, and a full run has no lower bound, so neither
-  // needs the high-water mark read.
-  if (options.mode !== "incremental" || options.since !== undefined) {
-    return resolveRunWindow({ options, highWaterMark: undefined });
-  }
-  const readDefaultHighWaterMark = () => {
-    return args.stores.listings.readHighWaterMark({
+): Promise<CrawlStart> {
+  const { config } = args;
+  return readCrawlStart({
+    store:
+      config.incremental === undefined ? undefined : args.stores.checkpoints,
+    key: {
       pipelineName: config.name,
-      apiBaseUrl: args.driveKey,
-    });
-  };
-  const readCustom = config.incremental?.readHighWaterMark;
-  const highWaterMark =
-    readCustom === undefined
-      ? await readDefaultHighWaterMark()
-      : await readCustom({
-          drive: args.drive,
-          driveKey: args.driveKey,
-          readDefaultHighWaterMark,
-        });
-  return resolveRunWindow({ options, highWaterMark });
+      driveKey: args.driveKey,
+      scopeKey: ETL_DEFAULT_SCOPE.key,
+    },
+    options: args.options,
+  });
 }
 
 /**
  * Throws when a relation's `sourceUpdatedAt` is later than its connection's
- * timestamp. `date_of_last_update` is the default high-water mark, so such a
- * row would move it past connections not yet written.
+ * timestamp. The two should come from one source date, and a later relation
+ * date would write a `date_of_last_update` beyond what the crawl's checkpoint
+ * has reached.
  */
 function _assertRelationsNotNewer<TDrive, TConnection>(args: {
   pagesArgs: _PagesArgs<TDrive, TConnection>;
@@ -183,7 +197,7 @@ function _assertRelationsNotNewer<TDrive, TConnection>(args: {
     });
   if (newerUpdate !== undefined) {
     throw new Error(
-      `Drive ${driveKey} returned ${config.getConnectionId(args.connection)} with a relation updated at ${newerUpdate.toISOString()}, later than the connection's timestamp ${connectionTime.toISOString()}. A relation's sourceUpdatedAt must not be later than its connection's timestamp, or the high-water mark would pass connections not yet written.`,
+      `Drive ${driveKey} returned ${config.getConnectionId(args.connection)} with a relation updated at ${newerUpdate.toISOString()}, later than the connection's timestamp ${connectionTime.toISOString()}. A relation's sourceUpdatedAt must not be later than its connection's timestamp.`,
     );
   }
 }
@@ -208,6 +222,21 @@ async function _transformConnections<TDrive, TConnection>(
   return relationsByConnection.flat();
 }
 
+function _buildLoadContext<TDrive, TConnection>(
+  args: _PagesArgs<TDrive, TConnection>,
+): LoadRelationsPageContext {
+  return {
+    pipelineName: args.config.name,
+    pipelineRunId: args.pipelineRunId,
+    service: args.config.service,
+    driveKey: args.driveKey,
+    scopeKey: ETL_DEFAULT_SCOPE.key,
+    syncedAt: args.syncedAt,
+    stores: args.stores,
+    bucket: args.config.output.bucket,
+  };
+}
+
 async function _processPage<TDrive, TConnection>(
   args: _PagesArgs<TDrive, TConnection> &
     Readonly<{ page: readonly TConnection[]; progress: _DriveProgress }>,
@@ -224,43 +253,45 @@ async function _processPage<TDrive, TConnection>(
   });
   const loaded = await loadRelationsPage({
     relations: await _transformConnections({ ...args, connections }),
-    context: {
-      pipelineName: config.name,
-      pipelineRunId: args.pipelineRunId,
-      service: config.service,
-      driveKey: args.driveKey,
-      scopeKey: ETL_DEFAULT_SCOPE.key,
-      syncedAt: args.syncedAt,
-      stores: args.stores,
-      bucket: config.output.bucket,
-    },
+    context: _buildLoadContext(args),
   });
-  const newestConnection = connections.at(-1);
+  const pageTimestamps =
+    getConnectionTimestamp === undefined
+      ? []
+      : connections.map(getConnectionTimestamp);
   return {
     connectionsFetched: progress.connectionsFetched + connections.length,
     relationsWritten: progress.relationsWritten + loaded.written,
     relationsUnchanged: progress.relationsUnchanged + loaded.unchanged,
-    newestTimestamp:
-      newestConnection === undefined || getConnectionTimestamp === undefined
-        ? progress.newestTimestamp
-        : getConnectionTimestamp(newestConnection),
+    newestTimestamp: pageTimestamps.at(-1) ?? progress.newestTimestamp,
     selection: state,
+    // The page is loaded, so the checkpoint may move past it.
+    checkpoint: await advanceCrawlCheckpoint({
+      checkpoint: progress.checkpoint,
+      pageTimestamps,
+      syncedAt: args.syncedAt,
+      pipelineRunId: args.pipelineRunId,
+    }),
   };
 }
 
 async function _crawlPages<TDrive, TConnection>(
   args: _PagesArgs<TDrive, TConnection>,
 ): Promise<Readonly<{ progress: _DriveProgress; outcome: _DriveOutcome }>> {
-  let progress = _createProgress(args.remaining);
+  let progress = _createProgress({
+    remaining: args.remaining,
+    checkpoint: args.checkpoint,
+  });
   try {
     const pages = args.config.extract({
       drive: args.drive,
       window: args.window,
       pipelineRunId: args.pipelineRunId,
     });
-    // Sequential on purpose: each page is written before the next is
-    // fetched, so the listings table always holds an oldest-first prefix of
-    // the drive. That is what makes the high-water mark safe to resume from.
+    // Sequential on purpose: each page is written, and the checkpoint moved
+    // past it, before the next is fetched, so the listings table always
+    // holds an oldest-first prefix of the drive up to the checkpoint. That
+    // is what makes the checkpoint safe to resume from.
     for await (const page of pages) {
       progress = await _processPage({ ...args, page, progress });
       if (progress.selection.remaining <= 0) {
@@ -295,12 +326,17 @@ async function _crawlKeyedDrive<TDrive, TConnection>(
     });
   }
   try {
-    const window = await _buildDriveWindow(args);
-    const { progress, outcome } = await _crawlPages({ ...args, window });
-    return _buildDriveResult({ driveKey, window, counts: progress, outcome });
+    const start = await _readDriveStart(args);
+    const { progress, outcome } = await _crawlPages({ ...args, ...start });
+    return _buildDriveResult({
+      driveKey,
+      window: start.window,
+      counts: progress,
+      outcome,
+    });
   } catch (error: unknown) {
-    // _crawlPages reports its own failures, so only reading the window, and
-    // with it the high-water mark, lands here.
+    // _crawlPages reports its own failures, so only reading the checkpoint
+    // lands here.
     return _buildUncrawledDriveResult({
       driveKey,
       options,
@@ -310,12 +346,13 @@ async function _crawlKeyedDrive<TDrive, TConnection>(
 }
 
 /**
- * Crawls one drive: reads its key and window, then fetches, transforms, and
- * loads one page at a time until the source runs out or the run's limit is
- * reached. A drive with no limit left is skipped without a request. A
- * failure never escapes: the drive is reported `failed` with the counts of
- * what it wrote before the failure, and the result keeps what it threw. A
- * drive whose key cannot be read is reported as `listDrives[<index>]`.
+ * Crawls one drive: reads its key, checkpoint, and window, then fetches,
+ * transforms, and loads one page at a time until the source runs out or
+ * the run's limit is reached, moving the checkpoint past each loaded page.
+ * A drive with no limit left is skipped without a request. A failure never
+ * escapes: the drive is reported `failed` with the counts of what it wrote
+ * before the failure, and the result keeps what it threw. A drive whose key
+ * cannot be read is reported as `listDrives[<index>]`.
  *
  * @returns The drive's report and, when it failed, its error.
  */

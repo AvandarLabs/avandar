@@ -1,4 +1,7 @@
-import { createInMemoryListingsStore } from "@avandar/etl";
+import {
+  createInMemoryCheckpointStore,
+  createInMemoryListingsStore,
+} from "@avandar/etl";
 import { createHdxEtlEngine } from "@pipelines/hdx/createHdxEtlEngine/createHdxEtlEngine";
 import { describe, expect, it, vi } from "vitest";
 import { parseCkanTimestamp } from "$/connectors/open-data/parseCkanTimestamp/parseCkanTimestamp";
@@ -74,7 +77,11 @@ describe("createHdxEtlEngine", () => {
       output: OUTPUT,
       discovery: _discovery([_package("a", 1), _package("b", 2)]),
       drive: DRIVE,
-      stores: { listings, objects: undefined },
+      stores: {
+        listings,
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+      },
     }).run({ mode: "full" });
 
     expect(
@@ -92,12 +99,16 @@ describe("createHdxEtlEngine", () => {
     ]);
   });
 
-  it("asks an incremental run for datasets modified since the newest stored one", async () => {
+  it("asks an incremental run for datasets modified since its checkpoint", async () => {
     const listings = createInMemoryListingsStore();
     const engineArgs = {
       output: OUTPUT,
       drive: DRIVE,
-      stores: { listings, objects: undefined },
+      stores: {
+        listings,
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+      },
     };
     await createHdxEtlEngine({
       ...engineArgs,
@@ -126,7 +137,11 @@ describe("createHdxEtlEngine", () => {
       output: OUTPUT,
       discovery,
       drive: undefined,
-      stores: { listings: createInMemoryListingsStore(), objects: undefined },
+      stores: {
+        listings: createInMemoryListingsStore(),
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+      },
     }).run({ mode: "full" });
 
     expect([

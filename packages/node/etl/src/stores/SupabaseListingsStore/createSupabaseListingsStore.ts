@@ -90,35 +90,6 @@ function _toStoredRows(data: unknown[] | null): StoredListingRow[] {
   return (data ?? []) as StoredListingRow[];
 }
 
-/**
- * The newest `date_of_last_update` no later than now. A later date is a bad
- * source timestamp, and counting it would make incremental runs skip real
- * changes until the clock caught up.
- */
-async function _readHighWaterMark(
-  args: SupabaseListingsStoreOptions & {
-    pipelineName: string;
-    apiBaseUrl: string;
-  },
-): Promise<Date | undefined> {
-  const { data, error } = await args.client
-    .from(args.listingsTable)
-    .select("date_of_last_update")
-    .eq("pipeline_name", args.pipelineName)
-    .eq("api_base_url", args.apiBaseUrl)
-    .not("date_of_last_update", "is", null)
-    .lte("date_of_last_update", new Date().toISOString())
-    .order("date_of_last_update", { ascending: false })
-    .limit(1);
-  throwOnSupabaseError({
-    error,
-    action: `reading the high-water mark from ${args.listingsTable}`,
-  });
-  const rows = (data ?? []) as ReadonlyArray<{ date_of_last_update: string }>;
-  const newest = rows[0]?.date_of_last_update;
-  return newest === undefined ? undefined : new Date(newest);
-}
-
 async function _readChunk(args: {
   options: SupabaseListingsStoreOptions;
   rows: readonly ListingRowValues[];
@@ -250,9 +221,6 @@ export function createSupabaseListingsStore(
   options: SupabaseListingsStoreOptions,
 ): ListingsStore {
   return {
-    readHighWaterMark: (args) => {
-      return _readHighWaterMark({ ...options, ...args });
-    },
     readRowsMatching: (rows) => {
       return _readRowsMatching({ options, rows });
     },
