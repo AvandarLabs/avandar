@@ -6,9 +6,10 @@ import type { EtlPipelineRunId, EtlRunReport } from "@avandar/etl";
 const REPORT: EtlRunReport = {
   pipelineRunId: "00000000-0000-4000-8000-000000000001" as EtlPipelineRunId,
   mode: "full",
-  drives: [
+  crawls: [
     {
       driveKey: "hdx",
+      scopeKey: "all",
       window: { since: new Date("2026-10-01T00:00:00Z"), until: undefined },
       connectionsFetched: 0,
       relationsWritten: 0,

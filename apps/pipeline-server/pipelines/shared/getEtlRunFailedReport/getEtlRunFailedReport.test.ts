@@ -6,7 +6,7 @@ import type { EtlPipelineRunId, EtlRunReport } from "@avandar/etl";
 const REPORT: EtlRunReport = {
   pipelineRunId: "00000000-0000-4000-8000-000000000001" as EtlPipelineRunId,
   mode: "full",
-  drives: [],
+  crawls: [],
 };
 
 describe("getEtlRunFailedReport", () => {
@@ -17,7 +17,7 @@ describe("getEtlRunFailedReport", () => {
   });
 
   it("matches by name, so a copy of the class from another load still counts", () => {
-    const error = Object.assign(new Error("Every drive failed."), {
+    const error = Object.assign(new Error("Every crawl failed."), {
       name: "EtlRunFailedError",
       report: REPORT,
     });

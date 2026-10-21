@@ -2,8 +2,8 @@ import { ETL_RUN_FAILED_ERROR_NAME } from "@avandar/etl";
 import type { EtlRunReport } from "@avandar/etl";
 
 /**
- * The report an `EtlRunFailedError` carries, so a run where every drive
- * failed can still show what each drive did. Matches the error by name, not
+ * The report an `EtlRunFailedError` carries, so a run where every crawl
+ * failed can still show what each crawl did. Matches the error by name, not
  * `instanceof`, in case `@avandar/etl` loads twice.
  *
  * @returns The report, or `undefined` for any other error.

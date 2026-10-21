@@ -15,7 +15,7 @@ vi.mock("@pipeline-server/routes/pipeline-name/run/run", () => {
 const REPORT: EtlRunReport = {
   pipelineRunId: "00000000-0000-4000-8000-000000000001" as EtlPipelineRunId,
   mode: "full",
-  drives: [],
+  crawls: [],
 };
 
 const SECRET = "test-secret";
@@ -277,9 +277,10 @@ describe("registerRunPipelineRoutes", () => {
   it("returns 500 with the report when every drive failed", async () => {
     const failedReport: EtlRunReport = {
       ...REPORT,
-      drives: [
+      crawls: [
         {
           driveKey: "https://data.cityofnewyork.us",
+          scopeKey: "all",
           window: { since: new Date("2026-10-01T00:00:00Z"), until: undefined },
           connectionsFetched: 0,
           relationsWritten: 0,

@@ -11,12 +11,14 @@ export { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionEr
 export {
   ETL_DEFAULT_SCOPE,
   ETL_SCOPE_KEY_PATTERN,
+  ETL_UNLISTED_SCOPE_KEY,
 } from "@etl/EtlEngine/etlScopes";
 export type {
   ApiResourceRelation,
+  EtlCrawlReport,
+  EtlCrawlStatus,
   EtlDestination,
-  EtlDriveReport,
-  EtlDriveStatus,
+  EtlDriveScopes,
   EtlEngineConfig,
   EtlEngineInstance,
   EtlIncrementalConfig,

@@ -109,7 +109,7 @@ describe("createSocrataEtlEngine", () => {
     });
 
     expect([
-      report.drives[0]?.relationsWritten,
+      report.crawls[0]?.relationsWritten,
       listings.getRows().length,
     ]).toEqual([3, 5]);
   });

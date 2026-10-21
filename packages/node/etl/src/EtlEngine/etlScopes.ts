@@ -10,3 +10,10 @@ export const ETL_DEFAULT_SCOPE: EtlScope = { key: "all" };
  * quotes would need escaping.
  */
 export const ETL_SCOPE_KEY_PATTERN = /^[a-z0-9][a-z0-9._:@-]{0,63}$/;
+
+/**
+ * The scope key a run report gives a drive that failed before its scopes
+ * were known. `ETL_SCOPE_KEY_PATTERN` allows no uppercase, so no real scope
+ * can share it.
+ */
+export const ETL_UNLISTED_SCOPE_KEY = "listScopes";

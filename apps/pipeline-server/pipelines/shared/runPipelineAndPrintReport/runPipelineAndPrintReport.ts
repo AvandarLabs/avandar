@@ -7,7 +7,7 @@ import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.ty
  * report as JSON on the last line of stdout, where `ava pipeline run
  * --local` reads it.
  *
- * When every drive failed, the error's message goes to stderr, the report is
+ * When every crawl failed, the error's message goes to stderr, the report is
  * still printed, and the exit code is set to 1. The process is left to exit
  * on its own, so stdout is flushed before it does.
  *

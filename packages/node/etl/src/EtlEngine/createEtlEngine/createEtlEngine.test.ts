@@ -11,6 +11,7 @@ import type {
   EtlRunOptions,
   EtlRunReport,
   EtlRunWindow,
+  EtlScope,
   EtlStores,
 } from "@etl/EtlEngine/EtlEngine.types";
 import type {
@@ -31,14 +32,20 @@ type FakeDrive = Readonly<{
   key: string;
   pages: readonly FakePage[];
   failAtPage?: number;
+  /** Pages for one scope, in place of `pages`. */
+  pagesByScope?: Readonly<Record<string, readonly FakePage[]>>;
 }>;
 type Recorder = {
   events: string[];
   windows: Map<string, EtlRunWindow>;
+  /** Each crawl's window, keyed `<drive>/<scope>`. */
+  scopeWindows: Map<string, EtlRunWindow>;
   /** The id of each connection passed to `transform`, in call order. */
   transforms: string[];
+  /** `<scope>:<connection id>` for each `transform` call, in order. */
+  scopedTransforms: string[];
 };
-type FakeConfig = EtlEngineConfig<FakeDrive, FakeConnection>;
+type FakeConfig = EtlEngineConfig<FakeDrive, FakeConnection, EtlScope>;
 
 const PIPELINE_NAME = "fake-pipeline";
 
@@ -63,25 +70,38 @@ function _drive(
 }
 
 function _recorder(): Recorder {
-  return { events: [], windows: new Map(), transforms: [] };
+  return {
+    events: [],
+    windows: new Map(),
+    scopeWindows: new Map(),
+    transforms: [],
+    scopedTransforms: [],
+  };
 }
 
-async function* _yieldPages(
-  drive: FakeDrive,
-  recorder: Recorder,
-): AsyncGenerator<FakePage> {
+/** A crawl's name in events: the drive key, plus `/<scope>` unless `all`. */
+function _crawlLabel(drive: FakeDrive, scope: EtlScope): string {
+  return scope.key === "all" ? drive.key : `${drive.key}/${scope.key}`;
+}
+
+async function* _yieldPages(args: {
+  label: string;
+  pages: readonly FakePage[];
+  failAtPage: number | undefined;
+  recorder: Recorder;
+}): AsyncGenerator<FakePage> {
   try {
     // Sequential on purpose: the fake pages like a real source, one at a
     // time.
-    for (const [index, page] of drive.pages.entries()) {
-      if (drive.failAtPage === index) {
-        throw new Error(`${drive.key} failed`);
+    for (const [index, page] of args.pages.entries()) {
+      if (args.failAtPage === index) {
+        throw new Error(`${args.label} failed`);
       }
-      recorder.events.push(`${drive.key}:page${index}`);
+      args.recorder.events.push(`${args.label}:page${index}`);
       yield page;
     }
   } finally {
-    recorder.events.push(`${drive.key}:closed`);
+    args.recorder.events.push(`${args.label}:closed`);
   }
 }
 
@@ -107,6 +127,7 @@ function _config(args: {
   supabase?: FakeConfig["supabase"];
   getDriveKey?: FakeConfig["getDriveKey"];
   transform?: FakeConfig["transform"];
+  listScopes?: FakeConfig["listScopes"];
 }): FakeConfig {
   return {
     name: PIPELINE_NAME,
@@ -118,6 +139,7 @@ function _config(args: {
       checkpointsTable: "pipeline_scope_checkpoints",
     },
     stores: args.stores,
+    ...(args.listScopes === undefined ? {} : { listScopes: args.listScopes }),
     listDrives: () => {
       args.recorder.events.push("listDrives");
       return args.drives;
@@ -127,17 +149,26 @@ function _config(args: {
       ((drive) => {
         return drive.key;
       }),
-    extract: ({ drive, window }) => {
+    extract: ({ drive, scope, window }) => {
+      const label = _crawlLabel(drive, scope);
       args.recorder.windows.set(drive.key, window);
-      return _yieldPages(drive, args.recorder);
+      args.recorder.scopeWindows.set(`${drive.key}/${scope.key}`, window);
+      return _yieldPages({
+        label,
+        pages: drive.pagesByScope?.[scope.key] ?? drive.pages,
+        failAtPage: drive.failAtPage,
+        recorder: args.recorder,
+      });
     },
     getConnectionId: (connection) => {
       return connection.id;
     },
     transform: (transformArgs) => {
-      args.recorder.transforms.push(transformArgs.connection.id);
+      const { connection, scope } = transformArgs;
+      args.recorder.transforms.push(connection.id);
+      args.recorder.scopedTransforms.push(`${scope.key}:${connection.id}`);
       return args.transform === undefined
-        ? _relationsFor(transformArgs.connection)
+        ? _relationsFor(connection)
         : args.transform(transformArgs);
     },
     incremental:
@@ -233,8 +264,14 @@ async function _runFailure(
 function _statusesOf(
   report: EtlRunReport,
 ): Array<[string, string, string | undefined]> {
-  return report.drives.map((drive) => {
-    return [drive.driveKey, drive.status, drive.error];
+  return report.crawls.map((crawl) => {
+    return [crawl.driveKey, crawl.status, crawl.error];
+  });
+}
+
+function _crawlsOf(report: EtlRunReport): Array<[string, string, string]> {
+  return report.crawls.map((crawl) => {
+    return [crawl.driveKey, crawl.scopeKey, crawl.status];
   });
 }
 
@@ -357,8 +394,8 @@ describe("createEtlEngine", () => {
       );
 
       expect([
-        report.drives[0]?.relationsWritten,
-        report.drives[0]?.relationsUnchanged,
+        report.crawls[0]?.relationsWritten,
+        report.crawls[0]?.relationsUnchanged,
       ]).toEqual([0, 1]);
     });
 
@@ -377,7 +414,7 @@ describe("createEtlEngine", () => {
       });
 
       expect(error).toBeInstanceOf(EtlRunFailedError);
-      expect((error as EtlRunFailedError).report.drives[0]?.error).toContain(
+      expect((error as EtlRunFailedError).report.crawls[0]?.error).toContain(
         "Drive a returned c2",
       );
       expect((error as EtlRunFailedError).errors[0]).toBeInstanceOf(
@@ -505,8 +542,8 @@ describe("createEtlEngine", () => {
       );
 
       expect(
-        report.drives.map((drive) => {
-          return drive.connectionsFetched;
+        report.crawls.map((crawl) => {
+          return crawl.connectionsFetched;
         }),
       ).toEqual([3, 2]);
     });
@@ -529,7 +566,7 @@ describe("createEtlEngine", () => {
         { mode: "full", limit: 2 },
       );
 
-      expect([recorder.events, report.drives[1]?.status]).toEqual([
+      expect([recorder.events, report.crawls[1]?.status]).toEqual([
         ["listDrives", "a:page0", "a:closed"],
         "skipped",
       ]);
@@ -631,7 +668,7 @@ describe("createEtlEngine", () => {
       );
 
       expect([
-        report.drives[0]?.relationsWritten,
+        report.crawls[0]?.relationsWritten,
         _datasetIds(listings).length,
       ]).toEqual([1, 4]);
     });
@@ -676,7 +713,7 @@ describe("createEtlEngine", () => {
       );
 
       expect([
-        report.drives[0]?.relationsWritten,
+        report.crawls[0]?.relationsWritten,
         _datasetIds(listings),
       ]).toEqual([1, ["c1", "c2", "c3"]]);
     });
@@ -873,9 +910,395 @@ describe("createEtlEngine", () => {
         }),
       );
 
-      expect([error.report.drives[0]?.error, _datasetIds(listings)]).toEqual([
-        "checkpoint write failed",
-        ["c1"],
+      expect([
+        error.report.crawls[0]?.error,
+        error.report.crawls[0]?.connectionsFetched,
+        error.report.crawls[0]?.relationsWritten,
+        _datasetIds(listings),
+      ]).toEqual(["checkpoint write failed", 1, 1, ["c1"]]);
+    });
+
+    it("leaves the checkpoint at the last loaded page when a later page fails to load", async () => {
+      const listings = createInMemoryListingsStore();
+      const checkpoints = createInMemoryCheckpointStore();
+      let upsertCalls = 0;
+      const failingListings: ListingsStore = {
+        ...listings,
+        upsertRows: async (rows) => {
+          upsertCalls += 1;
+          if (upsertCalls === 2) {
+            throw new Error("upsert failed");
+          }
+          return listings.upsertRows(rows);
+        },
+      };
+
+      await _runFailure(
+        _config({
+          drives: [
+            _drive("a", [[_connection("c1", 1)], [_connection("c2", 2)]]),
+          ],
+          recorder: _recorder(),
+          stores: _stores(failingListings, checkpoints),
+        }),
+      );
+
+      expect(_checkpointValues(checkpoints)).toEqual([["a", _at(1)]]);
+    });
+  });
+
+  describe("scopes", () => {
+    const INVALID_SCOPE_LISTS: ReadonlyArray<
+      [string, () => readonly EtlScope[], string]
+    > = [
+      [
+        "an invalid key",
+        () => {
+          return [{ key: "Not Valid" }];
+        },
+        "is not valid",
+      ],
+      [
+        "a repeated key",
+        () => {
+          return [{ key: "x" }, { key: "x" }];
+        },
+        "more than once",
+      ],
+      [
+        "no scopes",
+        () => {
+          return [];
+        },
+        "declares no scopes",
+      ],
+      [
+        "a throwing listScopes",
+        () => {
+          throw new Error("no scopes for a");
+        },
+        "no scopes for a",
+      ],
+    ];
+
+    function _twoScopes(): readonly EtlScope[] {
+      return [{ key: "x" }, { key: "y" }];
+    }
+
+    it("crawls a drive with no listScopes once, as scope all, and keys its rows all", async () => {
+      const listings = createInMemoryListingsStore();
+
+      const report = await _run(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 1)]])],
+          recorder: _recorder(),
+          stores: _stores(listings),
+        }),
+      );
+
+      expect([
+        _crawlsOf(report),
+        listings.getRows().map((row) => {
+          return row.pipeline_scope_keys;
+        }),
+      ]).toEqual([[["a", "all", "ok"]], [["all"]]]);
+    });
+
+    it("crawls each scope of a drive in order, passing the scope to extract and transform", async () => {
+      const recorder = _recorder();
+
+      const report = await _run(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 1)]])],
+          recorder,
+          stores: _stores(),
+          listScopes: _twoScopes,
+        }),
+      );
+
+      expect([
+        recorder.events,
+        recorder.scopedTransforms,
+        _crawlsOf(report),
+      ]).toEqual([
+        ["listDrives", "a/x:page0", "a/x:closed", "a/y:page0", "a/y:closed"],
+        ["x:c1", "y:c1"],
+        [
+          ["a", "x", "ok"],
+          ["a", "y", "ok"],
+        ],
+      ]);
+    });
+
+    it("starts each scope of an incremental run at its own checkpoint", async () => {
+      const recorder = _recorder();
+      const checkpoints = createInMemoryCheckpointStore({
+        checkpoints: [{ ..._checkpoint("a", 10), scopeKey: "x" }],
+      });
+
+      await _run(
+        _config({
+          drives: [_drive("a", [[]])],
+          recorder,
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
+          listScopes: _twoScopes,
+        }),
+        { mode: "incremental" },
+      );
+
+      expect([
+        recorder.scopeWindows.get("a/x")?.since,
+        recorder.scopeWindows.get("a/y")?.since,
+      ]).toEqual([_at(10), undefined]);
+    });
+
+    it("keeps one checkpoint per scope", async () => {
+      const checkpoints = createInMemoryCheckpointStore();
+
+      await _run(
+        _config({
+          drives: [
+            {
+              key: "a",
+              pages: [],
+              pagesByScope: {
+                x: [[_connection("c1", 1)]],
+                y: [[_connection("c1", 1), _connection("c2", 2)]],
+              },
+            },
+          ],
+          recorder: _recorder(),
+          stores: _stores(createInMemoryListingsStore(), checkpoints),
+          listScopes: _twoScopes,
+        }),
+      );
+
+      expect(
+        checkpoints.getCheckpoints().map((checkpoint) => {
+          return [checkpoint.scopeKey, checkpoint.highWaterMark];
+        }),
+      ).toEqual([
+        ["x", _at(1)],
+        ["y", _at(2)],
+      ]);
+    });
+
+    it("records both scopes on a relation two scopes produce, and leaves it unchanged on a rerun", async () => {
+      const listings = createInMemoryListingsStore();
+      const config = _config({
+        drives: [_drive("a", [[_connection("c1", 1)]])],
+        recorder: _recorder(),
+        stores: _stores(listings),
+        listScopes: _twoScopes,
+      });
+
+      const first = await _run(config);
+      const second = await _run(config);
+
+      const written = (report: EtlRunReport) => {
+        return report.crawls.map((crawl) => {
+          return crawl.relationsWritten;
+        });
+      };
+      expect([
+        written(first),
+        written(second),
+        listings.getRows().map((row) => {
+          return row.pipeline_scope_keys;
+        }),
+      ]).toEqual([[1, 1], [0, 0], [["x", "y"]]]);
+    });
+
+    it.each(INVALID_SCOPE_LISTS)(
+      "fails a drive with %s under scope listScopes and still crawls the next",
+      async (_name, scopesForA, message) => {
+        const report = await _run(
+          _config({
+            drives: [
+              _drive("a", [[_connection("a1", 1)]]),
+              _drive("b", [[_connection("b1", 1)]]),
+            ],
+            recorder: _recorder(),
+            stores: _stores(),
+            listScopes: (drive) => {
+              return drive.key === "a" ? scopesForA() : [{ key: "all" }];
+            },
+          }),
+        );
+
+        expect([_crawlsOf(report), report.crawls[0]?.error]).toEqual([
+          [
+            ["a", "listScopes", "failed"],
+            ["b", "all", "ok"],
+          ],
+          expect.stringContaining(message),
+        ]);
+      },
+    );
+
+    it("reports a drive whose key cannot be read under scope listScopes", async () => {
+      const report = await _run(
+        _config({
+          drives: [_drive("a", [[]]), _drive("b", [[]])],
+          recorder: _recorder(),
+          stores: _stores(),
+          getDriveKey: (drive) => {
+            if (drive.key === "a") {
+              throw new Error("no key for a");
+            }
+            return drive.key;
+          },
+        }),
+      );
+
+      expect(_crawlsOf(report)[0]).toEqual([
+        "listDrives[0]",
+        "listScopes",
+        "failed",
+      ]);
+    });
+
+    it("crawls only the scopes a run names", async () => {
+      const report = await _run(
+        _config({
+          drives: [_drive("a", [[]]), _drive("b", [[]])],
+          recorder: _recorder(),
+          stores: _stores(),
+          listScopes: (drive) => {
+            return drive.key === "a" ? _twoScopes() : [{ key: "z" }];
+          },
+        }),
+        { mode: "full", scopes: ["y"] },
+      );
+
+      expect(_crawlsOf(report)).toEqual([["a", "y", "ok"]]);
+    });
+
+    it("rejects a scope no drive declares before any extract", async () => {
+      const recorder = _recorder();
+
+      const run = _run(
+        _config({
+          drives: [_drive("a", [[]])],
+          recorder,
+          stores: _stores(),
+          listScopes: _twoScopes,
+        }),
+        { mode: "full", scopes: ["nope"] },
+      );
+
+      await expect(run).rejects.toThrow(EtlRunOptionsError);
+      await expect(run).rejects.toThrow("has no scope nope");
+      expect(recorder.events).toEqual(["listDrives"]);
+    });
+
+    it.each([[[] as string[]], [["Not Valid"]]])(
+      "rejects the scopes %j before listing drives",
+      async (scopes) => {
+        const recorder = _recorder();
+
+        const run = _run(
+          _config({ drives: [_drive("a", [[]])], recorder, stores: _stores() }),
+          { mode: "full", scopes },
+        );
+
+        await expect(run).rejects.toThrow(EtlRunOptionsError);
+        expect(recorder.events).toEqual([]);
+      },
+    );
+
+    it("counts the limit across scopes", async () => {
+      const report = await _run(
+        _config({
+          drives: [
+            _drive("a", [
+              [
+                _connection("c1", 1),
+                _connection("c2", 2),
+                _connection("c3", 3),
+              ],
+            ]),
+          ],
+          recorder: _recorder(),
+          stores: _stores(),
+          listScopes: _twoScopes,
+        }),
+        { mode: "full", limit: 4 },
+      );
+
+      expect(
+        report.crawls.map((crawl) => {
+          return crawl.connectionsFetched;
+        }),
+      ).toEqual([3, 1]);
+    });
+
+    it("lists each drive's live scopes without crawling", async () => {
+      const recorder = _recorder();
+
+      const scopes = await createEtlEngine(
+        _config({
+          drives: [_drive("a", [[]]), _drive("b", [[]])],
+          recorder,
+          stores: _stores(),
+          listScopes: (drive) => {
+            return drive.key === "a" ? _twoScopes() : [{ key: "all" }];
+          },
+        }),
+      ).listScopes();
+
+      expect([scopes, recorder.events]).toEqual([
+        [
+          { driveKey: "a", scopeKeys: ["x", "y"] },
+          { driveKey: "b", scopeKeys: ["all"] },
+        ],
+        ["listDrives"],
+      ]);
+    });
+
+    it("refuses to list scopes when a drive's scopes are invalid", async () => {
+      await expect(
+        createEtlEngine(
+          _config({
+            drives: [_drive("a", [[]])],
+            recorder: _recorder(),
+            stores: _stores(),
+            listScopes: () => {
+              return [];
+            },
+          }),
+        ).listScopes(),
+      ).rejects.toThrow("could not list the scopes of drive a");
+    });
+
+    it("lists the default scope without Supabase credentials", async () => {
+      const scopes = await createEtlEngine(
+        _config({
+          drives: [_drive("a", [[]])],
+          recorder: _recorder(),
+          supabase: { url: undefined, serviceRoleKey: undefined },
+        }),
+      ).listScopes();
+
+      expect(scopes).toEqual([{ driveKey: "a", scopeKeys: ["all"] }]);
+    });
+
+    it("rejects with every crawl's report when every crawl fails", async () => {
+      const error = await _runFailure(
+        _config({
+          drives: [_drive("a", [[]], 0)],
+          recorder: _recorder(),
+          stores: _stores(),
+          listScopes: _twoScopes,
+        }),
+      );
+
+      expect([_crawlsOf(error.report), error.message]).toEqual([
+        [
+          ["a", "x", "failed"],
+          ["a", "y", "failed"],
+        ],
+        "Every crawl failed. a [x]: a/x failed; a [y]: a/y failed",
       ]);
     });
   });
@@ -894,8 +1317,8 @@ describe("createEtlEngine", () => {
       );
 
       expect(
-        report.drives.map((drive) => {
-          return [drive.driveKey, drive.status, drive.error];
+        report.crawls.map((crawl) => {
+          return [crawl.driveKey, crawl.status, crawl.error];
         }),
       ).toEqual([
         ["a", "failed", "a failed"],
@@ -913,7 +1336,7 @@ describe("createEtlEngine", () => {
       );
 
       await expect(run).rejects.toThrow(EtlRunFailedError);
-      await expect(run).rejects.toThrow("a: a failed; b: b failed");
+      await expect(run).rejects.toThrow("a [all]: a failed; b [all]: b failed");
     });
 
     it("keeps every failed drive's error, in drive order, on the rejection", async () => {
@@ -1040,8 +1463,8 @@ describe("createEtlEngine", () => {
       );
 
       expect([
-        report.drives[0]?.status,
-        report.drives[0]?.relationsWritten,
+        report.crawls[0]?.status,
+        report.crawls[0]?.relationsWritten,
         _datasetIds(listings),
       ]).toEqual(["failed", 1, ["a1", "b1"]]);
     });
@@ -1066,7 +1489,7 @@ describe("createEtlEngine", () => {
         }),
       );
 
-      expect([error.report.drives[0]?.error, _datasetIds(listings)]).toEqual([
+      expect([error.report.crawls[0]?.error, _datasetIds(listings)]).toEqual([
         expect.stringContaining(
           `Drive a returned c2 with a relation updated at ${_at(9).toISOString()}, later than the connection's timestamp ${_at(2).toISOString()}.`,
         ),
@@ -1087,9 +1510,10 @@ describe("createEtlEngine", () => {
       expect(report).toEqual({
         pipelineRunId: expect.stringMatching(/^[0-9a-f-]{36}$/),
         mode: "full",
-        drives: [
+        crawls: [
           {
             driveKey: "a",
+            scopeKey: "all",
             window: { since: _at(0), until: undefined },
             connectionsFetched: 2,
             relationsWritten: 2,

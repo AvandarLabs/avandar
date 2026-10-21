@@ -111,7 +111,7 @@ async function _runPipeline(
   } catch (error: unknown) {
     const message: string =
       error instanceof Error ? error.message : "Unknown error";
-    // When every drive failed, the report still says what each drive did.
+    // When every crawl failed, the report still says what each crawl did.
     const report = getEtlRunFailedReport(error);
 
     return await reply.status(_getRunErrorStatus(error)).send({
@@ -126,7 +126,7 @@ async function _runPipeline(
  * Registers `POST /:pipelineName/run`, which answers with the run's report
  * as JSON. Auth is checked before the body is validated, so an
  * unauthenticated caller gets 401 whatever it sends. Invalid options answer
- * 400, and the pipeline does not run. A run where every drive failed answers
+ * 400, and the pipeline does not run. A run where every crawl failed answers
  * 500 with the error and the report.
  */
 export const registerPipelineRoutes: FastifyPluginAsync = async (server) => {

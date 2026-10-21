@@ -126,7 +126,7 @@ describe("createHdxEtlEngine", () => {
 
     expect([
       vi.mocked(discovery.searchDatasets).mock.calls[0]?.[0].modifiedSince,
-      report.drives[0]?.relationsWritten,
+      report.crawls[0]?.relationsWritten,
     ]).toEqual([new Date("2026-10-02T00:00:00.000Z"), 1]);
   });
 
@@ -145,7 +145,7 @@ describe("createHdxEtlEngine", () => {
     }).run({ mode: "full" });
 
     expect([
-      report.drives,
+      report.crawls,
       vi.mocked(discovery.searchDatasets).mock.calls.length,
     ]).toEqual([[], 0]);
   });

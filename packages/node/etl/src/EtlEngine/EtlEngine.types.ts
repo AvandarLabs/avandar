@@ -28,6 +28,8 @@ export type EtlRunOptions = Readonly<{
   until?: Date;
   /** The most connections to process, counted across every drive. */
   limit?: number;
+  /** Crawl only these scope keys. Omit to crawl every scope. */
+  scopes?: readonly string[];
 }>;
 
 /** The `[since, until)` range of source timestamps one drive's crawl covers. */
@@ -143,7 +145,11 @@ export type EtlIncrementalConfig<_TDrive, TConnection> = Readonly<{
 }>;
 
 /** Everything one pipeline gives the engine. */
-export type EtlEngineConfig<TDrive, TConnection> = EtlDestination &
+export type EtlEngineConfig<
+  TDrive,
+  TConnection,
+  TScope extends EtlScope = EtlScope,
+> = EtlDestination &
   Readonly<{
     /** Written to `pipeline_name`. */
     name: string;
@@ -154,16 +160,27 @@ export type EtlEngineConfig<TDrive, TConnection> = EtlDestination &
     listDrives: () => PromisedOrValue<readonly TDrive[]>;
     /** Written to `api_base_url` on `api_resource` rows. */
     getDriveKey: (drive: TDrive) => string;
-    /** Pages of connections, oldest first when `incremental` is set. */
+    /**
+     * The drive's scopes, crawled in this order. Omit for one scope,
+     * `all`, which leaves `TScope` at its default, `EtlScope`.
+     */
+    listScopes?: (drive: TDrive) => PromisedOrValue<readonly TScope[]>;
+    /**
+     * Pages of one scope's connections, oldest first when `incremental`
+     * is set. Narrow to the scope at the source where it can.
+     */
     extract: (args: {
       drive: TDrive;
+      scope: TScope;
       window: EtlRunWindow;
       pipelineRunId: EtlPipelineRunId;
     }) => AsyncIterable<readonly TConnection[]>;
-    /** Identifies a connection, so a repeat within one drive is dropped. */
+    /** Identifies a connection, so a repeat within one crawl is dropped. */
     getConnectionId: (connection: TConnection) => string;
+    /** Returns only the scope's relations of one connection. */
     transform: (args: {
       drive: TDrive;
+      scope: TScope;
       connection: TConnection;
       pipelineRunId: EtlPipelineRunId;
     }) => PromisedOrValue<readonly Relation[]>;
@@ -171,37 +188,46 @@ export type EtlEngineConfig<TDrive, TConnection> = EtlDestination &
     incremental?: EtlIncrementalConfig<TDrive, TConnection>;
   }>;
 
-/** How one drive's crawl ended. `skipped` means the limit was reached first. */
-export type EtlDriveStatus = "ok" | "failed" | "skipped";
+/** How one crawl ended. `skipped` means the limit was reached first. */
+export type EtlCrawlStatus = "ok" | "failed" | "skipped";
 
 /**
- * What happened to one drive during a run. The counts and `newestTimestamp`
- * cover only pages that finished loading: when a drive fails partway through
- * a page, rows that page already wrote are not counted in `relationsWritten`.
+ * What happened to one scope of one drive during a run. The counts and
+ * `newestTimestamp` cover only pages that finished loading: when a crawl
+ * fails partway through a page, rows that page already wrote are not
+ * counted in `relationsWritten`. A drive that failed before its scopes
+ * were known has one entry, with `scopeKey` `listScopes`.
  */
-export type EtlDriveReport = Readonly<{
+export type EtlCrawlReport = Readonly<{
   driveKey: string;
+  scopeKey: string;
   window: EtlRunWindow;
   connectionsFetched: number;
   relationsWritten: number;
   relationsUnchanged: number;
   newestTimestamp: Date | undefined;
-  status: EtlDriveStatus;
+  status: EtlCrawlStatus;
   error?: string;
 }>;
 
-/** What happened during a run, one entry per drive in crawl order. */
+/** What happened during a run, one entry per crawl in crawl order. */
 export type EtlRunReport = Readonly<{
   pipelineRunId: EtlPipelineRunId;
   mode: EtlRunMode;
-  drives: readonly EtlDriveReport[];
+  crawls: readonly EtlCrawlReport[];
+}>;
+
+/** One drive's live scope keys. */
+export type EtlDriveScopes = Readonly<{
+  driveKey: string;
+  scopeKeys: readonly string[];
 }>;
 
 /** A pipeline's engine. */
 export type EtlEngineInstance = Readonly<{
   /**
-   * Crawls every drive and loads what changed, resolving to the run's
-   * report when at least one drive did not fail.
+   * Crawls every scope of every drive and loads what changed, resolving to
+   * the run's report when at least one crawl did not fail.
    *
    * @throws Before listing drives, when `mode` is `incremental` on a
    * pipeline without `incremental` config, or `limit` is not an integer of 0
@@ -211,7 +237,18 @@ export type EtlEngineInstance = Readonly<{
    * @throws Before listing drives, when the config has `incremental` and
    * there is no checkpoint store.
    * @throws Whatever `listDrives` throws.
-   * @throws EtlRunFailedError when every drive failed.
+   * @throws EtlRunOptionsError when `scopes` is empty, holds an invalid key,
+   * or names a scope no drive declares.
+   * @throws EtlRunFailedError when every crawl failed.
    */
   run: (options: EtlRunOptions) => Promise<EtlRunReport>;
+  /**
+   * Lists each drive's live scope keys without crawling or touching any
+   * store, so it needs no Supabase credentials.
+   *
+   * @throws Whatever `listDrives` throws, and when any drive's key or
+   * scopes cannot be read or are invalid: a partial list would make live
+   * scopes look retired.
+   */
+  listScopes: () => Promise<readonly EtlDriveScopes[]>;
 }>;
