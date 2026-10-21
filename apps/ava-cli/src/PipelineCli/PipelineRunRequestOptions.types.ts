@@ -7,4 +7,6 @@ export type PipelineRunRequestOptions = Readonly<{
   since?: string;
   until?: string;
   limit?: number;
+  /** The scope keys to crawl. Omit to crawl every scope. */
+  scopes?: readonly string[];
 }>;

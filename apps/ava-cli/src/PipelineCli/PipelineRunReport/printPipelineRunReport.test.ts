@@ -8,6 +8,7 @@ import type { PipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/P
 
 const DRIVE = {
   driveKey: "https://data.cityofnewyork.us",
+  scopeKey: "all",
   window: { since: "2026-10-01T00:00:00.000Z" },
   connectionsFetched: 120,
   relationsWritten: 3,
@@ -22,11 +23,11 @@ const FAILED_DRIVE = {
   error: "HTTP GET request failed with status 429.",
 } as const;
 
-function _report(drives: PipelineRunReport["drives"]): PipelineRunReport {
+function _report(crawls: PipelineRunReport["crawls"]): PipelineRunReport {
   return {
     pipelineRunId: "00000000-0000-4000-8000-000000000001",
     mode: "incremental",
-    drives,
+    crawls,
   };
 }
 
@@ -50,11 +51,11 @@ describe("printPipelineRunReport", () => {
     );
   });
 
-  it("prints a drive's key, then its window and counts on indented lines", () => {
+  it("prints a crawl's drive and scope, then its window and counts on indented lines", () => {
     printPipelineRunReport(_report([DRIVE]));
 
     expect(_logs()).toContain(
-      "ok      https://data.cityofnewyork.us\n" +
+      "ok      https://data.cityofnewyork.us [all]\n" +
         "        2026-10-01T00:00:00.000Z to now\n" +
         "        fetched 120, written 3, unchanged 117, " +
         "newest 2026-10-20T12:00:00.000Z",
@@ -106,7 +107,7 @@ describe("printPipelineRunReport", () => {
   it("says when no drive is configured", () => {
     printPipelineRunReport(_report([]));
 
-    expect(_logs()).toContain("No drives are configured");
+    expect(_logs()).toContain("No drives or scopes are configured");
   });
 
   it("prints the header green when no drive failed", () => {

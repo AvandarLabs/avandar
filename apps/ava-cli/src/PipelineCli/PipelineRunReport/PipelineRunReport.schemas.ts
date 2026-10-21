@@ -8,16 +8,18 @@ const _TimestampSchema = z.iso.datetime({ offset: true });
 
 /**
  * A pipeline run's report as the pipeline server and the local runner send
- * it: `@avandar/etl`'s `EtlRunReport`, with dates as ISO 8601 strings and
+ * it: `@avandar/etl`'s `EtlRunReport`, where each entry is one crawl (one
+ * scope of one drive), with dates as ISO 8601 strings and
  * unset fields left out. `mode` and `status` accept any string, so a value
  * the engine adds later is printed as is instead of losing the report.
  */
 export const PipelineRunReportSchema = z.object({
   pipelineRunId: z.string(),
   mode: z.string(),
-  drives: z.array(
+  crawls: z.array(
     z.object({
       driveKey: z.string(),
+      scopeKey: z.string(),
       window: z.object({
         since: _TimestampSchema.optional(),
         until: _TimestampSchema.optional(),

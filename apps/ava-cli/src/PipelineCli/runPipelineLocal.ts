@@ -41,7 +41,7 @@ export type RunPipelineLocalResult = Readonly<{
 
 /**
  * The flags `scripts/runPipelineOnce.ts` accepts for the given options. It
- * parses argv strictly, so only these four flags are ever passed.
+ * parses argv strictly, so only these five flags are ever passed.
  */
 function _buildRunArgs(runOptions: PipelineRunRequestOptions): string[] {
   return [
@@ -51,6 +51,9 @@ function _buildRunArgs(runOptions: PipelineRunRequestOptions): string[] {
     ...(runOptions.limit === undefined
       ? []
       : ["--limit", String(runOptions.limit)]),
+    ...(runOptions.scopes === undefined
+      ? []
+      : ["--scope", runOptions.scopes.join(",")]),
   ];
 }
 

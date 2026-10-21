@@ -16,7 +16,7 @@ const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
 const REPORT = {
   pipelineRunId: "00000000-0000-4000-8000-000000000001",
   mode: "full",
-  drives: [],
+  crawls: [],
 };
 
 describe("sendRunPipelineRequest", () => {

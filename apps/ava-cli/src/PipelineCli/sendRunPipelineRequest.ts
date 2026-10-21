@@ -103,6 +103,7 @@ function _buildRunBody(
     ...(runOptions.since === undefined ? {} : { since: runOptions.since }),
     ...(runOptions.until === undefined ? {} : { until: runOptions.until }),
     ...(runOptions.limit === undefined ? {} : { limit: runOptions.limit }),
+    ...(runOptions.scopes === undefined ? {} : { scopes: runOptions.scopes }),
   };
   return Object.keys(body).length === 0 ? undefined : body;
 }

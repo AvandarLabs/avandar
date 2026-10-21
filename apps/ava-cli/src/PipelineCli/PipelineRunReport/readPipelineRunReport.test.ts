@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 const REPORT = {
   pipelineRunId: "00000000-0000-4000-8000-000000000001",
   mode: "full",
-  drives: [],
+  crawls: [],
 };
 
 describe("readPipelineRunReport", () => {

@@ -14,7 +14,7 @@ vi.mock("node:child_process", () => {
 const REPORT_LINE = JSON.stringify({
   pipelineRunId: "00000000-0000-4000-8000-000000000001",
   mode: "full",
-  drives: [],
+  crawls: [],
 });
 
 /** A `spawnSync` result with the given exit status and output. */
@@ -151,5 +151,19 @@ describe("runPipelineLocal", () => {
       reportJson: "",
       errorText: "Error: boom",
     });
+  });
+
+  it("passes scopes to the runner as one comma-separated flag", () => {
+    runPipelineLocal({
+      pipelineName: "hdx",
+      repoRoot: "/repo",
+      runOptions: { scopes: ["format:csv", "format:parquet"] },
+    });
+
+    expect(vi.mocked(spawnSync).mock.calls[0]?.[1]?.slice(-3)).toEqual([
+      "hdx",
+      "--scope",
+      "format:csv,format:parquet",
+    ]);
   });
 });

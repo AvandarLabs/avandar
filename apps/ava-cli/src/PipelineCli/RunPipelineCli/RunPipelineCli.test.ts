@@ -5,9 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const REPORT = {
   pipelineRunId: "00000000-0000-4000-8000-000000000001",
   mode: "full",
-  drives: [
+  crawls: [
     {
       driveKey: "https://data.cityofnewyork.us",
+      scopeKey: "all",
       window: {},
       connectionsFetched: 2,
       relationsWritten: 2,
@@ -21,9 +22,9 @@ const REPORT = {
 /** A report where every drive failed, as an all-failed run sends it. */
 const FAILED_REPORT = {
   ...REPORT,
-  drives: [
+  crawls: [
     {
-      ...REPORT.drives[0],
+      ...REPORT.crawls[0],
       status: "failed",
       error: "HTTP GET request failed with status 429.",
     },
@@ -379,5 +380,33 @@ describe("runPipelineCommand", () => {
     await runPipelineCommand({ name: "socrata", local: false });
 
     expect(_getCombinedLogs()).toContain('{"pipelineRunId":5}');
+  });
+
+  it("sends scopes to the pipeline server as a list", async () => {
+    const fetchMock = _mockFetch(async () => {
+      return new Response(JSON.stringify(REPORT), { status: 200 });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({
+      name: "hdx",
+      local: false,
+      scope: "format:csv,format:parquet",
+    });
+
+    expect(fetchMock.mock.calls[0]?.[1]?.body).toBe(
+      '{"scopes":["format:csv","format:parquet"]}',
+    );
+  });
+
+  it("passes scopes to a local run", async () => {
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({ name: "hdx", local: true, scope: "format:csv" });
+
+    expect(vi.mocked(runPipelineLocal)).toHaveBeenCalledWith({
+      pipelineName: "hdx",
+      repoRoot: "/repo",
+      runOptions: { scopes: ["format:csv"] },
+    });
   });
 });

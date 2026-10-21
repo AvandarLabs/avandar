@@ -9,46 +9,47 @@ import type {
   ReceivedPipelineRunReport,
 } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
 
-type _DriveReport = PipelineRunReport["drives"][number];
+type _CrawlReport = PipelineRunReport["crawls"][number];
 
 /** Width of the status column, so drive keys line up. */
 const _STATUS_WIDTH = 7;
 
-/** Indent of a drive's detail lines: under its key, past the status. */
+/** Indent of a crawl's detail lines: under its drive, past the status. */
 const _DETAIL_INDENT = " ".repeat(_STATUS_WIDTH + 1);
 
 /**
- * A drive's status and key, then its window, counts, newest timestamp, and
- * any error on indented lines, so each line fits about 80 columns.
+ * A crawl's status, drive, and scope, then its window, counts, newest
+ * timestamp, and any error on indented lines, so each line fits about 80
+ * columns.
  */
-function _formatDrive(drive: _DriveReport): string {
-  const since = drive.window.since ?? "the start";
-  const until = drive.window.until ?? "now";
+function _formatCrawl(crawl: _CrawlReport): string {
+  const since = crawl.window.since ?? "the start";
+  const until = crawl.window.until ?? "now";
   const counts =
-    `fetched ${String(drive.connectionsFetched)}, ` +
-    `written ${String(drive.relationsWritten)}, ` +
-    `unchanged ${String(drive.relationsUnchanged)}`;
-  const newest = drive.newestTimestamp ?? "none";
-  const limitNote = drive.status === "skipped" ? " (limit reached)" : "";
+    `fetched ${String(crawl.connectionsFetched)}, ` +
+    `written ${String(crawl.relationsWritten)}, ` +
+    `unchanged ${String(crawl.relationsUnchanged)}`;
+  const newest = crawl.newestTimestamp ?? "none";
+  const limitNote = crawl.status === "skipped" ? " (limit reached)" : "";
   const lines = [
-    `${drive.status.padEnd(_STATUS_WIDTH)} ${drive.driveKey}${limitNote}`,
+    `${crawl.status.padEnd(_STATUS_WIDTH)} ${crawl.driveKey} [${crawl.scopeKey}]${limitNote}`,
     `${_DETAIL_INDENT}${since} to ${until}`,
     `${_DETAIL_INDENT}${counts}, newest ${newest}`,
-    ...(drive.status === "failed"
-      ? [`${_DETAIL_INDENT}error: ${drive.error ?? "unknown error"}`]
+    ...(crawl.status === "failed"
+      ? [`${_DETAIL_INDENT}error: ${crawl.error ?? "unknown error"}`]
       : []),
   ];
   return lines.join("\n");
 }
 
-/** Prints a drive in its status's color. An unknown status is plain info. */
-function _printDrive(drive: _DriveReport): void {
-  const text = _formatDrive(drive);
-  if (drive.status === "failed") {
+/** Prints a crawl in its status's color. An unknown status is plain info. */
+function _printCrawl(crawl: _CrawlReport): void {
+  const text = _formatCrawl(crawl);
+  if (crawl.status === "failed") {
     printError(text);
     return;
   }
-  if (drive.status === "skipped") {
+  if (crawl.status === "skipped") {
     printWarn(text);
     return;
   }
@@ -56,15 +57,15 @@ function _printDrive(drive: _DriveReport): void {
 }
 
 /**
- * Prints the run's id and mode: red when every drive failed, yellow when
+ * Prints the run's id and mode: red when every crawl failed, yellow when
  * some did, green otherwise.
  */
 function _printHeader(report: PipelineRunReport): void {
   const header = `Pipeline run ${report.pipelineRunId} (${report.mode})`;
-  const failedCount = report.drives.filter((drive) => {
-    return drive.status === "failed";
+  const failedCount = report.crawls.filter((crawl) => {
+    return crawl.status === "failed";
   }).length;
-  if (failedCount > 0 && failedCount === report.drives.length) {
+  if (failedCount > 0 && failedCount === report.crawls.length) {
     printError(header);
     return;
   }
@@ -76,16 +77,17 @@ function _printHeader(report: PipelineRunReport): void {
 }
 
 /**
- * Prints a run's id and mode, then each drive with its window, counts,
- * newest timestamp, and status. A failed drive's error is printed under it.
+ * Prints a run's id and mode, then each crawl (a drive and scope) with its
+ * window, counts, newest timestamp, and status. A failed crawl's error is
+ * printed under it.
  */
 export function printPipelineRunReport(report: PipelineRunReport): void {
   _printHeader(report);
-  if (report.drives.length === 0) {
-    printInfo("No drives are configured, so nothing was crawled.");
+  if (report.crawls.length === 0) {
+    printInfo("No drives or scopes are configured, so nothing was crawled.");
     return;
   }
-  report.drives.forEach(_printDrive);
+  report.crawls.forEach(_printCrawl);
 }
 
 /**

@@ -5,9 +5,10 @@ import { describe, expect, it } from "vitest";
 const ENGINE_REPORT = {
   pipelineRunId: "00000000-0000-4000-8000-000000000001",
   mode: "incremental",
-  drives: [
+  crawls: [
     {
       driveKey: "https://data.cityofnewyork.us",
+      scopeKey: "all",
       window: {
         since: new Date("2026-10-01T00:00:00Z"),
         until: undefined,
@@ -28,8 +29,8 @@ describe("PipelineRunReportSchema", () => {
     );
 
     expect([
-      report.drives[0]?.window,
-      report.drives[0]?.newestTimestamp,
+      report.crawls[0]?.window,
+      report.crawls[0]?.newestTimestamp,
     ]).toEqual([
       { since: "2026-10-01T00:00:00.000Z" },
       "2026-10-20T12:00:00.000Z",
@@ -38,15 +39,22 @@ describe("PipelineRunReportSchema", () => {
 
   it("rejects a timestamp that is not ISO 8601", () => {
     const report = JSON.parse(JSON.stringify(ENGINE_REPORT));
-    report.drives[0].newestTimestamp = "yesterday";
+    report.crawls[0].newestTimestamp = "yesterday";
 
     expect(PipelineRunReportSchema.safeParse(report).success).toBe(false);
   });
   it("accepts a mode and a drive status it does not know", () => {
     const report = JSON.parse(JSON.stringify(ENGINE_REPORT));
     report.mode = "backfill";
-    report.drives[0].status = "paused";
+    report.crawls[0].status = "paused";
 
     expect(PipelineRunReportSchema.safeParse(report).success).toBe(true);
+  });
+
+  it("rejects a crawl with no scope key", () => {
+    const report = JSON.parse(JSON.stringify(ENGINE_REPORT));
+    delete report.crawls[0].scopeKey;
+
+    expect(PipelineRunReportSchema.safeParse(report).success).toBe(false);
   });
 });

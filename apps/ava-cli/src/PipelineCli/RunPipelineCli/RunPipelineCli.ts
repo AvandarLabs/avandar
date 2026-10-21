@@ -37,7 +37,7 @@ function _readReportLine(reportLine: string): ReceivedPipelineRunReport {
 /**
  * Runs the pipeline through the local runner and parses its report.
  *
- * @throws PipelineRunFailedError, carrying the report, when every drive
+ * @throws PipelineRunFailedError, carrying the report, when every crawl
  * failed.
  */
 function _runLocally(args: {
@@ -71,15 +71,16 @@ function _runLocally(args: {
 
 /**
  * Runs a pipeline, on the pipeline-server or locally through vite-node.
- * When every drive failed, it prints the report and sets the exit code to 1
+ * When every crawl failed, it prints the report and sets the exit code to 1
  * instead of throwing. Any other error is printed and rethrown.
  *
  * @param options.name - The pipeline's directory name.
  * @param options.local - Run it in-process instead of on the server.
- * @param options.incremental - Resume each drive from its high-water mark.
+ * @param options.incremental - Resume each scope from its checkpoint.
  * @param options.since - Only process what changed at or after this time.
  * @param options.until - Only process what changed before this time.
  * @param options.limit - Process at most this many datasets.
+ * @param options.scope - Comma-separated scope keys to crawl.
  */
 export async function runPipelineCommand(options: {
   name: string;
@@ -88,6 +89,7 @@ export async function runPipelineCommand(options: {
   since?: string;
   until?: string;
   limit?: number;
+  scope?: string;
 }): Promise<void> {
   const { name, local } = options;
   const runOptions: PipelineRunRequestOptions = {
@@ -95,6 +97,7 @@ export async function runPipelineCommand(options: {
     since: options.since,
     until: options.until,
     limit: options.limit,
+    scopes: options.scope?.split(","),
   };
 
   try {
@@ -113,7 +116,7 @@ export async function runPipelineCommand(options: {
     }
     printError(`Failed to run pipeline: ${name}`);
     printError(message);
-    // The report already says why every drive failed, so the run only sets
+    // The report already says why every crawl failed, so the run only sets
     // a failing exit code: a thrown error would add a stack trace after it.
     if (error instanceof PipelineRunFailedError) {
       process.exitCode = 1;
@@ -149,8 +152,9 @@ export const RunPipelineCli = Acclimate.createCLI("run")
     required: false,
     defaultValue: false,
     description:
-      "Only process what was created or changed since the newest timestamp " +
-      "already stored for each drive. Also continues a cancelled or limited run.",
+      "Only process what was created or changed since each scope's " +
+      "checkpoint. Also continues a cancelled or limited run, and crawls a " +
+      "scope with no checkpoint from the beginning.",
   })
   .addOption({
     name: "--since",
@@ -159,8 +163,7 @@ export const RunPipelineCli = Acclimate.createCLI("run")
     description:
       "Only process what changed at or after this ISO 8601 timestamp with a " +
       "timezone, such as 2026-10-01T00:00:00Z. Cannot be combined with " +
-      "--incremental. A --since later than a drive's last stored update " +
-      "leaves a gap that only a run reaching back over it fills.",
+      "--incremental.",
   })
   .addOption({
     name: "--until",
@@ -186,6 +189,15 @@ export const RunPipelineCli = Acclimate.createCLI("run")
       );
     },
   })
+  .addOption({
+    name: "--scope",
+    type: "string",
+    required: false,
+    description:
+      "Crawl only these scopes, as comma-separated keys such as " +
+      "format:csv,format:parquet. A scope never crawled before starts from " +
+      "the beginning, even with --incremental.",
+  })
   .action(
     (
       args: Readonly<{
@@ -195,6 +207,7 @@ export const RunPipelineCli = Acclimate.createCLI("run")
         since?: string;
         until?: string;
         limit?: number;
+        scope?: string;
       }>,
     ) => {
       return runPipelineCommand(args);
