@@ -7,6 +7,7 @@ import type {
   SocrataDiscoveryClient,
   SocrataDiscoveryResult,
   SocrataDiscoverySearchPage,
+  SocrataDiscoverySearchParams,
   SocrataSkippedResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types.ts";
 
@@ -55,6 +56,50 @@ function _splitValidResults(rawResults: readonly unknown[]): {
 }
 
 /**
+ * The Discovery API query for one search. A parameter given several values
+ * is repeated, which the API reads as OR.
+ *
+ * @throws When `categories` or `tags` is given without `searchContext`.
+ */
+function _buildSearchParams(
+  params: SocrataDiscoverySearchParams,
+): URLSearchParams {
+  const hasDomainFilter =
+    (params.categories?.length ?? 0) > 0 || (params.tags?.length ?? 0) > 0;
+  if (hasDomainFilter && params.searchContext === undefined) {
+    throw new Error(
+      `A Socrata search by categories or tags needs a searchContext, or the Discovery API matches nothing.`,
+    );
+  }
+  const searchParams = new URLSearchParams();
+  if (params.query !== undefined) {
+    searchParams.set("q", params.query);
+  }
+  if (params.domains && params.domains.length > 0) {
+    searchParams.set("domains", params.domains.join(","));
+  }
+  if (params.searchContext !== undefined) {
+    searchParams.set("search_context", params.searchContext);
+  }
+  params.categories?.forEach((category) => {
+    searchParams.append("categories", category);
+  });
+  params.tags?.forEach((tag) => {
+    searchParams.append("tags", tag);
+  });
+  if (params.limit !== undefined) {
+    searchParams.set("limit", String(params.limit));
+  }
+  if (params.offset !== undefined) {
+    searchParams.set("offset", String(params.offset));
+  }
+  if (params.order !== undefined) {
+    searchParams.set("order", params.order);
+  }
+  return searchParams;
+}
+
+/**
  * Searches Socrata's cross-portal Discovery API over an injected HTTP layer.
  *
  * Stateless, mirroring `CkanClient` and `SocrataClient`'s shape. Unlike
@@ -67,31 +112,9 @@ export function createSocrataDiscoveryClient(
   http: Readonly<OpenDataHttp>,
 ): SocrataDiscoveryClient {
   return {
-    search: async ({
-      query,
-      domains,
-      limit,
-      offset,
-      order,
-    }): Promise<SocrataDiscoverySearchPage> => {
-      const params = new URLSearchParams();
-      if (query !== undefined) {
-        params.set("q", query);
-      }
-      if (domains && domains.length > 0) {
-        params.set("domains", domains.join(","));
-      }
-      if (limit !== undefined) {
-        params.set("limit", String(limit));
-      }
-      if (offset !== undefined) {
-        params.set("offset", String(offset));
-      }
-      if (order !== undefined) {
-        params.set("order", order);
-      }
+    search: async (params): Promise<SocrataDiscoverySearchPage> => {
       const body = await http.get(
-        `${DISCOVERY_BASE_URL}?${params.toString()}`,
+        `${DISCOVERY_BASE_URL}?${_buildSearchParams(params).toString()}`,
       );
       const parsed = SocrataDiscoveryResponseSchema.parse(body);
       return {

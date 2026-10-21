@@ -29,6 +29,27 @@ export type SocrataDiscoverySearchPage = {
   resultSetSize: number;
 };
 
+/** What one Discovery API search asks for. */
+export type SocrataDiscoverySearchParams = Readonly<{
+  /** Free-text search. Omitted lists the domain's full catalog. */
+  query?: string;
+  domains?: readonly string[];
+  /**
+   * The domain whose own categories and tags `categories` and `tags` match.
+   * Required with either: without it the Discovery API matches nothing.
+   */
+  searchContext?: string;
+  /** Only datasets in one of these domain categories. */
+  categories?: readonly string[];
+  /** Only datasets with one of these domain tags. */
+  tags?: readonly string[];
+  limit?: number;
+  /** Pages past the first `limit` results, for enumerating a large domain. */
+  offset?: number;
+  /** e.g. `updatedAt ASC`. Omitted sorts by relevance. */
+  order?: string;
+}>;
+
 /** Searches Socrata's cross-portal Discovery API for candidate datasets. */
 export type SocrataDiscoveryClient = {
   /**
@@ -37,14 +58,7 @@ export type SocrataDiscoveryClient = {
    * searches every opted-in portal at once (drive discovery - "is there a
    * Chicago portal").
    */
-  search: (params: {
-    /** Free-text search. Omitted lists the domain's full catalog. */
-    query?: string;
-    domains?: readonly string[];
-    limit?: number;
-    /** Pages past the first `limit` results, for enumerating a large domain. */
-    offset?: number;
-    /** e.g. `updatedAt ASC`. Omitted sorts by relevance. */
-    order?: string;
-  }) => Promise<SocrataDiscoverySearchPage>;
+  search: (
+    params: SocrataDiscoverySearchParams,
+  ) => Promise<SocrataDiscoverySearchPage>;
 };

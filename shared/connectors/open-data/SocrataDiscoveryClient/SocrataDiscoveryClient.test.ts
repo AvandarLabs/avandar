@@ -100,6 +100,36 @@ describe("SocrataDiscoveryClient.search", () => {
     expect(sentUrl.searchParams.get("order")).toBe("updatedAt ASC");
   });
 
+  it("filters by categories and tags within the drive's own search context", async () => {
+    const http = _http();
+
+    await createSocrataDiscoveryClient(http).search({
+      domains: ["data.cityofnewyork.us"],
+      searchContext: "data.cityofnewyork.us",
+      categories: ["Education", "Health"],
+      tags: ["doe"],
+    });
+
+    const sentUrl = new URL(String(vi.mocked(http.get).mock.calls[0]?.[0]));
+    expect([
+      sentUrl.searchParams.get("search_context"),
+      sentUrl.searchParams.getAll("categories"),
+      sentUrl.searchParams.getAll("tags"),
+    ]).toEqual(["data.cityofnewyork.us", ["Education", "Health"], ["doe"]]);
+  });
+
+  it("rejects categories or tags without a search context, which match nothing", async () => {
+    const http = _http();
+
+    await expect(
+      createSocrataDiscoveryClient(http).search({
+        domains: ["data.cityofnewyork.us"],
+        categories: ["Education"],
+      }),
+    ).rejects.toThrow("needs a searchContext");
+    expect(http.get).not.toHaveBeenCalled();
+  });
+
   it.each([
     ["updatedAt", "missing", undefined],
     ["updatedAt", "not a date", "yesterday"],
