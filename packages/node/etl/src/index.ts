@@ -56,6 +56,10 @@ export {
   createSupabaseListingsStore,
   type SupabaseListingsStoreOptions,
 } from "@etl/stores/SupabaseListingsStore/createSupabaseListingsStore";
+export {
+  createSupabaseCheckpointStore,
+  type SupabaseCheckpointStoreOptions,
+} from "@etl/stores/SupabaseCheckpointStore/createSupabaseCheckpointStore";
 export { createSupabaseObjectStore } from "@etl/stores/SupabaseObjectStore/createSupabaseObjectStore";
 export {
   ETL_INPUT_BASE_DIR,

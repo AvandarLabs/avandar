@@ -1,6 +1,7 @@
 import { assertOneListingKind } from "@etl/stores/assertOneListingKind";
 import { buildListingKeyFromRow } from "@etl/stores/buildListingKeyFromRow/buildListingKeyFromRow";
 import { LISTING_CONTRACT_COLUMNS } from "@etl/stores/listingContractColumns";
+import { throwOnSupabaseError } from "@etl/stores/throwOnSupabaseError/throwOnSupabaseError";
 import { splitIntoChunks } from "@etl/utils/splitIntoChunks/splitIntoChunks";
 import type {
   ListingRowValues,
@@ -43,34 +44,6 @@ type _KeyColumn =
   | "external_dataset_id"
   | "api_resource_id"
   | "parquet_file_name";
-
-type _SupabaseError = Readonly<{
-  message: string;
-  code?: string;
-  details?: string | null;
-  hint?: string | null;
-}>;
-
-function _throwOnError(args: {
-  error: _SupabaseError | null;
-  action: string;
-}): void {
-  const { error } = args;
-  if (!error) {
-    return;
-  }
-  const extras = [
-    error.code ? `code ${error.code}` : "",
-    error.details ? `details: ${error.details}` : "",
-    error.hint ? `hint: ${error.hint}` : "",
-  ].filter((extra) => {
-    return extra !== "";
-  });
-  const suffix = extras.length === 0 ? "" : ` (${extras.join("; ")})`;
-  throw new Error(`Supabase failed ${args.action}: ${error.message}${suffix}`, {
-    cause: error,
-  });
-}
 
 function _groupBy<T>(
   items: readonly T[],
@@ -137,7 +110,7 @@ async function _readHighWaterMark(
     .lte("date_of_last_update", new Date().toISOString())
     .order("date_of_last_update", { ascending: false })
     .limit(1);
-  _throwOnError({
+  throwOnSupabaseError({
     error,
     action: `reading the high-water mark from ${args.listingsTable}`,
   });
@@ -171,7 +144,7 @@ async function _readChunk(args: {
           .eq("pipeline_name", first.pipeline_name)
           .in("parquet_file_name", _uniqueValues(rows, "parquet_file_name"));
   const { data, error } = await query;
-  _throwOnError({
+  throwOnSupabaseError({
     error,
     action: `reading rows from ${options.listingsTable}`,
   });
@@ -230,7 +203,7 @@ async function _upsertRows(args: {
           : PIPELINE_PARQUET_CONFLICT,
     })
     .select(SELECT_COLUMNS);
-  _throwOnError({
+  throwOnSupabaseError({
     error,
     action: `upserting rows into ${args.options.listingsTable}`,
   });
@@ -247,7 +220,7 @@ async function _replaceRelationColumns(args: {
     .from(relationColumnsTable)
     .delete()
     .eq("catalog_listing_id", args.listingId);
-  _throwOnError({
+  throwOnSupabaseError({
     error: deleteError,
     action: `deleting columns from ${relationColumnsTable}`,
   });
@@ -259,7 +232,7 @@ async function _replaceRelationColumns(args: {
       return { ...column, catalog_listing_id: args.listingId };
     }),
   );
-  _throwOnError({
+  throwOnSupabaseError({
     error: insertError,
     action: `writing columns to ${relationColumnsTable}`,
   });
