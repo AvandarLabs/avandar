@@ -3,8 +3,21 @@ import { getPipelineEtlDestination } from "@pipelines/shared/getPipelineEtlDesti
 import { createSocrataEtlEngine } from "@pipelines/socrata/createSocrataEtlEngine/createSocrataEtlEngine";
 import { createSocrataHttpClient } from "@pipelines/socrata/createSocrataHttpClient/createSocrataHttpClient";
 import { createSocrataDiscoveryClient } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient";
-import type { EtlRunReport } from "@avandar/etl";
+import type {
+  EtlDriveScopes,
+  EtlEngineInstance,
+  EtlRunReport,
+} from "@avandar/etl";
 import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
+
+function _createEngine(): EtlEngineInstance {
+  const discovery = createSocrataDiscoveryClient(
+    createSocrataHttpClient({
+      appToken: getOptionalEnvVar("SOCRATA_APP_TOKEN"),
+    }),
+  );
+  return createSocrataEtlEngine({ ...getPipelineEtlDestination(), discovery });
+}
 
 /**
  * Runs the Socrata pipeline over every configured drive and returns the
@@ -14,13 +27,13 @@ import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.ty
 export async function run(
   options: PipelineRunOptions = { mode: "full" },
 ): Promise<EtlRunReport> {
-  const discovery = createSocrataDiscoveryClient(
-    createSocrataHttpClient({
-      appToken: getOptionalEnvVar("SOCRATA_APP_TOKEN"),
-    }),
-  );
-  return await createSocrataEtlEngine({
-    ...getPipelineEtlDestination(),
-    discovery,
-  }).run(options);
+  return await _createEngine().run(options);
+}
+
+/**
+ * Lists every configured Socrata drive's live scopes, without crawling or
+ * needing Supabase credentials.
+ */
+export async function listScopes(): Promise<readonly EtlDriveScopes[]> {
+  return await _createEngine().listScopes();
 }

@@ -1,4 +1,5 @@
 import { ETL_RUN_OPTIONS_ERROR_NAME } from "@avandar/etl";
+import { listScopes } from "@pipeline-server/routes/pipeline-name/listScopes/listScopes";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import { getEtlRunFailedReport } from "@pipelines/shared/getEtlRunFailedReport/getEtlRunFailedReport";
 import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
@@ -19,6 +20,12 @@ type RunPipelineRequest = FastifyRequest<{
         scopes?: unknown;
       }
     | undefined;
+}>;
+
+type PipelineScopesRequest = FastifyRequest<{
+  Params: {
+    pipelineName: string;
+  };
 }>;
 
 function _getServerSecret(): string | undefined {
@@ -123,12 +130,29 @@ async function _runPipeline(
   }
 }
 
+async function _listPipelineScopes(
+  request: PipelineScopesRequest,
+  reply: FastifyReply,
+): Promise<FastifyReply> {
+  try {
+    const drives = await listScopes(request.params.pipelineName);
+    return await reply.send({ drives });
+  } catch (error: unknown) {
+    const message: string =
+      error instanceof Error ? error.message : "Unknown error";
+    return await reply.status(500).send({ ok: false, error: message });
+  }
+}
+
 /**
  * Registers `POST /:pipelineName/run`, which answers with the run's report
  * as JSON. Auth is checked before the body is validated, so an
  * unauthenticated caller gets 401 whatever it sends. Invalid options answer
  * 400, and the pipeline does not run. A run where every crawl failed answers
  * 500 with the error and the report.
+ *
+ * Also registers `GET /:pipelineName/scopes`, which answers with
+ * `{ drives }`, each drive's live scope keys, behind the same auth.
  */
 export const registerPipelineRoutes: FastifyPluginAsync = async (server) => {
   server.post(
@@ -144,5 +168,14 @@ export const registerPipelineRoutes: FastifyPluginAsync = async (server) => {
       },
     },
     _runPipeline,
+  );
+  server.get(
+    "/:pipelineName/scopes",
+    {
+      preValidation: async (request, reply) => {
+        return await _requireRunAuth({ request, reply });
+      },
+    },
+    _listPipelineScopes,
   );
 };

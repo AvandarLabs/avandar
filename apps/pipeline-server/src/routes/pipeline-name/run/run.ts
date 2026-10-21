@@ -1,3 +1,4 @@
+import { buildPipelineModuleUrl } from "@pipeline-server/routes/pipeline-name/buildPipelineModuleUrl/buildPipelineModuleUrl";
 import type { EtlRunReport } from "@avandar/etl";
 import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
 
@@ -10,18 +11,11 @@ type PipelineRunModule = Readonly<{
   run: (options: PipelineRunOptions) => Promise<EtlRunReport>;
 }>;
 
-function _getPipelineModuleURL(pipelineName: string): URL {
-  return new URL(
-    `../../../../pipelines/${pipelineName}/run.ts`,
-    import.meta.url,
-  );
-}
-
 export async function run(
   options: RunPipelineOptions,
 ): Promise<EtlRunReport> {
   const pipelineModule: unknown = await import(
-    _getPipelineModuleURL(options.pipelineName).href
+    buildPipelineModuleUrl(options.pipelineName).href
   );
 
   if (

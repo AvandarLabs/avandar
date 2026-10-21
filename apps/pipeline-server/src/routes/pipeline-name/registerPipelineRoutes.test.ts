@@ -1,4 +1,5 @@
 import { EtlRunFailedError, EtlRunOptionsError } from "@avandar/etl";
+import { listScopes } from "@pipeline-server/routes/pipeline-name/listScopes/listScopes";
 import { registerPipelineRoutes } from "@pipeline-server/routes/pipeline-name/registerPipelineRoutes";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import Fastify from "fastify";
@@ -9,6 +10,12 @@ import type { FastifyInstance } from "fastify";
 vi.mock("@pipeline-server/routes/pipeline-name/run/run", () => {
   return {
     run: vi.fn(),
+  };
+});
+
+vi.mock("@pipeline-server/routes/pipeline-name/listScopes/listScopes", () => {
+  return {
+    listScopes: vi.fn(),
   };
 });
 
@@ -344,5 +351,68 @@ describe("registerRunPipelineRoutes", () => {
         report: JSON.parse(JSON.stringify(failedReport)),
       },
     ]);
+  });
+
+  describe("GET /:pipelineName/scopes", () => {
+    it("returns 401 when auth is missing", async () => {
+      server = await _createServer();
+
+      const res = await server.inject({ method: "GET", url: "/hdx/scopes" });
+
+      expect([res.statusCode, vi.mocked(listScopes).mock.calls.length]).toEqual(
+        [401, 0],
+      );
+    });
+
+    it("answers with each drive's live scopes", async () => {
+      vi.mocked(listScopes).mockResolvedValue([
+        {
+          driveKey: "https://data.humdata.org",
+          scopeKeys: ["format:csv", "format:parquet"],
+        },
+      ]);
+      server = await _createServer();
+
+      const res = await server.inject({
+        method: "GET",
+        url: "/hdx/scopes",
+        headers: { authorization: AUTH_HEADER },
+      });
+
+      expect([
+        res.statusCode,
+        res.json(),
+        vi.mocked(listScopes).mock.calls,
+      ]).toEqual([
+        200,
+        {
+          drives: [
+            {
+              driveKey: "https://data.humdata.org",
+              scopeKeys: ["format:csv", "format:parquet"],
+            },
+          ],
+        },
+        [["hdx"]],
+      ]);
+    });
+
+    it("returns 500 with the message when the scopes cannot be listed", async () => {
+      vi.mocked(listScopes).mockRejectedValue(
+        new Error("could not list the scopes of drive a"),
+      );
+      server = await _createServer();
+
+      const res = await server.inject({
+        method: "GET",
+        url: "/hdx/scopes",
+        headers: { authorization: AUTH_HEADER },
+      });
+
+      expect([res.statusCode, res.json()]).toEqual([
+        500,
+        { ok: false, error: "could not list the scopes of drive a" },
+      ]);
+    });
   });
 });
