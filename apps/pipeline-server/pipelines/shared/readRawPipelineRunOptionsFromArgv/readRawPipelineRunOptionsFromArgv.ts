@@ -7,11 +7,12 @@ const RUN_OPTION_FLAGS = {
   since: { type: "string" },
   until: { type: "string" },
   limit: { type: "string" },
+  scope: { type: "string" },
 } as const;
 
 /**
- * Reads `--incremental`, `--since`, `--until`, and `--limit` from argv,
- * unvalidated. Accepts both `--limit 5` and `--limit=5`.
+ * Reads `--incremental`, `--since`, `--until`, `--limit`, and `--scope` from
+ * argv, unvalidated. Accepts both `--limit 5` and `--limit=5`.
  *
  * @throws For an unknown flag (such as a misspelled `--incremental`), a flag
  * missing its value, a flag given more than once, or a positional argument,
@@ -44,5 +45,6 @@ export function readRawPipelineRunOptionsFromArgv(
     ...(values.since === undefined ? {} : { since: values.since }),
     ...(values.until === undefined ? {} : { until: values.until }),
     ...(values.limit === undefined ? {} : { limit: values.limit }),
+    ...(values.scope === undefined ? {} : { scopes: values.scope }),
   };
 }

@@ -1,3 +1,4 @@
+import { ETL_SCOPE_KEY_PATTERN } from "@avandar/etl";
 import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
 
 /** Run options as a request body or argv carries them, before validation. */
@@ -6,6 +7,7 @@ export type RawPipelineRunOptions = Readonly<{
   since?: unknown;
   until?: unknown;
   limit?: unknown;
+  scopes?: unknown;
 }>;
 
 /**
@@ -90,10 +92,45 @@ function _parseLimit(value: unknown): number | undefined {
   return limit;
 }
 
+function _isScopeKeyList(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((scopeKey) => {
+      return (
+        typeof scopeKey === "string" && ETL_SCOPE_KEY_PATTERN.test(scopeKey)
+      );
+    })
+  );
+}
+
+/**
+ * Reads the scopes to crawl: a comma-separated string, as argv carries
+ * it, or a list of strings, as a request body carries it.
+ */
+function _parseScopes(value: unknown): readonly string[] | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  const scopeKeys = typeof value === "string" ? value.split(",") : value;
+  if (!_isScopeKeyList(scopeKeys)) {
+    throw new Error(
+      `--scope must name one or more scope keys separated by commas, such as format:csv,format:parquet. Got ${JSON.stringify(value)}.`,
+    );
+  }
+  if (new Set(scopeKeys).size < scopeKeys.length) {
+    throw new Error(
+      `--scope names a scope more than once: ${JSON.stringify(value)}.`,
+    );
+  }
+  return scopeKeys;
+}
+
 /**
  * Validates a run's options, from a request body or from argv. A full run is
  * the default. `since` and `until` must carry a timezone, so a bare date is
- * never guessed at.
+ * never guessed at. `scopes` is a comma-separated string or a list of valid
+ * scope keys, each named once.
  *
  * @throws When an option is malformed, when `incremental` and `since` are
  * both given (they name two different lower bounds), or when `since` is not
@@ -105,6 +142,7 @@ export function parsePipelineRunOptions(
   const isIncremental = _parseIncremental(raw.incremental);
   const since = _parseTimestamp("since", raw.since);
   const until = _parseTimestamp("until", raw.until);
+  const scopes = _parseScopes(raw.scopes);
   if (isIncremental && since !== undefined) {
     throw new Error(
       "Pass either --incremental or --since, not both: they name two different lower bounds.",
@@ -122,5 +160,6 @@ export function parsePipelineRunOptions(
     ...(since === undefined ? {} : { since }),
     ...(until === undefined ? {} : { until }),
     ...(raw.limit === undefined ? {} : { limit: _parseLimit(raw.limit) }),
+    ...(scopes === undefined ? {} : { scopes }),
   };
 }

@@ -105,4 +105,35 @@ describe("parsePipelineRunOptions", () => {
       return parsePipelineRunOptions({ incremental: "yes" });
     }).toThrow("incremental");
   });
+
+  it("reads comma-separated scopes from argv", () => {
+    expect(
+      parsePipelineRunOptions({ scopes: "format:csv,format:parquet" }).scopes,
+    ).toEqual(["format:csv", "format:parquet"]);
+  });
+
+  it("reads a list of scopes from a request body", () => {
+    expect(parsePipelineRunOptions({ scopes: ["format:csv"] }).scopes).toEqual(
+      ["format:csv"],
+    );
+  });
+
+  it.each([
+    [""],
+    ["Format:CSV"],
+    ["format:csv,,format:parquet"],
+    [[]],
+    [["format:csv", 1]],
+    [42],
+  ])("rejects the scopes %j", (scopes) => {
+    expect(() => {
+      return parsePipelineRunOptions({ scopes });
+    }).toThrow("--scope must name one or more scope keys");
+  });
+
+  it("rejects a scope named twice", () => {
+    expect(() => {
+      return parsePipelineRunOptions({ scopes: "format:csv,format:csv" });
+    }).toThrow("names a scope more than once");
+  });
 });

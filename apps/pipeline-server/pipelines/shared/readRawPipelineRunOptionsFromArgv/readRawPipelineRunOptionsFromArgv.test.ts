@@ -52,4 +52,21 @@ describe("readRawPipelineRunOptionsFromArgv", () => {
   it("leaves every option unset when no flag is given", () => {
     expect(readRawPipelineRunOptionsFromArgv([])).toEqual({});
   });
+
+  it("reads --scope as one raw string", () => {
+    expect(
+      readRawPipelineRunOptionsFromArgv(["--scope", "format:csv,format:parquet"]),
+    ).toEqual({ scopes: "format:csv,format:parquet" });
+  });
+
+  it("rejects --scope given twice", () => {
+    expect(() => {
+      return readRawPipelineRunOptionsFromArgv([
+        "--scope",
+        "format:csv",
+        "--scope",
+        "format:parquet",
+      ]);
+    }).toThrow("more than once");
+  });
 });

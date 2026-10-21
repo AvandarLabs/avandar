@@ -16,6 +16,7 @@ type RunPipelineRequest = FastifyRequest<{
         since?: unknown;
         until?: unknown;
         limit?: unknown;
+        scopes?: unknown;
       }
     | undefined;
 }>;
@@ -73,7 +74,7 @@ async function _requireRunAuth(options: {
  */
 const RUN_BODY_SCHEMA = {
   type: "object",
-  propertyNames: { enum: ["incremental", "since", "until", "limit"] },
+  propertyNames: { enum: ["incremental", "since", "until", "limit", "scopes"] },
 } as const;
 
 function _getRunErrorStatus(error: unknown): 400 | 500 {
@@ -89,7 +90,7 @@ async function _runPipeline(
   if (request.validationError) {
     return await reply.status(400).send({
       ok: false,
-      error: `The run body accepts only incremental, since, until, and limit. ${request.validationError.message}`,
+      error: `The run body accepts only incremental, since, until, limit, and scopes. ${request.validationError.message}`,
     });
   }
 

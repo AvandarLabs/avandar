@@ -35,11 +35,12 @@ export async function run(
     );
   }
 
-  const { mode, since, until, limit } = options;
+  const { mode, since, until, limit, scopes } = options;
   return await (pipelineModule as PipelineRunModule).run({
     mode,
     since,
     until,
     limit,
+    ...(scopes === undefined ? {} : { scopes }),
   });
 }

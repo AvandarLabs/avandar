@@ -200,6 +200,38 @@ describe("registerRunPipelineRoutes", () => {
     expect(vi.mocked(run)).not.toHaveBeenCalled();
   });
 
+  it("passes scopes from a JSON body to the run", async () => {
+    server = await _createServer();
+
+    await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+      payload: { scopes: ["format:csv"] },
+    });
+
+    expect(vi.mocked(run)).toHaveBeenCalledWith({
+      pipelineName: "example-pipeline",
+      mode: "full",
+      scopes: ["format:csv"],
+    });
+  });
+
+  it("returns 400 and skips the run for an invalid scope", async () => {
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+      payload: { scopes: ["Not Valid"] },
+    });
+
+    expect([res.statusCode, vi.mocked(run).mock.calls.length]).toEqual([
+      400, 0,
+    ]);
+  });
+
   it("returns 400 and skips the run when the body has an unknown option", async () => {
     server = await _createServer();
 
@@ -217,7 +249,7 @@ describe("registerRunPipelineRoutes", () => {
     ]).toEqual([
       400,
       expect.stringContaining(
-        "accepts only incremental, since, until, and limit",
+        "accepts only incremental, since, until, limit, and scopes",
       ),
       0,
     ]);

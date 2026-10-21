@@ -15,7 +15,7 @@ const _ETL_PATHS_ROOT_ENV = "ETL_PATHS_ROOT";
 const _PIPELINES_ENV_FILE = ".env.pipelines.local";
 
 const _USAGE =
-  "Usage: runPipelineOnce <pipeline-name> [--incremental] [--since <ISO 8601>] [--until <ISO 8601>] [--limit <n>]";
+  "Usage: runPipelineOnce <pipeline-name> [--incremental] [--since <ISO 8601>] [--until <ISO 8601>] [--limit <n>] [--scope <key>[,<key>...]]";
 
 /**
  * Loads `.env.pipelines.local` if it exists. Variables already set (from
