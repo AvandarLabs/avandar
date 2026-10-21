@@ -75,7 +75,17 @@ export async function countListings(options: {
   return _countFromContentRange(response);
 }
 
-/** Finds every workspace dataset added from a listing `filter` selects. */
+/**
+ * The most rows PostgREST returns from one request. A response this long
+ * may have been cut short.
+ */
+const POSTGREST_MAX_ROWS = 1000;
+
+/**
+ * Finds every workspace dataset added from a listing `filter` selects.
+ * Throws when the response may have been truncated, since a caller that
+ * trusted a partial list would delete listings it never saw in use.
+ */
 export async function findInUseListings(options: {
   target: PostgrestTarget;
   filter: ListingFilter;
@@ -98,7 +108,15 @@ export async function findInUseListings(options: {
       ...embeddedFilter,
     },
   });
-  return (await response.json()) as readonly InUseListing[];
+  const inUseListings = (await response.json()) as readonly InUseListing[];
+  if (inUseListings.length >= POSTGREST_MAX_ROWS) {
+    throw new Error(
+      `Found ${inUseListings.length} workspace datasets using these ` +
+        `listings, PostgREST's ${POSTGREST_MAX_ROWS}-row limit, so the ` +
+        "in-use list may be truncated. Nothing was deleted.",
+    );
+  }
+  return inUseListings;
 }
 
 /**

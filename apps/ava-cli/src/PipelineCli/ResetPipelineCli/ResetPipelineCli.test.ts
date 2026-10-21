@@ -304,7 +304,30 @@ describe("resetPipelineCommand", () => {
     ).toEqual(["DELETE pipeline_scope_checkpoints"]);
   });
 
+  it("refuses to delete when the in-use list may be truncated", async () => {
+    const requests = _mockPostgrest({
+      listingCount: 3,
+      inUseRows: Array.from({ length: 1000 }, (_, index) => {
+        return { ...IN_USE_ROW, dataset_id: `dataset-${index}` };
+      }),
+    });
+
+    await expect(resetPipelineCommand({ name: "socrata" })).rejects.toThrow(
+      "may be truncated",
+    );
+    expect(_getDeletes(requests)).toEqual([]);
+  });
+
   describe("with --scope", () => {
+    it("rejects an invalid scope key before any request", async () => {
+      const requests = _mockPostgrest({ listingCount: 0 });
+
+      await expect(
+        resetPipelineCommand({ name: "hdx", scope: "Format CSV" }),
+      ).rejects.toThrow("Invalid scope key: Format CSV");
+      expect(requests).toEqual([]);
+    });
+
     it("prunes the scope on every drive once confirmed", async () => {
       const requests = _mockPostgrest({
         listingCount: 0,

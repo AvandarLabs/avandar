@@ -15,7 +15,7 @@ export default defineConfig({
   resolve: {
     alias: getAppVitestAliases({
       repoRootDir,
-      include: ["shared"],
+      include: ["shared", "node"],
       moreAliases: {
         "@ava-cli": "apps/ava-cli/src",
       },

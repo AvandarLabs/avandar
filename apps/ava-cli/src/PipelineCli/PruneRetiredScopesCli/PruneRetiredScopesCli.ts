@@ -1,5 +1,6 @@
 import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
 import { announcePostgrestTarget } from "@ava-cli/PipelineCli/announcePostgrestTarget/announcePostgrestTarget";
+import { assertValidScopeKey } from "@ava-cli/PipelineCli/assertValidScopeKey/assertValidScopeKey";
 import { fetchLivePipelineScopes } from "@ava-cli/PipelineCli/fetchLivePipelineScopes/fetchLivePipelineScopes";
 import { findRetiredScopes } from "@ava-cli/PipelineCli/PruneRetiredScopesCli/findRetiredScopes";
 import {
@@ -57,8 +58,33 @@ function _formatPrune(prune: _PlannedPrune): string {
 }
 
 /**
+ * Whether a prune would only keep listings workspaces use: it would delete,
+ * detach, and clear nothing.
+ */
+function _isNothingToPrune(counts: ScopePruneCounts): boolean {
+  return (
+    counts.listings_deleted === 0 &&
+    counts.listings_detached === 0 &&
+    counts.checkpoints_deleted === 0
+  );
+}
+
+/** Prints what one dry run found: its plan, or that there is nothing to do. */
+function _printPlan(plan: _PlannedPrune): void {
+  if (_isNothingToPrune(plan.counts)) {
+    printInfo(
+      `${plan.driveKey} [${plan.scopeKey}]: kept ` +
+        `${plan.counts.listings_kept_in_use} listing(s) a workspace uses; ` +
+        "nothing to prune",
+    );
+    return;
+  }
+  printInfo(_formatPrune(plan));
+}
+
+/**
  * Dry-runs each retired scope's prune and prints what it would do. Resolves
- * to the retired scopes with their dry-run counts.
+ * to the retired scopes with something to prune, with their dry-run counts.
  */
 async function _planPrunes(args: {
   target: PostgrestTarget;
@@ -76,10 +102,10 @@ async function _planPrunes(args: {
     });
     return { ...pair, counts };
   });
-  plans.forEach((plan) => {
-    printInfo(_formatPrune(plan));
+  plans.forEach(_printPlan);
+  return plans.filter((plan) => {
+    return !_isNothingToPrune(plan.counts);
   });
-  return plans;
 }
 
 async function _pruneAll(args: {
@@ -119,6 +145,9 @@ export async function pruneRetiredScopesCommand(options: {
 }): Promise<void> {
   const { name } = options;
   try {
+    if (options.scope !== undefined) {
+      assertValidScopeKey(options.scope);
+    }
     _assertLocalOnlyInDevelopment(options.local);
     const target = getPostgrestTarget();
     announcePostgrestTarget(target);
@@ -136,6 +165,10 @@ export async function pruneRetiredScopesCommand(options: {
       return;
     }
     const plans = await _planPrunes({ target, name, retired });
+    if (plans.length === 0) {
+      printSuccess(`The ${name} pipeline's retired scopes have nothing to prune.`);
+      return;
+    }
     if (options.isDryRun) {
       printInfo("Dry run: nothing was changed.");
       return;
@@ -162,7 +195,9 @@ export const PruneRetiredScopesCli = Acclimate.createCLI("prune-retired-scopes")
       "what each retired scope's prune would do, then asks before changing " +
       "anything. Listings a workspace uses are never deleted. Reads live " +
       "scopes from the pipeline server and the database in .env.development, " +
-      "or the --staging/--prod ones.",
+      "or the --staging/--prod ones. Do not run it while a pipeline run is " +
+      "in progress: the run can write back the checkpoints and scope keys " +
+      "it removes.",
   )
   .addPositionalArg({
     name: "name",

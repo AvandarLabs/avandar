@@ -33,34 +33,53 @@ const LIST_RPC = "rpc/rpc_data_catalog_listings__list_pipeline_scopes";
 
 type RecordedPost = Readonly<{ table: string; body: unknown }>;
 
+type PruneCounts = Readonly<{
+  listings_deleted: number;
+  listings_kept_in_use: number;
+  listings_detached: number;
+  checkpoints_deleted: number;
+}>;
+
+const DEFAULT_COUNTS: PruneCounts = {
+  listings_deleted: 2,
+  listings_kept_in_use: 0,
+  listings_detached: 1,
+  checkpoints_deleted: 1,
+};
+
+/** Counts for a retired scope whose listings workspaces all still use. */
+const IN_USE_ONLY_COUNTS: PruneCounts = {
+  listings_deleted: 0,
+  listings_kept_in_use: 4,
+  listings_detached: 0,
+  checkpoints_deleted: 0,
+};
+
 /**
  * Stubs `fetch` as PostgREST's two scope RPCs: the list RPC returns
- * `storedScopes`, the prune RPC returns fixed counts.
+ * `storedScopes`, the prune RPC returns `countsByScope[p_scope_key]`, or
+ * fixed counts for a scope not in it.
  */
 function _mockScopeRpcs(
   storedScopes: ReadonlyArray<
     Readonly<{ drive_key: string; scope_key: string }>
   >,
+  countsByScope: Readonly<Record<string, PruneCounts>> = {},
 ): RecordedPost[] {
   const posts: RecordedPost[] = [];
   vi.stubGlobal(
     "fetch",
     vi.fn(async (input: string, init?: { body?: string }) => {
       const table = new URL(input).pathname.replace("/rest/v1/", "");
-      posts.push({ table, body: JSON.parse(init?.body ?? "null") });
+      const body = JSON.parse(init?.body ?? "null") as {
+        p_scope_key?: string;
+      } | null;
+      posts.push({ table, body });
       if (table === LIST_RPC) {
         return new Response(JSON.stringify(storedScopes));
       }
-      return new Response(
-        JSON.stringify([
-          {
-            listings_deleted: 2,
-            listings_kept_in_use: 0,
-            listings_detached: 1,
-            checkpoints_deleted: 1,
-          },
-        ]),
-      );
+      const counts = countsByScope[body?.p_scope_key ?? ""] ?? DEFAULT_COUNTS;
+      return new Response(JSON.stringify([counts]));
     }),
   );
   return posts;
@@ -205,5 +224,61 @@ describe("pruneRetiredScopesCommand", () => {
         p_is_dry_run: true,
       },
     ]);
+  });
+
+  it("rejects an invalid --scope before any request", async () => {
+    const posts = _mockScopeRpcs([LIVE, RETIRED]);
+
+    await expect(
+      pruneRetiredScopesCommand({
+        name: "hdx",
+        scope: "Format CSV",
+        isDryRun: true,
+        local: false,
+      }),
+    ).rejects.toThrow("Invalid scope key: Format CSV");
+    expect([posts, vi.mocked(fetchLivePipelineScopes).mock.calls]).toEqual([
+      [],
+      [],
+    ]);
+  });
+
+  it("skips a retired scope whose listings workspaces all still use", async () => {
+    const posts = _mockScopeRpcs([LIVE, RETIRED, OTHER_RETIRED], {
+      "format:parquet": IN_USE_ONLY_COUNTS,
+    });
+
+    await pruneRetiredScopesCommand({ name: "hdx", isDryRun: false, local: false });
+
+    expect([
+      _pruneCalls(posts).map((body) => {
+        const { p_scope_key, p_is_dry_run } = body as {
+          p_scope_key: string;
+          p_is_dry_run: boolean;
+        };
+        return `${p_scope_key} ${p_is_dry_run}`;
+      }),
+      vi.mocked(promptToConfirmReset).mock.calls,
+      _getCombinedLogs(),
+    ]).toEqual([
+      ["format:parquet true", "all true", "all false"],
+      [["Prune 1 retired scope(s) of hdx?"]],
+      expect.stringContaining(
+        "https://data.humdata.org [format:parquet]: kept 4 listing(s) a workspace uses; nothing to prune",
+      ),
+    ]);
+  });
+
+  it("finishes without asking when every retired scope is only in use", async () => {
+    const posts = _mockScopeRpcs([LIVE, RETIRED], {
+      "format:parquet": IN_USE_ONLY_COUNTS,
+    });
+
+    await pruneRetiredScopesCommand({ name: "hdx", isDryRun: false, local: false });
+
+    expect([
+      _pruneCalls(posts).length,
+      vi.mocked(promptToConfirmReset).mock.calls.length,
+    ]).toEqual([1, 0]);
   });
 });

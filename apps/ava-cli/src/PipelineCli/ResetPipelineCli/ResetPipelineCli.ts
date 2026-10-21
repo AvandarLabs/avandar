@@ -1,4 +1,5 @@
 import { announcePostgrestTarget } from "@ava-cli/PipelineCli/announcePostgrestTarget/announcePostgrestTarget";
+import { assertValidScopeKey } from "@ava-cli/PipelineCli/assertValidScopeKey/assertValidScopeKey";
 import {
   countCheckpoints,
   countListings,
@@ -230,6 +231,9 @@ export async function resetPipelineCommand(options: {
 }): Promise<void> {
   const { name, scope } = options;
   try {
+    if (scope !== undefined) {
+      assertValidScopeKey(scope);
+    }
     const target = getPostgrestTarget();
     announcePostgrestTarget(target);
     if (scope === undefined) {
@@ -252,7 +256,9 @@ export const ResetPipelineCli = Acclimate.createCLI("reset")
       "pipeline's listings by pipeline_name only, so listings written " +
       "before the pipeline_name backfill migration are not selected until " +
       "that migration has run. Also deletes the pipeline's checkpoints, " +
-      "before any listing.",
+      "before any listing. Do not run it while a pipeline run is in " +
+      "progress: the run can write back the checkpoints and scope keys it " +
+      "removes.",
   )
   .addPositionalArg({
     name: "name",
