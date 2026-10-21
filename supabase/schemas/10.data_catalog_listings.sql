@@ -15,8 +15,9 @@ create table public.data_catalog_listings (
   -- data source.
   date_of_last_sync timestamptz,
   -- When the source last modified this listing's dataset, as its API reports
-  -- it. Incremental pipeline runs resume from the newest value per pipeline
-  -- and drive (`api_base_url`).
+  -- it. Incremental pipeline runs resume from `pipeline_scope_checkpoints`,
+  -- not from this column. The checkpoint seed migration read its newest
+  -- value per pipeline and drive (`api_base_url`) once.
   date_of_last_update timestamptz,
   -- Coverage start date of the dataset
   coverage_start_date timestamptz,

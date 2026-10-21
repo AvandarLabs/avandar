@@ -1,9 +1,11 @@
 import type { EtlScope } from "@avandar/etl";
 
 /**
- * One Socrata scope: a drive's datasets in any of `categories` or with any
- * of `tags`, both spelled as the portal names them. A scope with neither is
- * the whole drive.
+ * One Socrata scope, with `categories` and `tags` spelled as the portal
+ * names them. The Discovery API ORs the values within one filter and ANDs
+ * the filters, so a scope with both matches the datasets that are in one of
+ * the `categories` and also carry one of the `tags`. A scope with neither,
+ * or with only empty lists, is the whole drive.
  */
 export type SocrataScope = EtlScope &
   Readonly<{ categories?: readonly string[]; tags?: readonly string[] }>;

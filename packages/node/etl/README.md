@@ -7,8 +7,9 @@ speaks Avandar's connector vocabulary. A pipeline crawls one or more
 **connections** (one dataset each), and turns every connection into zero or
 more **relations** (one listing row each).
 
-- **`EtlEngine`**: crawls a pipeline's drives oldest-first, writes one page
-  at a time, and resumes each drive from the newest timestamp it has stored.
+- **`EtlEngine`**: crawls each scope of each of a pipeline's drives
+  oldest-first, writes one page at a time, and resumes each scope from its
+  stored checkpoint.
 - **`NodeDuckDb`**: a thin wrapper around the `duckdb` Node bindings, used for
   CSV sniffing and Parquet export.
 
@@ -76,6 +77,7 @@ const config: EtlEngineConfig<Portal, Dataset> = {
   output: {
     listingsTable: "data_catalog_listings",
     relationColumnsTable: "data_catalog_listings__relation_columns",
+    checkpointsTable: "pipeline_scope_checkpoints",
   },
   listDrives: () => portals,
   getDriveKey: (portal) => portal.baseUrl,
@@ -100,83 +102,97 @@ const report = await EtlEngine.create(config).run({ mode: "incremental" });
 
 ## Run modes
 
-| Options | Each drive's window |
+| Options | Each crawl's window |
 | --- | --- |
 | `{ mode: "full" }` | No lower bound: every connection is fetched |
-| `{ mode: "incremental" }` | From the drive's high-water mark |
+| `{ mode: "incremental" }` | From the scope's checkpoint, or no lower bound when it has none |
 | `{ since }` | From `since` (inclusive), in either mode |
 | `{ until }` | Adds an exclusive upper bound |
-| `{ limit }` | Stops after this many connections across all drives |
+| `{ limit }` | Stops after this many connections across all crawls |
+| `{ scopes }` | Crawls only these scope keys |
 
-`limit` must be an integer of 0 or more. A drive reached after the limit is
+`limit` must be an integer of 0 or more. A crawl reached after the limit is
 spent is reported `skipped` and is never fetched, so `{ limit: 0 }` skips
-every drive. The engine filters connections by the window only when
+every crawl. The engine filters connections by the window only when
 `incremental` config is set. Without it, the window only reaches `extract`.
 
 Both modes write only rows that changed. A row is unchanged when every
 column the engine writes, except `pipeline_run_id` and `date_of_last_sync`,
 equals the stored value.
 
-**Resuming.** With `incremental` config, connections must arrive oldest
-first, and each page is written before the next is fetched. The listings
-table therefore always holds an oldest-first prefix of each drive, and an
-incremental run resumes from it after a cancelled run, a limited run, or a
-finished one. The lower bound is inclusive, so connections that share the
-last stored timestamp are fetched again and skipped if unchanged.
+**Scopes.** A crawl is one scope of one drive. `listScopes(drive)` returns
+the drive's scopes, each an object with a `key` plus whatever its
+`extract` and `transform` need, and omitting it gives every drive one
+scope, `all`. `extract` should narrow to the scope at the source where it
+can, and `transform` must return only the scope's relations. Keys match
+`ETL_SCOPE_KEY_PATTERN` and are unique within a drive. A key is the
+scope's identity: change it when the scope's meaning changes, and the new
+key crawls from the beginning. Every row records the scopes that produce
+it in `pipeline_scope_keys`. `listScopes()` on the engine returns each
+drive's live keys without crawling.
 
-**The high-water mark** defaults to `max(date_of_last_update)` for the
-pipeline's rows with `api_base_url` equal to the drive key. Override it with
-`incremental.readHighWaterMark`.
-Dates later than now are ignored, so one future-dated source timestamp
-cannot make incremental runs skip real changes until the clock catches up.
+**Resuming.** With `incremental` config, connections must arrive oldest
+first, and each page is written before the next is fetched. After each
+page, the scope's checkpoint moves to the page's newest connection
+timestamp, so an incremental run resumes after a cancelled run, a
+limited run, or a finished one. The lower bound is inclusive, so
+connections that share the checkpoint's timestamp are fetched again and
+skipped if unchanged.
+
+**Checkpoints** live in the checkpoints table (`output.checkpointsTable`,
+or `stores.checkpoints` in tests), one per pipeline, drive, and scope. A
+checkpoint records what was crawled, not what was written, so a scope
+whose connections all produce no relations still advances. It never moves
+backward, ignores timestamps later than the run's start, and does not
+move during a crawl whose explicit `since` is later than it, which would
+leave a gap. A pipeline with `incremental` config reads each crawl's
+checkpoint on every run, full runs included, so a failed checkpoint read
+fails that crawl in a full run too.
 
 **Repeats.**
 
-- A connection a drive returns more than once in a run is processed once. A
+- A connection a crawl returns more than once in a run is processed once. A
   repeat has the same connection id and, with
   `incremental.getConnectionTimestamp`, the same timestamp.
 - A connection modified during the crawl reappears with a newer timestamp, so
   it is processed again.
 - A page that holds the same listing twice (two relations with one conflict
-  key, see the output contract) fails the drive.
+  key, see the output contract) fails the crawl.
 
-**Ordering and timestamps.** With `incremental` config, a drive fails when:
+**Ordering and timestamps.** With `incremental` config, a crawl fails when:
 
 - a connection's timestamp is not a valid date,
 - the source returns a connection older than the one before it
   (`OutOfOrderConnectionError`), or
 - a relation's `sourceUpdatedAt` is later than its connection's timestamp.
-  `date_of_last_update` is the default high-water mark, so a later value
-  would move it past connections not yet written. Derive both from the same
-  parsed value.
+  The two should come from one parsed value.
 
 **Failures.**
 
-- A failing drive is reported `failed` with its error message. The next
-  drive still runs.
+- A failing crawl is reported `failed` with its error message. The next
+  crawl still runs.
+- A drive whose key or scopes cannot be read, or whose scope keys are
+  invalid, is reported `failed` once, with scope key `listScopes`.
 - `run()` rejects when:
   - the options are invalid: an `incremental` run on a pipeline without
-    `incremental` config, or a bad `limit`,
+    `incremental` config, a bad `limit`, or `scopes` is empty, invalid, or
+    names a scope no drive declares,
   - no `stores` are given and the Supabase credentials are missing,
   - `listDrives` throws, or
-  - every drive fails, with `EtlRunFailedError`. It carries `report`,
-    `errors` (what each drive threw), and a `cause` that aggregates them.
-- Otherwise `run()` resolves with the report, which lists every drive in
+  - every crawl fails, with `EtlRunFailedError`. It carries `report`,
+    `errors` (what each crawl threw), and a `cause` that aggregates them.
+- Otherwise `run()` resolves with the report, which lists every crawl in
   crawl order, including failed and skipped ones.
-- A drive's counts and `newestTimestamp` cover only pages that finished
+- A crawl's counts and `newestTimestamp` cover only pages that finished
   loading. After a mid-page failure, `relationsWritten` leaves out the rows
   that page already wrote.
 
 **Caveats.**
 
-- An explicit `since` later than a drive's high-water mark skips the
-  connections in between, and the next incremental run starts after them.
-  A later run fills that gap only when its window reaches back over it: a
-  full run, or a run with an earlier `since`.
 - A failed column write (see "Engine-managed metadata" below) is repaired
   by a later run whose window refetches the connection, such as a full run.
-  On a pipeline that runs incrementally the first upsert has already moved
-  the high-water mark, so the next incremental run may not reach it.
+  On a pipeline that runs incrementally the checkpoint has already moved
+  past the connection, so the next incremental run may not reach it.
 
 ## Output contract
 
@@ -185,7 +201,7 @@ The engine writes only these listings-table columns
 
 | Column | Written for |
 | --- | --- |
-| `id` (read only), `access_kind`, `pipeline_name`, `pipeline_run_id`, `display_name`, `external_organization_name`, `external_dataset_id`, `date_of_last_update`, `date_of_last_sync` | every row |
+| `id` (read only), `access_kind`, `pipeline_name`, `pipeline_run_id`, `display_name`, `external_organization_name`, `external_dataset_id`, `date_of_last_update`, `date_of_last_sync`, `pipeline_scope_keys` | every row |
 | `external_service_name`, `source_url`, `canonical_urls`, `license`, `update_frequency`, `description`, `notes`, `metadata`, `coverage_start_date`, `coverage_end_date` | every row, `null` when unset |
 | `api_service`, `api_base_url`, `api_resource_id`, `api_resource_format` | `api_resource` rows |
 | `parquet_file_name` | `pipeline_parquet` rows |
@@ -193,6 +209,10 @@ The engine writes only these listings-table columns
 Conflict targets: `(api_service, api_base_url, external_dataset_id,
 api_resource_id)` and `(parquet_file_name, pipeline_name)`. Any other column,
 such as an app-owned cache, is never written.
+
+The checkpoints table needs `pipeline_name`, `drive_key`, `scope_key`,
+`high_water_mark` (`timestamptz`), and `pipeline_run_id`, unique on the
+first three. It is required when the config has `incremental`.
 
 **Writes.** A page loads in connection order. Parquet objects upload before
 any row is written, then changed rows are upserted in chunks. Each
@@ -219,7 +239,7 @@ columns land. A failure in between leaves a row without the current hash,
 which the next load that reaches the row sees as changed and rewrites.
 
 **Parquet relations** need `output.bucket`: a `pipeline_parquet` relation
-fails its drive when no bucket is set. The bucket must already exist, and
+fails its crawl when no bucket is set. The bucket must already exist, and
 the service-role key must be able to write to it.
 
 - Each relation's CSV is converted to ZSTD Parquet and uploaded to
@@ -238,6 +258,7 @@ Pass `stores` to replace Supabase:
 
 ```ts
 import {
+  createInMemoryCheckpointStore,
   createInMemoryListingsStore,
   createInMemoryObjectStore,
 } from "@avandar/etl";
@@ -246,7 +267,11 @@ import {
 const listings = createInMemoryListingsStore();
 const testEngine = EtlEngine.create({
   ...config,
-  stores: { listings, objects: createInMemoryObjectStore() },
+  stores: {
+    listings,
+    objects: createInMemoryObjectStore(),
+    checkpoints: createInMemoryCheckpointStore(),
+  },
 });
 await testEngine.run({ mode: "full" });
 listings.getRows();

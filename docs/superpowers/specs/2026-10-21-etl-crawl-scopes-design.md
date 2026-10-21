@@ -322,8 +322,8 @@ checkpoint and listings stay. The run report does not mention it.
   CLI reads the server URL and the database credentials from the same env
   file (`.env.development`, or the `--staging`/`--prod` one), so it compares
   the server's scopes against that same environment's database.
-- With `--local`, from this checkout's code, through a new
-  `--list-scopes` mode of `scripts/runPipelineOnce.ts`. `--local` is refused
+- With `--local`, from this checkout's code, through a new script,
+  `scripts/listPipelineScopes.ts`. `--local` is refused
   unless the target is the development database, because a checkout can be
   behind or ahead of what a deployed server crawls.
 
@@ -353,10 +353,11 @@ This uses reset's interactive confirmation instead of a `--confirm` flag,
 because reset already sets that pattern and a prompt cannot be scripted by
 accident.
 
-**RPC `rpc_data_catalog_listings__prune_pipeline_scope(p_pipeline_name, p_drive_key, p_scope_key, p_is_dry_run)`**,
-granted to `service_role` only. In one transaction, over rows with that
-`pipeline_name` and `api_base_url = p_drive_key` whose keys contain
-`p_scope_key`:
+**RPC `rpc_data_catalog_listings__prune_pipeline_scope(p_pipeline_name, p_scope_key, p_drive_key, p_is_dry_run)`**,
+granted to `service_role` only. `p_drive_key` may be null, meaning every
+drive. In one transaction, over rows with that `pipeline_name` and
+`api_base_url = p_drive_key` (or any `api_base_url` when it is null) whose
+keys contain `p_scope_key`:
 
 | Row | Effect |
 | --- | --- |
@@ -366,7 +367,9 @@ granted to `service_role` only. In one transaction, over rows with that
 
 Then it deletes the `(pipeline, drive, scope)` checkpoint, so re-adding the
 scope later backfills it in full. It returns
-`(listings_deleted, listings_kept_in_use, listings_detached, checkpoint_deleted)`.
+`(listings_deleted, listings_kept_in_use, listings_detached, checkpoints_deleted)`,
+where `checkpoints_deleted` is a count, since a null drive can delete
+several.
 With `p_is_dry_run`, it computes the same counts and changes nothing.
 
 Workspace protection matters because `datasets__open_data.catalog_listing_id`
@@ -456,9 +459,10 @@ Declarative schema files, with a generated migration:
   it, both with the service role. An `updated_at` trigger like the other
   tables.
 - `supabase/schemas/10.data_catalog_listings.sql`: add
-  `pipeline_scope_keys`. Drop index
-  `data_catalog_listings__pipeline_drive_last_update`, which only the
-  derived mark read.
+  `pipeline_scope_keys`. Keep index
+  `data_catalog_listings__pipeline_drive_last_update`: the prune and list
+  RPCs and the checkpoint seed all filter on `pipeline_name` and
+  `api_base_url`.
 - `supabase/schemas/50.rpc_data_catalog_listings__prune_pipeline_scope.sql`:
   the RPC, `security invoker`, `execute` granted to `service_role` only.
 
@@ -531,7 +535,7 @@ run(options)
 | --- | --- |
 | `listScopes` throws, or returns an invalid or repeated key | That drive fails, with one report entry, scope key `listScopes`. Other drives run. |
 | `--scope` names a key no drive declares | `EtlRunOptionsError` before any crawl (400 on the server) |
-| Checkpoint read fails | That crawl fails before fetching, like a failed mark read today |
+| Checkpoint read fails | That crawl fails before fetching. A pipeline with incremental config reads every crawl's checkpoint on every run, so this fails the crawl in a full run too. |
 | Checkpoint write fails | That crawl fails. Rows already written stay, and the next run re-crawls from the last stored checkpoint. |
 | Incremental config without `checkpointsTable` | `run` throws before listing drives |
 | `listScopes()` for prune or reset hits an invalid drive or scope | Throws, and prune or reset stops before reading or deleting anything |
@@ -644,3 +648,32 @@ Taken by default in this spec:
    performance, CDC (logical replication) would keep that copy in sync.
    Needs scoping when that need appears. It does not apply to the
    open-data pipelines, whose sources expose no change log.
+
+## 11. Refinements made while planning
+
+1. The prune RPC takes `(p_pipeline_name, p_scope_key, p_drive_key,
+   p_is_dry_run)`. `p_drive_key` may be null for every drive, which is how
+   `ava pipeline reset --scope` prunes in one call, and it returns
+   `checkpoints_deleted` as a count.
+2. A second RPC, `rpc_data_catalog_listings__list_pipeline_scopes`, returns
+   a pipeline's distinct stored drive and scope pairs, so prune never reads
+   every listing.
+3. `data_catalog_listings__pipeline_drive_last_update` is kept: the RPCs and
+   the checkpoint seed filter on `pipeline_name` and `api_base_url`.
+4. `--local` live scopes come from `scripts/listPipelineScopes.ts`, not a
+   mode of `runPipelineOnce.ts`.
+5. A drive that fails before its scopes are known, including when its key
+   cannot be read or it declares no scopes, has one report entry with scope
+   key `listScopes`.
+6. `pipeline_scope_checkpoints` is excluded from the desktop SQLite mirror.
+7. The app's listing model carries `pipelineScopeKeys`.
+8. `ava pipeline reset` deletes checkpoints even when the pipeline has no
+   listings.
+
+### Known limits
+
+- A run that names a scope declared only by a drive whose `listScopes`
+  failed is rejected with `EtlRunOptionsError` ("has no scope"), so the
+  server answers 400, not 500.
+- A failed checkpoint read fails the crawl in a full run too, which is
+  broader than before, when a full run never read the derived mark.

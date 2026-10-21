@@ -505,11 +505,14 @@ objects for `world-bank__wdi`, writing only rows that changed.
 
 `hdx` and `socrata` crawl each drive oldest-modified first (`hdx` by
 `metadata_modified` with `package_search` keyset paging, `socrata` by
-`updatedAt`) and save each page before fetching the next. `ava pipeline run
-<name> --incremental` therefore resumes each drive from the newest
-`date_of_last_update` it already holds, whether the last run finished, was
-cancelled, or stopped at `--limit`. See the
-[engine spec](../superpowers/specs/2026-10-20-etl-engine-supabase-load-and-incremental-runs-design.md).
+`updatedAt`) and save each page before fetching the next.
+`ava pipeline run <name> --incremental` therefore resumes each scope of
+each drive from its checkpoint in `pipeline_scope_checkpoints`, whether the
+last run finished, was cancelled, or stopped at `--limit`, and a new scope,
+such as a newly supported HDX format, is crawled from the beginning. See the
+[engine spec](../superpowers/specs/2026-10-20-etl-engine-supabase-load-and-incremental-runs-design.md)
+and the
+[scopes spec](../superpowers/specs/2026-10-21-etl-crawl-scopes-design.md).
 
 Both send every request through an `HttpClientFactory` client with
 `withRateLimit({ minTimeMs: 1000 })`. HDX also retries an HTTP 429 three

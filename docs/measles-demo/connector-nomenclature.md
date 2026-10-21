@@ -51,6 +51,12 @@ Layer 3 - relation      the addressable child that becomes one Avandar
 | **Connection** (layer 2) | The reusable, picked-once-used-many-times parent a relation lives under. Infrastructure configuration, not a per-resource shareable item: gated by app role, not by per-resource sharing. | A Postgres server + database (`db_connections` / `db_connections__postgres`). One Google Sheets file, picked from the drive's list. One Socrata or CKAN dataset, picked from the portal. One Open Data Catalog listing, for `AvandarSupabaseStorage`. |
 | **Relation** (layer 3) | The addressable child a user ultimately selects - QETL's own word for this (`RelationRef`, `RelationCapabilities`). Becomes one Avandar dataset once a workspace adopts it (see "Relation vs. dataset" below) - it is not one before that. | A Postgres table or view. A tab within a Google Sheets file. A Socrata dataset's own rows (Socrata datasets do not subdivide further in practice, so layer 2 and layer 3 are almost always the same object for Socrata). The one Parquet object a catalog listing names. |
 
+**Scope** is not a layer. It is a pipeline's named slice of one drive, such
+as the CSV resources on HDX or one category on a Socrata portal, that an
+incremental run crawls and resumes on its own. It filters connections and
+relations inside a drive. See
+[the scopes spec](../superpowers/specs/2026-10-21-etl-crawl-scopes-design.md).
+
 ### Relation vs. dataset: related, not interchangeable
 
 A **relation** is the layer-3 granularity itself, regardless of who (if
