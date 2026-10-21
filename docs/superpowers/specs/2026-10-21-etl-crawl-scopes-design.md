@@ -497,6 +497,19 @@ new server's deploy writes rows with `{}` keys and advances no checkpoint.
 The first new run re-crawls from the seeded checkpoint and claims those
 rows through the change check.
 
+The full order:
+
+1. Run the migrations before the new pipeline server.
+2. Rebuild `ava` (`pnpm build:ava-cli`) on every machine that runs it. An
+   old `ava pipeline reset` deletes listings but not checkpoints, so the
+   next incremental run would resume past them and skip them. An old CLI
+   also cannot parse the new `crawls` report.
+3. Run no pipeline while migrating.
+
+The `@avandar/etl` API change is breaking: `EtlRunReport.drives` became
+`crawls`, and `ListingsStore.readHighWaterMark` is gone. The PR title needs
+`!`.
+
 ### 5.10 CLI and pipeline server
 
 - `ava pipeline run <name> --scope <key>[,<key>...]`. Comma-separated,
@@ -682,3 +695,14 @@ Taken by default in this spec:
   server answers 400, not 500.
 - A failed checkpoint read fails the crawl in a full run too, which is
   broader than before, when a full run never read the derived mark.
+- Reset or prune during a pipeline run can be undone: the run writes back
+  its in-memory checkpoint, or merges a pruned key back into a row. Run
+  them only when no run is in progress.
+- Scope keys are merged in the app (read, then write), so two processes
+  writing the same listing at once can drop a key.
+- `pipeline_parquet` listings (WDI) have no `api_base_url`, so the list RPC
+  never reports them and prune by drive cannot reach them. WDI only has
+  `all`.
+- The seed takes the newest stored update as covered, so a gap an earlier
+  `--since` run left behind it stays a gap, as it did with the old derived
+  mark.

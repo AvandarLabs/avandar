@@ -84,3 +84,10 @@ Deploy with:
 ```bash
 fly deploy --config apps/pipeline-server/fly.production.toml
 ```
+
+Deploy order for crawl scopes (`pipeline_scope_checkpoints`): run the
+migrations before deploying the new pipeline server, and run no pipeline
+while migrating. Then rebuild `ava` (`pnpm build:ava-cli`) on every machine
+that runs it. An old `ava pipeline reset` deletes listings but not
+checkpoints, so the next incremental run would skip them, and an old CLI
+cannot parse the new `crawls` report.
