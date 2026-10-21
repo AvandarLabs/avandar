@@ -1,4 +1,5 @@
 import { promiseMapSequential } from "@avandar/utils";
+import { ETL_DEFAULT_SCOPE } from "@etl/EtlEngine/etlScopes";
 import { loadRelationsPage } from "@etl/EtlEngine/loadRelationsPage/loadRelationsPage";
 import { resolveRunWindow } from "@etl/EtlEngine/resolveRunWindow/resolveRunWindow";
 import { selectPageConnections } from "@etl/EtlEngine/selectPageConnections/selectPageConnections";
@@ -228,6 +229,7 @@ async function _processPage<TDrive, TConnection>(
       pipelineRunId: args.pipelineRunId,
       service: config.service,
       driveKey: args.driveKey,
+      scopeKey: ETL_DEFAULT_SCOPE.key,
       syncedAt: args.syncedAt,
       stores: args.stores,
       bucket: config.output.bucket,

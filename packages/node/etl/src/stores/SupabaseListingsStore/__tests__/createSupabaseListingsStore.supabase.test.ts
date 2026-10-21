@@ -48,6 +48,7 @@ function _apiRow(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     api_resource_id: "etl-fixture-resource",
     api_resource_format: "CSV",
     parquet_file_name: null,
+    pipeline_scope_keys: ["all"],
     ...overrides,
   };
 }
@@ -241,6 +242,19 @@ describe("createSupabaseListingsStore", () => {
     expect(
       stored !== undefined && isListingRowUnchanged({ stored, next: row }),
     ).toBe(true);
+  });
+
+  it("round-trips a row's scope keys in order", async () => {
+    await store.upsertRows([
+      _apiRow({ pipeline_scope_keys: ["format:csv", "category:health"] }),
+    ]);
+
+    const [stored] = await store.readRowsMatching([_apiRow()]);
+
+    expect(stored?.pipeline_scope_keys).toEqual([
+      "format:csv",
+      "category:health",
+    ]);
   });
 
   it("returns one stored row when the same key is asked for twice", async () => {

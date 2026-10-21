@@ -32,6 +32,8 @@ export type ListingRowValues = Readonly<{
   api_resource_id: string | null;
   api_resource_format: string | null;
   parquet_file_name: string | null;
+  /** The scopes that produce this row, in the order they first wrote it. */
+  pipeline_scope_keys: readonly string[];
 }>;
 
 /** A listing row as stored, with its primary key. */

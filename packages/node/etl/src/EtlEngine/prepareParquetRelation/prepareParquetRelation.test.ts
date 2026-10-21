@@ -71,6 +71,7 @@ function _prepare(args: {
       service: undefined,
       driveKey: PIPELINE_NAME,
       syncedAt: new Date("2026-10-20T12:00:00.000Z"),
+      scopeKey: "all",
     }),
     stored: args.stored,
     pipelineName: PIPELINE_NAME,

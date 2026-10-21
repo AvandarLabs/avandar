@@ -8,6 +8,10 @@ export {
   EtlRunOptionsError,
 } from "@etl/EtlEngine/EtlRunOptionsError";
 export { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionError";
+export {
+  ETL_DEFAULT_SCOPE,
+  ETL_SCOPE_KEY_PATTERN,
+} from "@etl/EtlEngine/etlScopes";
 export type {
   ApiResourceRelation,
   EtlDestination,
@@ -22,6 +26,7 @@ export type {
   EtlRunOptions,
   EtlRunReport,
   EtlRunWindow,
+  EtlScope,
   EtlStores,
   PipelineParquetRelation,
   Relation,

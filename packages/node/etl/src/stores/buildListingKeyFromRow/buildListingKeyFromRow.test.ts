@@ -27,6 +27,7 @@ function _apiRow(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     api_resource_id: "resource-a",
     api_resource_format: "CSV",
     parquet_file_name: null,
+    pipeline_scope_keys: ["all"],
     ...overrides,
   };
 }

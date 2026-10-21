@@ -30,6 +30,8 @@ export type LoadRelationsPageContext = Readonly<{
   pipelineRunId: EtlPipelineRunId;
   service: string | undefined;
   driveKey: string;
+  /** The scope the page was crawled for. */
+  scopeKey: string;
   syncedAt: Date;
   stores: EtlStores;
   bucket: string | undefined;
@@ -164,6 +166,7 @@ function _buildRelationsWithRows(args: {
       service: context.service,
       driveKey: context.driveKey,
       syncedAt: context.syncedAt,
+      scopeKey: context.scopeKey,
     });
     return { relation, row, key: buildListingKeyFromRow(row) };
   });
@@ -204,6 +207,24 @@ async function _buildRowAndColumns(
   return { row: args.row, columns: relation.columns?.map(_buildColumnRow) };
 }
 
+/**
+ * The row's scope keys once this page's scope is recorded: the stored row's
+ * keys in their stored order, plus this scope's key when it is missing.
+ * Keeping the stored order is what lets a row this scope already produced
+ * compare unchanged.
+ */
+function _mergeStoredScopeKeys(args: {
+  row: ListingRowValues;
+  stored: StoredListingRow | undefined;
+  scopeKey: string;
+}): ListingRowValues {
+  const storedKeys = args.stored?.pipeline_scope_keys ?? [];
+  const mergedKeys = storedKeys.includes(args.scopeKey)
+    ? storedKeys
+    : [...storedKeys, args.scopeKey];
+  return { ...args.row, pipeline_scope_keys: [...mergedKeys] };
+}
+
 async function _prepareRelation(args: {
   relationWithRow: _RelationWithRow;
   storedByKey: ReadonlyMap<string, StoredListingRow>;
@@ -213,7 +234,11 @@ async function _prepareRelation(args: {
   const stored = args.storedByKey.get(key);
   const prepared = await _buildRowAndColumns({
     relation,
-    row,
+    row: _mergeStoredScopeKeys({
+      row,
+      stored,
+      scopeKey: args.context.scopeKey,
+    }),
     stored,
     context: args.context,
   });

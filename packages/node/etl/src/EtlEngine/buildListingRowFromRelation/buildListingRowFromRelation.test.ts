@@ -42,6 +42,7 @@ function _build(
     service: options.service,
     driveKey: DRIVE_KEY,
     syncedAt: SYNCED_AT,
+    scopeKey: "format:csv",
   });
 }
 
@@ -60,6 +61,10 @@ describe("buildListingRowFromRelation", () => {
     expect(_build(API_RELATION).date_of_last_update).toBe(
       "2026-10-19T08:30:00.000Z",
     );
+  });
+
+  it("records the scope that produced the row", () => {
+    expect(_build(API_RELATION).pipeline_scope_keys).toEqual(["format:csv"]);
   });
 
   it("writes an API relation's service, drive, and resource, and no Parquet column", () => {

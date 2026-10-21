@@ -44,6 +44,7 @@ function _context(
     syncedAt: new Date("2026-10-20T12:00:00.000Z"),
     stores,
     bucket: undefined,
+    scopeKey: "all",
     ...overrides,
   };
 }
@@ -142,6 +143,66 @@ describe("loadRelationsPage", () => {
     });
 
     expect(result).toEqual({ written: 0, unchanged: 1 });
+  });
+
+  it("records the page's scope on a new row", async () => {
+    const listings = createInMemoryListingsStore();
+
+    await loadRelationsPage({
+      relations: _apiRelations(1),
+      context: _context({ listings, objects: undefined }, { scopeKey: "x" }),
+    });
+
+    expect(
+      listings.getRows().map((row) => {
+        return row.pipeline_scope_keys;
+      }),
+    ).toEqual([["x"]]);
+  });
+
+  it("adds a second scope's key to a row another scope wrote, once", async () => {
+    const listings = createInMemoryListingsStore();
+    const stores = { listings, objects: undefined };
+    await loadRelationsPage({
+      relations: _apiRelations(1),
+      context: _context(stores, { scopeKey: "x" }),
+    });
+
+    const second = await loadRelationsPage({
+      relations: _apiRelations(1),
+      context: _context(stores, { scopeKey: "y" }),
+    });
+    const third = await loadRelationsPage({
+      relations: _apiRelations(1),
+      context: _context(stores, { scopeKey: "y" }),
+    });
+
+    expect([second, third, listings.getRows()[0]?.pipeline_scope_keys]).toEqual(
+      [{ written: 1, unchanged: 0 }, { written: 0, unchanged: 1 }, ["x", "y"]],
+    );
+  });
+
+  it("keeps the stored order of a row's scope keys", async () => {
+    const listings = createInMemoryListingsStore();
+    const stores = { listings, objects: undefined };
+    await loadRelationsPage({
+      relations: _apiRelations(1),
+      context: _context(stores, { scopeKey: "y" }),
+    });
+    await loadRelationsPage({
+      relations: _apiRelations(1),
+      context: _context(stores, { scopeKey: "x" }),
+    });
+
+    const result = await loadRelationsPage({
+      relations: _apiRelations(1),
+      context: _context(stores, { scopeKey: "y" }),
+    });
+
+    expect([result, listings.getRows()[0]?.pipeline_scope_keys]).toEqual([
+      { written: 0, unchanged: 1 },
+      ["y", "x"],
+    ]);
   });
 
   it("reads 450 relations back in chunks of at most 200", async () => {

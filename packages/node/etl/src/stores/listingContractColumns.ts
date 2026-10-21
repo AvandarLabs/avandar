@@ -31,4 +31,5 @@ export const LISTING_CONTRACT_COLUMNS = [
   "api_resource_id",
   "api_resource_format",
   "parquet_file_name",
+  "pipeline_scope_keys",
 ] as const satisfies ReadonlyArray<keyof ListingRowValues>;

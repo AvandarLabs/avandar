@@ -30,6 +30,7 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     api_resource_id: "abcd-1234",
     api_resource_format: "CSV",
     parquet_file_name: null,
+    pipeline_scope_keys: ["all"],
     ...overrides,
   };
 }
@@ -165,5 +166,14 @@ describe("isListingRowUnchanged", () => {
         next: _row({ date_of_last_update: "not a date" }),
       }),
     ).toBe(true);
+  });
+
+  it("treats a scope key added to the row as a change", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored(),
+        next: _row({ pipeline_scope_keys: ["all", "category:health"] }),
+      }),
+    ).toBe(false);
   });
 });

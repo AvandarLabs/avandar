@@ -189,6 +189,7 @@ function _storedRow(args: {
     api_resource_id: `${args.id}-r0`,
     api_resource_format: "CSV",
     parquet_file_name: null,
+    pipeline_scope_keys: ["all"],
   };
 }
 

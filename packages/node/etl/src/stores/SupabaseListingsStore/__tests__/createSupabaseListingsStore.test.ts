@@ -39,6 +39,7 @@ const ROW: ListingRowValues = {
   api_resource_id: "etl-fixture-resource",
   api_resource_format: "CSV",
   parquet_file_name: null,
+  pipeline_scope_keys: ["all"],
 };
 
 /** A client whose every read returns `rowCount` rows that match nothing. */

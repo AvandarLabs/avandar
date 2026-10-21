@@ -33,6 +33,7 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     api_resource_id: "abcd-1234",
     api_resource_format: "CSV",
     parquet_file_name: null,
+    pipeline_scope_keys: ["all"],
     ...overrides,
   };
 }

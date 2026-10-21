@@ -32,6 +32,16 @@ export type EtlRunWindow = Readonly<{
   until: Date | undefined;
 }>;
 
+/**
+ * One slice of a drive that is crawled and resumed on its own, such as one
+ * file format or one category. A pipeline adds whatever fields its `extract`
+ * and `transform` need to filter by it.
+ */
+export type EtlScope = Readonly<{
+  /** Unique within one drive. Matches `ETL_SCOPE_KEY_PATTERN`. */
+  key: string;
+}>;
+
 /** The descriptive listing fields every relation carries or may carry. */
 export type RelationDescription = Readonly<{
   /** The connection's id in the source, written to `external_dataset_id`. */

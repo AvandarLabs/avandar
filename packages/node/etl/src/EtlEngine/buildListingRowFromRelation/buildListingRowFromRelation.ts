@@ -8,6 +8,7 @@ type _BuildArgs = Readonly<{
   service: string | undefined;
   driveKey: string;
   syncedAt: Date;
+  scopeKey: string;
 }>;
 
 type _SharedColumns = Omit<
@@ -55,6 +56,7 @@ function _buildSharedColumns(args: _BuildArgs): _SharedColumns {
     metadata: relation.metadata ?? null,
     coverage_start_date: _readIsoOrNull(relation, "coverageStartDate"),
     coverage_end_date: _readIsoOrNull(relation, "coverageEndDate"),
+    pipeline_scope_keys: [args.scopeKey],
   };
 }
 
@@ -68,6 +70,8 @@ function _buildSharedColumns(args: _BuildArgs): _SharedColumns {
  * @param args.service - Written to `api_service` on an `api_resource` row.
  * @param args.driveKey - Written to `api_base_url` on an `api_resource` row.
  * @param args.syncedAt - Written to `date_of_last_sync`.
+ * @param args.scopeKey - The scope that produced the row, written to
+ *   `pipeline_scope_keys`.
  * @returns The row.
  * @throws When an `api_resource` relation has no `service` to write, or when
  * one of the relation's dates is invalid.
