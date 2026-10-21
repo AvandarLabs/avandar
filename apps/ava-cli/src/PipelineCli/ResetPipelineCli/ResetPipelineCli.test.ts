@@ -26,41 +26,69 @@ type InUseRow = Readonly<{
   workspace_id: string;
 }>;
 
+type PruneCounts = Readonly<{
+  listings_deleted: number;
+  listings_kept_in_use: number;
+  listings_detached: number;
+  checkpoints_deleted: number;
+}>;
+
+const NO_PRUNE: PruneCounts = {
+  listings_deleted: 0,
+  listings_kept_in_use: 0,
+  listings_detached: 0,
+  checkpoints_deleted: 0,
+};
+
 type RecordedRequest = Readonly<{
   method: string;
   table: string;
   params: URLSearchParams;
+  body: unknown;
 }>;
 
 /**
- * Stubs `fetch` as a tiny PostgREST: a HEAD on `data_catalog_listings`
- * reports `listingCount`, a GET on `datasets__open_data` returns `inUseRows`,
- * and every DELETE succeeds. Returns the requests in the order they were made.
+ * Stubs `fetch` as a tiny PostgREST: a HEAD reports `listingCount` on
+ * `data_catalog_listings` and `checkpointCount` on
+ * `pipeline_scope_checkpoints`, a GET on `datasets__open_data` returns
+ * `inUseRows`, a POST to the prune RPC returns `pruneCounts`, and every
+ * DELETE succeeds. Returns the requests in the order they were made.
  */
 function _mockPostgrest(options: {
   listingCount: number;
+  checkpointCount?: number;
   inUseRows?: readonly InUseRow[];
+  pruneCounts?: PruneCounts;
 }): RecordedRequest[] {
   const requests: RecordedRequest[] = [];
   vi.stubGlobal(
     "fetch",
-    vi.fn(async (input: string, init?: { method?: string }) => {
+    vi.fn(async (input: string, init?: { method?: string; body?: string }) => {
       const url = new URL(input);
       const method = init?.method ?? "GET";
       const table = url.pathname.replace("/rest/v1/", "");
-      requests.push({ method, table, params: url.searchParams });
+      const body: unknown =
+        init?.body === undefined ? undefined : JSON.parse(init.body);
+      requests.push({ method, table, params: url.searchParams, body });
+      const count =
+        table === "pipeline_scope_checkpoints"
+          ? (options.checkpointCount ?? 0)
+          : options.listingCount;
       if (method === "HEAD") {
         return new Response(null, {
           status: 200,
-          headers: { "content-range": `*/${options.listingCount}` },
+          headers: { "content-range": `*/${count}` },
         });
+      }
+      if (method === "POST") {
+        return new Response(JSON.stringify([options.pruneCounts ?? NO_PRUNE]));
       }
       if (method === "GET") {
         return new Response(JSON.stringify(options.inUseRows ?? []));
       }
       return new Response(null, {
         status: 204,
-        headers: { "content-range": `*/${options.listingCount}` },
+        headers: { "content-range": `*/${count}` },
       });
     }),
   );
@@ -108,7 +136,10 @@ describe("resetPipelineCommand", () => {
       deletes.map((request) => {
         return [request.table, request.params.toString()];
       }),
-    ).toEqual([["data_catalog_listings", "pipeline_name=eq.socrata"]]);
+    ).toEqual([
+      ["pipeline_scope_checkpoints", "pipeline_name=eq.socrata"],
+      ["data_catalog_listings", "pipeline_name=eq.socrata"],
+    ]);
   });
 
   it("deletes nothing when the reset is declined", async () => {
@@ -182,7 +213,10 @@ describe("resetPipelineCommand", () => {
       _getDeletes(requests).map((request) => {
         return [request.table, request.params.get("id")];
       }),
-    ).toEqual([["data_catalog_listings", "not.in.(listing-1)"]]);
+    ).toEqual([
+      ["pipeline_scope_checkpoints", null],
+      ["data_catalog_listings", "not.in.(listing-1)"],
+    ]);
   });
 
   it("deletes the workspace datasets first when asked to delete all", async () => {
@@ -199,6 +233,7 @@ describe("resetPipelineCommand", () => {
         return [request.table, request.params.toString()];
       }),
     ).toEqual([
+      ["pipeline_scope_checkpoints", "pipeline_name=eq.socrata"],
       ["datasets", new URLSearchParams({ id: "in.(dataset-1,dataset-2)" })
         .toString()],
       ["data_catalog_listings", "pipeline_name=eq.socrata"],
@@ -222,5 +257,135 @@ describe("resetPipelineCommand", () => {
     await expect(resetPipelineCommand({ name: "socrata" })).rejects.toThrow(
       "SUPABASE_SERVICE_ROLE_KEY is not set in .env.development",
     );
+  });
+
+  it("deletes checkpoints even when the pipeline has no listings", async () => {
+    const requests = _mockPostgrest({ listingCount: 0, checkpointCount: 2 });
+
+    await resetPipelineCommand({ name: "socrata" });
+
+    expect(
+      _getDeletes(requests).map((request) => {
+        return request.table;
+      }),
+    ).toEqual(["pipeline_scope_checkpoints", "data_catalog_listings"]);
+  });
+
+  it("deletes nothing else when deleting checkpoints fails", async () => {
+    const recorded: string[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: string, init?: { method?: string }) => {
+        const table = new URL(input).pathname.replace("/rest/v1/", "");
+        recorded.push(`${init?.method ?? "GET"} ${table}`);
+        if (init?.method === "DELETE") {
+          return new Response("boom", { status: 500 });
+        }
+        if (init?.method === "HEAD") {
+          return new Response(null, {
+            status: 200,
+            headers: { "content-range": "*/3" },
+          });
+        }
+        return new Response("[]");
+      }),
+    );
+
+    await expect(resetPipelineCommand({ name: "socrata" })).rejects.toThrow(
+      "500",
+    );
+    expect(
+      recorded.filter((request) => {
+        return request.startsWith("DELETE");
+      }),
+    ).toEqual(["DELETE pipeline_scope_checkpoints"]);
+  });
+
+  describe("with --scope", () => {
+    it("prunes the scope on every drive once confirmed", async () => {
+      const requests = _mockPostgrest({
+        listingCount: 0,
+        pruneCounts: {
+          ...NO_PRUNE,
+          listings_deleted: 3,
+          checkpoints_deleted: 1,
+        },
+      });
+
+      await resetPipelineCommand({ name: "hdx", scope: "format:parquet" });
+
+      const calls = requests.filter((request) => {
+        return request.method === "POST";
+      });
+      expect(
+        calls.map((request) => {
+          return [request.table, request.body];
+        }),
+      ).toEqual([
+        [
+          "rpc/rpc_data_catalog_listings__prune_pipeline_scope",
+          {
+            p_pipeline_name: "hdx",
+            p_scope_key: "format:parquet",
+            p_drive_key: null,
+            p_is_dry_run: true,
+          },
+        ],
+        [
+          "rpc/rpc_data_catalog_listings__prune_pipeline_scope",
+          {
+            p_pipeline_name: "hdx",
+            p_scope_key: "format:parquet",
+            p_drive_key: null,
+            p_is_dry_run: false,
+          },
+        ],
+      ]);
+    });
+
+    it("changes nothing when the scope has nothing to prune", async () => {
+      const requests = _mockPostgrest({ listingCount: 0 });
+
+      await resetPipelineCommand({ name: "hdx", scope: "format:parquet" });
+
+      expect([
+        vi.mocked(promptToConfirmReset).mock.calls.length,
+        requests.filter((request) => {
+          return request.method === "POST";
+        }).length,
+      ]).toEqual([0, 1]);
+    });
+
+    it("deletes the workspace datasets of in-use listings first when asked to", async () => {
+      vi.mocked(promptForInUseListingsChoice).mockResolvedValueOnce("delete");
+      const requests = _mockPostgrest({
+        listingCount: 0,
+        inUseRows: [IN_USE_ROW],
+        pruneCounts: { ...NO_PRUNE, listings_kept_in_use: 1 },
+      });
+
+      await resetPipelineCommand({ name: "hdx", scope: "format:parquet" });
+
+      const inUseLookup = requests.find((request) => {
+        return request.table === "datasets__open_data";
+      });
+      expect([
+        inUseLookup?.params.get("data_catalog_listings.pipeline_scope_keys"),
+        requests
+          .filter((request) => {
+            return request.method === "DELETE" || request.method === "POST";
+          })
+          .map((request) => {
+            return `${request.method} ${request.table}`;
+          }),
+      ]).toEqual([
+        "eq.{format:parquet}",
+        [
+          "POST rpc/rpc_data_catalog_listings__prune_pipeline_scope",
+          "DELETE datasets",
+          "POST rpc/rpc_data_catalog_listings__prune_pipeline_scope",
+        ],
+      ]);
+    });
   });
 });

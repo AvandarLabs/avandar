@@ -27,12 +27,13 @@ export function getPostgrestTarget(): PostgrestTarget {
 /** Sends one PostgREST request, throwing on a non-2xx answer. */
 async function _sendPostgrestRequest(options: {
   target: PostgrestTarget;
-  method: "HEAD" | "GET" | "DELETE";
+  method: "HEAD" | "GET" | "DELETE" | "POST";
   table: string;
   params: Readonly<Record<string, string>>;
   prefer?: string;
+  body?: unknown;
 }): Promise<Response> {
-  const { target, method, table, params, prefer } = options;
+  const { target, method, table, params, prefer, body } = options;
   const query = new URLSearchParams(params);
   const response = await fetch(`${target.apiUrl}/rest/v1/${table}?${query}`, {
     method,
@@ -40,12 +41,14 @@ async function _sendPostgrestRequest(options: {
       apikey: target.secretKey,
       Authorization: `Bearer ${target.secretKey}`,
       ...(prefer === undefined ? {} : { Prefer: prefer }),
+      ...(body === undefined ? {} : { "Content-Type": "application/json" }),
     },
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
   if (!response.ok) {
-    const body = await response.text();
+    const responseText = await response.text();
     throw new Error(
-      `Supabase answered ${response.status} on ${method} ${table}: ${body}`,
+      `Supabase answered ${response.status} on ${method} ${table}: ${responseText}`,
     );
   }
   return response;
@@ -136,4 +139,106 @@ export async function deleteListings(options: {
     prefer: "return=minimal,count=exact",
   });
   return _countFromContentRange(response);
+}
+
+/** The checkpoints table, as PostgREST names it. */
+const CHECKPOINTS_TABLE = "pipeline_scope_checkpoints";
+
+/** The RPC that prunes one scope from a pipeline's listings. */
+const PRUNE_SCOPE_RPC = "rpc/rpc_data_catalog_listings__prune_pipeline_scope";
+
+/** The RPC that lists a pipeline's stored drive and scope pairs. */
+const LIST_SCOPES_RPC = "rpc/rpc_data_catalog_listings__list_pipeline_scopes";
+
+/** What pruning one scope did, or would do in a dry run. */
+export type ScopePruneCounts = Readonly<{
+  listings_deleted: number;
+  listings_kept_in_use: number;
+  listings_detached: number;
+  checkpoints_deleted: number;
+}>;
+
+/** A drive and scope a pipeline has listings or a checkpoint for. */
+export type StoredScope = Readonly<{ drive_key: string; scope_key: string }>;
+
+/** Counts one pipeline's checkpoints. */
+export async function countCheckpoints(options: {
+  target: PostgrestTarget;
+  pipelineName: string;
+}): Promise<number> {
+  const response = await _sendPostgrestRequest({
+    target: options.target,
+    method: "HEAD",
+    table: CHECKPOINTS_TABLE,
+    params: {
+      pipeline_name: `eq.${options.pipelineName}`,
+      select: "scope_key",
+    },
+    prefer: "count=exact",
+  });
+  return _countFromContentRange(response);
+}
+
+/**
+ * Deletes every checkpoint of one pipeline. Resolves to how many were
+ * deleted.
+ */
+export async function deleteCheckpoints(options: {
+  target: PostgrestTarget;
+  pipelineName: string;
+}): Promise<number> {
+  const response = await _sendPostgrestRequest({
+    target: options.target,
+    method: "DELETE",
+    table: CHECKPOINTS_TABLE,
+    params: { pipeline_name: `eq.${options.pipelineName}` },
+    prefer: "return=minimal,count=exact",
+  });
+  return _countFromContentRange(response);
+}
+
+/**
+ * Prunes one scope from a pipeline's listings and checkpoints, on one
+ * drive or, with no `driveKey`, on every drive. A dry run only counts.
+ * Listings a workspace uses are never deleted.
+ */
+export async function pruneScope(options: {
+  target: PostgrestTarget;
+  pipelineName: string;
+  scopeKey: string;
+  driveKey: string | undefined;
+  isDryRun: boolean;
+}): Promise<ScopePruneCounts> {
+  const response = await _sendPostgrestRequest({
+    target: options.target,
+    method: "POST",
+    table: PRUNE_SCOPE_RPC,
+    params: {},
+    body: {
+      p_pipeline_name: options.pipelineName,
+      p_scope_key: options.scopeKey,
+      p_drive_key: options.driveKey ?? null,
+      p_is_dry_run: options.isDryRun,
+    },
+  });
+  const [counts] = (await response.json()) as readonly ScopePruneCounts[];
+  if (counts === undefined) {
+    throw new Error(`Supabase returned no counts from ${PRUNE_SCOPE_RPC}.`);
+  }
+  return counts;
+}
+
+/** Lists every drive and scope pair one pipeline has stored. */
+export async function listStoredScopes(options: {
+  target: PostgrestTarget;
+  pipelineName: string;
+}): Promise<readonly StoredScope[]> {
+  const response = await _sendPostgrestRequest({
+    target: options.target,
+    method: "POST",
+    table: LIST_SCOPES_RPC,
+    params: {},
+    body: { p_pipeline_name: options.pipelineName },
+  });
+  return (await response.json()) as readonly StoredScope[];
 }
