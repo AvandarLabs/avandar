@@ -20,6 +20,7 @@ type _ExtractArgs = Readonly<{
   window: EtlRunWindow;
   discovery: CkanDiscoveryClient;
   pageSize: number;
+  resourceFormats: readonly string[] | undefined;
 }>;
 
 /** One page's new datasets, and where the next page starts. */
@@ -99,6 +100,7 @@ async function _fetchPageAfter(
     modifiedBefore: args.window.until,
     after: cursor,
     rows: args.pageSize,
+    resourceFormats: args.resourceFormats,
   });
   _warnAboutSkippedDatasets(args.drive, page);
   if (cursor === undefined) {
@@ -152,6 +154,8 @@ async function* _pages(
  * the start is logged too, since a server row cap below the page size would
  * end the crawl there.
  *
+ * @param args.resourceFormats - Only datasets with a resource in one of
+ *   these formats, as CKAN labels them.
  * @throws When a full page has nothing after the cursor, which would
  * otherwise request the same page forever.
  */
@@ -160,11 +164,13 @@ export function extractHdxDatasets(args: {
   window: EtlRunWindow;
   discovery: CkanDiscoveryClient;
   pageSize?: number;
+  resourceFormats?: readonly string[];
 }): AsyncGenerator<readonly CkanPackage[]> {
   return _pages({
     drive: args.drive,
     window: args.window,
     discovery: args.discovery,
     pageSize: args.pageSize ?? HDX_PAGE_SIZE,
+    resourceFormats: args.resourceFormats,
   });
 }

@@ -39,16 +39,43 @@ function _package(name: string, day: number): CkanPackage {
   };
 }
 
-/** A one-page fake `package_search` that applies `modifiedSince`. */
+/** A dataset with one CSV and one Parquet resource. */
+function _packageWithParquet(name: string, day: number): CkanPackage {
+  const ckanPackage = _package(name, day);
+  const [csvResource] = ckanPackage.resources;
+  return {
+    ...ckanPackage,
+    resources: [
+      ...ckanPackage.resources,
+      {
+        ...csvResource!,
+        id: `${name}-parquet`,
+        name: `${name}.parquet`,
+        format: "Parquet",
+        url: `https://data.humdata.org/dataset/${name}/resource/${name}-parquet/download/${name}.parquet`,
+      },
+    ],
+  };
+}
+
+/**
+ * A one-page fake `package_search` that applies `modifiedSince` and
+ * `resourceFormats` the way CKAN does.
+ */
 function _discovery(catalog: readonly CkanPackage[]): CkanDiscoveryClient {
   return {
-    searchDatasets: vi.fn(async ({ modifiedSince }) => {
+    searchDatasets: vi.fn(async ({ modifiedSince, resourceFormats }) => {
       const datasets = catalog.filter((dataset) => {
-        return (
+        const isInWindow =
           modifiedSince === undefined ||
           parseCkanTimestamp(dataset.metadata_modified ?? "").getTime() >=
-            modifiedSince.getTime()
-        );
+            modifiedSince.getTime();
+        const hasFormat =
+          resourceFormats === undefined ||
+          dataset.resources.some((resource) => {
+            return resourceFormats.includes(resource.format);
+          });
+        return isInWindow && hasFormat;
       });
       const lastDataset = datasets.at(-1);
       return {
@@ -148,5 +175,48 @@ describe("createHdxEtlEngine", () => {
       report.crawls,
       vi.mocked(discovery.searchDatasets).mock.calls.length,
     ]).toEqual([[], 0]);
+  });
+
+  it("crawls the CSV scope, then the Parquet scope, each writing only its format", async () => {
+    const listings = createInMemoryListingsStore();
+    const discovery = _discovery([_packageWithParquet("a", 1)]);
+
+    await createHdxEtlEngine({
+      output: OUTPUT,
+      discovery,
+      drive: DRIVE,
+      stores: {
+        listings,
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+      },
+    }).run({ mode: "full" });
+
+    expect([
+      vi.mocked(discovery.searchDatasets).mock.calls.map(([params]) => {
+        return params.resourceFormats;
+      }),
+      listings.getRows().map((row) => {
+        return [row.api_resource_id, row.pipeline_scope_keys];
+      }),
+    ]).toEqual([
+      [["CSV"], ["Parquet"]],
+      [
+        ["a-csv", ["format:csv"]],
+        ["a-parquet", ["format:parquet"]],
+      ],
+    ]);
+  });
+
+  it("lists one scope per format for its drive", async () => {
+    const scopes = await createHdxEtlEngine({
+      output: OUTPUT,
+      discovery: _discovery([]),
+      drive: DRIVE,
+    }).listScopes();
+
+    expect(scopes).toEqual([
+      { driveKey: DRIVE.baseUrl, scopeKeys: ["format:csv", "format:parquet"] },
+    ]);
   });
 });

@@ -9,7 +9,7 @@ const CKAN_DRIVE: HdxDrive = {
 };
 
 describe("makeApiResourceRelationsFromCkanPackage", () => {
-  it("builds one relation per readable resource, dated by metadata_modified", () => {
+  it("builds one relation per readable resource of the scope's format, dated by metadata_modified", () => {
     const ckanPackage: CkanPackage = {
       id: "c3429f0e",
       name: "movement-range-maps",
@@ -57,6 +57,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     const relations = makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
       ckanPackage,
+      resourceFormat: "CSV",
     });
 
     expect(relations).toEqual([
@@ -66,15 +67,6 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         apiResourceId: "csv-1",
         apiResourceFormat: "CSV",
         displayName: "data.csv",
-        externalOrganizationName: "Humanitarian Data Exchange",
-        sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
-      },
-      {
-        kind: "api_resource",
-        externalDatasetId: "movement-range-maps",
-        apiResourceId: "parquet-1",
-        apiResourceFormat: "PARQUET",
-        displayName: "data.parquet",
         externalOrganizationName: "Humanitarian Data Exchange",
         sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
       },
@@ -106,7 +98,54 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
       makeApiResourceRelationsFromCkanPackage({
         drive: CKAN_DRIVE,
         ckanPackage,
+        resourceFormat: "CSV",
       }),
     ).toEqual([]);
+  });
+
+  it("keeps only the scope's format, whatever the resource's case", () => {
+    const ckanPackage: CkanPackage = {
+      id: "c3429f0e",
+      name: "movement-range-maps",
+      metadata_modified: "2025-11-19T10:29:46.280529",
+      resources: [
+        {
+          id: "csv-1",
+          name: "data.csv",
+          format: "CSV",
+          url: "https://data.humdata.org/dataset/x/resource/csv-1/download/data.csv",
+          url_type: "upload",
+          size: 200,
+          hash: "abc",
+          last_modified: undefined,
+          mimetype: undefined,
+          datastore_active: false,
+        },
+        {
+          id: "parquet-1",
+          name: "data.parquet",
+          format: "parquet",
+          url: "https://data.humdata.org/dataset/x/resource/parquet-1/download/data.parquet",
+          url_type: "upload",
+          size: 150,
+          hash: "def",
+          last_modified: undefined,
+          mimetype: undefined,
+          datastore_active: false,
+        },
+      ],
+    };
+
+    const relations = makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      ckanPackage,
+      resourceFormat: "Parquet",
+    });
+
+    expect(
+      relations.map((relation) => {
+        return [relation.apiResourceId, relation.apiResourceFormat];
+      }),
+    ).toEqual([["parquet-1", "PARQUET"]]);
   });
 });

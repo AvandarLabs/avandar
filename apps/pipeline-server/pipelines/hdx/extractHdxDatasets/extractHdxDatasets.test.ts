@@ -128,6 +128,27 @@ function _silenceWarnings() {
 }
 
 describe("extractHdxDatasets", () => {
+  it("asks for the given resource formats on every request", async () => {
+    const discovery = _keysetDiscovery(CATALOG);
+
+    // Sequential on purpose: the generator pages one request at a time.
+    for await (const _drainedPage of extractHdxDatasets({
+      drive: DRIVE,
+      window: OPEN_WINDOW,
+      discovery,
+      pageSize: 2,
+      resourceFormats: ["CSV"],
+    })) {
+      // Draining the crawl is all this test needs.
+    }
+
+    expect(
+      vi.mocked(discovery.searchDatasets).mock.calls.map(([params]) => {
+        return params.resourceFormats;
+      }),
+    ).toEqual([["CSV"], ["CSV"], ["CSV"]]);
+  });
+
   it("requests 100 rows per page by default", async () => {
     const discovery = _keysetDiscovery(CATALOG);
     // Sequential on purpose: the generator pages one request at a time.
