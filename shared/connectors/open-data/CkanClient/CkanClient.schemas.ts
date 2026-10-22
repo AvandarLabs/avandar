@@ -17,6 +17,8 @@ export const CkanResourceSchema = z.object({
   last_modified: z.string().nullish(),
   mimetype: z.string().nullish(),
   datastore_active: z.boolean().nullish(),
+  // HDX only: its file structure check log. Read by `readHdxFileHeaders`.
+  fs_check_info: z.unknown().optional(),
 });
 
 /** A CKAN dataset as it arrives on the wire. */

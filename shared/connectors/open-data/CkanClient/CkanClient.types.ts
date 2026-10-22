@@ -39,6 +39,12 @@ export type CkanResource = {
   mimetype: string | undefined;
   /** Whether CKAN has this resource's rows loaded into its datastore. */
   datastore_active: boolean;
+  /**
+   * HDX only: the file's column headers, as HDX's file structure check read
+   * them. Absent on other CKAN deployments, on a file HDX never checked, and
+   * on a file with several sheets.
+   */
+  fileHeaders?: readonly string[];
 };
 
 /**

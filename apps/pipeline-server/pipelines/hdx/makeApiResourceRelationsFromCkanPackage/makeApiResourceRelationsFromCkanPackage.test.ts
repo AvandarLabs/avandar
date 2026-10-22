@@ -1,6 +1,7 @@
 import { makeApiResourceRelationsFromCkanPackage } from "@pipelines/hdx/makeApiResourceRelationsFromCkanPackage/makeApiResourceRelationsFromCkanPackage";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
+import type { RelationColumn } from "@avandar/etl";
 import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
 
 const CKAN_DRIVE: HdxDrive = {
@@ -8,8 +9,41 @@ const CKAN_DRIVE: HdxDrive = {
   organizationName: "Humanitarian Data Exchange",
 };
 
+function _packageWithOneCsv(
+  overrides: Partial<CkanPackage["resources"][number]>,
+): CkanPackage {
+  return {
+    id: "c3429f0e",
+    name: "movement-range-maps",
+    metadata_modified: "2025-11-19T10:29:46.280529",
+    resources: [
+      {
+        id: "csv-1",
+        name: "data.csv",
+        format: "CSV",
+        url: "https://data.humdata.org/dataset/x/resource/csv-1/download/data.csv",
+        url_type: "upload",
+        size: 200,
+        hash: "abc",
+        last_modified: undefined,
+        mimetype: undefined,
+        datastore_active: false,
+        ...overrides,
+      },
+    ],
+  };
+}
+
+const SNIFFED_COLUMNS: RelationColumn[] = [
+  { name: "value", originalDataType: "DOUBLE", castDataType: "DOUBLE" },
+];
+
+async function _readSniffedColumns(): Promise<readonly RelationColumn[]> {
+  return SNIFFED_COLUMNS;
+}
+
 describe("makeApiResourceRelationsFromCkanPackage", () => {
-  it("builds one relation per readable resource of the scope's format, dated by metadata_modified", () => {
+  it("builds one relation per readable resource of the scope's format, dated by metadata_modified", async () => {
     const ckanPackage: CkanPackage = {
       id: "c3429f0e",
       name: "movement-range-maps",
@@ -54,10 +88,11 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
       ],
     };
 
-    const relations = makeApiResourceRelationsFromCkanPackage({
+    const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
       ckanPackage,
       resourceFormat: "CSV",
+      readFileColumns: _readSniffedColumns,
     });
 
     expect(relations).toEqual([
@@ -69,11 +104,45 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         displayName: "data.csv",
         externalOrganizationName: "Humanitarian Data Exchange",
         sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
+        columns: SNIFFED_COLUMNS,
       },
     ]);
   });
 
-  it("returns no relations when the dataset has no readable resource", () => {
+  it("uses the headers HDX recorded instead of reading the file", async () => {
+    const readFileColumns = vi.fn(_readSniffedColumns);
+
+    const relations = await makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      ckanPackage: _packageWithOneCsv({ fileHeaders: ["adm1", "year"] }),
+      resourceFormat: "CSV",
+      readFileColumns,
+    });
+
+    expect(
+      relations[0]?.columns.map((column) => {
+        return column.name;
+      }),
+    ).toEqual(["adm1", "year"]);
+    expect(readFileColumns).not.toHaveBeenCalled();
+  });
+
+  it("leaves out a resource whose columns cannot be read", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const relations = await makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      ckanPackage: _packageWithOneCsv({}),
+      resourceFormat: "CSV",
+      readFileColumns: async () => {
+        return undefined;
+      },
+    });
+
+    expect(relations).toEqual([]);
+  });
+
+  it("returns no relations when the dataset has no readable resource", async () => {
     const ckanPackage: CkanPackage = {
       id: "c3429f0e",
       name: "docs-only-dataset",
@@ -95,15 +164,16 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     };
 
     expect(
-      makeApiResourceRelationsFromCkanPackage({
+      await makeApiResourceRelationsFromCkanPackage({
         drive: CKAN_DRIVE,
         ckanPackage,
         resourceFormat: "CSV",
+        readFileColumns: _readSniffedColumns,
       }),
     ).toEqual([]);
   });
 
-  it("keeps only the scope's format, whatever the resource's case", () => {
+  it("keeps only the scope's format, whatever the resource's case", async () => {
     const ckanPackage: CkanPackage = {
       id: "c3429f0e",
       name: "movement-range-maps",
@@ -136,10 +206,11 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
       ],
     };
 
-    const relations = makeApiResourceRelationsFromCkanPackage({
+    const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
       ckanPackage,
       resourceFormat: "Parquet",
+      readFileColumns: _readSniffedColumns,
     });
 
     expect(

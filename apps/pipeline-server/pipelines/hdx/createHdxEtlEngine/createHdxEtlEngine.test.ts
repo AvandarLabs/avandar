@@ -14,7 +14,8 @@ const DRIVE = {
 };
 const OUTPUT = {
   listingsTable: "data_catalog_listings",
-  upsertListingsFunction: "rpc_data_catalog_listings__upsert_with_relation_columns",
+  upsertListingsFunction:
+    "rpc_data_catalog_listings__upsert_with_relation_columns",
 };
 
 function _package(name: string, day: number): CkanPackage {
@@ -34,6 +35,7 @@ function _package(name: string, day: number): CkanPackage {
         last_modified: undefined,
         mimetype: undefined,
         datastore_active: false,
+        fileHeaders: ["value"],
       },
     ],
   };
@@ -82,14 +84,14 @@ function _discovery(catalog: readonly CkanPackage[]): CkanDiscoveryClient {
         datasets,
         skippedDatasets: [],
         nextCursor:
-          lastDataset === undefined ? undefined : (
-            {
-              modifiedAt: parseCkanTimestamp(
-                lastDataset.metadata_modified ?? "",
-              ),
-              name: lastDataset.name,
-            }
-          ),
+          lastDataset === undefined
+            ? undefined
+            : {
+                modifiedAt: parseCkanTimestamp(
+                  lastDataset.metadata_modified ?? "",
+                ),
+                name: lastDataset.name,
+              },
         resultCount: datasets.length,
       };
     }),
@@ -206,6 +208,55 @@ describe("createHdxEtlEngine", () => {
         ["a-parquet", ["format:parquet"]],
       ],
     ]);
+  });
+
+  it("writes each listing's columns, reading the file when HDX recorded no headers", async () => {
+    const listings = createInMemoryListingsStore();
+    const [resource] = _package("a", 1).resources;
+    const readFileColumns = vi.fn(async () => {
+      return [
+        { name: "year", originalDataType: "BIGINT", castDataType: "BIGINT" },
+      ] as const;
+    });
+
+    await createHdxEtlEngine({
+      output: OUTPUT,
+      discovery: _discovery([
+        _package("with-headers", 1),
+        {
+          ..._package("without-headers", 2),
+          resources: [
+            {
+              ...resource!,
+              id: "without-headers-csv",
+              fileHeaders: undefined,
+            },
+          ],
+        },
+      ]),
+      drive: DRIVE,
+      stores: {
+        listings,
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+      },
+      readFileColumns,
+    }).run({ mode: "full", scopes: ["format:csv"] });
+
+    expect(
+      listings.getRows().map((row) => {
+        return [
+          row.api_resource_id,
+          listings.getRelationColumns(row.id)?.map((column) => {
+            return [column.column_name, column.cast_data_type];
+          }),
+        ];
+      }),
+    ).toEqual([
+      ["with-headers-csv", [["value", "VARCHAR"]]],
+      ["without-headers-csv", [["year", "BIGINT"]]],
+    ]);
+    expect(readFileColumns).toHaveBeenCalledTimes(1);
   });
 
   it("lists one scope per format for its drive", async () => {

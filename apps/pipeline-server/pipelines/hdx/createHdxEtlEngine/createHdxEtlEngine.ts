@@ -1,18 +1,20 @@
 import { EtlEngine } from "@avandar/etl";
+import { createHdxFileColumnReader } from "@pipelines/hdx/createHdxFileColumnReader/createHdxFileColumnReader";
 import { extractHdxDatasets } from "@pipelines/hdx/extractHdxDatasets/extractHdxDatasets";
 import { getHdxDatasetTimestamp } from "@pipelines/hdx/getHdxDatasetTimestamp/getHdxDatasetTimestamp";
 import { HDX_DRIVE } from "@pipelines/hdx/hdxDrive";
 import { HDX_SCOPES } from "@pipelines/hdx/hdxScopes";
 import { makeApiResourceRelationsFromCkanPackage } from "@pipelines/hdx/makeApiResourceRelationsFromCkanPackage/makeApiResourceRelationsFromCkanPackage";
+import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
+import type { CkanDiscoveryClient } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.types";
 import type {
   EtlDestination,
   EtlEngineInstance,
   EtlStores,
 } from "@avandar/etl";
-import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
-import type { CkanDiscoveryClient } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.types";
 import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
 import type { HdxScope } from "@pipelines/hdx/hdxScopes";
+import type { HdxFileColumnReader } from "@pipelines/hdx/readHdxResourceColumns/readHdxResourceColumns";
 
 /**
  * Creates the HDX pipeline's engine, which crawls the one HDX drive by
@@ -23,6 +25,8 @@ import type { HdxScope } from "@pipelines/hdx/hdxScopes";
  * @param args.discovery - The CKAN discovery client for HDX.
  * @param args.drive - Replaces `HDX_DRIVE`; `undefined` crawls nothing.
  * @param args.stores - Replaces the Supabase stores, for tests.
+ * @param args.readFileColumns - Replaces the DuckDB reader that resources
+ *   without usable HDX headers fall back to, for tests.
  */
 export function createHdxEtlEngine(
   args: EtlDestination &
@@ -30,9 +34,10 @@ export function createHdxEtlEngine(
       discovery: CkanDiscoveryClient;
       drive?: HdxDrive | undefined;
       stores?: EtlStores;
+      readFileColumns?: HdxFileColumnReader;
     }>,
 ): EtlEngineInstance {
-  const { discovery, drive, ...destination } = args;
+  const { discovery, drive, readFileColumns, ...destination } = args;
   const hdxDrive = "drive" in args ? drive : HDX_DRIVE;
   return EtlEngine.create<HdxDrive, CkanPackage, HdxScope>({
     ...destination,
@@ -63,6 +68,9 @@ export function createHdxEtlEngine(
         drive: current,
         ckanPackage: connection,
         resourceFormat: scope.resourceFormat,
+        readFileColumns:
+          readFileColumns ??
+          createHdxFileColumnReader({ baseUrl: current.baseUrl }),
       });
     },
     incremental: { getConnectionTimestamp: getHdxDatasetTimestamp },

@@ -1,3 +1,4 @@
+import { readHdxFileHeaders } from "$/connectors/open-data/CkanClient/readHdxFileHeaders/readHdxFileHeaders.ts";
 import type { CkanPackageSchema } from "$/connectors/open-data/CkanClient/CkanClient.schemas.ts";
 import type {
   CkanPackage,
@@ -10,10 +11,13 @@ type _WirePackage = z.output<typeof CkanPackageSchema>;
 /**
  * Normalizes one wire resource, turning CKAN's absent-or-null fields into
  * `undefined` and defaulting the three that an older deployment can omit:
- * `url_type`, `hash`, and `datastore_active`.
+ * `url_type`, `hash`, and `datastore_active`. HDX's file structure check log
+ * becomes `fileHeaders`.
  */
 function _toResource(wire: _WirePackage["resources"][number]): CkanResource {
+  const fileHeaders = readHdxFileHeaders(wire.fs_check_info);
   return {
+    ...(fileHeaders === undefined ? {} : { fileHeaders }),
     id: wire.id,
     name: wire.name,
     format: wire.format,

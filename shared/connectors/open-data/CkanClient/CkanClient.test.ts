@@ -142,6 +142,40 @@ describe("CkanClient.getPackage", () => {
     expect(ckanPackage.resources[0]?.format).toBe("CSV");
   });
 
+  it("reads the headers HDX's file structure check recorded", async () => {
+    const http = _http({
+      get: vi.fn(async () => {
+        return _packageResponse([
+          {
+            ...CSV_RESOURCE,
+            fs_check_info: JSON.stringify([
+              {
+                state: "success",
+                hxl_proxy_response: {
+                  sheets: [
+                    { name: "__DEFAULT__", headers: ["year", "funding"] },
+                  ],
+                },
+              },
+            ]),
+          },
+          README_RESOURCE,
+        ]);
+      }),
+    });
+
+    const ckanPackage = await createCkanClient(http).getPackage({
+      baseUrl: BASE_URL,
+      ckanDatasetId: DATASET_ID,
+    });
+
+    expect(
+      ckanPackage.resources.map((resource) => {
+        return resource.fileHeaders;
+      }),
+    ).toEqual([["year", "funding"], undefined]);
+  });
+
   // CKAN reports failures in-band, so reading `result` without checking
   // `success` would hand back undefined where a package was expected.
   it("raises ckan-action-failed on a 200 body with success false", async () => {
