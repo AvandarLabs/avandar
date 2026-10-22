@@ -9,10 +9,7 @@ import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryData
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type {
-  VizConfig,
-  VizConfigRegistry,
-} from "$/models/vizs/VizConfig/VizConfig.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
 /**
  * Identifies the currently open saved dataset in the Data Explorer, if any.
@@ -61,7 +58,15 @@ export type DataExplorerAppState = {
    */
   nlPrompt: string | undefined;
 
-  vizConfig: VizConfig;
+  vizConfig: VizConfig.T;
+
+  /**
+   * A chart config restored from the URL, keyed by output names because a URL
+   * carries no column IDs. The first query result binds those names to the
+   * result's column IDs and clears this field. Until then, URL sync keeps
+   * writing it back unchanged, so a slow or failed query does not drop it.
+   */
+  pendingUrlVizConfig?: VizConfig.OutputNameKeyed;
 
   /**
    * The last config the user actually saw for each viz type, so switching
@@ -83,7 +88,7 @@ export type DataExplorerAppState = {
    * In-memory only: this state manager is never persisted, so a reload
    * starts empty.
    */
-  vizConfigMemory: Partial<VizConfigRegistry>;
+  vizConfigMemory: Partial<VizConfig.Registry>;
 
   /** The currently open saved dataset, or `undefined` if none is open. */
   openDataset: OpenDatasetInfo | undefined;

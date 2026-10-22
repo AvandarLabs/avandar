@@ -5,6 +5,7 @@ import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
 } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
+import { makeColumnIdVizConfigFromLegacyConfig } from "$/models/vizs/makeColumnIdVizConfigFromLegacyConfig/makeColumnIdVizConfigFromLegacyConfig";
 import { remapProvisionalColumnIdsInVizConfig } from "$/models/vizs/remapProvisionalColumnIdsInVizConfig/remapProvisionalColumnIdsInVizConfig";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
@@ -20,11 +21,7 @@ import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
-import type {
-  VizConfig,
-  VizConfigRegistry,
-  VizType,
-} from "$/models/vizs/VizConfig/VizConfig.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
@@ -170,7 +167,10 @@ export const DataExplorerStateManager = createAppStateManager({
      * Activates a visualization type while preserving its most recent config.
      * Returns state with a restored or hydrated config for the selected type.
      */
-    setActiveVizType: (state: DataExplorerAppState, newVizType: VizType) => {
+    setActiveVizType: (
+      state: DataExplorerAppState,
+      newVizType: VizConfig.Type,
+    ) => {
       const { vizConfig, query, rawSql, vizConfigMemory, lastResultColumns } =
         state;
 
@@ -200,25 +200,49 @@ export const DataExplorerStateManager = createAppStateManager({
       const nextVizConfigMemory = {
         ...vizConfigMemory,
         [vizConfig.vizType]: vizConfig,
-      } as Partial<VizConfigRegistry>;
+      } as Partial<VizConfig.Registry>;
 
       return {
         ...state,
         vizConfig: nextVizConfig,
         vizConfigMemory: nextVizConfigMemory,
+        pendingUrlVizConfig: undefined,
       };
     },
 
     /**
-     * Seeds unconfigured slots from completed bound metadata and preserves
-     * owned selections while their output is unavailable.
+     * Holds a chart config restored from the URL until a query result can bind
+     * its output names to column IDs. Shows an empty chart of the restored
+     * type meanwhile.
+     */
+    restoreVizConfigFromUrl: (
+      state: DataExplorerAppState,
+      urlVizConfig: VizConfig.OutputNameKeyed,
+    ): DataExplorerAppState => {
+      return {
+        ...state,
+        vizConfig: VizConfigs.makeEmptyConfig(urlVizConfig.vizType),
+        pendingUrlVizConfig: urlVizConfig,
+      };
+    },
+
+    /**
+     * Seeds unconfigured slots from the result's columns and preserves owned
+     * selections while their output is unavailable. A chart config restored
+     * from the URL is first bound to these columns by output name.
      */
     syncVizFromQueryResult: (
       state: DataExplorerAppState,
       columns: readonly QueryResult.ColumnWithId[],
     ) => {
+      const { pendingUrlVizConfig } = state;
       const next = applyVizConfigFromQueryResult({
-        vizConfig: state.vizConfig,
+        vizConfig: pendingUrlVizConfig
+          ? makeColumnIdVizConfigFromLegacyConfig({
+              config: pendingUrlVizConfig,
+              columns: columns,
+            }).config
+          : state.vizConfig,
         rawSql: state.rawSql,
         query: state.query,
         columns,
@@ -233,7 +257,7 @@ export const DataExplorerStateManager = createAppStateManager({
         state.vizConfig,
       );
 
-      if (!columnsChanged && !vizConfigChanged) {
+      if (!columnsChanged && !vizConfigChanged && !pendingUrlVizConfig) {
         return state;
       }
 
@@ -241,6 +265,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state,
         ...(vizConfigChanged ? { vizConfig: next } : {}),
         ...(columnsChanged ? { lastResultColumns: columns } : {}),
+        pendingUrlVizConfig: undefined,
       };
     },
 
@@ -269,13 +294,17 @@ export const DataExplorerStateManager = createAppStateManager({
             }),
           ];
         }),
-      ) as Partial<VizConfigRegistry>;
+      ) as Partial<VizConfig.Registry>;
       return { ...state, columnBindings, vizConfig, vizConfigMemory };
     },
 
-    setVizConfig: (state: DataExplorerAppState, vizConfig: VizConfig) => {
+    /** Applies an explicit chart edit, replacing any URL-restored chart. */
+    setVizConfig: (state: DataExplorerAppState, vizConfig: VizConfig.T) => {
       // fill in the defaults
-      return setValue(state, "vizConfig", vizConfig);
+      return {
+        ...setValue(state, "vizConfig", vizConfig),
+        pendingUrlVizConfig: undefined,
+      };
     },
 
     setRawSql: (state: DataExplorerAppState, rawSql: string | undefined) => {

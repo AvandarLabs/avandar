@@ -260,10 +260,11 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           dispatch.setOpenDataset(urlState.openDataset);
         }
 
-        // Restore viz config last: may overwrite the result of
-        // hydrateFromQuery that setColumns triggered above.
+        // Restore viz config last so it replaces the defaults that setColumns
+        // seeded above. The URL keys it by output name, so it stays pending
+        // until the first query result binds those names to column IDs.
         if (urlState.vizConfig) {
-          dispatch.setVizConfig(urlState.vizConfig);
+          dispatch.restoreVizConfigFromUrl(urlState.vizConfig);
         }
 
         // Stamped last on purpose. Stamping earlier would not survive: the

@@ -3,15 +3,14 @@ import {
   shouldDeferUrlHydrationForStructuredLoading,
   urlSearchHasHydrateableExplorerKeys,
 } from "@/views/DataExplorerApp/dataExplorerUrlHydration/dataExplorerUrlHydration";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { ParsedUrlState } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
-const _minimalBarViz: VizConfig = {
+const _minimalBarViz: VizConfig.OutputNameKeyed = {
   vizType: "bar",
-  xAxisKey: "a" as QueryColumn.Id,
-  series: [{ renderAs: "bar", key: "b" as QueryColumn.Id }],
+  xAxisKey: "a",
+  series: [{ renderAs: "bar", key: "b" }],
   layout: "group",
   withLegend: false,
 };
