@@ -37,14 +37,14 @@ function createLocalFilter(columnId: QueryColumn.Id): LocalFilter {
 export function LocalFiltersPField({ auth }: Props): ReactElement {
   const authoring = useDataVizAuthoring(auth);
   const filters =
-    authoring.props.bindingVersion === 0
+    authoring.props.columnBindingVersion === 0
       ? authoring.props.localFilters
-      : (authoring.resolved?.localFilters ?? []);
+      : (authoring.runtime?.localFilters ?? []);
   const columns = authoring.schema?.columns ?? [];
   const onChange = (
     localFilters: ReadonlyArray<LocalFilter | LegacyLocalFilter>,
   ): void => {
-    if (authoring.props.bindingVersion === 0) {
+    if (authoring.props.columnBindingVersion === 0) {
       const legacyFilters = localFilters.map((filter) => {
         if ("columnName" in filter) {
           return filter;

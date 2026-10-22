@@ -14,7 +14,7 @@ type PieAxesConfig = {
  */
 export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
   currVizConfig: VConfig,
-  columns: readonly QueryResult.BoundColumn[],
+  columns: readonly QueryResult.ColumnWithId[],
 ): VConfig {
   if (columns.length === 0) {
     return currVizConfig;

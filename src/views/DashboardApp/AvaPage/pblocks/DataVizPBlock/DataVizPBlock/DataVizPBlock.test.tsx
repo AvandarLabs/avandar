@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
+import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
 import { screen } from "@/test-utils";
 import { upgradeAvaPageData } from "../../../utils/upgradeAvaPageData";
 import { useDataVizPBlockConfig } from "../useDataVizPBlockConfig";
@@ -51,7 +51,7 @@ vi.mock(
       useDataVizColumnBindings: () => {
         return {
           status: "ready",
-          schema: reconcileResultBindings({
+          schema: reconcileResultColumnBindings({
             scopeKey: "chart",
             sqlKey: "SELECT * FROM foo",
             columns: [
@@ -350,7 +350,7 @@ it("converts the migrated top-level type picker and restores unresolved legacy s
     >[1],
   );
   expect(switched.props).toMatchObject({
-    bindingVersion: 0,
+    columnBindingVersion: 0,
     vizType: "bar",
     vizConfig: {
       vizType: "bar",
@@ -380,7 +380,7 @@ it("converts the migrated top-level type picker and restores unresolved legacy s
     >[1],
   );
   expect(restored.props).toMatchObject({
-    bindingVersion: 0,
+    columnBindingVersion: 0,
     vizConfig: original.vizConfig,
   });
 });

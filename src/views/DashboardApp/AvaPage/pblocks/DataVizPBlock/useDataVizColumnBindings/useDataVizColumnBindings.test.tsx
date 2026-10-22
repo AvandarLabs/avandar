@@ -1,12 +1,12 @@
 import { DataVizColumnBindingTestFixtures } from "./DataVizColumnBindingTestFixtures";
-import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 const {
   uuid,
   makeProjectionDescriptorsFromSql,
-  reconcileResultBindings,
+  reconcileResultColumnBindings,
   applyDashboardFiltersToSql,
-  makeBindingsFromDashboardFilters,
+  makeColumnBindingsFromDashboardFilters,
   act,
   renderHook,
   waitFor,
@@ -40,7 +40,7 @@ it("discovers unfiltered schema once while filter values change", async () => {
       ];
       const resolved =
         bindings.status === "ready"
-          ? makeBindingsFromDashboardFilters({
+          ? makeColumnBindingsFromDashboardFilters({
               filters,
               targets: {},
               columns: bindings.schema!.columns,
@@ -240,7 +240,7 @@ it("isolates cache entries by auth mode, revision, workspace, block, and query",
 it("retains a persisted region ID through a supported SQL alias edit", async () => {
   const sql = "SELECT region FROM sales";
   const columns = _createResult().columns;
-  const previous = reconcileResultBindings({
+  const previous = reconcileResultColumnBindings({
     scopeKey: "block-a",
     sqlKey: sql,
     columns,
@@ -271,7 +271,7 @@ it("retains a persisted region ID through a supported SQL alias edit", async () 
 });
 
 it("rediscovers when a saved registry belongs to another block", async () => {
-  const registry: ResultBindingRegistry = {
+  const registry: ResultColumnBindingRegistry = {
     version: 1,
     scopeKey: "other-block",
     sqlKey: "SELECT region FROM sales",
@@ -295,7 +295,7 @@ it("rediscovers when a saved registry belongs to another block", async () => {
 });
 
 it("shares stable new output IDs when a changed opaque query has a stale registry", async () => {
-  const registry: ResultBindingRegistry = {
+  const registry: ResultColumnBindingRegistry = {
     version: 1,
     scopeKey: "block-a",
     sqlKey: "SELECT old",
@@ -335,7 +335,7 @@ it("shares stable new output IDs when a changed opaque query has a stale registr
 });
 
 it("revalidates persisted empty metadata before enabling predicates", async () => {
-  const registry: ResultBindingRegistry = {
+  const registry: ResultColumnBindingRegistry = {
     version: 1,
     scopeKey: "block-a",
     sqlKey: "SELECT region FROM sales",

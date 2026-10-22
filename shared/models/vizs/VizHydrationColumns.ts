@@ -7,14 +7,14 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 export const VizHydrationColumns = {
   /** Returns the available result identities for membership checks. */
   getIdSet: (
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): Set<QueryColumn.Id> => {
     return new Set(columns.map(prop("id")));
   },
 
   /** Returns the first numeric identity, when one is available. */
   getFirstNumericColumnId: (
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): QueryColumn.Id | undefined => {
     return columns.find((column) => {
       return AvaDataType.isNumeric(column.dataType);
@@ -26,7 +26,7 @@ export const VizHydrationColumns = {
     columns,
     excludedIds,
   }: Readonly<{
-    columns: readonly QueryResult.BoundColumn[];
+    columns: readonly QueryResult.ColumnWithId[];
     excludedIds: ReadonlySet<QueryColumn.Id>;
   }>): QueryColumn.Id | undefined => {
     const available = columns.filter((column) => {

@@ -2,7 +2,7 @@ import { DataExplorerIdentityTestFixtures } from "./DataExplorerIdentityTestFixt
 import type { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
 const {
   QueryColumn,
-  makeResolvedVizConfigFromBoundConfig,
+  makeOutputNameVizConfigFromColumnIdConfig,
   act,
   expect,
   it,
@@ -45,7 +45,7 @@ it("keeps a styled series when its aggregation changes and another series surviv
     });
   });
 
-  const resolved = makeResolvedVizConfigFromBoundConfig({
+  const resolved = makeOutputNameVizConfigFromColumnIdConfig({
     config: result.current[0].vizConfig,
     columns: [
       { id: quarter.id, name: "quarter", dataType: "varchar" },
@@ -133,7 +133,7 @@ it("propagates scatter X-only and bubble size-only changes through the real prov
     return result.current[1].syncVizFromQueryResult(columns);
   });
   expect(
-    makeResolvedVizConfigFromBoundConfig({
+    makeOutputNameVizConfigFromColumnIdConfig({
       config: result.current[0].vizConfig,
       columns: columns,
     }).config,
@@ -161,7 +161,7 @@ it("propagates scatter X-only and bubble size-only changes through the real prov
     return result.current[1].syncVizFromQueryResult(columns);
   });
   expect(
-    makeResolvedVizConfigFromBoundConfig({
+    makeOutputNameVizConfigFromColumnIdConfig({
       config: result.current[0].vizConfig,
       columns: columns,
     }).config,

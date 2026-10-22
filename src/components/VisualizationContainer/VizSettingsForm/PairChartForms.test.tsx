@@ -14,7 +14,7 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types";
 
-const COLUMNS: readonly QueryResult.BoundColumn[] = [
+const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "spend" as QueryColumn.Id, name: "spend", dataType: "double" },
   { id: "revenue" as QueryColumn.Id, name: "revenue", dataType: "double" },
   { id: "weight" as QueryColumn.Id, name: "weight", dataType: "double" },

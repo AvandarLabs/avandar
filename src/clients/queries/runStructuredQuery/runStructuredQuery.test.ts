@@ -20,13 +20,13 @@ const {
   runQueryMock,
   publicRunQueryMock,
   getConceptExtensionMock,
-  resolveManualQueryForExecutionMock,
+  makeExecutableQueryFromManualQueryMock,
 } = vi.hoisted(() => {
   return {
     runQueryMock: vi.fn(),
     publicRunQueryMock: vi.fn(),
     getConceptExtensionMock: vi.fn(),
-    resolveManualQueryForExecutionMock: vi.fn(),
+    makeExecutableQueryFromManualQueryMock: vi.fn(),
   };
 });
 
@@ -47,10 +47,11 @@ vi.mock(
   },
 );
 vi.mock(
-  "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution",
+  "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery",
   () => {
     return {
-      resolveManualQueryForExecution: resolveManualQueryForExecutionMock,
+      makeExecutableQueryFromManualQuery:
+        makeExecutableQueryFromManualQueryMock,
     };
   },
 );
@@ -118,8 +119,8 @@ beforeEach(() => {
   // Mirrors the real resolver's behavior for queries that never trip the
   // large-dataset auto-limit guard, which is every query these tests use
   // unless a test overrides this default.
-  resolveManualQueryForExecutionMock.mockReset();
-  resolveManualQueryForExecutionMock.mockImplementation((params) => {
+  makeExecutableQueryFromManualQueryMock.mockReset();
+  makeExecutableQueryFromManualQueryMock.mockImplementation((params) => {
     return Promise.resolve({ query: params.query, didAutoLimit: false });
   });
 });
@@ -289,7 +290,7 @@ describe("runStructuredQueryWithMetadata", () => {
     // Set up to fail the assertion if the raw-SQL path ever starts consulting
     // the resolver. Passing `rawSql` means it must not, so the reported value
     // has to stay false even though the resolver would say otherwise.
-    resolveManualQueryForExecutionMock.mockResolvedValue({
+    makeExecutableQueryFromManualQueryMock.mockResolvedValue({
       query: StructuredQuery.makeEmpty(),
       didAutoLimit: true,
       rowCount: 900000,
@@ -309,11 +310,11 @@ describe("runStructuredQueryWithMetadata", () => {
       expect.objectContaining({ rawSql: executedSql }),
     );
     expect(didAutoLimit).toBe(false);
-    expect(resolveManualQueryForExecutionMock).not.toHaveBeenCalled();
+    expect(makeExecutableQueryFromManualQueryMock).not.toHaveBeenCalled();
   });
 
   it("reports true when the resolver bounded a large dataset", async () => {
-    resolveManualQueryForExecutionMock.mockResolvedValue({
+    makeExecutableQueryFromManualQueryMock.mockResolvedValue({
       query: { ...StructuredQuery.makeEmpty(), limit: 5000 },
       didAutoLimit: true,
       rowCount: 900000,

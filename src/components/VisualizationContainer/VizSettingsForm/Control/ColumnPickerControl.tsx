@@ -10,7 +10,7 @@ type Props = {
   /** Display label for the picker. */
   label: string;
   /** Columns the user can pick from. */
-  fields: readonly QueryResult.BoundColumn[];
+  fields: readonly QueryResult.ColumnWithId[];
   /**
    * Restricts the pickable columns to those whose data type matches. `any`
    * (or `undefined`) allows every column.

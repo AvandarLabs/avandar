@@ -35,7 +35,7 @@ describe("createDataVizBlock", () => {
     });
     expect(block.props.localFilters).toEqual([]);
     expect(block.props).toMatchObject({
-      bindingVersion: 1,
+      columnBindingVersion: 1,
       globalFilterTargets: {},
     });
     expect(block.props.columnBindings.scopeKey).toBe(block.props.id);

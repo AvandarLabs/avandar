@@ -5,7 +5,7 @@ import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
 } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
-import { rebindProvisionalVizConfig } from "$/models/vizs/rebindProvisionalVizConfig/rebindProvisionalVizConfig";
+import { remapProvisionalColumnIdsInVizConfig } from "$/models/vizs/remapProvisionalColumnIdsInVizConfig/remapProvisionalColumnIdsInVizConfig";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
@@ -17,7 +17,7 @@ import { DataExplorerSourceActions } from "./DataExplorerSourceActions";
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type {
@@ -215,7 +215,7 @@ export const DataExplorerStateManager = createAppStateManager({
      */
     syncVizFromQueryResult: (
       state: DataExplorerAppState,
-      columns: readonly QueryResult.BoundColumn[],
+      columns: readonly QueryResult.ColumnWithId[],
     ) => {
       const next = applyVizConfigFromQueryResult({
         vizConfig: state.vizConfig,
@@ -247,13 +247,13 @@ export const DataExplorerStateManager = createAppStateManager({
     /** Records the completed registry used by explicit save. */
     setColumnBindings: (
       state: DataExplorerAppState,
-      columnBindings: ResultBindingRegistry,
+      columnBindings: ResultColumnBindingRegistry,
     ) => {
       const previous = state.columnBindings;
       if (!previous) {
         return { ...state, columnBindings };
       }
-      const vizConfig = rebindProvisionalVizConfig({
+      const vizConfig = remapProvisionalColumnIdsInVizConfig({
         config: state.vizConfig,
         previous: previous,
         current: columnBindings,
@@ -262,7 +262,7 @@ export const DataExplorerStateManager = createAppStateManager({
         Object.entries(state.vizConfigMemory).map(([type, config]) => {
           return [
             type,
-            rebindProvisionalVizConfig({
+            remapProvisionalColumnIdsInVizConfig({
               config: config,
               previous: previous,
               current: columnBindings,

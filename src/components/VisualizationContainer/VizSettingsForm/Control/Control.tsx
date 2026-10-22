@@ -26,7 +26,7 @@ type Props = {
    * Columns available for `columnPicker` controls. Required when
    * `spec.kind === "columnPicker"`; ignored otherwise.
    */
-  fields?: readonly QueryResult.BoundColumn[];
+  fields?: readonly QueryResult.ColumnWithId[];
 };
 
 /**

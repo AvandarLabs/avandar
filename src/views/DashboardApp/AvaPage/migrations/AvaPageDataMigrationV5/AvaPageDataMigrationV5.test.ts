@@ -60,10 +60,12 @@ describe("AvaPage v5 bindings", () => {
     const upgraded = upgradeAvaPageData(document);
     expect(upgraded.root.props?.schemaVersion).toBe(5);
     expect(upgraded.content[0]?.props).toMatchObject({
-      content: [{ ...chart, props: { ...chart.props, bindingVersion: 0 } }],
+      content: [
+        { ...chart, props: { ...chart.props, columnBindingVersion: 0 } },
+      ],
     });
     expect(upgraded.zones?.["zone:content"]).toEqual([
-      { ...chart, props: { ...chart.props, bindingVersion: 0 } },
+      { ...chart, props: { ...chart.props, columnBindingVersion: 0 } },
     ]);
     expect(JSON.stringify(document)).toBe(original);
     expect(upgradeAvaPageData(upgraded)).toEqual(upgraded);
@@ -101,7 +103,7 @@ it("unwraps version-zero charts exactly and rejects missing persisted bound targ
         type: "DataViz",
         props: {
           ...upgraded.content[0]!.props,
-          bindingVersion: 1,
+          columnBindingVersion: 1,
           columnBindings: {
             version: 1,
             scopeKey: "chart",
@@ -110,7 +112,7 @@ it("unwraps version-zero charts exactly and rejects missing persisted bound targ
           },
           globalFilterTargets: {
             global: {
-              kind: "bound",
+              kind: "columnId",
               columnId: "missing",
               authoringColumnName: "region",
             },
@@ -133,7 +135,7 @@ it("downgrades bound chart and local targets using only persisted names", async 
         type: "DataViz",
         props: {
           id: "chart",
-          bindingVersion: 1,
+          columnBindingVersion: 1,
           nlQuery: {
             prompt: "",
             rawSql: "SELECT region, amount FROM sales",
@@ -176,7 +178,7 @@ it("downgrades bound chart and local targets using only persisted names", async 
           globalFilterSubscription: { mode: "all", subscribedFilterIds: [] },
           globalFilterTargets: {
             global: {
-              kind: "bound",
+              kind: "columnId",
               columnId: "region-id",
               authoringColumnName: "region",
             },
@@ -196,7 +198,9 @@ it("downgrades bound chart and local targets using only persisted names", async 
     localFilters: [{ columnName: "region", defaultValue: "North" }],
   });
   expect(downgraded.content[0]?.props).not.toHaveProperty("columnBindings");
-  expect(downgraded.content[0]?.props).not.toHaveProperty("bindingVersion");
+  expect(downgraded.content[0]?.props).not.toHaveProperty(
+    "columnBindingVersion",
+  );
 });
 
 it.each([["territory"], ["region", "territory"]])(
@@ -223,7 +227,7 @@ it.each([["territory"], ["region", "territory"]])(
             type: "DataViz",
             props: {
               id: `chart-${index}`,
-              bindingVersion: 1,
+              columnBindingVersion: 1,
               nlQuery: {
                 prompt: "",
                 rawSql: `SELECT region AS ${name} FROM sales`,
@@ -244,7 +248,7 @@ it.each([["territory"], ["region", "territory"]])(
               },
               globalFilterTargets: {
                 global: {
-                  kind: "bound",
+                  kind: "columnId",
                   columnId: `column-${index}`,
                   authoringColumnName: "region",
                 },

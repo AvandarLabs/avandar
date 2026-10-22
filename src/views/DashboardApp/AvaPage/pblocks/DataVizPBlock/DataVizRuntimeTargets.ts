@@ -1,6 +1,6 @@
 import { objectValuesMap } from "@avandar/utils";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
-import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/makeBindingsFromDashboardFilters/makeBindingsFromDashboardFilters";
+import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
 import type { QueryClient } from "@tanstack/react-query";
 
 type Scope = { id: string; auth: StructuredQueryAuth; rawSql: string };

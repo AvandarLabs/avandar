@@ -5,7 +5,7 @@ import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownDataFrame } from "@avandar/utils";
 
-const COLUMNS: readonly QueryResult.BoundColumn[] = [
+const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "category" as QueryColumn.Id, name: "category", dataType: "varchar" },
   { id: "value" as QueryColumn.Id, name: "value", dataType: "double" },
   { id: "score" as QueryColumn.Id, name: "score", dataType: "double" },

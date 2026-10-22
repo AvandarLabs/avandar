@@ -24,7 +24,7 @@ const DRAWER_REGION_ID = "data-explorer-drawer-region";
 
 type Props = {
   /** Columns of the current query result, used by the chart settings. */
-  columns: readonly QueryResult.BoundColumn[];
+  columns: readonly QueryResult.ColumnWithId[];
 
   /** Rows of the current query result, used by per-slice color controls. */
   data: UnknownDataFrame;

@@ -16,7 +16,7 @@ export type XYVizChartKind = "bar" | "line";
  */
 export function hydrateXYFromQueryResult<VConfig extends XYAxesConfig>(
   currVizConfig: VConfig,
-  columns: readonly QueryResult.BoundColumn[],
+  columns: readonly QueryResult.ColumnWithId[],
   _chartKind: XYVizChartKind,
 ): VConfig {
   if (columns.length === 0) {

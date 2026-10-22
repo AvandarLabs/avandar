@@ -15,7 +15,7 @@ export function synchronizeLegacyVizType(
   const vizType = props.vizType ?? vizConfig.vizType;
   const legacyProps = { ...props, vizConfig, vizType } as Extract<
     Props,
-    { bindingVersion: 0 }
+    { columnBindingVersion: 0 }
   >;
   if (changed.vizType && vizConfig.vizType !== vizType) {
     const memory = vizConfigMemory[blockId]?.legacy ?? {};

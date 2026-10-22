@@ -61,8 +61,8 @@ export function applyQueryChange(
  */
 export function isSameColumnSchema(
   options: Readonly<{
-    previousColumns: readonly QueryResult.BoundColumn[] | undefined;
-    currentColumns: readonly QueryResult.BoundColumn[];
+    previousColumns: readonly QueryResult.ColumnWithId[] | undefined;
+    currentColumns: readonly QueryResult.ColumnWithId[];
   }>,
 ): boolean {
   const { previousColumns, currentColumns } = options;

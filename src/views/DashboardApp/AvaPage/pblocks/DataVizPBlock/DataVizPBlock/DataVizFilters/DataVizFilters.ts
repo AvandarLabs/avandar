@@ -40,7 +40,7 @@ export type DataVizFilterProps = {
   localFilters: readonly LocalFilter[];
 };
 
-type ResolveSubscribedFilterIdsOptions = {
+type GetSubscribedFilterIdsFromSubscriptionOptions = {
   subscription: GlobalFilterSubscription;
   registeredFilters: readonly DashboardFilterRecord[];
 };
@@ -65,8 +65,8 @@ const DEFAULT_DATA_VIZ_FILTER_PROPS: DataVizFilterProps = {
   localFilters: [],
 };
 
-function _resolveSubscribedFilterIds(
-  options: Readonly<ResolveSubscribedFilterIdsOptions>,
+function _getSubscribedFilterIdsFromSubscription(
+  options: Readonly<GetSubscribedFilterIdsFromSubscriptionOptions>,
 ): string[] | undefined {
   return matchLiteral(options.subscription.mode, {
     all: () => {
@@ -141,8 +141,12 @@ export const DataVizFilters = {
   defaultGlobalFilterSubscription: DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
   /** Default filter properties used by new visualization blocks. */
   defaultDataVizFilterProps: DEFAULT_DATA_VIZ_FILTER_PROPS,
-  /** Returns active dashboard-filter identifiers for a visualization. */
-  resolveSubscribedFilterIds: _resolveSubscribedFilterIds,
+  /**
+   * Returns the dashboard filter IDs a chart's subscription accepts, or
+   * `undefined` when it accepts every filter.
+   */
+  getSubscribedFilterIdsFromSubscription:
+    _getSubscribedFilterIdsFromSubscription,
   /** Returns normalized selection options from comma-separated input. */
   parseLocalFilterOptions: _parseLocalFilterOptions,
   /** Returns the viewer value encoded by a local filter default. */

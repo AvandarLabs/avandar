@@ -8,7 +8,7 @@ export function getColumnIdFromLegacyName({
   columns,
 }: Readonly<{
   name: string;
-  columns: readonly QueryResult.BoundColumn[];
+  columns: readonly QueryResult.ColumnWithId[];
 }>): QueryColumn.Id | undefined {
   const exact = columns.filter(propEq("name", name));
   if (exact.length > 0) {

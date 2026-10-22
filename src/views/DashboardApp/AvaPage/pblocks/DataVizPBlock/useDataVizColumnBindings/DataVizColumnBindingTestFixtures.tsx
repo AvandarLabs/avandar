@@ -7,10 +7,10 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
-import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
+import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
-import { makeBindingsFromDashboardFilters } from "@/views/DashboardApp/DashboardFilterStateManager/makeBindingsFromDashboardFilters/makeBindingsFromDashboardFilters";
+import { makeColumnBindingsFromDashboardFilters } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
 import { useDataVizColumnBindings } from "./useDataVizColumnBindings";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -88,9 +88,9 @@ beforeEach(() => {
 export const DataVizColumnBindingTestFixtures = {
   uuid,
   makeProjectionDescriptorsFromSql,
-  reconcileResultBindings,
+  reconcileResultColumnBindings,
   applyDashboardFiltersToSql,
-  makeBindingsFromDashboardFilters,
+  makeColumnBindingsFromDashboardFilters,
   act,
   renderHook,
   waitFor,

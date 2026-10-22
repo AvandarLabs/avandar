@@ -14,7 +14,7 @@ import { render } from "@/test-utils";
  */
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
-type BarChartVizConfig = Extract<VizConfig.Resolved, { vizType: "bar" }>;
+type BarChartVizConfig = Extract<VizConfig.OutputNameKeyed, { vizType: "bar" }>;
 
 const mantineBarChartMock = vi.fn();
 

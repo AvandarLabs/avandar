@@ -14,7 +14,7 @@ export function hydrateScatterSeriesFromQueryResult<
   VConfig extends ScatterSeriesConfig,
 >(
   currVizConfig: VConfig,
-  columns: readonly QueryResult.BoundColumn[],
+  columns: readonly QueryResult.ColumnWithId[],
 ): VConfig {
   if (columns.length === 0) {
     return currVizConfig;

@@ -108,7 +108,7 @@ describe("makeDataVizPBlockStateFromProps", () => {
 
   it("leaves props untouched when nothing relevant has changed", () => {
     const props: DataVizPBlockProps = {
-      bindingVersion: 1,
+      columnBindingVersion: 1,
       columnBindings: {
         version: 1,
         scopeKey: "block-1",

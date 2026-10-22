@@ -63,7 +63,7 @@ const data: AvaPageData = {
       type: "DataViz",
       props: {
         id: "film-district-chart",
-        bindingVersion: 1,
+        columnBindingVersion: 1,
         columnBindings: {
           version: 1,
           scopeKey: "film-district-chart",

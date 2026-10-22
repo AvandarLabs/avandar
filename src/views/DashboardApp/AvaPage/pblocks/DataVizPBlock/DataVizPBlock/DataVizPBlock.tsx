@@ -7,11 +7,11 @@ import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFil
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import { makeQueryAuthFromAvaPageMetadata } from "../makeQueryAuthFromAvaPageMetadata";
 import { useRefreshDataVizColumnBindings } from "../useDataVizColumnBindings/useRefreshDataVizColumnBindings";
-import { useResolvedDataVizBindings } from "../useResolvedDataVizBindings/useResolvedDataVizBindings";
+import { useDataVizRuntimeColumnBindings } from "../useDataVizRuntimeColumnBindings/useDataVizRuntimeColumnBindings";
 import { DataVizContent } from "./DataVizContent";
 import { useLocalFilterState } from "./useLocalFilterState";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
-import type { DataVizBindingProps } from "../makeSavedBindingsFromDataVizProps/makeSavedBindingsFromDataVizProps";
+import type { DataVizColumnBindingProps } from "../makeSavedColumnBindingsFromDataVizProps/makeSavedColumnBindingsFromDataVizProps";
 import type { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import type { WithPuckProps } from "@puckeditor/core";
 import type { ReactElement } from "react";
@@ -20,7 +20,7 @@ import type { ReactElement } from "react";
 export type Props = {
   nlQuery: NLQuery;
   vizType: VizConfig.Type;
-} & DataVizBindingProps;
+} & DataVizColumnBindingProps;
 
 /** Renders a saved chart with its local and subscribed dashboard filters. */
 export function DataVizPBlock(
@@ -28,13 +28,16 @@ export function DataVizPBlock(
 ): ReactElement {
   const metadata = useAvaPageMetadata(props.puck);
   const auth = makeQueryAuthFromAvaPageMetadata(metadata);
-  const bindings = useResolvedDataVizBindings({ props: props, auth: auth });
-  const localFilters = bindings.resolved?.localFilters ?? [];
+  const columnBindings = useDataVizRuntimeColumnBindings({
+    props: props,
+    auth: auth,
+  });
+  const localFilters = columnBindings.runtime?.localFilters ?? [];
   const localFilterState = useLocalFilterState(localFilters);
   const filteredSql = useApplyDashboardFiltersToSql({
     rawSql: props.nlQuery.rawSql,
-    columns: bindings.schema?.columns,
-    globalFilters: bindings.resolved?.global.resolvedFilters ?? [],
+    columns: columnBindings.schema?.columns,
+    globalFilters: columnBindings.runtime?.global.resolvedFilters ?? [],
     localFilters,
     localFilterState,
   });
@@ -44,7 +47,7 @@ export function DataVizPBlock(
   const [result, isLoading, query] = useDataQuery({
     query: emptyQuery,
     rawSql: filteredSql,
-    enabled: bindings.status === "ready",
+    enabled: columnBindings.status === "ready",
     analyticsSurface: "dashboard_block",
     ...auth,
   });
@@ -57,21 +60,21 @@ export function DataVizPBlock(
     isSuccess:
       query.isSuccess &&
       query.fetchStatus === "idle" &&
-      bindings.status === "ready",
+      columnBindings.status === "ready",
   });
-  const columns = bindings.schema?.columns ?? [];
+  const columns = columnBindings.schema?.columns ?? [];
   const data = result?.data ?? [];
   return (
     <DataVizContent
       prompt={props.nlQuery.prompt}
       rawSql={props.nlQuery.rawSql}
-      isLoading={isLoading || bindings.status === "loading"}
+      isLoading={isLoading || columnBindings.status === "loading"}
       columns={columns}
       rawColumns={result?.columns ?? []}
       data={data}
       dateColumns={getDateColumns(columns, data)}
       displayVizConfig={
-        bindings.resolved?.runtimeConfig ??
+        columnBindings.runtime?.runtimeConfig ??
         VizConfigs.makeEmptyConfig(props.vizType)
       }
       filterProps={{
@@ -80,7 +83,7 @@ export function DataVizPBlock(
       }}
       localFilterState={localFilterState}
       queryErrorMessage={
-        bindings.error?.message ??
+        columnBindings.error?.message ??
         (query.isError ? query.error.message : undefined)
       }
     />

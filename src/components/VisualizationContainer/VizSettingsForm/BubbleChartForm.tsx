@@ -9,7 +9,7 @@ import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 
 type Props = {
-  fields: readonly QueryResult.BoundColumn[];
+  fields: readonly QueryResult.ColumnWithId[];
   config: BubbleChartVizConfig;
   onConfigChange: (newConfig: BubbleChartVizConfig) => void;
 

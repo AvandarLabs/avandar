@@ -121,7 +121,7 @@ export const BarChartVizConfigs = {
 
   hydrateFromQueryResult: (
     vizConfig: BarChartVizConfig,
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): BarChartVizConfig => {
     return hydrateXYSeriesFromQueryResult(vizConfig, columns, "bar");
   },

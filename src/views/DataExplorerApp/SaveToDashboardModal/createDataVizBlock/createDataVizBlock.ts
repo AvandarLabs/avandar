@@ -1,6 +1,6 @@
 import { uuid } from "$/lib/uuid";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type {
   VizConfig,
   VizType,
@@ -9,11 +9,11 @@ import type {
   GlobalFilterSubscription,
   LocalFilter,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/makeBindingsFromDashboardFilters/makeBindingsFromDashboardFilters";
+import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
 type DataVizDashboardBlockProps = {
   id: string;
-  bindingVersion: 1;
-  columnBindings: ResultBindingRegistry;
+  columnBindingVersion: 1;
+  columnBindings: ResultColumnBindingRegistry;
   globalFilterTargets: DashboardFilterTargets;
   nlQuery: {
     prompt: string;
@@ -27,7 +27,7 @@ type DataVizDashboardBlockProps = {
 };
 
 type CreateDataVizBlockOptions = {
-  columnBindings: ResultBindingRegistry;
+  columnBindings: ResultColumnBindingRegistry;
   rawSql: string;
   prompt: string | undefined;
   vizType: VizType;
@@ -78,7 +78,7 @@ export function createDataVizBlock(
     type: "DataViz",
     props: {
       id,
-      bindingVersion: 1,
+      columnBindingVersion: 1,
       columnBindings: { ...args.columnBindings, scopeKey: id },
       globalFilterTargets: {},
       nlQuery: {

@@ -1,6 +1,6 @@
 import { useQuery } from "@avandar/query-hooks";
 import { DataVizColumnBindings } from "../DataVizColumnBindings";
-import type { BoundResultSchema } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { ResultColumnBindings } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { DataVizColumnBindingsOptions } from "../DataVizColumnBindings";
 
 /** Shares unfiltered schema readiness before chart predicates can execute. */
@@ -8,7 +8,7 @@ export function useDataVizColumnBindings(
   options: Readonly<DataVizColumnBindingsOptions>,
 ): {
   status: "loading" | "ready" | "error";
-  schema: BoundResultSchema | undefined;
+  schema: ResultColumnBindings | undefined;
   error: Error | undefined;
 } {
   const discovery = DataVizColumnBindings.getQueryOptions(options);

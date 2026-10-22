@@ -5,7 +5,7 @@ import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardC
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
-import { DashboardBindingPreparation } from "@/views/DashboardApp/AvaPage/utils/DashboardBindingPreparation/DashboardBindingPreparation";
+import { DashboardColumnBindingPreparation } from "@/views/DashboardApp/AvaPage/utils/DashboardColumnBindingPreparation/DashboardColumnBindingPreparation";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
@@ -103,7 +103,7 @@ function useSaveDashboard(
   const { dashboardTitle } = options;
   return useCallback(
     (savedData: AvaPageData): void => {
-      void DashboardBindingPreparation.prepareDocument({
+      void DashboardColumnBindingPreparation.prepareDocument({
         data: savedData,
         auth: { auth: "workspace", workspaceId },
         queryClient: queryClient,

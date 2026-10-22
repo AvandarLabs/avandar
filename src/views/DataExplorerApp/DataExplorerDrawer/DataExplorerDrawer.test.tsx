@@ -40,7 +40,7 @@ vi.mock("@/views/DataExplorerApp/SqlQueryView/SqlQueryView", () => {
   };
 });
 
-const COLUMNS: readonly QueryResult.BoundColumn[] = [
+const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "county" as QueryColumn.Id, name: "county", dataType: "varchar" },
   {
     id: "population" as QueryColumn.Id,
@@ -55,7 +55,7 @@ const DATA: UnknownDataFrame = [
 ];
 
 function _renderDrawer(
-  options: { columns?: readonly QueryResult.BoundColumn[] } = {},
+  options: { columns?: readonly QueryResult.ColumnWithId[] } = {},
 ): void {
   const { columns = COLUMNS } = options;
   render(

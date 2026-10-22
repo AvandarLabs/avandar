@@ -57,7 +57,7 @@ export function makeDataVizPBlockStateFromProps(options: {
     return { props: props as DataVizPBlockProps, vizConfigMemory };
   }
 
-  if (props.bindingVersion === 0) {
+  if (props.columnBindingVersion === 0) {
     return synchronizeLegacyVizType({
       props,
       changed,
@@ -65,27 +65,27 @@ export function makeDataVizPBlockStateFromProps(options: {
       vizConfigMemory,
     });
   }
-  const boundProps = props as Partial<
-    Extract<DataVizPBlockProps, { bindingVersion: 1 }>
+  const columnIdProps = props as Partial<
+    Extract<DataVizPBlockProps, { columnBindingVersion: 1 }>
   >;
-  const nextProps: Extract<DataVizPBlockProps, { bindingVersion: 1 }> = {
-    bindingVersion: 1,
-    columnBindings: boundProps.columnBindings ?? {
+  const nextProps: Extract<DataVizPBlockProps, { columnBindingVersion: 1 }> = {
+    columnBindingVersion: 1,
+    columnBindings: columnIdProps.columnBindings ?? {
       version: 1,
       scopeKey: blockId,
       sqlKey: "",
       columns: [],
     },
-    globalFilterTargets: boundProps.globalFilterTargets ?? {},
-    nlQuery: boundProps.nlQuery ?? DEFAULT_NL_QUERY,
-    vizType: boundProps.vizType ?? DEFAULT_VIZ_TYPE,
+    globalFilterTargets: columnIdProps.globalFilterTargets ?? {},
+    nlQuery: columnIdProps.nlQuery ?? DEFAULT_NL_QUERY,
+    vizType: columnIdProps.vizType ?? DEFAULT_VIZ_TYPE,
     vizConfig:
-      boundProps.vizConfig ??
-      VizConfigs.makeEmptyConfig(boundProps.vizType ?? DEFAULT_VIZ_TYPE),
+      columnIdProps.vizConfig ??
+      VizConfigs.makeEmptyConfig(columnIdProps.vizType ?? DEFAULT_VIZ_TYPE),
     globalFilterSubscription:
-      boundProps.globalFilterSubscription ??
+      columnIdProps.globalFilterSubscription ??
       DataVizFilters.defaultGlobalFilterSubscription,
-    localFilters: boundProps.localFilters ?? [],
+    localFilters: columnIdProps.localFilters ?? [],
   };
 
   if (changed.vizType && nextProps.vizConfig.vizType !== nextProps.vizType) {

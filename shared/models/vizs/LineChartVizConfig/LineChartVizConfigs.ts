@@ -122,7 +122,7 @@ export const LineChartVizConfigs = {
 
   hydrateFromQueryResult: (
     vizConfig: LineChartVizConfig,
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): LineChartVizConfig => {
     return hydrateXYSeriesFromQueryResult(vizConfig, columns, "line");
   },

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
+import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
 import { harness } from "@/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.mocks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
@@ -42,7 +42,7 @@ export function DataExplorerStandIn(): React.ReactNode {
     function syncVizFromQueryResult() {
       if (!isLoadingResults && queryResults?.columns) {
         dispatch.syncVizFromQueryResult(
-          reconcileResultBindings({
+          reconcileResultColumnBindings({
             scopeKey: "chat-test",
             sqlKey: state.rawSql ?? "",
             columns: queryResults.columns,

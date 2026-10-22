@@ -29,7 +29,7 @@ export const DASHBOARD_NAME = "Video - Harborfield response overview - pilot";
 export const DASHBOARD_SQL = EXPLORER_AGGREGATE_SQL;
 
 /** Column metadata for the saved chart, matching `EXPLORER_DISTRICT_COUNTS`. */
-export const chartColumns: QueryResult.BoundColumn[] = [
+export const chartColumns: QueryResult.ColumnWithId[] = [
   {
     id: "film-district" as QueryColumn.Id,
     name: "district_name",

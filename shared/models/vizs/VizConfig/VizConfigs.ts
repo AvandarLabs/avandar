@@ -108,7 +108,7 @@ export const VizConfigs = {
    */
   hydrateFromQueryResult: <VType extends VizType>(
     vizConfig: VizConfigType<VType>,
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): VizConfigType<VType> => {
     const vizUtils = _getVizTypeModule(vizConfig.vizType as VType);
     return vizUtils.hydrateFromQueryResult(vizConfig, columns);

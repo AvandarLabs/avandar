@@ -47,7 +47,7 @@ export function ManualQueryFormView({
     dismissLargeDatasetLimitHint,
   } = useManualQueryDataSourceChange({ query, handlers });
   const {
-    boundFilters,
+    columnIdFilters,
     pendingFilters,
     onFiltersChange,
     onOverwrite,
@@ -86,10 +86,10 @@ export function ManualQueryFormView({
 
   const filterFields = (
     <Stack gap="xs">
-      <AppliedFilterSummary filters={boundFilters} />
+      <AppliedFilterSummary filters={columnIdFilters} />
       <QueryFiltersField
         columns={dataSourceColumns}
-        value={boundFilters}
+        value={columnIdFilters}
         onChange={onFiltersChange}
       />
     </Stack>

@@ -45,7 +45,7 @@ export const PieChartVizConfigs = {
 
   hydrateFromQueryResult: (
     vizConfig: PieChartVizConfig,
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): PieChartVizConfig => {
     return hydratePieFromQueryResult(vizConfig, columns);
   },

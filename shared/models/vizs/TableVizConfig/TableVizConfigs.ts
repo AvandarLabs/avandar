@@ -31,7 +31,7 @@ export const TableVizConfigs = {
 
   hydrateFromQueryResult: (
     vizConfig: TableVizConfig,
-    _columns: readonly QueryResult.BoundColumn[],
+    _columns: readonly QueryResult.ColumnWithId[],
   ): TableVizConfig => {
     return vizConfig;
   },

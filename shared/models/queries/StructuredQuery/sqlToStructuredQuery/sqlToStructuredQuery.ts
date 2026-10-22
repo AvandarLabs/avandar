@@ -13,7 +13,7 @@ import { Parser } from "node-sql-parser";
  * "approximation only" badge.
  *
  * This orchestrator wires together the focused helpers in this directory:
- * `sqlAstReaders` (low-level AST value readers), `resolveFromClause`
+ * `sqlAstReaders` (low-level AST value readers), `parseFromClause`
  * (FROM/JOIN), and `parseFilterClauses` (WHERE/HAVING), plus a few small
  * private column/result helpers below.
  */
@@ -26,9 +26,9 @@ import {
   parseHavingNode,
   parseWhereNode,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFilterClauses.ts";
+import { parseFromClause } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFromClause.ts";
 import { parseSqlProjectionColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseSqlProjectionColumns.ts";
 import { reconcileParsedColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/reconcileParsedColumns.ts";
-import { resolveFrom } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/resolveFromClause.ts";
 import { columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
@@ -128,7 +128,11 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   }
 
   // Resolve FROM clause (base + joins + optional nested subquery)
-  const fromResolution = resolveFrom(ast.from, input.datasets, unmappedReasons);
+  const fromResolution = parseFromClause(
+    ast.from,
+    input.datasets,
+    unmappedReasons,
+  );
   if (!fromResolution) {
     return _makeUnmappedResult(unmappedReasons);
   }
@@ -299,25 +303,25 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     }
   }
 
-  const boundFilters = normalizeQueryFilters({
+  const columnIdFilters = normalizeQueryFilters({
     filter: filters,
     columns: sourceColumns,
     clause: "where",
   });
-  const boundHaving = normalizeQueryFilters({
+  const columnIdHaving = normalizeQueryFilters({
     filter: having,
     columns: queryColumns.filter((column) => {
       return column.aggregation !== "none" && column.aggregation !== undefined;
     }),
     clause: "having",
   });
-  boundFilters.issues.forEach(() => {
+  columnIdFilters.issues.forEach(() => {
     return unmappedReasons.push({
       code: "whereUnsupportedNode",
       nodeType: "unresolved column",
     });
   });
-  boundHaving.issues.forEach(() => {
+  columnIdHaving.issues.forEach(() => {
     return unmappedReasons.push({
       code: "havingUnsupportedNode",
       nodeType: "unresolved projection",
@@ -334,8 +338,8 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     orderByColumn,
     orderByDirection,
     aggregations,
-    filters: boundFilters.filter,
-    having: boundHaving.filter,
+    filters: columnIdFilters.filter,
+    having: columnIdHaving.filter,
     joins,
     offset,
     limit,

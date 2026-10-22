@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
+import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen } from "@/test-utils";
 import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
@@ -45,7 +45,7 @@ vi.mock("@puckeditor/core", () => {
     },
   };
 });
-const schema = reconcileResultBindings({
+const schema = reconcileResultColumnBindings({
   scopeKey: "viz-block",
   sqlKey: "SELECT * FROM foo",
   columns: [
@@ -100,7 +100,7 @@ function _renderField(props: RenderFieldOptions): {
   const onChange = vi.fn();
   editor.selectedItem.props = {
     id: "viz-block",
-    bindingVersion: props.legacy ? 0 : 1,
+    columnBindingVersion: props.legacy ? 0 : 1,
     nlQuery: {
       prompt: "find data",
       rawSql: "SELECT * FROM foo",
@@ -189,7 +189,7 @@ describe("VizConfigPField", () => {
         type: "replace",
         data: expect.objectContaining({
           props: expect.objectContaining({
-            bindingVersion: 1,
+            columnBindingVersion: 1,
             columnBindings: schema.registry,
             vizConfig: expect.objectContaining({
               vizType: "bar",
@@ -221,7 +221,7 @@ it("preserves unresolved legacy siblings when an existing field explicitly chang
     expect.objectContaining({
       data: expect.objectContaining({
         props: expect.objectContaining({
-          bindingVersion: 0,
+          columnBindingVersion: 0,
           vizConfig: { ...original, xAxisKey: "category" },
         }),
       }),
@@ -235,7 +235,7 @@ it("preserves unresolved legacy siblings when an existing field explicitly chang
     expect.objectContaining({
       data: expect.objectContaining({
         props: expect.objectContaining({
-          bindingVersion: 0,
+          columnBindingVersion: 0,
           vizConfig: {
             ...original,
             series: [
@@ -284,7 +284,7 @@ it("edits legacy local controls without discarding an unresolved sibling", () =>
     expect.objectContaining({
       data: expect.objectContaining({
         props: expect.objectContaining({
-          bindingVersion: 0,
+          columnBindingVersion: 0,
           localFilters: [
             { ...localFilters[0], label: "Updated" },
             localFilters[1],
@@ -301,7 +301,7 @@ it("edits legacy local controls without discarding an unresolved sibling", () =>
     expect.objectContaining({
       data: expect.objectContaining({
         props: expect.objectContaining({
-          bindingVersion: 0,
+          columnBindingVersion: 0,
           localFilters: [
             { ...localFilters[0], columnName: "category" },
             localFilters[1],

@@ -10,7 +10,7 @@ import type { SettingsColumnsLayout } from "@/components/SettingsColumns/Setting
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
-  columns: readonly QueryResult.BoundColumn[];
+  columns: readonly QueryResult.ColumnWithId[];
   data: UnknownDataFrame;
 
   /** Current visualization config. */

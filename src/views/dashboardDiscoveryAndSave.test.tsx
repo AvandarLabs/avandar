@@ -1,4 +1,4 @@
-import { DashboardBindingTestFixtures } from "./dashboardBindings/DashboardBindingTestFixtures";
+import { DashboardColumnBindingTestFixtures } from "./dashboardColumnBindings/DashboardColumnBindingTestFixtures";
 const {
   QueryResult,
   withDuckDb,
@@ -8,14 +8,14 @@ const {
   waitFor,
   expect,
   it,
-  useResolvedDataVizBindings,
-  DashboardBindingPreparation,
+  useDataVizRuntimeColumnBindings,
+  DashboardColumnBindingPreparation,
   mocks,
   AUTH,
   _createProps,
   _createWrapper,
   _renderBlock,
-} = DashboardBindingTestFixtures;
+} = DashboardColumnBindingTestFixtures;
 
 it("revalidates a saved SELECT star before executing a removed target and saving current types", async () => {
   await withDuckDb(async (connection) => {
@@ -56,7 +56,7 @@ it("revalidates a saved SELECT star before executing a removed target and saving
     const view = _renderBlock({ props: props, wrapper: wrapper });
     const picker = renderHook(
       () => {
-        return useResolvedDataVizBindings({ props: props, auth: AUTH });
+        return useDataVizRuntimeColumnBindings({ props: props, auth: AUTH });
       },
       {
         wrapper,
@@ -77,9 +77,9 @@ it("revalidates a saved SELECT star before executing a removed target and saving
       { name: "territory", dataType: "varchar" },
       { name: "amount", dataType: "double" },
     ]);
-    expect(picker.result.current.resolved?.global.resolvedFilters).toEqual([]);
+    expect(picker.result.current.runtime?.global.resolvedFilters).toEqual([]);
     expect(JSON.stringify(props)).toBe(original);
-    const saved = await DashboardBindingPreparation.prepareChart({
+    const saved = await DashboardColumnBindingPreparation.prepareChart({
       props: props,
       auth: AUTH,
       queryClient: client,
@@ -93,7 +93,7 @@ it("revalidates a saved SELECT star before executing a removed target and saving
         ],
       },
       globalFilterTargets:
-        props.bindingVersion === 1 ? props.globalFilterTargets : {},
+        props.columnBindingVersion === 1 ? props.globalFilterTargets : {},
     });
     view.unmount();
     picker.unmount();
@@ -129,7 +129,7 @@ it("shares successful execution metadata with settings and explicit save", async
   const view = _renderBlock({ props: props, wrapper: wrapper });
   const picker = renderHook(
     () => {
-      return useResolvedDataVizBindings({ props: props, auth: AUTH });
+      return useDataVizRuntimeColumnBindings({ props: props, auth: AUTH });
     },
     {
       wrapper,
@@ -146,7 +146,7 @@ it("shares successful execution metadata with settings and explicit save", async
     '"name":"added","dataType":"date"',
   );
   expect(JSON.stringify(props)).toBe(original);
-  const saved = await DashboardBindingPreparation.prepareChart({
+  const saved = await DashboardColumnBindingPreparation.prepareChart({
     props: props,
     auth: AUTH,
     queryClient: client,

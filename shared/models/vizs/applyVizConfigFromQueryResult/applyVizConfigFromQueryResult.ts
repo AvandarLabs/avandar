@@ -6,7 +6,7 @@ type ApplyVizConfigFromQueryResultOptions = {
   vizConfig: VizConfig.T;
   rawSql: string | undefined;
   query: StructuredQuery.Partial;
-  columns: readonly QueryResult.BoundColumn[];
+  columns: readonly QueryResult.ColumnWithId[];
 };
 
 /** Compares every configured slot and style before emitting a state update. */

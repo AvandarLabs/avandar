@@ -43,7 +43,7 @@ function renderBlock(props: RenderBlockOptions): ReactElement {
         <DashboardFilterStateManager.Provider>
           <DataVizPBlock
             id="chart"
-            bindingVersion={0}
+            columnBindingVersion={0}
             puck={fakePuckContext()}
             nlQuery={{
               prompt: props.prompt,

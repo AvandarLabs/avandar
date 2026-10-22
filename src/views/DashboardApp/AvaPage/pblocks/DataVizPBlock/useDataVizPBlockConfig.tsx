@@ -11,7 +11,7 @@ import { useGlobalFilterSubscriptionPFieldConfig } from "@/views/DashboardApp/Av
 import { useLocalFiltersPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/useLocalFiltersPFieldConfig";
 import { useNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig";
 import { useVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig";
-import { DashboardBindingPreparation } from "../../utils/DashboardBindingPreparation/DashboardBindingPreparation";
+import { DashboardColumnBindingPreparation } from "../../utils/DashboardColumnBindingPreparation/DashboardColumnBindingPreparation";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaPageConfig } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
@@ -22,7 +22,7 @@ import type { RefObject } from "react";
 const DEFAULT_VIZ_TYPE = "table" as const;
 
 const defaultProps: DataVizPBlockProps = {
-  bindingVersion: 1,
+  columnBindingVersion: 1,
   columnBindings: { version: 1, scopeKey: "", sqlKey: "", columns: [] },
   globalFilterTargets: {},
   nlQuery: {
@@ -37,7 +37,7 @@ const defaultProps: DataVizPBlockProps = {
 };
 
 type DataVizPBlockConfigOptions = {
-  prepareBindings: (
+  prepareColumnBindings: (
     props: DataVizPBlockProps & { id: string },
   ) => Promise<DataVizPBlockProps>;
   label: string;
@@ -94,10 +94,13 @@ function _getDataVizPBlockConfig(
       return {
         props:
           trigger === "load" ||
-          props.bindingVersion === 0 ||
+          props.columnBindingVersion === 0 ||
           !props.nlQuery.rawSql.trim()
             ? props
-            : await options.prepareBindings({ ...props, id: data.props.id }),
+            : await options.prepareColumnBindings({
+                ...props,
+                id: data.props.id,
+              }),
       };
     },
     // Puck maps branded strings as objects. Runtime serialized IDs remain
@@ -150,8 +153,8 @@ export function useDataVizPBlockConfig(
 
   return useMemo(() => {
     return _getDataVizPBlockConfig({
-      prepareBindings: (props) => {
-        return DashboardBindingPreparation.prepareChart({
+      prepareColumnBindings: (props) => {
+        return DashboardColumnBindingPreparation.prepareChart({
           props: props,
           auth: auth,
           queryClient: queryClient,

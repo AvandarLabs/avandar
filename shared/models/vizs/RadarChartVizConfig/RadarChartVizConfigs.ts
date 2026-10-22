@@ -90,7 +90,7 @@ export const RadarChartVizConfigs = {
 
   hydrateFromQueryResult: (
     vizConfig: RadarChartVizConfig,
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): RadarChartVizConfig => {
     return hydrateRadarSeriesFromQueryResult(vizConfig, columns);
   },

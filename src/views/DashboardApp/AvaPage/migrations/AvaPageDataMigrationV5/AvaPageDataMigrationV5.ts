@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { makeResolvedVizConfigFromBoundConfig } from "$/models/vizs/makeResolvedVizConfigFromBoundConfig/makeResolvedVizConfigFromBoundConfig";
+import { makeOutputNameVizConfigFromColumnIdConfig } from "$/models/vizs/makeOutputNameVizConfigFromColumnIdConfig/makeOutputNameVizConfigFromColumnIdConfig";
 import { transformAvaPageProps } from "../../utils/makeTraversalConfigFromAvaPageData/transformAvaPageProps";
 import type { AvaPageDataMigration } from "../AvaPageDataMigrator";
 import type {
@@ -12,18 +12,18 @@ import type {
 function _downgradeChart(
   props: V5_PBlockPropsRegistry["DataViz"],
 ): Record<string, unknown> {
-  if (props.bindingVersion === 0) {
-    const { bindingVersion: _version, ...legacy } = props;
+  if (props.columnBindingVersion === 0) {
+    const { columnBindingVersion: _version, ...legacy } = props;
     return legacy;
   }
   const {
-    bindingVersion: _version,
+    columnBindingVersion: _version,
     columnBindings,
     globalFilterTargets,
     ...rest
   } = props;
   Object.values(globalFilterTargets).forEach((target) => {
-    if (target.kind !== "bound") {
+    if (target.kind !== "columnId") {
       return;
     }
     const column = columnBindings.columns.find(propEq("id", target.columnId));
@@ -38,7 +38,7 @@ function _downgradeChart(
       );
     }
   });
-  const resolved = makeResolvedVizConfigFromBoundConfig({
+  const resolved = makeOutputNameVizConfigFromColumnIdConfig({
     config: props.vizConfig,
     columns: columnBindings.columns,
   });
@@ -75,7 +75,7 @@ export const AvaPageDataMigrationV5 = {
         DataViz: (props) => {
           return {
             ...props,
-            bindingVersion: 0,
+            columnBindingVersion: 0,
           } as V5_PBlockPropsRegistry["DataViz"];
         },
       },

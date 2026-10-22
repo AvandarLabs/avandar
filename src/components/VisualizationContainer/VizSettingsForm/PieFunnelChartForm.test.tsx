@@ -13,17 +13,17 @@ import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChart
 i18n.load("en", {});
 i18n.activate("en");
 
-const fields: readonly QueryResult.BoundColumn[] = [
+const fields: readonly QueryResult.ColumnWithId[] = [
   {
     id: "region" as QueryColumn.Id,
     name: "region",
     dataType: "varchar",
-  } as QueryResult.BoundColumn,
+  } as QueryResult.ColumnWithId,
   {
     id: "count" as QueryColumn.Id,
     name: "count",
     dataType: "double",
-  } as QueryResult.BoundColumn,
+  } as QueryResult.ColumnWithId,
 ];
 
 const pieConfig: PieChartVizConfig = {

@@ -1,0 +1,89 @@
+import { useLayoutEffect, useMemo, useRef } from "react";
+import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
+import type {
+  ResultColumnBindings,
+  ProjectionDescriptor,
+  ResultColumnBindingRegistry,
+} from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+
+type Options = {
+  scopeKey: string;
+  sqlKey: string;
+  resultSqlKey: string | undefined;
+  result: QueryResult.T | undefined;
+  projections: readonly ProjectionDescriptor[];
+  initialRegistry: ResultColumnBindingRegistry | undefined;
+};
+
+function _getSchema({
+  options,
+  previous,
+}: {
+  options: Readonly<Options>;
+  previous: ResultColumnBindings | undefined;
+}): ResultColumnBindings | undefined {
+  const sqlKey = normalizeSqlForSubquery(options.sqlKey);
+  if (options.result === undefined) {
+    return previous?.registry.sqlKey === sqlKey ? previous : undefined;
+  }
+  if (
+    (options.resultSqlKey === undefined
+      ? undefined
+      : normalizeSqlForSubquery(options.resultSqlKey)) !== sqlKey
+  ) {
+    return undefined;
+  }
+  const schema = reconcileResultColumnBindings({
+    ...options,
+    sqlKey,
+    columns: options.result.columns,
+    previous: previous?.registry ?? options.initialRegistry,
+  });
+  return schema.registry === previous?.registry &&
+    JSON.stringify(schema.issues) === JSON.stringify(previous.issues)
+    ? previous
+    : schema;
+}
+
+/**
+ * Binds completed results only to the execution that produced them.
+ * Structured descriptors replace provisional SQL IDs authoritatively.
+ */
+export function useQueryResultColumnBindings(
+  options: Readonly<Options>,
+): ResultColumnBindings | undefined {
+  const previousRef = useRef<ResultColumnBindings | undefined>(undefined);
+  const {
+    scopeKey,
+    sqlKey,
+    resultSqlKey,
+    result,
+    projections,
+    initialRegistry,
+  } = options;
+  const schema = useMemo(() => {
+    const previous =
+      previousRef.current?.registry.scopeKey === scopeKey
+        ? previousRef.current
+        : undefined;
+    return _getSchema({
+      options: {
+        scopeKey,
+        sqlKey,
+        resultSqlKey,
+        result,
+        projections,
+        initialRegistry,
+      },
+      previous: previous,
+    });
+  }, [scopeKey, sqlKey, resultSqlKey, result, projections, initialRegistry]);
+  useLayoutEffect(() => {
+    if (schema || previousRef.current?.registry.scopeKey !== scopeKey) {
+      previousRef.current = schema;
+    }
+  }, [schema, scopeKey]);
+  return schema;
+}

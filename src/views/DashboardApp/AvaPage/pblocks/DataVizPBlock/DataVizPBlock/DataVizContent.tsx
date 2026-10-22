@@ -17,7 +17,7 @@ type Props = {
   prompt: string;
   rawSql: string;
   isLoading: boolean;
-  columns: readonly QueryResult.BoundColumn[];
+  columns: readonly QueryResult.ColumnWithId[];
   rawColumns?: readonly QueryResult.Column[];
   data: UnknownDataFrame;
   dateColumns: ReadonlySet<string>;

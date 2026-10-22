@@ -44,8 +44,8 @@ function useRenderAsOptions(): ReadonlyArray<{
 }
 
 type SeriesCardProps = {
-  fields: readonly QueryResult.BoundColumn[];
-  numericFields: readonly QueryResult.BoundColumn[];
+  fields: readonly QueryResult.ColumnWithId[];
+  numericFields: readonly QueryResult.ColumnWithId[];
   series: XYSeries | RadarSeries;
   hostVizType: HostConfig["vizType"];
   isRadarHost: boolean;

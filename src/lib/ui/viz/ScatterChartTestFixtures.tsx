@@ -2,6 +2,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { render } from "@/test-utils";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 /**
  * Renderer-level prop verification for the series-aware chart wrappers.
  *
@@ -12,8 +13,7 @@ import { render } from "@/test-utils";
  * "changing a control updates the config"; these tests prove
  * "changing a config setting updates what the chart renders".
  */
-import type { LegacyScatterSeries as ScatterSeries } from "$/models/vizs/BoundVizConfig/LegacyVizConfig.types";
-import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
+import type { LegacyScatterSeries as ScatterSeries } from "$/models/vizs/ColumnIdVizConfig/LegacyVizConfig.types";
 import type { ReactNode } from "react";
 
 const rechartsXAxisMock = vi.fn();

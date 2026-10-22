@@ -24,8 +24,8 @@ import {
   CHART_COLOR_SWATCHES,
 } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import type { LegacyBubbleSeries as BubbleSeries } from "$/models/vizs/BoundVizConfig/LegacyVizConfig.types";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
+import type { LegacyBubbleSeries as BubbleSeries } from "$/models/vizs/ColumnIdVizConfig/LegacyVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {

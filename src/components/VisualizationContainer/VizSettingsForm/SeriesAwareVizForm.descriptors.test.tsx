@@ -31,7 +31,7 @@ function readSetting(obj: unknown, key: string): unknown {
   return getValue(obj as never, key as never, { throwError: false });
 }
 
-const COLUMNS: readonly QueryResult.BoundColumn[] = [
+const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "category" as QueryColumn.Id, name: "category", dataType: "varchar" },
   { id: "value" as QueryColumn.Id, name: "value", dataType: "double" },
   { id: "score" as QueryColumn.Id, name: "score", dataType: "double" },

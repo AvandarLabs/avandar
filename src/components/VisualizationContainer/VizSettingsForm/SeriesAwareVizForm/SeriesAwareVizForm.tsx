@@ -32,7 +32,7 @@ type RadarHostConfig = RadarChartVizConfig;
 export type HostConfig = XYHostConfig | RadarHostConfig;
 
 type Props<TConfig extends HostConfig> = {
-  fields: readonly QueryResult.BoundColumn[];
+  fields: readonly QueryResult.ColumnWithId[];
   config: TConfig;
   onConfigChange: (nextConfig: TConfig) => void;
 

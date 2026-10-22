@@ -6,8 +6,8 @@ import { doesAxisNeedValueExtent } from "@/lib/ui/viz/axis/doesAxisNeedValueExte
 import { getAreaStackingFromLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels";
-import type { LegacyXYSeries as XYSeries } from "$/models/vizs/BoundVizConfig/LegacyVizConfig.types";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
+import type { LegacyXYSeries as XYSeries } from "$/models/vizs/ColumnIdVizConfig/LegacyVizConfig.types";
 import type {
   ApplyChartStyleOptions,
   ChartStyleProps,

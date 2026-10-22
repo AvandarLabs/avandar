@@ -29,9 +29,9 @@ vi.mock(
   },
 );
 vi.mock(
-  "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution",
+  "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery",
   () => {
-    return { resolveManualQueryForExecution: vi.fn() };
+    return { makeExecutableQueryFromManualQuery: vi.fn() };
   },
 );
 const WORKSPACE = uuid<Workspace.Id>();

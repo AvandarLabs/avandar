@@ -10,30 +10,36 @@ export type ProjectionDescriptor = {
   outputName: string;
 };
 
-/** A current output and its recoverable expression lineage. */
-export type ResultBinding = QueryResult.Column & {
+/**
+ * One output column of a query result, paired with the column ID that chart
+ * settings and filters store, plus the expression keys that prove lineage.
+ */
+export type ResultColumnBinding = QueryResult.Column & {
   id: QueryColumn.Id;
   expressionKey?: string;
   sqlExpressionKey?: string;
 };
 
-/** The current resolvable outputs belonging to one query owner. */
-export type ResultBindingRegistry = {
+/** The column bindings of the latest result for one query owner. */
+export type ResultColumnBindingRegistry = {
   version: 1;
   scopeKey: string;
   sqlKey: string;
-  columns: readonly ResultBinding[];
+  columns: readonly ResultColumnBinding[];
 };
 
-/** A result output or projection that cannot safely be addressed. */
-export type BindingIssue = {
+/** An output column or setting that could not be bound to one column ID. */
+export type ColumnBindingIssue = {
   target: string;
   reason: "missing" | "ambiguous" | "unsupported";
 };
 
-/** Contextual identities alongside unchanged raw output metadata. */
-export type BoundResultSchema = {
-  registry: ResultBindingRegistry;
-  columns: readonly QueryResult.BoundColumn[];
-  issues: readonly BindingIssue[];
+/**
+ * The column bindings for one query result: the registry, each output column
+ * with its column ID, and the outputs that could not be bound.
+ */
+export type ResultColumnBindings = {
+  registry: ResultColumnBindingRegistry;
+  columns: readonly QueryResult.ColumnWithId[];
+  issues: readonly ColumnBindingIssue[];
 };

@@ -74,7 +74,7 @@ export const BubbleChartVizConfigs = {
    */
   hydrateFromQueryResult: (
     vizConfig: BubbleChartVizConfig,
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): BubbleChartVizConfig => {
     return hydrateBubbleSeriesFromQueryResult(vizConfig, columns);
   },

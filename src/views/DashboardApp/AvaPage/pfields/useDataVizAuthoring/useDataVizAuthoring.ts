@@ -1,7 +1,7 @@
 import { identity } from "@avandar/utils";
 import { createUsePuck } from "@puckeditor/core";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-import { useResolvedDataVizBindings } from "../../pblocks/DataVizPBlock/useResolvedDataVizBindings/useResolvedDataVizBindings";
+import { useDataVizRuntimeColumnBindings } from "../../pblocks/DataVizPBlock/useDataVizRuntimeColumnBindings/useDataVizRuntimeColumnBindings";
 import { getDataVizAuthoringProps } from "./getDataVizAuthoringProps";
 import type { Props } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { DataVizAuthoringChange } from "./getDataVizAuthoringProps";
@@ -9,11 +9,13 @@ import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/r
 
 const usePuckSelector = createUsePuck();
 
-type Authoring = ReturnType<typeof useResolvedDataVizBindings> & {
+type Authoring = ReturnType<typeof useDataVizRuntimeColumnBindings> & {
   props: Props & { id: string };
-  update: (changes: Partial<Extract<Props, { bindingVersion: 1 }>>) => void;
+  update: (
+    changes: Partial<Extract<Props, { columnBindingVersion: 1 }>>,
+  ) => void;
   updateLegacy: (
-    changes: Partial<Extract<Props, { bindingVersion: 0 }>>,
+    changes: Partial<Extract<Props, { columnBindingVersion: 0 }>>,
   ) => void;
 };
 
@@ -48,11 +50,14 @@ export function useDataVizAuthoring(
 ): Authoring {
   const { props, replace } = useSelectedDataVizOwner();
   const { filtersById } = DashboardFilterStateManager.useState();
-  const bindings = useResolvedDataVizBindings({ props: props, auth: auth });
+  const columnBindings = useDataVizRuntimeColumnBindings({
+    props: props,
+    auth: auth,
+  });
   const update = (change: DataVizAuthoringChange): void => {
     const updated = getDataVizAuthoringProps({
       props,
-      bindings,
+      columnBindings,
       filters: Object.values(filtersById),
       change,
     });
@@ -61,10 +66,10 @@ export function useDataVizAuthoring(
     }
   };
   return {
-    ...bindings,
+    ...columnBindings,
     props,
     update: (changes) => {
-      return update({ kind: "bound", props: changes });
+      return update({ kind: "columnId", props: changes });
     },
     updateLegacy: (changes) => {
       return update({ kind: "legacy", props: changes });

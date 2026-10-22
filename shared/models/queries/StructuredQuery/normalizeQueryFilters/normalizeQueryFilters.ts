@@ -9,11 +9,14 @@ import type {
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
-type BindingIssue = {
+type ColumnBindingIssue = {
   nodeId: string | undefined;
   reason: "missing" | "ambiguous";
 };
-type NodeOutcome = { rules: QueryFilterGroup["rules"]; issues: BindingIssue[] };
+type NodeOutcome = {
+  rules: QueryFilterGroup["rules"];
+  issues: ColumnBindingIssue[];
+};
 
 function _getMatches({
   node,
@@ -50,7 +53,7 @@ function _getMatches({
       });
 }
 
-function _getBoundRule({
+function _getColumnIdRule({
   node,
   column,
   clause,
@@ -82,7 +85,9 @@ function _getRuleOutcome({
   return column
     ? {
         rules: [
-          "columnId" in node ? node : _getBoundRule({ node, column, clause }),
+          "columnId" in node
+            ? node
+            : _getColumnIdRule({ node, column, clause }),
         ],
         issues: [],
       }
@@ -106,7 +111,7 @@ export function normalizeQueryFilters({
   filter: QueryFilterGroup | LegacyQueryFilterGroup;
   columns: readonly QueryColumn.T[];
   clause: "where" | "having";
-}>): { filter: QueryFilterGroup; issues: BindingIssue[] } {
+}>): { filter: QueryFilterGroup; issues: ColumnBindingIssue[] } {
   const outcomes = filter.rules.map((node): NodeOutcome => {
     return match(node)
       .with({ type: "group" }, (group) => {

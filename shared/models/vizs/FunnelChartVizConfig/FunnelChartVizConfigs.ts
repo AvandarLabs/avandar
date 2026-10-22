@@ -38,7 +38,7 @@ export const FunnelChartVizConfigs = {
 
   hydrateFromQueryResult: (
     vizConfig: FunnelChartVizConfig,
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): FunnelChartVizConfig => {
     return hydratePieFromQueryResult(vizConfig, columns);
   },

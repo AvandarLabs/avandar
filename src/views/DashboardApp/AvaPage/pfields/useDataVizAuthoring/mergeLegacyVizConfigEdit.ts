@@ -1,12 +1,12 @@
-import { makeBoundVizConfigFromLegacyConfig } from "$/models/vizs/makeBoundVizConfigFromLegacyConfig/makeBoundVizConfigFromLegacyConfig";
-import { makeResolvedVizConfigFromBoundConfig } from "$/models/vizs/makeResolvedVizConfigFromBoundConfig/makeResolvedVizConfigFromBoundConfig";
+import { makeColumnIdVizConfigFromLegacyConfig } from "$/models/vizs/makeColumnIdVizConfigFromLegacyConfig/makeColumnIdVizConfigFromLegacyConfig";
+import { makeOutputNameVizConfigFromColumnIdConfig } from "$/models/vizs/makeOutputNameVizConfigFromColumnIdConfig/makeOutputNameVizConfigFromColumnIdConfig";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 type MergeLegacyVizConfigEditOptions = {
   legacy: VizConfig.Legacy;
   before: VizConfig.T;
   after: VizConfig.T;
-  columns: readonly QueryResult.BoundColumn[];
+  columns: readonly QueryResult.ColumnWithId[];
 };
 
 type SeriesConfig = Extract<
@@ -21,16 +21,16 @@ function _mergeSeries({
 }: {
   legacy: SeriesConfig;
   edited: SeriesConfig;
-  columns: readonly QueryResult.BoundColumn[];
+  columns: readonly QueryResult.ColumnWithId[];
 }): SeriesConfig["series"] {
   let resolvedIndex = 0;
   const series = legacy.series.flatMap((original) => {
     const single = { ...legacy, series: [original] } as SeriesConfig;
-    const bound = makeBoundVizConfigFromLegacyConfig({
+    const columnIdConfig = makeColumnIdVizConfigFromLegacyConfig({
       config: single,
       columns: columns,
     }).config;
-    if (!("series" in bound) || bound.series.length === 0) {
+    if (!("series" in columnIdConfig) || columnIdConfig.series.length === 0) {
       return [original];
     }
     const updated = edited.series[resolvedIndex++];
@@ -52,11 +52,11 @@ export function mergeLegacyVizConfigEdit({
   if (legacy.vizType !== after.vizType) {
     return legacy;
   }
-  const previous = makeResolvedVizConfigFromBoundConfig({
+  const previous = makeOutputNameVizConfigFromColumnIdConfig({
     config: before,
     columns: columns,
   }).config;
-  const edited = makeResolvedVizConfigFromBoundConfig({
+  const edited = makeOutputNameVizConfigFromColumnIdConfig({
     config: after,
     columns: columns,
   });

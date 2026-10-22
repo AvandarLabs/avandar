@@ -63,7 +63,7 @@ export function VizConfigPField({
   });
   return (
     <VizConfigContent
-      value={authoring.resolved?.runtimeConfig ?? { vizType: "table" }}
+      value={authoring.runtime?.runtimeConfig ?? { vizType: "table" }}
       onChange={(vizConfig) => {
         return authoring.update({ vizConfig });
       }}

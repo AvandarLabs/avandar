@@ -9,7 +9,7 @@ import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionC
 import { PublicQuerySession } from "@/clients/qetl/PublicQuerySession/PublicQuerySession";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { buildConceptQueryResult } from "@/clients/qetl/wrappers/ConceptWrapper/buildConceptQueryResult";
-import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
+import { makeExecutableQueryFromManualQuery } from "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
@@ -44,7 +44,10 @@ async function _selectSqlForExecution(
     rawSql === undefined
       ? await match(params)
           .with({ auth: "workspace" }, async ({ workspaceId }) => {
-            return await resolveManualQueryForExecution({ query, workspaceId });
+            return await makeExecutableQueryFromManualQuery({
+              query,
+              workspaceId,
+            });
           })
           .with({ auth: "public" }, () => {
             return { query, didAutoLimit: false as const };

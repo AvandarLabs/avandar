@@ -15,7 +15,7 @@ import type {
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
-  fields: readonly QueryResult.BoundColumn[];
+  fields: readonly QueryResult.ColumnWithId[];
   config: PieChartVizConfig;
   data: UnknownDataFrame;
   onConfigChange: (newConfig: PieChartVizConfig) => void;

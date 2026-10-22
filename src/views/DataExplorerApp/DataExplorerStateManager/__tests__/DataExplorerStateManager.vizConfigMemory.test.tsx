@@ -18,7 +18,7 @@ import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChart
 import type { RenderHookResult } from "@testing-library/react";
 import type { ReactNode } from "react";
 
-const COLUMNS: readonly QueryResult.BoundColumn[] = [
+const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "quarter" as QueryColumn.Id, name: "quarter", dataType: "varchar" },
   { id: "revenue" as QueryColumn.Id, name: "revenue", dataType: "double" },
 ];

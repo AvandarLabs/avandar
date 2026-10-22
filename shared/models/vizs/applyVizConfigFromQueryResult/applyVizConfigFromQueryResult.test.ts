@@ -11,9 +11,9 @@ function cols(
   pairs: ReadonlyArray<{
     id?: QueryColumn.Id;
     name: string;
-    dataType: QueryResult.BoundColumn["dataType"];
+    dataType: QueryResult.ColumnWithId["dataType"];
   }>,
-): QueryResult.BoundColumn[] {
+): QueryResult.ColumnWithId[] {
   return pairs.map((p) => {
     return {
       id: p.id ?? (p.name as QueryColumn.Id),

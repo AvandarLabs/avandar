@@ -11,7 +11,7 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 
-const COLUMNS: readonly QueryResult.BoundColumn[] = [
+const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "category" as QueryColumn.Id, name: "category", dataType: "varchar" },
   { id: "value" as QueryColumn.Id, name: "value", dataType: "double" },
   { id: "score" as QueryColumn.Id, name: "score", dataType: "bigint" },

@@ -1,4 +1,4 @@
-import { DashboardFilterBindingTestFixtures } from "./DashboardFilterBindingTestFixtures";
+import { DashboardFilterColumnBindingTestFixtures } from "./DashboardFilterColumnBindingTestFixtures";
 import type { AvaPageData } from "./AvaPage/AvaPage.types";
 import type { Props } from "./AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 const {
@@ -11,14 +11,14 @@ const {
   waitFor,
   expect,
   it,
-  DashboardBindingPreparation,
-  makeRuntimeBindingsFromDataVizProps,
-  useResolvedDataVizBindings,
+  DashboardColumnBindingPreparation,
+  makeRuntimeColumnBindingsFromDataVizProps,
+  useDataVizRuntimeColumnBindings,
   FILTER,
   AUTH,
   _createProps,
   _createWrapper,
-} = DashboardFilterBindingTestFixtures;
+} = DashboardFilterColumnBindingTestFixtures;
 
 it.each([
   "SELECT region AS territory FROM sales_a",
@@ -29,54 +29,57 @@ it.each([
   const client = new QueryClient();
   const { result, rerender, unmount } = renderHook(
     ({ currentProps }) => {
-      return useResolvedDataVizBindings({ props: currentProps, auth: AUTH });
+      return useDataVizRuntimeColumnBindings({
+        props: currentProps,
+        auth: AUTH,
+      });
     },
     { initialProps: { currentProps: props }, wrapper: _createWrapper(client) },
   );
   await waitFor(() => {
     return expect(result.current.status).toBe("ready");
   });
-  const originalTarget = result.current.resolved!.global.targets.filter;
+  const originalTarget = result.current.runtime!.global.targets.filter;
   rerender({
     currentProps: { ...props, nlQuery: { ...props.nlQuery, rawSql } },
   });
   await waitFor(() => {
     return expect(result.current.status).toBe("ready");
   });
-  expect(result.current.resolved!.global.targets.filter).toEqual(
-    originalTarget,
-  );
+  expect(result.current.runtime!.global.targets.filter).toEqual(originalTarget);
   unmount();
   // The explicit query callback has no filter list, then save supplies it.
   // Target ownership must survive changing the selected authoring field.
-  const edited = await DashboardBindingPreparation.prepareChart({
+  const edited = await DashboardColumnBindingPreparation.prepareChart({
     props: { ...props, nlQuery: { ...props.nlQuery, rawSql } },
     auth: AUTH,
     queryClient: client,
     filters: [],
   });
-  const savedDocument = await DashboardBindingPreparation.prepareDocument({
-    data: {
-      ...DashboardConfigs.makeEmpty(),
-      content: [
-        { type: "DataViz", props: edited },
-        {
-          type: "Filter",
-          props: {
-            id: "filter-block",
-            filterId: "filter",
-            columnName: "region",
-            label: "Region",
-            mode: "select_single",
-            defaultValue: "North",
-            optionsRaw: "North,South",
+  const savedDocument = await DashboardColumnBindingPreparation.prepareDocument(
+    {
+      data: {
+        ...DashboardConfigs.makeEmpty(),
+        content: [
+          { type: "DataViz", props: edited },
+          {
+            type: "Filter",
+            props: {
+              id: "filter-block",
+              filterId: "filter",
+              columnName: "region",
+              label: "Region",
+              mode: "select_single",
+              defaultValue: "North",
+              optionsRaw: "North,South",
+            },
           },
-        },
-      ],
-    } as AvaPageData,
-    auth: AUTH,
-    queryClient: client,
-  });
+        ],
+      } as AvaPageData,
+      auth: AUTH,
+      queryClient: client,
+    },
+  );
   const saved = savedDocument.content[0]!.props;
   expect(JSON.stringify(props)).toBe(original);
   const reopened = JSON.parse(JSON.stringify(saved)) as Props & { id: string };
@@ -87,11 +90,13 @@ it.each([
       auth: AUTH,
       projections: [],
       initialRegistry:
-        reopened.bindingVersion === 1 ? reopened.columnBindings : undefined,
+        reopened.columnBindingVersion === 1
+          ? reopened.columnBindings
+          : undefined,
     },
     queryClient: new QueryClient(),
   });
-  const reopenedBindings = makeRuntimeBindingsFromDataVizProps({
+  const reopenedBindings = makeRuntimeColumnBindingsFromDataVizProps({
     props: reopened,
     schema: reopenedSchema,
     filters: [FILTER],

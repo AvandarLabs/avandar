@@ -145,7 +145,7 @@ export const AreaChartVizConfigs = {
 
   hydrateFromQueryResult: (
     vizConfig: AreaChartVizConfig,
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): AreaChartVizConfig => {
     return hydrateXYSeriesFromQueryResult(vizConfig, columns, "area");
   },

@@ -36,9 +36,9 @@ import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBa
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
 import { QueryExplorerResultsChrome } from "@/views/DataExplorerApp/QueryExplorerResultsChrome";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
-import { useBoundQueryResult } from "@/views/DataExplorerApp/useBoundQueryResult/useBoundQueryResult";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
+import { useQueryResultColumnBindings } from "@/views/DataExplorerApp/useQueryResultColumnBindings/useQueryResultColumnBindings";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import type { ReactNode } from "react";
@@ -143,7 +143,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     executionQuery: state.query,
   });
 
-  const bindingScope = useRef(crypto.randomUUID());
+  const columnBindingScope = useRef(crypto.randomUUID());
   const projections = useMemo(() => {
     const structured = state.isStructuredQueryInSync
       ? makeProjectionDescriptorsFromStructuredQuery(state.query)
@@ -160,8 +160,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     savableSql,
     queryResults?.columns,
   ]);
-  const schema = useBoundQueryResult({
-    scopeKey: `${workspace.id}:${bindingScope.current}`,
+  const schema = useQueryResultColumnBindings({
+    scopeKey: `${workspace.id}:${columnBindingScope.current}`,
     sqlKey: savableSql ?? "",
     resultSqlKey: queryResults?.executedSql,
     result: isLoadingResults ? undefined : queryResults,
@@ -170,7 +170,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   });
   const queryResultColumns = schema?.columns ?? [];
   useEffect(
-    function synchronizeBoundResult() {
+    function synchronizeResultColumnBindings() {
       if (schema && !isLoadingResults) {
         dispatch.syncVizFromQueryResult(schema.columns);
         if (schema.registry !== state.columnBindings) {

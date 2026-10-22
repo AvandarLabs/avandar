@@ -17,7 +17,7 @@ function buildDataVizItem(
     type: "DataViz",
     props: {
       id,
-      bindingVersion: 1,
+      columnBindingVersion: 1,
       columnBindings: { version: 1, scopeKey: id, sqlKey: "", columns: [] },
       globalFilterTargets: {},
       nlQuery: {

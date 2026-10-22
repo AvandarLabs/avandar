@@ -44,10 +44,12 @@ function _getBufferSourceQueryKey(
   };
 }
 
-function _hasBoundFilterTargets(filters: StructuredQuery.FilterGroup): boolean {
+function _hasColumnIdFilterTargets(
+  filters: StructuredQuery.FilterGroup,
+): boolean {
   return filters.rules.every((node) => {
     return match(node)
-      .with({ type: "group" }, _hasBoundFilterTargets)
+      .with({ type: "group" }, _hasColumnIdFilterTargets)
       .with({ type: "rule" }, (rule) => {
         return typeof rule.columnId === "string";
       })
@@ -60,8 +62,8 @@ function _hasReadySourceFilters(layer: MapLayer.T): boolean {
   return (
     (filters.rules.length === 0 && having.rules.length === 0) ||
     (sourceColumns !== undefined &&
-      _hasBoundFilterTargets(filters) &&
-      _hasBoundFilterTargets(having))
+      _hasColumnIdFilterTargets(filters) &&
+      _hasColumnIdFilterTargets(having))
   );
 }
 

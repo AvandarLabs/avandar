@@ -74,7 +74,7 @@ export const ScatterPlotVizConfigs = {
    */
   hydrateFromQueryResult: (
     vizConfig: ScatterPlotVizConfig,
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): ScatterPlotVizConfig => {
     return hydrateScatterSeriesFromQueryResult(vizConfig, columns);
   },

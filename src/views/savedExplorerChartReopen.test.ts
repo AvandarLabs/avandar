@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
-import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
-import { makeResolvedVizConfigFromBoundConfig } from "$/models/vizs/makeResolvedVizConfigFromBoundConfig/makeResolvedVizConfigFromBoundConfig";
-import { makeSavedBindingsFromDataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeSavedBindingsFromDataVizProps/makeSavedBindingsFromDataVizProps";
+import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { makeOutputNameVizConfigFromColumnIdConfig } from "$/models/vizs/makeOutputNameVizConfigFromColumnIdConfig/makeOutputNameVizConfigFromColumnIdConfig";
+import { makeSavedColumnBindingsFromDataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeSavedColumnBindingsFromDataVizProps";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
 import type { Props as DataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
@@ -13,7 +13,7 @@ it("reopens a serialized styled selection against a supported renamed output", (
     { name: "revenue", dataType: "double" as const },
   ];
   const sql = "SELECT region, revenue FROM sales";
-  const schema = reconcileResultBindings({
+  const schema = reconcileResultColumnBindings({
     scopeKey: "explorer",
     sqlKey: sql,
     columns,
@@ -46,9 +46,9 @@ it("reopens a serialized styled selection against a supported renamed output", (
   const reopened = upgradeAvaPageData(saved);
   const chart = reopened.content[0]! as {
     type: "DataViz";
-    props: Extract<DataVizProps, { bindingVersion: 1 }> & { id: string };
+    props: Extract<DataVizProps, { columnBindingVersion: 1 }> & { id: string };
   };
-  if (chart.type !== "DataViz" || chart.props.bindingVersion !== 1) {
+  if (chart.type !== "DataViz" || chart.props.columnBindingVersion !== 1) {
     throw new Error("Expected bound chart");
   }
   const renamedSql = "SELECT revenue AS amount, region FROM sales";
@@ -56,7 +56,7 @@ it("reopens a serialized styled selection against a supported renamed output", (
     { name: "amount", dataType: "double" as const },
     { name: "region", dataType: "varchar" as const },
   ];
-  const renamed = reconcileResultBindings({
+  const renamed = reconcileResultColumnBindings({
     scopeKey: chart.props.id,
     sqlKey: renamedSql,
     columns: renamedColumns,
@@ -66,11 +66,11 @@ it("reopens a serialized styled selection against a supported renamed output", (
     }),
     previous: chart.props.columnBindings,
   });
-  const runtime = makeSavedBindingsFromDataVizProps({
+  const runtime = makeSavedColumnBindingsFromDataVizProps({
     props: chart.props,
     schema: renamed,
   });
-  const rendered = makeResolvedVizConfigFromBoundConfig({
+  const rendered = makeOutputNameVizConfigFromColumnIdConfig({
     config: runtime.runtimeConfig,
     columns: renamed.columns,
   });

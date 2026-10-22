@@ -1,4 +1,4 @@
-import type { DataVizBindingProps } from "../../pblocks/DataVizPBlock/makeSavedBindingsFromDataVizProps/makeSavedBindingsFromDataVizProps";
+import type { DataVizColumnBindingProps } from "../../pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeSavedColumnBindingsFromDataVizProps";
 import type {
   V4_AvaPageData,
   V4_AvaPageRootProps,
@@ -13,7 +13,7 @@ export type V5_PBlockPropsRegistry = Omit<V4_PBlockPropsRegistry, "DataViz"> & {
     V4_PBlockPropsRegistry["DataViz"],
     "vizConfig" | "localFilters" | "globalFilterSubscription"
   > &
-    DataVizBindingProps;
+    DataVizColumnBindingProps;
 };
 /** Document root properties with the current binding-aware schema version. */
 export type V5_AvaPageRootProps = Omit<V4_AvaPageRootProps, "schemaVersion"> & {

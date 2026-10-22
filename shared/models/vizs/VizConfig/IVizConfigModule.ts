@@ -52,7 +52,7 @@ export interface IVizConfigModule<
    */
   hydrateFromQueryResult(
     vizConfig: TVizConfig,
-    columns: readonly QueryResult.BoundColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): TVizConfig;
 
   /**

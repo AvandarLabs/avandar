@@ -14,7 +14,7 @@ type XYSeriesConfig = {
  */
 export function hydrateXYSeriesFromQueryResult<VConfig extends XYSeriesConfig>(
   currVizConfig: VConfig,
-  columns: readonly QueryResult.BoundColumn[],
+  columns: readonly QueryResult.ColumnWithId[],
   defaultRenderAs: RenderAs,
 ): VConfig {
   if (columns.length === 0) {

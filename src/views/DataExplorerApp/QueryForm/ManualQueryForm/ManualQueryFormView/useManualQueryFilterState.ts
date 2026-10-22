@@ -16,7 +16,7 @@ type PruningOptions = Options & {
   normalized: ReturnType<typeof normalizeQueryFilters> | undefined;
 };
 type FilterState = {
-  boundFilters: StructuredQuery.FilterGroup;
+  columnIdFilters: StructuredQuery.FilterGroup;
   pendingFilters: StructuredQuery.FilterGroup | undefined;
   onFiltersChange: (filters: StructuredQuery.FilterGroup) => void;
   onOverwrite: () => void;
@@ -82,7 +82,7 @@ export function useManualQueryFilterState(
   }, [filters, columns, sourceCatalog.status]);
   useFilterPruning({ ...options, normalized });
   return {
-    boundFilters: normalized?.filter ?? filters,
+    columnIdFilters: normalized?.filter ?? filters,
     pendingFilters,
     onFiltersChange: (changedFilters) => {
       if (isStructuredQueryInSync) {

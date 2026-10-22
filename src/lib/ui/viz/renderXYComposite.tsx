@@ -1,8 +1,8 @@
 import { propEq } from "@avandar/utils";
 import { CompositeChart as MantineCompositeChart } from "@mantine/charts";
 import { Label } from "recharts";
-import type { LegacyXYSeries as XYSeries } from "$/models/vizs/BoundVizConfig/LegacyVizConfig.types";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
+import type { LegacyXYSeries as XYSeries } from "$/models/vizs/ColumnIdVizConfig/LegacyVizConfig.types";
 import type { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { CompositeChartSeries } from "@mantine/charts";

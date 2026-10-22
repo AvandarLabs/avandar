@@ -18,7 +18,7 @@ import type {
 import type { ReactNode } from "react";
 
 type Props = {
-  columns: readonly QueryResult.BoundColumn[];
+  columns: readonly QueryResult.ColumnWithId[];
   filter: LocalFilter | LegacyLocalFilter;
   onChange: (filter: LocalFilter | LegacyLocalFilter) => void;
   onRemove: () => void;
