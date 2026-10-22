@@ -1,9 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { assertOneListingKind } from "@etl/stores/assertOneListingKind";
 import { buildListingKeyFromRow } from "@etl/stores/buildListingKeyFromRow/buildListingKeyFromRow";
 import type {
-  ListingRowValues,
   ListingsStore,
+  ListingWithColumns,
   RelationColumnRow,
   StoredListingRow,
 } from "@etl/stores/EtlStores.types";
@@ -19,8 +18,11 @@ export type InMemoryListingsStore = ListingsStore &
     ) => readonly RelationColumnRow[] | undefined;
     /** How many rows each `readRowsMatching` call asked for, in call order. */
     getReadBatchSizes: () => readonly number[];
-    /** A copy of every stored `upsertRows` payload, in call order. */
-    getUpsertBatches: () => ReadonlyArray<readonly ListingRowValues[]>;
+    /**
+     * A copy of every stored `upsertListingsWithColumns` payload, in call
+     * order.
+     */
+    getUpsertBatches: () => ReadonlyArray<readonly ListingWithColumns[]>;
   }>;
 
 /**
@@ -32,24 +34,35 @@ function _copyThroughJson<T>(value: T): T {
   return value === undefined ? value : JSON.parse(JSON.stringify(value));
 }
 
-function _throwOnRepeatedKey(rows: readonly ListingRowValues[]): void {
-  const keys = rows.map((row) => {
-    return buildListingKeyFromRow(row);
+/**
+ * Throws the errors `rpc_data_catalog_listings__upsert_with_relation_columns`
+ * raises, before anything is written, so a refused call writes nothing.
+ */
+function _throwOnInvalidEntries(entries: readonly ListingWithColumns[]): void {
+  const seenKeys = new Set<string>();
+  entries.forEach(({ row, columns }) => {
+    if (columns.length === 0) {
+      throw new Error(
+        `Listing "${row.display_name}" has no relation columns. A listing is never stored without its columns.`,
+      );
+    }
+    const key = buildListingKeyFromRow(row);
+    if (seenKeys.has(key)) {
+      throw new Error(
+        `Listing "${row.display_name}" appears twice in one call. Each listing may be written only once per call.`,
+      );
+    }
+    seenKeys.add(key);
   });
-  if (new Set(keys).size < keys.length) {
-    throw new Error(
-      "ON CONFLICT DO UPDATE command cannot affect row a second time",
-    );
-  }
 }
 
 /**
  * Creates a listings store that keeps rows in memory, for testing a pipeline
  * or the engine without Supabase. It behaves like Postgres where a pipeline
  * can tell the difference: upserts keep a row's id and merge over any columns
- * outside the contract, a batch with a repeated key or with more than one
- * listing kind fails whole, and every row crosses the store boundary as a
- * JSON copy.
+ * outside the contract, a call with a repeated key or with a listing that has
+ * no columns fails whole, and every row crosses the store boundary as a JSON
+ * copy.
  *
  * @param options.rows - Rows to start with.
  * @returns The store.
@@ -64,7 +77,7 @@ export function createInMemoryListingsStore(
   );
   const columnsByListingId = new Map<string, readonly RelationColumnRow[]>();
   const readBatchSizes: number[] = [];
-  const upsertBatches: Array<readonly ListingRowValues[]> = [];
+  const upsertBatches: Array<readonly ListingWithColumns[]> = [];
 
   return {
     readRowsMatching: async (rows) => {
@@ -81,12 +94,11 @@ export function createInMemoryListingsStore(
         }),
       );
     },
-    upsertRows: async (rows) => {
-      assertOneListingKind(rows);
-      _throwOnRepeatedKey(rows);
-      upsertBatches.push(_copyThroughJson([...rows]));
+    upsertListingsWithColumns: async (entries) => {
+      _throwOnInvalidEntries(entries);
+      upsertBatches.push(_copyThroughJson([...entries]));
       return _copyThroughJson(
-        rows.map((row) => {
+        entries.map(({ row, columns }) => {
           const key = buildListingKeyFromRow(row);
           const existing = rowsByKey.get(key);
           const stored = {
@@ -95,12 +107,10 @@ export function createInMemoryListingsStore(
             id: existing?.id ?? randomUUID(),
           };
           rowsByKey.set(key, stored);
+          columnsByListingId.set(stored.id, _copyThroughJson([...columns]));
           return stored;
         }),
       );
-    },
-    replaceRelationColumns: async ({ listingId, columns }) => {
-      columnsByListingId.set(listingId, _copyThroughJson([...columns]));
     },
     getRows: () => {
       return _copyThroughJson([...rowsByKey.values()]);

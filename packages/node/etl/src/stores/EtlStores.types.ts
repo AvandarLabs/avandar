@@ -47,6 +47,13 @@ export type RelationColumnRow = Readonly<{
   cast_data_type: DuckDbSniffableDataType;
 }>;
 
+/** One listing row and its whole set of relation columns, written together. */
+export type ListingWithColumns = Readonly<{
+  row: ListingRowValues;
+  /** Never empty: a listing is never stored without its columns. */
+  columns: readonly RelationColumnRow[];
+}>;
+
 /** Reads and writes the listings table and the relation columns table. */
 export type ListingsStore = Readonly<{
   /**
@@ -58,23 +65,19 @@ export type ListingsStore = Readonly<{
     rows: readonly ListingRowValues[],
   ) => Promise<readonly StoredListingRow[]>;
   /**
-   * Inserts or replaces `rows` on their conflict keys, and returns the stored
+   * Inserts or replaces each entry's row on its conflict key and replaces
+   * that listing's whole set of relation columns, and returns the stored
    * rows. The result is in no particular order and has at most one entry per
-   * key, so callers match rows with `buildListingKeyFromRow`. Two rows in one
-   * call that share a key fail the whole call.
+   * key, so callers match rows with `buildListingKeyFromRow`.
    *
-   * The engine relies on each call being all-or-nothing: a call that fails
-   * writes none of its rows. Callers pass rows of one listing kind per call,
-   * since each kind has its own conflict target.
+   * Each call is one transaction: a call that fails writes none of its rows
+   * and none of their columns, so a listing is never stored without its
+   * columns. A call fails whole when an entry has no columns or when two
+   * entries share a key.
    */
-  upsertRows: (
-    rows: readonly ListingRowValues[],
+  upsertListingsWithColumns: (
+    entries: readonly ListingWithColumns[],
   ) => Promise<readonly StoredListingRow[]>;
-  /** Replaces one listing's whole set of relation columns. */
-  replaceRelationColumns: (args: {
-    listingId: string;
-    columns: readonly RelationColumnRow[];
-  }) => Promise<void>;
 }>;
 
 /** Writes Parquet objects to one storage bucket. */

@@ -1,4 +1,3 @@
-import { assertOneListingKind } from "@etl/stores/assertOneListingKind";
 import { buildListingKeyFromRow } from "@etl/stores/buildListingKeyFromRow/buildListingKeyFromRow";
 import { LISTING_CONTRACT_COLUMNS } from "@etl/stores/listingContractColumns";
 import { throwOnSupabaseError } from "@etl/stores/throwOnSupabaseError/throwOnSupabaseError";
@@ -6,15 +5,12 @@ import { splitIntoChunks } from "@etl/utils/splitIntoChunks/splitIntoChunks";
 import type {
   ListingRowValues,
   ListingsStore,
-  RelationColumnRow,
+  ListingWithColumns,
   StoredListingRow,
 } from "@etl/stores/EtlStores.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SELECT_COLUMNS = ["id", ...LISTING_CONTRACT_COLUMNS].join(",");
-const API_RESOURCE_CONFLICT =
-  "api_service,api_base_url,external_dataset_id,api_resource_id";
-const PIPELINE_PARQUET_CONFLICT = "parquet_file_name,pipeline_name";
 
 /**
  * Rows per read. A read is a GET whose URL lists the rows' dataset ids and
@@ -30,14 +26,18 @@ const ROWS_PER_READ = 25;
  */
 const POSTGREST_MAX_ROWS = 1000;
 
-/** The Supabase client and table names a listings store reads and writes. */
+/** The Supabase client, table, and function a listings store uses. */
 export type SupabaseListingsStoreOptions = Readonly<{
   /** A service-role client, since listings bypass RLS. */
   client: SupabaseClient;
-  /** The listings table. */
+  /** The listings table, which reads select from. */
   listingsTable: string;
-  /** The relation columns table. */
-  relationColumnsTable: string;
+  /**
+   * The database function writes call. It takes `p_listings`, a JSON array
+   * of `{ listing, relation_columns }`, writes it in one transaction, and
+   * returns the stored listings.
+   */
+  upsertListingsFunction: string;
 }>;
 
 type _KeyColumn =
@@ -86,7 +86,7 @@ function _pickContractColumns(row: ListingRowValues): Record<string, unknown> {
  * `pipeline_name` backfill has not reached, may carry one. The change check
  * handles a `null` in those columns.
  */
-function _toStoredRows(data: unknown[] | null): StoredListingRow[] {
+function _toStoredRows(data: unknown): StoredListingRow[] {
   return (data ?? []) as StoredListingRow[];
 }
 
@@ -155,66 +155,47 @@ async function _readRowsMatching(args: {
   });
 }
 
-async function _upsertRows(args: {
+async function _upsertListingsWithColumns(args: {
   options: SupabaseListingsStoreOptions;
-  rows: readonly ListingRowValues[];
+  entries: readonly ListingWithColumns[];
 }): Promise<readonly StoredListingRow[]> {
-  assertOneListingKind(args.rows);
-  const [first] = args.rows;
-  if (first === undefined) {
+  if (args.entries.length === 0) {
     return [];
   }
-  // One upsert statement, so the call is all-or-nothing.
-  const { data, error } = await args.options.client
-    .from(args.options.listingsTable)
-    .upsert(args.rows.map(_pickContractColumns), {
-      onConflict:
-        first.access_kind === "api_resource"
-          ? API_RESOURCE_CONFLICT
-          : PIPELINE_PARQUET_CONFLICT,
+  const { client, upsertListingsFunction } = args.options;
+  // PostgREST caps a function's returned rows as it caps a select's, so a
+  // larger call would store every listing and return only some of them.
+  if (args.entries.length > POSTGREST_MAX_ROWS) {
+    throw new Error(
+      `upsertListingsWithColumns takes at most ${POSTGREST_MAX_ROWS} listings per call, PostgREST's row cap, and this call has ${args.entries.length}.`,
+    );
+  }
+  // One function call is one transaction, so every listing in it is stored
+  // with its columns, or none is.
+  const { data, error } = await client
+    .rpc(upsertListingsFunction, {
+      p_listings: args.entries.map(({ row, columns }) => {
+        return {
+          listing: _pickContractColumns(row),
+          relation_columns: columns,
+        };
+      }),
     })
     .select(SELECT_COLUMNS);
   throwOnSupabaseError({
     error,
-    action: `upserting rows into ${args.options.listingsTable}`,
+    action: `upserting listings with ${upsertListingsFunction}`,
   });
   return _toStoredRows(data);
 }
 
-async function _replaceRelationColumns(args: {
-  options: SupabaseListingsStoreOptions;
-  listingId: string;
-  columns: readonly RelationColumnRow[];
-}): Promise<void> {
-  const { client, relationColumnsTable } = args.options;
-  const { error: deleteError } = await client
-    .from(relationColumnsTable)
-    .delete()
-    .eq("catalog_listing_id", args.listingId);
-  throwOnSupabaseError({
-    error: deleteError,
-    action: `deleting columns from ${relationColumnsTable}`,
-  });
-  if (args.columns.length === 0) {
-    return;
-  }
-  const { error: insertError } = await client.from(relationColumnsTable).insert(
-    args.columns.map((column) => {
-      return { ...column, catalog_listing_id: args.listingId };
-    }),
-  );
-  throwOnSupabaseError({
-    error: insertError,
-    action: `writing columns to ${relationColumnsTable}`,
-  });
-}
-
 /**
- * Creates a listings store over two Supabase tables that satisfy the
- * engine's output contract (see the README). Every method throws with the
- * table name and Supabase's message when a request fails.
+ * Creates a listings store over the Supabase listings table and the function
+ * that writes it, which satisfy the engine's output contract (see the
+ * README). Every method throws with the table or function name and
+ * Supabase's message when a request fails.
  *
- * @param options - The client and the two tables.
+ * @param options - The client, the listings table, and the write function.
  * @returns The store.
  */
 export function createSupabaseListingsStore(
@@ -224,11 +205,8 @@ export function createSupabaseListingsStore(
     readRowsMatching: (rows) => {
       return _readRowsMatching({ options, rows });
     },
-    upsertRows: (rows) => {
-      return _upsertRows({ options, rows });
-    },
-    replaceRelationColumns: (args) => {
-      return _replaceRelationColumns({ options, ...args });
+    upsertListingsWithColumns: (entries) => {
+      return _upsertListingsWithColumns({ options, entries });
     },
   };
 }

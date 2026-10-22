@@ -14,12 +14,20 @@ import type {
 import type {
   ListingRowValues,
   ListingsStore,
+  ListingWithColumns,
   RelationColumnRow,
   StoredListingRow,
 } from "@etl/stores/EtlStores.types";
 
-/** Rows per read and per upsert, so each request's URL and body stay small. */
+/** Rows per read and per write, so each request's URL and body stay small. */
 export const LISTING_CHUNK_SIZE = 200;
+
+/**
+ * The most relation columns one write carries, so a page of wide datasets
+ * still makes small requests. A listing with more columns than this is
+ * written alone, since a listing and its columns are never split.
+ */
+export const COLUMNS_PER_WRITE = 5000;
 
 /** The metadata key holding a SHA-256 of a row's declared relation columns. */
 const COLUMNS_FINGERPRINT_KEY = "relation_columns_sha256";
@@ -49,12 +57,7 @@ type _RelationWithRow = Readonly<{
   key: string;
 }>;
 
-type _RowAndColumns = Readonly<{
-  row: ListingRowValues;
-  columns: readonly RelationColumnRow[] | undefined;
-}>;
-
-type _PreparedRelation = _RowAndColumns &
+type _PreparedRelation = ListingWithColumns &
   Readonly<{
     key: string;
     stored: StoredListingRow | undefined;
@@ -66,21 +69,6 @@ type _BuildRowAndColumnsArgs = Readonly<{
   stored: StoredListingRow | undefined;
   context: LoadRelationsPageContext;
 }>;
-
-/** Splits relations into consecutive runs that share one listing kind. */
-function _splitIntoRunsOfOneKind(
-  preparedRelations: readonly _PreparedRelation[],
-): _PreparedRelation[][] {
-  return preparedRelations.reduce<_PreparedRelation[][]>((runs, prepared) => {
-    const lastRun = runs.at(-1);
-    if (lastRun?.[0]?.row.access_kind === prepared.row.access_kind) {
-      lastRun.push(prepared);
-    } else {
-      runs.push([prepared]);
-    }
-    return runs;
-  }, []);
-}
 
 function _buildColumnRow(
   column: RelationColumn,
@@ -109,28 +97,16 @@ function _buildColumnsFingerprint(
   return createHash("sha256").update(stableJson).digest("hex");
 }
 
-function _addColumnsFingerprint(prepared: _RowAndColumns): ListingRowValues {
+function _addColumnsFingerprint(
+  prepared: ListingWithColumns,
+): ListingRowValues {
   const { row, columns } = prepared;
-  if (columns === undefined) {
-    return row;
-  }
   return {
     ...row,
     metadata: {
       ...(row.metadata ?? {}),
       [COLUMNS_FINGERPRINT_KEY]: _buildColumnsFingerprint(columns),
     },
-  };
-}
-
-function _omitColumnsFingerprint(row: ListingRowValues): ListingRowValues {
-  return {
-    ...row,
-    metadata: Object.fromEntries(
-      Object.entries(row.metadata ?? {}).filter(([key]) => {
-        return key !== COLUMNS_FINGERPRINT_KEY;
-      }),
-    ),
   };
 }
 
@@ -151,6 +127,17 @@ function _throwOnRepeatedListingKey(
     }
     firstRelationByKey.set(key, relation);
   });
+}
+
+function _throwOnRelationWithoutColumns(relations: readonly Relation[]): void {
+  const bareRelation = relations.find((relation) => {
+    return relation.kind === "api_resource" && relation.columns.length === 0;
+  });
+  if (bareRelation !== undefined) {
+    throw new Error(
+      `Relation ${_describeRelation(bareRelation)} has no columns. A listing is never stored without its columns.`,
+    );
+  }
 }
 
 function _buildRelationsWithRows(args: {
@@ -191,7 +178,7 @@ async function _readStoredRowsByKey(args: {
 
 async function _buildRowAndColumns(
   args: _BuildRowAndColumnsArgs,
-): Promise<_RowAndColumns> {
+): Promise<ListingWithColumns> {
   const { relation, context } = args;
   if (relation.kind === "pipeline_parquet") {
     return prepareParquetRelation({
@@ -204,7 +191,7 @@ async function _buildRowAndColumns(
       bucket: context.bucket,
     });
   }
-  return { row: args.row, columns: relation.columns?.map(_buildColumnRow) };
+  return { row: args.row, columns: relation.columns.map(_buildColumnRow) };
 }
 
 /**
@@ -250,76 +237,65 @@ async function _prepareRelation(args: {
   };
 }
 
-async function _writeChunk(args: {
-  chunk: readonly _PreparedRelation[];
-  listings: ListingsStore;
-}): Promise<void> {
-  const { chunk, listings } = args;
-  // A row with columns is first written without its columns fingerprint, so
-  // a failure before the second write leaves a row the next load rewrites.
-  const writtenRows = await listings.upsertRows(
-    chunk.map(({ row, columns }) => {
-      return columns === undefined ? row : _omitColumnsFingerprint(row);
-    }),
-  );
-  const listingIdByKey = new Map(
-    writtenRows.map((stored) => {
-      return [buildListingKeyFromRow(stored), stored.id];
-    }),
-  );
-  const withColumns = chunk.flatMap(({ key, row, columns }) => {
-    return columns === undefined ? [] : [{ key, row, columns }];
-  });
-  await promiseMapSequential(withColumns, async ({ key, columns }) => {
-    const listingId = listingIdByKey.get(key);
-    if (listingId === undefined) {
-      throw new Error(
-        `The listings store returned no id for the written listing ${key}.`,
-      );
+/**
+ * Splits relations into write batches of at most `LISTING_CHUNK_SIZE`
+ * listings and `COLUMNS_PER_WRITE` columns, keeping their order. Each
+ * listing goes into one batch with all of its columns.
+ */
+function _splitIntoWriteBatches(
+  preparedRelations: readonly _PreparedRelation[],
+): _PreparedRelation[][] {
+  const batches: _PreparedRelation[][] = [];
+  let columnCount = 0;
+  preparedRelations.forEach((prepared) => {
+    const lastBatch = batches.at(-1);
+    const fitsLastBatch =
+      lastBatch !== undefined &&
+      lastBatch.length < LISTING_CHUNK_SIZE &&
+      columnCount + prepared.columns.length <= COLUMNS_PER_WRITE;
+    if (fitsLastBatch) {
+      lastBatch.push(prepared);
+      columnCount += prepared.columns.length;
+    } else {
+      batches.push([prepared]);
+      columnCount = prepared.columns.length;
     }
-    await listings.replaceRelationColumns({ listingId, columns });
   });
-  if (withColumns.length > 0) {
-    await listings.upsertRows(
-      withColumns.map(({ row }) => {
-        return row;
-      }),
-    );
-  }
+  return batches;
 }
 
 async function _writeChangedRelations(args: {
   changedRelations: readonly _PreparedRelation[];
   listings: ListingsStore;
 }): Promise<void> {
-  // Each upsert takes one listing kind. Splitting into consecutive runs keeps
-  // the page's oldest-first order across kinds.
-  const chunks = _splitIntoRunsOfOneKind(args.changedRelations).flatMap(
-    (run) => {
-      return splitIntoChunks(run, LISTING_CHUNK_SIZE);
+  // Sequential on purpose: batches go oldest connection first, so a failure
+  // partway leaves an oldest-first prefix of the page written.
+  await promiseMapSequential(
+    _splitIntoWriteBatches(args.changedRelations),
+    (batch) => {
+      return args.listings.upsertListingsWithColumns(
+        batch.map(({ row, columns }) => {
+          return { row, columns };
+        }),
+      );
     },
   );
-  // Sequential on purpose: chunks go oldest connection first, so a failure
-  // partway leaves an oldest-first prefix of the page written.
-  await promiseMapSequential(chunks, (chunk) => {
-    return _writeChunk({ chunk, listings: args.listings });
-  });
 }
 
 /**
  * Loads one page of relations, writing only the rows that changed, oldest
  * connection first. Parquet objects are uploaded before any row is written.
- * Each chunk of changed rows is upserted, then the relation columns of its
- * rows that declare them are replaced, then those rows are upserted again
- * with `metadata.relation_columns_sha256`, a fingerprint of their columns. A
- * failure between those writes leaves a row without the fingerprint, which
- * the next load sees as changed and rewrites.
+ * Changed rows are written in batches, each row with its whole set of
+ * relation columns in the same transaction, so a listing is never stored
+ * without its columns. Each row carries `metadata.relation_columns_sha256`,
+ * a fingerprint of its columns, so a change to the columns alone counts as
+ * a change to the row.
  *
  * @param args.relations - The page's relations, oldest connection first.
  * @param args.context - The run and drive the page belongs to.
  * @returns How many relations were written and how many were unchanged.
- * @throws Before any read or write when two relations share a listing key,
- * and when the store returns no id for a written row with columns.
+ * @throws Before any read or write when two relations share a listing key
+ * or an API relation has no columns.
  */
 export async function loadRelationsPage(args: {
   relations: readonly Relation[];
@@ -328,6 +304,7 @@ export async function loadRelationsPage(args: {
   const { context } = args;
   const relationsWithRows = _buildRelationsWithRows(args);
   _throwOnRepeatedListingKey(relationsWithRows);
+  _throwOnRelationWithoutColumns(args.relations);
   const storedByKey = await _readStoredRowsByKey({
     rows: relationsWithRows.map(({ row }) => {
       return row;

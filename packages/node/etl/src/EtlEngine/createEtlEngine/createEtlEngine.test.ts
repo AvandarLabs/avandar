@@ -115,6 +115,9 @@ function _relationsFor(connection: FakeConnection): ApiResourceRelation[] {
       displayName: `Dataset ${connection.id}`,
       externalOrganizationName: "Fake Org",
       sourceUpdatedAt: connection.modifiedAt,
+      columns: [
+        { name: "a", originalDataType: "text", castDataType: "VARCHAR" },
+      ],
     };
   });
 }
@@ -135,7 +138,8 @@ function _config(args: {
     supabase: args.supabase,
     output: {
       listingsTable: "data_catalog_listings",
-      relationColumnsTable: "data_catalog_listings__relation_columns",
+      upsertListingsFunction:
+        "rpc_data_catalog_listings__upsert_with_relation_columns",
       checkpointsTable: "pipeline_scope_checkpoints",
     },
     stores: args.stores,
@@ -398,7 +402,6 @@ describe("createEtlEngine", () => {
         report.crawls[0]?.relationsUnchanged,
       ]).toEqual([0, 1]);
     });
-
   });
 
   describe("ordering and limits", () => {
@@ -924,12 +927,12 @@ describe("createEtlEngine", () => {
       let upsertCalls = 0;
       const failingListings: ListingsStore = {
         ...listings,
-        upsertRows: async (rows) => {
+        upsertListingsWithColumns: async (entries) => {
           upsertCalls += 1;
           if (upsertCalls === 2) {
             throw new Error("upsert failed");
           }
-          return listings.upsertRows(rows);
+          return listings.upsertListingsWithColumns(entries);
         },
       };
 
@@ -1442,12 +1445,12 @@ describe("createEtlEngine", () => {
       let upsertCalls = 0;
       const failingListings: ListingsStore = {
         ...listings,
-        upsertRows: async (rows) => {
+        upsertListingsWithColumns: async (entries) => {
           upsertCalls += 1;
           if (upsertCalls === 2) {
             throw new Error("upsert failed");
           }
-          return listings.upsertRows(rows);
+          return listings.upsertListingsWithColumns(entries);
         },
       };
 
@@ -1600,7 +1603,9 @@ describe("createEtlEngine", () => {
         }),
       );
 
-      await expect(run).rejects.toThrow("needs somewhere to keep its checkpoints");
+      await expect(run).rejects.toThrow(
+        "needs somewhere to keep its checkpoints",
+      );
       expect(recorder.events).toEqual([]);
     });
 

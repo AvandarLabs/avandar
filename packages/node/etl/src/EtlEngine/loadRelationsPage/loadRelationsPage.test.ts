@@ -5,7 +5,10 @@ import {
   resetEtlPathsRootForTesting,
   setEtlPathsRootForTesting,
 } from "@etl/EtlEngine/etlPaths";
-import { loadRelationsPage } from "@etl/EtlEngine/loadRelationsPage/loadRelationsPage";
+import {
+  COLUMNS_PER_WRITE,
+  loadRelationsPage,
+} from "@etl/EtlEngine/loadRelationsPage/loadRelationsPage";
 import { createInMemoryListingsStore } from "@etl/stores/InMemoryListingsStore/createInMemoryListingsStore";
 import { createInMemoryObjectStore } from "@etl/stores/InMemoryObjectStore/createInMemoryObjectStore";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -62,6 +65,7 @@ function _apiRelation(
     displayName: `Dataset ${index}`,
     externalOrganizationName: "City of New York",
     sourceUpdatedAt: new Date(Date.UTC(2026, 9, 1, 0, index)),
+    columns: [COLUMN_A],
     ...overrides,
   };
 }
@@ -77,6 +81,12 @@ function _parquetRelation(csvPath: string): PipelineParquetRelation {
     externalOrganizationName: "World Bank",
     sourceUpdatedAt: undefined,
   };
+}
+
+function _columns(count: number): RelationColumn[] {
+  return Array.from({ length: count }, (_, index) => {
+    return { ...COLUMN_A, name: `column_${index}` };
+  });
 }
 
 function _apiRelations(count: number): Relation[] {
@@ -221,12 +231,12 @@ describe("loadRelationsPage", () => {
     let upsertCalls = 0;
     const failingListings: ListingsStore = {
       ...listings,
-      upsertRows: async (rows) => {
+      upsertListingsWithColumns: async (entries) => {
         upsertCalls += 1;
         if (upsertCalls === 2) {
           throw new Error("second chunk failed");
         }
-        return listings.upsertRows(rows);
+        return listings.upsertListingsWithColumns(entries);
       },
     };
 
@@ -270,29 +280,82 @@ describe("loadRelationsPage", () => {
     ).toEqual(["a"]);
   });
 
-  it("does not rewrite an unchanged relation's columns", async () => {
+  it("writes every row in the same call as its columns", async () => {
     const listings = createInMemoryListingsStore();
-    let replaceCalls = 0;
-    const countingListings: ListingsStore = {
-      ...listings,
-      replaceRelationColumns: async (args) => {
-        replaceCalls += 1;
-        return listings.replaceRelationColumns(args);
-      },
-    };
-    const relation = _apiRelation(1, { columns: [COLUMN_A] });
-    const stores = { listings: countingListings, objects: undefined };
-    await loadRelationsPage({
-      relations: [relation],
-      context: _context(stores),
-    });
 
     await loadRelationsPage({
-      relations: [relation],
-      context: _context(stores),
+      relations: [
+        _apiRelation(1, { columns: [COLUMN_A, COLUMN_B] }),
+        _apiRelation(2, { columns: [COLUMN_B] }),
+      ],
+      context: _context({ listings, objects: undefined }),
     });
 
-    expect(replaceCalls).toBe(1);
+    expect(
+      listings.getUpsertBatches().map((batch) => {
+        return batch.map(({ row, columns }) => {
+          return [
+            row.external_dataset_id,
+            columns.map((column) => {
+              return column.column_name;
+            }),
+          ];
+        });
+      }),
+    ).toEqual([
+      [
+        ["ds-001", ["a", "b"]],
+        ["ds-002", ["b"]],
+      ],
+    ]);
+  });
+
+  it("starts a new write when the next relation's columns would pass the cap, never splitting one", async () => {
+    const listings = createInMemoryListingsStore();
+    const halfOfCap = COLUMNS_PER_WRITE / 2;
+
+    await loadRelationsPage({
+      relations: [
+        _apiRelation(1, { columns: _columns(halfOfCap) }),
+        _apiRelation(2, { columns: _columns(halfOfCap) }),
+        _apiRelation(3, { columns: _columns(1) }),
+        _apiRelation(4, { columns: _columns(COLUMNS_PER_WRITE + 1) }),
+        _apiRelation(5, { columns: _columns(1) }),
+      ],
+      context: _context({ listings, objects: undefined }),
+    });
+
+    expect(
+      listings.getUpsertBatches().map((batch) => {
+        return batch.map(({ row, columns }) => {
+          return [row.external_dataset_id, columns.length];
+        });
+      }),
+    ).toEqual([
+      [
+        ["ds-001", halfOfCap],
+        ["ds-002", halfOfCap],
+      ],
+      [["ds-003", 1]],
+      [["ds-004", COLUMNS_PER_WRITE + 1]],
+      [["ds-005", 1]],
+    ]);
+  });
+
+  it("rejects an API relation with no columns before reading or writing", async () => {
+    const listings = createInMemoryListingsStore();
+
+    await expect(
+      loadRelationsPage({
+        relations: [_apiRelation(1), _apiRelation(2, { columns: [] })],
+        context: _context({ listings, objects: undefined }),
+      }),
+    ).rejects.toThrow(
+      'Relation "Dataset 2" (external dataset id "ds-002") has no columns. A listing is never stored without its columns.',
+    );
+    expect([listings.getReadBatchSizes(), listings.getUpsertBatches()]).toEqual(
+      [[], []],
+    );
   });
 
   it("writes nothing when a relation with columns is loaded again", async () => {
@@ -345,59 +408,6 @@ describe("loadRelationsPage", () => {
     expect(result).toEqual({ written: 1, unchanged: 0 });
   });
 
-  it("rewrites a relation whose columns failed to write on the last load", async () => {
-    const listings = createInMemoryListingsStore();
-    let replaceCalls = 0;
-    const failingOnceListings: ListingsStore = {
-      ...listings,
-      replaceRelationColumns: async (args) => {
-        replaceCalls += 1;
-        if (replaceCalls === 1) {
-          throw new Error("columns failed");
-        }
-        return listings.replaceRelationColumns(args);
-      },
-    };
-    const relation = _apiRelation(1, { columns: [COLUMN_A] });
-    const stores = { listings: failingOnceListings, objects: undefined };
-    await expect(
-      loadRelationsPage({ relations: [relation], context: _context(stores) }),
-    ).rejects.toThrow("columns failed");
-
-    const result = await loadRelationsPage({
-      relations: [relation],
-      context: _context(stores),
-    });
-
-    const listingId = listings.getRows()[0]?.id ?? "";
-    expect([
-      result,
-      listings.getRelationColumns(listingId)?.map((column) => {
-        return column.column_name;
-      }),
-    ]).toEqual([{ written: 1, unchanged: 0 }, ["a"]]);
-  });
-
-  it("rejects when the store returns no id for a row with columns", async () => {
-    const listings = createInMemoryListingsStore();
-    const idlessListings: ListingsStore = {
-      ...listings,
-      upsertRows: async (rows) => {
-        await listings.upsertRows(rows);
-        return [];
-      },
-    };
-
-    await expect(
-      loadRelationsPage({
-        relations: [_apiRelation(1, { columns: [COLUMN_A] })],
-        context: _context({ listings: idlessListings, objects: undefined }),
-      }),
-    ).rejects.toThrow(
-      '["api_resource","socrata","https://data.cityofnewyork.us","ds-001","ds-001"]',
-    );
-  });
-
   it("rejects a page that repeats a listing key before reading or writing", async () => {
     const listings = createInMemoryListingsStore();
 
@@ -431,7 +441,7 @@ describe("loadRelationsPage", () => {
       await rm(testRoot, { force: true, recursive: true });
     });
 
-    it("upserts each listing kind in its own call, in page order", async () => {
+    it("writes both listing kinds in one call, in page order", async () => {
       const listings = createInMemoryListingsStore();
 
       await loadRelationsPage({
@@ -448,11 +458,11 @@ describe("loadRelationsPage", () => {
 
       expect(
         listings.getUpsertBatches().map((batch) => {
-          return batch.map((row) => {
+          return batch.map(({ row }) => {
             return row.external_dataset_id;
           });
         }),
-      ).toEqual([["ds-001"], ["WDICSV"], ["WDICSV"], ["ds-002"]]);
+      ).toEqual([["ds-001", "WDICSV", "ds-002"]]);
     });
 
     it("uploads the object before writing its row", async () => {
@@ -462,9 +472,9 @@ describe("loadRelationsPage", () => {
       const stores: EtlStores = {
         listings: {
           ...listings,
-          upsertRows: async (rows) => {
+          upsertListingsWithColumns: async (entries) => {
             events.push("upsert");
-            return listings.upsertRows(rows);
+            return listings.upsertListingsWithColumns(entries);
           },
         },
         objects: {
@@ -486,8 +496,7 @@ describe("loadRelationsPage", () => {
         }),
       });
 
-      // The row is written, then written again with its columns fingerprint.
-      expect(events).toEqual(["upload", "upsert", "upsert"]);
+      expect(events).toEqual(["upload", "upsert"]);
     });
   });
 });

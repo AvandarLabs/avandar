@@ -84,8 +84,11 @@ export type ApiResourceRelation = RelationDescription &
     kind: "api_resource";
     apiResourceId: string;
     apiResourceFormat: string;
-    /** Written only when the relation's row is written. */
-    columns?: readonly RelationColumn[];
+    /**
+     * Never empty: a listing is never stored without its columns. Written
+     * together with the relation's row.
+     */
+    columns: readonly RelationColumn[];
   }>;
 
 /** A prebuilt relation: a CSV the engine converts to a Parquet object. */
@@ -103,10 +106,15 @@ export type PipelineParquetRelation = RelationDescription &
 /** One listing a pipeline's `transform` returns. */
 export type Relation = ApiResourceRelation | PipelineParquetRelation;
 
-/** The tables and bucket the engine writes to. */
+/** The tables, function, and bucket the engine writes to. */
 export type EtlOutput = Readonly<{
   listingsTable: string;
-  relationColumnsTable: string;
+  /**
+   * The database function that upserts listings with their relation columns
+   * in one transaction, such as
+   * `rpc_data_catalog_listings__upsert_with_relation_columns`.
+   */
+  upsertListingsFunction: string;
   /**
    * The checkpoints table. Required when the config has `incremental`,
    * because incremental crawls resume from it.

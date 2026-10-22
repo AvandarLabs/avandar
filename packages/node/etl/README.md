@@ -38,7 +38,12 @@ import type { EtlEngineConfig, EtlRunWindow } from "@avandar/etl";
 /** A drive: one portal. */
 type Portal = { baseUrl: string };
 /** A connection: one dataset the portal lists. */
-type Dataset = { id: string; name: string; updatedAt: string };
+type Dataset = {
+  id: string;
+  name: string;
+  updatedAt: string;
+  columns: { name: string; type: string }[];
+};
 
 const portals: Portal[] = [{ baseUrl: "https://data.example.org" }];
 
@@ -76,7 +81,7 @@ const config: EtlEngineConfig<Portal, Dataset> = {
   },
   output: {
     listingsTable: "data_catalog_listings",
-    relationColumnsTable: "data_catalog_listings__relation_columns",
+    upsertListingsFunction: "rpc_data_catalog_listings__upsert_with_relation_columns",
     checkpointsTable: "pipeline_scope_checkpoints",
   },
   listDrives: () => portals,
@@ -92,6 +97,11 @@ const config: EtlEngineConfig<Portal, Dataset> = {
       sourceUpdatedAt: getUpdatedAt(connection),
       apiResourceId: connection.id,
       apiResourceFormat: "json",
+      columns: connection.columns.map((column) => ({
+        name: column.name,
+        originalDataType: column.type,
+        castDataType: column.type === "number" ? "DOUBLE" : "VARCHAR",
+      })),
     },
   ],
   incremental: { getConnectionTimestamp: getUpdatedAt },
@@ -188,13 +198,6 @@ fails that crawl in a full run too.
   loading. After a mid-page failure, `relationsWritten` leaves out the rows
   that page already wrote.
 
-**Caveats.**
-
-- A failed column write (see "Engine-managed metadata" below) is repaired
-  by a later run whose window refetches the connection, such as a full run.
-  On a pipeline that runs incrementally the checkpoint has already moved
-  past the connection, so the next incremental run may not reach it.
-
 ## Output contract
 
 The engine writes only these listings-table columns
@@ -216,16 +219,29 @@ The checkpoints table needs `pipeline_name`, `drive_key`, `scope_key`,
 first three. It is required when the config has `incremental`.
 
 **Writes.** A page loads in connection order. Parquet objects upload before
-any row is written, then changed rows are upserted in chunks. Each
-`upsertRows` call holds one listing kind and is all-or-nothing. The Supabase
-store reads stored rows a few at a time to keep request URLs short.
+any row is written, then changed rows are written in batches of at most 200
+listings and `COLUMNS_PER_WRITE` (5,000) relation columns. Each batch is one
+`upsertListingsWithColumns` call, which writes every row together with its
+whole column set in one transaction. A listing is never split from its
+columns across batches, so a listing is never stored without its columns:
+one with more columns than the cap is written alone. The Supabase store
+reads stored rows a few at a time to keep request URLs short.
 
-**Relation columns.** The relation columns table needs `catalog_listing_id`,
-`column_name`, `display_order`, `original_data_type`, and `cast_data_type`.
-A relation that declares columns replaces that listing's whole column set
-when its row is written. An `api_resource` relation may declare `columns`,
-and a `pipeline_parquet` relation's columns always come from its Parquet
-file. A relation without `columns` never touches the column table.
+**Relation columns.** Every listing has at least one relation column. An
+`api_resource` relation must declare non-empty `columns`, and the engine
+rejects a page holding one that does not, before it reads or writes
+anything. A `pipeline_parquet` relation's columns always come from its
+Parquet file. Writing a row replaces that listing's whole column set.
+
+`output.upsertListingsFunction` names the database function that does the
+write. It takes `p_listings`, a JSON array of `{ listing, relation_columns }`
+where `listing` holds the contract columns and `relation_columns` holds
+`{ column_name, display_order, original_data_type, cast_data_type }` rows,
+upserts each listing on its conflict target, replaces its columns, and
+returns the stored listings. Avandar's is
+`rpc_data_catalog_listings__upsert_with_relation_columns`. Deleting a
+listing deletes its columns too (`on delete cascade`), which is how reset
+and prune clear them.
 
 **Engine-managed metadata.** The engine merges these keys over a relation's
 own `metadata`:
@@ -233,11 +249,10 @@ own `metadata`:
 | Key | Written for | Holds |
 | --- | --- | --- |
 | `open_data_bucket`, `storage_object_path`, `table` (`name`, `row_count`, `column_names`), `parquet_sha256` | `pipeline_parquet` rows | Where the object lives and the SHA-256 of its bytes |
-| `relation_columns_sha256` | any relation that declares columns | The SHA-256 of its column set |
+| `relation_columns_sha256` | every row | The SHA-256 of its column set |
 
-A row's `relation_columns_sha256` is written in a second upsert, after its
-columns land. A failure in between leaves a row without the current hash,
-which the next load that reaches the row sees as changed and rewrites.
+Because the hash is part of the row, a change to a relation's columns alone
+makes its row count as changed, and the row and its columns are rewritten.
 
 **Parquet relations** need `output.bucket`: a `pipeline_parquet` relation
 fails its crawl when no bucket is set. The bucket must already exist, and

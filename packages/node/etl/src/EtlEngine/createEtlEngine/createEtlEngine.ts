@@ -4,12 +4,12 @@ import {
   buildUncrawledCrawlResult,
   crawlScope,
 } from "@etl/EtlEngine/crawlScope/crawlScope";
+import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
+import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
 import {
   ETL_SCOPE_KEY_PATTERN,
   ETL_UNLISTED_SCOPE_KEY,
 } from "@etl/EtlEngine/etlScopes";
-import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
-import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
 import { resolveDriveScopes } from "@etl/EtlEngine/resolveDriveScopes/resolveDriveScopes";
 import { selectRequestedScopes } from "@etl/EtlEngine/selectRequestedScopes/selectRequestedScopes";
 import { createSupabaseCheckpointStore } from "@etl/stores/SupabaseCheckpointStore/createSupabaseCheckpointStore";
@@ -112,7 +112,7 @@ function _createSupabaseStores(destination: EtlDestination): EtlStores {
     listings: createSupabaseListingsStore({
       client,
       listingsTable: output.listingsTable,
-      relationColumnsTable: output.relationColumnsTable,
+      upsertListingsFunction: output.upsertListingsFunction,
     }),
     objects:
       output.bucket === undefined

@@ -41,6 +41,7 @@ export type {
   ListingAccessKind,
   ListingRowValues,
   ListingsStore,
+  ListingWithColumns,
   ObjectStore,
   RelationColumnRow,
   StoredCheckpoint,

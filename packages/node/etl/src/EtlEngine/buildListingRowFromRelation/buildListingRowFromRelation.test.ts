@@ -18,6 +18,7 @@ const API_RELATION: ApiResourceRelation = {
   displayName: "Rodent Inspections",
   externalOrganizationName: "City of New York",
   sourceUpdatedAt: new Date("2026-10-19T08:30:00.000Z"),
+  columns: [{ name: "a", originalDataType: "text", castDataType: "VARCHAR" }],
 };
 
 const PARQUET_RELATION: PipelineParquetRelation = {
@@ -77,7 +78,14 @@ describe("buildListingRowFromRelation", () => {
       row.api_resource_id,
       row.api_resource_format,
       row.parquet_file_name,
-    ]).toEqual(["api_resource", "socrata", DRIVE_KEY, "abcd-1234", "CSV", null]);
+    ]).toEqual([
+      "api_resource",
+      "socrata",
+      DRIVE_KEY,
+      "abcd-1234",
+      "CSV",
+      null,
+    ]);
   });
 
   it("writes a Parquet relation's file name and no API column", () => {

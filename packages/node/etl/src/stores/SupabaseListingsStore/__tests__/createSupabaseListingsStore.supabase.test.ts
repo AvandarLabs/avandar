@@ -3,10 +3,15 @@ import { isListingRowUnchanged } from "@etl/EtlEngine/isListingRowUnchanged/isLi
 import { createSupabaseListingsStore } from "@etl/stores/SupabaseListingsStore/createSupabaseListingsStore";
 import { createClient } from "@supabase/supabase-js";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import type { ListingRowValues } from "@etl/stores/EtlStores.types";
+import type {
+  ListingRowValues,
+  RelationColumnRow,
+} from "@etl/stores/EtlStores.types";
 
 const LISTINGS_TABLE = "data_catalog_listings";
 const COLUMNS_TABLE = "data_catalog_listings__relation_columns";
+const UPSERT_FUNCTION =
+  "rpc_data_catalog_listings__upsert_with_relation_columns";
 const DRIVE = "https://etl-fixture.invalid";
 const OTHER_DRIVE = "https://etl-fixture-other.invalid";
 const PIPELINE_NAME = `etl-fixture-${randomUUID()}`;
@@ -20,7 +25,7 @@ const client = createClient(
 const store = createSupabaseListingsStore({
   client,
   listingsTable: LISTINGS_TABLE,
-  relationColumnsTable: COLUMNS_TABLE,
+  upsertListingsFunction: UPSERT_FUNCTION,
 });
 
 function _apiRow(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
@@ -67,6 +72,36 @@ function _parquetRow(
   });
 }
 
+function _column(name: string, displayOrder = 0): RelationColumnRow {
+  return {
+    column_name: name,
+    display_order: displayOrder,
+    original_data_type: "text",
+    cast_data_type: "VARCHAR",
+  };
+}
+
+/** Upserts each row with one relation column, `a`, in one call. */
+function _upsert(rows: readonly ListingRowValues[]) {
+  return store.upsertListingsWithColumns(
+    rows.map((row) => {
+      return { row, columns: [_column("a")] };
+    }),
+  );
+}
+
+async function _readColumnNames(listingId: string): Promise<string[]> {
+  const { data, error } = await client
+    .from(COLUMNS_TABLE)
+    .select("column_name")
+    .eq("catalog_listing_id", listingId)
+    .order("display_order");
+  expect(error).toBeNull();
+  return (data ?? []).map((column) => {
+    return column.column_name;
+  });
+}
+
 function _resourceRows(args: {
   datasetId: string;
   count: number;
@@ -100,7 +135,10 @@ beforeAll(async () => {
   // lands on a stale row.
   const sweeps = await Promise.all([
     client.from(LISTINGS_TABLE).delete().like("pipeline_name", "etl-fixture-%"),
-    client.from(LISTINGS_TABLE).delete().in("api_base_url", [DRIVE, OTHER_DRIVE]),
+    client
+      .from(LISTINGS_TABLE)
+      .delete()
+      .in("api_base_url", [DRIVE, OTHER_DRIVE]),
   ]);
   expect(
     sweeps.map(({ error }) => {
@@ -119,20 +157,15 @@ afterEach(async () => {
 
 describe("createSupabaseListingsStore", () => {
   it("upserts an API relation onto one row by its conflict key", async () => {
-    await store.upsertRows([_apiRow()]);
-    const [second] = await store.upsertRows([
-      _apiRow({ display_name: "Renamed" }),
-    ]);
+    await _upsert([_apiRow()]);
+    const [second] = await _upsert([_apiRow({ display_name: "Renamed" })]);
 
-    expect([await _countRows(), second?.display_name]).toEqual([
-      1,
-      "Renamed",
-    ]);
+    expect([await _countRows(), second?.display_name]).toEqual([1, "Renamed"]);
   });
 
   it("upserts a Parquet relation onto one row by its conflict key", async () => {
-    await store.upsertRows([_parquetRow()]);
-    await store.upsertRows([_parquetRow({ display_name: "Renamed" })]);
+    await _upsert([_parquetRow()]);
+    await _upsert([_parquetRow({ display_name: "Renamed" })]);
 
     expect(await _countRows()).toBe(1);
   });
@@ -144,26 +177,73 @@ describe("createSupabaseListingsStore", () => {
       _apiRow({ display_name: "Renamed" }),
     ];
 
-    await expect(store.upsertRows(rows)).rejects.toThrow(
-      "cannot affect row a second time",
+    await expect(_upsert(rows)).rejects.toThrow(
+      'Listing "Renamed" appears twice in one call',
     );
     expect(await _countRows()).toBe(0);
   });
 
-  it("rejects a batch that mixes listing kinds and writes none of its rows", async () => {
+  it("writes both listing kinds in one call", async () => {
+    await _upsert([_apiRow(), _parquetRow()]);
+
+    expect(await _countRows()).toBe(2);
+  });
+
+  it("names the database error code and keeps its error as the cause", async () => {
     await expect(
-      store.upsertRows([_apiRow(), _parquetRow()]),
-    ).rejects.toThrow("upsertRows takes rows of one listing kind per call");
+      _upsert([_apiRow(), _apiRow({ display_name: "Renamed" })]),
+    ).rejects.toMatchObject({
+      message: expect.stringContaining("code P0001"),
+      cause: { code: "P0001" },
+    });
+  });
+
+  it("stores a listing with every one of its columns", async () => {
+    const [stored] = await store.upsertListingsWithColumns([
+      { row: _apiRow(), columns: [_column("a", 0), _column("b", 1)] },
+    ]);
+
+    expect(await _readColumnNames(stored?.id ?? "")).toEqual(["a", "b"]);
+  });
+
+  it("rejects an entry with no columns and writes none of the call's listings", async () => {
+    await expect(
+      store.upsertListingsWithColumns([
+        {
+          row: _apiRow({ external_dataset_id: "etl-fixture-first" }),
+          columns: [_column("a")],
+        },
+        { row: _apiRow({ display_name: "Bare" }), columns: [] },
+      ]),
+    ).rejects.toThrow('Listing "Bare" has no relation columns');
     expect(await _countRows()).toBe(0);
   });
 
-  it("names PostgREST's error code and keeps its error as the cause", async () => {
+  it("keeps a stored listing's columns when a later entry in the call fails", async () => {
+    const [stored] = await store.upsertListingsWithColumns([
+      { row: _apiRow(), columns: [_column("old")] },
+    ]);
+
     await expect(
-      store.upsertRows([_apiRow(), _apiRow({ display_name: "Renamed" })]),
-    ).rejects.toMatchObject({
-      message: expect.stringContaining("code 21000"),
-      cause: { code: "21000" },
-    });
+      store.upsertListingsWithColumns([
+        {
+          row: _apiRow({ display_name: "Renamed" }),
+          columns: [_column("new")],
+        },
+        {
+          row: _apiRow({ external_dataset_id: "etl-fixture-bare" }),
+          columns: [],
+        },
+      ]),
+    ).rejects.toThrow("has no relation columns");
+    expect(await _readColumnNames(stored?.id ?? "")).toEqual(["old"]);
+  });
+
+  it("refuses more listings than PostgREST returns in one response", async () => {
+    await expect(
+      _upsert(_resourceRows({ datasetId: "etl-fixture-dataset", count: 1001 })),
+    ).rejects.toThrow("at most 1000 listings per call");
+    expect(await _countRows()).toBe(0);
   });
 
   it("writes only contract columns when a row carries other properties", async () => {
@@ -172,7 +252,7 @@ describe("createSupabaseListingsStore", () => {
       cached_object_path: "etl-fixture/stray.csv",
     };
 
-    const [stored] = await store.upsertRows([rowWithCacheColumn]);
+    const [stored] = await _upsert([rowWithCacheColumn]);
 
     const { data } = await client
       .from(LISTINGS_TABLE)
@@ -184,7 +264,7 @@ describe("createSupabaseListingsStore", () => {
 
   it("reads back a written row that the change check sees as unchanged", async () => {
     const row = _apiRow();
-    await store.upsertRows([row]);
+    await _upsert([row]);
 
     const [stored] = await store.readRowsMatching([row]);
 
@@ -194,7 +274,7 @@ describe("createSupabaseListingsStore", () => {
   });
 
   it("round-trips a row's scope keys in order", async () => {
-    await store.upsertRows([
+    await _upsert([
       _apiRow({ pipeline_scope_keys: ["format:csv", "category:health"] }),
     ]);
 
@@ -208,7 +288,7 @@ describe("createSupabaseListingsStore", () => {
 
   it("returns one stored row when the same key is asked for twice", async () => {
     const row = _apiRow();
-    await store.upsertRows([row]);
+    await _upsert([row]);
 
     const stored = await store.readRowsMatching([row, row]);
 
@@ -217,7 +297,7 @@ describe("createSupabaseListingsStore", () => {
 
   it("reads exactly the 2 asked-for resources of a dataset that has 5", async () => {
     const rows = _resourceRows({ datasetId: "etl-fixture-dataset", count: 5 });
-    await store.upsertRows(rows);
+    await _upsert(rows);
     const wanted = rows.filter((_, index) => {
       return index === 1 || index === 3;
     });
@@ -233,7 +313,8 @@ describe("createSupabaseListingsStore", () => {
       datasetId: "etl-fixture-dataset",
       count: 1001,
     });
-    await store.upsertRows(rows);
+    await _upsert(rows.slice(0, 1000));
+    await _upsert(rows.slice(1000));
 
     const stored = await store.readRowsMatching(rows);
 
@@ -250,7 +331,7 @@ describe("createSupabaseListingsStore", () => {
         api_resource_id: `etl-fixture-${randomUUID()}`.padEnd(100, "y"),
       });
     });
-    await store.upsertRows(rows);
+    await _upsert(rows);
 
     const stored = await store.readRowsMatching(rows);
 
@@ -259,7 +340,7 @@ describe("createSupabaseListingsStore", () => {
 
   it("reads a Parquet listing back by its pipeline and file name", async () => {
     const wanted = _parquetRow({ parquet_file_name: "etl-fixture-a.parquet" });
-    await store.upsertRows([
+    await _upsert([
       wanted,
       _parquetRow({ parquet_file_name: "etl-fixture-b.parquet" }),
     ]);
@@ -274,46 +355,38 @@ describe("createSupabaseListingsStore", () => {
   });
 
   it("replaces a listing's relation columns as a whole", async () => {
-    const [stored] = await store.upsertRows([_apiRow()]);
-    const listingId = stored?.id ?? "";
-    await store.replaceRelationColumns({
-      listingId,
-      columns: [
-        {
-          column_name: "a",
-          display_order: 0,
-          original_data_type: "text",
-          cast_data_type: "VARCHAR",
-        },
-        {
-          column_name: "b",
-          display_order: 1,
-          original_data_type: "text",
-          cast_data_type: "VARCHAR",
-        },
-      ],
-    });
-    await store.replaceRelationColumns({
-      listingId,
-      columns: [
-        {
-          column_name: "c",
-          display_order: 0,
-          original_data_type: "float",
-          cast_data_type: "DOUBLE",
-        },
-      ],
-    });
+    await store.upsertListingsWithColumns([
+      { row: _apiRow(), columns: [_column("a", 0), _column("b", 1)] },
+    ]);
+    const [stored] = await store.upsertListingsWithColumns([
+      { row: _apiRow(), columns: [_column("c", 0)] },
+    ]);
 
-    const { data } = await client
-      .from(COLUMNS_TABLE)
-      .select("column_name")
-      .eq("catalog_listing_id", listingId);
-    expect(data).toEqual([{ column_name: "c" }]);
+    expect(await _readColumnNames(stored?.id ?? "")).toEqual(["c"]);
+  });
+
+  it("round-trips a row with every contract column set", async () => {
+    const row = _apiRow({
+      external_service_name: "Fixture API",
+      source_url: "https://etl-fixture.invalid/source",
+      license: "CC-BY-4.0",
+      update_frequency: "daily",
+      description: "A description",
+      notes: "Some notes",
+      coverage_start_date: "2020-01-01T00:00:00.000Z",
+      coverage_end_date: "2021-01-01T00:00:00.000Z",
+    });
+    await _upsert([row]);
+
+    const [stored] = await store.readRowsMatching([row]);
+
+    expect(
+      stored !== undefined && isListingRowUnchanged({ stored, next: row }),
+    ).toBe(true);
   });
 
   it("leaves an existing row's cache columns untouched", async () => {
-    const [stored] = await store.upsertRows([_apiRow()]);
+    const [stored] = await _upsert([_apiRow()]);
     await client
       .from(LISTINGS_TABLE)
       .update({
@@ -323,7 +396,7 @@ describe("createSupabaseListingsStore", () => {
       })
       .eq("id", stored?.id ?? "");
 
-    await store.upsertRows([_apiRow({ display_name: "Renamed" })]);
+    await _upsert([_apiRow({ display_name: "Renamed" })]);
 
     const { data } = await client
       .from(LISTINGS_TABLE)

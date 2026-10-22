@@ -19,7 +19,7 @@ export function getPipelineEtlDestination(): EtlDestination {
     },
     output: {
       listingsTable: "data_catalog_listings",
-      relationColumnsTable: "data_catalog_listings__relation_columns",
+      upsertListingsFunction: "rpc_data_catalog_listings__upsert_with_relation_columns",
       checkpointsTable: "pipeline_scope_checkpoints",
       bucket:
         getOptionalEnvVar("SUPABASE_OPENDATA_BUCKET") ??

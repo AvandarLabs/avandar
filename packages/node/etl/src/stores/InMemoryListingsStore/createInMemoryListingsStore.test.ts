@@ -2,6 +2,7 @@ import { createInMemoryListingsStore } from "@etl/stores/InMemoryListingsStore/c
 import { describe, expect, it } from "vitest";
 import type {
   ListingRowValues,
+  ListingWithColumns,
   RelationColumnRow,
   StoredListingRow,
 } from "@etl/stores/EtlStores.types";
@@ -57,12 +58,25 @@ function _column(name: string, displayOrder: number): RelationColumnRow {
   };
 }
 
+function _entry(
+  row: ListingRowValues,
+  columns: readonly RelationColumnRow[] = [_column("a", 0)],
+): ListingWithColumns {
+  return { row, columns };
+}
+
+function _columnNames(columns: readonly RelationColumnRow[] | undefined) {
+  return columns?.map((column) => {
+    return column.column_name;
+  });
+}
+
 describe("createInMemoryListingsStore", () => {
   it("keeps a row's id when the same key is upserted again", async () => {
     const store = createInMemoryListingsStore();
-    const [first] = await store.upsertRows([_row()]);
-    const [second] = await store.upsertRows([
-      _row({ display_name: "Renamed" }),
+    const [first] = await store.upsertListingsWithColumns([_entry(_row())]);
+    const [second] = await store.upsertListingsWithColumns([
+      _entry(_row({ display_name: "Renamed" })),
     ]);
 
     expect([second?.id, second?.display_name, store.getRows().length]).toEqual([
@@ -89,71 +103,80 @@ describe("createInMemoryListingsStore", () => {
     ).toEqual(["b"]);
   });
 
-  it("replaces a listing's relation columns as a whole", async () => {
+  it("stores a listing's columns with its row", async () => {
     const store = createInMemoryListingsStore();
-    await store.replaceRelationColumns({
-      listingId: "listing-1",
-      columns: [
-        {
-          column_name: "a",
-          display_order: 0,
-          original_data_type: "VARCHAR",
-          cast_data_type: "VARCHAR",
-        },
-        {
-          column_name: "b",
-          display_order: 1,
-          original_data_type: "VARCHAR",
-          cast_data_type: "VARCHAR",
-        },
-      ],
-    });
-    await store.replaceRelationColumns({
-      listingId: "listing-1",
-      columns: [
-        {
-          column_name: "c",
-          display_order: 0,
-          original_data_type: "DOUBLE",
-          cast_data_type: "DOUBLE",
-        },
-      ],
-    });
+    const [stored] = await store.upsertListingsWithColumns([
+      _entry(_row(), [_column("a", 0), _column("b", 1)]),
+    ]);
 
-    expect(
-      store.getRelationColumns("listing-1")?.map((column) => {
-        return column.column_name;
-      }),
-    ).toEqual(["c"]);
+    expect(_columnNames(store.getRelationColumns(stored?.id ?? ""))).toEqual([
+      "a",
+      "b",
+    ]);
   });
 
-  it("fails the whole batch when two rows share a key", async () => {
+  it("replaces a listing's relation columns as a whole", async () => {
+    const store = createInMemoryListingsStore();
+    await store.upsertListingsWithColumns([
+      _entry(_row(), [_column("a", 0), _column("b", 1)]),
+    ]);
+    const [stored] = await store.upsertListingsWithColumns([
+      _entry(_row(), [_column("c", 0)]),
+    ]);
+
+    expect(_columnNames(store.getRelationColumns(stored?.id ?? ""))).toEqual([
+      "c",
+    ]);
+  });
+
+  it("fails the whole call when two entries share a key", async () => {
     const store = createInMemoryListingsStore();
 
     await expect(
-      store.upsertRows([
-        _row({ external_dataset_id: "a", api_resource_id: "a" }),
-        _row({ external_dataset_id: "b", api_resource_id: "b" }),
-        _row({
-          external_dataset_id: "a",
-          api_resource_id: "a",
-          display_name: "Again",
-        }),
+      store.upsertListingsWithColumns([
+        _entry(_row({ external_dataset_id: "a", api_resource_id: "a" })),
+        _entry(_row({ external_dataset_id: "b", api_resource_id: "b" })),
+        _entry(
+          _row({
+            external_dataset_id: "a",
+            api_resource_id: "a",
+            display_name: "Again",
+          }),
+        ),
       ]),
-    ).rejects.toThrow(
-      "ON CONFLICT DO UPDATE command cannot affect row a second time",
-    );
+    ).rejects.toThrow('Listing "Again" appears twice in one call');
     expect([store.getRows().length, store.getUpsertBatches().length]).toEqual([
       0, 0,
     ]);
   });
 
-  it("fails the whole batch when it mixes listing kinds", async () => {
+  it("fails the whole call when an entry has no columns", async () => {
     const store = createInMemoryListingsStore();
 
     await expect(
-      store.upsertRows([
-        _row(),
+      store.upsertListingsWithColumns([
+        _entry(_row({ external_dataset_id: "a", api_resource_id: "a" })),
+        _entry(
+          _row({
+            external_dataset_id: "b",
+            api_resource_id: "b",
+            display_name: "Bare",
+          }),
+          [],
+        ),
+      ]),
+    ).rejects.toThrow('Listing "Bare" has no relation columns');
+    expect([store.getRows().length, store.getUpsertBatches().length]).toEqual([
+      0, 0,
+    ]);
+  });
+
+  it("writes both listing kinds in one call", async () => {
+    const store = createInMemoryListingsStore();
+
+    await store.upsertListingsWithColumns([
+      _entry(_row()),
+      _entry(
         _row({
           access_kind: "pipeline_parquet",
           api_service: null,
@@ -162,11 +185,10 @@ describe("createInMemoryListingsStore", () => {
           api_resource_format: null,
           parquet_file_name: "a.parquet",
         }),
-      ]),
-    ).rejects.toThrow("upsertRows takes rows of one listing kind per call");
-    expect([store.getRows().length, store.getUpsertBatches().length]).toEqual([
-      0, 0,
+      ),
     ]);
+
+    expect(store.getRows()).toHaveLength(2);
   });
 
   it("returns a stored row once when several rows match its key", async () => {
@@ -197,7 +219,7 @@ describe("createInMemoryListingsStore", () => {
   it("is not changed by editing an upserted row afterwards", async () => {
     const metadata = { count: 1 };
     const store = createInMemoryListingsStore();
-    await store.upsertRows([_row({ metadata })]);
+    await store.upsertListingsWithColumns([_entry(_row({ metadata }))]);
 
     metadata.count = 2;
 
@@ -206,7 +228,9 @@ describe("createInMemoryListingsStore", () => {
 
   it("is not changed by editing the rows an upsert returns", async () => {
     const store = createInMemoryListingsStore();
-    const [stored] = await store.upsertRows([_row({ metadata: { count: 1 } })]);
+    const [stored] = await store.upsertListingsWithColumns([
+      _entry(_row({ metadata: { count: 1 } })),
+    ]);
 
     Object.assign(stored?.metadata ?? {}, { count: 2 });
 
@@ -230,38 +254,40 @@ describe("createInMemoryListingsStore", () => {
   it("is not changed by editing a relation column list afterwards", async () => {
     const store = createInMemoryListingsStore();
     const columns: RelationColumnRow[] = [_column("a", 0)];
-    await store.replaceRelationColumns({ listingId: "listing-1", columns });
+    const [stored] = await store.upsertListingsWithColumns([
+      _entry(_row(), columns),
+    ]);
 
     columns.push(_column("b", 1));
 
-    expect(store.getRelationColumns("listing-1")).toHaveLength(1);
+    expect(store.getRelationColumns(stored?.id ?? "")).toHaveLength(1);
   });
 
   it("is not changed by editing the relation columns a read returns", async () => {
     const store = createInMemoryListingsStore();
-    await store.replaceRelationColumns({
-      listingId: "listing-1",
-      columns: [_column("a", 0)],
-    });
+    const [stored] = await store.upsertListingsWithColumns([_entry(_row())]);
+    const listingId = stored?.id ?? "";
 
-    Object.assign(store.getRelationColumns("listing-1")?.[0] ?? {}, {
+    Object.assign(store.getRelationColumns(listingId)?.[0] ?? {}, {
       column_name: "z",
     });
 
-    expect(store.getRelationColumns("listing-1")?.[0]?.column_name).toBe("a");
+    expect(store.getRelationColumns(listingId)?.[0]?.column_name).toBe("a");
   });
 
   it("stores and returns rows the way Postgres would, as JSON", async () => {
     const store = createInMemoryListingsStore();
 
-    const [stored] = await store.upsertRows([
-      _row({
-        metadata: {
-          kept: 1,
-          dropped: undefined,
-          when: new Date("2026-10-19T08:30:00.000Z"),
-        },
-      }),
+    const [stored] = await store.upsertListingsWithColumns([
+      _entry(
+        _row({
+          metadata: {
+            kept: 1,
+            dropped: undefined,
+            when: new Date("2026-10-19T08:30:00.000Z"),
+          },
+        }),
+      ),
     ]);
 
     expect(stored?.metadata).toEqual({
