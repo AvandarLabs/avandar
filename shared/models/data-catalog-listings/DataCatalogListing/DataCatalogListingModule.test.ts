@@ -41,6 +41,7 @@ function _entry(
     cachedSourceVersion: undefined,
     cachedAt: undefined,
     pipelineScopeKeys: [],
+    dateColumnTypeLastVerified: undefined,
     ...overrides,
   };
 }
@@ -74,9 +75,7 @@ describe("DataCatalogListing.toAccess", () => {
   });
 
   it("reads an API entry as the API shape", () => {
-    expect(
-      DataCatalogListing.toAccess(_entry(COMPLETE_API_FIELDS)),
-    ).toEqual({
+    expect(DataCatalogListing.toAccess(_entry(COMPLETE_API_FIELDS))).toEqual({
       kind: "api_resource",
       apiService: "ckan",
       apiBaseUrl: "https://data.humdata.org",

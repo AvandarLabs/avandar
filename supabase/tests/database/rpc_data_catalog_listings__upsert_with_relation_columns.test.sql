@@ -61,7 +61,7 @@ create function pg_temp.one_column (p_name text) returns jsonb as $$
   ));
 $$ language sql;
 
-select plan(14);
+select plan(23);
 
 -- ---------------------------------------------------------------------------
 -- Refusing a listing without columns, and rolling back the whole call
@@ -211,6 +211,123 @@ select is(
   ),
   'pgtap-fixture.parquet',
   'a pipeline_parquet listing is upserted on its own conflict key'
+);
+
+-- ---------------------------------------------------------------------------
+-- Keeping verified column types across pipeline rewrites
+-- ---------------------------------------------------------------------------
+
+-- Builds one element for the `pgtap-fixture-verified` listing, with a
+-- columns fingerprint and a verification date.
+create function pg_temp.fingerprinted_listing (
+  p_fingerprint text,
+  p_verified_at timestamptz,
+  p_column_name text
+) returns jsonb as $$
+  select jsonb_set(
+    jsonb_set(
+      pg_temp.api_listing('pgtap-fixture-verified', 'verified', pg_temp.one_column(p_column_name)),
+      '{listing,metadata}',
+      jsonb_build_object('relation_columns_sha256', p_fingerprint)
+    ),
+    '{listing,date_column_type_last_verified}',
+    coalesce(to_jsonb(p_verified_at), 'null'::jsonb)
+  );
+$$ language sql;
+
+select is(
+  (
+    select date_column_type_last_verified
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.fingerprinted_listing('fp-1', '2026-10-01T00:00:00Z', 'piped')))
+  ),
+  '2026-10-01T00:00:00Z'::timestamptz,
+  'a listing whose pipeline read real types is stored as verified'
+);
+
+-- The app verifies the types: the columns change and the date moves on.
+select public.rpc_data_catalog_listings__write_verified_column_types(
+  (select id from public.data_catalog_listings where external_dataset_id = 'pgtap-fixture-verified'),
+  jsonb_build_array(jsonb_build_object('column_name', 'checked', 'cast_data_type', 'BIGINT'))
+);
+
+-- A function's writes are invisible to the statement that called it, so each
+-- rewrite below is checked by a separate read of its columns.
+create function pg_temp.verified_column_names () returns setof text as $$
+  select relation_column.column_name
+  from public.data_catalog_listings__relation_columns relation_column
+  join public.data_catalog_listings listing
+    on listing.id = relation_column.catalog_listing_id
+  where listing.external_dataset_id = 'pgtap-fixture-verified';
+$$ language sql;
+
+select is(
+  (
+    select date_column_type_last_verified
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.fingerprinted_listing('fp-1', null, 'piped')))
+  ),
+  now(),
+  'an unverified rewrite with the same columns fingerprint keeps the verification date'
+);
+
+select results_eq(
+  $$select * from pg_temp.verified_column_names()$$,
+  $$values ('checked')$$,
+  'an unverified rewrite with the same columns fingerprint keeps the verified columns'
+);
+
+select is(
+  (
+    select date_column_type_last_verified
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.fingerprinted_listing('fp-2', null, 'renamed')))
+  ),
+  null,
+  'an unverified rewrite with a new columns fingerprint clears the date'
+);
+
+select results_eq(
+  $$select * from pg_temp.verified_column_names()$$,
+  $$values ('renamed')$$,
+  'an unverified rewrite with a new columns fingerprint replaces the columns'
+);
+
+select is(
+  (
+    select date_column_type_last_verified
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.fingerprinted_listing('fp-2', '2026-10-05T00:00:00Z', 'reread')))
+  ),
+  '2026-10-05T00:00:00Z'::timestamptz,
+  'a verified rewrite takes its verification date'
+);
+
+select results_eq(
+  $$select * from pg_temp.verified_column_names()$$,
+  $$values ('reread')$$,
+  'a verified rewrite replaces the columns even when the fingerprint is unchanged'
+);
+
+select is(
+  (
+    select date_column_type_last_verified
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.api_listing('pgtap-fixture-no-fingerprint', 'no fingerprint', pg_temp.one_column('a'))))
+  ),
+  null,
+  'a new listing without a verification date is unverified'
+);
+
+select is(
+  (
+    select count(*)::integer
+    from public.data_catalog_listings__relation_columns relation_column
+    join public.data_catalog_listings listing on listing.id = relation_column.catalog_listing_id
+    where listing.external_dataset_id = 'pgtap-fixture-no-fingerprint'
+  ),
+  1,
+  'a rewrite with no stored fingerprint writes its columns'
 );
 
 -- ---------------------------------------------------------------------------

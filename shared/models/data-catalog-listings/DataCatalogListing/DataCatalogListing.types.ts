@@ -112,6 +112,13 @@ export type DataCatalogListingRead = {
    * listing no scoped pipeline wrote.
    */
   pipelineScopeKeys: string[];
+
+  /**
+   * When the types of this entry's relation columns were last verified
+   * against a sample of the source's real data. Undefined when they never
+   * were, in which case every column is text.
+   */
+  dateColumnTypeLastVerified: string | undefined;
 };
 
 /**

@@ -47,6 +47,7 @@ function _entry(
     cachedSourceVersion: undefined,
     cachedAt: undefined,
     pipelineScopeKeys: [],
+    dateColumnTypeLastVerified: undefined,
     ...overrides,
   };
 }

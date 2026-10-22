@@ -340,6 +340,7 @@ export type Database = {
           coverage_end_date: string | null
           coverage_start_date: string | null
           created_at: string
+          date_column_type_last_verified: string | null
           date_of_last_sync: string | null
           date_of_last_update: string | null
           description: string | null
@@ -374,6 +375,7 @@ export type Database = {
           coverage_end_date?: string | null
           coverage_start_date?: string | null
           created_at?: string
+          date_column_type_last_verified?: string | null
           date_of_last_sync?: string | null
           date_of_last_update?: string | null
           description?: string | null
@@ -408,6 +410,7 @@ export type Database = {
           coverage_end_date?: string | null
           coverage_start_date?: string | null
           created_at?: string
+          date_column_type_last_verified?: string | null
           date_of_last_sync?: string | null
           date_of_last_update?: string | null
           description?: string | null
@@ -1881,6 +1884,7 @@ export type Database = {
           coverage_end_date: string | null
           coverage_start_date: string | null
           created_at: string
+          date_column_type_last_verified: string | null
           date_of_last_sync: string | null
           date_of_last_update: string | null
           description: string | null
@@ -1905,6 +1909,50 @@ export type Database = {
           to: "data_catalog_listings"
           isOneToOne: false
           isSetofReturn: true
+        }
+      }
+      rpc_data_catalog_listings__write_verified_column_types: {
+        Args: { p_catalog_listing_id: string; p_columns: Json }
+        Returns: {
+          access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
+          api_base_url: string | null
+          api_resource_format: string | null
+          api_resource_id: string | null
+          api_service:
+            | Database["public"]["Enums"]["data_catalog_listings__api_service"]
+            | null
+          cached_at: string | null
+          cached_object_path: string | null
+          cached_source_version: string | null
+          canonical_urls: string[] | null
+          coverage_end_date: string | null
+          coverage_start_date: string | null
+          created_at: string
+          date_column_type_last_verified: string | null
+          date_of_last_sync: string | null
+          date_of_last_update: string | null
+          description: string | null
+          display_name: string
+          external_dataset_id: string | null
+          external_organization_name: string
+          external_service_name: string | null
+          id: string
+          license: string | null
+          metadata: Json | null
+          notes: string | null
+          parquet_file_name: string | null
+          pipeline_name: string | null
+          pipeline_run_id: string | null
+          pipeline_scope_keys: string[]
+          source_url: string | null
+          update_frequency: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "data_catalog_listings"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       rpc_datasets__add_csv_file_dataset: {

@@ -94,6 +94,12 @@ create table public.data_catalog_listings (
   -- writes the row, and pruning a retired scope removes it. Empty on a
   -- listing no scoped pipeline wrote.
   pipeline_scope_keys text[] not null default '{}',
+  -- When this listing's relation column types were last verified against
+  -- the source's real data. Null when they never were: a pipeline that only
+  -- knows column names writes every column as text, and the app infers the
+  -- real types from a sample later. A listing is stale when this is older
+  -- than `date_of_last_update`.
+  date_column_type_last_verified timestamptz,
   constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name),
   -- A pipeline listing carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning

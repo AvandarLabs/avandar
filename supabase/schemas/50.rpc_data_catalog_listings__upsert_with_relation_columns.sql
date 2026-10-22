@@ -11,6 +11,14 @@
  * set on a replaced listing. Every other column, such as the app's cache
  * columns, keeps its stored value.
  *
+ * Column types the app verified survive a pipeline rewrite. When an element
+ * carries no `date_column_type_last_verified` and its
+ * `metadata.relation_columns_sha256` (the fingerprint of the columns the
+ * pipeline produces) equals the stored listing's, the pipeline's view of the
+ * columns has not changed, so the stored columns and verification date are
+ * kept. Otherwise the columns are replaced and the date is the element's:
+ * set when the pipeline read real types, null when it only knew names.
+ *
  * @param p_listings A JSON array. Each element is an object with `listing`,
  *   the listing's contract columns, and `relation_columns`, a non-empty array
  *   of `{ column_name, display_order, original_data_type, cast_data_type }`.
@@ -24,7 +32,9 @@ create or replace function public.rpc_data_catalog_listings__upsert_with_relatio
 declare
   v_item jsonb;
   v_input public.data_catalog_listings;
+  v_stored public.data_catalog_listings;
   v_listing public.data_catalog_listings;
+  v_is_keeping_stored_columns boolean;
   v_written_ids uuid[] := '{}';
 begin
   if p_listings is null or jsonb_typeof(p_listings) <> 'array' then
@@ -47,7 +57,7 @@ begin
 
     -- Find the stored listing by its conflict key, so one upsert on `id`
     -- serves both listing kinds.
-    select listing.id into v_input.id
+    select listing.* into v_stored
     from public.data_catalog_listings listing
     where
       case v_input.access_kind
@@ -61,6 +71,18 @@ begin
           listing.pipeline_name = v_input.pipeline_name
       end
     for update;
+
+    v_input.id := v_stored.id;
+    v_is_keeping_stored_columns :=
+      v_stored.id is not null and
+      v_input.date_column_type_last_verified is null and
+      v_stored.metadata ->> 'relation_columns_sha256' is not null and
+      v_stored.metadata ->> 'relation_columns_sha256' =
+        v_input.metadata ->> 'relation_columns_sha256';
+    if v_is_keeping_stored_columns then
+      v_input.date_column_type_last_verified :=
+        v_stored.date_column_type_last_verified;
+    end if;
 
     if v_input.id = any (v_written_ids) then
       raise exception 'Listing "%" appears twice in one call. Each listing may be written only once per call.',
@@ -92,7 +114,8 @@ begin
       api_resource_id,
       api_resource_format,
       parquet_file_name,
-      pipeline_scope_keys
+      pipeline_scope_keys,
+      date_column_type_last_verified
     ) values (
       coalesce(v_input.id, gen_random_uuid()),
       v_input.access_kind,
@@ -118,7 +141,8 @@ begin
       v_input.api_resource_id,
       v_input.api_resource_format,
       v_input.parquet_file_name,
-      coalesce(v_input.pipeline_scope_keys, '{}')
+      coalesce(v_input.pipeline_scope_keys, '{}'),
+      v_input.date_column_type_last_verified
     )
     on conflict (id) do update set
       access_kind = excluded.access_kind,
@@ -144,10 +168,16 @@ begin
       api_resource_id = excluded.api_resource_id,
       api_resource_format = excluded.api_resource_format,
       parquet_file_name = excluded.parquet_file_name,
-      pipeline_scope_keys = excluded.pipeline_scope_keys
+      pipeline_scope_keys = excluded.pipeline_scope_keys,
+      date_column_type_last_verified = excluded.date_column_type_last_verified
     returning * into v_listing;
 
     v_written_ids := v_written_ids || v_listing.id;
+
+    if v_is_keeping_stored_columns then
+      return next v_listing;
+      continue;
+    end if;
 
     delete from public.data_catalog_listings__relation_columns relation_column
     where relation_column.catalog_listing_id = v_listing.id;
