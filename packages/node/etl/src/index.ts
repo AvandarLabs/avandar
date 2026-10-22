@@ -97,3 +97,32 @@ export {
   type NodeDuckDbReadCsvIntoViewOptions,
   type NodeDuckDbSniffCsvColumn,
 } from "@etl/NodeDuckDb/NodeDuckDb";
+
+export type {
+  ExecutionCommand,
+  ExecutionDeletionCounts,
+  ExecutionDenominators,
+  ExecutionFinalStatus,
+  ExecutionInvocation,
+  ExecutionInvokedVia,
+  ExecutionOutcome,
+  ExecutionScope,
+  ExecutionScopeStatus,
+  ExecutionStageTimings,
+  ExecutionStart,
+  ExecutionStore,
+} from "@etl/stores/ExecutionStore.types";
+export {
+  buildExecutionOutcomeRow,
+  buildExecutionScopeRow,
+  buildExecutionStartRow,
+  NO_DELETIONS,
+  NO_DENOMINATORS,
+  NO_STAGE_TIMINGS,
+} from "@etl/stores/executionRecords/executionRecords";
+export { createNeverFatalExecutionStore } from "@etl/stores/createNeverFatalExecutionStore/createNeverFatalExecutionStore";
+export {
+  createInMemoryExecutionStore,
+  type InMemoryExecution,
+  type InMemoryExecutionStore,
+} from "@etl/stores/InMemoryExecutionStore/createInMemoryExecutionStore";
