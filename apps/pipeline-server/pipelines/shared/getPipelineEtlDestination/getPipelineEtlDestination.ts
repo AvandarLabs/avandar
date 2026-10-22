@@ -8,7 +8,8 @@ const DEFAULT_OPEN_DATA_BUCKET = "opendata";
  * Where every pipeline loads: the Supabase stack named by `SUPABASE_URL` and
  * `SUPABASE_SERVICE_ROLE_KEY`, the Open Data Catalog's two tables, the
  * pipeline checkpoints table, and the public `opendata` bucket (or
- * `SUPABASE_OPENDATA_BUCKET`). A blank variable counts as unset. The engine
+ * `SUPABASE_OPENDATA_BUCKET`). Each run is recorded through the pipeline
+ * execution functions. A blank variable counts as unset. The engine
  * itself reports any missing credential when a run starts.
  */
 export function getPipelineEtlDestination(): EtlDestination {
@@ -19,8 +20,14 @@ export function getPipelineEtlDestination(): EtlDestination {
     },
     output: {
       listingsTable: "data_catalog_listings",
-      upsertListingsFunction: "rpc_data_catalog_listings__upsert_with_relation_columns",
+      upsertListingsFunction:
+        "rpc_data_catalog_listings__upsert_with_relation_columns",
       checkpointsTable: "pipeline_scope_checkpoints",
+      executionFunctions: {
+        start: "rpc_pipeline_executions__start",
+        recordScope: "rpc_pipeline_executions__record_scope",
+        finish: "rpc_pipeline_executions__finish",
+      },
       bucket:
         getOptionalEnvVar("SUPABASE_OPENDATA_BUCKET") ??
         DEFAULT_OPEN_DATA_BUCKET,

@@ -132,7 +132,32 @@ describe("registerRunPipelineRoutes", () => {
     ]);
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
+      invocation: expect.objectContaining({ invokedVia: "http" }),
       mode: "full",
+    });
+  });
+
+  it("passes the CLI's invocation and the request body to the run", async () => {
+    server = await _createServer();
+
+    await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: {
+        authorization: AUTH_HEADER,
+        "x-ava-invocation": JSON.stringify({
+          cliArgv: ["pipeline", "run", "example-pipeline"],
+          actor: "pablo@laptop",
+        }),
+      },
+      payload: { limit: 5 },
+    });
+
+    expect(vi.mocked(run).mock.calls[0]?.[0].invocation).toMatchObject({
+      invokedVia: "cli_server",
+      cliArgv: ["pipeline", "run", "example-pipeline"],
+      actor: "pablo@laptop",
+      requestBody: { limit: 5 },
     });
   });
 
@@ -148,6 +173,7 @@ describe("registerRunPipelineRoutes", () => {
 
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
+      invocation: expect.objectContaining({ invokedVia: "http" }),
       mode: "full",
       limit: 5,
     });
@@ -165,6 +191,7 @@ describe("registerRunPipelineRoutes", () => {
 
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
+      invocation: expect.objectContaining({ invokedVia: "http" }),
       mode: "incremental",
       until: new Date("2026-10-15T00:00:00Z"),
       limit: 5,
@@ -227,6 +254,7 @@ describe("registerRunPipelineRoutes", () => {
 
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
+      invocation: expect.objectContaining({ invokedVia: "http" }),
       mode: "full",
       scopes: ["format:csv"],
     });

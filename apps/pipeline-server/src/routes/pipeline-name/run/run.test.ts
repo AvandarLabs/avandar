@@ -30,4 +30,16 @@ describe("run pipeline", () => {
       expect.objectContaining({ scopes: ["format:csv"] }),
     );
   });
+
+  it("passes the invocation to the pipeline module's run", async () => {
+    await run({
+      pipelineName: "hdx",
+      mode: "full",
+      invocation: { invokedVia: "http" },
+    });
+
+    expect(hdxRun).toHaveBeenCalledWith(
+      expect.objectContaining({ invocation: { invokedVia: "http" } }),
+    );
+  });
 });

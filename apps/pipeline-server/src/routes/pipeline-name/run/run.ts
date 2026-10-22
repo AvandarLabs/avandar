@@ -11,9 +11,7 @@ type PipelineRunModule = Readonly<{
   run: (options: PipelineRunOptions) => Promise<EtlRunReport>;
 }>;
 
-export async function run(
-  options: RunPipelineOptions,
-): Promise<EtlRunReport> {
+export async function run(options: RunPipelineOptions): Promise<EtlRunReport> {
   const pipelineModule: unknown = await import(
     buildPipelineModuleUrl(options.pipelineName).href
   );
@@ -29,12 +27,13 @@ export async function run(
     );
   }
 
-  const { mode, since, until, limit, scopes } = options;
+  const { mode, since, until, limit, scopes, invocation } = options;
   return await (pipelineModule as PipelineRunModule).run({
     mode,
     since,
     until,
     limit,
     ...(scopes === undefined ? {} : { scopes }),
+    ...(invocation === undefined ? {} : { invocation }),
   });
 }

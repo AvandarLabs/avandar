@@ -1,11 +1,17 @@
+import { hostname } from "node:os";
 import { ETL_RUN_OPTIONS_ERROR_NAME } from "@avandar/etl";
 import {
   assertValidPipelineName,
   INVALID_PIPELINE_NAME_ERROR_NAME,
 } from "@pipeline-server/routes/pipeline-name/buildPipelineModuleUrl/buildPipelineModuleUrl";
+import {
+  buildServerRunInvocation,
+  INVOCATION_HEADER,
+} from "@pipeline-server/routes/pipeline-name/buildServerRunInvocation/buildServerRunInvocation";
 import { listScopes } from "@pipeline-server/routes/pipeline-name/listScopes/listScopes";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import { getEtlRunFailedReport } from "@pipelines/shared/getEtlRunFailedReport/getEtlRunFailedReport";
+import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
 import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
 import { FastifyPluginAsync } from "fastify";
 import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
@@ -125,6 +131,12 @@ async function _runPipeline(
     const report = await run({
       pipelineName: request.params.pipelineName,
       ...options,
+      invocation: buildServerRunInvocation({
+        invocationHeader: request.headers[INVOCATION_HEADER],
+        requestBody: request.body ?? {},
+        host: hostname(),
+        codeVersion: getOptionalEnvVar("AVA_CODE_VERSION"),
+      }),
     });
     return await reply.send(report);
   } catch (error: unknown) {
@@ -164,7 +176,9 @@ async function _listPipelineScopes(
  * unauthenticated caller gets 401 whatever it sends. Invalid options answer
  * 400, and the pipeline does not run. So does a pipeline name that is not a
  * plain folder name of lowercase letters, digits, `_` and `-`. A run where
- * every crawl failed answers 500 with the error and the report.
+ * every crawl failed answers 500 with the error and the report. Each run is
+ * recorded with the request body, the CLI's `X-Ava-Invocation` header when
+ * present, and the server's host and `AVA_CODE_VERSION`.
  *
  * Also registers `GET /:pipelineName/scopes`, which answers with
  * `{ drives }`, each drive's live scope keys, behind the same auth. It

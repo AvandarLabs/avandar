@@ -1,8 +1,13 @@
 import { existsSync } from "node:fs";
+import { hostname } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { ETL_RUN_OPTIONS_ERROR_NAME } from "@avandar/etl";
 import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
+import {
+  LOCAL_RUN_INVOCATION_ENV,
+  readLocalRunInvocation,
+} from "@pipelines/shared/readLocalRunInvocation/readLocalRunInvocation";
 import { readRawPipelineRunOptionsFromArgv } from "@pipelines/shared/readRawPipelineRunOptionsFromArgv/readRawPipelineRunOptionsFromArgv";
 import { runPipelineAndPrintReport } from "@pipelines/shared/runPipelineAndPrintReport/runPipelineAndPrintReport";
 import type { EtlRunReport } from "@avandar/etl";
@@ -94,7 +99,14 @@ async function main(): Promise<void> {
 
   const moduleUrl = pathToFileURL(runPath).href;
   const { run } = await import(moduleUrl);
-  await _runPipeline(run, options);
+  await _runPipeline(run, {
+    ...options,
+    invocation: readLocalRunInvocation({
+      environmentValue: process.env[LOCAL_RUN_INVOCATION_ENV],
+      fallbackArgv: process.argv.slice(2),
+      fallbackHost: hostname(),
+    }),
+  });
 }
 
 void main();

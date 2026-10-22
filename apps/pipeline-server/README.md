@@ -81,6 +81,25 @@ The app verifies unverified or stale column types later from a sample of
 the source, and a pipeline rewrite keeps those verified columns as long as
 the pipeline's own view of the columns has not changed.
 
+## Execution history
+
+Every `ava pipeline run`, `reset`, and `prune-retired-scopes` is recorded in
+`pipeline_executions` (one row per command per pipeline) and
+`pipeline_execution_scopes` (one row per drive and scope it worked on), with
+the exact argv or HTTP body, the outcome, stage timings, and the counts and
+sizes behind them. Nothing in the app reads them. Query them directly:
+
+```sql
+-- When was each Socrata drive last crawled, and did it succeed?
+select distinct on (drive_key) drive_key, started_at, status
+from pipeline_execution_scopes
+where pipeline_name = 'socrata'
+order by drive_key, started_at desc;
+```
+
+Deploys should pass the commit, so server runs record it:
+`fly deploy --config apps/pipeline-server/fly.production.toml --build-arg AVA_CODE_VERSION=$(git rev-parse HEAD)`.
+
 ## Local development
 
 ```bash
@@ -105,7 +124,8 @@ fly secrets set AVA_PIPELINE_SERVER_SECRET=your-secret \
 Deploy with:
 
 ```bash
-fly deploy --config apps/pipeline-server/fly.production.toml
+fly deploy --config apps/pipeline-server/fly.production.toml \
+  --build-arg AVA_CODE_VERSION=$(git rev-parse HEAD)
 ```
 
 Deploy order for crawl scopes (`pipeline_scope_checkpoints`): run the

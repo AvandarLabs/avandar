@@ -40,6 +40,14 @@ describe("getPipelineEtlDestination", () => {
     );
   });
 
+  it("records runs through the pipeline execution functions", () => {
+    expect(getPipelineEtlDestination().output.executionFunctions).toEqual({
+      start: "rpc_pipeline_executions__start",
+      recordScope: "rpc_pipeline_executions__record_scope",
+      finish: "rpc_pipeline_executions__finish",
+    });
+  });
+
   it("treats blank Supabase credentials as unset", () => {
     vi.stubEnv("SUPABASE_URL", "");
     vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "  ");
