@@ -1,9 +1,10 @@
 import { getPipelineServerClientConfig } from "@ava-cli/PipelineCli/getPipelineServerClientConfig";
 import { PipelineRunFailedError } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunFailedError";
 import { readPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/readPipelineRunReport";
+import { Agent } from "undici";
+import type { CliInvocation } from "@ava-cli/PipelineCli/buildCliInvocation/buildCliInvocation";
 import type { ReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
 import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
-import { Agent } from "undici";
 
 /** HTTP status the server answers for invalid run options. */
 const _BAD_REQUEST_STATUS = 400;
@@ -16,6 +17,20 @@ const _BAD_REQUEST_STATUS = 400;
  * connection.
  */
 const _RUN_RESPONSE_TIMEOUT_MS = 2 * 60 * 60 * 1000;
+
+/** The header the pipeline server reads a CLI run's invocation from. */
+const _INVOCATION_HEADER = "x-ava-invocation";
+
+/**
+ * JSON with every character outside printable ASCII written as `\uXXXX`.
+ * `fetch` rejects a header value outside Latin-1, and `JSON.parse` reads
+ * the escapes back unchanged.
+ */
+function _toAsciiJson(value: unknown): string {
+  return JSON.stringify(value).replace(/[\u007f-\uffff]/g, (character) => {
+    return `\\u${character.charCodeAt(0).toString(16).padStart(4, "0")}`;
+  });
+}
 
 /** What an error response says: its message, and a report if it sent one. */
 type _ErrorBody = Readonly<{
@@ -133,6 +148,7 @@ async function _postRunRequest(
     serverSecret: string;
     body: Record<string, unknown> | undefined;
     dispatcher: Agent;
+    invocationHeader: string | undefined;
   }>,
 ): Promise<Response> {
   const { body } = args;
@@ -148,6 +164,9 @@ async function _postRunRequest(
         // Fastify rejects an empty body sent as JSON, so a body is only sent
         // when there is an option to carry.
         ...(body === undefined ? {} : { "content-type": "application/json" }),
+        ...(args.invocationHeader === undefined
+          ? {}
+          : { [_INVOCATION_HEADER]: args.invocationHeader }),
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
@@ -166,6 +185,9 @@ async function _postRunRequest(
 /**
  * Asks the pipeline server to run a pipeline.
  *
+ * @param options.invocation - Sent in X-Ava-Invocation, so the server
+ * records the CLI's argv and actor with the run. Only those two: the server
+ * records its own host and commit.
  * @returns The run's report, as received.
  * @throws With the server's own message when it rejects the options (400),
  * and with the status line plus that message for any other failure.
@@ -175,6 +197,7 @@ async function _postRunRequest(
 export async function sendRunPipelineRequest(options: {
   pipelineName: string;
   runOptions: PipelineRunRequestOptions;
+  invocation?: CliInvocation;
 }): Promise<ReceivedPipelineRunReport> {
   const config = getPipelineServerClientConfig();
   const encodedPipelineName: string = encodeURIComponent(options.pipelineName);
@@ -191,6 +214,13 @@ export async function sendRunPipelineRequest(options: {
       serverSecret: config.serverSecret,
       body,
       dispatcher,
+      invocationHeader:
+        options.invocation === undefined
+          ? undefined
+          : _toAsciiJson({
+              cliArgv: options.invocation.cliArgv,
+              actor: options.invocation.actor,
+            }),
     });
     if (!res.ok) {
       await _throwResponseError(res);

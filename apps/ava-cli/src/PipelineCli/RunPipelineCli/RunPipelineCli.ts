@@ -1,15 +1,19 @@
 import {
+  buildCliInvocation,
+  type CliInvocation,
+} from "@ava-cli/PipelineCli/buildCliInvocation/buildCliInvocation";
+import { PipelineRunFailedError } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunFailedError";
+import { printReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
+import { readPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/readPipelineRunReport";
+import {
   findAvandarRepoRoot,
   runPipelineLocal,
 } from "@ava-cli/PipelineCli/runPipelineLocal";
-import { PipelineRunFailedError } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunFailedError";
-import type { ReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
-import { printReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
-import { readPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/readPipelineRunReport";
-import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
 import { sendRunPipelineRequest } from "@ava-cli/PipelineCli/sendRunPipelineRequest";
 import { printError, printInfo } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
+import type { ReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
+import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
 
 function _assertOneLowerBound(runOptions: PipelineRunRequestOptions): void {
   if (runOptions.incremental === true && runOptions.since !== undefined) {
@@ -43,6 +47,7 @@ function _readReportLine(reportLine: string): ReceivedPipelineRunReport {
 function _runLocally(args: {
   name: string;
   runOptions: PipelineRunRequestOptions;
+  invocation: CliInvocation;
 }): ReceivedPipelineRunReport {
   const repoRoot: string | undefined = findAvandarRepoRoot();
   if (repoRoot === undefined) {
@@ -56,6 +61,7 @@ function _runLocally(args: {
     pipelineName: args.name,
     repoRoot,
     runOptions: args.runOptions,
+    invocation: args.invocation,
   });
   if (localResult.ok) {
     return _readReportLine(localResult.reportJson);
@@ -72,7 +78,8 @@ function _runLocally(args: {
 /**
  * Runs a pipeline, on the pipeline-server or locally through vite-node.
  * When every crawl failed, it prints the report and sets the exit code to 1
- * instead of throwing. Any other error is printed and rethrown.
+ * instead of throwing. Any other error is printed and rethrown. The run is
+ * recorded with how the CLI was invoked.
  *
  * @param options.name - The pipeline's directory name.
  * @param options.local - Run it in-process instead of on the server.
@@ -102,10 +109,15 @@ export async function runPipelineCommand(options: {
 
   try {
     _assertOneLowerBound(runOptions);
+    const invocation = buildCliInvocation();
     printInfo(`Running pipeline: ${name}`);
     const report: ReceivedPipelineRunReport = local
-      ? _runLocally({ name, runOptions })
-      : await sendRunPipelineRequest({ pipelineName: name, runOptions });
+      ? _runLocally({ name, runOptions, invocation })
+      : await sendRunPipelineRequest({
+          pipelineName: name,
+          runOptions,
+          invocation,
+        });
     printReceivedPipelineRunReport(report);
   } catch (error: unknown) {
     const message: string =

@@ -42,6 +42,25 @@ vi.mock("@ava-cli/PipelineCli/runPipelineLocal", () => {
   };
 });
 
+const { INVOCATION } = vi.hoisted(() => {
+  return {
+    INVOCATION: {
+      cliArgv: ["pipeline", "run", "hdx"],
+      actor: "pablo@laptop",
+      host: "laptop",
+      codeVersion: "abc123",
+    },
+  };
+});
+
+vi.mock("@ava-cli/PipelineCli/buildCliInvocation/buildCliInvocation", () => {
+  return {
+    buildCliInvocation: vi.fn(() => {
+      return INVOCATION;
+    }),
+  };
+});
+
 type FetchCall = readonly [
   input: string,
   init?:
@@ -177,6 +196,7 @@ describe("runPipelineCommand", () => {
     expect(vi.mocked(runPipelineLocal)).toHaveBeenCalledWith({
       pipelineName: "hdx",
       repoRoot: "/repo",
+      invocation: INVOCATION,
       runOptions: { limit: 3 },
     });
   });
@@ -218,6 +238,21 @@ describe("runPipelineCommand", () => {
     );
   });
 
+  it("sends the CLI's argv and actor to the server", async () => {
+    const fetchMock = _mockFetch(async () => {
+      return new Response(JSON.stringify(REPORT), { status: 200 });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({ name: "hdx", local: false });
+
+    expect(
+      JSON.parse(
+        fetchMock.mock.calls[0]?.[1]?.headers?.["x-ava-invocation"] ?? "",
+      ),
+    ).toEqual({ cliArgv: ["pipeline", "run", "hdx"], actor: "pablo@laptop" });
+  });
+
   it("passes since to a local run", async () => {
     const { runPipelineCommand } = await import("./RunPipelineCli");
     await runPipelineCommand({
@@ -229,6 +264,7 @@ describe("runPipelineCommand", () => {
     expect(vi.mocked(runPipelineLocal)).toHaveBeenCalledWith({
       pipelineName: "socrata",
       repoRoot: "/repo",
+      invocation: INVOCATION,
       runOptions: { since: "2026-10-01T00:00:00Z" },
     });
   });
@@ -301,7 +337,10 @@ describe("runPipelineCommand", () => {
   it("shows the server's own message when it answers 400", async () => {
     _mockFetch(async () => {
       return new Response(
-        JSON.stringify({ ok: false, error: "--since must be earlier than --until." }),
+        JSON.stringify({
+          ok: false,
+          error: "--since must be earlier than --until.",
+        }),
         { status: 400, statusText: "Bad Request" },
       );
     });
@@ -406,6 +445,7 @@ describe("runPipelineCommand", () => {
     expect(vi.mocked(runPipelineLocal)).toHaveBeenCalledWith({
       pipelineName: "hdx",
       repoRoot: "/repo",
+      invocation: INVOCATION,
       runOptions: { scopes: ["format:csv"] },
     });
   });

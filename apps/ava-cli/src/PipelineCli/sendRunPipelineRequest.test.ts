@@ -44,4 +44,34 @@ describe("sendRunPipelineRequest", () => {
       expect.objectContaining({ dispatcher: agent }),
     ]);
   });
+
+  it("sends the CLI's argv and actor in X-Ava-Invocation, as ASCII JSON", async () => {
+    const fetchMock = vi.fn(async () => {
+      return new Response(JSON.stringify(REPORT), { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await sendRunPipelineRequest({
+      pipelineName: "hdx",
+      runOptions: {},
+      invocation: {
+        cliArgv: ["pipeline", "run", "hdx", "--since", "café"],
+        actor: "pablo@laptop",
+        host: "laptop",
+        codeVersion: "abc123",
+      },
+    });
+
+    const init = (fetchMock.mock.calls[0] as unknown[] | undefined)?.[1] as
+      | { headers: Record<string, string> }
+      | undefined;
+    const header = init?.headers["x-ava-invocation"] ?? "";
+    expect([header, JSON.parse(header)]).toEqual([
+      '{"cliArgv":["pipeline","run","hdx","--since","caf\\u00e9"],"actor":"pablo@laptop"}',
+      {
+        cliArgv: ["pipeline", "run", "hdx", "--since", "café"],
+        actor: "pablo@laptop",
+      },
+    ]);
+  });
 });

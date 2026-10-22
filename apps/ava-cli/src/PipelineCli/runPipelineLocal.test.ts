@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { runPipelineLocal } from "@ava-cli/PipelineCli/runPipelineLocal";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { SpawnSyncOptions } from "node:child_process";
 
 vi.mock("node:child_process", () => {
   return {
@@ -38,6 +39,29 @@ describe("runPipelineLocal", () => {
     vi.clearAllMocks();
   });
 
+  it("passes the invocation to the runner in AVA_PIPELINE_INVOCATION", () => {
+    const invocation = {
+      cliArgv: ["pipeline", "run", "hdx", "--local"],
+      actor: "pablo@laptop",
+      host: "laptop",
+      codeVersion: "abc123",
+    };
+
+    runPipelineLocal({
+      pipelineName: "hdx",
+      repoRoot: "/repo",
+      runOptions: {},
+      invocation,
+    });
+
+    const spawnOptions = vi.mocked(spawnSync).mock.calls[0]?.[2] as
+      | SpawnSyncOptions
+      | undefined;
+    expect(
+      JSON.parse(spawnOptions?.env?.AVA_PIPELINE_INVOCATION ?? ""),
+    ).toEqual(invocation);
+  });
+
   it("passes every run option to the runner as flags", () => {
     runPipelineLocal({
       pipelineName: "socrata",
@@ -69,9 +93,7 @@ describe("runPipelineLocal", () => {
       runOptions: {},
     });
 
-    expect(vi.mocked(spawnSync).mock.calls[0]?.[1]?.slice(-1)).toEqual([
-      "hdx",
-    ]);
+    expect(vi.mocked(spawnSync).mock.calls[0]?.[1]?.slice(-1)).toEqual(["hdx"]);
   });
   it("returns the last stdout line as the report JSON when the run succeeds", () => {
     vi.mocked(spawnSync).mockReturnValueOnce(

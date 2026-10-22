@@ -2,7 +2,11 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { PipelineRunReportSchema } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
+import type { CliInvocation } from "@ava-cli/PipelineCli/buildCliInvocation/buildCliInvocation";
 import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
+
+/** The variable `scripts/runPipelineOnce.ts` reads the invocation from. */
+const _INVOCATION_ENV = "AVA_PIPELINE_INVOCATION";
 
 /**
  * Walks up from `process.cwd()` until a directory contains both
@@ -103,12 +107,15 @@ function _buildFailedResult(args: {
 }
 
 /**
- * Runs a pipeline module via `pnpm exec vite-node` (no HTTP server).
+ * Runs a pipeline module via `pnpm exec vite-node` (no HTTP server). With
+ * `invocation`, the run is recorded with the CLI's argv, actor, host, and
+ * commit.
  */
 export function runPipelineLocal(options: {
   pipelineName: string;
   repoRoot: string;
   runOptions: PipelineRunRequestOptions;
+  invocation?: CliInvocation;
 }): RunPipelineLocalResult {
   const scriptPath = join(options.repoRoot, "scripts", "runPipelineOnce.ts");
 
@@ -127,6 +134,14 @@ export function runPipelineLocal(options: {
       cwd: options.repoRoot,
       encoding: "utf8",
       maxBuffer: 10 * 1024 * 1024,
+      ...(options.invocation === undefined
+        ? {}
+        : {
+            env: {
+              ...process.env,
+              [_INVOCATION_ENV]: JSON.stringify(options.invocation),
+            },
+          }),
     },
   );
 
