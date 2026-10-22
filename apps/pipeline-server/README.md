@@ -61,14 +61,23 @@ before its listings, and `--scope` resets one scope.
 Every listing is written in one transaction with its relation columns, so a
 listing never exists without them, and deleting a listing (by reset or
 prune) deletes its columns too. A dataset whose columns cannot be read is
-not listed:
+not listed. Each listing records in `date_column_type_last_verified` when its
+column types were checked against real data:
 
-- `socrata` names each dataset's columns by its CSV export's header, one
-  request per dataset (eight at a time), and types them from the Discovery
-  API. A file or link with no CSV export is skipped.
-- `hdx` uses the headers HDX's file check recorded, as text. When those are
-  missing or ambiguous, DuckDB reads the columns and their types from the
-  file itself: a Parquet footer, or a CSV sample.
+- `socrata` takes each dataset's columns from the Discovery API, as text
+  with Socrata's type label as the original type, unverified. The list can
+  name columns the CSV export lacks. A file or link with no columns is
+  skipped.
+- `hdx` uses the headers HDX's file check recorded, as text of unknown
+  original type, unverified. When those are missing or ambiguous, DuckDB
+  reads the columns and their types from the file itself, a Parquet footer
+  or a CSV sample, and they are verified.
+- `world-bank__wdi` builds Parquet files, so its column types are verified
+  when written.
+
+The app verifies unverified or stale column types later from a sample of
+the source, and a pipeline rewrite keeps those verified columns as long as
+the pipeline's own view of the columns has not changed.
 
 ## Local development
 

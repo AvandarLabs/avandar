@@ -1,3 +1,4 @@
+import { UNKNOWN_ORIGINAL_DATA_TYPE } from "@avandar/etl";
 import type { CkanResource } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type { RelationColumn } from "@avandar/etl";
 
@@ -10,6 +11,13 @@ import type { RelationColumn } from "@avandar/etl";
 export type HdxFileColumnReader = (
   resource: Readonly<CkanResource>,
 ) => Promise<readonly RelationColumn[] | undefined>;
+
+/** One resource's columns, and when their types were read from its data. */
+export type HdxResourceColumns = Readonly<{
+  columns: readonly RelationColumn[];
+  /** Unset when the columns came from headers alone, with no types. */
+  columnTypesVerifiedAt: Date | undefined;
+}>;
 
 /**
  * Whether headers name the columns exactly as DuckDB will when the app reads
@@ -34,8 +42,9 @@ function _isUsableHeaderList(headers: readonly string[]): boolean {
 /**
  * The columns of one HDX resource. The headers HDX's file structure check
  * recorded are used when they name the columns unambiguously. They carry no
- * types, so each column is text. Otherwise the file itself is read, which
- * gives types too.
+ * types, so each column is text of unknown original type, unverified until
+ * the app reads a sample. Otherwise the file itself is read, which gives
+ * real types, verified now.
  *
  * @param args.resource - The resource.
  * @param args.readFileColumns - Reads the columns from the file.
@@ -44,16 +53,22 @@ function _isUsableHeaderList(headers: readonly string[]): boolean {
 export async function readHdxResourceColumns(args: {
   resource: Readonly<CkanResource>;
   readFileColumns: HdxFileColumnReader;
-}): Promise<readonly RelationColumn[] | undefined> {
+}): Promise<HdxResourceColumns | undefined> {
   const headers = args.resource.fileHeaders;
   if (headers !== undefined && _isUsableHeaderList(headers)) {
-    return headers.map((header) => {
-      return {
-        name: header,
-        originalDataType: "VARCHAR",
-        castDataType: "VARCHAR",
-      };
-    });
+    return {
+      columns: headers.map((header) => {
+        return {
+          name: header,
+          originalDataType: UNKNOWN_ORIGINAL_DATA_TYPE,
+          castDataType: "VARCHAR",
+        };
+      }),
+      columnTypesVerifiedAt: undefined,
+    };
   }
-  return args.readFileColumns(args.resource);
+  const fileColumns = await args.readFileColumns(args.resource);
+  return fileColumns === undefined
+    ? undefined
+    : { columns: fileColumns, columnTypesVerifiedAt: new Date() };
 }

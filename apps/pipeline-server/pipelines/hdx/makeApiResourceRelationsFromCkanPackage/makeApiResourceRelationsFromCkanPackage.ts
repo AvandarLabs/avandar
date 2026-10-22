@@ -15,7 +15,8 @@ import type { HdxFileColumnReader } from "@pipelines/hdx/readHdxResourceColumns/
  * readability rule the acquisition path enforces at query time. A dataset
  * with no readable resource yields none. Each relation is dated by the same
  * `metadata_modified` the crawl orders datasets by, and carries the columns
- * `readHdxResourceColumns` finds. A resource with no columns is left out and
+ * `readHdxResourceColumns` finds, verified only when they were read from the
+ * file. A resource with no columns is left out and
  * logged with `console.warn`, since a listing is never stored without its
  * columns.
  *
@@ -47,11 +48,11 @@ export async function makeApiResourceRelationsFromCkanPackage(params: {
   const relations = await promiseMapSequential(
     readableResources,
     async (resource: CkanResource) => {
-      const columns = await readHdxResourceColumns({
+      const resourceColumns = await readHdxResourceColumns({
         resource,
         readFileColumns: params.readFileColumns,
       });
-      if (columns === undefined) {
+      if (resourceColumns === undefined) {
         console.warn(
           `[hdx] drive ${drive.baseUrl}: skipped resource ${resource.id} of dataset ${ckanPackage.name}: no columns could be read`,
         );
@@ -65,7 +66,10 @@ export async function makeApiResourceRelationsFromCkanPackage(params: {
         displayName: resource.name,
         externalOrganizationName: drive.organizationName,
         sourceUpdatedAt,
-        columns,
+        columns: resourceColumns.columns,
+        ...(resourceColumns.columnTypesVerifiedAt === undefined
+          ? {}
+          : { columnTypesVerifiedAt: resourceColumns.columnTypesVerifiedAt }),
       };
     },
   );

@@ -24,7 +24,7 @@ function _resource(fileHeaders?: readonly string[]): CkanResource {
 }
 
 describe("readHdxResourceColumns", () => {
-  it("names the columns from HDX's headers as text, without reading the file", async () => {
+  it("names the columns from HDX's headers as unverified text, without reading the file", async () => {
     const readFileColumns = vi.fn(async () => {
       return SNIFFED;
     });
@@ -34,10 +34,13 @@ describe("readHdxResourceColumns", () => {
       readFileColumns,
     });
 
-    expect(columns).toEqual([
-      { name: "adm1", originalDataType: "VARCHAR", castDataType: "VARCHAR" },
-      { name: "value", originalDataType: "VARCHAR", castDataType: "VARCHAR" },
-    ]);
+    expect(columns).toEqual({
+      columns: [
+        { name: "adm1", originalDataType: "unknown", castDataType: "VARCHAR" },
+        { name: "value", originalDataType: "unknown", castDataType: "VARCHAR" },
+      ],
+      columnTypesVerifiedAt: undefined,
+    });
     expect(readFileColumns).not.toHaveBeenCalled();
   });
 
@@ -47,7 +50,7 @@ describe("readHdxResourceColumns", () => {
     ["a header with surrounding spaces", ["adm1", " value"]],
     ["two headers that differ only in case", ["Value", "value"]],
   ])(
-    "reads the file's columns when HDX recorded %s",
+    "reads the file's columns, verified, when HDX recorded %s",
     async (_label, headers) => {
       const columns = await readHdxResourceColumns({
         resource: _resource(headers),
@@ -56,7 +59,10 @@ describe("readHdxResourceColumns", () => {
         },
       });
 
-      expect(columns).toEqual(SNIFFED);
+      expect(columns).toEqual({
+        columns: SNIFFED,
+        columnTypesVerifiedAt: expect.any(Date),
+      });
     },
   );
 

@@ -55,23 +55,24 @@ describe("makeApiResourceRelationFromSocrataResult", () => {
     ).toEqual(["created_date"]);
   });
 
-  it.each([
-    ["Text", "VARCHAR"],
-    ["Number", "DOUBLE"],
-    ["Money", "DOUBLE"],
-    ["Percent", "DOUBLE"],
-    ["Calendar date", "TIMESTAMP"],
-    ["Floating Timestamp", "TIMESTAMP"],
-    ["Fixed Timestamp", "TIMESTAMP"],
-    ["Date", "TIMESTAMP"],
-    ["Checkbox", "BOOLEAN"],
-    ["Point", "VARCHAR"],
-    ["URL", "VARCHAR"],
-    ["Something new", "VARCHAR"],
-  ])("casts a %s column to %s", (dataType, castDataType) => {
-    expect(_make([_column("value", dataType)])?.columns).toEqual([
-      { name: "value", originalDataType: dataType, castDataType },
+  it("reads every column as text, keeping Socrata's type label", () => {
+    expect(
+      _make([_column("amount", "Number"), _column("opened", "Calendar date")])
+        ?.columns,
+    ).toEqual([
+      { name: "amount", originalDataType: "Number", castDataType: "VARCHAR" },
+      {
+        name: "opened",
+        originalDataType: "Calendar date",
+        castDataType: "VARCHAR",
+      },
     ]);
+  });
+
+  it("leaves the column types unverified", () => {
+    expect(_make([_column("amount", "Number")])?.columnTypesVerifiedAt).toBe(
+      undefined,
+    );
   });
 
   it("leaves out computed region columns, which the CSV export does not have", () => {

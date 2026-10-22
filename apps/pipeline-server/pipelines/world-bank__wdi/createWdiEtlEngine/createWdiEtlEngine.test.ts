@@ -19,7 +19,8 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const OUTPUT = {
   listingsTable: "data_catalog_listings",
-  upsertListingsFunction: "rpc_data_catalog_listings__upsert_with_relation_columns",
+  upsertListingsFunction:
+    "rpc_data_catalog_listings__upsert_with_relation_columns",
   bucket: "opendata",
 };
 
@@ -54,7 +55,7 @@ async function _runFullWithInputs(files: Readonly<Record<string, string>>) {
 }
 
 describe("createWdiEtlEngine", () => {
-  it("writes one Parquet listing per input CSV, with its object and columns", async () => {
+  it("writes one Parquet listing per input CSV, with its object and columns verified at sync time", async () => {
     const inputDir = getEtlPipelineInputDir(WDI_PIPELINE_NAME);
     await mkdir(inputDir, { recursive: true });
     await writeFile(
@@ -77,11 +78,13 @@ describe("createWdiEtlEngine", () => {
       listings.getRelationColumns(row?.id ?? "")?.map((column) => {
         return column.column_name;
       }),
+      row?.date_column_type_last_verified === row?.date_of_last_sync,
     ]).toEqual([
       "WDI: Indicator definitions",
       "WDISeries.parquet",
       ["world-bank__wdi/datasets/WDISeries.parquet"],
       ["Series Code", "Topic"],
+      true,
     ]);
   });
 

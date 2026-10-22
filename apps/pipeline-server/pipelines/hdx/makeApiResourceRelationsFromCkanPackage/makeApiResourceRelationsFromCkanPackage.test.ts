@@ -105,6 +105,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         externalOrganizationName: "Humanitarian Data Exchange",
         sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
         columns: SNIFFED_COLUMNS,
+        columnTypesVerifiedAt: expect.any(Date),
       },
     ]);
   });

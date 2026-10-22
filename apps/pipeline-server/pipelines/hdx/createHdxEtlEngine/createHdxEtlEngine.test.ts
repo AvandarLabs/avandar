@@ -210,7 +210,7 @@ describe("createHdxEtlEngine", () => {
     ]);
   });
 
-  it("writes each listing's columns, reading the file when HDX recorded no headers", async () => {
+  it("writes header columns unverified, and reads verified columns from the file when HDX recorded no headers", async () => {
     const listings = createInMemoryListingsStore();
     const [resource] = _package("a", 1).resources;
     const readFileColumns = vi.fn(async () => {
@@ -247,14 +247,15 @@ describe("createHdxEtlEngine", () => {
       listings.getRows().map((row) => {
         return [
           row.api_resource_id,
+          row.date_column_type_last_verified === null,
           listings.getRelationColumns(row.id)?.map((column) => {
             return [column.column_name, column.cast_data_type];
           }),
         ];
       }),
     ).toEqual([
-      ["with-headers-csv", [["value", "VARCHAR"]]],
-      ["without-headers-csv", [["year", "BIGINT"]]],
+      ["with-headers-csv", true, [["value", "VARCHAR"]]],
+      ["without-headers-csv", false, [["year", "BIGINT"]]],
     ]);
     expect(readFileColumns).toHaveBeenCalledTimes(1);
   });
