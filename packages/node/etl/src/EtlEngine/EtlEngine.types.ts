@@ -6,9 +6,40 @@ import type {
   ListingsStore,
   ObjectStore,
 } from "@etl/stores/EtlStores.types";
+import type {
+  ExecutionDenominators,
+  ExecutionStageTimings,
+} from "@etl/stores/ExecutionStore.types";
 
 /** A value, or a promise of one. */
 export type PromisedOrValue<T> = Promise<T> | T;
+
+/** Reads the time, for timing stages and dating crawls. */
+export type EtlClock = Readonly<{
+  /** The current date and time. */
+  now: () => Date;
+  /** Milliseconds from an arbitrary origin that never goes backwards. */
+  monotonicMs: () => number;
+}>;
+
+/**
+ * A pipeline's own counters and timers, collected per crawl into the
+ * crawl's `pipelineMetrics`. Name them `<pipeline>.<what>`, such as
+ * `hdx.parquet_footer_reads`.
+ */
+export type EtlPipelineMetrics = Readonly<{
+  /** Adds `by` (default 1) to a counter. */
+  increment: (name: string, by?: number) => void;
+  /** Runs `work` and adds how long it took, in milliseconds, to a timer. */
+  time: <T>(name: string, work: () => Promise<T>) => Promise<T>;
+}>;
+
+/** Everything one crawl measured. */
+export type EtlCrawlMetrics = Readonly<{
+  timings: ExecutionStageTimings;
+  denominators: ExecutionDenominators;
+  pipelineMetrics: Readonly<Record<string, number>>;
+}>;
 
 /** Identifies one `run()`. Written to `pipeline_run_id`. */
 export type EtlPipelineRunId = UUID<"PipelineRun">;

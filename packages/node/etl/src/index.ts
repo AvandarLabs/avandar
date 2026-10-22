@@ -13,8 +13,14 @@ export {
   ETL_SCOPE_KEY_PATTERN,
   ETL_UNLISTED_SCOPE_KEY,
 } from "@etl/EtlEngine/etlScopes";
+export {
+  NO_CRAWL_METRICS,
+  SYSTEM_CLOCK,
+} from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 export type {
   ApiResourceRelation,
+  EtlClock,
+  EtlCrawlMetrics,
   EtlCrawlReport,
   EtlCrawlStatus,
   EtlDestination,
@@ -23,6 +29,7 @@ export type {
   EtlEngineInstance,
   EtlIncrementalConfig,
   EtlOutput,
+  EtlPipelineMetrics,
   EtlPipelineRunId,
   EtlRunMode,
   EtlRunOptions,
