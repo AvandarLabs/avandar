@@ -282,6 +282,35 @@ the service-role key must be able to write to it.
   is not uploaded again while its hash matches. `ava pipeline reset` deletes
   the pipeline's rows, so the next run uploads every object.
 
+## Execution recording
+
+A run is recorded when its options carry an `invocation` (how it was started)
+and the engine has an execution store: `output.executionFunctions` names the
+three Supabase functions, or `stores.executions` replaces them in tests.
+
+- `start` inserts the execution as `running` with its id (the run's
+  `pipelineRunId`), mode, flags (`isScoped`, `isLimited`, `isWindowed`),
+  parsed options, and invocation.
+- `recordScope` records each crawl as it ends: its window, checkpoints,
+  outcome, and `metrics`.
+- `finish` records the outcome: `succeeded`, `partially_failed`, or
+  `failed`, with the first error.
+
+Recording never fails a run: a failed call is logged with `console.warn`,
+and after a failed start the rest is skipped.
+
+Every crawl report carries `startedAt`, `finishedAt`, `checkpointBefore`,
+`checkpointAfter`, and `metrics`:
+
+| Field | Holds |
+| --- | --- |
+| `metrics.timings` | Milliseconds in each stage, summed over pages: `setupMs`, `extractMs`, `transformMs`, `loadReadMs`, `loadParquetBuildMs`, `loadParquetUploadMs`, `loadWriteMs`, `checkpointWriteMs` |
+| `metrics.denominators` | Pages, datasets, listings considered and written, write batches, columns considered and written, the widest listing, CSV and Parquet bytes and rows, and the source's reported bytes |
+| `metrics.pipelineMetrics` | What `extract` and `transform` recorded through their `metrics` argument |
+
+Stages interleave page by page, so their sum is not the crawl's wall-clock
+time. `EtlEngineConfig.clock` replaces the system clock in tests.
+
 ## Testing a pipeline
 
 Pass `stores` to replace Supabase:

@@ -8,8 +8,11 @@ import type {
 } from "@etl/stores/EtlStores.types";
 import type {
   ExecutionDenominators,
+  ExecutionInvocation,
   ExecutionStageTimings,
+  ExecutionStore,
 } from "@etl/stores/ExecutionStore.types";
+import type { ExecutionFunctions } from "@etl/stores/SupabaseExecutionStore/createSupabaseExecutionStore";
 
 /** A value, or a promise of one. */
 export type PromisedOrValue<T> = Promise<T> | T;
@@ -61,6 +64,12 @@ export type EtlRunOptions = Readonly<{
   limit?: number;
   /** Crawl only these scope keys. Omit to crawl every scope. */
   scopes?: readonly string[];
+  /**
+   * How the run was started, recorded with it. A run without one, such as
+   * a test or script calling a pipeline's `run()` directly, is not
+   * recorded.
+   */
+  invocation?: ExecutionInvocation;
 }>;
 
 /** The `[since, until)` range of source timestamps one drive's crawl covers. */
@@ -168,6 +177,11 @@ export type EtlOutput = Readonly<{
   checkpointsTable?: string;
   /** Required only when a pipeline returns `pipeline_parquet` relations. */
   bucket?: string;
+  /**
+   * The database functions that record each run, such as
+   * `rpc_pipeline_executions__start`. Omit to record nothing.
+   */
+  executionFunctions?: ExecutionFunctions;
 }>;
 
 /** Where a pipeline's output goes: Supabase credentials and output names. */
@@ -187,6 +201,8 @@ export type EtlStores = Readonly<{
   objects: ObjectStore | undefined;
   /** Required when the config has `incremental`. */
   checkpoints?: CheckpointStore;
+  /** Where runs are recorded. Omit to record nothing. */
+  executions?: ExecutionStore;
 }>;
 
 /**
@@ -283,6 +299,11 @@ export type EtlRunReport = Readonly<{
   pipelineRunId: EtlPipelineRunId;
   mode: EtlRunMode;
   crawls: readonly EtlCrawlReport[];
+  /** When the run started and ended. */
+  startedAt: Date;
+  finishedAt: Date;
+  /** Milliseconds listing drives and their scopes, before any crawl. */
+  setupMs: number;
 }>;
 
 /** One drive's live scope keys. */
@@ -295,7 +316,8 @@ export type EtlDriveScopes = Readonly<{
 export type EtlEngineInstance = Readonly<{
   /**
    * Crawls every scope of every drive and loads what changed, resolving to
-   * the run's report when at least one crawl did not fail.
+   * the run's report when at least one crawl did not fail. A run that
+   * throws after it started is recorded as failed.
    *
    * @throws Before listing drives, when `mode` is `incremental` on a
    * pipeline without `incremental` config, or `limit` is not an integer of 0

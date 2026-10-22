@@ -4,8 +4,9 @@ import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
 import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
 import { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionError";
 import { createInMemoryCheckpointStore } from "@etl/stores/InMemoryCheckpointStore/createInMemoryCheckpointStore";
+import { createInMemoryExecutionStore } from "@etl/stores/InMemoryExecutionStore/createInMemoryExecutionStore";
 import { createInMemoryListingsStore } from "@etl/stores/InMemoryListingsStore/createInMemoryListingsStore";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type {
   ApiResourceRelation,
   EtlClock,
@@ -1550,6 +1551,9 @@ describe("createEtlEngine", () => {
             }),
           },
         ],
+        startedAt: expect.any(Date),
+        finishedAt: expect.any(Date),
+        setupMs: expect.any(Number),
       });
     });
   });
@@ -1643,6 +1647,173 @@ describe("createEtlEngine", () => {
         status: "skipped",
         metrics: NO_CRAWL_METRICS,
       });
+    });
+  });
+
+  describe("recording", () => {
+    const INVOCATION = {
+      invokedVia: "cli_local",
+      cliArgv: ["pipeline", "run", "fake-pipeline"],
+    } as const;
+
+    function _recordingStores(
+      executions = createInMemoryExecutionStore(),
+    ): EtlStores {
+      return { ..._stores(), executions };
+    }
+
+    it("records the run's start, one scope per crawl, and its finish", async () => {
+      const executions = createInMemoryExecutionStore();
+      const report = await _run(
+        _config({
+          drives: [
+            _drive("a", [[_connection("a1", 1)]]),
+            _drive("b", [[_connection("b1", 1)]]),
+          ],
+          recorder: _recorder(),
+          stores: _recordingStores(executions),
+        }),
+        { mode: "full", invocation: INVOCATION },
+      );
+
+      const [execution] = executions.getExecutions();
+      expect([
+        execution?.start.id,
+        execution?.start.invocation,
+        execution?.scopes.map((scope) => {
+          return [scope.driveKey, scope.status];
+        }),
+        execution?.outcome?.status,
+      ]).toEqual([
+        report.pipelineRunId,
+        INVOCATION,
+        [
+          ["a", "succeeded"],
+          ["b", "succeeded"],
+        ],
+        "succeeded",
+      ]);
+    });
+
+    it("records partially_failed when some crawls fail", async () => {
+      const executions = createInMemoryExecutionStore();
+      await _run(
+        _config({
+          drives: [
+            _drive("a", [[_connection("a1", 1)]], 0),
+            _drive("b", [[_connection("b1", 1)]]),
+          ],
+          recorder: _recorder(),
+          stores: _recordingStores(executions),
+        }),
+        { mode: "full", invocation: INVOCATION },
+      );
+
+      expect(executions.getExecutions()[0]?.outcome).toMatchObject({
+        status: "partially_failed",
+        error: "a failed",
+      });
+    });
+
+    it("records failed, and still rejects, when every crawl fails", async () => {
+      const executions = createInMemoryExecutionStore();
+      await _runFailure(
+        _config({
+          drives: [_drive("a", [[_connection("a1", 1)]], 0)],
+          recorder: _recorder(),
+          stores: _recordingStores(executions),
+        }),
+        { mode: "full", invocation: INVOCATION },
+      );
+
+      expect(executions.getExecutions()[0]?.outcome?.status).toBe("failed");
+    });
+
+    it("records failed when a requested scope does not exist", async () => {
+      const executions = createInMemoryExecutionStore();
+      await expect(
+        _run(
+          _config({
+            drives: [_drive("a", [[]])],
+            recorder: _recorder(),
+            stores: _recordingStores(executions),
+          }),
+          { mode: "full", scopes: ["nope"], invocation: INVOCATION },
+        ),
+      ).rejects.toThrow(EtlRunOptionsError);
+
+      expect(executions.getExecutions()[0]?.outcome?.status).toBe("failed");
+    });
+
+    it("does not record a run rejected before it starts", async () => {
+      const executions = createInMemoryExecutionStore();
+      await expect(
+        _run(
+          _config({
+            drives: [_drive("a", [[]])],
+            recorder: _recorder(),
+            stores: _recordingStores(executions),
+            isIncremental: false,
+          }),
+          { mode: "incremental", invocation: INVOCATION },
+        ),
+      ).rejects.toThrow(EtlRunOptionsError);
+
+      expect(executions.getExecutions()).toEqual([]);
+    });
+
+    it("does not record a run without an invocation", async () => {
+      const executions = createInMemoryExecutionStore();
+      await _run(
+        _config({
+          drives: [_drive("a", [[_connection("a1", 1)]])],
+          recorder: _recorder(),
+          stores: _recordingStores(executions),
+        }),
+      );
+
+      expect(executions.getExecutions()).toEqual([]);
+    });
+
+    it("runs and reports normally when recording fails", async () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const failing = {
+        ...createInMemoryExecutionStore(),
+        start: async () => {
+          throw new Error("no such function");
+        },
+      };
+
+      const report = await _run(
+        _config({
+          drives: [_drive("a", [[_connection("a1", 1)]])],
+          recorder: _recorder(),
+          stores: { ..._stores(), executions: failing },
+        }),
+        { mode: "full", invocation: INVOCATION },
+      );
+
+      expect([report.crawls[0]?.status, warn.mock.calls.length]).toEqual([
+        "ok",
+        1,
+      ]);
+      warn.mockRestore();
+    });
+
+    it("reports when the run started and finished, and its setup time", async () => {
+      const report = await _run(
+        _config({
+          drives: [_drive("a", [[_connection("a1", 1)]])],
+          recorder: _recorder(),
+          stores: _stores(),
+          clock: _tickingClock(),
+        }),
+      );
+
+      expect([
+        report.finishedAt.getTime() > report.startedAt.getTime(),
+        report.setupMs > 0,
+      ]).toEqual([true, true]);
     });
   });
 

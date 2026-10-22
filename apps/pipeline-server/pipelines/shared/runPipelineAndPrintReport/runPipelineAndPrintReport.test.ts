@@ -24,6 +24,9 @@ const REPORT: EtlRunReport = {
       metrics: NO_CRAWL_METRICS,
     },
   ],
+  startedAt: new Date("2026-10-22T10:00:00.000Z"),
+  finishedAt: new Date("2026-10-22T10:00:02.000Z"),
+  setupMs: 0,
 };
 
 function _lastStdoutLine(): unknown {

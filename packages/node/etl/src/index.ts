@@ -17,6 +17,13 @@ export {
   NO_CRAWL_METRICS,
   SYSTEM_CLOCK,
 } from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
+export {
+  buildExecutionScopeFromCrawl,
+  buildRunExecutionStart,
+  createRunExecutionRecorder,
+  getRunExecutionStatus,
+  type RunExecutionRecorder,
+} from "@etl/EtlEngine/recordRunExecution/createRunExecutionRecorder";
 export type {
   ApiResourceRelation,
   EtlClock,

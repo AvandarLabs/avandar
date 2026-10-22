@@ -7,6 +7,9 @@ const REPORT: EtlRunReport = {
   pipelineRunId: "00000000-0000-4000-8000-000000000001" as EtlPipelineRunId,
   mode: "full",
   crawls: [],
+  startedAt: new Date("2026-10-22T10:00:00.000Z"),
+  finishedAt: new Date("2026-10-22T10:00:02.000Z"),
+  setupMs: 0,
 };
 
 describe("getEtlRunFailedReport", () => {

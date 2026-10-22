@@ -11,15 +11,18 @@ import {
   ETL_SCOPE_KEY_PATTERN,
   ETL_UNLISTED_SCOPE_KEY,
 } from "@etl/EtlEngine/etlScopes";
+import { createRunExecutionRecorder } from "@etl/EtlEngine/recordRunExecution/createRunExecutionRecorder";
 import { resolveDriveScopes } from "@etl/EtlEngine/resolveDriveScopes/resolveDriveScopes";
 import { selectRequestedScopes } from "@etl/EtlEngine/selectRequestedScopes/selectRequestedScopes";
 import { createSupabaseCheckpointStore } from "@etl/stores/SupabaseCheckpointStore/createSupabaseCheckpointStore";
+import { createSupabaseExecutionStore } from "@etl/stores/SupabaseExecutionStore/createSupabaseExecutionStore";
 import { createSupabaseListingsStore } from "@etl/stores/SupabaseListingsStore/createSupabaseListingsStore";
 import { createSupabaseObjectStore } from "@etl/stores/SupabaseObjectStore/createSupabaseObjectStore";
 import { createClient } from "@supabase/supabase-js";
 import type { CrawlScopeResult } from "@etl/EtlEngine/crawlScope/crawlScope";
 import type {
   EtlClock,
+  EtlCrawlReport,
   EtlDestination,
   EtlDriveScopes,
   EtlEngineConfig,
@@ -31,6 +34,7 @@ import type {
   EtlScope,
   EtlStores,
 } from "@etl/EtlEngine/EtlEngine.types";
+import type { RunExecutionRecorder } from "@etl/EtlEngine/recordRunExecution/createRunExecutionRecorder";
 import type { ResolvedDrive } from "@etl/EtlEngine/resolveDriveScopes/resolveDriveScopes";
 
 /** One crawl to run, or a drive that failed before its scopes were known. */
@@ -46,6 +50,8 @@ type _CrawlTasksArgs<TDrive, TConnection, TScope extends EtlScope> = Readonly<{
   stores: EtlStores;
   syncedAt: Date;
   clock: EtlClock;
+  /** Called as each crawl ends, in crawl order. */
+  onCrawled: (crawl: EtlCrawlReport) => Promise<void>;
 }>;
 
 function _assertValidScopeOptions(args: {
@@ -127,6 +133,13 @@ function _createSupabaseStores(destination: EtlDestination): EtlStores {
         : createSupabaseCheckpointStore({
             client,
             checkpointsTable: output.checkpointsTable,
+          }),
+    executions:
+      output.executionFunctions === undefined
+        ? undefined
+        : createSupabaseExecutionStore({
+            client,
+            functions: output.executionFunctions,
           }),
   };
 }
@@ -218,30 +231,43 @@ async function _crawlInOrder<TDrive, TConnection, TScope extends EtlScope>(
         task,
         remaining: limit - fetched,
       });
+      // Recorded as each crawl ends, so a long run's progress is visible
+      // and a crash keeps the crawls that finished.
+      await args.onCrawled(result.report);
       return [...results, result];
     },
     [],
   );
 }
 
-/**
- * Builds the run's report.
- *
- * @throws EtlRunFailedError, carrying the report, when every crawl failed.
- */
-function _finishRun(args: {
+function _buildRunReport(args: {
   pipelineRunId: EtlPipelineRunId;
   mode: EtlRunMode;
   results: readonly CrawlScopeResult[];
+  startedAt: Date;
+  finishedAt: Date;
+  setupMs: number;
 }): EtlRunReport {
-  const { results } = args;
-  const report: EtlRunReport = {
+  return {
     pipelineRunId: args.pipelineRunId,
     mode: args.mode,
-    crawls: results.map((result) => {
+    crawls: args.results.map((result) => {
       return result.report;
     }),
+    startedAt: args.startedAt,
+    finishedAt: args.finishedAt,
+    setupMs: args.setupMs,
   };
+}
+
+/**
+ * @throws EtlRunFailedError, carrying the report, when every crawl failed.
+ */
+function _throwWhenEveryCrawlFailed(args: {
+  report: EtlRunReport;
+  results: readonly CrawlScopeResult[];
+}): void {
+  const { results } = args;
   const isEveryCrawlFailed =
     results.length > 0 &&
     results.every((result) => {
@@ -249,13 +275,96 @@ function _finishRun(args: {
     });
   if (isEveryCrawlFailed) {
     throw new EtlRunFailedError({
-      report,
+      report: args.report,
       errors: results.map((result) => {
         return result.error;
       }),
     });
   }
-  return report;
+}
+
+/**
+ * Lists the drives and their scopes, narrowed to the requested scopes.
+ *
+ * @throws Whatever `listDrives` throws.
+ * @throws EtlRunOptionsError when no drive declares a requested scope.
+ */
+async function _listRequestedDrives<
+  TDrive,
+  TConnection,
+  TScope extends EtlScope,
+>(args: {
+  config: EtlEngineConfig<TDrive, TConnection, TScope>;
+  options: EtlRunOptions;
+}): Promise<ReadonlyArray<ResolvedDrive<TDrive, TScope>>> {
+  const { config } = args;
+  return selectRequestedScopes({
+    pipelineName: config.name,
+    resolvedDrives: await resolveDriveScopes({
+      config,
+      drives: await config.listDrives(),
+    }),
+    requestedScopeKeys: args.options.scopes,
+  });
+}
+
+type _RecordedRunArgs<TDrive, TConnection, TScope extends EtlScope> = Readonly<{
+  config: EtlEngineConfig<TDrive, TConnection, TScope>;
+  options: EtlRunOptions;
+  stores: EtlStores;
+  clock: EtlClock;
+  pipelineRunId: EtlPipelineRunId;
+  startedAt: Date;
+  execution: RunExecutionRecorder;
+}>;
+
+/**
+ * Lists drives and scopes, crawls them, and builds the report, recording
+ * each crawl as it ends and the run's outcome before resolving or
+ * rejecting.
+ */
+async function _runRecorded<TDrive, TConnection, TScope extends EtlScope>(
+  args: _RecordedRunArgs<TDrive, TConnection, TScope>,
+): Promise<EtlRunReport> {
+  const { config, clock, execution } = args;
+  const setupStartMs = clock.monotonicMs();
+  let setupMs = 0;
+  try {
+    const resolvedDrives = await _listRequestedDrives({
+      config,
+      options: args.options,
+    });
+    setupMs = Math.round(clock.monotonicMs() - setupStartMs);
+    const results = await _crawlInOrder({
+      config,
+      tasks: _buildCrawlTasks(resolvedDrives),
+      options: args.options,
+      pipelineRunId: args.pipelineRunId,
+      stores: args.stores,
+      syncedAt: args.startedAt,
+      clock,
+      onCrawled: execution.recordCrawl,
+    });
+    const report = _buildRunReport({
+      pipelineRunId: args.pipelineRunId,
+      mode: args.options.mode,
+      results,
+      startedAt: args.startedAt,
+      finishedAt: clock.now(),
+      setupMs,
+    });
+    await execution.finishWithReport(report);
+    _throwWhenEveryCrawlFailed({ report, results });
+    return report;
+  } catch (error: unknown) {
+    // A no-op when the report was already recorded.
+    await execution.finishWithError({
+      error,
+      finishedAt: clock.now(),
+      setupMs,
+    });
+    throw error;
+  }
 }
 
 async function _listLiveScopes<TDrive, TConnection, TScope extends EtlScope>(
@@ -286,6 +395,9 @@ async function _listLiveScopes<TDrive, TConnection, TScope extends EtlScope>(
  * in `listDrives` and then `listScopes` order, one page at a time, and loads
  * each page into the configured listings table and bucket before fetching
  * the next. A failed crawl is reported and the next one still runs.
+ * Each run with an invocation and an execution store is recorded: its
+ * start, each crawl as it ends, and its outcome. Recording never fails a
+ * run.
  * `EtlEngineInstance` lists when `run()` and `listScopes()` reject. See the
  * package README for the output contract and run modes.
  *
@@ -302,25 +414,26 @@ export function createEtlEngine<
     run: async (options) => {
       _assertCanRun({ config, options });
       const stores = _resolveStores(config);
+      const clock = config.clock ?? SYSTEM_CLOCK;
       const pipelineRunId = randomUUID() as EtlPipelineRunId;
-      const resolvedDrives = selectRequestedScopes({
+      const startedAt = clock.now();
+      const execution = createRunExecutionRecorder({
+        store: stores.executions,
         pipelineName: config.name,
-        resolvedDrives: await resolveDriveScopes({
-          config,
-          drives: await config.listDrives(),
-        }),
-        requestedScopeKeys: options.scopes,
-      });
-      const results = await _crawlInOrder({
-        config,
-        tasks: _buildCrawlTasks(resolvedDrives),
-        options,
         pipelineRunId,
-        stores,
-        syncedAt: new Date(),
-        clock: config.clock ?? SYSTEM_CLOCK,
+        options,
+        startedAt,
       });
-      return _finishRun({ pipelineRunId, mode: options.mode, results });
+      await execution.start();
+      return _runRecorded({
+        config,
+        options,
+        stores,
+        clock,
+        pipelineRunId,
+        startedAt,
+        execution,
+      });
     },
     listScopes: () => {
       return _listLiveScopes(config);
