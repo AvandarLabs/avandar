@@ -391,11 +391,94 @@ describe("pruneRetiredScopesCommand", () => {
     vi.mocked(promptToConfirmReset).mockResolvedValueOnce(false);
     const posts = _mockScopeRpcs([LIVE, RETIRED]);
 
-    // The outcome carries no deletions: the scope rows carry the counts, and
-    // the database adds them up into the execution's totals.
-    const outcome = () => {
-      return _executionBodies(posts, "finish")[0]?.p_outcome;
-    };
+    await pruneRetiredScopesCommand({
+      name: "hdx",
+      isDryRun: false,
+      local: false,
+    });
+
+    const outcome = _executionBodies(posts, "finish")[0]?.p_outcome;
+    expect([
+      _executionBodies(posts, "record_scope").map((body) => {
+        return body.p_scope;
+      }),
+      outcome,
+    ]).toEqual([
+      [
+        expect.objectContaining({
+          status: "skipped",
+          listings_deleted: 2,
+          listings_detached: 1,
+          checkpoints_deleted: 1,
+        }),
+      ],
+      expect.objectContaining({ status: "cancelled" }),
+    ]);
+    // The scope rows carry the counts, and the database adds them up.
+    expect(outcome).not.toHaveProperty("listings_deleted");
+  });
+
+  it("records the scope it pruned and fails when a later prune fails", async () => {
+    const posts = _mockScopeRpcs([LIVE, RETIRED, OTHER_RETIRED]);
+    const recordingFetch = vi.mocked(fetch);
+    let realPruneCount = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: string, init?: { body?: string }) => {
+        const body = JSON.parse(init?.body ?? "null") as {
+          p_is_dry_run?: boolean;
+        } | null;
+        const isRealPrune =
+          input.includes(PRUNE_RPC) && body?.p_is_dry_run === false;
+        realPruneCount += isRealPrune ? 1 : 0;
+        if (isRealPrune && realPruneCount === 2) {
+          posts.push({ table: PRUNE_RPC, body });
+          return new Response("boom", { status: 500 });
+        }
+        return recordingFetch(input, init);
+      }),
+    );
+
+    await expect(
+      pruneRetiredScopesCommand({ name: "hdx", isDryRun: false, local: false }),
+    ).rejects.toThrow();
+
+    expect([
+      _executionBodies(posts, "record_scope").map((body) => {
+        return body.p_scope;
+      }),
+      _executionBodies(posts, "finish")[0]?.p_outcome,
+    ]).toEqual([
+      [
+        expect.objectContaining({
+          drive_key: RETIRED.drive_key,
+          scope_key: RETIRED.scope_key,
+          status: "succeeded",
+        }),
+      ],
+      expect.objectContaining({ status: "failed" }),
+    ]);
+  });
+
+  it("records a scoped prune with its scope argument", async () => {
+    const posts = _mockScopeRpcs([LIVE, RETIRED, OTHER_RETIRED]);
+
+    await pruneRetiredScopesCommand({
+      name: "hdx",
+      scope: "all",
+      isDryRun: true,
+      local: false,
+    });
+
+    expect(_executionBodies(posts, "start")[0]?.p_execution).toMatchObject({
+      is_scoped: true,
+      arguments: { scope: "all", dryRun: true },
+    });
+  });
+
+  it("records a succeeded execution with no scopes when nothing is retired", async () => {
+    const posts = _mockScopeRpcs([LIVE]);
+
     await pruneRetiredScopesCommand({
       name: "hdx",
       isDryRun: false,
@@ -403,16 +486,10 @@ describe("pruneRetiredScopesCommand", () => {
     });
 
     expect([
-      _executionBodies(posts, "record_scope").map((body) => {
-        return (body.p_scope as { status: string }).status;
-      }),
-      outcome(),
-      outcome(),
-    ]).toEqual([
-      ["skipped"],
-      expect.objectContaining({ status: "cancelled" }),
-      expect.not.objectContaining({ listings_deleted: expect.anything() }),
-    ]);
+      _executionBodies(posts, "start").length,
+      _executionBodies(posts, "record_scope").length,
+      _executionBodies(posts, "finish")[0]?.p_outcome,
+    ]).toEqual([1, 0, expect.objectContaining({ status: "succeeded" })]);
   });
 
   it("records a failed prune with its error", async () => {
