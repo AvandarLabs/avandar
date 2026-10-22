@@ -51,7 +51,7 @@ const OUTCOME: ExecutionOutcome = {
   deletions: undefined,
 };
 
-function _failingStore(
+function _createFailingStore(
   failing: ReadonlySet<keyof ExecutionStore>,
 ): ExecutionStore {
   const store = createInMemoryExecutionStore();
@@ -94,7 +94,7 @@ describe("createNeverFatalExecutionStore", () => {
   it("warns instead of throwing when a call fails", async () => {
     const warn = vi.fn();
     const safe = createNeverFatalExecutionStore({
-      store: _failingStore(new Set(["recordScope", "finish"])),
+      store: _createFailingStore(new Set(["recordScope", "finish"])),
       warn,
     });
 
@@ -138,5 +138,20 @@ describe("createNeverFatalExecutionStore", () => {
     });
 
     expect(store.getExecutions()[0]?.outcome?.status).toBe("succeeded");
+  });
+
+  it("skips a scope recorded after finish", async () => {
+    const store = createInMemoryExecutionStore();
+    const warn = vi.fn();
+    const safe = createNeverFatalExecutionStore({ store, warn });
+
+    await safe.start(START);
+    await safe.finish({ executionId: "run-1", outcome: OUTCOME });
+    await safe.recordScope({ executionId: "run-1", scope: SCOPE });
+
+    expect([warn.mock.calls.length, store.getExecutions()[0]?.scopes]).toEqual([
+      0,
+      [],
+    ]);
   });
 });

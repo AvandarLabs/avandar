@@ -23,32 +23,39 @@ export type InMemoryExecutionStore = ExecutionStore &
  * Creates an execution store that keeps executions in memory, for testing
  * the engine or a CLI command without Supabase. Like the database
  * functions, it refuses a scope or finish for an execution that never
- * started.
+ * started, a second start with the same id, and a scope or finish for an
+ * execution that already finished.
  */
 export function createInMemoryExecutionStore(): InMemoryExecutionStore {
   const executionsById = new Map<string, InMemoryExecution>();
 
-  function _requireExecution(executionId: string): InMemoryExecution {
+  function _requireOpenExecution(executionId: string): InMemoryExecution {
     const execution = executionsById.get(executionId);
     if (execution === undefined) {
       throw new Error(`Pipeline execution ${executionId} does not exist`);
+    }
+    if (execution.outcome !== undefined) {
+      throw new Error(`Pipeline execution ${executionId} already finished`);
     }
     return execution;
   }
 
   return {
     start: async (start) => {
+      if (executionsById.has(start.id)) {
+        throw new Error(`Pipeline execution ${start.id} already exists`);
+      }
       executionsById.set(start.id, { start, scopes: [], outcome: undefined });
     },
     recordScope: async ({ executionId, scope }) => {
-      const execution = _requireExecution(executionId);
+      const execution = _requireOpenExecution(executionId);
       executionsById.set(executionId, {
         ...execution,
         scopes: [...execution.scopes, scope],
       });
     },
     finish: async ({ executionId, outcome }) => {
-      const execution = _requireExecution(executionId);
+      const execution = _requireOpenExecution(executionId);
       executionsById.set(executionId, { ...execution, outcome });
     },
     getExecutions: () => {

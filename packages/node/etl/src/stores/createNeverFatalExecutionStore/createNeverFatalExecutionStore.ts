@@ -8,7 +8,8 @@ function _describeError(error: unknown): string {
  * Wraps an execution store so recording can never fail or stop the command
  * it records: each failed call is passed to `warn` and swallowed. A failed
  * `start` turns the rest into no-ops, since there is no row to add to, and
- * only the first `finish` is recorded.
+ * only the first `finish` is recorded. A wrapper tracks one execution, so
+ * create one per execution.
  *
  * @param args.store - The store to record through.
  * @param args.warn - Told about each failure, such as `console.warn`.
