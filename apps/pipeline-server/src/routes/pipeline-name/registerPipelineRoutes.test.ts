@@ -1,4 +1,8 @@
-import { EtlRunFailedError, EtlRunOptionsError } from "@avandar/etl";
+import {
+  EtlRunFailedError,
+  EtlRunOptionsError,
+  NO_CRAWL_METRICS,
+} from "@avandar/etl";
 import { listScopes } from "@pipeline-server/routes/pipeline-name/listScopes/listScopes";
 import { registerPipelineRoutes } from "@pipeline-server/routes/pipeline-name/registerPipelineRoutes";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
@@ -327,6 +331,11 @@ describe("registerRunPipelineRoutes", () => {
           newestTimestamp: undefined,
           status: "failed",
           error: "HTTP GET request failed with status 429.",
+          startedAt: new Date("2026-10-22T10:00:00.000Z"),
+          finishedAt: new Date("2026-10-22T10:00:01.000Z"),
+          checkpointBefore: undefined,
+          checkpointAfter: undefined,
+          metrics: NO_CRAWL_METRICS,
         },
       ],
     };

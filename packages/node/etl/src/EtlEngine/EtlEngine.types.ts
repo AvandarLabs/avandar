@@ -100,6 +100,12 @@ export type RelationDescription = Readonly<{
   metadata?: Readonly<Record<string, unknown>>;
   coverageStartDate?: Date;
   coverageEndDate?: Date;
+  /**
+   * The size in bytes the source reports for this relation's data, such
+   * as a CKAN resource's `size`. Summed into the crawl's
+   * `sourceBytesReported`.
+   */
+  sourceSizeBytes?: number;
 }>;
 
 /** One column of an API relation, written to the relation columns table. */
@@ -205,6 +211,8 @@ export type EtlEngineConfig<
     service?: string;
     /** Replaces the Supabase-backed stores, for tests. */
     stores?: EtlStores;
+    /** Replaces the system clock, for tests. */
+    clock?: EtlClock;
     listDrives: () => PromisedOrValue<readonly TDrive[]>;
     /** Written to `api_base_url` on `api_resource` rows. */
     getDriveKey: (drive: TDrive) => string;
@@ -222,6 +230,8 @@ export type EtlEngineConfig<
       scope: TScope;
       window: EtlRunWindow;
       pipelineRunId: EtlPipelineRunId;
+      /** Counters and timers this pipeline adds to the crawl's metrics. */
+      metrics: EtlPipelineMetrics;
     }) => AsyncIterable<readonly TConnection[]>;
     /** Identifies a connection, so a repeat within one crawl is dropped. */
     getConnectionId: (connection: TConnection) => string;
@@ -231,6 +241,8 @@ export type EtlEngineConfig<
       scope: TScope;
       connection: TConnection;
       pipelineRunId: EtlPipelineRunId;
+      /** Counters and timers this pipeline adds to the crawl's metrics. */
+      metrics: EtlPipelineMetrics;
     }) => PromisedOrValue<readonly Relation[]>;
     /** Omit for a pipeline that only supports full runs. */
     incremental?: EtlIncrementalConfig<TDrive, TConnection>;
@@ -256,6 +268,14 @@ export type EtlCrawlReport = Readonly<{
   newestTimestamp: Date | undefined;
   status: EtlCrawlStatus;
   error?: string;
+  /** When the crawl started and ended. */
+  startedAt: Date;
+  finishedAt: Date;
+  /** The scope's checkpoint when the crawl started and when it ended. */
+  checkpointBefore: Date | undefined;
+  checkpointAfter: Date | undefined;
+  /** The crawl's stage timings and the denominators that explain them. */
+  metrics: EtlCrawlMetrics;
 }>;
 
 /** What happened during a run, one entry per crawl in crawl order. */

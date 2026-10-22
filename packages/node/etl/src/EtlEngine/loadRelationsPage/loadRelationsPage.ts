@@ -5,6 +5,7 @@ import { isListingRowUnchanged } from "@etl/EtlEngine/isListingRowUnchanged/isLi
 import { prepareParquetRelation } from "@etl/EtlEngine/prepareParquetRelation/prepareParquetRelation";
 import { buildListingKeyFromRow } from "@etl/stores/buildListingKeyFromRow/buildListingKeyFromRow";
 import { splitIntoChunks } from "@etl/utils/splitIntoChunks/splitIntoChunks";
+import type { CrawlMetricsRecorder } from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 import type {
   EtlPipelineRunId,
   EtlStores,
@@ -43,6 +44,8 @@ export type LoadRelationsPageContext = Readonly<{
   syncedAt: Date;
   stores: EtlStores;
   bucket: string | undefined;
+  /** The crawl's metrics, which this page's reads and writes add to. */
+  metrics: CrawlMetricsRecorder;
 }>;
 
 /** How many of a page's relations were written and how many were skipped. */
@@ -178,6 +181,7 @@ async function _buildRowAndColumns(
       pipelineRunId: context.pipelineRunId,
       objects: context.stores.objects,
       bucket: context.bucket,
+      metrics: context.metrics,
     });
   }
   return { row: args.row, columns: relation.columns.map(_buildColumnRow) };
@@ -227,6 +231,28 @@ async function _prepareRelation(args: {
 }
 
 /**
+ * Adds the page's considered listings and columns, its widest listing, and
+ * the source sizes its relations report to the crawl's metrics.
+ */
+function _countConsidered(args: {
+  relations: readonly Relation[];
+  preparedRelations: readonly _PreparedRelation[];
+  metrics: CrawlMetricsRecorder;
+}): void {
+  const { metrics } = args;
+  metrics.count("listingsConsidered", args.preparedRelations.length);
+  args.preparedRelations.forEach(({ columns }) => {
+    metrics.count("columnsConsidered", columns.length);
+    metrics.observeListingWidth(columns.length);
+  });
+  args.relations.forEach((relation) => {
+    if (relation.sourceSizeBytes !== undefined) {
+      metrics.addSourceBytes(relation.sourceSizeBytes);
+    }
+  });
+}
+
+/**
  * Splits relations into write batches of at most `LISTING_CHUNK_SIZE`
  * listings and `COLUMNS_PER_WRITE` columns, keeping their order. Each
  * listing goes into one batch with all of its columns.
@@ -256,17 +282,25 @@ function _splitIntoWriteBatches(
 async function _writeChangedRelations(args: {
   changedRelations: readonly _PreparedRelation[];
   listings: ListingsStore;
+  metrics: CrawlMetricsRecorder;
 }): Promise<void> {
+  const { metrics } = args;
+  args.changedRelations.forEach(({ columns }) => {
+    metrics.count("columnsWritten", columns.length);
+  });
   // Sequential on purpose: batches go oldest connection first, so a failure
   // partway leaves an oldest-first prefix of the page written.
   await promiseMapSequential(
     _splitIntoWriteBatches(args.changedRelations),
     (batch) => {
-      return args.listings.upsertListingsWithColumns(
-        batch.map(({ row, columns }) => {
-          return { row, columns };
-        }),
-      );
+      metrics.count("writeBatches", 1);
+      return metrics.time("loadWriteMs", () => {
+        return args.listings.upsertListingsWithColumns(
+          batch.map(({ row, columns }) => {
+            return { row, columns };
+          }),
+        );
+      });
     },
   );
 }
@@ -278,7 +312,8 @@ async function _writeChangedRelations(args: {
  * relation columns in the same transaction, so a listing and its columns are
  * always written together. Each row carries `metadata.relation_columns_sha256`,
  * a fingerprint of its columns, so a change to the columns alone counts as
- * a change to the row.
+ * a change to the row. Adds the page's load timings and denominators to
+ * `context.metrics`.
  *
  * @param args.relations - The page's relations, oldest connection first.
  * @param args.context - The run and drive the page belongs to.
@@ -292,11 +327,13 @@ export async function loadRelationsPage(args: {
   const { context } = args;
   const relationsWithRows = _buildRelationsWithRows(args);
   _throwOnRepeatedListingKey(relationsWithRows);
-  const storedByKey = await _readStoredRowsByKey({
-    rows: relationsWithRows.map(({ row }) => {
-      return row;
-    }),
-    listings: context.stores.listings,
+  const storedByKey = await context.metrics.time("loadReadMs", () => {
+    return _readStoredRowsByKey({
+      rows: relationsWithRows.map(({ row }) => {
+        return row;
+      }),
+      listings: context.stores.listings,
+    });
   });
   const preparedRelations = await promiseMapSequential(
     relationsWithRows,
@@ -304,6 +341,11 @@ export async function loadRelationsPage(args: {
       return _prepareRelation({ relationWithRow, storedByKey, context });
     },
   );
+  _countConsidered({
+    relations: args.relations,
+    preparedRelations,
+    metrics: context.metrics,
+  });
   const changedRelations = preparedRelations.filter(({ row, stored }) => {
     return (
       stored === undefined || !isListingRowUnchanged({ stored, next: row })
@@ -312,6 +354,7 @@ export async function loadRelationsPage(args: {
   await _writeChangedRelations({
     changedRelations,
     listings: context.stores.listings,
+    metrics: context.metrics,
   });
   return {
     written: changedRelations.length,

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { promiseReduce } from "@avandar/utils";
+import { SYSTEM_CLOCK } from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 import {
   buildUncrawledCrawlResult,
   crawlScope,
@@ -18,6 +19,7 @@ import { createSupabaseObjectStore } from "@etl/stores/SupabaseObjectStore/creat
 import { createClient } from "@supabase/supabase-js";
 import type { CrawlScopeResult } from "@etl/EtlEngine/crawlScope/crawlScope";
 import type {
+  EtlClock,
   EtlDestination,
   EtlDriveScopes,
   EtlEngineConfig,
@@ -43,6 +45,7 @@ type _CrawlTasksArgs<TDrive, TConnection, TScope extends EtlScope> = Readonly<{
   pipelineRunId: EtlPipelineRunId;
   stores: EtlStores;
   syncedAt: Date;
+  clock: EtlClock;
 }>;
 
 function _assertValidScopeOptions(args: {
@@ -179,6 +182,8 @@ async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
       scopeKey: ETL_UNLISTED_SCOPE_KEY,
       options: args.options,
       outcome: { status: "failed", error: task.error },
+      startedAt: args.clock.now(),
+      finishedAt: args.clock.now(),
     });
   }
   return crawlScope({
@@ -191,6 +196,7 @@ async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
     stores: args.stores,
     remaining: args.remaining,
     syncedAt: args.syncedAt,
+    clock: args.clock,
   });
 }
 
@@ -312,6 +318,7 @@ export function createEtlEngine<
         pipelineRunId,
         stores,
         syncedAt: new Date(),
+        clock: config.clock ?? SYSTEM_CLOCK,
       });
       return _finishRun({ pipelineRunId, mode: options.mode, results });
     },

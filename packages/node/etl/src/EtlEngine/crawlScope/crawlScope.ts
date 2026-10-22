@@ -3,6 +3,10 @@ import {
   advanceCrawlCheckpoint,
   readCrawlStart,
 } from "@etl/EtlEngine/crawlCheckpoint/crawlCheckpoint";
+import {
+  createCrawlMetricsRecorder,
+  NO_CRAWL_METRICS,
+} from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 import { loadRelationsPage } from "@etl/EtlEngine/loadRelationsPage/loadRelationsPage";
 import { resolveRunWindow } from "@etl/EtlEngine/resolveRunWindow/resolveRunWindow";
 import { selectPageConnections } from "@etl/EtlEngine/selectPageConnections/selectPageConnections";
@@ -10,7 +14,10 @@ import type {
   CrawlCheckpoint,
   CrawlStart,
 } from "@etl/EtlEngine/crawlCheckpoint/crawlCheckpoint";
+import type { CrawlMetricsRecorder } from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 import type {
+  EtlClock,
+  EtlCrawlMetrics,
   EtlCrawlReport,
   EtlEngineConfig,
   EtlPipelineRunId,
@@ -24,22 +31,27 @@ import type { LoadRelationsPageContext } from "@etl/EtlEngine/loadRelationsPage/
 import type { ConnectionSelectionState } from "@etl/EtlEngine/selectPageConnections/selectPageConnections";
 
 /** What one scope's crawl needs. */
-export type CrawlScopeArgs<TDrive, TConnection, TScope extends EtlScope> =
-  Readonly<{
-    config: EtlEngineConfig<TDrive, TConnection, TScope>;
-    drive: TDrive;
-    driveKey: string;
-    scope: TScope;
-    options: EtlRunOptions;
-    pipelineRunId: EtlPipelineRunId;
-    stores: EtlStores;
-    /**
-     * How many more connections the run's limit allows. At 0 or below the
-     * crawl is skipped.
-     */
-    remaining: number;
-    syncedAt: Date;
-  }>;
+export type CrawlScopeArgs<
+  TDrive,
+  TConnection,
+  TScope extends EtlScope,
+> = Readonly<{
+  config: EtlEngineConfig<TDrive, TConnection, TScope>;
+  drive: TDrive;
+  driveKey: string;
+  scope: TScope;
+  options: EtlRunOptions;
+  pipelineRunId: EtlPipelineRunId;
+  stores: EtlStores;
+  /**
+   * How many more connections the run's limit allows. At 0 or below the
+   * crawl is skipped.
+   */
+  remaining: number;
+  syncedAt: Date;
+  /** Dates the crawl and times its stages. */
+  clock: EtlClock;
+}>;
 
 /** One crawl's report, plus what the crawl threw when it failed. */
 export type CrawlScopeResult = Readonly<{
@@ -68,6 +80,8 @@ type _PagesArgs<TDrive, TConnection, TScope extends EtlScope> = CrawlScopeArgs<
     window: EtlRunWindow;
     /** The scope's checkpoint as the crawl found it. */
     startCheckpoint: CrawlCheckpoint | undefined;
+    /** The crawl's metrics recorder. */
+    metrics: CrawlMetricsRecorder;
   }>;
 
 type _CrawlCounts = Readonly<{
@@ -95,6 +109,11 @@ type _CrawlResultArgs = Readonly<{
   window: EtlRunWindow;
   counts: _CrawlCounts;
   outcome: CrawlOutcome;
+  startedAt: Date;
+  finishedAt: Date;
+  checkpointBefore: Date | undefined;
+  checkpointAfter: Date | undefined;
+  metrics: EtlCrawlMetrics;
 }>;
 
 const NO_CRAWL_COUNTS: _CrawlCounts = {
@@ -129,6 +148,11 @@ function _buildCrawlResult(args: _CrawlResultArgs): CrawlScopeResult {
     relationsWritten: counts.relationsWritten,
     relationsUnchanged: counts.relationsUnchanged,
     newestTimestamp: counts.newestTimestamp,
+    startedAt: args.startedAt,
+    finishedAt: args.finishedAt,
+    checkpointBefore: args.checkpointBefore,
+    checkpointAfter: args.checkpointAfter,
+    metrics: args.metrics,
   };
   if (outcome.status !== "failed") {
     return { report: { ...base, status: outcome.status } };
@@ -147,12 +171,14 @@ function _buildCrawlResult(args: _CrawlResultArgs): CrawlScopeResult {
 /**
  * The result for a crawl that never got as far as fetching a page: one
  * skipped for the limit, one whose checkpoint could not be read, or a drive
- * that failed before its scopes were known.
+ * that failed before its scopes were known. It reports zero metrics.
  *
  * @param args.driveKey - The drive, or `listDrives[<index>]`.
  * @param args.scopeKey - The scope, or `ETL_UNLISTED_SCOPE_KEY`.
  * @param args.options - The run's options, for the reported window.
  * @param args.outcome - Skipped, or failed with what was thrown.
+ * @param args.startedAt - When the crawl was reached.
+ * @param args.finishedAt - When it was given up.
  * @returns The result, with zero counts.
  */
 export function buildUncrawledCrawlResult(args: {
@@ -160,6 +186,8 @@ export function buildUncrawledCrawlResult(args: {
   scopeKey: string;
   options: EtlRunOptions;
   outcome: CrawlOutcome;
+  startedAt: Date;
+  finishedAt: Date;
 }): CrawlScopeResult {
   return _buildCrawlResult({
     driveKey: args.driveKey,
@@ -171,6 +199,11 @@ export function buildUncrawledCrawlResult(args: {
     }),
     counts: NO_CRAWL_COUNTS,
     outcome: args.outcome,
+    startedAt: args.startedAt,
+    finishedAt: args.finishedAt,
+    checkpointBefore: undefined,
+    checkpointAfter: undefined,
+    metrics: NO_CRAWL_METRICS,
   });
 }
 
@@ -249,6 +282,7 @@ async function _transformConnections<
         scope: args.scope,
         connection,
         pipelineRunId: args.pipelineRunId,
+        metrics: args.metrics.pipelineMetrics,
       });
       _assertRelationsNotNewer({ pagesArgs: args, connection, relations });
       return relations;
@@ -269,6 +303,7 @@ function _buildLoadContext<TDrive, TConnection, TScope extends EtlScope>(
     syncedAt: args.syncedAt,
     stores: args.stores,
     bucket: args.config.output.bucket,
+    metrics: args.metrics,
   };
 }
 
@@ -290,8 +325,11 @@ async function _loadPage<TDrive, TConnection, TScope extends EtlScope>(
     getConnectionId: config.getConnectionId,
     getConnectionTimestamp,
   });
+  const relations = await args.metrics.time("transformMs", () => {
+    return _transformConnections({ ...args, connections });
+  });
   const loaded = await loadRelationsPage({
-    relations: await _transformConnections({ ...args, connections }),
+    relations,
     context: _buildLoadContext(args),
   });
   const pageTimestamps =
@@ -311,6 +349,50 @@ async function _loadPage<TDrive, TConnection, TScope extends EtlScope>(
   };
 }
 
+/**
+ * Yields the extract's pages, timing each wait for the next page as the
+ * crawl's extract stage and counting the pages. Closes the extract's
+ * iterator when the crawl stops early, as `for await` would.
+ */
+async function* _timePages<TConnection>(args: {
+  pages: AsyncIterable<readonly TConnection[]>;
+  metrics: CrawlMetricsRecorder;
+}): AsyncGenerator<readonly TConnection[]> {
+  const iterator = args.pages[Symbol.asyncIterator]();
+  try {
+    // Sequential on purpose: each `next()` is timed on its own, which a
+    // `for await` over the extract cannot do.
+    while (true) {
+      const nextPage = await args.metrics.time("extractMs", () => {
+        return iterator.next();
+      });
+      if (nextPage.done === true) {
+        return;
+      }
+      args.metrics.count("pageCount", 1);
+      yield nextPage.value;
+    }
+  } finally {
+    await iterator.return?.();
+  }
+}
+
+/** Starts the scope's extract, with each page's wait timed. */
+function _extractTimedPages<TDrive, TConnection, TScope extends EtlScope>(
+  args: _PagesArgs<TDrive, TConnection, TScope>,
+): AsyncGenerator<readonly TConnection[]> {
+  return _timePages({
+    pages: args.config.extract({
+      drive: args.drive,
+      scope: args.scope,
+      window: args.window,
+      pipelineRunId: args.pipelineRunId,
+      metrics: args.metrics.pipelineMetrics,
+    }),
+    metrics: args.metrics,
+  });
+}
+
 async function _crawlPages<TDrive, TConnection, TScope extends EtlScope>(
   args: _PagesArgs<TDrive, TConnection, TScope>,
 ): Promise<Readonly<{ progress: _CrawlProgress; outcome: CrawlOutcome }>> {
@@ -319,12 +401,7 @@ async function _crawlPages<TDrive, TConnection, TScope extends EtlScope>(
     checkpoint: args.startCheckpoint,
   });
   try {
-    const pages = args.config.extract({
-      drive: args.drive,
-      scope: args.scope,
-      window: args.window,
-      pipelineRunId: args.pipelineRunId,
-    });
+    const pages = _extractTimedPages(args);
     // Sequential on purpose: each page is written, and the checkpoint moved
     // past it, before the next is fetched, so the listings table always
     // holds an oldest-first prefix of the scope up to the checkpoint. That
@@ -335,11 +412,13 @@ async function _crawlPages<TDrive, TConnection, TScope extends EtlScope>(
       // reports the page it loaded.
       progress = loaded.progress;
       // The page is loaded, so the checkpoint may move past it.
-      const checkpoint = await advanceCrawlCheckpoint({
-        checkpoint: progress.checkpoint,
-        pageTimestamps: loaded.pageTimestamps,
-        syncedAt: args.syncedAt,
-        pipelineRunId: args.pipelineRunId,
+      const checkpoint = await args.metrics.time("checkpointWriteMs", () => {
+        return advanceCrawlCheckpoint({
+          checkpoint: progress.checkpoint,
+          pageTimestamps: loaded.pageTimestamps,
+          syncedAt: args.syncedAt,
+          pipelineRunId: args.pipelineRunId,
+        });
       });
       progress = { ...progress, checkpoint };
       if (progress.selection.remaining <= 0) {
@@ -353,42 +432,73 @@ async function _crawlPages<TDrive, TConnection, TScope extends EtlScope>(
 }
 
 /**
+ * Reads the scope's checkpoint, timed as the crawl's setup, then crawls its
+ * pages and builds the result with the crawl's metrics.
+ *
+ * @throws Only when the checkpoint cannot be read.
+ */
+async function _crawlFromStart<
+  TDrive,
+  TConnection,
+  TScope extends EtlScope,
+>(options: {
+  args: CrawlScopeArgs<TDrive, TConnection, TScope>;
+  startedAt: Date;
+}): Promise<CrawlScopeResult> {
+  const { args } = options;
+  const metrics = createCrawlMetricsRecorder(args.clock);
+  const start = await metrics.time("setupMs", () => {
+    return _readScopeStart(args);
+  });
+  const { progress, outcome } = await _crawlPages({
+    ...args,
+    window: start.window,
+    startCheckpoint: start.checkpoint,
+    metrics,
+  });
+  return _buildCrawlResult({
+    driveKey: args.driveKey,
+    scopeKey: args.scope.key,
+    window: start.window,
+    counts: progress,
+    outcome,
+    startedAt: options.startedAt,
+    finishedAt: args.clock.now(),
+    checkpointBefore: start.checkpoint?.current,
+    checkpointAfter: progress.checkpoint?.current,
+    metrics: metrics.snapshot(progress),
+  });
+}
+
+/**
  * Crawls one scope of one drive: reads the scope's checkpoint and window,
  * then fetches, transforms, and loads one page at a time until the source
  * runs out or the run's limit is reached, moving the checkpoint past each
  * loaded page. A crawl with no limit left is skipped without a request. A
  * failure never escapes: the crawl is reported `failed` with the counts of
  * what it wrote before the failure, and the result keeps what it threw.
+ * Dates the crawl, times its stages, and reports its metrics.
  *
  * @returns The crawl's report and, when it failed, its error.
  */
 export async function crawlScope<TDrive, TConnection, TScope extends EtlScope>(
   args: CrawlScopeArgs<TDrive, TConnection, TScope>,
 ): Promise<CrawlScopeResult> {
-  const { driveKey, options } = args;
+  const { driveKey, options, clock } = args;
   const scopeKey = args.scope.key;
+  const startedAt = clock.now();
   if (args.remaining <= 0) {
     return buildUncrawledCrawlResult({
       driveKey,
       scopeKey,
       options,
       outcome: { status: "skipped" },
+      startedAt,
+      finishedAt: startedAt,
     });
   }
   try {
-    const start = await _readScopeStart(args);
-    const { progress, outcome } = await _crawlPages({
-      ...args,
-      window: start.window,
-      startCheckpoint: start.checkpoint,
-    });
-    return _buildCrawlResult({
-      driveKey,
-      scopeKey,
-      window: start.window,
-      counts: progress,
-      outcome,
-    });
+    return await _crawlFromStart({ args, startedAt });
   } catch (error: unknown) {
     // _crawlPages reports its own failures, so only reading the checkpoint
     // lands here.
@@ -397,6 +507,8 @@ export async function crawlScope<TDrive, TConnection, TScope extends EtlScope>(
       scopeKey,
       options,
       outcome: { status: "failed", error },
+      startedAt,
+      finishedAt: clock.now(),
     });
   }
 }

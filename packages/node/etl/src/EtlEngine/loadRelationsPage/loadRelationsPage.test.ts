@@ -2,6 +2,10 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+  createCrawlMetricsRecorder,
+  SYSTEM_CLOCK,
+} from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
+import {
   resetEtlPathsRootForTesting,
   setEtlPathsRootForTesting,
 } from "@etl/EtlEngine/etlPaths";
@@ -14,6 +18,7 @@ import { createInMemoryObjectStore } from "@etl/stores/InMemoryObjectStore/creat
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type {
   ApiResourceRelation,
+  EtlClock,
   EtlPipelineRunId,
   EtlStores,
   PipelineParquetRelation,
@@ -48,6 +53,7 @@ function _context(
     stores,
     bucket: undefined,
     scopeKey: "all",
+    metrics: createCrawlMetricsRecorder(SYSTEM_CLOCK),
     ...overrides,
   };
 }
@@ -96,6 +102,74 @@ function _apiRelations(count: number): Relation[] {
 }
 
 describe("loadRelationsPage", () => {
+  it("counts the listings and columns it considered and wrote, the widest listing, and source sizes", async () => {
+    const listings = createInMemoryListingsStore();
+    const metrics = createCrawlMetricsRecorder(SYSTEM_CLOCK);
+    const stores = { listings, objects: undefined };
+    await loadRelationsPage({
+      relations: [_apiRelation(1, { columns: [COLUMN_A] })],
+      context: _context(stores),
+    });
+
+    await loadRelationsPage({
+      relations: [
+        _apiRelation(1, { columns: [COLUMN_A] }),
+        _apiRelation(2, {
+          columns: [COLUMN_A, COLUMN_B],
+          sourceSizeBytes: 300,
+        }),
+      ],
+      context: _context(stores, { metrics }),
+    });
+
+    expect(
+      metrics.snapshot({
+        connectionsFetched: 0,
+        relationsWritten: 0,
+        relationsUnchanged: 0,
+      }).denominators,
+    ).toMatchObject({
+      listingsConsidered: 2,
+      columnsConsidered: 3,
+      columnsWritten: 2,
+      maxColumnsPerListing: 2,
+      writeBatches: 1,
+      sourceBytesReported: 300,
+    });
+  });
+
+  it("times reading stored rows and each write batch", async () => {
+    let elapsedMs = 0;
+    const tickingClock: EtlClock = {
+      now: () => {
+        return new Date(elapsedMs);
+      },
+      monotonicMs: () => {
+        elapsedMs += 1;
+        return elapsedMs;
+      },
+    };
+    const metrics = createCrawlMetricsRecorder(tickingClock);
+
+    await loadRelationsPage({
+      relations: [_apiRelation(1)],
+      context: _context(
+        { listings: createInMemoryListingsStore(), objects: undefined },
+        { metrics },
+      ),
+    });
+
+    const { timings } = metrics.snapshot({
+      connectionsFetched: 0,
+      relationsWritten: 0,
+      relationsUnchanged: 0,
+    });
+    expect([timings.loadReadMs > 0, timings.loadWriteMs > 0]).toEqual([
+      true,
+      true,
+    ]);
+  });
+
   it("writes nothing when the same page is loaded again", async () => {
     const listings = createInMemoryListingsStore();
     const stores = { listings, objects: undefined };

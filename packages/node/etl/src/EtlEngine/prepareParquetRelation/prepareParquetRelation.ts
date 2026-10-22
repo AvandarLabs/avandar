@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, stat, writeFile } from "node:fs/promises";
 import { basename, dirname } from "node:path";
 import { getLoadParquetPathForTable } from "@etl/EtlEngine/etlFileHelpers";
 import { transformedCsvsToParquetBlobs } from "@etl/EtlEngine/transformedCsvsToParquetBlobs";
 import { duckDbDescribeColumnTypeToSniffable } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 import { NodeDuckDb } from "@etl/NodeDuckDb/NodeDuckDb";
+import type { CrawlMetricsRecorder } from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 import type {
   EtlPipelineRunId,
   PipelineParquetRelation,
@@ -46,6 +47,8 @@ type _PrepareParquetRelationArgs = Readonly<{
   pipelineRunId: EtlPipelineRunId;
   objects: ObjectStore | undefined;
   bucket: string | undefined;
+  /** The crawl's metrics: build and upload times and sizes. */
+  metrics: CrawlMetricsRecorder;
 }>;
 
 /** A Parquet relation's final row and the relation columns to write for it. */
@@ -114,6 +117,22 @@ async function _buildParquetFile(args: {
   };
 }
 
+/**
+ * Builds the Parquet file, timed as the crawl's Parquet build, and counts
+ * the input CSV's size. The size is read after the conversion, so a missing
+ * CSV fails with the conversion's error.
+ */
+async function _buildParquetFileTimed(
+  args: _PrepareParquetRelationArgs,
+): Promise<_ParquetFile> {
+  return args.metrics.time("loadParquetBuildMs", async () => {
+    const parquet = await _buildParquetFile(args);
+    const csvStat = await stat(args.relation.csvPath);
+    args.metrics.count("sourceCsvBytes", csvStat.size);
+    return parquet;
+  });
+}
+
 function _buildColumnRows(parquet: _ParquetFile): RelationColumnRow[] {
   return parquet.columnNames.map((columnName, index) => {
     const columnType = parquet.columnTypes[index] ?? "VARCHAR";
@@ -133,6 +152,33 @@ function _isStoredObjectCurrent(options: {
   return UPLOADED_OBJECT_KEYS.every((key) => {
     return options.stored?.metadata?.[key] === options.metadata[key];
   });
+}
+
+/**
+ * Uploads the object unless the stored row already records it, timing the
+ * upload and counting its bytes and rows, or counting the skip.
+ */
+async function _uploadUnlessCurrent(args: {
+  prepareArgs: _PrepareParquetRelationArgs;
+  objects: ObjectStore;
+  parquet: _ParquetFile;
+  storagePath: string;
+  metadata: Readonly<Record<string, unknown>>;
+}): Promise<void> {
+  const { metrics, stored } = args.prepareArgs;
+  if (_isStoredObjectCurrent({ stored, metadata: args.metadata })) {
+    metrics.count("parquetUploadsSkipped", 1);
+    return;
+  }
+  await metrics.time("loadParquetUploadMs", () => {
+    return args.objects.upload({
+      path: args.storagePath,
+      bytes: args.parquet.bytes,
+      contentType: PARQUET_CONTENT_TYPE,
+    });
+  });
+  metrics.count("parquetBytesWritten", args.parquet.bytes.byteLength);
+  metrics.count("parquetRowsWritten", args.parquet.rowCount);
 }
 
 function _requireObjectStore(
@@ -181,7 +227,7 @@ export async function prepareParquetRelation(
 ): Promise<PreparedParquetRelation> {
   const { relation, row } = args;
   const { objects, bucket } = _requireObjectStore(args);
-  const parquet = await _buildParquetFile(args);
+  const parquet = await _buildParquetFileTimed(args);
   const storagePath = `${args.pipelineName}/datasets/${relation.tableBaseName}.parquet`;
   const metadata = {
     ...(row.metadata ?? {}),
@@ -194,13 +240,13 @@ export async function prepareParquetRelation(
     },
     parquet_sha256: parquet.sha256,
   };
-  if (!_isStoredObjectCurrent({ stored: args.stored, metadata })) {
-    await objects.upload({
-      path: storagePath,
-      bytes: parquet.bytes,
-      contentType: PARQUET_CONTENT_TYPE,
-    });
-  }
+  await _uploadUnlessCurrent({
+    prepareArgs: args,
+    objects,
+    parquet,
+    storagePath,
+    metadata,
+  });
   const canonicalUrls = _appendPublicUrl({
     canonicalUrls: row.canonical_urls,
     publicUrl: objects.getPublicUrl(storagePath),

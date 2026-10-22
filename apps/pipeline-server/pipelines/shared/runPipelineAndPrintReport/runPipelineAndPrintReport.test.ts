@@ -1,4 +1,4 @@
-import { EtlRunFailedError } from "@avandar/etl";
+import { EtlRunFailedError, NO_CRAWL_METRICS } from "@avandar/etl";
 import { runPipelineAndPrintReport } from "@pipelines/shared/runPipelineAndPrintReport/runPipelineAndPrintReport";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { EtlPipelineRunId, EtlRunReport } from "@avandar/etl";
@@ -17,6 +17,11 @@ const REPORT: EtlRunReport = {
       newestTimestamp: undefined,
       status: "failed",
       error: "HTTP GET request failed with status 429.",
+      startedAt: new Date("2026-10-22T10:00:00.000Z"),
+      finishedAt: new Date("2026-10-22T10:00:01.000Z"),
+      checkpointBefore: undefined,
+      checkpointAfter: undefined,
+      metrics: NO_CRAWL_METRICS,
     },
   ],
 };

@@ -1,7 +1,11 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildListingRowFromRelation } from "@etl/EtlEngine/buildListingRowFromRelation/buildListingRowFromRelation";
+import {
+  createCrawlMetricsRecorder,
+  SYSTEM_CLOCK,
+} from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 import {
   resetEtlPathsRootForTesting,
   setEtlPathsRootForTesting,
@@ -10,6 +14,7 @@ import { isListingRowUnchanged } from "@etl/EtlEngine/isListingRowUnchanged/isLi
 import { prepareParquetRelation } from "@etl/EtlEngine/prepareParquetRelation/prepareParquetRelation";
 import { createInMemoryObjectStore } from "@etl/stores/InMemoryObjectStore/createInMemoryObjectStore";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import type { CrawlMetricsRecorder } from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 import type {
   EtlPipelineRunId,
   PipelineParquetRelation,
@@ -60,6 +65,7 @@ function _prepare(args: {
   stored?: StoredListingRow;
   objects?: InMemoryObjectStore | undefined;
   bucket?: string | undefined;
+  metrics?: CrawlMetricsRecorder;
 }) {
   const relation = args.relation ?? _relation();
   return prepareParquetRelation({
@@ -78,10 +84,47 @@ function _prepare(args: {
     pipelineRunId: RUN_ID,
     objects: "objects" in args ? args.objects : createInMemoryObjectStore(),
     bucket: "bucket" in args ? args.bucket : "opendata",
+    metrics: args.metrics ?? createCrawlMetricsRecorder(SYSTEM_CLOCK),
   });
 }
 
 describe("prepareParquetRelation", () => {
+  it("counts the CSV's bytes and the uploaded Parquet's bytes and rows", async () => {
+    const metrics = createCrawlMetricsRecorder(SYSTEM_CLOCK);
+    const objects = createInMemoryObjectStore();
+
+    await _prepare({ objects, metrics });
+
+    const { denominators } = metrics.snapshot({
+      connectionsFetched: 0,
+      relationsWritten: 0,
+      relationsUnchanged: 0,
+    });
+    expect([
+      denominators.sourceCsvBytes,
+      denominators.parquetBytesWritten > 0,
+      denominators.parquetRowsWritten,
+      denominators.parquetUploadsSkipped,
+    ]).toEqual([(await stat(csvPath)).size, true, 2, 0]);
+  });
+
+  it("counts a skipped upload and no bytes written", async () => {
+    const first = await _prepare({});
+    const metrics = createCrawlMetricsRecorder(SYSTEM_CLOCK);
+
+    await _prepare({ stored: { ...first.row, id: "listing-1" }, metrics });
+
+    const { denominators } = metrics.snapshot({
+      connectionsFetched: 0,
+      relationsWritten: 0,
+      relationsUnchanged: 0,
+    });
+    expect([
+      denominators.parquetUploadsSkipped,
+      denominators.parquetBytesWritten,
+    ]).toEqual([1, 0]);
+  });
+
   it("uploads the Parquet object to <pipeline>/datasets/<table>.parquet", async () => {
     const objects = createInMemoryObjectStore();
 

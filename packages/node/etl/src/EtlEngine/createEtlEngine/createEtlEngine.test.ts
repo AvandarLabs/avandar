@@ -1,3 +1,4 @@
+import { NO_CRAWL_METRICS } from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 import { createEtlEngine } from "@etl/EtlEngine/createEtlEngine/createEtlEngine";
 import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
 import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
@@ -7,6 +8,7 @@ import { createInMemoryListingsStore } from "@etl/stores/InMemoryListingsStore/c
 import { describe, expect, it } from "vitest";
 import type {
   ApiResourceRelation,
+  EtlClock,
   EtlEngineConfig,
   EtlRunOptions,
   EtlRunReport,
@@ -131,6 +133,7 @@ function _config(args: {
   getDriveKey?: FakeConfig["getDriveKey"];
   transform?: FakeConfig["transform"];
   listScopes?: FakeConfig["listScopes"];
+  clock?: EtlClock;
 }): FakeConfig {
   return {
     name: PIPELINE_NAME,
@@ -143,6 +146,7 @@ function _config(args: {
       checkpointsTable: "pipeline_scope_checkpoints",
     },
     stores: args.stores,
+    ...(args.clock === undefined ? {} : { clock: args.clock }),
     ...(args.listScopes === undefined ? {} : { listScopes: args.listScopes }),
     listDrives: () => {
       args.recorder.events.push("listDrives");
@@ -277,6 +281,20 @@ function _crawlsOf(report: EtlRunReport): Array<[string, string, string]> {
   return report.crawls.map((crawl) => {
     return [crawl.driveKey, crawl.scopeKey, crawl.status];
   });
+}
+
+/** A clock whose monotonic time moves 1 ms each time it is read. */
+function _tickingClock(): EtlClock {
+  let elapsedMs = 0;
+  return {
+    now: () => {
+      return new Date(Date.UTC(2026, 9, 22) + elapsedMs);
+    },
+    monotonicMs: () => {
+      elapsedMs += 1;
+      return elapsedMs;
+    },
+  };
 }
 
 describe("createEtlEngine", () => {
@@ -1523,8 +1541,107 @@ describe("createEtlEngine", () => {
             relationsUnchanged: 0,
             newestTimestamp: _at(2),
             status: "ok",
+            startedAt: expect.any(Date),
+            finishedAt: expect.any(Date),
+            checkpointBefore: undefined,
+            checkpointAfter: undefined,
+            metrics: expect.objectContaining({
+              denominators: expect.objectContaining({ pageCount: 1 }),
+            }),
           },
         ],
+      });
+    });
+  });
+
+  describe("metrics", () => {
+    it("times each crawl's stages and dates it", async () => {
+      const report = await _run(
+        _config({
+          drives: [
+            _drive("a", [[_connection("c1", 1)], [_connection("c2", 2)]]),
+          ],
+          recorder: _recorder(),
+          stores: _stores(),
+          clock: _tickingClock(),
+        }),
+        { mode: "incremental" },
+      );
+
+      const [crawl] = report.crawls;
+      const timings = crawl?.metrics.timings;
+      expect([
+        timings !== undefined && timings.setupMs > 0,
+        timings !== undefined && timings.extractMs > 0,
+        timings !== undefined && timings.transformMs > 0,
+        timings !== undefined && timings.loadWriteMs > 0,
+        timings !== undefined && timings.checkpointWriteMs > 0,
+        crawl !== undefined &&
+          crawl.finishedAt.getTime() > crawl.startedAt.getTime(),
+      ]).toEqual([true, true, true, true, true, true]);
+    });
+
+    it("counts pages, datasets, and listings, and records the checkpoint before and after", async () => {
+      const checkpoints = createInMemoryCheckpointStore({
+        checkpoints: [_checkpoint("a", 0)],
+      });
+      const listings = createInMemoryListingsStore();
+      const report = await _run(
+        _config({
+          drives: [
+            _drive("a", [[_connection("c1", 1, 2)], [_connection("c2", 2)]]),
+          ],
+          recorder: _recorder(),
+          stores: _stores(listings, checkpoints),
+        }),
+        { mode: "incremental" },
+      );
+
+      const [crawl] = report.crawls;
+      expect([
+        crawl?.metrics.denominators.pageCount,
+        crawl?.metrics.denominators.datasetsFetched,
+        crawl?.metrics.denominators.listingsConsidered,
+        crawl?.metrics.denominators.listingsWritten,
+        crawl?.checkpointBefore,
+        crawl?.checkpointAfter,
+      ]).toEqual([2, 2, 3, 3, _at(0), _at(2)]);
+    });
+
+    it("collects the pipeline's own metrics from transform", async () => {
+      const report = await _run(
+        _config({
+          drives: [_drive("a", [[_connection("c1", 1), _connection("c2", 2)]])],
+          recorder: _recorder(),
+          stores: _stores(),
+          transform: ({ connection, metrics }) => {
+            metrics.increment("fake.transforms");
+            return _relationsFor(connection);
+          },
+        }),
+      );
+
+      expect(report.crawls[0]?.metrics.pipelineMetrics).toEqual({
+        "fake.transforms": 2,
+      });
+    });
+
+    it("reports zero metrics for a crawl skipped by the limit", async () => {
+      const report = await _run(
+        _config({
+          drives: [
+            _drive("a", [[_connection("a1", 1)]]),
+            _drive("b", [[_connection("b1", 1)]]),
+          ],
+          recorder: _recorder(),
+          stores: _stores(),
+        }),
+        { mode: "full", limit: 1 },
+      );
+
+      expect(report.crawls[1]).toMatchObject({
+        status: "skipped",
+        metrics: NO_CRAWL_METRICS,
       });
     });
   });
