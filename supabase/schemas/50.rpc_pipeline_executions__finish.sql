@@ -1,9 +1,9 @@
 /**
  * Records that a pipeline command finished: sets its status, error, and
  * finish time, adds the run's own setup time to `setup_ms`, writes deletion
- * totals a reset passes (an execution with scope rows, such as a prune, gets
- * those totals from its scope rows, so passing them is an error), and counts the pipeline's catalog as it now
- * stands.
+ * totals a reset passes, and counts the pipeline's catalog as it now stands.
+ * An execution with scope rows, such as a prune, gets its deletion totals
+ * from those scope rows, so passing them is an error.
  *
  * @param p_execution_id The execution.
  * @param p_outcome A JSON object with `status` (not `running`), and

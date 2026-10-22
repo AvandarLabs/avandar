@@ -66,6 +66,17 @@ describe("createCrawlMetricsRecorder", () => {
     });
   });
 
+  it("rounds each reported source size to whole bytes", () => {
+    const metrics = createCrawlMetricsRecorder(_tickingClock(1));
+
+    metrics.addSourceBytes(100.4);
+    metrics.addSourceBytes(50.6);
+
+    expect(
+      metrics.snapshot(NO_CRAWL_COUNTS).denominators.sourceBytesReported,
+    ).toBe(151);
+  });
+
   it("leaves the source size unknown when nothing reported one", () => {
     const metrics = createCrawlMetricsRecorder(_tickingClock(1));
 

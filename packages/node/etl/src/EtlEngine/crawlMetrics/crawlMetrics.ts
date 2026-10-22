@@ -60,7 +60,7 @@ export type CrawlMetricsRecorder = Readonly<{
   count: (denominator: CountedDenominator, by: number) => void;
   /** Keeps the widest listing's column count. */
   observeListingWidth: (columnCount: number) => void;
-  /** Adds a size the source reported for one relation. */
+  /** Adds a size a source reported for one relation, in whole bytes. */
   addSourceBytes: (bytes: number) => void;
   /** Handed to the pipeline's `extract` and `transform`. */
   pipelineMetrics: EtlPipelineMetrics;
@@ -156,7 +156,7 @@ export function createCrawlMetricsRecorder(
       widest.columnCount = Math.max(widest.columnCount, columnCount);
     },
     addSourceBytes: (bytes) => {
-      reported.bytes = (reported.bytes ?? 0) + bytes;
+      reported.bytes = (reported.bytes ?? 0) + Math.round(bytes);
     },
     pipelineMetrics: _createPipelineMetrics(clock, pipelineValues),
     snapshot: (crawlCounts) => {

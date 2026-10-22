@@ -1,6 +1,5 @@
 import { spawnSync } from "node:child_process";
 import { hostname, userInfo } from "node:os";
-import { findAvandarRepoRoot } from "@ava-cli/PipelineCli/runPipelineLocal";
 
 /** How the CLI was started, as each pipeline execution it starts records it. */
 export type CliInvocation = Readonly<{
@@ -9,7 +8,10 @@ export type CliInvocation = Readonly<{
   /** `<OS user>@<hostname>`. */
   actor: string;
   host: string;
-  /** The commit checked out where the CLI runs, when it runs in a checkout. */
+  /**
+   * The commit of the checkout the CLI was built from, which is the code that
+   * executes. Absent when that location is not a git checkout.
+   */
   codeVersion?: string;
 }>;
 
@@ -38,7 +40,9 @@ export function readGitCommit(directory: string): string | undefined {
 
 /**
  * How this CLI process was started: its argv, who ran it where, and the
- * commit of the checkout it runs in.
+ * commit of the checkout the CLI itself lives in. The commit is resolved from
+ * the running module's directory (the bundle is CommonJS, so `__dirname`),
+ * never from the working directory, which can be any repo.
  *
  * @param cliArgv - The argv after the binary. Defaults to this process's.
  */
@@ -46,7 +50,7 @@ export function buildCliInvocation(
   cliArgv: readonly string[] = process.argv.slice(2),
 ): CliInvocation {
   const host = hostname();
-  const codeVersion = readGitCommit(findAvandarRepoRoot() ?? process.cwd());
+  const codeVersion = readGitCommit(__dirname);
   return {
     cliArgv,
     actor: `${_readUsername()}@${host}`,

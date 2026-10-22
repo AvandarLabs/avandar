@@ -281,7 +281,7 @@ and checkpoints.
   `sourceSizeBytes`. The engine sums it into `source_bytes_reported`. The HDX
   pipeline sets it from the CKAN resource's `size`.
 - **Pipeline metrics.** `extract` and `transform` receive a `metrics` handle
-  with `increment(name, by?)` and `addDuration(name, ms)`, collected per crawl
+  with `increment(name, by?)` and `time(name, work)`, collected per crawl
   into `pipeline_metrics`. HDX records `hdx.parquet_footer_reads` and
   `hdx.parquet_footer_read_ms`; Socrata records nothing yet.
 - **Recording.** `EtlStores` gains an optional `executions:
