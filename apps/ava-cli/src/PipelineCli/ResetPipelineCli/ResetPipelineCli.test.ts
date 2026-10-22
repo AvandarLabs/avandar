@@ -52,13 +52,15 @@ type RecordedRequest = Readonly<{
  * `data_catalog_listings` and `checkpointCount` on
  * `pipeline_scope_checkpoints`, a GET on `datasets__open_data` returns
  * `inUseRows`, a POST to the prune RPC returns `pruneCounts`, and every
- * DELETE succeeds. Returns the requests in the order they were made.
+ * DELETE succeeds. With `executionRpcStatus`, the execution functions answer
+ * that error status. Returns the requests in the order they were made.
  */
 function _mockPostgrest(options: {
   listingCount: number;
   checkpointCount?: number;
   inUseRows?: readonly InUseRow[];
   pruneCounts?: PruneCounts;
+  executionRpcStatus?: number;
 }): RecordedRequest[] {
   const requests: RecordedRequest[] = [];
   vi.stubGlobal(
@@ -78,6 +80,14 @@ function _mockPostgrest(options: {
         return new Response(null, {
           status: 200,
           headers: { "content-range": `*/${count}` },
+        });
+      }
+      if (
+        options.executionRpcStatus !== undefined &&
+        table.startsWith("rpc/rpc_pipeline_executions__")
+      ) {
+        return new Response("no such function", {
+          status: options.executionRpcStatus,
         });
       }
       if (method === "POST") {
@@ -421,6 +431,43 @@ describe("resetPipelineCommand", () => {
     });
   });
 
+  it("records the workspace datasets a reset deleted when asked to delete all", async () => {
+    vi.mocked(promptForInUseListingsChoice).mockResolvedValueOnce("delete");
+    const requests = _mockPostgrest({
+      listingCount: 3,
+      inUseRows: [IN_USE_ROW, { ...IN_USE_ROW, dataset_id: "dataset-2" }],
+    });
+
+    await resetPipelineCommand({ name: "socrata" });
+
+    expect(_getExecutionBody(requests, "finish")?.p_outcome).toMatchObject({
+      status: "succeeded",
+      listings_kept_in_use: 0,
+      workspace_datasets_deleted: 2,
+    });
+  });
+
+  it("still deletes everything when recording the reset fails", async () => {
+    const requests = _mockPostgrest({
+      listingCount: 3,
+      executionRpcStatus: 404,
+    });
+
+    await expect(
+      resetPipelineCommand({ name: "socrata" }),
+    ).resolves.toBeUndefined();
+
+    expect([
+      _getDeletes(requests).map((request) => {
+        return request.table;
+      }),
+      _getCombinedLogs(),
+    ]).toEqual([
+      ["pipeline_scope_checkpoints", "data_catalog_listings"],
+      expect.stringContaining("Could not record the start"),
+    ]);
+  });
+
   describe("with --scope", () => {
     it("rejects an invalid scope key before any request", async () => {
       const requests = _mockPostgrest({ listingCount: 0 });
@@ -585,6 +632,22 @@ describe("resetPipelineCommand", () => {
       expect(_getExecutionBody(requests, "finish")?.p_outcome).toMatchObject({
         status: "cancelled",
         listings_deleted: 3,
+      });
+    });
+
+    it("records the workspace datasets a scope reset deleted", async () => {
+      vi.mocked(promptForInUseListingsChoice).mockResolvedValueOnce("delete");
+      const requests = _mockPostgrest({
+        listingCount: 0,
+        inUseRows: [IN_USE_ROW, { ...IN_USE_ROW, dataset_id: "dataset-2" }],
+        pruneCounts: { ...NO_PRUNE, listings_kept_in_use: 1 },
+      });
+
+      await resetPipelineCommand({ name: "hdx", scope: "format:parquet" });
+
+      expect(_getExecutionBody(requests, "finish")?.p_outcome).toMatchObject({
+        status: "succeeded",
+        workspace_datasets_deleted: 2,
       });
     });
   });
