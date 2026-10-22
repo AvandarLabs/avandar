@@ -35,34 +35,48 @@ function _crawl(overrides: Partial<EtlCrawlReport> = {}): EtlCrawlReport {
 
 describe("buildRunExecutionStart", () => {
   it("records the run's mode, flags, and parsed arguments", () => {
-    expect(
-      buildRunExecutionStart({
-        pipelineName: "socrata",
-        pipelineRunId: RUN_ID,
-        startedAt: STARTED_AT,
-        invocation: { invokedVia: "cli_local" },
-        options: {
-          mode: "incremental",
-          until: new Date("2026-10-21T00:00:00.000Z"),
-          limit: 5,
-          scopes: ["all"],
-        },
-      }),
-    ).toMatchObject({
-      id: RUN_ID,
-      command: "run",
-      runMode: "incremental",
-      isDryRun: false,
-      isScoped: true,
-      isLimited: true,
-      isWindowed: true,
-      arguments: {
+    const start = buildRunExecutionStart({
+      pipelineName: "socrata",
+      pipelineRunId: RUN_ID,
+      startedAt: STARTED_AT,
+      invocation: { invokedVia: "cli_local" },
+      options: {
+        mode: "incremental",
+        until: new Date("2026-10-21T00:00:00.000Z"),
+        limit: 5,
+        scopes: ["all"],
+      },
+    });
+
+    expect([
+      {
+        id: start.id,
+        command: start.command,
+        runMode: start.runMode,
+        isDryRun: start.isDryRun,
+        isScoped: start.isScoped,
+        isLimited: start.isLimited,
+        isWindowed: start.isWindowed,
+      },
+      start.arguments,
+    ]).toStrictEqual([
+      {
+        id: RUN_ID,
+        command: "run",
+        runMode: "incremental",
+        isDryRun: false,
+        isScoped: true,
+        isLimited: true,
+        isWindowed: true,
+      },
+      // Strict, so an option left unset never appears as an undefined key.
+      {
         mode: "incremental",
         until: "2026-10-21T00:00:00.000Z",
         limit: 5,
         scopes: ["all"],
       },
-    });
+    ]);
   });
 });
 

@@ -1716,6 +1716,7 @@ describe("createEtlEngine", () => {
     });
 
     it("records failed, and still rejects, when every crawl fails", async () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
       const executions = createInMemoryExecutionStore();
       await _runFailure(
         _config({
@@ -1726,7 +1727,41 @@ describe("createEtlEngine", () => {
         { mode: "full", invocation: INVOCATION },
       );
 
-      expect(executions.getExecutions()[0]?.outcome?.status).toBe("failed");
+      // No warning: the error handler's second finish is skipped, not refused.
+      expect([
+        executions.getExecutions()[0]?.outcome?.status,
+        executions.getExecutions()[0]?.outcome?.error,
+        warn.mock.calls.length,
+      ]).toEqual(["failed", "a failed", 0]);
+      warn.mockRestore();
+    });
+
+    it("records the setup time spent when listing drives throws", async () => {
+      const executions = createInMemoryExecutionStore();
+      const config = _config({
+        drives: [],
+        recorder: _recorder(),
+        stores: _recordingStores(executions),
+        clock: _tickingClock(),
+      });
+      await expect(
+        _run(
+          {
+            ...config,
+            listDrives: () => {
+              throw new Error("listDrives failed");
+            },
+          },
+          { mode: "full", invocation: INVOCATION },
+        ),
+      ).rejects.toThrow("listDrives failed");
+
+      const outcome = executions.getExecutions()[0]?.outcome;
+      expect([
+        outcome?.status,
+        outcome?.error,
+        outcome !== undefined && outcome.setupMs > 0,
+      ]).toEqual(["failed", "listDrives failed", true]);
     });
 
     it("records failed when a requested scope does not exist", async () => {

@@ -328,7 +328,7 @@ async function _runRecorded<TDrive, TConnection, TScope extends EtlScope>(
 ): Promise<EtlRunReport> {
   const { config, clock, execution } = args;
   const setupStartMs = clock.monotonicMs();
-  let setupMs = 0;
+  let setupMs: number | undefined;
   try {
     const resolvedDrives = await _listRequestedDrives({
       config,
@@ -358,10 +358,12 @@ async function _runRecorded<TDrive, TConnection, TScope extends EtlScope>(
     return report;
   } catch (error: unknown) {
     // A no-op when the report was already recorded.
+    // A run that failed while listing drives or scopes spent all of its
+    // time so far on setup.
     await execution.finishWithError({
       error,
       finishedAt: clock.now(),
-      setupMs,
+      setupMs: setupMs ?? Math.round(clock.monotonicMs() - setupStartMs),
     });
     throw error;
   }
