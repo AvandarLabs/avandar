@@ -1,8 +1,6 @@
-import type {
-  SocrataDiscoveryColumn,
-  SocrataDiscoveryResult,
-} from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
+import type { SocrataDiscoveryColumn } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
 import type { ApiResourceRelation, RelationColumn } from "@avandar/etl";
+import type { SocrataDataset } from "@pipelines/socrata/attachSocrataCsvHeaders/attachSocrataCsvHeaders";
 import type { ConfiguredDrive } from "@pipelines/socrata/configuredDrives/configuredDrives";
 
 /**
@@ -24,20 +22,25 @@ const CAST_DATA_TYPE_BY_SOCRATA_TYPE: Readonly<
 };
 
 /**
- * Whether a column is one of Socrata's computed region columns
- * (`:@computed_region_...`). The Discovery API lists them, but a `.csv`
- * export leaves them out, as it does every `:`-prefixed system field.
+ * One column of the CSV export, typed by the Discovery API column of the
+ * same field name. A header the Discovery API does not list is text.
  */
-function _isExportedColumn(column: SocrataDiscoveryColumn): boolean {
-  return !column.fieldName.startsWith(":");
-}
-
-function _toRelationColumn(column: SocrataDiscoveryColumn): RelationColumn {
+function _toRelationColumn(
+  headerName: string,
+  discoveredColumn: SocrataDiscoveryColumn | undefined,
+): RelationColumn {
+  if (discoveredColumn === undefined) {
+    return {
+      name: headerName,
+      originalDataType: "VARCHAR",
+      castDataType: "VARCHAR",
+    };
+  }
   return {
-    name: column.fieldName,
-    originalDataType: column.dataType,
+    name: headerName,
+    originalDataType: discoveredColumn.dataType,
     castDataType:
-      CAST_DATA_TYPE_BY_SOCRATA_TYPE[column.dataType.toLowerCase()] ??
+      CAST_DATA_TYPE_BY_SOCRATA_TYPE[discoveredColumn.dataType.toLowerCase()] ??
       "VARCHAR",
   };
 }
@@ -45,23 +48,26 @@ function _toRelationColumn(column: SocrataDiscoveryColumn): RelationColumn {
 /**
  * Builds the one relation a discovered Socrata dataset becomes. Always
  * `"CSV"`: `SocrataClient.getRows` always fetches the `.csv` export, so that
- * is what the listing is read as, not a value from Socrata's metadata. Each
- * column is named by its API field name, which the export's header uses.
+ * is what the listing is read as, not a value from Socrata's metadata. The
+ * columns are the export's header, in its order, which uses each column's
+ * API field name. Each is typed by the Discovery API column of that name.
  *
- * @returns The relation, or `undefined` when the dataset has no column the
- *   export includes, since a listing is never stored without its columns.
+ * @returns The relation, or `undefined` when the dataset has no CSV header,
+ *   since a listing is never stored without its columns.
  */
 export function makeApiResourceRelationFromSocrataResult(params: {
   drive: Readonly<ConfiguredDrive>;
-  result: Readonly<SocrataDiscoveryResult>;
+  result: Readonly<SocrataDataset>;
 }): ApiResourceRelation | undefined {
   const { drive, result } = params;
-  const columns = result.columns
-    .filter(_isExportedColumn)
-    .map(_toRelationColumn);
-  if (columns.length === 0) {
+  if (result.csvHeader === undefined || result.csvHeader.length === 0) {
     return undefined;
   }
+  const discoveredColumnsByName = new Map(
+    result.columns.map((column) => {
+      return [column.fieldName, column];
+    }),
+  );
   return {
     kind: "api_resource",
     externalDatasetId: result.datasetId,
@@ -70,6 +76,11 @@ export function makeApiResourceRelationFromSocrataResult(params: {
     displayName: result.name,
     externalOrganizationName: drive.organizationName,
     sourceUpdatedAt: new Date(result.updatedAt),
-    columns,
+    columns: result.csvHeader.map((headerName) => {
+      return _toRelationColumn(
+        headerName,
+        discoveredColumnsByName.get(headerName),
+      );
+    }),
   };
 }
