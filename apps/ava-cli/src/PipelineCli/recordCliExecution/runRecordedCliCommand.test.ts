@@ -1,3 +1,5 @@
+import { createInterface } from "node:readline/promises";
+import { PassThrough } from "node:stream";
 import { runRecordedCliCommand } from "@ava-cli/PipelineCli/recordCliExecution/runRecordedCliCommand";
 import { Acclimate } from "@avandar/acclimate";
 import {
@@ -5,6 +7,7 @@ import {
   NO_STAGE_TIMINGS,
 } from "@etl/stores/executionRecords/executionRecords";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { CliCommandContext } from "@ava-cli/PipelineCli/recordCliExecution/runRecordedCliCommand";
 import type { ExecutionScope } from "@etl/stores/ExecutionStore.types";
 
 const TARGET = {
@@ -65,6 +68,29 @@ function _stubRpcs(status = 204): _RpcCall[] {
   return calls;
 }
 
+/**
+ * The error a terminal prompt rejects with when the user presses Ctrl+C: a
+ * readline question whose input receives `\x03`.
+ */
+async function _interruptPrompt(): Promise<unknown> {
+  const input = new PassThrough();
+  const prompt = createInterface({
+    input,
+    output: new PassThrough(),
+    terminal: true,
+  });
+  const question = prompt.question("Continue? ");
+  input.write("\x03");
+  return question.then(
+    () => {
+      throw new Error("Expected the prompt to be interrupted.");
+    },
+    (error: unknown) => {
+      return error;
+    },
+  );
+}
+
 function _getCombinedLogs(): string {
   const logCalls = (Acclimate.log as unknown as { mock: { calls: unknown[] } })
     .mock.calls;
@@ -79,6 +105,7 @@ describe("runRecordedCliCommand", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it("records the start, each scope, and the outcome, under one id", async () => {
@@ -87,7 +114,7 @@ describe("runRecordedCliCommand", () => {
     await runRecordedCliCommand({
       target: TARGET,
       start: START,
-      work: async (recordScope) => {
+      work: async ({ recordScope }) => {
         await recordScope(SCOPE);
         return { status: "succeeded" };
       },
@@ -177,6 +204,109 @@ describe("runRecordedCliCommand", () => {
       status: "failed",
       error: "boom",
     });
+  });
+
+  it("records the deletions noted before the command failed", async () => {
+    const calls = _stubRpcs();
+
+    await expect(
+      runRecordedCliCommand({
+        target: TARGET,
+        start: START,
+        work: async ({ noteDeletions }) => {
+          noteDeletions({ checkpointsDeleted: 2 });
+          noteDeletions({ workspaceDatasetsDeleted: 1, checkpointsDeleted: 1 });
+          throw new Error("boom");
+        },
+      }),
+    ).rejects.toThrow("boom");
+
+    expect(calls[1]?.body.p_outcome).toMatchObject({
+      status: "failed",
+      error: "boom",
+      listings_deleted: 0,
+      listings_kept_in_use: 0,
+      listings_detached: 0,
+      checkpoints_deleted: 3,
+      workspace_datasets_deleted: 1,
+    });
+  });
+
+  it("records no deletions for a failed command that noted none", async () => {
+    const calls = _stubRpcs();
+
+    await expect(
+      runRecordedCliCommand({
+        target: TARGET,
+        start: START,
+        work: async () => {
+          throw new Error("boom");
+        },
+      }),
+    ).rejects.toThrow("boom");
+
+    expect(calls[1]?.body.p_outcome).not.toHaveProperty("listings_deleted");
+  });
+
+  it("records cancelled when a prompt is interrupted with Ctrl+C, and rethrows", async () => {
+    const calls = _stubRpcs();
+    const interrupted = await _interruptPrompt();
+
+    await expect(
+      runRecordedCliCommand({
+        target: TARGET,
+        start: START,
+        work: async () => {
+          throw interrupted;
+        },
+      }),
+    ).rejects.toBe(interrupted);
+
+    expect(calls[1]?.body.p_outcome).toMatchObject({
+      status: "cancelled",
+      error: null,
+    });
+  });
+
+  it("gives up on recording calls that hang, and still runs the command", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: string, init?: { signal?: AbortSignal }) => {
+        if (new URL(input).pathname.endsWith("__start")) {
+          return Promise.resolve(new Response(null, { status: 204 }));
+        }
+        // Never answers: only an abort settles the call.
+        return new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            reject(init.signal?.reason);
+          });
+        });
+      }),
+    );
+    const timeoutMs: number[] = [];
+    vi.spyOn(AbortSignal, "timeout").mockImplementation((ms) => {
+      timeoutMs.push(ms);
+      const controller = new AbortController();
+      // Times out at once, in place of after `ms`.
+      setTimeout(() => {
+        controller.abort(new DOMException("timed out", "TimeoutError"));
+      }, 0);
+      return controller.signal;
+    });
+    const work = vi.fn(async ({ recordScope }: CliCommandContext) => {
+      await recordScope(SCOPE);
+      return { status: "succeeded" } as const;
+    });
+
+    await runRecordedCliCommand({ target: TARGET, start: START, work });
+
+    expect([work.mock.calls.length, timeoutMs, _getCombinedLogs()]).toEqual([
+      1,
+      [10_000, 10_000, 10_000],
+      expect.stringMatching(
+        /Could not record https:\/\/data\.humdata\.org \[format:parquet\][\s\S]*Could not record the end/,
+      ),
+    ]);
   });
 
   it("warns and still runs the command when recording fails", async () => {

@@ -32,8 +32,9 @@ async function _sendPostgrestRequest(options: {
   params: Readonly<Record<string, string>>;
   prefer?: string;
   body?: unknown;
+  signal?: AbortSignal;
 }): Promise<Response> {
-  const { target, method, table, params, prefer, body } = options;
+  const { target, method, table, params, prefer, body, signal } = options;
   const query = new URLSearchParams(params);
   const response = await fetch(`${target.apiUrl}/rest/v1/${table}?${query}`, {
     method,
@@ -44,6 +45,7 @@ async function _sendPostgrestRequest(options: {
       ...(body === undefined ? {} : { "Content-Type": "application/json" }),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    ...(signal === undefined ? {} : { signal }),
   });
   if (!response.ok) {
     const responseText = await response.text();
@@ -266,11 +268,13 @@ export async function listStoredScopes(options: {
  * a non-2xx answer.
  *
  * @param options.functionName - Such as `rpc_pipeline_executions__start`.
+ * @param options.signal - Aborts the call, such as `AbortSignal.timeout(ms)`.
  */
 export async function callPostgrestRpc(options: {
   target: PostgrestTarget;
   functionName: string;
   body: Readonly<Record<string, unknown>>;
+  signal?: AbortSignal;
 }): Promise<Response> {
   return await _sendPostgrestRequest({
     target: options.target,
@@ -278,5 +282,6 @@ export async function callPostgrestRpc(options: {
     table: `rpc/${options.functionName}`,
     params: {},
     body: options.body,
+    signal: options.signal,
   });
 }

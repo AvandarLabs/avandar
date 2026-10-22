@@ -53,7 +53,8 @@ type RecordedRequest = Readonly<{
  * `pipeline_scope_checkpoints`, a GET on `datasets__open_data` returns
  * `inUseRows`, a POST to the prune RPC returns `pruneCounts`, and every
  * DELETE succeeds. With `executionRpcStatus`, the execution functions answer
- * that error status. Returns the requests in the order they were made.
+ * that error status, and a request `isFailing` picks answers 500. Returns
+ * the requests in the order they were made.
  */
 function _mockPostgrest(options: {
   listingCount: number;
@@ -61,6 +62,7 @@ function _mockPostgrest(options: {
   inUseRows?: readonly InUseRow[];
   pruneCounts?: PruneCounts;
   executionRpcStatus?: number;
+  isFailing?: (request: RecordedRequest) => boolean;
 }): RecordedRequest[] {
   const requests: RecordedRequest[] = [];
   vi.stubGlobal(
@@ -71,7 +73,11 @@ function _mockPostgrest(options: {
       const table = url.pathname.replace("/rest/v1/", "");
       const body: unknown =
         init?.body === undefined ? undefined : JSON.parse(init.body);
-      requests.push({ method, table, params: url.searchParams, body });
+      const request = { method, table, params: url.searchParams, body };
+      requests.push(request);
+      if (options.isFailing?.(request) === true) {
+        return new Response("boom", { status: 500 });
+      }
       const count =
         table === "pipeline_scope_checkpoints"
           ? (options.checkpointCount ?? 0)
@@ -447,6 +453,33 @@ describe("resetPipelineCommand", () => {
     });
   });
 
+  it("records the deletions a failed reset made before it failed", async () => {
+    vi.mocked(promptForInUseListingsChoice).mockResolvedValueOnce("delete");
+    const requests = _mockPostgrest({
+      listingCount: 3,
+      checkpointCount: 2,
+      inUseRows: [IN_USE_ROW, { ...IN_USE_ROW, dataset_id: "dataset-2" }],
+      isFailing: (request) => {
+        return (
+          request.method === "DELETE" &&
+          request.table === "data_catalog_listings"
+        );
+      },
+    });
+
+    await expect(resetPipelineCommand({ name: "socrata" })).rejects.toThrow(
+      "500",
+    );
+
+    expect(_getExecutionBody(requests, "finish")?.p_outcome).toMatchObject({
+      status: "failed",
+      listings_deleted: 0,
+      listings_kept_in_use: 0,
+      checkpoints_deleted: 2,
+      workspace_datasets_deleted: 2,
+    });
+  });
+
   it("still deletes everything when recording the reset fails", async () => {
     const requests = _mockPostgrest({
       listingCount: 3,
@@ -632,6 +665,32 @@ describe("resetPipelineCommand", () => {
       expect(_getExecutionBody(requests, "finish")?.p_outcome).toMatchObject({
         status: "cancelled",
         listings_deleted: 3,
+      });
+    });
+
+    it("records the workspace datasets a failed scope reset deleted", async () => {
+      vi.mocked(promptForInUseListingsChoice).mockResolvedValueOnce("delete");
+      const requests = _mockPostgrest({
+        listingCount: 0,
+        inUseRows: [IN_USE_ROW, { ...IN_USE_ROW, dataset_id: "dataset-2" }],
+        pruneCounts: { ...NO_PRUNE, listings_kept_in_use: 1 },
+        isFailing: (request) => {
+          return (
+            request.table === PRUNE_RPC &&
+            (request.body as { p_is_dry_run: boolean }).p_is_dry_run === false
+          );
+        },
+      });
+
+      await expect(
+        resetPipelineCommand({ name: "hdx", scope: "format:parquet" }),
+      ).rejects.toThrow("500");
+
+      expect(_getExecutionBody(requests, "finish")?.p_outcome).toMatchObject({
+        status: "failed",
+        listings_deleted: 0,
+        checkpoints_deleted: 0,
+        workspace_datasets_deleted: 2,
       });
     });
 

@@ -263,7 +263,7 @@ export async function pruneRetiredScopesCommand(
           dryRun: options.isDryRun,
         },
       },
-      work: (recordScope) => {
+      work: ({ recordScope }) => {
         return _pruneRetiredScopes({ target, options, recordScope });
       },
     });
