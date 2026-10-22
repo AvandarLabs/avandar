@@ -1,5 +1,6 @@
 /** Tests that each Parquet source type is fetched the way it is today. */
 
+import { MIMEType } from "@avandar/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createDatasetParquetWrapper } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -251,6 +252,29 @@ describe("DatasetParquetWrapper", () => {
     expect(acquired.sourceVersion).toBe("ckan:hash:abc");
     expect(acquired.parquetBlob).toBeInstanceOf(Blob);
     expect(acquired.parquetBlob.size).toBe(parquetBytes.byteLength);
+  });
+
+  it("types an API-backed Parquet resource as Parquet so DuckDB can register it", async () => {
+    _mockDataset("open_data");
+    catalogEntryGetOneMock.mockResolvedValue({
+      id: CATALOG_ENTRY_ID,
+      accessKind: "api_resource",
+    });
+    const fetchApiOpenDataResource = vi.fn().mockResolvedValue({
+      contentKind: "parquet",
+      bytes: Uint8Array.from([1, 2, 3]) as Uint8Array<ArrayBuffer>,
+      sourceVersion: undefined,
+    });
+    const wrapper = createDatasetParquetWrapper({ fetchApiOpenDataResource });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    // `registerParquetFile` refuses any blob without this type, which is
+    // what kept an untyped resource from ever loading.
+    expect(acquired.parquetBlob.type).toBe(MIMEType.APPLICATION_PARQUET);
   });
 
   it("transcodes an API-backed CSV resource before returning parquet", async () => {

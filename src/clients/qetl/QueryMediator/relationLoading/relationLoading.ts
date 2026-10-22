@@ -1,6 +1,7 @@
 import {
   isDefined,
   makeBucketRecord,
+  MIMEType,
   makeIdLookupRecord,
   promiseMap,
   prop,
@@ -114,6 +115,18 @@ function _toDatasetCacheKey(
   };
 }
 
+/**
+ * Every cached payload is Parquet, but one written before acquisition typed
+ * its blobs carries no type, and `registerParquetFile` refuses an untyped
+ * blob. Re-typing it on the way out keeps such an entry loadable instead of
+ * failing every query that reads it.
+ */
+function _asParquetBlob(blob: Blob): Blob {
+  return blob.type === MIMEType.APPLICATION_PARQUET
+    ? blob
+    : new Blob([blob], { type: MIMEType.APPLICATION_PARQUET });
+}
+
 async function _readStorageCacheHit(
   options: Readonly<{
     hit: RelationCacheProbeHit;
@@ -131,7 +144,7 @@ async function _readStorageCacheHit(
   return {
     columns: options.hit.entry.columns,
     datasetId: options.hit.key.relation.id,
-    parquetBlob: payload,
+    parquetBlob: _asParquetBlob(payload),
   };
 }
 

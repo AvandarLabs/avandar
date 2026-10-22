@@ -1,4 +1,4 @@
-import { where } from "@avandar/utils";
+import { MIMEType, where } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -71,10 +71,15 @@ type FetchedParquet = {
   sourceVersion: SourceVersion | undefined;
 };
 
+/**
+ * Wraps fetched Parquet bytes in a Blob typed as Parquet. The type is not
+ * cosmetic: `registerParquetFile` refuses any blob without it, so an untyped
+ * blob would fail every load into DuckDB.
+ */
 function _parquetBlobFromBytes(bytes: Uint8Array<ArrayBuffer>): Blob {
   const copy = new Uint8Array(bytes.byteLength);
   copy.set(bytes);
-  return new Blob([copy]);
+  return new Blob([copy], { type: MIMEType.APPLICATION_PARQUET });
 }
 
 type DatasetParquetWrapperOptions = {
