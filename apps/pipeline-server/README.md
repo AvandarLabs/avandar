@@ -58,6 +58,18 @@ what only retired scopes produced, after a confirmation, and never a listing
 a workspace uses. `ava pipeline reset` deletes the pipeline's checkpoints
 before its listings, and `--scope` resets one scope.
 
+Every listing is written in one transaction with its relation columns, so a
+listing never exists without them, and deleting a listing (by reset or
+prune) deletes its columns too. A dataset whose columns cannot be read is
+not listed:
+
+- `socrata` names each dataset's columns by its CSV export's header, one
+  request per dataset (eight at a time), and types them from the Discovery
+  API. A file or link with no CSV export is skipped.
+- `hdx` uses the headers HDX's file check recorded, as text. When those are
+  missing or ambiguous, DuckDB reads the columns and their types from the
+  file itself: a Parquet footer, or a CSV sample.
+
 ## Local development
 
 ```bash
