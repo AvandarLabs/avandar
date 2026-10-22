@@ -29,6 +29,10 @@ create table if not exists data_catalog_listings__relation_columns (
   cast_data_type public.datasets__duckdb_data_type not null
 );
 
+-- A listing's columns are read in display order, replaced on every write, and
+-- deleted by cascade with their listing, all by `catalog_listing_id`.
+create index if not exists data_catalog_listings__relation_columns__listing on public.data_catalog_listings__relation_columns (catalog_listing_id, display_order);
+
 -- RLS Policies
 alter table data_catalog_listings__relation_columns enable row level security;
 

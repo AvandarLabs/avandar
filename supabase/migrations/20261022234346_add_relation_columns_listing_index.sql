@@ -1,0 +1,2 @@
+CREATE INDEX data_catalog_listings__relation_columns__listing ON public.data_catalog_listings__relation_columns USING btree (catalog_listing_id, display_order);
+
