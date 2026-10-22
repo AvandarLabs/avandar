@@ -9,7 +9,6 @@ import type {
   SocrataDiscoveryResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
 import type { EtlStores } from "@avandar/etl";
-import type { SocrataCsvHeaderReader } from "@pipelines/socrata/createSocrataCsvHeaderReader/createSocrataCsvHeaderReader";
 
 const DRIVE = {
   baseUrl: "https://data.cityofnewyork.us",
@@ -34,24 +33,6 @@ function _catalog(size: number): SocrataDiscoveryResult[] {
   });
 }
 
-/**
- * Reads a dataset's CSV header from `catalog`: its discovered columns
- * without system fields, as a real export's header has them.
- */
-function _headersFrom(
-  catalog: readonly SocrataDiscoveryResult[],
-): SocrataCsvHeaderReader {
-  return async ({ datasetId }) => {
-    return catalog
-      .find((result) => {
-        return result.datasetId === datasetId;
-      })
-      ?.columns.flatMap((column) => {
-        return column.fieldName.startsWith(":") ? [] : [column.fieldName];
-      });
-  };
-}
-
 function _discoveryOver(
   catalog: readonly SocrataDiscoveryResult[],
 ): SocrataDiscoveryClient {
@@ -73,7 +54,6 @@ function _engine(
   return createSocrataEtlEngine({
     output: OUTPUT,
     discovery: _discoveryOver(catalog),
-    readCsvHeader: _headersFrom(catalog),
     drives: [DRIVE],
     stores,
   });
@@ -179,7 +159,6 @@ describe("createSocrataEtlEngine", () => {
     await createSocrataEtlEngine({
       output: OUTPUT,
       discovery,
-      readCsvHeader: _headersFrom(_catalog(1)),
       drives: [
         {
           ...DRIVE,
@@ -216,7 +195,6 @@ describe("createSocrataEtlEngine", () => {
     const scopes = await createSocrataEtlEngine({
       output: OUTPUT,
       discovery: _discoveryOver([]),
-      readCsvHeader: _headersFrom([]),
       drives: [DRIVE],
     }).listScopes();
 

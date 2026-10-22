@@ -7,21 +7,7 @@ const DRIVE = {
   organizationName: "City of New York",
 };
 
-/**
- * Builds the relation for a dataset with `columns`. Its CSV header is
- * `csvHeader` when given, even as `undefined`, and otherwise the columns'
- * field names without system fields.
- */
-function _make(
-  columns: SocrataDiscoveryColumn[],
-  ...csvHeaderArgument: [csvHeader?: readonly string[] | undefined]
-) {
-  const csvHeader =
-    csvHeaderArgument.length > 0
-      ? csvHeaderArgument[0]
-      : columns.flatMap((column) => {
-          return column.fieldName.startsWith(":") ? [] : [column.fieldName];
-        });
+function _make(columns: SocrataDiscoveryColumn[]) {
   return makeApiResourceRelationFromSocrataResult({
     drive: DRIVE,
     result: {
@@ -31,7 +17,6 @@ function _make(
       createdAt: "2011-10-10T00:00:00.000Z",
       updatedAt: "2026-10-19T08:30:00.000Z",
       columns,
-      csvHeader,
     },
   });
 }
@@ -89,30 +74,20 @@ describe("makeApiResourceRelationFromSocrataResult", () => {
     ]);
   });
 
-  it("names and orders the columns by the CSV header, not the Discovery API", () => {
+  it("leaves out computed region columns, which the CSV export does not have", () => {
     expect(
-      _make(
-        [
-          _column("location_address", "Text"),
-          _column("location", "Point"),
-          _column("borough", "Text"),
-          _column(":@computed_region_92fq_4b7q", "Number"),
-        ],
-        ["borough", "location"],
-      )?.columns,
-    ).toEqual([
-      { name: "borough", originalDataType: "Text", castDataType: "VARCHAR" },
-      { name: "location", originalDataType: "Point", castDataType: "VARCHAR" },
-    ]);
+      _make([
+        _column("borough", "Text"),
+        _column(":@computed_region_92fq_4b7q", "Number"),
+      ])?.columns.map((column) => {
+        return column.name;
+      }),
+    ).toEqual(["borough"]);
   });
 
-  it("reads a header column the Discovery API does not list as text", () => {
-    expect(_make([], ["mystery"])?.columns).toEqual([
-      { name: "mystery", originalDataType: "VARCHAR", castDataType: "VARCHAR" },
-    ]);
-  });
-
-  it("builds no relation for a dataset with no CSV header", () => {
-    expect(_make([_column("a", "Text")], undefined)).toBe(undefined);
+  it("builds no relation for a dataset with no exportable columns", () => {
+    expect(_make([_column(":@computed_region_92fq_4b7q", "Number")])).toBe(
+      undefined,
+    );
   });
 });
