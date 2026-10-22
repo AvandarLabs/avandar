@@ -125,7 +125,7 @@ count and timing defaults to `0` so a sum never meets a null.
 | `status` | enum `pipeline_executions__status`: `running`, `succeeded`, `partially_failed`, `failed`, `cancelled` | `partially_failed` is a run where some crawls failed and some did not. `cancelled` is a reset or prune the user declined at the confirmation prompt. |
 | `error` | `text` | The first error, for `failed` and `partially_failed`. |
 | `started_at` | `timestamptz not null default now()` | |
-| `finished_at` | `timestamptz` | Null while `running`. A row left `running` long after it started is a crashed or killed process. |
+| `finished_at` | `timestamptz` | Null while `running`, and never before `started_at` (a check constraint). A row left `running` long after it started is a crashed or killed process. |
 | `duration_ms` | `bigint` generated from `finished_at - started_at` | Wall-clock. |
 | `created_at`, `updated_at` | `timestamptz` | `updated_at` moves each time a scope row lands, so it doubles as a heartbeat for a long run. |
 
@@ -175,7 +175,7 @@ pruned pair of a prune.
 | `error` | `text` | |
 | `window_since`, `window_until` | `timestamptz` | The crawl's window. |
 | `checkpoint_before`, `checkpoint_after` | `timestamptz` | The scope's checkpoint when the crawl started and when it ended. |
-| `started_at`, `finished_at` | `timestamptz not null` | |
+| `started_at`, `finished_at` | `timestamptz not null` | `finished_at` is never before `started_at` (a check constraint). |
 | `duration_ms` | `bigint` generated | Wall-clock. |
 
 **Stage timings.** One `bigint` millisecond column per stage in section 5.4.
@@ -200,6 +200,9 @@ pruned pair of a prune.
 | `source_bytes_reported` | Bytes the source reports for the relations considered, when it reports any (HDX does; Socrata does not). Null when no relation reported a size. |
 | `listings_deleted`, `listings_kept_in_use`, `listings_detached`, `checkpoints_deleted` | Prune only: the prune function's counts for this pair. |
 | `pipeline_metrics` | `jsonb not null default '{}'`: counters only one pipeline has (section 5.5). |
+
+**Uniqueness.** An execution has at most one scope row per drive and scope
+(a unique constraint on `(execution_id, drive_key, scope_key)`).
 
 **Indexes.** `(pipeline_name, drive_key, started_at desc)` for "when was this
 drive last run", and `(execution_id)` for the foreign key.
@@ -305,8 +308,11 @@ itself and the totals are always the sum of the scope rows.
 | Function | Does |
 | --- | --- |
 | `rpc_pipeline_executions__start(p_execution jsonb)` | Inserts the execution row as `running`, with its identity, command, flags, and invocation. Returns its id. |
-| `rpc_pipeline_executions__record_scope(p_execution_id uuid, p_scope jsonb)` | Inserts one scope row and recomputes the execution's totals from all its scope rows, in one transaction. |
-| `rpc_pipeline_executions__finish(p_execution_id uuid, p_outcome jsonb)` | Sets status, error, `finished_at`, the execution-level `setup_ms`, and any directly written totals (reset), and counts the catalog after from `data_catalog_listings`. |
+| `rpc_pipeline_executions__record_scope(p_execution_id uuid, p_scope jsonb)` | Inserts one scope row and recomputes the execution's totals from all its scope rows, in one transaction. Refuses an execution that already finished, and a repeated drive and scope. |
+| `rpc_pipeline_executions__finish(p_execution_id uuid, p_outcome jsonb)` | Sets status, error, `finished_at`, the execution-level `setup_ms`, and any directly written totals (reset), and counts the catalog after from `data_catalog_listings`. Refuses an execution that already finished. Refuses the four per-scope deletion counts (`listings_deleted`, `listings_kept_in_use`, `listings_detached`, `checkpoints_deleted`) when the execution has scope rows, since those totals come from the scope rows; `workspace_datasets_deleted` stays allowed. |
+
+All three reject any JSON key they do not accept, and an argument that is not
+a JSON object, so a misspelled key fails instead of recording zero.
 
 `data_catalog_listings__pipeline_drive_last_update` already indexes
 `pipeline_name`, so the catalog-after counts read only the pipeline's own
@@ -340,12 +346,13 @@ The pipeline server's Dockerfile gains an `AVA_CODE_VERSION` build argument,
 exposed as an environment variable; a deploy passes
 `--build-arg AVA_CODE_VERSION=$(git rev-parse HEAD)`. When it is unset,
 `code_version` is null. The `X-Ava-Invocation` header holds JSON with the
-argv, actor, and code version. Authorization headers and secrets are never
+argv and actor, with every non-ASCII character escaped; the server records its
+own `AVA_CODE_VERSION`, the commit that executed the run. Authorization headers and secrets are never
 recorded.
 
 ### 5.9 CLI output
 
-`ava pipeline run` prints each crawl's duration next to its counts, and the
+`ava pipeline run` prints each crawl's duration on its window line, and the
 run's total duration at the end. Nothing else changes in the CLI's output.
 
 ### 5.10 Schema
@@ -428,3 +435,22 @@ ava pipeline run socrata --incremental
 - Per-page timings, if a crawl's sums ever stop being enough to explain it.
 - Abandoned-run cleanup: mark `running` rows older than a threshold as
   `failed`.
+
+## 11. Refinements made while planning
+
+| # | Refinement |
+| --- | --- |
+| 1 | A run is recorded only when it carries an invocation. The pipeline server and `scripts/runPipelineOnce.ts` always pass one; a test or script calling a pipeline's `run()` directly is not recorded. |
+| 2 | An execution's `setup_ms` is its own setup (listing drives and scopes) plus its scope rows' `setup_ms` (reading checkpoints). |
+| 3 | Execution totals include `max_columns_per_listing`, the widest listing across its scope rows. |
+| 4 | A prune records a scope row only for a retired pair with something to prune: `succeeded` with the counts it would apply in a dry run, `skipped` with the dry run's counts when declined, and `succeeded` with the applied counts when pruned. |
+| 5 | A declined whole-pipeline reset records zero deletions, since the counts it showed were totals. A declined `reset --scope` records the dry run's counts. |
+| 6 | Reset and prune executions get a random id. Only a run's id is also its `pipeline_run_id`. |
+| 7 | `code_version` is always the commit of the code that executed the command. |
+| 8 | Stage timings are `setupMs`, `extractMs`, `transformMs`, `loadReadMs`, `loadParquetBuildMs`, `loadParquetUploadMs`, `loadWriteMs`, and `checkpointWriteMs` in TypeScript, and their snake_case forms in SQL. |
+| 9 | A crawl's printed duration sits on its window line, which has room within 80 columns. |
+| 10 | The CLI escapes non-ASCII characters in `X-Ava-Invocation`, since `fetch` rejects a header value outside Latin-1. |
+| 11 | Each execution has at most one scope row per drive and scope (a unique constraint); a repeated `record_scope` fails with a clear error and the never-fatal store only warns. |
+| 12 | Both tables check that `finished_at` is not before `started_at`. |
+| 13 | The three functions reject any JSON key they do not accept, and a non-object argument, so a typo fails instead of recording zero. |
+| 14 | `record_scope` and `finish` refuse an execution that already finished, and `finish` refuses the four per-scope deletion counts when the execution has scope rows (`workspace_datasets_deleted` stays allowed), so totals always equal the sum of the scope rows. |
