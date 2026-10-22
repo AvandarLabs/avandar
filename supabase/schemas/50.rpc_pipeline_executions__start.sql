@@ -2,6 +2,11 @@
  * Records that a pipeline command started: inserts its execution row as
  * `running`, with what ran and how it was invoked.
  *
+ * First it closes the same pipeline's abandoned executions: any still
+ * `running` whose `updated_at`, the heartbeat `__record_scope` moves with
+ * each scope row, is more than 24 hours old. Each becomes `failed` with the
+ * error `Abandoned: no progress for 24 hours`, finished at its last progress.
+ *
  * @param p_execution A JSON object with `pipeline_executions` columns:
  *   `id` (optional; a run passes its `pipeline_run_id`), `pipeline_name`,
  *   `command`, `run_mode`, `is_dry_run`, `is_scoped`, `is_limited`,
@@ -34,6 +39,19 @@ begin
     raise exception 'rpc_pipeline_executions__start got unknown keys: %', v_unknown_keys;
   end if;
   v_input := jsonb_populate_record(null::public.pipeline_executions, p_execution);
+
+  -- A crashed or killed process leaves its execution `running` forever.
+  -- `greatest` keeps `finished_at` from preceding a `started_at` the caller
+  -- set later than the row's insert.
+  update public.pipeline_executions execution
+  set
+    status = 'failed',
+    error = 'Abandoned: no progress for 24 hours',
+    finished_at = greatest(execution.updated_at, execution.started_at)
+  where
+    execution.pipeline_name = v_input.pipeline_name
+    and execution.status = 'running'
+    and execution.updated_at < now() - interval '24 hours';
 
   insert into public.pipeline_executions (
     id,

@@ -52,6 +52,17 @@ with public_tables as (
   from
     public_tables
     cross join unnest(array['DELETE', 'INSERT', 'SELECT', 'UPDATE']) as privileges (privilege_type)
+  where
+    -- Scope rows are insert-only, so the service role has no `UPDATE`.
+    table_name <> 'pipeline_execution_scopes'
+  union all
+  select
+    'pipeline_execution_scopes',
+    'service_role',
+    privilege_type,
+    false
+  from
+    unnest(array['DELETE', 'INSERT', 'SELECT']) as privileges (privilege_type)
   union all
   select
     table_name,

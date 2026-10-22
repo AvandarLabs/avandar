@@ -7,8 +7,9 @@
  */
 create table public.pipeline_execution_scopes (
   id uuid primary key default gen_random_uuid(),
-  execution_id uuid not null references public.pipeline_executions (id) on delete cascade,
-  -- Copied from the execution, so a drive's history needs no join.
+  execution_id uuid not null,
+  -- Copied from the execution, so a drive's history needs no join. The
+  -- foreign key on both columns keeps it equal to the execution's.
   pipeline_name text not null,
   drive_key text not null,
   scope_key text not null,
@@ -47,6 +48,8 @@ create table public.pipeline_execution_scopes (
   listings_unchanged integer not null default 0,
   write_batches integer not null default 0,
   -- Width.
+  -- One crawl's counts fit `integer`. The execution's totals, which sum
+  -- them across a catalog, are `bigint`.
   columns_considered integer not null default 0,
   columns_written integer not null default 0,
   max_columns_per_listing integer not null default 0,
@@ -70,8 +73,10 @@ create table public.pipeline_execution_scopes (
   -- `hdx.parquet_footer_reads`.
   pipeline_metrics jsonb not null default '{}',
   created_at timestamptz not null default now(),
+  constraint pipeline_execution_scopes__execution_fkey foreign key (execution_id, pipeline_name) references public.pipeline_executions (id, pipeline_name) on delete cascade,
   -- One row per drive and scope per execution, so a retried write cannot
-  -- double the execution's totals. Also indexes the foreign key.
+  -- double the execution's totals. Its leading `execution_id` also serves
+  -- the foreign key.
   constraint pipeline_execution_scopes__one_per_scope unique (execution_id, drive_key, scope_key),
   constraint pipeline_execution_scopes__finishes_after_start check (finished_at >= started_at)
 );
@@ -87,10 +92,11 @@ create index pipeline_execution_scopes__drive_started on public.pipeline_executi
 -- reaches this table.
 alter table public.pipeline_execution_scopes enable row level security;
 
--- Data API privileges. Service role only.
+-- Data API privileges. Service role only, and insert-only: a scope row is a
+-- record of what happened, and the execution's totals are summed from it.
+-- `delete` stays for cleanup scripts.
 grant
 select
 ,
   insert,
-update,
-delete on table public.pipeline_execution_scopes to service_role;
+  delete on table public.pipeline_execution_scopes to service_role;

@@ -90,8 +90,10 @@ The tables are for audit and debugging only. Nothing in the app reads them.
 ### 5.1 `pipeline_executions`
 
 One row per pipeline per command invocation. Columns are grouped by purpose.
-Counts are `integer`, byte sizes and milliseconds are `bigint`, and every
-count and timing defaults to `0` so a sum never meets a null.
+Counts are `integer`, except `columns_considered` and `columns_written`,
+which sum over a whole catalog and are `bigint`. Byte sizes and milliseconds
+are `bigint`, and every count and timing defaults to `0` so a sum never meets
+a null.
 
 **Identity and command**
 
@@ -122,10 +124,10 @@ count and timing defaults to `0` so a sum never meets a null.
 
 | Column | Type | Notes |
 | --- | --- | --- |
-| `status` | enum `pipeline_executions__status`: `running`, `succeeded`, `partially_failed`, `failed`, `cancelled` | `partially_failed` is a run where some crawls failed and some did not. `cancelled` is a reset or prune the user declined at the confirmation prompt. |
-| `error` | `text` | The first error, for `failed` and `partially_failed`. |
+| `status` | enum `pipeline_executions__status`: `running`, `succeeded`, `partially_failed`, `failed`, `cancelled` | `partially_failed` is a run where some crawls failed and some did not: only a run can have it (a check constraint). `cancelled` is a reset or prune the user declined at the confirmation prompt: a run never has it (a check constraint). |
+| `error` | `text` | The first error. Null unless `status` is `failed` or `partially_failed` (a check constraint). |
 | `started_at` | `timestamptz not null default now()` | |
-| `finished_at` | `timestamptz` | Null while `running`, and never before `started_at` (a check constraint). A row left `running` long after it started is a crashed or killed process. |
+| `finished_at` | `timestamptz` | Null while `running`, and never before `started_at` (a check constraint). A row left `running` with no progress for 24 hours is a crashed or killed process, and the pipeline's next `start` marks it `failed` (section 5.6). |
 | `duration_ms` | `bigint` generated from `finished_at - started_at` | Wall-clock. |
 | `created_at`, `updated_at` | `timestamptz` | `updated_at` moves each time a scope row lands, so it doubles as a heartbeat for a long run. |
 
@@ -167,8 +169,8 @@ pruned pair of a prune.
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | `uuid` primary key | |
-| `execution_id` | `uuid not null` references `pipeline_executions (id) on delete cascade` | |
-| `pipeline_name` | `text not null` | Copied from the execution, so per-drive history needs no join. |
+| `execution_id` | `uuid not null` | With `pipeline_name`, a foreign key to `pipeline_executions (id, pipeline_name)` `on delete cascade`, which a unique constraint on that pair backs. |
+| `pipeline_name` | `text not null` | Copied from the execution, so per-drive history needs no join. The composite foreign key keeps it equal to the execution's. |
 | `drive_key` | `text not null` | |
 | `scope_key` | `text not null` | |
 | `status` | enum `pipeline_execution_scopes__status`: `succeeded`, `failed`, `skipped` | The engine's crawl statuses `ok`, `failed`, `skipped`. |
@@ -205,7 +207,12 @@ pruned pair of a prune.
 (a unique constraint on `(execution_id, drive_key, scope_key)`).
 
 **Indexes.** `(pipeline_name, drive_key, started_at desc)` for "when was this
-drive last run", and `(execution_id)` for the foreign key.
+drive last run". The uniqueness constraint's leading `execution_id` serves the
+foreign key.
+
+**Writes.** Scope rows are insert-only: the service role has `select`,
+`insert`, and `delete` (for cleanup scripts), and no `update`, since the
+execution's totals are summed from them.
 
 ### 5.3 Example questions
 
@@ -307,12 +314,30 @@ itself and the totals are always the sum of the scope rows.
 
 | Function | Does |
 | --- | --- |
-| `rpc_pipeline_executions__start(p_execution jsonb)` | Inserts the execution row as `running`, with its identity, command, flags, and invocation. Returns its id. |
+| `rpc_pipeline_executions__start(p_execution jsonb)` | First marks the same pipeline's abandoned executions `failed`: any still `running` whose `updated_at` is more than 24 hours old, with the error `Abandoned: no progress for 24 hours` and `finished_at` set to that `updated_at`, its last progress (or `started_at`, if a caller set it later). Then inserts the execution row as `running`, with its identity, command, flags, and invocation. Returns its id. |
 | `rpc_pipeline_executions__record_scope(p_execution_id uuid, p_scope jsonb)` | Inserts one scope row and recomputes the execution's totals from all its scope rows, in one transaction. Refuses an execution that already finished, and a repeated drive and scope. |
 | `rpc_pipeline_executions__finish(p_execution_id uuid, p_outcome jsonb)` | Sets status, error, `finished_at`, the execution-level `setup_ms`, and any directly written totals (reset), and counts the catalog after from `data_catalog_listings`. Refuses an execution that already finished. Refuses the four per-scope deletion counts (`listings_deleted`, `listings_kept_in_use`, `listings_detached`, `checkpoints_deleted`) when the execution has scope rows, since those totals come from the scope rows; `workspace_datasets_deleted` stays allowed. |
 
 All three reject any JSON key they do not accept, and an argument that is not
-a JSON object, so a misspelled key fails instead of recording zero.
+a JSON object, so a misspelled key fails instead of recording zero. Each
+checks its keys against a fixed list, so a column added to a table later is
+refused until the function writes it, rather than accepted and dropped.
+
+`updated_at` moves each time `record_scope` lands a scope row, so it is the
+execution's heartbeat; that is what the 24-hour abandonment rule reads.
+
+Errors use distinct SQLSTATEs so a caller can tell them apart:
+
+| SQLSTATE | Meaning |
+| --- | --- |
+| `P0001` | Argument validation: not an object, an unknown key, a missing or `running` final status, or deletion totals for an execution with scope rows. Also a repeated drive and scope. |
+| `PE001` | The execution already finished. |
+| `PE002` | The execution does not exist. |
+
+Class `PE` is neither a SQL standard class nor one Postgres defines, and
+PostgREST reads a custom status only from class `PT`, so it returns these as
+the error's `code` unchanged. `P0002` was not used because Postgres already
+means it as `no_data_found` from `select into strict`.
 
 `data_catalog_listings__pipeline_drive_last_update` already indexes
 `pipeline_name`, so the catalog-after counts read only the pipeline's own
@@ -391,7 +416,7 @@ ava pipeline run socrata --incremental
 | Recording fails (missing migration, network, permissions) | Logged with `console.warn`; the command runs and reports normally. |
 | Every crawl fails | `failed`, with the first error; scope rows record each failure. |
 | Some crawls fail | `partially_failed`. |
-| The process is killed mid-run | The row stays `running` with the scopes recorded so far; `updated_at` shows when it last made progress. |
+| The process is killed mid-run | The row stays `running` with the scopes recorded so far until the pipeline's next `start`, which marks it `failed` with `Abandoned: no progress for 24 hours` once its `updated_at` is more than 24 hours old, finished at that `updated_at`. |
 | Invalid options caught up front (mode, limit, missing stores) | Rejected before `start`; not recorded. |
 | A requested scope no drive declares | Found after listing drives; recorded as `failed`. |
 
@@ -433,8 +458,6 @@ ava pipeline run socrata --incremental
 - A command such as `ava pipeline executions <name>` to print recent
   executions, if querying SQL directly becomes tedious.
 - Per-page timings, if a crawl's sums ever stop being enough to explain it.
-- Abandoned-run cleanup: mark `running` rows older than a threshold as
-  `failed`.
 
 ## 11. Refinements made while planning
 
@@ -454,3 +477,9 @@ ava pipeline run socrata --incremental
 | 12 | Both tables check that `finished_at` is not before `started_at`. |
 | 13 | The three functions reject any JSON key they do not accept, and a non-object argument, so a typo fails instead of recording zero. |
 | 14 | `record_scope` and `finish` refuse an execution that already finished, and `finish` refuses the four per-scope deletion counts when the execution has scope rows (`workspace_datasets_deleted` stays allowed), so totals always equal the sum of the scope rows. |
+| 15 | `start` marks the same pipeline's executions that are still `running` with no progress (`updated_at`) for 24 hours as `failed`, with `Abandoned: no progress for 24 hours`, finished at their `updated_at`. |
+| 16 | Check constraints: only a run is `partially_failed`, a run is never `cancelled`, and `error` is null unless the status is `failed` or `partially_failed`. |
+| 17 | The execution's `columns_considered` and `columns_written` are `bigint`. The scope rows' stay `integer`: one crawl's counts fit, and `avg_columns_per_listing` is generated from them, which blocks a type change. |
+| 18 | "Already finished" raises `PE001` and "does not exist" `PE002`; argument validation keeps `P0001` (section 5.6). |
+| 19 | A scope row's `(execution_id, pipeline_name)` is a foreign key to the execution's, so the copied pipeline name cannot disagree. |
+| 20 | Scope rows are insert-only: the service role has no `update` on them. |

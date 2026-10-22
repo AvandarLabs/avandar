@@ -6,16 +6,18 @@
  * own setup.
  *
  * @param p_execution_id The execution.
- * @param p_scope A JSON object with `pipeline_execution_scopes` columns,
- *   without `id`, `execution_id`, `pipeline_name`, `created_at`,
- *   `updated_at`, `duration_ms`, or `avg_columns_per_listing`, which the
- *   function or the table sets. Timings and counts default to 0,
- *   `pipeline_metrics` to `{}`.
+ * @param p_scope A JSON object with the `pipeline_execution_scopes` columns
+ *   named in the function's allow-list: every column except `id`,
+ *   `execution_id`, `pipeline_name`, `created_at`, `duration_ms`, and
+ *   `avg_columns_per_listing`, which the function or the table sets. The
+ *   list is fixed rather than read from the table, so a column added later
+ *   is refused until the function writes it. Timings and counts default
+ *   to 0, `pipeline_metrics` to `{}`.
  *
- * @throws When `p_scope` is not a JSON object, or has a key that is not an
- *   allowed column, so a typo fails instead of recording a 0. Also when the
- *   execution does not exist or already finished, or already has a row for
- *   the same drive and scope.
+ * @throws When `p_scope` is not a JSON object, or has a key that is not
+ *   allowed, so a typo fails instead of recording a 0. Also when the
+ *   execution does not exist (`PE002`) or already finished (`PE001`), or
+ *   already has a row for the same drive and scope.
  */
 create or replace function public.rpc_pipeline_executions__record_scope (p_execution_id uuid, p_scope jsonb) returns void as $$
 declare
@@ -33,74 +35,84 @@ begin
   where execution.id = p_execution_id
   for update;
 
+  -- `PE002` and `PE001` are in class `PE`, which neither the SQL standard
+  -- nor Postgres defines, and which PostgREST returns as the error's `code`
+  -- without treating it as an HTTP status (it does that only for `PT`). A
+  -- caller can tell these states apart from `P0001` argument errors.
   if v_pipeline_name is null then
-    raise exception 'Pipeline execution % does not exist', p_execution_id;
+    raise exception 'Pipeline execution % does not exist', p_execution_id
+      using errcode = 'PE002';
   end if;
   -- A finished execution's totals are final: a late or repeated call must
   -- not change them.
   if v_status <> 'running' then
-    raise exception 'Pipeline execution % already finished', p_execution_id;
+    raise exception 'Pipeline execution % already finished', p_execution_id
+      using errcode = 'PE001';
   end if;
 
-  v_scope := jsonb_populate_record(null::public.pipeline_execution_scopes, p_scope);
   select array_agg(key order by key)
   into v_unknown_keys
   from jsonb_object_keys(p_scope) key
-  where key not in (
-    select column_key
-    from jsonb_object_keys(to_jsonb(v_scope)) column_key
-    where column_key <> all (array[
-      'id', 'execution_id', 'pipeline_name', 'created_at', 'updated_at',
-      'duration_ms', 'avg_columns_per_listing'
-    ])
-  );
+  where key <> all (array[
+    'drive_key', 'scope_key', 'status', 'error', 'window_since',
+    'window_until', 'checkpoint_before', 'checkpoint_after', 'started_at',
+    'finished_at', 'setup_ms', 'extract_ms', 'transform_ms', 'load_read_ms',
+    'load_parquet_build_ms', 'load_parquet_upload_ms', 'load_write_ms',
+    'checkpoint_write_ms', 'page_count', 'datasets_fetched',
+    'listings_considered', 'listings_written', 'listings_unchanged',
+    'write_batches', 'columns_considered', 'columns_written',
+    'max_columns_per_listing', 'source_csv_bytes', 'parquet_bytes_written',
+    'parquet_rows_written', 'parquet_uploads_skipped', 'source_bytes_reported',
+    'listings_deleted', 'listings_kept_in_use', 'listings_detached',
+    'checkpoints_deleted', 'pipeline_metrics'
+  ]);
   if v_unknown_keys is not null then
     raise exception 'rpc_pipeline_executions__record_scope got unknown keys: %', v_unknown_keys;
   end if;
+  v_scope := jsonb_populate_record(null::public.pipeline_execution_scopes, p_scope);
 
   begin
-
-  insert into public.pipeline_execution_scopes (
-    execution_id, pipeline_name, drive_key, scope_key, status, error,
-    window_since, window_until, checkpoint_before, checkpoint_after,
-    started_at, finished_at,
-    setup_ms, extract_ms, transform_ms, load_read_ms, load_parquet_build_ms,
-    load_parquet_upload_ms, load_write_ms, checkpoint_write_ms,
-    page_count, datasets_fetched, listings_considered, listings_written,
-    listings_unchanged, write_batches, columns_considered, columns_written,
-    max_columns_per_listing, source_csv_bytes, parquet_bytes_written,
-    parquet_rows_written, parquet_uploads_skipped, source_bytes_reported,
-    listings_deleted, listings_kept_in_use, listings_detached,
-    checkpoints_deleted, pipeline_metrics
-  ) values (
-    p_execution_id, v_pipeline_name, v_scope.drive_key, v_scope.scope_key,
-    v_scope.status, v_scope.error,
-    v_scope.window_since, v_scope.window_until,
-    v_scope.checkpoint_before, v_scope.checkpoint_after,
-    v_scope.started_at, v_scope.finished_at,
-    coalesce(v_scope.setup_ms, 0), coalesce(v_scope.extract_ms, 0),
-    coalesce(v_scope.transform_ms, 0), coalesce(v_scope.load_read_ms, 0),
-    coalesce(v_scope.load_parquet_build_ms, 0),
-    coalesce(v_scope.load_parquet_upload_ms, 0),
-    coalesce(v_scope.load_write_ms, 0), coalesce(v_scope.checkpoint_write_ms, 0),
-    coalesce(v_scope.page_count, 0), coalesce(v_scope.datasets_fetched, 0),
-    coalesce(v_scope.listings_considered, 0),
-    coalesce(v_scope.listings_written, 0),
-    coalesce(v_scope.listings_unchanged, 0), coalesce(v_scope.write_batches, 0),
-    coalesce(v_scope.columns_considered, 0),
-    coalesce(v_scope.columns_written, 0),
-    coalesce(v_scope.max_columns_per_listing, 0),
-    coalesce(v_scope.source_csv_bytes, 0),
-    coalesce(v_scope.parquet_bytes_written, 0),
-    coalesce(v_scope.parquet_rows_written, 0),
-    coalesce(v_scope.parquet_uploads_skipped, 0),
-    v_scope.source_bytes_reported,
-    coalesce(v_scope.listings_deleted, 0),
-    coalesce(v_scope.listings_kept_in_use, 0),
-    coalesce(v_scope.listings_detached, 0),
-    coalesce(v_scope.checkpoints_deleted, 0),
-    coalesce(v_scope.pipeline_metrics, '{}'::jsonb)
-  );
+    insert into public.pipeline_execution_scopes (
+      execution_id, pipeline_name, drive_key, scope_key, status, error,
+      window_since, window_until, checkpoint_before, checkpoint_after,
+      started_at, finished_at,
+      setup_ms, extract_ms, transform_ms, load_read_ms, load_parquet_build_ms,
+      load_parquet_upload_ms, load_write_ms, checkpoint_write_ms,
+      page_count, datasets_fetched, listings_considered, listings_written,
+      listings_unchanged, write_batches, columns_considered, columns_written,
+      max_columns_per_listing, source_csv_bytes, parquet_bytes_written,
+      parquet_rows_written, parquet_uploads_skipped, source_bytes_reported,
+      listings_deleted, listings_kept_in_use, listings_detached,
+      checkpoints_deleted, pipeline_metrics
+    ) values (
+      p_execution_id, v_pipeline_name, v_scope.drive_key, v_scope.scope_key,
+      v_scope.status, v_scope.error,
+      v_scope.window_since, v_scope.window_until,
+      v_scope.checkpoint_before, v_scope.checkpoint_after,
+      v_scope.started_at, v_scope.finished_at,
+      coalesce(v_scope.setup_ms, 0), coalesce(v_scope.extract_ms, 0),
+      coalesce(v_scope.transform_ms, 0), coalesce(v_scope.load_read_ms, 0),
+      coalesce(v_scope.load_parquet_build_ms, 0),
+      coalesce(v_scope.load_parquet_upload_ms, 0),
+      coalesce(v_scope.load_write_ms, 0), coalesce(v_scope.checkpoint_write_ms, 0),
+      coalesce(v_scope.page_count, 0), coalesce(v_scope.datasets_fetched, 0),
+      coalesce(v_scope.listings_considered, 0),
+      coalesce(v_scope.listings_written, 0),
+      coalesce(v_scope.listings_unchanged, 0), coalesce(v_scope.write_batches, 0),
+      coalesce(v_scope.columns_considered, 0),
+      coalesce(v_scope.columns_written, 0),
+      coalesce(v_scope.max_columns_per_listing, 0),
+      coalesce(v_scope.source_csv_bytes, 0),
+      coalesce(v_scope.parquet_bytes_written, 0),
+      coalesce(v_scope.parquet_rows_written, 0),
+      coalesce(v_scope.parquet_uploads_skipped, 0),
+      v_scope.source_bytes_reported,
+      coalesce(v_scope.listings_deleted, 0),
+      coalesce(v_scope.listings_kept_in_use, 0),
+      coalesce(v_scope.listings_detached, 0),
+      coalesce(v_scope.checkpoints_deleted, 0),
+      coalesce(v_scope.pipeline_metrics, '{}'::jsonb)
+    );
   exception
     when unique_violation then
       raise exception 'Pipeline execution % already has drive % scope %',
@@ -155,8 +167,8 @@ begin
       sum(scope.listings_written)::integer as listings_written,
       sum(scope.listings_unchanged)::integer as listings_unchanged,
       sum(scope.write_batches)::integer as write_batches,
-      sum(scope.columns_considered)::integer as columns_considered,
-      sum(scope.columns_written)::integer as columns_written,
+      sum(scope.columns_considered)::bigint as columns_considered,
+      sum(scope.columns_written)::bigint as columns_written,
       max(scope.max_columns_per_listing)::integer as max_columns_per_listing,
       sum(scope.source_csv_bytes)::bigint as source_csv_bytes,
       sum(scope.parquet_bytes_written)::bigint as parquet_bytes_written,

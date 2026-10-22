@@ -1372,11 +1372,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "pipeline_execution_scopes_execution_id_fkey"
-            columns: ["execution_id"]
+            foreignKeyName: "pipeline_execution_scopes__execution_fkey"
+            columns: ["execution_id", "pipeline_name"]
             isOneToOne: false
             referencedRelation: "pipeline_executions"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "pipeline_name"]
           },
         ]
       }

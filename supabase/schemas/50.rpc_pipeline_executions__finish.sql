@@ -13,7 +13,8 @@
  *
  * @throws When `p_outcome` is not a JSON object, or has a key that is not
  *   listed above, so a typo fails instead of being ignored. Also when the
- *   execution does not exist or already finished, the status is missing or
+ *   execution does not exist (`PE002`) or already finished (`PE001`), the
+ *   status is missing or
  *   `running`, or the execution has scope rows and the outcome carries
  *   `listings_deleted`, `listings_kept_in_use`, `listings_detached`, or
  *   `checkpoints_deleted`. `workspace_datasets_deleted` is always allowed.
@@ -47,13 +48,19 @@ begin
   where execution.id = p_execution_id
   for update;
 
+  -- `PE002` and `PE001` are in class `PE`, which neither the SQL standard
+  -- nor Postgres defines, and which PostgREST returns as the error's `code`
+  -- without treating it as an HTTP status (it does that only for `PT`). A
+  -- caller can tell these states apart from `P0001` argument errors.
   if v_pipeline_name is null then
-    raise exception 'Pipeline execution % does not exist', p_execution_id;
+    raise exception 'Pipeline execution % does not exist', p_execution_id
+      using errcode = 'PE002';
   end if;
   -- A finished execution's totals are final: a late or repeated call must
   -- not change them.
   if v_status <> 'running' then
-    raise exception 'Pipeline execution % already finished', p_execution_id;
+    raise exception 'Pipeline execution % already finished', p_execution_id
+      using errcode = 'PE001';
   end if;
 
   if v_scope_count > 0 and p_outcome ?| array[

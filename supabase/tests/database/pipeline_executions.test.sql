@@ -7,7 +7,7 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(31);
+select plan(41);
 
 -- ---------------------------------------------------------------------------
 -- pipeline_executions
@@ -45,6 +45,33 @@ select throws_ok(
   '23514',
   'new row for relation "pipeline_executions" violates check constraint "pipeline_executions__finishes_after_start"',
   'an execution cannot finish before it starts'
+);
+
+select throws_ok(
+  $$insert into public.pipeline_executions
+      (pipeline_name, command, invoked_via, status, finished_at)
+    values ('pgtap-fixture', 'reset', 'cli_local', 'partially_failed', now())$$,
+  '23514',
+  'new row for relation "pipeline_executions" violates check constraint "pipeline_executions__partially_failed_only_on_runs"',
+  'only a run can partially fail'
+);
+
+select throws_ok(
+  $$insert into public.pipeline_executions
+      (pipeline_name, command, run_mode, invoked_via, status, finished_at)
+    values ('pgtap-fixture', 'run', 'full', 'cli_local', 'cancelled', now())$$,
+  '23514',
+  'new row for relation "pipeline_executions" violates check constraint "pipeline_executions__cancelled_only_on_reset_or_prune"',
+  'a run cannot be cancelled'
+);
+
+select throws_ok(
+  $$insert into public.pipeline_executions
+      (pipeline_name, command, invoked_via, status, finished_at, error)
+    values ('pgtap-fixture', 'reset', 'cli_local', 'succeeded', now(), 'oops')$$,
+  '23514',
+  'new row for relation "pipeline_executions" violates check constraint "pipeline_executions__error_only_on_failure"',
+  'only a failed or partially failed execution has an error'
 );
 
 insert into public.pipeline_executions
@@ -109,6 +136,17 @@ select throws_ok(
   'a scope cannot finish before it starts'
 );
 
+select throws_ok(
+  $$insert into public.pipeline_execution_scopes
+      (execution_id, pipeline_name, drive_key, scope_key, status, started_at, finished_at)
+    values ('ea100001-0000-4000-8000-000000000001'::uuid, 'pgtap-fixture-other',
+            'https://pgtap-fixture.invalid', 'mismatch', 'succeeded',
+            '2026-10-22T10:00:00Z', '2026-10-22T10:00:01Z')$$,
+  '23503',
+  'insert or update on table "pipeline_execution_scopes" violates foreign key constraint "pipeline_execution_scopes__execution_fkey"',
+  'a scope row''s pipeline name matches its execution''s'
+);
+
 delete from public.pipeline_executions
 where id = 'ea100001-0000-4000-8000-000000000001'::uuid;
 
@@ -155,6 +193,48 @@ select results_eq(
       array['pipeline', 'run', 'pgtap-fixture-run', '--incremental'],
       '{"incremental": true}'::jsonb, 'pablo@laptop', 'abc123')$$,
   'start records a running execution with its invocation'
+);
+
+-- Abandoned executions: a running row with no progress for over 24 hours is
+-- failed by the next start of the same pipeline.
+insert into public.pipeline_executions
+  (id, pipeline_name, command, invoked_via, started_at, updated_at)
+values
+  ('ea400001-0000-4000-8000-000000000001'::uuid, 'pgtap-fixture-abandon',
+   'reset', 'cli_local', now() - interval '30 hours', now() - interval '25 hours'),
+  ('ea400002-0000-4000-8000-000000000002'::uuid, 'pgtap-fixture-abandon',
+   'reset', 'cli_local', now() - interval '30 hours', now() - interval '1 hour'),
+  ('ea400003-0000-4000-8000-000000000003'::uuid, 'pgtap-fixture-elsewhere',
+   'reset', 'cli_local', now() - interval '30 hours', now() - interval '25 hours');
+
+select public.rpc_pipeline_executions__start(jsonb_build_object(
+  'pipeline_name', 'pgtap-fixture-abandon', 'command', 'reset',
+  'invoked_via', 'cli_local'
+));
+
+select results_eq(
+  $$select status::text, error, finished_at
+    from public.pipeline_executions
+    where id = 'ea400001-0000-4000-8000-000000000001'::uuid$$,
+  $$values ('failed', 'Abandoned: no progress for 24 hours',
+      now() - interval '25 hours')$$,
+  'start fails the pipeline''s execution with no progress for 24 hours, finished at its last progress'
+);
+
+select results_eq(
+  $$select status::text, error
+    from public.pipeline_executions
+    where id = 'ea400002-0000-4000-8000-000000000002'::uuid$$,
+  $$values ('running', null::text)$$,
+  'start leaves a running execution with recent progress alone'
+);
+
+select results_eq(
+  $$select status::text, error
+    from public.pipeline_executions
+    where id = 'ea400003-0000-4000-8000-000000000003'::uuid$$,
+  $$values ('running', null::text)$$,
+  'start leaves another pipeline''s abandoned execution alone'
 );
 
 -- ---------------------------------------------------------------------------
@@ -204,8 +284,8 @@ select results_eq(
       source_bytes_reported
     from public.pipeline_executions
     where id = 'ea200001-0000-4000-8000-000000000001'::uuid$$,
-  $$values (2, 3, 8::bigint, 150::bigint, 30::bigint, 3, 15, 17, 13, 80, 60,
-      14, 1000::bigint)$$,
+  $$values (2, 3, 8::bigint, 150::bigint, 30::bigint, 3, 15, 17, 13, 80::bigint,
+      60::bigint, 14, 1000::bigint)$$,
   'record_scope keeps the totals equal to the sum of the scope rows'
 );
 
@@ -223,9 +303,43 @@ select throws_ok(
       'ea2000ff-0000-4000-8000-0000000000ff'::uuid,
       jsonb_build_object('drive_key', 'x', 'scope_key', 'all', 'status', 'succeeded',
         'started_at', now(), 'finished_at', now()))$$,
-  'P0001',
+  'PE002',
   'Pipeline execution ea2000ff-0000-4000-8000-0000000000ff does not exist',
   'record_scope refuses an unknown execution'
+);
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__finish(
+      'ea2000ff-0000-4000-8000-0000000000ff'::uuid,
+      jsonb_build_object('status', 'failed'))$$,
+  'PE002',
+  'Pipeline execution ea2000ff-0000-4000-8000-0000000000ff does not exist',
+  'finish refuses an unknown execution'
+);
+
+-- Column totals across a whole catalog can pass the integer range.
+select public.rpc_pipeline_executions__start(jsonb_build_object(
+  'id', 'ea200005-0000-4000-8000-000000000005',
+  'pipeline_name', 'pgtap-fixture-wide', 'command', 'run',
+  'run_mode', 'full', 'invoked_via', 'cli_local'
+));
+
+select public.rpc_pipeline_executions__record_scope(
+  'ea200005-0000-4000-8000-000000000005'::uuid,
+  jsonb_build_object(
+    'drive_key', 'https://a.pgtap-fixture.invalid', 'scope_key', 'scope:' || scope_number,
+    'status', 'succeeded', 'started_at', now(), 'finished_at', now(),
+    'columns_considered', 2000000000, 'columns_written', 2000000000
+  )
+)
+from generate_series(1, 2) scope_number;
+
+select results_eq(
+  $$select columns_considered, columns_written
+    from public.pipeline_executions
+    where id = 'ea200005-0000-4000-8000-000000000005'::uuid$$,
+  $$values (4000000000::bigint, 4000000000::bigint)$$,
+  'record_scope sums column counts past the integer range'
 );
 
 -- ---------------------------------------------------------------------------
@@ -324,7 +438,7 @@ select throws_ok(
       'ea200001-0000-4000-8000-000000000001'::uuid,
       jsonb_build_object('drive_key', 'late', 'scope_key', 'all', 'status', 'succeeded',
         'started_at', now(), 'finished_at', now()))$$,
-  'P0001',
+  'PE001',
   'Pipeline execution ea200001-0000-4000-8000-000000000001 already finished',
   'record_scope refuses a scope for a finished execution'
 );
@@ -333,7 +447,7 @@ select throws_ok(
   $$select public.rpc_pipeline_executions__finish(
       'ea200001-0000-4000-8000-000000000001'::uuid,
       jsonb_build_object('status', 'failed', 'finished_at', now()))$$,
-  'P0001',
+  'PE001',
   'Pipeline execution ea200001-0000-4000-8000-000000000001 already finished',
   'finish refuses an execution that already finished'
 );
@@ -457,6 +571,11 @@ select ok(
 select ok(
   not has_table_privilege('authenticated', 'public.pipeline_execution_scopes', 'select'),
   'a signed-in user cannot read pipeline execution scopes'
+);
+
+select ok(
+  not has_table_privilege('service_role', 'public.pipeline_execution_scopes', 'update'),
+  'scope rows are insert-only, even for the service role'
 );
 
 select * from finish();
