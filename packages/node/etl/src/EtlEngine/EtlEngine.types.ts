@@ -86,9 +86,17 @@ export type ApiResourceRelation = RelationDescription &
     apiResourceFormat: string;
     /**
      * Never empty: a listing is never stored without its columns. Written
-     * together with the relation's row.
+     * together with the relation's row. A column whose type the pipeline
+     * does not know is `VARCHAR`, with an `originalDataType` of the source's
+     * own type label or `UNKNOWN_ORIGINAL_DATA_TYPE`.
      */
     columns: readonly RelationColumn[];
+    /**
+     * When the pipeline read the columns' real types from the source's data,
+     * such as from a file's Parquet footer. Leave it unset when the types
+     * are not verified: the app verifies them from a sample later.
+     */
+    columnTypesVerifiedAt?: Date;
   }>;
 
 /** A prebuilt relation: a CSV the engine converts to a Parquet object. */

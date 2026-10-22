@@ -54,6 +54,7 @@ function _apiRow(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     api_resource_format: "CSV",
     parquet_file_name: null,
     pipeline_scope_keys: ["all"],
+    date_column_type_last_verified: null,
     ...overrides,
   };
 }
@@ -352,6 +353,36 @@ describe("createSupabaseListingsStore", () => {
         return row.parquet_file_name;
       }),
     ).toEqual(["etl-fixture-a.parquet"]);
+  });
+
+  it("keeps verified columns when an unverified rewrite has the same columns fingerprint", async () => {
+    const metadata = { relation_columns_sha256: "fp-1" };
+    const [stored] = await store.upsertListingsWithColumns([
+      {
+        row: _apiRow({
+          metadata,
+          date_column_type_last_verified: "2026-10-20T00:00:00.000Z",
+        }),
+        columns: [_column("verified")],
+      },
+    ]);
+
+    const [rewritten] = await store.upsertListingsWithColumns([
+      {
+        row: _apiRow({ metadata, display_name: "Renamed" }),
+        columns: [_column("piped")],
+      },
+    ]);
+
+    expect([
+      rewritten?.display_name,
+      Date.parse(rewritten?.date_column_type_last_verified ?? ""),
+      await _readColumnNames(stored?.id ?? ""),
+    ]).toEqual([
+      "Renamed",
+      Date.parse("2026-10-20T00:00:00.000Z"),
+      ["verified"],
+    ]);
   });
 
   it("replaces a listing's relation columns as a whole", async () => {

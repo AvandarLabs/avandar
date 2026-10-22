@@ -35,6 +35,7 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     api_resource_format: "CSV",
     parquet_file_name: null,
     pipeline_scope_keys: ["all"],
+    date_column_type_last_verified: null,
     ...overrides,
   };
 }
@@ -127,6 +128,56 @@ describe("createInMemoryListingsStore", () => {
     expect(_columnNames(store.getRelationColumns(stored?.id ?? ""))).toEqual([
       "c",
     ]);
+  });
+
+  it("keeps verified columns when an unverified rewrite has the same columns fingerprint", async () => {
+    const store = createInMemoryListingsStore();
+    const metadata = { relation_columns_sha256: "fp-1" };
+    await store.upsertListingsWithColumns([
+      _entry(
+        _row({
+          metadata,
+          date_column_type_last_verified: "2026-10-20T00:00:00.000Z",
+        }),
+        [_column("verified", 0)],
+      ),
+    ]);
+
+    const [stored] = await store.upsertListingsWithColumns([
+      _entry(_row({ metadata, display_name: "Renamed" }), [
+        _column("piped", 0),
+      ]),
+    ]);
+
+    expect([
+      stored?.display_name,
+      stored?.date_column_type_last_verified,
+      _columnNames(store.getRelationColumns(stored?.id ?? "")),
+    ]).toEqual(["Renamed", "2026-10-20T00:00:00.000Z", ["verified"]]);
+  });
+
+  it("replaces verified columns when the columns fingerprint changed", async () => {
+    const store = createInMemoryListingsStore();
+    await store.upsertListingsWithColumns([
+      _entry(
+        _row({
+          metadata: { relation_columns_sha256: "fp-1" },
+          date_column_type_last_verified: "2026-10-20T00:00:00.000Z",
+        }),
+        [_column("verified", 0)],
+      ),
+    ]);
+
+    const [stored] = await store.upsertListingsWithColumns([
+      _entry(_row({ metadata: { relation_columns_sha256: "fp-2" } }), [
+        _column("piped", 0),
+      ]),
+    ]);
+
+    expect([
+      stored?.date_column_type_last_verified,
+      _columnNames(store.getRelationColumns(stored?.id ?? "")),
+    ]).toEqual([null, ["piped"]]);
   });
 
   it("fails the whole call when two entries share a key", async () => {

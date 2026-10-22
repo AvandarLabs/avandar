@@ -19,6 +19,7 @@ type _SharedColumns = Omit<
   | "api_resource_id"
   | "api_resource_format"
   | "parquet_file_name"
+  | "date_column_type_last_verified"
 >;
 
 type _DateField = "sourceUpdatedAt" | "coverageStartDate" | "coverageEndDate";
@@ -90,6 +91,8 @@ export function buildListingRowFromRelation(
       api_resource_id: null,
       api_resource_format: null,
       parquet_file_name: `${relation.tableBaseName}.parquet`,
+      // Read from the Parquet file the engine writes, so always verified.
+      date_column_type_last_verified: args.syncedAt.toISOString(),
     };
   }
   if (args.service === undefined) {
@@ -105,5 +108,7 @@ export function buildListingRowFromRelation(
     api_resource_id: relation.apiResourceId,
     api_resource_format: relation.apiResourceFormat,
     parquet_file_name: null,
+    date_column_type_last_verified:
+      relation.columnTypesVerifiedAt?.toISOString() ?? null,
   };
 }

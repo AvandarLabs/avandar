@@ -64,6 +64,26 @@ describe("buildListingRowFromRelation", () => {
     );
   });
 
+  it("leaves an API relation's column types unverified when it read none", () => {
+    expect(_build(API_RELATION).date_column_type_last_verified).toBe(null);
+  });
+
+  it("writes when an API relation's column types were verified", () => {
+    expect(
+      _build({
+        ...API_RELATION,
+        columnTypesVerifiedAt: new Date("2026-10-20T11:00:00.000Z"),
+      }).date_column_type_last_verified,
+    ).toBe("2026-10-20T11:00:00.000Z");
+  });
+
+  it("marks a Parquet relation's column types verified at sync time", () => {
+    expect(
+      _build(PARQUET_RELATION, { service: undefined })
+        .date_column_type_last_verified,
+    ).toBe("2026-10-20T12:00:00.000Z");
+  });
+
   it("records the scope that produced the row", () => {
     expect(_build(API_RELATION).pipeline_scope_keys).toEqual(["format:csv"]);
   });

@@ -31,6 +31,7 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     api_resource_format: "CSV",
     parquet_file_name: null,
     pipeline_scope_keys: ["all"],
+    date_column_type_last_verified: null,
     ...overrides,
   };
 }
@@ -54,6 +55,18 @@ describe("isListingRowUnchanged", () => {
           pipeline_run_id: "run-2",
           date_of_last_sync: "2026-10-21T00:00:00.000Z",
         }),
+      }),
+    ).toBe(true);
+  });
+
+  it("ignores date_column_type_last_verified, which the app also writes", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: {
+          ..._stored(),
+          date_column_type_last_verified: "2026-10-21T00:00:00.000Z",
+        },
+        next: _row({ date_column_type_last_verified: null }),
       }),
     ).toBe(true);
   });
@@ -144,7 +157,9 @@ describe("isListingRowUnchanged", () => {
   it("treats reordered canonical_urls as a change", () => {
     expect(
       isListingRowUnchanged({
-        stored: _stored({ canonical_urls: ["https://a.test", "https://b.test"] }),
+        stored: _stored({
+          canonical_urls: ["https://a.test", "https://b.test"],
+        }),
         next: _row({ canonical_urls: ["https://b.test", "https://a.test"] }),
       }),
     ).toBe(false);

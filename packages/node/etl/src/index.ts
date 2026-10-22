@@ -47,6 +47,7 @@ export type {
   StoredCheckpoint,
   StoredListingRow,
 } from "@etl/stores/EtlStores.types";
+export { UNKNOWN_ORIGINAL_DATA_TYPE } from "@etl/stores/EtlStores.types";
 export { LISTING_CONTRACT_COLUMNS } from "@etl/stores/listingContractColumns";
 export {
   createInMemoryListingsStore,

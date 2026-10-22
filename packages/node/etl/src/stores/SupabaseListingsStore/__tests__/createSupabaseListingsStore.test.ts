@@ -40,6 +40,7 @@ const ROW: ListingRowValues = {
   api_resource_format: "CSV",
   parquet_file_name: null,
   pipeline_scope_keys: ["all"],
+  date_column_type_last_verified: null,
 };
 
 /** A client whose every read returns `rowCount` rows that match nothing. */
@@ -76,7 +77,7 @@ function _createStore(rowCount: number): ListingsStore {
   return createSupabaseListingsStore({
     client: _createClientReturningRows(rowCount),
     listingsTable: LISTINGS_TABLE,
-    relationColumnsTable: "etl_fixture_columns",
+    upsertListingsFunction: "etl_fixture_upsert",
   });
 }
 

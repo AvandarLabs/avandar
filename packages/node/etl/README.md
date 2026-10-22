@@ -206,6 +206,7 @@ The engine writes only these listings-table columns
 | Column | Written for |
 | --- | --- |
 | `id` (read only), `access_kind`, `pipeline_name`, `pipeline_run_id`, `display_name`, `external_organization_name`, `external_dataset_id`, `date_of_last_update`, `date_of_last_sync`, `pipeline_scope_keys` | every row |
+| `date_column_type_last_verified` | every row, `null` when the column types are not verified |
 | `external_service_name`, `source_url`, `canonical_urls`, `license`, `update_frequency`, `description`, `notes`, `metadata`, `coverage_start_date`, `coverage_end_date` | every row, `null` when unset |
 | `api_service`, `api_base_url`, `api_resource_id`, `api_resource_format` | `api_resource` rows |
 | `parquet_file_name` | `pipeline_parquet` rows |
@@ -232,6 +233,19 @@ reads stored rows a few at a time to keep request URLs short.
 rejects a page holding one that does not, before it reads or writes
 anything. A `pipeline_parquet` relation's columns always come from its
 Parquet file. Writing a row replaces that listing's whole column set.
+
+**Column type verification.** `date_column_type_last_verified` records when
+a listing's column types were checked against real data. A
+`pipeline_parquet` row is verified at sync time, since its columns come
+from the Parquet file the engine wrote. An `api_resource` row is verified
+only when its relation sets `columnTypesVerifiedAt`. A pipeline that knows
+only column names writes each one as `VARCHAR`, with the source's own type
+label or `UNKNOWN_ORIGINAL_DATA_TYPE` as its `original_data_type`, and the
+app later verifies the types from a sample and rewrites the columns. So
+that work survives, an unverified rewrite whose
+`relation_columns_sha256` matches the stored row's keeps the stored
+columns and verification date. The change check never compares
+`date_column_type_last_verified`.
 
 `output.upsertListingsFunction` names the database function that does the
 write. It takes `p_listings`, a JSON array of `{ listing, relation_columns }`

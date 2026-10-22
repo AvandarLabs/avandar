@@ -32,4 +32,5 @@ export const LISTING_CONTRACT_COLUMNS = [
   "api_resource_format",
   "parquet_file_name",
   "pipeline_scope_keys",
+  "date_column_type_last_verified",
 ] as const satisfies ReadonlyArray<keyof ListingRowValues>;

@@ -34,6 +34,12 @@ export type ListingRowValues = Readonly<{
   parquet_file_name: string | null;
   /** The scopes that produce this row, in the order they first wrote it. */
   pipeline_scope_keys: readonly string[];
+  /**
+   * When the row's column types were verified against real data, or `null`
+   * when the pipeline only knew column names. The app also writes this
+   * when it verifies a listing's types, so it never counts as a change.
+   */
+  date_column_type_last_verified: string | null;
 }>;
 
 /** A listing row as stored, with its primary key. */
@@ -53,6 +59,13 @@ export type ListingWithColumns = Readonly<{
   /** Never empty: a listing is never stored without its columns. */
   columns: readonly RelationColumnRow[];
 }>;
+
+/**
+ * The `original_data_type` of a column whose source declares no type and
+ * whose type was not read from its data. Verifying the listing's types
+ * replaces it with the verified type.
+ */
+export const UNKNOWN_ORIGINAL_DATA_TYPE = "unknown";
 
 /** Reads and writes the listings table and the relation columns table. */
 export type ListingsStore = Readonly<{
@@ -74,6 +87,10 @@ export type ListingsStore = Readonly<{
    * and none of their columns, so a listing is never stored without its
    * columns. A call fails whole when an entry has no columns or when two
    * entries share a key.
+   *
+   * An entry whose row has no `date_column_type_last_verified` and the same
+   * `metadata.relation_columns_sha256` as the stored row keeps the stored
+   * columns and verification date, which the app may have verified since.
    */
   upsertListingsWithColumns: (
     entries: readonly ListingWithColumns[],

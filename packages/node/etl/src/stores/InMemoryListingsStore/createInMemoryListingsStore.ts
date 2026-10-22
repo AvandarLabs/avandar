@@ -56,13 +56,37 @@ function _throwOnInvalidEntries(entries: readonly ListingWithColumns[]): void {
   });
 }
 
+function _readColumnsFingerprint(
+  row: Pick<StoredListingRow, "metadata"> | undefined,
+): unknown {
+  return row?.metadata?.relation_columns_sha256;
+}
+
+/**
+ * Whether an upsert keeps the stored columns and verification date, the way
+ * `rpc_data_catalog_listings__upsert_with_relation_columns` decides it.
+ */
+function _isKeepingStoredColumns(
+  entry: ListingWithColumns,
+  existing: StoredListingRow | undefined,
+): boolean {
+  const storedFingerprint = _readColumnsFingerprint(existing);
+  return (
+    existing !== undefined &&
+    entry.row.date_column_type_last_verified === null &&
+    storedFingerprint !== undefined &&
+    storedFingerprint === _readColumnsFingerprint(entry.row)
+  );
+}
+
 /**
  * Creates a listings store that keeps rows in memory, for testing a pipeline
  * or the engine without Supabase. It behaves like Postgres where a pipeline
  * can tell the difference: upserts keep a row's id and merge over any columns
- * outside the contract, a call with a repeated key or with a listing that has
- * no columns fails whole, and every row crosses the store boundary as a JSON
- * copy.
+ * outside the contract, an unverified rewrite with an unchanged columns
+ * fingerprint keeps the stored columns and verification date, a call with a
+ * repeated key or with a listing that has no columns fails whole, and every
+ * row crosses the store boundary as a JSON copy.
  *
  * @param options.rows - Rows to start with.
  * @returns The store.
@@ -98,16 +122,28 @@ export function createInMemoryListingsStore(
       _throwOnInvalidEntries(entries);
       upsertBatches.push(_copyThroughJson([...entries]));
       return _copyThroughJson(
-        entries.map(({ row, columns }) => {
-          const key = buildListingKeyFromRow(row);
+        entries.map((entry) => {
+          const key = buildListingKeyFromRow(entry.row);
           const existing = rowsByKey.get(key);
+          const isKeepingStoredColumns = _isKeepingStoredColumns(
+            entry,
+            existing,
+          );
           const stored = {
             ...existing,
-            ..._copyThroughJson(row),
+            ..._copyThroughJson(entry.row),
             id: existing?.id ?? randomUUID(),
+            date_column_type_last_verified: isKeepingStoredColumns
+              ? (existing?.date_column_type_last_verified ?? null)
+              : entry.row.date_column_type_last_verified,
           };
           rowsByKey.set(key, stored);
-          columnsByListingId.set(stored.id, _copyThroughJson([...columns]));
+          if (!isKeepingStoredColumns) {
+            columnsByListingId.set(
+              stored.id,
+              _copyThroughJson([...entry.columns]),
+            );
+          }
           return stored;
         }),
       );
