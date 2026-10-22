@@ -63,11 +63,12 @@ export function createHdxEtlEngine(
     getConnectionId: (ckanPackage) => {
       return ckanPackage.name;
     },
-    transform: ({ drive: current, scope, connection }) => {
+    transform: ({ drive: current, scope, connection, metrics }) => {
       return makeApiResourceRelationsFromCkanPackage({
         drive: current,
         ckanPackage: connection,
         resourceFormat: scope.resourceFormat,
+        metrics,
         readFileColumns:
           readFileColumns ??
           createHdxFileColumnReader({ baseUrl: current.baseUrl }),

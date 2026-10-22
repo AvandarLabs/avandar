@@ -6,7 +6,7 @@ import type {
   CkanPackage,
   CkanResource,
 } from "$/connectors/open-data/CkanClient/CkanClient.types";
-import type { ApiResourceRelation } from "@avandar/etl";
+import type { ApiResourceRelation, EtlPipelineMetrics } from "@avandar/etl";
 import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
 import type { HdxFileColumnReader } from "@pipelines/hdx/readHdxResourceColumns/readHdxResourceColumns";
 
@@ -16,7 +16,8 @@ import type { HdxFileColumnReader } from "@pipelines/hdx/readHdxResourceColumns/
  * with no readable resource yields none. Each relation is dated by the same
  * `metadata_modified` the crawl orders datasets by, and carries the columns
  * `readHdxResourceColumns` finds, verified only when they were read from the
- * file. A resource with no columns is left out and
+ * file. Each relation reports the resource's `size` as `sourceSizeBytes`
+ * when CKAN records one. A resource with no columns is left out and
  * logged with `console.warn`, since a listing is never stored without its
  * columns.
  *
@@ -24,6 +25,8 @@ import type { HdxFileColumnReader } from "@pipelines/hdx/readHdxResourceColumns/
  *   in it, compared case-insensitively, become relations.
  * @param params.readFileColumns - Reads a resource's columns from its file
  *   when HDX recorded no usable headers.
+ * @param params.metrics - Receives the footer reads that finding columns
+ *   takes.
  * @throws When a dataset with a readable resource has no
  * `metadata_modified`.
  */
@@ -32,6 +35,7 @@ export async function makeApiResourceRelationsFromCkanPackage(params: {
   ckanPackage: Readonly<CkanPackage>;
   resourceFormat: string;
   readFileColumns: HdxFileColumnReader;
+  metrics: EtlPipelineMetrics;
 }): Promise<ApiResourceRelation[]> {
   const { drive, ckanPackage } = params;
   const wantedFormat = params.resourceFormat.toLowerCase();
@@ -51,6 +55,7 @@ export async function makeApiResourceRelationsFromCkanPackage(params: {
       const resourceColumns = await readHdxResourceColumns({
         resource,
         readFileColumns: params.readFileColumns,
+        metrics: params.metrics,
       });
       if (resourceColumns === undefined) {
         console.warn(
@@ -70,6 +75,9 @@ export async function makeApiResourceRelationsFromCkanPackage(params: {
         ...(resourceColumns.columnTypesVerifiedAt === undefined
           ? {}
           : { columnTypesVerifiedAt: resourceColumns.columnTypesVerifiedAt }),
+        ...(resource.size === undefined
+          ? {}
+          : { sourceSizeBytes: resource.size }),
       };
     },
   );

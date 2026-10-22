@@ -1,7 +1,7 @@
 import { makeApiResourceRelationsFromCkanPackage } from "@pipelines/hdx/makeApiResourceRelationsFromCkanPackage/makeApiResourceRelationsFromCkanPackage";
 import { describe, expect, it, vi } from "vitest";
 import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
-import type { RelationColumn } from "@avandar/etl";
+import type { EtlPipelineMetrics, RelationColumn } from "@avandar/etl";
 import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
 
 const CKAN_DRIVE: HdxDrive = {
@@ -40,6 +40,20 @@ const SNIFFED_COLUMNS: RelationColumn[] = [
 
 async function _readSniffedColumns(): Promise<readonly RelationColumn[]> {
   return SNIFFED_COLUMNS;
+}
+
+function _metrics() {
+  const values: Record<string, number> = {};
+  const metrics: EtlPipelineMetrics = {
+    increment: (name, by = 1) => {
+      values[name] = (values[name] ?? 0) + by;
+    },
+    time: async (name, work) => {
+      values[name] = (values[name] ?? 0) + 1;
+      return work();
+    },
+  };
+  return { metrics, values };
 }
 
 describe("makeApiResourceRelationsFromCkanPackage", () => {
@@ -93,6 +107,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
       ckanPackage,
       resourceFormat: "CSV",
       readFileColumns: _readSniffedColumns,
+      metrics: _metrics().metrics,
     });
 
     expect(relations).toEqual([
@@ -105,6 +120,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         externalOrganizationName: "Humanitarian Data Exchange",
         sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
         columns: [],
+        sourceSizeBytes: 200,
       },
     ]);
   });
@@ -117,6 +133,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
       ckanPackage: _packageWithOneCsv({ fileHeaders: ["adm1", "year"] }),
       resourceFormat: "CSV",
       readFileColumns,
+      metrics: _metrics().metrics,
     });
 
     expect(
@@ -137,6 +154,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
       readFileColumns: async () => {
         return undefined;
       },
+      metrics: _metrics().metrics,
     });
 
     expect(relations).toEqual([]);
@@ -169,6 +187,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         ckanPackage,
         resourceFormat: "CSV",
         readFileColumns: _readSniffedColumns,
+        metrics: _metrics().metrics,
       }),
     ).toEqual([]);
   });
@@ -211,6 +230,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
       ckanPackage,
       resourceFormat: "Parquet",
       readFileColumns: _readSniffedColumns,
+      metrics: _metrics().metrics,
     });
 
     expect(
@@ -218,5 +238,20 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         return [relation.apiResourceId, relation.apiResourceFormat];
       }),
     ).toEqual([["parquet-1", "PARQUET"]]);
+  });
+
+  it("reports the size CKAN records for each resource", async () => {
+    const relations = await makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      ckanPackage: _packageWithOneCsv({
+        fileHeaders: ["adm1"],
+        size: 4096,
+      }),
+      resourceFormat: "CSV",
+      readFileColumns: _readSniffedColumns,
+      metrics: _metrics().metrics,
+    });
+
+    expect(relations[0]?.sourceSizeBytes).toBe(4096);
   });
 });

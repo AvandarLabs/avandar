@@ -1,6 +1,6 @@
 import { UNKNOWN_ORIGINAL_DATA_TYPE } from "@avandar/etl";
 import type { CkanResource } from "$/connectors/open-data/CkanClient/CkanClient.types";
-import type { RelationColumn } from "@avandar/etl";
+import type { EtlPipelineMetrics, RelationColumn } from "@avandar/etl";
 
 /**
  * Reads a Parquet resource's columns from the file's footer.
@@ -49,12 +49,15 @@ function _isUsableHeaderList(headers: readonly string[]): boolean {
  *
  * @param args.resource - The resource.
  * @param args.readFileColumns - Reads the columns from the file.
+ * @param args.metrics - Counts and times each footer read, as
+ *   `hdx.parquet_footer_reads` and `hdx.parquet_footer_read_ms`.
  * @returns The columns, or `undefined` when a Parquet file's columns cannot
  *   be read.
  */
 export async function readHdxResourceColumns(args: {
   resource: Readonly<CkanResource>;
   readFileColumns: HdxFileColumnReader;
+  metrics: EtlPipelineMetrics;
 }): Promise<HdxResourceColumns | undefined> {
   const headers = args.resource.fileHeaders;
   if (headers !== undefined && _isUsableHeaderList(headers)) {
@@ -74,7 +77,13 @@ export async function readHdxResourceColumns(args: {
     // every run, so its columns are filled in when its types are verified.
     return { columns: [], columnTypesVerifiedAt: undefined };
   }
-  const fileColumns = await args.readFileColumns(args.resource);
+  args.metrics.increment("hdx.parquet_footer_reads");
+  const fileColumns = await args.metrics.time(
+    "hdx.parquet_footer_read_ms",
+    () => {
+      return args.readFileColumns(args.resource);
+    },
+  );
   return fileColumns === undefined
     ? undefined
     : { columns: fileColumns, columnTypesVerifiedAt: new Date() };
