@@ -14,10 +14,10 @@ import {
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch, IconWorldSearch } from "@tabler/icons-react";
 import Fuse from "fuse.js";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { uuid } from "$/lib/uuid";
-import { DataCatalogRelationColumnClient } from "@/clients/data-catalog-listings/DataCatalogRelationColumnClient";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
+import { DataCatalogRelationColumnClient } from "@/clients/data-catalog-listings/DataCatalogRelationColumnClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppSlateEmptyState } from "@/components/AppSlateEmptyState/AppSlateEmptyState";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
@@ -25,12 +25,15 @@ import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
   openFeaturebaseFeedbackWidget,
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { verifyOpenDataColumnTypes } from "@/lib/openData/verifyOpenDataColumnTypes/verifyOpenDataColumnTypes";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOpenDataDatasetColumnInputs";
 import { DataCatalogListingDetail } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail";
 import { DataCatalogListingList } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
+import { useVerifyColumnTypesOnDwell } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useVerifyColumnTypesOnDwell/useVerifyColumnTypesOnDwell";
 import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -100,8 +103,7 @@ export function DataCatalogView({
     });
   }, [catalogListings, debouncedSearch, fuse]);
 
-  const selectedListing: DataCatalogListingRead | undefined = useMemo(
-    () => {
+  const selectedListing: DataCatalogListingRead | undefined = useMemo(() => {
     if (!selectedId) {
       return undefined;
     }
@@ -109,6 +111,23 @@ export function DataCatalogView({
       return listing.id === selectedId;
     });
   }, [catalogListings, selectedId]);
+
+  // Refetches the listing and its columns once their types are verified, so
+  // "Add to workspace" uses the verified types.
+  const onColumnTypesVerified = useCallback(() => {
+    void AvaQueryClient.invalidateQueries({
+      queryKey: DataCatalogListingClient.QueryKeys.getAll(),
+    });
+    void AvaQueryClient.invalidateQueries({
+      queryKey: DataCatalogRelationColumnClient.QueryKeys.getAll(),
+    });
+  }, []);
+
+  useVerifyColumnTypesOnDwell({
+    listing: selectedListing,
+    verify: verifyOpenDataColumnTypes,
+    onVerified: onColumnTypesVerified,
+  });
 
   const [insertOpenDataDataset, isInsertPending] =
     DatasetClient.useInsertOpenDataDataset({
