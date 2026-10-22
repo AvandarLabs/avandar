@@ -109,7 +109,9 @@ export async function runPipelineCommand(options: {
 
   try {
     _assertOneLowerBound(runOptions);
-    const invocation = buildCliInvocation();
+    // A server run records the server's own commit, so only a local run
+    // reads this checkout's.
+    const invocation = buildCliInvocation({ shouldReadCodeVersion: local });
     printInfo(`Running pipeline: ${name}`);
     const report: ReceivedPipelineRunReport = local
       ? _runLocally({ name, runOptions, invocation })

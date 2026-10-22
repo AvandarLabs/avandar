@@ -39,20 +39,27 @@ export function readGitCommit(directory: string): string | undefined {
 }
 
 /**
- * How this CLI process was started: its argv, who ran it where, and the
- * commit of the checkout the CLI itself lives in. The commit is resolved from
- * the running module's directory (the bundle is CommonJS, so `__dirname`),
- * never from the working directory, which can be any repo.
+ * How this CLI process was started: its argv, who ran it where, and, when
+ * asked, the commit of the checkout the CLI itself lives in. The commit is
+ * resolved from the running module's directory (the bundle is CommonJS, so
+ * `__dirname`), never from the working directory, which can be any repo.
  *
- * @param cliArgv - The argv after the binary. Defaults to this process's.
+ * @param options.cliArgv - The argv after the binary. Defaults to this
+ * process's.
+ * @param options.shouldReadCodeVersion - Run git to read the commit. Pass
+ * false when the code that executes lives elsewhere, as on the pipeline
+ * server, so no git process is spawned for a value nobody sends.
  */
-export function buildCliInvocation(
-  cliArgv: readonly string[] = process.argv.slice(2),
-): CliInvocation {
+export function buildCliInvocation(options: {
+  cliArgv?: readonly string[];
+  shouldReadCodeVersion: boolean;
+}): CliInvocation {
   const host = hostname();
-  const codeVersion = readGitCommit(__dirname);
+  const codeVersion = options.shouldReadCodeVersion
+    ? readGitCommit(__dirname)
+    : undefined;
   return {
-    cliArgv,
+    cliArgv: options.cliArgv ?? process.argv.slice(2),
     actor: `${_readUsername()}@${host}`,
     host,
     ...(codeVersion === undefined ? {} : { codeVersion }),

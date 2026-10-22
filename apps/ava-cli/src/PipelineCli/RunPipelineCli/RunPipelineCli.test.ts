@@ -1,3 +1,4 @@
+import { buildCliInvocation } from "@ava-cli/PipelineCli/buildCliInvocation/buildCliInvocation";
 import { runPipelineLocal } from "@ava-cli/PipelineCli/runPipelineLocal";
 import { Acclimate } from "@avandar/acclimate";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -251,6 +252,21 @@ describe("runPipelineCommand", () => {
         fetchMock.mock.calls[0]?.[1]?.headers?.["x-ava-invocation"] ?? "",
       ),
     ).toEqual({ cliArgv: ["pipeline", "run", "hdx"], actor: "pablo@laptop" });
+  });
+
+  it("reads the commit for a local run only, since a server run never sends it", async () => {
+    _mockFetch(async () => {
+      return new Response(JSON.stringify(REPORT), { status: 200 });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({ name: "hdx", local: false });
+    await runPipelineCommand({ name: "hdx", local: true });
+
+    expect(vi.mocked(buildCliInvocation).mock.calls).toEqual([
+      [{ shouldReadCodeVersion: false }],
+      [{ shouldReadCodeVersion: true }],
+    ]);
   });
 
   it("passes since to a local run", async () => {

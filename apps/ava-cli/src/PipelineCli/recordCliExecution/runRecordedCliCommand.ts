@@ -60,7 +60,10 @@ export async function runRecordedCliCommand(args: {
     runMode: undefined,
     isLimited: false,
     isWindowed: false,
-    invocation: { invokedVia: "cli_local", ...buildCliInvocation() },
+    invocation: {
+      invokedVia: "cli_local",
+      ...buildCliInvocation({ shouldReadCodeVersion: true }),
+    },
     startedAt: new Date(),
   });
   const finish = (
