@@ -7,7 +7,7 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(11);
+select plan(23);
 
 -- ---------------------------------------------------------------------------
 -- pipeline_executions
@@ -120,6 +120,231 @@ select is(
   ),
   0::bigint,
   'deleting an execution deletes its scope rows'
+);
+
+-- ---------------------------------------------------------------------------
+-- rpc_pipeline_executions__start
+-- ---------------------------------------------------------------------------
+
+select is(
+  public.rpc_pipeline_executions__start(jsonb_build_object(
+    'id', 'ea200001-0000-4000-8000-000000000001',
+    'pipeline_name', 'pgtap-fixture-run',
+    'command', 'run',
+    'run_mode', 'incremental',
+    'is_scoped', true,
+    'invoked_via', 'cli_server',
+    'cli_argv', jsonb_build_array('pipeline', 'run', 'pgtap-fixture-run', '--incremental'),
+    'request_body', jsonb_build_object('incremental', true),
+    'arguments', jsonb_build_object('mode', 'incremental'),
+    'actor', 'pablo@laptop',
+    'host', 'fly-machine',
+    'code_version', 'abc123',
+    'started_at', '2026-10-22T10:00:00Z'
+  )),
+  'ea200001-0000-4000-8000-000000000001'::uuid,
+  'start returns the execution id'
+);
+
+select results_eq(
+  $$select status::text, command::text, run_mode::text, is_scoped, cli_argv,
+      request_body, actor, code_version
+    from public.pipeline_executions
+    where id = 'ea200001-0000-4000-8000-000000000001'::uuid$$,
+  $$values ('running', 'run', 'incremental', true,
+      array['pipeline', 'run', 'pgtap-fixture-run', '--incremental'],
+      '{"incremental": true}'::jsonb, 'pablo@laptop', 'abc123')$$,
+  'start records a running execution with its invocation'
+);
+
+-- ---------------------------------------------------------------------------
+-- rpc_pipeline_executions__record_scope
+-- ---------------------------------------------------------------------------
+
+select public.rpc_pipeline_executions__record_scope(
+  'ea200001-0000-4000-8000-000000000001'::uuid,
+  jsonb_build_object(
+    'drive_key', 'https://a.pgtap-fixture.invalid', 'scope_key', 'all',
+    'status', 'succeeded',
+    'started_at', '2026-10-22T10:00:00Z', 'finished_at', '2026-10-22T10:00:02Z',
+    'setup_ms', 5, 'extract_ms', 100, 'load_write_ms', 30,
+    'page_count', 2, 'datasets_fetched', 10, 'listings_considered', 12,
+    'listings_written', 8, 'columns_considered', 60, 'columns_written', 40,
+    'max_columns_per_listing', 9, 'source_bytes_reported', 1000,
+    'pipeline_metrics', jsonb_build_object('hdx.parquet_footer_reads', 1)
+  )
+);
+
+select public.rpc_pipeline_executions__record_scope(
+  'ea200001-0000-4000-8000-000000000001'::uuid,
+  jsonb_build_object(
+    'drive_key', 'https://a.pgtap-fixture.invalid', 'scope_key', 'category:health',
+    'status', 'failed', 'error', 'source answered 500',
+    'started_at', '2026-10-22T10:00:02Z', 'finished_at', '2026-10-22T10:00:03Z',
+    'setup_ms', 3, 'extract_ms', 50,
+    'page_count', 1, 'datasets_fetched', 5, 'listings_considered', 5,
+    'listings_written', 5, 'columns_considered', 20, 'columns_written', 20,
+    'max_columns_per_listing', 14
+  )
+);
+
+select public.rpc_pipeline_executions__record_scope(
+  'ea200001-0000-4000-8000-000000000001'::uuid,
+  jsonb_build_object(
+    'drive_key', 'https://b.pgtap-fixture.invalid', 'scope_key', 'all',
+    'status', 'skipped',
+    'started_at', '2026-10-22T10:00:03Z', 'finished_at', '2026-10-22T10:00:03Z'
+  )
+);
+
+select results_eq(
+  $$select drive_count, scope_count, setup_ms, extract_ms, load_write_ms,
+      page_count, datasets_fetched, listings_considered, listings_written,
+      columns_considered, columns_written, max_columns_per_listing,
+      source_bytes_reported
+    from public.pipeline_executions
+    where id = 'ea200001-0000-4000-8000-000000000001'::uuid$$,
+  $$values (2, 3, 8::bigint, 150::bigint, 30::bigint, 3, 15, 17, 13, 80, 60,
+      14, 1000::bigint)$$,
+  'record_scope keeps the totals equal to the sum of the scope rows'
+);
+
+select results_eq(
+  $$select pipeline_name, status::text, error
+    from public.pipeline_execution_scopes
+    where execution_id = 'ea200001-0000-4000-8000-000000000001'::uuid
+      and scope_key = 'category:health'$$,
+  $$values ('pgtap-fixture-run', 'failed', 'source answered 500')$$,
+  'record_scope copies the pipeline name and keeps the outcome'
+);
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__record_scope(
+      'ea2000ff-0000-4000-8000-0000000000ff'::uuid,
+      jsonb_build_object('drive_key', 'x', 'scope_key', 'all', 'status', 'succeeded',
+        'started_at', now(), 'finished_at', now()))$$,
+  'P0001',
+  'Pipeline execution ea2000ff-0000-4000-8000-0000000000ff does not exist',
+  'record_scope refuses an unknown execution'
+);
+
+-- ---------------------------------------------------------------------------
+-- rpc_pipeline_executions__finish
+-- ---------------------------------------------------------------------------
+
+-- The pipeline's catalog: two prebuilt listings (one with two columns) and
+-- one API listing with unverified column types.
+insert into public.data_catalog_listings
+  (id, display_name, external_organization_name, access_kind,
+   parquet_file_name, pipeline_name, pipeline_run_id,
+   date_column_type_last_verified)
+values
+  ('ea300001-0000-4000-8000-000000000001'::uuid, 'p1', 'Fixture Org',
+   'pipeline_parquet', 'pgtap-fixture-1.parquet', 'pgtap-fixture-run', 'r',
+   now()),
+  ('ea300002-0000-4000-8000-000000000002'::uuid, 'p2', 'Fixture Org',
+   'pipeline_parquet', 'pgtap-fixture-2.parquet', 'pgtap-fixture-run', 'r',
+   now());
+
+insert into public.data_catalog_listings
+  (id, display_name, external_organization_name, access_kind, api_service,
+   api_base_url, external_dataset_id, api_resource_id, api_resource_format,
+   pipeline_name)
+values
+  ('ea300003-0000-4000-8000-000000000003'::uuid, 'a1', 'Fixture Org',
+   'api_resource', 'socrata', 'https://a.pgtap-fixture.invalid',
+   'pgtap-fixture-a1', 'pgtap-fixture-a1', 'CSV', 'pgtap-fixture-run');
+
+insert into public.data_catalog_listings__relation_columns
+  (catalog_listing_id, column_name, display_order, original_data_type,
+   cast_data_type)
+values
+  ('ea300001-0000-4000-8000-000000000001'::uuid, 'x', 0, 'BIGINT', 'BIGINT'),
+  ('ea300001-0000-4000-8000-000000000001'::uuid, 'y', 1, 'VARCHAR', 'VARCHAR');
+
+select public.rpc_pipeline_executions__finish(
+  'ea200001-0000-4000-8000-000000000001'::uuid,
+  jsonb_build_object(
+    'status', 'partially_failed', 'error', 'source answered 500',
+    'finished_at', '2026-10-22T10:00:04Z', 'setup_ms', 20
+  )
+);
+
+select results_eq(
+  $$select status::text, error, duration_ms, setup_ms, catalog_listings,
+      catalog_prebuilt_listings, catalog_api_listings,
+      catalog_verified_listings, catalog_unverified_listings, catalog_columns
+    from public.pipeline_executions
+    where id = 'ea200001-0000-4000-8000-000000000001'::uuid$$,
+  $$values ('partially_failed', 'source answered 500', 4000::bigint,
+      28::bigint, 3, 2, 1, 2, 1, 2)$$,
+  'finish closes the execution, adds the run''s own setup, and counts the catalog after'
+);
+
+select public.rpc_pipeline_executions__start(jsonb_build_object(
+  'id', 'ea200002-0000-4000-8000-000000000002',
+  'pipeline_name', 'pgtap-fixture-run', 'command', 'reset',
+  'invoked_via', 'cli_local'
+));
+
+select public.rpc_pipeline_executions__finish(
+  'ea200002-0000-4000-8000-000000000002'::uuid,
+  jsonb_build_object(
+    'status', 'succeeded', 'listings_deleted', 7, 'checkpoints_deleted', 2,
+    'workspace_datasets_deleted', 1, 'listings_kept_in_use', 3
+  )
+);
+
+select results_eq(
+  $$select listings_deleted, checkpoints_deleted, workspace_datasets_deleted,
+      listings_kept_in_use, finished_at is not null
+    from public.pipeline_executions
+    where id = 'ea200002-0000-4000-8000-000000000002'::uuid$$,
+  $$values (7, 2, 1, 3, true)$$,
+  'finish writes a reset''s deletion totals'
+);
+
+select public.rpc_pipeline_executions__start(jsonb_build_object(
+  'id', 'ea200003-0000-4000-8000-000000000003',
+  'pipeline_name', 'pgtap-fixture-run', 'command', 'reset',
+  'invoked_via', 'cli_local'
+));
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__finish(
+      'ea200003-0000-4000-8000-000000000003'::uuid,
+      jsonb_build_object('status', 'running'))$$,
+  'P0001',
+  'rpc_pipeline_executions__finish needs a final status',
+  'finish refuses to leave an execution running'
+);
+
+select ok(
+  not has_function_privilege('authenticated', 'public.rpc_pipeline_executions__start(jsonb)', 'execute'),
+  'a signed-in user cannot start an execution'
+);
+
+select ok(
+  has_function_privilege('service_role', 'public.rpc_pipeline_executions__finish(uuid, jsonb)', 'execute'),
+  'the service role can finish an execution'
+);
+select throws_ok(
+  $$select public.rpc_pipeline_executions__record_scope(
+      'ea200001-0000-4000-8000-000000000001'::uuid,
+      jsonb_build_object('drive_key', 'late', 'scope_key', 'all', 'status', 'succeeded',
+        'started_at', now(), 'finished_at', now()))$$,
+  'P0001',
+  'Pipeline execution ea200001-0000-4000-8000-000000000001 already finished',
+  'record_scope refuses a scope for a finished execution'
+);
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__finish(
+      'ea200001-0000-4000-8000-000000000001'::uuid,
+      jsonb_build_object('status', 'failed', 'finished_at', now()))$$,
+  'P0001',
+  'Pipeline execution ea200001-0000-4000-8000-000000000001 already finished',
+  'finish refuses an execution that already finished'
 );
 
 -- ---------------------------------------------------------------------------

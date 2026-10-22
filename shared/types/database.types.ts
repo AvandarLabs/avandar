@@ -2563,6 +2563,18 @@ export type Database = {
         Args: { p_new_secret: string; p_secret_id: string }
         Returns: undefined
       }
+      rpc_pipeline_executions__finish: {
+        Args: { p_execution_id: string; p_outcome: Json }
+        Returns: undefined
+      }
+      rpc_pipeline_executions__record_scope: {
+        Args: { p_execution_id: string; p_scope: Json }
+        Returns: undefined
+      }
+      rpc_pipeline_executions__start: {
+        Args: { p_execution: Json }
+        Returns: string
+      }
       rpc_resources__make_private: {
         Args: {
           p_resource_id: string
