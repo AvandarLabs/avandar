@@ -126,3 +126,8 @@ export {
   type InMemoryExecution,
   type InMemoryExecutionStore,
 } from "@etl/stores/InMemoryExecutionStore/createInMemoryExecutionStore";
+export {
+  createSupabaseExecutionStore,
+  type ExecutionFunctions,
+  type SupabaseExecutionStoreOptions,
+} from "@etl/stores/SupabaseExecutionStore/createSupabaseExecutionStore";
