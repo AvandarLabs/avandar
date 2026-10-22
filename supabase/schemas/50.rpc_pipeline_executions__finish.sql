@@ -1,8 +1,8 @@
 /**
  * Records that a pipeline command finished: sets its status, error, and
  * finish time, adds the run's own setup time to `setup_ms`, writes deletion
- * totals a reset passes (a prune's come from its scope rows and are kept
- * when the outcome omits them), and counts the pipeline's catalog as it now
+ * totals a reset passes (an execution with scope rows, such as a prune, gets
+ * those totals from its scope rows, so passing them is an error), and counts the pipeline's catalog as it now
  * stands.
  *
  * @param p_execution_id The execution.
@@ -11,17 +11,38 @@
  *   `listings_deleted`, `listings_kept_in_use`, `listings_detached`,
  *   `checkpoints_deleted`, and `workspace_datasets_deleted`.
  *
- * @throws When the execution does not exist, or the status is missing or
- *   `running`.
+ * @throws When `p_outcome` is not a JSON object, or has a key that is not
+ *   listed above, so a typo fails instead of being ignored. Also when the
+ *   execution does not exist or already finished, the status is missing or
+ *   `running`, or the execution has scope rows and the outcome carries
+ *   `listings_deleted`, `listings_kept_in_use`, `listings_detached`, or
+ *   `checkpoints_deleted`. `workspace_datasets_deleted` is always allowed.
  */
 create or replace function public.rpc_pipeline_executions__finish (p_execution_id uuid, p_outcome jsonb) returns void as $$
 declare
   v_pipeline_name text;
   v_status public.pipeline_executions__status;
   v_outcome public.pipeline_executions;
+  v_scope_count integer;
+  v_unknown_keys text[];
 begin
-  select execution.pipeline_name, execution.status
-  into v_pipeline_name, v_status
+  if jsonb_typeof(p_outcome) is distinct from 'object' then
+    raise exception 'rpc_pipeline_executions__finish needs a JSON object';
+  end if;
+  select array_agg(key order by key)
+  into v_unknown_keys
+  from jsonb_object_keys(p_outcome) key
+  where key <> all (array[
+    'status', 'error', 'finished_at', 'setup_ms', 'listings_deleted',
+    'listings_kept_in_use', 'listings_detached', 'checkpoints_deleted',
+    'workspace_datasets_deleted'
+  ]);
+  if v_unknown_keys is not null then
+    raise exception 'rpc_pipeline_executions__finish got unknown keys: %', v_unknown_keys;
+  end if;
+
+  select execution.pipeline_name, execution.status, execution.scope_count
+  into v_pipeline_name, v_status, v_scope_count
   from public.pipeline_executions execution
   where execution.id = p_execution_id
   for update;
@@ -33,6 +54,13 @@ begin
   -- not change them.
   if v_status <> 'running' then
     raise exception 'Pipeline execution % already finished', p_execution_id;
+  end if;
+
+  if v_scope_count > 0 and p_outcome ?| array[
+    'listings_deleted', 'listings_kept_in_use', 'listings_detached',
+    'checkpoints_deleted'
+  ] then
+    raise exception 'Pipeline execution % has scope rows, so its deletion totals come from them', p_execution_id;
   end if;
 
   v_outcome := jsonb_populate_record(null::public.pipeline_executions, p_outcome);

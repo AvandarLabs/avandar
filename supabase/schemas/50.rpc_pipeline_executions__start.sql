@@ -9,14 +9,29 @@
  *   `actor`, `host`, `code_version`, and `started_at` (defaults to now).
  *
  * @returns The execution's id.
+ *
+ * @throws When the argument is not a JSON object, or has a key that is not
+ *   listed above, so a typo fails instead of silently recording a default.
  */
 create or replace function public.rpc_pipeline_executions__start (p_execution jsonb) returns uuid as $$
 declare
   v_input public.pipeline_executions;
   v_id uuid;
+  v_unknown_keys text[];
 begin
   if jsonb_typeof(p_execution) is distinct from 'object' then
     raise exception 'rpc_pipeline_executions__start needs a JSON object';
+  end if;
+  select array_agg(key order by key)
+  into v_unknown_keys
+  from jsonb_object_keys(p_execution) key
+  where key <> all (array[
+    'id', 'pipeline_name', 'command', 'run_mode', 'is_dry_run', 'is_scoped',
+    'is_limited', 'is_windowed', 'invoked_via', 'cli_argv', 'request_body',
+    'arguments', 'actor', 'host', 'code_version', 'started_at'
+  ]);
+  if v_unknown_keys is not null then
+    raise exception 'rpc_pipeline_executions__start got unknown keys: %', v_unknown_keys;
   end if;
   v_input := jsonb_populate_record(null::public.pipeline_executions, p_execution);
 

@@ -9,9 +9,26 @@ declare
   v_pipeline_name text;
   v_status public.pipeline_executions__status;
   v_outcome public.pipeline_executions;
+  v_scope_count integer;
+  v_unknown_keys text[];
 begin
-  select execution.pipeline_name, execution.status
-  into v_pipeline_name, v_status
+  if jsonb_typeof(p_outcome) is distinct from 'object' then
+    raise exception 'rpc_pipeline_executions__finish needs a JSON object';
+  end if;
+  select array_agg(key order by key)
+  into v_unknown_keys
+  from jsonb_object_keys(p_outcome) key
+  where key <> all (array[
+    'status', 'error', 'finished_at', 'setup_ms', 'listings_deleted',
+    'listings_kept_in_use', 'listings_detached', 'checkpoints_deleted',
+    'workspace_datasets_deleted'
+  ]);
+  if v_unknown_keys is not null then
+    raise exception 'rpc_pipeline_executions__finish got unknown keys: %', v_unknown_keys;
+  end if;
+
+  select execution.pipeline_name, execution.status, execution.scope_count
+  into v_pipeline_name, v_status, v_scope_count
   from public.pipeline_executions execution
   where execution.id = p_execution_id
   for update;
@@ -23,6 +40,13 @@ begin
   -- not change them.
   if v_status <> 'running' then
     raise exception 'Pipeline execution % already finished', p_execution_id;
+  end if;
+
+  if v_scope_count > 0 and p_outcome ?| array[
+    'listings_deleted', 'listings_kept_in_use', 'listings_detached',
+    'checkpoints_deleted'
+  ] then
+    raise exception 'Pipeline execution % has scope rows, so its deletion totals come from them', p_execution_id;
   end if;
 
   v_outcome := jsonb_populate_record(null::public.pipeline_executions, p_outcome);
@@ -82,7 +106,11 @@ declare
   v_pipeline_name text;
   v_status public.pipeline_executions__status;
   v_scope public.pipeline_execution_scopes;
+  v_unknown_keys text[];
 begin
+  if jsonb_typeof(p_scope) is distinct from 'object' then
+    raise exception 'rpc_pipeline_executions__record_scope needs a JSON object';
+  end if;
   select execution.pipeline_name, execution.status
   into v_pipeline_name, v_status
   from public.pipeline_executions execution
@@ -99,6 +127,22 @@ begin
   end if;
 
   v_scope := jsonb_populate_record(null::public.pipeline_execution_scopes, p_scope);
+  select array_agg(key order by key)
+  into v_unknown_keys
+  from jsonb_object_keys(p_scope) key
+  where key not in (
+    select column_key
+    from jsonb_object_keys(to_jsonb(v_scope)) column_key
+    where column_key <> all (array[
+      'id', 'execution_id', 'pipeline_name', 'created_at', 'updated_at',
+      'duration_ms', 'avg_columns_per_listing'
+    ])
+  );
+  if v_unknown_keys is not null then
+    raise exception 'rpc_pipeline_executions__record_scope got unknown keys: %', v_unknown_keys;
+  end if;
+
+  begin
 
   insert into public.pipeline_execution_scopes (
     execution_id, pipeline_name, drive_key, scope_key, status, error,
@@ -141,6 +185,11 @@ begin
     coalesce(v_scope.checkpoints_deleted, 0),
     coalesce(v_scope.pipeline_metrics, '{}'::jsonb)
   );
+  exception
+    when unique_violation then
+      raise exception 'Pipeline execution % already has drive % scope %',
+        p_execution_id, v_scope.drive_key, v_scope.scope_key;
+  end;
 
   update public.pipeline_executions execution
   set
@@ -218,9 +267,21 @@ AS $function$
 declare
   v_input public.pipeline_executions;
   v_id uuid;
+  v_unknown_keys text[];
 begin
   if jsonb_typeof(p_execution) is distinct from 'object' then
     raise exception 'rpc_pipeline_executions__start needs a JSON object';
+  end if;
+  select array_agg(key order by key)
+  into v_unknown_keys
+  from jsonb_object_keys(p_execution) key
+  where key <> all (array[
+    'id', 'pipeline_name', 'command', 'run_mode', 'is_dry_run', 'is_scoped',
+    'is_limited', 'is_windowed', 'invoked_via', 'cli_argv', 'request_body',
+    'arguments', 'actor', 'host', 'code_version', 'started_at'
+  ]);
+  if v_unknown_keys is not null then
+    raise exception 'rpc_pipeline_executions__start got unknown keys: %', v_unknown_keys;
   end if;
   v_input := jsonb_populate_record(null::public.pipeline_executions, p_execution);
 

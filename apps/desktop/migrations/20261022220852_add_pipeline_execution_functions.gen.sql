@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20261022220158_add_pipeline_execution_functions.sql by
+-- Generated from supabase/migrations/20261022220852_add_pipeline_execution_functions.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 0

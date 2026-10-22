@@ -7,7 +7,7 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(23);
+select plan(31);
 
 -- ---------------------------------------------------------------------------
 -- pipeline_executions
@@ -319,15 +319,6 @@ select throws_ok(
   'finish refuses to leave an execution running'
 );
 
-select ok(
-  not has_function_privilege('authenticated', 'public.rpc_pipeline_executions__start(jsonb)', 'execute'),
-  'a signed-in user cannot start an execution'
-);
-
-select ok(
-  has_function_privilege('service_role', 'public.rpc_pipeline_executions__finish(uuid, jsonb)', 'execute'),
-  'the service role can finish an execution'
-);
 select throws_ok(
   $$select public.rpc_pipeline_executions__record_scope(
       'ea200001-0000-4000-8000-000000000001'::uuid,
@@ -348,8 +339,115 @@ select throws_ok(
 );
 
 -- ---------------------------------------------------------------------------
+-- Argument validation
+-- ---------------------------------------------------------------------------
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__start(jsonb_build_object(
+      'pipeline_name', 'pgtap-fixture-run', 'command', 'reset',
+      'invoked_via', 'cli_local', 'pipeline_nmae', 'typo'))$$,
+  'P0001',
+  'rpc_pipeline_executions__start got unknown keys: {pipeline_nmae}',
+  'start refuses an unknown key'
+);
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__record_scope(
+      'ea200003-0000-4000-8000-000000000003'::uuid,
+      jsonb_build_object('drive_key', 'x', 'scope_key', 'all', 'status', 'succeeded',
+        'started_at', now(), 'finished_at', now(), 'extract_msec', 5, 'id', gen_random_uuid()))$$,
+  'P0001',
+  'rpc_pipeline_executions__record_scope got unknown keys: {extract_msec,id}',
+  'record_scope refuses a typo and a key the function sets itself'
+);
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__finish(
+      'ea200003-0000-4000-8000-000000000003'::uuid,
+      jsonb_build_object('status', 'failed', 'catalog_columns', 5))$$,
+  'P0001',
+  'rpc_pipeline_executions__finish got unknown keys: {catalog_columns}',
+  'finish refuses a key outside the outcome'
+);
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__record_scope(
+      'ea200003-0000-4000-8000-000000000003'::uuid, '[]'::jsonb)$$,
+  'P0001',
+  'rpc_pipeline_executions__record_scope needs a JSON object',
+  'record_scope refuses a non-object'
+);
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__finish(
+      'ea200003-0000-4000-8000-000000000003'::uuid, null)$$,
+  'P0001',
+  'rpc_pipeline_executions__finish needs a JSON object',
+  'finish refuses a null outcome'
+);
+
+-- A pipeline with scope rows takes its deletion totals from them.
+select public.rpc_pipeline_executions__start(jsonb_build_object(
+  'id', 'ea200004-0000-4000-8000-000000000004',
+  'pipeline_name', 'pgtap-fixture-run', 'command', 'prune_retired_scopes',
+  'invoked_via', 'cli_local'
+));
+
+select public.rpc_pipeline_executions__record_scope(
+  'ea200004-0000-4000-8000-000000000004'::uuid,
+  jsonb_build_object(
+    'drive_key', 'https://a.pgtap-fixture.invalid', 'scope_key', 'category:old',
+    'status', 'succeeded', 'listings_deleted', 4, 'checkpoints_deleted', 1,
+    'started_at', '2026-10-22T11:00:00Z', 'finished_at', '2026-10-22T11:00:01Z'
+  )
+);
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__record_scope(
+      'ea200004-0000-4000-8000-000000000004'::uuid,
+      jsonb_build_object('drive_key', 'https://a.pgtap-fixture.invalid',
+        'scope_key', 'category:old', 'status', 'failed',
+        'started_at', now(), 'finished_at', now()))$$,
+  'P0001',
+  'Pipeline execution ea200004-0000-4000-8000-000000000004 already has drive https://a.pgtap-fixture.invalid scope category:old',
+  'record_scope refuses a second row for the same drive and scope'
+);
+
+select throws_ok(
+  $$select public.rpc_pipeline_executions__finish(
+      'ea200004-0000-4000-8000-000000000004'::uuid,
+      jsonb_build_object('status', 'succeeded', 'listings_deleted', 9))$$,
+  'P0001',
+  'Pipeline execution ea200004-0000-4000-8000-000000000004 has scope rows, so its deletion totals come from them',
+  'finish refuses deletion totals for an execution with scope rows'
+);
+
+select public.rpc_pipeline_executions__finish(
+  'ea200004-0000-4000-8000-000000000004'::uuid,
+  jsonb_build_object('status', 'succeeded', 'workspace_datasets_deleted', 2)
+);
+
+select results_eq(
+  $$select listings_deleted, checkpoints_deleted, workspace_datasets_deleted
+    from public.pipeline_executions
+    where id = 'ea200004-0000-4000-8000-000000000004'::uuid$$,
+  $$values (4, 1, 2)$$,
+  'finish keeps the scope-derived deletion totals and takes workspace datasets'
+);
+
+-- ---------------------------------------------------------------------------
 -- Privileges
 -- ---------------------------------------------------------------------------
+
+select ok(
+  not has_function_privilege('authenticated', 'public.rpc_pipeline_executions__start(jsonb)', 'execute'),
+  'a signed-in user cannot start an execution'
+);
+
+select ok(
+  has_function_privilege('service_role', 'public.rpc_pipeline_executions__finish(uuid, jsonb)', 'execute'),
+  'the service role can finish an execution'
+);
 
 select ok(
   not has_table_privilege('authenticated', 'public.pipeline_executions', 'select'),

@@ -7,17 +7,26 @@
  *
  * @param p_execution_id The execution.
  * @param p_scope A JSON object with `pipeline_execution_scopes` columns,
- *   without `id`, `execution_id`, or `pipeline_name`. Timings and counts
- *   default to 0, `pipeline_metrics` to `{}`.
+ *   without `id`, `execution_id`, `pipeline_name`, `created_at`,
+ *   `updated_at`, `duration_ms`, or `avg_columns_per_listing`, which the
+ *   function or the table sets. Timings and counts default to 0,
+ *   `pipeline_metrics` to `{}`.
  *
- * @throws When the execution does not exist.
+ * @throws When `p_scope` is not a JSON object, or has a key that is not an
+ *   allowed column, so a typo fails instead of recording a 0. Also when the
+ *   execution does not exist or already finished, or already has a row for
+ *   the same drive and scope.
  */
 create or replace function public.rpc_pipeline_executions__record_scope (p_execution_id uuid, p_scope jsonb) returns void as $$
 declare
   v_pipeline_name text;
   v_status public.pipeline_executions__status;
   v_scope public.pipeline_execution_scopes;
+  v_unknown_keys text[];
 begin
+  if jsonb_typeof(p_scope) is distinct from 'object' then
+    raise exception 'rpc_pipeline_executions__record_scope needs a JSON object';
+  end if;
   select execution.pipeline_name, execution.status
   into v_pipeline_name, v_status
   from public.pipeline_executions execution
@@ -34,6 +43,22 @@ begin
   end if;
 
   v_scope := jsonb_populate_record(null::public.pipeline_execution_scopes, p_scope);
+  select array_agg(key order by key)
+  into v_unknown_keys
+  from jsonb_object_keys(p_scope) key
+  where key not in (
+    select column_key
+    from jsonb_object_keys(to_jsonb(v_scope)) column_key
+    where column_key <> all (array[
+      'id', 'execution_id', 'pipeline_name', 'created_at', 'updated_at',
+      'duration_ms', 'avg_columns_per_listing'
+    ])
+  );
+  if v_unknown_keys is not null then
+    raise exception 'rpc_pipeline_executions__record_scope got unknown keys: %', v_unknown_keys;
+  end if;
+
+  begin
 
   insert into public.pipeline_execution_scopes (
     execution_id, pipeline_name, drive_key, scope_key, status, error,
@@ -76,6 +101,11 @@ begin
     coalesce(v_scope.checkpoints_deleted, 0),
     coalesce(v_scope.pipeline_metrics, '{}'::jsonb)
   );
+  exception
+    when unique_violation then
+      raise exception 'Pipeline execution % already has drive % scope %',
+        p_execution_id, v_scope.drive_key, v_scope.scope_key;
+  end;
 
   update public.pipeline_executions execution
   set
