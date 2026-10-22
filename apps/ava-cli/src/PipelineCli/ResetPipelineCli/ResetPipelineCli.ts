@@ -1,5 +1,6 @@
 import { announcePostgrestTarget } from "@ava-cli/PipelineCli/announcePostgrestTarget/announcePostgrestTarget";
 import { assertValidScopeKey } from "@ava-cli/PipelineCli/assertValidScopeKey/assertValidScopeKey";
+import { runRecordedCliCommand } from "@ava-cli/PipelineCli/recordCliExecution/runRecordedCliCommand";
 import {
   countCheckpoints,
   countListings,
@@ -17,6 +18,7 @@ import {
 import {
   describeScopePruneCounts,
   isScopePruneEmpty,
+  scopePruneCountsToDeletionCounts,
 } from "@ava-cli/PipelineCli/scopePruneCounts/scopePruneCounts";
 import {
   printError,
@@ -25,11 +27,28 @@ import {
   printWarn,
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
+import type { CliCommandResult } from "@ava-cli/PipelineCli/recordCliExecution/runRecordedCliCommand";
 import type {
   InUseListing,
   ListingFilter,
   PostgrestTarget,
+  ScopePruneCounts,
 } from "@ava-cli/PipelineCli/ResetPipelineCli/pipelineListingsRest";
+import type { ExecutionOutcome } from "@etl/stores/ExecutionStore.types";
+
+/** What a reset deleted. */
+type _ResetDeletions = NonNullable<ExecutionOutcome["deletions"]>;
+
+/** A scope reset's prune counts and deleted workspace datasets. */
+function _toResetDeletions(
+  counts: ScopePruneCounts,
+  workspaceDatasetsDeleted: number,
+): _ResetDeletions {
+  return {
+    ...scopePruneCountsToDeletionCounts(counts),
+    workspaceDatasetsDeleted,
+  };
+}
 
 /**
  * Builds the filter that selects the listings `pipelineName` wrote. Every
@@ -81,14 +100,23 @@ async function _resolveInUseListings(
   };
 }
 
-/** Deletes what the user chose and reports how much was deleted. */
+/**
+ * Deletes what the user chose, reports how much was deleted, and resolves to
+ * the counts.
+ */
 async function _deleteChosenRows(options: {
   name: string;
   target: PostgrestTarget;
   filter: ListingFilter;
   datasetIds: readonly string[];
   keepListingIds: readonly string[];
-}): Promise<void> {
+}): Promise<
+  Readonly<{
+    listingsDeleted: number;
+    listingsKeptInUse: number;
+    workspaceDatasetsDeleted: number;
+  }>
+> {
   const { name, target, filter, datasetIds, keepListingIds } = options;
   // Workspace datasets go first: deleting a listing alone would cascade away
   // each dataset's `datasets__open_data` row and leave the `datasets` row
@@ -108,33 +136,23 @@ async function _deleteChosenRows(options: {
   printSuccess(
     `Deleted ${deletedCount} ${name} listing(s).${datasetsMessage}${keptMessage}`,
   );
+  return {
+    listingsDeleted: deletedCount,
+    listingsKeptInUse: keepListingIds.length,
+    workspaceDatasetsDeleted: datasetIds.length,
+  };
 }
 
 /**
- * Deletes every listing and checkpoint of one pipeline, after asking. Asks
- * again what to do when workspaces already use some of those listings.
+ * Deletes a pipeline's checkpoints, then the listings and workspace
+ * datasets the user chooses, and resolves to what was deleted.
  */
-async function _resetWholePipeline(options: {
+async function _deleteWholePipeline(options: {
   name: string;
   target: PostgrestTarget;
-}): Promise<void> {
-  const { name, target } = options;
-  const filter = buildListingFilterFromPipeline(name);
-  const [listingCount, checkpointCount] = await Promise.all([
-    countListings({ target, filter }),
-    countCheckpoints({ target, pipelineName: name }),
-  ]);
-  if (listingCount === 0 && checkpointCount === 0) {
-    printSuccess(`No ${name} listings or checkpoints to delete.`);
-    return;
-  }
-  const isConfirmed = await promptToConfirmReset(
-    `Delete all ${listingCount} ${name} listing(s) and ${checkpointCount} checkpoint(s)?`,
-  );
-  if (!isConfirmed) {
-    printInfo("Reset cancelled. Nothing was deleted.");
-    return;
-  }
+  filter: ListingFilter;
+}): Promise<_ResetDeletions> {
+  const { name, target, filter } = options;
   const inUseListings = await findInUseListings({ target, filter });
   const { datasetIds, keepListingIds } =
     inUseListings.length === 0
@@ -144,25 +162,64 @@ async function _resetWholePipeline(options: {
   // still there, the next incremental run would resume past listings that
   // are gone and never write them again. Without a checkpoint it only
   // crawls from the start.
-  await deleteCheckpoints({ target, pipelineName: name });
-  await _deleteChosenRows({
+  const checkpointsDeleted = await deleteCheckpoints({
+    target,
+    pipelineName: name,
+  });
+  const deleted = await _deleteChosenRows({
     name,
     target,
     filter,
     datasetIds,
     keepListingIds,
   });
+  return { ...deleted, listingsDetached: 0, checkpointsDeleted };
+}
+
+/**
+ * Deletes every listing and checkpoint of one pipeline, after asking. Asks
+ * again what to do when workspaces already use some of those listings.
+ * Resolves to how the reset ended and what it deleted.
+ */
+async function _resetWholePipeline(options: {
+  name: string;
+  target: PostgrestTarget;
+}): Promise<CliCommandResult> {
+  const { name, target } = options;
+  const filter = buildListingFilterFromPipeline(name);
+  const [listingCount, checkpointCount] = await Promise.all([
+    countListings({ target, filter }),
+    countCheckpoints({ target, pipelineName: name }),
+  ]);
+  if (listingCount === 0 && checkpointCount === 0) {
+    printSuccess(`No ${name} listings or checkpoints to delete.`);
+    return { status: "succeeded" };
+  }
+  const isConfirmed = await promptToConfirmReset(
+    `Delete all ${listingCount} ${name} listing(s) and ${checkpointCount} checkpoint(s)?`,
+  );
+  if (!isConfirmed) {
+    printInfo("Reset cancelled. Nothing was deleted.");
+    // The counts it showed were totals, not deletions, so none are
+    // recorded.
+    return { status: "cancelled" };
+  }
+  return {
+    status: "succeeded",
+    deletions: await _deleteWholePipeline({ name, target, filter }),
+  };
 }
 
 /**
  * Asks what to do with the workspace datasets added from listings only
- * `scope` produces, and deletes them when the user chooses to.
+ * `scope` produces, deletes them when the user chooses to, and resolves to
+ * how many were deleted.
  */
 async function _deleteScopeDatasetsIfChosen(options: {
   name: string;
   scope: string;
   target: PostgrestTarget;
-}): Promise<void> {
+}): Promise<number> {
   const { name, scope, target } = options;
   // Only listings this scope alone produces can be deleted, so only their
   // workspace datasets are asked about.
@@ -174,23 +231,25 @@ async function _deleteScopeDatasetsIfChosen(options: {
     },
   });
   if (inUseListings.length === 0) {
-    return;
+    return 0;
   }
   const { datasetIds } = await _resolveInUseListings(inUseListings);
   if (datasetIds.length > 0) {
     await deleteDatasets({ target, datasetIds });
   }
+  return datasetIds.length;
 }
 
 /**
  * Removes one scope from a pipeline's listings and checkpoints on every
- * drive, after showing a dry run's counts and asking.
+ * drive, after showing a dry run's counts and asking. Resolves to how the
+ * reset ended and what it deleted, or for a declined one, what it showed.
  */
 async function _resetScope(options: {
   name: string;
   scope: string;
   target: PostgrestTarget;
-}): Promise<void> {
+}): Promise<CliCommandResult> {
   const { name, scope, target } = options;
   const pruneArgs = {
     target,
@@ -201,7 +260,7 @@ async function _resetScope(options: {
   const planned = await pruneScope({ ...pruneArgs, isDryRun: true });
   if (isScopePruneEmpty(planned)) {
     printSuccess(`No ${name} listings or checkpoints have the scope ${scope}.`);
-    return;
+    return { status: "succeeded" };
   }
   printInfo(`Resetting ${scope} would ${describeScopePruneCounts(planned)}.`);
   const isConfirmed = await promptToConfirmReset(
@@ -209,18 +268,26 @@ async function _resetScope(options: {
   );
   if (!isConfirmed) {
     printInfo("Reset cancelled. Nothing was deleted.");
-    return;
+    return { status: "cancelled", deletions: _toResetDeletions(planned, 0) };
   }
-  if (planned.listings_kept_in_use > 0) {
-    await _deleteScopeDatasetsIfChosen({ name, scope, target });
-  }
+  const workspaceDatasetsDeleted =
+    planned.listings_kept_in_use > 0
+      ? await _deleteScopeDatasetsIfChosen({ name, scope, target })
+      : 0;
   const pruned = await pruneScope({ ...pruneArgs, isDryRun: false });
-  printSuccess(`Reset ${scope} of ${name}: ${describeScopePruneCounts(pruned)}.`);
+  printSuccess(
+    `Reset ${scope} of ${name}: ${describeScopePruneCounts(pruned)}.`,
+  );
+  return {
+    status: "succeeded",
+    deletions: _toResetDeletions(pruned, workspaceDatasetsDeleted),
+  };
 }
 
 /**
  * Deletes a pipeline's listings and checkpoints, or with `scope`, removes
  * one scope from them on every drive. Asks before changing anything.
+ * Records the reset in `pipeline_executions`, including a declined one.
  *
  * @param options.name - The pipeline's directory name.
  * @param options.scope - Reset only this scope.
@@ -236,11 +303,21 @@ export async function resetPipelineCommand(options: {
     }
     const target = getPostgrestTarget();
     announcePostgrestTarget(target);
-    if (scope === undefined) {
-      await _resetWholePipeline({ name, target });
-    } else {
-      await _resetScope({ name, scope, target });
-    }
+    await runRecordedCliCommand({
+      target,
+      start: {
+        pipelineName: name,
+        command: "reset",
+        isDryRun: false,
+        isScoped: scope !== undefined,
+        arguments: scope === undefined ? {} : { scope },
+      },
+      work: () => {
+        return scope === undefined
+          ? _resetWholePipeline({ name, target })
+          : _resetScope({ name, scope, target });
+      },
+    });
   } catch (error: unknown) {
     printError(`Failed to reset pipeline: ${name}`);
     printError(error instanceof Error ? error.message : String(error));
@@ -258,7 +335,8 @@ export const ResetPipelineCli = Acclimate.createCLI("reset")
       "that migration has run. Also deletes the pipeline's checkpoints, " +
       "before any listing. Do not run it while a pipeline run is in " +
       "progress: the run can write back the checkpoints and scope keys it " +
-      "removes.",
+      "removes. Records each reset in the database's pipeline_executions " +
+      "table.",
   )
   .addPositionalArg({
     name: "name",

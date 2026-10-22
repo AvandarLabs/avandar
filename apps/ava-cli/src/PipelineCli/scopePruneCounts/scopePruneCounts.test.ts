@@ -1,6 +1,7 @@
 import {
   describeScopePruneCounts,
   isScopePruneEmpty,
+  scopePruneCountsToDeletionCounts,
 } from "@ava-cli/PipelineCli/scopePruneCounts/scopePruneCounts";
 import { describe, expect, it } from "vitest";
 
@@ -30,5 +31,23 @@ describe("isScopePruneEmpty", () => {
         checkpoints_deleted: 0,
       }),
     ]).toEqual([false, true]);
+  });
+});
+
+describe("scopePruneCountsToDeletionCounts", () => {
+  it("names a prune's counts as an execution records them", () => {
+    expect(
+      scopePruneCountsToDeletionCounts({
+        listings_deleted: 1,
+        listings_kept_in_use: 2,
+        listings_detached: 3,
+        checkpoints_deleted: 4,
+      }),
+    ).toEqual({
+      listingsDeleted: 1,
+      listingsKeptInUse: 2,
+      listingsDetached: 3,
+      checkpointsDeleted: 4,
+    });
   });
 });

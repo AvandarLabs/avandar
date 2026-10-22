@@ -1,4 +1,5 @@
 import type { ScopePruneCounts } from "@ava-cli/PipelineCli/ResetPipelineCli/pipelineListingsRest";
+import type { ExecutionDeletionCounts } from "@etl/stores/ExecutionStore.types";
 
 /**
  * One line saying what pruning a scope does, such as
@@ -21,4 +22,16 @@ export function isScopePruneEmpty(counts: ScopePruneCounts): boolean {
     counts.listings_detached === 0 &&
     counts.checkpoints_deleted === 0
   );
+}
+
+/** A prune's counts, as a pipeline execution records them. */
+export function scopePruneCountsToDeletionCounts(
+  counts: ScopePruneCounts,
+): ExecutionDeletionCounts {
+  return {
+    listingsDeleted: counts.listings_deleted,
+    listingsKeptInUse: counts.listings_kept_in_use,
+    listingsDetached: counts.listings_detached,
+    checkpointsDeleted: counts.checkpoints_deleted,
+  };
 }

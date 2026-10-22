@@ -260,3 +260,23 @@ export async function listStoredScopes(options: {
   });
   return (await response.json()) as readonly StoredScope[];
 }
+
+/**
+ * Calls a database function through PostgREST with a JSON body, throwing on
+ * a non-2xx answer.
+ *
+ * @param options.functionName - Such as `rpc_pipeline_executions__start`.
+ */
+export async function callPostgrestRpc(options: {
+  target: PostgrestTarget;
+  functionName: string;
+  body: Readonly<Record<string, unknown>>;
+}): Promise<Response> {
+  return await _sendPostgrestRequest({
+    target: options.target,
+    method: "POST",
+    table: `rpc/${options.functionName}`,
+    params: {},
+    body: options.body,
+  });
+}
