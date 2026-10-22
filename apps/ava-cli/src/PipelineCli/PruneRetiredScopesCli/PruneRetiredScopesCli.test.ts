@@ -418,7 +418,7 @@ describe("pruneRetiredScopesCommand", () => {
     expect(outcome).not.toHaveProperty("listings_deleted");
   });
 
-  it("records the scope it pruned and fails when a later prune fails", async () => {
+  it("records the scope it pruned, and the later one that failed, and fails", async () => {
     const posts = _mockScopeRpcs([LIVE, RETIRED, OTHER_RETIRED]);
     const recordingFetch = vi.mocked(fetch);
     let realPruneCount = 0;
@@ -454,6 +454,18 @@ describe("pruneRetiredScopesCommand", () => {
           drive_key: RETIRED.drive_key,
           scope_key: RETIRED.scope_key,
           status: "succeeded",
+        }),
+        expect.objectContaining({
+          drive_key: OTHER_RETIRED.drive_key,
+          scope_key: OTHER_RETIRED.scope_key,
+          status: "failed",
+          error: expect.stringContaining("boom"),
+          started_at: expect.any(String),
+          finished_at: expect.any(String),
+          listings_deleted: 0,
+          listings_kept_in_use: 0,
+          listings_detached: 0,
+          checkpoints_deleted: 0,
         }),
       ],
       expect.objectContaining({ status: "failed" }),

@@ -124,6 +124,48 @@ async function _planPrunes(args: {
   });
 }
 
+/** What a prune that threw changed: nothing, since it is one transaction. */
+const _NO_PRUNE_COUNTS: ScopePruneCounts = {
+  listings_deleted: 0,
+  listings_kept_in_use: 0,
+  listings_detached: 0,
+  checkpoints_deleted: 0,
+};
+
+/**
+ * Prunes one planned pair for real. When the prune throws, records the pair
+ * as `failed` with its error and no deletions, then rethrows.
+ */
+async function _pruneRecordingFailure(args: {
+  target: PostgrestTarget;
+  name: string;
+  plan: _PlannedPrune;
+  startedAt: Date;
+  recordScope: RecordCliScope;
+}): Promise<ScopePruneCounts> {
+  const { plan } = args;
+  try {
+    return await _pruneOne({
+      target: args.target,
+      name: args.name,
+      retired: plan,
+      isDryRun: false,
+    });
+  } catch (error: unknown) {
+    await args.recordScope(
+      buildPruneExecutionScope({
+        ...plan,
+        counts: _NO_PRUNE_COUNTS,
+        status: "failed",
+        error: error instanceof Error ? error.message : String(error),
+        startedAt: args.startedAt,
+        finishedAt: new Date(),
+      }),
+    );
+    throw error;
+  }
+}
+
 async function _pruneAll(args: {
   target: PostgrestTarget;
   name: string;
@@ -134,12 +176,7 @@ async function _pruneAll(args: {
   // leaves the earlier ones done and a rerun picks up the rest.
   await promiseMapSequential(args.plans, async (plan) => {
     const startedAt = new Date();
-    const counts = await _pruneOne({
-      target: args.target,
-      name: args.name,
-      retired: plan,
-      isDryRun: false,
-    });
+    const counts = await _pruneRecordingFailure({ ...args, plan, startedAt });
     await args.recordScope(
       buildPruneExecutionScope({
         ...plan,

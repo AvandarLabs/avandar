@@ -15,13 +15,15 @@ import type {
  * nothing.
  *
  * @param args.status - `succeeded` for a pair pruned or dry-run, `skipped`
- * for one a declined prune left alone.
+ * for one a declined prune left alone, `failed` for one whose prune threw.
+ * @param args.error - Why a `failed` pair's prune threw.
  */
 export function buildPruneExecutionScope(args: {
   driveKey: string;
   scopeKey: string;
   counts: ScopePruneCounts;
   status: ExecutionScopeStatus;
+  error?: string;
   startedAt: Date;
   finishedAt: Date;
 }): ExecutionScope {
@@ -29,7 +31,7 @@ export function buildPruneExecutionScope(args: {
     driveKey: args.driveKey,
     scopeKey: args.scopeKey,
     status: args.status,
-    error: undefined,
+    error: args.error,
     windowSince: undefined,
     windowUntil: undefined,
     checkpointBefore: undefined,

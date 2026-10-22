@@ -43,4 +43,23 @@ describe("buildPruneExecutionScope", () => {
       pipelineMetrics: {},
     });
   });
+
+  it("records a failed pair's error", () => {
+    expect(
+      buildPruneExecutionScope({
+        driveKey: "https://data.humdata.org",
+        scopeKey: "format:parquet",
+        counts: {
+          listings_deleted: 0,
+          listings_kept_in_use: 0,
+          listings_detached: 0,
+          checkpoints_deleted: 0,
+        },
+        status: "failed",
+        error: "boom",
+        startedAt: new Date("2026-10-22T10:00:00.000Z"),
+        finishedAt: new Date("2026-10-22T10:00:01.000Z"),
+      }),
+    ).toMatchObject({ status: "failed", error: "boom" });
+  });
 });
