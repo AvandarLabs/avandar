@@ -56,7 +56,10 @@ export type RelationColumnRow = Readonly<{
 /** One listing row and its whole set of relation columns, written together. */
 export type ListingWithColumns = Readonly<{
   row: ListingRowValues;
-  /** Never empty: a listing is never stored without its columns. */
+  /**
+   * The listing's whole column set. Empty when the pipeline could not learn
+   * the columns: they are filled in when the listing's types are verified.
+   */
   columns: readonly RelationColumnRow[];
 }>;
 
@@ -84,9 +87,8 @@ export type ListingsStore = Readonly<{
    * key, so callers match rows with `buildListingKeyFromRow`.
    *
    * Each call is one transaction: a call that fails writes none of its rows
-   * and none of their columns, so a listing is never stored without its
-   * columns. A call fails whole when an entry has no columns or when two
-   * entries share a key.
+   * and none of their columns, so a listing and its columns are always
+   * written together. A call fails whole when two entries share a key.
    *
    * An entry whose row has no `date_column_type_last_verified` and the same
    * `metadata.relation_columns_sha256` as the stored row keeps the stored

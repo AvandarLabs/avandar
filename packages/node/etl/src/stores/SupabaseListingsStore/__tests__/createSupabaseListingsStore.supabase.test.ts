@@ -207,17 +207,15 @@ describe("createSupabaseListingsStore", () => {
     expect(await _readColumnNames(stored?.id ?? "")).toEqual(["a", "b"]);
   });
 
-  it("rejects an entry with no columns and writes none of the call's listings", async () => {
-    await expect(
-      store.upsertListingsWithColumns([
-        {
-          row: _apiRow({ external_dataset_id: "etl-fixture-first" }),
-          columns: [_column("a")],
-        },
-        { row: _apiRow({ display_name: "Bare" }), columns: [] },
-      ]),
-    ).rejects.toThrow('Listing "Bare" has no relation columns');
-    expect(await _countRows()).toBe(0);
+  it("stores an entry with no columns, with an empty column set", async () => {
+    const [stored] = await store.upsertListingsWithColumns([
+      { row: _apiRow(), columns: [] },
+    ]);
+
+    expect([
+      await _countRows(),
+      await _readColumnNames(stored?.id ?? ""),
+    ]).toEqual([1, []]);
   });
 
   it("keeps a stored listing's columns when a later entry in the call fails", async () => {
@@ -232,11 +230,11 @@ describe("createSupabaseListingsStore", () => {
           columns: [_column("new")],
         },
         {
-          row: _apiRow({ external_dataset_id: "etl-fixture-bare" }),
-          columns: [],
+          row: _apiRow({ display_name: "Again" }),
+          columns: [_column("new")],
         },
       ]),
-    ).rejects.toThrow("has no relation columns");
+    ).rejects.toThrow("appears twice in one call");
     expect(await _readColumnNames(stored?.id ?? "")).toEqual(["old"]);
   });
 

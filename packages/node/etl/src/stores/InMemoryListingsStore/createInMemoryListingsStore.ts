@@ -40,12 +40,7 @@ function _copyThroughJson<T>(value: T): T {
  */
 function _throwOnInvalidEntries(entries: readonly ListingWithColumns[]): void {
   const seenKeys = new Set<string>();
-  entries.forEach(({ row, columns }) => {
-    if (columns.length === 0) {
-      throw new Error(
-        `Listing "${row.display_name}" has no relation columns. A listing is never stored without its columns.`,
-      );
-    }
+  entries.forEach(({ row }) => {
     const key = buildListingKeyFromRow(row);
     if (seenKeys.has(key)) {
       throw new Error(
@@ -85,7 +80,7 @@ function _isKeepingStoredColumns(
  * can tell the difference: upserts keep a row's id and merge over any columns
  * outside the contract, an unverified rewrite with an unchanged columns
  * fingerprint keeps the stored columns and verification date, a call with a
- * repeated key or with a listing that has no columns fails whole, and every
+ * repeated key fails whole, and every
  * row crosses the store boundary as a JSON copy.
  *
  * @param options.rows - Rows to start with.

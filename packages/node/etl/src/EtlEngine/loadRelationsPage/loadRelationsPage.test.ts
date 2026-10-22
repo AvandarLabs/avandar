@@ -342,20 +342,19 @@ describe("loadRelationsPage", () => {
     ]);
   });
 
-  it("rejects an API relation with no columns before reading or writing", async () => {
+  it("writes an API relation with no columns, with an empty column set", async () => {
     const listings = createInMemoryListingsStore();
 
-    await expect(
-      loadRelationsPage({
-        relations: [_apiRelation(1), _apiRelation(2, { columns: [] })],
-        context: _context({ listings, objects: undefined }),
-      }),
-    ).rejects.toThrow(
-      'Relation "Dataset 2" (external dataset id "ds-002") has no columns. A listing is never stored without its columns.',
-    );
-    expect([listings.getReadBatchSizes(), listings.getUpsertBatches()]).toEqual(
-      [[], []],
-    );
+    await loadRelationsPage({
+      relations: [_apiRelation(1, { columns: [] })],
+      context: _context({ listings, objects: undefined }),
+    });
+
+    const [row] = listings.getRows();
+    expect([
+      row?.external_dataset_id,
+      listings.getRelationColumns(row?.id ?? ""),
+    ]).toEqual(["ds-001", []]);
   });
 
   it("writes nothing when a relation with columns is loaded again", async () => {

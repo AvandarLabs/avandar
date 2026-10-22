@@ -85,8 +85,9 @@ export type ApiResourceRelation = RelationDescription &
     apiResourceId: string;
     apiResourceFormat: string;
     /**
-     * Never empty: a listing is never stored without its columns. Written
-     * together with the relation's row. A column whose type the pipeline
+     * Written together with the relation's row. Empty when the pipeline
+     * cannot learn the columns: they are filled in when the listing's types
+     * are verified. A column whose type the pipeline
      * does not know is `VARCHAR`, with an `originalDataType` of the source's
      * own type label or `UNKNOWN_ORIGINAL_DATA_TYPE`.
      */

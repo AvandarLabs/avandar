@@ -129,17 +129,6 @@ function _throwOnRepeatedListingKey(
   });
 }
 
-function _throwOnRelationWithoutColumns(relations: readonly Relation[]): void {
-  const bareRelation = relations.find((relation) => {
-    return relation.kind === "api_resource" && relation.columns.length === 0;
-  });
-  if (bareRelation !== undefined) {
-    throw new Error(
-      `Relation ${_describeRelation(bareRelation)} has no columns. A listing is never stored without its columns.`,
-    );
-  }
-}
-
 function _buildRelationsWithRows(args: {
   relations: readonly Relation[];
   context: LoadRelationsPageContext;
@@ -286,16 +275,15 @@ async function _writeChangedRelations(args: {
  * Loads one page of relations, writing only the rows that changed, oldest
  * connection first. Parquet objects are uploaded before any row is written.
  * Changed rows are written in batches, each row with its whole set of
- * relation columns in the same transaction, so a listing is never stored
- * without its columns. Each row carries `metadata.relation_columns_sha256`,
+ * relation columns in the same transaction, so a listing and its columns are
+ * always written together. Each row carries `metadata.relation_columns_sha256`,
  * a fingerprint of its columns, so a change to the columns alone counts as
  * a change to the row.
  *
  * @param args.relations - The page's relations, oldest connection first.
  * @param args.context - The run and drive the page belongs to.
  * @returns How many relations were written and how many were unchanged.
- * @throws Before any read or write when two relations share a listing key
- * or an API relation has no columns.
+ * @throws Before any read or write when two relations share a listing key.
  */
 export async function loadRelationsPage(args: {
   relations: readonly Relation[];
@@ -304,7 +292,6 @@ export async function loadRelationsPage(args: {
   const { context } = args;
   const relationsWithRows = _buildRelationsWithRows(args);
   _throwOnRepeatedListingKey(relationsWithRows);
-  _throwOnRelationWithoutColumns(args.relations);
   const storedByKey = await _readStoredRowsByKey({
     rows: relationsWithRows.map(({ row }) => {
       return row;

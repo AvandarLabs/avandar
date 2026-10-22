@@ -224,15 +224,15 @@ any row is written, then changed rows are written in batches of at most 200
 listings and `COLUMNS_PER_WRITE` (5,000) relation columns. Each batch is one
 `upsertListingsWithColumns` call, which writes every row together with its
 whole column set in one transaction. A listing is never split from its
-columns across batches, so a listing is never stored without its columns:
-one with more columns than the cap is written alone. The Supabase store
+columns across batches, so the two are always written together: a listing
+with more columns than the cap is written alone. The Supabase store
 reads stored rows a few at a time to keep request URLs short.
 
-**Relation columns.** Every listing has at least one relation column. An
-`api_resource` relation must declare non-empty `columns`, and the engine
-rejects a page holding one that does not, before it reads or writes
-anything. A `pipeline_parquet` relation's columns always come from its
-Parquet file. Writing a row replaces that listing's whole column set.
+**Relation columns.** An `api_resource` relation declares its `columns`,
+which may be empty when the pipeline cannot learn them: they are filled in
+when the listing's column types are verified. A `pipeline_parquet`
+relation's columns always come from its Parquet file. Writing a row
+replaces that listing's whole column set.
 
 **Column type verification.** `date_column_type_last_verified` records when
 a listing's column types were checked against real data. A

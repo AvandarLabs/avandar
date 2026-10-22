@@ -201,25 +201,14 @@ describe("createInMemoryListingsStore", () => {
     ]);
   });
 
-  it("fails the whole call when an entry has no columns", async () => {
+  it("stores an entry with no columns, with an empty column set", async () => {
     const store = createInMemoryListingsStore();
 
-    await expect(
-      store.upsertListingsWithColumns([
-        _entry(_row({ external_dataset_id: "a", api_resource_id: "a" })),
-        _entry(
-          _row({
-            external_dataset_id: "b",
-            api_resource_id: "b",
-            display_name: "Bare",
-          }),
-          [],
-        ),
-      ]),
-    ).rejects.toThrow('Listing "Bare" has no relation columns');
-    expect([store.getRows().length, store.getUpsertBatches().length]).toEqual([
-      0, 0,
+    const [stored] = await store.upsertListingsWithColumns([
+      _entry(_row(), []),
     ]);
+
+    expect(store.getRelationColumns(stored?.id ?? "")).toEqual([]);
   });
 
   it("writes both listing kinds in one call", async () => {
