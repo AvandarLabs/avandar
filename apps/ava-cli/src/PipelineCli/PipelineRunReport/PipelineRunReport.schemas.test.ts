@@ -57,4 +57,38 @@ describe("PipelineRunReportSchema", () => {
 
     expect(PipelineRunReportSchema.safeParse(report).success).toBe(false);
   });
+
+  it("reads the run's and each crawl's times when sent, and a report without them", () => {
+    const timed = PipelineRunReportSchema.parse(
+      JSON.parse(
+        JSON.stringify({
+          ...ENGINE_REPORT,
+          startedAt: new Date("2026-10-22T10:00:00Z"),
+          finishedAt: new Date("2026-10-22T10:00:05Z"),
+          setupMs: 120,
+          crawls: [
+            {
+              ...ENGINE_REPORT.crawls[0],
+              startedAt: new Date("2026-10-22T10:00:00Z"),
+              finishedAt: new Date("2026-10-22T10:00:04Z"),
+            },
+          ],
+        }),
+      ),
+    );
+
+    expect([
+      timed.setupMs,
+      timed.finishedAt,
+      timed.crawls[0]?.startedAt,
+      PipelineRunReportSchema.safeParse(
+        JSON.parse(JSON.stringify(ENGINE_REPORT)),
+      ).success,
+    ]).toEqual([
+      120,
+      "2026-10-22T10:00:05.000Z",
+      "2026-10-22T10:00:00.000Z",
+      true,
+    ]);
+  });
 });

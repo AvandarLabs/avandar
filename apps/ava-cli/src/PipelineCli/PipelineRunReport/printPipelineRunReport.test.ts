@@ -1,4 +1,5 @@
 import {
+  formatDuration,
   printPipelineRunReport,
   printReceivedPipelineRunReport,
 } from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
@@ -36,6 +37,16 @@ function _logs(): string {
     .mock.calls;
   return calls.flat().join("\n");
 }
+
+describe("formatDuration", () => {
+  it.each([
+    [850, "850 ms"],
+    [1200, "1.2 s"],
+    [245_000, "4 min 05 s"],
+  ])("formats %s ms as %s", (durationMs, expected) => {
+    expect(formatDuration(durationMs)).toBe(expected);
+  });
+});
 
 describe("printPipelineRunReport", () => {
   beforeEach(() => {
@@ -126,6 +137,62 @@ describe("printPipelineRunReport", () => {
     printPipelineRunReport(_report([FAILED_DRIVE]));
 
     expect(_logs()).toContain("|red|Pipeline run");
+  });
+  it("prints how long a crawl took on its window line", () => {
+    printPipelineRunReport(
+      _report([
+        {
+          ...DRIVE,
+          startedAt: "2026-10-22T10:00:00.000Z",
+          finishedAt: "2026-10-22T10:00:01.200Z",
+        },
+      ]),
+    );
+
+    expect(_logs()).toContain("2026-10-01T00:00:00.000Z to now, took 1.2 s");
+  });
+
+  it("prints the run's total time and its setup after the crawls", () => {
+    printPipelineRunReport({
+      ..._report([DRIVE]),
+      startedAt: "2026-10-22T10:00:00.000Z",
+      finishedAt: "2026-10-22T10:04:05.000Z",
+      setupMs: 850,
+    });
+
+    expect(_logs()).toContain(
+      "Took 4 min 05 s (850 ms listing drives and scopes).",
+    );
+  });
+
+  it("prints no duration for a report without times", () => {
+    printPipelineRunReport(_report([DRIVE]));
+
+    expect(_logs()).not.toMatch(/took/i);
+  });
+
+  it("keeps a full window with an hour-long duration within 80 columns", () => {
+    printPipelineRunReport(
+      _report([
+        {
+          ...DRIVE,
+          window: {
+            since: "2026-10-01T00:00:00.000Z",
+            until: "2026-10-20T00:00:00.000Z",
+          },
+          startedAt: "2026-10-22T10:00:00.000Z",
+          finishedAt: "2026-10-22T10:59:59.000Z",
+        },
+      ]),
+    );
+
+    const lineLengths = _logs()
+      .replace(/\|\w+\|/g, "")
+      .split("\n")
+      .map((line) => {
+        return line.length;
+      });
+    expect(Math.max(...lineLengths)).toBeLessThanOrEqual(80);
   });
 });
 

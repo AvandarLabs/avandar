@@ -17,10 +17,53 @@ const _STATUS_WIDTH = 7;
 /** Indent of a crawl's detail lines: under its drive, past the status. */
 const _DETAIL_INDENT = " ".repeat(_STATUS_WIDTH + 1);
 
+/** A duration such as `850 ms`, `12.3 s`, or `4 min 05 s`. */
+export function formatDuration(durationMs: number): string {
+  if (durationMs < 1000) {
+    return `${String(Math.round(durationMs))} ms`;
+  }
+  if (durationMs < 60_000) {
+    return `${(durationMs / 1000).toFixed(1)} s`;
+  }
+  const totalSeconds = Math.round(durationMs / 1000);
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
+  return `${String(Math.floor(totalSeconds / 60))} min ${seconds} s`;
+}
+
 /**
- * A crawl's status, drive, and scope, then its window, counts, newest
- * timestamp, and any error on indented lines, so each line fits about 80
- * columns.
+ * Milliseconds between two ISO 8601 timestamps, or `undefined` unless both
+ * are set.
+ */
+function _getDurationMs(
+  startedAt: string | undefined,
+  finishedAt: string | undefined,
+): number | undefined {
+  if (startedAt === undefined || finishedAt === undefined) {
+    return undefined;
+  }
+  return Date.parse(finishedAt) - Date.parse(startedAt);
+}
+
+/**
+ * Prints how long the run took, and how much of that went to listing drives
+ * and scopes, when the report says.
+ */
+function _printRunDuration(report: PipelineRunReport): void {
+  const durationMs = _getDurationMs(report.startedAt, report.finishedAt);
+  if (durationMs === undefined) {
+    return;
+  }
+  const setupNote =
+    report.setupMs === undefined
+      ? ""
+      : ` (${formatDuration(report.setupMs)} listing drives and scopes)`;
+  printInfo(`Took ${formatDuration(durationMs)}${setupNote}.`);
+}
+
+/**
+ * A crawl's status, drive, and scope, then its window and how long it took,
+ * its counts, newest timestamp, and any error on indented lines, so each
+ * line fits about 80 columns.
  */
 function _formatCrawl(crawl: _CrawlReport): string {
   const since = crawl.window.since ?? "the start";
@@ -29,11 +72,14 @@ function _formatCrawl(crawl: _CrawlReport): string {
     `fetched ${String(crawl.connectionsFetched)}, ` +
     `written ${String(crawl.relationsWritten)}, ` +
     `unchanged ${String(crawl.relationsUnchanged)}`;
+  const durationMs = _getDurationMs(crawl.startedAt, crawl.finishedAt);
+  const tookNote =
+    durationMs === undefined ? "" : `, took ${formatDuration(durationMs)}`;
   const newest = crawl.newestTimestamp ?? "none";
   const limitNote = crawl.status === "skipped" ? " (limit reached)" : "";
   const lines = [
     `${crawl.status.padEnd(_STATUS_WIDTH)} ${crawl.driveKey} [${crawl.scopeKey}]${limitNote}`,
-    `${_DETAIL_INDENT}${since} to ${until}`,
+    `${_DETAIL_INDENT}${since} to ${until}${tookNote}`,
     `${_DETAIL_INDENT}${counts}, newest ${newest}`,
     ...(crawl.status === "failed"
       ? [`${_DETAIL_INDENT}error: ${crawl.error ?? "unknown error"}`]
@@ -78,8 +124,8 @@ function _printHeader(report: PipelineRunReport): void {
 
 /**
  * Prints a run's id and mode, then each crawl (a drive and scope) with its
- * window, counts, newest timestamp, and status. A failed crawl's error is
- * printed under it.
+ * window, counts, newest timestamp, and status, then the run's total time. A
+ * failed crawl's error is printed under it.
  */
 export function printPipelineRunReport(report: PipelineRunReport): void {
   _printHeader(report);
@@ -88,6 +134,7 @@ export function printPipelineRunReport(report: PipelineRunReport): void {
     return;
   }
   report.crawls.forEach(_printCrawl);
+  _printRunDuration(report);
 }
 
 /**
