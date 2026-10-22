@@ -1293,6 +1293,18 @@ describe("createEtlEngine", () => {
       ).rejects.toThrow("could not list the scopes of drive a");
     });
 
+    it("refuses to list scopes when two drives share a key", async () => {
+      await expect(
+        createEtlEngine(
+          _config({
+            drives: [_drive("a", [[]]), _drive("a", [[]])],
+            recorder: _recorder(),
+            stores: _stores(),
+          }),
+        ).listScopes(),
+      ).rejects.toThrow("Two drives have the key a");
+    });
+
     it("lists the default scope without Supabase credentials", async () => {
       const scopes = await createEtlEngine(
         _config({
@@ -1778,6 +1790,30 @@ describe("createEtlEngine", () => {
       ).rejects.toThrow(EtlRunOptionsError);
 
       expect(executions.getExecutions()[0]?.outcome?.status).toBe("failed");
+    });
+
+    it("records failed, naming the key, when two drives share a key", async () => {
+      const executions = createInMemoryExecutionStore();
+      const recorder = _recorder();
+      await expect(
+        _run(
+          _config({
+            drives: [
+              _drive("a", [[_connection("a1", 1)]]),
+              _drive("a", [[_connection("a2", 1)]]),
+            ],
+            recorder,
+            stores: _recordingStores(executions),
+          }),
+          { mode: "full", invocation: INVOCATION },
+        ),
+      ).rejects.toThrow("Two drives have the key a");
+
+      expect([
+        executions.getExecutions()[0]?.outcome?.status,
+        executions.getExecutions()[0]?.scopes,
+        recorder.transforms,
+      ]).toEqual(["failed", [], []]);
     });
 
     it("does not record a run rejected before it starts", async () => {

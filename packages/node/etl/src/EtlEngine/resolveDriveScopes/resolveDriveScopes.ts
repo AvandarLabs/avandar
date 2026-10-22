@@ -1,10 +1,7 @@
 import { promiseMapSequential } from "@avandar/utils";
 import { assertValidScopeKeys } from "@etl/EtlEngine/assertValidScopeKeys/assertValidScopeKeys";
 import { ETL_DEFAULT_SCOPE } from "@etl/EtlEngine/etlScopes";
-import type {
-  EtlEngineConfig,
-  EtlScope,
-} from "@etl/EtlEngine/EtlEngine.types";
+import type { EtlEngineConfig, EtlScope } from "@etl/EtlEngine/EtlEngine.types";
 
 /**
  * One drive with its key and validated scopes, or a drive that could not get
@@ -77,6 +74,25 @@ async function _resolveDrive<TDrive, TConnection, TScope extends EtlScope>(
 }
 
 /**
+ * Refuses two drives with the same key: they would share checkpoints and
+ * record two scope rows for the same drive and scope.
+ */
+function _assertUniqueDriveKeys<TDrive, TScope extends EtlScope>(args: {
+  pipelineName: string;
+  resolvedDrives: ReadonlyArray<ResolvedDrive<TDrive, TScope>>;
+}): void {
+  const seenKeys = new Set<string>();
+  args.resolvedDrives.forEach(({ driveKey }) => {
+    if (seenKeys.has(driveKey)) {
+      throw new Error(
+        `Two drives have the key ${driveKey} in the ${args.pipelineName} pipeline. Each drive's getDriveKey must be unique.`,
+      );
+    }
+    seenKeys.add(driveKey);
+  });
+}
+
+/**
  * Reads every drive's key and scopes, in `listDrives` order. A drive whose
  * key or scopes cannot be read, or whose scope keys are invalid, comes back
  * unresolved with what it threw, so a run can report it and go on.
@@ -84,6 +100,8 @@ async function _resolveDrive<TDrive, TConnection, TScope extends EtlScope>(
  * @param args.config - The pipeline.
  * @param args.drives - What `listDrives` returned.
  * @returns One entry per drive, in order.
+ * @throws When two drives have the same key, a pipeline bug no crawl can
+ * work around.
  */
 export async function resolveDriveScopes<
   TDrive,
@@ -96,7 +114,12 @@ export async function resolveDriveScopes<
   const indexedDrives = args.drives.map((drive, driveIndex) => {
     return { drive, driveIndex };
   });
-  return promiseMapSequential(indexedDrives, ({ drive, driveIndex }) => {
-    return _resolveDrive({ config: args.config, drive, driveIndex });
-  });
+  const resolvedDrives = await promiseMapSequential(
+    indexedDrives,
+    ({ drive, driveIndex }) => {
+      return _resolveDrive({ config: args.config, drive, driveIndex });
+    },
+  );
+  _assertUniqueDriveKeys({ pipelineName: args.config.name, resolvedDrives });
+  return resolvedDrives;
 }
