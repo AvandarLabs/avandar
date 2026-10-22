@@ -304,7 +304,7 @@ Postgres/direct-DB source type.** Open-data catalog is generic + Beta with
   boundaries, health facilities, population) as time allows.
 - P6.5 `[REFACTOR]` Open-data catalog Beta → production (search, provenance,
   refresh cadence surfacing).
-- P6.6 `[REFACTOR]` **Infer catalog column types on the server**: pipelines
+- P6.6 `[REFACTOR]` **Infer catalog column types on the server** (AVA-394): pipelines
   ingest API listings' columns as text, and the browser verifies their real
   types today. After a listing stays open for 3 seconds, the `open-data` edge
   function sends a sample to the browser, DuckDB-WASM infers the types, and
@@ -313,7 +313,7 @@ Postgres/direct-DB source type.** Open-data catalog is generic + Beta with
   read the sample and run DuckDB there instead. That removes the round trip
   and the need to trust types from a user's browser, which can still
   mislabel a type.
-- P6.7 `[FIX]` **One column type verification at a time per listing**: add a
+- P6.7 `[FIX]` **One column type verification at a time per listing** (AVA-395): add a
   lock, such as a claimed-at timestamp on the listing, so several people
   opening the same unverified listing don't each fetch a sample and verify it.
   Today each browser tries a listing at most once per page load, and
