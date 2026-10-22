@@ -1,10 +1,10 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { NodeDuckDb } from "@avandar/etl";
 import {
   createHdxFileColumnReader,
-  readFileColumnsWithDuckDb,
+  readParquetColumnsWithDuckDb,
 } from "@pipelines/hdx/createHdxFileColumnReader/createHdxFileColumnReader";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CkanResource } from "$/connectors/open-data/CkanClient/CkanClient.types";
@@ -15,7 +15,7 @@ function _resource(overrides: Partial<CkanResource>): CkanResource {
   return {
     id: "res-1",
     name: "data.csv",
-    format: "CSV",
+    format: "Parquet",
     url: `${BASE_URL}/dataset/x/resource/res-1/download/data.csv`,
     url_type: "upload",
     size: 200,
@@ -27,7 +27,7 @@ function _resource(overrides: Partial<CkanResource>): CkanResource {
   };
 }
 
-describe("readFileColumnsWithDuckDb", () => {
+describe("readParquetColumnsWithDuckDb", () => {
   let testRoot: string;
 
   beforeEach(async () => {
@@ -38,22 +38,6 @@ describe("readFileColumnsWithDuckDb", () => {
     await rm(testRoot, { force: true, recursive: true });
   });
 
-  it("sniffs a CSV's column names and types", async () => {
-    const csvPath = join(testRoot, "data.csv");
-    await writeFile(
-      csvPath,
-      "country,year,share\nKenya,2024,0.5\nChad,2025,1.5\n",
-    );
-
-    expect(
-      await readFileColumnsWithDuckDb({ path: csvPath, format: "csv" }),
-    ).toEqual([
-      { name: "country", originalDataType: "VARCHAR", castDataType: "VARCHAR" },
-      { name: "year", originalDataType: "BIGINT", castDataType: "BIGINT" },
-      { name: "share", originalDataType: "DOUBLE", castDataType: "DOUBLE" },
-    ]);
-  });
-
   it("reads a Parquet file's column names and types from its footer", async () => {
     const parquetPath = join(testRoot, "data.parquet");
     const duckDb = new NodeDuckDb();
@@ -62,9 +46,7 @@ describe("readFileColumnsWithDuckDb", () => {
     );
     await duckDb.close();
 
-    expect(
-      await readFileColumnsWithDuckDb({ path: parquetPath, format: "parquet" }),
-    ).toEqual([
+    expect(await readParquetColumnsWithDuckDb(parquetPath)).toEqual([
       { name: "country", originalDataType: "VARCHAR", castDataType: "VARCHAR" },
       { name: "year", originalDataType: "INTEGER", castDataType: "BIGINT" },
       { name: "day", originalDataType: "DATE", castDataType: "DATE" },
@@ -75,10 +57,7 @@ describe("readFileColumnsWithDuckDb", () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
 
     expect(
-      await readFileColumnsWithDuckDb({
-        path: join(testRoot, "missing.parquet"),
-        format: "parquet",
-      }),
+      await readParquetColumnsWithDuckDb(join(testRoot, "missing.parquet")),
     ).toBeUndefined();
   });
 });
@@ -93,38 +72,34 @@ describe("createHdxFileColumnReader", () => {
 
     const columns = await createHdxFileColumnReader({
       baseUrl: BASE_URL,
-      readFile,
+      readParquet: readFile,
     })(_resource({ url }));
 
     expect(columns).toBeUndefined();
     expect(readFile).not.toHaveBeenCalled();
   });
 
-  it.each([
-    ["CSV", "csv"],
-    ["Parquet", "parquet"],
-  ])("reads a %s file on the drive as %s", async (format, expectedFormat) => {
+  it("reads a Parquet file on the drive", async () => {
     const readFile = vi.fn(async () => {
       return undefined;
     });
-    const url = `${BASE_URL}/dataset/x/resource/res-1/download/data`;
+    const url = `${BASE_URL}/dataset/x/resource/res-1/download/data.parquet`;
 
-    await createHdxFileColumnReader({ baseUrl: BASE_URL, readFile })(
-      _resource({ format, url }),
-    );
+    await createHdxFileColumnReader({
+      baseUrl: BASE_URL,
+      readParquet: readFile,
+    })(_resource({ format: "Parquet", url }));
 
-    expect(readFile).toHaveBeenCalledWith({
-      path: url,
-      format: expectedFormat,
-    });
+    expect(readFile).toHaveBeenCalledWith(url);
   });
 
-  it("does not read a format it has no reader for", async () => {
+  it("does not read a CSV", async () => {
     const readFile = vi.fn();
 
-    await createHdxFileColumnReader({ baseUrl: BASE_URL, readFile })(
-      _resource({ format: "XLSX" }),
-    );
+    await createHdxFileColumnReader({
+      baseUrl: BASE_URL,
+      readParquet: readFile,
+    })(_resource({ format: "CSV" }));
 
     expect(readFile).not.toHaveBeenCalled();
   });

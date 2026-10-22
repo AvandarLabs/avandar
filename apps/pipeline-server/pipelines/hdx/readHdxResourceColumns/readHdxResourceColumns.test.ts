@@ -7,11 +7,14 @@ const SNIFFED: RelationColumn[] = [
   { name: "year", originalDataType: "BIGINT", castDataType: "BIGINT" },
 ];
 
-function _resource(fileHeaders?: readonly string[]): CkanResource {
+function _resource(
+  fileHeaders?: readonly string[],
+  format = "Parquet",
+): CkanResource {
   return {
-    id: "csv-1",
-    name: "data.csv",
-    format: "CSV",
+    id: "res-1",
+    name: "data",
+    format,
     url: "https://data.humdata.org/dataset/x/resource/csv-1/download/data.csv",
     url_type: "upload",
     size: 200,
@@ -50,7 +53,7 @@ describe("readHdxResourceColumns", () => {
     ["a header with surrounding spaces", ["adm1", " value"]],
     ["two headers that differ only in case", ["Value", "value"]],
   ])(
-    "reads the file's columns, verified, when HDX recorded %s",
+    "reads a Parquet file's columns, verified, when HDX recorded %s",
     async (_label, headers) => {
       const columns = await readHdxResourceColumns({
         resource: _resource(headers),
@@ -66,7 +69,21 @@ describe("readHdxResourceColumns", () => {
     },
   );
 
-  it("returns undefined when the file's columns cannot be read either", async () => {
+  it("gives a CSV with no usable headers no columns, unverified, without reading it", async () => {
+    const readFileColumns = vi.fn(async () => {
+      return SNIFFED;
+    });
+
+    const columns = await readHdxResourceColumns({
+      resource: _resource(undefined, "CSV"),
+      readFileColumns,
+    });
+
+    expect(columns).toEqual({ columns: [], columnTypesVerifiedAt: undefined });
+    expect(readFileColumns).not.toHaveBeenCalled();
+  });
+
+  it("returns undefined when a Parquet file's columns cannot be read", async () => {
     const columns = await readHdxResourceColumns({
       resource: _resource(),
       readFileColumns: async () => {

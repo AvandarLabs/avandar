@@ -58,20 +58,22 @@ what only retired scopes produced, after a confirmation, and never a listing
 a workspace uses. `ava pipeline reset` deletes the pipeline's checkpoints
 before its listings, and `--scope` resets one scope.
 
-Every listing is written in one transaction with its relation columns, so a
-listing never exists without them, and deleting a listing (by reset or
-prune) deletes its columns too. A dataset whose columns cannot be read is
-not listed. Each listing records in `date_column_type_last_verified` when its
-column types were checked against real data:
+Every listing is written in one transaction with its relation columns, so
+the two always land together, and deleting a listing (by reset or prune)
+deletes its columns too. A Socrata file or link, which has no columns, is
+not listed, and neither is an HDX Parquet file whose columns cannot be
+read. Each listing records in `date_column_type_last_verified` when its
+column types were checked against real data, and only a listing with
+verified column types can be added to a workspace:
 
 - `socrata` takes each dataset's columns from the Discovery API, as text
   with Socrata's type label as the original type, unverified. The list can
   name columns the CSV export lacks. A file or link with no columns is
   skipped.
 - `hdx` uses the headers HDX's file check recorded, as text of unknown
-  original type, unverified. When those are missing or ambiguous, DuckDB
-  reads the columns and their types from the file itself, a Parquet footer
-  or a CSV sample, and they are verified.
+  original type, unverified. When those are missing or ambiguous, a Parquet
+  file's footer is read with DuckDB, giving verified types, and a CSV gets
+  no columns until the app verifies it.
 - `world-bank__wdi` builds Parquet files, so its column types are verified
   when written.
 

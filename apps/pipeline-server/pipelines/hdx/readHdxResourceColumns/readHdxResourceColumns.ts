@@ -3,7 +3,7 @@ import type { CkanResource } from "$/connectors/open-data/CkanClient/CkanClient.
 import type { RelationColumn } from "@avandar/etl";
 
 /**
- * Reads a resource's columns from the file itself.
+ * Reads a Parquet resource's columns from the file's footer.
  *
  * @returns The columns, or `undefined` when the file cannot be read or has
  *   none.
@@ -43,12 +43,14 @@ function _isUsableHeaderList(headers: readonly string[]): boolean {
  * The columns of one HDX resource. The headers HDX's file structure check
  * recorded are used when they name the columns unambiguously. They carry no
  * types, so each column is text of unknown original type, unverified until
- * the app reads a sample. Otherwise the file itself is read, which gives
- * real types, verified now.
+ * the app reads a sample. Otherwise a Parquet file's footer is read, which
+ * gives real types, verified now, and a CSV gets no columns, unverified, to
+ * be filled in when the app verifies its types.
  *
  * @param args.resource - The resource.
  * @param args.readFileColumns - Reads the columns from the file.
- * @returns The columns, or `undefined` when neither source has any.
+ * @returns The columns, or `undefined` when a Parquet file's columns cannot
+ *   be read.
  */
 export async function readHdxResourceColumns(args: {
   resource: Readonly<CkanResource>;
@@ -66,6 +68,11 @@ export async function readHdxResourceColumns(args: {
       }),
       columnTypesVerifiedAt: undefined,
     };
+  }
+  if (args.resource.format.toLowerCase() !== "parquet") {
+    // Reading a CSV here would mean downloading part of every such file on
+    // every run, so its columns are filled in when its types are verified.
+    return { columns: [], columnTypesVerifiedAt: undefined };
   }
   const fileColumns = await args.readFileColumns(args.resource);
   return fileColumns === undefined

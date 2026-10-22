@@ -210,7 +210,7 @@ describe("createHdxEtlEngine", () => {
     ]);
   });
 
-  it("writes header columns unverified, and reads verified columns from the file when HDX recorded no headers", async () => {
+  it("writes header columns unverified, a CSV without headers with no columns, and a Parquet file's verified columns", async () => {
     const listings = createInMemoryListingsStore();
     const [resource] = _package("a", 1).resources;
     const readFileColumns = vi.fn(async () => {
@@ -231,6 +231,12 @@ describe("createHdxEtlEngine", () => {
               id: "without-headers-csv",
               fileHeaders: undefined,
             },
+            {
+              ...resource!,
+              id: "without-headers-parquet",
+              format: "Parquet",
+              fileHeaders: undefined,
+            },
           ],
         },
       ]),
@@ -241,7 +247,7 @@ describe("createHdxEtlEngine", () => {
         checkpoints: createInMemoryCheckpointStore(),
       },
       readFileColumns,
-    }).run({ mode: "full", scopes: ["format:csv"] });
+    }).run({ mode: "full" });
 
     expect(
       listings.getRows().map((row) => {
@@ -255,7 +261,8 @@ describe("createHdxEtlEngine", () => {
       }),
     ).toEqual([
       ["with-headers-csv", true, [["value", "VARCHAR"]]],
-      ["without-headers-csv", false, [["year", "BIGINT"]]],
+      ["without-headers-csv", true, []],
+      ["without-headers-parquet", false, [["year", "BIGINT"]]],
     ]);
     expect(readFileColumns).toHaveBeenCalledTimes(1);
   });

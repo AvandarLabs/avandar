@@ -104,8 +104,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         displayName: "data.csv",
         externalOrganizationName: "Humanitarian Data Exchange",
         sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
-        columns: SNIFFED_COLUMNS,
-        columnTypesVerifiedAt: expect.any(Date),
+        columns: [],
       },
     ]);
   });
@@ -128,13 +127,13 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     expect(readFileColumns).not.toHaveBeenCalled();
   });
 
-  it("leaves out a resource whose columns cannot be read", async () => {
+  it("leaves out a Parquet resource whose columns cannot be read", async () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
-      ckanPackage: _packageWithOneCsv({}),
-      resourceFormat: "CSV",
+      ckanPackage: _packageWithOneCsv({ format: "Parquet" }),
+      resourceFormat: "Parquet",
       readFileColumns: async () => {
         return undefined;
       },
