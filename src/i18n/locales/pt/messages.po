@@ -420,7 +420,7 @@ msgstr "Estilo"
 msgid "Square"
 msgstr "Quadrado"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Notes"
 msgstr "Notas"
@@ -470,7 +470,7 @@ msgstr "Segundo ponto"
 msgid "Latitude and longitude look swapped"
 msgstr "A latitude e a longitude parecem estar invertidas"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Cannot add dataset"
 msgstr "Não é possível adicionar conjunto de dados"
 
@@ -912,7 +912,7 @@ msgstr " registros"
 msgid "Something else…"
 msgstr "Algo mais…"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "The catalog is still in <0/> and grows as people tell us what they need. "
 "Missing a dataset? <1>tell us</1>."
 msgstr "O catálogo ainda está em <0/> e cresce à medida que as pessoas nos "
@@ -1015,7 +1015,7 @@ msgstr "Manter SQL como está"
 msgid "Remove User"
 msgstr "Remover usuário"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Avandar prepares public datasets and publishes them here. The catalog "
 "grows from what people ask for, so tell us which one you need."
 msgstr "A Avandar prepara conjuntos de dados públicos e os publica aqui. O "
@@ -1120,7 +1120,7 @@ msgid "Only the people and groups listed below can access this {resource}."
 msgstr "Somente as pessoas e os grupos listados abaixo podem acessar este "
 "{resource}."
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "Você não pode adicionar mais conjuntos de dados no seu plano atual. "
@@ -1254,7 +1254,7 @@ msgstr "Execute uma consulta primeiro."
 msgid "Seat limit reached"
 msgstr "Limite de assentos alcançado"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Pipeline"
 msgstr "Pipeline"
 
@@ -1319,6 +1319,11 @@ msgstr "CSV"
 msgid "Preset"
 msgstr "Predefinição"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "Reading a sample of this dataset to confirm its columns and their types. "
+"The list below may change."
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 msgstr "Adicione um gráfico de barras de {datasetName} agrupado por "
@@ -1355,7 +1360,7 @@ msgstr "Copiado"
 msgid "Measure distance and area"
 msgstr "Medir distância e área"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add to workspace"
 msgstr "Adicionar ao espaço de trabalho"
 
@@ -1416,7 +1421,7 @@ msgstr "Fechar chat (⌘/)"
 msgid "Create failed"
 msgstr "Falha ao criar"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Raw metadata"
 msgstr "Metadados brutos"
 
@@ -1939,6 +1944,10 @@ msgstr "Predefinições integradas"
 msgid "Select a data layer to buffer."
 msgstr "Selecione uma camada de dados para criar um buffer."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Cannot add dataset yet"
+msgstr ""
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Paper size"
 msgstr "Tamanho do papel"
@@ -1948,7 +1957,7 @@ msgid "Select a {conceptName}"
 msgstr "Selecione um {conceptName}"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" agora está no seu espaço de trabalho."
 
@@ -2556,7 +2565,7 @@ msgstr "Permitir que novos {pluralConceptName} sejam criados manualmente"
 msgid "Welcome to Avandar"
 msgstr "Boas-vindas ao Avandar"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
 msgstr "Nos diga qual conjunto de dados aberto você deseja através do feedback"
 
@@ -2733,7 +2742,7 @@ msgstr "{0}, {1} e {2} são fixos para cada espaço de trabalho."
 msgid "Synced to the cloud"
 msgstr "Sincronizado com a nuvem"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
 "how often it updates."
 msgstr "Escolha um conjunto de dados à esquerda para saber o que ele contém, "
@@ -3089,7 +3098,7 @@ msgstr "Você está atualmente no plano <0>{currentFeaturePlanName}</0>."
 msgid "Result size"
 msgstr "Tamanho do resultado"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Search open data catalog"
 msgstr "Pesquisar catálogo de dados abertos"
 
@@ -3523,6 +3532,10 @@ msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write "
 "the SQL, and drop a block onto the page."
 msgstr "Peça-me para adicionar um gráfico a este painel. Eu escolherei um tipo "
 "de visualização, escreverei o SQL e colocarei um bloco na página."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "Reading a sample of this dataset to find its columns."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Dashboard saved successfully!"
@@ -3974,7 +3987,7 @@ msgstr "Falha ao atualizar o nome do espaço de trabalho"
 msgid "Export"
 msgstr "Exportar"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Nothing in the catalog yet"
 msgstr "Ainda não há nada no catálogo"
 
@@ -4184,7 +4197,7 @@ msgstr "Localizações exatas"
 msgid "New chat"
 msgstr "Novo chat"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
 msgstr "Pesquisar por nome, organização, pipeline…"
 
@@ -4431,6 +4444,11 @@ msgstr "URL"
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY usa uma expressão que não é uma coluna."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Checking this dataset's columns first. It will be added to your "
+"workspace as soon as that finishes."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make private"
 msgstr "Tornar privado"
@@ -4561,7 +4579,7 @@ msgstr "Qualquer um no {app}"
 msgid "Failed to delete dataset"
 msgstr "Falha ao excluir o conjunto de dados"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "License"
 msgstr "Licença"
 
@@ -4590,7 +4608,7 @@ msgstr "Arraste para importar"
 msgid "Date range"
 msgstr "Intervalo de datas"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "Adicionar conjunto de dados ao espaço de trabalho"
 
@@ -4631,6 +4649,11 @@ msgstr "Gerando SQL…"
 msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr "Revise novamente, desde o início, como criar e compartilhar um "
 "dashboard."
+
+#. placeholder {0}: columns.length
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "{0}"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -4692,6 +4715,10 @@ msgstr "Gerar Consulta"
 msgid "No frequency data available."
 msgstr "Nenhum dado de frequência disponível."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "We couldn't check this dataset's columns. Try adding it again."
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "We'll add this visualization to your new dashboard."
 msgstr "Adicionaremos esta visualização ao seu novo painel."
@@ -4721,6 +4748,7 @@ msgstr "Substituir URL"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Columns"
 msgstr "Colunas"
@@ -4729,7 +4757,7 @@ msgstr "Colunas"
 msgid "Bright"
 msgstr "Brilhante"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Canonical"
 msgstr "Canônico"
 
@@ -4785,7 +4813,7 @@ msgid "Open chat (⌘/)"
 msgstr "Abrir chat (⌘/)"
 
 #. placeholder {0}: displayedListings.length
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "Catálogo ({0})"
 
@@ -5263,7 +5291,7 @@ msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "Conte-nos de onde os dados do {singularConceptName} devem vir..."
 
 #. placeholder {0}: debouncedSearch.trim()
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "No catalog dataset matches “{0}”."
 msgstr "Nenhum conjunto de dados do catálogo corresponde a “{0}”."
 
@@ -5346,7 +5374,7 @@ msgstr "Essa coordenada está fora do intervalo permitido."
 msgid "Open the record"
 msgstr "Abrir o registro"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Dataset added"
 msgstr "Conjunto de dados adicionado"
 
@@ -5846,6 +5874,11 @@ msgstr "Sistema sans"
 msgid "Series label"
 msgstr "Rótulo da série"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "We couldn't read a sample of this dataset, so its columns and their "
+"types are not confirmed. Adding it will try again."
+msgstr ""
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
@@ -6159,7 +6192,7 @@ msgstr "Cor das marcas do eixo Y"
 
 #. placeholder {0}: listing.pipelineName
 #. placeholder {1}: listing.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "{0} · run {1}"
 msgstr "{0} · executar {1}"
 
@@ -6386,7 +6419,7 @@ msgstr "Rugosidade ({0})"
 msgid "{0} columns · {1} rows"
 msgstr "{0} colunas · {1} linhas"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Request a dataset"
 msgstr "Solicitar um conjunto de dados"
 
@@ -6776,7 +6809,7 @@ msgstr "Conectado"
 msgid "Only the owner can make this {resource} private."
 msgstr "Somente o proprietário pode tornar este {resource} privado."
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Updates"
 msgstr "Atualizações"
 
@@ -7018,6 +7051,10 @@ msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
 msgstr "Seu plano atual suporta apenas até {0} conjuntos de dados. Faça upgrade "
 "para nosso plano Impact para aumentar o número de conjuntos de dados "
 "que você pode adicionar ao seu espaço de trabalho."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "Checking column types"
+msgstr ""
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
 msgid "Mark done"
@@ -7536,7 +7573,7 @@ msgstr "1 conjunto de dados"
 msgid "No numeric columns"
 msgstr "Sem colunas numéricas"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Service"
 msgstr "Serviço"
 
@@ -7972,7 +8009,7 @@ msgstr "Editor"
 msgid "Entered manually"
 msgstr "Inserido manualmente"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Organization"
 msgstr "Organização"
 
@@ -8195,7 +8232,7 @@ msgstr "Se houver múltiplos valores de {attributeName} para um {0}, então..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "Expressão de coluna sem nome no SELECT; ignorada."
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "Limpar pesquisa"
 
@@ -8604,7 +8641,7 @@ msgid "Thank you for your interest!"
 msgstr "Obrigado pelo seu interesse!"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -9162,7 +9199,7 @@ msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING usa o operador \"{operator}\", que não é compatível com o "
 "formulário."
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
 msgstr ""
 

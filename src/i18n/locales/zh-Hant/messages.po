@@ -404,7 +404,7 @@ msgstr "樣式"
 msgid "Square"
 msgstr "正方形"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Notes"
 msgstr "備註"
@@ -452,7 +452,7 @@ msgstr "第二點"
 msgid "Latitude and longitude look swapped"
 msgstr "緯度和經度似乎對調了"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Cannot add dataset"
 msgstr "無法添加資料集"
 
@@ -876,7 +876,7 @@ msgstr " 筆資料"
 msgid "Something else…"
 msgstr "其他…"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "The catalog is still in <0/> and grows as people tell us what they need. "
 "Missing a dataset? <1>tell us</1>."
 msgstr "目錄仍在 <0/>，並會隨著大家告訴我們需求而擴充。找不到需要的資料集？<1>告訴我們</1>。"
@@ -973,7 +973,7 @@ msgstr "保持 SQL 不變"
 msgid "Remove User"
 msgstr "移除用戶"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Avandar prepares public datasets and publishes them here. The catalog "
 "grows from what people ask for, so tell us which one you need."
 msgstr "Avandar 會準備公開資料集並在此發佈。目錄內容會根據大家的需求逐步增加，請告訴我們您需要哪一個。"
@@ -1068,7 +1068,7 @@ msgstr "無法載入"
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "只有下方列出的人員和群組可以存取此 {resource}。"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "您當前的計劃無法添加更多數據集。升級以添加此目錄數據集。"
@@ -1200,7 +1200,7 @@ msgstr "請先執行查詢。"
 msgid "Seat limit reached"
 msgstr "已達到座位限制"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Pipeline"
 msgstr "管道"
 
@@ -1261,6 +1261,11 @@ msgstr "CSV"
 msgid "Preset"
 msgstr "預設"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "Reading a sample of this dataset to confirm its columns and their types. "
+"The list below may change."
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 msgstr "新增一個按 {groupByColumn} 分組的 {datasetName} 的條形圖"
@@ -1294,7 +1299,7 @@ msgstr "已複製"
 msgid "Measure distance and area"
 msgstr "測量距離和面積"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add to workspace"
 msgstr "添加到工作區"
 
@@ -1353,7 +1358,7 @@ msgstr "關閉聊天 (⌘/)"
 msgid "Create failed"
 msgstr "創建失敗"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Raw metadata"
 msgstr "原始中繼資料"
 
@@ -1861,6 +1866,10 @@ msgstr "內建預設"
 msgid "Select a data layer to buffer."
 msgstr "選取要建立緩衝區的資料圖層。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Cannot add dataset yet"
+msgstr ""
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Paper size"
 msgstr "紙張大小"
@@ -1870,7 +1879,7 @@ msgid "Select a {conceptName}"
 msgstr "選取一個 {conceptName}"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" 現在在您的工作區中。"
 
@@ -2453,7 +2462,7 @@ msgstr "允許手動創建新的 {pluralConceptName}"
 msgid "Welcome to Avandar"
 msgstr "歡迎使用 Avandar"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
 msgstr "通過反饋告訴我們您想要的開放資料集"
 
@@ -2622,7 +2631,7 @@ msgstr "{0}、{1} 和 {2} 對每個工作區都是固定的。"
 msgid "Synced to the cloud"
 msgstr "已同步至雲端"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
 "how often it updates."
 msgstr "選取左側的資料集，以查看其涵蓋內容、發佈者及更新頻率。"
@@ -2961,7 +2970,7 @@ msgstr "您目前在<0>{currentFeaturePlanName}</0>計劃中。"
 msgid "Result size"
 msgstr "結果大小"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Search open data catalog"
 msgstr "搜索開放數據目錄"
 
@@ -3375,6 +3384,10 @@ msgstr "註冊"
 msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write "
 "the SQL, and drop a block onto the page."
 msgstr "請求我將圖表添加到此儀表板。我將選擇可視化類型，編寫 SQL，並將區塊放到頁面上。"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "Reading a sample of this dataset to find its columns."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Dashboard saved successfully!"
@@ -3812,7 +3825,7 @@ msgstr "更新工作區名稱失敗"
 msgid "Export"
 msgstr "匯出"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Nothing in the catalog yet"
 msgstr "目錄中目前還沒有任何內容"
 
@@ -4012,7 +4025,7 @@ msgstr "精確位置"
 msgid "New chat"
 msgstr "新聊天"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
 msgstr "按名稱、組織、管道等搜索…"
 
@@ -4254,6 +4267,11 @@ msgstr "URL"
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY 使用非欄位運算式。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Checking this dataset's columns first. It will be added to your "
+"workspace as soon as that finishes."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make private"
 msgstr "設為私人"
@@ -4383,7 +4401,7 @@ msgstr "在 {app} 中的任何人"
 msgid "Failed to delete dataset"
 msgstr "刪除資料集失敗"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "License"
 msgstr "許可證"
 
@@ -4412,7 +4430,7 @@ msgstr "拖放以導入"
 msgid "Date range"
 msgstr "日期範圍"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "將資料集添加到工作區"
 
@@ -4451,6 +4469,11 @@ msgstr "正在產生 SQL…"
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr "重新從頭開始，逐步瞭解如何建立及分享儀表板。"
+
+#. placeholder {0}: columns.length
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "{0}"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -4511,6 +4534,10 @@ msgstr "生成查詢"
 msgid "No frequency data available."
 msgstr "沒有可用的頻率數據。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "We couldn't check this dataset's columns. Try adding it again."
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "We'll add this visualization to your new dashboard."
 msgstr "我們將把這個視覺化添加到您的新儀表板。"
@@ -4539,6 +4566,7 @@ msgstr "取代 URL"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Columns"
 msgstr "列"
@@ -4547,7 +4575,7 @@ msgstr "列"
 msgid "Bright"
 msgstr "明亮"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Canonical"
 msgstr "標準"
 
@@ -4601,7 +4629,7 @@ msgid "Open chat (⌘/)"
 msgstr "打開聊天 (⌘/)"
 
 #. placeholder {0}: displayedListings.length
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "目錄 ({0})"
 
@@ -5065,7 +5093,7 @@ msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "告訴我們 {singularConceptName} 數據應該來自哪裡..."
 
 #. placeholder {0}: debouncedSearch.trim()
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "No catalog dataset matches “{0}”."
 msgstr "目錄中沒有符合「{0}」的資料集。"
 
@@ -5147,7 +5175,7 @@ msgstr "該座標超出範圍。"
 msgid "Open the record"
 msgstr "開啟記錄"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Dataset added"
 msgstr "資料集已添加"
 
@@ -5631,6 +5659,11 @@ msgstr "系統無襯線"
 msgid "Series label"
 msgstr "系列標籤"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "We couldn't read a sample of this dataset, so its columns and their "
+"types are not confirmed. Adding it will try again."
+msgstr ""
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
@@ -5935,7 +5968,7 @@ msgstr "Y 軸刻度顏色"
 
 #. placeholder {0}: listing.pipelineName
 #. placeholder {1}: listing.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "{0} · run {1}"
 msgstr "{0} · 執行 {1}"
 
@@ -6157,7 +6190,7 @@ msgstr "粗糙度 ({0})"
 msgid "{0} columns · {1} rows"
 msgstr "{0} 欄 · {1} 行"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Request a dataset"
 msgstr "申請資料集"
 
@@ -6535,7 +6568,7 @@ msgstr "已連線"
 msgid "Only the owner can make this {resource} private."
 msgstr "只有擁有者可以將此 {resource} 設為私人。"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Updates"
 msgstr "更新"
 
@@ -6765,6 +6798,10 @@ msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
 "Impact plan to increase the number of datasets you can add to your "
 "workspace."
 msgstr "您目前的計劃僅支援最多 {0} 個資料集。升級到我們的 Impact 計劃以增加您可以添加到工作區的資料集數量。"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "Checking column types"
+msgstr ""
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
 msgid "Mark done"
@@ -7266,7 +7303,7 @@ msgstr "1 個資料集"
 msgid "No numeric columns"
 msgstr "沒有數值欄"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Service"
 msgstr "服務"
 
@@ -7685,7 +7722,7 @@ msgstr "編輯者"
 msgid "Entered manually"
 msgstr "手動輸入"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Organization"
 msgstr "組織"
 
@@ -7906,7 +7943,7 @@ msgstr "如果一個 {0} 有多個 {attributeName} 值，那麼..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "SELECT 中的未命名欄位運算式；已略過。"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "清除搜尋"
 
@@ -8296,7 +8333,7 @@ msgid "Thank you for your interest!"
 msgstr "感謝您的關注！"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -8839,7 +8876,7 @@ msgstr "案件類型已刪除"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING 使用運算子「{operator}」，表單不支援此運算子。"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
 msgstr ""
 
