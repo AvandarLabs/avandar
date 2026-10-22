@@ -19,11 +19,13 @@ const _DETAIL_INDENT = " ".repeat(_STATUS_WIDTH + 1);
 
 /** A duration such as `850 ms`, `12.3 s`, or `4 min 05 s`. */
 export function formatDuration(durationMs: number): string {
-  if (durationMs < 1000) {
-    return `${String(Math.round(durationMs))} ms`;
+  const roundedMs = Math.round(durationMs);
+  if (roundedMs < 1000) {
+    return `${String(roundedMs)} ms`;
   }
-  if (durationMs < 60_000) {
-    return `${(durationMs / 1000).toFixed(1)} s`;
+  const tenthsOfSeconds = Math.round(durationMs / 100);
+  if (tenthsOfSeconds < 600) {
+    return `${(tenthsOfSeconds / 10).toFixed(1)} s`;
   }
   const totalSeconds = Math.round(durationMs / 1000);
   const seconds = String(totalSeconds % 60).padStart(2, "0");
@@ -32,7 +34,7 @@ export function formatDuration(durationMs: number): string {
 
 /**
  * Milliseconds between two ISO 8601 timestamps, or `undefined` unless both
- * are set.
+ * are set and the second is not before the first.
  */
 function _getDurationMs(
   startedAt: string | undefined,
@@ -41,7 +43,8 @@ function _getDurationMs(
   if (startedAt === undefined || finishedAt === undefined) {
     return undefined;
   }
-  return Date.parse(finishedAt) - Date.parse(startedAt);
+  const durationMs = Date.parse(finishedAt) - Date.parse(startedAt);
+  return durationMs < 0 ? undefined : durationMs;
 }
 
 /**

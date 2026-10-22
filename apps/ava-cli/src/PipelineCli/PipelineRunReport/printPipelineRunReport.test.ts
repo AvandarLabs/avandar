@@ -43,6 +43,8 @@ describe("formatDuration", () => {
     [850, "850 ms"],
     [1200, "1.2 s"],
     [245_000, "4 min 05 s"],
+    [999.6, "1.0 s"],
+    [59_999, "1 min 00 s"],
   ])("formats %s ms as %s", (durationMs, expected) => {
     expect(formatDuration(durationMs)).toBe(expected);
   });
@@ -167,6 +169,22 @@ describe("printPipelineRunReport", () => {
 
   it("prints no duration for a report without times", () => {
     printPipelineRunReport(_report([DRIVE]));
+
+    expect(_logs()).not.toMatch(/took/i);
+  });
+
+  it("prints no duration when a clock skew makes it negative", () => {
+    printPipelineRunReport({
+      ..._report([
+        {
+          ...DRIVE,
+          startedAt: "2026-10-22T10:00:05.000Z",
+          finishedAt: "2026-10-22T10:00:00.000Z",
+        },
+      ]),
+      startedAt: "2026-10-22T10:00:05.000Z",
+      finishedAt: "2026-10-22T10:00:00.000Z",
+    });
 
     expect(_logs()).not.toMatch(/took/i);
   });
