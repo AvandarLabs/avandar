@@ -4,8 +4,10 @@
  * (`data_catalog_listings__api_resource_unique` for an `api_resource`
  * listing, `unique_parquet_file_pipeline` for a `pipeline_parquet` one), and
  * its whole set of relation columns is replaced. A failure anywhere rolls
- * back every listing and column in the call, so a listing is never stored
- * without its columns.
+ * back every listing and column in the call, so a listing and its columns
+ * are always written together. The column set may be empty: a listing whose
+ * columns the pipeline could not learn gets them when the app verifies its
+ * column types.
  *
  * Only the columns `@avandar/etl` writes (its `LISTING_CONTRACT_COLUMNS`) are
  * set on a replaced listing. Every other column, such as the app's cache
@@ -20,13 +22,15 @@
  * set when the pipeline read real types, null when it only knew names.
  *
  * @param p_listings A JSON array. Each element is an object with `listing`,
- *   the listing's contract columns, and `relation_columns`, a non-empty array
- *   of `{ column_name, display_order, original_data_type, cast_data_type }`.
+ *   the listing's contract columns, and `relation_columns`, an array, possibly
+ *   empty, of `{ column_name, display_order, original_data_type,
+ *   cast_data_type }`.
  *
  * @returns The stored listings, in input order.
  *
- * @throws When `p_listings` is not an array, when an element has no relation
- *   columns, and when two elements share a conflict key.
+ * @throws When `p_listings` is not an array, when an element's
+ *   `relation_columns` is not an array, and when two elements share a
+ *   conflict key.
  */
 create or replace function public.rpc_data_catalog_listings__upsert_with_relation_columns (p_listings jsonb) returns setof public.data_catalog_listings as $$
 declare
@@ -42,11 +46,8 @@ begin
   end if;
 
   for v_item in select value from jsonb_array_elements(p_listings) loop
-    if
-      jsonb_typeof(v_item -> 'relation_columns') is distinct from 'array' or
-      jsonb_array_length(v_item -> 'relation_columns') = 0
-    then
-      raise exception 'Listing "%" has no relation columns. A listing is never stored without its columns.',
+    if jsonb_typeof(v_item -> 'relation_columns') is distinct from 'array' then
+      raise exception 'Listing "%" needs a relation_columns array, which may be empty.',
         v_item -> 'listing' ->> 'display_name';
     end if;
 

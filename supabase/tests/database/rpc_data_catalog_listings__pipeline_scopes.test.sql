@@ -104,6 +104,11 @@ values (
   'open_data'::public.datasets__source_type
 );
 
+-- Only a listing with verified column types can be added to a workspace.
+update public.data_catalog_listings
+set date_column_type_last_verified = '2026-10-01T00:00:00Z'
+where id = 'e7004003-0000-4000-8000-000000000003'::uuid;
+
 insert into public.datasets__open_data (dataset_id, workspace_id, catalog_listing_id)
 values (
   'e7005001-0000-4000-8000-000000000001'::uuid,

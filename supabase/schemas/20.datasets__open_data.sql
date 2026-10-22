@@ -76,3 +76,41 @@ create policy "User can delete datasets__open_data in their workspace" on public
 create trigger tr_datasets__open_data__set_updated_at before
 update on public.datasets__open_data for each row
 execute function public.util__set_updated_at ();
+
+/**
+ * Refuses to add a workspace dataset from a catalog listing whose relation
+ * column types were never verified against the source's real data. Until
+ * they are, the listing's columns are text at best, and possibly names the
+ * source does not have, so the dataset would start with the wrong columns.
+ * The app verifies a listing's types before it adds it.
+ */
+create or replace function public.datasets__open_data__assert_listing_column_types_verified () returns trigger as $$
+begin
+  if exists (
+    select 1
+    from public.data_catalog_listings listing
+    where
+      listing.id = new.catalog_listing_id and
+      listing.date_column_type_last_verified is null
+  ) then
+    raise exception 'Catalog listing % has unverified column types, so it cannot be added to a workspace yet', new.catalog_listing_id;
+  end if;
+  return new;
+end;
+$$ language plpgsql security invoker
+set
+  search_path = '';
+
+-- A trigger function is checked for EXECUTE when the trigger is created, not
+-- when it fires, so no role needs a grant.
+revoke
+execute on function public.datasets__open_data__assert_listing_column_types_verified ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr_datasets__open_data__assert_listing_column_types_verified before insert or
+update of catalog_listing_id on public.datasets__open_data for each row
+execute function public.datasets__open_data__assert_listing_column_types_verified ();

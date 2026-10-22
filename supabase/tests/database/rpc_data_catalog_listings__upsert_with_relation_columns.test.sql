@@ -64,18 +64,18 @@ $$ language sql;
 select plan(23);
 
 -- ---------------------------------------------------------------------------
--- Refusing a listing without columns, and rolling back the whole call
+-- Refusing a listing without a column array, and rolling back the whole call
 -- ---------------------------------------------------------------------------
 
 select throws_ok(
   $$select * from public.rpc_data_catalog_listings__upsert_with_relation_columns(
       jsonb_build_array(
         pg_temp.api_listing('pgtap-fixture-first', 'first', pg_temp.one_column('a')),
-        pg_temp.api_listing('pgtap-fixture-bare', 'bare', '[]'::jsonb)
+        jsonb_build_object('listing', pg_temp.api_listing('pgtap-fixture-bare', 'bare', '[]'::jsonb) -> 'listing')
       ))$$,
   'P0001',
-  'Listing "bare" has no relation columns. A listing is never stored without its columns.',
-  'a listing with no relation columns is refused'
+  'Listing "bare" needs a relation_columns array, which may be empty.',
+  'a listing with no relation_columns array is refused'
 );
 
 select is(
@@ -88,14 +88,16 @@ select is(
   'a refused call stores none of its listings, not even the ones before the refused one'
 );
 
-select throws_ok(
-  $$select * from public.rpc_data_catalog_listings__upsert_with_relation_columns(
-      jsonb_build_array(
-        jsonb_build_object('listing', pg_temp.api_listing('pgtap-fixture-no-key', 'no key', '[]'::jsonb) -> 'listing')
-      ))$$,
-  'P0001',
-  'Listing "no key" has no relation columns. A listing is never stored without its columns.',
-  'a listing with no relation_columns key is refused'
+select results_eq(
+  $$select listing.display_name, (
+      select count(*)::integer
+      from public.data_catalog_listings__relation_columns relation_column
+      where relation_column.catalog_listing_id = listing.id
+    )
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.api_listing('pgtap-fixture-empty', 'empty', '[]'::jsonb))) listing$$,
+  $$values ('empty', 0)$$,
+  'a listing with an empty column list is stored with no columns'
 );
 
 select throws_ok(
