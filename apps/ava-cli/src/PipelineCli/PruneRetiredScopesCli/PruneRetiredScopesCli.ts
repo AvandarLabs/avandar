@@ -2,7 +2,9 @@ import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
 import { announcePostgrestTarget } from "@ava-cli/PipelineCli/announcePostgrestTarget/announcePostgrestTarget";
 import { assertValidScopeKey } from "@ava-cli/PipelineCli/assertValidScopeKey/assertValidScopeKey";
 import { fetchLivePipelineScopes } from "@ava-cli/PipelineCli/fetchLivePipelineScopes/fetchLivePipelineScopes";
+import { buildPruneExecutionScope } from "@ava-cli/PipelineCli/PruneRetiredScopesCli/buildPruneExecutionScope";
 import { findRetiredScopes } from "@ava-cli/PipelineCli/PruneRetiredScopesCli/findRetiredScopes";
+import { runRecordedCliCommand } from "@ava-cli/PipelineCli/recordCliExecution/runRecordedCliCommand";
 import {
   getPostgrestTarget,
   listStoredScopes,
@@ -19,11 +21,24 @@ import { Acclimate } from "@avandar/acclimate";
 import { promiseMapSequential } from "@avandar/utils";
 import type { RetiredScope } from "@ava-cli/PipelineCli/PruneRetiredScopesCli/findRetiredScopes";
 import type {
+  CliCommandResult,
+  RecordCliScope,
+} from "@ava-cli/PipelineCli/recordCliExecution/runRecordedCliCommand";
+import type {
   PostgrestTarget,
   ScopePruneCounts,
 } from "@ava-cli/PipelineCli/ResetPipelineCli/pipelineListingsRest";
+import type { ExecutionScopeStatus } from "@etl/stores/ExecutionStore.types";
 
-type _PlannedPrune = RetiredScope & Readonly<{ counts: ScopePruneCounts }>;
+type _PlannedPrune = RetiredScope &
+  Readonly<{ counts: ScopePruneCounts; startedAt: Date; finishedAt: Date }>;
+
+type _PruneOptions = Readonly<{
+  name: string;
+  scope?: string;
+  isDryRun: boolean;
+  local: boolean;
+}>;
 
 /**
  * Refuses `--local` outside the development database: a checkout can be
@@ -94,13 +109,14 @@ async function _planPrunes(args: {
   // Sequential on purpose: one dry run at a time keeps the database load
   // and the printed plan in the stored order.
   const plans = await promiseMapSequential(args.retired, async (pair) => {
+    const startedAt = new Date();
     const counts = await _pruneOne({
       target: args.target,
       name: args.name,
       retired: pair,
       isDryRun: true,
     });
-    return { ...pair, counts };
+    return { ...pair, counts, startedAt, finishedAt: new Date() };
   });
   plans.forEach(_printPlan);
   return plans.filter((plan) => {
@@ -112,18 +128,102 @@ async function _pruneAll(args: {
   target: PostgrestTarget;
   name: string;
   plans: readonly _PlannedPrune[];
+  recordScope: RecordCliScope;
 }): Promise<void> {
   // Sequential on purpose: each prune is its own transaction, so a failure
   // leaves the earlier ones done and a rerun picks up the rest.
   await promiseMapSequential(args.plans, async (plan) => {
+    const startedAt = new Date();
     const counts = await _pruneOne({
       target: args.target,
       name: args.name,
       retired: plan,
       isDryRun: false,
     });
+    await args.recordScope(
+      buildPruneExecutionScope({
+        ...plan,
+        counts,
+        status: "succeeded",
+        startedAt,
+        finishedAt: new Date(),
+      }),
+    );
     printSuccess(`Pruned ${_formatPrune({ ...plan, counts })}`);
   });
+}
+
+/** Records each plan as a scope of the execution, with its dry run's counts. */
+async function _recordPlans(args: {
+  plans: readonly _PlannedPrune[];
+  status: ExecutionScopeStatus;
+  recordScope: RecordCliScope;
+}): Promise<void> {
+  // Sequential on purpose: scope rows are recorded in the printed order.
+  await promiseMapSequential(args.plans, (plan) => {
+    return args.recordScope(
+      buildPruneExecutionScope({ ...plan, status: args.status }),
+    );
+  });
+}
+
+/**
+ * Finds the pipeline's retired scopes and dry-runs each prune, printing
+ * what it would do. Resolves to the ones with something to prune.
+ */
+async function _findPrunePlans(args: {
+  target: PostgrestTarget;
+  options: _PruneOptions;
+}): Promise<_PlannedPrune[]> {
+  const { target, options } = args;
+  const { name } = options;
+  const [live, stored] = await Promise.all([
+    fetchLivePipelineScopes({ pipelineName: name, local: options.local }),
+    listStoredScopes({ target, pipelineName: name }),
+  ]);
+  const retired = findRetiredScopes({ stored, live, scopeKey: options.scope });
+  if (retired.length === 0) {
+    printSuccess(`The ${name} pipeline has no retired scopes.`);
+    return [];
+  }
+  const plans = await _planPrunes({ target, name, retired });
+  if (plans.length === 0) {
+    printSuccess(
+      `The ${name} pipeline's retired scopes have nothing to prune.`,
+    );
+  }
+  return plans;
+}
+
+/**
+ * Plans each retired scope's prune and, unless it is a dry run, prunes
+ * them after a confirmation. Records each planned or pruned scope.
+ */
+async function _pruneRetiredScopes(args: {
+  target: PostgrestTarget;
+  options: _PruneOptions;
+  recordScope: RecordCliScope;
+}): Promise<CliCommandResult> {
+  const { target, options, recordScope } = args;
+  const plans = await _findPrunePlans({ target, options });
+  if (plans.length === 0) {
+    return { status: "succeeded" };
+  }
+  if (options.isDryRun) {
+    printInfo("Dry run: nothing was changed.");
+    await _recordPlans({ plans, status: "succeeded", recordScope });
+    return { status: "succeeded" };
+  }
+  const isConfirmed = await promptToConfirmReset(
+    `Prune ${plans.length} retired scope(s) of ${options.name}?`,
+  );
+  if (!isConfirmed) {
+    printInfo("Prune cancelled. Nothing was changed.");
+    await _recordPlans({ plans, status: "skipped", recordScope });
+    return { status: "cancelled" };
+  }
+  await _pruneAll({ target, name: options.name, plans, recordScope });
+  return { status: "succeeded" };
 }
 
 /**
@@ -132,17 +232,17 @@ async function _pruneAll(args: {
  * only a retired scope produces are deleted unless a workspace uses them,
  * other listings only lose the key, and the scope's checkpoint is deleted.
  *
+ * Records the prune in `pipeline_executions`, including a dry run or a
+ * declined one.
+ *
  * @param options.name - The pipeline's directory name.
  * @param options.scope - Prune only this scope.
  * @param options.isDryRun - Print the plan and change nothing.
  * @param options.local - Read live scopes from this checkout, not the server.
  */
-export async function pruneRetiredScopesCommand(options: {
-  name: string;
-  scope?: string;
-  isDryRun: boolean;
-  local: boolean;
-}): Promise<void> {
+export async function pruneRetiredScopesCommand(
+  options: _PruneOptions,
+): Promise<void> {
   const { name } = options;
   try {
     if (options.scope !== undefined) {
@@ -151,36 +251,22 @@ export async function pruneRetiredScopesCommand(options: {
     _assertLocalOnlyInDevelopment(options.local);
     const target = getPostgrestTarget();
     announcePostgrestTarget(target);
-    const [live, stored] = await Promise.all([
-      fetchLivePipelineScopes({ pipelineName: name, local: options.local }),
-      listStoredScopes({ target, pipelineName: name }),
-    ]);
-    const retired = findRetiredScopes({
-      stored,
-      live,
-      scopeKey: options.scope,
+    await runRecordedCliCommand({
+      target,
+      start: {
+        pipelineName: name,
+        command: "prune_retired_scopes",
+        isDryRun: options.isDryRun,
+        isScoped: options.scope !== undefined,
+        arguments: {
+          ...(options.scope === undefined ? {} : { scope: options.scope }),
+          dryRun: options.isDryRun,
+        },
+      },
+      work: (recordScope) => {
+        return _pruneRetiredScopes({ target, options, recordScope });
+      },
     });
-    if (retired.length === 0) {
-      printSuccess(`The ${name} pipeline has no retired scopes.`);
-      return;
-    }
-    const plans = await _planPrunes({ target, name, retired });
-    if (plans.length === 0) {
-      printSuccess(`The ${name} pipeline's retired scopes have nothing to prune.`);
-      return;
-    }
-    if (options.isDryRun) {
-      printInfo("Dry run: nothing was changed.");
-      return;
-    }
-    const isConfirmed = await promptToConfirmReset(
-      `Prune ${plans.length} retired scope(s) of ${name}?`,
-    );
-    if (!isConfirmed) {
-      printInfo("Prune cancelled. Nothing was changed.");
-      return;
-    }
-    await _pruneAll({ target, name, plans });
   } catch (error: unknown) {
     printError(`Failed to prune retired scopes of pipeline: ${name}`);
     printError(error instanceof Error ? error.message : String(error));
@@ -197,7 +283,8 @@ export const PruneRetiredScopesCli = Acclimate.createCLI("prune-retired-scopes")
       "scopes from the pipeline server and the database in .env.development, " +
       "or the --staging/--prod ones. Do not run it while a pipeline run is " +
       "in progress: the run can write back the checkpoints and scope keys " +
-      "it removes.",
+      "it removes. Records each prune, including a dry run, in the " +
+      "database's pipeline_executions table.",
   )
   .addPositionalArg({
     name: "name",
