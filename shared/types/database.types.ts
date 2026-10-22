@@ -1234,6 +1234,338 @@ export type Database = {
           },
         ]
       }
+      pipeline_execution_scopes: {
+        Row: {
+          avg_columns_per_listing: number | null
+          checkpoint_after: string | null
+          checkpoint_before: string | null
+          checkpoint_write_ms: number
+          checkpoints_deleted: number
+          columns_considered: number
+          columns_written: number
+          created_at: string
+          datasets_fetched: number
+          drive_key: string
+          duration_ms: number | null
+          error: string | null
+          execution_id: string
+          extract_ms: number
+          finished_at: string
+          id: string
+          listings_considered: number
+          listings_deleted: number
+          listings_detached: number
+          listings_kept_in_use: number
+          listings_unchanged: number
+          listings_written: number
+          load_parquet_build_ms: number
+          load_parquet_upload_ms: number
+          load_read_ms: number
+          load_write_ms: number
+          max_columns_per_listing: number
+          page_count: number
+          parquet_bytes_written: number
+          parquet_rows_written: number
+          parquet_uploads_skipped: number
+          pipeline_metrics: Json
+          pipeline_name: string
+          scope_key: string
+          setup_ms: number
+          source_bytes_reported: number | null
+          source_csv_bytes: number
+          started_at: string
+          status: Database["public"]["Enums"]["pipeline_execution_scopes__status"]
+          transform_ms: number
+          window_since: string | null
+          window_until: string | null
+          write_batches: number
+        }
+        Insert: {
+          avg_columns_per_listing?: number | null
+          checkpoint_after?: string | null
+          checkpoint_before?: string | null
+          checkpoint_write_ms?: number
+          checkpoints_deleted?: number
+          columns_considered?: number
+          columns_written?: number
+          created_at?: string
+          datasets_fetched?: number
+          drive_key: string
+          duration_ms?: number | null
+          error?: string | null
+          execution_id: string
+          extract_ms?: number
+          finished_at: string
+          id?: string
+          listings_considered?: number
+          listings_deleted?: number
+          listings_detached?: number
+          listings_kept_in_use?: number
+          listings_unchanged?: number
+          listings_written?: number
+          load_parquet_build_ms?: number
+          load_parquet_upload_ms?: number
+          load_read_ms?: number
+          load_write_ms?: number
+          max_columns_per_listing?: number
+          page_count?: number
+          parquet_bytes_written?: number
+          parquet_rows_written?: number
+          parquet_uploads_skipped?: number
+          pipeline_metrics?: Json
+          pipeline_name: string
+          scope_key: string
+          setup_ms?: number
+          source_bytes_reported?: number | null
+          source_csv_bytes?: number
+          started_at: string
+          status: Database["public"]["Enums"]["pipeline_execution_scopes__status"]
+          transform_ms?: number
+          window_since?: string | null
+          window_until?: string | null
+          write_batches?: number
+        }
+        Update: {
+          avg_columns_per_listing?: number | null
+          checkpoint_after?: string | null
+          checkpoint_before?: string | null
+          checkpoint_write_ms?: number
+          checkpoints_deleted?: number
+          columns_considered?: number
+          columns_written?: number
+          created_at?: string
+          datasets_fetched?: number
+          drive_key?: string
+          duration_ms?: number | null
+          error?: string | null
+          execution_id?: string
+          extract_ms?: number
+          finished_at?: string
+          id?: string
+          listings_considered?: number
+          listings_deleted?: number
+          listings_detached?: number
+          listings_kept_in_use?: number
+          listings_unchanged?: number
+          listings_written?: number
+          load_parquet_build_ms?: number
+          load_parquet_upload_ms?: number
+          load_read_ms?: number
+          load_write_ms?: number
+          max_columns_per_listing?: number
+          page_count?: number
+          parquet_bytes_written?: number
+          parquet_rows_written?: number
+          parquet_uploads_skipped?: number
+          pipeline_metrics?: Json
+          pipeline_name?: string
+          scope_key?: string
+          setup_ms?: number
+          source_bytes_reported?: number | null
+          source_csv_bytes?: number
+          started_at?: string
+          status?: Database["public"]["Enums"]["pipeline_execution_scopes__status"]
+          transform_ms?: number
+          window_since?: string | null
+          window_until?: string | null
+          write_batches?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_execution_scopes_execution_id_fkey"
+            columns: ["execution_id"]
+            isOneToOne: false
+            referencedRelation: "pipeline_executions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pipeline_executions: {
+        Row: {
+          actor: string | null
+          arguments: Json
+          catalog_api_listings: number | null
+          catalog_columns: number | null
+          catalog_listings: number | null
+          catalog_prebuilt_listings: number | null
+          catalog_unverified_listings: number | null
+          catalog_verified_listings: number | null
+          checkpoint_write_ms: number
+          checkpoints_deleted: number
+          cli_argv: string[] | null
+          code_version: string | null
+          columns_considered: number
+          columns_written: number
+          command: Database["public"]["Enums"]["pipeline_executions__command"]
+          created_at: string
+          datasets_fetched: number
+          drive_count: number
+          duration_ms: number | null
+          error: string | null
+          extract_ms: number
+          finished_at: string | null
+          host: string | null
+          id: string
+          invoked_via: Database["public"]["Enums"]["pipeline_executions__invoked_via"]
+          is_dry_run: boolean
+          is_limited: boolean
+          is_scoped: boolean
+          is_windowed: boolean
+          listings_considered: number
+          listings_deleted: number
+          listings_detached: number
+          listings_kept_in_use: number
+          listings_unchanged: number
+          listings_written: number
+          load_parquet_build_ms: number
+          load_parquet_upload_ms: number
+          load_read_ms: number
+          load_write_ms: number
+          max_columns_per_listing: number
+          page_count: number
+          parquet_bytes_written: number
+          parquet_rows_written: number
+          parquet_uploads_skipped: number
+          pipeline_name: string
+          request_body: Json | null
+          run_mode:
+            | Database["public"]["Enums"]["pipeline_executions__run_mode"]
+            | null
+          scope_count: number
+          setup_ms: number
+          source_bytes_reported: number | null
+          source_csv_bytes: number
+          started_at: string
+          status: Database["public"]["Enums"]["pipeline_executions__status"]
+          transform_ms: number
+          updated_at: string
+          workspace_datasets_deleted: number
+          write_batches: number
+        }
+        Insert: {
+          actor?: string | null
+          arguments?: Json
+          catalog_api_listings?: number | null
+          catalog_columns?: number | null
+          catalog_listings?: number | null
+          catalog_prebuilt_listings?: number | null
+          catalog_unverified_listings?: number | null
+          catalog_verified_listings?: number | null
+          checkpoint_write_ms?: number
+          checkpoints_deleted?: number
+          cli_argv?: string[] | null
+          code_version?: string | null
+          columns_considered?: number
+          columns_written?: number
+          command: Database["public"]["Enums"]["pipeline_executions__command"]
+          created_at?: string
+          datasets_fetched?: number
+          drive_count?: number
+          duration_ms?: number | null
+          error?: string | null
+          extract_ms?: number
+          finished_at?: string | null
+          host?: string | null
+          id?: string
+          invoked_via: Database["public"]["Enums"]["pipeline_executions__invoked_via"]
+          is_dry_run?: boolean
+          is_limited?: boolean
+          is_scoped?: boolean
+          is_windowed?: boolean
+          listings_considered?: number
+          listings_deleted?: number
+          listings_detached?: number
+          listings_kept_in_use?: number
+          listings_unchanged?: number
+          listings_written?: number
+          load_parquet_build_ms?: number
+          load_parquet_upload_ms?: number
+          load_read_ms?: number
+          load_write_ms?: number
+          max_columns_per_listing?: number
+          page_count?: number
+          parquet_bytes_written?: number
+          parquet_rows_written?: number
+          parquet_uploads_skipped?: number
+          pipeline_name: string
+          request_body?: Json | null
+          run_mode?:
+            | Database["public"]["Enums"]["pipeline_executions__run_mode"]
+            | null
+          scope_count?: number
+          setup_ms?: number
+          source_bytes_reported?: number | null
+          source_csv_bytes?: number
+          started_at?: string
+          status?: Database["public"]["Enums"]["pipeline_executions__status"]
+          transform_ms?: number
+          updated_at?: string
+          workspace_datasets_deleted?: number
+          write_batches?: number
+        }
+        Update: {
+          actor?: string | null
+          arguments?: Json
+          catalog_api_listings?: number | null
+          catalog_columns?: number | null
+          catalog_listings?: number | null
+          catalog_prebuilt_listings?: number | null
+          catalog_unverified_listings?: number | null
+          catalog_verified_listings?: number | null
+          checkpoint_write_ms?: number
+          checkpoints_deleted?: number
+          cli_argv?: string[] | null
+          code_version?: string | null
+          columns_considered?: number
+          columns_written?: number
+          command?: Database["public"]["Enums"]["pipeline_executions__command"]
+          created_at?: string
+          datasets_fetched?: number
+          drive_count?: number
+          duration_ms?: number | null
+          error?: string | null
+          extract_ms?: number
+          finished_at?: string | null
+          host?: string | null
+          id?: string
+          invoked_via?: Database["public"]["Enums"]["pipeline_executions__invoked_via"]
+          is_dry_run?: boolean
+          is_limited?: boolean
+          is_scoped?: boolean
+          is_windowed?: boolean
+          listings_considered?: number
+          listings_deleted?: number
+          listings_detached?: number
+          listings_kept_in_use?: number
+          listings_unchanged?: number
+          listings_written?: number
+          load_parquet_build_ms?: number
+          load_parquet_upload_ms?: number
+          load_read_ms?: number
+          load_write_ms?: number
+          max_columns_per_listing?: number
+          page_count?: number
+          parquet_bytes_written?: number
+          parquet_rows_written?: number
+          parquet_uploads_skipped?: number
+          pipeline_name?: string
+          request_body?: Json | null
+          run_mode?:
+            | Database["public"]["Enums"]["pipeline_executions__run_mode"]
+            | null
+          scope_count?: number
+          setup_ms?: number
+          source_bytes_reported?: number | null
+          source_csv_bytes?: number
+          started_at?: string
+          status?: Database["public"]["Enums"]["pipeline_executions__status"]
+          transform_ms?: number
+          updated_at?: string
+          workspace_datasets_deleted?: number
+          write_batches?: number
+        }
+        Relationships: []
+      }
       pipeline_scope_checkpoints: {
         Row: {
           created_at: string
@@ -2550,6 +2882,16 @@ export type Database = {
       db_connections__connection_type: "postgres"
       db_connections__postgres_ssl_mode: "disable" | "require"
       nux_status: "not_started" | "in_progress" | "completed" | "dismissed"
+      pipeline_execution_scopes__status: "succeeded" | "failed" | "skipped"
+      pipeline_executions__command: "run" | "reset" | "prune_retired_scopes"
+      pipeline_executions__invoked_via: "cli_local" | "cli_server" | "http"
+      pipeline_executions__run_mode: "full" | "incremental"
+      pipeline_executions__status:
+        | "running"
+        | "succeeded"
+        | "partially_failed"
+        | "failed"
+        | "cancelled"
       resource_type: "dashboard" | "dataset" | "map"
       role_level: "viewer" | "editor" | "admin"
       share_principal_type: "user" | "user_group" | "workspace"
@@ -2807,6 +3149,17 @@ export const Constants = {
       db_connections__connection_type: ["postgres"],
       db_connections__postgres_ssl_mode: ["disable", "require"],
       nux_status: ["not_started", "in_progress", "completed", "dismissed"],
+      pipeline_execution_scopes__status: ["succeeded", "failed", "skipped"],
+      pipeline_executions__command: ["run", "reset", "prune_retired_scopes"],
+      pipeline_executions__invoked_via: ["cli_local", "cli_server", "http"],
+      pipeline_executions__run_mode: ["full", "incremental"],
+      pipeline_executions__status: [
+        "running",
+        "succeeded",
+        "partially_failed",
+        "failed",
+        "cancelled",
+      ],
       resource_type: ["dashboard", "dataset", "map"],
       role_level: ["viewer", "editor", "admin"],
       share_principal_type: ["user", "user_group", "workspace"],

@@ -180,6 +180,10 @@ export const EXCLUDED_TABLES = [
   // Pipeline crawl state, written by the pipeline server with the service
   // role. Nothing the desktop renders.
   "pipeline_scope_checkpoints",
+  // Pipeline execution history, written with the service role for audit and
+  // debugging. Nothing the desktop renders.
+  "pipeline_executions",
+  "pipeline_execution_scopes",
 ] as const;
 
 /**
