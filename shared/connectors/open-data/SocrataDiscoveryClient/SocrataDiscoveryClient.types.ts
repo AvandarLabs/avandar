@@ -9,6 +9,23 @@ export type SocrataDiscoveryResult = {
   createdAt: string;
   /** When the asset last changed in any way, as ISO 8601 with a time zone. */
   updatedAt: string;
+  /**
+   * The dataset's columns, in the order the Discovery API lists them, which
+   * is not always the dataset's own column order. Includes Socrata's
+   * computed region columns (`:@computed_region_...`), which a `.csv`
+   * export leaves out.
+   */
+  columns: SocrataDiscoveryColumn[];
+};
+
+/** One column of a Discovery API result. */
+export type SocrataDiscoveryColumn = {
+  /** The API name, e.g. `sample_date`. A `.csv` export's header uses it. */
+  fieldName: string;
+  /** The display name, e.g. `Sample Date`. */
+  name: string;
+  /** Socrata's display data type, e.g. `Text`, `Number`, `Calendar date`. */
+  dataType: string;
 };
 
 /** A Discovery API result left out of a page because it failed validation. */

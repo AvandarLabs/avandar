@@ -12,12 +12,32 @@ const SocrataTimestampSchema = z.iso.datetime({ offset: true });
  * fails this schema is skipped on its own, not the page it arrived in.
  */
 export const SocrataDiscoveryResultSchema = z.object({
-  resource: z.object({
-    id: z.string(),
-    name: z.string(),
-    createdAt: SocrataTimestampSchema,
-    updatedAt: SocrataTimestampSchema,
-  }),
+  resource: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      createdAt: SocrataTimestampSchema,
+      updatedAt: SocrataTimestampSchema,
+      // Three parallel lists, one entry per column. A result that lists no
+      // columns has none of them.
+      columns_name: z.array(z.string()).default([]),
+      columns_field_name: z.array(z.string()).default([]),
+      columns_datatype: z.array(z.string()).default([]),
+    })
+    .refine(
+      (resource) => {
+        return (
+          resource.columns_name.length === resource.columns_field_name.length &&
+          resource.columns_datatype.length ===
+            resource.columns_field_name.length
+        );
+      },
+      {
+        message:
+          "columns_name, columns_field_name, and columns_datatype must have one entry per column",
+        path: ["columns_field_name"],
+      },
+    ),
   metadata: z.object({ domain: z.string() }),
 });
 

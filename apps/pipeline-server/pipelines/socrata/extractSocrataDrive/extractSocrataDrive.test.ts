@@ -1,10 +1,10 @@
 import { extractSocrataDrive } from "@pipelines/socrata/extractSocrataDrive/extractSocrataDrive";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { EtlRunWindow } from "@avandar/etl";
 import type {
   SocrataDiscoveryClient,
   SocrataDiscoveryResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
+import type { EtlRunWindow } from "@avandar/etl";
 import type {
   ConfiguredDrive,
   SocrataScope,
@@ -32,6 +32,7 @@ function _catalog(size: number): SocrataDiscoveryResult[] {
       domain: "data.cityofnewyork.us",
       createdAt: "2026-01-01T00:00:00.000Z",
       updatedAt: _at(index).toISOString(),
+      columns: [{ fieldName: "a", name: "A", dataType: "Text" }],
     };
   });
 }
@@ -57,7 +58,10 @@ function _discoveryOver(
             return invalidIds.includes(result.datasetId);
           })
           .map((result) => {
-            return { datasetId: result.datasetId, reason: "updatedAt: Invalid" };
+            return {
+              datasetId: result.datasetId,
+              reason: "updatedAt: Invalid",
+            };
           }),
         resultSetSize,
       };

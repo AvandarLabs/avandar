@@ -3,14 +3,14 @@ import { CONFIGURED_DRIVES } from "@pipelines/socrata/configuredDrives/configure
 import { extractSocrataDrive } from "@pipelines/socrata/extractSocrataDrive/extractSocrataDrive";
 import { makeApiResourceRelationFromSocrataResult } from "@pipelines/socrata/makeApiResourceRelationFromSocrataResult/makeApiResourceRelationFromSocrataResult";
 import type {
+  SocrataDiscoveryClient,
+  SocrataDiscoveryResult,
+} from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
+import type {
   EtlDestination,
   EtlEngineInstance,
   EtlStores,
 } from "@avandar/etl";
-import type {
-  SocrataDiscoveryClient,
-  SocrataDiscoveryResult,
-} from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
 import type {
   ConfiguredDrive,
   SocrataScope,
@@ -58,9 +58,11 @@ export function createSocrataEtlEngine(
       return result.datasetId;
     },
     transform: ({ drive, connection }) => {
-      return [
-        makeApiResourceRelationFromSocrataResult({ drive, result: connection }),
-      ];
+      const relation = makeApiResourceRelationFromSocrataResult({
+        drive,
+        result: connection,
+      });
+      return relation === undefined ? [] : [relation];
     },
     incremental: {
       getConnectionTimestamp: (result) => {

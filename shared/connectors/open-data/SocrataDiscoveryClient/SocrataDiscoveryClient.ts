@@ -50,6 +50,13 @@ function _splitValidResults(rawResults: readonly unknown[]): {
       domain: metadata.domain,
       createdAt: resource.createdAt,
       updatedAt: resource.updatedAt,
+      columns: resource.columns_field_name.map((fieldName, index) => {
+        return {
+          fieldName,
+          name: resource.columns_name[index] ?? fieldName,
+          dataType: resource.columns_datatype[index] ?? "",
+        };
+      }),
     });
   });
   return { results, skippedResults };

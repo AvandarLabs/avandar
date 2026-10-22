@@ -4,11 +4,11 @@ import {
 } from "@avandar/etl";
 import { createSocrataEtlEngine } from "@pipelines/socrata/createSocrataEtlEngine/createSocrataEtlEngine";
 import { describe, expect, it, vi } from "vitest";
-import type { EtlStores } from "@avandar/etl";
 import type {
   SocrataDiscoveryClient,
   SocrataDiscoveryResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
+import type { EtlStores } from "@avandar/etl";
 
 const DRIVE = {
   baseUrl: "https://data.cityofnewyork.us",
@@ -16,7 +16,8 @@ const DRIVE = {
 };
 const OUTPUT = {
   listingsTable: "data_catalog_listings",
-  upsertListingsFunction: "rpc_data_catalog_listings__upsert_with_relation_columns",
+  upsertListingsFunction:
+    "rpc_data_catalog_listings__upsert_with_relation_columns",
 };
 
 function _catalog(size: number): SocrataDiscoveryResult[] {
@@ -27,6 +28,7 @@ function _catalog(size: number): SocrataDiscoveryResult[] {
       domain: "data.cityofnewyork.us",
       createdAt: "2026-01-01T00:00:00.000Z",
       updatedAt: new Date(Date.UTC(2026, 9, 1, 0, index)).toISOString(),
+      columns: [{ fieldName: "a", name: "A", dataType: "Text" }],
     };
   });
 }
@@ -77,6 +79,42 @@ describe("createSocrataEtlEngine", () => {
       ["socrata", DRIVE.baseUrl, "2026-10-01T00:01:00.000Z"],
       ["socrata", DRIVE.baseUrl, "2026-10-01T00:02:00.000Z"],
     ]);
+  });
+
+  it("writes each listing's columns with it, and skips a dataset with none the export has", async () => {
+    const listings = createInMemoryListingsStore();
+    const catalog = _catalog(2).map((result, index) => {
+      return index === 0
+        ? result
+        : {
+            ...result,
+            columns: [
+              {
+                fieldName: ":@computed_region_92fq_4b7q",
+                name: "Region",
+                dataType: "Number",
+              },
+            ],
+          };
+    });
+
+    const report = await _engine(
+      {
+        listings,
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+      },
+      catalog,
+    ).run({ mode: "full" });
+
+    const [row] = listings.getRows();
+    expect([
+      report.crawls[0]?.relationsWritten,
+      listings.getRows().length,
+      listings.getRelationColumns(row?.id ?? "")?.map((column) => {
+        return [column.column_name, column.cast_data_type];
+      }),
+    ]).toEqual([1, 1, [["a", "VARCHAR"]]]);
   });
 
   it("writes each dataset once across overlapping pages", async () => {
