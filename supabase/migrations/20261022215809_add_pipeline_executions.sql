@@ -123,7 +123,7 @@ alter table "public"."pipeline_executions" enable row level security;
 
 CREATE INDEX pipeline_execution_scopes__drive_started ON public.pipeline_execution_scopes USING btree (pipeline_name, drive_key, started_at DESC);
 
-CREATE INDEX pipeline_execution_scopes__execution ON public.pipeline_execution_scopes USING btree (execution_id);
+CREATE UNIQUE INDEX pipeline_execution_scopes__one_per_scope ON public.pipeline_execution_scopes USING btree (execution_id, drive_key, scope_key);
 
 CREATE UNIQUE INDEX pipeline_execution_scopes_pkey ON public.pipeline_execution_scopes USING btree (id);
 
@@ -135,6 +135,12 @@ alter table "public"."pipeline_execution_scopes" add constraint "pipeline_execut
 
 alter table "public"."pipeline_executions" add constraint "pipeline_executions_pkey" PRIMARY KEY using index "pipeline_executions_pkey";
 
+alter table "public"."pipeline_execution_scopes" add constraint "pipeline_execution_scopes__finishes_after_start" CHECK ((finished_at >= started_at)) not valid;
+
+alter table "public"."pipeline_execution_scopes" validate constraint "pipeline_execution_scopes__finishes_after_start";
+
+alter table "public"."pipeline_execution_scopes" add constraint "pipeline_execution_scopes__one_per_scope" UNIQUE using index "pipeline_execution_scopes__one_per_scope";
+
 alter table "public"."pipeline_execution_scopes" add constraint "pipeline_execution_scopes_execution_id_fkey" FOREIGN KEY (execution_id) REFERENCES public.pipeline_executions(id) ON DELETE CASCADE not valid;
 
 alter table "public"."pipeline_execution_scopes" validate constraint "pipeline_execution_scopes_execution_id_fkey";
@@ -142,6 +148,10 @@ alter table "public"."pipeline_execution_scopes" validate constraint "pipeline_e
 alter table "public"."pipeline_executions" add constraint "pipeline_executions__finished_unless_running" CHECK (((status = 'running'::public.pipeline_executions__status) = (finished_at IS NULL))) not valid;
 
 alter table "public"."pipeline_executions" validate constraint "pipeline_executions__finished_unless_running";
+
+alter table "public"."pipeline_executions" add constraint "pipeline_executions__finishes_after_start" CHECK ((finished_at >= started_at)) not valid;
+
+alter table "public"."pipeline_executions" validate constraint "pipeline_executions__finishes_after_start";
 
 alter table "public"."pipeline_executions" add constraint "pipeline_executions__run_mode_only_on_runs" CHECK (((command = 'run'::public.pipeline_executions__command) = (run_mode IS NOT NULL))) not valid;
 

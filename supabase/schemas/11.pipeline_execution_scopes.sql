@@ -69,7 +69,11 @@ create table public.pipeline_execution_scopes (
   -- Counters and timers only one pipeline has, such as
   -- `hdx.parquet_footer_reads`.
   pipeline_metrics jsonb not null default '{}',
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  -- One row per drive and scope per execution, so a retried write cannot
+  -- double the execution's totals. Also indexes the foreign key.
+  constraint pipeline_execution_scopes__one_per_scope unique (execution_id, drive_key, scope_key),
+  constraint pipeline_execution_scopes__finishes_after_start check (finished_at >= started_at)
 );
 
 -- When was this drive last crawled.
@@ -78,9 +82,6 @@ create index pipeline_execution_scopes__drive_started on public.pipeline_executi
   drive_key,
   started_at desc
 );
-
--- The foreign key, and an execution's scope rows.
-create index pipeline_execution_scopes__execution on public.pipeline_execution_scopes (execution_id);
 
 -- RLS on with no policies: only the service role, which bypasses RLS, ever
 -- reaches this table.

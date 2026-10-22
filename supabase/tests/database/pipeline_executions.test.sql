@@ -7,7 +7,7 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(7);
+select plan(11);
 
 -- ---------------------------------------------------------------------------
 -- pipeline_executions
@@ -17,7 +17,7 @@ select throws_ok(
   $$insert into public.pipeline_executions (pipeline_name, command, invoked_via)
     values ('pgtap-fixture', 'run', 'cli_local')$$,
   '23514',
-  null,
+  'new row for relation "pipeline_executions" violates check constraint "pipeline_executions__run_mode_only_on_runs"',
   'a run needs a run mode'
 );
 
@@ -25,7 +25,7 @@ select throws_ok(
   $$insert into public.pipeline_executions (pipeline_name, command, run_mode, invoked_via)
     values ('pgtap-fixture', 'reset', 'full', 'cli_local')$$,
   '23514',
-  null,
+  'new row for relation "pipeline_executions" violates check constraint "pipeline_executions__run_mode_only_on_runs"',
   'only a run has a run mode'
 );
 
@@ -33,8 +33,18 @@ select throws_ok(
   $$insert into public.pipeline_executions (pipeline_name, command, invoked_via, status)
     values ('pgtap-fixture', 'reset', 'cli_local', 'succeeded')$$,
   '23514',
-  null,
+  'new row for relation "pipeline_executions" violates check constraint "pipeline_executions__finished_unless_running"',
   'a finished execution has a finish time'
+);
+
+select throws_ok(
+  $$insert into public.pipeline_executions
+      (pipeline_name, command, invoked_via, status, started_at, finished_at)
+    values ('pgtap-fixture', 'reset', 'cli_local', 'succeeded',
+            '2026-10-22T10:00:01Z', '2026-10-22T10:00:00Z')$$,
+  '23514',
+  'new row for relation "pipeline_executions" violates check constraint "pipeline_executions__finishes_after_start"',
+  'an execution cannot finish before it starts'
 );
 
 insert into public.pipeline_executions
@@ -75,6 +85,41 @@ select results_eq(
     order by scope_key$$,
   $$values ('all', 2.5::numeric), ('empty', null::numeric)$$,
   'avg_columns_per_listing divides columns by listings, and is null with no listings'
+);
+
+select throws_ok(
+  $$insert into public.pipeline_execution_scopes
+      (execution_id, pipeline_name, drive_key, scope_key, status, started_at, finished_at)
+    values ('ea100001-0000-4000-8000-000000000001'::uuid, 'pgtap-fixture',
+            'https://pgtap-fixture.invalid', 'all', 'succeeded',
+            '2026-10-22T10:00:00Z', '2026-10-22T10:00:01Z')$$,
+  '23505',
+  'duplicate key value violates unique constraint "pipeline_execution_scopes__one_per_scope"',
+  'an execution has one row per drive and scope'
+);
+
+select throws_ok(
+  $$insert into public.pipeline_execution_scopes
+      (execution_id, pipeline_name, drive_key, scope_key, status, started_at, finished_at)
+    values ('ea100001-0000-4000-8000-000000000001'::uuid, 'pgtap-fixture',
+            'https://pgtap-fixture.invalid', 'backwards', 'succeeded',
+            '2026-10-22T10:00:01Z', '2026-10-22T10:00:00Z')$$,
+  '23514',
+  'new row for relation "pipeline_execution_scopes" violates check constraint "pipeline_execution_scopes__finishes_after_start"',
+  'a scope cannot finish before it starts'
+);
+
+delete from public.pipeline_executions
+where id = 'ea100001-0000-4000-8000-000000000001'::uuid;
+
+select is(
+  (
+    select count(*)
+    from public.pipeline_execution_scopes
+    where execution_id = 'ea100001-0000-4000-8000-000000000001'::uuid
+  ),
+  0::bigint,
+  'deleting an execution deletes its scope rows'
 );
 
 -- ---------------------------------------------------------------------------

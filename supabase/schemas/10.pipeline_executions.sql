@@ -61,7 +61,8 @@ create table public.pipeline_executions (
   load_parquet_upload_ms bigint not null default 0,
   load_write_ms bigint not null default 0,
   checkpoint_write_ms bigint not null default 0,
-  -- Volume and width, summed over the scope rows.
+  -- Volume and width over the scope rows: counts of drives and scopes, the
+  -- widest listing, and sums for the rest.
   drive_count integer not null default 0,
   scope_count integer not null default 0,
   page_count integer not null default 0,
@@ -101,7 +102,8 @@ create table public.pipeline_executions (
   ),
   constraint pipeline_executions__finished_unless_running check (
     (status = 'running') = (finished_at is null)
-  )
+  ),
+  constraint pipeline_executions__finishes_after_start check (finished_at >= started_at)
 );
 
 -- Recent executions of one pipeline.
