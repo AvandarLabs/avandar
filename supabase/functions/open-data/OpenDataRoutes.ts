@@ -1,6 +1,15 @@
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
-import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import {
+  defineRoutes,
+  GET,
+  POST,
+} from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
+import {
+  respondWithColumnTypeSample,
+  VerifiedColumnTypesBodySchema,
+  writeVerifiedColumnTypes,
+} from "@sbfn/open-data/columnTypeVerification/columnTypeVerification.ts";
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { string } from "zod";
 import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
@@ -13,6 +22,7 @@ import { HttpClientFactory } from "$/utils/HttpClientFactory/HttpClientFactory.t
 import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * The largest resource this route will relay. Kept well under the response size
@@ -95,6 +105,39 @@ async function _resolveOpenDataAcquisition(
 }
 
 /**
+ * Reads one catalog listing as the caller, so RLS decides whether they may
+ * see it.
+ *
+ * @returns The listing, or a 404 response when there is none to see.
+ */
+async function _readCatalogListing(
+  supabaseClient: SupabaseClient,
+  catalogListingId: string,
+): Promise<DataCatalogListing.T | Response> {
+  const { data, error } = await supabaseClient
+    .from("data_catalog_listings")
+    .select("*")
+    .eq("id", catalogListingId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+  if (!data) {
+    return new Response(
+      JSON.stringify({ error: { code: "catalog-entry-not-found" } }),
+      {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+  return DataCatalogListingParsers.fromDBReadToModelRead(
+    DataCatalogListingParsers.DBReadSchema.parse(data),
+  );
+}
+
+/**
  * Reads open data sources described by Avandar's catalog.
  *
  * This route exists because a browser cannot read a CKAN resource itself. CKAN
@@ -115,28 +158,13 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
       path: "/data-catalog-listings/:catalogListingId/resource",
       schema: { catalogListingId: string().uuid() },
     }).action(async ({ pathParams, supabaseClient }): Promise<Response> => {
-      const { data, error } = await supabaseClient
-        .from("data_catalog_listings")
-        .select("*")
-        .eq("id", pathParams.catalogListingId)
-        .maybeSingle();
-
-      if (error) {
-        throw error;
-      }
-      if (!data) {
-        return new Response(
-          JSON.stringify({ error: { code: "catalog-entry-not-found" } }),
-          {
-            status: 404,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
-
-      const entry = DataCatalogListingParsers.fromDBReadToModelRead(
-        DataCatalogListingParsers.DBReadSchema.parse(data),
+      const entry = await _readCatalogListing(
+        supabaseClient,
+        pathParams.catalogListingId,
       );
+      if (entry instanceof Response) {
+        return entry;
+      }
 
       try {
         const acquisition = await _resolveOpenDataAcquisition(entry);
@@ -160,5 +188,51 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
         throw caught;
       }
     }),
+  },
+  "/data-catalog-listings/:catalogListingId/column-type-sample": {
+    GET: GET({
+      path: "/data-catalog-listings/:catalogListingId/column-type-sample",
+      schema: { catalogListingId: string().uuid() },
+    }).action(async ({ pathParams, supabaseClient }): Promise<Response> => {
+      const entry = await _readCatalogListing(
+        supabaseClient,
+        pathParams.catalogListingId,
+      );
+      if (entry instanceof Response) {
+        return entry;
+      }
+      try {
+        return await respondWithColumnTypeSample(entry);
+      } catch (caught) {
+        if (OpenDataAcquisitionFailed.is(caught)) {
+          return _responseFromFailure(caught);
+        }
+        throw caught;
+      }
+    }),
+  },
+  "/data-catalog-listings/:catalogListingId/column-types": {
+    POST: POST({
+      path: "/data-catalog-listings/:catalogListingId/column-types",
+      schema: { catalogListingId: string().uuid() },
+    })
+      .bodySchema(VerifiedColumnTypesBodySchema)
+      .action(
+        async ({ pathParams, body, supabaseClient }): Promise<Response> => {
+          // Read as the caller first, so only a listing they can see is
+          // written.
+          const entry = await _readCatalogListing(
+            supabaseClient,
+            pathParams.catalogListingId,
+          );
+          if (entry instanceof Response) {
+            return entry;
+          }
+          return await writeVerifiedColumnTypes({
+            catalogListingId: entry.id,
+            body,
+          });
+        },
+      ),
   },
 });
