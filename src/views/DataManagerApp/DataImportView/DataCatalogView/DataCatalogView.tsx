@@ -14,7 +14,7 @@ import {
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch, IconWorldSearch } from "@tabler/icons-react";
 import Fuse from "fuse.js";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { uuid } from "$/lib/uuid";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DataCatalogRelationColumnClient } from "@/clients/data-catalog-listings/DataCatalogRelationColumnClient";
@@ -25,17 +25,43 @@ import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
   openFeaturebaseFeedbackWidget,
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
-import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { verifyOpenDataColumnTypes } from "@/lib/openData/verifyOpenDataColumnTypes/verifyOpenDataColumnTypes";
+import { ColumnTypeVerifications } from "@/lib/openData/ColumnTypeVerifications";
+import { isColumnTypeVerificationDue } from "@/lib/openData/verifyOpenDataColumnTypes/verifyOpenDataColumnTypes";
+import { Logger } from "@/utils/Logger";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOpenDataDatasetColumnInputs";
 import { DataCatalogListingDetail } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail";
 import { DataCatalogListingList } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
-import { useVerifyColumnTypesOnDwell } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useVerifyColumnTypesOnDwell/useVerifyColumnTypesOnDwell";
+import { readCatalogColumnsForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/readCatalogColumnsForAdding/readCatalogColumnsForAdding";
+import {
+  useColumnTypeVerificationStatus,
+  useVerifyColumnTypesOnDwell,
+} from "@/views/DataManagerApp/DataImportView/DataCatalogView/useVerifyColumnTypesOnDwell/useVerifyColumnTypesOnDwell";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
+import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
+
+/**
+ * Whether the open listing's column types are known: `checking` while they
+ * are unverified or stale and not known to have failed, `failed` when the
+ * last verification on this page failed, otherwise `verified`.
+ */
+function _toColumnTypeState(
+  listing: DataCatalogListingRead | undefined,
+  status: ReturnType<typeof useColumnTypeVerificationStatus>,
+): ColumnTypeState {
+  if (status === "verifying") {
+    return "checking";
+  }
+  if (listing === undefined || !isColumnTypeVerificationDue(listing)) {
+    return "verified";
+  }
+  return status === "failed" ? "failed" : "checking";
+}
 
 type Props = BoxProps & {
   /** When false, the add action is disabled (subscription limits). */
@@ -112,22 +138,19 @@ export function DataCatalogView({
     });
   }, [catalogListings, selectedId]);
 
-  // Refetches the listing and its columns once their types are verified, so
-  // "Add to workspace" uses the verified types.
-  const onColumnTypesVerified = useCallback(() => {
-    void AvaQueryClient.invalidateQueries({
-      queryKey: DataCatalogListingClient.QueryKeys.getAll(),
-    });
-    void AvaQueryClient.invalidateQueries({
-      queryKey: DataCatalogRelationColumnClient.QueryKeys.getAll(),
-    });
-  }, []);
-
   useVerifyColumnTypesOnDwell({
     listing: selectedListing,
-    verify: verifyOpenDataColumnTypes,
-    onVerified: onColumnTypesVerified,
+    coordinator: ColumnTypeVerifications,
   });
+  const columnTypeVerificationStatus = useColumnTypeVerificationStatus({
+    catalogListingId: selectedListing?.id,
+    coordinator: ColumnTypeVerifications,
+  });
+  // The listing whose "Add to workspace" is waiting for its column types to
+  // be verified before it saves.
+  const [waitingToAddListingId, setWaitingToAddListingId] = useState<
+    DataCatalogListing.Id | undefined
+  >();
 
   const [insertOpenDataDataset, isInsertPending] =
     DatasetClient.useInsertOpenDataDataset({
@@ -141,16 +164,48 @@ export function DataCatalogView({
       queriesToInvalidate: [DatasetClient.QueryKeys.getAll()],
     });
 
-  function onAddToWorkspace(): void {
+  async function _readColumnsForAdding(
+    listing: DataCatalogListingRead,
+  ): Promise<readonly DataCatalogRelationColumn.T[] | undefined> {
+    setWaitingToAddListingId(listing.id);
+    try {
+      return await readCatalogColumnsForAdding({
+        listing,
+        coordinator: ColumnTypeVerifications,
+        readColumns: (catalogListingId) => {
+          return DataCatalogRelationColumnClient.getAll(
+            where("catalog_listing_id", "eq", catalogListingId),
+          );
+        },
+      });
+    } catch (error) {
+      Logger.warn("Could not verify a catalog listing's columns to add it", {
+        catalogListingId: listing.id,
+        error,
+      });
+      notifyError({
+        title: t`Cannot add dataset yet`,
+        message: t`We couldn't check this dataset's columns. Try adding it again.`,
+      });
+      return undefined;
+    } finally {
+      setWaitingToAddListingId(undefined);
+    }
+  }
+
+  async function onAddToWorkspace(): Promise<void> {
     if (!selectedListing) {
       return;
     }
-
+    const listing = selectedListing;
+    const columns = await _readColumnsForAdding(listing);
+    if (columns === undefined) {
+      return;
+    }
     const columnInputs = resolveOpenDataDatasetColumnInputs({
-      catalogColumns: catalogListingColumns,
-      metadata: selectedListing.metadata,
+      catalogColumns: [...columns],
+      metadata: listing.metadata,
     });
-
     if (!columnInputs) {
       notifyError({
         title: t`Cannot add dataset`,
@@ -158,13 +213,12 @@ export function DataCatalogView({
       });
       return;
     }
-
     insertOpenDataDataset({
-      catalogListingId: selectedListing.id,
+      catalogListingId: listing.id,
       columns: columnInputs,
-      datasetDescription: selectedListing.description ?? "",
+      datasetDescription: listing.description ?? "",
       datasetId: uuid(),
-      datasetName: selectedListing.displayName,
+      datasetName: listing.displayName,
       workspaceId: workspace.id,
     });
   }
@@ -301,10 +355,21 @@ export function DataCatalogView({
                 <div className={css.dataCatalogViewBrowserDetail}>
                   <DataCatalogListingDetail
                     listing={selectedListing}
+                    columns={catalogListingColumns}
+                    columnTypeState={_toColumnTypeState(
+                      selectedListing,
+                      columnTypeVerificationStatus,
+                    )}
                     isAddAllowed={isAddAllowed}
                     isAdding={isInsertPending}
+                    isWaitingForColumnTypes={
+                      waitingToAddListingId !== undefined &&
+                      waitingToAddListingId === selectedListing?.id
+                    }
                     isLoadingColumnMetadata={isLoadingCatalogColumns}
-                    onAddToWorkspace={onAddToWorkspace}
+                    onAddToWorkspace={() => {
+                      void onAddToWorkspace();
+                    }}
                   />
                 </div>
               </>

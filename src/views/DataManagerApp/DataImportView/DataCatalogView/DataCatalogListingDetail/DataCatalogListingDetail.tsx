@@ -13,17 +13,29 @@ import { IconChevronDown, IconPlus } from "@tabler/icons-react";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
+import { DataCatalogListingColumns } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.module.css";
 import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
+import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";
+import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
 import type { ReactNode } from "react";
 
 type Props = {
   /** Selected catalog listing, or none when nothing is selected. */
   listing: DataCatalogListingRead | undefined;
+  /** The selected listing's columns, as stored. */
+  columns: readonly DataCatalogRelationColumn.T[];
+  /** Whether the selected listing's column types are confirmed yet. */
+  columnTypeState: ColumnTypeState;
   /** When false, add is blocked (e.g. subscription limit). */
   isAddAllowed: boolean;
   /** True while the insert mutation is running. */
   isAdding: boolean;
+  /**
+   * True while "Add to workspace" waits for the listing's column types to
+   * be confirmed before it saves.
+   */
+  isWaitingForColumnTypes: boolean;
   /**
    * True while loading `data_catalog_listings__relation_columns` for the
    * listing (or before the query runs). Add stays disabled until this is
@@ -44,8 +56,11 @@ type Props = {
  */
 export function DataCatalogListingDetail({
   listing,
+  columns,
+  columnTypeState,
   isAddAllowed,
   isAdding,
+  isWaitingForColumnTypes,
   isLoadingColumnMetadata,
   onAddToWorkspace,
 }: Props): ReactNode {
@@ -70,8 +85,12 @@ export function DataCatalogListingDetail({
     listing.metadata !== undefined
       ? JSON.stringify(listing.metadata, undefined, 2)
       : undefined;
+  const isAddPending = isAdding || isWaitingForColumnTypes;
   const isAddBlocked =
-    !isAddAllowed || isAdding || isLoadingColumnMetadata || offline.isBlocked;
+    !isAddAllowed ||
+    isAddPending ||
+    isLoadingColumnMetadata ||
+    offline.isBlocked;
 
   return (
     <Stack gap="md" className={css.dataCatalogListingDetail}>
@@ -86,7 +105,7 @@ export function DataCatalogListingDetail({
         <OfflineGated>
           <Button
             leftSection={<IconPlus size={16} />}
-            loading={isAdding || isLoadingColumnMetadata}
+            loading={isAddPending || isLoadingColumnMetadata}
             data-disabled={isAddBlocked || undefined}
             aria-disabled={isAddBlocked}
             aria-label={t`Add dataset to workspace`}
@@ -96,6 +115,15 @@ export function DataCatalogListingDetail({
           </Button>
         </OfflineGated>
       </Group>
+
+      {isWaitingForColumnTypes ? (
+        <Text size="sm" c="dimmed" role="status">
+          <Trans>
+            Checking this dataset's columns first. It will be added to your
+            workspace as soon as that finishes.
+          </Trans>
+        </Text>
+      ) : null}
 
       {!isAddAllowed ? (
         <Text c="danger.8" size="sm">
@@ -160,6 +188,11 @@ export function DataCatalogListingDetail({
           <AppViewRail.Fact label={t`Notes`}>{listing.notes}</AppViewRail.Fact>
         ) : null}
       </AppViewRail.Group>
+
+      <DataCatalogListingColumns
+        columns={columns}
+        columnTypeState={columnTypeState}
+      />
 
       {metadataJson ? (
         <Stack gap="xs" align="flex-start">

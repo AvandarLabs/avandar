@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createColumnTypeVerificationCoordinator } from "@/lib/openData/createColumnTypeVerificationCoordinator/createColumnTypeVerificationCoordinator";
 import { act, renderHook } from "@/test-utils";
 import {
   COLUMN_TYPE_VERIFICATION_DWELL_MS,
+  useColumnTypeVerificationStatus,
   useVerifyColumnTypesOnDwell,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useVerifyColumnTypesOnDwell/useVerifyColumnTypesOnDwell";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
@@ -22,14 +24,17 @@ function _listing(
 
 function _render(listing: DataCatalogListing.T | undefined) {
   const verify = vi.fn(async () => {});
-  const onVerified = vi.fn();
+  const coordinator = createColumnTypeVerificationCoordinator({
+    verify,
+    onVerified: vi.fn(),
+  });
   const hook = renderHook(
     ({ current }: { current: DataCatalogListing.T | undefined }) => {
-      useVerifyColumnTypesOnDwell({ listing: current, verify, onVerified });
+      useVerifyColumnTypesOnDwell({ listing: current, coordinator });
     },
     { initialProps: { current: listing } },
   );
-  return { ...hook, verify, onVerified };
+  return { ...hook, verify, coordinator };
 }
 
 describe("useVerifyColumnTypesOnDwell", () => {
@@ -42,14 +47,13 @@ describe("useVerifyColumnTypesOnDwell", () => {
   });
 
   it("verifies an unverified listing once it has been open for the dwell time", async () => {
-    const { verify, onVerified } = _render(_listing("a"));
+    const { verify } = _render(_listing("a"));
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(COLUMN_TYPE_VERIFICATION_DWELL_MS);
     });
 
     expect(verify).toHaveBeenCalledWith("a");
-    expect(onVerified).toHaveBeenCalledWith("a");
   });
 
   it("does nothing when the listing is closed before the dwell time", async () => {
@@ -80,7 +84,7 @@ describe("useVerifyColumnTypesOnDwell", () => {
     expect(verify).not.toHaveBeenCalled();
   });
 
-  it("tries a listing only once while the page is open", async () => {
+  it("starts a listing only once while the page is open", async () => {
     const { verify, rerender } = _render(_listing("a"));
     await act(async () => {
       await vi.advanceTimersByTimeAsync(COLUMN_TYPE_VERIFICATION_DWELL_MS);
@@ -93,5 +97,37 @@ describe("useVerifyColumnTypesOnDwell", () => {
     });
 
     expect(verify).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("useColumnTypeVerificationStatus", () => {
+  it("follows a listing's verification as it runs", async () => {
+    let finish = () => {};
+    const coordinator = createColumnTypeVerificationCoordinator({
+      verify: () => {
+        return new Promise<void>((resolve) => {
+          finish = resolve;
+        });
+      },
+      onVerified: vi.fn(),
+    });
+    const { result } = renderHook(() => {
+      return useColumnTypeVerificationStatus({
+        catalogListingId: "a" as DataCatalogListing.Id,
+        coordinator,
+      });
+    });
+
+    let verification: Promise<void> = Promise.resolve();
+    act(() => {
+      verification = coordinator.verify("a" as DataCatalogListing.Id);
+    });
+    const statusWhileRunning = result.current;
+    await act(async () => {
+      finish();
+      await verification;
+    });
+
+    expect([statusWhileRunning, result.current]).toEqual(["verifying", "idle"]);
   });
 });
