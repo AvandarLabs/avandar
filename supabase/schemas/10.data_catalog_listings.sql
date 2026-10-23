@@ -100,6 +100,12 @@ create table public.data_catalog_listings (
   -- real types from a sample later. A listing is stale when this is older
   -- than `date_of_last_update`.
   date_column_type_last_verified timestamptz,
+  -- Whether this listing's dataset cannot be loaded, as found when the app
+  -- last read a sample of it. Cleared when a later sample is read, or when
+  -- a pipeline rewrites the listing after its source changed.
+  is_invalid boolean not null default false,
+  -- Why the dataset cannot be loaded. Set exactly when `is_invalid` is.
+  invalid_dataset_reason public.data_catalog_listings__invalid_dataset_reason,
   constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name),
   -- A pipeline listing carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning
@@ -145,6 +151,10 @@ create table public.data_catalog_listings (
       cached_source_version is not null and
       cached_at is not null
     )
+  ),
+  -- An invalid listing says why, and a valid one carries no reason.
+  constraint data_catalog_listings__invalid_reason_complete check (
+    is_invalid = (invalid_dataset_reason is not null)
   ),
   -- Resource bytes are fetched from this host, so it must be TLS. Some CKAN
   -- resources point at upstream APIs over plain HTTP; those are rejected here

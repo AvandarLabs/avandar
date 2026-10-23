@@ -349,6 +349,10 @@ export type Database = {
           external_organization_name: string
           external_service_name: string | null
           id: string
+          invalid_dataset_reason:
+            | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
+            | null
+          is_invalid: boolean
           license: string | null
           metadata: Json | null
           notes: string | null
@@ -384,6 +388,10 @@ export type Database = {
           external_organization_name: string
           external_service_name?: string | null
           id?: string
+          invalid_dataset_reason?:
+            | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
+            | null
+          is_invalid?: boolean
           license?: string | null
           metadata?: Json | null
           notes?: string | null
@@ -419,6 +427,10 @@ export type Database = {
           external_organization_name?: string
           external_service_name?: string | null
           id?: string
+          invalid_dataset_reason?:
+            | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
+            | null
+          is_invalid?: boolean
           license?: string | null
           metadata?: Json | null
           notes?: string | null
@@ -2185,6 +2197,57 @@ export type Database = {
           scope_key: string
         }[]
       }
+      rpc_data_catalog_listings__mark_invalid: {
+        Args: {
+          p_catalog_listing_id: string
+          p_reason: Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
+        }
+        Returns: {
+          access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
+          api_base_url: string | null
+          api_resource_format: string | null
+          api_resource_id: string | null
+          api_service:
+            | Database["public"]["Enums"]["data_catalog_listings__api_service"]
+            | null
+          cached_at: string | null
+          cached_object_path: string | null
+          cached_source_version: string | null
+          canonical_urls: string[] | null
+          coverage_end_date: string | null
+          coverage_start_date: string | null
+          created_at: string
+          date_column_type_last_verified: string | null
+          date_of_last_sync: string | null
+          date_of_last_update: string | null
+          description: string | null
+          display_name: string
+          external_dataset_id: string | null
+          external_organization_name: string
+          external_service_name: string | null
+          id: string
+          invalid_dataset_reason:
+            | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
+            | null
+          is_invalid: boolean
+          license: string | null
+          metadata: Json | null
+          notes: string | null
+          parquet_file_name: string | null
+          pipeline_name: string | null
+          pipeline_run_id: string | null
+          pipeline_scope_keys: string[]
+          source_url: string | null
+          update_frequency: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "data_catalog_listings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rpc_data_catalog_listings__prune_pipeline_scope: {
         Args: {
           p_drive_key: string
@@ -2225,6 +2288,10 @@ export type Database = {
           external_organization_name: string
           external_service_name: string | null
           id: string
+          invalid_dataset_reason:
+            | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
+            | null
+          is_invalid: boolean
           license: string | null
           metadata: Json | null
           notes: string | null
@@ -2269,6 +2336,10 @@ export type Database = {
           external_organization_name: string
           external_service_name: string | null
           id: string
+          invalid_dataset_reason:
+            | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
+            | null
+          is_invalid: boolean
           license: string | null
           metadata: Json | null
           notes: string | null
@@ -2836,6 +2907,14 @@ export type Database = {
       dashboard_visibility: "draft" | "workspace" | "public"
       data_catalog_listings__access_kind: "pipeline_parquet" | "api_resource"
       data_catalog_listings__api_service: "ckan" | "socrata"
+      data_catalog_listings__invalid_dataset_reason:
+        | "empty_dataset"
+        | "dataset_not_found"
+        | "authorization_required"
+        | "unsupported_format"
+        | "external_host"
+        | "unparseable_dataset"
+        | "unreachable_dataset"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -3099,6 +3178,15 @@ export const Constants = {
       dashboard_visibility: ["draft", "workspace", "public"],
       data_catalog_listings__access_kind: ["pipeline_parquet", "api_resource"],
       data_catalog_listings__api_service: ["ckan", "socrata"],
+      data_catalog_listings__invalid_dataset_reason: [
+        "empty_dataset",
+        "dataset_not_found",
+        "authorization_required",
+        "unsupported_format",
+        "external_host",
+        "unparseable_dataset",
+        "unreachable_dataset",
+      ],
       datasets__ava_data_type: [
         "boolean",
         "bigint",

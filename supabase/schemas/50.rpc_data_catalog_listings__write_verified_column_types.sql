@@ -2,13 +2,14 @@
  * Replaces one catalog listing's relation columns with the columns and types
  * read from a sample of its source's real data, and records that their types
  * are verified. The app infers the types and the `open-data` edge function
- * calls this after checking the column names against the sample it served.
+ * calls this with a token proving it served the caller a sample.
  *
  * The whole column set is replaced, in the order given: a column the source
  * does not have is deleted, and one the pipeline did not know is added. A
  * column keeps the `original_data_type` the pipeline wrote, such as a
  * Socrata type label, unless that was `unknown`, in which case the verified
- * type becomes its original type too.
+ * type becomes its original type too. A listing marked invalid is valid
+ * again, since its source was just read.
  *
  * @param p_catalog_listing_id The listing.
  * @param p_columns A non-empty JSON array of `{ column_name, cast_data_type }`,
@@ -87,7 +88,10 @@ begin
   where relation_column.id = any (v_stale_column_ids);
 
   update public.data_catalog_listings listing
-  set date_column_type_last_verified = now()
+  set
+    date_column_type_last_verified = now(),
+    is_invalid = false,
+    invalid_dataset_reason = null
   where listing.id = p_catalog_listing_id
   returning listing.* into v_listing;
 
@@ -98,7 +102,7 @@ set
   search_path = '';
 
 -- `service_role` only: the `open-data` edge function calls this after it
--- checks the columns against the sample it served.
+-- checks the caller's sample token.
 revoke
 execute on function public.rpc_data_catalog_listings__write_verified_column_types (uuid, jsonb)
 from

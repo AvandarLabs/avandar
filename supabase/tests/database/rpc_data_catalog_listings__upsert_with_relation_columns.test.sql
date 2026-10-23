@@ -61,7 +61,7 @@ create function pg_temp.one_column (p_name text) returns jsonb as $$
   ));
 $$ language sql;
 
-select plan(23);
+select plan(26);
 
 -- ---------------------------------------------------------------------------
 -- Refusing a listing without a column array, and rolling back the whole call
@@ -352,6 +352,49 @@ select ok(
     'execute'
   ),
   'an anonymous visitor may not write catalog listings'
+);
+
+-- ---------------------------------------------------------------------------
+-- An invalid listing stays invalid until its source changes
+-- ---------------------------------------------------------------------------
+
+-- The fixture listing as the pipeline sends it, last updated at `p_updated`.
+create function pg_temp.invalid_fixture (p_updated text) returns jsonb as $$
+  select jsonb_set(
+    pg_temp.api_listing('pgtap-fixture-invalid', 'invalid', '[]'::jsonb),
+    '{listing,date_of_last_update}',
+    to_jsonb(p_updated)
+  );
+$$ language sql;
+
+select is(
+  (
+    select is_invalid
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.invalid_fixture('2026-10-01T00:00:00Z')))
+  ),
+  false,
+  'a new listing is written valid'
+);
+
+update public.data_catalog_listings
+set is_invalid = true, invalid_dataset_reason = 'empty_dataset'
+where external_dataset_id = 'pgtap-fixture-invalid';
+
+select results_eq(
+  $$select is_invalid, invalid_dataset_reason::text
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.invalid_fixture('2026-10-01T00:00:00Z')))$$,
+  $$values (true, 'empty_dataset')$$,
+  'a rewrite of an unchanged source keeps the listing invalid'
+);
+
+select results_eq(
+  $$select is_invalid, invalid_dataset_reason::text
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.invalid_fixture('2026-10-15T00:00:00Z')))$$,
+  $$values (false, null::text)$$,
+  'a rewrite after the source changed makes the listing valid again, to be checked anew'
 );
 
 select * from finish();

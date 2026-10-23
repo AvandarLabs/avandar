@@ -21,6 +21,10 @@
  * kept. Otherwise the columns are replaced and the date is the element's:
  * set when the pipeline read real types, null when it only knew names.
  *
+ * A listing the app marked invalid stays invalid while its
+ * `date_of_last_update` is unchanged. Once the source has changed, the
+ * listing is written valid again, so the app checks it anew.
+ *
  * @param p_listings A JSON array. Each element is an object with `listing`,
  *   the listing's contract columns, and `relation_columns`, an array, possibly
  *   empty, of `{ column_name, display_order, original_data_type,
@@ -85,6 +89,17 @@ begin
         v_stored.date_column_type_last_verified;
     end if;
 
+    if
+      v_stored.id is not null and
+      v_input.date_of_last_update is not distinct from v_stored.date_of_last_update
+    then
+      v_input.is_invalid := v_stored.is_invalid;
+      v_input.invalid_dataset_reason := v_stored.invalid_dataset_reason;
+    else
+      v_input.is_invalid := false;
+      v_input.invalid_dataset_reason := null;
+    end if;
+
     if v_input.id = any (v_written_ids) then
       raise exception 'Listing "%" appears twice in one call. Each listing may be written only once per call.',
         v_input.display_name;
@@ -116,7 +131,9 @@ begin
       api_resource_format,
       parquet_file_name,
       pipeline_scope_keys,
-      date_column_type_last_verified
+      date_column_type_last_verified,
+      is_invalid,
+      invalid_dataset_reason
     ) values (
       coalesce(v_input.id, gen_random_uuid()),
       v_input.access_kind,
@@ -143,7 +160,9 @@ begin
       v_input.api_resource_format,
       v_input.parquet_file_name,
       coalesce(v_input.pipeline_scope_keys, '{}'),
-      v_input.date_column_type_last_verified
+      v_input.date_column_type_last_verified,
+      v_input.is_invalid,
+      v_input.invalid_dataset_reason
     )
     on conflict (id) do update set
       access_kind = excluded.access_kind,
@@ -170,7 +189,9 @@ begin
       api_resource_format = excluded.api_resource_format,
       parquet_file_name = excluded.parquet_file_name,
       pipeline_scope_keys = excluded.pipeline_scope_keys,
-      date_column_type_last_verified = excluded.date_column_type_last_verified
+      date_column_type_last_verified = excluded.date_column_type_last_verified,
+      is_invalid = excluded.is_invalid,
+      invalid_dataset_reason = excluded.invalid_dataset_reason
     returning * into v_listing;
 
     v_written_ids := v_written_ids || v_listing.id;

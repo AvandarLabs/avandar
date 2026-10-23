@@ -26,7 +26,7 @@ values
   ('e9004001-0000-4000-8000-000000000001'::uuid, 'region', 1, 'unknown', 'VARCHAR'),
   ('e9004001-0000-4000-8000-000000000001'::uuid, 'location_address', 2, 'Text', 'VARCHAR');
 
-select plan(8);
+select plan(9);
 
 select throws_ok(
   $$select public.rpc_data_catalog_listings__write_verified_column_types(
@@ -77,6 +77,19 @@ select results_eq(
     ('amount', 1, 'Number', 'DOUBLE'),
     ('year', 2, 'BIGINT', 'BIGINT')$$,
   'the columns are replaced in the given order, keeping known original types, deleting the missing one, and adding the new one'
+);
+
+update public.data_catalog_listings
+set is_invalid = true, invalid_dataset_reason = 'unparseable_dataset'
+where id = 'e9004001-0000-4000-8000-000000000001'::uuid;
+
+select results_eq(
+  $$select is_invalid, invalid_dataset_reason::text
+    from public.rpc_data_catalog_listings__write_verified_column_types(
+      'e9004001-0000-4000-8000-000000000001'::uuid,
+      '[{"column_name": "region", "cast_data_type": "VARCHAR"}]'::jsonb)$$,
+  $$values (false, null::text)$$,
+  'writing verified types makes an invalid listing valid again'
 );
 
 select ok(
