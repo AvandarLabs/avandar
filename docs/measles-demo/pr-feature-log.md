@@ -60,6 +60,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F8 | Open-data write-back cache | not started | F4, F6 | |
 | F9 | Measles demo docs: use case, specs, plans | not started | every other feature | |
 | F10 | Pipeline run options: `ava pipeline run --limit` and `.env.pipelines.local` | not started | F4 | |
+| F11 | Live progress output for `ava pipeline run` | not started | F10, the ETL engine's per-scope crawl (`crawlScope`), which this log does not map yet | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -77,7 +78,8 @@ API. It's new work, not something this branch built.
 | 6 | F6 | Needs F2 (`OpenDataHttp` is a `Pick` of `HttpClient`), F4 (the `data_catalog_listings` table and the shared upsert) and F10 (`PipelineRunOptions`, `getOptionalEnvVar`). |
 | 7 | F7 | Same dependencies as F6. Independent of F6, so the two can merge in either order. |
 | 8 | F8 | Adds columns to the F4 table, and its freshness check reads Socrata metadata through F6's `SocrataClient`. |
-| 9 | F9 | Last, because the docs describe the merged features. |
+| 9 | F11 | Needs F10's local runner and `--limit`, and the ETL engine's scope crawl it hooks into. Can merge any time after those, before F9. |
+| 10 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -350,6 +352,51 @@ of `.env.development`.
 ```sh
 pnpm test:pipeline-server && pnpm --filter @avandar/ava-cli test && pnpm exec tsc -b --noEmit
 pnpm --filter @avandar/ava-cli build && node apps/ava-cli/dist/main.cjs pipeline run world-bank__wdi --local --limit 1   # expect the "does not support --limit" error
+```
+
+---
+
+## F11: Live progress output for `ava pipeline run`
+
+**Purpose:** `ava pipeline run --local` prints progress while the run goes:
+each crawl's drive and scope as it starts and ends, page updates (at most
+every 5 seconds) with the percent of the `--limit` reached (or of crawls done
+when there is no limit), datasets, tables, columns, and elapsed time, and a
+"still running" line after 15 seconds without output. A server run prints the
+heartbeat only, since the server streams nothing. A crawl the limit skipped
+now reads `(pipeline dataset limit reached)`. **Value:** a long run that has
+hung is easy to tell apart from a slow one.
+
+**PR title:** `feat(pipelines): print live progress during ava pipeline run`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `f2db070a7` | feat(pipelines): print live progress during ava pipeline run | all |
+
+**Files:**
+- `packages/node/etl/src/EtlEngine/EtlEngine.types.ts`: the `onProgress` option on `EtlRunOptions` and the `EtlRunProgress` type
+- `packages/node/etl/src/EtlEngine/createRunProgressReporter/**`
+- `packages/node/etl/src/EtlEngine/crawlScope/crawlScope.ts`: `onPageLoaded`, `CrawledPageCounts`, `_countPage`
+- `packages/node/etl/src/EtlEngine/createEtlEngine/createEtlEngine.ts` and its test (the `progress` describe)
+- `packages/node/etl/src/index.ts`: the `EtlRunProgress` export
+- `apps/pipeline-server/pipelines/shared/runPipelineAndPrintReport/**`: `PIPELINE_PROGRESS_LINE_PREFIX` and the stderr writer
+- `apps/ava-cli/src/PipelineCli/PipelineRunProgress/**`
+- `apps/ava-cli/src/PipelineCli/runPipelineLocal.ts` and its test: async `spawn` that streams stderr
+- `apps/ava-cli/src/PipelineCli/RunPipelineCli/RunPipelineCli.ts` and its test
+- `apps/ava-cli/src/PipelineCli/PipelineRunReport/printPipelineRunReport.ts` and its test: the skipped-crawl label
+
+**Schema:** none.
+
+**Notes:**
+- The progress line prefix, `ava-pipeline-progress `, is written in both `runPipelineAndPrintReport.ts` and `runPipelineLocal.ts`, since `ava-cli` does not depend on `@avandar/etl`. Keep them in sync.
+- Columns count what `transform` declares. HDX CSV resources declare none at crawl time, so an HDX CSV crawl shows 0 columns.
+
+**Verification:**
+```sh
+pnpm --filter @avandar/etl exec vitest run && pnpm test:pipeline-server && pnpm --filter @avandar/ava-cli test && pnpm exec tsc -b --noEmit
+pnpm --filter @avandar/ava-cli build && node apps/ava-cli/dist/main.cjs pipeline run hdx --local --limit 10
 ```
 
 ---
