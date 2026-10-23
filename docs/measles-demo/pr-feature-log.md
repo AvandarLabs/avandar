@@ -61,6 +61,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F9 | Measles demo docs: use case, specs, plans | not started | every other feature | |
 | F10 | Pipeline run options: `ava pipeline run --limit` and `.env.pipelines.local` | not started | F4 | |
 | F11 | Live progress output for `ava pipeline run` | not started | F10, the ETL engine's per-scope crawl (`crawlScope`), which this log does not map yet | |
+| F12 | Invalid catalog listings, and DuckDB-parsed column type samples | not started | F4, F7, and the column type verification feature (`verifyOpenDataColumnTypes`, `rpc_data_catalog_listings__write_verified_column_types`), which this log does not map yet | [AVA-396](https://linear.app/avandar/issue/AVA-396) (follow-up) |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -79,7 +80,8 @@ API. It's new work, not something this branch built.
 | 7 | F7 | Same dependencies as F6. Independent of F6, so the two can merge in either order. |
 | 8 | F8 | Adds columns to the F4 table, and its freshness check reads Socrata metadata through F6's `SocrataClient`. |
 | 9 | F11 | Needs F10's local runner and `--limit`, and the ETL engine's scope crawl it hooks into. Can merge any time after those, before F9. |
-| 10 | F9 | Last, because the docs describe the merged features. |
+| 10 | F12 | Extends the column type verification route and the F4 listings table. Merge after the verification feature it rewrites. |
+| 11 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -397,6 +399,58 @@ hung is easy to tell apart from a slow one.
 ```sh
 pnpm --filter @avandar/etl exec vitest run && pnpm test:pipeline-server && pnpm --filter @avandar/ava-cli test && pnpm exec tsc -b --noEmit
 pnpm --filter @avandar/ava-cli build && node apps/ava-cli/dist/main.cjs pipeline run hdx --local --limit 10
+```
+
+---
+
+## F12: Invalid catalog listings, and DuckDB-parsed column type samples
+
+**Purpose:** a catalog listing whose dataset cannot be loaded is marked
+`is_invalid` with an `invalid_dataset_reason` (`empty_dataset`,
+`dataset_not_found`, `authorization_required`, `unsupported_format`,
+`external_host`, `unparseable_dataset`, `unreachable_dataset`), and the
+catalog shows it as indexed but not loadable, with the reason, a list
+marker, and Add blocked. The `column-type-sample` route stops parsing CSV:
+it sends the file's first bytes gzipped, and the browser's DuckDB finds the
+delimiter, quoting, and header. **Value:** empty or dead HDX files say why
+instead of showing a generic error, and semicolon-delimited files or files
+with a blank header cell verify instead of failing.
+
+**PR title:** `feat(open-data): mark unloadable catalog listings and let DuckDB parse samples`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `f5f14f86e` | feat(db): track catalog listings whose dataset cannot be loaded | all |
+| `a2ba0d281` | feat(open-data): mark unloadable catalog listings and let DuckDB parse samples | all |
+
+**Files:**
+- `supabase/schemas/00.enum.data_catalog_listings__invalid_dataset_reason.sql`, `supabase/schemas/50.rpc_data_catalog_listings__mark_invalid.sql`
+- `supabase/schemas/10.data_catalog_listings.sql`: the two columns and `data_catalog_listings__invalid_reason_complete`
+- `supabase/schemas/50.rpc_data_catalog_listings__upsert_with_relation_columns.sql`: keep the mark until `date_of_last_update` changes
+- `supabase/schemas/50.rpc_data_catalog_listings__write_verified_column_types.sql`: clear the mark
+- `supabase/tests/database/rpc_data_catalog_listings__mark_invalid.test.sql`, and the new cases in the upsert and write-verified tests
+- `shared/connectors/open-data/openDataErrors.ts`: `resource-empty`, `resource-authorization-required`, `ckan-unreachable`
+- `shared/connectors/open-data/acquireOpenDataColumnTypeSample/**`: raw bytes and phase-aware failure codes
+- `shared/connectors/open-data/failureToInvalidDatasetReason/**`
+- `shared/connectors/open-data/parseCsvHeaderLine/**`: deleted
+- `shared/models/data-catalog-listings/DataCatalogListing/*`: `isInvalid`, `invalidDatasetReason`, `InvalidDatasetReason`, and fixture updates in the open-data tests
+- `supabase/functions/open-data/`: `gzipBytes/**`, `respondWithSampleFailure/**`, `columnTypeVerification/columnTypeVerification.ts`, `columnTypeSampleToken/**`, `readByteRangeOverHttp/**`, `statusFromOpenDataFailure/**`, `OpenDataRoutes.ts` and `OpenDataRoutes.types.ts` (the `unparseable` route)
+- `src/lib/openData/verifyOpenDataColumnTypes/**`, `src/lib/openData/createColumnTypeVerificationCoordinator/**`, `src/lib/openData/ColumnTypeVerifications.ts`
+- `src/views/DataManagerApp/DataImportView/DataCatalogView/`: `DataCatalogInvalidNotice/**`, `DataCatalogListingDetail/DataCatalogListingDetail.tsx`, `DataCatalogListingList/DataCatalogListingList.tsx`, `DataCatalogView.tsx`
+
+**Schema:** yes. Regenerate the migration with `supabase-declarative-schema`; do not copy `20261023164104_mark_invalid_catalog_listings.sql`. Regenerate `shared/types/database.types.ts`, the desktop SQLite migration, and the Lingui catalogs.
+
+**Notes:**
+- The sample token vouches only for the listing and its expiry, not for column names: the browser's DuckDB names the columns, trusted as its types already are.
+- An unreachable file host is marked right away. AVA-396 adds the scheduled recheck. A CKAN API outage and any Socrata failure leave the listing valid.
+
+**Verification:**
+```sh
+supabase test db supabase/tests/database/rpc_data_catalog_listings__mark_invalid.test.sql supabase/tests/database/rpc_data_catalog_listings__upsert_with_relation_columns.test.sql supabase/tests/database/rpc_data_catalog_listings__write_verified_column_types.test.sql
+pnpm exec vitest run shared/connectors/open-data shared/models/data-catalog-listings supabase/functions/open-data src/lib/openData src/views/DataManagerApp/DataImportView/DataCatalogView
+pnpm exec tsc -b --noEmit && pnpm type-check:deno
 ```
 
 ---
