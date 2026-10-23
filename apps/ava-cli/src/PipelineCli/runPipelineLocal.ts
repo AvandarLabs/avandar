@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { PipelineRunReportSchema } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
@@ -7,6 +7,12 @@ import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRun
 
 /** The variable `scripts/runPipelineOnce.ts` reads the invocation from. */
 const _INVOCATION_ENV = "AVA_PIPELINE_INVOCATION";
+
+/**
+ * Starts each progress line the runner writes to stderr. Matches
+ * `PIPELINE_PROGRESS_LINE_PREFIX` in `runPipelineAndPrintReport.ts`.
+ */
+const _PROGRESS_LINE_PREFIX = "ava-pipeline-progress ";
 
 /**
  * Walks up from `process.cwd()` until a directory contains both
@@ -107,21 +113,111 @@ function _buildFailedResult(args: {
 }
 
 /**
+ * Splits a stream's chunks into lines and passes each complete line to
+ * `onLine`. Returns a function that passes the last, unterminated line.
+ */
+function _readLines(
+  stream: NodeJS.ReadableStream | null,
+  onLine: (line: string) => void,
+): () => void {
+  let pendingText = "";
+  stream?.setEncoding("utf8");
+  stream?.on("data", (chunk: string) => {
+    const lines = (pendingText + chunk).split("\n");
+    pendingText = lines.pop() ?? "";
+    lines.forEach(onLine);
+  });
+  return () => {
+    if (pendingText !== "") {
+      onLine(pendingText);
+    }
+  };
+}
+
+/**
+ * Sends a progress line's event to `onProgress` and returns true, or
+ * returns false for any other line. A progress line that is not JSON is
+ * dropped.
+ */
+function _handleProgressLine(
+  line: string,
+  onProgress: ((progress: unknown) => void) | undefined,
+): boolean {
+  if (!line.startsWith(_PROGRESS_LINE_PREFIX)) {
+    return false;
+  }
+  try {
+    onProgress?.(JSON.parse(line.slice(_PROGRESS_LINE_PREFIX.length)));
+  } catch {
+    // A garbled progress line only costs one update.
+  }
+  return true;
+}
+
+type _ChildOutput = Readonly<{
+  status: number | null;
+  stdout: string;
+  stderr: string;
+  error?: Error;
+}>;
+
+/**
+ * Spawns the runner and collects its output. Progress lines on stderr go to
+ * `onProgress` as they arrive and are left out of the collected stderr.
+ */
+function _spawnRunner(args: {
+  commandArgs: string[];
+  repoRoot: string;
+  env: NodeJS.ProcessEnv | undefined;
+  onProgress: ((progress: unknown) => void) | undefined;
+}): Promise<_ChildOutput> {
+  return new Promise((resolve) => {
+    const child = spawn("pnpm", args.commandArgs, {
+      cwd: args.repoRoot,
+      env: args.env ?? process.env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const stdoutLines: string[] = [];
+    const stderrLines: string[] = [];
+    const flushStdout = _readLines(child.stdout, (line) => {
+      stdoutLines.push(line);
+    });
+    const flushStderr = _readLines(child.stderr, (line) => {
+      if (!_handleProgressLine(line, args.onProgress)) {
+        stderrLines.push(line);
+      }
+    });
+    const finish = (status: number | null, error?: Error): void => {
+      flushStdout();
+      flushStderr();
+      const stdout = stdoutLines.join("\n");
+      resolve({ status, stdout, stderr: stderrLines.join("\n"), error });
+    };
+    child.on("error", (error) => {
+      finish(null, error);
+    });
+    child.on("close", (status: number | null) => {
+      finish(status);
+    });
+  });
+}
+
+/**
  * Runs a pipeline module via `pnpm exec vite-node` (no HTTP server). With
  * `invocation`, the run is recorded with the CLI's argv, actor, host, and
- * commit.
+ * commit. Each progress event the runner reports goes to `onProgress`, as
+ * parsed JSON, while the run is still going.
  */
-export function runPipelineLocal(options: {
+export async function runPipelineLocal(options: {
   pipelineName: string;
   repoRoot: string;
   runOptions: PipelineRunRequestOptions;
   invocation?: CliInvocation;
-}): RunPipelineLocalResult {
+  onProgress?: (progress: unknown) => void;
+}): Promise<RunPipelineLocalResult> {
   const scriptPath = join(options.repoRoot, "scripts", "runPipelineOnce.ts");
-
-  const spawnResult = spawnSync(
-    "pnpm",
-    [
+  const spawnResult = await _spawnRunner({
+    commandArgs: [
       "exec",
       "vite-node",
       "--config",
@@ -130,20 +226,16 @@ export function runPipelineLocal(options: {
       options.pipelineName,
       ..._buildRunArgs(options.runOptions),
     ],
-    {
-      cwd: options.repoRoot,
-      encoding: "utf8",
-      maxBuffer: 10 * 1024 * 1024,
-      ...(options.invocation === undefined
-        ? {}
+    repoRoot: options.repoRoot,
+    env:
+      options.invocation === undefined
+        ? undefined
         : {
-            env: {
-              ...process.env,
-              [_INVOCATION_ENV]: JSON.stringify(options.invocation),
-            },
-          }),
-    },
-  );
+            ...process.env,
+            [_INVOCATION_ENV]: JSON.stringify(options.invocation),
+          },
+    onProgress: options.onProgress,
+  });
 
   if (spawnResult.error) {
     return {
@@ -153,9 +245,7 @@ export function runPipelineLocal(options: {
     };
   }
 
-  const stdout = spawnResult.stdout ?? "";
-  const stderr = spawnResult.stderr ?? "";
-
+  const { stdout, stderr } = spawnResult;
   if (spawnResult.status !== 0) {
     return _buildFailedResult({ stdout, stderr, status: spawnResult.status });
   }

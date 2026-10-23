@@ -108,7 +108,7 @@ describe("printPipelineRunReport", () => {
   it("marks a drive the limit skipped", () => {
     printPipelineRunReport(_report([{ ...DRIVE, status: "skipped" }]));
 
-    expect(_logs()).toContain("(limit reached)");
+    expect(_logs()).toContain("(pipeline dataset limit reached)");
   });
 
   it("prints a status it does not know as is", () => {

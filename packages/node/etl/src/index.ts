@@ -40,6 +40,7 @@ export type {
   EtlPipelineRunId,
   EtlRunMode,
   EtlRunOptions,
+  EtlRunProgress,
   EtlRunReport,
   EtlRunWindow,
   EtlScope,

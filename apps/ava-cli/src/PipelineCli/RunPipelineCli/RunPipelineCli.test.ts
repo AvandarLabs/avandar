@@ -37,7 +37,7 @@ vi.mock("@ava-cli/PipelineCli/runPipelineLocal", () => {
     findAvandarRepoRoot: vi.fn(() => {
       return "/repo";
     }),
-    runPipelineLocal: vi.fn(() => {
+    runPipelineLocal: vi.fn(async () => {
       return { ok: true, reportJson: JSON.stringify(REPORT), errorText: "" };
     }),
   };
@@ -130,6 +130,30 @@ describe("runPipelineCommand", () => {
     expect(logs).toContain("https://data.cityofnewyork.us");
   });
 
+  it("prints the local runner's progress while the run is going", async () => {
+    vi.mocked(runPipelineLocal).mockImplementationOnce(async (options) => {
+      options.onProgress?.({
+        stage: "crawl_started",
+        driveKey: "https://data.humdata.org",
+        scopeKey: "format:csv",
+        crawlNumber: 1,
+        crawlCount: 2,
+        limit: 10,
+        connectionsFetched: 0,
+        relationsTransformed: 0,
+        columnsFound: 0,
+      });
+      return { ok: true, reportJson: JSON.stringify(REPORT), errorText: "" };
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({ name: "hdx", local: true, limit: 10 });
+
+    expect(_getCombinedLogs()).toContain(
+      "[1/2] Crawling https://data.humdata.org [format:csv] · 0% of the 10-dataset limit",
+    );
+  });
+
   it("throws when AVA_PIPELINE_SERVER_URL is missing", async () => {
     delete process.env.AVA_PIPELINE_SERVER_URL;
 
@@ -195,6 +219,7 @@ describe("runPipelineCommand", () => {
     await runPipelineCommand({ name: "hdx", local: true, limit: 3 });
 
     expect(vi.mocked(runPipelineLocal)).toHaveBeenCalledWith({
+      onProgress: expect.any(Function),
       pipelineName: "hdx",
       repoRoot: "/repo",
       invocation: INVOCATION,
@@ -278,6 +303,7 @@ describe("runPipelineCommand", () => {
     });
 
     expect(vi.mocked(runPipelineLocal)).toHaveBeenCalledWith({
+      onProgress: expect.any(Function),
       pipelineName: "socrata",
       repoRoot: "/repo",
       invocation: INVOCATION,
@@ -396,7 +422,7 @@ describe("runPipelineCommand", () => {
   });
 
   it("prints the report and exits 1 without throwing when a local run says every drive failed", async () => {
-    vi.mocked(runPipelineLocal).mockReturnValueOnce({
+    vi.mocked(runPipelineLocal).mockResolvedValueOnce({
       ok: false,
       reportJson: JSON.stringify(FAILED_REPORT),
       errorText: "Every drive failed.",
@@ -413,7 +439,7 @@ describe("runPipelineCommand", () => {
     expect(_getCombinedLogs()).toContain("Every drive failed.");
   });
   it("names the runner's last line when a local run prints no report", async () => {
-    vi.mocked(runPipelineLocal).mockReturnValueOnce({
+    vi.mocked(runPipelineLocal).mockResolvedValueOnce({
       ok: true,
       reportJson: "done",
       errorText: "",
@@ -459,6 +485,7 @@ describe("runPipelineCommand", () => {
     await runPipelineCommand({ name: "hdx", local: true, scope: "format:csv" });
 
     expect(vi.mocked(runPipelineLocal)).toHaveBeenCalledWith({
+      onProgress: expect.any(Function),
       pipelineName: "hdx",
       repoRoot: "/repo",
       invocation: INVOCATION,

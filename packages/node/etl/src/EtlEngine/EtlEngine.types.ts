@@ -70,6 +70,33 @@ export type EtlRunOptions = Readonly<{
    * recorded.
    */
   invocation?: ExecutionInvocation;
+  /**
+   * Called as the run moves: when a crawl starts, after each page it loads,
+   * and when it ends. Lets a caller show that a long run has not hung.
+   */
+  onProgress?: (progress: EtlRunProgress) => void;
+}>;
+
+/**
+ * Where a run is, as `EtlRunOptions.onProgress` receives it. The counts are
+ * totals for the whole run so far, not for the one crawl. A crawl the limit
+ * skips only reports `crawl_finished`.
+ */
+export type EtlRunProgress = Readonly<{
+  stage: "crawl_started" | "page_loaded" | "crawl_finished";
+  driveKey: string;
+  scopeKey: string;
+  /** The crawl's 1-based position among the run's crawls. */
+  crawlNumber: number;
+  crawlCount: number;
+  /** The run's limit on connections, when it has one. */
+  limit: number | undefined;
+  connectionsFetched: number;
+  relationsTransformed: number;
+  /** Columns the transformed relations declare. */
+  columnsFound: number;
+  /** How the crawl ended. Set only on `crawl_finished`. */
+  status?: EtlCrawlStatus;
 }>;
 
 /** The `[since, until)` range of source timestamps one drive's crawl covers. */

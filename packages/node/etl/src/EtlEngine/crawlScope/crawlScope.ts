@@ -51,6 +51,16 @@ export type CrawlScopeArgs<
   syncedAt: Date;
   /** Dates the crawl and times its stages. */
   clock: EtlClock;
+  /** Called after each page finishes loading, with that page's counts. */
+  onPageLoaded?: (page: CrawledPageCounts) => void;
+}>;
+
+/** What one loaded page added to its crawl. */
+export type CrawledPageCounts = Readonly<{
+  connections: number;
+  relations: number;
+  /** Columns the page's relations declare. */
+  columns: number;
 }>;
 
 /** One crawl's report, plus what the crawl threw when it failed. */
@@ -101,6 +111,7 @@ type _CrawlProgress = _CrawlCounts &
 type _LoadedPage = Readonly<{
   progress: _CrawlProgress;
   pageTimestamps: readonly Date[];
+  pageCounts: CrawledPageCounts;
 }>;
 
 type _CrawlResultArgs = Readonly<{
@@ -265,6 +276,26 @@ function _assertRelationsNotNewer<
   }
 }
 
+/** How many columns a relation declares, or will cast when converted. */
+function _countRelationColumns(relation: Relation): number {
+  return relation.kind === "api_resource"
+    ? relation.columns.length
+    : relation.csvColumns.length;
+}
+
+function _countPage(
+  connections: readonly unknown[],
+  relations: readonly Relation[],
+): CrawledPageCounts {
+  return {
+    connections: connections.length,
+    relations: relations.length,
+    columns: relations.reduce((sum, relation) => {
+      return sum + _countRelationColumns(relation);
+    }, 0),
+  };
+}
+
 async function _transformConnections<
   TDrive,
   TConnection,
@@ -346,6 +377,7 @@ async function _loadPage<TDrive, TConnection, TScope extends EtlScope>(
       checkpoint: progress.checkpoint,
     },
     pageTimestamps,
+    pageCounts: _countPage(connections, relations),
   };
 }
 
@@ -411,6 +443,7 @@ async function _crawlPages<TDrive, TConnection, TScope extends EtlScope>(
       // Counted before the checkpoint write, so a failed write still
       // reports the page it loaded.
       progress = loaded.progress;
+      args.onPageLoaded?.(loaded.pageCounts);
       // The page is loaded, so the checkpoint may move past it.
       const checkpoint = await args.metrics.time("checkpointWriteMs", () => {
         return advanceCrawlCheckpoint({

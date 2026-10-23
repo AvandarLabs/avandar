@@ -79,7 +79,7 @@ function _formatCrawl(crawl: _CrawlReport): string {
   const tookNote =
     durationMs === undefined ? "" : `, took ${formatDuration(durationMs)}`;
   const newest = crawl.newestTimestamp ?? "none";
-  const limitNote = crawl.status === "skipped" ? " (limit reached)" : "";
+  const limitNote = crawl.status === "skipped" ? " (pipeline dataset limit reached)" : "";
   const lines = [
     `${crawl.status.padEnd(_STATUS_WIDTH)} ${crawl.driveKey} [${crawl.scopeKey}]${limitNote}`,
     `${_DETAIL_INDENT}${since} to ${until}${tookNote}`,

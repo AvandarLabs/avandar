@@ -1,14 +1,12 @@
-import { spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
+import { EventEmitter } from "node:events";
+import { PassThrough } from "node:stream";
 import { runPipelineLocal } from "@ava-cli/PipelineCli/runPipelineLocal";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { SpawnSyncOptions } from "node:child_process";
+import type { ChildProcess, SpawnOptions } from "node:child_process";
 
 vi.mock("node:child_process", () => {
-  return {
-    spawnSync: vi.fn(() => {
-      return { status: 0, stdout: "run-id\n", stderr: "", error: undefined };
-    }),
-  };
+  return { spawn: vi.fn() };
 });
 
 /** A report line as the runner prints it. */
@@ -18,28 +16,48 @@ const REPORT_LINE = JSON.stringify({
   crawls: [],
 });
 
-/** A `spawnSync` result with the given exit status and output. */
-function _spawnResult(args: {
+/**
+ * A child process that writes the given output, each stderr chunk as its
+ * own write, and then closes with the given exit status.
+ */
+function _fakeChild(args: {
   status: number;
   stdout: string;
-  stderr?: string;
-}): ReturnType<typeof spawnSync> {
-  return {
-    pid: 1,
-    output: [],
-    signal: null,
-    status: args.status,
-    stdout: args.stdout,
-    stderr: args.stderr ?? "",
-  };
+  stderrChunks?: readonly string[];
+}): ChildProcess {
+  const child = new EventEmitter() as ChildProcess;
+  const stdout = new PassThrough();
+  const stderr = new PassThrough();
+  Object.assign(child, { stdout, stderr });
+  setImmediate(() => {
+    stdout.end(args.stdout);
+    (args.stderrChunks ?? []).forEach((chunk) => {
+      stderr.write(chunk);
+    });
+    stderr.end();
+    setImmediate(() => {
+      child.emit("close", args.status);
+    });
+  });
+  return child;
+}
+
+/** Makes the next `spawn` return a child with the given output. */
+function _mockNextChild(args: Parameters<typeof _fakeChild>[0]): void {
+  vi.mocked(spawn).mockImplementationOnce(() => {
+    return _fakeChild(args);
+  });
 }
 
 describe("runPipelineLocal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(spawn).mockImplementation(() => {
+      return _fakeChild({ status: 0, stdout: "run-id\n" });
+    });
   });
 
-  it("passes the invocation to the runner in AVA_PIPELINE_INVOCATION", () => {
+  it("passes the invocation to the runner in AVA_PIPELINE_INVOCATION", async () => {
     const invocation = {
       cliArgv: ["pipeline", "run", "hdx", "--local"],
       actor: "pablo@laptop",
@@ -47,23 +65,23 @@ describe("runPipelineLocal", () => {
       codeVersion: "abc123",
     };
 
-    runPipelineLocal({
+    await runPipelineLocal({
       pipelineName: "hdx",
       repoRoot: "/repo",
       runOptions: {},
       invocation,
     });
 
-    const spawnOptions = vi.mocked(spawnSync).mock.calls[0]?.[2] as
-      | SpawnSyncOptions
+    const spawnOptions = vi.mocked(spawn).mock.calls[0]?.[2] as
+      | SpawnOptions
       | undefined;
     expect(
       JSON.parse(spawnOptions?.env?.AVA_PIPELINE_INVOCATION ?? ""),
     ).toEqual(invocation);
   });
 
-  it("passes every run option to the runner as flags", () => {
-    runPipelineLocal({
+  it("passes every run option to the runner as flags", async () => {
+    await runPipelineLocal({
       pipelineName: "socrata",
       repoRoot: "/repo",
       runOptions: {
@@ -74,7 +92,7 @@ describe("runPipelineLocal", () => {
       },
     });
 
-    expect(vi.mocked(spawnSync).mock.calls[0]?.[1]?.slice(-8)).toEqual([
+    expect(vi.mocked(spawn).mock.calls[0]?.[1]?.slice(-8)).toEqual([
       "socrata",
       "--incremental",
       "--since",
@@ -86,21 +104,19 @@ describe("runPipelineLocal", () => {
     ]);
   });
 
-  it("passes no flag when no option is given", () => {
-    runPipelineLocal({
+  it("passes no flag when no option is given", async () => {
+    await runPipelineLocal({
       pipelineName: "hdx",
       repoRoot: "/repo",
       runOptions: {},
     });
 
-    expect(vi.mocked(spawnSync).mock.calls[0]?.[1]?.slice(-1)).toEqual(["hdx"]);
+    expect(vi.mocked(spawn).mock.calls[0]?.[1]?.slice(-1)).toEqual(["hdx"]);
   });
-  it("returns the last stdout line as the report JSON when the run succeeds", () => {
-    vi.mocked(spawnSync).mockReturnValueOnce(
-      _spawnResult({ status: 0, stdout: 'log line\n{"pipelineRunId":"r"}\n' }),
-    );
+  it("returns the last stdout line as the report JSON when the run succeeds", async () => {
+    _mockNextChild({ status: 0, stdout: 'log line\n{"pipelineRunId":"r"}\n' });
 
-    const result = runPipelineLocal({
+    const result = await runPipelineLocal({
       pipelineName: "hdx",
       repoRoot: "/repo",
       runOptions: {},
@@ -113,16 +129,14 @@ describe("runPipelineLocal", () => {
     });
   });
 
-  it("keeps a failed run's report JSON out of its error text", () => {
-    vi.mocked(spawnSync).mockReturnValueOnce(
-      _spawnResult({
+  it("keeps a failed run's report JSON out of its error text", async () => {
+    _mockNextChild({
         status: 1,
         stdout: `log line\n${REPORT_LINE}\n`,
-        stderr: "Every drive failed.\n",
-      }),
-    );
+        stderrChunks: ["Every drive failed.\n"],
+      });
 
-    const result = runPipelineLocal({
+    const result = await runPipelineLocal({
       pipelineName: "hdx",
       repoRoot: "/repo",
       runOptions: {},
@@ -135,16 +149,14 @@ describe("runPipelineLocal", () => {
     });
   });
 
-  it("keeps a failed run's whole output as error text when its JSON is not a report", () => {
-    vi.mocked(spawnSync).mockReturnValueOnce(
-      _spawnResult({
+  it("keeps a failed run's whole output as error text when its JSON is not a report", async () => {
+    _mockNextChild({
         status: 1,
         stdout: '{"level":"error"}\n',
-        stderr: "Error: boom\n",
-      }),
-    );
+        stderrChunks: ["Error: boom\n"],
+      });
 
-    const result = runPipelineLocal({
+    const result = await runPipelineLocal({
       pipelineName: "hdx",
       repoRoot: "/repo",
       runOptions: {},
@@ -157,12 +169,10 @@ describe("runPipelineLocal", () => {
     });
   });
 
-  it("returns no report JSON when a failed run's last line is not JSON", () => {
-    vi.mocked(spawnSync).mockReturnValueOnce(
-      _spawnResult({ status: 1, stdout: "", stderr: "Error: boom\n" }),
-    );
+  it("returns no report JSON when a failed run's last line is not JSON", async () => {
+    _mockNextChild({ status: 1, stdout: "", stderrChunks: ["Error: boom\n"] });
 
-    const result = runPipelineLocal({
+    const result = await runPipelineLocal({
       pipelineName: "hdx",
       repoRoot: "/repo",
       runOptions: {},
@@ -175,17 +185,44 @@ describe("runPipelineLocal", () => {
     });
   });
 
-  it("passes scopes to the runner as one comma-separated flag", () => {
-    runPipelineLocal({
+  it("passes scopes to the runner as one comma-separated flag", async () => {
+    await runPipelineLocal({
       pipelineName: "hdx",
       repoRoot: "/repo",
       runOptions: { scopes: ["format:csv", "format:parquet"] },
     });
 
-    expect(vi.mocked(spawnSync).mock.calls[0]?.[1]?.slice(-3)).toEqual([
+    expect(vi.mocked(spawn).mock.calls[0]?.[1]?.slice(-3)).toEqual([
       "hdx",
       "--scope",
       "format:csv,format:parquet",
+    ]);
+  });
+
+  it("sends progress lines to onProgress as they arrive and keeps them out of the error text", async () => {
+    const progressEvents: unknown[] = [];
+    _mockNextChild({
+      status: 1,
+      stdout: "",
+      stderrChunks: [
+        'ava-pipeline-progress {"stage":"crawl_',
+        'started"}\nError: boom\n',
+        'ava-pipeline-progress {"stage":"page_loaded"}\n',
+      ],
+    });
+
+    const result = await runPipelineLocal({
+      pipelineName: "hdx",
+      repoRoot: "/repo",
+      runOptions: {},
+      onProgress: (progress) => {
+        progressEvents.push(progress);
+      },
+    });
+
+    expect([progressEvents, result.errorText]).toEqual([
+      [{ stage: "crawl_started" }, { stage: "page_loaded" }],
+      "Error: boom",
     ]);
   });
 });

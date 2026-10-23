@@ -12,6 +12,7 @@ import {
   ETL_UNLISTED_SCOPE_KEY,
 } from "@etl/EtlEngine/etlScopes";
 import { createRunExecutionRecorder } from "@etl/EtlEngine/recordRunExecution/createRunExecutionRecorder";
+import { createRunProgressReporter } from "@etl/EtlEngine/createRunProgressReporter/createRunProgressReporter";
 import { resolveDriveScopes } from "@etl/EtlEngine/resolveDriveScopes/resolveDriveScopes";
 import { selectRequestedScopes } from "@etl/EtlEngine/selectRequestedScopes/selectRequestedScopes";
 import { createSupabaseCheckpointStore } from "@etl/stores/SupabaseCheckpointStore/createSupabaseCheckpointStore";
@@ -34,6 +35,10 @@ import type {
   EtlScope,
   EtlStores,
 } from "@etl/EtlEngine/EtlEngine.types";
+import type {
+  ProgressCrawl,
+  RunProgressReporter,
+} from "@etl/EtlEngine/createRunProgressReporter/createRunProgressReporter";
 import type { RunExecutionRecorder } from "@etl/EtlEngine/recordRunExecution/createRunExecutionRecorder";
 import type { ResolvedDrive } from "@etl/EtlEngine/resolveDriveScopes/resolveDriveScopes";
 
@@ -186,9 +191,14 @@ function _buildCrawlTasks<TDrive, TScope extends EtlScope>(
 
 async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
   args: _CrawlTasksArgs<TDrive, TConnection, TScope> &
-    Readonly<{ task: _CrawlTask<TDrive, TScope>; remaining: number }>,
+    Readonly<{
+      task: _CrawlTask<TDrive, TScope>;
+      remaining: number;
+      progress: RunProgressReporter;
+      progressCrawl: ProgressCrawl;
+    }>,
 ): Promise<CrawlScopeResult> {
-  const { task } = args;
+  const { task, progress, progressCrawl } = args;
   if (!task.isListed) {
     return buildUncrawledCrawlResult({
       driveKey: task.driveKey,
@@ -198,6 +208,10 @@ async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
       startedAt: args.clock.now(),
       finishedAt: args.clock.now(),
     });
+  }
+  // A crawl with no limit left is skipped at once, so it only finishes.
+  if (args.remaining > 0) {
+    progress.crawlStarted(progressCrawl);
   }
   return crawlScope({
     config: args.config,
@@ -210,13 +224,33 @@ async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
     remaining: args.remaining,
     syncedAt: args.syncedAt,
     clock: args.clock,
+    onPageLoaded: (page) => {
+      progress.pageLoaded(progressCrawl, page);
+    },
   });
+}
+
+/** The crawl a task is, for progress events. */
+function _buildProgressCrawl<TDrive, TScope extends EtlScope>(
+  task: _CrawlTask<TDrive, TScope>,
+  crawlNumber: number,
+): ProgressCrawl {
+  return {
+    driveKey: task.driveKey,
+    scopeKey: task.isListed ? task.scope.key : ETL_UNLISTED_SCOPE_KEY,
+    crawlNumber,
+  };
 }
 
 async function _crawlInOrder<TDrive, TConnection, TScope extends EtlScope>(
   args: _CrawlTasksArgs<TDrive, TConnection, TScope>,
 ): Promise<readonly CrawlScopeResult[]> {
   const limit = args.options.limit ?? Number.POSITIVE_INFINITY;
+  const progress = createRunProgressReporter({
+    onProgress: args.options.onProgress,
+    crawlCount: args.tasks.length,
+    limit: args.options.limit,
+  });
   // Sequential on purpose: crawls run one after another, drive by drive and
   // scope by scope, and each crawl's remaining limit depends on how many
   // connections the crawls before it fetched.
@@ -226,11 +260,15 @@ async function _crawlInOrder<TDrive, TConnection, TScope extends EtlScope>(
       const fetched = results.reduce((sum, { report }) => {
         return sum + report.connectionsFetched;
       }, 0);
+      const progressCrawl = _buildProgressCrawl(task, results.length + 1);
       const result = await _runCrawlTask({
         ...args,
         task,
         remaining: limit - fetched,
+        progress,
+        progressCrawl,
       });
+      progress.crawlFinished(progressCrawl, result.report.status);
       // Recorded as each crawl ends, so a long run's progress is visible
       // and a crash keeps the crawls that finished.
       await args.onCrawled(result.report);

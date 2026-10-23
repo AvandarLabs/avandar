@@ -12,6 +12,7 @@ import type {
   EtlClock,
   EtlEngineConfig,
   EtlRunOptions,
+  EtlRunProgress,
   EtlRunReport,
   EtlRunWindow,
   EtlScope,
@@ -2001,6 +2002,92 @@ describe("createEtlEngine", () => {
       expect([recorder.events, _statusesOf(report)]).toEqual([
         ["listDrives"],
         [["a", "skipped", undefined]],
+      ]);
+    });
+  });
+
+  describe("progress", () => {
+    /** Runs the config and returns each progress event as a short tuple. */
+    async function _runAndCollectProgress(
+      config: FakeConfig,
+      options: EtlRunOptions,
+    ): Promise<unknown[][]> {
+      const events: EtlRunProgress[] = [];
+      await _run(config, {
+        ...options,
+        onProgress: (event) => {
+          events.push(event);
+        },
+      });
+      return events.map((event) => {
+        return [
+          event.stage,
+          event.driveKey,
+          `${String(event.crawlNumber)}/${String(event.crawlCount)}`,
+          event.connectionsFetched,
+          event.columnsFound,
+          event.status,
+        ];
+      });
+    }
+
+    it("reports each crawl's start, every loaded page, and its end with run totals", async () => {
+      const events = await _runAndCollectProgress(
+        _config({
+          drives: [
+            _drive("a", [
+              [_connection("a1", 1), _connection("a2", 2, 2)],
+              [_connection("a3", 3)],
+            ]),
+            _drive("b", [[_connection("b1", 1)]]),
+          ],
+          recorder: _recorder(),
+          stores: _stores(),
+        }),
+        { mode: "full" },
+      );
+
+      expect(events).toEqual([
+        ["crawl_started", "a", "1/2", 0, 0, undefined],
+        ["page_loaded", "a", "1/2", 2, 3, undefined],
+        ["page_loaded", "a", "1/2", 3, 4, undefined],
+        ["crawl_finished", "a", "1/2", 3, 4, "ok"],
+        ["crawl_started", "b", "2/2", 3, 4, undefined],
+        ["page_loaded", "b", "2/2", 4, 5, undefined],
+        ["crawl_finished", "b", "2/2", 4, 5, "ok"],
+      ]);
+    });
+
+    it("reports a crawl the limit skips only as finished, with the limit", async () => {
+      const events: EtlRunProgress[] = [];
+
+      await _run(
+        _config({
+          drives: [
+            _drive("a", [[_connection("a1", 1), _connection("a2", 2)]]),
+            _drive("b", [[_connection("b1", 1)]]),
+          ],
+          recorder: _recorder(),
+          stores: _stores(),
+        }),
+        {
+          mode: "full",
+          limit: 2,
+          onProgress: (event) => {
+            events.push(event);
+          },
+        },
+      );
+
+      expect(
+        events.map((event) => {
+          return [event.stage, event.driveKey, event.limit, event.status];
+        }),
+      ).toEqual([
+        ["crawl_started", "a", 2, undefined],
+        ["page_loaded", "a", 2, undefined],
+        ["crawl_finished", "a", 2, "ok"],
+        ["crawl_finished", "b", 2, "skipped"],
       ]);
     });
   });

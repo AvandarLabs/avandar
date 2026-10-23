@@ -2,6 +2,7 @@ import {
   buildCliInvocation,
   type CliInvocation,
 } from "@ava-cli/PipelineCli/buildCliInvocation/buildCliInvocation";
+import { createPipelineProgressPrinter } from "@ava-cli/PipelineCli/PipelineRunProgress/createPipelineProgressPrinter";
 import { PipelineRunFailedError } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunFailedError";
 import { printReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
 import { readPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/readPipelineRunReport";
@@ -39,16 +40,17 @@ function _readReportLine(reportLine: string): ReceivedPipelineRunReport {
 }
 
 /**
- * Runs the pipeline through the local runner and parses its report.
+ * Runs the pipeline through the local runner, printing its progress as it
+ * goes, and parses its report.
  *
  * @throws PipelineRunFailedError, carrying the report, when every crawl
  * failed.
  */
-function _runLocally(args: {
+async function _runLocally(args: {
   name: string;
   runOptions: PipelineRunRequestOptions;
   invocation: CliInvocation;
-}): ReceivedPipelineRunReport {
+}): Promise<ReceivedPipelineRunReport> {
   const repoRoot: string | undefined = findAvandarRepoRoot();
   if (repoRoot === undefined) {
     throw new Error(
@@ -57,12 +59,14 @@ function _runLocally(args: {
         "Run this command from inside the repository.",
     );
   }
-  const localResult = runPipelineLocal({
+  const progressPrinter = createPipelineProgressPrinter();
+  const localResult = await runPipelineLocal({
     pipelineName: args.name,
     repoRoot,
     runOptions: args.runOptions,
     invocation: args.invocation,
-  });
+    onProgress: progressPrinter.print,
+  }).finally(progressPrinter.stop);
   if (localResult.ok) {
     return _readReportLine(localResult.reportJson);
   }
@@ -73,6 +77,25 @@ function _runLocally(args: {
     message: localResult.errorText,
     report: _readReportLine(localResult.reportJson),
   });
+}
+
+/**
+ * Runs the pipeline on the pipeline-server. The server sends no progress,
+ * so the CLI only says the run is still going while it waits.
+ */
+async function _runOnServer(args: {
+  name: string;
+  runOptions: PipelineRunRequestOptions;
+  invocation: CliInvocation;
+}): Promise<ReceivedPipelineRunReport> {
+  const progressPrinter = createPipelineProgressPrinter({
+    waitingLabel: "waiting on the pipeline server",
+  });
+  return await sendRunPipelineRequest({
+    pipelineName: args.name,
+    runOptions: args.runOptions,
+    invocation: args.invocation,
+  }).finally(progressPrinter.stop);
 }
 
 /**
@@ -114,12 +137,8 @@ export async function runPipelineCommand(options: {
     const invocation = buildCliInvocation({ shouldReadCodeVersion: local });
     printInfo(`Running pipeline: ${name}`);
     const report: ReceivedPipelineRunReport = local
-      ? _runLocally({ name, runOptions, invocation })
-      : await sendRunPipelineRequest({
-          pipelineName: name,
-          runOptions,
-          invocation,
-        });
+      ? await _runLocally({ name, runOptions, invocation })
+      : await _runOnServer({ name, runOptions, invocation });
     printReceivedPipelineRunReport(report);
   } catch (error: unknown) {
     const message: string =
