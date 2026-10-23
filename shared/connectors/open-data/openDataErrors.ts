@@ -68,6 +68,15 @@ export type OpenDataAcquisitionFailure =
    * no status, so this condition cannot tell "blocked" from "host down".
    */
   | { code: "resource-unreachable"; ckanResourceId: string }
+  /** The resource's file has no bytes, or only whitespace. */
+  | { code: "resource-empty"; ckanResourceId: string }
+  /** The resource's file host wants credentials Avandar does not hold. */
+  | { code: "resource-authorization-required"; ckanResourceId: string }
+  /**
+   * The CKAN API itself did not answer, or answered with a server error, so
+   * nothing is known about the resource. Usually the instance's own outage.
+   */
+  | { code: "ckan-unreachable"; action: string }
   /** The catalog entry satisfied neither access shape, so it cannot be read. */
   | { code: "access-shape-invalid"; accessKind: string }
   /** Socrata reported more rows than the caller's ceiling allows. */
@@ -103,6 +112,12 @@ function _buildFailureMessage(failure: OpenDataAcquisitionFailure): string {
       return `CKAN resource '${failure.ckanResourceId}' is served from '${failure.resourceHost}' but its catalog entry names '${failure.expectedHost}'.`;
     case "resource-unreachable":
       return `CKAN resource '${failure.ckanResourceId}' could not be read.`;
+    case "resource-empty":
+      return `CKAN resource '${failure.ckanResourceId}' is an empty file.`;
+    case "resource-authorization-required":
+      return `CKAN resource '${failure.ckanResourceId}' requires credentials to download.`;
+    case "ckan-unreachable":
+      return `CKAN action '${failure.action}' could not be reached.`;
     case "access-shape-invalid":
       return `Catalog entry declares access kind '${failure.accessKind}' but does not carry that shape's columns.`;
     case "socrata-too-large":

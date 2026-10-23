@@ -17,6 +17,7 @@ export type OpenDataAPI = APITypeDef<
     "/data-catalog-listings/:catalogListingId/resource",
     "/data-catalog-listings/:catalogListingId/column-type-sample",
     "/data-catalog-listings/:catalogListingId/column-types",
+    "/data-catalog-listings/:catalogListingId/unparseable",
   ],
   {
     "/data-catalog-listings/:catalogListingId/resource": {
@@ -42,6 +43,13 @@ export type OpenDataAPI = APITypeDef<
             dataType: Enums<"datasets__duckdb_data_type">;
           }>;
         };
+      };
+    };
+    "/data-catalog-listings/:catalogListingId/unparseable": {
+      POST: {
+        returnType: Response;
+        pathParams: { catalogListingId: string };
+        body: { token: string };
       };
     };
   }

@@ -1095,6 +1095,10 @@ msgstr "يقرأ Avandar الملف في متصفحك. لا يغادر أي شي
 msgid "Could not load"
 msgstr "تعذر التحميل"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source file is empty."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "يمكن للأشخاص والمجموعات المدرجين أدناه فقط الوصول إلى هذا {resource}."
@@ -3178,6 +3182,10 @@ msgstr "رابط إلى السجل المصدر"
 msgid "None"
 msgstr "لا شيء"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "This dataset is indexed in {serviceName}, but it can't be loaded."
+msgstr ""
+
 #: src/views/ProfileView/PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
 msgstr "سيُطلب منك تأكيد كلمة المرور الحالية."
@@ -4039,6 +4047,10 @@ msgid "Only you can access this {resource}. Everyone else loses access, "
 msgstr "يمكنك وحدك الوصول إلى هذا {resource}. سيفقد الآخرون إمكانية الوصول، بما "
 "في ذلك مسؤولو مساحة العمل."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Can't be loaded"
+msgstr ""
+
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "اختر نموذجًا"
@@ -4118,6 +4130,10 @@ msgstr "إعدادات الشكل الهندسي المتقدمة"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
 msgstr "تحميل CSV"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source file isn't in a format Avandar can read as a table."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
@@ -5525,6 +5541,10 @@ msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 msgstr "تسمح خطتك الحالية فقط بمشاركة {maxAllowed, plural, one {لوحة معلومات "
 "واحدة} other {# من لوحات المعلومات}} أو نشرها. قم بالترقية إلى خطة "
 "Starter أو Impact لمشاركة العدد الذي تريده من لوحات المعلومات."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The file was downloaded, but Avandar couldn't read it as a table."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
@@ -7026,6 +7046,11 @@ msgstr "اسم مجموعة البيانات"
 msgid "Copy share link"
 msgstr "نسخ رابط المشاركة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The file is hosted on a different site from the one that lists it, so "
+"Avandar doesn't download it."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Leave empty when the geometry is already WGS 84."
 msgstr "اتركه فارغًا عندما تكون الأشكال الهندسية بالفعل بنظام WGS 84."
@@ -7072,6 +7097,10 @@ msgstr "رابط مخصص متاح"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Number of rows"
 msgstr "عدد الصفوف"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The site that hosts the file didn't respond. This may be temporary."
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Form is an approximation"
@@ -7443,6 +7472,10 @@ msgstr "اختر ما يجب قراءته"
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
 msgstr "إعادة كتابة مقترحة:"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source no longer has this dataset."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -8247,6 +8280,10 @@ msgstr "تغيير حجم لوحة السحب"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
 msgstr "الحشو الأفقي"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source requires a login to download this dataset."
+msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"

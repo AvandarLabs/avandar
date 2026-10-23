@@ -3,11 +3,14 @@ import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.t
 import { formatToContentKind } from "$/connectors/open-data/formatToContentKind.ts";
 import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResourceFromPackage.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
-import { parseCsvHeaderLine } from "$/connectors/open-data/parseCsvHeaderLine/parseCsvHeaderLine.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
+import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
 import type { OpenDataApiAccessFor } from "$/connectors/open-data/acquireOpenDataResource.ts";
-import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
+import type {
+  CkanPackage,
+  OpenDataHttp,
+} from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
 /** Rows of a Socrata dataset a sample holds. */
 export const COLUMN_TYPE_SAMPLE_MAX_ROWS = 10_000;
@@ -15,47 +18,169 @@ export const COLUMN_TYPE_SAMPLE_MAX_ROWS = 10_000;
 /** Bytes of a CKAN file a sample holds. */
 export const COLUMN_TYPE_SAMPLE_MAX_BYTES = 5 * 1024 * 1024;
 
+/** HTTP statuses saying the dataset or file no longer exists. */
+const _GONE_STATUSES: ReadonlySet<number> = new Set([404, 410]);
+
+/** HTTP statuses saying the source wants credentials. */
+const _AUTHORIZATION_STATUSES: ReadonlySet<number> = new Set([401, 403]);
+
+/**
+ * What a range request for the start of an empty file answers: there is no
+ * first byte to send.
+ */
+const _RANGE_NOT_SATISFIABLE_STATUS = 416;
+
+const _NEWLINE_BYTE = 0x0a;
+
+/** Tab, line feed, carriage return, and space. */
+const _WHITESPACE_BYTES: ReadonlySet<number> = new Set([
+  0x09, 0x0a, 0x0d, 0x20,
+]);
+
 /**
  * Reads at most `maxBytes` from the start of a file. A server that ignores a
- * range request still yields only the first `maxBytes`.
+ * range request still yields only the first `maxBytes`. A response that is
+ * not a success throws an `HttpClientError` carrying its status.
  */
 export type ReadByteRange = (args: {
   url: string;
   maxBytes: number;
 }) => Promise<Uint8Array>;
 
-/** The start of a source's real data, as CSV, and the names in its header. */
-export type OpenDataColumnTypeSample = Readonly<{
-  csvText: string;
-  headerNames: readonly string[];
-}>;
+/**
+ * The start of a source's real data, as raw bytes. Nothing here parses it:
+ * the app's DuckDB reads it as CSV, delimiter, quoting, and header
+ * included.
+ */
+export type OpenDataColumnTypeSample = Readonly<{ bytes: Uint8Array }>;
+
+function _readHttpStatus(error: unknown): number | undefined {
+  return error instanceof HttpClientError ? error.status : undefined;
+}
 
 /**
- * Cuts a sample that may end mid-row back to its last complete line, so the
- * reader that infers types never sees a partial row.
+ * Cuts a sample that filled the byte limit back to its last line break, so
+ * the reader that infers types never sees a partial row. A line feed byte
+ * never occurs inside a multi-byte UTF-8 character, so the cut needs no
+ * decoding.
  */
 function _trimToLastCompleteLine(args: {
   bytes: Uint8Array;
   maxBytes: number;
-}): string {
-  const text = new TextDecoder().decode(args.bytes);
+}): Uint8Array {
   if (args.bytes.byteLength < args.maxBytes) {
-    return text;
+    return args.bytes;
   }
-  const lastLineBreak = text.lastIndexOf("\n");
-  return lastLineBreak === -1 ? text : text.slice(0, lastLineBreak + 1);
+  const lastLineBreak = args.bytes.lastIndexOf(_NEWLINE_BYTE);
+  return lastLineBreak === -1
+    ? args.bytes
+    : args.bytes.subarray(0, lastLineBreak + 1);
+}
+
+function _isBlank(bytes: Uint8Array): boolean {
+  return bytes.every((byte) => {
+    return _WHITESPACE_BYTES.has(byte);
+  });
+}
+
+/**
+ * Reads the dataset from the CKAN API. A 404 means the dataset is gone and
+ * a 401 or 403 that it is private. Any other failure, a server error or no
+ * answer at all, is the API's own trouble, so it says nothing about the
+ * resource and is reported as `ckan-unreachable`.
+ */
+async function _getCkanPackage(args: {
+  access: Readonly<OpenDataApiAccessFor<"ckan">>;
+  http: Readonly<OpenDataHttp>;
+}): Promise<CkanPackage> {
+  const { access } = args;
+  try {
+    return await createCkanClient(args.http).getPackage({
+      baseUrl: access.apiBaseUrl,
+      ckanDatasetId: access.externalDatasetId,
+    });
+  } catch (cause) {
+    if (OpenDataAcquisitionFailed.is(cause)) {
+      throw cause;
+    }
+    const status = _readHttpStatus(cause);
+    if (status !== undefined && _GONE_STATUSES.has(status)) {
+      throw new OpenDataAcquisitionFailed(
+        { code: "resource-not-found", ckanResourceId: access.apiResourceId },
+        cause,
+      );
+    }
+    if (status !== undefined && _AUTHORIZATION_STATUSES.has(status)) {
+      throw new OpenDataAcquisitionFailed(
+        { code: "ckan-authorization-required", action: "package_show" },
+        cause,
+      );
+    }
+    throw new OpenDataAcquisitionFailed(
+      { code: "ckan-unreachable", action: "package_show" },
+      cause,
+    );
+  }
+}
+
+/** Why reading a CKAN file failed, from what its host answered. */
+function _createFileReadFailure(
+  error: unknown,
+  ckanResourceId: string,
+): OpenDataAcquisitionFailed {
+  const status = _readHttpStatus(error) ?? 0;
+  if (status === _RANGE_NOT_SATISFIABLE_STATUS) {
+    return new OpenDataAcquisitionFailed(
+      { code: "resource-empty", ckanResourceId },
+      error,
+    );
+  }
+  if (_GONE_STATUSES.has(status)) {
+    return new OpenDataAcquisitionFailed(
+      { code: "resource-not-found", ckanResourceId },
+      error,
+    );
+  }
+  const code = _AUTHORIZATION_STATUSES.has(status)
+    ? "resource-authorization-required"
+    : "resource-unreachable";
+  return new OpenDataAcquisitionFailed({ code, ckanResourceId }, error);
+}
+
+/** Reads the start of a CKAN file, refusing one with no content. */
+async function _readCkanFileStart(args: {
+  url: string;
+  ckanResourceId: string;
+  readByteRange: ReadByteRange;
+}): Promise<Uint8Array> {
+  let bytes: Uint8Array;
+  try {
+    bytes = await args.readByteRange({
+      url: args.url,
+      maxBytes: COLUMN_TYPE_SAMPLE_MAX_BYTES,
+    });
+  } catch (error) {
+    throw _createFileReadFailure(error, args.ckanResourceId);
+  }
+  if (_isBlank(bytes)) {
+    throw new OpenDataAcquisitionFailed({
+      code: "resource-empty",
+      ckanResourceId: args.ckanResourceId,
+    });
+  }
+  return _trimToLastCompleteLine({
+    bytes,
+    maxBytes: COLUMN_TYPE_SAMPLE_MAX_BYTES,
+  });
 }
 
 async function _sampleCkanResource(args: {
   access: Readonly<OpenDataApiAccessFor<"ckan">>;
   http: Readonly<OpenDataHttp>;
   readByteRange: ReadByteRange;
-}): Promise<string> {
+}): Promise<Uint8Array> {
   const { access } = args;
-  const ckanPackage = await createCkanClient(args.http).getPackage({
-    baseUrl: access.apiBaseUrl,
-    ckanDatasetId: access.externalDatasetId,
-  });
+  const ckanPackage = await _getCkanPackage(args);
   // Only the start of the file is read, so the file's size sets no limit.
   const resource = getCkanResourceFromPackage({
     ckanPackage,
@@ -71,13 +196,10 @@ async function _sampleCkanResource(args: {
       format: resource.format,
     });
   }
-  const bytes = await args.readByteRange({
+  return await _readCkanFileStart({
     url: resource.url,
-    maxBytes: COLUMN_TYPE_SAMPLE_MAX_BYTES,
-  });
-  return _trimToLastCompleteLine({
-    bytes,
-    maxBytes: COLUMN_TYPE_SAMPLE_MAX_BYTES,
+    ckanResourceId: resource.id,
+    readByteRange: args.readByteRange,
   });
 }
 
@@ -91,9 +213,11 @@ async function _sampleCkanResource(args: {
  * @param params.entry - The listing.
  * @param params.http - Reads CKAN metadata and Socrata exports.
  * @param params.readByteRange - Reads the start of a CKAN file.
- * @returns The sample and its header's names.
+ * @returns The sample's raw bytes.
  * @throws `OpenDataAcquisitionFailed` when the listing is not API-backed, or
- *   names a CKAN resource that is not a CSV or cannot be read.
+ *   names a CKAN resource that is not a CSV or cannot be read. Its code says
+ *   whether the CKAN API failed (`ckan-unreachable`) or the resource did
+ *   (`resource-empty`, `resource-unreachable`, and the rest).
  */
 export async function acquireOpenDataColumnTypeSample(params: {
   entry: Readonly<DataCatalogListing.T>;
@@ -107,17 +231,18 @@ export async function acquireOpenDataColumnTypeSample(params: {
       accessKind: params.entry.accessKind,
     });
   }
-  const csvText = await match(access)
+  const bytes = await match(access)
     .with({ apiService: "ckan" }, (ckanAccess) => {
       return _sampleCkanResource({ ...params, access: ckanAccess });
     })
-    .with({ apiService: "socrata" }, (socrataAccess) => {
-      return createSocrataClient(params.http).getRows({
+    .with({ apiService: "socrata" }, async (socrataAccess) => {
+      const csvText = await createSocrataClient(params.http).getRows({
         baseUrl: socrataAccess.apiBaseUrl,
         socrataDatasetId: socrataAccess.externalDatasetId,
         maxRows: COLUMN_TYPE_SAMPLE_MAX_ROWS,
       });
+      return new TextEncoder().encode(csvText);
     })
     .exhaustive();
-  return { csvText, headerNames: parseCsvHeaderLine(csvText) };
+  return { bytes };
 }

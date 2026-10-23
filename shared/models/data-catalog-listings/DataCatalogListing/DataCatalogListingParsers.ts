@@ -48,6 +48,18 @@ const DBReadSchema = z.object({
   cached_at: z.iso.datetime({ offset: true }).nullable(),
   pipeline_scope_keys: z.array(z.string()),
   date_column_type_last_verified: z.iso.datetime({ offset: true }).nullable(),
+  is_invalid: z.boolean(),
+  invalid_dataset_reason: z
+    .enum([
+      "empty_dataset",
+      "dataset_not_found",
+      "authorization_required",
+      "unsupported_format",
+      "external_host",
+      "unparseable_dataset",
+      "unreachable_dataset",
+    ])
+    .nullable(),
 });
 
 export const DataCatalogListingParsers =

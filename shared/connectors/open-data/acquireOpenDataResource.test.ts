@@ -48,6 +48,8 @@ function _entry(
     cachedAt: undefined,
     pipelineScopeKeys: [],
     dateColumnTypeLastVerified: undefined,
+    isInvalid: false,
+    invalidDatasetReason: undefined,
     ...overrides,
   };
 }

@@ -1,4 +1,5 @@
 import { createByteRangeReader } from "@sbfn/open-data/readByteRangeOverHttp/readByteRangeOverHttp.ts";
+import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
 import { describe, expect, it, vi } from "vitest";
 
 describe("createByteRangeReader", () => {
@@ -40,14 +41,30 @@ describe("createByteRangeReader", () => {
     expect(new TextDecoder().decode(bytes)).toBe("ab");
   });
 
-  it("fails on an error status", async () => {
-    await expect(
-      createByteRangeReader((async () => {
-        return new Response("nope", { status: 404 });
-      }) as unknown as typeof fetch)({
-        url: "https://data.humdata.org/file.csv",
-        maxBytes: 10,
-      }),
-    ).rejects.toThrow("HTTP 404");
+  it("fails on an error status with an HttpClientError carrying it", async () => {
+    const caught = await createByteRangeReader((async () => {
+      return new Response("nope", { status: 416 });
+    }) as unknown as typeof fetch)({
+      url: "https://data.humdata.org/file.csv",
+      maxBytes: 10,
+    }).catch((error: unknown) => {
+      return error;
+    });
+
+    expect([
+      caught instanceof HttpClientError,
+      (caught as HttpClientError).status,
+    ]).toEqual([true, 416]);
+  });
+
+  it("reads a success with no body as no bytes", async () => {
+    const bytes = await createByteRangeReader((async () => {
+      return new Response(null, { status: 200 });
+    }) as unknown as typeof fetch)({
+      url: "https://data.humdata.org/file.csv",
+      maxBytes: 10,
+    });
+
+    expect(bytes.byteLength).toBe(0);
   });
 });

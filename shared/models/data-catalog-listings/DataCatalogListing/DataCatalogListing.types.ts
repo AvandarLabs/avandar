@@ -119,7 +119,29 @@ export type DataCatalogListingRead = {
    * were, in which case every column is text.
    */
   dateColumnTypeLastVerified: string | undefined;
+
+  /**
+   * Whether this entry's dataset cannot be loaded, as found when a sample of
+   * it was last read.
+   */
+  isInvalid: boolean;
+
+  /** Why the dataset cannot be loaded. Set exactly when `isInvalid` is. */
+  invalidDatasetReason: InvalidDatasetReason | undefined;
 };
+
+/**
+ * Why an entry's dataset cannot be loaded. Mirrors the database enum
+ * `data_catalog_listings__invalid_dataset_reason`.
+ */
+export type InvalidDatasetReason =
+  | "empty_dataset"
+  | "dataset_not_found"
+  | "authorization_required"
+  | "unsupported_format"
+  | "external_host"
+  | "unparseable_dataset"
+  | "unreachable_dataset";
 
 /**
  * How an entry's rows are reached. Mirrors the database enum of the same
@@ -165,7 +187,7 @@ export type DataCatalogListingModel = SupabaseCrudModelSpec<
       Read: DataCatalogListingRead;
       Insert: SetOptional<
         DataCatalogListingRead,
-        "id" | "createdAt" | "updatedAt"
+        "id" | "createdAt" | "updatedAt" | "isInvalid" | "invalidDatasetReason"
       >;
       Update: Partial<DataCatalogListingRead>;
     };

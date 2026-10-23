@@ -81,6 +81,22 @@ describe("createColumnTypeVerificationCoordinator", () => {
     expect(deferred.verify).toHaveBeenCalledTimes(2);
   });
 
+  it("calls onFailed after a verification fails, so a listing marked invalid is refetched", async () => {
+    const deferred = _deferredVerify();
+    const onFailed = vi.fn();
+    const coordinator = createColumnTypeVerificationCoordinator({
+      verify: deferred.verify,
+      onVerified: vi.fn(),
+      onFailed,
+    });
+
+    const failing = coordinator.verify(LISTING_ID);
+    deferred.reject(new Error("empty file"));
+    await expect(failing).rejects.toThrow("empty file");
+
+    expect(onFailed).toHaveBeenCalledWith(LISTING_ID);
+  });
+
   it("remembers which listings it has tried", async () => {
     const deferred = _deferredVerify();
     const coordinator = createColumnTypeVerificationCoordinator({

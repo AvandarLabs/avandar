@@ -13,6 +13,7 @@ import { IconChevronDown, IconPlus } from "@tabler/icons-react";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
+import { DataCatalogInvalidNotice } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice";
 import { DataCatalogListingColumns } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.module.css";
 import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
@@ -52,7 +53,8 @@ type Props = {
  * The provenance fields read as a labelled fact list rather than as nine
  * bold-heading-plus-paragraph pairs, which turns a page of short values into
  * a page of headings. There is exactly one add button: a primary action
- * offered twice makes a user check whether the two do the same thing.
+ * offered twice makes a user check whether the two do the same thing. A
+ * listing whose dataset cannot be loaded says so and cannot be added.
  */
 export function DataCatalogListingDetail({
   listing,
@@ -87,6 +89,7 @@ export function DataCatalogListingDetail({
       : undefined;
   const isAddPending = isAdding || isWaitingForColumnTypes;
   const isAddBlocked =
+    listing.isInvalid ||
     !isAddAllowed ||
     isAddPending ||
     isLoadingColumnMetadata ||
@@ -115,6 +118,15 @@ export function DataCatalogListingDetail({
           </Button>
         </OfflineGated>
       </Group>
+
+      {listing.isInvalid && listing.invalidDatasetReason ? (
+        <DataCatalogInvalidNotice
+          serviceName={
+            listing.externalServiceName ?? listing.externalOrganizationName
+          }
+          reason={listing.invalidDatasetReason}
+        />
+      ) : null}
 
       {isWaitingForColumnTypes ? (
         <Text size="sm" c="dimmed" role="status">

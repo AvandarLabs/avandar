@@ -31,10 +31,13 @@ export type ColumnTypeVerificationCoordinator = Readonly<{
  *
  * @param options.verify - Verifies one listing's column types.
  * @param options.onVerified - Called after a listing's types are written.
+ * @param options.onFailed - Called after a listing's verification fails,
+ *   which may have marked the listing invalid.
  */
 export function createColumnTypeVerificationCoordinator(options: {
   verify: (catalogListingId: DataCatalogListing.Id) => Promise<void>;
   onVerified: (catalogListingId: DataCatalogListing.Id) => void;
+  onFailed?: (catalogListingId: DataCatalogListing.Id) => void;
 }): ColumnTypeVerificationCoordinator {
   const runningVerifications = new Map<DataCatalogListing.Id, Promise<void>>();
   const failedListingIds = new Set<DataCatalogListing.Id>();
@@ -53,6 +56,7 @@ export function createColumnTypeVerificationCoordinator(options: {
       options.onVerified(catalogListingId);
     } catch (error) {
       failedListingIds.add(catalogListingId);
+      options.onFailed?.(catalogListingId);
       throw error;
     } finally {
       runningVerifications.delete(catalogListingId);

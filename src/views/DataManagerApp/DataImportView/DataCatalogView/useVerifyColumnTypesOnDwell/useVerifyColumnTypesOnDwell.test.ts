@@ -17,6 +17,8 @@ function _listing(
     accessKind: "api_resource",
     apiResourceFormat: "CSV",
     dateColumnTypeLastVerified: undefined,
+    isInvalid: false,
+    invalidDatasetReason: undefined,
     dateOfLastUpdate: "2026-10-20T00:00:00+00:00",
     ...overrides,
   } as DataCatalogListing.T;

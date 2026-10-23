@@ -4,11 +4,13 @@ import {
   isColumnTypeSampleTokenValid,
   signColumnTypeSampleToken,
 } from "@sbfn/open-data/columnTypeSampleToken/columnTypeSampleToken.ts";
+import { gzipBytes } from "@sbfn/open-data/gzipBytes/gzipBytes.ts";
 import { createByteRangeReader } from "@sbfn/open-data/readByteRangeOverHttp/readByteRangeOverHttp.ts";
 import { z } from "zod";
 import { acquireOpenDataColumnTypeSample } from "$/connectors/open-data/acquireOpenDataColumnTypeSample/acquireOpenDataColumnTypeSample.ts";
 import { Constants } from "$/types/database.types.ts";
 import { HttpClientFactory } from "$/utils/HttpClientFactory/HttpClientFactory.ts";
+import type { MarkListingInvalid } from "@sbfn/open-data/respondWithSampleFailure/respondWithSampleFailure.ts";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 
 /** The largest response a sample's metadata or Socrata rows may be. */
@@ -31,6 +33,11 @@ export const VerifiedColumnTypesBodySchema = z.object({
     .max(5000),
 });
 
+/** The body the unparseable route accepts: the sample's token. */
+export const UnparseableSampleBodySchema = z.object({
+  token: z.string().min(1).max(4096),
+});
+
 function _getSigningSecret(): string {
   const secret = Deno.env.get("SB_SECRET_KEY");
   if (!secret) {
@@ -46,11 +53,45 @@ function _jsonResponse(status: number, body: unknown): Response {
   });
 }
 
+async function _isTokenValid(args: {
+  token: string;
+  catalogListingId: string;
+}): Promise<boolean> {
+  return await isColumnTypeSampleTokenValid({
+    token: args.token,
+    catalogListingId: args.catalogListingId,
+    secret: _getSigningSecret(),
+    now: Date.now(),
+  });
+}
+
+function _respondWithInvalidToken(): Response {
+  return _jsonResponse(409, {
+    error: { code: "column-type-sample-token-invalid" },
+  });
+}
+
+/** Marks a listing invalid through the service role's RPC. */
+export const markListingInvalid: MarkListingInvalid = async ({
+  catalogListingId,
+  reason,
+}) => {
+  const { error } = await SupabaseAdmin.rpc(
+    "rpc_data_catalog_listings__mark_invalid",
+    { p_catalog_listing_id: catalogListingId, p_reason: reason },
+  );
+  if (error) {
+    throw error;
+  }
+};
+
 /**
- * Answers with a sample of a listing's real data as CSV text, and a token in
- * `X-Ava-Column-Type-Token` that vouches for the sample's header. The
- * browser infers the column types from the sample and sends them back with
- * the token to `writeVerifiedColumnTypes`.
+ * Answers with the start of a listing's real data, gzipped and otherwise
+ * untouched, and a token in `X-Ava-Column-Type-Token` proving the caller
+ * read it. Nothing here parses the sample: the browser's DuckDB reads it as
+ * CSV, so a file with an unusual delimiter, a blank header cell, or stray
+ * quoting gets DuckDB's handling, not a hand-written parser's. The browser
+ * sends the types back with the token to `writeVerifiedColumnTypes`.
  *
  * @throws `OpenDataAcquisitionFailed` when the sample cannot be read.
  */
@@ -66,16 +107,16 @@ export async function respondWithColumnTypeSample(
   });
   const token = await signColumnTypeSampleToken({
     catalogListingId: entry.id,
-    headerNames: sample.headerNames,
     secret: _getSigningSecret(),
     now: Date.now(),
   });
-  return new Response(sample.csvText, {
+  return new Response(await gzipBytes(sample.bytes), {
     status: 200,
     headers: {
       ...corsHeaders,
       "Access-Control-Expose-Headers": COLUMN_TYPE_TOKEN_HEADER,
-      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Encoding": "gzip",
+      "Content-Type": "text/csv",
       [COLUMN_TYPE_TOKEN_HEADER]: token,
     },
   });
@@ -83,12 +124,12 @@ export async function respondWithColumnTypeSample(
 
 /**
  * Writes column types the browser inferred from a sample this function
- * served. The column names must be exactly the sample's header, in order,
- * as its token vouches, so a caller can label types but cannot add, drop,
- * or rename columns. Answers 409 with `column-type-sample-mismatch` when
- * they are not.
+ * served, once the token shows the caller read a sample of this listing.
+ * The browser's DuckDB names the columns, so the names are trusted as its
+ * types are. Answers 409 with `column-type-sample-token-invalid` when the
+ * token is expired, forged, or for another listing.
  *
- * Trusting the browser's types at all is temporary: once DuckDB can run
+ * Trusting the browser at all is temporary: once DuckDB can run
  * server-side, the server should read the sample and infer the types
  * itself.
  */
@@ -96,19 +137,8 @@ export async function writeVerifiedColumnTypes(args: {
   catalogListingId: string;
   body: z.infer<typeof VerifiedColumnTypesBodySchema>;
 }): Promise<Response> {
-  const isTokenValid = await isColumnTypeSampleTokenValid({
-    token: args.body.token,
-    catalogListingId: args.catalogListingId,
-    headerNames: args.body.columns.map((column) => {
-      return column.name;
-    }),
-    secret: _getSigningSecret(),
-    now: Date.now(),
-  });
-  if (!isTokenValid) {
-    return _jsonResponse(409, {
-      error: { code: "column-type-sample-mismatch" },
-    });
+  if (!(await _isTokenValid({ ...args, token: args.body.token }))) {
+    return _respondWithInvalidToken();
   }
   const { data, error } = await SupabaseAdmin.rpc(
     "rpc_data_catalog_listings__write_verified_column_types",
@@ -125,4 +155,23 @@ export async function writeVerifiedColumnTypes(args: {
   return _jsonResponse(200, {
     dateColumnTypeLastVerified: data.date_column_type_last_verified,
   });
+}
+
+/**
+ * Marks a listing `unparseable_dataset` when the browser's DuckDB could not
+ * read a sample this function served, once the token shows the caller read
+ * one. Answers 409 with `column-type-sample-token-invalid` when it did not.
+ */
+export async function markColumnTypeSampleUnparseable(args: {
+  catalogListingId: string;
+  body: z.infer<typeof UnparseableSampleBodySchema>;
+}): Promise<Response> {
+  if (!(await _isTokenValid({ ...args, token: args.body.token }))) {
+    return _respondWithInvalidToken();
+  }
+  await markListingInvalid({
+    catalogListingId: args.catalogListingId,
+    reason: "unparseable_dataset",
+  });
+  return _jsonResponse(200, { invalidDatasetReason: "unparseable_dataset" });
 }

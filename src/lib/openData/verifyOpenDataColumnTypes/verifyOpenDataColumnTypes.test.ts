@@ -34,11 +34,13 @@ function _listing(
   | "apiResourceFormat"
   | "dateColumnTypeLastVerified"
   | "dateOfLastUpdate"
+  | "isInvalid"
 > {
   return {
     accessKind: "api_resource",
     apiResourceFormat: "CSV",
     dateColumnTypeLastVerified: undefined,
+    isInvalid: false,
     dateOfLastUpdate: "2026-10-20T00:00:00+00:00",
     ...overrides,
   };
@@ -66,6 +68,7 @@ describe("isColumnTypeVerificationDue", () => {
       false,
     ],
     ["a Parquet resource", { apiResourceFormat: "PARQUET" }, false],
+    ["marked invalid", { isInvalid: true }, false],
     [
       "a pipeline Parquet listing",
       { accessKind: "pipeline_parquet", apiResourceFormat: undefined },
@@ -159,5 +162,60 @@ describe("verifyOpenDataColumnTypes", () => {
         },
       }),
     ).rejects.toThrow("Column type write-back failed: 409");
+  });
+
+  it.each([
+    [
+      "DuckDB cannot parse the sample",
+      async () => {
+        throw new Error("Invalid unicode");
+      },
+    ],
+    [
+      "DuckDB finds no columns",
+      async () => {
+        return [];
+      },
+    ],
+  ])("reports the sample as unparseable when %s", async (_label, inferColumnTypes) => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(
+        new Response("\u0000\u0001", {
+          status: 200,
+          headers: { "X-Ava-Column-Type-Token": "token-1" },
+        }),
+      )
+      .mockResolvedValueOnce(new Response("{}", { status: 200 }));
+
+    await expect(
+      verifyOpenDataColumnTypes(LISTING_ID, { inferColumnTypes }),
+    ).rejects.toThrow("could not be parsed");
+    expect(fetch).toHaveBeenNthCalledWith(
+      2,
+      `${EDGE_FUNCTIONS_URL}/open-data/data-catalog-listings/${LISTING_ID}/unparseable`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer session-token",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: "token-1" }),
+      },
+    );
+  });
+
+  it("names why the sample could not be read when the server says", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          error: { code: "resource-empty", invalidDatasetReason: "empty_dataset" },
+        }),
+        { status: 409 },
+      ),
+    );
+
+    await expect(
+      verifyOpenDataColumnTypes(LISTING_ID, { inferColumnTypes: vi.fn() }),
+    ).rejects.toThrow("Column type sample fetch failed: 409 (resource-empty)");
   });
 });

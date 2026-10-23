@@ -3,6 +3,7 @@ import type {
   OpenDataAccess,
   OpenDataAccessKind,
   OpenDataApiService,
+  InvalidDatasetReason as InvalidDatasetReasonType,
   DataCatalogListingId,
   DataCatalogListingModel,
 } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
@@ -23,4 +24,7 @@ export namespace DataCatalogListing {
 
   /** The API protocol an `api_resource` entry speaks. */
   export type ApiService = OpenDataApiService;
+
+  /** Why an entry's dataset cannot be loaded. */
+  export type InvalidDatasetReason = InvalidDatasetReasonType;
 }

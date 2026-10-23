@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Stack, Text, UnstyledButton } from "@mantine/core";
 import clsx from "clsx";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.module.css";
@@ -18,7 +19,8 @@ type Props = {
  *
  * Selection is a fill and a weight change, which is both quieter and easier
  * to spot than a border that appears on one of thirty identical boxes. The
- * rows are plain, not bordered, shadowed cards.
+ * rows are plain, not bordered, shadowed cards. A listing whose dataset
+ * cannot be loaded says so under its name.
  *
  * Only rendered when there is something to list. Which of the two empty
  * situations applies, an unpublished catalog or a query that matched nothing,
@@ -53,6 +55,11 @@ export function DataCatalogListingList({
               {listing.externalOrganizationName}
               {listing.pipelineName ? ` · ${listing.pipelineName}` : ""}
             </Text>
+            {listing.isInvalid ? (
+              <Text c="danger.8" size="xs">
+                <Trans>Can't be loaded</Trans>
+              </Text>
+            ) : null}
           </UnstyledButton>
         );
       })}

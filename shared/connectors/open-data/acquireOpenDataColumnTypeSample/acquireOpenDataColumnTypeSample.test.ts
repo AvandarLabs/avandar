@@ -5,8 +5,10 @@ import {
   COLUMN_TYPE_SAMPLE_MAX_ROWS,
 } from "$/connectors/open-data/acquireOpenDataColumnTypeSample/acquireOpenDataColumnTypeSample.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
 import type { ReadByteRange } from "$/connectors/open-data/acquireOpenDataColumnTypeSample/acquireOpenDataColumnTypeSample.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
+import type { OpenDataAcquisitionFailureCode } from "$/connectors/open-data/openDataErrors.ts";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 
 const CKAN_BASE_URL = "https://data.humdata.org";
@@ -49,6 +51,8 @@ function _entry(
     cachedAt: undefined,
     pipelineScopeKeys: [],
     dateColumnTypeLastVerified: undefined,
+    isInvalid: false,
+    invalidDatasetReason: undefined,
     ...overrides,
   };
 }
@@ -89,8 +93,46 @@ function _readByteRange(text: string): ReadByteRange {
   });
 }
 
+/** A `ReadByteRange` that fails the way a file host does. */
+function _failingByteRange(error: Error): ReadByteRange {
+  return vi.fn(async () => {
+    throw error;
+  });
+}
+
+/** An HttpClient whose `package_show` request fails. */
+function _failingCkanHttp(error: Error): OpenDataHttp {
+  return {
+    get: vi.fn(async () => {
+      throw error;
+    }),
+    getBytes: vi.fn(),
+  };
+}
+
+function _statusError(status: number): HttpClientError {
+  return new HttpClientError({ kind: "status", method: "GET", status });
+}
+
+const NETWORK_ERROR = new HttpClientError({ kind: "network", method: "GET" });
+
+/** The failure code a sample attempt rejected with. */
+async function _readFailureCode(
+  attempt: Promise<unknown>,
+): Promise<OpenDataAcquisitionFailureCode | undefined> {
+  const caught = await attempt.then(
+    () => {
+      return undefined;
+    },
+    (error: unknown) => {
+      return error;
+    },
+  );
+  return OpenDataAcquisitionFailed.is(caught) ? caught.failure.code : undefined;
+}
+
 describe("acquireOpenDataColumnTypeSample", () => {
-  it("reads the start of a CKAN CSV, however large the file, and its header", async () => {
+  it("reads the start of a CKAN CSV as raw bytes, however large the file", async () => {
     const readByteRange = _readByteRange('"adm1","value"\nKenya,1\n');
 
     const sample = await acquireOpenDataColumnTypeSample({
@@ -99,10 +141,9 @@ describe("acquireOpenDataColumnTypeSample", () => {
       readByteRange,
     });
 
-    expect(sample).toEqual({
-      csvText: '"adm1","value"\nKenya,1\n',
-      headerNames: ["adm1", "value"],
-    });
+    expect(new TextDecoder().decode(sample.bytes)).toBe(
+      '"adm1","value"\nKenya,1\n',
+    );
     expect(readByteRange).toHaveBeenCalledWith({
       url: RESOURCE_URL,
       maxBytes: COLUMN_TYPE_SAMPLE_MAX_BYTES,
@@ -122,7 +163,7 @@ describe("acquireOpenDataColumnTypeSample", () => {
       readByteRange: _readByteRange(fullLines + partialLine),
     });
 
-    expect(sample.csvText).toBe(fullLines);
+    expect(new TextDecoder().decode(sample.bytes)).toBe(fullLines);
   });
 
   it("refuses a CKAN resource that is not a CSV", async () => {
@@ -161,7 +202,9 @@ describe("acquireOpenDataColumnTypeSample", () => {
       readByteRange: _readByteRange(""),
     });
 
-    expect(sample.headerNames).toEqual(["borough", "count"]);
+    expect(new TextDecoder().decode(sample.bytes)).toBe(
+      '"borough","count"\nBronx,3\n',
+    );
     expect(http.getBytes).toHaveBeenCalledWith(
       `https://data.cityofnewyork.us/resource/erm2-nwe9.csv?%24limit=${COLUMN_TYPE_SAMPLE_MAX_ROWS}`,
     );
@@ -187,5 +230,85 @@ describe("acquireOpenDataColumnTypeSample", () => {
         caught.failure.code === "access-shape-invalid"
       );
     });
+  });
+
+  it.each([
+    ["an empty body", ""],
+    ["only whitespace", " \r\n\n"],
+  ])("reports a CKAN file with %s as empty", async (_label, text) => {
+    const code = await _readFailureCode(
+      acquireOpenDataColumnTypeSample({
+        entry: _entry(),
+        http: _ckanHttp(),
+        readByteRange: _readByteRange(text),
+      }),
+    );
+
+    expect(code).toBe("resource-empty");
+  });
+
+  it.each([
+    [416, "resource-empty"],
+    [404, "resource-not-found"],
+    [410, "resource-not-found"],
+    [401, "resource-authorization-required"],
+    [403, "resource-authorization-required"],
+    [503, "resource-unreachable"],
+  ])(
+    "maps a CKAN file read that fails with HTTP %i to %s",
+    async (status, expectedCode) => {
+      const code = await _readFailureCode(
+        acquireOpenDataColumnTypeSample({
+          entry: _entry(),
+          http: _ckanHttp(),
+          readByteRange: _failingByteRange(_statusError(status)),
+        }),
+      );
+
+      expect(code).toBe(expectedCode);
+    },
+  );
+
+  it("reports a CKAN file host that never answers as unreachable", async () => {
+    const code = await _readFailureCode(
+      acquireOpenDataColumnTypeSample({
+        entry: _entry(),
+        http: _ckanHttp(),
+        readByteRange: _failingByteRange(NETWORK_ERROR),
+      }),
+    );
+
+    expect(code).toBe("resource-unreachable");
+  });
+
+  it.each([
+    [404, "resource-not-found"],
+    [403, "ckan-authorization-required"],
+    [503, "ckan-unreachable"],
+  ])(
+    "maps a CKAN package_show that fails with HTTP %i to %s",
+    async (status, expectedCode) => {
+      const code = await _readFailureCode(
+        acquireOpenDataColumnTypeSample({
+          entry: _entry(),
+          http: _failingCkanHttp(_statusError(status)),
+          readByteRange: _readByteRange("a\n1\n"),
+        }),
+      );
+
+      expect(code).toBe(expectedCode);
+    },
+  );
+
+  it("reports a CKAN API that never answers as the API being unreachable, not the file", async () => {
+    const code = await _readFailureCode(
+      acquireOpenDataColumnTypeSample({
+        entry: _entry(),
+        http: _failingCkanHttp(NETWORK_ERROR),
+        readByteRange: _readByteRange("a\n1\n"),
+      }),
+    );
+
+    expect(code).toBe("ckan-unreachable");
   });
 });

@@ -48,7 +48,8 @@ async function _inferColumnTypesWithDuckDb(
  * Whether a catalog listing's column types should be verified: it is an
  * API-backed CSV resource whose types were never verified, or were verified
  * before its source last changed. A Parquet resource's types come from its
- * file when a pipeline reads it.
+ * file when a pipeline reads it. A listing marked invalid is not tried
+ * again: a pipeline rewrite after its source changes clears the mark.
  */
 export function isColumnTypeVerificationDue(
   listing: Pick<
@@ -57,9 +58,11 @@ export function isColumnTypeVerificationDue(
     | "apiResourceFormat"
     | "dateColumnTypeLastVerified"
     | "dateOfLastUpdate"
+    | "isInvalid"
   >,
 ): boolean {
   if (
+    listing.isInvalid ||
     listing.accessKind !== "api_resource" ||
     listing.apiResourceFormat?.toUpperCase() !== "CSV"
   ) {
@@ -84,39 +87,113 @@ async function _readAccessToken(): Promise<string> {
   return accessToken;
 }
 
+/** The failure code a refused sample response names, if it names one. */
+async function _readSampleFailureCode(
+  response: Response,
+): Promise<string | undefined> {
+  try {
+    const body = (await response.json()) as {
+      error?: { code?: unknown };
+    };
+    return typeof body.error?.code === "string" ? body.error.code : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Reads a listing's sample and its token. The server gzips the sample and
+ * `fetch` gunzips it, so this reads plain text.
+ *
+ * @throws When the sample cannot be read, naming the server's failure code.
+ */
+async function _fetchSample(args: {
+  listingUrl: string;
+  accessToken: string;
+}): Promise<Readonly<{ csvText: string; token: string }>> {
+  const response = await fetch(`${args.listingUrl}/column-type-sample`, {
+    headers: { Authorization: `Bearer ${args.accessToken}` },
+  });
+  if (!response.ok) {
+    const code = await _readSampleFailureCode(response);
+    const codeNote = code === undefined ? "" : ` (${code})`;
+    throw new Error(
+      `Column type sample fetch failed: ${response.status}${codeNote}`,
+    );
+  }
+  return {
+    token: response.headers.get("X-Ava-Column-Type-Token") ?? "",
+    csvText: await response.text(),
+  };
+}
+
+/**
+ * Infers a sample's column types. When DuckDB cannot parse the sample, or
+ * finds no columns in it, the server is told the listing is unparseable.
+ *
+ * @throws When the sample could not be parsed.
+ */
+async function _inferOrReportUnparseable(args: {
+  csvText: string;
+  token: string;
+  listingUrl: string;
+  accessToken: string;
+  inferColumnTypes: InferColumnTypes;
+}): Promise<readonly InferredColumnType[]> {
+  let columns: readonly InferredColumnType[] = [];
+  let cause: unknown;
+  try {
+    columns = await args.inferColumnTypes(args.csvText);
+  } catch (error) {
+    cause = error;
+  }
+  if (columns.length > 0) {
+    return columns;
+  }
+  await fetch(`${args.listingUrl}/unparseable`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${args.accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token: args.token }),
+  });
+  throw new Error("The column type sample could not be parsed", { cause });
+}
+
 /**
  * Verifies one catalog listing's column types: reads a sample of its source
- * through the open-data edge function, infers each column's type with
- * DuckDB in this browser, and sends the types back to be written. The edge
- * function only accepts them for exactly the sample's columns.
+ * through the open-data edge function, infers each column's name and type
+ * with DuckDB in this browser, and sends them back to be written. The edge
+ * function never parses the sample, so DuckDB's CSV detection decides the
+ * delimiter, quoting, and header. A sample DuckDB cannot read marks the
+ * listing unparseable, and a sample the server cannot read at all may mark
+ * it invalid on the server's side.
  *
  * Inferring in the browser is temporary: once DuckDB can run server-side,
  * the server should read the sample and infer the types itself.
  *
  * @param catalogListingId - The listing.
  * @param options.inferColumnTypes - Replaces the DuckDB inference, for tests.
- * @throws When the sample cannot be read or the types are refused.
+ * @throws When the sample cannot be read or parsed, or the types are
+ *   refused.
  */
 export async function verifyOpenDataColumnTypes(
   catalogListingId: DataCatalogListing.Id,
   options: { inferColumnTypes?: InferColumnTypes } = {},
 ): Promise<void> {
-  const inferColumnTypes =
-    options.inferColumnTypes ?? _inferColumnTypesWithDuckDb;
   const accessToken = await _readAccessToken();
   const listingUrl =
     `${AvaSupabase.getEdgeFunctionsURL()}/open-data/data-catalog-listings/` +
     encodeURIComponent(catalogListingId);
-  const sampleResponse = await fetch(`${listingUrl}/column-type-sample`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
+  const { csvText, token } = await _fetchSample({ listingUrl, accessToken });
+  const columns = await _inferOrReportUnparseable({
+    csvText,
+    token,
+    listingUrl,
+    accessToken,
+    inferColumnTypes: options.inferColumnTypes ?? _inferColumnTypesWithDuckDb,
   });
-  if (!sampleResponse.ok) {
-    throw new Error(
-      `Column type sample fetch failed: ${sampleResponse.status}`,
-    );
-  }
-  const token = sampleResponse.headers.get("X-Ava-Column-Type-Token") ?? "";
-  const columns = await inferColumnTypes(await sampleResponse.text());
   const writeResponse = await fetch(`${listingUrl}/column-types`, {
     method: "POST",
     headers: {

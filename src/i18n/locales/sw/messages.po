@@ -1107,6 +1107,10 @@ msgstr "Avandar husoma faili kwenye kivinjari chako. Hakuna kinachoondoka "
 msgid "Could not load"
 msgstr "Haikuweza kupakia"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source file is empty."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "Ni watu na vikundi vilivyoorodheshwa hapa chini pekee vinavyoweza "
@@ -3222,6 +3226,10 @@ msgstr "Kiungo cha rekodi chanzo"
 msgid "None"
 msgstr "Hakuna"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "This dataset is indexed in {serviceName}, but it can't be loaded."
+msgstr ""
+
 #: src/views/ProfileView/PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
 msgstr "Utatazamiwa kuthibitisha nenosiri lako la sasa."
@@ -4094,6 +4102,10 @@ msgid "Only you can access this {resource}. Everyone else loses access, "
 msgstr "Ni wewe pekee unayeweza kufikia {resource} hii. Wengine wote watapoteza "
 "idhini ya kufikia, wakiwemo wasimamizi wa nafasi ya kazi."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Can't be loaded"
+msgstr ""
+
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "Chagua mfano"
@@ -4173,6 +4185,10 @@ msgstr "Mipangilio mahiri ya jiometri"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
 msgstr "Pakia CSV"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source file isn't in a format Avandar can read as a table."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
@@ -5596,6 +5612,10 @@ msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 msgstr "Mpango wako wa sasa unakuruhusu tu kushiriki au kuchapisha {maxAllowed, "
 "plural, one {dashibodi #} other {dashibodi #}}. Boresha hadi mpango "
 "wetu wa Starter au Impact ili kushiriki dashibodi nyingi utakavyo."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The file was downloaded, but Avandar couldn't read it as a table."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
@@ -7115,6 +7135,11 @@ msgstr "Jina la Seti ya Data"
 msgid "Copy share link"
 msgstr "Nakili kiungo cha kushiriki"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The file is hosted on a different site from the one that lists it, so "
+"Avandar doesn't download it."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Leave empty when the geometry is already WGS 84."
 msgstr "Acha wazi wakati jiometri tayari ni WGS 84."
@@ -7161,6 +7186,10 @@ msgstr "URL ya kawaida inapatikana"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Number of rows"
 msgstr "Idadi ya safu"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The site that hosts the file didn't respond. This may be temporary."
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Form is an approximation"
@@ -7537,6 +7566,10 @@ msgstr "Chagua cha kusoma"
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
 msgstr "Mapendekezo ya kuandika upya:"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source no longer has this dataset."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -8346,6 +8379,10 @@ msgstr "Badilisha ukubwa wa paneli ya pembeni"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
 msgstr "Pambizo ya mlalo"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source requires a login to download this dataset."
+msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"

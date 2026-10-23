@@ -5,12 +5,14 @@ export const COLUMN_TYPE_SAMPLE_TOKEN_LIFETIME_MS = 15 * 60 * 1000;
  * Keeps this token's key separate from every other use of the secret it is
  * derived from.
  */
-const KEY_PURPOSE = "avandar:open-data:column-type-sample-token:v1";
+const KEY_PURPOSE = "avandar:open-data:column-type-sample-token:v2";
 
-/** What a token vouches for: one listing's sample header, until a time. */
+/**
+ * What a token vouches for: that this function served the caller a sample
+ * of one listing, until a time.
+ */
 type _TokenClaims = Readonly<{
   catalogListingId: string;
-  headerNamesSha256: string;
   expiresAtMs: number;
 }>;
 
@@ -57,27 +59,11 @@ async function _importKey(secret: string): Promise<CryptoKey> {
 }
 
 /**
- * The SHA-256 of a header's names, in order, as hex. Two headers hash the
- * same only when they hold the same names in the same order.
- */
-export async function hashHeaderNames(
-  headerNames: readonly string[],
-): Promise<string> {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(JSON.stringify(headerNames)),
-  );
-  return [...new Uint8Array(digest)]
-    .map((byte) => {
-      return byte.toString(16).padStart(2, "0");
-    })
-    .join("");
-}
-
-/**
- * Signs a token that vouches for the header of a sample this function
- * served, so a later write-back can be checked against the real column
- * names rather than whatever the browser sends.
+ * Signs a token that vouches for a sample of a listing this function
+ * served, so a later write-back, or a report that the sample could not be
+ * parsed, comes from a caller who read one recently. It does not vouch for
+ * column names: the app's DuckDB finds those, and this function never parses
+ * the sample.
  *
  * @param args.secret - The secret the signing key is derived from.
  * @param args.now - The current time, in milliseconds.
@@ -85,13 +71,11 @@ export async function hashHeaderNames(
  */
 export async function signColumnTypeSampleToken(args: {
   catalogListingId: string;
-  headerNames: readonly string[];
   secret: string;
   now: number;
 }): Promise<string> {
   const claims: _TokenClaims = {
     catalogListingId: args.catalogListingId,
-    headerNamesSha256: await hashHeaderNames(args.headerNames),
     expiresAtMs: args.now + COLUMN_TYPE_SAMPLE_TOKEN_LIFETIME_MS,
   };
   const encodedClaims = _toBase64Url(
@@ -106,17 +90,15 @@ export async function signColumnTypeSampleToken(args: {
 }
 
 /**
- * Whether a token this function signed vouches for these column names on
- * this listing, and has not expired.
+ * Whether a token this function signed vouches for a sample of this
+ * listing, and has not expired.
  *
  * @param args.token - The token, as `signColumnTypeSampleToken` made it.
- * @param args.headerNames - The names the caller claims, in order.
  * @param args.now - The current time, in milliseconds.
  */
 export async function isColumnTypeSampleTokenValid(args: {
   token: string;
   catalogListingId: string;
-  headerNames: readonly string[];
   secret: string;
   now: number;
 }): Promise<boolean> {
@@ -143,8 +125,7 @@ export async function isColumnTypeSampleTokenValid(args: {
     ) as _TokenClaims;
     return (
       claims.catalogListingId === args.catalogListingId &&
-      claims.expiresAtMs > args.now &&
-      claims.headerNamesSha256 === (await hashHeaderNames(args.headerNames))
+      claims.expiresAtMs > args.now
     );
   } catch {
     return false;

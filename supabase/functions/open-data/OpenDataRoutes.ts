@@ -6,10 +6,14 @@ import {
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
 import {
+  markColumnTypeSampleUnparseable,
+  markListingInvalid,
   respondWithColumnTypeSample,
+  UnparseableSampleBodySchema,
   VerifiedColumnTypesBodySchema,
   writeVerifiedColumnTypes,
 } from "@sbfn/open-data/columnTypeVerification/columnTypeVerification.ts";
+import { respondWithSampleFailure } from "@sbfn/open-data/respondWithSampleFailure/respondWithSampleFailure.ts";
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { string } from "zod";
 import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
@@ -205,7 +209,11 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
         return await respondWithColumnTypeSample(entry);
       } catch (caught) {
         if (OpenDataAcquisitionFailed.is(caught)) {
-          return _responseFromFailure(caught);
+          return await respondWithSampleFailure({
+            catalogListingId: entry.id,
+            error: caught,
+            markInvalid: markListingInvalid,
+          });
         }
         throw caught;
       }
@@ -229,6 +237,30 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
             return entry;
           }
           return await writeVerifiedColumnTypes({
+            catalogListingId: entry.id,
+            body,
+          });
+        },
+      ),
+  },
+  "/data-catalog-listings/:catalogListingId/unparseable": {
+    POST: POST({
+      path: "/data-catalog-listings/:catalogListingId/unparseable",
+      schema: { catalogListingId: string().uuid() },
+    })
+      .bodySchema(UnparseableSampleBodySchema)
+      .action(
+        async ({ pathParams, body, supabaseClient }): Promise<Response> => {
+          // Read as the caller first, so only a listing they can see is
+          // marked.
+          const entry = await _readCatalogListing(
+            supabaseClient,
+            pathParams.catalogListingId,
+          );
+          if (entry instanceof Response) {
+            return entry;
+          }
+          return await markColumnTypeSampleUnparseable({
             catalogListingId: entry.id,
             body,
           });

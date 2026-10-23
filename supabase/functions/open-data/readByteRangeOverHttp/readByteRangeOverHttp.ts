@@ -1,3 +1,4 @@
+import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
 import type { ReadByteRange } from "$/connectors/open-data/acquireOpenDataColumnTypeSample/acquireOpenDataColumnTypeSample.ts";
 
 /** How long reading one sample may take before it counts as failed. */
@@ -33,6 +34,8 @@ async function _readAtMost(
  * Creates a `ReadByteRange` over `fetch`. It asks for the first `maxBytes`
  * with a `Range` header and follows redirects, and stops reading at
  * `maxBytes` even when the server ignores the range and sends the whole file.
+ * A response that is not a success throws an `HttpClientError` with its
+ * status, such as 416 for the start of an empty file.
  *
  * @param fetchImpl - Replaces `fetch`, for tests.
  */
@@ -45,9 +48,17 @@ export function createByteRangeReader(
       redirect: "follow",
       signal: AbortSignal.timeout(READ_TIMEOUT_MS),
     });
-    if (!response.ok || response.body === null) {
-      throw new Error(`Reading ${url} failed with HTTP ${response.status}`);
+    if (!response.ok) {
+      // No URL in the error: after a redirect it can be a presigned
+      // object-store URL, which is a credential.
+      throw new HttpClientError({
+        kind: "status",
+        method: "GET",
+        status: response.status,
+      });
     }
-    return await _readAtMost(response.body, maxBytes);
+    return response.body === null
+      ? new Uint8Array()
+      : await _readAtMost(response.body, maxBytes);
   };
 }
