@@ -17,7 +17,7 @@
  *
  * Today's split (every entry is a judgment call, review in the PR):
  *   - ACTIVE: dataset definitions and their per-format detail rows,
- *     catalog entries, dashboards, concepts + their attributes + attribute
+ *     catalog listings, dashboards, concepts + their attributes + attribute
  *     mappings, individuals, user profile, plus `workspaces` and
  *     `workspace_memberships` so the workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
@@ -38,8 +38,9 @@ const ACTIVE_TABLES = [
   "datasets__pdf_file",
   "datasets__virtual",
   "datasets__xlsx_file",
-  "catalog_entries__open_data",
-  "catalog_entries__dataset_column",
+  "datasets__postgres_table",
+  "data_catalog_listings",
+  "data_catalog_listings__relation_columns",
   "dashboards",
   "concepts",
   "concept_attributes",
@@ -107,6 +108,20 @@ const DEPRECATED_TABLES = [
   "entities",
   "value_extractors__dataset_column_value",
   "value_extractors__manual_entry",
+  // Renamed by 20261017112819 ("rename catalog_entries to
+  // catalog_listings") and then by 20261017121944 ("rename catalog_listings
+  // to data_catalog_listings"). The old names have to stay recognisable so
+  // the whole pre-rename history, and both rename ALTER TABLEs themselves,
+  // partition cleanly:
+  //   catalog_entries__open_data      -> catalog_listings__open_data
+  //                                   -> data_catalog_listings
+  //   catalog_entries__dataset_column -> catalog_listings__dataset_column
+  //                                   -> data_catalog_listings
+  //                                      __relation_columns
+  "catalog_entries__open_data",
+  "catalog_entries__dataset_column",
+  "catalog_listings__open_data",
+  "catalog_listings__dataset_column",
 ] as const;
 
 /**
@@ -155,6 +170,20 @@ export const EXCLUDED_TABLES = [
   "resource_shares",
   // Web GIS maps are not mirrored to desktop SQLite yet.
   "maps",
+  // Web-only first-run tutorial/onboarding progress; nothing the desktop
+  // needs to render offline.
+  "user_nux_progress",
+  // A saved connection's secret pointer is meaningless offline, and the
+  // desktop shell cannot proxy a live Postgres connection either.
+  "db_connections",
+  "db_connections__postgres",
+  // Pipeline crawl state, written by the pipeline server with the service
+  // role. Nothing the desktop renders.
+  "pipeline_scope_checkpoints",
+  // Pipeline execution history, written with the service role for audit and
+  // debugging. Nothing the desktop renders.
+  "pipeline_executions",
+  "pipeline_execution_scopes",
 ] as const;
 
 /**

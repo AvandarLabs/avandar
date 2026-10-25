@@ -404,7 +404,7 @@ msgstr "样式"
 msgid "Square"
 msgstr "正方形"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Notes"
 msgstr "备注"
@@ -452,7 +452,7 @@ msgstr "第二点"
 msgid "Latitude and longitude look swapped"
 msgstr "纬度和经度似乎颠倒了"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Cannot add dataset"
 msgstr "无法添加数据集"
 
@@ -541,6 +541,10 @@ msgstr "保存并重新运行查询"
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Saved as \"{0}\"."
 msgstr "已保存为 \"{0}\"。"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Could not save. Your last change is still on screen."
@@ -822,7 +826,7 @@ msgid "Pick both a latitude and a longitude column. One on its own plots every "
 msgstr "请同时选择纬度列和经度列。只选择其中一列会将每个点绘制在一条对角线上，看起来像有效结果，但实际并非如此。"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Open data"
@@ -872,7 +876,7 @@ msgstr " 条记录"
 msgid "Something else…"
 msgstr "其他…"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "The catalog is still in <0/> and grows as people tell us what they need. "
 "Missing a dataset? <1>tell us</1>."
 msgstr "目录仍处于 <0/> 阶段，并会随着用户告知我们需求而不断扩充。找不到所需的数据集？<1>告诉我们</1>。"
@@ -919,6 +923,7 @@ msgstr "地图"
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Table"
 msgstr "表格"
 
@@ -968,7 +973,7 @@ msgstr "保持 SQL 不变"
 msgid "Remove User"
 msgstr "移除用户"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Avandar prepares public datasets and publishes them here. The catalog "
 "grows from what people ask for, so tell us which one you need."
 msgstr "Avandar 会整理公共数据集并发布在这里。目录内容会根据大家的需求不断扩充，告诉我们您需要哪个数据集。"
@@ -986,7 +991,7 @@ msgstr "当前 SQL 包含表单无法表示的部分。继续操作会使用根�
 msgid "Updated {0}"
 msgstr "已更新 {0}"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory.tsx
 msgid "Request a data source connection via feedback"
 msgstr "通过反馈请求数据源连接"
 
@@ -1059,11 +1064,15 @@ msgstr "Avandar 会在浏览器中读取文件。在您保存数据集之前，�
 msgid "Could not load"
 msgstr "无法加载"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source file is empty."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "只有下方列出的人和群组可以访问此 {resource}。"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "您无法在当前计划中添加更多数据集。升级以添加此目录数据集。"
@@ -1195,7 +1204,7 @@ msgstr "请先运行查询。"
 msgid "Seat limit reached"
 msgstr "达到座位限制"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Pipeline"
 msgstr "管道"
 
@@ -1256,6 +1265,11 @@ msgstr "CSV"
 msgid "Preset"
 msgstr "预设"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "Reading a sample of this dataset to confirm its columns and their types. "
+"The list below may change."
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 msgstr "添加按 {groupByColumn} 分组的 {datasetName} 的条形图"
@@ -1289,7 +1303,7 @@ msgstr "已复制"
 msgid "Measure distance and area"
 msgstr "测量距离和面积"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add to workspace"
 msgstr "添加到工作区"
 
@@ -1348,7 +1362,7 @@ msgstr "关闭聊天 (⌘/)"
 msgid "Create failed"
 msgstr "创建失败"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Raw metadata"
 msgstr "原始元数据"
 
@@ -1438,6 +1452,10 @@ msgstr "已发布的副本仍面向之前的受众。请使用下面的按钮应
 msgid "Hide tutorial"
 msgstr "隐藏教程"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
+msgid "Username"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "SQL 中的列名"
@@ -1502,6 +1520,7 @@ msgstr "按值调整大小"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Label"
 msgstr "标签"
 
@@ -1614,6 +1633,7 @@ msgstr "数值轴 {0} 至 {1}，{scaleLabel}，适合 {2} 个刻度（最大误�
 
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 #: src/views/ProfileView/PasswordSection.tsx
 #: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
@@ -1850,6 +1870,10 @@ msgstr "内置预设"
 msgid "Select a data layer to buffer."
 msgstr "选择要创建缓冲区的数据图层。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Cannot add dataset yet"
+msgstr ""
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Paper size"
 msgstr "纸张大小"
@@ -1859,7 +1883,7 @@ msgid "Select a {conceptName}"
 msgstr "选择一个 {conceptName}"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" 现在在您的工作区中。"
 
@@ -1886,6 +1910,10 @@ msgstr "来自这些区块的行"
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
 msgstr "聊天"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
+msgid "Host"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the z, x and y placeholders where the server expects the tile "
@@ -2273,6 +2301,10 @@ msgstr "存储"
 msgid "Publish it"
 msgstr "发布"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
+msgid "Prod reporting replica"
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
 msgstr "请让我为此仪表板添加图表..."
@@ -2434,7 +2466,7 @@ msgstr "允许手动创建新的 {pluralConceptName}"
 msgid "Welcome to Avandar"
 msgstr "欢迎使用 Avandar"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
 msgstr "通过反馈告诉我们您想要哪个开放数据集"
 
@@ -2532,6 +2564,10 @@ msgid "Your workspace is on the Free plan, which lets you share or publish one "
 "dashboards as you like."
 msgstr "您的工作区使用的是免费套餐，该套餐允许您分享或发布一个仪表板。升级到 Starter 或 Impact 套餐，即可随意分享任意数量的仪表板。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
+msgid "Disable"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
 "column reference."
@@ -2599,7 +2635,7 @@ msgstr "{0}、{1} 和 {2} 对每个工作区都是固定的。"
 msgid "Synced to the cloud"
 msgstr "已同步到云端"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
 "how often it updates."
 msgstr "选择左侧的数据集，查看其涵盖的内容、发布者以及更新频率。"
@@ -2824,6 +2860,10 @@ msgstr "无法总结此列。查询可能因不支持的值或格式错误的单
 msgid "Draw a box around a table, chart, map or block of text to extract it."
 msgstr "在表格、图表、地图或文本块周围框选，以提取其中的内容。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable.ts
+msgid "Listing tables..."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
 msgstr "数据范围"
@@ -2885,6 +2925,10 @@ msgstr "审核匹配项"
 msgid "Done"
 msgstr "完成"
 
+#: src/components/badges/SourceBadge.tsx
+msgid "From a database"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
 msgstr "图层"
@@ -2930,7 +2974,7 @@ msgstr "您当前处于 <0>{currentFeaturePlanName}</0> 计划中。"
 msgid "Result size"
 msgstr "结果大小"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Search open data catalog"
 msgstr "搜索开放数据目录"
 
@@ -2995,6 +3039,10 @@ msgstr "{layerName} 未返回任何行"
 msgid "is at most"
 msgstr "不超过"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Use a database"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is"
 msgstr "是"
@@ -3047,6 +3095,10 @@ msgstr "链接到源记录"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "None"
 msgstr "无"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "This dataset is indexed in {serviceName}, but it can't be loaded."
+msgstr ""
 
 #: src/views/ProfileView/PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
@@ -3237,6 +3289,10 @@ msgstr "X 轴最大值"
 msgid "ends with"
 msgstr "以……结尾"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Table or view to import"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
@@ -3337,6 +3393,10 @@ msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write "
 "the SQL, and drop a block onto the page."
 msgstr "请让我为此仪表板添加图表。我将选择可视化类型，编写 SQL，并将块放到页面上。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "Reading a sample of this dataset to find its columns."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Dashboard saved successfully!"
 msgstr "仪表板保存成功！"
@@ -3358,7 +3418,7 @@ msgstr "经度"
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr "仅发布仪表板读取的列。最狭窄，最私密。"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory.tsx
 msgid "New connectors are added every month. If there is a database or service "
 "you need, <0>tell us so we can prioritize it</0>."
 msgstr "我们每月都会添加新的连接器。如果您需要连接某个数据库或服务，<0>请告诉我们，以便我们确定优先级</0>。"
@@ -3470,6 +3530,10 @@ msgstr "正在捕获仪表板…"
 msgid "Keep the measurements as found"
 msgstr "保留原始测量值"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "A secure connection is required"
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
 msgstr "X 轴刻度间隔"
@@ -3513,6 +3577,10 @@ msgstr "Y 轴标签颜色"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Name of {0}"
 msgstr "{0} 的名称"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "This table is too large to import"
+msgstr ""
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Please <0>email us</0> if you would like access."
@@ -3766,7 +3834,7 @@ msgstr "更新工作区名称失败"
 msgid "Export"
 msgstr "导出"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Nothing in the catalog yet"
 msgstr "目录中暂时没有内容"
 
@@ -3872,6 +3940,10 @@ msgid "Only you can access this {resource}. Everyone else loses access, "
 "including workspace admins."
 msgstr "只有你可以访问此 {resource}。其他所有人都将失去访问权限，包括工作区管理员。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Can't be loaded"
+msgstr ""
+
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "选择模型"
@@ -3950,6 +4022,10 @@ msgstr "高级几何设置"
 msgid "Upload CSV"
 msgstr "上传 CSV"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source file isn't in a format Avandar can read as a table."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
 msgstr "图像"
@@ -3966,7 +4042,7 @@ msgstr "精确位置"
 msgid "New chat"
 msgstr "新聊天"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
 msgstr "按名称、组织、管道搜索…"
 
@@ -4061,6 +4137,10 @@ msgstr "要导入的标签页"
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf}（约 {approxSizeMb} MB 下载）。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "Authentication failed"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Hex"
 msgstr "六边形"
@@ -4123,6 +4203,10 @@ msgstr "下一步"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "来自数据集的字段"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
+msgid "Port"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
@@ -4199,6 +4283,11 @@ msgstr "URL"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY 使用了非列表达式。"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Checking this dataset's columns first. It will be added to your "
+"workspace as soon as that finishes."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make private"
@@ -4329,7 +4418,7 @@ msgstr "在 {app} 中的任何人"
 msgid "Failed to delete dataset"
 msgstr "删除数据集失败"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "License"
 msgstr "许可证"
 
@@ -4346,6 +4435,7 @@ msgid "Draw a region on the page"
 msgstr "在页面上绘制区域"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Connect"
 msgstr "连接"
 
@@ -4357,7 +4447,7 @@ msgstr "拖放以导入"
 msgid "Date range"
 msgstr "日期范围"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "将数据集添加到工作区"
 
@@ -4396,6 +4486,11 @@ msgstr "正在生成 SQL…"
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr "再次从头开始，了解如何创建和共享仪表板。"
+
+#. placeholder {0}: columns.length
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "{0}"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -4456,6 +4551,10 @@ msgstr "生成查询"
 msgid "No frequency data available."
 msgstr "没有可用的频率数据。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "We couldn't check this dataset's columns. Try adding it again."
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "We'll add this visualization to your new dashboard."
 msgstr "我们将把此可视化添加到您的新仪表板。"
@@ -4484,6 +4583,7 @@ msgstr "替换 URL"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Columns"
 msgstr "列"
@@ -4492,7 +4592,7 @@ msgstr "列"
 msgid "Bright"
 msgstr "明亮"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Canonical"
 msgstr "规范值"
 
@@ -4529,7 +4629,7 @@ msgstr "“{value}”不是有效的正则表达式。"
 msgid "Unable to load dashboard"
 msgstr "无法加载仪表板"
 
-#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 msgid "Connectors"
 msgstr "连接器"
 
@@ -4545,8 +4645,8 @@ msgstr "座位购买成功"
 msgid "Open chat (⌘/)"
 msgstr "打开聊天 (⌘/)"
 
-#. placeholder {0}: displayedEntries.length
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#. placeholder {0}: displayedListings.length
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "目录 ({0})"
 
@@ -4664,6 +4764,14 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL is what actually runs."
 msgstr "此 SQL 的部分内容无法在手动表单中表示。表单显示的是尽力而为的近似结果；实际运行的是该 SQL。"
 
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "Database"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
 msgstr "导出 PDF"
@@ -4709,6 +4817,10 @@ msgstr "1"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Rows skipped"
 msgstr "跳过的行"
+
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "Databases"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Not yet published. Viewers will not see this."
@@ -4998,7 +5110,7 @@ msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "告诉我们 {singularConceptName} 数据应该来自哪里..."
 
 #. placeholder {0}: debouncedSearch.trim()
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "No catalog dataset matches “{0}”."
 msgstr "目录中没有与“{0}”匹配的数据集。"
 
@@ -5080,7 +5192,7 @@ msgstr "该坐标超出范围。"
 msgid "Open the record"
 msgstr "打开记录"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Dataset added"
 msgstr "数据集已添加"
 
@@ -5151,6 +5263,10 @@ msgstr "您的工作区处于免费计划，支持最多 2 个席位。要邀请
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Options (comma-separated, for select modes)"
 msgstr "选项（逗号分隔，用于选择模式）"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Postgres"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -5294,6 +5410,10 @@ msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "Impact plan to share as many dashboards as you like."
 msgstr "您当前的套餐仅允许您分享或发布 {maxAllowed, plural, one {# 个仪表板} other {# 个仪表板}}。升级到 "
 "Starter 或 Impact 套餐，即可随意分享任意数量的仪表板。"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The file was downloaded, but Avandar couldn't read it as a table."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
@@ -5560,6 +5680,11 @@ msgstr "系统无"
 msgid "Series label"
 msgstr "系列标签"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "We couldn't read a sample of this dataset, so its columns and their "
+"types are not confirmed. Adding it will try again."
+msgstr ""
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
@@ -5636,6 +5761,10 @@ msgstr "测量读数"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Upper bound"
 msgstr "上限"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable.ts
+msgid "Connecting to database"
+msgstr ""
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -5858,9 +5987,9 @@ msgstr "电子邮件"
 msgid "Y axis tick color"
 msgstr "Y 轴刻度颜色"
 
-#. placeholder {0}: entry.pipelineName
-#. placeholder {1}: entry.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#. placeholder {0}: listing.pipelineName
+#. placeholder {1}: listing.pipelineRunId
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "{0} · run {1}"
 msgstr "{0} · 运行 {1}"
 
@@ -5946,6 +6075,11 @@ msgstr "此图层有一个活动筛选条件，可能会排除所有内容。"
 msgid "Workspace name updated"
 msgstr "工作区名称已更新"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "Avandar could not reach that host and port. Check the address and that "
+"the server allows connections from Avandar."
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
 msgstr "将列添加为字段"
@@ -5989,7 +6123,7 @@ msgid "Private dashboards"
 msgstr "私有仪表板"
 
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 msgid "Upload"
 msgstr "上传"
 
@@ -6077,7 +6211,7 @@ msgstr "粗糙度 ({0})"
 msgid "{0} columns · {1} rows"
 msgstr "{0} 列 · {1} 行"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Request a dataset"
 msgstr "请求数据集"
 
@@ -6281,6 +6415,11 @@ msgstr "创建一个新的工作区。您可以随时稍后编辑它。"
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "请稍后重试；如果问题持续存在，请联系支持团队。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
+msgid "The database user should ideally have read-only access to the table or "
+"view you plan to import."
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
 msgstr "Qwen 2.5 7B"
@@ -6450,13 +6589,17 @@ msgstr "已连接"
 msgid "Only the owner can make this {resource} private."
 msgstr "只有所有者可以将此 {resource} 设为私密。"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Updates"
 msgstr "更新"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed. Please fix the SQL and try again."
 msgstr "该查询失败。请修复 SQL 并重试。"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Schema"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Repeating labelled blocks"
@@ -6514,8 +6657,8 @@ msgid "Add layer"
 msgstr "添加图层"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
-msgid "This catalog entry has no column metadata. It cannot be imported yet."
-msgstr "此目录条目没有列元数据。尚无法导入。"
+#~ msgid "This catalog entry has no column metadata. It cannot be imported yet."
+#~ msgstr "此目录条目没有列元数据。尚无法导入。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
@@ -6676,6 +6819,10 @@ msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
 "workspace."
 msgstr "您当前的计划仅支持最多 {0} 个数据集。升级到我们的 Impact 计划以增加您可以添加到工作区的数据集数量。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+msgid "Checking column types"
+msgstr ""
+
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
 msgid "Mark done"
 msgstr "标记为已完成"
@@ -6743,6 +6890,11 @@ msgstr "数据集名称"
 msgid "Copy share link"
 msgstr "复制共享链接"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The file is hosted on a different site from the one that lists it, so "
+"Avandar doesn't download it."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Leave empty when the geometry is already WGS 84."
 msgstr "如果几何图形已经是 WGS 84，请留空。"
@@ -6789,6 +6941,10 @@ msgstr "自定义 URL 可用"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Number of rows"
 msgstr "行数"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The site that hosts the file didn't respond. This may be temporary."
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Form is an approximation"
@@ -7152,6 +7308,10 @@ msgstr "选择要读取的内容"
 msgid "Suggested rewrite:"
 msgstr "建议重写："
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source no longer has this dataset."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact "
@@ -7176,7 +7336,7 @@ msgstr "1 个数据集"
 msgid "No numeric columns"
 msgstr "没有数值列"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Service"
 msgstr "服务"
 
@@ -7192,6 +7352,12 @@ msgstr "已保留原始内容"
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} km"
 msgstr "{lengthValue} 千米"
+
+#. placeholder {0}: load.savedConnections?.length
+#. placeholder {1}: load.savedConnections?.length === 1 ? "database" : "databases"
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#~ msgid "{0} saved {1} available"
+#~ msgstr ""
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
@@ -7237,6 +7403,10 @@ msgstr "有访问权限的人"
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Google Sheets"
 msgstr "Google Sheets"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "+ New database"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "None of the selected regions produced any rows yet, so there are no "
@@ -7337,6 +7507,14 @@ msgid "The layer fetches exactly these fields, so adding one also makes it "
 "available to filter on."
 msgstr "该图层只获取这些字段，因此添加字段后也可以用于筛选。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
+msgid "Require"
+msgstr ""
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Import a table or view from a database your organization runs"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
 msgstr "默认值"
@@ -7396,6 +7574,10 @@ msgstr "堆叠组"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "选择规则（例如，最频繁）"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "Database is unreachable"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add tabular data to render a simple table."
@@ -7573,7 +7755,7 @@ msgstr "编辑者"
 msgid "Entered manually"
 msgstr "手动输入"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Organization"
 msgstr "组织"
 
@@ -7601,6 +7783,11 @@ msgstr "正在保存"
 msgid "Role for new share"
 msgstr "新共享的角色"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "This table has more rows than Avandar can import at once. Try a smaller "
+"table or view."
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
 msgstr "地图工具"
@@ -7612,6 +7799,11 @@ msgstr "发送给 AI 吗？"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
 msgstr "购买 {seatsToAdd} 个座位"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "The username or password was not accepted. Check the credentials and try "
+"again."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
@@ -7784,9 +7976,13 @@ msgstr "如果一个 {0} 有多个 {attributeName} 值，那么..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "SELECT 中的列表达式未命名；已跳过。"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "清除搜索"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "An unexpected error occurred while connecting."
+msgstr ""
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
@@ -7901,6 +8097,10 @@ msgstr "调整抽屉大小"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
 msgstr "水平内边距"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
+msgid "The source requires a login to download this dataset."
+msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
@@ -8170,7 +8370,7 @@ msgid "Thank you for your interest!"
 msgstr "感谢您的关注！"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -8272,6 +8472,12 @@ msgstr "弹出窗口"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterOperatorSelector/FilterOperatorSelector.tsx
 msgid "Condition"
 msgstr "条件"
+
+#. placeholder {0}: load.savedConnections?.length ?? 0
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "{0, plural, one {# saved database available} other {# saved databases "
+"available}}"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
@@ -8415,6 +8621,10 @@ msgstr "只有在至少有 {0} 条记录参与时，聚合结果才会绘制区�
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "数据集已保存"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "Connection timed out"
+msgstr ""
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low to High"
@@ -8703,6 +8913,10 @@ msgstr "案例类型已删除"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING 使用了表单不支持的运算符“{operator}”。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "This catalog listing has no column metadata. It cannot be imported yet."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
 msgstr "已偏移"
@@ -8790,6 +9004,10 @@ msgid "Upload a CSV, Excel, or PDF file, connect a Google Sheet, or browse the "
 "here."
 msgstr "上传 CSV、Excel 或 PDF 文件，连接 Google Sheet，或浏览开放数据目录。Avandar "
 "中的其他所有内容都基于您在此处导入的数据。"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "The database did not respond in time. Check the address and try again."
+msgstr ""
 
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
@@ -9027,6 +9245,10 @@ msgstr "第 10 列"
 msgid "Click a labelled tick on the y-axis."
 msgstr "在 Y 轴上点击一个带标签的刻度。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+msgid "Could not connect to the database"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
 msgstr "值，逗号分隔"
@@ -9117,6 +9339,10 @@ msgstr "表单不支持类型为“{exprType}”的 SELECT 表达式。"
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw an annotation area"
 msgstr "绘制注释区域"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
+msgid "SSL mode"
+msgstr ""
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"

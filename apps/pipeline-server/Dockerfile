@@ -26,6 +26,12 @@ COPY apps/pipeline-server apps/pipeline-server
 
 WORKDIR /avandar/apps/pipeline-server
 
+# The git commit this image was built from, recorded with every run. Pass it
+# with `--build-arg AVA_CODE_VERSION=$(git rev-parse HEAD)`. Unset, runs
+# record no commit.
+ARG AVA_CODE_VERSION
+ENV AVA_CODE_VERSION=${AVA_CODE_VERSION}
+
 ENV HOST=0.0.0.0
 ENV PORT=8080
 

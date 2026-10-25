@@ -18,6 +18,87 @@ response.
   pipeline run.
 - `HOST` (optional): Defaults to `0.0.0.0`.
 - `PORT` (optional): For localhost only, defaults to `4611`.
+- `SOCRATA_APP_TOKEN` (optional): App token for the `socrata` pipeline, which
+  raises the Socrata API's rate limit. Locally, copy `.env.pipelines.example`
+  at the repo root to `.env.pipelines.local` and fill it in. In production,
+  set it as a Fly secret. The `hdx` pipeline needs no key: HDX API tokens only
+  grant write access and do not raise read rate limits.
+
+## Running one pipeline
+
+```bash
+ava pipeline run socrata --local                # full run: write every listing that changed
+ava pipeline run socrata --local --incremental  # per scope, only what changed since the last run
+ava pipeline run socrata --local --since 2026-10-01T00:00:00Z --until 2026-10-08T00:00:00Z
+ava pipeline run socrata --local --limit 10     # stop after 10 datasets
+ava pipeline reset socrata                      # delete this pipeline's checkpoints and listings
+ava pipeline run hdx --local --incremental --scope format:parquet  # one scope only
+ava pipeline reset hdx --scope format:parquet    # forget one scope: its next run starts from the beginning
+ava pipeline prune-retired-scopes hdx --dry-run  # what removing undeclared scopes would delete
+```
+
+`--incremental` starts each scope of each drive at its checkpoint, so it
+also continues a run that was cancelled or stopped by `--limit`, and a scope
+that has never been crawled starts from the beginning. `--since` and `--until` take ISO 8601 timestamps with a
+timezone, and `--since` cannot be combined with `--incremental`.
+`world-bank__wdi` supports full runs only: its sources carry no modification
+time, so `--incremental`, `--since`, and `--until` are rejected. `--limit`
+must be a positive integer. Invalid options are rejected before anything
+runs (HTTP 400 from the server). Every run prints one line per crawl (a
+drive and scope): its window, how many datasets it fetched, and how many
+listings it wrote or left unchanged. When every crawl fails, the report is still printed before the
+command exits with an error. `ava pipeline reset` selects listings by their
+`pipeline_name`.
+
+A scope is a slice of a drive that is crawled and resumed on its own: `hdx`
+has `format:csv` and `format:parquet`, and a Socrata drive has `all` unless
+`CONFIGURED_DRIVES` gives it category or tag scopes. Removing a scope from
+the code only stops crawling it. `ava pipeline prune-retired-scopes` deletes
+what only retired scopes produced, after a confirmation, and never a listing
+a workspace uses. `ava pipeline reset` deletes the pipeline's checkpoints
+before its listings, and `--scope` resets one scope.
+
+Every listing is written in one transaction with its relation columns, so
+the two always land together, and deleting a listing (by reset or prune)
+deletes its columns too. A Socrata file or link, which has no columns, is
+not listed, and neither is an HDX Parquet file whose columns cannot be
+read. Each listing records in `date_column_type_last_verified` when its
+column types were checked against real data, and only a listing with
+verified column types can be added to a workspace:
+
+- `socrata` takes each dataset's columns from the Discovery API, as text
+  with Socrata's type label as the original type, unverified. The list can
+  name columns the CSV export lacks. A file or link with no columns is
+  skipped.
+- `hdx` uses the headers HDX's file check recorded, as text of unknown
+  original type, unverified. When those are missing or ambiguous, a Parquet
+  file's footer is read with DuckDB, giving verified types, and a CSV gets
+  no columns until the app verifies it.
+- `world-bank__wdi` builds Parquet files, so its column types are verified
+  when written.
+
+The app verifies unverified or stale column types later from a sample of
+the source, and a pipeline rewrite keeps those verified columns as long as
+the pipeline's own view of the columns has not changed.
+
+## Execution history
+
+Every `ava pipeline run`, `reset`, and `prune-retired-scopes` is recorded in
+`pipeline_executions` (one row per command per pipeline) and
+`pipeline_execution_scopes` (one row per drive and scope it worked on), with
+the exact argv or HTTP body, the outcome, stage timings, and the counts and
+sizes behind them. Nothing in the app reads them. Query them directly:
+
+```sql
+-- When was each Socrata drive last crawled, and did it succeed?
+select distinct on (drive_key) drive_key, started_at, status
+from pipeline_execution_scopes
+where pipeline_name = 'socrata'
+order by drive_key, started_at desc;
+```
+
+Deploys should pass the commit, so server runs record it:
+`fly deploy --config apps/pipeline-server/fly.production.toml --build-arg AVA_CODE_VERSION=$(git rev-parse HEAD)`.
 
 ## Local development
 
@@ -43,5 +124,13 @@ fly secrets set AVA_PIPELINE_SERVER_SECRET=your-secret \
 Deploy with:
 
 ```bash
-fly deploy --config apps/pipeline-server/fly.production.toml
+fly deploy --config apps/pipeline-server/fly.production.toml \
+  --build-arg AVA_CODE_VERSION=$(git rev-parse HEAD)
 ```
+
+Deploy order for crawl scopes (`pipeline_scope_checkpoints`): run the
+migrations before deploying the new pipeline server, and run no pipeline
+while migrating. Then rebuild `ava` (`pnpm build:ava-cli`) on every machine
+that runs it. An old `ava pipeline reset` deletes listings but not
+checkpoints, so the next incremental run would skip them, and an old CLI
+cannot parse the new `crawls` report.

@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 import { getAppVitestAliases } from "../../../tests/vitestAliases";
 
 const repoRootDir: string = resolve(
@@ -11,6 +11,7 @@ const repoRootDir: string = resolve(
 export default defineConfig({
   test: {
     environment: "node",
+    exclude: [...configDefaults.exclude, "src/**/*.supabase.test.ts"],
   },
   resolve: {
     alias: getAppVitestAliases({

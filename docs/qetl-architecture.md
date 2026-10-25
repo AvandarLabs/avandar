@@ -43,7 +43,7 @@ loading entirely; they only see tables already resident in the tab.
 | relation | Anything SQL can name that QETL can make resident: a dataset or an ontology concept |
 | `RelationRef` | `{ kind, id }` naming a relation; `kind` is `dataset` or `concept` ([RelationRef.types.ts](../shared/models/relations/RelationRef/RelationRef.types.ts)) |
 | table name | A dataset's DuckDB name is its bare UUID; a concept's is `concept_<uuid>` (`RelationRef.toTableName` and `fromTableName`) |
-| source type | `datasets.source_type`: `csv_file`, `xlsx_file`, `pdf_file`, `open_data`, `virtual`, `google_sheets`. Not part of `RelationRef` |
+| source type | `datasets.source_type`: `csv_file`, `xlsx_file`, `pdf_file`, `open_data`, `virtual`, `google_sheets`, `postgres_table`. Not part of `RelationRef` |
 | session | `WorkspaceQuerySession` or `PublicQuerySession`; builds one mediator per principal with a policy object |
 | mediator | The module built by `QueryMediatorFactory`; its only method is `runQuery`, implemented in `queryRunner.ts` |
 | principal key | `w:<workspaceId>:<userId>` or `p:<bucket>:<dashboardId>:<percent-encoded revision>`; scopes the storage tier |
@@ -63,6 +63,39 @@ loading entirely; they only see tables already resident in the tab.
 | spine | `concept_<id>__individuals`: a one-column `VARCHAR` table of a concept's `external_id` values |
 | `ava_rows_<id>` | A second view over a dataset's Parquet file that adds `file_row_number` |
 | trusted internal SQL | SQL the DuckDB client or QETL builds itself (loaders, CSV sniffing, projection, concept views), marked with the `TRUSTED_INTERNAL_SQL` symbol so `runRawQuery` accepts it when the analyzer's only objection is a source it cannot inspect (`uninspectable-source`) |
+
+### 2.1 Client, wrapper, and adapter: three words, two separate layers
+
+Every connector-backed source type (see
+[`connector-nomenclature.md`](measles-demo/connector-nomenclature.md) for which source
+types count as connector-backed and which do not) is built from two
+independent pieces, and they must not be confused:
+
+- **A protocol client**: a plain, QETL-ignorant module that only knows how to
+  talk to one external service - HTTP calls, auth, pagination, its own error
+  shapes. `CkanClient`, a future `SocrataClient`, and the Postgres driver
+  inside `supabase/functions/external-datasets/connectors/postgres/` are this
+  layer. None of it knows what a `RelationRef`, a `RelationCapabilities`
+  record, Parquet, or DuckDB is, and all of it is reusable outside QETL
+  entirely - a client could be unit-tested or called from a script with no
+  QETL import anywhere.
+- **A wrapper**: the `SourceWrapper` implementation that adapts a client's
+  native response into what QETL needs - `describe`, `acquire`, and
+  optionally `pushDown`/`readFreshness` - governed by the `RelationCapabilities`
+  record it declares. `PostgresTableWrapper` and `GoogleSheetsWrapper` are
+  each one connector's wrapper; `DatasetParquetWrapper` is a composite one,
+  internally dispatching to `CkanClient` today for `open_data` datasets and
+  to `SocrataClient` once that connector exists, alongside its unrelated
+  `csv_file`/`xlsx_file`/`pdf_file` branches (section 2's vocabulary table,
+  "source type").
+
+**"Wrapper" is the name to use, in code and in prose - not "adapter," even
+though both describe the same role.** The type is `SourceWrapper`, every
+implementation is named `*Wrapper` (`PostgresTableWrapper`, never
+`PostgresTableAdapter`), and section 9's design pattern table already uses
+"Adapter" to name the *Gang-of-Four pattern* a wrapper happens to implement,
+not as a second name for the thing itself. One name per concept keeps
+"adapter" from becoming a synonym nothing in the codebase answers to.
 
 ## 3. Architecture: one query from caller to DuckDB
 
@@ -172,7 +205,7 @@ taking locks.
 | SQL analyzer | [`src/lib/sql/DuckDbSqlAnalyzer/`](../src/lib/sql/DuckDbSqlAnalyzer/) | Fail-closed read, mutating, or unsafe verdict with the relations involved | `RelationRef`, `duckDbSqlText` |
 | DuckDB client | [`src/clients/DuckDbClient/`](../src/clients/DuckDbClient/) | Facade over connection, load, query, export units; coordinator | analyzer, `@duckdb/duckdb-wasm` |
 | Google Drive | [`src/clients/google/GoogleDriveClient/`](../src/clients/google/GoogleDriveClient/) | Tab CSV export, file version, debounced freshness | `fetch` |
-| Open data (shared) | [`shared/open-data/`](../shared/open-data/) | CKAN client, resource selection, size-capped HTTP | runtime-neutral |
+| Open data (shared) | [`shared/connectors/open-data/`](../shared/connectors/open-data/) | CKAN and Socrata clients, the Open Data Catalog's own storage client, resource selection, size-capped HTTP | runtime-neutral |
 | Open data proxy | [`supabase/functions/open-data/`](../supabase/functions/open-data/) | Relays one catalogued CKAN resource | `shared/open-data` |
 | Open data fetch | [`src/lib/openData/`](../src/lib/openData/) | Browser call to the proxy | Supabase session |
 | Storage clients | [`src/clients/storage/`](../src/clients/storage/) | Workspace Parquet, catalog Parquet URL, snapshot generations | Supabase Storage |
@@ -400,6 +433,44 @@ sharing, the `datasets` RLS, and every dataset consumer (its own per-type table
 and that table's RLS are row 2). Ordered checklist, using a
 hypothetical `postgres_table` reached through a server-side proxy:
 
+The hypothetical below is no longer hypothetical: the real Postgres connector
+is designed in
+[`docs/superpowers/specs/2026-10-13-qetl-postgres-connector-design/2026-10-13-qetl-postgres-connector-design.md`](superpowers/specs/2026-10-13-qetl-postgres-connector-design/2026-10-13-qetl-postgres-connector-design.md),
+with this checklist's rows filled in under the real file names (that spec's
+section 6/7). Two things it needed that this checklist does not cover, because
+every existing source type has at most a per-dataset or per-user credential:
+
+### 10.1 Reusable connections: a new sibling entity above datasets
+
+A source type whose credential is reusable across more than one dataset (a
+Postgres server holding many tables, unlike one Google Sheets OAuth grant
+which Google itself already models as a reusable entity) needs a new entity
+one layer above `datasets`, not a new field on it: a generic `*_connections`
+table carrying the common shape (workspace, type, label, timestamps) plus one
+`*_connections__<type>` satellite per connection type, mirroring the existing
+`datasets` / `datasets__<type>` split exactly. The per-type dataset table
+gains a foreign key to the connection (`on delete restrict`, not `cascade`:
+deleting a connection out from under a live dataset must be an explicit,
+informed action, never an implicit side effect of deleting the connection).
+Gate the connection tables by **app role**
+(`util__auth_user_meets_min_app_role`), not by the per-resource sharing every
+`datasets__<type>` table uses - a connection is infrastructure configuration
+a workspace editor manages, not a document one teammate shares with another.
+See the Postgres spec's section 5.1 for the worked example
+(`db_connections` / `db_connections__postgres`).
+
+### 10.2 A credential storage tier stronger than a plain column
+
+Every source type so far either has no stored secret (`csv_file`, `virtual`)
+or stores one in a plain column gated only by RLS (`tokens__google`). A
+reusable connection's credential is higher-value (one password unlocks every
+table on a server, not one user's own OAuth grant) and needs a storage tier
+where there is no RLS policy on the secret itself to get wrong: Supabase
+Vault (`pgsodium`-backed `vault.create_secret`/`vault.decrypted_secrets`,
+grantable only to `service_role`). See the Postgres spec's section 5.2 for
+the full design, including the SSRF and identifier-quoting requirements that
+come with proxying a connection to an arbitrary user-supplied host.
+
 | # | File | Change | Caught by |
 | --- | --- | --- | --- |
 | 1 | `supabase/schemas/10.datasets.sql` | add the value to `datasets__source_type` | inherent |
@@ -417,7 +488,7 @@ hypothetical `postgres_table` reached through a server-side proxy:
 | 13 | `src/clients/datasets/SourceDatasetClient.ts` | registry entry | compiler |
 | 14 | `src/clients/datasets/DatasetClient/createDatasetQueries.ts` | `getSourceDataset` arm | compiler |
 | 15 | `src/clients/datasets/DatasetClient/createDatasetMutations.ts`, `DatasetClient.types.ts`, `DatasetClient.ts` | insert mutation and its registration | inherent |
-| 16 | new server proxy, for example `supabase/functions/postgres-table/` | keeps credentials server-side | inherent |
+| 16 | new server proxy - the real Postgres connector registers a connector implementation into a shared `supabase/functions/external-datasets/` edge function rather than creating a single-purpose one; see the Postgres spec section 5.4 for why | keeps credentials server-side | inherent |
 | 17 | new browser client, for example `src/lib/postgresTable/` | calls the proxy, returns bytes | inherent |
 | 18 | new `src/clients/qetl/wrappers/PostgresTableWrapper/` | `SourceWrapper` with `capabilities` and `acquire`, plus tests | inherent |
 | 19 | `src/clients/qetl/QueryMediator/QueryMediator.types.ts` | `RelationSource` arm | compiler (through row 20) |
@@ -539,6 +610,8 @@ means traced through the source but not run.
   [relation cache](superpowers/specs/2026-08-18-qetl-relation-cache-design.md),
   [concept relations](superpowers/specs/2026-08-18-qetl-concept-relations-design.md),
   [Google Sheets](superpowers/specs/2026-08-18-qetl-google-sheets-design.md),
+  [Postgres connector](superpowers/specs/2026-10-13-qetl-postgres-connector-design/2026-10-13-qetl-postgres-connector-design.md)
+  (also the worked example behind section 10.1/10.2 above),
   [open data APIs](superpowers/specs/2026-08-19-qetl-open-data-apis-design.md),
   [column projection](superpowers/specs/2026-08-19-qetl-column-projection-design.md),
   and the [decisions log](superpowers/specs/2026-08-18-qetl-spec-decisions-log.md).

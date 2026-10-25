@@ -1,8 +1,38 @@
+import { hostname } from "node:os";
+import { ETL_RUN_OPTIONS_ERROR_NAME } from "@avandar/etl";
+import {
+  assertValidPipelineName,
+  INVALID_PIPELINE_NAME_ERROR_NAME,
+} from "@pipeline-server/routes/pipeline-name/buildPipelineModuleUrl/buildPipelineModuleUrl";
+import {
+  buildServerRunInvocation,
+  INVOCATION_HEADER,
+} from "@pipeline-server/routes/pipeline-name/buildServerRunInvocation/buildServerRunInvocation";
+import { listScopes } from "@pipeline-server/routes/pipeline-name/listScopes/listScopes";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
+import { getEtlRunFailedReport } from "@pipelines/shared/getEtlRunFailedReport/getEtlRunFailedReport";
+import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
+import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
 import { FastifyPluginAsync } from "fastify";
+import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 type RunPipelineRequest = FastifyRequest<{
+  Params: {
+    pipelineName: string;
+  };
+  Body:
+    | {
+        incremental?: unknown;
+        since?: unknown;
+        until?: unknown;
+        limit?: unknown;
+        scopes?: unknown;
+      }
+    | undefined;
+}>;
+
+type PipelineScopesRequest = FastifyRequest<{
   Params: {
     pipelineName: string;
   };
@@ -51,31 +81,131 @@ async function _requireRunAuth(options: {
   return undefined;
 }
 
+/**
+ * The run body's shape. Unknown keys are rejected, so a typo such as
+ * `incremntal` answers 400 instead of silently running in full. This uses
+ * `propertyNames`, not `additionalProperties: false`, because Fastify's
+ * default Ajv option `removeAdditional: true` would delete the unknown key
+ * and let the run through. Values are left untyped here:
+ * `parsePipelineRunOptions` validates them.
+ */
+const RUN_BODY_SCHEMA = {
+  type: "object",
+  propertyNames: { enum: ["incremental", "since", "until", "limit", "scopes"] },
+} as const;
+
+/** Errors the caller can fix answer 400. Anything else answers 500. */
+const _CLIENT_ERROR_NAMES: ReadonlySet<string> = new Set([
+  ETL_RUN_OPTIONS_ERROR_NAME,
+  INVALID_PIPELINE_NAME_ERROR_NAME,
+]);
+
+function _getErrorStatus(error: unknown): 400 | 500 {
+  return error instanceof Error && _CLIENT_ERROR_NAMES.has(error.name)
+    ? 400
+    : 500;
+}
+
+async function _runPipeline(
+  request: RunPipelineRequest,
+  reply: FastifyReply,
+): Promise<FastifyReply> {
+  if (request.validationError) {
+    return await reply.status(400).send({
+      ok: false,
+      error: `The run body accepts only incremental, since, until, limit, and scopes. ${request.validationError.message}`,
+    });
+  }
+
+  let options: PipelineRunOptions;
+  try {
+    options = parsePipelineRunOptions(request.body ?? {});
+  } catch (error: unknown) {
+    const message: string =
+      error instanceof Error ? error.message : "Invalid run options.";
+    return await reply.status(400).send({ ok: false, error: message });
+  }
+
+  try {
+    assertValidPipelineName(request.params.pipelineName);
+    const report = await run({
+      pipelineName: request.params.pipelineName,
+      ...options,
+      invocation: buildServerRunInvocation({
+        invocationHeader: request.headers[INVOCATION_HEADER],
+        requestBody: request.body ?? {},
+        host: hostname(),
+        codeVersion: getOptionalEnvVar("AVA_CODE_VERSION"),
+      }),
+    });
+    return await reply.send(report);
+  } catch (error: unknown) {
+    const message: string =
+      error instanceof Error ? error.message : "Unknown error";
+    // When every crawl failed, the report still says what each crawl did.
+    const report = getEtlRunFailedReport(error);
+
+    return await reply.status(_getErrorStatus(error)).send({
+      ok: false,
+      error: message,
+      ...(report === undefined ? {} : { report }),
+    });
+  }
+}
+
+async function _listPipelineScopes(
+  request: PipelineScopesRequest,
+  reply: FastifyReply,
+): Promise<FastifyReply> {
+  try {
+    assertValidPipelineName(request.params.pipelineName);
+    const drives = await listScopes(request.params.pipelineName);
+    return await reply.send({ drives });
+  } catch (error: unknown) {
+    const message: string =
+      error instanceof Error ? error.message : "Unknown error";
+    return await reply
+      .status(_getErrorStatus(error))
+      .send({ ok: false, error: message });
+  }
+}
+
+/**
+ * Registers `POST /:pipelineName/run`, which answers with the run's report
+ * as JSON. Auth is checked before the body is validated, so an
+ * unauthenticated caller gets 401 whatever it sends. Invalid options answer
+ * 400, and the pipeline does not run. So does a pipeline name that is not a
+ * plain folder name of lowercase letters, digits, `_` and `-`. A run where
+ * every crawl failed answers 500 with the error and the report. Each run is
+ * recorded with the request body, the CLI's `X-Ava-Invocation` header when
+ * present, and the server's host and `AVA_CODE_VERSION`.
+ *
+ * Also registers `GET /:pipelineName/scopes`, which answers with
+ * `{ drives }`, each drive's live scope keys, behind the same auth. It
+ * answers 400 for an invalid pipeline name and 500 for any other error.
+ */
 export const registerPipelineRoutes: FastifyPluginAsync = async (server) => {
   server.post(
     "/:pipelineName/run",
-    async (request: RunPipelineRequest, reply: FastifyReply) => {
-      const authError = await _requireRunAuth({ request, reply });
-      if (authError) {
+    {
+      schema: { body: RUN_BODY_SCHEMA },
+      attachValidation: true,
+      preValidation: async (request, reply) => {
+        const authError = await _requireRunAuth({ request, reply });
+        // A request with no body is a full run, so it validates as `{}`.
+        request.body ??= {};
         return authError;
-      }
-
-      try {
-        const result: string = await run({
-          pipelineName: request.params.pipelineName,
-        });
-
-        reply.type("text/plain; charset=utf-8");
-        return await reply.send(result);
-      } catch (error: unknown) {
-        const message: string =
-          error instanceof Error ? error.message : "Unknown error";
-
-        return await reply.status(500).send({
-          ok: false,
-          error: message,
-        });
-      }
+      },
     },
+    _runPipeline,
+  );
+  server.get(
+    "/:pipelineName/scopes",
+    {
+      preValidation: async (request, reply) => {
+        return await _requireRunAuth({ request, reply });
+      },
+    },
+    _listPipelineScopes,
   );
 };

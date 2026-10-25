@@ -61,6 +61,7 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
       google_sheets: t`Google Sheets`,
       open_data: t`Open data`,
       pdf_file: t`PDF file`,
+      postgres_table: t`Database`,
       virtual: t`Derived dataset`,
       xlsx_file: t`Excel file`,
     };

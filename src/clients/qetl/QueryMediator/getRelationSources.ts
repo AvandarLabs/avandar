@@ -12,6 +12,7 @@ import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFile
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { PdfFileDatasetClient } from "@/clients/datasets/source-datasets/PdfFileDatasetClient";
+import { PostgresTableDatasetClient } from "@/clients/datasets/source-datasets/PostgresTableDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -149,6 +150,24 @@ async function _getGoogleSheetsExtractors(
 }
 
 /**
+ * Pairs `postgres_table` datasets with their stored connection/schema/table.
+ */
+async function _getPostgresTableExtractors(
+  options: Readonly<SourceRecordReaderOptions>,
+): Promise<RelationSource[]> {
+  const sources = await PostgresTableDatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("dataset_id", "in", options.ids));
+  return sources.map((sourceDataset) => {
+    return {
+      dataset: options.datasetsById[sourceDataset.datasetId]!,
+      sourceType: "postgres_table",
+      sourceDataset,
+    };
+  });
+}
+
+/**
  * The source-record reader for each dataset source type.
  *
  * A `Record` keyed by the source-type union rather than a `match`, which keeps
@@ -169,6 +188,7 @@ const _EXTRACTOR_READER_BY_SOURCE_TYPE: Record<
   virtual: _getVirtualExtractors,
   open_data: _getOpenDataExtractors,
   google_sheets: _getGoogleSheetsExtractors,
+  postgres_table: _getPostgresTableExtractors,
 };
 
 async function _getExtractorsForSourceType(

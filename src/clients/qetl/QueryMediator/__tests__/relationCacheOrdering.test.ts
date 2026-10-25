@@ -131,7 +131,7 @@ beforeAll(async () => {
 async function _runQueryForDependencies(
   dependencies: readonly Dataset.Id[],
 ): Promise<void> {
-  const mediator = QueryMediatorFactory.create({
+  const mediator = QueryMediatorFactory.create("QueryMediator", { state: {
     getQueryDependencies: async () => {
       return [...dependencies];
     },
@@ -140,7 +140,7 @@ async function _runQueryForDependencies(
     },
     relationCache,
     principalKey: PRINCIPAL_KEY,
-  });
+  } });
   await mediator.runQuery({ rawSql: "SELECT 1" });
 }
 

@@ -11,7 +11,7 @@ import type {
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { NeededColumnsByDatasetId } from "@/clients/qetl/QueryMediator/QueryMediator.types";
-import type { Module } from "@avandar/modules";
+import type { BuilderModule, Module, StateOfModule } from "@avandar/modules";
 
 export type IQueryMediator = Module<
   "QueryMediator",
@@ -87,11 +87,17 @@ export type IQueryMediator = Module<
  * it only operates on full datasets rather than doing any filtering of data,
  * relation management, relation loading, or any other optimizations.
  */
-export const QueryMediatorFactory = createModuleFactory<IQueryMediator>(
-  "QueryMediator",
-  {
-    childBuilder: (module) => {
-      return { runQuery: createQetlQueryRunner(module.getState()) };
-    },
+export const QueryMediatorFactory = createModuleFactory("QueryMediator", {
+  defaultState: {
+    planConceptRelations: undefined,
+    getDuckDbLeaseDatasetIds: undefined,
+    duckDbReadMode: undefined,
+    publicSnapshotDuckDbOwner: undefined,
+    prepareDuckDbDatasets: undefined,
   },
-);
+  builder: (
+    module: BuilderModule<StateOfModule<IQueryMediator>>,
+  ): Pick<IQueryMediator, "runQuery"> => {
+    return { runQuery: createQetlQueryRunner(module.getState()) };
+  },
+});

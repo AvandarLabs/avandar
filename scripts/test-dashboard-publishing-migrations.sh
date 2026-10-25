@@ -33,3 +33,17 @@ run_migration_replay \
   "$repo_root/supabase/migration-upgrade-tests/dashboard_snapshot_revision.prelude.sql" \
   "$repo_root/supabase/migrations/20260816020100_add_dashboard_snapshot_revision.sql" \
   "$repo_root/supabase/migration-upgrade-tests/dashboard_snapshot_revision.assertions.sql"
+
+# API listing pipeline backfill: name the pipeline on Socrata and HDX
+# listings, and leave every other row alone.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/data_catalog_listings_pipeline_name.prelude.sql" \
+  "$repo_root/supabase/migrations/20261020174732_backfill_api_listing_pipeline_name.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/data_catalog_listings_pipeline_name.assertions.sql"
+
+# Scope seed: key existing pipeline listings by the scope that produced them,
+# and seed per-scope checkpoints from each drive's newest update.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/pipeline_scope_seed.prelude.sql" \
+  "$repo_root/supabase/migrations/20261021211630_seed_pipeline_scope_keys_and_checkpoints.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/pipeline_scope_seed.assertions.sql"

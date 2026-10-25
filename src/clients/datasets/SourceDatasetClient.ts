@@ -7,6 +7,7 @@ import { CsvFileDatasetClient } from "./source-datasets/CsvFileDatasetClient";
 import { GoogleSheetsDatasetClient } from "./source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "./source-datasets/OpenDataDatasetClient";
 import { PdfFileDatasetClient } from "./source-datasets/PdfFileDatasetClient";
+import { PostgresTableDatasetClient } from "./source-datasets/PostgresTableDatasetClient";
 import { VirtualDatasetClient } from "./source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "./source-datasets/XlsxFileDatasetClient";
 
@@ -15,6 +16,7 @@ const SourceDatasetClientRegistry = {
   google_sheets: GoogleSheetsDatasetClient,
   open_data: OpenDataDatasetClient,
   pdf_file: PdfFileDatasetClient,
+  postgres_table: PostgresTableDatasetClient,
   virtual: VirtualDatasetClient,
   xlsx_file: XlsxFileDatasetClient,
 } satisfies Registry<DatasetSource.SourceType>;

@@ -1,0 +1,371 @@
+import type { UUID } from "@avandar/utils";
+import type { TransformedColumnDescription } from "@etl/EtlEngine/transformedCsvsToParquetBlobs";
+import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
+import type {
+  CheckpointStore,
+  ListingsStore,
+  ObjectStore,
+} from "@etl/stores/EtlStores.types";
+import type {
+  ExecutionDenominators,
+  ExecutionInvocation,
+  ExecutionStageTimings,
+  ExecutionStore,
+} from "@etl/stores/ExecutionStore.types";
+import type { ExecutionFunctions } from "@etl/stores/SupabaseExecutionStore/createSupabaseExecutionStore";
+
+/** A value, or a promise of one. */
+export type PromisedOrValue<T> = Promise<T> | T;
+
+/** Reads the time, for timing stages and dating crawls. */
+export type EtlClock = Readonly<{
+  /** The current date and time. */
+  now: () => Date;
+  /** Milliseconds from an arbitrary origin that never goes backwards. */
+  monotonicMs: () => number;
+}>;
+
+/**
+ * A pipeline's own counters and timers, collected per crawl into the
+ * crawl's `pipelineMetrics`. Name them `<pipeline>.<what>`, such as
+ * `hdx.parquet_footer_reads`.
+ */
+export type EtlPipelineMetrics = Readonly<{
+  /** Adds `by` (default 1) to a counter. */
+  increment: (name: string, by?: number) => void;
+  /** Runs `work` and adds how long it took, in milliseconds, to a timer. */
+  time: <T>(name: string, work: () => Promise<T>) => Promise<T>;
+}>;
+
+/** Everything one crawl measured. */
+export type EtlCrawlMetrics = Readonly<{
+  timings: ExecutionStageTimings;
+  denominators: ExecutionDenominators;
+  pipelineMetrics: Readonly<Record<string, number>>;
+}>;
+
+/** Identifies one `run()`. Written to `pipeline_run_id`. */
+export type EtlPipelineRunId = UUID<"PipelineRun">;
+
+/**
+ * How a run picks a crawl's lower bound when no `since` is given: `full` has
+ * none, and `incremental` starts at the scope's checkpoint.
+ */
+export type EtlRunMode = "full" | "incremental";
+
+/** Options for one `run()`. */
+export type EtlRunOptions = Readonly<{
+  mode: EtlRunMode;
+  /** Inclusive lower bound on source timestamps. Beats the checkpoint. */
+  since?: Date;
+  /** Exclusive upper bound on source timestamps. */
+  until?: Date;
+  /** The most connections to process, counted across every drive. */
+  limit?: number;
+  /** Crawl only these scope keys. Omit to crawl every scope. */
+  scopes?: readonly string[];
+  /**
+   * How the run was started, recorded with it. A run without one, such as
+   * a test or script calling a pipeline's `run()` directly, is not
+   * recorded.
+   */
+  invocation?: ExecutionInvocation;
+  /**
+   * Called as the run moves: when a crawl starts, after each page it loads,
+   * and when it ends. Lets a caller show that a long run has not hung.
+   */
+  onProgress?: (progress: EtlRunProgress) => void;
+}>;
+
+/**
+ * Where a run is, as `EtlRunOptions.onProgress` receives it. The counts are
+ * totals for the whole run so far, not for the one crawl. A crawl the limit
+ * skips only reports `crawl_finished`.
+ */
+export type EtlRunProgress = Readonly<{
+  stage: "crawl_started" | "page_loaded" | "crawl_finished";
+  driveKey: string;
+  scopeKey: string;
+  /** The crawl's 1-based position among the run's crawls. */
+  crawlNumber: number;
+  crawlCount: number;
+  /** The run's limit on connections, when it has one. */
+  limit: number | undefined;
+  connectionsFetched: number;
+  relationsTransformed: number;
+  /** Columns the transformed relations declare. */
+  columnsFound: number;
+  /** How the crawl ended. Set only on `crawl_finished`. */
+  status?: EtlCrawlStatus;
+}>;
+
+/** The `[since, until)` range of source timestamps one drive's crawl covers. */
+export type EtlRunWindow = Readonly<{
+  since: Date | undefined;
+  until: Date | undefined;
+}>;
+
+/**
+ * One slice of a drive that is crawled and resumed on its own, such as one
+ * file format or one category. A pipeline adds whatever fields its `extract`
+ * and `transform` need to filter by it.
+ */
+export type EtlScope = Readonly<{
+  /** Unique within one drive. Matches `ETL_SCOPE_KEY_PATTERN`. */
+  key: string;
+}>;
+
+/** The descriptive listing fields every relation carries or may carry. */
+export type RelationDescription = Readonly<{
+  /** The connection's id in the source, written to `external_dataset_id`. */
+  externalDatasetId: string;
+  displayName: string;
+  externalOrganizationName: string;
+  /**
+   * The connection's source modification time, written to
+   * `date_of_last_update`.
+   */
+  sourceUpdatedAt: Date | undefined;
+  externalServiceName?: string;
+  sourceUrl?: string;
+  canonicalUrls?: readonly string[];
+  license?: string;
+  updateFrequency?: string;
+  description?: string;
+  notes?: string;
+  metadata?: Readonly<Record<string, unknown>>;
+  coverageStartDate?: Date;
+  coverageEndDate?: Date;
+  /**
+   * The size in bytes the source reports for this relation's data, such
+   * as a CKAN resource's `size`. Summed into the crawl's
+   * `sourceBytesReported`.
+   */
+  sourceSizeBytes?: number;
+}>;
+
+/** One column of an API relation, written to the relation columns table. */
+export type RelationColumn = Readonly<{
+  name: string;
+  originalDataType: string;
+  castDataType: DuckDbSniffableDataType;
+}>;
+
+/** A drive-index relation: a listing that points at an API, with no blob. */
+export type ApiResourceRelation = RelationDescription &
+  Readonly<{
+    kind: "api_resource";
+    apiResourceId: string;
+    apiResourceFormat: string;
+    /**
+     * Written together with the relation's row. Empty when the pipeline
+     * cannot learn the columns: they are filled in when the listing's types
+     * are verified. A column whose type the pipeline
+     * does not know is `VARCHAR`, with an `originalDataType` of the source's
+     * own type label or `UNKNOWN_ORIGINAL_DATA_TYPE`.
+     */
+    columns: readonly RelationColumn[];
+    /**
+     * When the pipeline read the columns' real types from the source's data,
+     * such as from a file's Parquet footer. Leave it unset when the types
+     * are not verified: the app verifies them from a sample later.
+     */
+    columnTypesVerifiedAt?: Date;
+  }>;
+
+/** A prebuilt relation: a CSV the engine converts to a Parquet object. */
+export type PipelineParquetRelation = RelationDescription &
+  Readonly<{
+    kind: "pipeline_parquet";
+    /** The object name and `parquet_file_name` stem, e.g. `WDICSV`. */
+    tableBaseName: string;
+    /** The CSV on disk. It must be named `<tableBaseName>.csv`. */
+    csvPath: string;
+    /** Casts for the CSV to Parquet conversion. Empty means infer them. */
+    csvColumns: readonly TransformedColumnDescription[];
+  }>;
+
+/** One listing a pipeline's `transform` returns. */
+export type Relation = ApiResourceRelation | PipelineParquetRelation;
+
+/** The tables, function, and bucket the engine writes to. */
+export type EtlOutput = Readonly<{
+  listingsTable: string;
+  /**
+   * The database function that upserts listings with their relation columns
+   * in one transaction, such as
+   * `rpc_data_catalog_listings__upsert_with_relation_columns`.
+   */
+  upsertListingsFunction: string;
+  /**
+   * The checkpoints table. Required when the config has `incremental`,
+   * because incremental crawls resume from it.
+   */
+  checkpointsTable?: string;
+  /** Required only when a pipeline returns `pipeline_parquet` relations. */
+  bucket?: string;
+  /**
+   * The database functions that record each run, such as
+   * `rpc_pipeline_executions__start`. Omit to record nothing.
+   */
+  executionFunctions?: ExecutionFunctions;
+}>;
+
+/** Where a pipeline's output goes: Supabase credentials and output names. */
+export type EtlDestination = Readonly<{
+  /** Values may be `undefined` so callers can pass env vars straight in. */
+  supabase?: Readonly<{
+    url: string | undefined;
+    serviceRoleKey: string | undefined;
+  }>;
+  output: EtlOutput;
+}>;
+
+/** The stores the engine reads and writes through. */
+export type EtlStores = Readonly<{
+  listings: ListingsStore;
+  /** Undefined when no bucket is configured. */
+  objects: ObjectStore | undefined;
+  /** Required when the config has `incremental`. */
+  checkpoints?: CheckpointStore;
+  /** Where runs are recorded. Omit to record nothing. */
+  executions?: ExecutionStore;
+}>;
+
+/**
+ * What a pipeline adds to support incremental runs. `_TDrive` is unused. It
+ * keeps the type's parameters in step with `EtlEngineConfig`'s.
+ */
+export type EtlIncrementalConfig<_TDrive, TConnection> = Readonly<{
+  /** Modification time, or creation time when the source has no other. */
+  getConnectionTimestamp: (connection: TConnection) => Date;
+}>;
+
+/** Everything one pipeline gives the engine. */
+export type EtlEngineConfig<
+  TDrive,
+  TConnection,
+  TScope extends EtlScope = EtlScope,
+> = EtlDestination &
+  Readonly<{
+    /** Written to `pipeline_name`. */
+    name: string;
+    /** Written to `api_service`. Required for `api_resource` relations. */
+    service?: string;
+    /** Replaces the Supabase-backed stores, for tests. */
+    stores?: EtlStores;
+    /** Replaces the system clock, for tests. */
+    clock?: EtlClock;
+    listDrives: () => PromisedOrValue<readonly TDrive[]>;
+    /** Written to `api_base_url` on `api_resource` rows. */
+    getDriveKey: (drive: TDrive) => string;
+    /**
+     * The drive's scopes, crawled in this order. Omit for one scope,
+     * `all`, which leaves `TScope` at its default, `EtlScope`.
+     */
+    listScopes?: (drive: TDrive) => PromisedOrValue<readonly TScope[]>;
+    /**
+     * Pages of one scope's connections, oldest first when `incremental`
+     * is set. Narrow to the scope at the source where it can.
+     */
+    extract: (args: {
+      drive: TDrive;
+      scope: TScope;
+      window: EtlRunWindow;
+      pipelineRunId: EtlPipelineRunId;
+      /** Counters and timers this pipeline adds to the crawl's metrics. */
+      metrics: EtlPipelineMetrics;
+    }) => AsyncIterable<readonly TConnection[]>;
+    /** Identifies a connection, so a repeat within one crawl is dropped. */
+    getConnectionId: (connection: TConnection) => string;
+    /** Returns only the scope's relations of one connection. */
+    transform: (args: {
+      drive: TDrive;
+      scope: TScope;
+      connection: TConnection;
+      pipelineRunId: EtlPipelineRunId;
+      /** Counters and timers this pipeline adds to the crawl's metrics. */
+      metrics: EtlPipelineMetrics;
+    }) => PromisedOrValue<readonly Relation[]>;
+    /** Omit for a pipeline that only supports full runs. */
+    incremental?: EtlIncrementalConfig<TDrive, TConnection>;
+  }>;
+
+/** How one crawl ended. `skipped` means the limit was reached first. */
+export type EtlCrawlStatus = "ok" | "failed" | "skipped";
+
+/**
+ * What happened to one scope of one drive during a run. The counts and
+ * `newestTimestamp` cover only pages that finished loading: when a crawl
+ * fails partway through a page, rows that page already wrote are not
+ * counted in `relationsWritten`. A drive that failed before its scopes
+ * were known has one entry, with `scopeKey` `listScopes`.
+ */
+export type EtlCrawlReport = Readonly<{
+  driveKey: string;
+  scopeKey: string;
+  window: EtlRunWindow;
+  connectionsFetched: number;
+  relationsWritten: number;
+  relationsUnchanged: number;
+  newestTimestamp: Date | undefined;
+  status: EtlCrawlStatus;
+  error?: string;
+  /** When the crawl started and ended. */
+  startedAt: Date;
+  finishedAt: Date;
+  /** The scope's checkpoint when the crawl started and when it ended. */
+  checkpointBefore: Date | undefined;
+  checkpointAfter: Date | undefined;
+  /** The crawl's stage timings and the denominators that explain them. */
+  metrics: EtlCrawlMetrics;
+}>;
+
+/** What happened during a run, one entry per crawl in crawl order. */
+export type EtlRunReport = Readonly<{
+  pipelineRunId: EtlPipelineRunId;
+  mode: EtlRunMode;
+  crawls: readonly EtlCrawlReport[];
+  /** When the run started and ended. */
+  startedAt: Date;
+  finishedAt: Date;
+  /** Milliseconds listing drives and their scopes, before any crawl. */
+  setupMs: number;
+}>;
+
+/** One drive's live scope keys. */
+export type EtlDriveScopes = Readonly<{
+  driveKey: string;
+  scopeKeys: readonly string[];
+}>;
+
+/** A pipeline's engine. */
+export type EtlEngineInstance = Readonly<{
+  /**
+   * Crawls every scope of every drive and loads what changed, resolving to
+   * the run's report when at least one crawl did not fail. A run that
+   * throws after it started is recorded as failed.
+   *
+   * @throws Before listing drives, when `mode` is `incremental` on a
+   * pipeline without `incremental` config, or `limit` is not an integer of 0
+   * or more.
+   * @throws Before listing drives, when no `stores` are given and
+   * `supabase.url` or `supabase.serviceRoleKey` is missing.
+   * @throws Before listing drives, when the config has `incremental` and
+   * there is no checkpoint store.
+   * @throws Whatever `listDrives` throws.
+   * @throws EtlRunOptionsError when `scopes` is empty, holds an invalid key,
+   * or names a scope no drive declares.
+   * @throws EtlRunFailedError when every crawl failed.
+   */
+  run: (options: EtlRunOptions) => Promise<EtlRunReport>;
+  /**
+   * Lists each drive's live scope keys without crawling or touching any
+   * store, so it needs no Supabase credentials.
+   *
+   * @throws Whatever `listDrives` throws, and when any drive's key or
+   * scopes cannot be read or are invalid: a partial list would make live
+   * scopes look retired.
+   */
+  listScopes: () => Promise<readonly EtlDriveScopes[]>;
+}>;

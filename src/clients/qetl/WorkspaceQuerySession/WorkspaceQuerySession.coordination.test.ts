@@ -4,8 +4,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+
+/**
+ * The real `QueryMediatorFactory.create` parameters, so the fake tracks its
+ * signature.
+ */
+type QueryMediatorCreateParameters = Parameters<
+  typeof QueryMediatorFactory.create
+>;
 
 const DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
@@ -96,13 +104,10 @@ vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
 vi.mock("@/clients/qetl/QueryMediator/QueryMediator", () => {
   return {
     QueryMediatorFactory: {
-      create: (options: {
-        getQueryDependencies: (rawSql: string) => Promise<Dataset.Id[]>;
-        prepareDuckDbDatasets?: (params: {
-          datasetIds: readonly Dataset.Id[];
-          datasetDuckDbLease: DatasetDuckDbLease;
-        }) => Promise<void>;
-      }) => {
+      create: (
+        _name: QueryMediatorCreateParameters[0],
+        { state: options }: QueryMediatorCreateParameters[1],
+      ) => {
         return {
           runQuery: async ({ rawSql }: { rawSql: string }) => {
             const datasetIds = await options.getQueryDependencies(rawSql);

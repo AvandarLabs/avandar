@@ -1,0 +1,64 @@
+import { Tabs } from "@avandar/ui";
+import { useLingui } from "@lingui/react/macro";
+import { Stack } from "@mantine/core";
+import { ConnectorsAdvisory } from "@/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory";
+import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
+import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
+import { DataCatalogView } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView";
+import { PostgresConnectorImportView } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
+type Props = {
+  isAddAllowed: boolean;
+
+  /**
+   * When set, the import sub-views skip their default post-save navigation
+   * and call this callback with the newly saved dataset instead.
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
+};
+
+/**
+ * The three import flows (manual upload, connectors, open data catalog)
+ * wrapped in tabs. Shared between the standalone DataImportView page and
+ * the Data Explorer's "Open" drawer.
+ */
+export function DataImportTabs({
+  isAddAllowed,
+  onSaveSuccess,
+}: Props): JSX.Element {
+  const { t } = useLingui();
+  return (
+    <Tabs
+      tabIds={["upload-view", "connectors-view", "open-data-catalog"] as const}
+      renderTabHeader={{
+        "upload-view": t`Upload`,
+        "connectors-view": t`Connectors`,
+        "open-data-catalog": t`Open data`,
+      }}
+      renderTabPanel={{
+        "upload-view": () => {
+          return <ManualUploadView pt="lg" onSaveSuccess={onSaveSuccess} />;
+        },
+        "connectors-view": () => {
+          return (
+            <Stack gap="xl" pt="lg">
+              <GoogleSheetsImportView onSaveSuccess={onSaveSuccess} />
+              <PostgresConnectorImportView onSaveSuccess={onSaveSuccess} />
+              <ConnectorsAdvisory />
+            </Stack>
+          );
+        },
+        "open-data-catalog": () => {
+          return (
+            <DataCatalogView
+              isAddAllowed={isAddAllowed}
+              onSaveSuccess={onSaveSuccess}
+              pt="lg"
+            />
+          );
+        },
+      }}
+    />
+  );
+}

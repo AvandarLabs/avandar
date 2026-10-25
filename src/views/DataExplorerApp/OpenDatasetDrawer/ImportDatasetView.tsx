@@ -3,7 +3,7 @@ import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/Sub
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs";
+import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {

@@ -1,14 +1,14 @@
 import type { UnknownObject } from "@avandar/utils";
 
 /**
- * A mixin to add new members to a module.
+ * A mixin that adds `newMembers` and reads nothing from the module.
  *
- * @param newMembers - The new members to add to the module.
- * @returns A function that returns the new members.
+ * @param newMembers - The members to add.
+ * @returns The mixin.
  */
-export function withNewMembers<T extends UnknownObject>(
-  newMembers: T,
-): () => { members: T } {
+export function withNewMembers<NewMembers extends UnknownObject>(
+  newMembers: NewMembers,
+): () => { members: NewMembers } {
   return () => {
     return { members: newMembers };
   };

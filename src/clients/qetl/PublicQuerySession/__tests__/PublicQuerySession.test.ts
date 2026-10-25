@@ -2,6 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { makePrincipalKeyFromPublicSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator";
+
+/**
+ * The real `QueryMediatorFactory.create` parameters, so the fake tracks its
+ * signature.
+ */
+type QueryMediatorCreateParameters = Parameters<
+  typeof QueryMediatorFactory.create
+>;
 
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
 const DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
@@ -56,9 +65,10 @@ beforeEach(() => {
   vi.clearAllMocks();
   listDatasetIdsForDashboardMock.mockResolvedValue([DATASET_ID]);
   createMock.mockImplementation(
-    (options: {
-      getQueryDependencies: (rawSql: string) => Promise<string[]>;
-    }) => {
+    (
+      _name: QueryMediatorCreateParameters[0],
+      { state: options }: QueryMediatorCreateParameters[1],
+    ) => {
       return {
         runQuery: async ({ rawSql }: { rawSql: string }) => {
           return { rows: await options.getQueryDependencies(rawSql) };
@@ -204,7 +214,7 @@ describe("PublicQuerySession.runQuery", () => {
       snapshotRevision: THIRD_REVISION,
     });
 
-    const qetlOptions = createMock.mock.calls.at(-1)?.[0] as {
+    const qetlOptions = createMock.mock.calls.at(-1)?.[1]?.state as {
       principalKey: string;
       relationCache: unknown;
     };

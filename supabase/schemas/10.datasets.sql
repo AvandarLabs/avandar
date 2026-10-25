@@ -4,7 +4,8 @@ create type public.datasets__source_type as enum(
   'virtual',
   'open_data',
   'xlsx_file',
-  'pdf_file'
+  'pdf_file',
+  'postgres_table'
 );
 
 create table public.datasets (

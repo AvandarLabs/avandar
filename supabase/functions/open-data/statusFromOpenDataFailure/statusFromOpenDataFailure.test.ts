@@ -1,6 +1,6 @@
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { describe, expect, it } from "vitest";
-import type { OpenDataAcquisitionFailureCode } from "$/open-data/openDataErrors.ts";
+import type { OpenDataAcquisitionFailureCode } from "$/connectors/open-data/openDataErrors.ts";
 
 /**
  * Every code the failure union carries. Listed rather than derived, so adding a
@@ -17,6 +17,9 @@ const ALL_CODES: readonly OpenDataAcquisitionFailureCode[] = [
   "resource-too-large",
   "resource-host-mismatch",
   "resource-unreachable",
+  "resource-empty",
+  "resource-authorization-required",
+  "ckan-unreachable",
   "access-shape-invalid",
 ];
 
@@ -26,6 +29,9 @@ describe("statusFromOpenDataFailure", () => {
     ["resource-too-large", 413],
     ["ckan-action-failed", 502],
     ["resource-unreachable", 502],
+    ["resource-authorization-required", 502],
+    ["ckan-unreachable", 502],
+    ["resource-empty", 409],
     ["resource-is-remote-api", 409],
     ["resource-format-unsupported", 409],
     ["resource-format-changed", 409],

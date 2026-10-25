@@ -331,7 +331,7 @@ Five durations (`instant` 80ms, `fast` 140ms, `normal` 200ms, `moderate` 270ms, 
 - **Do** put every app view inside `AppSlate` so it gets the slate, the toolbar, and the gutter.
 - **Do** pair an `--ava-border-*` token with the matching `--ava-surface-*` token and an elevation step, rather than picking neutral shades by hand.
 - **Do** default to `radius="sm"` (6px) and `color="neutral"`, and spend Brand Blue only on filled actions, current selection, and focus.
-- **Do** call a County a County and a case type a case type. Use the user's nouns in every label, placeholder, and empty state.
+- **Do** call a County a County and a case type a case type. Use the user's nouns in every label, placeholder, and empty state. This extends to internal entity names that differ from what a user thinks they're doing: a Postgres connector's saved credential is a "connection" in the schema, but the user is "adding a database," never "creating a connection" - write for a low-tech (not non-tech) audience's mental model, and let each connector pick its own noun (see `AGENTS.md`'s "Copy and nomenclature").
 - **Do** use the Data Sources list pane as the spatial template for any new master-detail surface.
 - **Do** keep empty states instructional: what this is, and the one next move.
 - **Do** let `--mantine-scale` handle tablet sizing.
@@ -342,6 +342,7 @@ Five durations (`instant` 80ms, `fast` 140ms, `normal` 200ms, `moderate` 270ms, 
 - **Don't** leave `AppShell.Main` unpainted so shell background shows through where the slate should be.
 - **Don't** take the gutter or the drop shadow off the slate, or let another layer clip them.
 - **Don't** say "slate" when you mean a color, or "canvas" when you mean the slate. "Canvas" means a real `<canvas>` element.
+- **Don't** let an internal schema or model name leak into copy because it's convenient. "Database" reads correctly to a user even though the backend calls it a "connection"; match their model of the task, not the table name.
 - **Don't** use `Callout color="info"` for a selection or empty state. Build an empty state instead.
 - **Don't** say "entity", "profile manager", "concept", or "Sync data!" in the UI, or title a list "{name} Manager".
 - **Don't** give list rows a left accent stripe, or a hover color equal to the pane background.

@@ -3,20 +3,20 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { buildCsvFromDatastoreRecords } from "$/open-data/buildCsvFromDatastoreRecords";
+import { buildCsvFromDatastoreRecords } from "$/connectors/open-data/buildCsvFromDatastoreRecords";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
-import type { CkanDatastoreField } from "$/open-data/CkanClient/CkanClient.types";
+import type { CkanDatastoreField } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type { DuckDBConnection } from "@duckdb/node-api";
 
 /**
  * This suite lives under `src/` rather than beside
- * `shared/open-data/buildCsvFromDatastoreRecords.ts` because it reuses
- * `withDuckDb`, whose DuckDB driver is Node-only. Anything under `shared/` is
- * type-checked by Deno and may use only path-alias imports, and there is no
- * Deno-visible alias for `src/`, so importing the harness from there would fail
- * both `deno check shared` and lint. Duplicating the harness was the
- * alternative, and its whole purpose is to be the one place a DuckDB
- * instance is guaranteed to be closed.
+ * `shared/connectors/open-data/buildCsvFromDatastoreRecords.ts` because it
+ * reuses `withDuckDb`, whose DuckDB driver is Node-only. Anything under
+ * `shared/` is type-checked by Deno and may use only path-alias imports, and
+ * there is no Deno-visible alias for `src/`, so importing the harness from
+ * there would fail both `deno check shared` and lint. Duplicating the
+ * harness was the alternative, and its whole purpose is to be the one place
+ * a DuckDB instance is guaranteed to be closed.
  */
 const HERE = dirname(fileURLToPath(import.meta.url));
 

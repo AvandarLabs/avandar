@@ -1,12 +1,32 @@
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
-import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import {
+  defineRoutes,
+  GET,
+  POST,
+} from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
+import {
+  markColumnTypeSampleUnparseable,
+  markListingInvalid,
+  respondWithColumnTypeSample,
+  UnparseableSampleBodySchema,
+  VerifiedColumnTypesBodySchema,
+  writeVerifiedColumnTypes,
+} from "@sbfn/open-data/columnTypeVerification/columnTypeVerification.ts";
+import { respondWithSampleFailure } from "@sbfn/open-data/respondWithSampleFailure/respondWithSampleFailure.ts";
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { string } from "zod";
-import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
-import { acquireOpenDataResource } from "$/open-data/acquireOpenDataResource.ts";
-import { createOpenDataHttp } from "$/open-data/createOpenDataHttp.ts";
-import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
+import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
+import { acquireOpenDataResourceWithCache } from "$/connectors/open-data/acquireOpenDataResourceWithCache/acquireOpenDataResourceWithCache.ts";
+import { createAvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.ts";
+import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken/readOpenDataFreshnessToken.ts";
+import { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts";
+import { HttpClientFactory } from "$/utils/HttpClientFactory/HttpClientFactory.ts";
+import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * The largest resource this route will relay. Kept well under the response size
@@ -31,6 +51,97 @@ function _responseFromFailure(error: OpenDataAcquisitionFailed): Response {
 }
 
 /**
+ * Writes a freshly fetched resource's cache location and source version back
+ * onto its catalog listing. The sole `updateCache` implementation
+ * `acquireOpenDataResourceWithCache` is given, so a cache write only happens
+ * through the catalog-entry update it performs.
+ */
+async function _persistOpenDataCache(params: {
+  catalogListingId: DataCatalogListing.Id;
+  cachedObjectPath: string;
+  cachedSourceVersion: string;
+}): Promise<void> {
+  const { error: updateError } = await SupabaseAdmin.from(
+    "data_catalog_listings",
+  )
+    .update({
+      cached_object_path: params.cachedObjectPath,
+      cached_source_version: params.cachedSourceVersion,
+      cached_at: new Date().toISOString(),
+    })
+    .eq("id", params.catalogListingId);
+  if (updateError) {
+    throw updateError;
+  }
+}
+
+/**
+ * Resolves one catalog listing's resource bytes through the cache-aside path:
+ * builds the HTTP and storage clients the acquisition needs, then wires them
+ * into `acquireOpenDataResourceWithCache` along with the freshness check,
+ * the live fetch, and the cache-persist callback.
+ */
+async function _resolveOpenDataAcquisition(
+  entry: Readonly<DataCatalogListing.T>,
+): Promise<OpenDataAcquisition> {
+  const http = HttpClientFactory.create("OpenDataRouteHttpClient", {
+    state: { maxResponseBytes: MAX_RESOURCE_BYTES },
+  });
+  const storage = createAvandarSupabaseStorageClient(
+    SupabaseAdmin.storage.from("open-data-catalog"),
+  );
+
+  return acquireOpenDataResourceWithCache({
+    entry,
+    readFreshnessToken: (freshnessEntry) => {
+      return readOpenDataFreshnessToken({ entry: freshnessEntry, http });
+    },
+    acquireLive: (liveEntry) => {
+      return acquireOpenDataResource({
+        entry: liveEntry,
+        http,
+        maxBytes: MAX_RESOURCE_BYTES,
+      });
+    },
+    storage,
+    updateCache: _persistOpenDataCache,
+  });
+}
+
+/**
+ * Reads one catalog listing as the caller, so RLS decides whether they may
+ * see it.
+ *
+ * @returns The listing, or a 404 response when there is none to see.
+ */
+async function _readCatalogListing(
+  supabaseClient: SupabaseClient,
+  catalogListingId: string,
+): Promise<DataCatalogListing.T | Response> {
+  const { data, error } = await supabaseClient
+    .from("data_catalog_listings")
+    .select("*")
+    .eq("id", catalogListingId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+  if (!data) {
+    return new Response(
+      JSON.stringify({ error: { code: "catalog-entry-not-found" } }),
+      {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+  return DataCatalogListingParsers.fromDBReadToModelRead(
+    DataCatalogListingParsers.DBReadSchema.parse(data),
+  );
+}
+
+/**
  * Reads open data sources described by Avandar's catalog.
  *
  * This route exists because a browser cannot read a CKAN resource itself. CKAN
@@ -39,47 +150,28 @@ function _responseFromFailure(error: OpenDataAcquisitionFailed): Response {
  * `access-control-allow-origin` names only the CKAN host, so the bytes are
  * unreachable from any other origin. Server-side there is no such restriction.
  *
- * The caller sends a catalog entry id and nothing else. It never sends a URL:
+ * The caller sends a catalog listing id and nothing else. It never sends a URL:
  * the API root comes from the catalog row, the resource URL comes from CKAN's
  * own response, and `getCkanResourceFromPackage` refuses a resource URL whose
  * host is not the catalogued one. That chain is what keeps this from being an
  * open relay for arbitrary server-side requests.
  */
 export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
-  "/catalog-entries/:catalogEntryId/resource": {
+  "/data-catalog-listings/:catalogListingId/resource": {
     GET: GET({
-      path: "/catalog-entries/:catalogEntryId/resource",
-      schema: { catalogEntryId: string().uuid() },
+      path: "/data-catalog-listings/:catalogListingId/resource",
+      schema: { catalogListingId: string().uuid() },
     }).action(async ({ pathParams, supabaseClient }): Promise<Response> => {
-      const { data, error } = await supabaseClient
-        .from("catalog_entries__open_data")
-        .select("*")
-        .eq("id", pathParams.catalogEntryId)
-        .maybeSingle();
-
-      if (error) {
-        throw error;
-      }
-      if (!data) {
-        return new Response(
-          JSON.stringify({ error: { code: "catalog-entry-not-found" } }),
-          {
-            status: 404,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
-
-      const entry = OpenDataCatalogEntryParsers.fromDBReadToModelRead(
-        OpenDataCatalogEntryParsers.DBReadSchema.parse(data),
+      const entry = await _readCatalogListing(
+        supabaseClient,
+        pathParams.catalogListingId,
       );
+      if (entry instanceof Response) {
+        return entry;
+      }
 
       try {
-        const acquisition = await acquireOpenDataResource({
-          entry,
-          http: createOpenDataHttp({ maxBytes: MAX_RESOURCE_BYTES }),
-          maxBytes: MAX_RESOURCE_BYTES,
-        });
+        const acquisition = await _resolveOpenDataAcquisition(entry);
 
         return new Response(acquisition.bytes as BodyInit, {
           status: 200,
@@ -100,5 +192,79 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
         throw caught;
       }
     }),
+  },
+  "/data-catalog-listings/:catalogListingId/column-type-sample": {
+    GET: GET({
+      path: "/data-catalog-listings/:catalogListingId/column-type-sample",
+      schema: { catalogListingId: string().uuid() },
+    }).action(async ({ pathParams, supabaseClient }): Promise<Response> => {
+      const entry = await _readCatalogListing(
+        supabaseClient,
+        pathParams.catalogListingId,
+      );
+      if (entry instanceof Response) {
+        return entry;
+      }
+      try {
+        return await respondWithColumnTypeSample(entry);
+      } catch (caught) {
+        if (OpenDataAcquisitionFailed.is(caught)) {
+          return await respondWithSampleFailure({
+            catalogListingId: entry.id,
+            error: caught,
+            markInvalid: markListingInvalid,
+          });
+        }
+        throw caught;
+      }
+    }),
+  },
+  "/data-catalog-listings/:catalogListingId/column-types": {
+    POST: POST({
+      path: "/data-catalog-listings/:catalogListingId/column-types",
+      schema: { catalogListingId: string().uuid() },
+    })
+      .bodySchema(VerifiedColumnTypesBodySchema)
+      .action(
+        async ({ pathParams, body, supabaseClient }): Promise<Response> => {
+          // Read as the caller first, so only a listing they can see is
+          // written.
+          const entry = await _readCatalogListing(
+            supabaseClient,
+            pathParams.catalogListingId,
+          );
+          if (entry instanceof Response) {
+            return entry;
+          }
+          return await writeVerifiedColumnTypes({
+            catalogListingId: entry.id,
+            body,
+          });
+        },
+      ),
+  },
+  "/data-catalog-listings/:catalogListingId/unparseable": {
+    POST: POST({
+      path: "/data-catalog-listings/:catalogListingId/unparseable",
+      schema: { catalogListingId: string().uuid() },
+    })
+      .bodySchema(UnparseableSampleBodySchema)
+      .action(
+        async ({ pathParams, body, supabaseClient }): Promise<Response> => {
+          // Read as the caller first, so only a listing they can see is
+          // marked.
+          const entry = await _readCatalogListing(
+            supabaseClient,
+            pathParams.catalogListingId,
+          );
+          if (entry instanceof Response) {
+            return entry;
+          }
+          return await markColumnTypeSampleUnparseable({
+            catalogListingId: entry.id,
+            body,
+          });
+        },
+      ),
   },
 });
