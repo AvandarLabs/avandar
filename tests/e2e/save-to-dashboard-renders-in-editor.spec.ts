@@ -2,14 +2,8 @@ import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { openDataExplorerDrawerTab } from "./helpers/dataExplorerFlow";
 import { parseDashboardIdFromEditorUrl } from "./helpers/parseDashboardIdFromEditorUrl";
-import {
-  deleteAllDashboardsForOwner,
-  deleteDashboardsByIds,
-} from "./helpers/seedDashboard";
-import {
-  createSupabaseAdminClient,
-  getWorkspaceIdBySlug,
-} from "./helpers/supabaseAdminClient";
+import { deleteDashboardsByIds } from "./helpers/seedDashboard";
+import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 /**

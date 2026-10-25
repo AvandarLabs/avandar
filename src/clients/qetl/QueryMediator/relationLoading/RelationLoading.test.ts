@@ -32,6 +32,7 @@ describe("probeStorageRelationCache", () => {
       },
       columns: "all",
       payload: new Blob(["parquet-bytes"]),
+      staleAt: undefined,
     });
 
     const { cachedRelations } = await RelationLoading.probeStorageRelationCache({

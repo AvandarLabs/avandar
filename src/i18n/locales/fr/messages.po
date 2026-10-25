@@ -67,7 +67,7 @@ msgstr "1 groupe"
 msgid "Numbers in prose"
 msgstr "Nombres dans le texte"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort by"
 msgstr "Trier par"
 
@@ -138,6 +138,10 @@ msgstr "Nommez ce type de dossier et indiquez l’origine de ses champs. Faites 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Value column"
 msgstr "Colonne de valeur"
+
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Could not refresh this dataset"
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not on"
@@ -515,7 +519,7 @@ msgid "Individual locations will be drawn on the map, and suppressed areas will 
 msgstr "Les emplacements individuels seront affichés sur la carte et les zones "
 "masquées afficheront leurs nombres réels. Continuer ?"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Aggregations"
 msgstr "Agrégations"
 
@@ -566,7 +570,7 @@ msgstr "Enregistrer et relancer la requête"
 msgid "Saved as \"{0}\"."
 msgstr "Enregistré sous \"{0}\"."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
 msgstr ""
 
@@ -1044,7 +1048,7 @@ msgstr "Le SQL actuel contient des éléments que le formulaire ne peut pas "
 msgid "Updated {0}"
 msgstr "Mis à jour {0}"
 
-#: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory/ConnectorsAdvisory.tsx
 msgid "Request a data source connection via feedback"
 msgstr "Demander une connexion à une source de données via les retours"
 
@@ -2064,7 +2068,7 @@ msgstr "Données ouvertes"
 msgid "Radius"
 msgstr "Rayon"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Tri et limite"
 
@@ -2186,6 +2190,10 @@ msgid "The boundaries and names shown do not imply official endorsement or "
 msgstr "Les limites et les noms affichés n’impliquent aucune approbation ni "
 "reconnaissance officielle."
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Try again. If it keeps failing, reload the page."
+msgstr ""
+
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
 msgstr "Vous pouvez commencer à utiliser votre nouveau mot de passe maintenant"
@@ -2305,6 +2313,10 @@ msgid "You shared your first dashboard with your workspace. Anyone there can "
 msgstr "Vous avez partagé votre premier tableau de bord avec votre espace de "
 "travail. Toute personne qui en fait partie peut l'ouvrir dès qu'elle en "
 "a besoin."
+
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "This dataset now reflects the current contents of the table."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
@@ -2677,7 +2689,7 @@ msgstr "{keyboardShortcut} pour enregistrer"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
@@ -2793,7 +2805,8 @@ msgstr "Chaque série est une colonne numérique tracée sur l'axe Y. Les valeur
 msgid "Filled in by hand"
 msgstr "Rempli manuellement"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
 msgid "Some filters were removed"
 msgstr "Certains filtres ont été supprimés"
 
@@ -2974,7 +2987,7 @@ msgstr "La prise en charge de la géométrie est en cours de téléchargement. C
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
@@ -3012,7 +3025,7 @@ msgid "Draw a box around a table, chart, map or block of text to extract it."
 msgstr "Tracez un cadre autour d’un tableau, d’un graphique, d’une carte ou "
 "d’un bloc de texte pour l’extraire."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/testAndSavePostgresConnection.ts
 msgid "Listing tables..."
 msgstr ""
 
@@ -3024,6 +3037,10 @@ msgstr "Portée des données"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "Aperçu des données"
+
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
+msgid "This address isn't allowed"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Your Google connection expired"
@@ -3126,7 +3143,7 @@ msgstr "Vous ne pouvez pas enregistrer dans un tableau de bord tant que vous "
 msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
 msgstr "Vous êtes actuellement sur le plan <0>{currentFeaturePlanName}</0>."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Result size"
 msgstr "Taille du résultat"
 
@@ -3140,6 +3157,10 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 msgstr "La mise à niveau vers un plan \"Payez ce que vous voulez\" ne peut se "
 "faire que via le portail de facturation.<0/>Le bouton ci-dessous vous y "
 "conduira."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem.tsx
+msgid "Refresh from the database"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
@@ -3280,6 +3301,11 @@ msgstr "Appuyez sur Espace ou Entrée pour commencer à faire glisser. Utilisez 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Grid shape"
 msgstr "Forme de la grille"
+
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+msgid "Failed to save dashboard: {0}"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish"
@@ -3474,7 +3500,7 @@ msgstr ""
 msgid "e.g. cholera-outbreak-2024"
 msgstr "par exemple cholera-outbreak-2024"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem.tsx
 msgid "Refresh from Google Sheets"
 msgstr "Actualiser depuis Google Sheets"
 
@@ -3599,7 +3625,7 @@ msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr "Publiez uniquement les colonnes lues par votre tableau de bord. Le plus "
 "étroit, le plus privé."
 
-#: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory/ConnectorsAdvisory.tsx
 msgid "New connectors are added every month. If there is a database or service "
 "you need, <0>tell us so we can prioritize it</0>."
 msgstr "De nouveaux connecteurs sont ajoutés chaque mois. Si vous avez besoin "
@@ -3720,7 +3746,7 @@ msgstr "Capture du tableau de bord…"
 msgid "Keep the measurements as found"
 msgstr "Conserver les mesures telles qu’elles ont été trouvées"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
 msgstr ""
 
@@ -3769,7 +3795,7 @@ msgstr "Couleur du libellé de l’axe Y"
 msgid "Name of {0}"
 msgstr "Nom de {0}"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table is too large to import"
 msgstr ""
 
@@ -3940,7 +3966,7 @@ msgid "Rose"
 msgstr "Rose"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "Êtes-vous sûr de vouloir supprimer {0} ?"
 
@@ -3984,7 +4010,7 @@ msgstr "Barre"
 msgid "No {conceptName} records yet"
 msgstr "Aucun enregistrement {conceptName} pour le moment"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "More dataset actions"
 msgstr "Plus d’actions sur le jeu de données"
 
@@ -4350,7 +4376,7 @@ msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (téléchargement d’environ {approxSizeMb} "
 "Mo)."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
 msgstr ""
 
@@ -4717,6 +4743,10 @@ msgstr ""
 msgid "X axis label rotation"
 msgstr "Rotation des libellés de l’axe X"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Refreshed from the database"
+msgstr ""
+
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
 "query without asking me to select from the failed catalog.]"
@@ -4759,8 +4789,8 @@ msgid "Edit {name}"
 msgstr "Modifier {name}"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
-msgid "Column name (must match SQL)"
-msgstr "Nom de la colonne (doit correspondre à SQL)"
+#~ msgid "Column name (must match SQL)"
+#~ msgstr "Nom de la colonne (doit correspondre à SQL)"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
@@ -4826,6 +4856,11 @@ msgid "Anyone with the link can view this {resource}. People and groups below "
 msgstr "Toute personne disposant du lien peut consulter ce {resource}. Les "
 "personnes et les groupes ci-dessous contrôlent toujours les accès en "
 "modification."
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "The person who added this sheet needs to reconnect their Google account. "
+"Ask them to reconnect it, then try again."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
@@ -4963,7 +4998,7 @@ msgstr "Suppression échouée"
 #. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
 #: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} supprimé avec succès"
@@ -5841,7 +5876,7 @@ msgstr "Rendre interne"
 msgid "Detected"
 msgstr "Détecté"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete Dataset"
 msgstr "Supprimer le jeu de données"
@@ -6034,7 +6069,7 @@ msgstr "Lecture de la mesure"
 msgid "Upper bound"
 msgstr "Limite supérieure"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/testAndSavePostgresConnection.ts
 msgid "Connecting to database"
 msgstr ""
 
@@ -6355,7 +6390,7 @@ msgstr "Un filtre est actif sur cette couche. Il peut exclure tous les "
 msgid "Workspace name updated"
 msgstr "Nom de l'espace de travail mis à jour"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
 "the server allows connections from Avandar."
 msgstr ""
@@ -6866,7 +6901,7 @@ msgstr "Impossible de joindre l’assistant. Les résultats basés sur des règl
 msgid "{0} missing"
 msgstr "{0} manquant"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "Dataset deleted"
 msgstr "Jeu de données supprimé"
 
@@ -7095,7 +7130,7 @@ msgstr "La latitude et la longitude doivent toutes deux être des nombres."
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "Supprimer le jeu de données"
@@ -7125,6 +7160,10 @@ msgstr "Séparateur"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
 msgstr "Limite inférieure"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "This sheet can't be read right now"
+msgstr ""
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -7782,6 +7821,11 @@ msgstr "Modifier les autorisations"
 msgid "queried"
 msgstr "interrogé"
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
+msgid "They referenced columns this data source does not have."
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "{conceptName} fields"
 msgstr "Champs {conceptName}"
@@ -7928,7 +7972,7 @@ msgstr "Groupe d’empilement"
 msgid "Select rule (e.g. most frequent)"
 msgstr "Sélectionner la règle (par exemple, la plus fréquente)"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Database is unreachable"
 msgstr ""
 
@@ -8052,7 +8096,7 @@ msgstr "Période : {0}"
 msgid "Coordinate is outside the valid range"
 msgstr "La coordonnée est en dehors de la plage valide"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Filters (Where)"
 msgstr "Filtres (Où)"
 
@@ -8142,7 +8186,7 @@ msgstr "Enregistrement"
 msgid "Role for new share"
 msgstr "Rôle pour le nouveau partage"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
 msgstr ""
@@ -8159,7 +8203,7 @@ msgstr "Envoyer à l'IA ?"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "Acheter {seatsToAdd} sièges"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
 msgstr ""
@@ -8343,7 +8387,7 @@ msgstr "Expression de colonne sans nom dans SELECT ; ignorée."
 msgid "Clear search"
 msgstr "Effacer la recherche"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "An unexpected error occurred while connecting."
 msgstr ""
 
@@ -8510,6 +8554,11 @@ msgstr "Masquer les détails"
 msgid "See why"
 msgstr "Voir pourquoi"
 
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
+msgid "Avandar can't connect to a loopback, link-local, or private address. Use "
+"a publicly reachable host and port."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
 msgstr "Aucune entrée pour le moment. Le journal se remplit au fur et à mesure "
@@ -8559,10 +8608,10 @@ msgid "Profiles"
 msgstr "Profils"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-msgid "They referenced columns this data source does not have: "
-"{removedColumnNames}"
-msgstr "Les colonnes référencées n’existent pas dans cette source de données : "
-"{removedColumnNames}"
+#~ msgid "They referenced columns this data source does not have: "
+#~ "{removedColumnNames}"
+#~ msgstr "Les colonnes référencées n’existent pas dans cette source de données : "
+#~ "{removedColumnNames}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
@@ -8755,7 +8804,7 @@ msgstr "Avandar est encore en version bêta. Certaines fonctionnalités peuvent 
 msgid "Thank you for your interest!"
 msgstr "Merci de votre intérêt !"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
@@ -8886,6 +8935,7 @@ msgid "Geometry column"
 msgstr "Colonne de géométrie"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterFieldSelector/FilterFieldSelector.tsx
 msgid "Column"
@@ -9018,7 +9068,7 @@ msgstr "Aggregate n’affiche les zones qu’après au moins {0} enregistrements
 msgid "Dataset saved"
 msgstr "Ensemble de données enregistré"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Connection timed out"
 msgstr ""
 
@@ -9423,7 +9473,7 @@ msgstr "Importez un fichier CSV, Excel ou PDF, connectez une feuille Google "
 "Sheets ou parcourez le catalogue de données ouvertes. Tout le reste "
 "dans Avandar repose sur ce que vous importez ici."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
 msgstr ""
 
@@ -9667,7 +9717,7 @@ msgstr "Colonne 10"
 msgid "Click a labelled tick on the y-axis."
 msgstr "Cliquez sur une graduation étiquetée de l’axe Y."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Could not connect to the database"
 msgstr ""
 
