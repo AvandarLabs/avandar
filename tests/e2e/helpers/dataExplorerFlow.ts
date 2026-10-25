@@ -62,3 +62,53 @@ export async function openDataExplorerDrawerTab({
     timeout: SHORT_WAIT,
   });
 }
+
+/** A query to run over one saved dataset in the Data Explorer. */
+type RunSqlOverDatasetOptions = {
+  page: Page;
+  datasetName: string;
+
+  /** One of the dataset's columns, chosen to start the query from. */
+  columnName: string;
+  sql: string;
+};
+
+/**
+ * Opens the Data Explorer from the nav and runs `sql` over a saved dataset
+ * through its SQL editor. The dataset is chosen as the query's source first,
+ * with one of its columns, which is what registers it with the editor so the
+ * SQL can name it. Waiting for the result is left to the caller.
+ */
+export async function runSqlOverDataset(
+  options: Readonly<RunSqlOverDatasetOptions>,
+): Promise<void> {
+  const { page } = options;
+  await page.getByRole("link", { name: "Data Explorer", exact: true }).click();
+  await dismissBlockingOverlays(page);
+  await openDataExplorerDrawerTab({ page, tab: "query" });
+
+  const queryPanel = page.getByRole("tabpanel", {
+    name: DRAWER_TAB_NAME_PATTERNS.query,
+  });
+  await queryPanel
+    .getByRole("combobox", { name: "Data source", exact: true })
+    .click();
+  await page
+    .getByRole("option", { name: options.datasetName, exact: true })
+    .click();
+  await queryPanel
+    .getByPlaceholder("Select columns to query")
+    .fill(options.columnName);
+  await page
+    .getByRole("option", { name: options.columnName, exact: true })
+    .click();
+  await page.keyboard.press("Escape");
+
+  await page
+    .getByRole("radiogroup", { name: "Query editor mode" })
+    .getByText("SQL", { exact: true })
+    .click();
+  await queryPanel.getByRole("button", { name: "Edit query" }).click();
+  await queryPanel.getByRole("textbox").fill(options.sql);
+  await queryPanel.getByRole("button", { name: "Re-run query" }).click();
+}

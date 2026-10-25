@@ -15,6 +15,37 @@ export type QuotaScope =
 export type SourceVersion = string;
 
 /**
+ * A cheap, synchronous description of one relation's shape, known before any
+ * row is read - enough for a per-call cap to vary with what is actually
+ * being acquired, rather than declare one flat number for every relation a
+ * source has regardless of its width.
+ */
+export type RelationRowDescriptor = {
+  /** Number of columns the relation has. */
+  columnCount: number;
+  /**
+   * The source's own best-effort estimate of one row's average serialized
+   * width in bytes, when it can compute one from its own column metadata
+   * (Postgres can, from `information_schema`; a source with no per-column
+   * type information cannot, and omits this).
+   */
+  estimatedRowBytes?: number;
+};
+
+/**
+ * A per-call ceiling: a flat number, `"unbounded"`, or a function of the
+ * relation actually being acquired. A flat number does not describe a
+ * source whose real limit is a byte budget divided by a row width that
+ * varies relation to relation - Postgres's row cap, for one, is derived
+ * this way rather than chosen as one number for every table (see
+ * `PostgresTableWrapper.ts`).
+ */
+export type RelationCallCap =
+  | number
+  | "unbounded"
+  | ((descriptor: RelationRowDescriptor) => number | "unbounded");
+
+/**
  * What a source can and cannot be asked. The negative declarations carry the
  * weight: `rowIdentity: "none"` is what makes combining two partial fetches
  * from that source provably unsound, by declaration rather than by argument.
@@ -42,14 +73,25 @@ export type RelationCapabilities = {
    */
   wholeRelationAcquirable: "yes" | "no" | "probe";
 
-  /** Hard row ceiling per call, which forces paging. */
-  maxRowsPerCall: number | "unbounded";
+  /**
+   * Hard row ceiling per call, which forces paging. Independent of
+   * `maxBytesPerCall`, not a fallback for it: when a source declares both as
+   * real numbers (or as functions that resolve to real numbers for the
+   * relation at hand), a caller must enforce both and refuse at whichever is
+   * hit first. `"unbounded"` is how a source opts one axis out entirely
+   * rather than leaving it undeclared - there is no third "not applicable"
+   * state distinct from "no limit on this axis."
+   */
+  maxRowsPerCall: RelationCallCap;
 
   /**
-   * Hard byte ceiling per call. Separate from the row ceiling because sources
-   * cap different things: CKAN caps rows, Google Sheets caps response bytes.
+   * Hard byte ceiling per call. Independent of `maxRowsPerCall` for the same
+   * reason and under the same both-apply rule: sources cap different things
+   * (CKAN caps rows, Google Sheets caps response bytes), and a source capping
+   * both expects both checked, not whichever one a caller happened to read
+   * first.
    */
-  maxBytesPerCall: number | "unbounded";
+  maxBytesPerCall: RelationCallCap;
 
   /** A cheap token that says the source changed, without refetching it. */
   freshnessSignal: "none" | "version-token" | "etag" | "modified-time";

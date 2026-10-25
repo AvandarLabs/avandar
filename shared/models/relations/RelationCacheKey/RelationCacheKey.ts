@@ -239,20 +239,35 @@ export function coversColumns(
 }
 
 /**
- * The reuse predicate: whether a stored entry may serve a requested key.
- * Every comparison but column coverage is exact equality, and every
- * ambiguity resolves toward `false`, because a false hit serves unauthorized
- * or stale rows while a false miss only costs a refetch.
+ * Whether an entry with this `staleAt` is still fresh at `now`, in epoch ms.
+ * An entry with no `staleAt` never goes stale.
+ */
+export function isFreshAt(
+  options: Readonly<{ staleAt: number | undefined; now: number }>,
+): boolean {
+  return options.staleAt === undefined || options.now < options.staleAt;
+}
+
+/**
+ * The reuse predicate: whether a stored entry may serve a requested key at
+ * `now`, in epoch ms. Every comparison but column coverage and freshness is
+ * exact equality, and every ambiguity resolves toward `false`, because a
+ * false hit serves unauthorized or stale rows while a false miss only costs
+ * a refetch.
  */
 export function serves(
-  entry: Readonly<RelationCacheEntryFields>,
-  key: PreparedRelationCacheKey,
+  options: Readonly<{
+    entry: Readonly<RelationCacheEntryFields>;
+    key: PreparedRelationCacheKey;
+    now: number;
+  }>,
 ): boolean {
+  const { entry, key, now } = options;
   return (
     entry.principalKey === key.principalKey &&
     entry.tableName === key.tableName &&
     entry.definitionToken === key.definitionToken &&
-    entry.staleAt === undefined &&
+    isFreshAt({ staleAt: entry.staleAt, now }) &&
     coversColumns(entry.columns, key.columns)
   );
 }

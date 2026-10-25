@@ -52,7 +52,7 @@ loading entirely; they only see tables already resident in the tab.
 | registry | `RelationRegistry`: one wrapper per relation kind, built per fetch |
 | acquire | `SourceWrapper.acquire`: fetch a relation's rows from its source |
 | queryable tier | The DuckDB catalog itself: a dataset is cached if its table or view exists |
-| sidecar | The module-level map in `queryableRelationColumns.ts` recording which columns each DuckDB table was loaded with |
+| sidecar | The module-level map in `QueryableRelationColumns.ts` recording which columns each DuckDB table was loaded with |
 | storage tier | IndexedDB behind `RelationCachePort`: `DexieRelationCache` (workspace) or `LocalPublicDatasetRelationCache` (public) |
 | `growFrom` | On a storage miss, the narrower live entry for the same relation, whose columns are added to the next acquisition |
 | lease | `DatasetDuckDbLease`: an unforgeable token proving the holder runs inside a coordinated operation for a set of names. No expiry |
@@ -196,7 +196,7 @@ taking locks.
 | Public session | [`src/clients/qetl/PublicQuerySession/`](../src/clients/qetl/PublicQuerySession/) | Snapshot policy; one mediator per dashboard, visibility, revision | analyzer, `LocalPublicDatasetRelationCache`, `PublicDatasetParquetStorageClient` |
 | Authorization | [`src/clients/qetl/assertWorkspaceMembership/`](../src/clients/qetl/assertWorkspaceMembership/), [`assertWorkspaceRelations/`](../src/clients/qetl/assertWorkspaceRelations/) | Principal check and per-relation check, both fail closed | `AuthClient`, `WorkspaceClient`, `DatasetClient` |
 | Mediator | [`src/clients/qetl/QueryMediator/`](../src/clients/qetl/QueryMediator/) | The pipeline of section 4 | everything below |
-| Column inference | `QueryMediator/getNeededColumnsFromQuery/`, `getParquetColumnNamesFromNeeded/`, `queryableRelationColumns/` | Infer and map needed columns; the sidecar | analyzer tokens |
+| Column inference | `QueryMediator/getNeededColumnsFromQuery/`, `getParquetColumnNamesFromNeeded/`, `QueryableRelationColumns/` | Infer and map needed columns; the sidecar | analyzer tokens |
 | Concepts | `QueryMediator/conceptRelation/` | Plan, spine, view | ontology CRUD clients, `DuckDbClient` |
 | Registry | [`src/clients/qetl/RelationRegistry/`](../src/clients/qetl/RelationRegistry/) | One wrapper per kind; registration checks | wrapper types |
 | Wrappers | [`src/clients/qetl/wrappers/`](../src/clients/qetl/wrappers/) | `createDefaultRegistry` (dataset dispatcher on `sourceType`), Parquet, virtual, Sheets, concept wrappers | connector clients, CRUD clients |
@@ -224,7 +224,7 @@ flowchart TD
   B["Does the sidecar hold<br/>an entry for it?"]
   C["Does the recorded set<br/>cover the needed set?"]
   HIT1["Served by DuckDB"]
-  D["probeStorageRelationCache:<br/>does an entry serve it?<br/>same principal, table,<br/>definition token;<br/>staleAt unset; columns<br/>cover the need"]
+  D["probeStorageRelationCache:<br/>does an entry serve it?<br/>same principal, table,<br/>definition token;<br/>not past staleAt; columns<br/>cover the need"]
   E["Is the payload<br/>row readable?"]
   HIT2["Served by IndexedDB,<br/>loaded at step 11"]
   F["Miss, with growFrom if<br/>a narrower live entry exists"]
@@ -250,6 +250,14 @@ reaches a wrapper._
 **Queryable tier.** Presence in `information_schema.tables` plus the sidecar.
 It has no principal; it is protected by authorization (step 1), the lease check
 (step 13), and ownership (section 7). A tab reload empties it.
+
+**Max age for live sources.** A wrapper whose rows can change without a
+re-import (Google Sheets, Postgres tables) returns `maxAgeMs` from `acquire`
+(`GlobalAppConfig.timing.liveRelationMaxAgeMs`, 5 minutes). Relation loading
+turns it into a `staleAt` time that both tiers record, and from that time on
+neither serves the rows, so the next query acquires them again. While the
+browser is offline nothing is judged stale (`getRelationFreshnessNow`): stale
+rows beat no rows. Each source's "Refresh" action evicts both tiers at once.
 
 **Storage key** ([RelationCacheKey.ts](../shared/models/relations/RelationCacheKey/RelationCacheKey.ts)):
 
@@ -457,7 +465,7 @@ Gate the connection tables by **app role**
 `datasets__<type>` table uses - a connection is infrastructure configuration
 a workspace editor manages, not a document one teammate shares with another.
 See the Postgres spec's section 5.1 for the worked example
-(`db_connections` / `db_connections__postgres`).
+(`connections` / `connections__postgres`).
 
 ### 10.2 A credential storage tier stronger than a plain column
 
@@ -488,15 +496,15 @@ come with proxying a connection to an arbitrary user-supplied host.
 | 13 | `src/clients/datasets/SourceDatasetClient.ts` | registry entry | compiler |
 | 14 | `src/clients/datasets/DatasetClient/createDatasetQueries.ts` | `getSourceDataset` arm | compiler |
 | 15 | `src/clients/datasets/DatasetClient/createDatasetMutations.ts`, `DatasetClient.types.ts`, `DatasetClient.ts` | insert mutation and its registration | inherent |
-| 16 | new server proxy - the real Postgres connector registers a connector implementation into a shared `supabase/functions/external-datasets/` edge function rather than creating a single-purpose one; see the Postgres spec section 5.4 for why | keeps credentials server-side | inherent |
+| 16 | new server proxy - the real Postgres connector registers a connector implementation into a shared `supabase/functions/connectors/` edge function rather than creating a single-purpose one; see the Postgres spec section 5.4 for why | keeps credentials server-side | inherent |
 | 17 | new browser client, for example `src/lib/postgresTable/` | calls the proxy, returns bytes | inherent |
 | 18 | new `src/clients/qetl/wrappers/PostgresTableWrapper/` | `SourceWrapper` with `capabilities` and `acquire`, plus tests | inherent |
 | 19 | `src/clients/qetl/QueryMediator/QueryMediator.types.ts` | `RelationSource` arm | compiler (through row 20) |
 | 20 | `src/clients/qetl/QueryMediator/getRelationSources.ts` | reader function and `Record` entry | compiler |
 | 21 | `src/clients/qetl/wrappers/createDefaultRegistry.ts` | options field, delegate, `match` arm, construction | compiler |
 | 22 | `src/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper.ts` | add the type to the refusing arm | compiler |
-| 23 | `src/clients/qetl/QueryMediator/relationLoading.ts` | type guard, lookup, and registry option if the wrapper needs its source row; a lease-bound transcoder if it returns CSV or JSON | **nothing: fails at query time** |
-| 24 | `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts` | branch in `_getSnapshotDatasetBlob`; the default downloads a Storage object that may not exist | **nothing: fails at publish time** |
+| 23 | `src/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch.ts` | registry option if the wrapper needs its source row; a wrapper that acquires CSV reads it through the shared `RelationCsvReader`, passing its `columnTypes` (`source-schema` or `inferred`, `SourceWrapper.types.ts`) | compiler (`columnTypes` is required) and the contract test (row 37) |
+| 24 | `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts` | an arm in `_getSnapshotDatasetBlob`: copy a stored parquet, or read the rows through the workspace query (any source that keeps no parquet in Storage) | compiler (exhaustive `match`) and `DashboardClient.publishSnapshotSources.test.ts`, whose expectations are a `Record` over every source type |
 | 25 | `src/views/DataManagerApp/DataImportView/` | connector card or tab and its view | inherent |
 | 26 | `DatasetImportForm.types.ts`, `DatasetParseControls.tsx`, `useImportedColumns.ts` | metadata union and controls | inherent |
 | 27 | `useSaveDataset.ts`, `makeDatasetImportedPayloadFromSaveResult.ts` | save branch, upload gating | inherent |
@@ -504,6 +512,11 @@ come with proxying a connection to an arbitrary user-supplied host.
 | 34 | `ResyncDatasetCard.tsx` | an arm only if the type is restored from a local file | inherent, situational |
 | 35 | `src/i18n/locales/*/messages.po` | `pnpm i18n:extract` | generated |
 | 36 | `getRelationSources.characterization.test.ts`, an e2e import spec | pin the reader and the flow | inherent |
+| 37 | `src/clients/qetl/wrappers/datasetSourceTypeContract.test.ts` | the source type's contract entry: whether it is live, and for a live source its `columnTypes` and a wrapper built from fakes | compiler (`Record` over every source type), then the shared checks in section 10.3 |
+| 38 | `src/views/DataManagerApp/DatasetMetaView/getDatasetRefreshFromSourceType/` | the manual refresh a live source offers, and its menu item in `DatasetActionsMenu.tsx` | compiler (exhaustive `match`) and `getDatasetRefreshFromSourceType.test.ts`, whose expectations are a `Record` over every source type |
+| 39 | the edge connector's `previewRelation` | report each column's `dataType`, read from the source's own schema (`ConnectorPreviewColumn`, `Connector.ts`) | compiler (`dataType` is required) |
+| 40 | a server route keyed by dataset, for example `connectors`' `/:connectorType/datasets/:datasetId/rows` | check `util__auth_user_may_select_dataset` with the caller's client, then read with the service role through the credential the dataset was imported with, so anyone who can see the dataset can read it | the contract test, and route tests modelled on `ConnectorRoutes/ConnectorRoutes.test.ts` |
+| 41 | `tests/e2e/helpers/liveConnectors/LiveConnectorE2eRegistry.ts` | a live source type's `LiveConnectorE2e` adapter | compiler (`Record` over `DatasetRefresh`, row 38), then `live-connector-datasets.spec.ts` |
 
 Not needed: `Dataset/DatasetParsers.ts` (derives from `SourceTypes`), chat schema
 code, `assertWorkspaceRelations`, and both cache ports, which are source-type
@@ -512,14 +525,74 @@ agnostic.
 ```mermaid
 flowchart TD
   U["Rows 1 and 5: new enum<br/>value, then pnpm<br/>db:gen-types widens the<br/>datasets__source_type#nbsp;union"]
-  G["Compiler reports until<br/>handled: rows 9 to 11,<br/>13, 14, 19 to 22,<br/>and 28 to 33"]
-  N["Nothing reports: row 23 in<br/>relationLoading.ts<br/>(query time) and row 24 in<br/>dashboardPublishSnapshots.ts<br/>(publish time)"]
+  G["Compiler reports until<br/>handled: rows 9 to 11,<br/>13, 14, 19 to 24,<br/>28 to 33, 37 to 39<br/>and 41"]
+  T["Contract tests check every<br/>source type the same way:<br/>publishing, staleness,<br/>refresh, column types and<br/>credential reuse"]
+  E["The live connector e2e<br/>spec runs the same UI<br/>flows for every live<br/>source in its registry"]
   U -->|"exhaustive Record or<br/>match on the union"| G
-  U -.->|"no exhaustive check<br/>on the union"| N
+  G --> T
+  T --> E
 ```
 
-_After regenerating types, the compiler lists every guarded site; check rows 23
-and 24 by hand, because nothing else will._
+_After regenerating types, the compiler lists every guarded site, and the
+contract tests then hold the new source type to the same behaviour as every
+other. The live connector e2e spec (section 10.3) is the part no compiler
+catches, so its registry is keyed by every source type too._
+
+### 10.3 Required tests
+
+Every connector shipped so far broke in the same places: its dataset failed
+to publish, its rows never refreshed, its columns were all text, and only the
+person who imported it could read it. None of those was caught, because each
+connector's tests stopped at import. A new source type must add all of the
+following.
+
+**Automatic, once its entries exist (rows 24, 37 and 41):**
+
+- **Publishing:** `DashboardClient.publishSnapshotSources.test.ts` publishes
+  a whole-dataset slice of every source type and checks where its rows come
+  from.
+- **Staleness:** `datasetSourceTypeContract.test.ts` checks that a live
+  source's acquired rows carry `GlobalAppConfig.timing.liveRelationMaxAgeMs`.
+- **Refresh:** `getDatasetRefreshFromSourceType.test.ts` checks which manual
+  refresh every source type offers.
+- **Column types:** the contract test also checks that its wrapper passes the
+  `columnTypes` its contract declares to the CSV reader. A `source-schema`
+  source must also store `detectedDataType: "VARCHAR"` and the type its
+  schema declared, as `savePostgresTableDataset` does, so relation loading
+  casts it; `getColumnReplacementsFromColumns.executed.test.ts` shows that
+  cast landing in a real DuckDB.
+- **Credential reuse:** the contract test also checks that a live source reads its
+  rows through a server route keyed by the dataset, with only the caller's
+  session, never a third-party token in the browser.
+- **The UI flows, end to end:** `tests/e2e/live-connector-datasets.spec.ts`
+  runs the same six checks for every live source in
+  `LiveConnectorE2eRegistry`, each through the UI: a whole-number and a date
+  column arrive as numbers and dates, both in the stored types and in DuckDB;
+  a refresh shows an edited source row, in the data preview and in the
+  summary; a member other than the importer reads its rows through the
+  dataset's own route; a dashboard widget renders its rows; and a dashboard
+  published with a whole-dataset slice, and with a queried one, shows a
+  member the published rows after the source changes, without reading the
+  source. The registry is keyed by `DatasetRefresh`, the manual refresh
+  `getDatasetRefreshFromSourceType` offers (row 38), so a new source type
+  that offers one fails to compile until it has an adapter.
+
+**Written for the connector:**
+
+- Route tests for its dataset-keyed route: a caller who may not see the
+  dataset gets a 403 before anything is read with the service role, and an
+  allowed caller reads through the stored credential.
+- Its `LiveConnectorE2e` adapter, next to
+  `tests/e2e/helpers/liveConnectors/postgresTableLiveConnectorE2e.ts`: seed
+  its account or connection, stub its boundary at the browser (its own
+  dataset-keyed route, plus any third-party endpoint the browser calls
+  during import), and drive its import form to a saved dataset. Serve
+  `LiveSourceTable`'s rows, and keep serving whatever `setSourceRows` last
+  set. The six checks above then run for it with no new spec.
+- An import spec for anything particular to its import form, such as
+  `postgres-connector-import.spec.ts`'s schema-grouped picker. Tag a spec
+  `@third-party` only when it reaches a real external service
+  (`docs/rules/e2e-testing.md`).
 
 ## 11. Adding a new relation kind
 
@@ -584,7 +657,7 @@ means traced through the source but not run.
 
 | Gap | Status | Where |
 | --- | --- | --- |
-| No freshness: `sourceVersion` and `definition` are always `undefined` in the storage key, the acquired `sourceVersion` is dropped, `readFreshness` has no caller, nothing sets `staleAt`. Virtual dataset edits and CKAN republishes are never seen; only "Refresh from Google Sheets" evicts | by reading | `relationLoading.ts` |
+| No version-based freshness: `sourceVersion` and `definition` are always `undefined` in the storage key, the acquired `sourceVersion` is dropped, and `readFreshness` has no caller. Live sources (Sheets, Postgres) are re-acquired once their max age passes, but virtual dataset edits and CKAN republishes are never seen | by reading | `relationLoading/RelationLoading.ts` |
 | No pushdown and no capability-driven planning | by reading | `QueryMediator.ts` TODO |
 | Eviction only on `QuotaExceededError`; no byte budget | by reading | both cache adapters |
 | Every workspace query locks every workspace dataset, so top-level queries in one workspace serialize across tabs | by reading | `WorkspaceQuerySession.ts`, `queryRunner.ts` |
@@ -595,8 +668,8 @@ means traced through the source but not run.
 | The analyzer refuses `EXTRACT(part FROM column)` as `uninspectable-source` | verified | `duckDbSqlSources.ts` |
 | Anonymous public dashboards: `loadRelationBytes` always reads `dataset_columns`, which `anon` cannot read (HTTP 401 on the local stack) | 401 verified; dashboard failure by reading | `relationLoading.ts` |
 | A CKAN resource in Parquet format is wrapped in an untyped Blob and fails `registerParquetFile` when the query needs all columns; the bad entry is cached first. Latent: in-repo registrations are CSV and XLSX | by reading | `DatasetParquetWrapper.ts` |
-| The sidecar is never cleared; a stale narrow entry can make a public query reload a snapshot table and then fail the ownership check | by reading | `queryableRelationColumns.ts` |
-| Snapshot publishing of an `all_columns` slice fails over Google Sheets (no Storage object exists) and over API-backed open data without a ready `LocalDataset` row (no `.parquet` canonical URL exists) | by reading | `dashboardPublishSnapshots.ts` |
+| The sidecar is never cleared; a stale narrow entry can make a public query reload a snapshot table and then fail the ownership check | by reading | `QueryableRelationColumns.ts` |
+| Snapshot publishing of an `all_columns` slice fails over API-backed open data without a ready `LocalDataset` row (no `.parquet` canonical URL exists). Google Sheets and Postgres tables keep no parquet in Storage, so every slice of theirs is read through the workspace query instead. An uploaded file's `all_columns` slice copies the stored parquet, which keeps the original column names and detected types, so a column renamed or retyped after import does not match the widget SQL a published viewer runs | by reading | `dashboardPublishSnapshots.ts`, `LocalPublicDatasetRawDataClient.ts` |
 | `_runConceptQuery` fallback ignores filters, grouping, aggregation, and sort | by reading | `runStructuredQueryWithMetadata.ts` |
 | `ConceptWrapper` is registered but never resolved; `extractReferencedRelations`, `buildCsvFromDatastoreRecords`, `RelationRegistry.resolveAll` and `wrappers` have no production caller | by reading | as named |
 | Concept attributes mapped from two datasets read only the first mapping | by reading | `makeConceptAttributeColumnsFromMetadata.ts` |

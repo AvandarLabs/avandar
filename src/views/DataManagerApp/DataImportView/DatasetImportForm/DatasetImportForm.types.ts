@@ -1,4 +1,5 @@
-import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
+import type { GoogleSheetTab } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveClient.types";
+import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type {
@@ -15,7 +16,6 @@ import type {
   XlsxParseOptions,
 } from "./useSaveDataset/useSaveDataset";
 import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { GoogleSheetTab } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
 import type { UnknownObject } from "@avandar/utils";
 
 export type DatasetImportFormValues = {
