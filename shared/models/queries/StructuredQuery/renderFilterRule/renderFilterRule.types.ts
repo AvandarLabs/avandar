@@ -1,3 +1,5 @@
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 /** A SQL snippet plus its positional bindings, ready for knex `*Raw` calls. */
@@ -9,11 +11,15 @@ export type SqlFragment = {
 /** Options for rendering one filter rule to SQL. */
 export type RenderFilterRuleOptions = {
   /**
-   * Live column types, keyed by column name. Takes precedence over the type
+   * Live column types, keyed by column ID. Takes precedence over the type
    * stored on the rule, so a column whose type the user changed renders with
    * the new type.
    */
   columnTypes?: Readonly<QueryFilterColumnTypes>;
+  /** Model-derived expression for the source or projection identity. */
+  getColumn?: (
+    columnId: QueryColumn.Id,
+  ) => { sql: string; dataType: AvaDataType.T } | undefined;
 };
 
 /**

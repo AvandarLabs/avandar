@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
 
 describe("projectParquetBlob row-order contract", () => {
   it("keeps row count and order when projecting two of three columns", async () => {

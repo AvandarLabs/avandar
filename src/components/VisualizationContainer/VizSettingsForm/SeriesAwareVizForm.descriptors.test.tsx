@@ -15,7 +15,8 @@ import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
@@ -30,39 +31,39 @@ function readSetting(obj: unknown, key: string): unknown {
   return getValue(obj as never, key as never, { throwError: false });
 }
 
-const COLUMNS: readonly QueryResultColumn[] = [
-  { name: "category", dataType: "varchar" },
-  { name: "value", dataType: "double" },
-  { name: "score", dataType: "double" },
+const COLUMNS: readonly QueryResult.ColumnWithId[] = [
+  { id: "category" as QueryColumn.Id, name: "category", dataType: "varchar" },
+  { id: "value" as QueryColumn.Id, name: "value", dataType: "double" },
+  { id: "score" as QueryColumn.Id, name: "score", dataType: "double" },
 ];
 
 const barConfig: BarChartVizConfig = {
   vizType: "bar",
-  xAxisKey: "category",
-  series: [{ renderAs: "bar", key: "value" }],
+  xAxisKey: "category" as QueryColumn.Id,
+  series: [{ renderAs: "bar", key: "value" as QueryColumn.Id }],
   layout: "group",
   withLegend: true,
 };
 
 const lineConfig: LineChartVizConfig = {
   vizType: "line",
-  xAxisKey: "category",
-  series: [{ renderAs: "line", key: "value" }],
+  xAxisKey: "category" as QueryColumn.Id,
+  series: [{ renderAs: "line", key: "value" as QueryColumn.Id }],
   withLegend: true,
 };
 
 const areaConfig: AreaChartVizConfig = {
   vizType: "area",
-  xAxisKey: "category",
-  series: [{ renderAs: "area", key: "value" }],
+  xAxisKey: "category" as QueryColumn.Id,
+  series: [{ renderAs: "area", key: "value" as QueryColumn.Id }],
   layout: "default",
   withLegend: true,
 };
 
 const radarConfig: RadarChartVizConfig = {
   vizType: "radar",
-  nameKey: "category",
-  series: [{ key: "value" }],
+  nameKey: "category" as QueryColumn.Id,
+  series: [{ key: "value" as QueryColumn.Id }],
   withLegend: true,
 };
 

@@ -1,3 +1,4 @@
+import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
@@ -20,12 +21,17 @@ function makePieConfig(
 }
 
 function makeCol(name: string, dataType: DatasetColumn.T["dataType"]) {
-  return QueryColumn.makeFromDatasetColumn({
-    id: name as DatasetColumn.T["id"],
-    name,
-    dataType,
-    columnIdx: 0,
-  } as DatasetColumn.T);
+  return {
+    ...QueryColumn.makeFromDatasetColumn(
+      Model.make("DatasetColumn", {
+        id: name as DatasetColumn.T["id"],
+        name,
+        dataType,
+        columnIdx: 0,
+      }) as DatasetColumn.T,
+    ),
+    id: name as QueryColumn.Id,
+  };
 }
 
 function makeQuery(
@@ -56,17 +62,20 @@ describe("hydratePieFromQuery", () => {
     expect(out.nameKey).toBe("y");
   });
 
-  it("clears nameKey when the column no longer exists in the query", () => {
+  it("retains nameKey when the selected ID is missing", () => {
     const out = hydratePieFromQuery(
-      makePieConfig({ nameKey: "stale_col" }),
+      makePieConfig({ nameKey: "stale_col" as QueryColumn.Id }),
       makeQuery([makeCol("category", "varchar"), makeCol("total", "double")]),
     );
-    expect(out.nameKey).toBe("category");
+    expect(out.nameKey).toBe("stale_col");
   });
 
   it("does not overwrite already valid keys", () => {
     const out = hydratePieFromQuery(
-      makePieConfig({ nameKey: "category", valueKey: "total" }),
+      makePieConfig({
+        nameKey: "category" as QueryColumn.Id,
+        valueKey: "total" as QueryColumn.Id,
+      }),
       makeQuery([makeCol("category", "varchar"), makeCol("total", "double")]),
     );
     expect(out.nameKey).toBe("category");

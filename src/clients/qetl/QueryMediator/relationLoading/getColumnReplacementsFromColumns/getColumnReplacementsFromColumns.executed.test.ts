@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { getParquetProjectionClauses } from "@/clients/DuckDbClient/duckDbSqlText";
 import { getColumnReplacementsFromColumns } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";

@@ -1,3 +1,10 @@
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
+import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
+import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
+import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
+import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
 /**
  * Executed tests for the step that turns a concept's ontology rows into the
  * columns its DuckDB view emits.
@@ -16,13 +23,6 @@
  * spine's ids to numbers, which raises a conversion error on the first
  * non-numeric id.
  */
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { describe, expect, it } from "vitest";
-import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
-import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
-import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";

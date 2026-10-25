@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { makeDataVizPBlockStateFromProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { DataVizConfigMemory } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
@@ -20,8 +21,8 @@ function _getDataVizPBlockProps(
 
 const STYLED_BAR_CONFIG: BarChartVizConfig = {
   vizType: "bar",
-  xAxisKey: "category",
-  series: [{ renderAs: "bar", key: "value" }],
+  xAxisKey: "category" as QueryColumn.Id,
+  series: [{ renderAs: "bar", key: "value" as QueryColumn.Id }],
   layout: "stack",
   withLegend: false,
   chartStyle: { legend: { position: "left" }, grid: { color: "#e0e0e0" } },
@@ -48,8 +49,8 @@ describe("makeDataVizPBlockStateFromProps", () => {
         vizType: "line",
         vizConfig: {
           vizType: "bar",
-          xAxisKey: "category",
-          series: [{ renderAs: "bar", key: "value" }],
+          xAxisKey: "category" as QueryColumn.Id,
+          series: [{ renderAs: "bar", key: "value" as QueryColumn.Id }],
           layout: "group",
           withLegend: true,
         },
@@ -107,12 +108,20 @@ describe("makeDataVizPBlockStateFromProps", () => {
 
   it("leaves props untouched when nothing relevant has changed", () => {
     const props: DataVizPBlockProps = {
+      columnBindingVersion: 1,
+      columnBindings: {
+        version: 1,
+        scopeKey: "block-1",
+        sqlKey: "",
+        columns: [],
+      },
+      globalFilterTargets: {},
       nlQuery: { prompt: "p", rawSql: "s", generations: [] },
       vizType: "bar",
       vizConfig: {
         vizType: "bar",
-        xAxisKey: "category",
-        series: [{ renderAs: "bar", key: "value" }],
+        xAxisKey: "category" as QueryColumn.Id,
+        series: [{ renderAs: "bar", key: "value" as QueryColumn.Id }],
         layout: "group",
         withLegend: true,
       },
@@ -130,8 +139,8 @@ describe("makeDataVizPBlockStateFromProps", () => {
         vizType: "line",
         vizConfig: {
           vizType: "bar",
-          xAxisKey: "category",
-          series: [{ renderAs: "bar", key: "value" }],
+          xAxisKey: "category" as QueryColumn.Id,
+          series: [{ renderAs: "bar", key: "value" as QueryColumn.Id }],
           layout: "group",
           withLegend: true,
         },
@@ -195,7 +204,7 @@ describe("makeDataVizPBlockStateFromProps viz config memory", () => {
 
     const otherBarConfig: BarChartVizConfig = {
       ...STYLED_BAR_CONFIG,
-      xAxisKey: "other-category",
+      xAxisKey: "other-category" as QueryColumn.Id,
     };
     const blockTwoPieState = makeDataVizPBlockStateFromProps({
       props: {
@@ -255,7 +264,7 @@ describe("makeDataVizPBlockStateFromProps viz config memory", () => {
 
     expect(lineState.props.vizConfig.vizType).toBe("line");
     expect(lineState.props.vizConfig).toMatchObject({
-      xAxisKey: "category",
+      xAxisKey: "category" as QueryColumn.Id,
       withLegend: false,
     });
   });

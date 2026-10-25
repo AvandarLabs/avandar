@@ -1,18 +1,24 @@
+import { isDefined, propEq } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Button, Stack, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { LocalFilterEditor } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor";
-import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import { useDataVizAuthoring } from "../useDataVizAuthoring/useDataVizAuthoring";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
+import type {
+  LegacyLocalFilter,
+  LocalFilter,
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { ReactElement } from "react";
 
-type Props = AvaPageFieldProps<readonly LocalFilter[]>;
+type Props = { auth: StructuredQueryAuth };
 
-function createLocalFilter(): LocalFilter {
+function createLocalFilter(columnId: QueryColumn.Id): LocalFilter {
   return {
     id: crypto.randomUUID(),
     label: "",
-    columnName: "",
+    columnId,
     mode: "select_single",
     optionsRaw: "",
     defaultValue: "",
@@ -28,10 +34,44 @@ function createLocalFilter(): LocalFilter {
  * applied as a second subselect wrap on top of any subscribed global
  * filters at SQL-compose time.
  */
-export function LocalFiltersPField({ value, onChange }: Props): ReactElement {
-  const filters = value ?? [];
+export function LocalFiltersPField({ auth }: Props): ReactElement {
+  const authoring = useDataVizAuthoring(auth);
+  const filters =
+    authoring.props.columnBindingVersion === 0
+      ? authoring.props.localFilters
+      : (authoring.runtime?.localFilters ?? []);
+  const columns = authoring.schema?.columns ?? [];
+  const onChange = (
+    localFilters: ReadonlyArray<LocalFilter | LegacyLocalFilter>,
+  ): void => {
+    if (authoring.props.columnBindingVersion === 0) {
+      const legacyFilters = localFilters.map((filter) => {
+        if ("columnName" in filter) {
+          return filter;
+        }
+        const column = columns.find(propEq("id", filter.columnId));
+        if (!column) {
+          return undefined;
+        }
+        const { columnId: _columnId, ...definition } = filter;
+        return { ...definition, columnName: column.name };
+      });
+      if (legacyFilters.every(isDefined)) {
+        authoring.updateLegacy({ localFilters: legacyFilters });
+      }
+    } else if (
+      localFilters.every((filter): filter is LocalFilter => {
+        return "columnId" in filter;
+      })
+    ) {
+      authoring.update({ localFilters });
+    }
+  };
 
-  const updateFilter = (filterIndex: number, filter: LocalFilter): void => {
+  const updateFilter = (
+    filterIndex: number,
+    filter: LocalFilter | LegacyLocalFilter,
+  ): void => {
     onChange(
       filters.map((currentFilter, currentFilterIndex) => {
         return currentFilterIndex === filterIndex ? filter : currentFilter;
@@ -48,7 +88,10 @@ export function LocalFiltersPField({ value, onChange }: Props): ReactElement {
   };
 
   const addFilter = (): void => {
-    onChange([...filters, createLocalFilter()]);
+    const firstColumn = columns[0];
+    if (firstColumn) {
+      onChange([...filters, createLocalFilter(firstColumn.id)]);
+    }
   };
 
   return (
@@ -67,6 +110,7 @@ export function LocalFiltersPField({ value, onChange }: Props): ReactElement {
               <LocalFilterEditor
                 key={filter.id}
                 filter={filter}
+                columns={columns}
                 onChange={(updatedFilter) => {
                   updateFilter(filterIndex, updatedFilter);
                 }}
@@ -82,6 +126,7 @@ export function LocalFiltersPField({ value, onChange }: Props): ReactElement {
         size="compact-xs"
         leftSection={<IconPlus size={12} />}
         onClick={addFilter}
+        disabled={columns.length === 0}
         variant="light"
       >
         <Trans>Add filter</Trans>

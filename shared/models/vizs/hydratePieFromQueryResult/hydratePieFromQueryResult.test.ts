@@ -1,15 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult/hydratePieFromQueryResult.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
 function cols(
   pairs: ReadonlyArray<{
+    id?: QueryColumn.Id;
     name: string;
-    dataType: QueryResultColumn["dataType"];
+    dataType: QueryResult.ColumnWithId["dataType"];
   }>,
-): QueryResultColumn[] {
+): QueryResult.ColumnWithId[] {
   return pairs.map((p) => {
-    return { name: p.name, dataType: p.dataType };
+    return {
+      id: p.id ?? (p.name as QueryColumn.Id),
+      name: p.name,
+      dataType: p.dataType,
+    };
   });
 }
 
@@ -20,8 +26,12 @@ describe("hydratePieFromQueryResult", () => {
     const out = hydratePieFromQueryResult(
       { ...empty },
       cols([
-        { name: "month", dataType: "timestamp" },
-        { name: "total_cases", dataType: "double" },
+        { id: "month" as QueryColumn.Id, name: "month", dataType: "timestamp" },
+        {
+          id: "total_cases" as QueryColumn.Id,
+          name: "total_cases",
+          dataType: "double",
+        },
       ]),
     );
     expect(out.nameKey).toBe("month");
@@ -32,8 +42,8 @@ describe("hydratePieFromQueryResult", () => {
     const out = hydratePieFromQueryResult(
       { ...empty },
       cols([
-        { name: "total", dataType: "double" },
-        { name: "region", dataType: "varchar" },
+        { id: "total" as QueryColumn.Id, name: "total", dataType: "double" },
+        { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
       ]),
     );
     expect(out.valueKey).toBe("total");
@@ -44,8 +54,8 @@ describe("hydratePieFromQueryResult", () => {
     const out = hydratePieFromQueryResult(
       { ...empty },
       cols([
-        { name: "a", dataType: "bigint" },
-        { name: "b", dataType: "double" },
+        { id: "a" as QueryColumn.Id, name: "a", dataType: "bigint" },
+        { id: "b" as QueryColumn.Id, name: "b", dataType: "double" },
       ]),
     );
     expect(out.valueKey).toBe("a");
@@ -54,28 +64,42 @@ describe("hydratePieFromQueryResult", () => {
 
   it("preserves preset keys that still exist in the columns", () => {
     const out = hydratePieFromQueryResult(
-      { nameKey: "custom_name", valueKey: "custom_value" },
+      {
+        nameKey: "custom_name" as QueryColumn.Id,
+        valueKey: "custom_value" as QueryColumn.Id,
+      },
       cols([
-        { name: "cat", dataType: "varchar" },
-        { name: "num", dataType: "double" },
-        { name: "custom_name", dataType: "varchar" },
-        { name: "custom_value", dataType: "double" },
+        { id: "cat" as QueryColumn.Id, name: "cat", dataType: "varchar" },
+        { id: "num" as QueryColumn.Id, name: "num", dataType: "double" },
+        {
+          id: "custom_name" as QueryColumn.Id,
+          name: "custom_name",
+          dataType: "varchar",
+        },
+        {
+          id: "custom_value" as QueryColumn.Id,
+          name: "custom_value",
+          dataType: "double",
+        },
       ]),
     );
     expect(out.nameKey).toBe("custom_name");
     expect(out.valueKey).toBe("custom_value");
   });
 
-  it("prunes preset keys that no longer exist in the columns and reseeds", () => {
+  it("preserves configured IDs that no longer exist in the columns", () => {
     const out = hydratePieFromQueryResult(
-      { nameKey: "old_name", valueKey: "old_value" },
+      {
+        nameKey: "old_name" as QueryColumn.Id,
+        valueKey: "old_value" as QueryColumn.Id,
+      },
       cols([
-        { name: "cat", dataType: "varchar" },
-        { name: "num", dataType: "double" },
+        { id: "cat" as QueryColumn.Id, name: "cat", dataType: "varchar" },
+        { id: "num" as QueryColumn.Id, name: "num", dataType: "double" },
       ]),
     );
-    expect(out.valueKey).toBe("num");
-    expect(out.nameKey).toBe("cat");
+    expect(out.valueKey).toBe("old_value");
+    expect(out.nameKey).toBe("old_name");
   });
 
   it("returns unchanged when columns is empty", () => {
@@ -86,7 +110,9 @@ describe("hydratePieFromQueryResult", () => {
   it("leaves valueKey undefined when there is no numeric column", () => {
     const out = hydratePieFromQueryResult(
       { ...empty },
-      cols([{ name: "label", dataType: "varchar" }]),
+      cols([
+        { id: "label" as QueryColumn.Id, name: "label", dataType: "varchar" },
+      ]),
     );
     expect(out.valueKey).toBeUndefined();
   });

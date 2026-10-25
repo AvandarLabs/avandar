@@ -23,7 +23,7 @@ export type QueryFilterValidationReason =
   | { code: "regexDoesNotCompile"; value: string };
 
 function _isRuleComplete(rule: QueryFilterRule): boolean {
-  if (rule.columnName.trim() === "") {
+  if (rule.columnId.trim() === "") {
     return false;
   }
   const spec = QueryFilterOperator.getSpec(rule.operator);

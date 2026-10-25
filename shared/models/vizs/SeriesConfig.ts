@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { CurveType } from "$/models/vizs/CurveType.ts";
 
 /**
@@ -12,12 +13,12 @@ export type RenderAs = "bar" | "line" | "area";
 /** Default fill opacity used when seeding a new area series. */
 export const DEFAULT_AREA_FILL_OPACITY = 0.6;
 
-/** A bar series — renders as bars. */
+/** A bar series - renders as bars. */
 export type BarSeries = {
   renderAs: "bar";
 
-  /** Column name supplying the bar's values. */
-  key: string;
+  /** Column ID supplying the bar's values. */
+  key: QueryColumn.Id;
 
   /** Optional override for the series label shown in legend/tooltip. */
   label?: string;
@@ -39,12 +40,12 @@ export type BarSeries = {
   stackId?: string;
 };
 
-/** A line series — renders as a polyline. */
+/** A line series - renders as a polyline. */
 export type LineSeries = {
   renderAs: "line";
 
-  /** Column name supplying the line's Y values. */
-  key: string;
+  /** Column ID supplying the line's Y values. */
+  key: QueryColumn.Id;
 
   /** Optional override for the series label shown in legend/tooltip. */
   label?: string;
@@ -62,12 +63,12 @@ export type LineSeries = {
   withDots?: boolean;
 };
 
-/** An area series — renders as a filled region under a polyline. */
+/** An area series - renders as a filled region under a polyline. */
 export type AreaSeries = {
   renderAs: "area";
 
-  /** Column name supplying the area's Y values. */
-  key: string;
+  /** Column ID supplying the area's Y values. */
+  key: QueryColumn.Id;
 
   /** Optional override for the series label shown in legend/tooltip. */
   label?: string;
@@ -98,12 +99,12 @@ export type XYSeries = BarSeries | LineSeries | AreaSeries;
 
 /**
  * A radar series. Radar does not compose with bar/line/area so there is
- * no `renderAs` discriminator — every radar series renders as a radar
+ * no `renderAs` discriminator - every radar series renders as a radar
  * polygon.
  */
 export type RadarSeries = {
-  /** Column name supplying the radial values. */
-  key: string;
+  /** Column ID supplying the radial values. */
+  key: QueryColumn.Id;
 
   /** Optional override for the series label shown in legend/tooltip. */
   label?: string;
@@ -119,15 +120,15 @@ export type RadarSeries = {
 };
 
 /**
- * A scatter series — each carries its own X and Y columns since
+ * A scatter series - each carries its own X and Y columns since
  * scatter plots pair points, unlike bar/line/area which share an X
  * axis across all series.
  */
 export type ScatterSeries = {
-  /** Column name supplying the Y values. */
-  key: string;
-  /** Column name supplying the X values. */
-  xKey: string;
+  /** Column ID supplying the Y values. */
+  key: QueryColumn.Id;
+  /** Column ID supplying the X values. */
+  xKey: QueryColumn.Id;
   /** Optional override for the series label shown in legend/tooltip. */
   label?: string;
   /** Optional CSS color override. */
@@ -135,11 +136,11 @@ export type ScatterSeries = {
 };
 
 /**
- * A bubble series — like ScatterSeries plus a third column for radius.
+ * A bubble series - like ScatterSeries plus a third column for radius.
  */
 export type BubbleSeries = ScatterSeries & {
-  /** Column name supplying the bubble size (radius). */
-  sizeKey: string;
+  /** Column ID supplying the bubble size (radius). */
+  sizeKey: QueryColumn.Id;
 };
 
 /**

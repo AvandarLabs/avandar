@@ -61,8 +61,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
         query: emptyQuery,
         vizConfig: {
           vizType: "bar",
-          xAxisKey: "month",
-          series: [{ renderAs: "bar", key: "total" }],
+          xAxisKey: "month" as QueryColumn.Id,
+          series: [{ renderAs: "bar", key: "total" as QueryColumn.Id }],
           layout: "group",
           withLegend: true,
         },
@@ -81,8 +81,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
         ]),
         vizConfig: {
           vizType: "bar",
-          xAxisKey: "month",
-          series: [{ renderAs: "bar", key: "total_cases" }],
+          xAxisKey: "month" as QueryColumn.Id,
+          series: [{ renderAs: "bar", key: "total_cases" as QueryColumn.Id }],
           layout: "group",
           withLegend: true,
         },
@@ -109,8 +109,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
         query: _makeQueryWithColumns([mockColumn("month")]),
         vizConfig: {
           vizType: "bar",
-          xAxisKey: "old_x",
-          series: [{ renderAs: "bar", key: "y" }],
+          xAxisKey: "old_x" as QueryColumn.Id,
+          series: [{ renderAs: "bar", key: "y" as QueryColumn.Id }],
           layout: "group",
           withLegend: true,
         },
@@ -137,7 +137,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
         query: _makeQueryWithColumns([mockColumn("Admin2")]),
         vizConfig: {
           vizType: "bar",
-          xAxisKey: "Admin2",
+          xAxisKey: "Admin2" as QueryColumn.Id,
           series: [],
           layout: "group",
           withLegend: true,
@@ -157,9 +157,13 @@ describe("shouldHydrateVizFromQueryResult", () => {
         ]),
         vizConfig: {
           vizType: "line",
-          xAxisKey: "month",
+          xAxisKey: "month" as QueryColumn.Id,
           series: [
-            { renderAs: "line", key: "total_cases", curveType: "monotone" },
+            {
+              renderAs: "line",
+              key: "total_cases" as QueryColumn.Id,
+              curveType: "monotone",
+            },
           ],
           withLegend: true,
         },

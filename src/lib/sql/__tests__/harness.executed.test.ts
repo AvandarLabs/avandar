@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { withDuckDb } from "./executedDuckDb";
+import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
 
 describe("executed test harness", () => {
   it("runs SQL against a real DuckDB and reads rows back", async () => {

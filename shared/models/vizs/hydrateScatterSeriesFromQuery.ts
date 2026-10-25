@@ -8,40 +8,27 @@ type ScatterSeriesConfig = {
 };
 
 /**
- * Reconcile a scatter config against the current structured query's columns.
- * Series whose `xKey` or `key` are no longer in the query are dropped.
- * When the series array is empty, seeds one series from the first two numeric
- * columns (or same column for both if only one numeric is available).
- *
- * @param currVizConfig Current scatter viz config.
- * @param query The structured query to hydrate from.
- * @returns Updated config with stale series pruned and defaults seeded.
+ * Seeds unconfigured slots from column IDs and preserves existing selections
+ * and styles, including identities absent from the current result.
  */
 export function hydrateScatterSeriesFromQuery<
   VConfig extends ScatterSeriesConfig,
 >(currVizConfig: VConfig, query: PartialStructuredQuery): VConfig {
   const { queryColumns } = query;
-  const columnNames = new Set(
-    queryColumns.map((c) => {
-      return QueryColumn.getDerivedColumnName(c);
-    }),
-  );
 
-  let nextSeries: ScatterSeries[] = currVizConfig.series.filter((s) => {
-    return columnNames.has(s.xKey) && columnNames.has(s.key);
-  });
+  let nextSeries: ScatterSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0 && isNonEmptyArray(queryColumns)) {
     const numerics = queryColumns.filter(QueryColumn.isNumeric);
     if (numerics.length >= 2) {
       nextSeries = [
         {
-          xKey: QueryColumn.getDerivedColumnName(numerics[0]!),
-          key: QueryColumn.getDerivedColumnName(numerics[1]!),
+          xKey: numerics[0]!.id,
+          key: numerics[1]!.id,
         },
       ];
     } else if (numerics.length === 1) {
-      const only = QueryColumn.getDerivedColumnName(numerics[0]!);
+      const only = numerics[0]!.id;
       nextSeries = [{ xKey: only, key: only }];
     }
   }

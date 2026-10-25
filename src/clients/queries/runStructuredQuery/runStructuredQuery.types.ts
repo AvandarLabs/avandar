@@ -36,6 +36,8 @@ export type RunStructuredQueryParams = StructuredQueryAuth & {
 
 /** A query result plus the execution relations analytics records about it. */
 export type RunStructuredQueryResult = {
+  /** SQL captured at execution, including any automatic row limit. */
+  executedSql: string | undefined;
   result: QueryResult.T<UnknownRow>;
   /**
    * True when the large-dataset guard replaced the caller's query with a

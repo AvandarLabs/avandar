@@ -1,14 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import {
-  createDataVizBlock,
   DATA_EXPLORER_FALLBACK_PROMPT,
+  createDataVizBlock,
 } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
 
 describe("createDataVizBlock", () => {
   it("returns a DataViz block whose props mirror the input rawSql, prompt, and viz config", () => {
     const vizConfig = VizConfigs.makeEmptyConfig("table");
     const block = createDataVizBlock({
+      columnBindings: {
+        version: 1,
+        scopeKey: "explorer",
+        sqlKey: "SELECT 1",
+        columns: [],
+      },
       rawSql: "SELECT 1",
       prompt: "Show one",
       vizType: "table",
@@ -28,17 +34,34 @@ describe("createDataVizBlock", () => {
       subscribedFilterIds: [],
     });
     expect(block.props.localFilters).toEqual([]);
+    expect(block.props).toMatchObject({
+      columnBindingVersion: 1,
+      globalFilterTargets: {},
+    });
+    expect(block.props.columnBindings.scopeKey).toBe(block.props.id);
   });
 
   it("stamps a unique UUID into props.id for every call", () => {
     const vizConfig = VizConfigs.makeEmptyConfig("table");
     const blockA = createDataVizBlock({
+      columnBindings: {
+        version: 1,
+        scopeKey: "explorer",
+        sqlKey: "SELECT 1",
+        columns: [],
+      },
       rawSql: "SELECT 1",
       prompt: "Show one",
       vizType: "table",
       vizConfig,
     });
     const blockB = createDataVizBlock({
+      columnBindings: {
+        version: 1,
+        scopeKey: "explorer",
+        sqlKey: "SELECT 1",
+        columns: [],
+      },
       rawSql: "SELECT 1",
       prompt: "Show one",
       vizType: "table",
@@ -53,6 +76,12 @@ describe("createDataVizBlock", () => {
   it("falls back to a non-empty default prompt when prompt is undefined so the block renders", () => {
     const vizConfig = VizConfigs.makeEmptyConfig("bar");
     const block = createDataVizBlock({
+      columnBindings: {
+        version: 1,
+        scopeKey: "explorer",
+        sqlKey: "SELECT 1",
+        columns: [],
+      },
       rawSql: "SELECT a, b FROM t",
       prompt: undefined,
       vizType: "bar",
@@ -71,6 +100,12 @@ describe("createDataVizBlock", () => {
   it("falls back to the default prompt when the supplied prompt is just whitespace", () => {
     const vizConfig = VizConfigs.makeEmptyConfig("table");
     const block = createDataVizBlock({
+      columnBindings: {
+        version: 1,
+        scopeKey: "explorer",
+        sqlKey: "SELECT 1",
+        columns: [],
+      },
       rawSql: "SELECT 1",
       prompt: "   ",
       vizType: "table",

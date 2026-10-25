@@ -1,4 +1,4 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AnyVizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
 import type {
@@ -52,7 +52,7 @@ export interface IVizConfigModule<
    */
   hydrateFromQueryResult(
     vizConfig: TVizConfig,
-    columns: readonly QueryResultColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): TVizConfig;
 
   /**

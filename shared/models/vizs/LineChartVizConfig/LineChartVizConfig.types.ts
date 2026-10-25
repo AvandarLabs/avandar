@@ -1,3 +1,4 @@
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type { XYSeries } from "$/models/vizs/SeriesConfig.ts";
 
@@ -13,13 +14,12 @@ export type LineChartVizConfig = {
    * The key of the column to use for the X axis. This is a column
    * name, not an ID.
    *
-   * TODO(jpsyx): create a concept of a QueryColumn and use QueryColumnId here.
    */
-  xAxisKey: string | undefined;
+  xAxisKey: QueryColumn.Id | undefined;
 
   /**
    * One entry per rendered series. Each series carries its own `key`
-   * (column name), `renderAs` (line by default — bar / area allowed),
+   * (column name), `renderAs` (line by default - bar / area allowed),
    * `color`, `curveType`, and other mark-level settings.
    */
   series: XYSeries[];

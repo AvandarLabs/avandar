@@ -5,6 +5,7 @@
  * and inner nodes are AND/OR groups that may contain other groups.
  */
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
 
 export type { QueryFilterOperator };
@@ -16,11 +17,13 @@ export type QueryFilterCombinator = "AND" | "OR";
 export type QueryFilterNodeId = string;
 
 /**
- * Column data types keyed by column name. Shared by everything that needs to
+ * Column data types keyed by column ID. Shared by everything that needs to
  * know a filter column's type: the SQL renderer, the SQL-to-form parser, and
  * the filter controls. Declare it once so the four consumers cannot drift.
  */
-export type QueryFilterColumnTypes = Record<string, AvaDataType.T>;
+export type QueryFilterColumnTypes = Partial<
+  Record<QueryColumn.Id, AvaDataType.T>
+>;
 
 /** A single column-level predicate. */
 export type QueryFilterRule = {
@@ -30,8 +33,8 @@ export type QueryFilterRule = {
    * therefore does not steal focus from the value input).
    */
   id?: QueryFilterNodeId;
-  /** The name of the underlying base column we filter on. */
-  columnName: string;
+  /** The source (WHERE) or selected projection (HAVING) identity. */
+  columnId: QueryColumn.Id;
   /**
    * The column's data type at authoring time. Used to render typed literals
    * and to pick the operator list. A live `columnTypes` map overrides it;
@@ -78,3 +81,13 @@ export function isEmptyQueryFilter(filter: QueryFilter | undefined): boolean {
     filter !== undefined && filter.type === "group" && filter.rules.length === 0
   );
 }
+
+/** Name-based persisted predicate accepted only at ingestion boundaries. */
+export type LegacyQueryFilterRule = Omit<QueryFilterRule, "columnId"> & {
+  columnName: string;
+};
+
+/** Recursive name-based tree accepted only at ingestion boundaries. */
+export type LegacyQueryFilterGroup = Omit<QueryFilterGroup, "rules"> & {
+  rules: ReadonlyArray<LegacyQueryFilterGroup | LegacyQueryFilterRule>;
+};

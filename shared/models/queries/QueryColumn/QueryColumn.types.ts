@@ -14,5 +14,7 @@ export type QueryColumnRead = Model.Base<
     id: QueryColumnId;
     baseColumn: DatasetColumnRead | ConceptAttributeModel["Read"];
     aggregation: QueryAggregationTypeT | undefined;
+    /** Explicit SQL output name for this projection. */
+    outputAlias?: string;
   }
 >;

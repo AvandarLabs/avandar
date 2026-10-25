@@ -1,6 +1,7 @@
 import { constant } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { QUERY_AGGREGATION_TYPES } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type {
   DuckDbQueryAggregationTypeT,
   QueryAggregationTypeT,
@@ -36,6 +37,26 @@ export const QueryAggregationTypeModule = {
   /** Type guard checking whether a string is a valid aggregation. */
   isValid: (value: string): value is QueryAggregationTypeT => {
     return (QUERY_AGGREGATION_TYPES as readonly string[]).includes(value);
+  },
+
+  /**
+   * Aggregate result type within Avandar's supported scalar representation.
+   * Integer and boolean SUM widen to whole numbers, including DuckDB HUGEINT.
+   */
+  getResultDataType: ({
+    aggregation,
+    sourceDataType,
+  }: Readonly<{
+    aggregation: QueryAggregationTypeT | undefined;
+    sourceDataType: AvaDataType.T;
+  }>): AvaDataType.T => {
+    return match(aggregation)
+      .with("count", constant("bigint" as const))
+      .with("avg", constant("double" as const))
+      .with("sum", () => {
+        return sourceDataType === "double" ? "double" : "bigint";
+      })
+      .otherwise(constant(sourceDataType));
   },
 
   getAggregationColumnName: (

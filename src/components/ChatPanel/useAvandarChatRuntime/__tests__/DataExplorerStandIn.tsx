@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
 import { harness } from "@/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.mocks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
@@ -40,10 +41,18 @@ export function DataExplorerStandIn(): React.ReactNode {
   useEffect(
     function syncVizFromQueryResult() {
       if (!isLoadingResults && queryResults?.columns) {
-        dispatch.syncVizFromQueryResult(queryResults.columns);
+        dispatch.syncVizFromQueryResult(
+          reconcileResultColumnBindings({
+            scopeKey: "chat-test",
+            sqlKey: state.rawSql ?? "",
+            columns: queryResults.columns,
+            projections: [],
+            previous: undefined,
+          }).columns,
+        );
       }
     },
-    [isLoadingResults, queryResults, dispatch],
+    [isLoadingResults, queryResults, dispatch, state.rawSql],
   );
   return null;
 }
