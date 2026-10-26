@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import {
   assertOperationBlocksLaterWork,
   assertUnleasedDropDoesNotDeadlock,
@@ -152,9 +153,10 @@ describe("DuckDbClient dataset leasing", () => {
     const loadMayFinish = createDeferred();
     vi.spyOn(DuckDbClient, "hasView").mockResolvedValue(false);
     vi.spyOn(DuckDbClient, "hasTable").mockResolvedValue(false);
-    vi.spyOn(DuckDbClient, "runRawQuery").mockResolvedValue(new Blob());
-    vi.spyOn(DuckDbClient, "getTableSchema").mockResolvedValue([]);
-    vi.spyOn(DuckDbClient, "getTableRowCount").mockResolvedValue(0);
+    // The load's own statements and its schema and row count read-back.
+    vi.spyOn(DuckDbClient, "runRawQuery").mockResolvedValue(
+      QueryResult.makeEmpty(),
+    );
     registerFileHandleMock.mockImplementation(async () => {
       loadStarted.resolve();
       await loadMayFinish.promise;
