@@ -5,6 +5,7 @@ import { match } from "ts-pattern";
 import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
+import { makeQueryColumnsFromConcept } from "@/views/DataExplorerApp/makeQueryColumnsFromConcept/makeQueryColumnsFromConcept";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
@@ -18,6 +19,7 @@ type Result = {
 
 /**
  * Loads every column of a data source, whether it is a Dataset or a Concept.
+ * A case type's columns end with its built-in `status` column.
  *
  * Shared by the column multi-select (what the query selects) and the filter
  * panel (what the query can filter on), which are deliberately different
@@ -44,6 +46,10 @@ export function useQueryColumnsForDataSource(
 
   const sourceType = dataSourceId?.__type;
   const sourceId = dataSourceId?.id;
+  // Narrowed on `__type` so the id is a `Concept.Id`, which the status column
+  // is derived from.
+  const conceptId =
+    dataSourceId?.__type === "Concept" ? dataSourceId.id : undefined;
   const columns = useMemo(() => {
     if (!sourceId) {
       return [];
@@ -54,13 +60,16 @@ export function useQueryColumnsForDataSource(
           return QueryColumnFns.makeFromDatasetColumn(column);
         },
       ),
-      ...(sourceType === "Concept" ? (conceptAttributes ?? []) : []).map(
-        (attribute) => {
-          return QueryColumnFns.makeFromConceptAttribute(attribute);
-        },
-      ),
+      // The status column waits for the attributes, so a case type's columns
+      // arrive together rather than `status` first and alone.
+      ...(conceptId && conceptAttributes
+        ? makeQueryColumnsFromConcept({
+            conceptId,
+            attributes: conceptAttributes,
+          })
+        : []),
     ];
-  }, [datasetColumns, conceptAttributes, sourceType, sourceId]);
+  }, [datasetColumns, conceptAttributes, sourceType, sourceId, conceptId]);
 
   return {
     columns,
