@@ -8467,6 +8467,10 @@ msgstr ""
 msgid "Hide details"
 msgstr "隱藏詳細資料"
 
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+msgid "Choose a case type from the sidebar to see its records."
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "See why"
 msgstr "了解原因"
@@ -9778,6 +9782,10 @@ msgstr "成功"
 msgid "This layer's popup shows no fields. Choose some in the layer's Popup "
 "section."
 msgstr "此圖層的彈出視窗沒有顯示任何欄位。請在圖層的「彈出視窗」區段中選取欄位。"
+
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+msgid "Pick a case type"
+msgstr ""
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx

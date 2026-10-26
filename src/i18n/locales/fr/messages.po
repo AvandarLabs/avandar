@@ -8839,6 +8839,10 @@ msgstr ""
 msgid "Hide details"
 msgstr "Masquer les détails"
 
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+msgid "Choose a case type from the sidebar to see its records."
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "See why"
 msgstr "Voir pourquoi"
@@ -10209,6 +10213,10 @@ msgid "This layer's popup shows no fields. Choose some in the layer's Popup "
 "section."
 msgstr "La fenêtre contextuelle de cette couche n’affiche aucun champ. "
 "Sélectionnez-en dans la section Fenêtre contextuelle de la couche."
+
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+msgid "Pick a case type"
+msgstr ""
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
