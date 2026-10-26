@@ -46,16 +46,17 @@ select
     )
   );
 
+-- Attributes are part of a case type's design, so every write requires
+-- `case_types` editor.
 create policy "
   User can INSERT concept_attributes
 " on public.concept_attributes for insert to authenticated
 with
   check (
-    public.concept_attributes.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_meets_min_app_role (
+      public.concept_attributes.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
     )
   );
 
@@ -63,25 +64,29 @@ create policy "
   User can UPDATE concept_attributes
 " on public.concept_attributes
 for update
-  to authenticated
+  to authenticated using (
+    public.util__auth_user_meets_min_app_role (
+      public.concept_attributes.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
+    )
+  )
 with
   check (
-    public.concept_attributes.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_meets_min_app_role (
+      public.concept_attributes.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
     )
   );
 
 create policy "
   User can DELETE concept_attributes
 " on public.concept_attributes for delete to authenticated using (
-  public.concept_attributes.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
+  public.util__auth_user_meets_min_app_role (
+    public.concept_attributes.workspace_id,
+    'case_types'::public.app_type,
+    'editor'::public.role_level
   )
 );
 
