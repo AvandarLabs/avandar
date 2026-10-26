@@ -9,11 +9,11 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
+import type { ConceptStatusId } from "$/models/ontology/ConceptStatus/ConceptStatus.types.ts";
 import type {
   IndividualId,
   IndividualModel,
 } from "$/models/ontology/Individual/Individual.types.ts";
-import type { ConceptStatusId } from "$/models/ontology/ConceptStatus/ConceptStatus.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";

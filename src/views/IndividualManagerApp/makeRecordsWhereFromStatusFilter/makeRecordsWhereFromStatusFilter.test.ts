@@ -4,10 +4,8 @@ import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 
 const CONCEPT_ID = "00000000-0000-4000-8000-0000000000c1" as Concept.Id;
-const SUSPECTED_ID =
-  "00000000-0000-4000-8000-0000000000a1" as ConceptStatus.Id;
-const CONFIRMED_ID =
-  "00000000-0000-4000-8000-0000000000a2" as ConceptStatus.Id;
+const SUSPECTED_ID = "00000000-0000-4000-8000-0000000000a1" as ConceptStatus.Id;
+const CONFIRMED_ID = "00000000-0000-4000-8000-0000000000a2" as ConceptStatus.Id;
 
 describe("makeRecordsWhereFromStatusFilter", () => {
   it("filters by case type alone when no status is chosen", () => {

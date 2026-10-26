@@ -31,9 +31,9 @@ import {
   makeDefaultDatasetColumnAttribute,
   makeDefaultManualEntryAttribute,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-import { getStatusSetValueFromFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/getStatusSetValueFromFormValues/getStatusSetValueFromFormValues";
 import { ConceptStatusesFieldset } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset";
 import { DatasetColumnAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index";
+import { getStatusSetValueFromFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/getStatusSetValueFromFormValues/getStatusSetValueFromFormValues";
 import { ManualEntryAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock";
 import { useSubmitConceptCreatorForm } from "@/views/OntologyDesignerApp/ConceptCreatorView/useSubmitConceptCreatorForm";
 

@@ -55,7 +55,11 @@ export function CaseTypeStatusList({
               </Text>
             ) : null}
             {recordCounts === undefined ? null : (
-              <Text size="sm" c="dimmed" className={css.caseTypeStatusListCount}>
+              <Text
+                size="sm"
+                c="dimmed"
+                className={css.caseTypeStatusListCount}
+              >
                 <Plural
                   value={recordCounts[status.id] ?? 0}
                   one="# record"

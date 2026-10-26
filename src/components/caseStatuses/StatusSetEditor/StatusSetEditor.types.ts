@@ -19,9 +19,6 @@ export type StatusSetEditorActions = {
   updateStatus: (status: ConceptStatus.Draft) => void;
   removeStatus: (statusId: ConceptStatus.Id) => void;
   makeDefault: (statusId: ConceptStatus.Id) => void;
-  moveStatus: (options: {
-    statusId: ConceptStatus.Id;
-    offset: -1 | 1;
-  }) => void;
+  moveStatus: (options: { statusId: ConceptStatus.Id; offset: -1 | 1 }) => void;
   reorderStatuses: (statuses: ConceptStatus.Draft[]) => void;
 };

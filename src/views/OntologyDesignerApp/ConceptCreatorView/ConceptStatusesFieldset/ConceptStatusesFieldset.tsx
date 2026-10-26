@@ -27,8 +27,8 @@ export function ConceptStatusesFieldset({
       <Stack gap="xs">
         <Text size="sm" c="dimmed">
           <Trans>
-            The stages a record moves through. New records start in the
-            default status.
+            The stages a record moves through. New records start in the default
+            status.
           </Trans>
         </Text>
         <StatusSetEditor

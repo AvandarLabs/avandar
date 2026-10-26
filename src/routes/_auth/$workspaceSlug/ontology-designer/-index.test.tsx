@@ -114,8 +114,8 @@ describe("/$workspaceSlug/ontology-designer/", () => {
   });
 
   it("hands a case_types admin's home a delete action", () => {
-    expect(
-      _renderHomeFor({ case_types: "admin" }).onDeleteCaseType,
-    ).toBeTypeOf("function");
+    expect(_renderHomeFor({ case_types: "admin" }).onDeleteCaseType).toBeTypeOf(
+      "function",
+    );
   });
 });

@@ -35,13 +35,14 @@ describe("probeStorageRelationCache", () => {
       staleAt: undefined,
     });
 
-    const { cachedRelations } =
-      await RelationLoading.probeStorageRelationCache({
+    const { cachedRelations } = await RelationLoading.probeStorageRelationCache(
+      {
         datasetIds: [DATASET_ID],
         neededByDatasetId: {},
         relationCache,
         principalKey: PRINCIPAL_KEY,
-      });
+      },
+    );
 
     // `registerParquetFile` refuses an untyped blob, so an entry written
     // before acquisition typed its blobs would otherwise fail every load.
@@ -49,8 +50,6 @@ describe("probeStorageRelationCache", () => {
     expect(cachedRelations[0]?.parquetBlob.type).toBe(
       MIMEType.APPLICATION_PARQUET,
     );
-    expect(cachedRelations[0]?.parquetBlob.size).toBe(
-      "parquet-bytes".length,
-    );
+    expect(cachedRelations[0]?.parquetBlob.size).toBe("parquet-bytes".length);
   });
 });

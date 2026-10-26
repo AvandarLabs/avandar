@@ -27,7 +27,9 @@ describe("StatusColorPicker", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Active color: Green" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Active color: Green" }),
+    );
     fireEvent.click(await screen.findByRole("button", { name: "Red" }));
 
     expect(onChange).toHaveBeenCalledWith("#fa5252");

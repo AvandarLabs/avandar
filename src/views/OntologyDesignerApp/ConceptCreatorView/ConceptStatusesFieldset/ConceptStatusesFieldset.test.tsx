@@ -1,8 +1,8 @@
 import { useForm } from "@avandar/ui/hooks";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
-import { ConceptStatusesFieldset } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset";
 import { getDefaultConceptFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import { ConceptStatusesFieldset } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset";
 import type { ConceptFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import type { FormType } from "@avandar/ui/hooks";
 import type { ReactNode } from "react";

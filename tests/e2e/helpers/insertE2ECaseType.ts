@@ -62,9 +62,7 @@ export async function insertE2ECaseType(options: {
   );
 
   if (caseTypeError) {
-    throw new Error(
-      `[e2e] case type insert failed: ${caseTypeError.message}`,
-    );
+    throw new Error(`[e2e] case type insert failed: ${caseTypeError.message}`);
   }
 
   return { id: caseTypeId, name: options.name };

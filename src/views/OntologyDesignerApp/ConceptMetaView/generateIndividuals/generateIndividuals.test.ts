@@ -27,8 +27,8 @@ import type {
 } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
-import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
+import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { IndividualId } from "$/models/ontology/Individual/Individual.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";

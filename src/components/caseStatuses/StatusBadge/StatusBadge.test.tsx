@@ -7,7 +7,11 @@ const DESCRIPTION = "A lab test came back positive.";
 describe("StatusBadge", () => {
   it("shows what the status means when the badge has keyboard focus", async () => {
     render(
-      <StatusBadge name="Confirmed" color="#fa5252" description={DESCRIPTION} />,
+      <StatusBadge
+        name="Confirmed"
+        color="#fa5252"
+        description={DESCRIPTION}
+      />,
     );
 
     const badge = screen

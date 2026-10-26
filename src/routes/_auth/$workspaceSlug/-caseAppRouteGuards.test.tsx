@@ -94,12 +94,10 @@ vi.mock("@/views/IndividualManagerApp", () => {
 });
 
 const { Route: caseManagerRoute } = await import("./ontology-designer/route");
-const { Route: caseTypeCreatorRoute } = await import(
-  "./ontology-designer/concept-creator"
-);
-const { Route: caseRecordsRoute } = await import(
-  "./individual-manager/$conceptId/route"
-);
+const { Route: caseTypeCreatorRoute } =
+  await import("./ontology-designer/concept-creator");
+const { Route: caseRecordsRoute } =
+  await import("./individual-manager/$conceptId/route");
 
 type GuardedRoute = { options: { beforeLoad?: unknown } };
 type BeforeLoad = (args: {

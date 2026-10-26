@@ -8,10 +8,7 @@ import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatu
  *
  * @returns A translated name for every `ConceptStatus.ColorKey`.
  */
-export function useStatusColorLabels(): Record<
-  ConceptStatus.ColorKey,
-  string
-> {
+export function useStatusColorLabels(): Record<ConceptStatus.ColorKey, string> {
   const { t } = useLingui();
   return useMemo(() => {
     return {

@@ -39,9 +39,7 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
     "dashboards__can_view_dashboard",
   );
   const canAccessMaps = useHasPermission("gis__can_view_map");
-  const canAccessCaseTypes = useHasPermission(
-    "case_types__can_view_case_type",
-  );
+  const canAccessCaseTypes = useHasPermission("case_types__can_view_case_type");
   const canAccessCaseRecords = useHasPermission(
     "case_records__can_view_record",
   );
