@@ -47,3 +47,11 @@ run_migration_replay \
   "$repo_root/supabase/migration-upgrade-tests/pipeline_scope_seed.prelude.sql" \
   "$repo_root/supabase/migrations/20261021211630_seed_pipeline_scope_keys_and_checkpoints.sql" \
   "$repo_root/supabase/migration-upgrade-tests/pipeline_scope_seed.assertions.sql"
+
+# Case app role backfill: re-seed built-in groups with both case apps, and
+# mirror each custom group's data_sources role into case_types and
+# case_records.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/case_app_roles_backfill.prelude.sql" \
+  "$repo_root/supabase/migrations/20261026105957_backfill_case_app_role_group_app_roles.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/case_app_roles_backfill.assertions.sql"
