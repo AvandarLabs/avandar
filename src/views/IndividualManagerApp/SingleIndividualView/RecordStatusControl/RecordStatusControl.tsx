@@ -9,6 +9,8 @@ type Props = {
   currentStatusId: ConceptStatus.Id;
   /** Whether the user may change a record's status. */
   canEdit: boolean;
+  /** Whether a change is being saved. The menu stays closed until then. */
+  isSaving?: boolean;
   onChange: (statusId: ConceptStatus.Id) => void;
 };
 
@@ -22,6 +24,7 @@ export function RecordStatusControl({
   statuses,
   currentStatusId,
   canEdit,
+  isSaving = false,
   onChange,
 }: Readonly<Props>): ReactNode {
   const currentStatus = statuses.find((status) => {
@@ -34,6 +37,7 @@ export function RecordStatusControl({
     <RecordStatusMenu
       statuses={statuses}
       currentStatus={currentStatus}
+      isSaving={isSaving}
       onChange={onChange}
     />
   ) : (

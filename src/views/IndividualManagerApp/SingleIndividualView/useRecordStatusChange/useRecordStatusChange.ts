@@ -15,6 +15,8 @@ const RECORDS_EDITOR_REQUIRED_HINT = "case_records_editor_required";
 type RecordStatusChange = {
   /** The status to show: the one being saved while a save is in flight. */
   displayedStatusId: ConceptStatus.Id;
+  /** Whether a change is being saved. Picks are ignored until it settles. */
+  isSaving: boolean;
   changeStatus: (statusId: ConceptStatus.Id) => void;
 };
 
@@ -30,7 +32,8 @@ function _isRecordsEditorRequired(error: unknown): boolean {
 /**
  * Changes a record's status the moment the user picks one.
  *
- * The picked status shows at once. On success every view of the case type's
+ * The picked status shows at once, and further picks are ignored until it
+ * is saved. On success every view of the case type's
  * statuses is refreshed, including the route loader that holds this record,
  * and the record's own value takes over again. On failure the record goes
  * back to the status it had and a toast says so, without the database's own
@@ -47,7 +50,7 @@ export function useRecordStatusChange(
   const [pendingStatusId, setPendingStatusId] = useState<
     ConceptStatus.Id | undefined
   >();
-  const [updateIndividual] = IndividualClient.useUpdate({
+  const [updateIndividual, isUpdatePending] = IndividualClient.useUpdate({
     onSuccess: async () => {
       await invalidateCaseStatusQueries({
         queryClient,
@@ -69,11 +72,17 @@ export function useRecordStatusChange(
     },
   });
   const displayedStatusId = pendingStatusId ?? individual.statusId;
+  // The pending status stays set until the post-save refresh finishes, so
+  // it also covers the moment after the write settles.
+  const isSaving = isUpdatePending || pendingStatusId !== undefined;
 
   return {
     displayedStatusId,
+    isSaving,
     changeStatus: (statusId) => {
-      if (statusId === displayedStatusId) {
+      // One save at a time: a second pick could otherwise land out of order
+      // and the first save's outcome would clear the second's pending state.
+      if (isSaving || statusId === displayedStatusId) {
         return;
       }
       setPendingStatusId(statusId);

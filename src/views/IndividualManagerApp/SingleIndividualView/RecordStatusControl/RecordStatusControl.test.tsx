@@ -108,6 +108,24 @@ describe("RecordStatusControl", () => {
     });
   });
 
+  it("keeps the status menu closed while a change is being saved", () => {
+    render(
+      <RecordStatusControl
+        statuses={STATUSES}
+        currentStatusId={SUSPECTED.id}
+        canEdit
+        isSaving
+        onChange={vi.fn()}
+      />,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Status: Suspected" });
+    fireEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute("aria-busy", "true");
+    expect(screen.queryByRole("menuitem", { name: "Confirmed" })).toBeNull();
+  });
+
   it("shows a badge and no status menu to a user who cannot change statuses", () => {
     render(
       <RecordStatusControl

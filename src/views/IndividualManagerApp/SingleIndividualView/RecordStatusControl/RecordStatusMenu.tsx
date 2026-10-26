@@ -11,6 +11,8 @@ type Props = {
   /** The case type's statuses, in position order. */
   statuses: readonly ConceptStatus.T[];
   currentStatus: ConceptStatus.T;
+  /** Whether a change is being saved. The menu stays closed until then. */
+  isSaving: boolean;
   onChange: (statusId: ConceptStatus.Id) => void;
 };
 
@@ -25,12 +27,13 @@ type Props = {
 export function RecordStatusMenu({
   statuses,
   currentStatus,
+  isSaving,
   onChange,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
 
   return (
-    <Menu position="bottom-start" width={260}>
+    <Menu position="bottom-start" width={260} disabled={isSaving}>
       <Tooltip
         label={currentStatus.description}
         disabled={!currentStatus.description}
@@ -41,6 +44,7 @@ export function RecordStatusMenu({
           <UnstyledButton
             className={css.recordStatusControlTrigger}
             aria-label={t`Status: ${currentStatus.name}`}
+            aria-busy={isSaving}
           >
             <StatusBadge
               name={currentStatus.name}

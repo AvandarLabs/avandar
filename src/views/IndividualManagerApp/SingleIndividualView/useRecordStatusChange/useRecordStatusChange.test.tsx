@@ -15,22 +15,28 @@ type UpdateOptions = {
   onError: (error: unknown) => void;
 };
 
-const { updateMock, invalidateMock, notifyErrorMock, updateOptionsRef } =
-  vi.hoisted(() => {
-    return {
-      updateMock: vi.fn(),
-      invalidateMock: vi.fn(),
-      notifyErrorMock: vi.fn(),
-      updateOptionsRef: { current: undefined as UpdateOptions | undefined },
-    };
-  });
+const {
+  updateMock,
+  invalidateMock,
+  notifyErrorMock,
+  updateOptionsRef,
+  isUpdatePendingRef,
+} = vi.hoisted(() => {
+  return {
+    updateMock: vi.fn(),
+    invalidateMock: vi.fn(),
+    notifyErrorMock: vi.fn(),
+    updateOptionsRef: { current: undefined as UpdateOptions | undefined },
+    isUpdatePendingRef: { current: false },
+  };
+});
 
 vi.mock("@/clients/ontology/IndividualClient", () => {
   return {
     IndividualClient: {
       useUpdate: (options: UpdateOptions) => {
         updateOptionsRef.current = options;
-        return [updateMock, false];
+        return [updateMock, isUpdatePendingRef.current];
       },
     },
   };
@@ -60,6 +66,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 
 const SUSPECTED_ID = "00000000-0000-4000-8000-0000000000a1" as ConceptStatus.Id;
 const CONFIRMED_ID = "00000000-0000-4000-8000-0000000000a2" as ConceptStatus.Id;
+const CLOSED_ID = "00000000-0000-4000-8000-0000000000a3" as ConceptStatus.Id;
 
 const RECORD: Individual.T = {
   assignedTo: undefined,
@@ -105,6 +112,10 @@ function _renderStatusChange(): StatusChangeResult {
 describe("useRecordStatusChange", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    isUpdatePendingRef.current = false;
+    updateMock.mockImplementation(() => {
+      isUpdatePendingRef.current = true;
+    });
     invalidateMock.mockResolvedValue(undefined);
   });
 
@@ -116,6 +127,18 @@ describe("useRecordStatusChange", () => {
       id: RECORD.id,
       data: { statusId: CONFIRMED_ID },
     });
+  });
+
+  it("ignores a second pick while the first one is still being saved", () => {
+    const result = _renderStatusChange();
+
+    act(() => {
+      result.current.changeStatus(CLOSED_ID);
+    });
+
+    expect(updateMock).toHaveBeenCalledTimes(1);
+    expect(result.current.displayedStatusId).toBe(CONFIRMED_ID);
+    expect(result.current.isSaving).toBe(true);
   });
 
   it("goes back to the saved status and says so when the change fails", () => {
