@@ -4,6 +4,7 @@ import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgress
 import { insertConceptFromFormValues } from "./insertConceptFromFormValues";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
+import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
@@ -64,6 +65,7 @@ vi.mock("@/utils/Logger", () => {
   return { Logger: { error: vi.fn(), log: vi.fn() } };
 });
 
+const STATUS_ID = uuid<ConceptStatus.Id>();
 const WORKSPACE_ID = uuid<Workspace.Id>();
 const CONCEPT_ID = uuid<Concept.Id>();
 const ATTRIBUTE_ID = uuid<ConceptAttributeId>();
@@ -80,6 +82,10 @@ function _makeFormValues(): ConceptFormSubmitValues {
     sourceDatasets: [],
     datasetColumnAttributes: [],
     manualEntryAttributes: [],
+    defaultStatusId: STATUS_ID,
+    statuses: [
+      { id: STATUS_ID, name: " Active ", description: "", color: "#40c057" },
+    ],
     attributes: [
       {
         __type: "ConceptAttribute",

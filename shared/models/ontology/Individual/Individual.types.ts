@@ -1,4 +1,5 @@
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
+import type { ConceptStatusId } from "$/models/ontology/ConceptStatus/ConceptStatus.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { UUID } from "@avandar/utils";
@@ -14,7 +15,7 @@ type IndividualRead = {
   id: IndividualId;
   missingFromSourceAt: string | undefined;
   name: string;
-  status: string;
+  statusId: ConceptStatusId;
   updatedAt: string;
   workspaceId: Workspace.Id;
 };
@@ -35,7 +36,7 @@ export type IndividualModel = SupabaseCrudModelSpec<
         | "createdAt"
         | "id"
         | "missingFromSourceAt"
-        | "status"
+        | "statusId"
         | "updatedAt"
       >;
       Update: Partial<IndividualRead>;

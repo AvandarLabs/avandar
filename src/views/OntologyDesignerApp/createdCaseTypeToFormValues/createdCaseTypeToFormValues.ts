@@ -1,6 +1,8 @@
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
 import { makeDefaultManualEntryAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
+import { makeDefaultStatusDrafts } from "@/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
@@ -45,7 +47,7 @@ function _makeMappedAttribute(options: {
   return Model.make("ConceptAttribute", {
     id: conceptAttributeId,
     conceptId: options.conceptId,
-    name: options.name,
+    name: ConceptStatus.toNonReservedAttributeName(options.name),
     description: options.description,
     dataType: options.column.dataType,
     mappingType: "dataset_column",
@@ -130,7 +132,7 @@ function _attributesFromCaseType(options: {
       return [
         makeDefaultManualEntryAttribute({
           conceptId,
-          name: attribute.name,
+          name: ConceptStatus.toNonReservedAttributeName(attribute.name),
         }),
       ];
     }
@@ -190,6 +192,7 @@ export function createdCaseTypeToFormValues(options: {
   const label = attributes.find((attribute) => {
     return attribute.isLabel;
   });
+  const { statuses, defaultStatusId } = makeDefaultStatusDrafts();
   return {
     ...Model.make("Concept", {
       id: conceptId,
@@ -205,6 +208,8 @@ export function createdCaseTypeToFormValues(options: {
       manualEntryAttributes: attributes.filter((attribute) => {
         return attribute.mappingType === "manual_entry";
       }),
+      statuses,
+      defaultStatusId,
     }),
     attributes,
   };

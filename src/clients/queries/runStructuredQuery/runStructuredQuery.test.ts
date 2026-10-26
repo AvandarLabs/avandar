@@ -10,6 +10,7 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -68,6 +69,7 @@ function _createConcept(): Concept.T {
     createdAt: now,
     updatedAt: now,
     allowManualCreation: false,
+    defaultStatusId: uuid<ConceptStatus.Id>(),
   });
 }
 

@@ -4,6 +4,7 @@ import { uuid } from "$/lib/uuid";
 import { makeHasPermissionFromAppRoles, render, screen } from "@/test-utils";
 import { EditCaseTypeButton } from "@/views/IndividualManagerApp/EditCaseTypeButton";
 import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { PermissionKey } from "$/models/Permissions/Permissions";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -49,6 +50,7 @@ function _createConcept(): Concept.T {
     createdAt: now,
     updatedAt: now,
     allowManualCreation: false,
+    defaultStatusId: uuid<ConceptStatus.Id>(),
   });
 }
 
