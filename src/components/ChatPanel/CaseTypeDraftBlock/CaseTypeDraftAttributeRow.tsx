@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Checkbox, Group, Select, Text, TextInput } from "@mantine/core";
 import clsx from "clsx";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import css from "./CaseTypeDraftCard.module.css";
 import type {
   ChatCaseValuePickerRuleType,
@@ -50,6 +51,12 @@ export function CaseTypeDraftAttributeRow({
           size="xs"
           value={attribute.name}
           aria-label={t`Name for ${columnLabel}`}
+          error={
+            attribute.isIncluded &&
+            ConceptStatus.isReservedAttributeName(attribute.name)
+              ? t`Every case type already has a status. Choose another name.`
+              : undefined
+          }
           onChange={(event) => {
             editor.setAttributeName(
               attribute.columnId,

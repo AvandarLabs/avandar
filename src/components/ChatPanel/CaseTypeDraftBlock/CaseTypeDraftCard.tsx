@@ -13,6 +13,7 @@ import css from "./CaseTypeDraftCard.module.css";
 import { CaseTypeDraftIdentityFields } from "./CaseTypeDraftIdentityFields";
 import { CaseTypeDraftManualEntrySection } from "./CaseTypeDraftManualEntrySection";
 import { CaseTypeDraftSourceSection } from "./CaseTypeDraftSourceSection";
+import { CaseTypeDraftStatusSection } from "./CaseTypeDraftStatusSection";
 import { useValuePickerOptions } from "./useValuePickerOptions";
 import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 
@@ -103,6 +104,7 @@ export function CaseTypeDraftCard({
               );
             })}
             <CaseTypeDraftManualEntrySection editor={editor} />
+            <CaseTypeDraftStatusSection editor={editor} />
             <Checkbox
               size="xs"
               label={t`Let people create cases by hand too`}
