@@ -4602,7 +4602,7 @@ with
 
 ```markdown
 **Current state:** Status workflow and the records list's status filter ship
-(P5c.4, P5c.6). Comments and assignment are still **stubs with no backend**:
+(P5c.4, and P5c.6 except the assignee filter). Comments and assignment are still **stubs with no backend**:
 `ActivityBlock` (comments) calls `notifyNotImplemented`, and
 `Individual.assignedTo` exists with no writer or UI.
 ```
@@ -4634,9 +4634,9 @@ Replace
 with
 
 ```markdown
-- P5c.6 `[DONE]` ABox **list/grid view** with filtering by status/assignee.
-  The records list filters by status and counts the matching records.
-  Filtering by assignee waits on assignment (P5c.3).
+- P5c.6 `[PARTIAL]` ABox **list/grid view** with filtering by status/assignee.
+  Done: the records list filters by status and counts the matching records.
+  Not done: filtering by assignee, which waits on assignment (P5c.3).
 ```
 
 After the P5c.8 bullet, add:
