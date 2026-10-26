@@ -10,6 +10,10 @@ import {
   restoreE2ESecondaryMemberRoleGroup,
 } from "./helpers/assignE2ESecondaryMemberRole";
 import { signInWithEmailPassword } from "./helpers/auth";
+import {
+  deleteE2ECaseTypes,
+  insertE2ECaseType,
+} from "./helpers/insertE2ECaseType";
 import { insertE2ERestrictedDataset } from "./helpers/insertE2ERestrictedDataset";
 import { createE2ESupabaseViewerClient } from "./helpers/supabase";
 import { LONG_WAIT } from "./helpers/timeouts";
@@ -31,7 +35,7 @@ function _appRouteForType(app: AppType): WorkspaceAppRouteCase | undefined {
     data_explorer: WORKSPACE_APP_ROUTES.dataExplorer,
     dashboards: WORKSPACE_APP_ROUTES.dashboards,
     gis: undefined,
-    case_types: undefined,
+    case_types: WORKSPACE_APP_ROUTES.caseTypes,
     case_records: undefined,
     settings: undefined,
   };
@@ -306,6 +310,90 @@ test.describe("GIS route permission matrix", () => {
           workspaceId: e2eViewerMembership.workspaceId,
           viewerUserId: e2eViewerMembership.viewerUserId,
           ...assignResult,
+        });
+      }
+    });
+  });
+});
+
+type CaseRecordsRouteCase = {
+  title: string;
+  matrix: UserAppRolesMatrix;
+  isAllowed: boolean;
+};
+
+const CASE_RECORDS_ROUTE_CASES: CaseRecordsRouteCase[] = [
+  {
+    title: "denies Case Records when member lacks case_records viewer",
+    matrix: createRolesMatrixWithoutApp("case_records"),
+    isAllowed: false,
+  },
+  {
+    title: "allows Case Records for case_records viewer only",
+    matrix: createSingleAppViewerRolesMatrix("case_records"),
+    isAllowed: true,
+  },
+  {
+    title: "allows Case Records for case_records editor",
+    matrix: createSingleAppEditorRolesMatrix("case_records"),
+    isAllowed: true,
+  },
+  {
+    title: "allows Case Records for case_records admin",
+    matrix: createSingleAppAdminRolesMatrix("case_records"),
+    isAllowed: true,
+  },
+];
+
+test.describe("Case Records route permission matrix", () => {
+  CASE_RECORDS_ROUTE_CASES.forEach(({ title, matrix, isAllowed }) => {
+    test(title, async ({ page, e2eWorkerDb, e2eViewerMembership }) => {
+      const { admin, workspaceId, viewerUserId } = e2eViewerMembership;
+      const caseType = await insertE2ECaseType({
+        supabaseAdminClient: admin,
+        workspaceId,
+        name: "E2E case records route",
+      });
+
+      try {
+        const assignResult = await assignE2ESecondaryMemberCustomMatrix({
+          supabaseAdminClient: admin,
+          workspaceId,
+          viewerUserId,
+          matrix,
+        });
+
+        try {
+          await signInWithEmailPassword(page, {
+            email: e2eWorkerDb.secondaryUser.email,
+            password: e2eWorkerDb.secondaryUser.password,
+            workspaceSlug: e2eWorkerDb.workspaceSlug,
+          });
+          const expectationOptions = {
+            workspaceSlug: e2eWorkerDb.workspaceSlug,
+            appPath: `${WORKSPACE_APP_ROUTES.caseRecords.path}/${caseType.id}`,
+          };
+          if (isAllowed) {
+            await expectWorkspaceAppAccessAllowed(page, {
+              ...expectationOptions,
+              allowedUrlPattern:
+                WORKSPACE_APP_ROUTES.caseRecords.allowedUrlPattern,
+            });
+          } else {
+            await expectWorkspaceAppAccessDenied(page, expectationOptions);
+          }
+        } finally {
+          await restoreE2ESecondaryMemberRoleGroup({
+            supabaseAdminClient: admin,
+            workspaceId,
+            viewerUserId,
+            ...assignResult,
+          });
+        }
+      } finally {
+        await deleteE2ECaseTypes({
+          supabaseAdminClient: admin,
+          ids: [caseType.id],
         });
       }
     });
