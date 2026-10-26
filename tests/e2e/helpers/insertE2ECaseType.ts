@@ -43,7 +43,7 @@ export async function insertE2ECaseType(options: {
   return caseType;
 }
 
-/** Deletes case types a spec seeded, with everything that cascades from them. */
+/** Deletes the case types a spec seeded and everything cascading from them. */
 export async function deleteE2ECaseTypes(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   ids: readonly string[];
