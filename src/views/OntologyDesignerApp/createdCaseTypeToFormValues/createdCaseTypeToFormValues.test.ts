@@ -302,4 +302,25 @@ describe("createdCaseTypeToFormValues", () => {
         }),
     ).toEqual(["Status (attribute)", "status (attribute)"]);
   });
+
+  it("starts a chat-created case type with the statuses chat proposed", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: _covidCase({
+        statuses: [
+          { name: "Suspected", description: "", color: "#fab005" },
+          { name: "Confirmed", description: "", color: "#fa5252" },
+        ],
+        defaultStatusName: "Confirmed",
+      }),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(
+      formValues.statuses.map((status) => {
+        return status.name;
+      }),
+    ).toEqual(["Suspected", "Confirmed"]);
+    expect(formValues.defaultStatusId).toBe(formValues.statuses[1]?.id);
+  });
 });
