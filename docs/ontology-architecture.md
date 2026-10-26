@@ -88,10 +88,11 @@ names. Do not put DL terms in UI strings.
 - **CRUD clients and mapping dispatch**: `src/clients/ontology/`
 - **Virtual assertions and value pickers**: `src/clients/ontology/AttributeAssertionClient/`
 - **Concepts as QETL relations**: `src/clients/qetl/QueryMediator/conceptRelation/`, `src/clients/qetl/wrappers/ConceptWrapper/`
+- **Data Explorer status column**: `shared/models/queries/ConceptStatusColumn/`, `src/views/DataExplorerApp/makeQueryColumnsFromConcept/`
 - **Case Manager (TBox authoring, Sync)**: `src/views/OntologyDesignerApp/`
 - **Records screens (ABox browsing)**: `src/views/IndividualManagerApp/`
 - **Chat draft card and session kickoff**: `src/components/ChatPanel/CaseTypeDraftBlock/`, `src/components/ChatPanel/CaseDesignKickoff/`
-- **Chat edge function pieces**: `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts`, `parseCreateCaseTypes.ts`, `prompt/buildCaseManagerSystemPrompt.ts`
+- **Chat edge function pieces**: `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts`, `parseProposedCaseStatuses.ts`, `parseCreateCaseTypes.ts`, `prompt/buildCaseManagerSystemPrompt.ts`
 - **Chat contract types**: `shared/types/chat.types.ts` (`ChatProposedCaseType`, `ChatCreatedCaseType`)
 - **Routes**: `src/routes/_auth/$workspaceSlug/ontology-designer/`, `src/routes/_auth/$workspaceSlug/individual-manager/`
 
@@ -115,7 +116,7 @@ flowchart TD
   QE -- "planner reads ontology<br/>rows, view uses<br/>getSQLSelectOfMapping,<br/>ConceptWrapper imports<br/>AttributeAssertionClient" --> OC
   OC -- "types and parsers" --> SM
   CP -- "chat draft types" --> SM
-  EF -- "chat.types only" --> SM
+  EF -- "chat.types and<br/>the ConceptStatus model" --> SM
 ```
 
 _The two-way edge between the ontology clients and QETL is a module import
@@ -298,6 +299,9 @@ On the edge function (`PostChatMessages`, context `case-manager`):
 - `buildCaseManagerSystemPrompt` replaces the unified prompt. It is built from
   catalog metadata only (dataset and column names, types and ids, existing case
   type names), never row values.
+  It tells the model every case type already has a built-in status, and asks
+  for a status set, each status with a one-sentence description for the people
+  working the cases, when the case type implies a workflow.
 - Tools offered: `clarify`, `proposeCaseType`, `createCaseTypes`. The prompt
   tells the model to open with one clarification, then propose a fully
   prefilled draft (clarifying again only for a genuine ambiguity), and not to
@@ -306,9 +310,20 @@ On the edge function (`PostChatMessages`, context `case-manager`):
   key, attributes whose dataset is not a declared source, and a label that is
   not one of the attributes, and defaults unknown value pickers to
   `most_frequent`.
+  It renames an attribute named "status" to "status (attribute)"
+  (`ConceptStatus.toNonReservedAttributeName`), and keeps the proposal's status
+  set only when it is valid as a whole (`parseProposedCaseStatuses`: 1 to 12
+  statuses, names unique case-insensitively, the default one of them, colors
+  from the palette with missing ones filled by `ConceptStatus.getNextFreeColor`).
+  An invalid or absent set is dropped, and the client supplies the default set.
 
 On the client, the draft becomes `pendingCaseTypeDraft` and
-`CaseTypeDraftBlock` renders it. The session as a state machine:
+`CaseTypeDraftBlock` renders it.
+The card lists the proposed statuses, or the translated default set for a
+proposal with none, each badge beside its description, and swaps the list for
+`StatusSetEditor` when the user chooses Edit statuses. An attribute or
+hand-filled field named "status" is flagged and blocks Create.
+The session as a state machine:
 
 ```mermaid
 stateDiagram-v2
@@ -347,11 +362,16 @@ The draft card converts to the insert payload in two steps that do no I/O:
 1. `proposedCaseTypeToCreatedCaseType` applies the user's edits: keeps checked
    attributes, re-includes every join key, drops sources left with no
    attribute, and falls back to the first join key as the label.
+   It also carries the card's status set as `statuses` and
+   `defaultStatusName`.
 2. `createdCaseTypeToFormValues` (called by `applyCreatedCaseTypes`) resolves
    column ids against the workspace's `dataset_columns` (unknown ids are
    dropped), adds a missing identifier attribute for any source whose join key
    was not an attribute, and makes the first identifier the label when none is
    set.
+   It builds the status set with `makeStatusSetValueFromChatStatuses`: chat's
+   statuses with fresh ids and the named default, or the default set when chat
+   sent none, which is always the case for `createCaseTypes`.
 
 ## 6. Generating records (Sync records)
 
@@ -496,7 +516,7 @@ cached, and no source wrapper is involved. QETL itself is described in
 flowchart LR
   A["Session<br/>planConceptRelations hook:<br/>getConceptRelationPlansFromSql<br/>reads the SQL"]
   B["Allowlist: every named<br/>concept and every<br/>contributing dataset must<br/>belong to the workspace"]
-  C["Plan per concept,<br/>read from Postgres<br/>before the lease:<br/>attribute columns,<br/>contributing dataset ids,<br/>external ids"]
+  C["Plan per concept,<br/>read from Postgres<br/>before the lease:<br/>attribute columns,<br/>contributing dataset ids,<br/>external ids and<br/>status names"]
   A --> B --> C
 ```
 
@@ -512,7 +532,7 @@ runner takes the lease._
 flowchart TD
   D["Query runner takes<br/>one lease covering<br/>the datasets,<br/>the contributors, and<br/>each spine table name<br/>(a workspace session<br/>widens the datasets to<br/>every workspace dataset)"]
   E["Load contributing datasets as parquet:<br/>public view plus ava_rows_ view each"]
-  F["loadConceptSpine: external ids as CSV into<br/>concept_{id}__individuals, key typed VARCHAR"]
+  F["loadConceptSpine: external ids and<br/>status names as CSV into<br/>concept_{id}__individuals,<br/>both typed VARCHAR"]
   G["buildConceptViewSql:<br/>CREATE OR REPLACE VIEW<br/>concept_{id}, run as<br/>trusted internal SQL"]
   H["Run the user's SQL"]
   D --> E --> F --> G --> H
@@ -523,10 +543,10 @@ defined, so the datasets and the spine must already exist._
 
 | Piece | File | What it guarantees |
 | --- | --- | --- |
-| Planning | `conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts` | No Postgres read for SQL that names no concept; foreign concepts and contributors throw (fail closed) |
-| Column resolution | `conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | One column per attribute; one key column per dataset; duplicate names suffixed `_2`, `_3`; manual-entry and unmapped attributes become typed NULL columns; a missing dataset column or key column throws |
-| Spine | `conceptRelation/loadConceptSpine/loadConceptSpine.ts`, `conceptRelation/toCsvColumn.ts` | Keys travel as RFC 4180 CSV, never spliced into SQL; key pinned to `VARCHAR`; empty `external_id` refused; empty concept gets an empty typed table |
-| View | `conceptRelation/buildConceptViewSql.ts` | `FROM` is the spine alone, every attribute a correlated subquery, so the grain is one row per individual and a missing contribution is NULL; columns sorted by name for byte-stable SQL; array attributes as `list(... ORDER BY file_row_number)` |
+| Planning | `conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts` | No Postgres read for SQL that names no concept; foreign concepts and contributors throw (fail closed); statuses are read once per concept and matched to each record by `statusId`, and a record whose status is missing throws |
+| Column resolution | `conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | One column per attribute; one key column per dataset; `status` is taken before any attribute, and duplicate names (including an attribute named `status`) are suffixed `_2`, `_3`; manual-entry and unmapped attributes become typed NULL columns; a missing dataset column or key column throws |
+| Spine | `conceptRelation/loadConceptSpine/loadConceptSpine.ts`, `conceptRelation/toCsvRows.ts` | Keys and status names travel as RFC 4180 CSV, never spliced into SQL; both columns pinned to `VARCHAR`; empty `external_id` refused; empty concept gets an empty table with both typed columns |
+| View | `conceptRelation/buildConceptViewSql.ts` | `FROM` is the spine alone, every attribute a correlated subquery, so the grain is one row per individual and a missing contribution is NULL; `external_id` and `status` come from the spine and win over an attribute of the same name; attribute columns sorted by name for byte-stable SQL; array attributes as `list(... ORDER BY file_row_number)` |
 | Ordering and lease | `src/clients/qetl/QueryMediator/queryRunner.ts`, `conceptRelation/loadConceptRelations.ts` | Datasets, then spine, then view, then user SQL; spine names included in the lease |
 
 **Naming.** `concept_<id>` is the view; `concept_<id>__individuals` is the
@@ -536,6 +556,21 @@ edge function; see
 [2026-08-19-chat-concept-aliases-design.md](superpowers/specs/2026-08-19-chat-concept-aliases-design.md).
 Structured queries reach the view through `structuredQueryToSql`, which emits
 `concept_<id>` for a concept data source.
+
+**The status column.** Every concept view has a `status` column holding each
+record's status name. The Data Explorer offers it after the attributes as a
+`ConceptStatusColumn` base column whose id is the case type's id, so
+`Model.getTypedId` gives it the same identity on every load and a selected
+status column survives a refetch of the column list or a restore from the URL
+(`makeQueryColumnsFromConcept`, used by `useQueryColumnsForDataSource` and
+`getRestoredColumnsFromUrl`). Filters, grouping and aggregation need nothing
+special, because they read only a base column's `name` and `dataType`. The
+legacy `_runConceptQuery` path reads attribute values only and leaves the
+status column out. Filters match the status name, so renaming a status changes
+what a saved `status = '...'` filter matches. Chat's schema line lists each
+case type's statuses in position order (`- c0: Cholera case (age, status:
+Suspected | Confirmed)`), online through `fetchWorkspaceSchema` and offline
+through `fetchOfflineChatSchema`.
 
 **ConceptWrapper.** `src/clients/qetl/wrappers/ConceptWrapper/` is registered
 in `createDefaultRegistry` but the registry is only resolved for dataset refs,
@@ -589,7 +624,8 @@ Outside the routes:
 | A record's status is one of its own case type's statuses | `individuals__status_fkey` | `concepts__default_status_fkey` has the same shape for the default |
 | A bare UUID DuckDB table name means a dataset | `RelationRef.fromTableName` (`shared/models/relations/RelationRef/`) | Hence `concept_`, `ava_rows_`, `ava_staging_individuals_` prefixes and the `__individuals` suffix (`src/clients/DuckDbClient/duckDbSqlText.ts`, `loadConceptSpine.ts`) |
 | Keys are compared as text | `getEntityKeyComparisonSql`, `duckDbSqlText.ts` | Applies to the view and Sync; the record page does not yet follow it |
-| No user data spliced into concept SQL | `loadConceptSpine` loads keys as CSV through `toCsvColumn` | The record page does not yet follow it |
+| No user data spliced into concept SQL | `loadConceptSpine` loads keys and status names as CSV through `toCsvRows` | The record page does not yet follow it |
+| A concept view's `status` is the record's status | `makeConceptAttributeColumnsFromMetadata` reserves the name; `buildConceptViewSql` drops an attribute column of that name | Behind the `concept_attributes__name_not_reserved` check |
 | `first` and arrays order by `file_row_number` | `getSQLSelectOfMapping`, `buildConceptViewSql`; the `ava_rows_` view is created by `src/clients/DuckDbClient/duckDbParquetLoad.ts` | Never use `row_number() OVER ()`; parallel scan order is unstable |
 | Concept refs and contributors outside the workspace throw | `getConceptRelationPlansFromSql` | Do not change this to dropping the reference: a stale view could answer |
 | Datasets and the spine before the view | `queryRunner._runLeasedQuery`, `loadConceptRelations` | DuckDB binds a view's sources when it is defined; the code loads datasets, then the spine, then the view. The lease must include each spine name (`_getLeaseNames`) |
@@ -743,11 +779,15 @@ Layers a per-case capability touches:
    `makeRecordsWhereFromStatusFilter` builds the one `where` that both the
    page query and the count use. A new filter follows the same path. The pane
    still has no ordering or search.
-6. **QETL**, if SQL and dashboards should see the state: the spine carries only
-   `external_id` (`ConceptRelationPlan.externalIds`, one CSV column), so the
-   plan type, CSV writer and view select list must widen.
-7. **Chat**, if case types should propose the capability (for example status
-   sets): types, parser, tool schema, prompt, draft card.
+6. **QETL**, if SQL and dashboards should see the state: the spine carries
+   `external_id` and the status name (`ConceptRelationPlan.spineRows`, written
+   by `toCsvRows`), so a new per-case field widens the spine row type, the
+   spine's columns in `loadConceptSpine`, and the view's select list, as status
+   does.
+7. **Chat**, if case types should propose the capability: types, parser, tool
+   schema, prompt, and draft card, as status sets do
+   (`parseProposedCaseStatuses`, `proposeCaseType.statuses`,
+   `CaseTypeDraftStatusSection`).
 8. **Permissions**: writes need Case Types or Case Records roles (section 4).
    A capability that some writers must not change, like status, needs its own
    guard, the way `tr_individuals__check_status_change` guards `status_id`.
@@ -774,11 +814,12 @@ Follow [rules/testing.md](rules/testing.md). Existing coverage:
 | Layer | Files | Run with |
 | --- | --- | --- |
 | RLS (pgTAP) | `supabase/tests/database/permissions/rls_concepts.test.sql` and the four peers | `pnpm test:db`, only after `ava supabase status` reads green for the current branch (on any branch other than `develop`, that means its own switched project; see `CLAUDE.md`) |
-| Concept view and column resolution against real DuckDB | `src/lib/sql/__tests__/buildConceptViewSql.executed.test.ts`, `conceptAttributeColumns.executed.test.ts`, `toCsvColumn.executed.test.ts` | `pnpm vitest run --config vitest.executed.config.ts <files>` (or `pnpm test:executed`) |
+| Concept view and column resolution against real DuckDB | `src/lib/sql/__tests__/buildConceptViewSql.executed.test.ts`, `conceptAttributeColumns.executed.test.ts`, `toCsvColumn.executed.test.ts`, `toCsvRows.executed.test.ts`, `tests/integration/queries/structuredQueryConcepts.executed.test.ts` | `pnpm vitest run --config vitest.executed.config.ts <files>` (or `pnpm test:executed`) |
 | QETL planning, spine, ordering | `src/clients/qetl/QueryMediator/conceptRelation/**/*.test.ts`, `src/clients/qetl/QueryMediator/__tests__/QueryMediator.concepts.test.ts`, `src/clients/qetl/wrappers/ConceptWrapper/ConceptWrapper.test.ts` | `pnpm vitest run <paths>` |
 | Authoring conversion and draft card | `src/views/OntologyDesignerApp/**/*.test.ts(x)`, `src/components/ChatPanel/CaseTypeDraftBlock/*.test.ts(x)`, `src/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff.test.ts` | `pnpm vitest run <paths>` |
 | Edge function parsing and prompt | `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.test.ts`, `parseCreateCaseTypes.test.ts`, `prompt/buildCaseManagerSystemPrompt.test.ts` | `pnpm vitest run <paths>` |
 | Records UI | `src/views/IndividualManagerApp/**/*.test.tsx` | `pnpm vitest run <paths>` |
+| Status column end to end | `tests/e2e/case-statuses-data-explorer.spec.ts` | `pnpm test:e2e case-statuses-data-explorer.spec.ts`, on its own |
 
 Gaps to close when touching the code: no test covers
 `AttributeAssertionClient`, `insertConceptFromFormValues`, or Sync's upsert
