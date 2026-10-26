@@ -14,7 +14,10 @@ create table public.concepts (
   -- Timestamp of the last update to the concept.
   updated_at timestamptz not null default now(),
   -- Whether users can manually create individuals of this concept.
-  allow_manual_creation boolean not null
+  allow_manual_creation boolean not null,
+  -- Status new records of this case type start in. Its foreign key is
+  -- declared in `11.concept_statuses.sql`, which defines the target table.
+  default_status_id uuid
 );
 
 -- Enable row level security
