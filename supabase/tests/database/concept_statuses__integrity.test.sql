@@ -84,7 +84,7 @@ values
     0
   );
 
-select plan (8);
+select plan (10);
 
 -- 1. Colors are stored lowercase, so lookups never need to normalize them.
 select throws_ok (
@@ -163,6 +163,41 @@ select throws_ok (
   '23503',
   null,
   'a case type cannot default to another case type''s status'
+);
+
+-- 9. Every case type needs a default status.
+select throws_ok (
+  $t9$
+  insert into public.concepts (owner_id, workspace_id, name, allow_manual_creation)
+  values ('a6000001-0000-4000-8000-000000000001'::uuid, 'a6001001-0000-4000-8000-000000000001'::uuid, 'no default case type', true);
+  $t9$,
+  '23502',
+  null,
+  'a case type without a default status is rejected'
+);
+
+-- 10. The built-in `status` column owns the name, in any case and spacing.
+select throws_ok (
+  $t10$
+  insert into public.concept_attributes (
+    workspace_id, concept_id, name, data_type, mapping_type,
+    is_label, is_identifier, is_array, allow_manual_edit
+  )
+  values (
+    'a6001001-0000-4000-8000-000000000001'::uuid,
+    'a6002002-0000-4000-8000-000000000002'::uuid,
+    ' Status ',
+    'varchar',
+    'manual_entry',
+    true,
+    false,
+    false,
+    false
+  );
+  $t10$,
+  '23514',
+  null,
+  'an attribute cannot be named status'
 );
 
 -- 8.

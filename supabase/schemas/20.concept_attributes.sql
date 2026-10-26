@@ -17,7 +17,10 @@ create table public.concept_attributes (
   is_label boolean not null,
   is_identifier boolean not null,
   is_array boolean not null,
-  allow_manual_edit boolean not null
+  allow_manual_edit boolean not null,
+  -- The Data Explorer gives every case type a built-in `status` column, and
+  -- DuckDB identifiers ignore case, so no attribute may take that name.
+  constraint concept_attributes__name_not_reserved check (lower(btrim(name)) <> 'status')
 );
 
 -- Enable row level security

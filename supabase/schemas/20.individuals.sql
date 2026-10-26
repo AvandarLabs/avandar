@@ -18,15 +18,13 @@ create table public.individuals (
   -- User id of the owner. We cannot delete users that are still assigned to
   -- individuals.
   assigned_to uuid references auth.users (id) on update cascade on delete no action,
-  -- Status of the individual
-  status text not null default 'active',
   -- Set when this individual's external_id stops appearing in any source
   -- dataset on a sync. Clear the timestamp if it reappears. NULL means it
   -- is present.
   missing_from_source_at timestamptz,
   -- Status of this record: one of its case type's statuses. Filled with the
   -- case type's default when an insert names none.
-  status_id uuid,
+  status_id uuid not null,
   -- Unique constraint to ensure one external_id per concept
   constraint individuals__concept_external_id_unique unique (concept_id, external_id),
   -- Keeps the status inside the record's own case type. `no action` rather

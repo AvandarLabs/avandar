@@ -71,8 +71,12 @@ on conflict (id) do nothing;
 
 -- Case types the tests below read and write. Every seeded concept is in this
 -- one block.
-insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation)
-values ('f300b003-0000-4000-8000-000000000003'::uuid, 'f3000001-0000-4000-8000-000000000001'::uuid, 'f3001001-0000-4000-8000-000000000001'::uuid, 'host concept', true)
+insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
+values ('f300b003-0000-4000-8000-000000000003'::uuid, 'f3000001-0000-4000-8000-000000000001'::uuid, 'f3001001-0000-4000-8000-000000000001'::uuid, 'host concept', true, 'f300c003-0000-4000-8000-000000000003'::uuid)
+on conflict (id) do nothing;
+
+insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
+values ('f300c003-0000-4000-8000-000000000003'::uuid, 'f3001001-0000-4000-8000-000000000001'::uuid, 'f300b003-0000-4000-8000-000000000003'::uuid, 'Active', '#40c057', 0)
 on conflict (id) do nothing;
 
 insert into public.individuals (id, workspace_id, name, concept_id, external_id)

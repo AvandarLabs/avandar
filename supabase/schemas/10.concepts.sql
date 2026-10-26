@@ -17,7 +17,7 @@ create table public.concepts (
   allow_manual_creation boolean not null,
   -- Status new records of this case type start in. Its foreign key is
   -- declared in `11.concept_statuses.sql`, which defines the target table.
-  default_status_id uuid
+  default_status_id uuid not null
 );
 
 -- Enable row level security

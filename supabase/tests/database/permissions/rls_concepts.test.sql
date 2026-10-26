@@ -62,11 +62,18 @@ on conflict (id) do nothing;
 
 -- Case types the tests below read and write. Every seeded concept is in this
 -- one block.
-insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation)
+insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
 values
-  ('f100a001-0000-4000-8000-000000000001'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'ws a concept', false),
-  ('f100a002-0000-4000-8000-000000000002'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'disposable concept', false),
-  ('f100a003-0000-4000-8000-000000000003'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'editable concept', false)
+  ('f100a001-0000-4000-8000-000000000001'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'ws a concept', false, 'f100c001-0000-4000-8000-000000000001'::uuid),
+  ('f100a002-0000-4000-8000-000000000002'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'disposable concept', false, 'f100c002-0000-4000-8000-000000000002'::uuid),
+  ('f100a003-0000-4000-8000-000000000003'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'editable concept', false, 'f100c003-0000-4000-8000-000000000003'::uuid)
+on conflict (id) do nothing;
+
+insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
+values
+  ('f100c001-0000-4000-8000-000000000001'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'f100a001-0000-4000-8000-000000000001'::uuid, 'Active', '#40c057', 0),
+  ('f100c002-0000-4000-8000-000000000002'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'f100a002-0000-4000-8000-000000000002'::uuid, 'Active', '#40c057', 0),
+  ('f100c003-0000-4000-8000-000000000003'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'f100a003-0000-4000-8000-000000000003'::uuid, 'Active', '#40c057', 0)
 on conflict (id) do nothing;
 
 select plan (14);
@@ -125,8 +132,8 @@ select throws_ok (
     '{"sub":"f1000002-0000-4000-8000-000000000002","role":"authenticated"}',
     true
   );
-  insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation)
-  values ('f100b001-0000-4000-8000-000000000001'::uuid, 'f1000002-0000-4000-8000-000000000002'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'smuggled concept', false);
+  insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
+  values ('f100b001-0000-4000-8000-000000000001'::uuid, 'f1000002-0000-4000-8000-000000000002'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'smuggled concept', false, 'f100c011-0000-4000-8000-000000000011'::uuid);
   $t3$,
   '42501',
   null,
@@ -228,8 +235,8 @@ select throws_ok (
     '{"sub":"f1000003-0000-4000-8000-000000000003","role":"authenticated"}',
     true
   );
-  insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation)
-  values ('f100b002-0000-4000-8000-000000000002'::uuid, 'f1000003-0000-4000-8000-000000000003'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'viewer concept', false);
+  insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
+  values ('f100b002-0000-4000-8000-000000000002'::uuid, 'f1000003-0000-4000-8000-000000000003'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'viewer concept', false, 'f100c012-0000-4000-8000-000000000012'::uuid);
   $t8$,
   '42501',
   null,
@@ -245,8 +252,10 @@ select lives_ok (
     '{"sub":"f1000004-0000-4000-8000-000000000004","role":"authenticated"}',
     true
   );
-  insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation)
-  values ('f100b003-0000-4000-8000-000000000003'::uuid, 'f1000004-0000-4000-8000-000000000004'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'editor concept', false);
+  insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
+  values ('f100b003-0000-4000-8000-000000000003'::uuid, 'f1000004-0000-4000-8000-000000000004'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'editor concept', false, 'f100c013-0000-4000-8000-000000000013'::uuid);
+  insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
+  values ('f100c013-0000-4000-8000-000000000013'::uuid, 'f1001001-0000-4000-8000-000000000001'::uuid, 'f100b003-0000-4000-8000-000000000003'::uuid, 'Active', '#40c057', 0);
   reset role;
   $t9$,
   'a case_types editor inserts a concepts row'
