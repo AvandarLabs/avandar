@@ -147,8 +147,8 @@ from
 
 -- Deliberately `after insert or update`. A concept's attributes are inserted in
 -- bulk after the concept row itself, so a `before` trigger would count zero
--- attributes and raise. The cost is that a failure here has to be undone by the
--- caller: the frontend rolls the partial write back with DELETE requests.
+-- attributes and raise. `rpc_concepts__create` writes the concept and its
+-- attributes in one transaction, so a failure here leaves nothing behind.
 create trigger tr_concept_attributes__validate_label_and_identifiers
 after insert or
 update on public.concept_attributes for each row
