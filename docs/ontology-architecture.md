@@ -548,17 +548,26 @@ extension.
 | --- | --- | --- |
 | `ontology-designer/route.tsx` | Case Manager slate; list pane on detail routes | `src/views/OntologyDesignerApp/index.tsx`, `ConceptNavbar.tsx`, `NewCaseTypeButton.tsx` |
 | `ontology-designer/index.tsx` | Home grid of case types, delete with confirm | `src/views/OntologyDesignerApp/CaseTypeHome/` |
-| `ontology-designer/$conceptId.tsx` | Case type detail: attributes, View records, Sync records, Delete (read-only, no edit) | `src/views/OntologyDesignerApp/ConceptMetaView/` (`CaseTypeActions.tsx`, `CaseTypeAttributesList.tsx`, `useHydratedConcept.ts`) |
-| `ontology-designer/concept-creator.tsx` | Concept creator form | `src/views/OntologyDesignerApp/ConceptCreatorView/` |
+| `ontology-designer/$conceptId.tsx` | Case type page (`AppView`): record and attribute counts, Description, Attributes, and Statuses with a record count per status. Refresh records, View records, and Delete (in the overflow menu) are each hidden without the permission they need. Statuses are the only part editable after creation, through the Edit statuses modal | `src/views/OntologyDesignerApp/ConceptMetaView/` (`CaseTypeActions.tsx`, `CaseTypeAttributesList.tsx`, `CaseTypeStatusesSection.tsx`, `CaseTypeStatusList/`, `EditStatusesModal/`, `CaseTypeRail.tsx`, `useHydratedConcept.ts`) |
+| `ontology-designer/concept-creator.tsx` | Concept creator form, with a Statuses section that starts from the default set | `src/views/OntologyDesignerApp/ConceptCreatorView/` (`ConceptStatusesFieldset/`) |
 | `individual-manager/index.tsx` | Redirect to Case Manager home | |
-| `individual-manager/$conceptId/route.tsx` | Records slate: list pane plus outlet | `src/views/IndividualManagerApp/index.tsx`, `IndividualNavbar.tsx`, `useConceptIndividuals.ts`, `useVirtualIndividualLinks.ts`, `EditCaseTypeButton.tsx` |
+| `individual-manager/$conceptId/route.tsx` | Records slate: an `AppListPane` with a status filter and the count of records it matches, each row marked with its status color, plus the outlet | `src/views/IndividualManagerApp/index.tsx`, `IndividualNavbar/` (`StatusFilter/`), `makeRecordsWhereFromStatusFilter/`, `useConceptIndividuals.ts`, `useVirtualIndividualLinks.tsx`, `EditCaseTypeButton.tsx` |
 | `individual-manager/$conceptId/index.tsx` | Select-a-record or sync-first empty state | `src/views/IndividualManagerApp/IndividualSelectionEmptyState/` |
-| `individual-manager/$conceptId/$individualId.tsx` | Record page: Details and Notes | `src/views/IndividualManagerApp/SingleIndividualView/` (`RecordAttributesList.tsx`, `ActivityBlock.tsx`) |
+| `individual-manager/$conceptId/$individualId.tsx` | Record page (`AppView`): the status beside the name (a menu for a Case Records editor, a badge for everyone else, each status's description on hover and focus), Details, Activity, and a rail of record facts | `src/views/IndividualManagerApp/SingleIndividualView/` (`RecordStatusControl/`, `useRecordStatusChange/`, `RecordRail/`, `RecordDetailsSection.tsx`, `RecordAttributesList.tsx`, `ActivityBlock.tsx`) |
 
 Outside the routes:
 
 - **Chat draft card**: `src/components/ChatPanel/CaseTypeDraftBlock/`, rendered
   by `ChatThread` when `pendingCaseTypeDraft` is set.
+- **Status components**: `src/components/caseStatuses/` holds `StatusSetEditor`
+  (the controlled status set editor), `StatusBadge`, `StatusDot`, and
+  `StatusColorPicker`. The create form and the Edit statuses modal use the
+  editor.
+- **Status cache invalidation**: `invalidateCaseStatusQueries`
+  (`src/views/IndividualManagerApp/invalidateCaseStatusQueries/`) is the one
+  place a record's status change or a status set save marks queries stale:
+  the case type's record lists and counts, its statuses, every Data Explorer
+  query, and the route loader.
 - **Sidebar**: `WorkspaceLayout` adds one link per case type to its records
   screen.
 - **Spotlight**: `SpotlightLinks.ontologyDesignerCreatorView` opens the form.
@@ -729,8 +738,11 @@ Layers a per-case capability touches:
 3. **Models and clients** for the new tables.
 4. **Record page**: controls in `SingleIndividualView`; `ActivityBlock` is the
    existing (unwired) notes editor.
-5. **A list or grid view** to filter by the new state; the records list pane has
-   no ordering, filtering or search.
+5. **A list or grid view** to filter by the new state. The records list pane
+   filters by status: `StatusFilter` picks the statuses, and
+   `makeRecordsWhereFromStatusFilter` builds the one `where` that both the
+   page query and the count use. A new filter follows the same path. The pane
+   still has no ordering or search.
 6. **QETL**, if SQL and dashboards should see the state: the spine carries only
    `external_id` (`ConceptRelationPlan.externalIds`, one CSV column), so the
    plan type, CSV writer and view select list must widen.
