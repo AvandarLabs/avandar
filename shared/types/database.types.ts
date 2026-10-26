@@ -2902,6 +2902,8 @@ export type Database = {
         | "dashboards"
         | "settings"
         | "gis"
+        | "case_types"
+        | "case_records"
       attribute_mappings__value_picker_rule_type:
         | "most_frequent"
         | "first"
@@ -3170,6 +3172,8 @@ export const Constants = {
         "dashboards",
         "settings",
         "gis",
+        "case_types",
+        "case_records",
       ],
       attribute_mappings__value_picker_rule_type: [
         "most_frequent",
