@@ -1,0 +1,95 @@
+.statusSetEditor {
+  container: status-set-editor / inline-size;
+}
+
+.statusSetEditorList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * One row is a grid so the inputs line up across rows. `start` alignment
+ * keeps the controls on the first line when a name error adds a second.
+ */
+.statusSetEditorRow {
+  align-items: start;
+  background-color: var(--ava-surface-raised);
+  display: grid;
+  gap: var(--mantine-spacing-xxs) var(--mantine-spacing-xs);
+  grid-template-areas: "handle color name description default-status remove";
+  grid-template-columns:
+    auto auto minmax(7rem, 1fr)
+    minmax(9rem, 2fr) auto auto;
+  padding-block: var(--mantine-spacing-xxs);
+  position: relative;
+}
+
+.statusSetEditorRow + .statusSetEditorRow {
+  border-top: 1px solid var(--ava-border-default);
+}
+
+.statusSetEditorRow[data-dragging="true"] {
+  box-shadow: var(--mantine-shadow-md);
+  z-index: 1;
+}
+
+/* Every non-input cell is one `xs` input tall, so it centers on the input. */
+.statusSetEditorHandle,
+.statusSetEditorColor,
+.statusSetEditorDefault,
+.statusSetEditorRemove {
+  align-items: center;
+  display: flex;
+  min-height: calc(1.875rem * var(--mantine-scale));
+}
+
+.statusSetEditorHandle {
+  background: none;
+  border: 0;
+  border-radius: var(--mantine-radius-xs);
+  color: var(--mantine-color-neutral-5);
+  cursor: grab;
+  grid-area: handle;
+  justify-content: center;
+  padding: 0 2px;
+}
+
+.statusSetEditorHandle:hover {
+  color: var(--mantine-color-neutral-8);
+}
+
+.statusSetEditorHandle:focus-visible {
+  outline-offset: -2px;
+}
+
+.statusSetEditorColor {
+  grid-area: color;
+}
+
+.statusSetEditorName {
+  grid-area: name;
+  min-width: 0;
+}
+
+.statusSetEditorDescription {
+  grid-area: description;
+  min-width: 0;
+}
+
+.statusSetEditorDefault {
+  grid-area: default-status;
+}
+
+.statusSetEditorRemove {
+  grid-area: remove;
+}
+
+@container status-set-editor (width < 34rem) {
+  .statusSetEditorRow {
+    grid-template-areas:
+      "handle color name default-status remove"
+      ". . description description description";
+    grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  }
+}
