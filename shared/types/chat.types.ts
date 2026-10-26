@@ -151,6 +151,17 @@ export type ChatCaseSourceDataset = {
 };
 
 /**
+ * One status a chat-drafted case type starts with. `color` is always a palette
+ * hex: the edge function fills one when the model leaves it out.
+ */
+export type ChatCaseStatus = {
+  name: string;
+  /** One sentence telling the people working the cases what it means. */
+  description: string;
+  color: string;
+};
+
+/**
  * A case type the model asked the client to persist. Attribute values are
  * later read through the Query mediator; source file type does not matter.
  *
@@ -164,6 +175,13 @@ export type ChatCreatedCaseType = {
   allowManualCreation: boolean;
   identities: ChatCaseSourceDataset[];
   attributes: ChatCreatedCaseAttribute[];
+  /**
+   * The case type's statuses, in order. Absent when chat proposed none, in
+   * which case the client starts the case type with its default set.
+   */
+  statuses?: ChatCaseStatus[];
+  /** The status a new case starts in, naming one of `statuses`. */
+  defaultStatusName?: string;
 };
 
 /**
@@ -213,6 +231,13 @@ export type ChatProposedCaseType = {
   labelColumnId?: string;
   attributes: ChatProposedCaseAttribute[];
   manualEntryAttributes: ChatProposedManualEntryAttribute[];
+  /**
+   * The case type's statuses, in order. Absent when chat proposed none, in
+   * which case the client starts the case type with its default set.
+   */
+  statuses?: ChatCaseStatus[];
+  /** The status a new case starts in, naming one of `statuses`. */
+  defaultStatusName?: string;
 };
 
 export type ChatClarifyRequest = {
