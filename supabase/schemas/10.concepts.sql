@@ -41,40 +41,46 @@ select
     )
   );
 
+-- Creating and editing a case type requires `case_types` editor, and deleting
+-- one requires `case_types` admin. Reads stay open to every member so the Data
+-- Explorer and chat can query case types.
 create policy "
   User can INSERT concepts
 " on public.concepts for insert to authenticated
 with
   check (
-    public.concepts.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_meets_min_app_role (
+      public.concepts.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
     )
   );
 
 create policy "User can UPDATE concepts" on public.concepts
 for update
-  to authenticated
+  to authenticated using (
+    public.util__auth_user_meets_min_app_role (
+      public.concepts.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
+    )
+  )
 with
   check (
-    public.concepts.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_meets_min_app_role (
+      public.concepts.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
     )
   );
 
 create policy "
   User can DELETE concepts
 " on public.concepts for delete to authenticated using (
-  public.concepts.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
+  public.util__auth_user_meets_min_app_role (
+    public.concepts.workspace_id,
+    'case_types'::public.app_type,
+    'admin'::public.role_level
   )
 );
 
