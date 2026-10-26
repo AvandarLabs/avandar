@@ -6,6 +6,7 @@ import {
   useNavigate,
 } from "@tanstack/react-router";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { IndividualSelectionEmptyState } from "@/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState";
 import { useConceptIndividuals } from "@/views/IndividualManagerApp/useConceptIndividuals";
@@ -29,6 +30,7 @@ function IndividualManagerWithNoIndividualSelected(): ReactNode {
   const workspace = useCurrentWorkspace();
   const concept = conceptRoute.useLoaderData();
   const { allIndividuals, isLoading } = useConceptIndividuals(concept.id);
+  const canViewCaseType = useHasPermission("case_types__can_view_case_type");
   const hasRecords = allIndividuals.length > 0;
 
   if (isLoading) {
@@ -41,7 +43,7 @@ function IndividualManagerWithNoIndividualSelected(): ReactNode {
         conceptName={concept.name}
         hasRecords={hasRecords}
         action={
-          hasRecords ? undefined : (
+          hasRecords || !canViewCaseType ? undefined : (
             <Button
               size="md"
               variant="light"
