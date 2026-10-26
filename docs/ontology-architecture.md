@@ -131,14 +131,23 @@ imports from the views layer (`useCaseTypeDraftCreation`).
 
 ```mermaid
 erDiagram
+  concepts ||--o{ concept_statuses : "concept_id, on delete cascade"
   concepts ||--o{ concept_attributes : "concept_id, on delete cascade"
   concepts ||--o{ individuals : "concept_id, on delete cascade"
+  concept_statuses ||--o{ individuals : "(status_id, concept_id)"
   concept_attributes ||--o| attribute_mappings__dataset_column : "concept_attribute_id<br/>unique, cascade"
   concept_attributes ||--o| attribute_mappings__manual_entry : "concept_attribute_id<br/>unique, cascade"
   concepts {
     uuid id
     text name
     bool allow_manual_creation
+    uuid default_status_id
+  }
+  concept_statuses {
+    text name
+    text description
+    text color
+    int position
   }
   concept_attributes {
     enum mapping_type
@@ -150,7 +159,7 @@ erDiagram
   individuals {
     text external_id
     text name
-    text status
+    uuid status_id
     uuid assigned_to
   }
   attribute_mappings__dataset_column {
@@ -164,42 +173,52 @@ erDiagram
 ```
 
 _Each attribute has exactly one mapping row, in the table its `mapping_type`
-names. Every table also carries `workspace_id`, which the policies test._
+names. Every table also carries `workspace_id`, which the policies test. `concepts.default_status_id` points back at one of the case type's own statuses._
 
 | Table | One row means | Notes |
 | --- | --- | --- |
-| `concepts` | A case type | `allow_manual_creation` is stored; nothing reads it yet |
+| `concepts` | A case type | `allow_manual_creation` is stored; nothing reads it yet. `default_status_id` is the status new records start in |
+| `concept_statuses` | A status a case type's records can be in | Name unique per case type ignoring case; `color` is lowercase `#rrggbb`; `position` orders the set; `unique (id, concept_id)` is the target of both status foreign keys |
 | `concept_attributes` | A field of a case type | `mapping_type` (`dataset_column`, `manual_entry`) discriminates which mapping table holds its mapping |
 | `attribute_mappings__dataset_column` | "This field reads this column of this dataset, collapsed by this value picker" | `dataset_id` and `dataset_column_id` are bare ids, not foreign keys |
 | `attribute_mappings__manual_entry` | "This field is typed by hand" | Holds no value; no table stores entered values yet |
-| `individuals` | A record: one key of one case type | `unique (concept_id, external_id)`; `name` is `not null`; `status` and `assigned_to` are the only per-case state |
+| `individuals` | A record: one key of one case type | `unique (concept_id, external_id)`; `name` is `not null`; `status_id` and `assigned_to` are the only per-case state |
 
 Attribute assertions have no table. The `AttributeAssertion` model's `id`,
 `createdAt` and `updatedAt` are generated at read time and identify nothing;
 `datasetId` is its only provenance field. (An `entity_field_values` table once
 stored values; migration `20250929162612` dropped it.)
 
-**RLS model.** Every policy on all five tables (four per table) uses one
-predicate: `workspace_id = any(array(select util__get_auth_user_workspaces()))`.
-Access is workspace membership only; the ontology is not part of the role-based
-permission catalog in [permissions-architecture.md](permissions-architecture.md),
-so any member can create, sync and delete case types. `anon` has no grant.
+**RLS model.** Reads on all six tables test workspace membership
+(`workspace_id = any(array(select util__get_auth_user_workspaces()))`), so the
+Data Explorer and chat can query any case type in the workspace. Writes test
+app roles through `util__auth_user_meets_min_app_role` (see
+[permissions-architecture.md](permissions-architecture.md)): a Case Types
+editor writes case types, attributes, mappings, and statuses, and a Case Types
+admin deletes case types. Records accept inserts and updates from a Case Types
+editor (who syncs them) or a Case Records editor, and deletes from a Case
+Records admin. `tr_individuals__check_status_change` narrows that for one
+column: only a Case Records editor may change a record's status. `anon` has no
+grant.
 
-**(as of 2026-10-09)** The `UPDATE` policies on `concepts`,
-`concept_attributes` and both mapping tables have `with check` but no `using`,
-so an update by a member matches zero rows. Through the shared clients'
-`update` (which uses `.select().single()`) that surfaces as PostgREST's
-`PGRST116` no-rows error; through a plain update it reports success and changes
-nothing. `individuals` has a `using` and updates normally. Add a `using` before
-building any edit feature.
+Every `UPDATE` policy on these tables has both `using` and `with check`.
 
 **Database-enforced integrity:**
 
-- Concept delete cascades to attributes, mappings and individuals (all four
-  foreign keys are `on delete cascade`).
+- Concept delete cascades to statuses, attributes, mappings and individuals.
 - The trigger `concept_attributes__validate_label_and_identifiers`
   (`after insert or update` on `concept_attributes`) requires exactly one label
   attribute per concept.
+- A record's status and a case type's default status belong to that case
+  type: both reference `concept_statuses (id, concept_id)`. The default's
+  foreign key is deferred, so a case type and its statuses can be inserted in
+  one transaction.
+- A status that records use cannot be deleted, and neither can a case type's
+  default. `rpc_concept_statuses__save` moves records to a replacement first.
+- A new record without a status takes its case type's default
+  (`tr_individuals__set_default_status`). Sync never sends a status.
+- No attribute may be named `status` (`concept_attributes__name_not_reserved`),
+  because the Data Explorer gives every case type a built-in `status` column.
 - The same trigger also checks one identifier per contributing dataset, but
   **that half checks nothing on creation**: the insert path writes attributes
   before mappings, so the join to the mapping table is empty when it runs and
@@ -218,34 +237,35 @@ flowchart TD
   K["Draft card Create button:<br/>useCaseTypeDraftCreation runs<br/>proposedCaseTypeToCreatedCaseType"]
   T["Model calls createCaseTypes:<br/>applyChatModelTurnResponse,<br/>no card (still offered<br/>as of 2026-10-09)"]
   A["applyCreatedCaseTypes:<br/>for each case type,<br/>createdCaseTypeToFormValues"]
-  I["insertConceptFromFormValues,<br/>three sequential writes:<br/>insert concepts,<br/>bulk insert<br/>concept_attributes,<br/>bulk insert<br/>attribute_mappings__*<br/>(one request per kind)"]
-  R["rollbackConceptFormInsert,<br/>run by the caller:<br/>delete the concept and<br/>its attributes by id;<br/>the cascading foreign keys<br/>remove the mappings"]
+  I["insertConceptFromFormValues:<br/>one call to rpc_concepts__create,<br/>which writes the concept,<br/>its statuses, attributes,<br/>and mappings in one<br/>transaction"]
   F --> I
   K --> A
   T --> A
   A --> I
-  I -- "any of the three<br/>writes throws" --> R
 ```
 
 Where:
 
 - **`attribute_mappings__*`** - the per-kind mapping tables.
 
-_Three entry points share one writer and one compensating delete, and the
-delete runs in the browser, so a page closed mid-write leaves a partial
-concept._
+_Three entry points share one writer. The database writes the whole case type
+or nothing, so a failed or abandoned creation leaves no partial case type._
 
-### 5.1 The shared insert: three writes and a compensating delete
+### 5.1 The shared insert: one transaction
 
-- Three writes, in this order: `concepts`, `concept_attributes`, then the
-  mappings (one PostgREST request per mapping kind present, run together).
-  There is no transaction.
-- On failure the caller runs `rollbackConceptFormInsert` (the form mutation's
-  `onError`, or the `catch` in `applyCreatedCaseTypes`): a compensating delete
-  of the concept and its attributes, relying on cascades for mappings.
-- The parser registry (`makeParserRegistry`) strips each insert to the table's
-  columns, which is why the whole form object can be passed to
-  `ConceptClient.insert`.
+- `ConceptClient.create` calls `rpc_concepts__create` once, with the concept,
+  its statuses, its attributes, and one array per mapping kind. The RPC
+  inserts them in that order inside one transaction.
+- The RPC is `SECURITY INVOKER`, so each insert passes the caller's RLS. A
+  caller without Case Types editor fails on the first insert, and nothing is
+  written.
+- The client builds each payload with the model parsers (`makeParserRegistry`
+  strips each to the table's columns), so the whole form object can be passed
+  as the concept. Child rows take the case type's id and workspace from the
+  inserted concept.
+- New case types start with Active (the default) and Inactive, built by
+  `makeDefaultStatusDrafts` in the creator's language. A field named after a
+  dataset column called `status` is renamed `status (attribute)`.
 
 ### 5.2 Form path (concept creator)
 
@@ -554,9 +574,10 @@ Outside the routes:
 | Exactly one label attribute per concept | Trigger `concept_attributes__validate_label_and_identifiers`, `supabase/schemas/20.concept_attributes.sql` | `after insert`, so the bulk attribute insert is counted as a whole |
 | One identifier attribute per contributing dataset | Not the database (see section 4). `createdCaseTypeToFormValues` (chat), form validation (`primaryKeyColumnId: isNotEmpty`), and a query-time throw in `makeConceptAttributeColumnsFromMetadata` | Any new authoring path must enforce it itself |
 | At most one mapping row per attribute in each mapping table | `unique` on `concept_attribute_id` in both mapping tables | Nothing requires a row to exist (a partial write can leave none), and nothing checks that the row's table matches `mapping_type`; `_mappingsFromAttributes` keeps them consistent |
-| TBox writes go concept, attributes, mappings | `insertConceptFromFormValues.ts` | The label trigger relies on attributes arriving in one statement |
-| Every policy tests workspace membership | Policies in the five schema files; pgTAP files in `supabase/tests/database/permissions/` | Keep the predicate identical when adding a table |
-| Concept delete removes its whole subtree | `on delete cascade` foreign keys | Individuals included |
+| TBox writes go concept, statuses, attributes, mappings, in one transaction | `rpc_concepts__create` | The label trigger relies on attributes arriving in one statement |
+| Reads test workspace membership; writes test Case Types or Case Records roles | Policies in the six schema files; pgTAP files in `supabase/tests/database/permissions/` | A new ontology table follows the same split |
+| Concept delete removes its whole subtree | `on delete cascade` foreign keys | Individuals and statuses included |
+| A record's status is one of its own case type's statuses | `individuals__status_fkey` | `concepts__default_status_fkey` has the same shape for the default |
 | A bare UUID DuckDB table name means a dataset | `RelationRef.fromTableName` (`shared/models/relations/RelationRef/`) | Hence `concept_`, `ava_rows_`, `ava_staging_individuals_` prefixes and the `__individuals` suffix (`src/clients/DuckDbClient/duckDbSqlText.ts`, `loadConceptSpine.ts`) |
 | Keys are compared as text | `getEntityKeyComparisonSql`, `duckDbSqlText.ts` | Applies to the view and Sync; the record page does not yet follow it |
 | No user data spliced into concept SQL | `loadConceptSpine` loads keys as CSV through `toCsvColumn` | The record page does not yet follow it |
@@ -576,7 +597,7 @@ Outside the routes:
 | Table Data Gateway plus Data Mapper | `createRdbCrudClient`, `makeParserRegistry` | `AttributeAssertionClient` is named a client but has no table |
 | Tagged union with exhaustive `match` | Five `match(mappingType)` sites | No runtime registry of per-kind behaviour; `AttributeMappingModelRegistry` is a type only |
 | Adapter chain onto one writer | `proposedCaseTypeToCreatedCaseType`, `createdCaseTypeToFormValues` | The chat path fabricates form-only fields |
-| Compensating action | `rollbackConceptFormInsert` | Client-side, best effort |
+| Single-transaction RPC | `rpc_concepts__create`, `rpc_concept_statuses__save` | The save RPC is `SECURITY DEFINER` and checks Case Types editor itself, because it moves records |
 | Staging table then merge | `generateIndividuals` | The merge overwrites every column and never deletes (as of 2026-10-09) |
 | Fail-safe defaults | Concept allowlist, column resolution, spine loader | The record page swallows its errors; a `dataset_column` attribute with no mapping row becomes a typed NULL column rather than a throw |
 | Injected reads around a pure core | `ConceptWrapperDependencies`, `ConceptRelationAllowlist`, `makeConceptAttributeColumnsFromMetadata` | Older code calls singleton clients directly and is harder to test |
@@ -611,7 +632,7 @@ means TypeScript lists the site once the database enum gains the value;
 | 14 | `src/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes.ts` | `mappings.computed` draft in both factories | Compile |
 | 15 | `src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx` | Per-kind list, its block, and the `.concat` in `transformValues` | **Silent** (a missing `.concat` drops the attributes) |
 | 16 | New `ConceptCreatorView/ComputedAttributesBlock.tsx` | Form block | Inherent |
-| 17 | `src/views/OntologyDesignerApp/insertConceptFromFormValues/insertConceptFromFormValues.ts` | `_mappingsFromAttributes` arm | Compile |
+| 17 | `insertConceptFromFormValues.ts`, `supabase/schemas/50.rpc_concepts__create.sql`, and `ConceptClient.create` | `_mappingsFromAttributes` arm, plus a parameter and an insert for the new mapping table | Compile for the arm; **Silent** for the RPC (the new kind's mappings are never written) |
 | 18 | `shared/types/chat.types.ts` | `ChatCreatedCaseAttribute` arm, proposal list | Inherent |
 | 19 | `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts` | Parse the list | Inherent |
 | 20 | `supabase/functions/chat/PostChatMessages/parsing/parseCreateCaseTypes.ts` | `kind` branch | **Silent** (unknown kinds dropped) |
@@ -680,7 +701,7 @@ that state lives decides whether Sync erases it:
 ```mermaid
 flowchart TD
   Q{"Where is the per-case value stored?"}
-  A["A column on individuals<br/>(status and<br/>assigned_to today)"]
+  A["A column on individuals<br/>(status_id and<br/>assigned_to today)"]
   B["A child table with<br/>references individuals (id)"]
   C["A child table keyed on<br/>(concept_id, external_id)"]
   A1["Reset on every sync<br/>while the upsert writes<br/>every staged column"]
@@ -697,7 +718,7 @@ child table either blocks the sync (`no action`) or has every row rewritten on
 every sync (`cascade`). Verified on 2026-10-09 by replaying the sync upsert
 against all three placements in a rolled-back transaction on the local stack.
 Once Sync stops sending `id`, `status` and `assigned_to`, all three placements
-work._
+work. Statuses take the column placement: `individuals.status_id`, which Sync never sends and the default trigger fills on insert._
 
 Layers a per-case capability touches:
 
@@ -715,8 +736,10 @@ Layers a per-case capability touches:
    plan type, CSV writer and view select list must widen.
 7. **Chat**, if case types should propose the capability (for example status
    sets): types, parser, tool schema, prompt, draft card.
-8. **Permissions**: policies test membership only, so any member can change any
-   case. Assignment needs a principal model (see
+8. **Permissions**: writes need Case Types or Case Records roles (section 4).
+   A capability that some writers must not change, like status, needs its own
+   guard, the way `tr_individuals__check_status_change` guards `status_id`.
+   Assignment needs a principal model (see
    [permissions-architecture.md](permissions-architecture.md)).
 
 ## 14. How to add a dataset connector
@@ -766,7 +789,6 @@ means established from the code.
 | Sync never deletes individuals | Records whose keys left the data stay | Read |
 | `getPage` in `createSupabaseCrudClient` uses an inclusive range with no order | Duplicate rows in the records list; duplicate spine keys past 500 individuals | Verified (duplicate-key warnings; rolled-back replay) |
 | Two `most_frequent` copies disagree on NULL | Record page and queries can show different values | Verified (DuckDB CLI) |
-| `UPDATE` policies without `using` on four tables | Any edit feature fails with `PGRST116` or silently changes nothing | Verified (rolled-back update) |
 | Identifier-per-dataset trigger check runs before mappings exist | The database never enforces one key per dataset | Read |
 | No foreign key from mappings to datasets or columns | Deleting a dataset breaks every concept that reads it | Read |
 | `createCaseTypes` still offered to the model | A call creates case types with no confirmation and default pickers | Read |
@@ -775,7 +797,7 @@ means established from the code.
 | The form allows a manual-entry label | Sync then fails with a TypeError | Read |
 | Value-picker SQL quotes names without escaping | A name containing `"` breaks the concept view | Read |
 
-Not built: roles between concepts, subsumption, status sets, comments,
+Not built: roles between concepts, subsumption, status change history, comments,
 assignment, activity log, manual entry storage, editing a case type, manual
 creation of individuals, a records grid with filters, incremental sync,
 concepts on public dashboards (`PublicQuerySession` has no concept planner),
