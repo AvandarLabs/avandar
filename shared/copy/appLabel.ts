@@ -21,6 +21,12 @@ export function appLabel(app: AppType): string {
     gis: () => {
       return t`Maps`;
     },
+    case_types: () => {
+      return t`Case Types`;
+    },
+    case_records: () => {
+      return t`Case Records`;
+    },
     settings: () => {
       return t`Settings`;
     },

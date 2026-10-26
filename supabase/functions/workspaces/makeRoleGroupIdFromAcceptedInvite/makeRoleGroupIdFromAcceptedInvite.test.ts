@@ -10,4 +10,19 @@ describe("WorkspaceInviteRoleOverrideSchema", () => {
       }).success,
     ).toBe(true);
   });
+
+  it("accepts role overrides for both case apps", () => {
+    expect(
+      WorkspaceInviteRoleOverrideSchema.safeParse({
+        app: "case_types",
+        role: "editor",
+      }).success,
+    ).toBe(true);
+    expect(
+      WorkspaceInviteRoleOverrideSchema.safeParse({
+        app: "case_records",
+        role: "admin",
+      }).success,
+    ).toBe(true);
+  });
 });

@@ -7483,6 +7483,10 @@ msgstr "Could not generate QR code"
 msgid "Remove condition"
 msgstr "Remove condition"
 
+#: shared/copy/appLabel.ts
+msgid "Case Types"
+msgstr "Case Types"
+
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
 msgid "Open case type"
 msgstr "Open case type"
@@ -8039,6 +8043,10 @@ msgstr "Map tools"
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
 msgstr "Send to AI?"
+
+#: shared/copy/appLabel.ts
+msgid "Case Records"
+msgstr "Case Records"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"

@@ -31,6 +31,8 @@ function _appRouteForType(app: AppType): WorkspaceAppRouteCase | undefined {
     data_explorer: WORKSPACE_APP_ROUTES.dataExplorer,
     dashboards: WORKSPACE_APP_ROUTES.dashboards,
     gis: undefined,
+    case_types: undefined,
+    case_records: undefined,
     settings: undefined,
   };
   return routes[app];

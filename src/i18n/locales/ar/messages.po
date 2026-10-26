@@ -7462,6 +7462,10 @@ msgstr "تعذر إنشاء رمز الاستجابة السريعة"
 msgid "Remove condition"
 msgstr "إزالة الشرط"
 
+#: shared/copy/appLabel.ts
+msgid "Case Types"
+msgstr ""
+
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
 msgid "Open case type"
 msgstr "فتح نوع الحالة"
@@ -8015,6 +8019,10 @@ msgstr "أدوات الخريطة"
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
 msgstr "إرسال إلى الذكاء الاصطناعي؟"
+
+#: shared/copy/appLabel.ts
+msgid "Case Records"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
