@@ -1,7 +1,13 @@
 import { Model } from "@avandar/models";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { makeHasPermissionFromAppRoles, render, screen } from "@/test-utils";
+import {
+  fireEvent,
+  makeHasPermissionFromAppRoles,
+  render,
+  screen,
+} from "@/test-utils";
 import { CaseTypeActions } from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
@@ -81,7 +87,16 @@ function _renderActionsFor(
 ): void {
   hasPermissionMock.mockImplementation(makeHasPermissionFromAppRoles(roles));
   const concept = _createConcept();
-  render(<CaseTypeActions concept={concept} fullConcept={concept} />);
+  const queryClient = new QueryClient();
+  render(<CaseTypeActions concept={concept} fullConcept={concept} />, {
+    wrapper: ({ children }) => {
+      return (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      );
+    },
+  });
 }
 
 describe("CaseTypeActions", () => {
@@ -113,18 +128,24 @@ describe("CaseTypeActions", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("hides Delete from a case_types editor", () => {
+  it("hides the menu holding Delete case type from a case_types editor", () => {
     _renderActionsFor({ case_types: "editor" });
 
     expect(
-      screen.queryByRole("button", { name: "Delete" }),
+      screen.queryByRole("button", { name: "More case type actions" }),
     ).not.toBeInTheDocument();
   });
 
-  it("shows Delete to a case_types admin", () => {
+  it("offers Delete case type to a case_types admin from the actions menu", async () => {
     _renderActionsFor({ case_types: "admin" });
 
-    expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "More case type actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", { name: "Delete case type" }),
+    ).toBeInTheDocument();
   });
 
   it("hides View records from a member with no case_records role", () => {
