@@ -31,5 +31,6 @@ export function ensureOfflineChatSchema(args: {
     columns,
     concepts: args.schema.concepts ?? [],
     conceptAttributes: args.schema.conceptAttributes ?? [],
+    conceptStatuses: args.schema.conceptStatuses ?? [],
   };
 }

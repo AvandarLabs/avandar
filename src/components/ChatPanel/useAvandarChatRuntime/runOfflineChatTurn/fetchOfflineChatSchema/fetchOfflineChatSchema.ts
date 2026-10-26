@@ -2,11 +2,13 @@ import { where } from "@avandar/utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
+import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { OfflineChatSchemaCache } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/OfflineChatSchemaCache";
 import { truncateSchemaForOffline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/truncateSchemaForOffline/truncateSchemaForOffline";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { OfflineChatSchema } from "$/types/offlineChat.types";
 
@@ -15,6 +17,7 @@ const EMPTY_SCHEMA: OfflineChatSchema = {
   columns: [],
   concepts: [],
   conceptAttributes: [],
+  conceptStatuses: [],
 };
 
 function _mapDatasets(
@@ -36,17 +39,42 @@ function _mapDatasets(
 }
 
 function _mapConcepts(
-  concepts: readonly Concept.T[],
-  attributes: readonly ConceptAttribute.T[],
-): Pick<OfflineChatSchema, "concepts" | "conceptAttributes"> {
+  options: Readonly<{
+    concepts: readonly Concept.T[];
+    attributes: readonly ConceptAttribute.T[];
+    statuses: readonly ConceptStatus.T[];
+  }>,
+): Pick<
+  OfflineChatSchema,
+  "concepts" | "conceptAttributes" | "conceptStatuses"
+> {
   return {
-    concepts: concepts.map((concept) => {
+    concepts: options.concepts.map((concept) => {
       return { id: concept.id, name: concept.name };
     }),
-    conceptAttributes: attributes.map((attribute) => {
+    conceptAttributes: options.attributes.map((attribute) => {
       return { concept_id: attribute.conceptId, name: attribute.name };
     }),
+    conceptStatuses: options.statuses.map((status) => {
+      return {
+        concept_id: status.conceptId,
+        name: status.name,
+        position: status.position,
+      };
+    }),
   };
+}
+
+/** Every attribute and status in the workspace, read together. */
+async function _fetchConceptDetails(workspaceId: Workspace.Id): Promise<{
+  attributes: ConceptAttribute.T[];
+  statuses: ConceptStatus.T[];
+}> {
+  const [attributes, statuses] = await Promise.all([
+    ConceptAttributeClient.getAll(where("workspace_id", "eq", workspaceId)),
+    ConceptStatusClient.getAll(where("workspace_id", "eq", workspaceId)),
+  ]);
+  return { attributes, statuses };
 }
 
 /**
@@ -70,15 +98,13 @@ export async function fetchOfflineChatSchema(
         ),
         ConceptClient.getAll(where("workspace_id", "eq", args.workspace.id)),
       ]);
-      const attributes =
+      const conceptDetails =
         concepts.length === 0
-          ? []
-          : await ConceptAttributeClient.getAll(
-              where("workspace_id", "eq", args.workspace.id),
-            );
+          ? { attributes: [], statuses: [] }
+          : await _fetchConceptDetails(args.workspace.id);
       const schema: OfflineChatSchema = {
         ..._mapDatasets(datasetRows),
-        ..._mapConcepts(concepts, attributes),
+        ..._mapConcepts({ concepts, ...conceptDetails }),
       };
       OfflineChatSchemaCache.write(args.workspace.id, schema);
       return truncateSchemaForOffline(schema, args.openDatasetId);

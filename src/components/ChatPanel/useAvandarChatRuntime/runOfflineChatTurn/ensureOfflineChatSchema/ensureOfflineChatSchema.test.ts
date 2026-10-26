@@ -9,4 +9,20 @@ describe("ensureOfflineChatSchema", () => {
     });
     expect(result.datasets).toEqual([{ id: "ds-open", name: "ds-open" }]);
   });
+
+  it("keeps case type statuses when it adds the open dataset", () => {
+    const result = ensureOfflineChatSchema({
+      schema: {
+        datasets: [],
+        columns: [],
+        concepts: [{ id: "c-1", name: "Case" }],
+        conceptStatuses: [{ concept_id: "c-1", name: "Active", position: 0 }],
+      },
+      openDatasetId: "ds-open",
+    });
+
+    expect(result.conceptStatuses).toEqual([
+      { concept_id: "c-1", name: "Active", position: 0 },
+    ]);
+  });
 });

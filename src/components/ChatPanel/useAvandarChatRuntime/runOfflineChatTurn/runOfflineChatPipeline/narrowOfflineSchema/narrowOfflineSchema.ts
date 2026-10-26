@@ -15,5 +15,6 @@ export function narrowOfflineSchema(
     columns,
     concepts: schema.concepts ?? [],
     conceptAttributes: schema.conceptAttributes ?? [],
+    conceptStatuses: schema.conceptStatuses ?? [],
   };
 }
