@@ -1,4 +1,5 @@
 import { makeIdLookupMap, where } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
 import { Loader } from "@mantine/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -6,6 +7,7 @@ import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { AppListPane } from "@/components/layouts/AppListPane/AppListPane";
+import { filterToKnownStatusIds } from "@/views/IndividualManagerApp/IndividualNavbar/filterToKnownStatusIds/filterToKnownStatusIds";
 import { IndividualNavbarRows } from "@/views/IndividualManagerApp/IndividualNavbar/IndividualNavbarRows";
 import { StatusFilter } from "@/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter";
 import { makeRecordsWhereFromStatusFilter } from "@/views/IndividualManagerApp/makeRecordsWhereFromStatusFilter/makeRecordsWhereFromStatusFilter";
@@ -32,7 +34,10 @@ type Props = {
  * use.
  */
 export function IndividualNavbar({ concept }: Readonly<Props>): ReactNode {
-  const [statusIds, setStatusIds] = useState<ConceptStatus.Id[]>([]);
+  const { t } = useLingui();
+  const [pickedStatusIds, setPickedStatusIds] = useState<ConceptStatus.Id[]>(
+    [],
+  );
   const [statuses = NO_STATUSES] = ConceptStatusClient.useGetAll(
     where("concept_id", "eq", concept.id),
   );
@@ -42,26 +47,38 @@ export function IndividualNavbar({ concept }: Readonly<Props>): ReactNode {
   const statusesById = useMemo(() => {
     return makeIdLookupMap(sortedStatuses);
   }, [sortedStatuses]);
+  const statusIds = useMemo(() => {
+    return filterToKnownStatusIds({
+      statusIds: pickedStatusIds,
+      statuses: sortedStatuses,
+    });
+  }, [pickedStatusIds, sortedStatuses]);
   const [matchingCount] = IndividualClient.useGetCount({
     ...makeRecordsWhereFromStatusFilter({ conceptId: concept.id, statusIds }),
     useQueryOptions: { placeholderData: keepPreviousData },
   });
   const records = useConceptIndividuals({ conceptId: concept.id, statusIds });
-  const { parentRef, individualLinks, listHeight } = useVirtualIndividualLinks(
-    { concept, statusesById, ...records },
-  );
+  const { parentRef, individualLinks, listHeight } = useVirtualIndividualLinks({
+    concept,
+    statusesById,
+    ...records,
+  });
 
   return (
     <AppListPane
       title={concept.name}
       count={matchingCount ?? undefined}
-      action={records.isLoading ? <Loader size={14} /> : null}
+      action={
+        records.isLoading ? (
+          <Loader size={14} role="status" aria-label={t`Loading records`} />
+        ) : null
+      }
       bodyRef={parentRef}
       filter={
         <StatusFilter
           statuses={sortedStatuses}
           selectedStatusIds={statusIds}
-          onChange={setStatusIds}
+          onChange={setPickedStatusIds}
         />
       }
     >
