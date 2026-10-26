@@ -9,18 +9,16 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
 const {
-  conceptInsertMock,
-  attributeBulkInsertMock,
-  mappingBulkInsertMock,
+  conceptCreateMock,
+  conceptGetByIdMock,
   attributeGetAllMock,
   getAllAttributeMappingsMock,
   datasetGetAllMock,
   generateIndividualsMock,
 } = vi.hoisted(() => {
   return {
-    conceptInsertMock: vi.fn(),
-    attributeBulkInsertMock: vi.fn(),
-    mappingBulkInsertMock: vi.fn(),
+    conceptCreateMock: vi.fn(),
+    conceptGetByIdMock: vi.fn(),
     attributeGetAllMock: vi.fn(),
     getAllAttributeMappingsMock: vi.fn(),
     datasetGetAllMock: vi.fn(),
@@ -29,19 +27,20 @@ const {
 });
 
 vi.mock("@/clients/ontology/ConceptClient", () => {
-  return { ConceptClient: { insert: conceptInsertMock } };
+  return {
+    ConceptClient: {
+      create: conceptCreateMock,
+      getById: conceptGetByIdMock,
+    },
+  };
 });
 vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
   return {
     ConceptAttributeClient: {
-      bulkInsert: attributeBulkInsertMock,
       getAll: attributeGetAllMock,
       getAllAttributeMappings: getAllAttributeMappingsMock,
     },
   };
-});
-vi.mock("@/clients/ontology/AttributeMappingClient", () => {
-  return { AttributeMappingClient: { bulkInsert: mappingBulkInsertMock } };
 });
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return { DatasetClient: { getAll: datasetGetAllMock } };
@@ -119,13 +118,12 @@ function _makeFormValues(): ConceptFormSubmitValues {
 
 describe("insertConceptFromFormValues", () => {
   beforeEach(() => {
-    conceptInsertMock.mockResolvedValue({
+    conceptCreateMock.mockResolvedValue(CONCEPT_ID);
+    conceptGetByIdMock.mockResolvedValue({
       id: CONCEPT_ID,
       workspaceId: WORKSPACE_ID,
       name: "Facility",
     });
-    attributeBulkInsertMock.mockResolvedValue(undefined);
-    mappingBulkInsertMock.mockResolvedValue(undefined);
     attributeGetAllMock.mockResolvedValue([
       {
         id: ATTRIBUTE_ID,
@@ -182,5 +180,54 @@ describe("insertConceptFromFormValues", () => {
         }),
       );
     });
+  });
+
+  it("creates the case type with its trimmed statuses, attributes, and mappings in one call", async () => {
+    generateIndividualsMock.mockResolvedValue(undefined);
+
+    await insertConceptFromFormValues(_makeFormValues());
+
+    expect(conceptCreateMock).toHaveBeenCalledTimes(1);
+    expect(conceptCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        concept: expect.objectContaining({
+          id: CONCEPT_ID,
+          workspaceId: WORKSPACE_ID,
+          defaultStatusId: STATUS_ID,
+        }),
+        statuses: [
+          expect.objectContaining({
+            id: STATUS_ID,
+            conceptId: CONCEPT_ID,
+            workspaceId: WORKSPACE_ID,
+            name: "Active",
+            description: undefined,
+            position: 0,
+          }),
+        ],
+        attributes: [
+          expect.objectContaining({
+            id: ATTRIBUTE_ID,
+            workspaceId: WORKSPACE_ID,
+          }),
+        ],
+        mappings: [
+          {
+            type: "manual_entry",
+            conceptAttributeId: ATTRIBUTE_ID,
+            workspaceId: WORKSPACE_ID,
+          },
+        ],
+      }),
+    );
+  });
+
+  it("rejects without syncing when the case type cannot be created", async () => {
+    conceptCreateMock.mockRejectedValue(new Error("refused"));
+
+    await expect(
+      insertConceptFromFormValues(_makeFormValues()),
+    ).rejects.toThrow("refused");
+    expect(generateIndividualsMock).not.toHaveBeenCalled();
   });
 });
