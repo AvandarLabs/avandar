@@ -31,11 +31,15 @@ export type IndividualUpsertRow = {
  * generated insert type requires `status_id`, but sync sends none on purpose:
  * a database trigger starts each new record in its case type's default
  * status, and an upsert that omits the column leaves existing statuses alone.
+ *
+ * A single `as` is rejected by the compiler: the row type lacks the required
+ * `status_id` and makes `missing_from_source_at` required, so neither type is
+ * assignable to the other.
  */
 export function makeBulkInsertRowsFromUpsertRows(
   rows: readonly IndividualUpsertRow[],
-): Array<Individual.T<"DBInsert">> {
-  return rows as unknown as Array<Individual.T<"DBInsert">>;
+): ReadonlyArray<Individual.T<"DBInsert">> {
+  return rows as unknown as ReadonlyArray<Individual.T<"DBInsert">>;
 }
 
 /** Builds an `IndividualUpsertRow` for the given identity and sync fields. */
