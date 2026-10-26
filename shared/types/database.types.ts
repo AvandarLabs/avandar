@@ -184,10 +184,62 @@ export type Database = {
           },
         ]
       }
+      concept_statuses: {
+        Row: {
+          color: string
+          concept_id: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          position: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          color: string
+          concept_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          position: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          color?: string
+          concept_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          position?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concept_statuses_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concept_statuses_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concepts: {
         Row: {
           allow_manual_creation: boolean
           created_at: string
+          default_status_id: string
           description: string | null
           id: string
           name: string
@@ -198,6 +250,7 @@ export type Database = {
         Insert: {
           allow_manual_creation: boolean
           created_at?: string
+          default_status_id: string
           description?: string | null
           id?: string
           name: string
@@ -208,6 +261,7 @@ export type Database = {
         Update: {
           allow_manual_creation?: boolean
           created_at?: string
+          default_status_id?: string
           description?: string | null
           id?: string
           name?: string
@@ -216,6 +270,13 @@ export type Database = {
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "concepts__default_status_fkey"
+            columns: ["default_status_id", "id"]
+            isOneToOne: false
+            referencedRelation: "concept_statuses"
+            referencedColumns: ["id", "concept_id"]
+          },
           {
             foreignKeyName: "concepts_workspace_id_fkey"
             columns: ["workspace_id"]
@@ -1141,7 +1202,7 @@ export type Database = {
           id: string
           missing_from_source_at: string | null
           name: string
-          status: string
+          status_id: string
           updated_at: string
           workspace_id: string
         }
@@ -1153,7 +1214,7 @@ export type Database = {
           id?: string
           missing_from_source_at?: string | null
           name: string
-          status?: string
+          status_id: string
           updated_at?: string
           workspace_id: string
         }
@@ -1165,11 +1226,18 @@ export type Database = {
           id?: string
           missing_from_source_at?: string | null
           name?: string
-          status?: string
+          status_id?: string
           updated_at?: string
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "individuals__status_fkey"
+            columns: ["status_id", "concept_id"]
+            isOneToOne: false
+            referencedRelation: "concept_statuses"
+            referencedColumns: ["id", "concept_id"]
+          },
           {
             foreignKeyName: "individuals_concept_id_fkey"
             columns: ["concept_id"]
@@ -2197,6 +2265,25 @@ export type Database = {
       maps__owner_id_matches_stored: {
         Args: { p_map_id: string; p_owner_id: string }
         Returns: boolean
+      }
+      rpc_concept_statuses__save: {
+        Args: {
+          p_concept_id: string
+          p_default_status_id: string
+          p_replacements: Json
+          p_statuses: Json
+        }
+        Returns: undefined
+      }
+      rpc_concepts__create: {
+        Args: {
+          p_attributes: Json
+          p_concept: Json
+          p_dataset_column_mappings: Json
+          p_manual_entry_mappings: Json
+          p_statuses: Json
+        }
+        Returns: string
       }
       rpc_connections__create_vault_secret: {
         Args: { p_description: string; p_name: string; p_secret: string }
