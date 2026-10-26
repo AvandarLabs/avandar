@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { prop, sortObjList } from "@avandar/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
+import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
@@ -276,6 +277,37 @@ describe("runStructuredQuery", () => {
       { name: "Ada", age: 30 },
       { name: "Grace", age: 40 },
     ]);
+  });
+
+  // The legacy path reads attribute values by attribute id. The status column
+  // has no attribute id, so handing it over would ask for a value that cannot
+  // exist.
+  it("leaves the status column out of the legacy attribute read", async () => {
+    const concept = _createConcept();
+    const ageAttribute = _createConceptAttribute(concept.id, "age");
+    getConceptExtensionMock.mockResolvedValue([{ [ageAttribute.id]: 30 }]);
+
+    const result = await runStructuredQuery({
+      auth: "workspace",
+      workspaceId,
+      query: {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: concept,
+        queryColumns: [
+          QueryColumn.makeFromConceptAttribute(ageAttribute),
+          QueryColumn.makeFromConceptStatusColumn(
+            ConceptStatusColumn.fromConceptId(concept.id),
+          ),
+        ],
+      },
+      rawSql: undefined,
+      isStructuredQueryInSync: false,
+    });
+
+    expect(getConceptExtensionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ conceptAttributes: [ageAttribute] }),
+    );
+    expect(result.columns).toEqual([{ name: "age", dataType: "varchar" }]);
   });
 });
 
