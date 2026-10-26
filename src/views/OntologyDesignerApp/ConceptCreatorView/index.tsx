@@ -17,6 +17,7 @@ import {
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -53,6 +54,13 @@ export function ConceptCreatorView(): JSX.Element {
       labelAttributeId: isNotEmpty(t`Title field is required`),
       sourceDatasets: {
         primaryKeyColumnId: isNotEmpty(t`ID field is required`),
+      },
+      manualEntryAttributes: {
+        name: (name: string) => {
+          return ConceptStatus.isReservedAttributeName(name)
+            ? t`Every case type already has a status. Choose another name.`
+            : null;
+        },
       },
     },
 
