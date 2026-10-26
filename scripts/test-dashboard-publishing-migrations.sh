@@ -55,3 +55,10 @@ run_migration_replay \
   "$repo_root/supabase/migration-upgrade-tests/case_app_roles_backfill.prelude.sql" \
   "$repo_root/supabase/migrations/20261026105957_backfill_case_app_role_group_app_roles.sql" \
   "$repo_root/supabase/migration-upgrade-tests/case_app_roles_backfill.assertions.sql"
+
+# Case statuses backfill: give every existing case type Active, Inactive,
+# and its records' other status values, then point each record at its status.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/case_statuses_backfill.prelude.sql" \
+  "$repo_root/supabase/migrations/20261026115137_backfill_case_statuses.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/case_statuses_backfill.assertions.sql"
