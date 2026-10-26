@@ -203,8 +203,11 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
     CREATE VIEW "${getRowNumberedViewName(DATASET_B)}" AS
       SELECT * FROM read_parquet('${pathB}', file_row_number = true);
     CREATE TABLE "${SPINE}" AS
-      SELECT CAST(external_id AS VARCHAR) AS external_id
-      FROM (VALUES ('101'), ('102'), ('103')) AS t(external_id);
+      SELECT
+        CAST(external_id AS VARCHAR) AS external_id,
+        CAST(status AS VARCHAR) AS status
+      FROM (VALUES ('101', 'Active'), ('102', 'Active'), ('103', 'Inactive'))
+        AS t(external_id, status);
   `);
 }
 
@@ -266,6 +269,7 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     expect(rows).toEqual([
       {
         external_id: "101",
+        status: "Active",
         age: 41,
         hh_id: "101",
         note: null,
@@ -275,6 +279,7 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
       },
       {
         external_id: "102",
+        status: "Active",
         age: 50,
         hh_id: "102",
         note: null,
@@ -284,6 +289,7 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
       },
       {
         external_id: "103",
+        status: "Inactive",
         age: null,
         hh_id: null,
         note: null,
@@ -306,8 +312,11 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
       await _seed(connection);
       await connection.run(`
         CREATE OR REPLACE TABLE "${SPINE}" AS
-          SELECT CAST(external_id AS VARCHAR) AS external_id
-          FROM (VALUES ('101'), ('x-9')) AS t(external_id);
+          SELECT
+            CAST(external_id AS VARCHAR) AS external_id,
+            CAST(status AS VARCHAR) AS status
+          FROM (VALUES ('101', 'Active'), ('x-9', 'Active'))
+            AS t(external_id, status);
       `);
       await connection.run(
         buildConceptViewSql({
@@ -415,6 +424,7 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     ]);
     expect(rows[0]).toEqual({
       external_id: "101",
+      status: "Active",
       age: 41,
       age_2: 41,
       person_id: 101,
@@ -441,5 +451,36 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
       { kind: "unmapped", attributeName: "note", duckDbDataType: "VARCHAR" },
     ]);
     expect(columns.contributingDatasetIds).toEqual([]);
+  });
+
+  // `status` belongs to the built-in column the view reads from the spine. An
+  // attribute of that name is suffixed, so both survive and neither shadows
+  // the other.
+  it("suffixes an attribute named status so the built-in status keeps its name", async () => {
+    const statusAttribute = _attribute({
+      name: "status",
+      mappingType: "manual_entry",
+    });
+    const metadata = _metadata({
+      attributes: [PERSON_ID, statusAttribute],
+      mappings: [PERSON_ID_MAPPING],
+    });
+
+    const columns = makeConceptAttributeColumnsFromMetadata(metadata);
+    const rows = await _queryConcept(metadata);
+
+    expect(columns.renamedColumns).toEqual([
+      {
+        attributeId: statusAttribute.id,
+        requestedName: "status",
+        emittedName: "status_2",
+      },
+    ]);
+    expect(rows[0]).toEqual({
+      external_id: "101",
+      status: "Active",
+      status_2: null,
+      person_id: 101,
+    });
   });
 });

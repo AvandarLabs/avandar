@@ -71,7 +71,11 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
     CREATE VIEW "${getRowNumberedViewName(DATASET_B)}" AS
       SELECT * FROM read_parquet('${pathB}', file_row_number = true);
     CREATE TABLE "${SPINE}" AS
-      SELECT * FROM (VALUES ('p1'), ('p2'), ('p3')) AS t(external_id);
+      SELECT * FROM (VALUES
+        ('p1', 'Suspected'),
+        ('p2', 'Confirmed'),
+        ('p3', 'Suspected')
+      ) AS t(external_id, status);
   `);
 }
 
@@ -166,7 +170,12 @@ describe("buildConceptViewSql", () => {
   it("keeps an individual no dataset contributes to, with NULL attributes", async () => {
     const rows = await _queryView([AGE, REGION]);
 
-    expect(rows[2]).toEqual({ external_id: "p3", age: null, region: null });
+    expect(rows[2]).toEqual({
+      external_id: "p3",
+      status: "Suspected",
+      age: null,
+      region: null,
+    });
   });
 
   // `p1` has ages 41 then 42 in file order. `first` must return 41 every time,
@@ -174,7 +183,11 @@ describe("buildConceptViewSql", () => {
   it("resolves `first` deterministically when a key has several rows", async () => {
     const rows = await _queryView([AGE]);
 
-    expect(rows[0]).toEqual({ external_id: "p1", age: 41 });
+    expect(rows[0]).toEqual({
+      external_id: "p1",
+      status: "Suspected",
+      age: 41,
+    });
   });
 
   // Ten consecutive runs, because the defect this replaces was observed
@@ -198,7 +211,11 @@ describe("buildConceptViewSql", () => {
   it("breaks a `most_frequent` tie by value rather than arbitrarily", async () => {
     const rows = await _queryView([REGION]);
 
-    expect(rows[1]).toEqual({ external_id: "p2", region: "East" });
+    expect(rows[1]).toEqual({
+      external_id: "p2",
+      status: "Confirmed",
+      region: "East",
+    });
   });
 
   // An array attribute keeps every contributed value, ordered by row number,
@@ -206,9 +223,21 @@ describe("buildConceptViewSql", () => {
   it("collects array attributes in row order and empties to a list", async () => {
     const rows = await _queryView([TAGS]);
 
-    expect(rows[0]).toEqual({ external_id: "p1", tags: ["blue", "green"] });
-    expect(rows[1]).toEqual({ external_id: "p2", tags: ["red"] });
-    expect(rows[2]).toEqual({ external_id: "p3", tags: [] });
+    expect(rows[0]).toEqual({
+      external_id: "p1",
+      status: "Suspected",
+      tags: ["blue", "green"],
+    });
+    expect(rows[1]).toEqual({
+      external_id: "p2",
+      status: "Confirmed",
+      tags: ["red"],
+    });
+    expect(rows[2]).toEqual({
+      external_id: "p3",
+      status: "Suspected",
+      tags: [],
+    });
   });
 
   // An attribute with no dataset contribution still occupies a typed column, so
@@ -216,7 +245,11 @@ describe("buildConceptViewSql", () => {
   it("emits an unmapped attribute as a typed NULL column", async () => {
     const rows = await _queryView([NOTE]);
 
-    expect(rows[0]).toEqual({ external_id: "p1", note: null });
+    expect(rows[0]).toEqual({
+      external_id: "p1",
+      status: "Suspected",
+      note: null,
+    });
   });
 
   // Why the loader has to mark this statement trusted internal SQL, asserted
@@ -291,5 +324,27 @@ describe("buildConceptViewSql", () => {
       { region: "East", n: 2 },
       { region: "North", n: 1 },
     ]);
+  });
+
+  // Every case type's relation has a `status` column, read from the spine,
+  // whatever attributes it has. This is the column the Data Explorer offers.
+  it("exposes each record's status as the status column", async () => {
+    const rows = await _queryView([]);
+
+    expect(rows).toEqual([
+      { external_id: "p1", status: "Suspected" },
+      { external_id: "p2", status: "Confirmed" },
+      { external_id: "p3", status: "Suspected" },
+    ]);
+  });
+
+  // An attribute column named `status` would give the view two columns of one
+  // name, which does not compile. The spine's column wins.
+  it("keeps the spine's status when an attribute column is named status", async () => {
+    const rows = await _queryView([
+      { kind: "unmapped", attributeName: "status", duckDbDataType: "VARCHAR" },
+    ]);
+
+    expect(rows[1]).toEqual({ external_id: "p2", status: "Confirmed" });
   });
 });
