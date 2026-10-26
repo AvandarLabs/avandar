@@ -33,6 +33,7 @@ function _createFakeClient(): {
       return {};
     }),
     runRawQuery,
+    // A single cast fails: the stub has only the operations the loader calls.
   } as unknown as DuckDbClientOperations;
   return { client, runRawQuery };
 }

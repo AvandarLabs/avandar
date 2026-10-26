@@ -65,6 +65,7 @@ function _createFakeClient(): {
     loadParquet: vi.fn(async () => {}),
     logger: { log: vi.fn(), error: vi.fn() },
     runRawQuery,
+    // A single cast fails: the stub has only the operations the loader calls.
   } as unknown as DuckDbClientOperations;
   return { client, runRawQuery };
 }
