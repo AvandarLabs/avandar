@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
   ConceptStatusColorKey,
   ConceptStatusDraft,
@@ -11,6 +11,7 @@ import type {
 } from "$/models/ontology/ConceptStatus/ConceptStatus.types.ts";
 
 export { ConceptStatusParsers } from "$/models/ontology/ConceptStatus/ConceptStatusParsers.ts";
+export { ConceptStatusModule as ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatusModule/ConceptStatusModule.ts";
 
 export namespace ConceptStatus {
   export type T<K extends keyof ConceptStatusModel = "Read"> =
