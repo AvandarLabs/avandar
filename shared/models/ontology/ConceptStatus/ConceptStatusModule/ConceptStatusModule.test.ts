@@ -141,3 +141,172 @@ describe("ConceptStatus.toNonReservedAttributeName", () => {
     expect(ConceptStatus.toNonReservedAttributeName("Region")).toBe("Region");
   });
 });
+
+describe("ConceptStatus.findSetIssues", () => {
+  it("reports an empty set and nothing else", () => {
+    expect(
+      ConceptStatus.findSetIssues({
+        value: { statuses: [], defaultStatusId: undefined },
+      }),
+    ).toEqual([{ type: "empty_set" }]);
+  });
+
+  it("flags a blank name on its own row", () => {
+    const blank = _makeDraft("   ");
+
+    expect(
+      ConceptStatus.findSetIssues({
+        value: { statuses: [blank], defaultStatusId: blank.id },
+      }),
+    ).toEqual([{ type: "name_required", statusId: blank.id }]);
+  });
+
+  it("flags both rows when two names differ only in case and spacing", () => {
+    const active = _makeDraft("Active");
+    const duplicate = _makeDraft(" active ");
+
+    expect(
+      ConceptStatus.findSetIssues({
+        value: { statuses: [active, duplicate], defaultStatusId: active.id },
+      }),
+    ).toEqual([
+      { type: "name_not_unique", statusId: active.id },
+      { type: "name_not_unique", statusId: duplicate.id },
+    ]);
+  });
+
+  it("requires a default that is in the set", () => {
+    const active = _makeDraft("Active");
+
+    expect(
+      ConceptStatus.findSetIssues({
+        value: {
+          statuses: [active],
+          defaultStatusId: uuid<ConceptStatus.Id>(),
+        },
+      }),
+    ).toEqual([{ type: "default_required" }]);
+  });
+
+  it("requires a replacement for a removed status that still has records", () => {
+    const kept = _makeDraft("Kept");
+    const removedId = uuid<ConceptStatus.Id>();
+
+    expect(
+      ConceptStatus.findSetIssues({
+        value: { statuses: [kept], defaultStatusId: kept.id },
+        savedStatusIds: [kept.id, removedId],
+        recordCounts: { [removedId]: 3 },
+        replacements: {},
+      }),
+    ).toEqual([{ type: "replacement_required", statusId: removedId }]);
+  });
+
+  it("does not require a replacement for a removed status with no records", () => {
+    const kept = _makeDraft("Kept");
+    const removedId = uuid<ConceptStatus.Id>();
+
+    expect(
+      ConceptStatus.findSetIssues({
+        value: { statuses: [kept], defaultStatusId: kept.id },
+        savedStatusIds: [kept.id, removedId],
+        recordCounts: { [removedId]: 0 },
+      }),
+    ).toEqual([]);
+  });
+
+  it("rejects a replacement that is itself being removed", () => {
+    const kept = _makeDraft("Kept");
+    const removedId = uuid<ConceptStatus.Id>();
+    const alsoRemovedId = uuid<ConceptStatus.Id>();
+
+    expect(
+      ConceptStatus.findSetIssues({
+        value: { statuses: [kept], defaultStatusId: kept.id },
+        savedStatusIds: [kept.id, removedId, alsoRemovedId],
+        recordCounts: { [removedId]: 2 },
+        replacements: { [removedId]: alsoRemovedId },
+      }),
+    ).toEqual([{ type: "replacement_required", statusId: removedId }]);
+  });
+});
+
+describe("ConceptStatus.buildSavePayload", () => {
+  it("numbers positions by order, trims names, and drops blank descriptions", () => {
+    const closed = { ..._makeDraft(" Closed "), description: "  " };
+    const active = { ..._makeDraft("Active"), description: "Open." };
+
+    const payload = ConceptStatus.buildSavePayload({
+      conceptId: CONCEPT_ID,
+      value: { statuses: [closed, active], defaultStatusId: active.id },
+      savedStatusIds: [],
+      replacements: {},
+    });
+
+    expect(payload.statuses).toEqual([
+      {
+        id: closed.id,
+        name: "Closed",
+        description: undefined,
+        color: "#637c95",
+        position: 0,
+      },
+      {
+        id: active.id,
+        name: "Active",
+        description: "Open.",
+        color: "#637c95",
+        position: 1,
+      },
+    ]);
+    expect(payload.defaultStatusId).toBe(active.id);
+  });
+
+  it("keeps replacements only for statuses that are being removed", () => {
+    const kept = _makeDraft("Kept");
+    const other = _makeDraft("Other");
+    const removedId = uuid<ConceptStatus.Id>();
+
+    const payload = ConceptStatus.buildSavePayload({
+      conceptId: CONCEPT_ID,
+      value: { statuses: [kept, other], defaultStatusId: kept.id },
+      savedStatusIds: [kept.id, other.id, removedId],
+      replacements: { [removedId]: kept.id, [other.id]: kept.id },
+    });
+
+    expect(payload.replacements).toEqual({ [removedId]: kept.id });
+  });
+
+  it("throws when the set has no default status", () => {
+    expect(() => {
+      return ConceptStatus.buildSavePayload({
+        conceptId: CONCEPT_ID,
+        value: { statuses: [_makeDraft("Active")], defaultStatusId: undefined },
+        savedStatusIds: [],
+        replacements: {},
+      });
+    }).toThrow();
+  });
+});
+
+describe("ConceptStatus.toSaveErrorHint", () => {
+  it("reads a known hint off a thrown database error", () => {
+    expect(
+      ConceptStatus.toSaveErrorHint({
+        code: "23514",
+        message: "Records still use a removed status. Choose where they move.",
+        hint: "status_replacement_required",
+      }),
+    ).toBe("status_replacement_required");
+  });
+
+  it("ignores a hint the save RPC does not raise", () => {
+    expect(
+      ConceptStatus.toSaveErrorHint({ hint: "something_else" }),
+    ).toBeUndefined();
+  });
+
+  it("ignores a thrown value that is not an object", () => {
+    expect(ConceptStatus.toSaveErrorHint("boom")).toBeUndefined();
+  });
+});
