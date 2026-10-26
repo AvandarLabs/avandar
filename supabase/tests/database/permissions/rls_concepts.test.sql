@@ -374,3 +374,5 @@ select lives_ok (
 );
 
 select * from finish ();
+
+rollback;
