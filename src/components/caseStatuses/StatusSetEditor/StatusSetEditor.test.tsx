@@ -274,5 +274,11 @@ describe("StatusSetEditor in edit mode", () => {
     fireEvent.click(screen.getByRole("button", { name: "Remove Inactive" }));
 
     expect(screen.queryByRole("combobox")).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "Remove Inactive" }),
+    ).toBeNull();
+    expect(
+      screen.getAllByRole("textbox", { name: "Status name" }),
+    ).toHaveLength(1);
   });
 });
