@@ -126,6 +126,43 @@ describe("SqlTableAlias.formatSchemaBlock", () => {
     expect(block).toContain("- c0: Case (onset_date, status)");
     expect(block).not.toContain(CONCEPT_B.id);
   });
+
+  it("lists a case type's statuses in position order after its attributes", () => {
+    const aliases = SqlTableAlias.fromConcepts([
+      { id: CONCEPT_B.id, name: "Cholera case" },
+    ]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [
+        { concept_id: CONCEPT_B.id, name: "age" },
+        { concept_id: CONCEPT_B.id, name: "district" },
+      ],
+      conceptStatuses: [
+        { concept_id: CONCEPT_B.id, name: "Ruled out", position: 2 },
+        { concept_id: CONCEPT_B.id, name: "Suspected", position: 0 },
+        { concept_id: CONCEPT_B.id, name: "Confirmed", position: 1 },
+      ],
+    });
+
+    expect(block).toBe(
+      "- c0: Cholera case (age, district, status: Suspected | Confirmed | Ruled out)",
+    );
+  });
+
+  it("lists the status field alone for a case type with no attributes", () => {
+    const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptStatuses: [
+        { concept_id: CONCEPT_B.id, name: "Active", position: 0 },
+        { concept_id: CONCEPT_B.id, name: "Inactive", position: 1 },
+      ],
+    });
+
+    expect(block).toBe("- c0: Case (status: Active | Inactive)");
+  });
 });
 
 describe("SqlTableAlias.applyToSql", () => {

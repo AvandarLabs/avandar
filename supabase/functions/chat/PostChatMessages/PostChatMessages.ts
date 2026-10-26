@@ -121,6 +121,7 @@ export const PostChatMessages = POST({
         columns: schema.columns,
         concepts: schema.concepts,
         conceptAttributes: schema.conceptAttributes,
+        conceptStatuses: schema.conceptStatuses,
         includeSpatialDocumentation: false,
       });
       const systemContent =

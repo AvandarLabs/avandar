@@ -8,6 +8,7 @@ type Dataset = { id: string; name: string };
 type DatasetColumn = { dataset_id: string; name: string; data_type: string };
 type Concept = { id: string; name: string };
 type ConceptAttribute = { concept_id: string; name: string };
+type ConceptStatus = { concept_id: string; name: string; position: number };
 
 /**
  * Heuristic to detect whether a prompt looks like a geospatial question. Used
@@ -41,6 +42,7 @@ type BuildSqlSystemPromptOptions = {
   columns: readonly DatasetColumn[];
   concepts?: readonly Concept[];
   conceptAttributes?: readonly ConceptAttribute[];
+  conceptStatuses?: readonly ConceptStatus[];
   includeSpatialDocumentation?: boolean;
 };
 
@@ -64,6 +66,7 @@ export function buildSqlSystemPrompt(
     columns,
     concepts = [],
     conceptAttributes = [],
+    conceptStatuses = [],
     includeSpatialDocumentation = true,
   } = options;
   const aliases = SqlTableAlias.fromSchema({ datasets, concepts });
@@ -71,6 +74,7 @@ export function buildSqlSystemPrompt(
     aliases,
     columns,
     conceptAttributes,
+    conceptStatuses,
   });
   const spatialDocs = includeSpatialDocumentation
     ? makeSpatialSqlDocumentationFromPrompt(prompt)
