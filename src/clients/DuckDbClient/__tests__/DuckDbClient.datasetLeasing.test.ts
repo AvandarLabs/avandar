@@ -153,9 +153,10 @@ describe("DuckDbClient dataset leasing", () => {
     const loadMayFinish = createDeferred();
     vi.spyOn(DuckDbClient, "hasView").mockResolvedValue(false);
     vi.spyOn(DuckDbClient, "hasTable").mockResolvedValue(false);
-    // The load's own statements and its schema and row count read-back.
+    // One value serves both overloads: the load's statements ignore it, and
+    // its schema and row count read-back reads an empty `data`.
     vi.spyOn(DuckDbClient, "runRawQuery").mockResolvedValue(
-      QueryResult.makeEmpty(),
+      Object.assign(new Blob(), QueryResult.makeEmpty()),
     );
     registerFileHandleMock.mockImplementation(async () => {
       loadStarted.resolve();

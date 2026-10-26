@@ -134,7 +134,7 @@ async function _seedCaseTypeOverDataset(
     })
     .throwOnError();
 
-  // No `status_id`: the default-status trigger fills it, as it does for sync.
+  // Every record starts in the default status, as a synced record does.
   await supabaseAdminClient
     .from("individuals")
     .insert(
@@ -144,6 +144,7 @@ async function _seedCaseTypeOverDataset(
           concept_id: conceptId,
           external_id: key,
           name: key,
+          status_id: statusIdsByName.Active,
         };
       }),
     )
