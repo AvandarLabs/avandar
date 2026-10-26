@@ -8,6 +8,8 @@ type MakeMainNavbarLinksInput = {
   canAccessDataExplorer: boolean;
   canAccessDashboards: boolean;
   canAccessMaps: boolean;
+  canAccessCaseTypes: boolean;
+  canAccessCaseRecords: boolean;
   individualManagerLinks: NavbarLink[];
 };
 
@@ -18,6 +20,8 @@ export function makeMainNavbarLinksFromPermissions({
   canAccessDataExplorer,
   canAccessDashboards,
   canAccessMaps,
+  canAccessCaseTypes,
+  canAccessCaseRecords,
   individualManagerLinks,
 }: MakeMainNavbarLinksInput): NavbarLink[] {
   return [
@@ -26,7 +30,9 @@ export function makeMainNavbarLinksFromPermissions({
     canAccessDataExplorer ? NavbarLinks.dataExplorer(workspaceSlug) : undefined,
     canAccessDashboards ? NavbarLinks.dashboards(workspaceSlug) : undefined,
     canAccessMaps ? NavbarLinks.map(workspaceSlug) : undefined,
-    NavbarLinks.ontologyDesignerHome(workspaceSlug),
-    ...individualManagerLinks,
+    canAccessCaseTypes
+      ? NavbarLinks.ontologyDesignerHome(workspaceSlug)
+      : undefined,
+    ...(canAccessCaseRecords ? individualManagerLinks : []),
   ].filter(isDefined);
 }
