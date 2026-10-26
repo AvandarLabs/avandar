@@ -1,8 +1,8 @@
-import { Flex, ScrollArea } from "@mantine/core";
+import { Flex } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
 import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { EditCaseTypeButton } from "@/views/IndividualManagerApp/EditCaseTypeButton";
-import { IndividualNavbar } from "@/views/IndividualManagerApp/IndividualNavbar";
+import { IndividualNavbar } from "@/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 
 type Props = {
@@ -19,11 +19,18 @@ export function IndividualManagerApp({ concept }: Props): JSX.Element {
       title={concept.name}
       toolbarButtonSection={<EditCaseTypeButton concept={concept} />}
     >
-      <Flex align="stretch" h="100%">
-        <IndividualNavbar concept={concept} miw={240} />
-        <ScrollArea h="100%" w="100%">
+      {
+        // The record view owns its own scrolling so its header band stays
+        // put while the content moves under it. The list pane is keyed by
+        // case type so its status filter starts empty for each one: the
+        // route keeps this component mounted when only the case type in the
+        // URL changes.
+      }
+      <Flex align="stretch" h="100%" mih={0}>
+        <IndividualNavbar key={concept.id} concept={concept} />
+        <Flex direction="column" flex={1} miw={0} mih={0}>
           <Outlet />
-        </ScrollArea>
+        </Flex>
       </Flex>
     </AppSlate>
   );
