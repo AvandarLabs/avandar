@@ -27,7 +27,7 @@ export function IndividualNavbar({
     isFetchingNextPage,
     fetchNextPage,
     isLoading,
-  } = useConceptIndividuals(concept.id);
+  } = useConceptIndividuals({ conceptId: concept.id });
   const { parentRef, individualLinks, listHeight } = useVirtualIndividualLinks({
     concept,
     allIndividuals,

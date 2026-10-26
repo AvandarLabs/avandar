@@ -29,7 +29,9 @@ function IndividualManagerWithNoIndividualSelected(): ReactNode {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const concept = conceptRoute.useLoaderData();
-  const { allIndividuals, isLoading } = useConceptIndividuals(concept.id);
+  const { allIndividuals, isLoading } = useConceptIndividuals({
+    conceptId: concept.id,
+  });
   const canViewCaseType = useHasPermission("case_types__can_view_case_type");
   const hasRecords = allIndividuals.length > 0;
 
