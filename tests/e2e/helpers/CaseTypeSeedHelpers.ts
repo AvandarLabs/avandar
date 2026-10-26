@@ -134,21 +134,28 @@ async function _seedCaseTypeOverDataset(
     })
     .throwOnError();
 
-  // Every record starts in the default status, as a synced record does.
-  await supabaseAdminClient
-    .from("individuals")
-    .insert(
-      options.recordKeys.map((key) => {
-        return {
-          workspace_id: workspaceId,
-          concept_id: conceptId,
-          external_id: key,
-          name: key,
-          status_id: statusIdsByName.Active,
-        };
-      }),
-    )
-    .throwOnError();
+  // Every record starts in the default status, as a synced record does. The
+  // spec's cleanup only sees a case type once this function returns it, so a
+  // failed insert removes the case type here instead of leaving it behind.
+  try {
+    await supabaseAdminClient
+      .from("individuals")
+      .insert(
+        options.recordKeys.map((key) => {
+          return {
+            workspace_id: workspaceId,
+            concept_id: conceptId,
+            external_id: key,
+            name: key,
+            status_id: statusIdsByName.Active,
+          };
+        }),
+      )
+      .throwOnError();
+  } catch (insertError) {
+    await _deleteCaseType({ supabaseAdminClient, conceptId });
+    throw insertError;
+  }
 
   return { conceptId, statusIdsByName };
 }
