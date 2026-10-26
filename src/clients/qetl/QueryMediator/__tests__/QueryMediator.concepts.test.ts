@@ -123,7 +123,7 @@ type DatasetIdFilter = { where?: { id?: { in?: readonly Dataset.Id[] } } };
 const CONCEPT_PLAN: ConceptRelationPlan = {
   ref: { kind: "concept", id: CONCEPT_ID },
   contributingDatasetIds: [DATASET_ID],
-  externalIds: ["p1"],
+  spineRows: [{ externalId: "p1", statusName: "Active" }],
   attributeColumns: [
     {
       kind: "dataset_column",
@@ -157,12 +157,14 @@ async function _createQetlClient(
     payload: new Blob(["cached"]),
     staleAt: undefined,
   });
-  return QueryMediatorFactory.create("QueryMediator", { state: {
-    getQueryDependencies: options.getQueryDependencies,
-    planConceptRelations: options.planConceptRelations,
-    relationCache,
-    principalKey: PRINCIPAL_KEY,
-  } });
+  return QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      getQueryDependencies: options.getQueryDependencies,
+      planConceptRelations: options.planConceptRelations,
+      relationCache,
+      principalKey: PRINCIPAL_KEY,
+    },
+  });
 }
 
 beforeEach(() => {

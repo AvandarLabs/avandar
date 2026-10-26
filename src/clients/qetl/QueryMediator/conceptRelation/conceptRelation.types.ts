@@ -2,6 +2,13 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ConceptRelationRef } from "$/models/relations/RelationRef/RelationRef.types";
 import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 
+/** One record of a concept, as its spine loads it. */
+export type ConceptSpineRow = {
+  externalId: string;
+  /** The record's status name, which the view exposes as `status`. */
+  statusName: string;
+};
+
 /**
  * Everything one concept's DuckDB relation is built from, read once.
  *
@@ -20,6 +27,6 @@ export type ConceptRelationPlan = {
    */
   contributingDatasetIds: Dataset.Id[];
   /** The concept's individuals, which become the spine's rows. */
-  externalIds: string[];
+  spineRows: ConceptSpineRow[];
   attributeColumns: ConceptAttributeColumn[];
 };
