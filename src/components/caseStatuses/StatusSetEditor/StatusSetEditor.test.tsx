@@ -3,11 +3,15 @@
  * small stateful harness that feeds every change back in, the way the
  * create form and the Edit statuses modal do.
  */
+import { Model } from "@avandar/models";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { StatusSetEditor } from "@/components/caseStatuses/StatusSetEditor/StatusSetEditor";
 import { fireEvent, render, screen } from "@/test-utils";
+import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { StatusReplacements } from "@/components/caseStatuses/StatusSetEditor/StatusSetEditor.types";
 import type { ReactNode } from "react";
 
@@ -190,5 +194,85 @@ describe("StatusSetEditor", () => {
         return status.id;
       }),
     ).toEqual([INACTIVE_ID, ACTIVE_ID]);
+  });
+});
+
+const CONCEPT_ID = "00000000-0000-4000-8000-0000000000c1" as Concept.Id;
+const WORKSPACE_ID = "00000000-0000-4000-8000-0000000000e1" as Workspace.Id;
+
+function _makeSavedStatus(
+  draft: ConceptStatus.Draft,
+  position: number,
+): ConceptStatus.T {
+  return Model.make("ConceptStatus", {
+    id: draft.id,
+    workspaceId: WORKSPACE_ID,
+    conceptId: CONCEPT_ID,
+    name: draft.name,
+    description: draft.description,
+    color: draft.color,
+    position,
+    createdAt: "2026-10-25T12:00:00.000Z",
+    updatedAt: "2026-10-25T12:00:00.000Z",
+  });
+}
+
+const SAVED_STATUSES = [
+  _makeSavedStatus(ACTIVE, 0),
+  _makeSavedStatus(INACTIVE, 1),
+];
+
+describe("StatusSetEditor in edit mode", () => {
+  it("asks where a removed status's records go", () => {
+    render(
+      <StatusSetEditorHarness
+        initialValue={DEFAULT_SET}
+        savedStatuses={SAVED_STATUSES}
+        recordCounts={{ [INACTIVE_ID]: 2 }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Remove Inactive" }));
+
+    expect(
+      screen.getByRole("combobox", { name: "Move 2 records to" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Choose a status for these records."),
+    ).toBeInTheDocument();
+  });
+
+  it("records the status chosen for a removed status's records", () => {
+    const onReplacementsChange = vi.fn();
+    render(
+      <StatusSetEditorHarness
+        initialValue={DEFAULT_SET}
+        savedStatuses={SAVED_STATUSES}
+        recordCounts={{ [INACTIVE_ID]: 2 }}
+        onReplacementsChange={onReplacementsChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Remove Inactive" }));
+    pickMantineSelectOption("Move 2 records to", "Active");
+
+    expect(onReplacementsChange).toHaveBeenLastCalledWith({
+      [INACTIVE_ID]: ACTIVE_ID,
+    });
+    expect(screen.queryByText("Choose a status for these records.")).toBeNull();
+  });
+
+  it("drops a removed status that has no records without asking", () => {
+    render(
+      <StatusSetEditorHarness
+        initialValue={DEFAULT_SET}
+        savedStatuses={SAVED_STATUSES}
+        recordCounts={{}}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Remove Inactive" }));
+
+    expect(screen.queryByRole("combobox")).toBeNull();
   });
 });

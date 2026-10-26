@@ -6,6 +6,7 @@ import { Button, Stack, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useId } from "react";
 import { makeStatusSetEditorActions } from "@/components/caseStatuses/StatusSetEditor/makeStatusSetEditorActions";
+import { RemovedStatusList } from "@/components/caseStatuses/StatusSetEditor/RemovedStatusList";
 import css from "@/components/caseStatuses/StatusSetEditor/StatusSetEditor.module.css";
 import { StatusSetEditorRow } from "@/components/caseStatuses/StatusSetEditor/StatusSetEditorRow";
 import { useStatusSetIssueMessages } from "@/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages";
@@ -94,6 +95,14 @@ export function StatusSetEditor({
           </ul>
         </div>
       </DragDropProvider>
+      <RemovedStatusList
+        value={value}
+        savedStatuses={savedStatuses}
+        recordCounts={recordCounts}
+        replacements={replacements}
+        errorsByStatusId={issueMessages.byStatusId}
+        onReplacementsChange={onReplacementsChange}
+      />
       {issueMessages.forSet.map((message) => {
         return (
           <Text key={message} size="sm" c="danger" role="alert">
