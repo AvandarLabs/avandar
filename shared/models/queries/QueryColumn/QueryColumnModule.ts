@@ -4,6 +4,7 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { ConceptAttributeModel } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
+import type { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 export const QueryColumnModule = {
@@ -17,6 +18,21 @@ export const QueryColumnModule = {
     });
   },
   makeFromDatasetColumn: (column: DatasetColumnRead): QueryColumn.T => {
+    return Model.make("QueryColumn", {
+      id: uuid<QueryColumn.Id>(),
+      baseColumn: column,
+      aggregation: undefined,
+    });
+  },
+
+  /**
+   * Wraps a case type's built-in `status` column. Filters, grouping and
+   * aggregation read only the base column's `name` and `dataType`, so the
+   * status column needs no handling of its own past this point.
+   */
+  makeFromConceptStatusColumn: (
+    column: ConceptStatusColumn.T,
+  ): QueryColumn.T => {
     return Model.make("QueryColumn", {
       id: uuid<QueryColumn.Id>(),
       baseColumn: column,

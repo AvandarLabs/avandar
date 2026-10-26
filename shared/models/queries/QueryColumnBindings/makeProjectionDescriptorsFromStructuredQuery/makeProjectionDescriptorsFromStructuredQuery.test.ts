@@ -52,7 +52,13 @@ describe("makeProjectionDescriptorsFromStructuredQuery", () => {
     const renamed = makeProjectionDescriptorsFromStructuredQuery({
       ...query,
       queryColumns: [
-        { ...COLUMN, baseColumn: { ...COLUMN.baseColumn, name: "new_name" } },
+        {
+          ...COLUMN,
+          baseColumn: {
+            ...(COLUMN.baseColumn as DatasetColumn.T),
+            name: "new_name",
+          },
+        },
       ],
     })[0];
     expect(original).toBeDefined();
