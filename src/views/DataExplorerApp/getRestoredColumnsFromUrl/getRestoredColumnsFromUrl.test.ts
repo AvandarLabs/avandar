@@ -65,6 +65,22 @@ describe("getRestoredColumnsFromUrl", () => {
     expect(restored.map(prop("baseColumn.name"))).toEqual(["status"]);
   });
 
+  // `status` is not an attribute, so restoring from attributes alone drops it
+  // and a reload loses the column the user had selected.
+  it("restores a case type's built-in status column by name", () => {
+    const restored = getRestoredColumnsFromUrl({
+      colNames: ["age", "status"],
+      datasetColumns: undefined,
+      conceptAttributes: [_makeConceptAttribute("age")],
+      conceptId: uuid<Concept.Id>(),
+    });
+
+    expect(restored.map(prop("baseColumn.__type"))).toEqual([
+      "ConceptAttribute",
+      "ConceptStatusColumn",
+    ]);
+  });
+
   it("resolves dataset column names to query columns", () => {
     const restored = getRestoredColumnsFromUrl({
       colNames: ["region", "total"],
