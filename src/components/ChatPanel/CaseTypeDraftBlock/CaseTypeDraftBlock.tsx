@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { CaseTypeDraftCard } from "./CaseTypeDraftCard";
 import { useCaseTypeDraftCreation } from "./useCaseTypeDraftCreation";
@@ -35,6 +36,9 @@ function CaseTypeDraftCardContainer({
   const dispatch = ChatPanelStateManager.useDispatch();
   const editor = useCaseTypeDraftEditor(draft);
   const { isCreating, createCaseType } = useCaseTypeDraftCreation(workspace.id);
+  const canCreateCaseType = useHasPermission(
+    "case_types__can_create_case_type",
+  );
 
   // Names are read from the catalog rather than the proposal, so a dataset or
   // column the model mislabelled still displays what it really is. Every source
@@ -63,9 +67,13 @@ function CaseTypeDraftCardContainer({
         datasetNamesById={datasetNamesById}
         columnNamesById={columnNamesById}
         isCreating={isCreating}
-        onCreate={() => {
-          void createCaseType(editor.draft);
-        }}
+        onCreate={
+          canCreateCaseType
+            ? () => {
+                void createCaseType(editor.draft);
+              }
+            : undefined
+        }
         onDismiss={() => {
           dispatch.setPendingCaseTypeDraft(undefined);
         }}

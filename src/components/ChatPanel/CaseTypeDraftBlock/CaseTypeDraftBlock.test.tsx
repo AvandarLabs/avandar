@@ -5,8 +5,15 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import {
+  fireEvent,
+  makeHasPermissionFromAppRoles,
+  render,
+  screen,
+  waitFor,
+} from "@/test-utils";
 import { CaseTypeDraftBlock } from "./CaseTypeDraftBlock";
+import type { PermissionKey } from "$/models/Permissions/Permissions";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatProposedCaseType } from "$/types/chat.types";
 
@@ -21,17 +28,23 @@ const WORKSPACE_ID = "4d5e6f70-aaaa-4bbb-8ccc-ddddeeeeffff" as Workspace.Id;
 
 const {
   applyCreatedCaseTypesMock,
+  hasPermissionMock,
   setPendingCaseTypeDraftMock,
   useChatPanelStateMock,
 } = vi.hoisted(() => {
   return {
     applyCreatedCaseTypesMock: vi.fn().mockResolvedValue(undefined),
+    hasPermissionMock: vi.fn<(permissionKey: PermissionKey) => boolean>(),
     setPendingCaseTypeDraftMock: vi.fn(),
     useChatPanelStateMock: vi.fn(),
   };
 });
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace");
+
+vi.mock("@/hooks/permissions/useHasPermission/useHasPermission", () => {
+  return { useHasPermission: hasPermissionMock };
+});
 
 vi.mock(
   "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager",
@@ -145,6 +158,9 @@ describe("CaseTypeDraftBlock", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     applyCreatedCaseTypesMock.mockResolvedValue(undefined);
+    hasPermissionMock.mockImplementation(
+      makeHasPermissionFromAppRoles({ case_types: "editor" }),
+    );
     vi.mocked(useCurrentWorkspace).mockReturnValue({
       id: WORKSPACE_ID,
     } as ReturnType<typeof useCurrentWorkspace>);
@@ -312,5 +328,17 @@ describe("CaseTypeDraftBlock", () => {
 
     expect(setPendingCaseTypeDraftMock).toHaveBeenCalledWith(undefined);
     expect(applyCreatedCaseTypesMock).not.toHaveBeenCalled();
+  });
+
+  it("hides Create case type from a case_types viewer", () => {
+    hasPermissionMock.mockImplementation(
+      makeHasPermissionFromAppRoles({ case_types: "viewer" }),
+    );
+    render(<CaseTypeDraftBlock />);
+
+    expect(
+      screen.queryByRole("button", { name: "Create case type" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Discard" })).toBeInTheDocument();
   });
 });
