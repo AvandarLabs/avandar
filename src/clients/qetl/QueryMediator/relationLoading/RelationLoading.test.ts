@@ -35,12 +35,13 @@ describe("probeStorageRelationCache", () => {
       staleAt: undefined,
     });
 
-    const { cachedRelations } = await RelationLoading.probeStorageRelationCache({
-      datasetIds: [DATASET_ID],
-      neededByDatasetId: {},
-      relationCache,
-      principalKey: PRINCIPAL_KEY,
-    });
+    const { cachedRelations } =
+      await RelationLoading.probeStorageRelationCache({
+        datasetIds: [DATASET_ID],
+        neededByDatasetId: {},
+        relationCache,
+        principalKey: PRINCIPAL_KEY,
+      });
 
     // `registerParquetFile` refuses an untyped blob, so an entry written
     // before acquisition typed its blobs would otherwise fail every load.
