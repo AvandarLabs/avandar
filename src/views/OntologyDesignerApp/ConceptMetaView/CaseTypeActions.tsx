@@ -7,6 +7,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Logger } from "@/utils/Logger";
 import { notifySuccess } from "@/utils/notifications/notify";
@@ -24,14 +25,28 @@ type Props = {
 };
 
 /**
- * Sync and delete actions for a case type.
+ * Records, sync, and delete actions for a case type. Each renders only for a
+ * user whose role lets them use it.
  */
 export function CaseTypeActions({ concept, fullConcept }: Props): ReactNode {
+  const canViewRecords = useHasPermission("case_records__can_view_record");
+  const canSyncAsCaseTypesEditor = useHasPermission(
+    "case_types__can_sync_records",
+  );
+  const canSyncAsCaseRecordsEditor = useHasPermission(
+    "case_records__can_sync_records",
+  );
+  const canDeleteCaseType = useHasPermission(
+    "case_types__can_delete_case_type",
+  );
+
   return (
     <Group gap="xs" wrap="nowrap">
-      <ViewRecordsButton concept={concept} />
-      <SyncRecordsButton concept={concept} fullConcept={fullConcept} />
-      <DeleteCaseTypeButton concept={concept} />
+      {canViewRecords ? <ViewRecordsButton concept={concept} /> : null}
+      {canSyncAsCaseTypesEditor || canSyncAsCaseRecordsEditor ? (
+        <SyncRecordsButton concept={concept} fullConcept={fullConcept} />
+      ) : null}
+      {canDeleteCaseType ? <DeleteCaseTypeButton concept={concept} /> : null}
     </Group>
   );
 }

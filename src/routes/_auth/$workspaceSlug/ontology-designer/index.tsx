@@ -7,6 +7,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { CaseTypeHome } from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome";
 import type { CaseTypeHomeItem } from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome";
@@ -33,6 +34,12 @@ function OntologyDesignerRoot(): ReactNode {
   const [sendDelete] = ConceptClient.useDelete({
     queriesToInvalidate: [ConceptClient.QueryKeys.getAll()],
   });
+  const canCreateCaseType = useHasPermission(
+    "case_types__can_create_case_type",
+  );
+  const canDeleteCaseType = useHasPermission(
+    "case_types__can_delete_case_type",
+  );
 
   // Deleting a case type discards its attributes and mappings, so it is
   // confirmed rather than done on a single click of a hover control. The card
@@ -81,8 +88,8 @@ function OntologyDesignerRoot(): ReactNode {
   return (
     <CaseTypeHome
       caseTypes={concepts ?? []}
-      onCreate={dispatch.beginCaseDesign}
-      onDeleteCaseType={confirmDeleteCaseType}
+      onCreate={canCreateCaseType ? dispatch.beginCaseDesign : undefined}
+      onDeleteCaseType={canDeleteCaseType ? confirmDeleteCaseType : undefined}
       onOpenCaseType={(caseType) => {
         navigate(
           AppLinks.ontologyDesignerConceptView({
