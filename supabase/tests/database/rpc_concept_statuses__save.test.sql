@@ -74,7 +74,7 @@ values
   ('a9006001-0000-4000-8000-000000000001'::uuid, 'a9001001-0000-4000-8000-000000000001'::uuid, 'a9004001-0000-4000-8000-000000000001'::uuid, 'ext-1', 'Record one', 'a9005001-0000-4000-8000-000000000001'::uuid),
   ('a9006002-0000-4000-8000-000000000002'::uuid, 'a9001001-0000-4000-8000-000000000001'::uuid, 'a9004001-0000-4000-8000-000000000001'::uuid, 'ext-2', 'Record two', 'a9005003-0000-4000-8000-000000000003'::uuid);
 
-select plan (23);
+select plan (24);
 
 -- Refusals. None of them changes anything.
 
@@ -414,6 +414,24 @@ select is (
   array['a9005002-0000-4000-8000-000000000002'::uuid, 'a9005002-0000-4000-8000-000000000002'::uuid],
   'both records moved to the replacement of the removed status'
 );
+
+-- 24.
+select is (
+  pg_temp.error_hint ($s$
+    set local role authenticated;
+    select set_config('request.jwt.claims', '{"sub":"a9000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+    select public.rpc_concept_statuses__save (
+      'a9004001-0000-4000-8000-000000000001'::uuid,
+      null,
+      'a9005002-0000-4000-8000-000000000002'::uuid,
+      '{}'::jsonb
+    );
+  $s$),
+  'status_set_empty',
+  'a null status set is refused'
+);
+
+reset role;
 
 select * from finish ();
 

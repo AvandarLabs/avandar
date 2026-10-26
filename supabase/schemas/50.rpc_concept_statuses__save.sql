@@ -32,12 +32,12 @@ declare
   v_status_count integer;
   v_replacements jsonb := coalesce(p_replacements, '{}'::jsonb);
 begin
-  -- Locks the case type, so two saves of its statuses run one at a time.
+  -- Read without a lock: the caller has not been authorized yet, and a lock
+  -- would let any signed-in user block another workspace's case type.
   select c.workspace_id
   into v_workspace_id
   from public.concepts c
-  where c.id = p_concept_id
-  for update;
+  where c.id = p_concept_id;
 
   -- A missing case type and a forbidden one raise the same error, so the
   -- function cannot be used to probe for case type ids.
@@ -49,6 +49,10 @@ begin
     raise exception 'Only Case Types editors can change a case type''s statuses'
       using errcode = '42501', hint = 'case_types_editor_required';
   end if;
+
+  -- Locks the case type once the caller is authorized, so two saves of its
+  -- statuses run one at a time.
+  perform 1 from public.concepts where id = p_concept_id for update;
 
   if jsonb_typeof(p_statuses) is distinct from 'array' then
     v_status_count := 0;
