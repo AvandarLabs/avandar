@@ -1219,8 +1219,9 @@ description, or introduced in product terms and defined in the
 and every other piece of text read on its own (bold lead-ins, table row
 labels, captions) as that new reader. For every noun, say what concrete thing it names;
 for every verb, say who does it to what. An answer that needs knowledge of this
-code means the sentence needs grounding. One exception: a pipeline step's
-heading is named for the code that runs it, per
+code means the sentence needs grounding. One exception: each step heading
+inside a pipeline section, though not the section's own heading, is named for
+the code that runs it, per
 [Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline),
 so the grounding moves to that step's first sentence, which the test still
 applies to. The [clarity pass](#the-clarity-pass-runs-in-a-subagent) applies
@@ -1548,14 +1549,17 @@ It returns four things:
 3. **Questions for the parent,** for the stalls only the author can resolve.
 4. **The glossary,** ready to paste, per [Glossary](#glossary).
 
-The parent reads every proposal, heading rename, and move, and accepts or
-rejects each. It applies the accepted ones, checking that each rewrite keeps
-the original claim, or corrects it on purpose where the author knows the
-original was imprecise, and that every fact a rewrite adds is true, tagged or
-not. It answers the questions in the text or the figures, then writes the
-glossary into its section, dropping any entry for a term the body no longer
-uses. A rejection is a normal outcome, and the content review that follows
-checks the result against the code.
+The parent reads every proposal, heading rename, and move, and accepts,
+corrects, or rejects each. It applies the accepted ones, checking that each
+rewrite keeps the original claim, or corrects it on purpose where the author
+knows the original was imprecise, and that every fact a rewrite adds is true,
+tagged or not. A move that leaves a section without its locating sentence
+gets one. It answers the questions in the text or the figures, then writes the
+glossary into its section: dropping any entry for a term the reader no longer
+meets, in prose or in a code name the document asks them to read, and adding
+one for any new term its own rewrites introduced. A rejection is a normal
+outcome, and the content review that follows checks the result against the
+code.
 
 ### The content review runs in a subagent
 
