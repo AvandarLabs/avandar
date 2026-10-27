@@ -426,8 +426,9 @@ Use these headings in this order, numbered, omitting any that would be empty.
 Purpose, Glossary, Background technical context, and Manual testing are never
 omitted. The list gives the order, not literal numbers: each strand takes its
 own top-level number, and the sections after the strands number on from the
-last one. Numbers are stable for the life of the review so the reviewer can
-annotate a printout and cite `§6.2` back to you.
+last one. Once the walkthrough is handed over, numbers are stable for the life
+of the review so the reviewer can annotate a printout and cite `§6.2` back to
+you; before that, the review passes may renumber.
 
 Headings are factual navigation, not titles. A correct, specific, boring
 heading beats an elegant one every time; this is a reference document a
@@ -553,7 +554,10 @@ being specific or clear is worse.
 7. **Interface changes.** Any user-visible change, with evidence. See
    [Screenshots](#screenshots).
 8. **Decisions.** One bullet per real decision: what was chosen, the
-   alternative that was rejected, why, and what evidence would reverse it. A
+   alternative that was rejected, why, and what evidence would reverse it.
+   Lead with the choice as one bold sentence that a reviewer skimming the list
+   can parse on its own, per
+   [Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code). A
    decision with no rejected alternative is not a decision, it is narration:
    cut it, or say plainly that the choice was arbitrary. Cite precedent per
    [Citations](#citations).
@@ -588,7 +592,9 @@ parent pastes it in, per
 - **Concepts go here, code units go in the background.** A model, module, or
   function name belongs in
   [Background technical context](#background-technical-context). The glossary
-  holds the ideas those units implement.
+  holds the ideas those units implement. When the code spells a concept
+  differently from the document, the entry gives the code's spelling too, so
+  the reader recognizes the concept in the diff.
 - **It does not replace a figure's own glossary.** A diagram still carries its
   `Where:` list directly under the fence, per
   [A diagram must stand alone](#a-diagram-must-stand-alone), because the figure
@@ -1178,7 +1184,23 @@ description, or introduced in product terms and defined in the
 - **Qualify a generic word that names more than one thing in the codebase.**
   `descriptor`, `config`, `settings`, `registry`, `context`, and `schema`
   usually name several unrelated types. A reader resolves the bare word to
-  whichever one they already know, which is often the wrong one.
+  whichever one they already know, which is often the wrong one. The same
+  goes for a word with a common general-engineering meaning, such as
+  `session`, `snapshot`, `index`, or `version`: the reader takes that meaning
+  unless the sentence says this code means something else.
+- **Give every process word its actor and its object.** `bind`, `resolve`,
+  `reconcile`, `normalize`, `hydrate`, `prepare`, `upgrade`, `sync`, and their
+  noun forms each name something done by something to something. Say what
+  does it, what it acts on, and where the result goes. Two shapes always drop
+  them: a process noun as a sentence's subject ("the reconciliation step
+  follows"), and a string of bare process verbs ("charts sync, resolve, and
+  write"). Rewrite either with the actor as the subject and the object named.
+- **Text read on its own is grounded like a heading.** A heading, a section's
+  opening sentence, the bold lead-in of a list item or a decision, a table's
+  row label, and a caption are each read without the paragraph around them,
+  and usually without the glossary, by a reviewer skimming the document. None
+  of them may lean on a glossary term in place of a plain description, and
+  none may compress a mechanism into a slogan.
 - **Clarity outranks brevity.** Write as briefly as clarity allows, and no more
   briefly. A heading or sentence that grew by the qualifier a reader needed has
   improved; one that lost it to save words has not. Shortening is worth doing
@@ -1190,13 +1212,19 @@ description, or introduced in product terms and defined in the
 | `When no descriptor exists, a unique output receives an ID.` | Which descriptor. The codebase also has visualization setting descriptors, so the reader picks the wrong one. | `When the app cannot describe the query's SELECT list as projection descriptors, for example because the query has a join, each uniquely named result column receives an ID.` |
 | `4.3 Old rows cannot establish a new Explorer binding` | What is bound to what. "Explorer binding" reads like a documented term, and is not one. | `4.3 After a user edits the SQL in the Data Explorer, results from the old SQL cannot supply column IDs to the chart settings` |
 | `Source-field identity and result identity meet at compilation and reconciliation.` | Two identities of unnamed things, joined by two process nouns the reader has not met. | `WHERE filters save IDs of the data source's columns, while chart settings and HAVING filters save IDs of the columns the query selects. The two kinds of ID meet only when the query is compiled to SQL and when its results are matched back to IDs.` |
+| `**Dashboard filters bind per chart.**` (a decision's bold lead-in) | Bind what to what, and who does it. The lead-in is read alone when a reviewer skims the decisions. | `**Each dashboard chart matches every dashboard filter that applies to it to one of that chart's own result columns.**` |
+| `**Ambiguity produces no ID.**` (a decision's bold lead-in) | Ambiguity of what, and what goes without an ID. | `**When a saved column name or a result column could match more than one column, the app assigns no column ID rather than guess.**` |
 
-**The cold-read test.** Read each heading, and the first sentence of each
-section, as that new reader. For every noun, say what concrete thing it names;
+**The cold-read test.** Read each heading, the first sentence of each section,
+and every other piece of text read on its own (bold lead-ins, table row
+labels, captions) as that new reader. For every noun, say what concrete thing it names;
 for every verb, say who does it to what. An answer that needs knowledge of this
-code means the sentence needs grounding. The
-[clarity pass](#the-clarity-pass-runs-in-a-subagent) applies this test to the
-whole draft.
+code means the sentence needs grounding. One exception: a pipeline step's
+heading is named for the code that runs it, per
+[Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline),
+so the grounding moves to that step's first sentence, which the test still
+applies to. The [clarity pass](#the-clarity-pass-runs-in-a-subagent) applies
+this test to the whole draft.
 
 ### How much to explain
 
@@ -1320,8 +1348,9 @@ own draft.
    - A section cross-reference (`§4.2`) against where that content now lives.
    - The Glossary against the body: an entry for a term the body no longer
      uses, or a term the body leans on with no entry.
-   - The Background tree against the list under it: every unit in one appears
-     in the other.
+   - The Background tree against the list under it: every unit in the tree
+     has an entry, and every entry's subject is in the tree. A function named
+     inside an entry is not a unit and needs no node.
 
 2. **Audit the coverage,** per the checklist in item 6 of
    [Sections](#sections): walk it against every strand and confirm where each
@@ -1346,8 +1375,11 @@ own draft.
    [A figure never spans two pages](#a-figure-never-spans-two-pages): a long
    glossary shrinks the drawing it exists to explain.
 
-5. **Audit the writing contract.** Read the headings without the body and
-   confirm each names a checkable claim rather than a topic or a metaphor.
+5. **Audit the writing contract.** Read the headings and every bold lead-in
+   without the body, and confirm each names a checkable claim that a new
+   reader can parse without the glossary, rather than a topic, a metaphor, or
+   a glossary term standing in for a description. Rewording one for that
+   reason is style; the claim it states must not change.
    Check every solved-problem section for `The Problem` and `The Solution`,
    every repository code excerpt for its project-relative file label AND its
    enclosing signature, and every paragraph and caption against
@@ -1439,9 +1471,10 @@ It works in three steps:
 3. **Keep only what a reader needs as background:** a unit is in when a later
    section names it without saying what it is, or when the reader needs it to
    place the change in the codebase. A unit a strand section introduces itself
-   stays out, and so does a changed file nothing in the walkthrough depends
-   on. When the result will not fit on one page, keep each area's anchor unit
-   and drop the rest.
+   stays out unless it is the only anchor for its layer, and so does a changed
+   file nothing in the walkthrough depends on. When the result will not fit on
+   one page, keep each area's anchor unit and drop the rest; the style check
+   reports it when the rendered page splits the figure.
 
 It returns the units it included, the ones it considered and left out, and why,
 so the parent can judge the cut.
@@ -1460,7 +1493,8 @@ Dispatch it with:
 - the branch and comparison the walkthrough describes,
 - the absolute path of this SKILL.md, told to read
   [Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code),
-  [Glossary](#glossary), and the heading rules in [Sections](#sections) first,
+  [Glossary](#glossary), the heading rules in [Sections](#sections), and
+  [Flow and orientation](#flow-and-orientation) first,
 - read-only access to the walkthrough, the diff, the code, and the project's
   docs.
 
@@ -1485,20 +1519,43 @@ anything else:
 Only then does it read the diff, the code, and the docs, to turn each stall
 into a concrete fix and to write glossary definitions that are true.
 
-It returns three things:
+A glossary entry fixes a term that is merely undefined, so most term stalls
+need no rewrite. A sentence still needs one when:
 
-1. **Proposals,** one per stall: the location (section number and the quoted
-   text), what the newcomer could not work out, and the replacement text. When
-   rewording cannot fix a stall because the underlying claim is unclear, it
-   returns a question for the parent instead of a guessed rewrite.
-2. **Heading order changes,** each with the dependency that motivates it.
-3. **The glossary,** ready to paste, per [Glossary](#glossary).
+- it is text read on its own: a heading, a section's opening sentence, the
+  bold lead-in of a list item or a decision, a table's row label, or a
+  caption, because those are read without the glossary at hand,
+- a process word in it is missing its actor or its object, which no
+  definition supplies,
+- one word stands for several different things across the document, so a
+  definition cannot say which one this sentence means,
+- it would still fail with every term defined, because a relationship word is
+  missing a side, an abstract noun has no owner, or the sentence names a
+  process without saying what it acts on.
 
-The parent reads every proposal and accepts or rejects it. It applies the
-accepted ones, checking that each rewrite still states the same claim, then
-writes the glossary into its section, dropping any entry for a term the
-accepted rewrites removed from the body. A rejection is a normal outcome, and
-the content review that follows checks the result against the code.
+It returns four things:
+
+1. **Proposals,** one per stall that needs a rewrite: the location (section
+   number and the quoted text), what the newcomer could not work out, and the
+   replacement text. A replacement that adds a fact the draft did not state is
+   tagged `[adds fact]` with the source it was checked against, so the parent
+   and the content review can verify it. When rewording cannot fix a stall
+   because the underlying claim is unclear, it returns a question for the
+   parent instead of a guessed rewrite.
+2. **Heading renames and order changes:** every heading that fails the
+   cold-read test, with its replacement, and every move, each with the
+   dependency that motivates it.
+3. **Questions for the parent,** for the stalls only the author can resolve.
+4. **The glossary,** ready to paste, per [Glossary](#glossary).
+
+The parent reads every proposal, heading rename, and move, and accepts or
+rejects each. It applies the accepted ones, checking that each rewrite keeps
+the original claim, or corrects it on purpose where the author knows the
+original was imprecise, and that every fact a rewrite adds is true, tagged or
+not. It answers the questions in the text or the figures, then writes the
+glossary into its section, dropping any entry for a term the body no longer
+uses. A rejection is a normal outcome, and the content review that follows
+checks the result against the code.
 
 ### The content review runs in a subagent
 
@@ -1589,9 +1646,10 @@ Beyond the joins, check and fix:
 - **Open questions**, for whether the code has since answered one.
 - **Deliberately not handled**, for whether each gap is still a gap.
 
-Its remit stops at accuracy. It does not rewrite for tone, restructure a
-section, retitle a heading that is merely dull, or touch a diagram for
-legibility: those are the style check's, and doing them here costs the parent
+Its remit stops at accuracy. A diagram label or caption that states something
+false is a claim, so correcting it is in scope. It does not rewrite for tone,
+restructure a section, retitle a heading that is merely dull, or touch a
+diagram for legibility: those are the style check's, and doing them here costs the parent
 the ability to tell a correction from a preference. Where a claim is
 unrecoverable from the code, it adds an Open question rather than inventing a
 rationale. A correction it writes follows
