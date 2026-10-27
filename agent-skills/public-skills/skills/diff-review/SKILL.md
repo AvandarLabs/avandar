@@ -1,6 +1,6 @@
 ---
 name: diff-review
-description: Use when preparing or updating a difit review transcript, reviewing a pull request for the user, responding to difit comments, managing the diff guide or reviewed state, reprinting a review summary, or cleaning stale .difit files.
+description: Use when preparing or updating a difit review transcript or review walkthrough, reviewing a pull request for the user, responding to difit comments, managing the diff guide or reviewed state, reprinting a review summary, or cleaning stale .difit files.
 ---
 
 # Diff Review
@@ -40,7 +40,7 @@ If a required tool is missing, stop and give the user the exact remediation.
 | Request or state | Mode |
 | --- | --- |
 | Explicit summary request | Summary |
-| Explicit request for a walkthrough, an as-built design doc, or a document to read before the code | Walkthrough |
+| Explicit request for a walkthrough, an as-built design doc, or a document to read before the code, including `/diff-review walkthrough` | Walkthrough |
 | Regenerate guide, mark reviewed, or report reviewed state | Diff guide |
 | Open reviewer comments | Continue |
 | Ask the agent to critique a PR or local diff, including `pr`, `pre`, `pre-review`, or `/diff-review auto <PR-number>` | PR review |
@@ -52,7 +52,14 @@ explicit-only. "Review this PR" and "prepare a diff review" ask the agent to
 review; "prepare the diff for review" only asks for Initial setup. A live
 session with no reviewer comment is Initial coordination state, not Continue.
 For an existing unchanged review with no open comments, do not reset or rewrite
-artifacts; report that no comments are open and wait for a concrete request.
+artifacts. If its walkthrough is missing, write it by running steps 2 to 11 of
+[Walkthrough](#walkthrough), per
+[When a walkthrough is written](#when-a-walkthrough-is-written); otherwise
+report that no comments are open and wait for a concrete request.
+
+`walkthrough` as the first argument names the mode, not a comparison:
+`/diff-review walkthrough` uses the default comparison, and
+`/diff-review walkthrough main` compares against `main`.
 
 ## Artifact names
 
@@ -167,6 +174,25 @@ from context the diff does not state: why an abstraction exists, how data moves,
 which domain rule or invariant applies, or why a fallback or integration works
 that way. Skip formatting, naming-only changes, obvious helpers, and narration
 of the attached line. Never comment outside the requested diff scope.
+
+**Explainers point into the walkthrough; the walkthrough never points back.**
+When a walkthrough exists, it is where the context lives, so an explainer
+whose context a walkthrough section already explains cites that section by
+number and heading instead of repeating it, and adds only what is specific to
+the attached lines:
+
+```markdown
+Keeps the earlier column ID only for an unchanged expression. Why, with a
+worked example: §6.2, "When a user edits and re-runs a query, each result
+column keeps its earlier column ID only when the app can prove it is the same
+column".
+```
+
+Point a thread at the walkthrough wherever a reader of those lines needs the
+bigger picture: the strand section that explains the code block, or the
+Background technical context entry for an unfamiliar module. PR findings never
+cite the walkthrough, because they are pasted into GitHub, where it does not
+exist.
 
 For PR findings, write text a human can paste into GitHub unchanged, in the
 voice `references/review-comment-style.md` describes:
@@ -351,19 +377,57 @@ file. The guide answers "where do I go next", a thread answers "why is this
 line like this", and the walkthrough answers "what is this change, and why is
 it shaped this way".
 
-Write `-walkthrough.md` in Walkthrough mode only. Never write it automatically:
-it costs real effort and is worth nothing to a reader who did not ask for it.
-
 The walkthrough is always a markdown file in `.difit/`, named from the same
 stem as every other artifact (see [Artifact names](#artifact-names)). It is
 printed from that file. Never publish it to a hosting service, and never
 substitute a hosted page for the file.
 
+### When a walkthrough is written
+
+A walkthrough is written by default, once, and changed only on request:
+
+- **No walkthrough yet:** preparing a review writes one. Initial and PR review
+  both do, once the guides are up, and so does a plain `/diff-review` on an
+  already prepared review with no open comments whose `-walkthrough.md` is
+  missing. Continue, Diff guide, Summary, and Cleanup never write one.
+- **A walkthrough exists:** only Walkthrough mode changes it, and Walkthrough
+  mode is selected only by an explicit request such as
+  `/diff-review walkthrough`. No other mode regenerates or edits it, even after
+  a code change has made it stale, because producing one costs more than every
+  other artifact combined. When a code change makes it stale, say so in one
+  line of the chat report and name `/diff-review walkthrough` as the way to
+  regenerate it.
+
+### The walkthrough stands alone
+
+The walkthrough is published with the pull request, for reviewers who have the
+repository and nothing else. Everything in `.difit/` is gitignored, so none of
+it exists for them, and neither does anything else local to the author's
+checkout. The walkthrough therefore never cites:
+
+- the diff guide, its group numbers, the transcript, its threads, the summary,
+  the test plan, or any other `.difit/` artifact,
+- a gitignored or untracked file, such as a local log, a scratch plan, or a
+  verification transcript,
+- a local-only path, such as a worktree's absolute location.
+
+It may cite files tracked in the repository at the compared revision, commands
+the reader can run, and external sources with URLs. Its own screenshots under
+`.difit/<stem>-walkthrough-assets/` are part of the document rather than a
+reference, and travel with it into the printed PDF. Local artifacts are inputs
+to writing it, never references in it: carry over what they established, as a
+claim verified against the code, and drop the pointer. A sentence that exists
+only to point at a local artifact, such as "the authoritative navigation is in
+the guide", comes out whole.
+
 ### Sections
 
 Use these headings in this order, numbered, omitting any that would be empty.
-Numbers are stable for the life of the review so the reviewer can annotate a
-printout and cite `§3.2` back to you.
+Purpose, Glossary, Background technical context, and Manual testing are never
+omitted. The list gives the order, not literal numbers: each strand takes its
+own top-level number, and the sections after the strands number on from the
+last one. Numbers are stable for the life of the review so the reviewer can
+annotate a printout and cite `§6.2` back to you.
 
 Headings are factual navigation, not titles. A correct, specific, boring
 heading beats an elegant one every time; this is a reference document a
@@ -372,8 +436,7 @@ Name the concrete subject and the condition in plain language, and never use
 wordplay, suspense, alliteration, or a phrase whose meaning only resolves after
 reading the section.
 
-Two failure modes, and the second is the one that survives review because it
-reads well:
+Three failure modes. The last two survive review because they read well:
 
 - **Vague:** the heading names a topic but not a claim, so it cannot be
   distinguished from three neighbouring sections.
@@ -381,6 +444,12 @@ reads well:
   built on a metaphor ("as a durable transition"), an abstract noun phrase
   ("Claim, then settle"), or a value judgement ("Visibility replaces a
   boolean") names the author's framing rather than the mechanism.
+- **Insider:** the heading states a precise claim, but only to a reader who
+  already knows this code's informal vocabulary. `Executed results need
+  evidence before they can inherit identity` is checkable to its author; a
+  reviewer cannot tell what was executed, what the evidence proves, or whose
+  identity is inherited. The fix is in
+  [Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code).
 
 | Avoid | Use |
 | --- | --- |
@@ -392,8 +461,9 @@ reads well:
 
 The test: read the heading alone and say what the section will assert. If the
 answer is "something about publishing", rename it. A heading may be a full
-clause and may run to a dozen words; length is not the constraint, and a
-shorter heading that has stopped being specific is worse.
+clause and may run past twenty words when grounding it for a new reader takes
+that; length is not the constraint, and a shorter heading that has stopped
+being specific or clear is worse.
 
 1. **Purpose.** The problem in the reader's terms and what "done" means. No
    file names, no module names. Two paragraphs at most, and it must **name
@@ -401,19 +471,27 @@ shorter heading that has stopped being specific is worse.
    been told about will read as a non sequitur when its section arrives.
    Finish with a one-line map, strand to section number, so the reader can
    predict the section list before reading it.
-2. **Shape of the solution.** The mental model: the moving parts and how data
+2. **Glossary.** Every term the reader will meet that is not general
+   software-engineering vocabulary, defined in plain words. See
+   [Glossary](#glossary).
+3. **Background technical context.** A directory tree of the code the reader
+   needs to know about, then one or two sentences per model or module. See
+   [Background technical context](#background-technical-context).
+4. **Manual testing.** Numbered steps the reviewer can follow to exercise the
+   change themselves. See [Manual testing](#manual-testing).
+5. **Shape of the solution.** The mental model: the moving parts and how data
    flows between them, as prose plus at least one mermaid diagram. When the
    change has more than one strand, say here how they relate, including "these
    two are independent" when that is the truth.
-3. **One section per strand of work,** named after the concern rather than the
-   kind of thing it contains. Use numbered subsections (`3.1`, `3.2`) for the
+6. **One section per strand of work,** named after the concern rather than the
+   kind of thing it contains. Use numbered subsections (`6.1`, `6.2`) for the
    pieces inside a strand, so the reviewer can cite one.
 
    When a section explains one specific defect and its resolution, add `The
    Problem` and `The Solution` one heading level below it:
 
    ```markdown
-   ### 3.1 Ambiguous 404 when getting a file from Drive
+   ### 6.1 Ambiguous 404 when getting a file from Drive
 
    #### The Problem
 
@@ -472,21 +550,199 @@ shorter heading that has stopped being specific is worse.
    strand-based one, and it fails by disappearing silently rather than by
    leaving an empty heading. Auditing this list is part of
    [Closing checks](#closing-checks).
-4. **Interface changes.** Any user-visible change, with evidence. See
+7. **Interface changes.** Any user-visible change, with evidence. See
    [Screenshots](#screenshots).
-5. **Decisions.** One bullet per real decision: what was chosen, the
+8. **Decisions.** One bullet per real decision: what was chosen, the
    alternative that was rejected, why, and what evidence would reverse it. A
    decision with no rejected alternative is not a decision, it is narration:
    cut it, or say plainly that the choice was arbitrary. Cite precedent per
    [Citations](#citations).
-6. **Deliberately not handled.** Scope boundaries and known gaps, so the
+9. **Deliberately not handled.** Scope boundaries and known gaps, so the
    reviewer does not spend attention rediscovering them.
-7. **Open questions.** Explicit asks for the reviewer, each answerable. A
-   change with genuinely no open question probably did not need a walkthrough.
-8. **Reading order.** Map each section to the `-guide.md` group numbers that
-   implement it, so the reviewer can go from a section straight to its code.
-9. **Sources.** The numbered reference list, present whenever the body cites
+10. **Open questions.** Explicit asks for the reviewer, each answerable. A
+    change with genuinely no open question probably did not need a
+    walkthrough.
+11. **Sources.** The numbered reference list, present whenever the body cites
     anything.
+
+There is no reading-order or navigation section. Mapping sections to code is
+the explainer threads' job, per [As the reviewer](#as-the-reviewer), because
+the walkthrough stands alone.
+
+### Glossary
+
+Every term the reader will meet in the document that is not general
+software-engineering vocabulary: product terms with a specific meaning here,
+house terms, and the informal vocabulary of this area of the code. One list in
+alphabetical order, not split by kind. The clarity pass drafts it and the
+parent pastes it in, per
+[The clarity pass runs in a subagent](#the-clarity-pass-runs-in-a-subagent).
+
+- **Define each term in plain words, grounded in the product.** Say what the
+  thing is in terms of what a user does or sees, then, only if needed, what the
+  code does with it. One or two sentences.
+- **Never define a term with more jargon.** A definition that leans on another
+  unexplained term has moved the problem, not solved it. Every word in a
+  definition is general vocabulary, product vocabulary, or another entry in
+  this list, and the first two are preferred.
+- **Concepts go here, code units go in the background.** A model, module, or
+  function name belongs in
+  [Background technical context](#background-technical-context). The glossary
+  holds the ideas those units implement.
+- **It does not replace a figure's own glossary.** A diagram still carries its
+  `Where:` list directly under the fence, per
+  [A diagram must stand alone](#a-diagram-must-stand-alone), because the figure
+  has to read on its own page.
+
+| Avoid | Use |
+| --- | --- |
+| **Binding registry** - the query-owned reconciliation output that maps projection identities to result column descriptors. | **Binding registry** - a lookup list, rebuilt each time a query runs, that records which column of the query's results each column ID points to. Charts use it to find the column to draw. |
+| **Owner** - the scope a registry is keyed by. | **Owner** - the one place a query runs from, such as the Data Explorer or a single chart on a dashboard. Column IDs are never carried from one owner to another. |
+
+```markdown
+## 2. Glossary
+
+- **Column ID** - a permanent ID the app gives each column a user selects in a
+  query. Chart settings and filters save this ID instead of the column's name,
+  so renaming the column does not break them.
+- **Output name** - the name a column has in the query's results, such as
+  `total` in `SUM(cnt) AS total`. It changes when the user renames the column
+  or changes its aggregation.
+- **Projection** - one item in a query's SELECT list. `SUM(revenue)` and
+  `AVG(revenue)` are two projections of the same table column.
+```
+
+### Background technical context
+
+The map of the code a reader needs before the strand sections make sense. The
+background context pass writes it, per
+[The background context pass runs in a subagent](#the-background-context-pass-runs-in-a-subagent).
+Two parts, in this order:
+
+1. **A directory tree** in a `text` fence, showing only the directories and
+   units the walkthrough involves and the reader needs as background. It is
+   not a file inventory of the change. Mark a unit the change adds `(new)` and
+   one it modifies `(changed)`; an unmarked unit is unchanged code the change
+   depends on. A directory that only leads to a unit is a path, not a unit: it
+   carries no marker and gets no entry. The tree needs no caption, because the
+   list under it is its legend.
+2. **One entry per unit in the tree,** one or two short sentences and never
+   more: what the unit is in product terms, then the one relationship the
+   reader needs, such as what it writes to or who calls it. The strand
+   sections carry everything else.
+
+The tree and its list are one figure, so they fit on one printed page, per
+[A figure never spans two pages](#a-figure-never-spans-two-pages). When the
+change is too wide for that, show each area's anchor unit and let the strand
+sections introduce the rest. Do not define vocabulary in an entry: terms
+belong in the [Glossary](#glossary), which the clarity pass drafts after this
+section exists.
+
+````markdown
+## 3. Background technical context
+
+```text
+shared/models/
+├── Dashboard/                                     (changed)
+├── queries/
+│   ├── StructuredQuery/                           (changed)
+│   └── QueryColumnBindings/                       (new)
+└── vizs/
+    └── makeOutputNameVizConfigFromColumnIdConfig/ (new)
+src/clients/dashboards/
+└── DashboardClient/
+src/views/
+├── DataExplorerApp/                               (changed)
+└── DashboardApp/AvaPage/pblocks/
+    └── DataVizPBlock/                             (changed)
+```
+
+- `Dashboard`: the model that holds everything about one dashboard, including
+  its page and the charts on it. Written to the `dashboards` table through
+  `DashboardClient`.
+- `StructuredQuery`: the model for a query a user builds with the Query tab's
+  form instead of typing SQL. `structuredQueryToSql` turns it into the SQL that
+  runs.
+- `QueryColumnBindings`: matches each column of a query's results to the
+  column ID that chart settings and filters saved.
+- `makeOutputNameVizConfigFromColumnIdConfig`: just before a chart draws, swaps
+  each saved column ID for that column's current name in the results.
+- `DashboardClient`: reads and writes rows of the `dashboards` table.
+- `DataExplorerApp`: the Data Explorer page, where a user writes a query and
+  charts its results.
+- `DataVizPBlock`: one chart on a dashboard page. It runs its own query and
+  draws the result.
+````
+
+### Manual testing
+
+How the reviewer exercises the change themselves, as numbered steps they can
+follow without asking anything. The author writes this section while drafting,
+because the author knows what changed and how to reach it. Start from
+`-test-plan.md` when it exists, verify each step against the code, and bring it
+up to this standard. Do not edit `-test-plan.md` itself.
+
+- **Setup comes first, as numbered steps,** taking the reader from a fresh
+  checkout to the state the test needs:
+  - **Database state.** When the project's standard seed data is enough, say
+    so and give the project's reset command (in Avandar, `pnpm db:reset`).
+    When the test needs records the seed does not create, give the exact
+    command that creates them. Carry over any precondition the project's
+    instructions attach to those commands: in Avandar, a branch other than
+    `develop` runs `ava supabase switch` before any database command.
+  - **Data loaded through the UI.** Name the exact fixture file in the
+    repository's test-data directory (in Avandar, a file under `tests/data/`)
+    and the clicks that load it.
+  - **The app.** The command that starts it, and the file where the sign-in
+    credentials are defined. Point to the file; never paste a password.
+- **One step per action:** what to open, where to click, what to type, and
+  what to look for. Name a page by its navigation path or URL, and bold every
+  UI label exactly as the screen spells it.
+- **A fixed defect gets a before-and-after** under the step that reproduces it:
+  - **Before this change:** what used to happen, so the reader recognises it
+    if it ever comes back.
+  - **Now:** what happens instead.
+- **What the UI cannot reach gets commands.** When part of the change has no
+  path through the UI, give the commands that exercise it: the specific test
+  files, one command per fenced block, and what a pass looks like. Follow the
+  project's rules on which tests to run and how (in Avandar, end-to-end specs
+  one at a time, never the whole suite).
+- Put commands in fenced blocks and literal text the reader must type in a
+  blockquote, as in the test plan.
+
+````markdown
+## 4. Manual testing
+
+1. Confirm `ava supabase status` reports this worktree's own project, running
+   `ava supabase switch` first if it does not. Then rebuild the database. The
+   standard seed data is enough.
+
+   ```sh
+   pnpm db:reset
+   ```
+
+2. Run `pnpm dev`, open the printed URL, and sign in with the seeded user
+   defined in `seed/SeedData.ts`.
+3. Open `/avandar-labs/data-manager/data-import`, choose **Upload**, import
+   `tests/data/small-california-covid-sample/small-california-covid-sample.csv`,
+   and click **Save Dataset**.
+4. Open **Data Explorer** and select that dataset on the **Query** tab. On the
+   **Visualizations** tab, choose **Bar chart**, add **daily_new_cases** as a
+   series, and set its **Series label** to:
+
+   > Cases trend
+
+5. Back on the **Query** tab, change the aggregation of **daily_new_cases** to
+   **SUM**.
+   - **Before this change:** the labelled series was dropped from the chart,
+     because its settings were saved under the column's old name.
+   - **Now:** the series stays, with the same label.
+6. The SQL round trip has no path through the UI. Run its regression:
+
+   ```sh
+   pnpm test:executed tests/integration/queries/structuredQueryRoundTrip.executed.test.ts
+   ```
+````
 
 ### Diagrams
 
@@ -845,7 +1101,7 @@ different steps, and a single section covering both answers neither.
 Three rules apply throughout:
 
 - **Trace one traversal with real values.** The input, the intermediate states,
-  the output, per the algorithm bullet in section 3 of [Sections](#sections).
+  the output, per the algorithm bullet in item 6 of [Sections](#sections).
   For a pipeline this is often a before and after pair of catalog reads, file
   contents, or command output, quoted rather than described.
 - **State what each step deliberately does not do.** An unexplained exclusion
@@ -880,6 +1136,68 @@ structural, not more words.
 - **Check the structure by reading only the headings and each section's first
   sentence.** That pass is part of [Closing checks](#closing-checks).
 
+### Writing for a reader new to this code
+
+Write for a software engineer who knows the product and has never worked in
+this part of the codebase. They know what the product's screens do, and they
+know general engineering vocabulary: tables, indexes, caches, inheritance, a SQL
+alias. They do not know the vocabulary this area of the code has grown, and
+they were not in the conversations it grew in.
+
+That vocabulary comes in two kinds, and the second is the trap:
+
+- **Nomenclature** is documented: a label in the product's UI, a term the
+  project's docs define, a model the codebase names on purpose. A reader can
+  look it up.
+- **Vernacular** is informal: words that emerged while the code was being
+  built, living in comments, variable names, and discussion, and defined
+  nowhere. `binding`, `identity`, `owner`, `descriptor`, and `evidence` in the
+  examples below are all vernacular. A reader cannot look it up, and an author
+  who has used a word for a week no longer hears it as jargon.
+
+Vernacular is not banned. The reader will meet it in the diff, and the document
+should prepare them for it. It must be grounded: either replaced with a plain
+description, or introduced in product terms and defined in the
+[Glossary](#glossary).
+
+- **Ground each mechanism in what a user does or sees.** Name the user action
+  that triggers it, or the screen that shows its effect, then use the technical
+  vocabulary freely. "Column ID" means something to a reader once they know it
+  is what keeps a chart series' label when the user renames the column on the
+  Query tab.
+- **Name both sides of every relationship word.** `binding`, `mapping`, `link`,
+  `match`, `reference`, and `target` each join two things, so say which two:
+  not "an Explorer binding" but "the link between a chart setting in the Data
+  Explorer and one column of the query's results".
+- **Name the owner of every abstract noun.** `identity`, `state`, `metadata`,
+  `schema`, `evidence`, `scope`, and `provenance` say nothing until the reader
+  knows whose. The owner goes in the same sentence or the one before;
+  otherwise restate it. When one word covers several things across the
+  document, as `identity` can cover a source column's ID, a selected column's
+  ID, and a result column's ID, name the specific thing every time.
+- **Qualify a generic word that names more than one thing in the codebase.**
+  `descriptor`, `config`, `settings`, `registry`, `context`, and `schema`
+  usually name several unrelated types. A reader resolves the bare word to
+  whichever one they already know, which is often the wrong one.
+- **Clarity outranks brevity.** Write as briefly as clarity allows, and no more
+  briefly. A heading or sentence that grew by the qualifier a reader needed has
+  improved; one that lost it to save words has not. Shortening is worth doing
+  only until the reader starts to lose the meaning.
+
+| Avoid | What a new reader cannot tell | Use |
+| --- | --- | --- |
+| `4. Executed results need evidence before they can inherit identity` | What ran, what the evidence proves, and whose identity is inherited by what. | `4. When a user edits and re-runs a query, each result column keeps its earlier column ID only when the app can prove it is the same column` |
+| `When no descriptor exists, a unique output receives an ID.` | Which descriptor. The codebase also has visualization setting descriptors, so the reader picks the wrong one. | `When the app cannot describe the query's SELECT list as projection descriptors, for example because the query has a join, each uniquely named result column receives an ID.` |
+| `4.3 Old rows cannot establish a new Explorer binding` | What is bound to what. "Explorer binding" reads like a documented term, and is not one. | `4.3 After a user edits the SQL in the Data Explorer, results from the old SQL cannot supply column IDs to the chart settings` |
+| `Source-field identity and result identity meet at compilation and reconciliation.` | Two identities of unnamed things, joined by two process nouns the reader has not met. | `WHERE filters save IDs of the data source's columns, while chart settings and HAVING filters save IDs of the columns the query selects. The two kinds of ID meet only when the query is compiled to SQL and when its results are matched back to IDs.` |
+
+**The cold-read test.** Read each heading, and the first sentence of each
+section, as that new reader. For every noun, say what concrete thing it names;
+for every verb, say who does it to what. An answer that needs knowledge of this
+code means the sentence needs grounding. The
+[clarity pass](#the-clarity-pass-runs-in-a-subagent) applies this test to the
+whole draft.
+
 ### How much to explain
 
 There is no word limit. A walkthrough is long when the change has many ideas in
@@ -895,6 +1213,11 @@ false, or could not reach a conclusion at all, it stays, at whatever length the
 correction takes. The test runs per passage, never per document: a section that
 earns four paragraphs sits beside one that earns a sentence, and the document
 is correct.
+
+The competent reviewer in this test is the reader that
+[Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code)
+describes, not an insider. A phrase that grounds a term for that reader passes
+the test, even where an insider would not miss it.
 
 What material earns, once it passes that test:
 
@@ -968,7 +1291,7 @@ do not turn the caption into a slogan or punchline.
 
 ### Closing checks
 
-Seven passes over the finished draft, before handing it over. Each catches a
+Nine passes over the finished draft, before handing it over. Each catches a
 class of defect that reading the document top to bottom does not.
 
 Run them by dispatching a subagent, per
@@ -995,8 +1318,12 @@ own draft.
      Sources list is the symptom.
    - The strand map in Purpose against the sections delivered.
    - A section cross-reference (`§4.2`) against where that content now lives.
+   - The Glossary against the body: an entry for a term the body no longer
+     uses, or a term the body leans on with no entry.
+   - The Background tree against the list under it: every unit in one appears
+     in the other.
 
-2. **Audit the coverage,** per the checklist in section 3 of
+2. **Audit the coverage,** per the checklist in item 6 of
    [Sections](#sections): walk it against every strand and confirm where each
    item landed, saying so when an item does not apply.
 
@@ -1045,17 +1372,139 @@ own draft.
    longest sections first, where the answer is least likely to cover the whole
    length.
 
+8. **Check the opening sections against their contracts.** Purpose, Glossary,
+   Background technical context, and Manual testing come first, in that order.
+   No glossary definition uses a term that would itself need defining, per
+   [Glossary](#glossary). No Background entry runs past two sentences, per
+   [Background technical context](#background-technical-context). Every Manual
+   testing step is runnable as written, setup comes first, and each fixed
+   defect has its before-and-after, per [Manual testing](#manual-testing).
+
+9. **Confirm the document stands alone,** per
+   [The walkthrough stands alone](#the-walkthrough-stands-alone). Search it for
+   `.difit`, `guide`, `group`, `transcript`, `test plan`, `thread`, and
+   absolute paths, and remove every pointer to something a reader of the pull
+   request cannot open. There is no reading-order section.
+
+### Review passes
+
+A drafted walkthrough goes through four review passes, each dispatched to its
+own subagent, one at a time and in this order. Each pass reads the document the
+previous one left, and each is done by a reader who did not choose the words.
+
+| Order | Pass | Question it answers | What it changes |
+| --- | --- | --- | --- |
+| 1 | Background context | What code does a reader need to know to follow this change? | Writes the Background technical context section |
+| 2 | Clarity | Can an engineer new to this code follow it? | Nothing. It returns proposals and the glossary; the parent applies them |
+| 3 | Content review | Is every claim true of the code? | Edits claims, returning each change with its evidence. The parent reverts any it rejects |
+| 4 | Style check | Does the document meet this contract? | Edits style only. Always last |
+
+The background section and the glossary are new claims about the code, and the
+clarity rewrites restate existing claims in new words, so the content review
+runs after both and checks all of them. Content runs before style because a
+heading polished to state a claim that turns out to be false is worse than the
+vague heading it replaced, and because a sentence cut as a tell may have been
+the only place a caveat was recorded.
+
+### The background context pass runs in a subagent
+
+This pass writes
+[Background technical context](#background-technical-context), and it is the
+only pass that adds a section rather than reviewing one. A separate reader
+decides what background is needed because the author cannot: having just
+worked in this code, the author no longer sees which modules a newcomer has
+never heard of.
+
+Dispatch it with:
+
+- the absolute path of `-walkthrough.md`,
+- the branch and comparison the walkthrough describes, so it can read the diff,
+- the absolute path of this SKILL.md, told to read
+  [Background technical context](#background-technical-context) and
+  [Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code)
+  before writing anything,
+- authority to edit the Background technical context section of the
+  walkthrough and nothing else.
+
+It works in three steps:
+
+1. **Read the whole walkthrough,** and list every model, module, directory, and
+   table it names, or relies on without naming.
+2. **Measure the blast radius** from the diff: which layers and directories the
+   change touches, such as models, clients, views, the database, or workers,
+   and which unchanged units the changed code calls into or is called from. The
+   blast radius sets the depth. A change confined to one module needs two or
+   three entries; a change that crosses the model, client, and view layers
+   needs an anchor in each layer.
+3. **Keep only what a reader needs as background:** a unit is in when a later
+   section names it without saying what it is, or when the reader needs it to
+   place the change in the codebase. A unit a strand section introduces itself
+   stays out, and so does a changed file nothing in the walkthrough depends
+   on. When the result will not fit on one page, keep each area's anchor unit
+   and drop the rest.
+
+It returns the units it included, the ones it considered and left out, and why,
+so the parent can judge the cut.
+
+### The clarity pass runs in a subagent
+
+This pass reads the draft as the reader in
+[Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code):
+a software engineer who knows the product and has never worked in this part of
+the code. It edits nothing. It returns proposals to the parent, and it delivers
+the [Glossary](#glossary).
+
+Dispatch it with:
+
+- the absolute path of `-walkthrough.md`,
+- the branch and comparison the walkthrough describes,
+- the absolute path of this SKILL.md, told to read
+  [Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code),
+  [Glossary](#glossary), and the heading rules in [Sections](#sections) first,
+- read-only access to the walkthrough, the diff, the code, and the project's
+  docs.
+
+**Cold read first, research second.** Once the subagent has read the code, it
+can no longer see what a newcomer cannot. So it reads the walkthrough alone, top
+to bottom, and records every point where a newcomer would stall before it opens
+anything else:
+
+- **Nomenclature and vernacular:** a term it cannot resolve from the product or
+  from general engineering vocabulary, a relationship word missing one side, an
+  abstract noun whose owner is not in the same or the previous sentence, or a
+  generic word that could name more than one thing.
+- **Problems and solutions:** a problem it could not restate as what a user did
+  and what went wrong, or a solution whose mechanism it could not name.
+- **Algorithms:** a step it could not trace using the worked example given.
+- **Architecture:** a component it could not place in the Shape diagram or the
+  Background tree, or a data flow it could not follow end to end.
+- **Heading order:** a heading that depends on a term or mechanism introduced
+  only later, or a heading list that does not tell the story of the change when
+  read alone.
+
+Only then does it read the diff, the code, and the docs, to turn each stall
+into a concrete fix and to write glossary definitions that are true.
+
+It returns three things:
+
+1. **Proposals,** one per stall: the location (section number and the quoted
+   text), what the newcomer could not work out, and the replacement text. When
+   rewording cannot fix a stall because the underlying claim is unclear, it
+   returns a question for the parent instead of a guessed rewrite.
+2. **Heading order changes,** each with the dependency that motivates it.
+3. **The glossary,** ready to paste, per [Glossary](#glossary).
+
+The parent reads every proposal and accepts or rejects it. It applies the
+accepted ones, checking that each rewrite still states the same claim, then
+writes the glossary into its section, dropping any entry for a term the
+accepted rewrites removed from the body. A rejection is a normal outcome, and
+the content review that follows checks the result against the code.
+
 ### The content review runs in a subagent
 
-A finished walkthrough is checked twice, by two subagents, in this order:
-content, then style. Content first, because a heading polished to state a claim
-that turns out to be false is worse than the vague heading it replaced, and
-because a sentence cut as a tell may have been the only place a caveat was
-recorded.
-
-The content review reads the draft for ACCURACY. Its question is never "does
-this read well", it is "is this true, and is it what the code does". Dispatch it
-with:
+The third pass, per [Review passes](#review-passes). It reads the draft for
+ACCURACY. Its question is never "does this read well", it is "is this true, and
+is it what the code does". Dispatch it with:
 
 - the absolute path of `-walkthrough.md`,
 - the branch and comparison the walkthrough describes, so it can read the diff
@@ -1125,6 +1574,16 @@ Beyond the joins, check and fix:
 - **Highlight specs**, by counting the printed snippet's lines. A clause the
   prose points at that spans two source lines needs both, and a spec naming
   only the first shades half a claim.
+- **The opening sections.** Every Glossary definition and Background entry,
+  against the code. Every command, path, test file, and fixture file in Manual
+  testing exists under that name, and each before-and-after matches what the
+  base revision and the change actually do. Check these by reading, never by
+  running a database command.
+- **Every path the document cites,** for being tracked in the repository at
+  the compared revision (`git cat-file -e <rev>:<path>`). A citation of a
+  `.difit/` artifact, a gitignored file, or a local-only path is a defect, per
+  [The walkthrough stands alone](#the-walkthrough-stands-alone): replace it
+  with the verified claim it stood for, or remove it.
 - **Decisions**, for a rejected alternative that is real and a stated reason
   that is true.
 - **Open questions**, for whether the code has since answered one.
@@ -1135,22 +1594,27 @@ section, retitle a heading that is merely dull, or touch a diagram for
 legibility: those are the style check's, and doing them here costs the parent
 the ability to tell a correction from a preference. Where a claim is
 unrecoverable from the code, it adds an Open question rather than inventing a
-rationale.
+rationale. A correction it writes follows
+[Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code),
+so fixing a claim never brings back vernacular the clarity pass grounded.
 
 ### The style check runs in a subagent
 
-The second and last review phase, dispatched once the content review's changes
-have been accepted or rejected. It reads the document against this contract and
-fixes what it finds, so the pass is done by a reader who did not choose the
-words.
+The last review pass, per [Review passes](#review-passes), dispatched once the
+content review's changes have been accepted or rejected. Nothing runs after it.
+It reads the document against this contract and fixes what it finds, so the
+pass is done by a reader who did not choose the words.
 
 Dispatch it with:
 
 - the absolute path of `-walkthrough.md`,
 - the absolute path of this SKILL.md, told to read
-  [Sections](#sections), [Diagrams](#diagrams),
+  [Sections](#sections), [Glossary](#glossary),
+  [Background technical context](#background-technical-context),
+  [Manual testing](#manual-testing), [Diagrams](#diagrams),
   [Screenshots](#screenshots),
   [Code alongside the prose](#code-alongside-the-prose),
+  [Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code),
   [How much to explain](#how-much-to-explain),
   [Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline),
   [Factual prose](#factual-prose), [Closing checks](#closing-checks) and
@@ -1162,9 +1626,12 @@ It returns the list of changes it made and anything it judged out of scope.
 **Its remit is style, never substance.** It may rewrite a heading, cut a tell,
 retitle a caption, add a missing glossary, reflow a diagram, and correct a
 highlight spec. It may not change a technical claim, add or remove a decision
-or an open question, or alter the meaning of any sentence. When a passage reads
-badly because the underlying claim is unclear, it reports that rather than
-guessing at a fix.
+or an open question, or alter the meaning of any sentence. Nor may it shorten a
+heading or sentence by dropping a qualifier or a phrase that grounds a term for
+a new reader: clarity outranks brevity, per
+[Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code).
+When a passage reads badly because the underlying claim is unclear, it reports
+that rather than guessing at a fix.
 
 #### The diagrams are checked visually, in a loop
 
@@ -1215,6 +1682,9 @@ away.
   close, say so: that is where reviewer attention pays best.
 - Never restate the diff, never narrate file by file, and never explain a
   function whose name already does.
+- Ground the code's informal vocabulary in what a user does or sees, and never
+  trade clarity for brevity. See
+  [Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code).
 - Never hand-wrap a code excerpt to fit the page. `markdown-to-pdf` 0.8.0 and
   later break a long line at the measured column budget and mark the
   continuation with `\u21b3`, so a manual break only adds a wrap the source does
@@ -1259,8 +1729,9 @@ commits made in that round. End it with
 The reviewer is very likely already looking at this diff: `dif` opens difit
 immediately and only then asks for the review. Write artifacts as you finish
 them rather than batching everything to the end, so the browser fills in
-progressively. The guides are what the reviewer is waiting on; write them before
-polishing explainer threads.
+progressively. The guides are what the reviewer is waiting on, so they go up
+first. Explainer threads come after the walkthrough, because they cite its
+sections, and the walkthrough takes longer than everything else combined.
 
 1. Resolve the repo root, branch, comparison, stem, and artifacts. Do the
    comparison handoff now if a live session needs it.
@@ -1270,20 +1741,32 @@ polishing explainer threads.
    - `staged`: `git diff --staged`
    - `working`: `git diff`, plus untracked files
    - branch: `git diff <base>...HEAD`
-3. For a new transcript — absent, or the `[]` one `dif` created — write helpful
-   explainer threads or leave it `[]`. For a new round on an existing
-   transcript, preserve every entry and append only new `claude` threads; never
-   replace the conversation with the new round alone. With a live session,
-   follow [Writing the transcript while a session is
-   live](#writing-the-transcript-while-a-session-is-live).
-4. Validate the transcript.
-5. Write all guide artifacts. Initialize reviewed state only when it is absent;
-   otherwise preserve and reconcile it. Pass the coverage gate.
-6. Send the Initial chat summary.
+3. Write all guide artifacts, with thread counts taken from the transcript as
+   it stands. Initialize reviewed state only when it is absent; otherwise
+   preserve and reconcile it. Pass the coverage gate.
+4. When `-walkthrough.md` does not exist for the selected comparison, write it
+   by running steps 2 to 10 of [Walkthrough](#walkthrough). When it exists,
+   leave it untouched, per
+   [When a walkthrough is written](#when-a-walkthrough-is-written).
+5. Write the explainer threads, pointing into the walkthrough per
+   [As the reviewer](#as-the-reviewer). For a new transcript (absent, or the
+   `[]` one `dif` created), write helpful explainer threads or leave it `[]`.
+   For a new round on an existing transcript, preserve every entry and append
+   only new `claude` threads; never replace the conversation with the new
+   round alone. With a live session, follow [Writing the transcript while a
+   session is live](#writing-the-transcript-while-a-session-is-live).
+6. Validate the transcript, then update the guides' thread counts and pass the
+   coverage gate again.
+7. Send the Initial chat summary. When this round wrote the walkthrough, follow
+   it with the report from step 11 of [Walkthrough](#walkthrough).
 
 A reviewer comment may arrive mid-round: `dif` types it into your input as soon
-as it is written, so it lands as a queued message while you work. Finish the
-Initial round first, then address it as a Continue round.
+as it is written, so it lands as a queued message while you work. Before the
+guides are written, finish them first. After that, answer the comment as a
+Continue round at the next break between steps, then resume the Initial round
+where it stopped: a reviewer should not wait for a walkthrough to get a reply.
+When the reply changed code, the walkthrough describes the code as it stands
+after that change.
 
 Except for the package script added by `ensure-command.py`, do not change source
 files, commit, push, or merge in Initial mode.
@@ -1316,7 +1799,7 @@ files, commit, push, or merge in Initial mode.
    review the selected comparison. Check correctness, edge cases, architecture,
    data modeling, documented conventions, and useful nits.
 4. Write one thread per finding, then use the Initial artifact, validation,
-   coverage, and reporting steps with the selected comparison.
+   coverage, reporting, and walkthrough steps with the selected comparison.
 
 Do not change, commit, push, or merge the contributor's code.
 
@@ -1359,7 +1842,9 @@ to the `/diff-review auto <PR-number>` alias for PR review.
    ```
 
 6. If code changed, regenerate the guides and reviewed signatures, run the
-   coverage gate, and update the summary or test plan only if stale.
+   coverage gate, and update the summary or test plan only if stale. Never
+   touch the walkthrough, even when the change makes it stale, per
+   [When a walkthrough is written](#when-a-walkthrough-is-written).
 7. Report according to the entry path:
    - Injected question with no code edit: compose the reply body once, POST it,
      then send that exact body as the entire chat response.
@@ -1377,7 +1862,8 @@ The POST updates the open browser live; do not restart `dif`.
    and append only genuinely new groups.
 4. Recompute reviewed signatures and demote changed files.
 5. Write reviewed state and both guides, then pass the coverage gate.
-6. Update the summary or test plan only when stale.
+6. Update the summary or test plan only when stale. Never touch the
+   walkthrough.
 7. Briefly report the reviewed and remaining counts without pasting the guide.
 
 Do not change source files, commit, push, or post comments in Diff guide mode.
@@ -1402,19 +1888,28 @@ Do not write artifacts, source files, commits, or comments in Summary mode.
 
 ### Walkthrough
 
-Selected only by an explicit request. Read-only with respect to source.
+Selected only by an explicit request, such as `/diff-review walkthrough`, and
+the only mode that changes an existing walkthrough. Initial and PR review run
+steps 2 to 10 when no walkthrough exists, and a plain `/diff-review` on a
+prepared review with no walkthrough runs steps 2 to 11. Apart from what Initial
+does when step 1 runs it, read-only with respect to source.
 
 1. Resolve the artifacts for the selected comparison. Require `-guide.md` and
-   `-guide.json`; when either is absent, run Initial first, because the
-   walkthrough cites group numbers.
+   `-guide.json`, because a walkthrough belongs to a prepared review. When
+   either is absent, run Initial. If Initial wrote the walkthrough because
+   none existed, stop there rather than writing it a second time. If a
+   walkthrough already existed, Initial left it untouched, so continue from
+   step 2: this request asked for it to change.
 2. Start from what `.difit/` already holds, then go past it. The guide's
    grouping and file tags, the transcript's threads, `-summary.md`,
-   `-test-plan.md`, and any `<branch>_explanations.md` are a prepared map of
-   this diff: read them first to orient, and to avoid re-deriving conclusions
-   an earlier round already reached. None of it is required content and none of
-   it is authoritative. Verify anything you carry forward against the code, and
-   treat a disagreement between an artifact and the code as a finding worth
-   stating.
+   `-test-plan.md`, any `<branch>_explanations.md`, and the current
+   `-walkthrough.md` when one is being regenerated are a prepared map of this
+   diff: read them first to orient, and to avoid re-deriving conclusions an
+   earlier round already reached. None of it is required content, none of it
+   is authoritative, and none of it is cited, per
+   [The walkthrough stands alone](#the-walkthrough-stands-alone). Verify
+   anything you carry forward against the code, and treat a disagreement
+   between an artifact and the code as a finding worth stating.
 3. Read the full diff, then read the surrounding code the diff calls into and
    is called from. The walkthrough describes the system as it now stands, so
    unchanged collaborators are in scope for understanding even though they are
@@ -1423,34 +1918,49 @@ Selected only by an explicit request. Read-only with respect to source.
    [Screenshots](#screenshots).
 5. Where a decision's rationale is not recoverable from the code, say so
    rather than inventing one, and add it to Open questions.
-6. Write `-walkthrough.md`. Do not touch the transcript, the guides, the
-   reviewed state, or any source file. When a strand is a pipeline or a
-   multi-pass algorithm, read
+6. Write `-walkthrough.md`, including Manual testing per
+   [Manual testing](#manual-testing). Write the Glossary and Background
+   technical context headings with a one-line placeholder each, so section
+   numbers are final from the first draft; the next two passes fill them.
+   When regenerating, keep each section's number where its content still
+   fits, because earlier explainer threads cite those numbers. Do not touch
+   the transcript, the guides, the reviewed state, or any source file. When a strand is a pipeline or a multi-pass algorithm, read
    [`references/pipeline-explanation.md`](references/pipeline-explanation.md)
    before writing that section.
-7. Enter the content review phase, by dispatching a subagent per
+7. Run the background context pass, by dispatching a subagent per
+   [The background context pass runs in a subagent](#the-background-context-pass-runs-in-a-subagent).
+   Read what it included and what it left out, and correct the section when a
+   unit a later section depends on is missing.
+8. Run the clarity pass, by dispatching a subagent per
+   [The clarity pass runs in a subagent](#the-clarity-pass-runs-in-a-subagent).
+   Read every proposal and accept or reject it, apply the accepted ones, answer
+   its questions in the text, and write the glossary it returned into the
+   Glossary section.
+9. Enter the content review phase, by dispatching a subagent per
    [The content review runs in a subagent](#the-content-review-runs-in-a-subagent).
    It checks the draft for accuracy against the code, fixes what it finds, and
    reports each change with its evidence. Read every change and accept or
    reject it: a rejection is a normal outcome, and a change accepted without
    reading it defeats the phase.
-8. Then run the style check, by dispatching a subagent per
-   [The style check runs in a subagent](#the-style-check-runs-in-a-subagent).
-   It applies [Closing checks](#closing-checks) and loops on the rendered PDF
-   until every diagram is visually legible. Do not skip it because the draft
-   looks finished: looking finished to its author is the condition the phase
-   exists to test.
-9. Report the section count, what the content review changed and what you
-   rejected, what the style check changed, and any section the deletion test
-   shortened or removed, then end
-   the response with a table naming the walkthrough. One row is expected; the
-   table is there so the path stands out at the end of a long reply.
+10. Then run the style check, always the last pass, by dispatching a subagent
+    per [The style check runs in a subagent](#the-style-check-runs-in-a-subagent).
+    It applies [Closing checks](#closing-checks) and loops on the rendered PDF
+    until every diagram is visually legible. Do not skip it because the draft
+    looks finished: looking finished to its author is the condition the phase
+    exists to test.
+11. Report the section count, which units the background context pass
+    included, what the clarity pass proposed and what you rejected, what the
+    content review changed and what you rejected, what the style check
+    changed, and any section the deletion test shortened or removed. When a
+    regeneration moved a section that an existing thread cites, list those
+    threads. Then end the response with a table naming the walkthrough. One row is expected; the
+    table is there so the path stands out at the end of a long reply.
 
-   ```markdown
-   | Walkthrough | Location |
-   | --- | --- |
-   | <the document's H1 title> | `.difit/<stem>-walkthrough.md` |
-   ```
+    ```markdown
+    | Walkthrough | Location |
+    | --- | --- |
+    | <the document's H1 title> | `.difit/<stem>-walkthrough.md` |
+    ```
 
 ### Cleanup
 
