@@ -1,4 +1,4 @@
-import { makeBucketMap, setValue } from "@avandar/utils";
+import { makeBucketMap, propEq, setValue } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -17,6 +17,7 @@ import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   RadarSeries,
@@ -113,9 +114,10 @@ export function SeriesCard({
       if (nextKey === null) {
         return;
       }
-      const column = numericFields.find((field) => {
-        return field.id === nextKey;
-      });
+      // `Control` reports a plain string. The lookup confirms it is a real ID.
+      const column = numericFields.find(
+        propEq("id", nextKey as QueryColumn.Id),
+      );
       if (column) {
         onSeriesChange({ ...series, key: column.id });
       }
