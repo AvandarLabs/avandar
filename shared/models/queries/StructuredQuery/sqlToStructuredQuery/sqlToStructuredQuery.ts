@@ -32,7 +32,7 @@ import { reconcileParsedColumns } from "$/models/queries/StructuredQuery/sqlToSt
 import { columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
-import type { LegacyQueryFilterGroup as QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { ColumnNameQueryFilterGroup as QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 import type {
   SqlMappingInput,

@@ -2,9 +2,9 @@ import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { normalizeQueryFilters } from "$/models/queries/StructuredQuery/normalizeQueryFilters/normalizeQueryFilters.ts";
-/** Legacy ingress binds only unique names, while runtime rules require IDs. */
+/** Column-name rules bind only unique names. Runtime rules require IDs. */
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
-import type { LegacyQueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { ColumnNameQueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 function _column({ id, name }: { id: string; name: string }): QueryColumn.T {
   return Model.make("QueryColumn", {
@@ -17,7 +17,7 @@ function _column({ id, name }: { id: string; name: string }): QueryColumn.T {
     aggregation: undefined,
   });
 }
-const LEGACY_FILTER: LegacyQueryFilterGroup = {
+const COLUMN_NAME_FILTER: ColumnNameQueryFilterGroup = {
   type: "group",
   id: "group",
   combinator: "OR",
@@ -26,10 +26,10 @@ const LEGACY_FILTER: LegacyQueryFilterGroup = {
   ],
 };
 describe("normalizeQueryFilters", () => {
-  it("retains node identity and values when binding a unique legacy name", () => {
+  it("retains node identity and values when binding a unique column name", () => {
     expect(
       normalizeQueryFilters({
-        filter: LEGACY_FILTER,
+        filter: COLUMN_NAME_FILTER,
         columns: [_column({ id: "source", name: "cnt" })],
         clause: "where",
       }),
@@ -52,9 +52,9 @@ describe("normalizeQueryFilters", () => {
       issues: [],
     });
   });
-  it("omits an ambiguous legacy name and reports its rule", () => {
+  it("omits an ambiguous column name and reports its rule", () => {
     const result = normalizeQueryFilters({
-      filter: LEGACY_FILTER,
+      filter: COLUMN_NAME_FILTER,
       columns: [
         _column({ id: "one", name: "cnt" }),
         _column({ id: "two", name: "cnt" }),
@@ -66,7 +66,7 @@ describe("normalizeQueryFilters", () => {
   });
   it("never rebinds an absent ID to an unrelated source with the old name", () => {
     const bound = normalizeQueryFilters({
-      filter: LEGACY_FILTER,
+      filter: COLUMN_NAME_FILTER,
       columns: [_column({ id: "original", name: "cnt" })],
       clause: "where",
     }).filter;

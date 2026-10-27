@@ -1,6 +1,6 @@
 import { isDefined, prop } from "@avandar/utils";
-import { getColumnIdFromLegacyName } from "$/models/queries/QueryColumnBindings/getColumnIdFromLegacyName/getColumnIdFromLegacyName";
-import { makeColumnIdVizConfigFromLegacyConfig } from "$/models/vizs/makeColumnIdVizConfigFromLegacyConfig/makeColumnIdVizConfigFromLegacyConfig";
+import { getColumnIdFromOutputName } from "$/models/queries/QueryColumnBindings/getColumnIdFromOutputName/getColumnIdFromOutputName";
+import { makeColumnIdVizConfigFromOutputNameConfig } from "$/models/vizs/makeColumnIdVizConfigFromOutputNameConfig/makeColumnIdVizConfigFromOutputNameConfig";
 import { makeOutputNameVizConfigFromColumnIdConfig } from "$/models/vizs/makeOutputNameVizConfigFromColumnIdConfig/makeOutputNameVizConfigFromColumnIdConfig";
 import type {
   ColumnBindingIssue,
@@ -29,7 +29,7 @@ function _getLocalFilterOutcome({
   filter: LegacyLocalFilter;
   columns: readonly QueryResult.ColumnWithId[];
 }): { filter: LocalFilter | undefined; issue: ColumnBindingIssue | undefined } {
-  const columnId = getColumnIdFromLegacyName({
+  const columnId = getColumnIdFromOutputName({
     name: filter.columnName,
     columns,
   });
@@ -74,7 +74,7 @@ export function makeSavedColumnBindingsFromDataVizProps({
       }).issues,
     };
   }
-  const columnIdConversion = makeColumnIdVizConfigFromLegacyConfig({
+  const columnIdConversion = makeColumnIdVizConfigFromOutputNameConfig({
     config: props.vizConfig,
     columns: schema.columns,
   });

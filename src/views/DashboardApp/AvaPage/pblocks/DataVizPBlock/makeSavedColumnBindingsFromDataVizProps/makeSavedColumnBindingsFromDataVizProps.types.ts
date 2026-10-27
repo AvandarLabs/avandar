@@ -9,7 +9,7 @@ import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilte
 
 type DataVizColumnNameProps = {
   columnBindingVersion: 0;
-  vizConfig: VizConfig.Legacy;
+  vizConfig: VizConfig.OutputNameKeyed;
   localFilters: readonly LegacyLocalFilter[];
   globalFilterSubscription: GlobalFilterSubscription;
 };
@@ -24,8 +24,12 @@ type DataVizColumnIdProps = {
 };
 
 /**
- * Persisted compatibility envelope. Legacy names remain intact until
- * resolvable.
+ * Saved column references of a DataViz block. `columnBindingVersion: 0` is the
+ * name-keyed form saved before column IDs, kept intact until every name binds.
+ * That variant, `LegacyLocalFilter`, `mergeLegacyVizConfigEdit`,
+ * `synchronizeLegacyVizType`, and `updateLegacy` exist only to read and edit
+ * it, and can be deleted once no `dashboards.config` row holds a version 0
+ * DataViz block.
  */
 export type DataVizColumnBindingProps =
   | DataVizColumnNameProps

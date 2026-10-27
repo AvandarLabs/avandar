@@ -25,7 +25,7 @@ import {
 } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { LegacyBubbleSeries as BubbleSeries } from "$/models/vizs/ColumnIdVizConfig/LegacyVizConfig.types";
+import type { OutputNameBubbleSeries as BubbleSeries } from "$/models/vizs/ColumnIdVizConfig/OutputNameVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {

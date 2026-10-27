@@ -11,7 +11,7 @@ type RenderBlockOptions = {
   prompt: string;
   rawSql: string;
   vizType: string;
-  vizConfig: VizConfig.Legacy;
+  vizConfig: VizConfig.OutputNameKeyed;
 };
 
 const TEST_DASHBOARD_ID = "00000000-0000-4000-8000-000000000001";

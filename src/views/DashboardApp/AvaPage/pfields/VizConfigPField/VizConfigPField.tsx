@@ -10,10 +10,10 @@ import type { ReactElement } from "react";
 
 type Props = {
   /** Current viz config. */
-  value: VizConfig.T | VizConfig.Legacy;
+  value: VizConfig.T | VizConfig.OutputNameKeyed;
 
   /** Called when the user edits any control inside the per-type subform. */
-  onChange: (value: VizConfig.T | VizConfig.Legacy) => void;
+  onChange: (value: VizConfig.T | VizConfig.OutputNameKeyed) => void;
 
   /**
    * Workspace id used to authorize the SQL data query. When undefined the

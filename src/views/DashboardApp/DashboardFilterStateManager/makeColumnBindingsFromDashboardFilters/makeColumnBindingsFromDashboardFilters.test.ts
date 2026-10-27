@@ -84,12 +84,12 @@ describe("makeColumnBindingsFromDashboardFilters", () => {
     expect(refetch.issues).toEqual([{ target: "global", reason: "missing" }]);
     const reset = makeColumnBindingsFromDashboardFilters({
       filters: [FILTER],
-      targets: { global: { kind: "legacy", columnName: "region" } },
+      targets: { global: { kind: "columnName", columnName: "region" } },
       columns: [{ ...COLUMN, name: "region" }],
     });
     expect(reset.resolvedFilters).toEqual([FILTER]);
   });
-  it("reports ambiguous legacy matches without selecting the first", () => {
+  it("reports ambiguous name matches without selecting the first", () => {
     const result = makeColumnBindingsFromDashboardFilters({
       filters: [FILTER],
       targets: {},
@@ -101,7 +101,7 @@ describe("makeColumnBindingsFromDashboardFilters", () => {
     expect(result.resolvedFilters).toEqual([]);
     expect(result.issues).toEqual([{ target: "global", reason: "ambiguous" }]);
   });
-  it("binds a unique case-insensitive legacy name", () => {
+  it("binds a unique case-insensitive column name", () => {
     const result = makeColumnBindingsFromDashboardFilters({
       filters: [FILTER],
       targets: {},

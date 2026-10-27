@@ -83,11 +83,11 @@ export function isEmptyQueryFilter(filter: QueryFilter | undefined): boolean {
 }
 
 /** Name-based persisted predicate accepted only at ingestion boundaries. */
-export type LegacyQueryFilterRule = Omit<QueryFilterRule, "columnId"> & {
+export type ColumnNameQueryFilterRule = Omit<QueryFilterRule, "columnId"> & {
   columnName: string;
 };
 
 /** Recursive name-based tree accepted only at ingestion boundaries. */
-export type LegacyQueryFilterGroup = Omit<QueryFilterGroup, "rules"> & {
-  rules: ReadonlyArray<LegacyQueryFilterGroup | LegacyQueryFilterRule>;
+export type ColumnNameQueryFilterGroup = Omit<QueryFilterGroup, "rules"> & {
+  rules: ReadonlyArray<ColumnNameQueryFilterGroup | ColumnNameQueryFilterRule>;
 };

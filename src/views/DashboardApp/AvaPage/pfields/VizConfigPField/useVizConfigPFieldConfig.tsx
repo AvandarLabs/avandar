@@ -19,7 +19,7 @@ export function useVizConfigPFieldConfig(options: {
   workspaceId: Workspace.Id | undefined;
   dashboardId: Dashboard.Id;
   snapshotRevision?: string;
-}): CustomField<VizConfig.T | VizConfig.Legacy> {
+}): CustomField<VizConfig.T | VizConfig.OutputNameKeyed> {
   const { t } = useLingui();
   const { workspaceId, dashboardId, snapshotRevision } = options;
 
@@ -27,7 +27,7 @@ export function useVizConfigPFieldConfig(options: {
     ({
       value,
       onChange,
-    }: AvaPageFieldProps<VizConfig.T | VizConfig.Legacy>) => {
+    }: AvaPageFieldProps<VizConfig.T | VizConfig.OutputNameKeyed>) => {
       return (
         <VizConfigPField
           value={value}

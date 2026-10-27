@@ -1,8 +1,8 @@
 import { propNotEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-/** Legacy chart names bind uniquely before renderer resolution. */
+/** Chart output names bind uniquely before renderer resolution. */
 import { uuid } from "$/lib/uuid.ts";
-import { makeColumnIdVizConfigFromLegacyConfig } from "$/models/vizs/makeColumnIdVizConfigFromLegacyConfig/makeColumnIdVizConfigFromLegacyConfig.ts";
+import { makeColumnIdVizConfigFromOutputNameConfig } from "$/models/vizs/makeColumnIdVizConfigFromOutputNameConfig/makeColumnIdVizConfigFromOutputNameConfig.ts";
 import { makeOutputNameVizConfigFromColumnIdConfig } from "$/models/vizs/makeOutputNameVizConfigFromColumnIdConfig/makeOutputNameVizConfigFromColumnIdConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
@@ -21,7 +21,7 @@ const SERIES: { key: string; label: string; color: string } = {
   label: "revenue",
   color: "#123456",
 };
-const CONFIGS: ColumnIdVizConfig.Legacy[] = [
+const CONFIGS: ColumnIdVizConfig.OutputNameKeyed[] = [
   {
     vizType: "bar",
     xAxisKey: "quarter",
@@ -66,11 +66,11 @@ const CONFIGS: ColumnIdVizConfig.Legacy[] = [
   { vizType: "table" },
 ];
 
-describe("makeColumnIdVizConfigFromLegacyConfig", () => {
+describe("makeColumnIdVizConfigFromOutputNameConfig", () => {
   it.each(CONFIGS)(
     "binds $vizType without changing its style or category values",
     (config) => {
-      const result = makeColumnIdVizConfigFromLegacyConfig({
+      const result = makeColumnIdVizConfigFromOutputNameConfig({
         config: config,
         columns: COLUMNS,
       });
@@ -99,9 +99,9 @@ describe("makeColumnIdVizConfigFromLegacyConfig", () => {
   );
 
   it.each(["Revenue", "revenue"])(
-    "rejects ambiguous legacy target %s without choosing the first column",
+    "rejects ambiguous output name %s without choosing the first column",
     (key) => {
-      const config: ColumnIdVizConfig.Legacy = {
+      const config: ColumnIdVizConfig.OutputNameKeyed = {
         vizType: "line",
         xAxisKey: undefined,
         series: [{ renderAs: "line", key }],
@@ -116,7 +116,7 @@ describe("makeColumnIdVizConfigFromLegacyConfig", () => {
           dataType: "double" as const,
         },
       ];
-      const result = makeColumnIdVizConfigFromLegacyConfig({
+      const result = makeColumnIdVizConfigFromOutputNameConfig({
         config: config,
         columns: columns,
       });
@@ -128,8 +128,8 @@ describe("makeColumnIdVizConfigFromLegacyConfig", () => {
     },
   );
 
-  it("accepts a unique case-insensitive legacy name", () => {
-    const result = makeColumnIdVizConfigFromLegacyConfig({
+  it("accepts a unique case-insensitive output name", () => {
+    const result = makeColumnIdVizConfigFromOutputNameConfig({
       config: { vizType: "funnel", nameKey: "QUARTER", valueKey: "REVENUE" },
       columns: COLUMNS,
     });
@@ -139,10 +139,10 @@ describe("makeColumnIdVizConfigFromLegacyConfig", () => {
     });
   });
 
-  it("reports missing required targets without changing the saved legacy input", () => {
+  it("reports missing required targets without changing the input config", () => {
     const config = CONFIGS[4]!;
     const original = structuredClone(config);
-    const result = makeColumnIdVizConfigFromLegacyConfig({
+    const result = makeColumnIdVizConfigFromOutputNameConfig({
       config: config,
       columns: COLUMNS.filter(propNotEq("id", SIZE_ID)),
     });

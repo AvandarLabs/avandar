@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { getColumnIdFromLegacyName } from "$/models/queries/QueryColumnBindings/getColumnIdFromLegacyName/getColumnIdFromLegacyName";
+import { getColumnIdFromOutputName } from "$/models/queries/QueryColumnBindings/getColumnIdFromOutputName/getColumnIdFromOutputName";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ColumnBindingIssue } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -8,7 +8,7 @@ import type { DashboardFilterRecord } from "../DashboardFilterStateManager";
 /** A chart-owned target, independent of the filter control and viewer value. */
 export type DashboardFilterTarget =
   | { kind: "columnId"; columnId: QueryColumn.Id; authoringColumnName: string }
-  | { kind: "legacy"; columnName: string }
+  | { kind: "columnName"; columnName: string }
   | { kind: "unresolved"; columnName: string; reason: "missing" | "ambiguous" };
 /** Chart-owned targets indexed by filter control ID. */
 export type DashboardFilterTargets = Readonly<
@@ -39,10 +39,10 @@ function _buildTarget({
   const authoredName =
     saved?.kind === "columnId" ? saved.authoringColumnName : saved?.columnName;
   const target = authoredName === filter.columnName ? saved : undefined;
-  if (target && target.kind !== "legacy") {
+  if (target && target.kind !== "columnName") {
     return target;
   }
-  const columnId = getColumnIdFromLegacyName({
+  const columnId = getColumnIdFromOutputName({
     name: filter.columnName,
     columns: columns,
   });
@@ -94,7 +94,7 @@ function _buildFilter({
  * Binds each subscribed dashboard filter to a column ID in this chart's query,
  * then maps that ID to the column's current output name for the wrapper SQL.
  * Preserve returned targets across value updates. Explicit query edits may
- * reset only unresolved legacy targets to `legacy`. Column ID targets keep
+ * reset only unresolved targets to `columnName`. Column ID targets keep
  * their IDs even when absent. Definition name edits are detected from
  * authoring metadata.
  */

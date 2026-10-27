@@ -11,15 +11,15 @@ import {
   unwrapLowerCall,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type {
-  LegacyQueryFilterGroup,
-  LegacyQueryFilterRule,
+  ColumnNameQueryFilterGroup,
+  ColumnNameQueryFilterRule,
   QueryFilterCombinator,
-  LegacyQueryFilterGroup as QueryFilterGroup,
+  ColumnNameQueryFilterGroup as QueryFilterGroup,
   QueryFilterOperator,
-  LegacyQueryFilterRule as QueryFilterRule,
+  ColumnNameQueryFilterRule as QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
-type QueryFilter = LegacyQueryFilterGroup | LegacyQueryFilterRule;
+type QueryFilter = ColumnNameQueryFilterGroup | ColumnNameQueryFilterRule;
 
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";

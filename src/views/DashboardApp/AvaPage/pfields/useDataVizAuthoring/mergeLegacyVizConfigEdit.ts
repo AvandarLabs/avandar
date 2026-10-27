@@ -1,17 +1,17 @@
-import { makeColumnIdVizConfigFromLegacyConfig } from "$/models/vizs/makeColumnIdVizConfigFromLegacyConfig/makeColumnIdVizConfigFromLegacyConfig";
+import { makeColumnIdVizConfigFromOutputNameConfig } from "$/models/vizs/makeColumnIdVizConfigFromOutputNameConfig/makeColumnIdVizConfigFromOutputNameConfig";
 import { makeOutputNameVizConfigFromColumnIdConfig } from "$/models/vizs/makeOutputNameVizConfigFromColumnIdConfig/makeOutputNameVizConfigFromColumnIdConfig";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
 type MergeLegacyVizConfigEditOptions = {
-  legacy: VizConfig.Legacy;
+  legacy: VizConfig.OutputNameKeyed;
   before: VizConfig.T;
   after: VizConfig.T;
   columns: readonly QueryResult.ColumnWithId[];
 };
 
 type SeriesConfig = Extract<
-  VizConfig.Legacy,
+  VizConfig.OutputNameKeyed,
   { series: ReadonlyArray<{ key: string }> }
 >;
 
@@ -27,7 +27,7 @@ function _mergeSeries({
   let resolvedIndex = 0;
   const series = legacy.series.flatMap((original) => {
     const single = { ...legacy, series: [original] } as SeriesConfig;
-    const columnIdConfig = makeColumnIdVizConfigFromLegacyConfig({
+    const columnIdConfig = makeColumnIdVizConfigFromOutputNameConfig({
       config: single,
       columns: columns,
     }).config;
@@ -49,7 +49,7 @@ export function mergeLegacyVizConfigEdit({
   before,
   after,
   columns,
-}: Readonly<MergeLegacyVizConfigEditOptions>): VizConfig.Legacy {
+}: Readonly<MergeLegacyVizConfigEditOptions>): VizConfig.OutputNameKeyed {
   if (legacy.vizType !== after.vizType) {
     return legacy;
   }
@@ -84,5 +84,5 @@ export function mergeLegacyVizConfigEdit({
         }
       : {};
   // The edit keeps the discriminant and changes only fields of that chart.
-  return { ...legacy, ...changes, ...series } as VizConfig.Legacy;
+  return { ...legacy, ...changes, ...series } as VizConfig.OutputNameKeyed;
 }

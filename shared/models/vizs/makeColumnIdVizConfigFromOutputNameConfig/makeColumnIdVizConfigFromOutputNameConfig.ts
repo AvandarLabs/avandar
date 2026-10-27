@@ -1,6 +1,6 @@
 import { identity, isDefined, prop, propEq } from "@avandar/utils";
 import { match } from "ts-pattern";
-import { getColumnIdFromLegacyName } from "$/models/queries/QueryColumnBindings/getColumnIdFromLegacyName/getColumnIdFromLegacyName.ts";
+import { getColumnIdFromOutputName } from "$/models/queries/QueryColumnBindings/getColumnIdFromOutputName/getColumnIdFromOutputName.ts";
 import { makeColumnSlotsFromVizConfig } from "$/models/vizs/makeColumnSlotsFromVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { ColumnBindingIssue } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
@@ -34,7 +34,10 @@ function _mapSeries<Series extends { key: string }>(
 function _mapScatterSeries(
   options: Readonly<{
     series: Readonly<
-      Extract<ColumnIdVizConfig.Legacy, { vizType: "scatter" }>["series"]
+      Extract<
+        ColumnIdVizConfig.OutputNameKeyed,
+        { vizType: "scatter" }
+      >["series"]
     >;
     getSlotColumnId: GetSlotColumnId;
   }>,
@@ -57,7 +60,10 @@ function _mapScatterSeries(
 function _mapBubbleSeries(
   options: Readonly<{
     series: Readonly<
-      Extract<ColumnIdVizConfig.Legacy, { vizType: "bubble" }>["series"]
+      Extract<
+        ColumnIdVizConfig.OutputNameKeyed,
+        { vizType: "bubble" }
+      >["series"]
     >;
     getSlotColumnId: GetSlotColumnId;
   }>,
@@ -84,7 +90,7 @@ function _mapBubbleSeries(
 function _mapXYConfig(
   options: Readonly<{
     config: Extract<
-      ColumnIdVizConfig.Legacy,
+      ColumnIdVizConfig.OutputNameKeyed,
       { vizType: "bar" | "line" | "area" }
     >;
     getSlotColumnId: GetSlotColumnId;
@@ -100,7 +106,10 @@ function _mapXYConfig(
 
 function _mapCategoryConfig(
   options: Readonly<{
-    config: Extract<ColumnIdVizConfig.Legacy, { vizType: "pie" | "funnel" }>;
+    config: Extract<
+      ColumnIdVizConfig.OutputNameKeyed,
+      { vizType: "pie" | "funnel" }
+    >;
     getSlotColumnId: GetSlotColumnId;
   }>,
 ): Extract<ColumnIdVizConfig.T, { vizType: "pie" | "funnel" }> {
@@ -114,7 +123,7 @@ function _mapCategoryConfig(
 
 function _mapConfig(
   options: Readonly<{
-    config: Readonly<ColumnIdVizConfig.Legacy>;
+    config: Readonly<ColumnIdVizConfig.OutputNameKeyed>;
     getSlotColumnId: GetSlotColumnId;
   }>,
 ): ColumnIdVizConfig.T {
@@ -168,7 +177,7 @@ function _bindSlotToColumnId({
   const id =
     slot.key === undefined
       ? undefined
-      : getColumnIdFromLegacyName({ name: slot.key, columns });
+      : getColumnIdFromOutputName({ name: slot.key, columns });
   const hasCandidate =
     slot.key !== undefined &&
     columns.some((column) => {
@@ -188,14 +197,14 @@ function _bindSlotToColumnId({
 }
 
 /**
- * Replaces each legacy column name in a chart config with the column ID of the
- * one output column that has that name. Leaves the saved input unchanged.
+ * Replaces each output name in a chart config with the column ID of the one
+ * output column that has that name. Leaves the input config unchanged.
  */
-export function makeColumnIdVizConfigFromLegacyConfig({
+export function makeColumnIdVizConfigFromOutputNameConfig({
   config,
   columns,
 }: Readonly<{
-  config: Readonly<ColumnIdVizConfig.Legacy>;
+  config: Readonly<ColumnIdVizConfig.OutputNameKeyed>;
   columns: readonly QueryResult.ColumnWithId[];
 }>): { config: ColumnIdVizConfig.T; issues: ColumnBindingIssue[] } {
   const slots = makeColumnSlotsFromVizConfig(config).map((slot) => {

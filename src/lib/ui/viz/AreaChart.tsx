@@ -34,7 +34,7 @@ import { useAreaChartStyleProps } from "@/lib/ui/viz/axis/useAreaChartStyleProps
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { LegacyAreaSeries as AreaSeries } from "$/models/vizs/ColumnIdVizConfig/LegacyVizConfig.types";
+import type { OutputNameAreaSeries as AreaSeries } from "$/models/vizs/ColumnIdVizConfig/OutputNameVizConfig.types";
 import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 

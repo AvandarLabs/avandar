@@ -49,7 +49,7 @@ function _getTargets({
   }
   return objectValuesMap(targets, (target) => {
     return target.kind === "unresolved"
-      ? { kind: "legacy" as const, columnName: target.columnName }
+      ? { kind: "columnName" as const, columnName: target.columnName }
       : target;
   });
 }

@@ -3,8 +3,8 @@ import { match } from "ts-pattern";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type {
-  LegacyQueryFilterGroup,
-  LegacyQueryFilterRule,
+  ColumnNameQueryFilterGroup,
+  ColumnNameQueryFilterRule,
   QueryFilterGroup,
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
@@ -23,7 +23,7 @@ function _getMatches({
   columns,
   clause,
 }: {
-  node: QueryFilterRule | LegacyQueryFilterRule;
+  node: QueryFilterRule | ColumnNameQueryFilterRule;
   columns: readonly QueryColumn.T[];
   clause: "where" | "having";
 }): QueryColumn.T[] {
@@ -58,7 +58,7 @@ function _getColumnIdRule({
   column,
   clause,
 }: {
-  node: LegacyQueryFilterRule;
+  node: ColumnNameQueryFilterRule;
   column: QueryColumn.T;
   clause: "where" | "having";
 }): QueryFilterRule {
@@ -76,7 +76,7 @@ function _getRuleOutcome({
   columns,
   clause,
 }: {
-  node: QueryFilterRule | LegacyQueryFilterRule;
+  node: QueryFilterRule | ColumnNameQueryFilterRule;
   columns: readonly QueryColumn.T[];
   clause: "where" | "having";
 }): NodeOutcome {
@@ -102,13 +102,13 @@ function _getRuleOutcome({
       };
 }
 
-/** Binds legacy names once and validates existing identity-based targets. */
+/** Binds column-name rules to column IDs and validates existing ID rules. */
 export function normalizeQueryFilters({
   filter,
   columns,
   clause,
 }: Readonly<{
-  filter: QueryFilterGroup | LegacyQueryFilterGroup;
+  filter: QueryFilterGroup | ColumnNameQueryFilterGroup;
   columns: readonly QueryColumn.T[];
   clause: "where" | "having";
 }>): { filter: QueryFilterGroup; issues: ColumnBindingIssue[] } {

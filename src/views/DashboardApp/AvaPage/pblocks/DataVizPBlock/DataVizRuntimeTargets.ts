@@ -32,7 +32,7 @@ export const DataVizRuntimeTargets = {
     }
     return objectValuesMap(memory.targets, (target) => {
       return target.kind === "unresolved"
-        ? { kind: "legacy" as const, columnName: target.columnName }
+        ? { kind: "columnName" as const, columnName: target.columnName }
         : target;
     });
   },

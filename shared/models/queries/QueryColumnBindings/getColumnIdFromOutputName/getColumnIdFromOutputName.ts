@@ -2,8 +2,12 @@ import { propEq } from "@avandar/utils";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
-/** Recovers a unique name-based target at legacy configuration ingress. */
-export function getColumnIdFromLegacyName({
+/**
+ * Gets the ID of the one result column with this output name, matching
+ * exactly first and then case-insensitively. Undefined when none or several
+ * match.
+ */
+export function getColumnIdFromOutputName({
   name,
   columns,
 }: Readonly<{
