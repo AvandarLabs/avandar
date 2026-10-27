@@ -1,3 +1,4 @@
+import { noop } from "@avandar/utils";
 import { Button, Group, Paper, Stack } from "@mantine/core";
 import { useEffect, useRef } from "react";
 import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";
@@ -7,7 +8,6 @@ import css from "./ExplorerScreen.module.css";
 import type { EditorView } from "@codemirror/view";
 import type { ReactNode } from "react";
 type Props = { sql: string; isEditingSql: boolean };
-const _noop = (): void => {};
 /** SQL editor fixture driven by the current video frame. */
 export function ExplorerSqlEditor({
   sql,
@@ -30,7 +30,7 @@ export function ExplorerSqlEditor({
             <SqlEditor
               value={sql}
               catalog={EXPLORER_SQL_CATALOG}
-              onChange={_noop}
+              onChange={noop}
               minRows={9}
               onEditorReady={(view) => {
                 sqlViewRef.current = view;
@@ -42,7 +42,7 @@ export function ExplorerSqlEditor({
             <SqlEditor
               value={sql}
               catalog={EXPLORER_SQL_CATALOG}
-              onChange={_noop}
+              onChange={noop}
               readOnly
               minRows={9}
             />
@@ -60,11 +60,11 @@ export function ExplorerSqlEditor({
                 size="sm"
                 variant="default"
                 disabled={sql.trim().length === 0}
-                onClick={_noop}
+                onClick={noop}
               >
                 Re-run query
               </Button>
-              <Button size="sm" variant="subtle" onClick={_noop}>
+              <Button size="sm" variant="subtle" onClick={noop}>
                 Cancel
               </Button>
             </>
@@ -73,7 +73,7 @@ export function ExplorerSqlEditor({
               data-video-target="explorer-edit-query"
               size="xs"
               variant="subtle"
-              onClick={_noop}
+              onClick={noop}
             >
               Edit query
             </Button>
