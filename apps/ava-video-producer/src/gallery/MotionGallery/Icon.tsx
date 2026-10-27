@@ -5,6 +5,7 @@ export type IconName =
   | "pause"
   | "search"
   | "arrow"
+  | "previous"
   | "close"
   | "restart"
   | "bookmark"
@@ -32,6 +33,7 @@ export function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
         <path d="m16 16 4 4" />
       </>
     ),
+    previous: <path d="M19 12H5m6-6-6 6 6 6" />,
     arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
     close: <path d="m6 6 12 12M6 18 18 6" />,
     restart: (

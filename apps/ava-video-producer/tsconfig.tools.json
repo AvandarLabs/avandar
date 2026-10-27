@@ -4,5 +4,5 @@
     "types": ["node"],
     "allowJs": true
   },
-  "include": ["scripts", "tests", "capture-flows"]
+  "include": ["scripts", "tests", "capture-flows", "src/yaml.d.ts"]
 }

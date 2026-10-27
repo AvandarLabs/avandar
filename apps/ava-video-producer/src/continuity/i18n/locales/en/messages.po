@@ -1,0 +1,3176 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-10-18 17:55-0400\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A batch pipeline prepares data before the question arrives."
+msgstr "A batch pipeline prepares data before the question arrives."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A case has an identifier and descriptive fields."
+msgstr "A case has an identifier and descriptive fields."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A Case Manager record opens into an explanatory relationship "
+"graph."
+msgstr "A Case Manager record opens into an explanatory relationship graph."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A chart has dependencies."
+msgstr "A chart has dependencies."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A common foundation need not force an identical toolset."
+msgstr "A common foundation need not force an identical toolset."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A conceptual query frame changes bounds and opens onto the "
+"actual product. Use measured destination geometry."
+msgstr "A conceptual query frame changes bounds and opens onto the actual "
+"product. Use measured destination geometry."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A connector is required to explain a verified causal path, or "
+"the selected area is ambiguous."
+msgstr "A connector is required to explain a verified causal path, or the "
+"selected area is ambiguous."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A deliberate fit for the social sector."
+msgstr "A deliberate fit for the social sector."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A different architectural opportunity."
+msgstr "A different architectural opportunity."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A different field can use another rule suited to its meaning."
+msgstr "A different field can use another rule suited to its meaning."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A district count begins with a question about response cases."
+msgstr "A district count begins with a question about response cases."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A facility has a different set of attributes."
+msgstr "A facility has a different set of attributes."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A fictional entity spine keeps one record per entity."
+msgstr "A fictional entity spine keeps one record per entity."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A fictional health example makes the grammar concrete."
+msgstr "A fictional health example makes the grammar concrete."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A field can retain multiple observations or return one value."
+msgstr "A field can retain multiple observations or return one value."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A field needs a source and a rule."
+msgstr "A field needs a source and a rule."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.A field rule changes, then a connector carries attention to "
+#~ "the illustrated calculation."
+#~ msgstr "A field rule changes, then a connector carries attention to the "
+#~ "illustrated calculation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A future plugin ecosystem moves from mission needs to "
+"modules, integration and contributions."
+msgstr "A future plugin ecosystem moves from mission needs to modules, "
+"integration and contributions."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A generalizable model begins with a small grammar."
+msgstr "A generalizable model begins with a small grammar."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A later query can add what is missing."
+msgstr "A later query can add what is missing."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A long-term product direction"
+msgstr "A long-term product direction"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A mission-sized workload."
+msgstr "A mission-sized workload."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A model becomes a workspace"
+msgstr "A model becomes a workspace"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A module could add a specialized visualization or workflow."
+msgstr "A module could add a specialized visualization or workflow."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A name and description identify what this dataset represents."
+msgstr "A name and description identify what this dataset represents."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.A native-scale dashboard crop stays visible beside a "
+#~ "provenance and reuse explanation."
+#~ msgstr "A native-scale dashboard crop stays visible beside a provenance and "
+#~ "reuse explanation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.A native-scale product crop with a conceptual dependency "
+#~ "lane."
+#~ msgstr "A native-scale product crop with a conceptual dependency lane."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A new field does not invent historical answers."
+msgstr "A new field does not invent historical answers."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A platform shaped by its community"
+msgstr "A platform shaped by its community"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A plugin ecosystem."
+msgstr "A plugin ecosystem."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A query describes the records and columns it needs."
+msgstr "A query describes the records and columns it needs."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A query names the data and the operation."
+msgstr "A query names the data and the operation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A question becomes a bounded query."
+msgstr "A question becomes a bounded query."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A record reveals its structure"
+msgstr "A record reveals its structure"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A response case brings related information into one record."
+msgstr "A response case brings related information into one record."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A response case has its own identifier, fields and sources."
+msgstr "A response case has its own identifier, fields and sources."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A restrained teaching underline"
+msgstr "A restrained teaching underline"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A result has a data dependency."
+msgstr "A result has a data dependency."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A reusable result can avoid repeated work."
+msgstr "A reusable result can avoid repeated work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A reusable result can avoid repeating the same computation."
+msgstr "A reusable result can avoid repeating the same computation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A rule turns observations into the displayed value."
+msgstr "A rule turns observations into the displayed value."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A separate allocation example keeps the same amount of work."
+msgstr "A separate allocation example keeps the same amount of work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A separate conceptual example of conserved work and fewer "
+"active hosts."
+msgstr "A separate conceptual example of conserved work and fewer active hosts."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A shared case identifier links each visit to its case."
+msgstr "A shared case identifier links each visit to its case."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A shared foundation."
+msgstr "A shared foundation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A shared modeling grammar can express those differences."
+msgstr "A shared modeling grammar can express those differences."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A source is the beginning"
+msgstr "A source is the beginning"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A stable identity keeps those observations together."
+msgstr "A stable identity keeps those observations together."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A supported source can apply the selection before transfer."
+msgstr "A supported source can apply the selection before transfer."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A travel direction would imply order or causality that the "
+"content does not support."
+msgstr "A travel direction would imply order or causality that the content does "
+"not support."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A useful question can reach beyond a single file."
+msgstr "A useful question can reach beyond a single file."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A useful question gives data work a boundary."
+msgstr "A useful question gives data work a boundary."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A useful record is connected."
+msgstr "A useful record is connected."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A workload, selected transfer, local execution and resource "
+"allocation explain the small-to-medium data thesis."
+msgstr "A workload, selected transfer, local execution and resource allocation "
+"explain the small-to-medium data thesis."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.action and consequence"
+msgstr "action and consequence"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Action-to-explanation timing"
+#~ msgstr "Action-to-explanation timing"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Action, signal, consequence"
+msgstr "Action, signal, consequence"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Actual case components and related-observation fixture "
+"values."
+msgstr "Actual case components and related-observation fixture values."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Actual concept navigation and attribute components."
+msgstr "Actual concept navigation and attribute components."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Actual field-mapping controls with a separate illustrative "
+#~ "model."
+#~ msgstr "Actual field-mapping controls with a separate illustrative model."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Actual import components, fictional Harborfield records."
+msgstr "Actual import components, fictional Harborfield records."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Actual mapping and manual-entry controls stay alongside join "
+#~ "and value-selection diagrams."
+#~ msgstr "Actual mapping and manual-entry controls stay alongside join and "
+#~ "value-selection diagrams."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Actual savings depend on the sources and the workload."
+msgstr "Actual savings depend on the sources and the workload."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Actual SQL editor and result components."
+msgstr "Actual SQL editor and result components."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Add a tool to the shared workspace."
+msgstr "Add a tool to the shared workspace."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Adjust the overlap without consuming the reading hold."
+msgstr "Adjust the overlap without consuming the reading hold."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.aligned layout"
+msgstr "aligned layout"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Aligned-layout dissolve"
+msgstr "Aligned-layout dissolve"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Allow time to read the statement after the emphasis resolves."
+msgstr "Allow time to read the statement after the emphasis resolves."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.An aperture and a code-frame match bring query intent into "
+"the actual Explorer."
+msgstr "An aperture and a code-frame match bring query intent into the actual "
+"Explorer."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.An entity model resolves into an inspectable product "
+"configuration. Retain the conceptual thread through the reveal."
+msgstr "An entity model resolves into an inspectable product configuration. "
+"Retain the conceptual thread through the reveal."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.An explanation emerges from a measured control after its "
+"action, then returns attention to the source."
+msgstr "An explanation emerges from a measured control after its action, then "
+"returns attention to the source."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.An illustrative batch design, not every ETL system."
+msgstr "An illustrative batch design, not every ETL system."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.An import preview makes the source structure visible."
+msgstr "An import preview makes the source structure visible."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.An incremental cache grows with requested columns."
+msgstr "An incremental cache grows with requested columns."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Anchor the signal to the measured product region being "
+"explained."
+msgstr "Anchor the signal to the measured product region being explained."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.anchored diagram"
+msgstr "anchored diagram"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.anchored overlay"
+msgstr "anchored overlay"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Annotation style"
+msgstr "Annotation style"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Aperture into detail"
+msgstr "Aperture into detail"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.aperture reveal"
+msgstr "aperture reveal"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Architectural illustration · Fictional demonstration data"
+msgstr "Architectural illustration · Fictional demonstration data"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.As the model changes, new fields can be introduced."
+msgstr "As the model changes, new fields can be introduced."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Ask before moving data"
+msgstr "Ask before moving data"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Ask for a subset."
+msgstr "Ask for a subset."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Assemble fields around stable identities."
+msgstr "Assemble fields around stable identities."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Assemble the fictional observations around stable entity "
+"identities, inspecting the source rows and resulting record model before "
+"restoring the wide diagram. Morph the Record model label into the "
+"measured product frame over 30 frames, then reveal the scripted "
+"concept-navigation and attribute sequence after its lead-in. Give the "
+"native interface the longer 20-second beat so the transition feels like "
+"an invitation to inspect the conceptual model in configuration."
+msgstr "Assemble the fictional observations around stable entity identities, "
+"inspecting the source rows and resulting record model before restoring "
+"the wide diagram. Morph the Record model label into the measured "
+"product frame over 30 frames, then reveal the scripted "
+"concept-navigation and attribute sequence after its lead-in. Give the "
+"native interface the longer 20-second beat so the transition feels like "
+"an invitation to inspect the conceptual model in configuration."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.attention handoff"
+msgstr "attention handoff"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Attention timing"
+#~ msgstr "Attention timing"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.attribute mapping"
+msgstr "attribute mapping"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Attributes describe what matters."
+msgstr "Attributes describe what matters."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Author diagram cues in increasing beat-local time, beginning "
+"at zero."
+msgstr "Author diagram cues in increasing beat-local time, beginning at zero."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Availability and supported operations shape that choice."
+msgstr "Availability and supported operations shape that choice."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.AVANDAR"
+msgstr "AVANDAR"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Avandar defines concepts and their attributes."
+msgstr "Avandar defines concepts and their attributes."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Avandar focuses on teams with limited resources."
+msgstr "Avandar focuses on teams with limited resources."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Avoid when"
+msgstr "Avoid when"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Avoiding unnecessary transfers can reduce remote work."
+msgstr "Avoiding unnecessary transfers can reduce remote work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Balance the opening with time to read the detail afterward."
+msgstr "Balance the opening with time to read the detail afterward."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Batch ETL and query-led retrieval, connected through a "
+"persistent question and a selective data boundary."
+msgstr "Batch ETL and query-led retrieval, connected through a persistent "
+"question and a selective data boundary."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Begin with an 18-second scripted Case inspection so the "
+"record and related-observation fixture values are readable before the "
+"explanation changes. A 24-frame dissolve introduces a conceptual route "
+"from Record through Field, Mapping, and Source to Value, with brief "
+"camera travel between held details. Finish on the wide graph for an "
+"analytical, traceable explanation of the field structure."
+msgstr "Begin with an 18-second scripted Case inspection so the record and "
+"related-observation fixture values are readable before the explanation "
+"changes. A 24-frame dissolve introduces a conceptual route from Record "
+"through Field, Mapping, and Source to Value, with brief camera travel "
+"between held details. Finish on the wide graph for an analytical, "
+"traceable explanation of the field structure."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Begin with an actual record, then expand into the "
+"relationships that explain its fields."
+msgstr "Begin with an actual record, then expand into the relationships that "
+"explain its fields."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Begin with the illustrative SQL request, moving between its "
+"selected fields and operation before returning to the wide diagram. Over "
+"30 frames, expand the Query label into the measured editor outline and "
+"reveal the scripted Explorer sequence after its lead-in. Let the actual "
+"editor and result components remain at native scale through the longer "
+"inspection beat for a precise, deliberate handoff."
+msgstr "Begin with the illustrative SQL request, moving between its selected "
+"fields and operation before returning to the wide diagram. Over 30 "
+"frames, expand the Query label into the measured editor outline and "
+"reveal the scripted Explorer sequence after its lead-in. Let the actual "
+"editor and result components remain at native scale through the longer "
+"inspection beat for a precise, deliberate handoff."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Begin with the relevant visible record state."
+msgstr "Begin with the relevant visible record state."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Begin with the relevant workload."
+msgstr "Begin with the relevant workload."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Begin with what the mission needs."
+msgstr "Begin with what the mission needs."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Benefits depend on workload, device and source support."
+msgstr "Benefits depend on workload, device and source support."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Boundary treatment"
+msgstr "Boundary treatment"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.bounded opening"
+msgstr "bounded opening"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Bracket a field group"
+msgstr "Bracket a field group"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.bracket annotation"
+msgstr "bracket annotation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Bring in a source."
+msgstr "Bring in a source."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Build the vocabulary your mission needs."
+msgstr "Build the vocabulary your mission needs."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Camera route"
+msgstr "Camera route"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Captions"
+msgstr "Captions"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Carry a diagram boundary into a real interface region at "
+"native scale."
+msgstr "Carry a diagram boundary into a real interface region at native scale."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Carry an explicit model frame into the measured product "
+"region."
+msgstr "Carry an explicit model frame into the measured product region."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Carry one identified object between two diagrams. Change its "
+"position while retaining a single rendered copy."
+msgstr "Carry one identified object between two diagrams. Change its position "
+"while retaining a single rendered copy."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.causal connector"
+msgstr "causal connector"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Change the domain vocabulary."
+msgstr "Change the domain vocabulary."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose a composition"
+msgstr "Choose a composition"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose a forward fixture interval within its adapter horizon."
+msgstr "Choose a forward fixture interval within its adapter horizon."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose a resolved source frame instead of its reset phase."
+msgstr "Choose a resolved source frame instead of its reset phase."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose a seeded mark, measured native rectangle, and "
+"draw/hold/retract interval."
+msgstr "Choose a seeded mark, measured native rectangle, and draw/hold/retract "
+"interval."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose morph for a shared frame and aperture for a bounded "
+"reveal."
+msgstr "Choose morph for a shared frame and aperture for a bounded reveal."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose the data that answers it."
+msgstr "Choose the data that answers it."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose the single phrase to receive the underline."
+msgstr "Choose the single phrase to receive the underline."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose the smallest measured region that makes the point "
+"readable."
+msgstr "Choose the smallest measured region that makes the point readable."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose the sources and relationships."
+msgstr "Choose the sources and relationships."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose where the work belongs."
+msgstr "Choose where the work belongs."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose wipe for a moving opaque edge."
+msgstr "Choose wipe for a moving opaque edge."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.column requests"
+msgstr "column requests"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Community knowledge could then extend its reach."
+msgstr "Community knowledge could then extend its reach."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Company-built plugins could seed the marketplace."
+msgstr "Company-built plugins could seed the marketplace."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Company-built tools can seed a wider ecosystem."
+msgstr "Company-built tools can seed a wider ecosystem."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Compositing"
+msgstr "Compositing"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Composition Atlas"
+msgstr "Composition Atlas"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Composition recipes"
+msgstr "Composition recipes"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Composition screening"
+msgstr "Composition screening"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.concept to configuration"
+msgstr "concept to configuration"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.concept to product"
+msgstr "concept to product"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Conceptual modules, not a marketplace interface."
+msgstr "Conceptual modules, not a marketplace interface."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.conceptual provenance"
+msgstr "conceptual provenance"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Configuration is a set of decisions."
+msgstr "Configuration is a set of decisions."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.configuration teaching"
+msgstr "configuration teaching"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Configure how observations become fields."
+msgstr "Configure how observations become fields."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Configure identity, relationships and field behavior."
+msgstr "Configure identity, relationships and field behavior."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Configure the meaning"
+msgstr "Configure the meaning"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Connect an entity model to an inspectable product "
+"configuration."
+msgstr "Connect an entity model to an inspectable product configuration."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Connect consecutive steps that share a clear horizontal "
+"direction."
+msgstr "Connect consecutive steps that share a clear horizontal direction."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Connect the needed inputs."
+msgstr "Connect the needed inputs."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Connected-source integration is the architectural "
+"explanation."
+msgstr "Connected-source integration is the architectural explanation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Consequence sequence"
+msgstr "Consequence sequence"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.context preservation"
+msgstr "context preservation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.contextual teaching"
+msgstr "contextual teaching"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Continue across a shared horizontal space. Direction carries "
+"the relationship between the scenes."
+msgstr "Continue across a shared horizontal space. Direction carries the "
+"relationship between the scenes."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Continuity frame"
+msgstr "Continuity frame"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Control bounds"
+msgstr "Control bounds"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.controls and explanation"
+msgstr "controls and explanation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Controls and their meaning"
+msgstr "Controls and their meaning"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Controls to adapt"
+msgstr "Controls to adapt"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Correspondence connects existing fields to shared meanings."
+msgstr "Correspondence connects existing fields to shared meanings."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Cover a scene boundary with a moving opaque edge, retaining "
+"an opaque background throughout."
+msgstr "Cover a scene boundary with a moving opaque edge, retaining an opaque "
+"background throughout."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Creative direction"
+msgstr "Creative direction"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.cross dissolve"
+msgstr "cross dissolve"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Customizability comes from configuration of that structure."
+msgstr "Customizability comes from configuration of that structure."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Data begins in sources that need names and context."
+msgstr "Data begins in sources that need names and context."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.decision fork"
+msgstr "decision fork"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Define how fields behave."
+msgstr "Define how fields behave."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.derived field"
+msgstr "derived field"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Descriptive fields assemble around that identity."
+msgstr "Descriptive fields assemble around that identity."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Design around the work a team actually needs."
+msgstr "Design around the work a team actually needs."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Detail hold"
+msgstr "Detail hold"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.diagram sequence"
+msgstr "diagram sequence"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.diagram to interface"
+msgstr "diagram to interface"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.diagram transition"
+msgstr "diagram transition"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Different missions. Shared building blocks."
+msgstr "Different missions. Shared building blocks."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Different programs need different capabilities."
+msgstr "Different programs need different capabilities."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Direct attention to one product region while a separate "
+"diagram explains it."
+msgstr "Direct attention to one product region while a separate diagram "
+"explains it."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.directional transition"
+msgstr "directional transition"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.domain modeling"
+msgstr "domain modeling"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Download MP4"
+msgstr "Download MP4"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Draw the boundary of the question."
+msgstr "Draw the boundary of the question."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Draw the bracket once after the group is ready, then hold."
+#~ msgstr "Draw the bracket once after the group is ready, then hold."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Draw timing"
+#~ msgstr "Draw timing"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Earlier records retain what was and was not collected."
+msgstr "Earlier records retain what was and was not collected."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.edge reveal"
+msgstr "edge reveal"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Edge travel"
+msgstr "Edge travel"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Emphasize one short takeaway after the viewer has read the "
+"surrounding claim."
+msgstr "Emphasize one short takeaway after the viewer has read the surrounding "
+"claim."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Entities, descriptors and relationships carry through mapping "
+"and schema change."
+msgstr "Entities, descriptors and relationships carry through mapping and "
+"schema change."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Entities. Descriptors. Relationships."
+msgstr "Entities. Descriptors. Relationships."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Entity grain resolves into actual ontology inspection and "
+"attribute lists."
+msgstr "Entity grain resolves into actual ontology inspection and attribute "
+"lists."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.entity graph"
+msgstr "entity graph"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.entity model"
+msgstr "entity model"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.entity network"
+msgstr "entity network"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.entity spine"
+msgstr "entity spine"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Establish the batch pipeline, visit its details, and let the "
+"query region depart before carrying the single question label into the "
+"source-filtering diagram. The 24-frame handoff relocates that identity "
+"while each diagram receives an eight-second beat with brief camera "
+"travel between sharp reading holds. Keep the movement purposeful and "
+"traceable so the question remains the visual thread across the "
+"architectural comparison."
+msgstr "Establish the batch pipeline, visit its details, and let the query "
+"region depart before carrying the single question label into the "
+"source-filtering diagram. The 24-frame handoff relocates that identity "
+"while each diagram receives an eight-second beat with brief camera "
+"travel between sharp reading holds. Keep the movement purposeful and "
+"traceable so the question remains the visual thread across the "
+"architectural comparison."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Establish the fictional Case network and inspect its central "
+"entity and relationships before opening onto the source-to-attribute "
+"mapping. A 24-frame aperture from the authored central origin connects "
+"the two eight-second diagram beats, followed by camera holds on the "
+"source columns and corresponding attributes. Keep the reveal contained "
+"and the pace explanatory so the mapping reads as a closer look at the "
+"model."
+msgstr "Establish the fictional Case network and inspect its central entity and "
+"relationships before opening onto the source-to-attribute mapping. A "
+"24-frame aperture from the authored central origin connects the two "
+"eight-second diagram beats, followed by camera holds on the source "
+"columns and corresponding attributes. Keep the reveal contained and the "
+"pace explanatory so the mapping reads as a closer look at the model."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Establish why a field needs a source and a rule, then wipe "
+"into the scripted mapping form and draw a stable bracket around the "
+"measured control group. Show the keyed case-and-visit detail briefly "
+"before holding the sum explanation below the controls, keeping the form "
+"at native scale throughout the 24-second composite beat. Use the bracket "
+"and brief circle annotation as restrained teaching marks that group the "
+"controls without drawing a causal connector."
+msgstr "Establish why a field needs a source and a rule, then wipe into the "
+"scripted mapping form and draw a stable bracket around the measured "
+"control group. Show the keyed case-and-visit detail briefly before "
+"holding the sum explanation below the controls, keeping the form at "
+"native scale throughout the 24-second composite beat. Use the bracket "
+"and brief circle annotation as restrained teaching marks that group the "
+"controls without drawing a causal connector."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Every mission has things it tracks, facts about them and "
+"links."
+msgstr "Every mission has things it tracks, facts about them and links."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.execution placement"
+msgstr "execution placement"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Expand an actual record into an explanation of its fields and "
+"relationships."
+msgstr "Expand an actual record into an explanation of its fields and "
+"relationships."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Explain a configuration alongside the actual controls, then "
+#~ "settle on the consequence."
+#~ msgstr "Explain a configuration alongside the actual controls, then settle on "
+#~ "the consequence."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Explain a real control or result alongside the dependency "
+"that gives it meaning."
+msgstr "Explain a real control or result alongside the dependency that gives it "
+"meaning."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Explain the route from a displayed result to its source."
+msgstr "Explain the route from a displayed result to its source."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Explanation reveal"
+msgstr "Explanation reveal"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Explanatory sequence"
+msgstr "Explanatory sequence"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Export failed. Check the showcase terminal and retry."
+msgstr "Export failed. Check the showcase terminal and retry."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Expose the relationships that matter."
+msgstr "Expose the relationships that matter."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Extend it with domain expertise."
+msgstr "Extend it with domain expertise."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Fewer unnecessary transfers can reduce remote work."
+msgstr "Fewer unnecessary transfers can reduce remote work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.field configuration"
+msgstr "field configuration"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.field group"
+msgstr "field group"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.field lineage"
+msgstr "field lineage"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.First, the familiar batch pipeline."
+msgstr "First, the familiar batch pipeline."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Fit the infrastructure to the work."
+msgstr "Fit the infrastructure to the work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.floating artwork"
+msgstr "floating artwork"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.floating diagram"
+msgstr "floating diagram"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Floating explanation"
+msgstr "Floating explanation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Focus bounds"
+msgstr "Focus bounds"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.focus spotlight"
+msgstr "focus spotlight"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Focus treatment"
+msgstr "Focus treatment"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Focus without a connector"
+msgstr "Focus without a connector"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Follow a dashboard result through explanations that emerge "
+"over the native interface."
+msgstr "Follow a dashboard result through explanations that emerge over the "
+"native interface."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Follow a district count back to its source."
+msgstr "Follow a district count back to its source."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Follow a field through its source and mapping."
+msgstr "Follow a field through its source and mapping."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Follow the result back"
+msgstr "Follow the result back"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Follow the result back to the data and query it depends on."
+msgstr "Follow the result back to the data and query it depends on."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.frame morph"
+msgstr "frame morph"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Frame-to-interface morph"
+msgstr "Frame-to-interface morph"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Freshness and cache policy determine when to reuse it."
+msgstr "Freshness and cache policy determine when to reuse it."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.From a visible field to its meaning."
+msgstr "From a visible field to its meaning."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.From question to query"
+msgstr "From question to query"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Full films"
+#~ msgstr "Full films"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Future product vision"
+msgstr "Future product vision"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Future product vision · Conceptual illustrations"
+msgstr "Future product vision · Conceptual illustrations"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Generalizable structure, explicit meaning."
+msgstr "Generalizable structure, explicit meaning."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.gentle transition"
+msgstr "gentle transition"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Give the model-to-interface reveal enough overlap to remain "
+"traceable."
+msgstr "Give the model-to-interface reveal enough overlap to remain traceable."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Give the movement enough time to preserve orientation."
+msgstr "Give the movement enough time to preserve orientation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Give the structure a name."
+msgstr "Give the structure a name."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Good for"
+msgstr "Good for"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Group bounds"
+msgstr "Group bounds"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Group several related configuration controls while preserving "
+"their original layout."
+msgstr "Group several related configuration controls while preserving their "
+"original layout."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Grouping changes individual cases into district totals."
+msgstr "Grouping changes individual cases into district totals."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Handoff duration"
+msgstr "Handoff duration"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Handoff treatment"
+msgstr "Handoff treatment"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Health and volunteer programs need different capabilities."
+msgstr "Health and volunteer programs need different capabilities."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Health, education and humanitarian work have different "
+"models."
+msgstr "Health, education and humanitarian work have different models."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Here, the question is how many cases each district has."
+msgstr "Here, the question is how many cases each district has."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Here, visits supply values for a response case."
+msgstr "Here, visits supply values for a response case."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Hide a scene boundary behind one opaque moving edge."
+msgstr "Hide a scene boundary behind one opaque moving edge."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Hold on a detail, travel quickly to the next, then restore "
+"the wide context. Coordinates use the 960 by 600 diagram stage."
+msgstr "Hold on a detail, travel quickly to the next, then restore the wide "
+"context. Coordinates use the 960 by 600 diagram stage."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Hold the incoming state once the wipe has cleared."
+msgstr "Hold the incoming state once the wipe has cleared."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.horizontal travel"
+msgstr "horizontal travel"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.How many cases are in each district?"
+msgstr "How many cases are in each district?"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Identity → observations → useful fields."
+msgstr "Identity → observations → useful fields."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Identity, descriptors and relationships give context."
+msgstr "Identity, descriptors and relationships give context."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Illustrated dependencies. Scripted product demonstration."
+#~ msgstr "Illustrated dependencies. Scripted product demonstration."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Illustrative integration; no plugin API is being asserted."
+msgstr "Illustrative integration; no plugin API is being asserted."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Illustrative proportions, not measured customer statistics."
+msgstr "Illustrative proportions, not measured customer statistics."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Import is demonstrated; planning is illustrated."
+msgstr "Import is demonstrated; planning is illustrated."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.In this example, a schema leaves the device for planning."
+msgstr "In this example, a schema leaves the device for planning."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.incremental cache"
+msgstr "incremental cache"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Inspect a response case."
+msgstr "Inspect a response case."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Inspect the model in Avandar."
+msgstr "Inspect the model in Avandar."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Inspect the query in Avandar."
+msgstr "Inspect the query in Avandar."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Inspection interval"
+msgstr "Inspection interval"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Integration follows the question and the data it requires."
+msgstr "Integration follows the question and the data it requires."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Intent before infrastructure."
+msgstr "Intent before infrastructure."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Introduce the Cases, Visits, and Facilities sources "
+"converging on query inputs, then carry an opaque edge across the stage "
+"to reveal the execution-placement decision. Keep the wipe to 24 frames "
+"between two eight-second diagram beats, allowing the camera to inspect "
+"the source and destination details on either side. The effect should "
+"feel like a clean change of explanatory subject while the local, source, "
+"and cloud alternatives remain explicitly illustrative."
+msgstr "Introduce the Cases, Visits, and Facilities sources converging on query "
+"inputs, then carry an opaque edge across the stage to reveal the "
+"execution-placement decision. Keep the wipe to 24 frames between two "
+"eight-second diagram beats, allowing the camera to inspect the source "
+"and destination details on either side. The effect should feel like a "
+"clean change of explanatory subject while the local, source, and cloud "
+"alternatives remain explicitly illustrative."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Introduce the fictional Case network, then dissolve into the "
+"source-column mappings while retaining the editorial heading region and "
+"stage layout. Use the 24-frame opacity overlap as a brief bridge between "
+"eight-second beats, with detail camera holds before returning each "
+"diagram to its wide context. Aim for a gentle change of representation "
+"whose continuity comes from the stable layout rather than matched object "
+"geometry."
+msgstr "Introduce the fictional Case network, then dissolve into the "
+"source-column mappings while retaining the editorial heading region and "
+"stage layout. Use the 24-frame opacity overlap as a brief bridge "
+"between eight-second beats, with detail camera holds before returning "
+"each diagram to its wide context. Aim for a gentle change of "
+"representation whose continuity comes from the stable layout rather "
+"than matched object geometry."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Isolate a diagram region for a quick departure. Its "
+"surroundings remain visible."
+msgstr "Isolate a diagram region for a quick departure. Its surroundings remain "
+"visible."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Its fields retain their connections to source data."
+msgstr "Its fields retain their connections to source data."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Its purpose is to fit more specific missions."
+msgstr "Its purpose is to fit more specific missions."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.join semantics"
+msgstr "join semantics"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep a meaningful object or relationship in view."
+msgstr "Keep a meaningful object or relationship in view."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep attention within a shared editorial heading and stage "
+"layout while changing explanatory content."
+msgstr "Keep attention within a shared editorial heading and stage layout while "
+"changing explanatory content."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep each diagram cue consistent with the currently displayed "
+"control."
+msgstr "Keep each diagram cue consistent with the currently displayed control."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep identity stable."
+msgstr "Keep identity stable."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep one named question or entity recognizable while the "
+"surrounding explanation changes."
+msgstr "Keep one named question or entity recognizable while the surrounding "
+"explanation changes."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep the dissolve short enough to avoid layered text."
+msgstr "Keep the dissolve short enough to avoid layered text."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep the editorial heading and stage layout aligned while a "
+"short opacity overlap changes the explanatory diagrams."
+msgstr "Keep the editorial heading and stage layout aligned while a short "
+"opacity overlap changes the explanatory diagrams."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep the full interface visible while a floating diagram "
+"explains the selected field rule."
+msgstr "Keep the full interface visible while a floating diagram explains the "
+"selected field rule."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep the full scripted mapping interface visible while a "
+"bracket groups the relevant controls and floating details explain keyed "
+"case-and-visit relationships followed by the sum rule. Let the first "
+"overlay return before the longer arithmetic hold, then dissolve over 18 "
+"frames into a seven-second closing thesis about choosing sources, "
+"relationships, and field behavior. Maintain a measured teaching rhythm, "
+"with the diagrams clearly illustrating decisions made in the form."
+msgstr "Keep the full scripted mapping interface visible while a bracket groups "
+"the relevant controls and floating details explain keyed case-and-visit "
+"relationships followed by the sum rule. Let the first overlay return "
+"before the longer arithmetic hold, then dissolve over 18 frames into a "
+"seven-second closing thesis about choosing sources, relationships, and "
+"field behavior. Maintain a measured teaching rhythm, with the diagrams "
+"clearly illustrating decisions made in the form."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep the record grain clear."
+msgstr "Keep the record grain clear."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep the result close to the work."
+msgstr "Keep the result close to the work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep the revealed beat long enough to explain the "
+"relationship."
+msgstr "Keep the revealed beat long enough to explain the relationship."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep the same label on both sides of a handoff."
+msgstr "Keep the same label on both sides of a handoff."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep the supporting lines readable and factually bounded."
+msgstr "Keep the supporting lines readable and factually bounded."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep what this query needed."
+msgstr "Keep what this query needed."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.keyed join"
+msgstr "keyed join"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keywords / tags"
+msgstr "Keywords / tags"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Layout overlap"
+msgstr "Layout overlap"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Leave a stable hold before the next spatial move."
+msgstr "Leave a stable hold before the next spatial move."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Less unnecessary remote work."
+msgstr "Less unnecessary remote work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Less unnecessary work is the aim."
+msgstr "Less unnecessary work is the aim."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Let modules participate in a common system."
+msgstr "Let modules participate in a common system."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Let the community contribute its expertise."
+msgstr "Let the community contribute its expertise."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Let the model grow without rewriting the past."
+msgstr "Let the model grow without rewriting the past."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Let the next scene continue the explanation."
+msgstr "Let the next scene continue the explanation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Let the question define the work."
+msgstr "Let the question define the work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Live React compositions. Fictional demonstration data. "
+"Product states are scripted; architecture diagrams are illustrations. "
+"Plugin capabilities are future vision. Downloads render the current "
+"composition and caption selection."
+msgstr "Live React compositions. Fictional demonstration data. Product states "
+"are scripted; architecture diagrams are illustrations. Plugin "
+"capabilities are future vision. Downloads render the current "
+"composition and caption selection."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Loading preview…"
+msgstr "Loading preview…"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Local execution does not mean every step is offline."
+msgstr "Local execution does not mean every step is offline."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Make the request explicit."
+msgstr "Make the request explicit."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Manual fields describe information outside the dataset."
+msgstr "Manual fields describe information outside the dataset."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Many observations can describe one entity."
+msgstr "Many observations can describe one entity."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Many observations."
+msgstr "Many observations."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Many visits. One response case."
+msgstr "Many visits. One response case."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Map the source into that vocabulary."
+msgstr "Map the source into that vocabulary."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.mapping controls"
+msgstr "mapping controls"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Mark the active product region while a separate diagram "
+"explains it. Useful when a line would imply a false data flow."
+msgstr "Mark the active product region while a separate diagram explains it. "
+"Useful when a line would imply a false data flow."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Matched frame"
+msgstr "Matched frame"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Measure a rectangle around the exact controls in the group."
+msgstr "Measure a rectangle around the exact controls in the group."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Measured annotations"
+msgstr "Measured annotations"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.measured bounds"
+msgstr "measured bounds"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Measured field controls anchor floating explanations of "
+"mapping and value selection."
+msgstr "Measured field controls anchor floating explanations of mapping and "
+"value selection."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.measured region"
+msgstr "measured region"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Missing observations remain missing."
+msgstr "Missing observations remain missing."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Model to workspace"
+msgstr "Model to workspace"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Modeling becomes inspectable."
+msgstr "Modeling becomes inspectable."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Modules would need to participate in the wider platform."
+msgstr "Modules would need to participate in the wider platform."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.More capability near the team."
+msgstr "More capability near the team."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.More missions. More useful tools."
+msgstr "More missions. More useful tools."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Motion Atlas"
+msgstr "Motion Atlas"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Motion to motion"
+msgstr "Motion to motion"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Motion to product"
+msgstr "Motion to product"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Move and process what it needs."
+msgstr "Move and process what it needs."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Move attention only after the relevant product state is "
+#~ "visible."
+#~ msgstr "Move attention only after the relevant product state is visible."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Move from a broad model into one bounded detail without "
+"losing its context."
+msgstr "Move from a broad model into one bounded detail without losing its "
+"context."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Move from the short configuration thesis into the full "
+"scripted mapping interface, marking the measured source region while its "
+"explanation floats below. The keyed relationship detail appears briefly "
+"before the longer sum-rule hold, with timed bracket and circle "
+"annotations supporting the focus treatment throughout the composite "
+"beat. Keep attention moving between control and explanation without a "
+"connecting line so the sequence feels guided while leaving the "
+"surrounding interface readable."
+msgstr "Move from the short configuration thesis into the full scripted mapping "
+"interface, marking the measured source region while its explanation "
+"floats below. The keyed relationship detail appears briefly before the "
+"longer sum-rule hold, with timed bracket and circle annotations "
+"supporting the focus treatment throughout the composite beat. Keep "
+"attention moving between control and explanation without a connecting "
+"line so the sequence feels guided while leaving the surrounding "
+"interface readable."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Move the data the task needs."
+msgstr "Move the data the task needs."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Names identify the domain."
+msgstr "Names identify the domain."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.native interface"
+msgstr "native interface"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Native product with anchored explanatory overlays."
+msgstr "Native product with anchored explanatory overlays."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.native scale"
+msgstr "native scale"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.No matching compositions. Try another search."
+msgstr "No matching compositions. Try another search."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Now move the question upstream."
+msgstr "Now move the question upstream."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Object bounds"
+msgstr "Object bounds"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.object continuity"
+msgstr "object continuity"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Object departure"
+msgstr "Object departure"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Object identity"
+msgstr "Object identity"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Objects require a one-to-one geometric handoff, or the "
+"overlap makes diagram labels hard to read."
+msgstr "Objects require a one-to-one geometric handoff, or the overlap makes "
+"diagram labels hard to read."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.occluded boundary"
+msgstr "occluded boundary"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Occlusion wipe"
+msgstr "Occlusion wipe"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.One entity."
+msgstr "One entity."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.One foundation. Different domain models."
+msgstr "One foundation. Different domain models."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.One grammar, many missions"
+msgstr "One grammar, many missions"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.One platform cannot predict every mission."
+msgstr "One platform cannot predict every mission."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.One source becomes part of a question."
+msgstr "One source becomes part of a question."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Only Explorer has partial modes"
+msgstr "Only Explorer has partial modes"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.ontology inspection"
+msgstr "ontology inspection"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.opacity overlap"
+msgstr "opacity overlap"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.opaque wipe"
+msgstr "opaque wipe"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Open with the relationship between identity, observations, "
+"and fields, then use a 30-frame wipe into the scripted attribute-mapping "
+"interface. Let the keyed case-and-visit detail appear first, then time "
+"the source signal after the rule action and bring out the sum "
+"explanation with a longer reading hold. Keep the measured control as the "
+"visual origin and return attention there as the overlays retract, "
+"treating the arithmetic as an illustrative explanation of the choice."
+msgstr "Open with the relationship between identity, observations, and fields, "
+"then use a 30-frame wipe into the scripted attribute-mapping interface. "
+"Let the keyed case-and-visit detail appear first, then time the source "
+"signal after the rule action and bring out the sum explanation with a "
+"longer reading hold. Keep the measured control as the visual origin and "
+"return attention there as the overlays retract, treating the arithmetic "
+"as an illustrative explanation of the choice."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Opening origin"
+msgstr "Opening origin"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Optimize for the teams doing the work."
+msgstr "Optimize for the teams doing the work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Or begin with what you need?"
+msgstr "Or begin with what you need?"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Other information can wait for another question."
+msgstr "Other information can wait for another question."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Other relationships connect the case to its wider context."
+msgstr "Other relationships connect the case to its wider context."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Other source fields are not required for this question."
+msgstr "Other source fields are not required for this question."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Overlap duration"
+msgstr "Overlap duration"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Packing it differently leaves some capacity idle."
+msgstr "Packing it differently leaves some capacity idle."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Performance and cost depend on real conditions."
+msgstr "Performance and cost depend on real conditions."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.persistent identity"
+msgstr "persistent identity"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Place the annotation after the control state changes."
+#~ msgstr "Place the annotation after the control state changes."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Place the computation deliberately."
+msgstr "Place the computation deliberately."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Place the opening on the source idea that leads into the next "
+"scene."
+msgstr "Place the opening on the source idea that leads into the next scene."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Placement depends on source support and workload."
+msgstr "Placement depends on source support and workload."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.predicate pushdown"
+msgstr "predicate pushdown"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Prepare everything first?"
+msgstr "Prepare everything first?"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Preparing export…"
+msgstr "Preparing export…"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Present two short thesis cards about fitting infrastructure "
+"to the work, emphasizing one takeaway phrase on each with a "
+"deterministic drawn underline. Give each card seven seconds and connect "
+"them with an 18-frame dissolve while the supporting typography remains "
+"still. Keep the gesture quiet and editorial so the viewer reads the "
+"argument before dwelling on its emphasized conclusion."
+msgstr "Present two short thesis cards about fitting infrastructure to the "
+"work, emphasizing one takeaway phrase on each with a deterministic "
+"drawn underline. Give each card seven seconds and connect them with an "
+"18-frame dissolve while the supporting typography remains still. Keep "
+"the gesture quiet and editorial so the viewer reads the argument before "
+"dwelling on its emphasized conclusion."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Product and motion"
+msgstr "Product and motion"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Product interval"
+msgstr "Product interval"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Product segment must move forward"
+msgstr "Product segment must move forward"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.product to diagram"
+msgstr "product to diagram"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Product to motion"
+msgstr "Product to motion"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Productions"
+msgstr "Productions"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Provide complete stock inputs that agree with the displayed "
+"record."
+msgstr "Provide complete stock inputs that agree with the displayed record."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.QETL and a conventional batch ETL example"
+msgstr "QETL and a conventional batch ETL example"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.QETL can integrate relevant information across sources."
+msgstr "QETL can integrate relevant information across sources."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.QETL lets that question guide the data work."
+msgstr "QETL lets that question guide the data work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.QETL starts with the question instead."
+msgstr "QETL starts with the question instead."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.QETL uses query intent to guide integration and execution."
+msgstr "QETL uses query intent to guide integration and execution."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Query"
+msgstr "Query"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.query first"
+msgstr "query first"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.query inspection"
+msgstr "query inspection"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Query intent guides the work."
+msgstr "Query intent guides the work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.query subset"
+msgstr "query subset"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Query. Then retrieve and compute."
+msgstr "Query. Then retrieve and compute."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Read the result in context."
+msgstr "Read the result in context."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reading hold"
+msgstr "Reading hold"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.reading holds"
+msgstr "reading holds"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.reading pause"
+msgstr "reading pause"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reading time"
+msgstr "Reading time"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.record identity"
+msgstr "record identity"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.record inspection"
+msgstr "record inspection"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Record interval"
+msgstr "Record interval"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Record model"
+msgstr "Record model"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Record to relationships"
+msgstr "Record to relationships"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.related controls"
+msgstr "related controls"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Relationship explanation"
+msgstr "Relationship explanation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.relationship traversal"
+msgstr "relationship traversal"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Relevant records and fields stay in view."
+msgstr "Relevant records and fields stay in view."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Repeated observations should not multiply its identity."
+msgstr "Repeated observations should not multiply its identity."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Repeated visit observations can contribute to a case field."
+msgstr "Repeated visit observations can contribute to a case field."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Request the relevant data."
+msgstr "Request the relevant data."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reserve overlap for the move and leave both beats a reading "
+"hold."
+msgstr "Reserve overlap for the move and leave both beats a reading hold."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Resolved hold"
+msgstr "Resolved hold"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Resolved stock state"
+msgstr "Resolved stock state"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Resource allocation should follow actual demand."
+msgstr "Resource allocation should follow actual demand."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.restrained emphasis"
+msgstr "restrained emphasis"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Retain the modeling foundation."
+msgstr "Retain the modeling foundation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reuse the common foundation."
+msgstr "Reuse the common foundation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reuse the grammar across domains."
+msgstr "Reuse the grammar across domains."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reuse this study"
+msgstr "Reuse this study"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reuse work when it remains valid."
+msgstr "Reuse work when it remains valid."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reveal duration"
+msgstr "Reveal duration"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reveal shape"
+msgstr "Reveal shape"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reveal the next explanation through a bounded opening. Useful "
+"when moving from structure to detail."
+msgstr "Reveal the next explanation through a bounded opening. Useful when "
+"moving from structure to detail."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.rule selection"
+msgstr "rule selection"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Rules turn observations into useful fields."
+msgstr "Rules turn observations into useful fields."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Run the query to inspect the returned table."
+msgstr "Run the query to inspect the returned table."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.scene change"
+msgstr "scene change"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.schema correspondence"
+msgstr "schema correspondence"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.schema mapping"
+msgstr "schema mapping"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Search compositions"
+msgstr "Search compositions"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Search the collection"
+msgstr "Search the collection"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.seconds"
+msgstr "seconds"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.See it in a full film:"
+msgstr "See it in a full film:"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Segment exceeds the authored product horizon"
+msgstr "Segment exceeds the authored product horizon"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Select the ontology fixture interval that proves the bounded "
+"point."
+msgstr "Select the ontology fixture interval that proves the bounded point."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Separate the needed subset from other work."
+msgstr "Separate the needed subset from other work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Set departure, return, and a settled rectangle clear of the "
+"relevant product controls."
+msgstr "Set departure, return, and a settled rectangle clear of the relevant "
+"product controls."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Set explicit origin and destination bounds in the 1600 by 840 "
+"stage."
+msgstr "Set explicit origin and destination bounds in the 1600 by 840 stage."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Several phrases compete for emphasis, or the underline would "
+"be mistaken for an interactive link."
+msgstr "Several phrases compete for emphasis, or the underline would be "
+"mistaken for an interactive link."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.shared element"
+msgstr "shared element"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Shared platform"
+msgstr "Shared platform"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Shared-object handoff"
+msgstr "Shared-object handoff"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Show both the control and the meaning of the choice."
+msgstr "Show both the control and the meaning of the choice."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Show which fictional rows cross the source boundary, then "
+"continue horizontally into the cache diagram that adds columns requested "
+"by a query. The 24-frame spatial transition joins two eight-second "
+"beats, with quick camera moves separated by stable detail holds and a "
+"return to the wide view. Preserve a clear sense of forward progression "
+"while giving the retained rows and requested columns time to read."
+msgstr "Show which fictional rows cross the source boundary, then continue "
+"horizontally into the cache diagram that adds columns requested by a "
+"query. The 24-frame spatial transition joins two eight-second beats, "
+"with quick camera moves separated by stable detail holds and a return "
+"to the wide view. Preserve a clear sense of forward progression while "
+"giving the retained rows and requested columns time to read."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Showcase navigation"
+msgstr "Showcase navigation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Signal timing"
+msgstr "Signal timing"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.single takeaway"
+msgstr "single takeaway"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Source bounds"
+msgstr "Source bounds"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.source columns"
+msgstr "source columns"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Source columns can map to that shared vocabulary."
+msgstr "Source columns can map to that shared vocabulary."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Source components. Fictional data."
+msgstr "Source components. Fictional data."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.source integration"
+msgstr "source integration"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.source mapping"
+msgstr "source mapping"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.source spotlight"
+msgstr "source spotlight"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Spatial continuation"
+msgstr "Spatial continuation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.spatial continuity"
+msgstr "spatial continuity"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Spatial relationship"
+msgstr "Spatial relationship"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.SQL editor"
+msgstr "SQL editor"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.SQL names the grouping and the count explicitly."
+msgstr "SQL names the grouping and the count explicitly."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.stable heading"
+msgstr "stable heading"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.stable typography"
+msgstr "stable typography"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Start after the action and leave at least 45 frames for the "
+"consequence."
+msgstr "Start after the action and leave at least 45 frames for the "
+"consequence."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Start with a useful question."
+msgstr "Start with a useful question."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Start with the thing being tracked."
+msgstr "Start with the thing being tracked."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.structure to detail"
+msgstr "structure to detail"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Sum adds the available kit counts."
+msgstr "Sum adds the available kit counts."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.sum aggregation"
+msgstr "sum aggregation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.sum calculation"
+msgstr "sum calculation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.sum rule"
+msgstr "sum rule"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Supporting statement"
+msgstr "Supporting statement"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Takeaway phrase"
+msgstr "Takeaway phrase"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Teach how a configuration choice relates to a join or "
+"value-selection rule."
+msgstr "Teach how a configuration choice relates to a join or value-selection "
+"rule."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.teaching underline"
+msgstr "teaching underline"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Ten stories about how Avandar works, and reusable guidance "
+"for the transitions and visual relationships that make them flow."
+msgstr "Ten stories about how Avandar works, and reusable guidance for the "
+"transitions and visual relationships that make them flow."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.That intent becomes a query in Avandar Explorer."
+msgstr "That intent becomes a query in Avandar Explorer."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.That workload can call for a different architecture."
+msgstr "That workload can call for a different architecture."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The actual import sequence opens into an explanation of "
+"integration and execution placement."
+msgstr "The actual import sequence opens into an explanation of integration and "
+"execution placement."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The aim is less unnecessary preparation before an answer."
+msgstr "The aim is less unnecessary preparation before an answer."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The aim is to avoid unnecessary transfer and repeated work."
+msgstr "The aim is to avoid unnecessary transfer and repeated work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The answer has a visible table."
+msgstr "The answer has a visible table."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The answer needs case records and their district field."
+msgstr "The answer needs case records and their district field."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The architectural aim is less unnecessary transfer and work."
+msgstr "The architectural aim is less unnecessary transfer and work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The architecture follows the question."
+msgstr "The architecture follows the question."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The benefit depends on the sources and the workload."
+msgstr "The benefit depends on the sources and the workload."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The business argument is a closer fit to small and medium "
+"work."
+msgstr "The business argument is a closer fit to small and medium work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The cache can retain previously requested columns."
+msgstr "The cache can retain previously requested columns."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The case identifier links observations."
+msgstr "The case identifier links observations."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The conceptual model implies configuration capabilities "
+"absent from the selected product leaves."
+msgstr "The conceptual model implies configuration capabilities absent from the "
+"selected product leaves."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The connector would claim a data flow or product behavior "
+"that has not been established."
+msgstr "The connector would claim a data flow or product behavior that has not "
+"been established."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The controls are unrelated, or a bracket would cover their "
+"labels or input values."
+msgstr "The controls are unrelated, or a bracket would cover their labels or "
+"input values."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The diagram explains structure, not a live synchronization."
+msgstr "The diagram explains structure, not a live synchronization."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The displayed record is one view of a wider model."
+msgstr "The displayed record is one view of a wider model."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The dissolve kind applies a short opacity overlap. It "
+"preserves the layout without matching individual object geometry."
+msgstr "The dissolve kind applies a short opacity overlap. It preserves the "
+"layout without matching individual object geometry."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The ecosystem is future work."
+msgstr "The ecosystem is future work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The editor makes the requested operation visible."
+msgstr "The editor makes the requested operation visible."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The explanatory diagram is presented as a successful live "
+"query, save or backfill."
+msgstr "The explanatory diagram is presented as a successful live query, save "
+"or backfill."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The form sequence is scripted; diagrams explain the decision."
+msgstr "The form sequence is scripted; diagrams explain the decision."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The goal is to move and process what the question needs."
+msgstr "The goal is to move and process what the question needs."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The graph introduces relationships that are not supported by "
+"the record or declared fixtures."
+msgstr "The graph introduces relationships that are not supported by the record "
+"or declared fixtures."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The inspection is a deterministic product-component demo."
+msgstr "The inspection is a deterministic product-component demo."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The interface destination has not been measured, or the frame "
+"would obscure the control being explained."
+msgstr "The interface destination has not been measured, or the frame would "
+"obscure the control being explained."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The lane is conceptual, not backend telemetry."
+msgstr "The lane is conceptual, not backend telemetry."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The long-term aim is reusable tools for specific missions."
+msgstr "The long-term aim is reusable tools for specific missions."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The mapping makes the correspondence explicit."
+msgstr "The mapping makes the correspondence explicit."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The marketplace is not presented as available today."
+msgstr "The marketplace is not presented as available today."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.The match schema kind applies a short opacity overlap. It "
+#~ "does not match individual object geometry."
+#~ msgstr "The match schema kind applies a short opacity overlap. It does not "
+#~ "match individual object geometry."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The model gives the workspace its own vocabulary."
+msgstr "The model gives the workspace its own vocabulary."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The model gives the workspace its vocabulary."
+msgstr "The model gives the workspace its vocabulary."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The model specifies sources, relationships and field "
+"behavior."
+msgstr "The model specifies sources, relationships and field behavior."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The object changes identity, or the same label would imply an "
+"unsupported equivalence."
+msgstr "The object changes identity, or the same label would imply an "
+"unsupported equivalence."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The opening clips important labels, or several details need "
+"equal attention at once."
+msgstr "The opening clips important labels, or several details need equal "
+"attention at once."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The order changes the work."
+msgstr "The order changes the work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The plan gives cholera, HIV and volunteer examples."
+msgstr "The plan gives cholera, HIV and volunteer examples."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The plugin ecosystem is a future product vision."
+msgstr "The plugin ecosystem is a future product vision."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The query defines the subset that crosses the boundary."
+msgstr "The query defines the subset that crosses the boundary."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The query plan also needs an execution location."
+msgstr "The query plan also needs an execution location."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The question"
+msgstr "The question"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The question determines what is needed."
+msgstr "The question determines what is needed."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The question has a visible form."
+msgstr "The question has a visible form."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The record belongs to a wider model."
+msgstr "The record belongs to a wider model."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The requested subset determines what needs to move."
+msgstr "The requested subset determines what needs to move."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The result needs a district field and a counting rule."
+msgstr "The result needs a district field and a counting rule."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The result points back to its source."
+msgstr "The result points back to its source."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The returned plan runs on local data."
+msgstr "The returned plan runs on local data."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The right scale changes the design"
+msgstr "The right scale changes the design"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The route is a conceptual explanation of a derived field."
+msgstr "The route is a conceptual explanation of a derived field."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The same case can collect several observations."
+msgstr "The same case can collect several observations."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The same foundation can support a different domain model."
+msgstr "The same foundation can support a different domain model."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The same product surfaces can inspect both models."
+msgstr "The same product surfaces can inspect both models."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The source serves the question."
+msgstr "The source serves the question."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The Sum rule totals the supplied kit counts."
+msgstr "The Sum rule totals the supplied kit counts."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The UI demonstrates a scripted query sequence."
+msgstr "The UI demonstrates a scripted query sequence."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The user queries the prepared copy afterward."
+msgstr "The user queries the prepared copy afterward."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The viewer needs to compare both states simultaneously, or "
+"the cover hides the key evidence."
+msgstr "The viewer needs to compare both states simultaneously, or the cover "
+"hides the key evidence."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The vision joins ontology with case management."
+msgstr "The vision joins ontology with case management."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The vocabulary lets the workspace fit its mission."
+msgstr "The vocabulary lets the workspace fit its mission."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The workspace can then fit a particular mission."
+msgstr "The workspace can then fit a particular mission."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.These paths refer to the continuity beat schema. Adjust the "
+"authored input, then inspect the result at native scale."
+msgstr "These paths refer to the continuity beat schema. Adjust the authored "
+"input, then inspect the result at native scale."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.These proportions explain a concept, not a benchmark."
+msgstr "These proportions explain a concept, not a benchmark."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.thesis card"
+msgstr "thesis card"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.This batch example prepares data on a schedule."
+msgstr "This batch example prepares data on a schedule."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.This dashboard groups fictional cases by district."
+msgstr "This dashboard groups fictional cases by district."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.This diagram illustrates integration, not a shipped API."
+msgstr "This diagram illustrates integration, not a shipped API."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.This example prepares a source for later questions."
+msgstr "This example prepares a source for later questions."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.This example sends a schema and runs the returned plan "
+"locally."
+msgstr "This example sends a schema and runs the returned plan locally."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.This fictional result shows the shape of the answer."
+msgstr "This fictional result shows the shape of the answer."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Those links make the model useful beyond a single row."
+msgstr "Those links make the model useful beyond a single row."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Tools that fit the mission."
+msgstr "Tools that fit the mission."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Trace a field back through its structure."
+msgstr "Trace a field back through its structure."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Transcript"
+msgstr "Transcript"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Transitions"
+msgstr "Transitions"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Travel duration"
+msgstr "Travel duration"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Travel time"
+msgstr "Travel time"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.unconnected explanation"
+msgstr "unconnected explanation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Underline one takeaway with a fixed seed and frame-driven "
+"progress. Keep the rest of the typography still."
+msgstr "Underline one takeaway with a fixed seed and frame-driven progress. "
+"Keep the rest of the typography still."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Use a short transition into the relationship explanation "
+"after the record has been read."
+msgstr "Use a short transition into the relationship explanation after the "
+"record has been read."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Use a stable rough-notation bracket to group actual "
+"configuration controls. Draw once, then hold."
+msgstr "Use a stable rough-notation bracket to group actual configuration "
+"controls. Draw once, then hold."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Use aperture to expose the incoming scene through a bounded "
+"opening."
+msgstr "Use aperture to expose the incoming scene through a bounded opening."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Use bracket to group controls without asserting a data "
+"connection."
+msgstr "Use bracket to group controls without asserting a data connection."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Use focus when a line would imply an unsupported flow."
+msgstr "Use focus when a line would imply an unsupported flow."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Use local computation when it fits."
+msgstr "Use local computation when it fits."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Use measured mapping-control bounds as the explanatory "
+"source."
+msgstr "Use measured mapping-control bounds as the explanatory source."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Use measured product bounds for the destination outline."
+msgstr "Use measured product bounds for the destination outline."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Use spatial to continue across the same horizontal space."
+msgstr "Use spatial to continue across the same horizontal space."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Useful data does not have to be big data."
+msgstr "Useful data does not have to be big data."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.value selection"
+msgstr "value selection"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Visits and facilities give it relationships and context."
+msgstr "Visits and facilities give it relationships and context."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+#~ msgid "continuity.Vocabulary"
+#~ msgstr "Vocabulary"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.What are the things?"
+msgstr "What are the things?"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.What describes and connects them?"
+msgstr "What describes and connects them?"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.What if the question came first?"
+msgstr "What if the question came first?"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Which districts have cases?"
+msgstr "Which districts have cases?"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.workload fit"
+msgstr "workload fit"

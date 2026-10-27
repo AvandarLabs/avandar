@@ -7,14 +7,16 @@ import {
 } from "node:http";
 import path from "node:path";
 import { z } from "zod";
-import { buildAtlas } from "../build-motion-gallery.mjs";
+import { buildAtlas } from "../buildAtlas/buildAtlas.mjs";
 import { assetReferences, publicAsset, captionFiles } from "../lib/planHelpers";
 import { requireLicense } from "../require-license.mjs";
+import { buildStockContracts } from "../stock/buildStockContracts/buildStockContracts";
+import { type StockFingerprint } from "../stock/StockFingerprintModule/StockFingerprintModule";
 import { buildLivePlayers } from "./build";
 import { createExportJobs } from "./createExportJobs/createExportJobs";
-import { appRoot, loadFilm, plans } from "./loadFilm/loadFilm";
 import { withNarration } from "./narrationHelpers/narrationHelpers";
 import { renderFilm } from "./render";
+import { appRoot, ShowcaseFilms, PLANS } from "./ShowcaseFilms/ShowcaseFilms";
 import { servedFile, streamFile } from "./staticFileHelpers/staticFileHelpers";
 import type { Film } from "../../src/showcase/showcase.types";
 
@@ -25,6 +27,7 @@ const media = new Map<string, string>();
 const session = randomUUID();
 let generation = 0;
 const publish = async () => {
+  await buildStockContracts(appRoot);
   generation += 1;
   clients.forEach((client) =>
     client.write(`data: ${session}:${generation}\n\n`),
@@ -37,16 +40,34 @@ const atlas = await buildAtlas({
   outputDirectory: live.output,
 });
 let planTimer: ReturnType<typeof setTimeout> | undefined;
-const plansWatcher = watch(path.join(appRoot, "storyboards"), () => {
-  clearTimeout(planTimer);
-  planTimer = setTimeout(() => {
-    void Promise.all(Object.keys(plans).map((id) => loadFilm(id)))
-      .then(publish)
-      .catch((error) => console.error("Storyboard not ready:", error));
-  }, 200);
-});
-const jobs = createExportJobs<Film>(async (film, id, progress) =>
-  renderFilm(await withNarration(film), id, progress),
+const plansWatcher = watch(
+  path.join(appRoot, "storyboards"),
+  { recursive: true },
+  () => {
+    clearTimeout(planTimer);
+    planTimer = setTimeout(() => {
+      void Promise.all(Object.keys(PLANS).map((id) => ShowcaseFilms.load(id)))
+        .then(publish)
+        .catch((error) => console.error("Storyboard not ready:", error));
+    }, 200);
+  },
+);
+const jobs: ReturnType<
+  typeof createExportJobs<{ film: Film; fingerprint?: StockFingerprint }>
+> = createExportJobs<{ film: Film; fingerprint?: StockFingerprint }>(
+  async ({ input: { film, fingerprint }, directoryId: id, progress }) => {
+    const release = ShowcaseFilms.retainContracts(film);
+    try {
+      return await renderFilm(
+        await withNarration(film),
+        id,
+        progress,
+        fingerprint?.sourceHash,
+      );
+    } finally {
+      await release();
+    }
+  },
 );
 const requestSchema = z
   .object({
@@ -64,7 +85,7 @@ function json(res: ServerResponse, status: number, body: unknown) {
     .end(JSON.stringify(body));
 }
 async function filmForPlayer(id: string) {
-  const film = await withNarration(await loadFilm(id));
+  const film = await withNarration(await ShowcaseFilms.load(id));
   await Promise.all(
     (film.plan ? assetReferences(film.plan) : []).map(async (asset) =>
       media.set(`/${asset}`, await publicAsset(appRoot, asset)),
@@ -87,8 +108,14 @@ async function exportRequest(req: IncomingMessage, res: ServerResponse) {
   }
   try {
     const request = requestSchema.parse(JSON.parse(body));
-    const film = await loadFilm(request.id, request.options);
-    json(res, 202, jobs.start(JSON.stringify({ generation, film }), film));
+    const film = await ShowcaseFilms.load(request.id, request.options);
+    const fingerprint =
+      film.kind === "stock"
+        ? await ShowcaseFilms.getFingerprintFromFilm(film)
+        : undefined;
+    const key =
+      fingerprint?.configurationHash ?? JSON.stringify({ generation, film });
+    json(res, 202, jobs.start(key, { film, fingerprint }));
   } catch (error) {
     const busy =
       error instanceof Error && error.message.includes("already rendering");
@@ -124,7 +151,15 @@ async function api(
       json(res, 200, await filmForPlayer(filmMatch[1]));
       return;
     }
-    const film = await loadFilm(filmMatch[1]);
+    const parameters = new URL(req.url ?? "/", "http://localhost").searchParams;
+    const film = await ShowcaseFilms.load(filmMatch[1], {
+      ...(parameters.has("cameraPreset")
+        ? { cameraPreset: parameters.get("cameraPreset") }
+        : {}),
+      ...(parameters.has("cameraMotion")
+        ? { cameraMotion: parameters.get("cameraMotion") !== "false" }
+        : {}),
+    });
     if (!film.plan) {
       res.writeHead(404).end();
       return;
@@ -191,9 +226,12 @@ const server = createServer(async (req, res) => {
       return;
     }
     const generated = [
+      "/composition-gallery.js",
+      "/composition-gallery.css",
       "/live-player.js",
       "/live-player.css",
       "/motion-gallery.js",
+      "/motion-gallery.css",
       "/showcase-theme.css",
     ].includes(pathname);
     const file =

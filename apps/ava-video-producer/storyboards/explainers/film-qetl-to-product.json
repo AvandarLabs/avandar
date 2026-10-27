@@ -1,0 +1,404 @@
+{
+  "version": 1,
+  "id": "qetl-to-product",
+  "title": "From question to query",
+  "description": "An aperture and a code-frame match bring query intent into the actual Explorer.",
+  "sourceNotes": [
+    "Authored explainer informed by Avandar business-plan arguments. Diagrams are conceptual, not measured backend telemetry.",
+    "Product leaves import current Avandar source. Navigation, queries and form state use deterministic fictional fixtures. No live backend behavior is asserted.",
+    "Continuity overlaps are internal to the explanation shot. Caption times include those overlaps. Stock poses hold before their loop reset."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 1852,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "From question to query",
+        "category": "motion-product",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#82c8f2",
+        "beats": [
+          {
+            "id": "intent",
+            "title": "Start with a useful question.",
+            "subtitle": "A question becomes a bounded query.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Which districts have cases?",
+                "Choose the data that answers it."
+              ],
+              "emphasis": "Intent before infrastructure."
+            },
+            "duration": 316,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "scope",
+            "title": "Draw the boundary of the question.",
+            "subtitle": "Relevant records and fields stay in view.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "scope-aperture",
+                "schemaVersion": 1,
+                "input": {
+                  "broadTopic": "A response workspace",
+                  "topics": [
+                    {
+                      "id": "cases",
+                      "label": "Cases",
+                      "included": true
+                    },
+                    {
+                      "id": "district",
+                      "label": "District",
+                      "included": true
+                    },
+                    {
+                      "id": "visits",
+                      "label": "Visit notes",
+                      "included": false
+                    },
+                    {
+                      "id": "supplies",
+                      "label": "Supplies",
+                      "included": false
+                    }
+                  ],
+                  "focusedQuestion": "How many cases in each district?",
+                  "outsideLabel": "Outside this question",
+                  "insideLabel": "Needed for this answer",
+                  "showExcludedTopics": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 480,
+                  "y": 310,
+                  "zoom": 1.9,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 480,
+                  "y": 310,
+                  "zoom": 1.9,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 570,
+                  "y": 330,
+                  "zoom": 2.2,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 570,
+                  "y": 330,
+                  "zoom": 2.2,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "wipe",
+              "frames": 24
+            }
+          },
+          {
+            "id": "query",
+            "title": "Make the request explicit.",
+            "subtitle": "A query names the data and the operation.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "code-focus",
+                "schemaVersion": 1,
+                "input": {
+                  "lines": [
+                    [
+                      {
+                        "text": "SELECT district_name, COUNT(*)",
+                        "color": "#edf7f4"
+                      }
+                    ],
+                    [
+                      {
+                        "text": "FROM harborfield_cases",
+                        "color": "#82c8f2"
+                      }
+                    ],
+                    [
+                      {
+                        "text": "GROUP BY district_name;",
+                        "color": "#9fefca"
+                      }
+                    ]
+                  ],
+                  "highlight": [0, 1, 2],
+                  "title": "An illustrative question as SQL",
+                  "footer": "Question \u2192 fields \u2192 operation",
+                  "showHighlight": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 81,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 105,
+                  "x": 430,
+                  "y": 260,
+                  "zoom": 1.65,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 430,
+                  "y": 260,
+                  "zoom": 1.65,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 480,
+                  "y": 365,
+                  "zoom": 1.8,
+                  "ease": "whip"
+                },
+                {
+                  "at": 296,
+                  "x": 480,
+                  "y": 365,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 324,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 338,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 24
+            },
+            "token": {
+              "label": "Query",
+              "anchor": {
+                "x": 1150,
+                "y": 690,
+                "width": 320,
+                "height": 64
+              },
+              "appearance": "label"
+            }
+          },
+          {
+            "id": "explorer",
+            "title": "Inspect the query in Avandar.",
+            "subtitle": "Actual SQL editor and result components.",
+            "content": {
+              "kind": "product",
+              "segment": {
+                "feature": "explorer",
+                "mode": "query",
+                "fromFrame": 0,
+                "toFrame": 329,
+                "leadIn": 30
+              }
+            },
+            "duration": 660,
+            "transition": {
+              "kind": "morph",
+              "frames": 30
+            },
+            "token": {
+              "label": "Query",
+              "anchor": {
+                "x": 247,
+                "y": 524.59,
+                "width": 1332,
+                "height": 214
+              },
+              "appearance": "outline"
+            }
+          },
+          {
+            "id": "answer",
+            "title": "Read the result in context.",
+            "subtitle": "The UI demonstrates a scripted query sequence.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "The question has a visible form.",
+                "The answer has a visible table."
+              ],
+              "emphasis": "Source components. Fictional data."
+            },
+            "duration": 302,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "intent-0",
+      "shotId": "explanation",
+      "startFrame": 18,
+      "endFrame": 138,
+      "text": "A useful question gives data work a boundary.",
+      "beatId": "intent"
+    },
+    {
+      "id": "intent-1",
+      "shotId": "explanation",
+      "startFrame": 143,
+      "endFrame": 271,
+      "text": "Here, the question is how many cases each district has.",
+      "beatId": "intent"
+    },
+    {
+      "id": "scope-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "The answer needs case records and their district field.",
+      "beatId": "scope"
+    },
+    {
+      "id": "scope-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "Other information can wait for another question.",
+      "beatId": "scope"
+    },
+    {
+      "id": "query-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "SQL names the grouping and the count explicitly.",
+      "beatId": "query"
+    },
+    {
+      "id": "query-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "That intent becomes a query in Avandar Explorer.",
+      "beatId": "query"
+    },
+    {
+      "id": "explorer-0",
+      "shotId": "explanation",
+      "startFrame": 48,
+      "endFrame": 185,
+      "text": "The editor makes the requested operation visible.",
+      "beatId": "explorer"
+    },
+    {
+      "id": "explorer-1",
+      "shotId": "explanation",
+      "startFrame": 190,
+      "endFrame": 327,
+      "text": "Grouping changes individual cases into district totals.",
+      "beatId": "explorer"
+    },
+    {
+      "id": "explorer-2",
+      "shotId": "explanation",
+      "startFrame": 332,
+      "endFrame": 469,
+      "text": "Run the query to inspect the returned table.",
+      "beatId": "explorer"
+    },
+    {
+      "id": "explorer-3",
+      "shotId": "explanation",
+      "startFrame": 474,
+      "endFrame": 619,
+      "text": "This fictional result shows the shape of the answer.",
+      "beatId": "explorer"
+    },
+    {
+      "id": "answer-0",
+      "shotId": "explanation",
+      "startFrame": 36,
+      "endFrame": 156,
+      "text": "QETL uses query intent to guide integration and execution.",
+      "beatId": "answer"
+    },
+    {
+      "id": "answer-1",
+      "shotId": "explanation",
+      "startFrame": 161,
+      "endFrame": 281,
+      "text": "The aim is less unnecessary preparation before an answer.",
+      "beatId": "answer"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

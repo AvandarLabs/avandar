@@ -1,62 +1,29 @@
 #!/usr/bin/env node
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { propEq } from "@avandar/utils";
 import { bundle } from "@remotion/bundler";
 import {
   openBrowser,
   renderStill,
   selectComposition,
 } from "@remotion/renderer";
-import {
-  STOCK_CATALOG,
-  STOCK_LOOP_FRAMES,
-  STOCK_FPS,
-  stockEntry,
-  type StockEntry,
-} from "../src/stock/catalog";
+import { STOCK_LOOP_FRAMES, STOCK_FPS } from "../src/stock/catalog";
 import { run, ffmpeg, probe } from "./lib/mediaHelpers";
 import { ensureDirectory, fileHash } from "./lib/planHelpers";
+import { withWorkspaceAliases } from "./lib/withWorkspaceAliases.mjs";
+import {
+  MotionRequests,
+  type MotionRequest,
+} from "./MotionRequests/MotionRequests";
 import { requireLicense } from "./require-license.mjs";
+import { StockFingerprintModule } from "./stock/StockFingerprintModule/StockFingerprintModule";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SAMPLES = [0, 18, 36, 90, 150, 179];
 
-export function parseMotionArgs(args: string[]) {
-  const [command, selection = "all", ...extra] = args;
-  if (!["list", "preview", "render"].includes(command) || extra.length) {
-    throw new Error(
-      "Usage: npm run motion -- list | preview [all|preset-id] | render [all|preset-id]",
-    );
-  }
-  const entries =
-    selection === "all" ? [...STOCK_CATALOG] : [stockEntry(selection)];
-  return { command, entries };
-}
-
-/** Only explicit renderer files are read; no env files or raw capture data. */
-async function _fingerprint() {
-  const files = [
-    "src/stock-entry.tsx",
-    "src/motion.ts",
-    "remotion.config.ts",
-    "../../pnpm-lock.yaml",
-    "package.json",
-    "scripts/render.sh",
-    "scripts/render-sequence.mjs",
-    "scripts/check-frames.mjs",
-    "scripts/motion.ts",
-  ];
-  for (const name of await fs.readdir(path.join(ROOT, "src/stock"))) {
-    if (/^[a-zA-Z][a-zA-Z0-9.-]*\.tsx?$/.test(name))
-      files.push(`src/stock/${name}`);
-  }
-  const hash = createHash("sha256");
-  for (const file of files.sort())
-    hash.update(`${file}\0${await fileHash(path.join(ROOT, file))}\n`);
-  return hash.digest("hex");
-}
+const SAMPLES: number[] = StockFingerprintModule.SAMPLE_PARAMETERS.samples;
 
 async function _fresh(relative: string) {
   const parent = await ensureDirectory(ROOT, "out/motion");
@@ -79,14 +46,20 @@ async function _fresh(relative: string) {
   return ensureDirectory(ROOT, `out/motion/${relative}`);
 }
 
-async function _preview(entries: StockEntry[]) {
-  const digest = await _fingerprint();
+async function _preview(requests: MotionRequest[]) {
+  await Promise.all(
+    requests.map(({ sourceHash }) =>
+      StockFingerprintModule.verifySources({ root: ROOT, sourceHash }),
+    ),
+  );
+  const digest = await StockFingerprintModule.getSourceHashFromRoot(ROOT);
   const temporary = await _fresh("bundle");
   const publicDir = await ensureDirectory(
     ROOT,
     "out/motion/bundle/empty-public",
   );
   const serveUrl = await bundle({
+    webpackOverride: withWorkspaceAliases,
     entryPoint: path.join(ROOT, "src/stock-entry.tsx"),
     rootDir: ROOT,
     outDir: path.join(temporary, "renderer"),
@@ -94,11 +67,23 @@ async function _preview(entries: StockEntry[]) {
   });
   const browser = await openBrowser("chrome", { logLevel: "error" });
   try {
-    for (const entry of entries) {
-      const directory = await _fresh(`preview/${entry.id}`);
+    for (const { entry, request, sourceHash } of requests) {
+      const fingerprint = await StockFingerprintModule.fromRequest({
+        root: ROOT,
+        request,
+        expectedSourceHash: sourceHash,
+      });
+      await StockFingerprintModule.verifySources({
+        root: ROOT,
+        sourceHash: digest,
+      });
+      const directory = await _fresh(
+        `preview/${entry.id}/${fingerprint.configurationHash}`,
+      );
       const composition = await selectComposition({
         serveUrl,
         id: `stock-${entry.id}`,
+        inputProps: request,
         puppeteerInstance: browser,
         envVariables: {},
         logLevel: "error",
@@ -106,6 +91,7 @@ async function _preview(entries: StockEntry[]) {
       for (const [index, frame] of SAMPLES.entries()) {
         await renderStill({
           composition,
+          inputProps: request,
           serveUrl,
           frame,
           output: path.join(
@@ -138,15 +124,18 @@ async function _preview(entries: StockEntry[]) {
         ],
         { quiet: true },
       );
-      if (digest !== (await _fingerprint()))
-        throw new Error("Stock renderer changed during preview; regenerate it");
+      await StockFingerprintModule.verifySources({
+        root: ROOT,
+        sourceHash: digest,
+      });
       await fs.writeFile(
         path.join(directory, "manifest.json"),
         `${JSON.stringify(
           {
             complete: true,
             preset: entry.id,
-            fingerprint: digest,
+            fingerprint,
+            request,
             samples: SAMPLES,
             generatedAt: new Date().toISOString(),
             note: "Generated evidence, not automatic visual approval. Inspect before rendering.",
@@ -154,6 +143,19 @@ async function _preview(entries: StockEntry[]) {
           null,
           2,
         )}\n`,
+      );
+      await fs.writeFile(
+        path.join(
+          path.dirname(
+            StockFingerprintModule.getPreviewDirectoryFromOptions({
+              root: ROOT,
+              preset: entry.id,
+              fingerprint,
+            }),
+          ),
+          "index.json",
+        ),
+        `${JSON.stringify({ configurationHash: fingerprint.configurationHash })}\n`,
       );
       console.log(`Preview ready: ${entry.id}`);
     }
@@ -163,27 +165,39 @@ async function _preview(entries: StockEntry[]) {
   await fs.rm(temporary, { recursive: true });
 }
 
-async function _render(entries: StockEntry[]) {
-  const digest = await _fingerprint();
+async function _render(requests: MotionRequest[]) {
+  const digest = await StockFingerprintModule.getSourceHashFromRoot(ROOT);
   // Check the whole selection before spending time on a partial batch.
-  for (const entry of entries) {
-    const directory = path.join(ROOT, "out/motion/preview", entry.id);
-    let manifest;
-    try {
-      manifest = JSON.parse(
-        await fs.readFile(path.join(directory, "manifest.json"), "utf8"),
-      );
-    } catch {
-      throw new Error(`Run and inspect preview first: ${entry.id}`);
-    }
-    if (!manifest.complete || manifest.fingerprint !== digest)
-      throw new Error(`Preview is stale: ${entry.id}`);
-    await fs.access(path.join(directory, "contact-sheet.jpg"));
-  }
+  await Promise.all(
+    requests.map(async ({ entry, request, sourceHash }) => {
+      await StockFingerprintModule.requirePreview({
+        root: ROOT,
+        preset: entry.id,
+        fingerprint: await StockFingerprintModule.fromRequest({
+          root: ROOT,
+          request,
+          expectedSourceHash: sourceHash,
+        }),
+      });
+    }),
+  );
   const destination = await ensureDirectory(ROOT, "out/motion/deliveries");
   const publicDir = await ensureDirectory(ROOT, "out/motion/empty-public");
-  for (const entry of entries) {
-    const directory = await _fresh(`render/${entry.id}`);
+  for (const { entry, request, sourceHash } of requests) {
+    await StockFingerprintModule.verifySources({
+      root: ROOT,
+      sourceHash: digest,
+    });
+    const fingerprint = await StockFingerprintModule.fromRequest({
+      root: ROOT,
+      request,
+      expectedSourceHash: sourceHash,
+    });
+    const directory = await _fresh(
+      `render/${entry.id}/${fingerprint.configurationHash}`,
+    );
+    const propsFile = path.join(directory, "inputs.json");
+    await fs.writeFile(propsFile, JSON.stringify(request));
     const output = await run(
       "sh",
       [path.join(ROOT, "scripts/render.sh"), `stock-${entry.id}`, "90"],
@@ -194,7 +208,7 @@ async function _render(entries: StockEntry[]) {
           ...process.env,
           RENDER_OUT_DIR: directory,
           RENDER_OUTPUT_ID: entry.id,
-          REMOTION_PROPS_FILE: "",
+          REMOTION_PROPS_FILE: propsFile,
           DELIVER: "1280:800",
           STANDALONE: "0",
           KEEP_RENDER_FRAMES: "1",
@@ -206,7 +220,7 @@ async function _render(entries: StockEntry[]) {
     await fs.writeFile(path.join(directory, "render.log"), output);
     const video = path.join(directory, `${entry.id}.mp4`);
     const info = await probe(video);
-    const stream = info.streams.find((item) => item.codec_type === "video");
+    const stream = info.streams.find(propEq("codec_type", "video"));
     if (
       info.duration !== 6 ||
       stream?.width !== 1280 ||
@@ -215,10 +229,10 @@ async function _render(entries: StockEntry[]) {
       Number(stream.nb_frames) !== STOCK_LOOP_FRAMES
     )
       throw new Error(`Unexpected media metadata: ${entry.id}`);
-    if (digest !== (await _fingerprint()))
-      throw new Error(
-        "Stock renderer changed during render; outputs retained for inspection",
-      );
+    await StockFingerprintModule.verifySources({
+      root: ROOT,
+      sourceHash: digest,
+    });
     // Existing delivery files stay recoverable even when rerendering one preset.
     const backup = await ensureDirectory(
       ROOT,
@@ -240,7 +254,8 @@ async function _render(entries: StockEntry[]) {
     }
     const record = {
       preset: entry.id,
-      fingerprint: digest,
+      fingerprint,
+      request,
       frames: STOCK_LOOP_FRAMES,
       fps: STOCK_FPS,
       width: 1280,
@@ -267,14 +282,22 @@ async function _render(entries: StockEntry[]) {
 
 async function _main() {
   requireLicense();
-  const { command, entries } = parseMotionArgs(process.argv.slice(2));
-  if (command === "list")
-    for (const entry of entries)
+  const args = MotionRequests.parseArgs(process.argv.slice(2));
+  const { command, entries } = args;
+  if (command === "list") {
+    entries.forEach((entry) =>
       console.log(
         `${entry.id.padEnd(20)} ${entry.category.padEnd(12)} ${entry.name}`,
-      );
-  else if (command === "preview") await _preview(entries);
-  else await _render(entries);
+      ),
+    );
+  } else {
+    const requests = await MotionRequests.fromArgs({ args });
+    if (command === "preview") {
+      await _preview(requests);
+    } else {
+      await _render(requests);
+    }
+  }
 }
 
 if (

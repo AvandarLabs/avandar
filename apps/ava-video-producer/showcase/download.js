@@ -31,12 +31,24 @@ function saveDownload(download) {
   link.remove();
 }
 
-async function runExport({ id, options, onStatus }) {
+function buildExportRequest(id, options) {
+  return JSON.stringify({ id, options }, (_key, value) => {
+    if (!value || typeof value !== "object" || Array.isArray(value))
+      return value;
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, value[key]]),
+    );
+  });
+}
+
+async function runExport({ request, onStatus }) {
   onStatus({ state: "running", message: "Preparing MP4…" });
   let job = await requestJob("/api/exports", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ id, options }),
+    body: request,
   });
   while (job.state === "running") {
     onStatus(job);
@@ -54,17 +66,18 @@ async function runExport({ id, options, onStatus }) {
 /**
  * Render and download a film using the selected preview options.
  * Calls onStatus with job progress and rejects failures so the caller can retry.
- * Concurrent requests for the same film share the active export and download.
+ * Concurrent identical requests share the active export and download.
  */
 export async function downloadFilm({ id, options = {}, onStatus = () => {} }) {
-  if (activeDownloads.has(id)) return activeDownloads.get(id);
-  const pending = runExport({ id, options, onStatus })
+  const request = buildExportRequest(id, options);
+  if (activeDownloads.has(request)) return activeDownloads.get(request);
+  const pending = runExport({ request, onStatus })
     .catch((error) => {
       onStatus({ state: "failed", message: error.message });
       throw error;
     })
-    .finally(() => activeDownloads.delete(id));
-  activeDownloads.set(id, pending);
+    .finally(() => activeDownloads.delete(request));
+  activeDownloads.set(request, pending);
   return pending;
 }
 

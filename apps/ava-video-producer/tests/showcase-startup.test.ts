@@ -24,7 +24,13 @@ test("an occupied showcase port exits with actionable guidance and no build erro
   assert.ok(address && typeof address !== "string");
   const child = spawn(
     process.execPath,
-    ["--import", "tsx", "scripts/showcase/server.ts"],
+    [
+      "--import",
+      "tsx",
+      "--import",
+      "./scripts/yaml/registerYaml.mjs",
+      "scripts/showcase/server.ts",
+    ],
     {
       cwd: fileURLToPath(new URL("../", import.meta.url)),
       env: { ...licenseTestEnvironment(keyFile), PORT: String(address.port) },

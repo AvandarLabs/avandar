@@ -7,8 +7,8 @@ scratch narration. It is not a recording of Avandar's product interface.
 Commands completed successfully:
 
 ```sh
-npx tsx scripts/video.ts preview out/scene-library/scratch/storyboard.json
-npx tsx scripts/video.ts render out/scene-library/scratch/storyboard.json
+pnpm video preview out/scene-library/scratch/storyboard.json
+pnpm video render out/scene-library/scratch/storyboard.json
 ```
 
 The 54-frame preview samples the actual composed film, including transition

@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "id": "configured-comparison",
+  "title": "Compare fictional review approaches",
+  "description": "A qualitative comparison of two authored fictional review approaches.",
+  "sourceNotes": [
+    "Fictional demonstration data. No measured productivity or product outcome is claimed."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "delivery": {
+    "width": 1280,
+    "height": 800
+  },
+  "shots": [
+    {
+      "id": "comparison",
+      "scene": "stock",
+      "durationInFrames": 180,
+      "transitionInFrames": 0,
+      "props": {
+        "preset": "paired-contrast",
+        "schemaVersion": 1,
+        "input": {
+          "question": "How will the fictional exhibit be reviewed?",
+          "alternatives": [
+            {
+              "id": "solo",
+              "label": "Solo review"
+            },
+            {
+              "id": "pair",
+              "label": "Pair review"
+            }
+          ],
+          "criteria": [
+            {
+              "id": "reader",
+              "label": "Readers",
+              "leftText": "One author",
+              "rightText": "Two collaborators"
+            },
+            {
+              "id": "handoff",
+              "label": "Handoff",
+              "leftText": "A self-check",
+              "rightText": "A shared discussion"
+            }
+          ],
+          "focusCriterionId": "reader",
+          "comparisonLabel": "Fictional review approaches",
+          "showPairBrackets": true
+        },
+        "accent": "#9fefca",
+        "background": "#0b1219"
+      },
+      "note": "All people, text and relationships are authored fictional content."
+    }
+  ],
+  "narration": [],
+  "captions": false,
+  "soundEffects": []
+}

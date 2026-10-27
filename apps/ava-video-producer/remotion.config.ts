@@ -1,5 +1,6 @@
 import { Config } from "@remotion/cli/config";
 import { readLicense } from "./scripts/lib/readLicense.mjs";
+import { withWorkspaceAliases } from "./scripts/lib/withWorkspaceAliases.mjs";
 
 // Remotion evaluates bundled configuration from the app root.
 const { publicKey } = readLicense(process.cwd());
@@ -18,6 +19,7 @@ Object.keys(process.env)
     delete process.env[name];
   });
 
+Config.overrideWebpackConfig(withWorkspaceAliases);
 Config.setVideoImageFormat("jpeg");
 Config.setOverwriteOutput(true);
 

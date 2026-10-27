@@ -1,0 +1,133 @@
+name:
+  id: motionAtlas.actor-attribution-split.name
+  message: Separate accounts preserve separate attribution
+description:
+  id: motionAtlas.actor-attribution-split.description
+  message:
+    Two fictional collaborators first stamp events with one shared account label.
+    After choosing distinct accounts, their later events receive distinct account stamps
+    while the historical shared-account events retain their limited attribution.
+category:
+  id: motionAtlas.actor-attribution-split.category
+  message: Identity and recorded evidence
+useWhen:
+  id: motionAtlas.actor-attribution-split.useWhen
+  message: Show what separate account identities make distinguishable in future records.
+intent:
+  id: motionAtlas.actor-attribution-split.intent
+  message: Show what separate account identities make distinguishable in future records.
+creativeDirection:
+  id: motionAtlas.actor-attribution-split.creativeDirection
+  message:
+    Frames 0-11 reveal two collaborators, one shared stamp, and an empty event
+    ledger. Frames 12-60 let each collaborator stamp one authored historical event with
+    that same account mark. Frames 61-95 move the shared stamp aside and place the
+    supplied distinct account stamps beside the collaborators. Frames 96-140 stamp the
+    later events with their assigned accounts. Frames 141-167 hold the older
+    shared-account entries above the individually attributed later entries, retaining
+    the limitation caption. Fade to the common opaque ground at frames 168-179. Use
+    deterministic React/SVG on 960x600 at 30fps; no credential entry or real
+    authentication occurs.
+distinction:
+  id: motionAtlas.actor-attribution-split.distinction
+  message:
+    Unlike contribution-weave, this explicitly contrasts indistinguishable recorded
+    accounts with distinguishable later accounts and retains the historical limitation.
+    Unlike journal-receipts, the changing information is account attribution rather than
+    receipt status. No old event is assigned a newly inferred human author.
+prompt:
+  id: motionAtlas.actor-attribution-split.prompt
+  message:
+    Two fictional collaborators first stamp events with one shared account label.
+    After choosing distinct accounts, their later events receive distinct account stamps
+    while the historical shared-account events retain their limited attribution.
+tags:
+  - id: motionAtlas.actor-attribution-split.tags.0
+    message: collaboration
+  - id: motionAtlas.actor-attribution-split.tags.1
+    message: account attribution
+  - id: motionAtlas.actor-attribution-split.tags.2
+    message: shared account
+  - id: motionAtlas.actor-attribution-split.tags.3
+    message: individual accounts
+  - id: motionAtlas.actor-attribution-split.tags.4
+    message: event history
+  - id: motionAtlas.actor-attribution-split.tags.5
+    message: audit trail
+  - id: motionAtlas.actor-attribution-split.tags.6
+    message: identity boundary
+goodFor:
+  - id: motionAtlas.actor-attribution-split.goodFor.0
+    message: Explain one collaboration benefit of individual accounts
+  - id: motionAtlas.actor-attribution-split.goodFor.1
+    message: Show why later account separation does not repair past attribution
+  - id: motionAtlas.actor-attribution-split.goodFor.2
+    message: Distinguish an account identity recorded by software from a verified human identity
+domains:
+  - id: motionAtlas.actor-attribution-split.domains.0
+    message: Identity and recorded evidence
+aliases:
+  - id: motionAtlas.actor-attribution-split.aliases.0
+    message: collaboration
+  - id: motionAtlas.actor-attribution-split.aliases.1
+    message: account attribution
+  - id: motionAtlas.actor-attribution-split.aliases.2
+    message: shared account
+notFor:
+  - id: motionAtlas.actor-attribution-split.notFor.0
+    message:
+      Account attribution is one illustrative collaboration benefit. This scene does
+      not claim a particular product implementation or prescribe punitive
+      account-sharing restrictions.
+  - id: motionAtlas.actor-attribution-split.notFor.1
+    message:
+      An account label is not proof of a real person, consent, authorization, legal
+      signature, or secure identity. No credential or permission mechanism is modeled.
+  - id: motionAtlas.actor-attribution-split.notFor.2
+    message:
+      The source authors of the fictional choreography are known to the animation,
+      but the shared-account ledger retains only the shared identity. Do not add
+      individual attribution to earlier entries.
+  - id: motionAtlas.actor-attribution-split.notFor.3
+    message:
+      Four authored events are the entire illustrated history. No hidden total,
+      productivity comparison, or financial conversion is inferred.
+  - id: motionAtlas.actor-attribution-split.notFor.4
+    message:
+      The decision to separate accounts is authored and voluntary; the animation does
+      not lock collaborators out or claim all collaboration problems are solved.
+  - id: motionAtlas.actor-attribution-split.notFor.5
+    message:
+      Free prose is author supplied; only structural, reference, numeric and
+      documented lexical constraints are runtime-validated.
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.actor-attribution-split.beats.0
+      message: Reveal the authored scene.
+  - startFrame: 12
+    endFrame: 60
+    description:
+      id: motionAtlas.actor-attribution-split.beats.1
+      message: Stamp both historical events with the shared account.
+  - startFrame: 61
+    endFrame: 95
+    description:
+      id: motionAtlas.actor-attribution-split.beats.2
+      message: Set the shared stamp aside and introduce the distinct account stamps.
+  - startFrame: 96
+    endFrame: 140
+    description:
+      id: motionAtlas.actor-attribution-split.beats.3
+      message: Stamp later actions with their assigned accounts.
+  - startFrame: 141
+    endFrame: 167
+    description:
+      id: motionAtlas.actor-attribution-split.beats.4
+      message: Hold the complete ledger and its historical attribution limit.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.actor-attribution-split.beats.5
+      message: Return to the common opaque ground.

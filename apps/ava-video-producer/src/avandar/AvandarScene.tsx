@@ -13,6 +13,7 @@ const TEXT_HOLDS: Record<string, number> = {
   "explorer-filter-value": 190,
   "explorer-sql-editor": 540,
   "dashboard-name": 208,
+  "mapping-manual-name": 442,
 };
 
 type MeasuredBeat = {
@@ -34,7 +35,9 @@ export const AvandarScene: ProductSceneRenderer = ({
 }) => {
   const productFrame = frame + fromFrame;
   const offset = mode === "query" ? 290 : mode === "chart" ? 570 : 0;
-  const beats = (targets[feature] as MeasuredBeat[])
+  const beats = (
+    (targets as Partial<Record<string, MeasuredBeat[]>>)[feature] ?? []
+  )
     .filter(
       (b) =>
         mode === "full" ||
@@ -52,8 +55,12 @@ export const AvandarScene: ProductSceneRenderer = ({
           ? "pointer"
           : "default") as CursorKind,
     }));
-  const keys = measuredPath(beats, width, height);
-  const clicks = beats.filter((b) => b.action === "click").map((b) => b.frame);
+  const keys = beats.length
+    ? measuredPath(beats, width, height)
+    : [{ at: 0, x: 0, y: 0 }];
+  const clicks = beats
+    .filter((b) => b.action === "click" || b.action === "select")
+    .map((b) => b.frame);
   const cursor = cursorOnTarget(productFrame, keys, beats);
   return (
     <div
@@ -80,12 +87,14 @@ export const AvandarScene: ProductSceneRenderer = ({
           pointerEvents: "none",
         }}
       >
-        <Cursor
-          frame={productFrame}
-          path={keys}
-          clicks={clicks}
-          cursor={cursor}
-        />
+        {beats.length > 0 && (
+          <Cursor
+            frame={productFrame}
+            path={keys}
+            clicks={clicks}
+            cursor={cursor}
+          />
+        )}
       </div>
     </div>
   );

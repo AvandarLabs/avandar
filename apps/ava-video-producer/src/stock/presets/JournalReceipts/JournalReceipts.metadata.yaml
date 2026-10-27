@@ -1,0 +1,118 @@
+name:
+  id: motionAtlas.journal-receipts.name
+  message: Receipts Close the Journal
+description:
+  id: motionAtlas.journal-receipts.description
+  message: A retained journal folds open when a connection returns. Matching
+    acknowledgments settle onto its entries while any unacknowledged entries keep their
+    pending tabs.
+category:
+  id: motionAtlas.journal-receipts.category
+  message: Acknowledgment and retention
+tags:
+  - id: motionAtlas.journal-receipts.tags.0
+    message: reconnect
+  - id: motionAtlas.journal-receipts.tags.1
+    message: offline outbox
+  - id: motionAtlas.journal-receipts.tags.2
+    message: acknowledgment
+  - id: motionAtlas.journal-receipts.tags.3
+    message: pending changes
+  - id: motionAtlas.journal-receipts.tags.4
+    message: receipt
+  - id: motionAtlas.journal-receipts.tags.5
+    message: sync confirmation
+  - id: motionAtlas.journal-receipts.tags.6
+    message: journal
+  - id: motionAtlas.journal-receipts.tags.7
+    message: retained copy
+useWhen:
+  id: motionAtlas.journal-receipts.useWhen
+  message:
+    Explain that confirmation closes a pending entry while missing confirmation
+    leaves it visibly unresolved.
+prompt:
+  id: motionAtlas.journal-receipts.prompt
+  message:
+    Use Motion Atlas "Receipts Close the Journal" (journal-receipts) as an
+    illustrative conceptual graphic. Explain that confirmation closes a pending entry
+    while missing confirmation leaves it visibly unresolved. Bind complete authored
+    inputs and preserve the stated limits.
+creativeDirection:
+  id: motionAtlas.journal-receipts.creativeDirection
+  message:
+    Reveal a compact accordion journal with one folded tab per pending entry. As
+    the connection caption changes, unfold the journal just enough to expose each
+    identifier. Authored receipt halves emerge from a separate acknowledgment pocket and
+    register precisely against matching journal tabs; the paired tabs flatten into the
+    page, leaving unpaired tabs raised. Hold on the visibly retained journal with only
+    the supplied receipts closed, then fade to the shared opaque ground.
+goodFor:
+  - id: motionAtlas.journal-receipts.goodFor.0
+    message: Explain why a locally saved action can still await confirmation
+  - id: motionAtlas.journal-receipts.goodFor.1
+    message: Show reconnection clearing only acknowledged offline changes
+  - id: motionAtlas.journal-receipts.goodFor.2
+    message:
+      Illustrate a dispatch log, expense envelope, or hand-carried register with
+      signed receipts
+intent:
+  id: motionAtlas.journal-receipts.intent
+  message:
+    Explain that confirmation closes a pending entry while missing confirmation
+    leaves it visibly unresolved.
+domains:
+  - id: motionAtlas.journal-receipts.domains.0
+    message: Acknowledgment and retention
+aliases:
+  - id: motionAtlas.journal-receipts.aliases.0
+    message: reconnect
+  - id: motionAtlas.journal-receipts.aliases.1
+    message: offline outbox
+  - id: motionAtlas.journal-receipts.aliases.2
+    message: acknowledgment
+  - id: motionAtlas.journal-receipts.aliases.3
+    message: pending changes
+notFor:
+  - id: motionAtlas.journal-receipts.notFor.0
+    message:
+      One supplied receipt closes exactly one entry. A missing receipt means
+      acknowledgment is absent from this illustration, not that remote processing
+      failed.
+  - id: motionAtlas.journal-receipts.notFor.1
+    message: No retransmission, conflict resolution, deduplication guarantee, or
+      exactly-once delivery claim is implied.
+  - id: motionAtlas.journal-receipts.notFor.2
+    message:
+      The final state may intentionally contain pending entries. The loop reset is
+      editorial, not a depiction of receipts being revoked.
+distinction:
+  id: motionAtlas.journal-receipts.distinction
+  message:
+    Packet-stream depicts movement; this depicts identity-matched acknowledgments
+    changing the physical condition of a retained journal. Source-merge combines
+    sources, whereas the original entries remain in place and a matching receipt closes
+    each obligation.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.journal-receipts.motionBeats.0
+      message: The authored setup is established.
+  - startFrame: 36
+    endFrame: 135
+    description:
+      id: motionAtlas.journal-receipts.motionBeats.1
+      message:
+        Reveal a compact accordion journal with one folded tab per pending entry. As
+        the connection caption changes, unfold the journal just enough to expose each
+        identifier. Authored receipt halves emerge from a separate acknowledgment pocket
+        and register precisely against matching journal tabs; the paired tabs flatten
+        into the page, leaving unpaired tabs raised. Hold on the visibly retained
+        journal with only the supplied receipts closed, then fade to the shared opaque
+        ground.
+  - startFrame: 136
+    endFrame: 167
+    description:
+      id: motionAtlas.journal-receipts.motionBeats.2
+      message: The completed authored state remains held.

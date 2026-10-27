@@ -1,0 +1,58 @@
+name:
+  id: motionAtlas.source-merge.name
+  message: Many sources, one view
+description:
+  id: motionAtlas.source-merge.description
+  message: Separate sources converge into a shared destination.
+category:
+  id: motionAtlas.source-merge.category
+  message: Data flow
+tags:
+  - id: motionAtlas.source-merge.tags.0
+    message: integration
+  - id: motionAtlas.source-merge.tags.1
+    message: import
+  - id: motionAtlas.source-merge.tags.2
+    message: merge
+  - id: motionAtlas.source-merge.tags.3
+    message: sources
+useWhen:
+  id: motionAtlas.source-merge.useWhen
+  message: Introduce data integration before showing the actual supported import workflow.
+prompt:
+  id: motionAtlas.source-merge.prompt
+  message:
+    Use Motion Atlas "Many sources, one view" (source-merge) as a conceptual
+    graphic. Introduce data integration before showing the actual supported import
+    workflow. Keep the restrained motion and readable labels; replace sample content
+    with approved facts before making product claims.
+creativeDirection:
+  id: motionAtlas.source-merge.creativeDirection
+  message: Separate sources converge into a shared destination.
+goodFor:
+  - id: motionAtlas.source-merge.goodFor.0
+    message: Introduce data integration before showing the actual supported import workflow.
+intent:
+  id: motionAtlas.source-merge.intent
+  message: Introduce data integration before showing the actual supported import workflow.
+domains:
+  - id: motionAtlas.source-merge.domains.0
+    message: Data flow
+aliases:
+  - id: motionAtlas.source-merge.aliases.0
+    message: integration
+  - id: motionAtlas.source-merge.aliases.1
+    message: import
+  - id: motionAtlas.source-merge.aliases.2
+    message: merge
+  - id: motionAtlas.source-merge.aliases.3
+    message: sources
+notFor:
+  - id: motionAtlas.source-merge.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.source-merge.distinction
+  message: Separate sources converge into a shared destination.

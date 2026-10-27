@@ -4,7 +4,7 @@ This is the complete inventory of the motion vocabulary currently implemented in
 
 The code is the source of truth. The rules for using it live in the [product-demo skill](../.claude/skills/product-demo/SKILL.md) and its [motion](../.claude/skills/product-demo/references/motion.md), [title](../.claude/skills/product-demo/references/titles.md), and [rendering](../.claude/skills/product-demo/references/render.md) references. The original primitives in `src/motion.ts` remain unchanged; three periodic helpers were added for Motion Atlas. Scenes and stock graphics share this module, without a second easing vocabulary.
 
-For visual reference, browse [Motion Atlas](../showcase/motion.html), served at **http://localhost:4173/motion.html**. Its [stock catalog](stock-motion-library.md) names 20 combinations of these primitives: graphs, node traversal, plexus fields, integrations, code highlighting, charts, and interface motion. A primitive is how something moves; a stock preset is a reusable authored graphic that demonstrates those movements.
+For visual reference, browse [Motion Atlas](../showcase/motion.html), served at **http://localhost:4173/motion.html**. Its [stock catalog](stock-motion-library.md) names 170 registered bounded combinations of these primitives: graphs, node traversal, plexus fields, integrations, code highlighting, charts, and interface motion. A primitive is how something moves; a stock preset is a reusable authored graphic that demonstrates those movements.
 
 ## Time and coordinates
 
@@ -28,7 +28,7 @@ All five curves are exported through `EASE` in [src/motion.ts](../src/motion.ts)
 | `EASE.inOutCubic` | `4t³` for the first half; `1 - (-2t + 2)³ / 2` for the second | Pointer travel between targets |
 | `EASE.word` | `bezier(0.22, 1, 0.36, 1)` | Headline words rising out of masks |
 
-`bezier(x1, y1, x2, y2)` is also exported. It creates a CSS-style cubic-bezier easing function, returning 0 at inputs at or below 0 and 1 at inputs at or above 1. Curves such as `outBack` can overshoot between those endpoints. There is no ease-in entrance token in the current vocabulary.
+`bezier(x1, y1, x2, y2)` is also exported. It creates a CSS-style cubic-bezier easing function, returning 0 at inputs at or below 0 and 1 at inputs at or above 1. Curves such as `outBack` can overshoot between those endpoints. The configurable motion components also expose named `ease-in` for accelerating departures, plus bounded custom curves.
 
 ## Duration scale
 
@@ -71,7 +71,7 @@ These are all the exported functions in [src/motion.ts](../src/motion.ts), inclu
 
 ## Pointer and click vocabulary
 
-The pointer helpers live in [src/cursor-motion.ts](../src/cursor-motion.ts). `trackPos` and `downAt` are also re-exported from [src/chrome.tsx](../src/chrome.tsx), which renders the shared `Cursor`.
+The pointer helpers live in [src/cursor-motion.ts](../src/cursor-motion.ts). `trackPos` and `downAt` are also re-exported from [src/chrome.tsx](../src/chrome/chrome.tsx), which renders the shared `Cursor`.
 
 | API | Behavior |
 | --- | --- |
@@ -105,7 +105,7 @@ These are combinations of the helpers above, not extra exported functions or reu
 
 | Pattern | Current implementation | Example |
 | --- | --- | --- |
-| Staggered rows and cards | `enterAt()` on each sibling | [Demo](../src/compositions/Demo.tsx), [MotionLab](../src/compositions/MotionLab.tsx) |
+| Staggered rows and cards | `enterAt()` on each sibling | [Demo](../src/compositions/Demo/Demo.tsx), [MotionLab](../src/compositions/MotionLab.tsx) |
 | Typed input and blinking caret | `typed()` plus `caretOn()` | Demo; MotionLab demonstrates typing |
 | Counter and recount | `countTo()`, or rounded `mix()` driven by a `ramp()` | Demo, MotionLab |
 | Bars/progress filling | Width driven by `ramp()` and numeric interpolation | Demo's result bars, MotionLab's progress bar |
@@ -153,8 +153,9 @@ the plan's duration must leave time after each final action or word reveal.
 
 `StockGraphic` uses a 180-frame, 30 fps loop. Authored particles follow seeded
 deterministic positions and periodic paths; edges reveal with SVG dash progress;
-packets travel along explicit geometry. These are conceptual patterns, not force
-simulation, geographic coordinates, or measured network traffic. The stock
+packets travel along explicit geometry. These particle examples are conceptual patterns, not force simulation or
+measured network traffic. Separate globe presets use locally vendored physical
+land; local-map presets remain explicitly schematic. The stock
 renderer uses explicit local frames, never CSS animations or wall-clock time.
 The browser gallery supplies frames from its playback clock; Remotion supplies
 timeline frames to the same component. At both loop boundaries, the content
@@ -197,14 +198,14 @@ alignment, and speech-driven word animation are not.
 1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change.
 2. Derive animation from frames. CSS transitions, timers, and wall-clock animation do not define a reproducible Remotion timeline.
 3. Use small element travel and sibling stagger. Springs are for landing; ramps are for travel. Spend the main visual beat once per phase.
-4. Keep app chrome stationary and avoid sustained scaling of text. A brief press returns to exactly 1; a camera push on footage is a different operation.
+4. Keep app chrome stationary during explanation and avoid sustained scaling of UI or title text. A brief press returns to exactly 1. Native-size spatial boundaries and SVG viewBox cameras have separate contracts in the reusable motion API.
 5. Blend colors through design tokens. For real product work, read actual screen markup, copy, and tokens before rebuilding it. Preserve the original palette for the generic starter showcase.
 6. Inspect preview contact sheets, including pointer targets, before rendering. Watch the finished clip for pacing. The mandatory frame gate detects certain tiling and luminance faults; it cannot certify the picture or the argument.
 
 Graph paths, explicit connectors/traversal, multiline masked typography,
 stationary footage wrappers/callouts, whole-cue captions, and authored narration
 timing are now implemented through scenes and pipeline modules. Automatic graph
-routing, animated cameras, karaoke captions, and automatic speech alignment
+routing, general-purpose scene cameras, karaoke captions, and automatic speech alignment
 remain outside the current vocabulary. Read the [scene inventory](shared-scene-library.md)
 and [architecture assessment](agent-architecture.md) before promising those behaviors.
 
@@ -218,3 +219,54 @@ rows, reveal real chart bars, and open record and dashboard views.
 `scripts/measure-avandar.mjs` regenerates them from the review player.
 Map movement uses the native map camera, with frame-controlled center and zoom.
 Product text and application chrome remain at native scale.
+
+## Expanded stock vocabulary: 2026-10-17
+
+The 150 additions reuse the same easing/duration vocabulary. `loopPhase`, `wave`
+and `loopEnvelope` remain the three shared periodic helpers in `src/motion.ts`.
+There is no new timing engine. Bounded route, quantity, finite-range, label-slot,
+polygon, orthogonal-grid and globe helpers are inventoried with their actual
+signatures in the [shared scene library](shared-scene-library.md#shared-stock-contracts-and-geometry).
+They describe geometry and authored relationships; they do not infer work,
+results, route safety or document meaning. Preset-specific choreography stays
+with its renderer. The [durable rulings](motion-atlas/implementation-rulings.md)
+retain accepted timing clarifications, including the grouped map-count hold and
+dashboard support staging, without inventing new helper APIs.
+
+**2026-10-18 evidence update:** All 170 contracts/renderers are implemented. Completed historical 167-file MP4 and 166-poster evidence retains actual 498c/source 2ad identities. R67's isolated spatial-sampling correction is reported at e5aeb3e7c/source 38c12b84; changed-scene verification and R68 continuity are complete as recorded below; whole-branch review remains pending. See [implementation evidence](motion-atlas/implementation-validation.md).
+
+
+## Historical delivered media and pending current-source verification: 2026-10-18
+
+The [completed media record](motion-atlas/implementation-media-validation-498c717d.md) preserves 167 original decoded deliveries, 166 standalone posters, the separate HTTP preview, all retained findings and corrected custody/N6 prose at actual 498c/source 2ad identities. R67's isolated spatial-sampling correction is reported at e5aeb3e7c/source 38c12b84. R67 source/media verification and R68 complete unaffected-fixture continuity are now verified. Final whole-branch review remains pending; the dated final scoped record below supersedes earlier pending wording. No historical output is relabeled as latest. These documentation updates preserve prior approved contract wording, defaults, IDs, bindings and bounds.
+
+
+## Final scoped source verification and evidence custody: 2026-10-18
+
+R67 is closed at `e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e`, stock source `38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9`. Independent source review is spec compliant and quality approved with one deferred test-helper RO-RO Minor. The controller inspected 13 actual current images. Gallery playback covered 180 states, one wrap and zero errors. The fresh default MP4 passed the unchanged gate and independent silent H.264 1280x800/30fps/180-frame/six-second probe, completed 179 decoded callbacks and ended at six seconds with zero reported dropped frames. Dense current stills show 8/12/4; default holds show 2/5/3. No globally empty selection or schema widening was introduced.
+
+R68 is satisfied: the strict three-file local diff and the complete 169-preset comparison retain 754 fixtures and 6,786 exact pre/post frame hashes. The full current 170-preset SVG harness passed. Unaffected outputs retain their actual historical source 2ad / HEAD 498c identities under this explicit versioned carry-forward. Only the changed preset's default MP4 is freshly rendered at source 38c. Finite screenshots and SVG equality do not establish uninterrupted pixels or fresh media for the other presets. All historical readability/transient concerns and the test-helper Minor remain for final whole-branch review, which is pending.
+
+R69 keeps exact raw reports, callback/clock traces, session/capture material and full original-report envelopes ignored and in Downloads mirrors. Durable records retain compact per-preset/candidate outcomes, all findings/dispositions/narrative limits and source/configuration/media/report hashes with local evidence pointers. A fresh clone cannot inspect local pixels/session files directly. No original local evidence was deleted.
+
+See [current scoped verification](motion-atlas/implementation-sampling-correction-controller-verification.json) and its linked compact continuity/delivery records.
+
+
+## Continuity compositions
+
+Continuity adds typed cut/dissolve/wipe/aperture/spatial/handoff/morph presentations, persistent rectangular identity, stock reveal-and-hold sampling, and deterministic rough-notation emphasis. These use the existing easing helpers and nested TransitionSeries timing. See [continuity compositions](continuity-compositions.md) for the API, film matrix, editorial guidance and evidence limits.
+
+Continuity diagram cameras add ordered glide/push/whip routes, reading holds, ten-sample temporal motion blur, and bounded object departures. Native UI remains unscaled. Anchored overlays use the existing easing functions and measured product coordinates; annotation kinds share draw/hold/retract intervals. Camera, blur, notation and editorial palette choices are available in live previews and explicit exports.
+
+
+Independent annotationRoughness and boxRoughness (0–3) now select seeded sketch treatments without retiming the animation. Zero means smooth, not hidden. The Composition Atlas exposes separate presets and exports the acknowledged values.
+
+## Configurable motion components
+
+The public `src/motion-components` library provides `DiagramCamera`,
+`SvgObjectDeparture`, `AnchoredOverlay`, `SharedElement`, and
+`SceneTransition`/`createSceneTransition`. Existing continuity films use these
+implementations. Five semantic presets combine speed, blur and easing; numeric
+overrides and bounded cubic Beziers are available in JSX and JSON. Camera
+speed preserves reading holds and leaves content clocks unchanged. See the
+[reusable motion API](reusable-motion.md) for timing, precedence and examples.

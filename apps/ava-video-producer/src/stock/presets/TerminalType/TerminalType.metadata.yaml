@@ -1,0 +1,64 @@
+name:
+  id: motionAtlas.terminal-type.name
+  message: Terminal typing
+description:
+  id: motionAtlas.terminal-type.description
+  message: A command types, executes, and reveals its response.
+category:
+  id: motionAtlas.terminal-type.category
+  message: Code
+tags:
+  - id: motionAtlas.terminal-type.tags.0
+    message: terminal
+  - id: motionAtlas.terminal-type.tags.1
+    message: typing
+  - id: motionAtlas.terminal-type.tags.2
+    message: caret
+  - id: motionAtlas.terminal-type.tags.3
+    message: command
+useWhen:
+  id: motionAtlas.terminal-type.useWhen
+  message:
+    Present an illustrative command sequence; substitute a real command when
+    teaching usage.
+prompt:
+  id: motionAtlas.terminal-type.prompt
+  message:
+    Use Motion Atlas "Terminal typing" (terminal-type) as a conceptual graphic.
+    Present an illustrative command sequence; substitute a real command when teaching
+    usage. Keep the restrained motion and readable labels; replace sample content with
+    approved facts before making product claims.
+creativeDirection:
+  id: motionAtlas.terminal-type.creativeDirection
+  message: A command types, executes, and reveals its response.
+goodFor:
+  - id: motionAtlas.terminal-type.goodFor.0
+    message:
+      Present an illustrative command sequence; substitute a real command when
+      teaching usage.
+intent:
+  id: motionAtlas.terminal-type.intent
+  message:
+    Present an illustrative command sequence; substitute a real command when
+    teaching usage.
+domains:
+  - id: motionAtlas.terminal-type.domains.0
+    message: Code
+aliases:
+  - id: motionAtlas.terminal-type.aliases.0
+    message: terminal
+  - id: motionAtlas.terminal-type.aliases.1
+    message: typing
+  - id: motionAtlas.terminal-type.aliases.2
+    message: caret
+  - id: motionAtlas.terminal-type.aliases.3
+    message: command
+notFor:
+  - id: motionAtlas.terminal-type.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.terminal-type.distinction
+  message: A command types, executes, and reveals its response.

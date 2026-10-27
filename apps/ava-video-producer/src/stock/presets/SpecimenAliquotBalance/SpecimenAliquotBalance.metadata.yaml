@@ -1,0 +1,121 @@
+name:
+  id: motionAtlas.specimen-aliquot-balance.name
+  message: One sample, several aliquots
+description:
+  id: motionAtlas.specimen-aliquot-balance.description
+  message:
+    A parent specimen divides into labeled aliquot tubes while the parent identity
+    stays visible. The remaining parent volume and the aliquot volumes reconcile
+    exactly.
+category:
+  id: motionAtlas.specimen-aliquot-balance.category
+  message: Material division and lineage
+useWhen:
+  id: motionAtlas.specimen-aliquot-balance.useWhen
+  message:
+    Show that splitting a specimen increases container count without creating more
+    source specimens or volume.
+intent:
+  id: motionAtlas.specimen-aliquot-balance.intent
+  message:
+    Show that splitting a specimen increases container count without creating more
+    source specimens or volume.
+creativeDirection:
+  id: motionAtlas.specimen-aliquot-balance.creativeDirection
+  message:
+    Reveal the parent sample tube with its supplied volume. Move only the authored
+    aliquot volumes into their child tubes while identity tethers retain the parent
+    relationship; the parent level falls by the transferred amount. Hold the remaining
+    parent volume plus all child volumes beside a derived equality and a separate
+    specimen-family count, then fade.
+distinction:
+  id: motionAtlas.specimen-aliquot-balance.distinction
+  message:
+    Unlike source-merge or network-graph, matter visibly divides rather than
+    information merely branching, and the parent liquid level changes to preserve
+    volume. Unlike specimen-custody-seal, this explicitly creates child containers while
+    preserving one source identity.
+prompt:
+  id: motionAtlas.specimen-aliquot-balance.prompt
+  message:
+    Use One sample, several aliquots (specimen-aliquot-balance) for a fictional or
+    approved authored example. Show that splitting a specimen increases container count
+    without creating more source specimens or volume.
+tags:
+  - id: motionAtlas.specimen-aliquot-balance.tags.0
+    message: aliquot
+  - id: motionAtlas.specimen-aliquot-balance.tags.1
+    message: specimen split
+  - id: motionAtlas.specimen-aliquot-balance.tags.2
+    message: sample lineage
+  - id: motionAtlas.specimen-aliquot-balance.tags.3
+    message: volume conservation
+  - id: motionAtlas.specimen-aliquot-balance.tags.4
+    message: parent sample
+  - id: motionAtlas.specimen-aliquot-balance.tags.5
+    message: laboratory tubes
+  - id: motionAtlas.specimen-aliquot-balance.tags.6
+    message: subsample
+  - id: motionAtlas.specimen-aliquot-balance.tags.7
+    message: identity inheritance
+goodFor:
+  - id: motionAtlas.specimen-aliquot-balance.goodFor.0
+    message: Explain why several laboratory tubes may originate from one collected specimen.
+  - id: motionAtlas.specimen-aliquot-balance.goodFor.1
+    message: Show volume conservation during fictional aliquoting.
+  - id: motionAtlas.specimen-aliquot-balance.goodFor.2
+    message: Distinguish source specimens, child containers, and measured volume.
+domains:
+  - id: motionAtlas.specimen-aliquot-balance.domains.0
+    message: Material division and lineage
+aliases:
+  - id: motionAtlas.specimen-aliquot-balance.aliases.0
+    message: aliquot
+  - id: motionAtlas.specimen-aliquot-balance.aliases.1
+    message: specimen split
+  - id: motionAtlas.specimen-aliquot-balance.aliases.2
+    message: sample lineage
+notFor:
+  - id: motionAtlas.specimen-aliquot-balance.notFor.0
+    message: Exactly one source specimen is represented. Child-tube count is
+      aliquots.length; total shown tube count is 1 + aliquots.length, regardless of
+      whether the parent remainder is zero.
+  - id: motionAtlas.specimen-aliquot-balance.notFor.1
+    message:
+      sum(aliquots.volume) must be <= parent.volume. Parent remainder is derived by
+      subtraction, so source volume equals child volume plus remainder; no loss or
+      separate remainder input exists.
+  - id: motionAtlas.specimen-aliquot-balance.notFor.2
+    message:
+      Volume units are fictional schematic units. Tube geometry is illustrative, not
+      a calibrated laboratory instrument or a practical aliquoting procedure.
+  - id: motionAtlas.specimen-aliquot-balance.notFor.3
+    message:
+      This shows lineage and bookkeeping only. No assay, sample suitability,
+      diagnostic result, laboratory method, or clinical recommendation is implied.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.specimen-aliquot-balance.motionBeats.0
+      message: Reveal the supplied setting and identities.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.specimen-aliquot-balance.motionBeats.1
+      message:
+        Reveal the parent sample tube with its supplied volume. Move only the authored
+        aliquot volumes into their child tubes while identity tethers retain the parent
+        relationship; the parent level falls by the transferred amount. Hold the
+        remaining parent volume plus all child volumes beside a derived equality and a
+        separate specimen-family count, then fade.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.specimen-aliquot-balance.motionBeats.2
+      message: Hold the supplied final records and separate derived quantities.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.specimen-aliquot-balance.motionBeats.3
+      message: Return to the opaque ground through the shared envelope.

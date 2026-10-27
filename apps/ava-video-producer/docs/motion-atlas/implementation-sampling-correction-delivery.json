@@ -1,0 +1,206 @@
+{
+  "head": "e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e",
+  "sourceHash": "38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9",
+  "delivery": {
+    "preset": "stratified-spatial-sample",
+    "fingerprint": {
+      "sourceHash": "38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9",
+      "configurationHash": "6991984f189122533365c44b71aca53c5a285f7339735b80ffc82195273d3bf2"
+    },
+    "request": {
+      "preset": "stratified-spatial-sample",
+      "schemaVersion": 1,
+      "accent": "#9fefca",
+      "background": "#0b1219",
+      "input": {
+        "strata": [
+          {
+            "id": "w",
+            "label": "West stratum",
+            "polygon": [
+              [5, 5],
+              [50, 5],
+              [50, 95],
+              [5, 95]
+            ]
+          },
+          {
+            "id": "e",
+            "label": "East stratum",
+            "polygon": [
+              [50, 5],
+              [95, 5],
+              [95, 95],
+              [50, 95]
+            ]
+          }
+        ],
+        "sites": [
+          {
+            "id": "a",
+            "label": "Site A",
+            "stratumId": "w",
+            "x": 20,
+            "y": 20
+          },
+          {
+            "id": "b",
+            "label": "Site B",
+            "stratumId": "w",
+            "x": 30,
+            "y": 50
+          },
+          {
+            "id": "c",
+            "label": "Site C",
+            "stratumId": "w",
+            "x": 20,
+            "y": 80
+          },
+          {
+            "id": "d",
+            "label": "Site D",
+            "stratumId": "e",
+            "x": 70,
+            "y": 25
+          },
+          {
+            "id": "e",
+            "label": "Site E",
+            "stratumId": "e",
+            "x": 80,
+            "y": 75
+          }
+        ],
+        "selectedSiteIds": ["a", "d"],
+        "copy": {
+          "context": "Fictional schematic sampling plan",
+          "selected": "Selected",
+          "eligible": "Eligible sites",
+          "unsampled": "Not selected",
+          "unit": "sites"
+        },
+        "showUnselectedLabels": false
+      }
+    },
+    "frames": 180,
+    "fps": 30,
+    "width": 1280,
+    "height": 800,
+    "seconds": 6,
+    "audio": false,
+    "gate": "passed including loop seam",
+    "videoSha256": "4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a",
+    "posterSha256": "bc751509784f0dca8a04ecd27e91d86ce0625b68c5ef529d7aef69fef2a1d0ac",
+    "generatedAt": "2026-10-18T02:10:03.235Z"
+  },
+  "probe": {
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High",
+        "codec_type": "video",
+        "codec_tag_string": "avc1",
+        "codec_tag": "0x31637661",
+        "mime_codec_string": "avc1.640028",
+        "width": 1280,
+        "height": 800,
+        "coded_width": 1280,
+        "coded_height": 800,
+        "has_b_frames": 0,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "8:5",
+        "pix_fmt": "yuvj420p",
+        "level": 40,
+        "color_range": "pc",
+        "color_space": "bt470bg",
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "id": "0x1",
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "time_base": "1/15360",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "duration_ts": 92160,
+        "duration": "6.000000",
+        "bit_rate": "185702",
+        "bits_per_raw_sample": "8",
+        "nb_frames": "180",
+        "extradata_size": 50,
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "und",
+          "handler_name": "VideoHandler",
+          "encoder": "Lavc63.1.102 libx264"
+        },
+        "side_data_list": [
+          {
+            "side_data_type": "ICC Profile"
+          }
+        ]
+      }
+    ],
+    "format": {
+      "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/stratified-spatial-sample/6991984f189122533365c44b71aca53c5a285f7339735b80ffc82195273d3bf2/stratified-spatial-sample.mp4",
+      "nb_streams": 1,
+      "nb_programs": 0,
+      "nb_stream_groups": 0,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "start_time": "0.000000",
+      "duration": "6.000000",
+      "size": "141335",
+      "bit_rate": "188446",
+      "probe_score": 100,
+      "tags": {
+        "major_brand": "isom",
+        "minor_version": "512",
+        "compatible_brands": "isomiso2avc1mp41",
+        "encoder": "Lavf63.1.102"
+      }
+    }
+  },
+  "canonicalMedia": {
+    "key": "sampling-corrected-default",
+    "id": "stratified-spatial-sample",
+    "configurationHash": "6991984f189122533365c44b71aca53c5a285f7339735b80ffc82195273d3bf2",
+    "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/stratified-spatial-sample/6991984f189122533365c44b71aca53c5a285f7339735b80ffc82195273d3bf2/stratified-spatial-sample.mp4",
+    "sha256": "4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a"
+  },
+  "poster": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/stratified-spatial-sample/6991984f189122533365c44b71aca53c5a285f7339735b80ffc82195273d3bf2/stratified-spatial-sample-poster.jpg",
+  "renderLog": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/stratified-spatial-sample/6991984f189122533365c44b71aca53c5a285f7339735b80ffc82195273d3bf2/render.log",
+  "renderLogSha256": "7296660cfff3f1384b1217b460ec22118de4ffd5b314f6aa92243ec04ced466c",
+  "previewManifest": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/stratified-spatial-sample/6991984f189122533365c44b71aca53c5a285f7339735b80ffc82195273d3bf2/manifest.json",
+  "status": "actual publicCLI render exit0, canonical hashes and independent silent H2641280x80030fps180frames6second probe verified; decoded inspection pending",
+  "preservedOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/sampling-correction-delivery.json",
+    "sha256": "9bb74ce59d0d89e076cd08304242eead46fdb3643a0ba64bdbb367cd9dc059b2",
+    "bytes": 7147
+  },
+  "publicationPolicy": "Curated R69 outcome/identity/limitation record; no raw callback/session trace."
+}

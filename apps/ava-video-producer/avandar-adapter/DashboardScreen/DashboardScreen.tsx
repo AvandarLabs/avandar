@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react";
 import { Render } from "@puckeditor/core";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import "@puckeditor/core/puck.css";
 import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
 import { DashboardPreviewBanner } from "@/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner";
@@ -98,13 +98,6 @@ export function DashboardScreen({
   width: number;
   height: number;
 }) {
-  const { i18n } = useLingui();
-  const config = useDashboardPuckConfig({
-    dashboardTitle: DASHBOARD_NAME,
-    workspaceId: dashboard.workspaceId,
-    dashboardId: dashboard.id,
-    i18n,
-  });
   const context = useMemo(() => ({ frame, chartAt: 328 }), [frame]);
   return (
     <DashboardFixtureContext.Provider value={context}>
@@ -133,12 +126,7 @@ export function DashboardScreen({
               opacity: ramp(frame, 328, 18),
             }}
           >
-            <Editor
-              config={config}
-              data={data}
-              dashboardId={dashboard.id}
-              height={height}
-            />
+            <DashboardCanvas isPreview={false} height={height} />
           </div>
         ) : null}
         {frame >= 474 ? (
@@ -151,17 +139,50 @@ export function DashboardScreen({
               background: "var(--ava-surface-raised)",
             }}
           >
-            <DashboardPreviewBanner
-              dashboard={dashboard}
-              workspaceSlug="avandar-labs"
-              canEdit
-            />
-            <Render config={config} data={data} />
+            <DashboardCanvas isPreview height={height} />
           </div>
         ) : null}
       </div>
     </DashboardFixtureContext.Provider>
   );
 }
+
+/**
+ * Keep the product Puck config outside frame updates. Its render functions are
+ * component identities. Recreating them remounts the responsive charts.
+ * FixtureDataViz still receives every frame directly through context.
+ */
+const DashboardCanvas = memo(function DashboardCanvas({
+  isPreview,
+  height,
+}: {
+  isPreview: boolean;
+  height: number;
+}) {
+  const { i18n } = useLingui();
+  const config = useDashboardPuckConfig({
+    dashboardTitle: DASHBOARD_NAME,
+    workspaceId: dashboard.workspaceId,
+    dashboardId: dashboard.id,
+    i18n,
+  });
+  return isPreview ? (
+    <>
+      <DashboardPreviewBanner
+        dashboard={dashboard}
+        workspaceSlug="avandar-labs"
+        canEdit
+      />
+      <Render config={config} data={data} />
+    </>
+  ) : (
+    <Editor
+      config={config}
+      data={data}
+      dashboardId={dashboard.id}
+      height={height}
+    />
+  );
+});
 
 export { DashboardScreen as Screen };

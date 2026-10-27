@@ -1,0 +1,133 @@
+name:
+  id: motionAtlas.pooled-donor-allocation.name
+  message: Pool support, preserve its purpose
+description:
+  id: motionAtlas.pooled-donor-allocation.description
+  message:
+    Contributor-marked demo credits gather in a transparent shared tray before
+    being allocated to named funding requests. Earmarked credits keep their destination
+    restriction, flexible credits can support different requests, and every unit remains
+    attributable.
+category:
+  id: motionAtlas.pooled-donor-allocation.category
+  message: Participatory resource allocation
+useWhen:
+  id: motionAtlas.pooled-donor-allocation.useWhen
+  message: Show that pooling resources can preserve both donor attribution and
+    restrictions on their use.
+intent:
+  id: motionAtlas.pooled-donor-allocation.intent
+  message: Show that pooling resources can preserve both donor attribution and
+    restrictions on their use.
+creativeDirection:
+  id: motionAtlas.pooled-donor-allocation.creativeDirection
+  message:
+    Over six seconds, contributors tip small stacks of individually marked
+    demo-credit tokens into a transparent shared tray. Earmarked tokens retain their
+    destination ribbon; flexible tokens retain a distinct flexible marker. A community
+    coordinator slides the configured tokens into labeled funding-request envelopes,
+    preserving donor marks and respecting every earmark, while any unallocated tokens
+    stay in the tray. Set each funded envelope upright with contributor marks visible
+    above its edge, and hold the allocation totals alongside the remaining pool without
+    transforming money into goods before the shared opaque exit fade. No token changes
+    value, duplicates, or loses attribution.
+distinction:
+  id: motionAtlas.pooled-donor-allocation.distinction
+  message:
+    Unlike source-merge, pooling is followed by a constrained physical allocation
+    into separate funding requests, and contributor identity survives the entire
+    sequence. The hero action is sorting and retaining attributed, restricted units, not
+    convergence toward one destination or a fundraising counter.
+prompt:
+  id: motionAtlas.pooled-donor-allocation.prompt
+  message:
+    Pool support, preserve its purpose. Show that pooling resources can preserve
+    both donor attribution and restrictions on their use.
+tags:
+  - id: motionAtlas.pooled-donor-allocation.tags.0
+    message: donor pooling
+  - id: motionAtlas.pooled-donor-allocation.tags.1
+    message: pooled funding
+  - id: motionAtlas.pooled-donor-allocation.tags.2
+    message: earmarked funds
+  - id: motionAtlas.pooled-donor-allocation.tags.3
+    message: flexible funds
+  - id: motionAtlas.pooled-donor-allocation.tags.4
+    message: resource allocation
+  - id: motionAtlas.pooled-donor-allocation.tags.5
+    message: donor attribution
+  - id: motionAtlas.pooled-donor-allocation.tags.6
+    message: restricted contributions
+  - id: motionAtlas.pooled-donor-allocation.tags.7
+    message: conserved budget
+  - id: motionAtlas.pooled-donor-allocation.tags.8
+    message: humanitarian coordination
+goodFor:
+  - id: motionAtlas.pooled-donor-allocation.goodFor.0
+    message: Explain earmarked and flexible contributions in a fictional pooled fund
+  - id: motionAtlas.pooled-donor-allocation.goodFor.1
+    message: Show how donor attribution survives shared resource allocation
+  - id: motionAtlas.pooled-donor-allocation.goodFor.2
+    message:
+      Connect a jointly managed pool to specific funding requests without implying
+      delivered outcomes
+domains:
+  - id: motionAtlas.pooled-donor-allocation.domains.0
+    message: Participatory resource allocation
+aliases:
+  - id: motionAtlas.pooled-donor-allocation.aliases.0
+    message: donor pooling
+  - id: motionAtlas.pooled-donor-allocation.aliases.1
+    message: pooled funding
+  - id: motionAtlas.pooled-donor-allocation.aliases.2
+    message: earmarked funds
+notFor:
+  - id: motionAtlas.pooled-donor-allocation.notFor.0
+    message:
+      Every token is exactly one fictional demo credit; total contributions equal
+      total allocations plus the visibly retained pool. Totals and residuals are
+      derived, never separately authored.
+  - id: motionAtlas.pooled-donor-allocation.notFor.1
+    message:
+      Earmarked credits cannot move to another request. Flexible credits may be split
+      only as explicitly configured, and donor marks remain visible throughout.
+  - id: motionAtlas.pooled-donor-allocation.notFor.2
+    message:
+      Funding envelopes represent planned spending allocations only. No conversion
+      into goods, people served, delivery completion, or impact is implied.
+  - id: motionAtlas.pooled-donor-allocation.notFor.3
+    message:
+      The scene is a small authored example, not accounting software, a fundraising
+      transaction, a financial recommendation, or real donor reporting.
+  - id: motionAtlas.pooled-donor-allocation.notFor.4
+    message:
+      Literal donor whitespace is shown with styled whitespace marks; original input
+      remains exact.
+motionBeats:
+  - startFrame: 12
+    endFrame: 17
+    description:
+      id: motionAtlas.pooled-donor-allocation.motionBeats.0
+      message: Reveal the donor labels and individually attributed credits.
+  - startFrame: 18
+    endFrame: 61
+    description:
+      id: motionAtlas.pooled-donor-allocation.motionBeats.1
+      message: Tip the exact credits into a transparent shared tray.
+  - startFrame: 62
+    endFrame: 132
+    description:
+      id: motionAtlas.pooled-donor-allocation.motionBeats.2
+      message:
+        The coordinator slides each configured request batch on a clear scoop,
+        withdraws the support and sets the envelopes upright.
+  - startFrame: 133
+    endFrame: 167
+    description:
+      id: motionAtlas.pooled-donor-allocation.motionBeats.3
+      message: Hold all donor marks, earmarks, allocation totals and residual credits.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.pooled-donor-allocation.motionBeats.4
+      message: Return to the opaque ground through the shared envelope.

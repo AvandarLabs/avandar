@@ -5,6 +5,11 @@ import { Trans } from "@lingui/react/macro";
 import { Player, type PlayerRef } from "@remotion/player";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import {
+  continuityAppearanceSchema,
+  createContinuityPlanFromOptions,
+} from "../continuity/continuityAppearance";
+import { durationInFrames } from "../storyboard/schema/timeline";
 import { FilmComposition } from "./FilmComposition";
 import type { Film } from "./showcase.types";
 import "../theme.css";
@@ -19,6 +24,8 @@ function readSaved() {
       frame: number;
       playing: boolean;
       captions: boolean;
+      speed?: number;
+      loop?: boolean;
     } | null;
   } catch {
     return null;
@@ -49,9 +56,34 @@ function send(message: object) {
 
 function LivePlayer({ film }: { film: Film }) {
   const player = useRef<PlayerRef>(null);
+  const continuity = film.plan?.shots.find(
+    (shot) => shot.scene === "continuity",
+  );
+  const [appearance, setAppearance] = useState(() =>
+    continuityAppearanceSchema.parse(
+      continuity?.scene === "continuity"
+        ? {
+            accent: continuity.props.accent,
+            background: continuity.props.background,
+            cameraMotion: continuity.props.cameraMotion,
+            motionBlur: continuity.props.motionBlur,
+            annotations: continuity.props.annotations,
+            annotationRoughness: continuity.props.annotationRoughness,
+            boxRoughness: continuity.props.boxRoughness,
+          }
+        : {},
+    ),
+  );
+  const previewPlan =
+    film.plan && continuity
+      ? createContinuityPlanFromOptions(film.plan, appearance)
+      : film.plan;
+  const previewFrames = previewPlan
+    ? durationInFrames(previewPlan)
+    : film.frames;
   const [captions, setCaptions] = useState(saved?.captions ?? true);
-  const [speed, setSpeed] = useState(1);
-  const [loop, setLoop] = useState(false);
+  const [speed, setSpeed] = useState(saved?.speed ?? 1);
+  const [loop, setLoop] = useState(saved?.loop ?? false);
   useEffect(
     function restoreSavedPlaybackState() {
       savePlayback = () =>
@@ -61,9 +93,16 @@ function LivePlayer({ film }: { film: Film }) {
             frame: player.current?.getCurrentFrame() ?? 0,
             playing: player.current?.isPlaying() ?? false,
             captions,
+            speed,
+            loop,
           }),
         );
-      send({ type: "film-options", id, options: { captions } });
+      send({
+        type: "film-options",
+        id,
+        options: continuity ? { ...appearance, captions } : { captions },
+        transport: { speed, loop },
+      });
       const receive = (event: MessageEvent) => {
         if (
           event.origin !== location.origin ||
@@ -72,7 +111,22 @@ function LivePlayer({ film }: { film: Film }) {
         ) {
           return;
         }
+        if (event.data.id && event.data.id !== id) return;
         const { action, value } = event.data;
+        if (action === "appearance" && continuity) {
+          const result = continuityAppearanceSchema.safeParse(value);
+          if (result.success) {
+            setAppearance(result.data);
+            setCaptions(result.data.captions);
+          }
+        }
+        if (action === "options")
+          send({
+            type: "film-options",
+            id,
+            options: continuity ? { ...appearance, captions } : { captions },
+            transport: { speed, loop },
+          });
         if (action === "play") {
           player.current?.play();
         }
@@ -84,7 +138,9 @@ function LivePlayer({ film }: { film: Film }) {
           player.current?.play();
         }
         if (action === "seek" && Number.isFinite(value)) {
-          player.current?.seekTo(Math.max(0, Math.min(film.frames - 1, value)));
+          player.current?.seekTo(
+            Math.max(0, Math.min(previewFrames - 1, value)),
+          );
           player.current?.play();
         }
         if (action === "speed" && [0.5, 1, 1.5, 2].includes(value)) {
@@ -97,7 +153,7 @@ function LivePlayer({ film }: { film: Film }) {
       window.addEventListener("message", receive);
       return () => window.removeEventListener("message", receive);
     },
-    [film.frames, captions],
+    [previewFrames, captions, appearance, speed, loop, continuity],
   );
   useEffect(function registerPlayEventListener() {
     const current = player.current;
@@ -113,19 +169,26 @@ function LivePlayer({ film }: { film: Film }) {
         <Player
           ref={player}
           component={FilmComposition}
-          inputProps={{ film: { ...film, showCaptions: captions } }}
+          inputProps={{
+            film: {
+              ...film,
+              plan: previewPlan,
+              frames: previewFrames,
+              showCaptions: captions,
+            },
+          }}
           compositionWidth={film.width}
           compositionHeight={film.height}
-          durationInFrames={film.frames}
+          durationInFrames={previewFrames}
           fps={film.fps}
           controls
           loop={loop}
           playbackRate={speed}
           autoPlay={saved?.playing ?? false}
           initialFrame={Math.min(
-            film.frames - 1,
+            previewFrames - 1,
             saved?.frame ??
-              (id === "avandar-home" ? 490 : Math.min(100, film.frames - 1)),
+              (id === "avandar-home" ? 490 : Math.min(100, previewFrames - 1)),
           )}
           style={{ width: "100%" }}
           clickToPlay={false}
@@ -138,7 +201,7 @@ function LivePlayer({ film }: { film: Film }) {
             </p>
           )}
         />
-        {film.plan?.captions ? (
+        {film.plan?.captions && !continuity ? (
           <label className="captionToggle">
             <input
               type="checkbox"

@@ -1,0 +1,124 @@
+/* Shared PaletteControls uses the existing Motion Atlas class names. */
+/* stylelint-disable selector-class-pattern */
+.swatches {
+  display: flex;
+  gap: 8px;
+}
+
+.swatch {
+  align-items: center;
+  background: var(--swatch);
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  color: var(--ava-primary-7);
+  display: flex;
+  height: 22px;
+  justify-content: center;
+  outline: 1px solid var(--ava-primary-1);
+  width: 22px;
+}
+
+.swatch.is-selected {
+  outline: 1px solid var(--ava-primary-7);
+}
+
+.swatch:focus-visible {
+  outline: 2px solid var(--ava-primary-7);
+  outline-offset: 3px;
+}
+
+.palette-controls {
+  align-items: center;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 18px 0 24px;
+  padding: 14px;
+}
+
+.color-control {
+  align-items: center;
+  display: flex;
+  font-size: 11px;
+  gap: 8px;
+}
+
+.color-control code {
+  font: 10px var(--mono);
+}
+
+.color-control input[type="color"] {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  cursor: pointer;
+  height: 32px;
+  padding: 2px;
+  width: 32px;
+}
+
+.palette-reset {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--ava-primary-7);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  padding: 8px 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.palette-help {
+  color: var(--ava-neutral-6);
+  flex-basis: 100%;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.palette-controls input:focus-visible,
+.palette-reset:focus-visible {
+  outline: 2px solid var(--ava-primary-7);
+  outline-offset: 3px;
+}
+
+.palette-group {
+  display: flex;
+  flex: 1 1 310px;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.palette-controls .swatches {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.palette-controls .swatch {
+  height: 26px;
+  width: 26px;
+}
+
+.palette-controls .swatch > svg {
+  color: #fff;
+  filter: drop-shadow(0 1px 1px var(--ava-neutral-9))
+    drop-shadow(0 0 1px var(--ava-neutral-9));
+}
+
+.palette-controls .color-control > span {
+  min-width: 68px;
+}
+
+.palette-controls .palette-reset {
+  align-self: center;
+}
+
+.palette-controls .palette-help {
+  margin: 0;
+}

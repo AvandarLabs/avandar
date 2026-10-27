@@ -1,0 +1,127 @@
+name:
+  id: motionAtlas.school-cost-satchel.name
+  message: Unpack the cost of attending
+description:
+  id: motionAtlas.school-cost-satchel.description
+  message:
+    A school satchel opens to reveal the different expenses a fictional household
+    is asked to plan for over one stated period. The costs stay attached to recognizable
+    school objects.
+category:
+  id: motionAtlas.school-cost-satchel.category
+  message: School object unpacking
+useWhen:
+  id: motionAtlas.school-cost-satchel.useWhen
+  message:
+    Make the components of an attendance-related expense visible without claiming
+    affordability or exclusion.
+prompt:
+  id: motionAtlas.school-cost-satchel.prompt
+  message:
+    Begin with a learner beside an open school doorway carrying a closed satchel.
+    Open the bag and unfold exactly the object kinds supplied in the expense array,
+    ordered by unpackOrder onto a small ground cloth. Each object reveals its authored
+    amount; a bracket gathers their amounts into a clearly labeled total for the stated
+    period. Hold the objects, period, and total together, then close the scene through
+    the shared exit envelope.
+creativeDirection:
+  id: motionAtlas.school-cost-satchel.creativeDirection
+  message:
+    Begin with a learner beside an open school doorway carrying a closed satchel.
+    Open the bag and unfold exactly the object kinds supplied in the expense array,
+    ordered by unpackOrder onto a small ground cloth. Each object reveals its authored
+    amount; a bracket gathers their amounts into a clearly labeled total for the stated
+    period. Hold the objects, period, and total together, then close the scene through
+    the shared exit envelope.
+intent:
+  id: motionAtlas.school-cost-satchel.intent
+  message:
+    Make the components of an attendance-related expense visible without claiming
+    affordability or exclusion.
+distinction:
+  id: motionAtlas.school-cost-satchel.distinction
+  message:
+    The satchel physically reveals the objects behind a school-cost total. It does
+    not show a purchasing choice, generic bar comparison, money gate, or an access
+    intervention automatically succeeding.
+tags:
+  - id: motionAtlas.school-cost-satchel.tags.0
+    message: education access
+  - id: motionAtlas.school-cost-satchel.tags.1
+    message: school costs
+  - id: motionAtlas.school-cost-satchel.tags.2
+    message: financial barriers
+  - id: motionAtlas.school-cost-satchel.tags.3
+    message: uniform
+  - id: motionAtlas.school-cost-satchel.tags.4
+    message: learning supplies
+  - id: motionAtlas.school-cost-satchel.tags.5
+    message: transport fare
+  - id: motionAtlas.school-cost-satchel.tags.6
+    message: household budget
+  - id: motionAtlas.school-cost-satchel.tags.7
+    message: satchel
+goodFor:
+  - id: motionAtlas.school-cost-satchel.goodFor.0
+    message: Introduce financial barriers beyond a tuition headline
+  - id: motionAtlas.school-cost-satchel.goodFor.1
+    message: Explain what is included in a fictional school-access budget
+  - id: motionAtlas.school-cost-satchel.goodFor.2
+    message: Separate a named expense from the total household cost being discussed
+domains:
+  - id: motionAtlas.school-cost-satchel.domains.0
+    message: School object unpacking
+aliases:
+  - id: motionAtlas.school-cost-satchel.aliases.0
+    message: education access
+  - id: motionAtlas.school-cost-satchel.aliases.1
+    message: school costs
+  - id: motionAtlas.school-cost-satchel.aliases.2
+    message: financial barriers
+notFor:
+  - id: motionAtlas.school-cost-satchel.authoringIdentity
+    message:
+      The author assigns one unique ID per distinct cost. Equal label, object and
+      amount values do not imply duplicate identity. Underlying real-world duplicate
+      costs cannot be detected from these fields.
+  - id: motionAtlas.school-cost-satchel.notFor.0
+    message:
+      The total is the sum of the expense amounts. In the default, workbook cost is 3
+      of 6 example credits, not 3 of 6 learners.
+  - id: motionAtlas.school-cost-satchel.notFor.1
+    message:
+      The bag and objects are semantic illustrations. Their sizes do not encode
+      price, weight, deprivation, or a household income share.
+  - id: motionAtlas.school-cost-satchel.notFor.2
+    message:
+      The open doorway does not imply enrollment is conditional on payment. No
+      admission, dropout, affordability, or causal impact is inferred.
+  - id: motionAtlas.school-cost-satchel.notFor.3
+    message:
+      Amounts require a common period and unit. The animation does not annualize
+      one-off costs or estimate missing expenses. Defaults are fictional.
+motionBeats:
+  - startFrame: 0
+    endFrame: 23
+    description:
+      id: motionAtlas.school-cost-satchel.motionBeats.0
+      message: Reveal the learner, open school doorway and closed satchel.
+  - startFrame: 24
+    endFrame: 37
+    description:
+      id: motionAtlas.school-cost-satchel.motionBeats.1
+      message: The learner opens the satchel flap.
+  - startFrame: 38
+    endFrame: 107
+    description:
+      id: motionAtlas.school-cost-satchel.motionBeats.2
+      message:
+        Unfold two to five authored objects in the chosen stable order, with amounts
+        and optional exact shares.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.school-cost-satchel.motionBeats.3
+      message:
+        Gather the authored amounts into their period total, hold, then use the shared
+        exit envelope.

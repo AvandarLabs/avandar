@@ -8,15 +8,22 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { StockRect } from "../primitives/StockRect/StockRect";
+import type { EventBusInput } from "../presets/EventBus/EventBus.schema";
+import type { ReactNode } from "react";
 
-const EVENT_PRODUCERS = ["Create", "Update", "Archive"];
-const EVENT_CONSUMERS = ["Log", "Index", "Notify"];
+type Props = GraphicProps & { input: EventBusInput };
 
-export function EventBus({ frame, accent }: GraphicProps) {
+/** Draws the bounded authored event-bus study at an explicit frame. */
+export function EventBus({ input, frame, accent }: Readonly<Props>): ReactNode {
+  const producers = input.producers;
+  const subscribers = input.subscribers;
   return (
     <g>
-      <Eyebrow>EVENT BUS</Eyebrow>
-      <rect
+      <Eyebrow>{input.heading}</Eyebrow>
+      <StockRect
         x={136}
         y={277}
         width={688}
@@ -33,19 +40,21 @@ export function EventBus({ frame, accent }: GraphicProps) {
         strokeOpacity={0.4}
         strokeWidth={2}
       />
-      {[0, 1, 2, 3].map((i) => (
-        <Packet
-          key={i}
-          frame={frame}
-          from={{ x: 165, y: 306 }}
-          to={{ x: 794, y: 306 }}
-          delay={i * 25}
-          period={100}
-          color={accent}
-          radius={4.5}
-        />
-      ))}
-      {EVENT_PRODUCERS.map((name, i) => {
+      {input.showPackets
+        ? [0, 1, 2, 3].map((i) => (
+            <Packet
+              key={i}
+              frame={frame}
+              from={{ x: 165, y: 306 }}
+              to={{ x: 794, y: 306 }}
+              delay={i * 25}
+              period={100}
+              color={accent}
+              radius={4.5}
+            />
+          ))
+        : null}
+      {producers.map((name, i) => {
         const x = 160 + i * 260;
         const center = x + 60;
         const to = { x: center, y: 277 };
@@ -59,14 +68,16 @@ export function EventBus({ frame, accent }: GraphicProps) {
               color={STOCK.cyan}
               opacity={0.5}
             />
-            <Packet
-              frame={frame}
-              from={from}
-              to={to}
-              color={STOCK.cyan}
-              delay={i * 24}
-              period={80}
-            />
+            {input.showPackets ? (
+              <Packet
+                frame={frame}
+                from={from}
+                to={to}
+                color={STOCK.cyan}
+                delay={i * 24}
+                period={80}
+              />
+            ) : null}
             <Arrive frame={frame} index={i}>
               <Panel x={x} y={121} width={120} height={72}>
                 <Text x={center} y={163} size={21} anchor="middle">
@@ -82,12 +93,15 @@ export function EventBus({ frame, accent }: GraphicProps) {
               anchor="middle"
               mono
             >
-              PRODUCER 0{i + 1}
+              {getStockDisplayCopyFromDescriptor({
+                descriptor: LEGACY_DISPLAY_COPY["event-bus"].producerNumber,
+                values: { number: `0${i + 1}` },
+              })}
             </Text>
           </g>
         );
       })}
-      {EVENT_CONSUMERS.map((name, i) => {
+      {subscribers.map((name, i) => {
         const x = 160 + i * 260;
         const center = x + 60;
         const from = { x: center, y: 335 };
@@ -101,14 +115,16 @@ export function EventBus({ frame, accent }: GraphicProps) {
               color={STOCK.orange}
               opacity={0.45}
             />
-            <Packet
-              frame={frame}
-              from={from}
-              to={to}
-              color={STOCK.orange}
-              delay={i * 24 + 34}
-              period={80}
-            />
+            {input.showPackets ? (
+              <Packet
+                frame={frame}
+                from={from}
+                to={to}
+                color={STOCK.orange}
+                delay={i * 24 + 34}
+                period={80}
+              />
+            ) : null}
             <Arrive frame={frame} index={i} at={26}>
               <Panel x={x} y={418} width={120} height={72}>
                 <Text x={center} y={460} size={21} anchor="middle">
@@ -124,7 +140,10 @@ export function EventBus({ frame, accent }: GraphicProps) {
               anchor="middle"
               mono
             >
-              SUBSCRIBER 0{i + 1}
+              {getStockDisplayCopyFromDescriptor({
+                descriptor: LEGACY_DISPLAY_COPY["event-bus"].subscriberNumber,
+                values: { number: `0${i + 1}` },
+              })}
             </Text>
           </g>
         );

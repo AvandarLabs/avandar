@@ -1,0 +1,120 @@
+name:
+  id: motionAtlas.chosen-service-access.name
+  message: Open the service someone chooses
+description:
+  id: motionAtlas.chosen-service-access.description
+  message:
+    A participant chooses a named community service and an access barrier is
+    visibly addressed at its entrance. The person then approaches and enters by the
+    accessible path shown in the example.
+category:
+  id: motionAtlas.chosen-service-access.category
+  message: Access and participation
+useWhen:
+  id: motionAtlas.chosen-service-access.useWhen
+  message:
+    Show that a service becomes usable when a person can choose it and physically
+    reach its entrance.
+intent:
+  id: motionAtlas.chosen-service-access.intent
+  message:
+    Show that a service becomes usable when a person can choose it and physically
+    reach its entrance.
+creativeDirection:
+  id: motionAtlas.chosen-service-access.creativeDirection
+  message:
+    Within six seconds, reveal two or three modest service entrances and a
+    participant considering their labels. The participant points to the configured
+    choice. At that entrance, either unfold a ramp over the step or roll a physical
+    obstruction clear, according to the supplied access change; the staff member holds
+    the door while the participant moves under their own power through it. Keep the
+    other service options visible, hold the selected doorway and cleared path, then
+    apply the shared opaque exit fade.
+distinction:
+  id: motionAtlas.chosen-service-access.distinction
+  message:
+    The central transformation changes physical access to a doorway, followed by
+    participant-directed entry. It is not node-traversal, a generic status transition,
+    or merely labels arriving on cards.
+prompt:
+  id: motionAtlas.chosen-service-access.prompt
+  message:
+    Open the service someone chooses. Show that a service becomes usable when a
+    person can choose it and physically reach its entrance.
+tags:
+  - id: motionAtlas.chosen-service-access.tags.0
+    message: service access
+  - id: motionAtlas.chosen-service-access.tags.1
+    message: shelter access
+  - id: motionAtlas.chosen-service-access.tags.2
+    message: accessibility
+  - id: motionAtlas.chosen-service-access.tags.3
+    message: participant choice
+  - id: motionAtlas.chosen-service-access.tags.4
+    message: remove barriers
+  - id: motionAtlas.chosen-service-access.tags.5
+    message: community services
+  - id: motionAtlas.chosen-service-access.tags.6
+    message: accessible entrance
+  - id: motionAtlas.chosen-service-access.tags.7
+    message: humanitarian support
+goodFor:
+  - id: motionAtlas.chosen-service-access.goodFor.0
+    message: Explain a fictional barrier to accessing shelter or community support
+  - id: motionAtlas.chosen-service-access.goodFor.1
+    message: Show the combination of service choice and a usable entrance
+  - id: motionAtlas.chosen-service-access.goodFor.2
+    message: Introduce an accessibility improvement through a physical action
+domains:
+  - id: motionAtlas.chosen-service-access.domains.0
+    message: Access and participation
+aliases:
+  - id: motionAtlas.chosen-service-access.aliases.0
+    message: service access
+  - id: motionAtlas.chosen-service-access.aliases.1
+    message: shelter access
+  - id: motionAtlas.chosen-service-access.aliases.2
+    message: accessibility
+notFor:
+  - id: motionAtlas.chosen-service-access.notFor.0
+    message:
+      The ramp and entrance are conceptual silhouettes, not dimensional design
+      guidance or a certification of accessibility.
+  - id: motionAtlas.chosen-service-access.notFor.1
+    message:
+      Removing one depicted physical barrier does not imply that language,
+      eligibility, safety, affordability, or other barriers have been resolved.
+  - id: motionAtlas.chosen-service-access.notFor.2
+    message:
+      Entry into a shelter desk does not imply a shelter placement, admission
+      entitlement, or guaranteed housing.
+  - id: motionAtlas.chosen-service-access.notFor.3
+    message:
+      The scene shows one fictional participant; it makes no population-level access
+      or impact claim.
+motionBeats:
+  - startFrame: 12
+    endFrame: 43
+    description:
+      id: motionAtlas.chosen-service-access.motionBeats.0
+      message: Reveal options. Participant points toward the authored choice.
+  - startFrame: 44
+    endFrame: 77
+    description:
+      id: motionAtlas.chosen-service-access.motionBeats.1
+      message: Staff unfolds the selected ramp or clears its obstruction and holds the door.
+  - startFrame: 78
+    endFrame: 120
+    description:
+      id: motionAtlas.chosen-service-access.motionBeats.2
+      message: Participant walks or self-propels through the selected entrance.
+  - startFrame: 121
+    endFrame: 167
+    description:
+      id: motionAtlas.chosen-service-access.motionBeats.3
+      message: Hold the usable chosen path with all other options visible.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.chosen-service-access.motionBeats.4
+      message: Return to the opaque ground through the shared envelope.

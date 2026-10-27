@@ -207,7 +207,7 @@ or missing video also invalidates a run.
 ```sh
 node --check scripts/capture-avandar.mjs
 node --check scripts/capture-lib.mjs
-npx tsx --test tests/capture.test.ts
+node --import ./scripts/yaml/registerYaml.mjs --import tsx --test tests/capture.test.ts
 ```
 
 Tests cover URL/network restrictions, redaction and credential rejection,
@@ -268,7 +268,7 @@ material and customer data remain local under the artifact policy in AGENTS.md.
 
 ```sh
 node --check scripts/curate-capture.mjs
-npx tsx --test tests/curation.test.ts
+node --import ./scripts/yaml/registerYaml.mjs --import tsx --test tests/curation.test.ts
 ```
 
 The tests exercise copying and evidence links, rejected failure states,

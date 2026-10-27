@@ -10,38 +10,49 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import type { RadialNetworkInput } from "../presets/RadialNetwork/RadialNetwork.schema";
+import type { ReactNode } from "react";
 
-const RADIAL_LABELS = [
-  "Input",
-  "Parse",
-  "Match",
-  "Model",
-  "Store",
-  "Query",
-  "Route",
-  "Sync",
-];
+type Props = GraphicProps & { input: RadialNetworkInput };
 
-export function RadialNetwork({ frame, accent }: GraphicProps) {
+/** Draws the bounded authored radial-network study at an explicit frame. */
+export function RadialNetwork({
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const spokes = input.spokes;
   const center = { x: 480, y: 295 };
-  const nodes = RADIAL_LABELS.map((label, i) => ({
+  const nodes = spokes.map((label, i) => ({
     label,
-    x: center.x + Math.cos(-Math.PI / 2 + (i * Math.PI) / 4) * 278,
-    y: center.y + Math.sin(-Math.PI / 2 + (i * Math.PI) / 4) * 181,
+    x:
+      center.x +
+      Math.cos(-Math.PI / 2 + (i * Math.PI * 2) / spokes.length) * 278,
+    y:
+      center.y +
+      Math.sin(-Math.PI / 2 + (i * Math.PI * 2) / spokes.length) * 181,
   }));
   return (
     <g>
-      <Eyebrow x={64}>HUB &amp; SPOKE</Eyebrow>
-      <ellipse
-        cx={480}
-        cy={295}
-        rx={278}
-        ry={181}
-        fill="none"
-        stroke={STOCK.line}
-        strokeDasharray="3 9"
-        opacity={0.65}
-      />
+      <Eyebrow x={64}>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["radial-network"].hubSpoke,
+        })}
+      </Eyebrow>
+      {input.showOrbit ? (
+        <ellipse
+          cx={480}
+          cy={295}
+          rx={278}
+          ry={181}
+          fill="none"
+          stroke={STOCK.line}
+          strokeDasharray="3 9"
+          opacity={0.65}
+        />
+      ) : null}
       {nodes.map((node, i) => (
         <g key={node.label}>
           <DrawPath
@@ -79,14 +90,17 @@ export function RadialNetwork({ frame, accent }: GraphicProps) {
         />
         <circle cx={480} cy={295} r={59} fill={accent} fillOpacity={0.035} />
         <Text x={480} y={293} size={25} anchor="middle" weight={600}>
-          Connect
+          {input.hub.label}
         </Text>
         <Text x={480} y={317} size={12} anchor="middle" fill={STOCK.muted} mono>
-          ONE SYSTEM
+          {input.hub.detail}
         </Text>
       </Arrive>
       <Text x={480} y={560} size={15} fill={STOCK.muted} anchor="middle">
-        Many endpoints. One shared center.
+        {getStockDisplayCopyFromDescriptor({
+          descriptor:
+            LEGACY_DISPLAY_COPY["radial-network"].manyEndpointsOneSharedCenter,
+        })}
       </Text>
     </g>
   );

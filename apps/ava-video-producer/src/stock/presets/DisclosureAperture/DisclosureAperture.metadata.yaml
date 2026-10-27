@@ -1,0 +1,164 @@
+name:
+  id: motionAtlas.disclosure-aperture.name
+  message: Only the Chosen Fields Leave
+description:
+  id: motionAtlas.disclosure-aperture.description
+  message:
+    A local document stays intact behind a boundary while copies of explicitly
+    selected fields pass through a narrow opening. Retained fields remain visible on the
+    original sheet.
+category:
+  id: motionAtlas.disclosure-aperture.category
+  message: Boundaries and disclosure
+tags:
+  - id: motionAtlas.disclosure-aperture.tags.0
+    message: selective disclosure
+  - id: motionAtlas.disclosure-aperture.tags.1
+    message: data minimization
+  - id: motionAtlas.disclosure-aperture.tags.2
+    message: privacy boundary
+  - id: motionAtlas.disclosure-aperture.tags.3
+    message: local data
+  - id: motionAtlas.disclosure-aperture.tags.4
+    message: remote request
+  - id: motionAtlas.disclosure-aperture.tags.5
+    message: approved fields
+  - id: motionAtlas.disclosure-aperture.tags.6
+    message: share excerpt
+  - id: motionAtlas.disclosure-aperture.tags.7
+    message: retain original
+  - id: motionAtlas.disclosure-aperture.tags.8
+    message: public summary
+  - id: motionAtlas.disclosure-aperture.tags.9
+    message: publication boundary
+  - id: motionAtlas.disclosure-aperture.tags.10
+    message: AI context
+  - id: motionAtlas.disclosure-aperture.tags.11
+    message: AI consent
+  - id: motionAtlas.disclosure-aperture.tags.12
+    message: selected excerpt
+  - id: motionAtlas.disclosure-aperture.tags.13
+    message: raw-data boundary
+  - id: motionAtlas.disclosure-aperture.tags.14
+    message: metadata versus bytes
+  - id: motionAtlas.disclosure-aperture.tags.15
+    message: offline-only
+  - id: motionAtlas.disclosure-aperture.tags.16
+    message: storage boundary
+useWhen:
+  id: motionAtlas.disclosure-aperture.useWhen
+  message:
+    Show that a handoff can carry a declared subset while the source remains local
+    and complete.
+prompt:
+  id: motionAtlas.disclosure-aperture.prompt
+  message:
+    Use Motion Atlas "Only the Chosen Fields Leave" (disclosure-aperture) as an
+    illustrative conceptual graphic. Show that a handoff can carry a declared subset
+    while the source remains local and complete. Bind complete authored inputs and
+    preserve the stated limits.
+creativeDirection:
+  id: motionAtlas.disclosure-aperture.creativeDirection
+  message:
+    Reveal one local document behind a tall boundary panel and an empty disclosure
+    envelope outside it. Each authored share field briefly lifts as a duplicate while
+    the original stays printed; a precisely sized aperture opens only opposite that
+    field and lets its duplicate pass into the envelope. Retained fields never lift or
+    leave. Close the aperture and hold the complete original beside the selected
+    disclosure contents, then return to the opaque loop ground.
+goodFor:
+  - id: motionAtlas.disclosure-aperture.goodFor.0
+    message: Explain an explicit data-minimization policy
+  - id: motionAtlas.disclosure-aperture.goodFor.1
+    message: Show which local facts are included in an authored remote request
+  - id: motionAtlas.disclosure-aperture.goodFor.2
+    message: Illustrate sharing an excerpt from a notebook or a limited handoff brief
+  - id: motionAtlas.disclosure-aperture.goodFor.3
+    message: Explain which authored summary fields a team chooses to publish
+  - id: motionAtlas.disclosure-aperture.goodFor.4
+    message: Show a minimal remote planning request while private details remain local
+  - id: motionAtlas.disclosure-aperture.goodFor.5
+    message: Explain a user-selected AI excerpt
+  - id: motionAtlas.disclosure-aperture.goodFor.6
+    message: Show exactly what an optional remote assist receives
+  - id: motionAtlas.disclosure-aperture.goodFor.7
+    message: Explain data existence metadata versus file contents
+  - id: motionAtlas.disclosure-aperture.goodFor.8
+    message: Illustrate opt-in bulk-data synchronization
+intent:
+  id: motionAtlas.disclosure-aperture.intent
+  message:
+    Show that a handoff can carry a declared subset while the source remains local
+    and complete.
+domains:
+  - id: motionAtlas.disclosure-aperture.domains.0
+    message: Boundaries and disclosure
+aliases:
+  - id: motionAtlas.disclosure-aperture.aliases.0
+    message: selective disclosure
+  - id: motionAtlas.disclosure-aperture.aliases.1
+    message: data minimization
+  - id: motionAtlas.disclosure-aperture.aliases.2
+    message: privacy boundary
+  - id: motionAtlas.disclosure-aperture.aliases.3
+    message: local data
+notFor:
+  - id: motionAtlas.disclosure-aperture.notFor.0
+    message:
+      Shared quantity is the number of fields marked share. Retained quantity is the
+      number marked retain. Neither is a percentage of an unshown larger dataset.
+  - id: motionAtlas.disclosure-aperture.notFor.1
+    message:
+      All-retain and all-share inputs are valid but communicate no disclosure and
+      complete disclosure respectively.
+  - id: motionAtlas.disclosure-aperture.notFor.2
+    message:
+      The animation does not perform redaction, access control, privacy review, or
+      secure transport. It shows only an authored policy for the depicted fields.
+  - id: motionAtlas.disclosure-aperture.notFor.3
+    message:
+      A published summary field must already be approved and supplied. This preset
+      neither computes safe aggregation nor proves anonymity, privacy, consent, or
+      correct access control.
+  - id: motionAtlas.disclosure-aperture.notFor.4
+    message:
+      Public visibility of selected fields does not grant access to the underlying
+      records or establish a customer-acquisition result.
+  - id: motionAtlas.disclosure-aperture.notFor.5
+    message: Do not claim that clean detector output means the content is safe or anonymous.
+  - id: motionAtlas.disclosure-aperture.notFor.6
+    message:
+      All-retain represents declining the transfer; selected fields may include
+      sensitive values.
+  - id: motionAtlas.disclosure-aperture.notFor.7
+    message:
+      Keeping file bytes local does not mean the remote system knows nothing about
+      the dataset.
+distinction:
+  id: motionAtlas.disclosure-aperture.distinction
+  message:
+    Unlike schema-mapping, the purpose is to enforce an explicit disclosure subset
+    rather than correspond fields between schemas. The opening and retained originals
+    carry the meaning, rather than connectors or a funnel.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.disclosure-aperture.motionBeats.0
+      message: The authored setup is established.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.disclosure-aperture.motionBeats.1
+      message:
+        Reveal one local document behind a tall boundary panel and an empty disclosure
+        envelope outside it. Each authored share field briefly lifts as a duplicate
+        while the original stays printed; a precisely sized aperture opens only opposite
+        that field and lets its duplicate pass into the envelope. Retained fields never
+        lift or leave. Close the aperture and hold the complete original beside the
+        selected disclosure contents, then return to the opaque loop ground.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.disclosure-aperture.motionBeats.2
+      message: The completed authored state remains held.

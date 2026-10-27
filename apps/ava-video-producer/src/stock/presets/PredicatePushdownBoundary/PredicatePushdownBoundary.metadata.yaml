@@ -1,0 +1,120 @@
+name:
+  id: motionAtlas.predicate-pushdown-boundary.name
+  message: Apply the row condition before transfer
+description:
+  id: motionAtlas.predicate-pushdown-boundary.description
+  message:
+    A source table applies one explicit row predicate before selected record copies
+    cross a transfer boundary. Excluded rows stay at the source and the destination
+    displays exactly the transferred subset.
+category:
+  id: motionAtlas.predicate-pushdown-boundary.category
+  message: Source-side filtering
+useWhen:
+  id: motionAtlas.predicate-pushdown-boundary.useWhen
+  message: Make the location of filtering relative to a transfer boundary explicit.
+prompt:
+  id: motionAtlas.predicate-pushdown-boundary.prompt
+  message: Use Motion Atlas Apply the row condition before transfer
+    (predicate-pushdown-boundary) to make the location of filtering relative to a
+    transfer boundary explicit. Supply approved authored content before making claims.
+creativeDirection:
+  id: motionAtlas.predicate-pushdown-boundary.creativeDirection
+  message:
+    960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+    0-12 reveal the scene. Frames 13-50 show a query predicate arriving at the source.
+    Frames 51-95 close source gates for nonmatching rows. Frames 96-139 move only
+    matching row copies across the boundary while the full source remains intact. Hold
+    the resolved relationship at frames 140-165, then fade to the same opaque ground at
+    166-179. Reset is editorial.
+intent:
+  id: motionAtlas.predicate-pushdown-boundary.intent
+  message: Make the location of filtering relative to a transfer boundary explicit.
+distinction:
+  id: motionAtlas.predicate-pushdown-boundary.distinction
+  message:
+    Unlike a generic data-pipeline, selection occurs before the boundary and only
+    the matching rows are transferred. It differs from column-cache growth, which
+    retains every row.
+tags:
+  - id: motionAtlas.predicate-pushdown-boundary.tags.0
+    message: predicate pushdown
+  - id: motionAtlas.predicate-pushdown-boundary.tags.1
+    message: query-first extraction
+  - id: motionAtlas.predicate-pushdown-boundary.tags.2
+    message: data transfer
+  - id: motionAtlas.predicate-pushdown-boundary.tags.3
+    message: source filtering
+goodFor:
+  - id: motionAtlas.predicate-pushdown-boundary.goodFor.0
+    message: Explain source-side row filtering before transfer
+  - id: motionAtlas.predicate-pushdown-boundary.goodFor.1
+    message: Show precisely which records a pushed predicate selects
+domains:
+  - id: motionAtlas.predicate-pushdown-boundary.domains.0
+    message: Source-side filtering
+aliases:
+  - id: motionAtlas.predicate-pushdown-boundary.aliases.0
+    message: predicate pushdown
+  - id: motionAtlas.predicate-pushdown-boundary.aliases.1
+    message: query-first extraction
+  - id: motionAtlas.predicate-pushdown-boundary.aliases.2
+    message: data transfer
+  - id: motionAtlas.predicate-pushdown-boundary.aliases.3
+    message: source filtering
+notFor:
+  - id: motionAtlas.predicate-pushdown-boundary.notFor.0
+    message:
+      The source is assumed to support this predicate; source capabilities must be
+      established before presenting a real implementation claim.
+  - id: motionAtlas.predicate-pushdown-boundary.notFor.1
+    message: "Rows are not bytes: fewer rows does not establish a measured bandwidth reduction."
+  - id: motionAtlas.predicate-pushdown-boundary.notFor.2
+    message: Predicate correctness and source capability are supplied assumptions.
+  - id: motionAtlas.predicate-pushdown-boundary.notFor.3
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
+      authored explanation, not actual document extraction or product evidence.
+  - id: motionAtlas.predicate-pushdown-boundary.notFor.4
+    message:
+      Authored prose and schematic context are the author's responsibility. Runtime
+      validation checks structural bounds and numeric, reference and geometry
+      constraints, without classifying natural-language claims.
+  - id: motionAtlas.predicate-pushdown-boundary.notFor.5
+    message:
+      Source IDs preserve exact authored characters, including empty strings.
+      Whitespace uses distinct literal-data marks.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.predicate-pushdown-boundary.motionBeats.0
+      message: Reveal the schematic scene.
+  - startFrame: 13
+    endFrame: 50
+    description:
+      id: motionAtlas.predicate-pushdown-boundary.motionBeats.1
+      message:
+        A source table applies one explicit row predicate before selected record copies
+        cross a transfer boundary. Excluded rows stay at the source and the destination
+        displays exactly the transferred subset.
+  - startFrame: 51
+    endFrame: 95
+    description:
+      id: motionAtlas.predicate-pushdown-boundary.motionBeats.2
+      message: Close source gates for nonmatching rows.
+  - startFrame: 96
+    endFrame: 139
+    description:
+      id: motionAtlas.predicate-pushdown-boundary.motionBeats.3
+      message: Move only matching row copies across the boundary while retaining all originals.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.predicate-pushdown-boundary.motionBeats.4
+      message: Hold the complete resolved relationship.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.predicate-pushdown-boundary.motionBeats.5
+      message: The outer stock envelope fades to the same opaque ground.

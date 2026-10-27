@@ -188,3 +188,11 @@ available to generate the loop and two toolkit studies through the CLI; those
 MP4 outputs stay in ignored `apps/ava-video-producer/out/` locations for each
 film. The script does not copy them into gallery assets or rewrite page
 revisions. The original generic `demo` remains in source.
+
+
+## Continuity compositions
+
+Continuity includes two additional source-backed adapters: Ontology metadata inspection (600 frames) and Attribute Mapping (660 frames). Their fixture controllers and narrow aliases are documented in `avandar-adapter/ontology-adapter-notes.json`. Manual-field defaults and name replacement follow the imported product controls. No backend persistence is exercised. See [continuity compositions](continuity-compositions.md) for the API, film matrix, editorial guidance and evidence limits.
+
+
+The dashboard adapter wraps its Puck configuration and editor/preview in a memoized DashboardCanvas. Frame updates travel through DashboardFixtureContext to the bar-reveal controller, without recreating native chart component identities during composition playback.

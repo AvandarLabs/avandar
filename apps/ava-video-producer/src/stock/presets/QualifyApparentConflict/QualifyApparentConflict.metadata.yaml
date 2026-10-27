@@ -1,0 +1,143 @@
+name:
+  id: motionAtlas.qualify-apparent-conflict.name
+  message: Both can be true
+description:
+  id: motionAtlas.qualify-apparent-conflict.description
+  message:
+    Two apparently conflicting statements first face each other, then separate into
+    explicit contexts that explain how both can apply. The qualifier is supplied by the
+    author and stays visible in the final arrangement.
+category:
+  id: motionAtlas.qualify-apparent-conflict.category
+  message: Tradeoffs and qualifications
+useWhen:
+  id: motionAtlas.qualify-apparent-conflict.useWhen
+  message: Explain how two statements can coexist when their contexts differ.
+prompt:
+  id: motionAtlas.qualify-apparent-conflict.prompt
+  message:
+    Use Motion Atlas "Both can be true" (qualify-apparent-conflict) as a conceptual
+    graphic. Explain how two statements can coexist when their contexts differ. Replace
+    fictional sample content with approved authored content before making product
+    claims.
+creativeDirection:
+  id: motionAtlas.qualify-apparent-conflict.creativeDirection
+  message:
+    Two short claims enter on opposing horizontal tracks and stop at a central
+    question mark. A context divider unfolds vertically, moving each claim to its own
+    labeled region. The question mark resolves into a small joining brace with the
+    authored qualifier below it. Both context-claim pairs hold together before the
+    shared fade, without rewriting either claim.
+intent:
+  id: motionAtlas.qualify-apparent-conflict.intent
+  message: Explain how two statements can coexist when their contexts differ.
+distinction:
+  id: motionAtlas.qualify-apparent-conflict.distinction
+  message:
+    Unlike paired-contrast, this begins with apparent incompatibility and resolves
+    it by revealing distinct scopes of truth. The semantic transformation is
+    qualification rather than comparison or choosing a winner.
+tags:
+  - id: motionAtlas.qualify-apparent-conflict.tags.0
+    message: apparent contradiction
+  - id: motionAtlas.qualify-apparent-conflict.tags.1
+    message: context
+  - id: motionAtlas.qualify-apparent-conflict.tags.2
+    message: both can be true
+  - id: motionAtlas.qualify-apparent-conflict.tags.3
+    message: qualification
+  - id: motionAtlas.qualify-apparent-conflict.tags.4
+    message: depends
+  - id: motionAtlas.qualify-apparent-conflict.tags.5
+    message: reconcile
+  - id: motionAtlas.qualify-apparent-conflict.tags.6
+    message: conditions
+  - id: motionAtlas.qualify-apparent-conflict.tags.7
+    message: nuance
+  - id: motionAtlas.qualify-apparent-conflict.tags.8
+    message: policy scope
+  - id: motionAtlas.qualify-apparent-conflict.tags.9
+    message: source versus content
+  - id: motionAtlas.qualify-apparent-conflict.tags.10
+    message: price sensitivity
+  - id: motionAtlas.qualify-apparent-conflict.tags.11
+    message: context qualification
+  - id: motionAtlas.qualify-apparent-conflict.tags.12
+    message: preparation
+  - id: motionAtlas.qualify-apparent-conflict.tags.13
+    message: time horizon
+  - id: motionAtlas.qualify-apparent-conflict.tags.14
+    message: deliberate work
+  - id: motionAtlas.qualify-apparent-conflict.tags.15
+    message: readiness
+goodFor:
+  - id: motionAtlas.qualify-apparent-conflict.goodFor.0
+    message: Resolve an apparent contradiction by naming context
+  - id: motionAtlas.qualify-apparent-conflict.goodFor.1
+    message: Distinguish a generalization from a situation-specific statement
+  - id: motionAtlas.qualify-apparent-conflict.goodFor.2
+    message: Explain why advice changes under different conditions
+  - id: motionAtlas.qualify-apparent-conflict.goodFor.3
+    message: Separate source-code availability from access to independently curated content
+  - id: motionAtlas.qualify-apparent-conflict.goodFor.4
+    message: Clarify that price sensitivity and willingness to pay are different statements
+  - id: motionAtlas.qualify-apparent-conflict.goodFor.5
+    message: Separate the time spent preparing from the time needed for a later response
+domains:
+  - id: motionAtlas.qualify-apparent-conflict.domains.0
+    message: Tradeoffs and qualifications
+aliases:
+  - id: motionAtlas.qualify-apparent-conflict.aliases.0
+    message: apparent contradiction
+  - id: motionAtlas.qualify-apparent-conflict.aliases.1
+    message: context
+  - id: motionAtlas.qualify-apparent-conflict.aliases.2
+    message: both can be true
+  - id: motionAtlas.qualify-apparent-conflict.aliases.3
+    message: qualification
+notFor:
+  - id: motionAtlas.qualify-apparent-conflict.notFor.0
+    message:
+      The author must provide a valid contextual reconciliation; the renderer cannot
+      establish that both claims are true.
+  - id: motionAtlas.qualify-apparent-conflict.notFor.1
+    message: Exactly two claims are shown, each with one context.
+  - id: motionAtlas.qualify-apparent-conflict.notFor.2
+    message:
+      The graphic must not be used to hide a genuine unresolved contradiction behind
+      decorative separation.
+  - id: motionAtlas.qualify-apparent-conflict.notFor.3
+    message:
+      Show only supplied policy statements and their distinct objects. The animation
+      does not interpret licenses, determine ownership, confer rights, or prove that any
+      legal position is correct.
+  - id: motionAtlas.qualify-apparent-conflict.notFor.4
+    message:
+      A low price, paid plan, or free offer by itself proves neither high nor low
+      technical quality.
+  - id: motionAtlas.qualify-apparent-conflict.notFor.5
+    message:
+      Separate time contexts explain how the authored statements can coexist. They do
+      not establish a measured speed improvement or a guarantee of emergency
+      performance.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.qualify-apparent-conflict.motionBeats.0
+      message: Establish the authored starting arrangement.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.qualify-apparent-conflict.motionBeats.1
+      message:
+        Two short claims enter on opposing horizontal tracks and stop at a central
+        question mark. A context divider unfolds vertically, moving each claim to its
+        own labeled region. The question mark resolves into a small joining brace with
+        the authored qualifier below it. Both context-claim pairs hold together before
+        the shared fade, without rewriting either claim.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.qualify-apparent-conflict.motionBeats.2
+      message: Hold the resolved authored relationships before the shared exit.

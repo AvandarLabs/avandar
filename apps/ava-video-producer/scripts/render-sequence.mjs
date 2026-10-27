@@ -7,6 +7,7 @@ import {
   renderFrames,
   selectComposition,
 } from "@remotion/renderer";
+import { withWorkspaceAliases } from "./lib/withWorkspaceAliases.mjs";
 import { requireLicense } from "./require-license.mjs";
 
 requireLicense();
@@ -18,6 +19,7 @@ if (!id || !outputDir)
 const props = process.env.REMOTION_PROPS_FILE;
 const inputProps = props ? JSON.parse(await fs.readFile(props, "utf8")) : {};
 const serveUrl = await bundle({
+  webpackOverride: withWorkspaceAliases,
   entryPoint: path.resolve(
     root,
     process.env.RENDER_ENTRY_POINT || "src/index.ts",

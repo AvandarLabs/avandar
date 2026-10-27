@@ -625,6 +625,9 @@ importers:
 
   apps/ava-video-producer:
     dependencies:
+      '@avandar/utils':
+        specifier: workspace:*
+        version: link:../../packages/shared/utils
       '@codemirror/autocomplete':
         specifier: ^6.20.2
         version: 6.20.3
@@ -700,6 +703,9 @@ importers:
       '@react-querybuilder/mantine':
         specifier: ^8.16.1
         version: 8.20.2(@mantine/core@9.2.0(@mantine/hooks@9.2.0(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@mantine/dates@9.2.0(@mantine/core@9.2.0(@mantine/hooks@9.2.0(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@mantine/hooks@9.2.0(react@19.2.5))(dayjs@1.11.21)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@mantine/hooks@9.2.0(react@19.2.5))(dayjs@1.11.21)(react-querybuilder@8.20.2(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)
+      '@remotion/animation-utils':
+        specifier: 4.0.516
+        version: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@remotion/bundler':
         specifier: 4.0.516
         version: 4.0.516(@swc/helpers@0.5.19)(lightningcss@1.33.0)(postcss@8.5.8)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -712,10 +718,19 @@ importers:
       '@remotion/mac-cursors':
         specifier: 4.0.516
         version: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@remotion/motion-blur':
+        specifier: 4.0.516
+        version: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@remotion/player':
         specifier: 4.0.516
         version: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@remotion/renderer':
+        specifier: 4.0.516
+        version: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@remotion/rough-notation':
+        specifier: 4.0.516
+        version: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@remotion/transitions':
         specifier: 4.0.516
         version: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tabler/icons-react':
@@ -748,6 +763,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      d3-geo:
+        specifier: 3.1.1
+        version: 3.1.1
       dayjs:
         specifier: ^1.11.13
         version: 1.11.21
@@ -781,9 +799,15 @@ importers:
       remotion:
         specifier: 4.0.516
         version: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      roughjs:
+        specifier: 4.6.6
+        version: 4.6.6
       ts-pattern:
         specifier: 'catalog:'
         version: 5.9.0
+      yaml:
+        specifier: 2.9.0
+        version: 2.9.0
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -797,9 +821,21 @@ importers:
       '@lingui/babel-plugin-lingui-macro':
         specifier: ^6.2.0
         version: 6.2.0
+      '@lingui/cli':
+        specifier: 6.2.0
+        version: 6.2.0
+      '@lingui/conf':
+        specifier: 6.2.0
+        version: 6.2.0
+      '@lingui/format-po':
+        specifier: 6.2.0
+        version: 6.2.0
       '@playwright/test':
         specifier: ^1.59.1
         version: 1.59.1
+      '@types/d3-geo':
+        specifier: 3.1.0
+        version: 3.1.0
       '@types/node':
         specifier: ^22.15.0
         version: 22.19.19
@@ -5248,6 +5284,12 @@ packages:
       react-redux:
         optional: true
 
+  '@remotion/animation-utils@4.0.516':
+    resolution: {integrity: sha512-ubbLAR2Ype/lYy57c5HvoHz7TZH6b0VSquH/ldulJAO4YYrwVZabY4+nnlF/Z1Neqe3xyIYxHwOT6A/udM1ZBQ==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
   '@remotion/bundler@4.0.516':
     resolution: {integrity: sha512-1rGD1PMdiqXMAHItMw0OqcMysAr7kK7g4meFoGSOULeQhldEDl8Twlp6uNe17cjn5eWmhmqL9OFOQ1lDW3hPbg==}
     peerDependencies:
@@ -5324,6 +5366,15 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
+  '@remotion/motion-blur@4.0.516':
+    resolution: {integrity: sha512-6piyG2wGAg/UXWMdVAnC1KflbrTVoIKjDRPrwXMn+FQGpHLM8quunJPh4PMni9onstzXPKR7a4naUOayJzBqZw==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
+  '@remotion/paths@4.0.516':
+    resolution: {integrity: sha512-TcboLhXdG/O7EpHarp6SBMzLflu94/WRsciyfZMy/g63ErfpQzRETXOrdyt/nP7bUmj/iQVhW1PIL969MPFuHQ==}
+
   '@remotion/player@4.0.516':
     resolution: {integrity: sha512-yPm3WSs9cfj9NiTRvjHJFhMgKolyUkaslrxIcF4rzCnlgKARClIvxoVP1m4w3FMx/jecscX3LNg3OSLca7lbTw==}
     peerDependencies:
@@ -5332,6 +5383,18 @@ packages:
 
   '@remotion/renderer@4.0.516':
     resolution: {integrity: sha512-oqYWn9CjBB9u6b4FBJ3QnRIgOaY6Fevn2rmob9Ev4Sisc4UqX+dNh5o49R2nNkglw1SBpL7IqVUsPjHyCBJ19w==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
+  '@remotion/rough-notation@4.0.516':
+    resolution: {integrity: sha512-OvHflCwsiWSQhirL88oY1hRH0t8mdP8rKwuG4n1UNp69/xX+taGevl3J+4OjQ1/8JrWhfkFh3ZCROaG8EBCUZg==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
+  '@remotion/shapes@4.0.516':
+    resolution: {integrity: sha512-4Va5DB4Cvelrw0mFmPGIpyRMEV0i0LMW0wpCwpLvCtvpJ78nEJvDNydlZorojvjoflm8J62waoF0gtDIbAni5g==}
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
@@ -5359,6 +5422,12 @@ packages:
 
   '@remotion/timeline-utils@4.0.516':
     resolution: {integrity: sha512-ujkzSquRucvKAAJME5CJn3Ml3PrNlXlYslE23t/G817ZSfspRw5QwSZhFOZXycZVMxjshK+IhEjDLxBkd/xxSA==}
+
+  '@remotion/transitions@4.0.516':
+    resolution: {integrity: sha512-X8CfIZJBw3cEZxJox8PRdTudpccoiVHPfPwNCn3ZWj0828x1eVWHoUA7pILQCp6m/jZ7cCVpAaE4QZwRJCIjgw==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   '@remotion/web-renderer@4.0.516':
     resolution: {integrity: sha512-U+yUXN7fdUinyOdlq1TJFlVbnSesaiF63XquOMtvbX1IA4rANzNutASMZ88+n5uyA99RI1QcEUwAihRGdH/Ebw==}
@@ -10024,9 +10093,6 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lodash.sortby@4.7.0:
-    resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
-
   lodash.startcase@4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
 
@@ -12129,11 +12195,6 @@ packages:
     resolution: {integrity: sha512-d8EqvL+k/SOXCreS/SUzg2ciyHqBBLcN/yuRjFsbvVhHTE2pgei7oAhmPM7kWFbkX6OSMQfUq4KbkF3au9lhYQ==}
     engines: {node: '>= 12'}
 
-  source-map@0.8.0-beta.0:
-    resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
-    engines: {node: '>= 8'}
-    deprecated: The work that was done in this beta branch won't be included in future versions
-
   space-separated-tokens@2.0.2:
     resolution: {integrity: sha512-PEGlAwrG8yXGXRjW32fGbg66JAlOAwbObuqVoJpv/mRgoWDQfgH1wDPvtzWyUSNAXBGSk8h755YDbbcEy3SH2Q==}
 
@@ -12638,9 +12699,6 @@ packages:
 
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
-
-  tr46@1.0.1:
-    resolution: {integrity: sha512-dTpowEjclQ7Kgx5SdBkqRzVhERQXov8/l9Ft9dVM9fmg0W0KQSVaXX9T4i6twCPNtYiZM53lpSSUAwJbFPOHxA==}
 
   tr46@5.1.1:
     resolution: {integrity: sha512-hdF5ZgjTqgAntKkklYw0R03MG2x/bSzTtkxmIRw/sTNV8YXsCJ1tfLAX23lhxhHJlEf3CRCOCGGWw3vI3GaSPw==}
@@ -13187,9 +13245,6 @@ packages:
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
 
-  webidl-conversions@4.0.2:
-    resolution: {integrity: sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==}
-
   webidl-conversions@7.0.0:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
     engines: {node: '>=12'}
@@ -13230,9 +13285,6 @@ packages:
 
   whatwg-url@5.0.0:
     resolution: {integrity: sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==}
-
-  whatwg-url@7.1.0:
-    resolution: {integrity: sha512-WUu7Rg1DroM7oQvGWfOiAK21n74Gg+T4elXEQYkOhtyLeWiJFoOGLXPKI/9gzIie9CtwVLm8wtw6YJdKyxSjeg==}
 
   when-exit@2.1.5:
     resolution: {integrity: sha512-VGkKJ564kzt6Ms1dbgPP/yuIoQCrsFAnRbptpC5wOEsDaNsbCB2bnfnaA8i/vRs5tjUSEOtIuvl9/MyVsvQZCg==}
@@ -17433,6 +17485,12 @@ snapshots:
       react: 19.2.5
       react-redux: 9.3.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1)
 
+  '@remotion/animation-utils@4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      remotion: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+
   '@remotion/bundler@4.0.516(@swc/helpers@0.5.19)(lightningcss@1.33.0)(postcss@8.5.8)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
       '@remotion/media-parser': 4.0.516
@@ -17551,6 +17609,14 @@ snapshots:
       react-dom: 19.2.5(react@19.2.5)
       remotion: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
 
+  '@remotion/motion-blur@4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      remotion: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+
+  '@remotion/paths@4.0.516': {}
+
   '@remotion/player@4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
       react: 19.2.5
@@ -17578,6 +17644,21 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+
+  '@remotion/rough-notation@4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      '@remotion/paths': 4.0.516
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      remotion: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      roughjs: 4.6.6
+
+  '@remotion/shapes@4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      '@remotion/paths': 4.0.516
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      remotion: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
 
   '@remotion/streaming@4.0.516': {}
 
@@ -17676,6 +17757,14 @@ snapshots:
     transitivePeerDependencies:
       - react
       - react-dom
+
+  '@remotion/transitions@4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      '@remotion/paths': 4.0.516
+      '@remotion/shapes': 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      remotion: 4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
 
   '@remotion/web-renderer@4.0.516(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
@@ -19177,14 +19266,6 @@ snapshots:
       magic-string: 0.30.21
     optionalDependencies:
       vite: 7.3.1(@types/node@22.19.19)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
-
-  '@vitest/mocker@3.2.4(vite@7.3.1(@types/node@25.3.4)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))':
-    dependencies:
-      '@vitest/spy': 3.2.4
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-    optionalDependencies:
-      vite: 7.3.1(@types/node@25.3.4)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -22809,8 +22890,6 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lodash.sortby@4.7.0: {}
-
   lodash.startcase@4.4.0: {}
 
   lodash.throttle@4.1.1: {}
@@ -25587,10 +25666,6 @@ snapshots:
 
   source-map@0.8.0: {}
 
-  source-map@0.8.0-beta.0:
-    dependencies:
-      whatwg-url: 7.1.0
-
   space-separated-tokens@2.0.2: {}
 
   spawndamnit@3.0.1:
@@ -26153,10 +26228,6 @@ snapshots:
       tldts: 6.1.86
 
   tr46@0.0.3: {}
-
-  tr46@1.0.1:
-    dependencies:
-      punycode: 2.3.1
 
   tr46@5.1.1:
     dependencies:
@@ -26755,7 +26826,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@25.3.4)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
+      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@22.19.19)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
@@ -26828,8 +26899,6 @@ snapshots:
 
   webidl-conversions@3.0.1: {}
 
-  webidl-conversions@4.0.2: {}
-
   webidl-conversions@7.0.0: {}
 
   webpack-sources@3.6.0: {}
@@ -26894,12 +26963,6 @@ snapshots:
     dependencies:
       tr46: 0.0.3
       webidl-conversions: 3.0.1
-
-  whatwg-url@7.1.0:
-    dependencies:
-      lodash.sortby: 4.7.0
-      tr46: 1.0.1
-      webidl-conversions: 4.0.2
 
   when-exit@2.1.5: {}
 
@@ -27001,7 +27064,7 @@ snapshots:
       glob: 11.1.0
       pretty-bytes: 5.6.0
       rollup: 4.59.0
-      source-map: 0.8.0-beta.0
+      source-map: 0.8.0
       stringify-object: 3.3.0
       strip-comments: 2.0.1
       tempy: 0.6.0

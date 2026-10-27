@@ -1,3 +1,5 @@
+import { prop } from "@avandar/utils";
+import { Fragment } from "react";
 import { DUR, ramp } from "../../motion";
 import {
   Eyebrow,
@@ -6,28 +8,57 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import type { DotMatrixInput } from "../presets/DotMatrix/DotMatrix.schema";
+import type { ReactNode } from "react";
 
-const MATRIX_POINTS = Array.from({ length: 100 }, (_, i) => ({
-  x: 78 + (i % 20) * 30,
-  y: 222 + Math.floor(i / 20) * 48,
-  selected: i < 64,
-}));
+type Props = GraphicProps & { input: DotMatrixInput };
 
-export function DotMatrix({ frame, accent }: GraphicProps) {
+/** Draws the bounded authored dot-matrix study at an explicit frame. */
+export function DotMatrix({
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const selectedTotal = input.groups
+    .filter(prop("selected"))
+    .reduce((total, group) => total + group.value, 0);
+  const cohortTotal = input.groups.reduce((sum, group) => sum + group.value, 0);
+  const matrixPoints = Array.from({ length: cohortTotal }, (_, i) => ({
+    x: 78 + (i % 20) * 30,
+    y: 222 + Math.floor(i / 20) * 48,
+    selected: i < selectedTotal,
+  }));
+  const legendGroups = input.groups.map((group, index) => ({
+    ...group,
+    x: 78 + index * 189,
+  }));
   const selected = Math.round(
-    MATRIX_POINTS.slice(0, 64).reduce(
-      (total, _, i) => total + ramp(frame, 18 + i, DUR.chip),
-      0,
-    ),
+    matrixPoints
+      .slice(0, selectedTotal)
+      .reduce((total, _, i) => total + ramp(frame, 18 + i, DUR.chip), 0),
   );
   return (
     <g>
-      <Eyebrow>COHORT MATRIX</Eyebrow>
-      <Pill x={748} y={44} width={148} text="FICTIONAL DATA" color={accent} />
+      <Eyebrow>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["dot-matrix"].cohortMatrix,
+        })}
+      </Eyebrow>
+      <Pill
+        x={748}
+        y={44}
+        width={148}
+        text={getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["dot-matrix"].fictionalData,
+        })}
+        color={accent}
+      />
       <Text x={64} y={118} size={31} weight={600}>
-        One dot. One example.
+        {input.heading}
       </Text>
-      {MATRIX_POINTS.map((dot, i) => {
+      {matrixPoints.map((dot, i) => {
         const t = dot.selected ? ramp(frame, 18 + i, DUR.chip) : 0;
         return (
           <g key={i}>
@@ -49,21 +80,37 @@ export function DotMatrix({ frame, accent }: GraphicProps) {
         {selected}
       </Text>
       <Text x={748} y={329} size={24}>
-        of 100
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["dot-matrix"].cohortTotal,
+          values: {
+            count: cohortTotal,
+          },
+        })}
       </Text>
       <Text x={748} y={362} size={15} fill={STOCK.muted}>
-        Sample cohort
+        {input.cohortLabel}
       </Text>
-      <circle cx={78} cy={492} r={5} fill={accent} />
-      <Text x={94} y={498} size={17} fill={STOCK.muted}>
-        64 selected
-      </Text>
-      <circle cx={267} cy={492} r={5} fill={STOCK.muted} fillOpacity={0.4} />
-      <Text x={283} y={498} size={17} fill={STOCK.muted}>
-        36 remaining
-      </Text>
+      {input.showLegend
+        ? legendGroups.map((group) => (
+            <Fragment key={group.x}>
+              <circle
+                cx={group.x}
+                cy={492}
+                r={5}
+                fill={group.selected ? accent : STOCK.muted}
+                fillOpacity={group.selected ? undefined : 0.4}
+              />
+              <Text x={group.x + 16} y={498} size={17} fill={STOCK.muted}>
+                {group.value} {group.label}
+              </Text>
+            </Fragment>
+          ))
+        : null}
       <Text x={64} y={553} size={13} fill={STOCK.muted} mono>
-        ILLUSTRATIVE COHORT · 100 EXAMPLES
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["dot-matrix"].illustrativeCohort,
+          values: { count: cohortTotal },
+        })}
       </Text>
     </g>
   );

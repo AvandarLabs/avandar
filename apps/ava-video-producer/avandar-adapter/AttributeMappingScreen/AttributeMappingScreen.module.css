@@ -1,0 +1,10 @@
+.attributeMappingScreen {
+  background: var(--mantine-color-neutral-0);
+  overflow: hidden;
+}
+
+.attributeMappingScreenContent {
+  margin: 0 auto;
+  max-width: 940px;
+  padding: var(--mantine-spacing-xl);
+}

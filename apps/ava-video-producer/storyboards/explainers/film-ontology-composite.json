@@ -1,0 +1,332 @@
+{
+  "version": 1,
+  "id": "ontology-composite",
+  "title": "Configure the meaning",
+  "description": "Full-stage native product with timed, source-anchored explanatory overlays and measured annotations.",
+  "sourceNotes": [
+    "Authored explainer informed by Avandar business-plan arguments. Diagrams are conceptual, not measured backend telemetry.",
+    "Product leaves import current Avandar source. Navigation, queries and form state use deterministic fictional fixtures. No live backend behavior is asserted.",
+    "Continuity overlaps are internal to the explanation shot. Caption times include those overlaps. Stock poses hold before their loop reset."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 1648,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "Configure the meaning",
+        "category": "composite",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#82c8f2",
+        "beats": [
+          {
+            "id": "choice",
+            "title": "Configuration is a set of decisions.",
+            "subtitle": "Show both the control and the meaning of the choice.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Many visits. One response case.",
+                "A field needs a source and a rule."
+              ],
+              "emphasis": "Identity \u2192 observations \u2192 useful fields."
+            },
+            "duration": 314,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "mapping",
+            "title": "Configure how observations become fields.",
+            "subtitle": "Native product with anchored explanatory overlays.",
+            "content": {
+              "kind": "composite",
+              "segment": {
+                "feature": "attribute-mapping",
+                "mode": "full",
+                "fromFrame": 0,
+                "toFrame": 659,
+                "leadIn": 60
+              },
+              "diagrams": [
+                {
+                  "at": 0,
+                  "request": {
+                    "preset": "keyed-row-zipper",
+                    "schemaVersion": 1,
+                    "input": {
+                      "leftRows": [
+                        {
+                          "key": "C01",
+                          "value": "Case 01"
+                        },
+                        {
+                          "key": "C02",
+                          "value": "Case 02"
+                        },
+                        {
+                          "key": "C03",
+                          "value": "Case 03"
+                        }
+                      ],
+                      "rightRows": [
+                        {
+                          "key": "C01",
+                          "value": "Visit A"
+                        },
+                        {
+                          "key": "C03",
+                          "value": "Visit B"
+                        },
+                        {
+                          "key": "C04",
+                          "value": "Visit C"
+                        }
+                      ],
+                      "joinType": "left",
+                      "labels": {
+                        "title": "Illustrative case / visit keys",
+                        "left": "Case",
+                        "right": "Visit",
+                        "key": "Key",
+                        "result": "Joined records",
+                        "unmatched": "Unmatched input",
+                        "missing": "No match"
+                      },
+                      "showKeys": true,
+                      "showUnmatchedTray": true
+                    }
+                  },
+                  "label": "The case identifier links observations.",
+                  "detail": {
+                    "x": 40,
+                    "y": 110,
+                    "width": 530,
+                    "height": 332
+                  },
+                  "overlay": {
+                    "at": 180,
+                    "until": 258,
+                    "target": {
+                      "x": 510,
+                      "y": 535,
+                      "width": 900,
+                      "height": 235
+                    }
+                  }
+                },
+                {
+                  "at": 270,
+                  "request": {
+                    "preset": "grouped-value-picker",
+                    "schemaVersion": 1,
+                    "input": {
+                      "observations": [
+                        {
+                          "id": "a",
+                          "value": 2
+                        },
+                        {
+                          "id": "b",
+                          "value": 4
+                        },
+                        {
+                          "id": "c",
+                          "value": 4
+                        },
+                        {
+                          "id": "d",
+                          "value": null
+                        }
+                      ],
+                      "rule": "sum",
+                      "nullPolicy": "exclude-from-mode",
+                      "labels": {
+                        "entity": "Illustrative case",
+                        "field": "Supply kits delivered",
+                        "unit": "kits",
+                        "missing": "Missing",
+                        "result": "Total kits",
+                        "countUnit": "observations"
+                      },
+                      "showCalculation": true
+                    }
+                  },
+                  "label": "Sum adds the available kit counts.",
+                  "detail": {
+                    "x": 42,
+                    "y": 332,
+                    "width": 885,
+                    "height": 215
+                  },
+                  "overlay": {
+                    "at": 294,
+                    "until": 1035,
+                    "target": {
+                      "x": 450,
+                      "y": 535,
+                      "width": 900,
+                      "height": 235
+                    }
+                  }
+                }
+              ],
+              "signalAt": 290,
+              "source": {
+                "x": 502,
+                "y": 294.875,
+                "width": 822,
+                "height": 36
+              },
+              "effect": "bracket",
+              "annotations": [
+                {
+                  "at": 156,
+                  "until": 1035,
+                  "kind": "bracket",
+                  "target": {
+                    "x": 502,
+                    "y": 294.875,
+                    "width": 822,
+                    "height": 36
+                  },
+                  "seed": 17
+                },
+                {
+                  "at": 170,
+                  "until": 235,
+                  "kind": "circle",
+                  "target": {
+                    "x": 502,
+                    "y": 234.078,
+                    "width": 20,
+                    "height": 20
+                  },
+                  "seed": 29
+                }
+              ]
+            },
+            "duration": 1080,
+            "transition": {
+              "kind": "wipe",
+              "frames": 30
+            }
+          },
+          {
+            "id": "result",
+            "title": "Build the vocabulary your mission needs.",
+            "subtitle": "The form sequence is scripted; diagrams explain the decision.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Choose the sources and relationships.",
+                "Define how fields behave."
+              ],
+              "emphasis": "One foundation. Different domain models."
+            },
+            "duration": 302,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "choice-0",
+      "shotId": "explanation",
+      "startFrame": 18,
+      "endFrame": 138,
+      "text": "The same case can collect several observations.",
+      "beatId": "choice"
+    },
+    {
+      "id": "choice-1",
+      "shotId": "explanation",
+      "startFrame": 143,
+      "endFrame": 263,
+      "text": "Rules turn observations into useful fields.",
+      "beatId": "choice"
+    },
+    {
+      "id": "mapping-0",
+      "shotId": "explanation",
+      "startFrame": 48,
+      "endFrame": 203,
+      "text": "Here, visits supply values for a response case.",
+      "beatId": "mapping"
+    },
+    {
+      "id": "mapping-1",
+      "shotId": "explanation",
+      "startFrame": 208,
+      "endFrame": 371,
+      "text": "A shared case identifier links each visit to its case.",
+      "beatId": "mapping"
+    },
+    {
+      "id": "mapping-2",
+      "shotId": "explanation",
+      "startFrame": 376,
+      "endFrame": 539,
+      "text": "A field can retain multiple observations or return one value.",
+      "beatId": "mapping"
+    },
+    {
+      "id": "mapping-3",
+      "shotId": "explanation",
+      "startFrame": 544,
+      "endFrame": 699,
+      "text": "The Sum rule totals the supplied kit counts.",
+      "beatId": "mapping"
+    },
+    {
+      "id": "mapping-4",
+      "shotId": "explanation",
+      "startFrame": 704,
+      "endFrame": 878,
+      "text": "A different field can use another rule suited to its meaning.",
+      "beatId": "mapping"
+    },
+    {
+      "id": "mapping-5",
+      "shotId": "explanation",
+      "startFrame": 883,
+      "endFrame": 1038,
+      "text": "Manual fields describe information outside the dataset.",
+      "beatId": "mapping"
+    },
+    {
+      "id": "result-0",
+      "shotId": "explanation",
+      "startFrame": 36,
+      "endFrame": 156,
+      "text": "The model specifies sources, relationships and field behavior.",
+      "beatId": "result"
+    },
+    {
+      "id": "result-1",
+      "shotId": "explanation",
+      "startFrame": 161,
+      "endFrame": 281,
+      "text": "The vocabulary lets the workspace fit its mission.",
+      "beatId": "result"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

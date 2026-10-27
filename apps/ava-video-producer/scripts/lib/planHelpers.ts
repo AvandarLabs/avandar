@@ -3,6 +3,8 @@ import { createReadStream } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import cursorTargets from "../../src/avandar/cursor-targets.json";
+import { getContinuityTimeline } from "../../src/continuity/continuityTimeline";
+import { getMotionDuration } from "../../src/motion-components/motionSettings";
 import {
   storyboardSchema,
   assetPathSchema,
@@ -12,6 +14,7 @@ import {
   type Storyboard,
 } from "../../src/storyboard/schema/schema";
 import { verifyProductBuild } from "./product-source.mjs";
+import { productRequirements } from "./productRequirements/productRequirements";
 
 export async function readPlan(filename: string): Promise<Storyboard> {
   return storyboardSchema.parse(
@@ -141,6 +144,7 @@ export function applySrt(
     const { audio: _audio, ...withoutAudio } = cue;
     return {
       ...withoutAudio,
+      beatId: undefined,
       startFrame: parseTime(times[0]) - shot.startFrame,
       endFrame: parseTime(times[1]) - shot.startFrame,
     };
@@ -231,7 +235,7 @@ async function _rendererFiles(
     if (entry.isDirectory())
       files.push(...(await _rendererFiles(root, relative)));
     else if (
-      /\.(tsx?|jsx?|css|json)$/.test(entry.name) &&
+      /\.(tsx?|[cm]?jsx?|css|json|ya?ml)$/.test(entry.name) &&
       !entry.name.startsWith(".")
     )
       files.push(relative);
@@ -259,7 +263,7 @@ export async function fingerprintPlan(
       sha256: await fileHash(await publicAsset(assetRoot, asset)),
     });
   const files = await _rendererFiles(root);
-  if (plan.shots.some((shot) => shot.scene === "avandar")) {
+  if (productRequirements(plan).needsProduct) {
     files.push(...(await _rendererFiles(root, "avandar-adapter")));
     await verifyProductBuild(root);
     files.push(
@@ -270,6 +274,7 @@ export async function fingerprintPlan(
   }
   for (const extra of [
     "remotion.config.ts",
+    "public/fonts/geist-latin.woff2",
     "../../pnpm-lock.yaml",
     "package.json",
     "scripts/render.sh",
@@ -278,6 +283,8 @@ export async function fingerprintPlan(
     "scripts/video.ts",
     "scripts/lib/plan.ts",
     "scripts/lib/media.ts",
+    "scripts/yaml/compileYaml.cjs",
+    "scripts/yaml/yamlLoader.cjs",
   ]) {
     try {
       await fs.access(path.join(root, extra));
@@ -343,6 +350,30 @@ export function previewFrames(plan: Storyboard): number[] {
       shot.durationInFrames - 1,
     ])
       local(value);
+    if (shot.scene === "continuity") {
+      const positions = getContinuityTimeline(shot.props.beats);
+      shot.props.beats.forEach((beat, index) => {
+        const start = positions[index].start;
+        const overlap = getMotionDuration(
+          beat.transition.frames,
+          beat.transition.motion,
+        );
+        for (const offset of [
+          -1,
+          0,
+          Math.floor(overlap / 2),
+          overlap,
+          Math.min(180, beat.duration - 1),
+          beat.duration - 1,
+        ])
+          local(start + offset);
+        if (beat.content.kind === "composite") {
+          local(start + beat.content.signalAt + 30);
+          for (const diagram of beat.content.diagrams)
+            local(start + diagram.at + 120);
+        }
+      });
+    }
     if (shot.scene === "avandar") {
       for (const beat of cursorTargets[shot.props.feature] as Array<{
         frame: number;

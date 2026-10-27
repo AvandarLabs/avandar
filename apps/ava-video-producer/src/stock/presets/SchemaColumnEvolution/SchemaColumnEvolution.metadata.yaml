@@ -1,0 +1,135 @@
+name:
+  id: motionAtlas.schema-column-evolution.name
+  message: Add a field without inventing the past
+description:
+  id: motionAtlas.schema-column-evolution.description
+  message:
+    A small table gains one new field while every earlier record keeps its identity
+    and its uncollected value. A later record supplies a value under the expanded
+    schema, leaving the older gaps visible.
+category:
+  id: motionAtlas.schema-column-evolution.category
+  message: Schema change and retained evidence
+useWhen:
+  id: motionAtlas.schema-column-evolution.useWhen
+  message: Separate the addition of a field from the collection of a value for that field.
+creativeDirection:
+  id: motionAtlas.schema-column-evolution.creativeDirection
+  message:
+    On a 960x600 React/SVG canvas, frames 0-11 reveal a compact table of earlier
+    records. Frames 12-48 slide the existing columns left and unfold one new column from
+    the header seam. Frames 49-92 place an explicit not-collected mark in that column
+    for each earlier record without changing any original value. Frames 93-132 seat one
+    later record in the same table, with its authored new-field value or missing mark.
+    Frames 133-167 hold both generations under the new header and optional version
+    captions. Frames 168-179 fade to the shared opaque palette ground, giving a
+    deterministic six-second loop at 30fps.
+intent:
+  id: motionAtlas.schema-column-evolution.intent
+  message: Separate the addition of a field from the collection of a value for that field.
+distinction:
+  id: motionAtlas.schema-column-evolution.distinction
+  message:
+    Unlike cell-normalization, this changes the available field structure without
+    correcting existing values. Unlike schema-mapping, no fields are paired across two
+    schemas. Unlike state-preserving-source-refresh, the visible change is a new
+    collection question and its historical absence, not refreshing values from an
+    existing source.
+prompt:
+  id: motionAtlas.schema-column-evolution.prompt
+  message: Use Motion Atlas "Add a field without inventing the past"
+    (schema-column-evolution) as a conceptual graphic. Separate the addition of a field
+    from the collection of a value for that field. Replace fictional examples with
+    approved authored content before making product claims.
+tags:
+  - id: motionAtlas.schema-column-evolution.tags.0
+    message: schema evolution
+  - id: motionAtlas.schema-column-evolution.tags.1
+    message: new field
+  - id: motionAtlas.schema-column-evolution.tags.2
+    message: missing values
+  - id: motionAtlas.schema-column-evolution.tags.3
+    message: historical records
+  - id: motionAtlas.schema-column-evolution.tags.4
+    message: changing forms
+  - id: motionAtlas.schema-column-evolution.tags.5
+    message: crisis data
+  - id: motionAtlas.schema-column-evolution.tags.6
+    message: optional field
+goodFor:
+  - id: motionAtlas.schema-column-evolution.goodFor.0
+    message: Explain an evolving collection form during a changing field program
+  - id: motionAtlas.schema-column-evolution.goodFor.1
+    message: Show why adding a question does not supply historical answers
+  - id: motionAtlas.schema-column-evolution.goodFor.2
+    message: Introduce a schema extension before discussing any backfill process
+domains:
+  - id: motionAtlas.schema-column-evolution.domains.0
+    message: Schema change and retained evidence
+aliases:
+  - id: motionAtlas.schema-column-evolution.aliases.0
+    message: schema evolution
+  - id: motionAtlas.schema-column-evolution.aliases.1
+    message: new field
+  - id: motionAtlas.schema-column-evolution.aliases.2
+    message: missing values
+  - id: motionAtlas.schema-column-evolution.aliases.3
+    message: historical records
+notFor:
+  - id: motionAtlas.schema-column-evolution.notFor.0
+    message:
+      One retained field, one added field, one later row, and at most three earlier
+      rows fit the six-second explanation.
+  - id: motionAtlas.schema-column-evolution.notFor.1
+    message:
+      The ending record count is earlierRecords.length + 1. A new column does not
+      create or remove earlier records.
+  - id: motionAtlas.schema-column-evolution.notFor.2
+    message:
+      The earlier records always retain missing marks in the added column. No
+      default, imputation, migration, enrichment, or retrospectively inferred answer is
+      shown.
+  - id: motionAtlas.schema-column-evolution.notFor.3
+    message:
+      The sequence is a conceptual collection example. It makes no claim about a
+      particular database migration system or any shipped form-editing feature.
+  - id: motionAtlas.schema-column-evolution.notFor.4
+    message:
+      The editorial fade resets the illustration, not the stored records. All labels
+      are supplied inputs.
+  - id: motionAtlas.schema-column-evolution.notFor.5
+    message:
+      Supplied prose meaning, fictional status and agreement with structured choices
+      are authoring responsibilities. Runtime validation enforces structure, numeric
+      bounds, identities and references.
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.schema-column-evolution.motionBeats.0
+      message: Reveal earlier rows.
+  - startFrame: 12
+    endFrame: 48
+    description:
+      id: motionAtlas.schema-column-evolution.motionBeats.1
+      message: Unfold the added header from its seam.
+  - startFrame: 49
+    endFrame: 92
+    description:
+      id: motionAtlas.schema-column-evolution.motionBeats.2
+      message: Mark historical values as not collected.
+  - startFrame: 93
+    endFrame: 132
+    description:
+      id: motionAtlas.schema-column-evolution.motionBeats.3
+      message: Seat the supplied later record.
+  - startFrame: 133
+    endFrame: 167
+    description:
+      id: motionAtlas.schema-column-evolution.motionBeats.4
+      message: Hold both generations.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.schema-column-evolution.motionBeats.5
+      message: Shared opaque exit.

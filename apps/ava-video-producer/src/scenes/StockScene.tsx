@@ -1,23 +1,24 @@
 import { loopPhase } from "../motion";
-import { STOCK_LOOP_FRAMES, type StockPresetId } from "../stock/catalog";
+import { STOCK_LOOP_FRAMES } from "../stock/catalog";
 import { StockGraphic } from "../stock/StockGraphic";
 import { SceneShell } from "./SceneShell";
+import type { StockRequest } from "../stock/contracts/StockContract.types";
 import type { SceneBase } from "./scenes.types";
 
-export type Props = SceneBase & {
-  preset: StockPresetId;
-  accent?: string;
-};
+/** Storyboard heading and frame context around a typed stock request. */
+export type Props = SceneBase & StockRequest;
 
-/** Conceptual stock graphics repeat their six-second cycle; sample content is fixed. */
+/**
+ * Conceptual stock graphics repeat their six-second cycle; authored content is
+ * preserved.
+ */
 export function StockScene({
-  preset,
-  accent,
   frame,
   width = 1600,
   height = 1000,
   title,
   kicker,
+  ...request
 }: Props) {
   const top = title || kicker ? 200 : 0;
   return (
@@ -35,15 +36,14 @@ export function StockScene({
           left: 0,
           width,
           height: height - top,
-          background: "#0b1219",
+          background: request.background ?? "#0b1219",
         }}
       >
         <StockGraphic
-          preset={preset}
+          {...request}
           frame={loopPhase(frame, STOCK_LOOP_FRAMES) * STOCK_LOOP_FRAMES}
           width={width}
           height={height - top}
-          accent={accent}
         />
       </div>
     </SceneShell>

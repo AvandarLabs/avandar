@@ -8,17 +8,21 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import type { ScanLinesInput } from "../presets/ScanLines/ScanLines.schema";
+import type { ReactNode } from "react";
 
-const SCAN_ROWS = [
-  "record / alpha",
-  "record / beta",
-  "record / gamma",
-  "record / delta",
-  "record / epsilon",
-  "record / zeta",
-];
+type Props = GraphicProps & { input: ScanLinesInput };
 
-export function ScanLines({ frame, accent, id }: GraphicProps) {
+/** Draws the bounded authored scan-lines study at an explicit frame. */
+export function ScanLines({
+  input,
+  frame,
+  accent,
+  id,
+}: Readonly<Props>): ReactNode {
+  const fields = input.fields;
   const t = ramp(frame, 23, 110, EASE.inOut);
   const scanY = mix(t, 138, 489);
   return (
@@ -32,10 +36,22 @@ export function ScanLines({ frame, accent, id }: GraphicProps) {
           <rect x={153} y={142} width={691} height={344} rx={12} />
         </clipPath>
       </defs>
-      <Eyebrow>SCANNING PASS</Eyebrow>
-      <Pill x={744} y={44} width={152} text="SAMPLE RECORDS" color={accent} />
+      <Eyebrow>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["scan-lines"].scanningPass,
+        })}
+      </Eyebrow>
+      <Pill
+        x={744}
+        y={44}
+        width={152}
+        text={getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["scan-lines"].sampleRecords,
+        })}
+        color={accent}
+      />
       <Panel x={153} y={142} width={691} height={344} radius={12} />
-      {SCAN_ROWS.map((row, i) => {
+      {fields.map((row, i) => {
         const y = 178 + i * 55;
         const passed = ramp(scanY, y - 12, 28);
         return (
@@ -60,9 +76,11 @@ export function ScanLines({ frame, accent, id }: GraphicProps) {
               strokeOpacity={0.15 + passed * 0.6}
             />
             <g opacity={passed}>
-              <Check x={795} y={y + 2} color={accent} size={9} />
+              {input.showChecks ? (
+                <Check x={795} y={y + 2} color={accent} size={9} />
+              ) : null}
             </g>
-            {i < 5 ? (
+            {i < fields.length - 1 ? (
               <path
                 d={`M176 ${y + 29} H821`}
                 stroke={STOCK.line}
@@ -92,10 +110,14 @@ export function ScanLines({ frame, accent, id }: GraphicProps) {
         fill={accent}
       />
       <Text x={153} y={535} size={15} mono fill={STOCK.muted}>
-        INSPECT
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["scan-lines"].inspect,
+        })}
       </Text>
       <Text x={844} y={535} size={15} mono anchor="end" fill={STOCK.muted}>
-        VERIFY
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["scan-lines"].verify,
+        })}
       </Text>
     </g>
   );

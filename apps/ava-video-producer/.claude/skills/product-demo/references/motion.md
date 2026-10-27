@@ -1,18 +1,15 @@
 # Motion vocabulary
 
-## Why moving elements is safe when moving the camera is not
+## Keep the product stable while directing attention
 
-Hard rules 2 and 3 ban a CSS camera on the chrome and any zoom on type.
-Both are right, and both are about the **frame**.
-
-Individual elements moving on `transform` and `opacity` are a different
-thing. Those two properties skip layout and paint and composite on the GPU,
-so they cannot resample type — the shimmer rule 3 prevents. And
-`check-frames.mjs` looks for tiled frames and full-frame luminance jumps; a
-12px rise on a card is neither.
-
-The line: **never transform a container that holds the whole UI. Always free
-to transform what is inside it.**
+Hard rules 2 and 3 prevent sustained CSS scaling of live UI chrome and title
+type. Animate individual elements with frame-derived transforms and opacity.
+Use the SVG viewBox camera for diagram detail, including its vector labels.
+A short native-size spatial transition may translate the product layer and
+apply CSS blur, then settle exactly. Do not duplicate live UI for temporal
+samples or leave its chrome drifting during a reading hold. See
+[camera direction](camera-direction.md) for the reusable components and
+preset/easing decisions.
 
 ## The tier this sits in
 
@@ -34,7 +31,11 @@ import { EASE, DUR, STAGGER, ramp, mix, mixToken,
 clip. `EASE.inOut` only for something already on screen that travels.
 `EASE.word` is the title curve, titles only.
 
-Never `ease-in`: it starts slow, delaying the moment the eye is waiting on.
+Prefer ease-out for entrances and click feedback. Use `ease-in` when an
+object accelerates away without an on-screen landing. Camera travel between
+held landmarks usually uses ease-in-out. Named curves and bounded custom
+cubic Beziers are exposed by `src/motion-components`; see camera direction
+for their different meanings.
 
 **Durations** in frames at 30fps: `press` 4 · `chip` 6 · `panel` 9 ·
 `sheet` 13 · `hero` 18 · `word` 15.

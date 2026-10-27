@@ -1,0 +1,142 @@
+name:
+  id: motionAtlas.utterance-to-model-draft.name
+  message: Lift a description into a model draft
+description:
+  id: motionAtlas.utterance-to-model-draft.description
+  message: Named phrases lift from a short authored sentence into an explicit
+    entity-and-relationship draft. The original wording remains visible beside the
+    proposed structure, and an optional human acceptance marker distinguishes a reviewed
+    draft from a pending one.
+category:
+  id: motionAtlas.utterance-to-model-draft.category
+  message: Description and conceptual structure
+useWhen:
+  id: motionAtlas.utterance-to-model-draft.useWhen
+  message:
+    Make an authored phrase-to-model interpretation inspectable without treating it
+    as automatic truth.
+intent:
+  id: motionAtlas.utterance-to-model-draft.intent
+  message:
+    Make an authored phrase-to-model interpretation inspectable without treating it
+    as automatic truth.
+creativeDirection:
+  id: motionAtlas.utterance-to-model-draft.creativeDirection
+  message:
+    Frames 0-11 reveal a short sentence on a 960x600 canvas. Frames 12-48 underline
+    the supplied entity and relation tokens while all connector words remain in place.
+    Frames 49-105 lift duplicate phrase slips from those exact spans into two entity
+    sockets and one relationship hinge; an optional attribute slip docks to its declared
+    entity. Frames 106-135 place the supplied review note and, only for accept, a human
+    acceptance marker. Frames 136-167 hold the unchanged source sentence beside the
+    complete proposed model. Fade to the common opaque palette ground at frames 168-179.
+    All React/SVG motion is deterministic at 30fps and no language-model request is
+    executed.
+distinction:
+  id: motionAtlas.utterance-to-model-draft.distinction
+  message:
+    Unlike schema-mapping, the starting material is a sentence rather than two
+    field schemas. Unlike entity-spine-assembly, no source records are materialized and
+    no unique-member set is calculated. The hero action preserves the origin of each
+    authored concept as language becomes a proposed structure. Unlike
+    prose-measurement-ledger, this proposes conceptual entity types and a relationship
+    rather than extracting a subject's measurement, unit, reporting period, and
+    qualifier. It defines a model, not an observation row.
+prompt:
+  id: motionAtlas.utterance-to-model-draft.prompt
+  message: Named phrases lift from a short authored sentence into an explicit
+    entity-and-relationship draft. The original wording remains visible beside the
+    proposed structure, and an optional human acceptance marker distinguishes a reviewed
+    draft from a pending one.
+tags:
+  - id: motionAtlas.utterance-to-model-draft.tags.0
+    message: natural language
+  - id: motionAtlas.utterance-to-model-draft.tags.1
+    message: model draft
+  - id: motionAtlas.utterance-to-model-draft.tags.2
+    message: entities
+  - id: motionAtlas.utterance-to-model-draft.tags.3
+    message: attributes
+  - id: motionAtlas.utterance-to-model-draft.tags.4
+    message: relationships
+  - id: motionAtlas.utterance-to-model-draft.tags.5
+    message: semantic modeling
+  - id: motionAtlas.utterance-to-model-draft.tags.6
+    message: human review
+  - id: motionAtlas.utterance-to-model-draft.tags.7
+    message: configuration
+goodFor:
+  - id: motionAtlas.utterance-to-model-draft.goodFor.0
+    message: Explain the difference between a domain description and a proposed data model
+  - id: motionAtlas.utterance-to-model-draft.goodFor.1
+    message: Introduce entities, attributes, and relationships using a bounded sentence
+  - id: motionAtlas.utterance-to-model-draft.goodFor.2
+    message: Show a human review boundary around AI-assisted model configuration
+domains:
+  - id: motionAtlas.utterance-to-model-draft.domains.0
+    message: Description and conceptual structure
+aliases:
+  - id: motionAtlas.utterance-to-model-draft.aliases.0
+    message: natural language
+  - id: motionAtlas.utterance-to-model-draft.aliases.1
+    message: model draft
+  - id: motionAtlas.utterance-to-model-draft.aliases.2
+    message: entities
+notFor:
+  - id: motionAtlas.utterance-to-model-draft.notFor.0
+    message:
+      One short sentence, two entities, one relation, and at most one attribute fit
+      the six-second loop. More complex domain modeling belongs in a longer explanation.
+  - id: motionAtlas.utterance-to-model-draft.notFor.1
+    message:
+      All mappings and labels are authored inputs, not generated model output. The
+      scene does not implement description-logic reasoning, model training,
+      natural-language parsing, or arbitrary-domain configuration.
+  - id: motionAtlas.utterance-to-model-draft.notFor.2
+    message:
+      No cardinality, uniqueness, datatype, relationship inference, or business rule
+      may be added unless explicitly present in a future separately specified contract.
+  - id: motionAtlas.utterance-to-model-draft.notFor.3
+    message:
+      Pending review remains pending without a success marker. Accepted marks only
+      the supplied owner decision, not objective model correctness or a deployed
+      workspace.
+  - id: motionAtlas.utterance-to-model-draft.notFor.4
+    message:
+      The stock animation makes no claim that a particular product provides
+      natural-language configuration or that a proposed model has been deployed.
+  - id: motionAtlas.utterance-to-model-draft.notFor.5
+    message:
+      Free prose is author supplied; only structural, reference, numeric and
+      documented lexical constraints are runtime-validated.
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.utterance-to-model-draft.beats.0
+      message: Reveal the authored scene.
+  - startFrame: 12
+    endFrame: 48
+    description:
+      id: motionAtlas.utterance-to-model-draft.beats.1
+      message: Underline authored mapped fragments.
+  - startFrame: 49
+    endFrame: 105
+    description:
+      id: motionAtlas.utterance-to-model-draft.beats.2
+      message: Lift duplicate phrase slips to their supplied model sockets.
+  - startFrame: 106
+    endFrame: 135
+    description:
+      id: motionAtlas.utterance-to-model-draft.beats.3
+      message: Reveal the supplied review note and only an authored acceptance.
+  - startFrame: 136
+    endFrame: 167
+    description:
+      id: motionAtlas.utterance-to-model-draft.beats.4
+      message: Hold the unchanged sentence and complete draft.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.utterance-to-model-draft.beats.5
+      message: Return to the common opaque ground.

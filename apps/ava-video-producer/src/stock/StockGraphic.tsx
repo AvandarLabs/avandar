@@ -1,72 +1,23 @@
 import { useId } from "react";
 import { loopEnvelope } from "../motion";
-import {
-  BarRace,
-  LineTrace,
-  MetricCounter,
-} from "./graphics-charts/graphics-charts";
-import {
-  CodeFocus,
-  ScanLines,
-  TerminalType,
-} from "./graphics-code/graphics-code";
-import { STOCK, type GraphicProps } from "./graphics-common";
-import {
-  DataPipeline,
-  EventBus,
-  PacketStream,
-  SchemaMapping,
-  SourceMerge,
-} from "./graphics-data/graphics-data";
-import {
-  DotMatrix,
-  StaggerCards,
-  StatusCycle,
-  WordReveal,
-} from "./graphics-interface/graphics-interface";
-import {
-  NetworkGraph,
-  NodeTraversal,
-  OrbitalSystem,
-  PlexusField,
-  RadialNetwork,
-} from "./graphics-networks/graphics-networks";
-import type { StockPresetId } from "./catalog";
+import { stockRequestEnvelopeSchema } from "./contracts/stockRequestSchema/stockRequestSchema";
+import { STOCK } from "./graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "./i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { STOCK_GRAPHIC_COPY } from "./i18n/stockGraphicCopy";
+import { StockBoxRoughnessContext } from "./primitives/StockRect/StockRect";
+import { stockRenderers } from "./registry/stockRenderers/stockRenderers";
+import type { StockRequest } from "./contracts/StockContract.types";
 
-const GRAPHICS: Record<
-  StockPresetId,
-  (props: GraphicProps) => React.JSX.Element
-> = {
-  "network-graph": NetworkGraph,
-  "node-traversal": NodeTraversal,
-  "radial-network": RadialNetwork,
-  "plexus-field": PlexusField,
-  "orbital-system": OrbitalSystem,
-  "source-merge": SourceMerge,
-  "data-pipeline": DataPipeline,
-  "schema-mapping": SchemaMapping,
-  "packet-stream": PacketStream,
-  "event-bus": EventBus,
-  "code-focus": CodeFocus,
-  "terminal-type": TerminalType,
-  "scan-lines": ScanLines,
-  "bar-race": BarRace,
-  "line-trace": LineTrace,
-  "metric-counter": MetricCounter,
-  "dot-matrix": DotMatrix,
-  "stagger-cards": StaggerCards,
-  "word-reveal": WordReveal,
-  "status-cycle": StatusCycle,
-};
-
-export type Props = {
-  preset: StockPresetId;
+/** Preset-discriminated content with explicit local frame and display size. */
+export type Props = StockRequest & {
   /** Local frame at 30 fps. The authored loop spans frames 0 through 179. */
   frame: number;
   width?: number;
   height?: number;
-  accent?: string;
-  background?: string;
+  /** Omit the stage ground when compositing the diagram above another surface. */
+  transparent?: boolean;
+  /** Seeded hand-drawn box outlines, from smooth (0) to expressive (3). */
+  boxRoughness?: number;
 };
 
 /**
@@ -82,9 +33,18 @@ export function StockGraphic({
   height = 600,
   accent = STOCK.mint,
   background = STOCK.ground,
+  input,
+  schemaVersion,
+  transparent = false,
+  boxRoughness = 0,
 }: Props) {
   const id = `stock-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
-  const Graphic = GRAPHICS[preset];
+  stockRequestEnvelopeSchema.parse({
+    preset,
+    schemaVersion,
+    accent,
+    background,
+  });
   const localFrame = Math.max(
     0,
     Math.min(179, Number.isFinite(frame) ? frame : 0),
@@ -96,18 +56,27 @@ export function StockGraphic({
       height={height}
       viewBox="0 0 960 600"
       role="img"
-      aria-label={`${preset.replaceAll("-", " ")}, conceptual motion graphic`}
-      style={{ display: "block", background, fontFamily: "Arial, sans-serif" }}
+      aria-label={getStockDisplayCopyFromDescriptor({
+        descriptor: STOCK_GRAPHIC_COPY,
+        values: {
+          preset: preset.replaceAll("-", " "),
+        },
+      })}
+      style={{
+        display: "block",
+        background: transparent ? "transparent" : background,
+        fontFamily: "Arial, sans-serif",
+      }}
     >
-      <rect width={960} height={600} fill={background} />
-      <g opacity={loopEnvelope(localFrame, 180)}>
-        <Graphic
-          frame={localFrame}
-          accent={accent}
-          background={background}
-          id={id}
-        />
-      </g>
+      {!transparent && <rect width={960} height={600} fill={background} />}
+      <StockBoxRoughnessContext.Provider value={boxRoughness}>
+        <g opacity={loopEnvelope(localFrame, 180)}>
+          {stockRenderers[preset](
+            { frame: localFrame, accent, background, id },
+            input,
+          )}
+        </g>
+      </StockBoxRoughnessContext.Provider>
     </svg>
   );
 }

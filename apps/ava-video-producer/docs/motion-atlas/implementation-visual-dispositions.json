@@ -1,0 +1,1237 @@
+{
+  "sourceHash": "590064e14ebb6b0a8c23736695a0460e2035985d461dac9e00020d0bdaad8dad",
+  "head": "ad14a8264dba97c267d0a5784c217dcfa76ff97f",
+  "status": "Controller dispositions complete. Fifteen correction presets dispatched; intentional transitions and legacy observations preserved for final review. No global visual acceptance.",
+  "counts": {
+    "default": {
+      "completed": 170,
+      "concerns": 16
+    },
+    "dense": {
+      "completed": 150,
+      "concerns": 16
+    }
+  },
+  "reports": [
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-000-005.json",
+      "reportSha256": "2fe539bf1a47a206abdc1b62adf1403bca64ddeffe5b2f278c8a8642dba62087",
+      "count": 5,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-000-005-assignment.json",
+      "assignmentSha256": "213a3e778f77b8cec79a7081034fba9e55d5be398d537e21d3cdc15477aa76aa"
+    },
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-005-015.json",
+      "reportSha256": "8213656bd3af2d08733f8774882dc72daeef08164596e283242661063810be56",
+      "count": 10,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-005-015-assignment.json",
+      "assignmentSha256": "fe2c0b8c25f92110b3a117c62e47ee1e5709487425ed6ae8303c699dd1fbaf09"
+    },
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-015-025.json",
+      "reportSha256": "bb8bd288893fc497bce50e22217c9419a8879806d5d1b42589e09d65a1afd544",
+      "count": 10,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-015-025-assignment.json",
+      "assignmentSha256": "2e540263272eddd0c4d8a9e34701359c38b4f5dd459c01380e4bb306439008da"
+    },
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+      "reportSha256": "3c31528d4ebea501689c737dba29b04b08d3959466307d73b700fa8a8f12cf48",
+      "count": 20,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045-assignment.json",
+      "assignmentSha256": "f886d7131b28b479db564f242b33bbccf80e7809abb40f7a1e9cbf2c0b1493bb"
+    },
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-045-060.json",
+      "reportSha256": "b88bfe50d7396635d2c1d2b0874dca04ad36c01afbff0f8884c5c2f7aae720a6",
+      "count": 15,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-045-060-assignment.json",
+      "assignmentSha256": "08aa47aa88dc2177ca70a8024faf301e25359afd38646c72dca7520af3ffbcde"
+    },
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-060-070.json",
+      "reportSha256": "241146f1efb272c7d034d4bb7570e76759b3f95f90f222426d694d921e89ba81",
+      "count": 10,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-060-070-assignment.json",
+      "assignmentSha256": "bed17a6e3e8abac2c8d99aaae6bb2edb0100591526e5ca99ba54349939345b39"
+    },
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-070-095.json",
+      "reportSha256": "09a491723375376ccf56d21d87be1aad21b3f46c9cb413828717319655da4ef4",
+      "count": 25,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-070-095-assignment.json",
+      "assignmentSha256": "091a0436073857f1c42e66fa4291d6cb6698179d1a23d516982c4f1b73f3032f"
+    },
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-095-110.json",
+      "reportSha256": "395fadb0e31787503bb08a492850c6384e1e785cef42339d54542638d0eeac92",
+      "count": 15,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-095-110-assignment.json",
+      "assignmentSha256": "c858a462a5a80660d4aedc3ec7117b8075c11d9b55e91217b504fa2878a8b001"
+    },
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-110-125.json",
+      "reportSha256": "5966f0584ca2f50c9314fbdd9d9f7f40864ac3bc67b97dce03c7ba9250a95f8a",
+      "count": 15,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-110-125-assignment.json",
+      "assignmentSha256": "5a44843f78323085f083580a0fb8be3f41f1e71246a62657d72061469921badb"
+    },
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-125-145.json",
+      "reportSha256": "699abb13e923208bd7c4667586fc4e51766764817a9d71c34e91720efa9e2d89",
+      "count": 20,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-125-145-assignment.json",
+      "assignmentSha256": "745b61da2dc165baed684639ba87d6b6cc1f957b1e0f1c95d455dfb44013065f"
+    },
+    {
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-145-170.json",
+      "reportSha256": "0f8f99eb074eaae180cc923a6187081699bf1b7d6c4889ecb1683038ddb9bd5f",
+      "count": 25,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-145-170-assignment.json",
+      "assignmentSha256": "01ace9a7d6141f5f37695ff5c7e63f9ec662af9a4fd0a3fc4b80258525bbf688"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-000-005.json",
+      "reportSha256": "9ad0e5400dbf1431d401a9c230b71f121d5a1053f4fd4b0d012e4611f3bec787",
+      "count": 5,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-000-005-assignment.json",
+      "assignmentSha256": "d051212c528cbdf5d8391d4c793f8c50dc837bfe97677b19f00b76ee7b9f465a"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+      "reportSha256": "29940e468659385cadbbb898e6437016dde78d5fb0486cc743eec8a31e1e5955",
+      "count": 15,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020-assignment.json",
+      "assignmentSha256": "dbd44753a4cbee2a3418ef8fda25b9f2e3e4dfeb2a5955890cfe752e3baf4938"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-020-035.json",
+      "reportSha256": "dd2b63cf62260c74aed63f0ef8cf63e60dd82415e62074a92409369d055e02d4",
+      "count": 15,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-020-035-assignment.json",
+      "assignmentSha256": "67b3d1b1e3a3d0fad66a23f0f83952d3088fff24ba3fb7fe5da89e7adc136189"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-035-050.json",
+      "reportSha256": "bf0584f01e4e9ff6b1bed8f0418c8f678b415376a9298a88bff2b59b1fb9ed02",
+      "count": 15,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-035-050-assignment.json",
+      "assignmentSha256": "abbc3359d863e0cc6670a7b43e7d4b7347c4ebcb50295537eabededae275abdc"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-050-060.json",
+      "reportSha256": "333835948926057a8b1416a2b776bc4365f166291a722f2c8133d7b2273eb5c8",
+      "count": 10,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-050-060-assignment.json",
+      "assignmentSha256": "ad864fbb00b486755804b89445947e5f15bf9f64c87bc59635b8ab9b65adb13e"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-060-075.json",
+      "reportSha256": "f9b790d25a58602b6289b66ce7d784670a39c2ce088762ae3e081c43941b9aec",
+      "count": 15,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-060-075-assignment.json",
+      "assignmentSha256": "4c1944c80b0e928665193672d99d5ccb4f1123a396806fffcabbcd4c9ec62a70"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-075-085.json",
+      "reportSha256": "f725bca0fd7093b8f7ad9926d722bd209c34578ce6a63985d7f5d96f5fa7d675",
+      "count": 10,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-075-085-assignment.json",
+      "assignmentSha256": "3bc2190e4ded8277774952a8be0ee04d2639009650799cba16aee464020af20f"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-085-095.json",
+      "reportSha256": "0560211688e395ef42a64f1c0d92ee2318ef10a8d0b74c32f597eefa6474bd94",
+      "count": 10,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-085-095-assignment.json",
+      "assignmentSha256": "dc7503eb8e52aeae906b68b79d7183db65c355ac47054c0960f4ed6e353053aa"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-095-110.json",
+      "reportSha256": "7c7a2c4f705c22456f6ca7e6f358e88113204f5e8e1fbf10d8304e97875df46f",
+      "count": 15,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-095-110-assignment.json",
+      "assignmentSha256": "2b2307252be69128c792a22d40fd50eacefb2ec29a298f2443a2be55ec58493b"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-110-120.json",
+      "reportSha256": "c8f55d9bd857933f814240b08fc688f88e26d10d98decb4870bf1a57ced01a04",
+      "count": 10,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-110-120-assignment.json",
+      "assignmentSha256": "2eed5cab7461b8250eb621b94344f0d893c9102c3f9e7a65790c3aa9d1341bf7"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-120-130.json",
+      "reportSha256": "f284fee5123b354f5fa0b7ece313b81e6491d94efa61fd5164b7451629efef88",
+      "count": 10,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-120-130-assignment.json",
+      "assignmentSha256": "4a6fd031b7bcedec22536d9feaffb2e5465516ce366682924bbfa7b7c1e1c20c"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-130-140.json",
+      "reportSha256": "1a11bdf514859f9276d213c519d5da11d59384ee77a49955749f019924438291",
+      "count": 10,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-130-140-assignment.json",
+      "assignmentSha256": "fdde57dac7d34b77d620ce5e05292c2a99e4dd94630c4f47ef1adba63d5d1dec"
+    },
+    {
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-140-150.json",
+      "reportSha256": "bf14be01ce0f825b7838d0e5e60f418cdc320bd924b991aaf9a06229f34c1fab",
+      "count": 10,
+      "assignment": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-140-150-assignment.json",
+      "assignmentSha256": "f6562b0964aa5133347a3268f0b3929cf2c05d48d03c49cad4b0ac3f5aa5a380"
+    }
+  ],
+  "temporalReviewConcerns": [
+    {
+      "id": "aid-cargo-mode-handoff",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-050-060.json",
+      "observation": {
+        "frames": [90],
+        "location": "1280x800 image, parcel1 box around x\u2248587-636,y\u2248320-370, overlapped by parcel2 beginning around x\u2248610,y\u2248351.",
+        "observation": "The staggered moving stack partially covers the lower part of parcel1's number.",
+        "reasonForTemporalReview": "The overlap is part of the depicted handoff and is absent at the hold. Stills cannot establish whether its duration impairs tracking through the handoff.",
+        "relationshipToDefault": "Dense input increases the load from two to four parcels. Default and dense holds preserve identity; the dense stack needs temporal assessment."
+      },
+      "disposition": {
+        "action": "retain-transition-evidence-no-source-change",
+        "reason": "GroupC actual samples preserve identities and correct resolved quantities. Brief contact, handoff, ballot unfolding and contribution-transport overlaps remain explicitly recorded. Workshop exact158 confirms all participants return to own bookings after sequential use ends152."
+      }
+    },
+    {
+      "id": "referral-consent-withdrawal",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-085-095.json",
+      "observation": {
+        "frames": [90],
+        "location": "1280x800 image, blue worker gesture line from x\u22481013,y\u2248200 toward x\u22481197,y\u2248530 across the right contact column.",
+        "observation": "The action gesture crosses portions of the first and second planned-contact text.",
+        "reasonForTemporalReview": "The line is associated with the depicted contact-handling gesture and disappears in the hold. Stills cannot establish whether it remains long enough to hinder reading.",
+        "relationshipToDefault": "Default counterpart was not personally inspected by this worker."
+      },
+      "disposition": {
+        "action": "retain-transition-evidence-no-source-change",
+        "reason": "GroupC actual samples preserve identities and correct resolved quantities. Brief contact, handoff, ballot unfolding and contribution-transport overlaps remain explicitly recorded. Workshop exact158 confirms all participants return to own bookings after sequential use ends152."
+      }
+    },
+    {
+      "id": "resident-budget-ballots",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-085-095.json",
+      "observation": {
+        "frames": [90],
+        "location": "1280x800 image, ballot box/lid around x\u2248559-720,y\u2248269-419, in the same region as the garden symbol and adjacent project labels.",
+        "observation": "The unfolding box/lid overlaps the future tally row's geometry while the tally is being arranged.",
+        "reasonForTemporalReview": "This appears to be purposeful transformation overlap and clears completely at the hold. Playback is needed to judge whether the object-to-tally handoff is clear.",
+        "relationshipToDefault": "Default counterpart was not personally inspected by this worker."
+      },
+      "disposition": {
+        "action": "retain-transition-evidence-no-source-change",
+        "reason": "GroupC actual samples preserve identities and correct resolved quantities. Brief contact, handoff, ballot unfolding and contribution-transport overlaps remain explicitly recorded. Workshop exact158 confirms all participants return to own bookings after sequential use ends152."
+      }
+    },
+    {
+      "id": "entity-spine-assembly",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-120-130.json",
+      "observation": {
+        "frames": [90],
+        "location": "Floating 100-value cards between the seven source observations and the first entity.",
+        "observation": "Converging cards share the source numeric-value region during aggregation.",
+        "reasonForTemporalReview": "The hold has a readable source list and correct 700 aggregate. The overlap appears purposeful; stills do not establish whether its duration harms the handoff.",
+        "relationshipToDefault": "Default counterpart was not personally inspected by this worker."
+      },
+      "disposition": {
+        "action": "retain-transition-evidence-no-source-change",
+        "reason": "GroupC actual samples preserve identities and correct resolved quantities. Brief contact, handoff, ballot unfolding and contribution-transport overlaps remain explicitly recorded. Workshop exact158 confirms all participants return to own bookings after sequential use ends152."
+      }
+    }
+  ],
+  "editorialObservations": [
+    {
+      "id": "argument-bridge",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+      "observation": "The conclusion and bridge have large vertical gaps. This is a sparse composition, not a correctness defect."
+    },
+    {
+      "id": "scope-aperture",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+      "observation": "The early broad-topic title is absent at the hold. The focused question and excluded topics provide the remaining context."
+    },
+    {
+      "id": "journal-receipts",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+      "observation": "The receipt legend markers have large horizontal distances from their labels, but their pairings remain understandable."
+    },
+    {
+      "id": "contribution-weave",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+      "observation": "The lower-left crossing joins two identically colored solid strips, so its over/under order is visually ambiguous. Other crossings preserve the weave cue; this is lower-impact pattern differentiation."
+    },
+    {
+      "id": "dashboard-slot-assembly",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+      "observation": "The featured value panel and other widgets have substantial empty interior space. This is a sparse default-content composition, not a data or readability defect."
+    },
+    {
+      "id": "report-page-bind",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+      "observation": "The stack sits well above its labeled reading tray with a large empty gap. The destination is named, but the hold does not visually place the stack on the tray."
+    },
+    {
+      "id": "cell-normalization",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+      "observation": "The central divider extends far below the last row into empty space. This does not obscure content."
+    },
+    {
+      "id": "aid-cargo-mode-handoff",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-070-095.json",
+      "observation": "The receiving-team figure and the cargo bike's front wheel overlap at the right edge of the hold, creating mild pictorial congestion. Parcel identity and labels remain clear."
+    },
+    {
+      "id": "battery-dispatch-balance",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-070-095.json",
+      "observation": "The equation uses the same Stored energy wording for its initial and final positions. Their equation positions distinguish them, but explicit initial/final wording would be clearer."
+    },
+    {
+      "id": "environmental-observation-gaps",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-070-095.json",
+      "observation": "The coverage-unit row sits close to the bottom image edge, with about5 px of margin. It remains readable and is not visibly clipped."
+    },
+    {
+      "id": "fraction-material-translation",
+      "fixture": "default",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-070-095.json",
+      "observation": "The resolved shared-table arrangement still uses three adjacent table surfaces with narrow gaps, rather than a single continuous top. This does not change the fraction representation."
+    },
+    {
+      "id": "paired-contrast",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-000-005.json",
+      "observation": "The bottom comparison label has a small bottom margin, but its second line remains visible."
+    },
+    {
+      "id": "capability-matrix",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-000-005.json",
+      "observation": "The column-c focus outline runs very close to the top of its wrapped header, but no definite glyph clipping is visible."
+    },
+    {
+      "id": "reject-and-replace",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-000-005.json",
+      "observation": "The entering replacement panel extends beyond the right image edge at frame90, while its visible label is intact. It is fully inside the image at the hold."
+    },
+    {
+      "id": "qualify-apparent-conflict",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+      "observation": "The faded central question mark sits on the divider during action 90, but remains recognizable and clears at the hold."
+    },
+    {
+      "id": "disclosure-aperture",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+      "observation": "The moving fifth copy partly covers its identical original at action 90. This is transient pictorial congestion around the depicted copy operation; no different field or final data is lost."
+    },
+    {
+      "id": "aid-cargo-mode-handoff",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-050-060.json",
+      "observation": "The receiving figure meets the cargo bike's front-wheel area at the hold, repeating low-impact pictorial congestion seen in the default."
+    },
+    {
+      "id": "carbon-storage-accounting",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-050-060.json",
+      "observation": "The tiny decimal values and the raw net-equation operands/results wrap within their numeric tokens across two lines. The displayed floating-point residue near \u22122000 is not treated as a material balance error here, but numerical presentation would benefit from separate formatting review."
+    },
+    {
+      "id": "location-uncertainty-boundary",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-085-095.json",
+      "observation": "Boundary-touch classification semantics were not audited beyond the rendered geometry. The focused footprint's cross-district status is unambiguous."
+    },
+    {
+      "id": "person-led-support-calendar",
+      "fixture": "dense",
+      "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-085-095.json",
+      "observation": "The moving appointment is a blank dashed outline at action90 and becomes a labeled card by the hold. Playback remains necessary to judge the clarity of that transition."
+    }
+  ],
+  "presetConcerns": [
+    {
+      "id": "network-graph",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-000-005.json",
+          "configurationHash": "62b9e0176f6fa594fb93bc9128d11b865635b2e048365a1020b1278afe35427e",
+          "finding": {
+            "id": "network-label-connector-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "nodes[0] Nexus / CENTRAL NODE, nodes[3] Gamma, edges [3,0] and [0,6]",
+            "frames": [90, 150],
+            "location": "Full-size 1280x800 image, vertical centerline x\u2248640. Gamma at y\u2248213-232, Nexus at y\u2248454-474 and CENTRAL NODE at y\u2248491-503.",
+            "observation": "The Gamma-to-Nexus line continues through the Gamma label, and the Nexus-to-Zeta line continues behind Nexus and CENTRAL NODE. At frame90 a signal marker also sits immediately above Nexus on the same line.",
+            "consequence": "The connector paint visibly bisects label areas and weakens text separation. The words are still readable, so this is a low-impact readability defect rather than missing or incorrect content."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "preserve-baseline-carry-to-final-review",
+        "reason": "Original exact SVG baselines are binding. Low line/text separation concerns and legacy crossing choreography are retained explicitly; BarRace resolves to the correct labeled order."
+      }
+    },
+    {
+      "id": "radial-network",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-000-005.json",
+          "configurationHash": "81a0960d298ba42e2d50d5777c34f276508a2ee9076fda0c6056d2b9db57c497",
+          "finding": {
+            "id": "radial-input-connector-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "spokes[0] Input and the hub-to-Input spoke",
+            "frames": [90, 150],
+            "location": "Full-size 1280x800 image, x\u2248640, Input text at y\u2248203-223 between the top node and hub.",
+            "observation": "The vertical connector from the top Input node to the central hub continues behind the center of the Input label in both full-size samples.",
+            "consequence": "The visible connector bisects the label and reduces text separation. Input remains readable, so the impact is low."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "preserve-baseline-carry-to-final-review",
+        "reason": "Original exact SVG baselines are binding. Low line/text separation concerns and legacy crossing choreography are retained explicitly; BarRace resolves to the correct labeled order."
+      }
+    },
+    {
+      "id": "orbital-system",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-000-005.json",
+          "configurationHash": "3172121c691cd14e6db61766fdee494f1cc8d0ffe4a53bdebfd71fb62abab5e1",
+          "finding": {
+            "id": "orbital-label-orbit-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "bodies[2].label GAMMA with showOrbits true",
+            "frames": [90, 150],
+            "location": "Full-size 1280x800 image. Frame90 GAMMA at x\u2248788-849, y\u2248178-191. Frame150 GAMMA at x\u2248670-730, y\u2248590-603.",
+            "observation": "At frame90 the green orbit runs through the GAMMA text area. At frame150 the blue orbit crosses the lower part of the GAMMA text area.",
+            "consequence": "Orbit paint competes with the colored satellite label and reduces separation. GAMMA remains readable, making this a low-impact readability defect."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "preserve-baseline-carry-to-final-review",
+        "reason": "Original exact SVG baselines are binding. Low line/text separation concerns and legacy crossing choreography are retained explicitly; BarRace resolves to the correct labeled order."
+      }
+    },
+    {
+      "id": "bar-race",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-005-015.json",
+          "configurationHash": "3218e6411673c439dcf055762a303b6cdac0e1f69d3365bce5fc782b0ef81a46",
+          "finding": {
+            "id": "bar-race-default-frame90-series-identity",
+            "classification": "correctness/readability",
+            "severity": "pending-playback",
+            "input": "Default bars Alpha 42\u219286 (rank2\u21920), Beta68\u219272 (rank0\u21921), Gamma34\u219258 (rank3\u21922), Delta53\u219241 (rank1\u21923), showLegend=true.",
+            "frame": 90,
+            "viewedFile": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/bar-race/3218e6411673c439dcf055762a303b6cdac0e1f69d3365bce5fc782b0ef81a46/still-003.jpg",
+            "location": "Plot rows around y331 and y502 in the 1280\u00d7800 image. Alpha/Beta overlap on the upper row. Gamma/Delta overlap on the lower row. The row-name region left of x273 and value-label regions beside the bars are blank.",
+            "observation": "Four input series are painted as two overlapping horizontal rows. The blue Beta bar covers almost all of the mint Alpha bar. The gray Delta bar covers most of the amber Gamma bar. All four row names and numeric values are absent at this sampled action frame.",
+            "consequence": "At this sampled midpoint, four series are not separately visible and the per-row names/values are unavailable. The four-color legend is retained. This still cannot establish how long the overlap lasts or whether identity is lost throughout the transition. Temporal and readability severity remain pending actual playback and comparison with the preserved legacy baseline.",
+            "suggestedOutcome": "Controller should inspect natural playback and compare the preserved legacy baseline before deciding severity, scope, or correction."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "preserve-baseline-carry-to-final-review",
+        "reason": "Original exact SVG baselines are binding. Low line/text separation concerns and legacy crossing choreography are retained explicitly; BarRace resolves to the correct labeled order."
+      }
+    },
+    {
+      "id": "decision-fork",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-015-025.json",
+          "configurationHash": "63f29748536c92b1fcfaf76fc97269c0a0db17b799ca0e0e4cf99bd0e0879556",
+          "finding": {
+            "classification": "readability",
+            "severity": "medium",
+            "input": {
+              "showUnchosenOutcomes": true,
+              "branches": [
+                {
+                  "id": "rough",
+                  "outcome": "Idea notebook"
+                },
+                {
+                  "id": "archive",
+                  "outcome": "Archive"
+                }
+              ]
+            },
+            "frame": 150,
+            "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/decision-fork/63f29748536c92b1fcfaf76fc97269c0a0db17b799ca0e0e4cf99bd0e0879556/still-004.jpg",
+            "location": "Labels in the lower-left Idea notebook and lower-right Archive outcome cards.",
+            "observation": "Both outcome labels are heavily dimmed into their dark card fills. They are difficult to read even in the full-size hold frame, while the adjacent condition labels remain clear.",
+            "consequence": "The supplied unchosen outcomes are retained geometrically but are not reliably readable when showUnchosenOutcomes is enabled. Closed-gate de-emphasis can remain while the labels need more contrast."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "exception-detour",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+          "configurationHash": "628773d8dc9de21564782ba05ee7c0f34f075187f8564ef398407df70fddb227",
+          "finding": {
+            "id": "exception-detour-label-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "pathLabels.exception = Except when, detourSide = below",
+            "frames": [90, 150],
+            "location": "1280x800 full-size image, Except when at x\u2248625-747,y\u2248467-485. The orange curve crosses the word when around x\u2248710-745.",
+            "observation": "The detour curve is painted directly across the right side of Except when in both full-size samples.",
+            "consequence": "The route label competes with a line of the same accent color. The words remain readable, so impact is low."
+          }
+        },
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+          "configurationHash": "d7824c4145f27e539d499bedbdd72ad86bbf0c12d9c35027a0f6a16852885416",
+          "finding": {
+            "id": "dense-exception-detour-label-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "pathLabels.exception (18 CJK characters), detourSide below",
+            "frames": [90, 150],
+            "location": "1280x800 image, exception path label at x\u2248549-823,y\u2248466-514. The orange curve crosses the first line around x\u2248710-744,y\u2248466-490.",
+            "observation": "The detour curve runs across the label's glyphs.",
+            "consequence": "The label remains decipherable but competes with same-color route paint.",
+            "relationshipToDefault": "Repeated: default-visual-025-045.json, exception-detour / exception-detour-label-overlap."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "shared-foundation",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+          "configurationHash": "61128f9e8150befcff2addf5135c298bddd50da60f1389fbf16573a27a63e44e",
+          "finding": {
+            "id": "shared-foundation-action-text-mask",
+            "severity": "medium",
+            "category": "readability",
+            "input": "foundationReveal = join; foundationLabel = A shared purpose; sharedPrinciple = Make the fictional route understandable",
+            "frames": [90],
+            "location": "1280x800 full-size image, opaque vertical center gap x\u2248607-673,y\u2248520-733. It intersects the foundation label at y\u2248545-563 and principle at y\u2248594-614.",
+            "observation": "A dark center strip removes the middle letters of both already-visible foundation text lines while the two foundation halves are separated.",
+            "consequence": "Both labels are incomplete in this action state. Frame150 resolves the obstruction, but the sampled action does not keep the shared statement readable."
+          }
+        },
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+          "configurationHash": "b12ab74f446f36d71b7420871bc42c7cde9d9d5c96a701a78f7112e73c203de1",
+          "finding": {
+            "id": "dense-shared-foundation-action-text-mask",
+            "severity": "medium",
+            "category": "readability",
+            "input": "foundationReveal join; maximum CJK foundationLabel and sharedPrinciple",
+            "frames": [90],
+            "location": "1280x800 image, opaque center gap x\u2248607-673,y\u2248520-733. It intersects the label at y\u2248545-564 and principle at y\u2248593-651.",
+            "observation": "The gap removes the middle glyphs of the label and both principle lines while they are already visible.",
+            "consequence": "The shared statement is incomplete in this action state. The hold clears the mask.",
+            "relationshipToDefault": "Repeated: default-visual-025-045.json, shared-foundation / shared-foundation-action-text-mask."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "retain-transient-observation-no-source-change",
+        "reason": "Observed transition is part of joining, registration, scanning, inclusion-boundary movement or staggered receipt arrival. Matching natural late/hold samples are readable and correct. Preserve the observation for final editorial review; do not claim every action frame is unobstructed."
+      }
+    },
+    {
+      "id": "sealed-handoff",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+          "configurationHash": "fa33f3bfda75a98c328ec59cc37d81da02ac4c829fe3e40222e4182cf540b16c",
+          "finding": {
+            "id": "sealed-handoff-address-seam-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "address.recipient = Example coordinator; showExteriorReference = true",
+            "frames": [90],
+            "location": "1280x800 full-size image, Example coordinator at x\u2248550-695,y\u2248392-405. The two envelope diagonals cross the lower left and lower right edges of this label.",
+            "observation": "The envelope fold seams run into the lower ends of the recipient address text instead of leaving a clear label area.",
+            "consequence": "The address remains decipherable, but seam paint reduces its separation from the envelope. This is a low-impact readability defect."
+          }
+        },
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+          "configurationHash": "877ae302c66b4ab224296a2f2d23bcbca4d8fdcfff9691cac180d4c3402312c9",
+          "finding": {
+            "id": "dense-sealed-address-seam-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "address.sender, recipient and reference, each 28 W characters; showExteriorReference true",
+            "frames": [90],
+            "location": "1280x800 image, address lines span x\u2248412-836 at y\u2248333-346,y\u2248392-405 and y\u2248512-525. Diagonal fold seams cross portions of these lines.",
+            "observation": "Both upper seams intersect the sender and recipient strings, and a lower seam intersects the reference string.",
+            "consequence": "The address remains legible but its glyphs compete with envelope linework. Brief contents remain properly covered.",
+            "relationshipToDefault": "Repeated and broader: default-visual-025-045.json, sealed-handoff / sealed-handoff-address-seam-overlap."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "chart-focus-edit",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+          "configurationHash": "8880bf6ae966f811f2773865746b23094498c0259f0364d881769b6184034d41",
+          "finding": {
+            "id": "chart-focus-final-row-misalignment",
+            "severity": "medium",
+            "category": "correctness-readability",
+            "input": "categories Paper=4, Ink=7, Labels=5; treatment=both; showValueLabels=true",
+            "frames": [90, 150],
+            "location": "1280x800 image. At frame150, category labels begin at x\u2248458,y\u2248190/286/382. Bar centers are y\u2248245/341/437. Value labels at x\u22481173,y\u2248283/379/475.",
+            "observation": "Final category labels sit roughly 55 px above their associated bar centers, while value labels sit roughly 38 px below them. Ink and 4 are on the same row, as are Labels and 7. At frame90, category labels are already above the bars, but still positioned to their left.",
+            "consequence": "Although values and lengths are correct, the final alignment gives misleading category-to-value associations and weakens the intended reading improvement."
+          }
+        },
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-025-045.json",
+          "configurationHash": "8880bf6ae966f811f2773865746b23094498c0259f0364d881769b6184034d41",
+          "finding": {
+            "id": "chart-focus-duplicate-refined-label",
+            "severity": "low",
+            "category": "readability",
+            "input": "headings.after = Refined presentation; treatment = both",
+            "frames": [150],
+            "location": "1280x800 full-size hold, Refined presentation at x\u224885,y\u2248145-160 and again at x\u224827,y\u2248279-294.",
+            "observation": "The after-stage label is rendered twice, with the second copy in the left margin level with Ink's category label.",
+            "consequence": "The duplicate introduces a stray apparent chart-row label and visual clutter in the refined presentation. Impact is lower than the category/value alignment defect."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "fictional-conflict-globe",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-060-070.json",
+          "configurationHash": "361699210fdd0010158b49c6f459e488675601e768442400a2a54222d55ca9fa",
+          "finding": {
+            "classification": "identity-readability",
+            "severity": "medium",
+            "input": {
+              "showLabels": true,
+              "incidents": [
+                {
+                  "id": "scenario-a",
+                  "label": "Fictional situation A",
+                  "latitude": 24,
+                  "longitude": 12
+                },
+                {
+                  "id": "scenario-c",
+                  "label": "Fictional situation C",
+                  "latitude": 31,
+                  "longitude": 72
+                }
+              ]
+            },
+            "frames": [90, 150],
+            "files": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/fictional-conflict-globe/361699210fdd0010158b49c6f459e488675601e768442400a2a54222d55ca9fa/still-003.jpg",
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/fictional-conflict-globe/361699210fdd0010158b49c6f459e488675601e768442400a2a54222d55ca9fa/still-004.jpg"
+            ],
+            "location": "Situation C X marker near x469,y246 in frame150. The leader from situation A to callout 1 passes through this marker.",
+            "observation": "The situation A leader crosses directly through the situation C X, which also originates its own leader to callout 3. In frame90 the A leader also intersects C within the X footprint.",
+            "consequence": "Two callout paths appear to share the C marker, making the association between fictional situations and their geographic markers ambiguous. Separate callouts remain readable, but marker identity is compromised."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "aquifer-allocation-balance",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-070-095.json",
+          "configurationHash": "67ecc77376fba0223c1bba1227906e356967047ddbfab034b71303686d55a60f",
+          "finding": {
+            "id": "aquifer-reservoir-unit-clipping",
+            "severity": "low",
+            "category": "readability",
+            "input": "copy.unit = m3",
+            "frames": [90, 150],
+            "location": "1280x800 full-size image, small unit text at x\u2248946-969,y\u2248520-534 on the tank's lower-right edge.",
+            "observation": "The unit's left m is partly covered by the tank/background, leaving lower m-like strokes and the3 visible. This is present in the action frame and hold.",
+            "consequence": "The sole small unit tag near the tank is partially unreadable. The numeric budget remains correct, so the finding is low impact."
+          }
+        },
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-060-075.json",
+          "configurationHash": "fbbafb952939a43e162df02465b2287e824ff9b0c22c7fdef327cecaebfdc47e",
+          "finding": {
+            "id": "dense-aquifer-unit-contour-collision",
+            "classification": "readability",
+            "severity": "low",
+            "input": "Dense aquifer fixture uses copy.unit containing8 repeated\u754ccharacters, horizontal tank capacity2, final storage1, and all maximum-length boundary/decision/copy strings.",
+            "frames": [36, 90, 150],
+            "viewedFiles": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/aquifer-allocation-balance/fbbafb952939a43e162df02465b2287e824ff9b0c22c7fdef327cecaebfdc47e/still-002.jpg",
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/aquifer-allocation-balance/fbbafb952939a43e162df02465b2287e824ff9b0c22c7fdef327cecaebfdc47e/still-003.jpg",
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/aquifer-allocation-balance/fbbafb952939a43e162df02465b2287e824ff9b0c22c7fdef327cecaebfdc47e/still-004.jpg"
+            ],
+            "location": "Tank lower-right contour, approximately x948\u20131075/y520\u2013537 in the1280\u00d7800 full-size frames.",
+            "observation": "The unit label begins beneath the lower-right tank border/fill. Its leading glyph is partially hidden by the tank edge, while the rest extends to the right outside the tank. The same collision remains in frame150.",
+            "consequence": "The complete authored short unit label is not fully readable at the tank corner. The numeric balance and other captions remain readable.",
+            "suggestedOutcome": "Place the unit caption clear of the tank wall/fill so its full glyph sequence remains visible."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "cluster-epicurve-link",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-095-110.json",
+          "configurationHash": "f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8",
+          "finding": {
+            "classification": "identity-readability",
+            "severity": "medium",
+            "input": {
+              "investigationCaseIds": ["a", "b", "c"],
+              "showIdentityGuides": true
+            },
+            "frames": [90, 150],
+            "files": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8/still-003.jpg",
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8/still-004.jpg"
+            ],
+            "location": "Selected mint chart blocks for numbered cases 1, 2, and 3, around x486/537/639 and y435 in frame150.",
+            "observation": "The selected blocks use nearly white identity numerals on a bright mint fill. These numerals are faint and substantially harder to read than the white 4 and 5 on dark blocks in both viewed full-size frames.",
+            "consequence": "The individual selected case identities are not reliably readable in the curve, weakening the promised identity match with the map and case list even though totals and bins are correct."
+          }
+        },
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-075-085.json",
+          "configurationHash": "7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76",
+          "finding": {
+            "classification": "identity-readability",
+            "severity": "medium",
+            "relatedDefaultReport": "default-visual-095-110.json",
+            "input": {
+              "investigationCaseIds": ["0", "1", "2", "3", "4", "5", "6", "7"],
+              "showIdentityGuides": true,
+              "casesCount": 12,
+              "coincidentLocation": {
+                "x": 50,
+                "y": 50
+              },
+              "onsetBinId": "0"
+            },
+            "frames": [90, 150],
+            "files": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76/still-003.jpg",
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76/still-004.jpg"
+            ],
+            "location": "Bright mint selected blocks for numbered cases1 through8, in the first onset-bin stack around x486 and y277 through435 in frame150.",
+            "observation": "The selected blocks use nearly white numerals on bright mint. IDs1 through8 are substantially fainter than white IDs9 through12 on dark blocks in both full-size frames.",
+            "consequence": "Selected case identities are not reliably readable in the epidemic-curve stack, weakening the identity match to the map/list. Counts and bin assignments are correct. This repeats the default-frame concern."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "expectation-overlay-check",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-125-145.json",
+          "configurationHash": "21240029b50ed310f0ed1c06b737221099703456c3cb5986f9e81dbc746a5a5c",
+          "finding": {
+            "id": "expectation-overlay-default-frame90-overprint",
+            "classification": "sampled correctness/readability concern",
+            "severity": "pending-playback",
+            "input": "Default Expired ticket / Ticket B: expected Hold, observed Admit; sheetMotion=lower; showStateGlyphs=true.",
+            "frame": 90,
+            "viewedFile": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/expectation-overlay-check/21240029b50ed310f0ed1c06b737221099703456c3cb5986f9e81dbc746a5a5c/still-003.jpg",
+            "location": "Expired ticket result rectangle, approximately x700\u2013745/y414\u2013426 in the1280\u00d7800 full-size action frame.",
+            "observation": "The expected Hold and observed Admit text are painted at the same location. Their letters overprint into a merged glyph string and neither value is separately readable at the sampled midpoint. The matching Admit row above aligns readably.",
+            "consequence": "The two different supplied values cannot be read separately in this sampled state. Hold frame150 correctly separates them and marks Differs. The still does not establish duration or readability throughout the transition.",
+            "suggestedOutcome": "Controller should inspect natural playback before deciding severity, scope, or correction. Keep distinct values readable during any materially sustained comparison state."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "retain-transient-observation-no-source-change",
+        "reason": "Observed transition is part of joining, registration, scanning, inclusion-boundary movement or staggered receipt arrival. Matching natural late/hold samples are readable and correct. Preserve the observation for final editorial review; do not claim every action frame is unobstructed."
+      }
+    },
+    {
+      "id": "minimum-count-map-suppression",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-145-170.json",
+          "configurationHash": "ba568dbcda5c26e5f008fced2de53656b1cfcd486ca47d483fcd13543dfce025",
+          "finding": {
+            "classification": "source-visibility",
+            "severity": "medium",
+            "input": {
+              "showLocalCounts": true,
+              "minimum": 5,
+              "cells": [
+                {
+                  "id": "a",
+                  "label": "Cell A",
+                  "count": 2
+                }
+              ]
+            },
+            "frames": [90, 150],
+            "files": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/minimum-count-map-suppression/ba568dbcda5c26e5f008fced2de53656b1cfcd486ca47d483fcd13543dfce025/still-003.jpg",
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/minimum-count-map-suppression/ba568dbcda5c26e5f008fced2de53656b1cfcd486ca47d483fcd13543dfce025/still-004.jpg"
+            ],
+            "location": "Cell A in the left Local aggregates panel, around x166,y322 in frame150.",
+            "observation": "The supplied local count 2 is replaced by a crossed mask, while local 6 and 0 remain numeric. The same source-side masking is visible at frame90 before the released map appears.",
+            "consequence": "The local source count is not retained when showLocalCounts is enabled, preventing the viewer from checking the suppressed cell against the release threshold. Suppression is correctly applied in the released panel but also obscures the local comparison."
+          }
+        },
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-140-150.json",
+          "configurationHash": "f88aaf9478ff8889f38d39e4cebf87cabb5cabdafd3be0e0d6c233efb742c57a",
+          "finding": {
+            "classification": "source-count-concealed",
+            "severity": "medium",
+            "input": {
+              "showLocalCounts": true,
+              "cell": {
+                "id": "2",
+                "count": 4
+              },
+              "minimum": 5
+            },
+            "frames": [90, 150],
+            "files": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/minimum-count-map-suppression/f88aaf9478ff8889f38d39e4cebf87cabb5cabdafd3be0e0d6c233efb742c57a/still-003.jpg",
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/minimum-count-map-suppression/f88aaf9478ff8889f38d39e4cebf87cabb5cabdafd3be0e0d6c233efb742c57a/still-004.jpg"
+            ],
+            "location": "Local analysis grid, middle-left cell, count area near (166,455).",
+            "observation": "The local count 4 is replaced by a crossed rectangle. It remains concealed alongside the completed public grid.",
+            "consequence": "The visible local analysis no longer preserves the exact below-threshold count required for comparing source and public suppression.",
+            "relatedDefaultReport": "default-visual-145-170.json"
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "kernel-density-spread",
+      "observations": [
+        {
+          "fixture": "default",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/default-visual-145-170.json",
+          "configurationHash": "10772459e83cb711a9459a82d0ce2a693e9b57a1fab61afbc45b72aa2999bf85",
+          "finding": {
+            "classification": "legend-encoding",
+            "severity": "medium",
+            "input": {
+              "legendMaximum": 5,
+              "labels": {
+                "intensity": "Illustrative intensity",
+                "unit": "kernel units"
+              }
+            },
+            "frames": [90, 150],
+            "files": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/10772459e83cb711a9459a82d0ce2a693e9b57a1fab61afbc45b72aa2999bf85/still-003.jpg",
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/10772459e83cb711a9459a82d0ce2a693e9b57a1fab61afbc45b72aa2999bf85/still-004.jpg"
+            ],
+            "location": "Intensity legend at the right, approximately x813 to1187 and y387 to403 in frame150.",
+            "observation": "The entire bar between the 0 and 5 endpoints is one solid bright mint color, although the field uses different intensities and shades. The same solid bar appears in frame90.",
+            "consequence": "The legend gives no changing swatches or gradient to associate the displayed field colors with the stated intensity range."
+          }
+        },
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-140-150.json",
+          "configurationHash": "716cf3f165a52fbb62fe1c6f66a9b077f19e7dcc7977e23b1fb0d423542cb95a",
+          "finding": {
+            "classification": "ungraded-intensity-legend",
+            "severity": "medium",
+            "input": {
+              "initialRadius": 40,
+              "finalRadius": 5,
+              "gridSize": 12,
+              "legendMaximum": 25,
+              "pointCount": 5,
+              "pointWeight": 5
+            },
+            "frames": [90, 150],
+            "files": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/716cf3f165a52fbb62fe1c6f66a9b077f19e7dcc7977e23b1fb0d423542cb95a/still-003.jpg",
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/716cf3f165a52fbb62fe1c6f66a9b077f19e7dcc7977e23b1fb0d423542cb95a/still-004.jpg"
+            ],
+            "location": "Right-side intensity legend, horizontal strip approximately x813..1187, y387..403.",
+            "observation": "The entire 0-to-25 intensity strip has the same bright mint appearance, even while the frame 90 field uses several visibly different shades.",
+            "consequence": "The legend cannot visually map the field's varying intensities to its numeric scale.",
+            "relatedDefaultReport": "default-visual-145-170.json"
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "capability-matrix",
+      "observations": [
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-000-005.json",
+          "configurationHash": "c95a97a4b877449ee604ba9f590b949171baeed085955d49e36be73ddfd9503d",
+          "finding": {
+            "id": "dense-capability-reveal-line-text-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "capabilities[4] row-4, showNotes=true, focus column c",
+            "frames": [90],
+            "location": "1280x800 action image, horizontal green line y\u2248622 from x\u224872 to1210 through the fifth row. It crosses the left label, three notes and the check/dash/conditional symbols.",
+            "observation": "The reveal/scan line is painted on top of the already-visible last row, cutting across glyphs instead of staying between rows.",
+            "consequence": "Row text and state symbols remain decipherable but visually compete with the bright line. Frame150 clears the overlap, so this is low-impact action-state interference.",
+            "relationshipToDefault": "Undetermined. This worker did not personally inspect this entry's default frames."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "retain-transient-observation-no-source-change",
+        "reason": "Observed transition is part of joining, registration, scanning, inclusion-boundary movement or staggered receipt arrival. Matching natural late/hold samples are readable and correct. Preserve the observation for final editorial review; do not claim every action frame is unobstructed."
+      }
+    },
+    {
+      "id": "scope-aperture",
+      "observations": [
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+          "configurationHash": "b727e28c83455759126fe56155f727670a00b6cfe42329fcc4b6a91597a10bfe",
+          "finding": {
+            "id": "dense-scope-border-text-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "topics[3..5] excluded, each with a 22-character CJK label; showExcludedTopics true",
+            "frames": [90],
+            "location": "1280x800 image. Left aperture edge x\u2248291 intersects the two left excluded labels at y\u2248271-344 and y\u2248421-493. Right edge x\u2248989 intersects the right excluded label at y\u2248291-363.",
+            "observation": "All three long excluded labels straddle the aperture boundary, and the border passes through several glyphs.",
+            "consequence": "The transient state makes the excluded text compete with the inclusion boundary. Labels remain readable, and frame 150 resolves the overlap.",
+            "relationshipToDefault": "New relative to personally viewed default samples, whose short excluded labels fit outside the sampled aperture boundary."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "retain-transient-observation-no-source-change",
+        "reason": "Observed transition is part of joining, registration, scanning, inclusion-boundary movement or staggered receipt arrival. Matching natural late/hold samples are readable and correct. Preserve the observation for final editorial review; do not claim every action frame is unobstructed."
+      }
+    },
+    {
+      "id": "journal-receipts",
+      "observations": [
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+          "configurationHash": "39feee85da653307997bd913a1ca5a7395ffc8e205c4e247fe943eac74402055",
+          "finding": {
+            "id": "dense-journal-arrival-card-overlap",
+            "severity": "low",
+            "category": "readability-congestion",
+            "input": "five entries with maximum identifiers and W titles; receipts ordered 4,3,2,1,0",
+            "frames": [90],
+            "location": "1280x800 image, moving receipt for suffix 2 at x\u2248960-1160,y\u2248425-565, over the right side of entry 4 and its settled receipt.",
+            "observation": "The arriving receipt masks the right part of entry 4's first identifier line and part of receipt 4's title. The suffix 4 itself remains visible.",
+            "consequence": "Several neighboring text strokes are temporarily hidden, although identifier suffixes still distinguish the cards and the hold is clear.",
+            "relationshipToDefault": "New relative to personally viewed default samples, which had three entries and two receipts without this sampled pileup."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "retain-transient-observation-no-source-change",
+        "reason": "Observed transition is part of joining, registration, scanning, inclusion-boundary movement or staggered receipt arrival. Matching natural late/hold samples are readable and correct. Preserve the observation for final editorial review; do not claim every action frame is unobstructed."
+      }
+    },
+    {
+      "id": "custody-transfer",
+      "observations": [
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+          "configurationHash": "05b83713670160c47cfd580739458628490403bebbac59a75855803d995361a6",
+          "finding": {
+            "id": "dense-custody-badge-detail-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "object.details[0] with 28 W characters; accepted outcome",
+            "frames": [90, 150],
+            "location": "1280x800 image, acceptance badge centered around x\u2248907,y\u2248307 with bottom edge y\u2248337. First detail line begins around x\u2248711,y\u2248334.",
+            "observation": "The lower edge of the badge crosses the upper strokes of the long first detail line near x\u2248900-913.",
+            "consequence": "A small part of the first line visually competes with the acceptance badge. All details remain decipherable.",
+            "relationshipToDefault": "New relative to the personally viewed default, where the short Blue shed detail ended before the badge."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "expiring-lease",
+      "observations": [
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+          "configurationHash": "54526aebc77f2a23ece76b64c0ac8b726164cd7e4a8c903478f14ba9ed57ee16",
+          "finding": {
+            "id": "dense-lease-connector-unit-overlap",
+            "severity": "low",
+            "category": "readability",
+            "input": "holderId person 3 (rightmost participant); lifetime.unit with 20 W characters",
+            "frames": [90, 150],
+            "location": "1280x800 image, lifetime-unit text at x\u2248640-993,y\u2248453-468. The diagonal dotted line crosses it around x\u2248840-870.",
+            "observation": "The holder-to-pool connector passes through the long unit label.",
+            "consequence": "The unit text competes with connector paint. Token identity, expiration state and final custody remain correct.",
+            "relationshipToDefault": "New relative to the personally viewed default, whose left-hand holder connector did not intersect the shorter unit text."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "dashboard-slot-assembly",
+      "observations": [
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-005-020.json",
+          "configurationHash": "ddeacc3886465096a03640905ff3246428f2f2f08623d2b1a95b6b421af26682",
+          "finding": {
+            "id": "dense-dashboard-action-panel-occlusion",
+            "severity": "medium",
+            "category": "readability",
+            "input": "four widgets; featuredWidgetId widget 3; layout feature-left; widget 2 is a three-line note",
+            "frames": [90],
+            "location": "1280x800 image. Featured widget 3 occupies x\u224832-560,y\u2248175-768. Moving widget 2 is behind it at x\u224870-616,y\u2248465-783.",
+            "observation": "The featured panel masks widget 2's title and nearly all three note lines, leaving only tiny trailing W strokes near x\u2248560.",
+            "consequence": "One of the four supplied views becomes unreadable in this action sample. The final hold restores the panel and all its content.",
+            "relationshipToDefault": "New relative to the personally viewed three-widget default samples, which did not hide an entire note panel."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "field-conflict-choice",
+      "observations": [
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-020-035.json",
+          "configurationHash": "957813e333669837fef9332c98bd3e6d9cd6fda94f37aa4a213c42a3ccfbde5b",
+          "finding": {
+            "id": "dense-field-conflict-frame90-alternative-occlusion",
+            "classification": "sampled readability concern",
+            "severity": "pending-playback",
+            "input": "Dense four-field fixture. Field1 chooses source notes while retained alternatives remain visible. Source/value strings contain26 W characters; decisionStyle=sliding-rail.",
+            "frame": 90,
+            "viewedFile": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/field-conflict-choice/957813e333669837fef9332c98bd3e6d9cd6fda94f37aa4a213c42a3ccfbde5b/still-003.jpg",
+            "location": "Second field row, around y343\u2013433 in the1280\u00d7800 image. The selected notes card spans approximately x177\u2013732, and its right edge covers the beginning of the alternative text behind it.",
+            "observation": "The selected card is between the right and left positions and paints over part of the retained alternative source/value. Only the suffix of those alternative text lines is visible at this action frame.",
+            "consequence": "The alternative cannot be read in full at this sampled midpoint. Hold150 shows both the selected result and retained alternative fully separated. The still does not establish the duration or overall transition readability.",
+            "relationshipToDefault": "The earlier inspected default had only a chosen-register row and an unresolved row, so this chosen-notes midpoint was not present there.",
+            "suggestedOutcome": "Inspect natural playback before deciding severity, scope, or correction. Preserve readable alternatives during any materially sustained comparison state."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "retain-transient-observation-no-source-change",
+        "reason": "Actual77 and85..87 show candidate crossing hides the retained alternative. Actual120..122 and145..147 separate both candidates. Preserve this low action-readability issue for final editorial review; final comparison remains readable. See targeted-dense-group-c-inspection.json."
+      }
+    },
+    {
+      "id": "carbon-storage-accounting",
+      "observations": [
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-050-060.json",
+          "configurationHash": "e37a93071e71404d489049f6914ddacf169dddc6b0bcd589695264ba266991cd",
+          "finding": {
+            "id": "dense-carbon-pipe-number-unit-overlap",
+            "severity": "medium",
+            "category": "readability",
+            "input": "capture.capturedTonnesCO 2 = 0.0000010000000000000002; copy.massUnit has 10 W characters",
+            "frames": [90, 150],
+            "location": "1280 x 800 image. Captured-value text starts x\u2248253,y\u2248508 and extends across the vertical mint pipe x\u2248332-361. The mass-unit label at y\u2248558-571 crosses the same pipe.",
+            "observation": "The pale captured-value digits and mass-unit glyphs are drawn over the bright mint pipe, creating white-on-mint regions in both action and hold.",
+            "consequence": "Part of the precise captured quantity and its unit become difficult to read in the sustained final accounting layout.",
+            "relationshipToDefault": "New in the dense samples. The default short 12 label did not reach the pipe."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    },
+    {
+      "id": "serviceable-panel-swap",
+      "observations": [
+        {
+          "fixture": "dense",
+          "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-110-120.json",
+          "configurationHash": "80da9431685a8bd0c39c40b99ab072d0c557d8aa8568bab5a1c5c0f6251a0a1d",
+          "finding": {
+            "id": "dense-panel-swap-removed-caption-occlusion",
+            "classification": "readability",
+            "severity": "medium",
+            "input": "Four-module dense fixture replaces the fourth module. labels.removed contains36 W characters; labels.whole/changed/retained/example also use36 W.",
+            "frame": 150,
+            "viewedFile": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/serviceable-panel-swap/80da9431685a8bd0c39c40b99ab072d0c557d8aa8568bab5a1c5c0f6251a0a1d/still-004.jpg",
+            "location": "Removed-original caption at the lower-left console corner, around x64\u2013405/y493\u2013531 in the1280\u00d7800 image. The console starts near x212 and ends near y505, covering the caption first line to its right.",
+            "observation": "The first line of the removed-original caption extends into the console enclosure and is partially hidden by its painted left/bottom corner. Only the initial portion before that corner and the wrapped second line below the console remain visible.",
+            "consequence": "The full authored caption cannot be read at the final hold, weakening the association between the removed part and its separate tray. The module replacement state itself is correct.",
+            "relationshipToDefault": "The shorter default caption Removed original fit to the left of the console and was readable in the earlier default inspection.",
+            "suggestedOutcome": "Move or reflow the removed-original caption so every line stays clear of the console paint at maximum supported length."
+          }
+        }
+      ],
+      "disposition": {
+        "action": "correct",
+        "reason": "Concrete readability or encoding defect in an intended reading state. Dashboard includes sustained action-state occlusion."
+      }
+    }
+  ],
+  "correctionPresetIds": [
+    "decision-fork",
+    "exception-detour",
+    "sealed-handoff",
+    "chart-focus-edit",
+    "fictional-conflict-globe",
+    "aquifer-allocation-balance",
+    "cluster-epicurve-link",
+    "minimum-count-map-suppression",
+    "kernel-density-spread",
+    "custody-transfer",
+    "expiring-lease",
+    "dashboard-slot-assembly",
+    "carbon-storage-accounting",
+    "serviceable-panel-swap",
+    "invalid-table-quarantine"
+  ],
+  "targetedEvidence": [
+    "targeted-default-mint-temporal-inspection.json",
+    "targeted-dense-group-b-inspection.json",
+    "targeted-dense-group-c-inspection.json"
+  ]
+}

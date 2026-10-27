@@ -1,0 +1,120 @@
+name:
+  id: motionAtlas.kernel-density-spread.name
+  message: A smooth surface depends on its radius
+description:
+  id: motionAtlas.kernel-density-spread.description
+  message:
+    Each supplied point contributes a bounded kernel to a schematic grid. The
+    kernels add into one intensity field, then a second radius changes the smoothing
+    without creating or deleting any point observations.
+category:
+  id: motionAtlas.kernel-density-spread.category
+  message: Spatial smoothing
+useWhen:
+  id: motionAtlas.kernel-density-spread.useWhen
+  message: Expose smoothing assumptions without presenting intensity as observed counts.
+prompt:
+  id: motionAtlas.kernel-density-spread.prompt
+  message:
+    960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
+    Reveal at frames 0-12. Frames 13-55 raise a small cone over each point. Frames
+    56-105 add cone heights into a sampled grid intensity. Frames 106-139 widen or
+    narrow every cone to the second radius and recompute the grid while point markers
+    stay fixed. Hold the resolved state at 140-165; fade to the same opaque ground at
+    166-179. Reset is editorial.
+creativeDirection:
+  id: motionAtlas.kernel-density-spread.creativeDirection
+  message:
+    960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
+    Reveal at frames 0-12. Frames 13-55 raise a small cone over each point. Frames
+    56-105 add cone heights into a sampled grid intensity. Frames 106-139 widen or
+    narrow every cone to the second radius and recompute the grid while point markers
+    stay fixed. Hold the resolved state at 140-165; fade to the same opaque ground at
+    166-179. Reset is editorial.
+intent:
+  id: motionAtlas.kernel-density-spread.intent
+  message: Expose smoothing assumptions without presenting intensity as observed counts.
+distinction:
+  id: motionAtlas.kernel-density-spread.distinction
+  message:
+    Spatial-grid-binning assigns each point once to an exact count cell. This
+    spreads each contribution across neighboring cells and makes radius a visible
+    modeling choice.
+tags:
+  - id: motionAtlas.kernel-density-spread.tags.0
+    message: heatmap
+  - id: motionAtlas.kernel-density-spread.tags.1
+    message: kernel
+  - id: motionAtlas.kernel-density-spread.tags.2
+    message: smoothing radius
+  - id: motionAtlas.kernel-density-spread.tags.3
+    message: intensity surface
+goodFor:
+  - id: motionAtlas.kernel-density-spread.goodFor.0
+    message: Explain how a heatmap radius changes smoothing
+  - id: motionAtlas.kernel-density-spread.goodFor.1
+    message: Distinguish modeled intensity from observed cell counts
+domains:
+  - id: motionAtlas.kernel-density-spread.domains.0
+    message: Spatial smoothing
+aliases:
+  - id: motionAtlas.kernel-density-spread.aliases.0
+    message: heatmap
+  - id: motionAtlas.kernel-density-spread.aliases.1
+    message: kernel
+  - id: motionAtlas.kernel-density-spread.aliases.2
+    message: smoothing radius
+notFor:
+  - id: motionAtlas.kernel-density-spread.zeroQualifier
+    message: Zero modeled intensity does not establish zero population.
+  - id: motionAtlas.kernel-density-spread.notFor.0
+    message:
+      This specified cone kernel is an instructional design, not a claim about a
+      mapping library kernel.
+  - id: motionAtlas.kernel-density-spread.notFor.1
+    message:
+      Intensity is neither case count, population, probability nor risk. Grid cell
+      intensities do not sum to point count.
+  - id: motionAtlas.kernel-density-spread.notFor.2
+    message:
+      A smooth field does not fill gaps in actual observations or establish
+      conditions between points.
+  - id: motionAtlas.kernel-density-spread.notFor.3
+    message:
+      No external requests, URLs, JSX or functions in props. Supplied examples are
+      fictional.
+  - id: motionAtlas.kernel-density-spread.notFor.4
+    message:
+      Authored prose remains the author’s responsibility. Runtime validation
+      preserves supplied text without classifying its language or factual claims.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.kernel-density-spread.beat.0
+      message: Reveal fixed observations and legend.
+  - startFrame: 13
+    endFrame: 55
+    description:
+      id: motionAtlas.kernel-density-spread.beat.1
+      message: Raise one cone per supplied weighted point.
+  - startFrame: 56
+    endFrame: 105
+    description:
+      id: motionAtlas.kernel-density-spread.beat.2
+      message: Add cone contributions into cell-center samples.
+  - startFrame: 106
+    endFrame: 139
+    description:
+      id: motionAtlas.kernel-density-spread.beat.3
+      message: Change radius and recompute without moving points.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.kernel-density-spread.beat.4
+      message: Hold the resolved study.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.kernel-density-spread.beat.5
+      message: The enclosing StockGraphic fades to opaque ground.

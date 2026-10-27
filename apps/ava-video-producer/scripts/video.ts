@@ -37,7 +37,9 @@ import {
   previewFrames,
   requireMatchingPreview,
 } from "./lib/planHelpers";
+import { productRequirements } from "./lib/productRequirements/productRequirements";
 import { videoWorkspace } from "./lib/video-workspace.mjs";
+import { withWorkspaceAliases } from "./lib/withWorkspaceAliases.mjs";
 import { requireLicense } from "./require-license.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -71,7 +73,7 @@ type Options = {
   rate?: number;
 };
 
-const HELP = `Usage: npx tsx scripts/video.ts <command> <plan.json> [options]
+const HELP = `Usage: pnpm video <command> <plan.json> [options]
   validate                     Check schema, assets and media timing
   plan                         Write shot list, transcript, SRT and VTT
   preview                      Render composed-film stills and contact sheet
@@ -196,6 +198,11 @@ async function stageAssets(
 ) {
   const target = path.join(directory, "bundle-public");
   await fs.mkdir(target);
+  await fs.mkdir(path.join(target, "fonts"));
+  await fs.copyFile(
+    await publicAsset(ROOT, "fonts/geist-latin.woff2"),
+    path.join(target, "fonts/geist-latin.woff2"),
+  );
   for (const asset of assetReferences(plan)) {
     const destination = path.join(target, asset);
     await fs.mkdir(path.dirname(destination), { recursive: true });
@@ -214,9 +221,10 @@ async function preview(plan: Storyboard, filename: string, workspace: string) {
   const directory = await freshStage(plan, "preview", workspace);
   const publicDir = await stageAssets(plan, directory, workspace);
   const serveUrl = await bundle({
+    webpackOverride: withWorkspaceAliases,
     entryPoint: path.join(
       ROOT,
-      plan.shots.some((s) => s.scene === "avandar")
+      productRequirements(plan).needsProduct
         ? "src/avandar-entry.tsx"
         : "src/index.ts",
     ),
@@ -234,11 +242,7 @@ async function preview(plan: Storyboard, filename: string, workspace: string) {
   // can fail WebGL2 context creation. This does not replace serial rendering.
   const chromiumOptions = {
     headless: true,
-    ...(plan.shots.some(
-      (s) => s.scene === "avandar" && s.props.feature === "map",
-    )
-      ? { gl: "angle" as const }
-      : {}),
+    ...(productRequirements(plan).needsMap ? { gl: "angle" as const } : {}),
   };
   const browser = await openBrowser("chrome", {
     ...browserOptions,
@@ -354,15 +358,11 @@ async function render(plan: Storyboard, filename: string, workspace: string) {
         ...process.env,
         RENDER_OUT_DIR: directory,
         RENDER_OUTPUT_ID: plan.id,
-        RENDER_ENTRY_POINT: plan.shots.some((s) => s.scene === "avandar")
+        RENDER_ENTRY_POINT: productRequirements(plan).needsProduct
           ? "src/avandar-entry.tsx"
           : "src/index.ts",
         RENDER_PUBLIC_DIR: publicDir,
-        RENDER_GL: plan.shots.some(
-          (s) => s.scene === "avandar" && s.props.feature === "map",
-        )
-          ? "angle"
-          : "",
+        RENDER_GL: productRequirements(plan).needsMap ? "angle" : "",
         REMOTION_PROPS_FILE: props,
         DELIVER: `${plan.delivery.width}:${plan.delivery.height}`,
         STANDALONE: plan.purpose === "standalone" ? "1" : "0",
@@ -575,7 +575,7 @@ export async function main(argv = process.argv.slice(2)) {
   const plan = await readPlan(options.filename);
   if (
     ["preview", "render"].includes(options.command) &&
-    plan.shots.some((shot) => shot.scene === "avandar")
+    productRequirements(plan).needsProduct
   )
     await buildProduct();
   if (options.command === "tts") {

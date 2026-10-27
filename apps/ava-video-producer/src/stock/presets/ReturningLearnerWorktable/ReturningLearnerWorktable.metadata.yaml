@@ -1,0 +1,128 @@
+name:
+  id: motionAtlas.returning-learner-worktable.name
+  message: Return with earlier work intact
+description:
+  id: motionAtlas.returning-learner-worktable.description
+  message:
+    A learner returns to a classroom with earlier work still visible while a
+    teacher adds an explicitly chosen return activity. A break in schooling is shown as
+    time away, not as erased knowledge.
+category:
+  id: motionAtlas.returning-learner-worktable.category
+  message: Classroom return and retained artifacts
+useWhen:
+  id: motionAtlas.returning-learner-worktable.useWhen
+  message:
+    Present reentry as building from known prior work rather than restarting a
+    learner from zero.
+prompt:
+  id: motionAtlas.returning-learner-worktable.prompt
+  message:
+    Reveal one learner at a classroom desk with the supplied prior-work samples,
+    preserving their authored forms and marks without grading them. Move the learner and
+    the same portfolio to a side table while the interruption-period label appears.
+    Bring the learner back to the desk, where the teacher places exactly the supplied
+    return activities. Link each review activity to its referenced prior work and show
+    each new activity without inventing a prior artifact. Hold the original work and
+    supplied activities together, then fade out.
+creativeDirection:
+  id: motionAtlas.returning-learner-worktable.creativeDirection
+  message:
+    Reveal one learner at a classroom desk with the supplied prior-work samples,
+    preserving their authored forms and marks without grading them. Move the learner and
+    the same portfolio to a side table while the interruption-period label appears.
+    Bring the learner back to the desk, where the teacher places exactly the supplied
+    return activities. Link each review activity to its referenced prior work and show
+    each new activity without inventing a prior artifact. Hold the original work and
+    supplied activities together, then fade out.
+intent:
+  id: motionAtlas.returning-learner-worktable.intent
+  message:
+    Present reentry as building from known prior work rather than restarting a
+    learner from zero.
+distinction:
+  id: motionAtlas.returning-learner-worktable.distinction
+  message:
+    A learner carries tangible prior work through a discontinuity and joins a
+    physical teaching session. Unlike missed-visit followup or restoring a software
+    checkpoint, nothing is retrieved by an alert and no human knowledge is rolled back
+    or automatically recovered.
+tags:
+  - id: motionAtlas.returning-learner-worktable.tags.0
+    message: interrupted schooling
+  - id: motionAtlas.returning-learner-worktable.tags.1
+    message: return to school
+  - id: motionAtlas.returning-learner-worktable.tags.2
+    message: reentry
+  - id: motionAtlas.returning-learner-worktable.tags.3
+    message: prior learning
+  - id: motionAtlas.returning-learner-worktable.tags.4
+    message: bridge lesson
+  - id: motionAtlas.returning-learner-worktable.tags.5
+    message: learner portfolio
+  - id: motionAtlas.returning-learner-worktable.tags.6
+    message: education continuity
+  - id: motionAtlas.returning-learner-worktable.tags.7
+    message: time away
+goodFor:
+  - id: motionAtlas.returning-learner-worktable.goodFor.0
+    message: Explain a fictional return-to-school support arrangement
+  - id: motionAtlas.returning-learner-worktable.goodFor.1
+    message: Show that time away and retained prior work are different facts
+  - id: motionAtlas.returning-learner-worktable.goodFor.2
+    message: Introduce an authored bridge lesson without predicting learning recovery
+domains:
+  - id: motionAtlas.returning-learner-worktable.domains.0
+    message: Classroom return and retained artifacts
+aliases:
+  - id: motionAtlas.returning-learner-worktable.aliases.0
+    message: interrupted schooling
+  - id: motionAtlas.returning-learner-worktable.aliases.1
+    message: return to school
+  - id: motionAtlas.returning-learner-worktable.aliases.2
+    message: reentry
+notFor:
+  - id: motionAtlas.returning-learner-worktable.notFor.0
+    message:
+      One learner is represented. Work samples count artifacts only, not mastered
+      competencies, credits, or school days.
+  - id: motionAtlas.returning-learner-worktable.notFor.1
+    message:
+      The middle beat does not specify why schooling was interrupted, where the
+      learner lived, or what learning happened while away.
+  - id: motionAtlas.returning-learner-worktable.notFor.2
+    message:
+      Review and new are authored activity roles, not diagnostic judgments. A return
+      scene does not prove reenrollment or learning recovery.
+  - id: motionAtlas.returning-learner-worktable.notFor.3
+    message:
+      All defaults are fictional. Durations are editorial and the loop reset is not
+      another interruption.
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.returning-learner-worktable.motionBeats.0
+      message: Reveal the learner and original portfolio at the classroom desk.
+  - startFrame: 36
+    endFrame: 71
+    description:
+      id: motionAtlas.returning-learner-worktable.motionBeats.1
+      message: Carry the same portfolio to the side table during the interruption.
+  - startFrame: 72
+    endFrame: 89
+    description:
+      id: motionAtlas.returning-learner-worktable.motionBeats.2
+      message: Return the learner and intact earlier work to the desk.
+  - startFrame: 90
+    endFrame: 137
+    description:
+      id: motionAtlas.returning-learner-worktable.motionBeats.3
+      message:
+        The teacher picks up and places one to three review or new activities,
+        preserving every original artifact.
+  - startFrame: 138
+    endFrame: 179
+    description:
+      id: motionAtlas.returning-learner-worktable.motionBeats.4
+      message: Hold original work with the supplied activities and use the shared fade.
