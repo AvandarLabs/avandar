@@ -5,6 +5,7 @@ import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { DashboardFilterRecord } from "../DashboardFilterStateManager";
 import type { DashboardFilterTargets } from "./makeColumnBindingsFromDashboardFilters";
+
 const COLUMN: QueryResult.ColumnWithId = {
   id: uuid<QueryColumn.Id>(),
   name: "territory",

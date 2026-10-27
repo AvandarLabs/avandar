@@ -1,5 +1,6 @@
 import { DEFAULT_INPUT } from "./ComputeCapacityConsolidation.fixtures";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
+
 const hosts: Array<{ id: string; label: string; capacityCpuHours: number }> =
   Array.from({ length: 4 }, (_, index) => ({
     id: `host-${index}`,

@@ -6,6 +6,7 @@ import test from "node:test";
 import { prop } from "@avandar/utils";
 import { z } from "zod";
 import { registerStockTextLayoutAssertions } from "./registerStockTextLayoutAssertions";
+
 const inputSchema = z.strictObject({
   id: z.literal("literal-id"),
   learnerIds: z.array(z.literal("learner-a")),

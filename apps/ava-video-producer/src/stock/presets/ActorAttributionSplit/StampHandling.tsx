@@ -1,5 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = {
   x: number;
   y: number;

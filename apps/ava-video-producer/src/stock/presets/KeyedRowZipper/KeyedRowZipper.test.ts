@@ -13,6 +13,7 @@ import {
   invalidInputs,
 } from "./KeyedRowZipper.fixtures";
 import { inputSchema, type Input } from "./KeyedRowZipper.schema";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,

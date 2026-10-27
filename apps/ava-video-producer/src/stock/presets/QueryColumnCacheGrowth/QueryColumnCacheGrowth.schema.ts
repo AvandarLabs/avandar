@@ -4,6 +4,7 @@ import type {
   StockJsonSchema,
   StockSemanticRule,
 } from "../../contracts/StockContract.types";
+
 const columnIds: z.ZodArray<z.ZodString> = z
   .array(z.string().min(1).max(12))
   .min(1)

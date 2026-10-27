@@ -10,6 +10,7 @@ import type {
   ProjectionDescriptor,
   ResultColumnBindingRegistry,
 } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
+
 type ReconcileColumnBindingsOptions = {
   names: string[];
   projections: ProjectionDescriptor[];

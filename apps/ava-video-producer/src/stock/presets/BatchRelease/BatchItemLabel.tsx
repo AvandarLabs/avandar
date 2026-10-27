@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { ReactNode } from "react";
+
 type Props = { label: string; x: number; y: number };
 /** Each item keeps its full label inside its own token slot. */
 export function BatchItemLabel({ label, x, y }: Readonly<Props>): ReactNode {

@@ -2,6 +2,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { frame: number };
 /** The operator reaches the capture valve before transfer begins. */
 export function CarbonOperator({ frame }: Readonly<Props>): ReactNode {

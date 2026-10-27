@@ -3,6 +3,7 @@ import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; accent: string };
 /** Fixed label rails stay outside the complete authored road region. */
 export function ConvoyCopy({ input, accent }: Readonly<Props>): ReactNode {

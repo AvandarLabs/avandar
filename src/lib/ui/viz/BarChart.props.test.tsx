@@ -1,4 +1,5 @@
 import { BarChartTestFixtures } from "./BarChartTestFixtures";
+
 type LegendPropsHolder = {
   legendProps?: {
     verticalAlign?: string;

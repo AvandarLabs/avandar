@@ -7,6 +7,7 @@ import { EXPLORER_SQL_CATALOG } from "../Explorer.constants";
 import css from "./ExplorerScreen.module.css";
 import type { EditorView } from "@codemirror/view";
 import type { ReactNode } from "react";
+
 type Props = { sql: string; isEditingSql: boolean };
 /** SQL editor fixture driven by the current video frame. */
 export function ExplorerSqlEditor({

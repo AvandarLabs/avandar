@@ -3,6 +3,7 @@ import { mergeLegacyVizConfigEdit } from "./mergeLegacyVizConfigEdit";
 import type { Props } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { useDataVizRuntimeColumnBindings } from "../../pblocks/DataVizPBlock/useDataVizRuntimeColumnBindings/useDataVizRuntimeColumnBindings";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+
 type GetDataVizAuthoringPropsOptions = {
   props: Props;
   columnBindings: ReturnType<typeof useDataVizRuntimeColumnBindings>;

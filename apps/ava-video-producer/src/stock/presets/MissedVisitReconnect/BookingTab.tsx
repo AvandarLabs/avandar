@@ -2,6 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   item: Input["cases"][number];
   index: number;

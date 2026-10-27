@@ -6,6 +6,7 @@ import { DetailEventLedger } from "./DetailEventLedger";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** Retained and removed counts accompany their actual algorithm outputs. */
 export function DetailLedger({ input, frame }: Readonly<Props>): ReactNode {

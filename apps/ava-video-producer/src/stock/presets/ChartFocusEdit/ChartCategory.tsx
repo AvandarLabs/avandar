@@ -4,6 +4,7 @@ import { CategoryContext } from "./CategoryContext";
 import { CategoryLabel } from "./CategoryLabel";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   category: Input["categories"][number];
   index: number;

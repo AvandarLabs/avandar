@@ -5,6 +5,7 @@ import { DestinationMarker } from "./DestinationMarker";
 import { getTravelCostsFromInput } from "./getTravelCostsFromInput";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Stable destination identities tie map markers to their cost ledger. */
 export function NetworkDestinations({

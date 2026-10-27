@@ -5,6 +5,7 @@ import type {
   StockControl,
   StockMessageDescriptor,
 } from "../../contracts/StockContract.types";
+
 function _message({
   key,
   message,

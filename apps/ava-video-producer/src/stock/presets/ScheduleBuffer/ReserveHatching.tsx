@@ -1,5 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { x: number; width: number };
 /** Hatch marks remain within the exact remaining reserve width. */
 export function ReserveHatching({ x, width }: Readonly<Props>): ReactNode {

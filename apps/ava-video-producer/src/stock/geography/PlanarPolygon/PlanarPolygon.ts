@@ -1,4 +1,5 @@
 import { binary64ToInteger } from "./binary64ToInteger";
+
 type Point = readonly [number, number];
 
 type Ring = readonly Point[];

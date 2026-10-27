@@ -3,6 +3,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SealedHandoff.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input };
 /**
  * The intact brief slides into its enclosure. Its text never fades to simulate

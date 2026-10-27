@@ -6,6 +6,7 @@ import { TestProviders, act, renderHook, waitFor } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import type { ReactNode } from "react";
+
 type Props = { children: ReactNode };
 /** Exercises column reconstruction and chart edits through the real store. */
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";

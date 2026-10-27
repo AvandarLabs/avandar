@@ -1,6 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./BoundaryRegroupingEffect.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; records: number; population: number };
 /** Overall numerator and denominator remain visible for both partitions. */
 export function GroupingTotals({

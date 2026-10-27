@@ -4,6 +4,7 @@ import { LampObject } from "./LampObject";
 import { LockerObject } from "./LockerObject";
 import type { Input } from "./GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /** A latch closes or a lamp lights only for the supplied functioning retest. */
 export function RemedyObject({

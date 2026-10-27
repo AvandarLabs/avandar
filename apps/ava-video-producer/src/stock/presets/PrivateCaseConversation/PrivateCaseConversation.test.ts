@@ -11,6 +11,7 @@ import {
   fixtures,
 } from "./PrivateCaseConversation.fixtures";
 import { inputSchema, type Input } from "./PrivateCaseConversation.schema";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -45,6 +46,7 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { privateCaseConversationContract as contract } from "./PrivateCaseConversation.contract";
+
 const EXCLUDED_TEXT_FIELDS: string[] = [
   "id",
   "permissionId",

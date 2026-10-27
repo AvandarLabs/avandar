@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import type { getJigSceneFromFrame } from "./getJigSceneFromFrame";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; scene: ReturnType<typeof getJigSceneFromFrame> };
 /**
  * The collaborator's marking hand and tool contact the selected open cutout.

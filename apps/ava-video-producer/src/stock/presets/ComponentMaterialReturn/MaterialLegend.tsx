@@ -2,6 +2,7 @@ import { getMaterialItemsFromInput } from "./getMaterialItemsFromInput";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /** Numbered labels retain their explicit source, route and mass ownership. */
 export function MaterialLegend({ input }: Readonly<Props>): ReactNode {

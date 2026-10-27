@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { inputSchema } from "./PriorityInsertion.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
+
 function _copy({ path, message }: { path: string; message: string }) {
   return { id: `motionAtlas.priority-insertion.controls.${path}`, message };
 }

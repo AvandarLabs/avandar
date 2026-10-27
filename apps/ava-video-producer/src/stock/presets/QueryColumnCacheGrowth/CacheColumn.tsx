@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { CacheCell } from "./CacheCell";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   column: Input["columns"][number];
   index: number;

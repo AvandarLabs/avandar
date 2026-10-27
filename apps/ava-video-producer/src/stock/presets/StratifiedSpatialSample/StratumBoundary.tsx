@@ -1,6 +1,7 @@
 import { ramp } from "../../../motion";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   stratum: Input["strata"][number];
   index: number;

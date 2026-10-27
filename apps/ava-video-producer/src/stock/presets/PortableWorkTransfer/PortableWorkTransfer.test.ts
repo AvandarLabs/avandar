@@ -13,6 +13,7 @@ import {
 } from "./PortableWorkTransfer.fixtures";
 import { inputSchema, type Input } from "./PortableWorkTransfer.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,
@@ -75,6 +76,7 @@ test("each artifact retains its original and one same-ID copy without pending su
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+
 function _getVisibleTexts({
   input,
   frame,

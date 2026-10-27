@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Reference area and optional radius ratios use the same square-root scale. */
 export function AreaLegend({

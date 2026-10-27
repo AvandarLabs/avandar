@@ -8,6 +8,7 @@ import {
 import { ReviewLatch } from "./ReviewLatch";
 import type { Input } from "./DocumentRegionDriftCheck.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Exact strings determine matching independently of the detector's ordinal. */
 export function ContentComparison({

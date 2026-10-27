@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   item: Input["tests"][number];
   state: string;

@@ -1,4 +1,5 @@
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
+
 type MakeSqlExpressionKeyFromColumnExpressionOptions = {
   database?: string;
   schema?: string;

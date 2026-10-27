@@ -4,6 +4,7 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   row: Input["rows"][number];
   x: number;

@@ -1,4 +1,5 @@
 import { StructuredQueryTestFixtures } from "./StructuredQueryTestFixtures";
+
 const {
   structuredQueryToSql,
   expect,

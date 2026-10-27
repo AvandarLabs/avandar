@@ -1,5 +1,6 @@
 import { pickProps } from "@avandar/utils";
 import { DashboardColumnBindingTestFixtures } from "./dashboardColumnBindings/DashboardColumnBindingTestFixtures";
+
 const {
   QueryResult,
   withDuckDb,

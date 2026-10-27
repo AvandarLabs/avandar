@@ -4,6 +4,7 @@ import { getServiceFloorYFromX } from "./getServiceFloorYFromX";
 import { getServiceWheelCenterYFromWheelGeometry } from "./getServiceWheelCenterYFromWheelGeometry";
 import type { Input } from "./ChosenServiceAccess.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * The participant points, then walks or self-propels through the chosen door.

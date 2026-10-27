@@ -1,4 +1,5 @@
 import type { DataVizColumnBindingsOptions } from "../DataVizColumnBindings";
+
 type Props = { children: ReactNode };
 
 import { AvaQueryProvider } from "@avandar/query-hooks";

@@ -16,6 +16,7 @@ import {
 } from "./OutreachHouseholdRevisits.fixtures";
 import { inputSchema, type Input } from "./OutreachHouseholdRevisits.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,

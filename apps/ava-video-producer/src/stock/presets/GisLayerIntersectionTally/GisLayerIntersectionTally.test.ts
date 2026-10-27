@@ -17,6 +17,7 @@ import {
 } from "./GisLayerIntersectionTally.fixtures";
 import { inputSchema, type Input } from "./GisLayerIntersectionTally.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,

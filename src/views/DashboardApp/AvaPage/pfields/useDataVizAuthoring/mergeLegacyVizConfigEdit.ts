@@ -2,6 +2,7 @@ import { makeColumnIdVizConfigFromLegacyConfig } from "$/models/vizs/makeColumnI
 import { makeOutputNameVizConfigFromColumnIdConfig } from "$/models/vizs/makeOutputNameVizConfigFromColumnIdConfig/makeOutputNameVizConfigFromColumnIdConfig";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+
 type MergeLegacyVizConfigEditOptions = {
   legacy: VizConfig.Legacy;
   before: VizConfig.T;

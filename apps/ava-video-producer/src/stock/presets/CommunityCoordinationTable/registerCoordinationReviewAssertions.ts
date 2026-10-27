@@ -4,6 +4,7 @@ import { propEq } from "@avandar/utils";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { DEFAULT_INPUT, fixtures } from "./CommunityCoordinationTable.fixtures";
 import { inputSchema, type Input } from "./CommunityCoordinationTable.schema";
+
 function _createCloseInput({
   movingIndex,
   angle = 44.4,

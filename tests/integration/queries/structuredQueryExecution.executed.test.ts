@@ -1,5 +1,6 @@
 import { StructuredQueryTestFixtures } from "./StructuredQueryTestFixtures";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+
 const {
   structuredQueryToSql,
   expect,

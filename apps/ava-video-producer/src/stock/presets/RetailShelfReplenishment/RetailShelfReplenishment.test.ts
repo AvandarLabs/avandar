@@ -12,6 +12,7 @@ import {
   DENSE_INPUT,
   MINIMUM_INPUT,
 } from "./RetailShelfReplenishment.fixtures";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -60,6 +61,7 @@ test("changed authored input emits its physical scene", () => {
 
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+
 test("changed zero-opening purchase leaves exactly zero stock and three basket units", () => {
   const markup = _render({ frame: 150, input: CHANGED_INPUT });
   assert.equal((markup.match(/data-owner="shelf"/g) ?? []).length, 0);
@@ -150,6 +152,7 @@ test("retailer points and orders before a loaded carrier arrives, then shopper s
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { retailShelfReplenishmentContract } from "./RetailShelfReplenishment.contract";
 import { inputSchema, type Input } from "./RetailShelfReplenishment.schema";
+
 function _getVisibleTexts({
   input,
   frame,

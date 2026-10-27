@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SealedHandoff.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input };
 /** Routing information is intentionally visible on the closed envelope. */
 export function ExteriorAddress({ frame, input }: Readonly<Props>): ReactNode {

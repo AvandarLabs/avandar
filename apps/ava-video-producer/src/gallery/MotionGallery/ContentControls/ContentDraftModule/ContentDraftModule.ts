@@ -7,6 +7,7 @@ import type {
   StockJsonValue,
   StockPresetId,
 } from "../../../../stock/contracts/StockContract.types";
+
 type InputPath = Array<string | number>;
 /** Invalid authored values coexist with the last schema-valid render input. */
 export type ContentDraft = {

@@ -3,6 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { CategoryTally } from "./CategoryTally";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Each retained row becomes one tally on the same eight-record ruler. */
 export function CategoryTallies({

@@ -1,5 +1,6 @@
 import { STOCK } from "../../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { accent: string };
 /** Water transport silhouette. */
 export function Boat({ accent }: Readonly<Props>): ReactNode {

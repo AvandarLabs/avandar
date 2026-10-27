@@ -1,6 +1,7 @@
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ContourSedimentRetention.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /**
  * Slope context and intervention captions remain outside the transport path.

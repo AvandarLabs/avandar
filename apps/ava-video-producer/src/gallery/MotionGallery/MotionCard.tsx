@@ -6,6 +6,7 @@ import { useFrames, useVisible } from "./useGalleryClock";
 import type { StockPresetId } from "../../stock/catalog";
 import type { ContentDraft } from "./ContentControls/ContentDraftModule/ContentDraftModule";
 import type { Preset } from "./Preset.types";
+
 export const MotionCard = memo(function MotionCard({
   preset,
   index,

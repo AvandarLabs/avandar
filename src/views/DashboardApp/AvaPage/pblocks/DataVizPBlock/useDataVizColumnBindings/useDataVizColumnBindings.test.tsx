@@ -1,6 +1,7 @@
 import { DataVizColumnBindingTestFixtures } from "./DataVizColumnBindingTestFixtures";
 import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
 const {
   uuid,
   makeProjectionDescriptorsFromSql,

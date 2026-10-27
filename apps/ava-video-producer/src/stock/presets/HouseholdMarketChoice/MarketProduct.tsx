@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { getMarketProductPositionFromInputAndFrame } from "./getMarketProductPositionFromInputAndFrame";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; index: number; accent: string };
 const SYMBOLS: Record<"grain" | "beans" | "vegetables" | "soap", string> = {
   grain: "M0 12 V-13 M0 1 L-9 -8 M0 -3 L9 -12",

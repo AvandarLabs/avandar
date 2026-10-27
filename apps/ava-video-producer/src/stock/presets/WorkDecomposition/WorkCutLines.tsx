@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import type { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
 import type { Input } from "./WorkDecomposition.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   pieces: ReturnType<typeof getWorkPartitionFromInput>;

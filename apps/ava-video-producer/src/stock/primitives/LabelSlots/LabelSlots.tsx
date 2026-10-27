@@ -1,6 +1,7 @@
 import { FitText } from "../FitText/FitText";
 import { type FitTextSize } from "../FitText/wrapTextToLines";
 import type { ReactNode } from "react";
+
 type Label = [
   text: string,
   x: number,

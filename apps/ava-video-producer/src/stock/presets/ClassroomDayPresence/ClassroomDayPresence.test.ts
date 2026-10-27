@@ -14,6 +14,7 @@ import {
   invalidInputs,
 } from "./ClassroomDayPresence.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -73,6 +74,7 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { classroomDayPresenceContract as contract } from "./ClassroomDayPresence.contract";
 import { inputSchema, SEMANTIC_RULES } from "./ClassroomDayPresence.schema";
 import type { Input } from "./ClassroomDayPresence.schema";
+
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     ...input.learners.map(prop("label")),

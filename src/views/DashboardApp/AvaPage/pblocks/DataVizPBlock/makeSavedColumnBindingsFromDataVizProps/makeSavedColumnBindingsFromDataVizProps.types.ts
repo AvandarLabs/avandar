@@ -6,6 +6,7 @@ import type {
   LocalFilter,
 } from "../DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
+
 type DataVizColumnNameProps = {
   columnBindingVersion: 0;
   vizConfig: VizConfig.Legacy;

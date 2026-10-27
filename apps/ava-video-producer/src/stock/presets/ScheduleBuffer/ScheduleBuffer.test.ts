@@ -9,6 +9,7 @@ import { ScheduleBuffer } from "./ScheduleBuffer";
 import { scheduleBufferContract } from "./ScheduleBuffer.contract";
 import { DEFAULT_INPUT, FIXTURES } from "./ScheduleBuffer.fixtures";
 import { inputSchema, type Input } from "./ScheduleBuffer.schema";
+
 function _render({
   frame,
   input,

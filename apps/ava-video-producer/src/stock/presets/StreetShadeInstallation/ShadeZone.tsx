@@ -3,6 +3,7 @@ import { SceneLabel } from "./SceneLabel";
 import { ShadeFootprint } from "./ShadeFootprint";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; index: number; frame: number; accent: string };
 /** Zone-owned footprints preserve the complete supplied ground area. */
 export function ShadeZone({

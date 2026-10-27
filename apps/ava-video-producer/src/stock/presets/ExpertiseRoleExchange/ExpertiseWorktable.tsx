@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ExpertiseRoleExchange.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string; toolX: number };
 /**
  * A shared table supports a visibly handled folding guide or alignment ruler.

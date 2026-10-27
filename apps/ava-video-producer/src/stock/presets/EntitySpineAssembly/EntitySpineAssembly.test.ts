@@ -10,6 +10,7 @@ import { DEFAULT_INPUT, FIXTURES } from "./EntitySpineAssembly.fixtures";
 import { INVALID_INPUTS } from "./rejectedInputs.constants";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import type { Input } from "./EntitySpineAssembly.schema";
+
 function _render({
   frame,
   input,
@@ -64,6 +65,7 @@ import { registerStockLocalizationAssertions } from "../../../../tests/helpers/r
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { entitySpineAssemblyContract } from "./EntitySpineAssembly.contract";
 import { inputSchema } from "./EntitySpineAssembly.schema";
+
 function _getVisibleTexts({
   input,
   frame,

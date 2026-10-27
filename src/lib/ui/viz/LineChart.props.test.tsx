@@ -1,4 +1,5 @@
 import { LineChartTestFixtures } from "./LineChartTestFixtures";
+
 const {
   expect,
   it,

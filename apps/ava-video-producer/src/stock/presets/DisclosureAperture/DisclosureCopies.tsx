@@ -1,6 +1,7 @@
 import { DisclosureField } from "./DisclosureField";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Only share fields receive duplicate geometry, in their original authored row

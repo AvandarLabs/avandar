@@ -18,6 +18,7 @@ import type {
   QueryFilterOperator,
   LegacyQueryFilterRule as QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+
 type QueryFilter = LegacyQueryFilterGroup | LegacyQueryFilterRule;
 
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";

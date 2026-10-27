@@ -1,4 +1,5 @@
 import { ScatterChartTestFixtures } from "./ScatterChartTestFixtures";
+
 const {
   expect,
   it,

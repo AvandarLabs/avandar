@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { getRequestPositionFromInputAndFrame } from "./getRequestPositionFromInputAndFrame";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /** The worker's arm stays in contact through the request's lift and travel. */
 export function BoundaryWorker({

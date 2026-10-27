@@ -6,6 +6,7 @@ import { evaluateAffineRule } from "./evaluateAffineRule";
 import { RehearsalRuler } from "./RehearsalRuler";
 import type { Input } from "./LinkedParameterRehearsal.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   output: Input["outputs"][number];
   source: Input["source"];

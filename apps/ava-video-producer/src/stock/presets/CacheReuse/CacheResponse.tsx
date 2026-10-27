@@ -3,6 +3,7 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; opacity: number };
 /** The requester retains the exact delivered result during the next lookup. */
 export function CacheResponse({ input, opacity }: Readonly<Props>): ReactNode {

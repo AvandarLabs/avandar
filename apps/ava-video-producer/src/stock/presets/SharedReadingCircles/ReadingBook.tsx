@@ -5,6 +5,7 @@ import { PhysicalReadingBook } from "./PhysicalReadingBook";
 import { ReadingBookLabels } from "./ReadingBookLabels";
 import type { Input } from "./SharedReadingCircles.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   groupIndex: number;

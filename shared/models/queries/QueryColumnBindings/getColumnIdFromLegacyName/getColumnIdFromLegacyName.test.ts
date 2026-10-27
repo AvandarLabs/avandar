@@ -4,6 +4,7 @@ import { uuid } from "$/lib/uuid.ts";
 import { getColumnIdFromLegacyName } from "$/models/queries/QueryColumnBindings/getColumnIdFromLegacyName/getColumnIdFromLegacyName.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
+
 const COLUMNS: QueryResult.ColumnWithId[] = [
   { name: "total", dataType: "double", id: uuid<QueryColumn.Id>() },
   { name: "TOTAL", dataType: "double", id: uuid<QueryColumn.Id>() },

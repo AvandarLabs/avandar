@@ -5,6 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { TallyMarks } from "./TallyMarks";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   category: Input["categories"][number];

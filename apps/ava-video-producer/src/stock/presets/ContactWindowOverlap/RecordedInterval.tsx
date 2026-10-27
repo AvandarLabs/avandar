@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
+
 type Props = { record: Input["records"][number]; axisEnd: number; y: number };
 /** Missing times receive a question mark, never an invented duration. */
 export function RecordedInterval({

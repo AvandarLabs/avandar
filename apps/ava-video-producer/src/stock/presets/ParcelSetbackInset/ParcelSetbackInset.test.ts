@@ -20,6 +20,7 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { parcelSetbackInsetContract } from "./ParcelSetbackInset.contract";
 import { inputSchema, type Input } from "./ParcelSetbackInset.schema";
+
 function _render({
   frame,
   input = defaultInput,
@@ -215,6 +216,7 @@ test("dimension toggles cover original, inset and footprint rectangles without h
 });
 
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
+
 type TextBox = {
   text: string;
   left: number;

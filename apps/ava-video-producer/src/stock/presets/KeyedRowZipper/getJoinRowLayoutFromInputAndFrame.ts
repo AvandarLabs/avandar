@@ -1,6 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { EASE, mix, ramp } from "../../../motion";
 import type { Input } from "./KeyedRowZipper.schema";
+
 type Options = {
   input: Input;
   frame: number;

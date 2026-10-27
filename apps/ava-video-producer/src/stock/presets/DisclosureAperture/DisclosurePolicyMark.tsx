@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
+
 type Props = { policy: Input["fields"][number]["disclosure"]; accent: string };
 /**
  * Distinct circle and diamond shapes reinforce the supplied policy captions.

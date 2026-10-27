@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./SchemaColumnEvolution.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** Optional version captions leave the evidence boundary visible. */
 export function EvolutionCaptions({

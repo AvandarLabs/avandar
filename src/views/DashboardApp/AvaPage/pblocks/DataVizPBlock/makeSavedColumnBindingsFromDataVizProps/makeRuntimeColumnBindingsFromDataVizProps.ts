@@ -9,6 +9,7 @@ import type { LocalFilter } from "../DataVizPBlock/DataVizFilters/DataVizFilters
 import type { Props } from "../DataVizPBlock/DataVizPBlock";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
+
 type Options = {
   props: Props;
   schema: ResultColumnBindings;

@@ -4,6 +4,7 @@ import { QueueHeadings } from "./QueueHeadings";
 import { QueueServiceBay } from "./QueueServiceBay";
 import type { Input } from "./QueueRelief.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /** Closed bay outlines unfold before any waiting item can enter them. */
 export function QueueStructure({

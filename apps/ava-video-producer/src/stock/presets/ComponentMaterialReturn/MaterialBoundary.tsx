@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { MaterialCaptions } from "./MaterialCaptions";
 import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; assembled: number };
 /**
  * Distinct returned and output silhouettes never suggest a zero-mass assembly.

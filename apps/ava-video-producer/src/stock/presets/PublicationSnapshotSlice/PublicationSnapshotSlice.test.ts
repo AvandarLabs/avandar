@@ -14,6 +14,7 @@ import {
 } from "./PublicationSnapshotSlice.fixtures";
 import { inputSchema, type Input } from "./PublicationSnapshotSlice.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,
@@ -92,6 +93,7 @@ test("selected value copies cross into a separate snapshot before only the live 
 import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { publicationSnapshotSliceContract as contract } from "./PublicationSnapshotSlice.contract";
+
 const EXCLUDED_TEXT_FIELDS: string[] = [
   "id",
   "rowId",
@@ -210,6 +212,7 @@ test("hidden excluded cells cannot enter the snapshot for either explicit audien
 });
 
 import { getSnapshotCellFromFrame } from "./getSnapshotCellFromFrame";
+
 test("the live write cue never changes the frozen snapshot or an unedited source cell", () => {
   [96, 109, 116, 117, 130, 139, 150].forEach((frame) => {
     const snapshot = getSnapshotCellFromFrame({

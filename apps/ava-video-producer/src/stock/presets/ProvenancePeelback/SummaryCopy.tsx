@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode, ComponentProps } from "react";
+
 type Props = { summary: Input["summary"]; accent: string };
 /**
  * Fixed-size summary copy reserves its full accepted worst-case line height.

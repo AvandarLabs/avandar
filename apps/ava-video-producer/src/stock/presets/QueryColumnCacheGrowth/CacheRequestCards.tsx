@@ -3,6 +3,7 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Two authored request cards retain their labels through the coverage checks.

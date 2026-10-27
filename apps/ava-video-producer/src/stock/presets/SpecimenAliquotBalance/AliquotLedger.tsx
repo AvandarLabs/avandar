@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; transferred: number };
 /** Source identity, tube count and material are independent quantities. */
 export function AliquotLedger({

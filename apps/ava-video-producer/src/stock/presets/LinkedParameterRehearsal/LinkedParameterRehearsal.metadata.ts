@@ -2,6 +2,7 @@ import { parseStockMetadata } from "../../contracts/parseStockMetadata/parseStoc
 import authoredMetadata from "./LinkedParameterRehearsal.metadata.yaml";
 import type { StockMetadata } from "../../contracts/StockContract.types";
 import type { Input } from "./LinkedParameterRehearsal.schema";
+
 export { controls } from "./LinkedParameterRehearsal.controls";
 /** Public retrieval copy excludes private planning provenance. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);

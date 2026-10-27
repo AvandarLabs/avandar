@@ -6,6 +6,7 @@ import type {
   StockMetadata,
   StockMessageDescriptor,
 } from "../../contracts/StockContract.types";
+
 export { CONTROLS } from "./JournalReceipts.controls";
 
 function _message({

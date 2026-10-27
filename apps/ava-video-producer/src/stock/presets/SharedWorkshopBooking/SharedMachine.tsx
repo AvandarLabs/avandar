@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SharedWorkshopBooking.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; accent: string };
 /**
  * One physical productive asset stays present throughout every authored turn.

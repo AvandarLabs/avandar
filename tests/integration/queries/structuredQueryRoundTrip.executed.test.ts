@@ -1,6 +1,7 @@
 import { StructuredQueryTestFixtures } from "./StructuredQueryTestFixtures";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
+
 const {
   propEq,
   sqlToStructuredQuery,

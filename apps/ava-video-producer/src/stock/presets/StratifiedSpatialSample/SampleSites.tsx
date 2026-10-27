@@ -1,6 +1,7 @@
 import { SampleSite } from "./SampleSite";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Selection leaves every eligible site anchor and identity key in place. */
 export function SampleSites({

@@ -5,6 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { ClinicVehicle } from "./ClinicVehicle";
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** A schematic route preserves authored local coordinates in both contexts. */
 export function ClinicMap({

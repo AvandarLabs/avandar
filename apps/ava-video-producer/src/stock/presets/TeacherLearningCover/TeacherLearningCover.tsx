@@ -6,6 +6,7 @@ import { MentorBoard } from "./MentorBoard";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./TeacherLearningCover.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** Keeps the fixed class physically attended across both teacher handoffs. */
 export function TeacherLearningCover({

@@ -5,6 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { HostLabels } from "./HostLabels";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; index: number; frame: number; accent: string };
 /** A common capacity scale persists while truly empty hosts fold. */
 export function HostBay({

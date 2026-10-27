@@ -12,6 +12,7 @@ import type { Props as DataVizProps } from "../../pblocks/DataVizPBlock/DataVizP
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { QueryClient } from "@tanstack/react-query";
+
 type PrepareChartOptions = {
   props: DataVizProps & { id: string };
   auth: StructuredQueryAuth;

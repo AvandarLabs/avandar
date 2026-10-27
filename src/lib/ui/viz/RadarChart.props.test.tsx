@@ -1,4 +1,5 @@
 import { RadarChartTestFixtures } from "./RadarChartTestFixtures";
+
 type LegendPropsHolder = {
   legendProps?: {
     verticalAlign?: string;

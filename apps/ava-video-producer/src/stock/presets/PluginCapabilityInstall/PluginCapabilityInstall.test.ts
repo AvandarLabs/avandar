@@ -16,6 +16,7 @@ import {
 } from "./PluginCapabilityInstall.fixtures";
 import { inputSchema, type Input } from "./PluginCapabilityInstall.schema";
 import { INVALID_INPUTS } from "./rejectedInputs.constants";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -77,6 +78,7 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { pluginCapabilityInstallContract } from "./PluginCapabilityInstall.contract";
+
 function _getVisibleTexts({
   input,
   frame,
@@ -212,6 +214,7 @@ test("concentrated membership keeps empty category labels and one tally per sour
 });
 
 import { getTextEnvelopesFromMarkup } from "../SchemaColumnEvolution/getTextEnvelopesFromMarkup";
+
 test("wrapped source headings clear each other and the first source record", () => {
   const input = {
     ...DENSE_INPUT,

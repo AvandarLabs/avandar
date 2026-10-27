@@ -2,6 +2,7 @@ import { expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { makeLocalFilterColumnBindingsFromLocalFilters } from "./makeLocalFilterColumnBindingsFromLocalFilters";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+
 it("omits a deleted local ID without substituting a same-named output", () => {
   const result = makeLocalFilterColumnBindingsFromLocalFilters({
     filters: [

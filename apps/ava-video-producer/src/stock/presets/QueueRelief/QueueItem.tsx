@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { getQueueItemLayoutFromInputAndFrame } from "./getQueueItemLayoutFromInputAndFrame";
 import type { Input } from "./QueueRelief.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   item: Input["items"][number];

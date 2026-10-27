@@ -4,6 +4,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./TradeoffPivot.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /** The authored priority appears only after both sides can be read together. */
 export function TradeoffCopy({

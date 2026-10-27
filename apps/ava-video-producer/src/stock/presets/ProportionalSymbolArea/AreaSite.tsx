@@ -3,6 +3,7 @@ import { AreaSiteLabels } from "./AreaSiteLabels";
 import { AreaTile } from "./AreaTile";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   site: Input["sites"][number];
   index: number;

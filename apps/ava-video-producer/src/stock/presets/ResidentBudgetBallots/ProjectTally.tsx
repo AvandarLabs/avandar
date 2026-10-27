@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { ProjectSymbol } from "./ProjectSymbol";
 import type { Input } from "./ResidentBudgetBallots.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   project: Input["projects"][number] | null;

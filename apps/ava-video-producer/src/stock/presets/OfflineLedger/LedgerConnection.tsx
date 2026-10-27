@@ -1,6 +1,7 @@
 import { mix, ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; accent: string };
 /**
  * The connection arc collapses at the first entry and stays unavailable during

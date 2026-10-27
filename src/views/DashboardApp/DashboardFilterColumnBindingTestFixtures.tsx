@@ -1,5 +1,6 @@
 import type { Props as DataVizProps } from "./AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { DashboardFilterRecord } from "./DashboardFilterStateManager/DashboardFilterStateManager";
+
 type Props = { children: ReactNode };
 
 import { AvaQueryProvider } from "@avandar/query-hooks";

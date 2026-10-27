@@ -4,6 +4,7 @@ import { JigPattern } from "./JigPattern";
 import type { getJigSceneFromFrame } from "./getJigSceneFromFrame";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; scene: ReturnType<typeof getJigSceneFromFrame> };
 /** One reusable guide keeps its label, selected pattern and holding hand. */
 export function JigGuide({ input, scene }: Readonly<Props>): ReactNode {

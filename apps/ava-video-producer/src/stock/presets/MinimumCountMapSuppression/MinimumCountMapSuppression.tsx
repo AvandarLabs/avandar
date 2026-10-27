@@ -5,6 +5,7 @@ import { PublicCountMap } from "./PublicCountMap";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /**
  * Thresholded aggregate release with zero, missing and suppression distinct.

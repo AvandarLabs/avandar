@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { ResponseWriting } from "./ResponseWriting";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /**
  * A moving opaque fold reveals the response after the internal cartridge

@@ -7,6 +7,7 @@ import { makeSavedColumnBindingsFromDataVizProps } from "@/views/DashboardApp/Av
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
 import type { Props as DataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+
 it("reopens a serialized styled selection against a supported renamed output", () => {
   const columns = [
     { name: "region", dataType: "varchar" as const },

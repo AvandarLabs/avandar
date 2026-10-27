@@ -3,6 +3,7 @@ import { wrapTextToLines } from "../../primitives/FitText/wrapTextToLines";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   source: Input["sources"][number];
   frame: number;

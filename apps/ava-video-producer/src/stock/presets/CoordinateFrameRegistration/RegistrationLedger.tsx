@@ -4,6 +4,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { makeRegisteredLandmarksFromInputAndFrame } from "./makeRegisteredLandmarksFromInputAndFrame";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /**
  * Indexed identity rows associate complete labels with both coordinate pairs.

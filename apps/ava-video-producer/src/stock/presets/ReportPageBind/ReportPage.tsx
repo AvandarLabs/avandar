@@ -4,6 +4,7 @@ import { getReportPageGeometryFromInputAndFrame } from "./getReportPageGeometryF
 import { ReportPageCopy } from "./ReportPageCopy";
 import type { Input } from "./ReportPageBind.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   section: Input["sections"][number];
   index: number;

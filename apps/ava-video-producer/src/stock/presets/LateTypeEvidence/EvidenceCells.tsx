@@ -3,6 +3,7 @@ import { EvidenceOutputCell } from "./EvidenceOutputCell";
 import { EvidenceSourceCell } from "./EvidenceSourceCell";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   frame: number;

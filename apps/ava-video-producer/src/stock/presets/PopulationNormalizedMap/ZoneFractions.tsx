@@ -1,6 +1,7 @@
 import { ZoneFraction } from "./ZoneFraction";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Stable named fraction shelves remain legible for arbitrarily small polygons.

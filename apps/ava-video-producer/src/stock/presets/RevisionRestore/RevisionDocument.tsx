@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { RevisionCurrentLines } from "./RevisionCurrentLines";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   content: Array<string | undefined>;

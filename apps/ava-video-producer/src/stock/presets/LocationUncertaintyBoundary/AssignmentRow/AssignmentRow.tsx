@@ -3,6 +3,7 @@ import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { FocusedRecord } from "./FocusedRecord";
 import type { getAssignmentsFromLocations } from "../getAssignmentsFromLocations";
 import type { ReactNode } from "react";
+
 type Props = {
   location: ReturnType<typeof getAssignmentsFromLocations>[number];
   index: number;

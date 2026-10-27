@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { DialogueGestures } from "./DialogueGestures";
 import type { Input } from "./InterpretedCaseDialogue.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Direct participant-worker orientation keeps interpretation to one side. */
 export function DialoguePeople({

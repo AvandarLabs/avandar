@@ -4,6 +4,7 @@ import { HandoverAcknowledgement } from "./HandoverAcknowledgement";
 import { HandoverReceiptRow } from "./HandoverReceiptRow";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Receipt rows fill only after their actual physical units reach the basket.

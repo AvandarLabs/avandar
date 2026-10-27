@@ -15,6 +15,7 @@ import {
 } from "./ServiceablePanelSwap.fixtures";
 import { inputSchema, type Input } from "./ServiceablePanelSwap.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,
@@ -87,6 +88,7 @@ test("every target slot swaps one module while original neighbors retain geometr
 });
 
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
+
 function _getVisibleTexts({
   input,
   frame,

@@ -1,4 +1,5 @@
 import type { StockControl, StockJsonSchema } from "../StockContract.types";
+
 type ReferenceSelect = Extract<
   StockControl,
   { optionsFrom: object }

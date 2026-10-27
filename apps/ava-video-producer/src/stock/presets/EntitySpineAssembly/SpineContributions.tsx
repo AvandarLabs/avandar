@@ -4,6 +4,7 @@ import { SpineContribution } from "./SpineContribution";
 import { SpineSum } from "./SpineSum";
 import type { Input } from "./EntitySpineAssembly.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   observations: Input["observations"];

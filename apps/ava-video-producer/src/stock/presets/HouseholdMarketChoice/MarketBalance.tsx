@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; balance: number; accent: string };
 
 /** The household keeps the exact unspent demo credits beside its label. */

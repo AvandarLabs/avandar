@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import { getRecordPlacementsFromInputAndFrame } from "./getRecordPlacementsFromInputAndFrame";
 import type { ReactNode } from "react";
+
 type Props = {
   record: ReturnType<typeof getRecordPlacementsFromInputAndFrame>[number];
   accent: string;

@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   completeAt: number;

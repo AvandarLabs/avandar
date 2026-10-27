@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import type { makePublicCellsFromInput } from "./makePublicCellsFromInput";
 import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   status: ReturnType<typeof makePublicCellsFromInput>[number]["status"];
   labels: Input["labels"];

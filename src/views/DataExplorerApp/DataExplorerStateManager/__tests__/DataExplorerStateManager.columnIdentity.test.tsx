@@ -1,5 +1,6 @@
 import { DataExplorerIdentityTestFixtures } from "./DataExplorerIdentityTestFixtures";
 import type { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
+
 const {
   QueryColumn,
   makeOutputNameVizConfigFromColumnIdConfig,

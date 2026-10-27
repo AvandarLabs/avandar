@@ -2,6 +2,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   pattern: Input["guide"]["pattern"];

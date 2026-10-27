@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** The completed fold states the count or exact numeric calculation. */
 export function PickerFormula({ input, frame }: Readonly<Props>): ReactNode {

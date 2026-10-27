@@ -1,6 +1,7 @@
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ContourSedimentRetention.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /** Both destinations retain their common incoming-mass denominator. */
 export function SedimentQuantities({ input }: Readonly<Props>): ReactNode {

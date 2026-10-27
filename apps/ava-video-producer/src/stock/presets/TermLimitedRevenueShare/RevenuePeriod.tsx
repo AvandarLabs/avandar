@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { RevenuePortions } from "./RevenuePortions";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   period: Input["periods"][number];
   index: number;

@@ -1,6 +1,7 @@
 import { propEq, prop } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
+
 const coordinate: z.ZodNumber = z.number().min(0).max(100);
 /** Strict rectangular parcel, clearance and full footprint contract. */
 export const inputSchema = z

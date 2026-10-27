@@ -5,6 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { PENDING_DELIVERY_MESSAGE } from "./AtomicOutboxCommit.controls";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; accent: string };
 /** A committed matching obligation remains pending for delivery. */
 export function PendingDeliveryTicket({

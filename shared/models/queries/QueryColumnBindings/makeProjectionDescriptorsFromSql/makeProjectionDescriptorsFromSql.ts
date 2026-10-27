@@ -12,6 +12,7 @@ import type { QueryAggregationType } from "$/models/queries/QueryAggregationType
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { ProjectionDescriptor } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
+
 type CreateDescriptorOptions = {
   source: Readonly<Source>;
   column: string;

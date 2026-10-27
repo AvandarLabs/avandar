@@ -4,6 +4,7 @@ import { SelectionCopy } from "./SelectionCopy";
 import { SelectionMarker } from "./SelectionMarker";
 import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   input: Input;

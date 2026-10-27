@@ -8,6 +8,7 @@ import {
 import { PermissionRanks } from "./PermissionRanks";
 import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** A result marker rises separately from the fixed action-requirement notch. */
 export function PermissionLadder({

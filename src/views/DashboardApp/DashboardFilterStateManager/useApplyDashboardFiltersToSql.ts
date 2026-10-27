@@ -4,6 +4,7 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { DashboardFilterRecord } from "./DashboardFilterStateManager";
 import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { LocalFilterStateApi } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
+
 type UseApplyDashboardFiltersToSqlOptions = {
   rawSql: string;
   columns: readonly QueryResult.ColumnWithId[] | undefined;

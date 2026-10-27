@@ -5,6 +5,7 @@ import { PracticePeople } from "./PracticePeople";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /**
  * A learner rehearses two physical stops with their authored companion choice.

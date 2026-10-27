@@ -1,6 +1,7 @@
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { DehydrateOptions, DehydratedState } from "@tanstack/react-query";
+
 type Props = { children: ReactNode };
 
 import { AvaQueryProvider } from "@avandar/query-hooks";

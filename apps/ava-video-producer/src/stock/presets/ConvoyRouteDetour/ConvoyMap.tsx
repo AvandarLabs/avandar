@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { ConvoyLandmarks } from "./ConvoyLandmarks";
 import type { Input } from "./ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Authored roads retain the closure even after the receiving gate opens. */
 export function ConvoyMap({

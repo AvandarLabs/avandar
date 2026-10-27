@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 
 function _getIdentityInk(accent: string): string {

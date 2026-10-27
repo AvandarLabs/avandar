@@ -1,6 +1,7 @@
 import { mix } from "../../../motion";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   site: Input["sites"][number];
   unitIndex: number;

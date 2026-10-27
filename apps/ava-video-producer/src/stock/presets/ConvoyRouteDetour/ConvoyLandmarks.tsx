@@ -3,6 +3,7 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Numbered depot, receiving gate and branch junction match the label rail. */
 export function ConvoyLandmarks({

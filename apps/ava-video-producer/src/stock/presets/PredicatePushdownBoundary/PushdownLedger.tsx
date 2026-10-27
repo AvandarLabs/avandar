@@ -1,6 +1,7 @@
 import { PushdownCount } from "./PushdownCount";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** Original, excluded and arrived row counts own separate stateful captions. */
 export function PushdownLedger({ input, frame }: Readonly<Props>): ReactNode {

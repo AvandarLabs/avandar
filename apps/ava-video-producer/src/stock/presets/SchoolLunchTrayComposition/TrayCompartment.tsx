@@ -5,6 +5,7 @@ import { ServedFood } from "./ServedFood";
 import { ServingUtensil } from "./ServingUtensil";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   component: Input["plannedComponents"][number];
   frame: number;

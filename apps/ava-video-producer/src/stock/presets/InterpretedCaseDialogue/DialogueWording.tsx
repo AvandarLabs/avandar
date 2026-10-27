@@ -1,6 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./InterpretedCaseDialogue.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   turnIndex: number;

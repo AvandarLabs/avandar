@@ -13,6 +13,7 @@ import {
   invalidInputs,
 } from "./PublicWorksMeasurementCheck.fixtures";
 import { inputSchema, type Input } from "./PublicWorksMeasurementCheck.schema";
+
 function _render({
   frame,
   input = defaultInput,
@@ -63,6 +64,7 @@ test("measurement endpoints follow observed geometry on the promised scale", () 
 
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { publicWorksMeasurementCheckContract as contract } from "./PublicWorksMeasurementCheck.contract";
+
 function _visible({
   input,
   frame,

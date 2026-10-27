@@ -7,6 +7,7 @@ import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+
 type GetQueryOptions = {
   query: StructuredQuery.Partial;
   previous: StructuredQuery.Partial | undefined;

@@ -1,5 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import type { ReactNode } from "react";
+
 type Props = {
   role: "retailer" | "shopper";
   x: number;

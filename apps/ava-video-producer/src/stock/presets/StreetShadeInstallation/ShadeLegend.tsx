@@ -3,6 +3,7 @@ import { INSTALLATION_COLORS } from "./installationColors";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /** Every installation names its owning zone, including zero-area objects. */
 export function ShadeLegend({ input }: Readonly<Props>): ReactNode {

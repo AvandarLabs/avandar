@@ -1,6 +1,7 @@
 import { DimensionTicks } from "./DimensionTicks";
 import type { ParcelEnvelopeGeometry } from "./makeParcelEnvelopeGeometryFromParcel";
 import type { ReactNode } from "react";
+
 type Props = {
   parcelId: string;
   index: number;

@@ -3,6 +3,7 @@ import { AlignmentGuides } from "./AlignmentGuides";
 import { MeasurementMark } from "./MeasurementMark";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   x: number;

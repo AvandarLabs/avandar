@@ -12,6 +12,7 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { QueryClient } from "@tanstack/react-query";
+
 type CreateSchemaOptions = {
   options: Readonly<DataVizColumnBindingsOptions>;
   columns: readonly QueryResult.Column[];

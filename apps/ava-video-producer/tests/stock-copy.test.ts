@@ -12,6 +12,7 @@ import { buildStockContracts } from "../scripts/stock/buildStockContracts/buildS
 import { yamlPlugin } from "../scripts/yaml/yamlPlugin/yamlPlugin";
 import { parseStockInput } from "../src/stock/contracts/parseStockInput/parseStockInput";
 import type { StockInputByPreset } from "../src/stock/contracts/StockContract.types";
+
 const execute: typeof execFile.__promisify__ = promisify(execFile);
 const root: string = process.cwd();
 const authored: StockInputByPreset["decision-fork"] = {

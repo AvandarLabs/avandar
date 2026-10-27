@@ -2,6 +2,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./PublicationSnapshotSlice.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; index: number };
 /**
  * Source and reordered snapshot headings identify values throughout copying.

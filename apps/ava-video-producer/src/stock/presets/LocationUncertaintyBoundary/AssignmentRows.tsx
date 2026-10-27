@@ -1,6 +1,7 @@
 import { AssignmentRow } from "./AssignmentRow/AssignmentRow";
 import type { getAssignmentsFromLocations } from "./getAssignmentsFromLocations";
 import type { ReactNode } from "react";
+
 type Props = {
   assignments: ReturnType<typeof getAssignmentsFromLocations>;
   focusedLocationId: string;
