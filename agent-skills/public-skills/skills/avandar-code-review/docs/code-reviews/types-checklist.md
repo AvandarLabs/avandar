@@ -84,6 +84,71 @@ contracts. Naming, module structure, comments, and function shape live in
   <Chart tooltipProps={tooltipProps} />;
   ```
 
+- Never keep an `as T` cast that the compiler does not need. A cast tells
+  the reader "TypeScript cannot prove this", so a cast that proves nothing
+  sends them looking for a problem that does not exist, and it silences the
+  check that would catch a future mismatch. This applies to every single
+  `as T`, not only the `as unknown as T` double cast above.
+
+  **The gate is mechanical, never a judgement call.** For every added line
+  containing a cast, delete the cast and re-run the type checker. Do not
+  reason about whether the cast "looks needed": casts that look necessary
+  are routinely removable, and that is how they survive review.
+
+  - **Still type-checks without it:** report a finding. The cast is noise.
+  - **A type error appears:** look at what produced the wider type. When
+    the surrounding code widened the value itself, report a finding against
+    the widening and remove both: a `?? ""` or `|| {}` fallback for a value
+    that is always present, an empty literal (`[]`, `{}`) with no declared
+    type, or a `.find()` on a value that is always in the collection. A
+    non-null assertion (`!`) or a typed declaration is narrower than a cast
+    and keeps the real type flowing.
+  - **A type error appears and nothing in the code widened the value:**
+    the cast may be legitimate. Apply the exceptions below.
+
+  Exceptions (not casts, or casts the compiler genuinely cannot avoid):
+  1) `as const`; 2) import and export aliases (`import * as x`,
+  `{ a as b }`); 3) `satisfies`, which is a check and not a cast; 4) a
+  value whose real type is only known at runtime and cannot be narrowed by a
+  type guard, such as a DOM query result or an `event.target`, where a
+  comment or the API makes the reason evident; 5) an existing cast whose
+  comment already justifies it on those grounds.
+
+  **Find candidates:**
+
+  ```bash
+  grep -rEn '\bas [A-Za-z_{(\[]' --include="*.ts" --include="*.tsx" . \
+    | grep -vE '\bas const\b|^[^:]+:[0-9]+:\s*(import|export)\b'
+  ```
+
+  Restrict the hits to `+` lines in the diff before verifying each one.
+  Hits inside a multi-line import or export list are aliases: drop them.
+
+  This is bad (the fallback widens the id to `string`, so the cast is only
+  there to undo a widening the same expression introduced):
+
+  ```ts
+  const columnId = (columns.find(byName(name))?.id ?? "") as ColumnId;
+  ```
+
+  This is good (the column always exists, so assert that instead):
+
+  ```ts
+  const columnId = columns.find(byName(name))!.id;
+  ```
+
+  This is bad (the value already has the target type):
+
+  ```ts
+  const rows = (await fetchRows()) as Row[];
+  ```
+
+  This is good:
+
+  ```ts
+  const rows = await fetchRows();
+  ```
+
 - Use `as const` for literals that never change.
 
 - Prefer `type` over `interface`, except for class-style OOP interfaces.
