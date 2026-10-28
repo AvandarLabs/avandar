@@ -195,7 +195,10 @@ const _STYLED_REVENUE_SERIES = {
   strokeWidth: 4,
 } as const;
 
-/** A link to a styled bar chart, keyed by output name as the app writes it. */
+/**
+ * A link to a styled bar chart, keyed by `QueryResult` column name as the app
+ * writes it.
+ */
 const _STYLED_CHART_URL: DataExplorerUrlSearch = {
   sql: 'select "quarter", "revenue" from "sales"',
   vc: JSON.stringify({

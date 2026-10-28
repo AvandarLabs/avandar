@@ -3,11 +3,16 @@ import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
 /**
- * Gets the ID of the one result column with this output name, matching
- * exactly first and then case-insensitively. Undefined when none or several
- * match.
+ * Gets the query column ID of the one `QueryResult` column with this name,
+ * matching exactly first and then case-insensitively. Undefined when none or
+ * several match.
+ *
+ * A `QueryResult` column name is the name the query emits, which is not
+ * always the name of the source column it reads. An aggregate is emitted as
+ * `sum(revenue)` rather than `revenue`, and an explicit alias replaces the
+ * name entirely.
  */
-export function getColumnIdFromOutputName({
+export function getQueryColumnIdFromQueryResultColumnName({
   name,
   columns,
 }: Readonly<{

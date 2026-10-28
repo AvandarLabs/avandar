@@ -7,8 +7,8 @@ import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPB
 /** An authored local filter whose target is a column ID. */
 export type ColumnIdLocalFilter = LocalFilter;
 /**
- * Maps each local filter's column ID to that column's current output name for
- * the wrapper SQL. A filter whose ID matches no output is reported, never
+ * Maps each local filter's column ID to its current `QueryResult` column name
+ * for the wrapper SQL. A filter whose ID matches no output is reported, never
  * matched by name.
  */
 export function makeLocalFilterColumnBindingsFromLocalFilters(

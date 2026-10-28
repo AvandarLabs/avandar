@@ -12,7 +12,7 @@ import type { ColumnBindingIssue } from "$/models/queries/QueryColumnBindings/Qu
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { ColumnIdVizConfig } from "$/models/vizs/ColumnIdVizConfig/ColumnIdVizConfig.ts";
 
-type GetSlotOutputName = ({
+type GetSlotQueryResultColumnName = ({
   key,
   target,
 }: Readonly<{
@@ -33,13 +33,13 @@ type NameBoundRadarSeries = Extract<
 function _mapSeries(
   options: Readonly<{
     series: readonly ColumnIdVizConfig.XYSeries[];
-    getSlotOutputName: GetSlotOutputName;
+    getSlotQueryResultColumnName: GetSlotQueryResultColumnName;
   }>,
 ): NameBoundXYSeries[];
 function _mapSeries(
   options: Readonly<{
     series: readonly ColumnIdVizConfig.RadarSeries[];
-    getSlotOutputName: GetSlotOutputName;
+    getSlotQueryResultColumnName: GetSlotQueryResultColumnName;
   }>,
 ): NameBoundRadarSeries[];
 function _mapSeries(
@@ -47,11 +47,11 @@ function _mapSeries(
     series: ReadonlyArray<
       ColumnIdVizConfig.XYSeries | ColumnIdVizConfig.RadarSeries
     >;
-    getSlotOutputName: GetSlotOutputName;
+    getSlotQueryResultColumnName: GetSlotQueryResultColumnName;
   }>,
 ): Array<NameBoundXYSeries | NameBoundRadarSeries> {
   return options.series.flatMap((series, index) => {
-    const key = options.getSlotOutputName({
+    const key = options.getSlotQueryResultColumnName({
       key: series.key,
       target: `series.${index}.key`,
     });
@@ -62,15 +62,15 @@ function _mapSeries(
 function _mapScatterSeries(
   options: Readonly<{
     series: readonly ColumnIdVizConfig.ScatterSeries[];
-    getSlotOutputName: GetSlotOutputName;
+    getSlotQueryResultColumnName: GetSlotQueryResultColumnName;
   }>,
 ): Extract<ColumnIdVizConfig.NameBound, { vizType: "scatter" }>["series"] {
   return options.series.flatMap((series, index) => {
-    const key = options.getSlotOutputName({
+    const key = options.getSlotQueryResultColumnName({
       key: series.key,
       target: `series.${index}.key`,
     });
-    const xKey = options.getSlotOutputName({
+    const xKey = options.getSlotQueryResultColumnName({
       key: series.xKey,
       target: `series.${index}.xKey`,
     });
@@ -83,19 +83,19 @@ function _mapScatterSeries(
 function _mapBubbleSeries(
   options: Readonly<{
     series: readonly ColumnIdVizConfig.BubbleSeries[];
-    getSlotOutputName: GetSlotOutputName;
+    getSlotQueryResultColumnName: GetSlotQueryResultColumnName;
   }>,
 ): Extract<ColumnIdVizConfig.NameBound, { vizType: "bubble" }>["series"] {
   return options.series.flatMap((series, index) => {
-    const key = options.getSlotOutputName({
+    const key = options.getSlotQueryResultColumnName({
       key: series.key,
       target: `series.${index}.key`,
     });
-    const xKey = options.getSlotOutputName({
+    const xKey = options.getSlotQueryResultColumnName({
       key: series.xKey,
       target: `series.${index}.xKey`,
     });
-    const sizeKey = options.getSlotOutputName({
+    const sizeKey = options.getSlotQueryResultColumnName({
       key: series.sizeKey,
       target: `series.${index}.sizeKey`,
     });
@@ -108,38 +108,47 @@ function _mapBubbleSeries(
 function _mapXYConfig(
   options: Readonly<{
     config: Extract<ColumnIdVizConfig.T, { vizType: "bar" | "line" | "area" }>;
-    getSlotOutputName: GetSlotOutputName;
+    getSlotQueryResultColumnName: GetSlotQueryResultColumnName;
   }>,
 ): Extract<ColumnIdVizConfig.NameBound, { vizType: "bar" | "line" | "area" }> {
-  const { config, getSlotOutputName } = options;
+  const { config, getSlotQueryResultColumnName } = options;
   return {
     ...config,
-    xAxisKey: getSlotOutputName({ key: config.xAxisKey, target: "xAxisKey" }),
-    series: _mapSeries({ series: config.series, getSlotOutputName }),
+    xAxisKey: getSlotQueryResultColumnName({
+      key: config.xAxisKey,
+      target: "xAxisKey",
+    }),
+    series: _mapSeries({ series: config.series, getSlotQueryResultColumnName }),
   };
 }
 
 function _mapCategoryConfig(
   options: Readonly<{
     config: Extract<ColumnIdVizConfig.T, { vizType: "pie" | "funnel" }>;
-    getSlotOutputName: GetSlotOutputName;
+    getSlotQueryResultColumnName: GetSlotQueryResultColumnName;
   }>,
 ): Extract<ColumnIdVizConfig.NameBound, { vizType: "pie" | "funnel" }> {
-  const { config, getSlotOutputName } = options;
+  const { config, getSlotQueryResultColumnName } = options;
   return {
     ...config,
-    nameKey: getSlotOutputName({ key: config.nameKey, target: "nameKey" }),
-    valueKey: getSlotOutputName({ key: config.valueKey, target: "valueKey" }),
+    nameKey: getSlotQueryResultColumnName({
+      key: config.nameKey,
+      target: "nameKey",
+    }),
+    valueKey: getSlotQueryResultColumnName({
+      key: config.valueKey,
+      target: "valueKey",
+    }),
   };
 }
 
 function _mapConfig(
   options: Readonly<{
     config: Readonly<ColumnIdVizConfig.T>;
-    getSlotOutputName: GetSlotOutputName;
+    getSlotQueryResultColumnName: GetSlotQueryResultColumnName;
   }>,
 ): ColumnIdVizConfig.NameBound {
-  const { config, getSlotOutputName } = options;
+  const { config, getSlotQueryResultColumnName } = options;
   return match(config)
     .with({ vizType: "table" }, identity)
     .with(
@@ -147,30 +156,45 @@ function _mapConfig(
       { vizType: "line" },
       { vizType: "area" },
       (chart) => {
-        return _mapXYConfig({ config: chart, getSlotOutputName });
+        return _mapXYConfig({ config: chart, getSlotQueryResultColumnName });
       },
     )
     .with({ vizType: "radar" }, (chart) => {
       return {
         ...chart,
-        nameKey: getSlotOutputName({ key: chart.nameKey, target: "nameKey" }),
-        series: _mapSeries({ series: chart.series, getSlotOutputName }),
+        nameKey: getSlotQueryResultColumnName({
+          key: chart.nameKey,
+          target: "nameKey",
+        }),
+        series: _mapSeries({
+          series: chart.series,
+          getSlotQueryResultColumnName,
+        }),
       };
     })
     .with({ vizType: "scatter" }, (chart) => {
       return {
         ...chart,
-        series: _mapScatterSeries({ series: chart.series, getSlotOutputName }),
+        series: _mapScatterSeries({
+          series: chart.series,
+          getSlotQueryResultColumnName,
+        }),
       };
     })
     .with({ vizType: "bubble" }, (chart) => {
       return {
         ...chart,
-        series: _mapBubbleSeries({ series: chart.series, getSlotOutputName }),
+        series: _mapBubbleSeries({
+          series: chart.series,
+          getSlotQueryResultColumnName,
+        }),
       };
     })
     .with({ vizType: "pie" }, { vizType: "funnel" }, (chart) => {
-      return _mapCategoryConfig({ config: chart, getSlotOutputName });
+      return _mapCategoryConfig({
+        config: chart,
+        getSlotQueryResultColumnName,
+      });
     })
     .exhaustive();
 }
@@ -204,11 +228,13 @@ export function makeNameBoundVizConfigFromColumnIdConfig({
       };
     },
   );
-  const getSlotOutputName: GetSlotOutputName = ({ target }) => {
+  const getSlotQueryResultColumnName: GetSlotQueryResultColumnName = ({
+    target,
+  }) => {
     return slots.find(propEq("target", target))?.name;
   };
   return {
-    config: _mapConfig({ config, getSlotOutputName }),
+    config: _mapConfig({ config, getSlotQueryResultColumnName }),
     issues: slots.map(prop("issue")).filter(isDefined),
   };
 }

@@ -1,7 +1,9 @@
 import { propNotEq } from "@avandar/utils";
 import { P, match } from "ts-pattern";
 import { describe, expect, it } from "vitest";
-/** Renderer reads follow saved IDs even when output names change. */
+/**
+ * Renderer reads follow saved IDs even when `QueryResult` column names change.
+ */
 import { uuid } from "$/lib/uuid.ts";
 import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";

@@ -79,7 +79,7 @@ function _createDescriptor({
   };
 }
 
-function _getAggregateOutputName({
+function _getAggregateQueryResultColumnName({
   argument,
   aggregation,
   columns,
@@ -168,7 +168,7 @@ function _getProjection({
   }
   const outputName =
     alias ??
-    _getAggregateOutputName({
+    _getAggregateQueryResultColumnName({
       argument: args.expr,
       aggregation: aggregation,
       columns: columns,

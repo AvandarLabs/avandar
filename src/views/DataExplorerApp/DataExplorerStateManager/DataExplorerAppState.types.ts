@@ -61,10 +61,11 @@ export type DataExplorerAppState = {
   vizConfig: VizConfig.T;
 
   /**
-   * A chart config restored from the URL, keyed by output names because a URL
-   * carries no column IDs. The first query result binds those names to the
-   * result's column IDs and clears this field. Until then, URL sync keeps
-   * writing it back unchanged, so a slow or failed query does not drop it.
+   * A chart config restored from the URL, keyed by `QueryResult` column names
+   * because a URL carries no column IDs. The first query result binds those
+   * names to the result's column IDs and clears this field. Until then, URL
+   * sync keeps writing it back unchanged, so a slow or failed query does not
+   * drop it.
    */
   pendingUrlVizConfig?: VizConfig.NameBound;
 

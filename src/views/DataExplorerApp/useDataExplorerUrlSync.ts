@@ -261,8 +261,9 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
         }
 
         // Restore viz config last so it replaces the defaults that setColumns
-        // seeded above. The URL keys it by output name, so it stays pending
-        // until the first query result binds those names to column IDs.
+        // seeded above. The URL keys it by `QueryResult` column name, so it
+        // stays pending until the first query result binds those names to
+        // column IDs.
         if (urlState.vizConfig) {
           dispatch.restoreVizConfigFromUrl(urlState.vizConfig);
         }

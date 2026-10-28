@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { getColumnIdFromOutputName } from "$/models/queries/QueryColumnBindings/getColumnIdFromOutputName/getColumnIdFromOutputName";
+import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ColumnBindingIssue } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -42,7 +42,7 @@ function _buildTarget({
   if (target && target.kind !== "columnName") {
     return target;
   }
-  const columnId = getColumnIdFromOutputName({
+  const columnId = getQueryColumnIdFromQueryResultColumnName({
     name: filter.columnName,
     columns: columns,
   });
@@ -92,7 +92,8 @@ function _buildFilter({
 
 /**
  * Binds each subscribed dashboard filter to a column ID in this chart's query,
- * then maps that ID to the column's current output name for the wrapper SQL.
+ * then maps that ID to its current `QueryResult` column name for the wrapper
+ * SQL.
  * Preserve returned targets across value updates. Explicit query edits may
  * reset only unresolved targets to `columnName`. Column ID targets keep
  * their IDs even when absent. Definition name edits are detected from

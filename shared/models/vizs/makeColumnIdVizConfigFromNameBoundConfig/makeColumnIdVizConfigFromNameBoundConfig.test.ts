@@ -1,6 +1,6 @@
 import { propNotEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-/** Chart output names bind uniquely before renderer resolution. */
+/** Chart `QueryResult` column names bind uniquely before rendering. */
 import { uuid } from "$/lib/uuid.ts";
 import { makeColumnIdVizConfigFromNameBoundConfig } from "$/models/vizs/makeColumnIdVizConfigFromNameBoundConfig/makeColumnIdVizConfigFromNameBoundConfig.ts";
 import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig.ts";
@@ -99,7 +99,7 @@ describe("makeColumnIdVizConfigFromNameBoundConfig", () => {
   );
 
   it.each(["Revenue", "revenue"])(
-    "rejects ambiguous output name %s without choosing the first column",
+    "rejects ambiguous QueryResult column name %s without choosing the first column",
     (key) => {
       const config: ColumnIdVizConfig.NameBound = {
         vizType: "line",
@@ -128,7 +128,7 @@ describe("makeColumnIdVizConfigFromNameBoundConfig", () => {
     },
   );
 
-  it("accepts a unique case-insensitive output name", () => {
+  it("accepts a unique case-insensitive QueryResult column name", () => {
     const result = makeColumnIdVizConfigFromNameBoundConfig({
       config: { vizType: "funnel", nameKey: "QUARTER", valueKey: "REVENUE" },
       columns: COLUMNS,

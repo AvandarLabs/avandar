@@ -82,10 +82,14 @@ type NameBoundAreaSeriesShape = {
 };
 
 /**
- * A `VizConfig.T` bound to its columns by name: each column ID replaced by the
- * name a query result row is keyed by. The renderers in `src/lib/ui/viz`
- * consume it, Explorer URLs store charts in it, and dashboards saved before
- * column IDs still hold it until they bind.
+ * A `VizConfig.T` bound to its columns by name: each column ID replaced by its
+ * `QueryResult` column name, the key each result row is read by. The
+ * renderers in `src/lib/ui/viz` consume it, Explorer URLs store charts in it,
+ * and dashboards saved before column IDs still hold it until they bind.
+ *
+ * A `QueryResult` column name is not always the source column's name. An
+ * aggregate is emitted as `sum(revenue)` rather than `revenue`, and an
+ * explicit alias replaces the name entirely.
  */
 export type NameBoundVizConfig =
   | { vizType: "table" }
@@ -106,13 +110,13 @@ export type NameBoundVizConfig =
   | NameBoundVizConfigPie
   | NameBoundVizConfigFunnel;
 
-/** Mark settings for mixed XY charts, keyed by output name. */
+/** Mark settings for mixed XY charts, keyed by `QueryResult` column name. */
 export type NameBoundXYSeries =
   | NameBoundBarSeriesShape
   | NameBoundLineSeriesShape
   | NameBoundAreaSeriesShape;
 
-/** Scatter cloud settings, keyed by output name. */
+/** Scatter cloud settings, keyed by `QueryResult` column name. */
 export type NameBoundScatterSeries = {
   key: string;
   xKey: string;
@@ -120,12 +124,12 @@ export type NameBoundScatterSeries = {
   color?: string;
 };
 
-/** Bubble cloud settings, keyed by output name. */
+/** Bubble cloud settings, keyed by `QueryResult` column name. */
 export type NameBoundBubbleSeries = NameBoundScatterSeries & {
   sizeKey: string;
 };
 
-/** Radar polygon settings, keyed by output name. */
+/** Radar polygon settings, keyed by `QueryResult` column name. */
 export type NameBoundRadarSeries = {
   key: string;
   label?: string;

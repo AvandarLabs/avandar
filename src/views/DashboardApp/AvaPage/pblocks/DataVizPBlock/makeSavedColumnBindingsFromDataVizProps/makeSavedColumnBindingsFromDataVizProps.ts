@@ -1,5 +1,5 @@
 import { isDefined, prop } from "@avandar/utils";
-import { getColumnIdFromOutputName } from "$/models/queries/QueryColumnBindings/getColumnIdFromOutputName/getColumnIdFromOutputName";
+import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
 import { makeColumnIdVizConfigFromNameBoundConfig } from "$/models/vizs/makeColumnIdVizConfigFromNameBoundConfig/makeColumnIdVizConfigFromNameBoundConfig";
 import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
 import type {
@@ -29,7 +29,7 @@ function _getLocalFilterOutcome({
   filter: LegacyLocalFilter;
   columns: readonly QueryResult.ColumnWithId[];
 }): { filter: LocalFilter | undefined; issue: ColumnBindingIssue | undefined } {
-  const columnId = getColumnIdFromOutputName({
+  const columnId = getQueryColumnIdFromQueryResultColumnName({
     name: filter.columnName,
     columns,
   });

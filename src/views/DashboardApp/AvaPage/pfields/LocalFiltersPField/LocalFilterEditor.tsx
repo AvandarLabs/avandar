@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { getColumnIdFromOutputName } from "$/models/queries/QueryColumnBindings/getColumnIdFromOutputName/getColumnIdFromOutputName";
+import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
 import css from "./LocalFiltersPField.module.css";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
@@ -74,7 +74,7 @@ export function LocalFilterEditor({
           value={
             "columnId" in filter
               ? filter.columnId
-              : (getColumnIdFromOutputName({
+              : (getQueryColumnIdFromQueryResultColumnName({
                   name: filter.columnName,
                   columns: columns,
                 }) ?? null)

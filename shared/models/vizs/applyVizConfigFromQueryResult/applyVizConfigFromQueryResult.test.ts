@@ -166,7 +166,7 @@ describe("applyVizConfigFromQueryResult", () => {
     );
   });
 
-  it("does not reinterpret an owned ID as a case-insensitive output name", () => {
+  it("does not reinterpret an owned ID as a case-insensitive QueryResult column name", () => {
     const out = applyVizConfigFromQueryResult({
       vizConfig: {
         vizType: "bar",

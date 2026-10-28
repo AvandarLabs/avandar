@@ -1,6 +1,6 @@
 import { identity, isDefined, prop, propEq } from "@avandar/utils";
 import { match } from "ts-pattern";
-import { getColumnIdFromOutputName } from "$/models/queries/QueryColumnBindings/getColumnIdFromOutputName/getColumnIdFromOutputName.ts";
+import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName.ts";
 import { makeColumnSlotsFromVizConfig } from "$/models/vizs/makeColumnSlotsFromVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { ColumnBindingIssue } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
@@ -168,7 +168,7 @@ function _bindSlotToColumnId({
   const id =
     slot.key === undefined
       ? undefined
-      : getColumnIdFromOutputName({ name: slot.key, columns });
+      : getQueryColumnIdFromQueryResultColumnName({ name: slot.key, columns });
   const hasCandidate =
     slot.key !== undefined &&
     columns.some((column) => {
@@ -188,8 +188,9 @@ function _bindSlotToColumnId({
 }
 
 /**
- * Replaces each output name in a chart config with the column ID of the one
- * output column that has that name. Leaves the input config unchanged.
+ * Replaces each `QueryResult` column name in a chart config with the column
+ * ID of the one `QueryResult` column that has that name. Leaves the input
+ * config unchanged.
  */
 export function makeColumnIdVizConfigFromNameBoundConfig({
   config,

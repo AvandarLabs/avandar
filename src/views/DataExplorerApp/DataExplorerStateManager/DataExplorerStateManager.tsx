@@ -212,8 +212,8 @@ export const DataExplorerStateManager = createAppStateManager({
 
     /**
      * Holds a chart config restored from the URL until a query result can bind
-     * its output names to column IDs. Shows an empty chart of the restored
-     * type meanwhile.
+     * its `QueryResult` column names to column IDs. Shows an empty chart of the
+     * restored type meanwhile.
      */
     restoreVizConfigFromUrl: (
       state: DataExplorerAppState,
@@ -229,7 +229,8 @@ export const DataExplorerStateManager = createAppStateManager({
     /**
      * Seeds unconfigured slots from the result's columns and preserves owned
      * selections while their output is unavailable. A chart config restored
-     * from the URL is first bound to these columns by output name.
+     * from the URL is first bound to these columns by `QueryResult` column
+     * name.
      */
     syncVizFromQueryResult: (
       state: DataExplorerAppState,
