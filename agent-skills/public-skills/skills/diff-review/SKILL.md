@@ -423,12 +423,12 @@ the guide", comes out whole.
 ### Sections
 
 Use these headings in this order, numbered, omitting any that would be empty.
-Purpose, Glossary, Background technical context, and Manual testing are never
-omitted. The list gives the order, not literal numbers: each strand takes its
-own top-level number, and the sections after the strands number on from the
-last one. Once the walkthrough is handed over, numbers are stable for the life
-of the review so the reviewer can annotate a printout and cite `§6.2` back to
-you; before that, the review passes may renumber.
+Purpose, Background technical context, Manual testing, and the Glossary
+appendix are never omitted. The list gives the order, not literal numbers: each
+strand takes its own top-level number, and the sections after the strands
+number on from the last one. Once the walkthrough is handed over, numbers are
+stable for the life of the review so the reviewer can annotate a printout and
+cite `§5.2` back to you; before that, the review passes may renumber.
 
 Headings are factual navigation, not titles. A correct, specific, boring
 heading beats an elegant one every time; this is a reference document a
@@ -466,33 +466,27 @@ clause and may run past twenty words when grounding it for a new reader takes
 that; length is not the constraint, and a shorter heading that has stopped
 being specific or clear is worse.
 
-1. **Purpose.** The problem in the reader's terms and what "done" means. No
-   file names, no module names. Two paragraphs at most, and it must **name
-   every strand of work in the change**, because a strand the reader has not
-   been told about will read as a non sequitur when its section arrives.
-   Finish with a one-line map, strand to section number, so the reader can
-   predict the section list before reading it.
-2. **Glossary.** Every term the reader will meet that is not general
-   software-engineering vocabulary, defined in plain words. See
-   [Glossary](#glossary).
-3. **Background technical context.** A directory tree of the code the reader
-   needs to know about, then one or two sentences per model or module. See
-   [Background technical context](#background-technical-context).
-4. **Manual testing.** Numbered steps the reviewer can follow to exercise the
+1. **Purpose.** Why the change exists, as one paragraph, then what it
+   changes, as one short bullet per strand of work. No file names, no module
+   names. See [Purpose](#purpose).
+2. **Background technical context.** A directory tree of the code the reader
+   needs to know about, then a table with one or two sentences per model or
+   module. See [Background technical context](#background-technical-context).
+3. **Manual testing.** Numbered steps the reviewer can follow to exercise the
    change themselves. See [Manual testing](#manual-testing).
-5. **Shape of the solution.** The mental model: the moving parts and how data
+4. **Shape of the solution.** The mental model: the moving parts and how data
    flows between them, as prose plus at least one mermaid diagram. When the
    change has more than one strand, say here how they relate, including "these
    two are independent" when that is the truth.
-6. **One section per strand of work,** named after the concern rather than the
-   kind of thing it contains. Use numbered subsections (`6.1`, `6.2`) for the
+5. **One section per strand of work,** named after the concern rather than the
+   kind of thing it contains. Use numbered subsections (`5.1`, `5.2`) for the
    pieces inside a strand, so the reviewer can cite one.
 
    When a section explains one specific defect and its resolution, add `The
    Problem` and `The Solution` one heading level below it:
 
    ```markdown
-   ### 6.1 Ambiguous 404 when getting a file from Drive
+   ### 5.1 Ambiguous 404 when getting a file from Drive
 
    #### The Problem
 
@@ -551,9 +545,9 @@ being specific or clear is worse.
    strand-based one, and it fails by disappearing silently rather than by
    leaving an empty heading. Auditing this list is part of
    [Closing checks](#closing-checks).
-7. **Interface changes.** Any user-visible change, with evidence. See
+6. **Interface changes.** Any user-visible change, with evidence. See
    [Screenshots](#screenshots).
-8. **Decisions.** One bullet per real decision: what was chosen, the
+7. **Decisions.** One bullet per real decision: what was chosen, the
    alternative that was rejected, why, and what evidence would reverse it.
    Lead with the choice as one bold sentence that a reviewer skimming the list
    can parse on its own, per
@@ -561,27 +555,107 @@ being specific or clear is worse.
    decision with no rejected alternative is not a decision, it is narration:
    cut it, or say plainly that the choice was arbitrary. Cite precedent per
    [Citations](#citations).
-9. **Deliberately not handled.** Scope boundaries and known gaps, so the
+8. **Deliberately not handled.** Scope boundaries and known gaps, so the
    reviewer does not spend attention rediscovering them.
-10. **Open questions.** Explicit asks for the reviewer, each answerable. A
-    change with genuinely no open question probably did not need a
-    walkthrough.
-11. **Sources.** The numbered reference list, present whenever the body cites
+9. **Open questions.** Explicit asks for the reviewer, each answerable. A
+   change with genuinely no open question probably did not need a
+   walkthrough.
+10. **Sources.** The numbered reference list, present whenever the body cites
     anything.
+
+Then, after Sources, **Appendix A. Glossary**: every term the reader will meet
+that is not general software-engineering vocabulary, defined in plain words and
+numbered, with each use in the text pointing to it. It is lettered rather than
+numbered, so adding it never shifts a section number. See
+[Glossary](#glossary).
 
 There is no reading-order or navigation section. Mapping sections to code is
 the explainer threads' job, per [As the reviewer](#as-the-reviewer), because
 the walkthrough stands alone.
 
+### Purpose
+
+The section every reader reads first, and often the only one a skimming
+reviewer reads. It answers two questions fast: why does this change exist, and
+what does it change. Two parts, in this order:
+
+1. **The problem, as one paragraph.** What a user did, what went wrong or was
+   missing, and why that matters, in the product's terms. Name one concrete
+   case the reader will recognise, such as the edit that broke a chart. This is
+   the part that earns the reader's attention, so it may take a full paragraph.
+2. **What the change does, as a bulleted list** under the line `This change:`.
+   One bullet per strand of work, in section order, each ending with its
+   section number in parentheses. Every strand gets a bullet, unrelated changes
+   that shipped on the same branch included (one bullet may list those
+   together), because a strand the reader has not been told about reads as a
+   non sequitur when its section arrives. The section numbers are the map;
+   there is no separate strand map.
+
+Each bullet is a line of a diff summary, not an explanation:
+
+- **Lead with a verb whose subject is the change:** "Stores", "Gives",
+  "Keeps", "Moves", "Waits".
+- **Say what changes, not how.** State the outcome a user or reviewer would
+  notice, or the one structural fact that defines the strand. Mechanism,
+  conditions, and edge cases belong to the strand's own section.
+- **One sentence of about 25 words at most.** A bullet that needs a semicolon,
+  a second clause of conditions, or a parenthetical has started explaining;
+  move the detail to the section.
+- **Plain words.** The bullets are read before any other section, so they use
+  product vocabulary and general engineering terms. A glossary marker helps a
+  reader who wants more, and never stands in for a plain description.
+
+| Avoid | Use |
+| --- | --- |
+| A paragraph that chains every strand's mechanism into one sentence: `Done means: dashboards carry a visibility level that survives a copy; publishing writes objects first and commits visibility after, retrying only while the claimed revision is current; the share dialog...` | One bullet per strand, each stating one outcome, as in the example below. |
+| `- Publishing claims a revision, uploads, then settles visibility only if the claim still holds (§6)`: the mechanism, compressed into the code's vocabulary. | `- Publishes in two steps, so a failed upload leaves the previous published copy online (§6)` |
+
+```markdown
+## 1. Purpose
+
+A dashboard was either private or visible to anyone with its link, and
+publishing one uploaded its charts and made it public in a single request. When
+the upload failed partway, people who followed the shared link saw a dashboard
+with blank charts, and the editor could not retry without unpublishing it
+first. Teams also had no way to share a dashboard with their own workspace
+without making it public.
+
+This change:
+
+- Replaces the public on/off switch with three visibility levels: private,
+  workspace, and public (§5).
+- Publishes in two steps, so a failed upload leaves the previous published
+  copy online (§6).
+- Adds a **Retry publish** button to the share dialog after a failed
+  publish (§7).
+- Also ships, unrelated: a lint rule against unused imports (§8).
+```
+
 ### Glossary
 
 Every term the reader will meet in the document that is not general
 software-engineering vocabulary: product terms with a specific meaning here,
-house terms, and the informal vocabulary of this area of the code. One list in
-alphabetical order, not split by kind. The clarity pass drafts it and the
-parent pastes it in, per
-[The clarity pass runs in a subagent](#the-clarity-pass-runs-in-a-subagent).
+house terms, and the informal vocabulary of this area of the code. One table in
+alphabetical order, not split by kind, placed last as `## Appendix A. Glossary`.
+The clarity pass drafts it and the parent pastes it in, per
+[The clarity pass runs in a subagent](#the-clarity-pass-runs-in-a-subagent),
+then numbers it and marks every use of its terms, per
+[Marking glossary terms in the text](#marking-glossary-terms-in-the-text).
 
+- **A two-column table, `Term` and `Meaning`, in smaller type.** Put a line
+  holding only `<small>` and a blank line before the table, and a blank line
+  and a line holding only `</small>` after it. `markdown-to-pdf` prints the
+  wrapped table a size smaller; GitHub drops the tag and prints it at normal
+  size, so nothing breaks either way.
+- **Numbered `G1` to `Gn` in alphabetical order,** with the number in bold at
+  the start of the term cell: `**G4** Column ID`. The marking script assigns
+  the numbers, so never number by hand.
+- **Name each entry the way the body says it.** The script matches the term's
+  exact words, plus the regular plural, possessive, `-ed`, and `-ing` forms of
+  its last word. List any other spelling the body uses in parentheses after the
+  term: `**G20** Reconcile (reconciliation)`. A term that is also an everyday
+  word, such as `Block` or `Issue`, marks every everyday use too, so qualify
+  it: `Dashboard block`.
 - **Define each term in plain words, grounded in the product.** Say what the
   thing is in terms of what a user does or sees, then, only if needed, what the
   code does with it. One or two sentences.
@@ -606,17 +680,48 @@ parent pastes it in, per
 | **Owner** - the scope a registry is keyed by. | **Owner** - the one place a query runs from, such as the Data Explorer or a single chart on a dashboard. Column IDs are never carried from one owner to another. |
 
 ```markdown
-## 2. Glossary
+## Appendix A. Glossary
 
-- **Column ID** - a permanent ID the app gives each column a user selects in a
-  query. Chart settings and filters save this ID instead of the column's name,
-  so renaming the column does not break them.
-- **Output name** - the name a column has in the query's results, such as
-  `total` in `SUM(cnt) AS total`. It changes when the user renames the column
-  or changes its aggregation.
-- **Projection** - one item in a query's SELECT list. `SUM(revenue)` and
-  `AVG(revenue)` are two projections of the same table column.
+<small>
+
+| Term | Meaning |
+| --- | --- |
+| **G1** Column ID | A permanent ID the app gives each column a user selects in a query. Chart settings and filters save this ID instead of the column's name, so renaming the column does not break them. |
+| **G2** Output name | The name a column has in the query's results, such as `total` in `SUM(cnt) AS total`. It changes when the user renames the column or changes its aggregation. |
+| **G3** Projection | One item in a query's SELECT list. `SUM(revenue)` and `AVG(revenue)` are two projections of the same table column. |
+
+</small>
 ```
+
+#### Marking glossary terms in the text
+
+Every use of a glossary term in the text carries the entry's number as a
+superscript straight after the word: `column ID<sup>G1</sup>`. The `G` and the
+raised type keep a marker distinct from a citation, which stays a bracketed
+numeral on the line, `[1]`, per [Citations](#citations).
+
+- **The first use in each block is marked.** A block is a paragraph, a list
+  item, or a table cell. Later uses in the same block are not marked, because
+  the marker is a line or two away.
+- **Never in** a heading, a table's header row, a code span, a fenced block
+  (mermaid included), or Sources. Headings are read without the glossary
+  anyway, per
+  [Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code).
+  A definition in the glossary marks the other entries it uses, never its own
+  term.
+- **The script owns the markers.** Never add, move, or renumber one by hand.
+  After writing the glossary, and again after any later edit to the text or
+  the glossary, run:
+
+  ```sh
+  python3 <skill-dir>/scripts/mark-glossary-terms.py <walkthrough.md>
+  ```
+
+  It sorts and numbers the glossary, strips every marker, and marks the
+  document again, so running it twice changes nothing. It prints each entry
+  the text never uses: drop the entry, or add the spelling the text uses to
+  the entry's parentheses. With `--check` it changes nothing and exits 1 when
+  the document is not marked as the script would leave it.
 
 ### Background technical context
 
@@ -630,22 +735,24 @@ Two parts, in this order:
    not a file inventory of the change. Mark a unit the change adds `(new)` and
    one it modifies `(changed)`; an unmarked unit is unchanged code the change
    depends on. A directory that only leads to a unit is a path, not a unit: it
-   carries no marker and gets no entry. The tree needs no caption, because the
-   list under it is its legend.
-2. **One entry per unit in the tree,** one or two short sentences and never
-   more: what the unit is in product terms, then the one relationship the
-   reader needs, such as what it writes to or who calls it. The strand
-   sections carry everything else.
+   carries no marker and gets no row. The tree needs no caption, because the
+   table under it is its legend.
+2. **A two-column table, `Unit` and `What it is`,** one row per unit in the
+   tree, in tree order, and not numbered. Wrap it in `<small>` the same way as
+   the [Glossary](#glossary), so it prints a size smaller. Each row is one or
+   two short sentences and never more: what the unit is in product terms, then
+   the one relationship the reader needs, such as what it writes to or who
+   calls it. The strand sections carry everything else.
 
-The tree and its list are one figure, so they fit on one printed page, per
+The tree and its table are one figure, so they fit on one printed page, per
 [A figure never spans two pages](#a-figure-never-spans-two-pages). When the
 change is too wide for that, show each area's anchor unit and let the strand
-sections introduce the rest. Do not define vocabulary in an entry: terms
-belong in the [Glossary](#glossary), which the clarity pass drafts after this
-section exists.
+sections introduce the rest. Do not define vocabulary in a row: terms belong
+in the [Glossary](#glossary), which the clarity pass drafts after this section
+exists.
 
 ````markdown
-## 3. Background technical context
+## 2. Background technical context
 
 ```text
 shared/models/
@@ -663,21 +770,19 @@ src/views/
     └── DataVizPBlock/                             (changed)
 ```
 
-- `Dashboard`: the model that holds everything about one dashboard, including
-  its page and the charts on it. Written to the `dashboards` table through
-  `DashboardClient`.
-- `StructuredQuery`: the model for a query a user builds with the Query tab's
-  form instead of typing SQL. `structuredQueryToSql` turns it into the SQL that
-  runs.
-- `QueryColumnBindings`: matches each column of a query's results to the
-  column ID that chart settings and filters saved.
-- `makeOutputNameVizConfigFromColumnIdConfig`: just before a chart draws, swaps
-  each saved column ID for that column's current name in the results.
-- `DashboardClient`: reads and writes rows of the `dashboards` table.
-- `DataExplorerApp`: the Data Explorer page, where a user writes a query and
-  charts its results.
-- `DataVizPBlock`: one chart on a dashboard page. It runs its own query and
-  draws the result.
+<small>
+
+| Unit | What it is |
+| --- | --- |
+| `Dashboard` | The model that holds everything about one dashboard, including its page and the charts on it. Written to the `dashboards` table through `DashboardClient`. |
+| `StructuredQuery` | The model for a query a user builds with the Query tab's form instead of typing SQL. `structuredQueryToSql` turns it into the SQL that runs. |
+| `QueryColumnBindings` | Matches each column of a query's results to the column ID that chart settings and filters saved. |
+| `makeOutputNameVizConfigFromColumnIdConfig` | Just before a chart draws, swaps each saved column ID for that column's current name in the results. |
+| `DashboardClient` | Reads and writes rows of the `dashboards` table. |
+| `DataExplorerApp` | The Data Explorer page, where a user writes a query and charts its results. |
+| `DataVizPBlock` | One chart on a dashboard page. It runs its own query and draws the result. |
+
+</small>
 ````
 
 ### Manual testing
@@ -717,7 +822,7 @@ up to this standard. Do not edit `-test-plan.md` itself.
   blockquote, as in the test plan.
 
 ````markdown
-## 4. Manual testing
+## 3. Manual testing
 
 1. Confirm `ava supabase status` reports this worktree's own project, running
    `ava supabase switch` first if it does not. Then rebuild the database. The
@@ -1107,7 +1212,7 @@ different steps, and a single section covering both answers neither.
 Three rules apply throughout:
 
 - **Trace one traversal with real values.** The input, the intermediate states,
-  the output, per the algorithm bullet in item 6 of [Sections](#sections).
+  the output, per the algorithm bullet in item 5 of [Sections](#sections).
   For a pipeline this is often a before and after pair of catalog reads, file
   contents, or command output, quoted rather than described.
 - **State what each step deliberately does not do.** An unexplained exclusion
@@ -1320,7 +1425,7 @@ do not turn the caption into a slogan or punchline.
 
 ### Closing checks
 
-Nine passes over the finished draft, before handing it over. Each catches a
+Ten passes over the finished draft, before handing it over. Each catches a
 class of defect that reading the document top to bottom does not.
 
 Run them by dispatching a subagent, per
@@ -1345,15 +1450,17 @@ own draft.
      shades the wrong line and nothing else will tell you.
    - A claim that carried a citation, after the sections moved. A shrinking
      Sources list is the symptom.
-   - The strand map in Purpose against the sections delivered.
+   - The section number on each Purpose bullet against the sections
+     delivered, and one bullet per strand.
    - A section cross-reference (`§4.2`) against where that content now lives.
    - The Glossary against the body: an entry for a term the body no longer
-     uses, or a term the body leans on with no entry.
-   - The Background tree against the list under it: every unit in the tree
-     has an entry, and every entry's subject is in the tree. A function named
-     inside an entry is not a unit and needs no node.
+     uses, which the marking script reports, or a term the body leans on with
+     no entry.
+   - The Background tree against the table under it: every unit in the tree
+     has a row, and every row's subject is in the tree. A function named
+     inside a row is not a unit and needs no node.
 
-2. **Audit the coverage,** per the checklist in item 6 of
+2. **Audit the coverage,** per the checklist in item 5 of
    [Sections](#sections): walk it against every strand and confirm where each
    item landed, saying so when an item does not apply.
 
@@ -1405,19 +1512,33 @@ own draft.
    longest sections first, where the answer is least likely to cover the whole
    length.
 
-8. **Check the opening sections against their contracts.** Purpose, Glossary,
-   Background technical context, and Manual testing come first, in that order.
+8. **Check the opening sections and the appendix against their contracts.**
+   Purpose, Background technical context, and Manual testing come first, in
+   that order, and the Glossary is Appendix A, after Sources. Purpose is one
+   problem paragraph and one bullet per strand, and every bullet passes
+   [Purpose](#purpose): it leads with a verb, says what changes rather than
+   how, and fits one sentence of about 25 words. Read the bullets alone and
+   confirm a reviewer could say what the change does without reading further.
    No glossary definition uses a term that would itself need defining, per
-   [Glossary](#glossary). No Background entry runs past two sentences, per
-   [Background technical context](#background-technical-context). Every Manual
-   testing step is runnable as written, setup comes first, and each fixed
-   defect has its before-and-after, per [Manual testing](#manual-testing).
+   [Glossary](#glossary). No Background row runs past two sentences, per
+   [Background technical context](#background-technical-context). Both tables
+   sit inside a `<small>` wrapper. Every Manual testing step is runnable as
+   written, setup comes first, and each fixed defect has its before-and-after,
+   per [Manual testing](#manual-testing).
 
 9. **Confirm the document stands alone,** per
    [The walkthrough stands alone](#the-walkthrough-stands-alone). Search it for
    `.difit`, `guide`, `group`, `transcript`, `test plan`, `thread`, and
    absolute paths, and remove every pointer to something a reader of the pull
    request cannot open. There is no reading-order section.
+
+10. **Confirm the glossary markers are current,** per
+    [Marking glossary terms in the text](#marking-glossary-terms-in-the-text).
+    Run `mark-glossary-terms.py` after the last edit, then again with
+    `--check`, which must pass. Act on every entry it reports as unused. Skim
+    the markers on everyday words and confirm each marks the glossary's
+    meaning; where one does not, qualify the entry's term or reword the
+    sentence, then run the script again.
 
 ### Review passes
 
@@ -1467,7 +1588,7 @@ It works in three steps:
    change touches, such as models, clients, views, the database, or workers,
    and which unchanged units the changed code calls into or is called from. The
    blast radius sets the depth. A change confined to one module needs two or
-   three entries; a change that crosses the model, client, and view layers
+   three rows; a change that crosses the model, client, and view layers
    needs an anchor in each layer.
 3. **Keep only what a reader needs as background:** a unit is in when a later
    section names it without saying what it is, or when the reader needs it to
@@ -1508,6 +1629,9 @@ anything else:
   from general engineering vocabulary, a relationship word missing one side, an
   abstract noun whose owner is not in the same or the previous sentence, or a
   generic word that could name more than one thing.
+- **Purpose:** after the Purpose section alone, it cannot say in a sentence or
+  two why the change exists and what it changes, or a bullet explains a
+  mechanism instead of stating what changes, per [Purpose](#purpose).
 - **Problems and solutions:** a problem it could not restate as what a user did
   and what went wrong, or a solution whose mechanism it could not name.
 - **Algorithms:** a step it could not trace using the worked example given.
@@ -1547,7 +1671,9 @@ It returns four things:
    cold-read test, with its replacement, and every move, each with the
    dependency that motivates it.
 3. **Questions for the parent,** for the stalls only the author can resolve.
-4. **The glossary,** ready to paste, per [Glossary](#glossary).
+4. **The glossary,** as table rows ready to paste, per [Glossary](#glossary):
+   each term spelled the way the text uses it, with other spellings the text
+   uses in parentheses. It need not number them.
 
 The parent reads every proposal, heading rename, and move, and accepts,
 corrects, or rejects each. It applies the accepted ones, checking that each
@@ -1555,11 +1681,13 @@ rewrite keeps the original claim, or corrects it on purpose where the author
 knows the original was imprecise, and that every fact a rewrite adds is true,
 tagged or not. A move that leaves a section without its locating sentence
 gets one. It answers the questions in the text or the figures, then writes the
-glossary into its section: dropping any entry for a term the reader no longer
+glossary into Appendix A: dropping any entry for a term the reader no longer
 meets, in prose or in a code name the document asks them to read, and adding
-one for any new term its own rewrites introduced. A rejection is a normal
-outcome, and the content review that follows checks the result against the
-code.
+one for any new term its own rewrites introduced. Last, it runs the marking
+script per
+[Marking glossary terms in the text](#marking-glossary-terms-in-the-text) and
+acts on its unused-entry report. A rejection is a normal outcome, and the
+content review that follows checks the result against the code.
 
 ### The content review runs in a subagent
 
@@ -1576,9 +1704,11 @@ is it what the code does". Dispatch it with:
   the change applied. Never a write, and never the production database.
 
 It applies its fixes to the markdown and returns every change with the evidence
-behind it. The parent then accepts or rejects each one: the subagent has read
-the code more recently, the author knows what the change was for, and neither
-alone is a good judge of a disputed claim.
+behind it. It leaves glossary markers alone, even where an edit strands one,
+because the parent runs the marking script afterwards. The parent then accepts
+or rejects each change: the subagent has read the code more recently, the
+author knows what the change was for, and neither alone is a good judge of a
+disputed claim.
 
 #### Verify against the sources, never against the document
 
@@ -1635,7 +1765,7 @@ Beyond the joins, check and fix:
 - **Highlight specs**, by counting the printed snippet's lines. A clause the
   prose points at that spans two source lines needs both, and a spec naming
   only the first shades half a claim.
-- **The opening sections.** Every Glossary definition and Background entry,
+- **The opening sections.** Every Glossary definition and Background row,
   against the code. Every command, path, test file, and fixture file in Manual
   testing exists under that name, and each before-and-after matches what the
   base revision and the change actually do. Check these by reading, never by
@@ -1671,7 +1801,7 @@ Dispatch it with:
 
 - the absolute path of `-walkthrough.md`,
 - the absolute path of this SKILL.md, told to read
-  [Sections](#sections), [Glossary](#glossary),
+  [Sections](#sections), [Purpose](#purpose), [Glossary](#glossary),
   [Background technical context](#background-technical-context),
   [Manual testing](#manual-testing), [Diagrams](#diagrams),
   [Screenshots](#screenshots),
@@ -1683,7 +1813,9 @@ Dispatch it with:
   [Rules](#rules) before changing anything,
 - authority to edit the walkthrough file and nothing else.
 
-It returns the list of changes it made and anything it judged out of scope.
+It runs the marking script after its last edit and before its last render, per
+closing check 10, and returns the list of changes it made and anything it
+judged out of scope.
 
 **Its remit is style, never substance.** It may rewrite a heading, cut a tell,
 retitle a caption, add a missing glossary, reflow a diagram, and correct a
@@ -1980,13 +2112,15 @@ does when step 1 runs it, read-only with respect to source.
    [Screenshots](#screenshots).
 5. Where a decision's rationale is not recoverable from the code, say so
    rather than inventing one, and add it to Open questions.
-6. Write `-walkthrough.md`, including Manual testing per
-   [Manual testing](#manual-testing). Write the Glossary and Background
-   technical context headings with a one-line placeholder each, so section
-   numbers are final from the first draft; the next two passes fill them.
+6. Write `-walkthrough.md`, including Purpose per [Purpose](#purpose) and
+   Manual testing per [Manual testing](#manual-testing). Write the Background
+   technical context heading and `## Appendix A. Glossary` with a one-line
+   placeholder each, so section numbers are final from the first draft; the
+   next two passes fill them.
    When regenerating, keep each section's number where its content still
    fits, because earlier explainer threads cite those numbers. Do not touch
-   the transcript, the guides, the reviewed state, or any source file. When a strand is a pipeline or a multi-pass algorithm, read
+   the transcript, the guides, the reviewed state, or any source file. When a
+   strand is a pipeline or a multi-pass algorithm, read
    [`references/pipeline-explanation.md`](references/pipeline-explanation.md)
    before writing that section.
 7. Run the background context pass, by dispatching a subagent per
@@ -1996,14 +2130,15 @@ does when step 1 runs it, read-only with respect to source.
 8. Run the clarity pass, by dispatching a subagent per
    [The clarity pass runs in a subagent](#the-clarity-pass-runs-in-a-subagent).
    Read every proposal and accept or reject it, apply the accepted ones, answer
-   its questions in the text, and write the glossary it returned into the
-   Glossary section.
+   its questions in the text, write the glossary it returned into Appendix A,
+   and run the marking script per
+   [Marking glossary terms in the text](#marking-glossary-terms-in-the-text).
 9. Enter the content review phase, by dispatching a subagent per
    [The content review runs in a subagent](#the-content-review-runs-in-a-subagent).
    It checks the draft for accuracy against the code, fixes what it finds, and
    reports each change with its evidence. Read every change and accept or
    reject it: a rejection is a normal outcome, and a change accepted without
-   reading it defeats the phase.
+   reading it defeats the phase. Then run the marking script again.
 10. Then run the style check, always the last pass, by dispatching a subagent
     per [The style check runs in a subagent](#the-style-check-runs-in-a-subagent).
     It applies [Closing checks](#closing-checks) and loops on the rendered PDF
