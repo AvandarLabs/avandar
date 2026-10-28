@@ -13,7 +13,7 @@ import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
  * "changing a control updates the config"; these tests prove
  * "changing a config setting updates what the chart renders".
  */
-import type { NameBoundScatterSeries as ScatterSeries } from "$/models/vizs/ColumnIdVizConfig/NameBoundVizConfig.types";
+import type { NameBoundScatterSeries as ScatterSeries } from "$/models/vizs/VizConfig/NameBoundVizConfig.types";
 import type { ReactNode } from "react";
 
 const rechartsXAxisMock = vi.fn();

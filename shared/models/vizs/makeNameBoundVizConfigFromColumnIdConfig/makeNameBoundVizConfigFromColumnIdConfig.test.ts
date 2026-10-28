@@ -8,7 +8,7 @@ import { uuid } from "$/lib/uuid.ts";
 import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { ColumnIdVizConfig } from "$/models/vizs/ColumnIdVizConfig/ColumnIdVizConfig.ts";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
 
 const REVENUE_ID = uuid<QueryColumn.Id>();
 const CATEGORY_ID = uuid<QueryColumn.Id>();
@@ -31,14 +31,14 @@ const SERIES: { key: QueryColumn.Id; label: string; color: string } = {
   color: "#123456",
 };
 const CHART_STYLE: NonNullable<
-  Extract<ColumnIdVizConfig.T, { vizType: "bar" }>["chartStyle"]
+  Extract<VizConfig.T, { vizType: "bar" }>["chartStyle"]
 > = { xAxis: { label: "revenue", tickColor: "blue.6" } };
 
 function _readValues({
   config,
   row = ROW,
 }: {
-  config: ColumnIdVizConfig.NameBound;
+  config: VizConfig.NameBound;
   row?: Readonly<Record<string, string | number>>;
 }): unknown[] {
   return match(config)
@@ -77,7 +77,7 @@ function _readValues({
     .exhaustive();
 }
 
-const CONFIGS: ColumnIdVizConfig.T[] = [
+const CONFIGS: VizConfig.T[] = [
   {
     vizType: "bar",
     xAxisKey: CATEGORY_ID,
@@ -189,7 +189,7 @@ describe("makeNameBoundVizConfigFromColumnIdConfig", () => {
   ] as const)(
     "moves $vizType $slot independently of the other coordinates",
     ({ vizType, slot }) => {
-      const config: ColumnIdVizConfig.T =
+      const config: VizConfig.T =
         vizType === "scatter"
           ? { vizType, series: [{ key: REVENUE_ID, xKey: CATEGORY_ID }] }
           : {

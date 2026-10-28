@@ -5,8 +5,12 @@ import { makeColumnSlotsFromVizConfig } from "$/models/vizs/makeColumnSlotsFromV
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { QueryResultColumnBindingIssue } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
-import type { ColumnIdVizConfig } from "$/models/vizs/ColumnIdVizConfig/ColumnIdVizConfig.ts";
 import type { VizColumnSlot } from "$/models/vizs/makeColumnSlotsFromVizConfig.ts";
+import type {
+  BubbleSeries,
+  ScatterSeries,
+} from "$/models/vizs/SeriesConfig.ts";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
 
 type GetSlotColumnId = ({
   key,
@@ -34,11 +38,11 @@ function _mapSeries<Series extends { key: string }>(
 function _mapScatterSeries(
   options: Readonly<{
     series: Readonly<
-      Extract<ColumnIdVizConfig.NameBound, { vizType: "scatter" }>["series"]
+      Extract<VizConfig.NameBound, { vizType: "scatter" }>["series"]
     >;
     getSlotColumnId: GetSlotColumnId;
   }>,
-): ColumnIdVizConfig.ScatterSeries[] {
+): ScatterSeries[] {
   return options.series.flatMap((series, index) => {
     const key = options.getSlotColumnId({
       key: series.key,
@@ -57,11 +61,11 @@ function _mapScatterSeries(
 function _mapBubbleSeries(
   options: Readonly<{
     series: Readonly<
-      Extract<ColumnIdVizConfig.NameBound, { vizType: "bubble" }>["series"]
+      Extract<VizConfig.NameBound, { vizType: "bubble" }>["series"]
     >;
     getSlotColumnId: GetSlotColumnId;
   }>,
-): ColumnIdVizConfig.BubbleSeries[] {
+): BubbleSeries[] {
   return options.series.flatMap((series, index) => {
     const key = options.getSlotColumnId({
       key: series.key,
@@ -83,13 +87,10 @@ function _mapBubbleSeries(
 
 function _mapXYConfig(
   options: Readonly<{
-    config: Extract<
-      ColumnIdVizConfig.NameBound,
-      { vizType: "bar" | "line" | "area" }
-    >;
+    config: Extract<VizConfig.NameBound, { vizType: "bar" | "line" | "area" }>;
     getSlotColumnId: GetSlotColumnId;
   }>,
-): Extract<ColumnIdVizConfig.T, { vizType: "bar" | "line" | "area" }> {
+): Extract<VizConfig.T, { vizType: "bar" | "line" | "area" }> {
   const { config, getSlotColumnId } = options;
   return {
     ...config,
@@ -100,10 +101,10 @@ function _mapXYConfig(
 
 function _mapCategoryConfig(
   options: Readonly<{
-    config: Extract<ColumnIdVizConfig.NameBound, { vizType: "pie" | "funnel" }>;
+    config: Extract<VizConfig.NameBound, { vizType: "pie" | "funnel" }>;
     getSlotColumnId: GetSlotColumnId;
   }>,
-): Extract<ColumnIdVizConfig.T, { vizType: "pie" | "funnel" }> {
+): Extract<VizConfig.T, { vizType: "pie" | "funnel" }> {
   const { config, getSlotColumnId } = options;
   return {
     ...config,
@@ -114,10 +115,10 @@ function _mapCategoryConfig(
 
 function _mapConfig(
   options: Readonly<{
-    config: Readonly<ColumnIdVizConfig.NameBound>;
+    config: Readonly<VizConfig.NameBound>;
     getSlotColumnId: GetSlotColumnId;
   }>,
-): ColumnIdVizConfig.T {
+): VizConfig.T {
   const { config, getSlotColumnId } = options;
   return match(config)
     .with({ vizType: "table" }, identity)
@@ -196,9 +197,9 @@ export function makeColumnIdVizConfigFromNameBoundConfig({
   config,
   columns,
 }: Readonly<{
-  config: Readonly<ColumnIdVizConfig.NameBound>;
+  config: Readonly<VizConfig.NameBound>;
   columns: readonly QueryResult.ColumnWithId[];
-}>): { config: ColumnIdVizConfig.T; issues: QueryResultColumnBindingIssue[] } {
+}>): { config: VizConfig.T; issues: QueryResultColumnBindingIssue[] } {
   const slots = makeColumnSlotsFromVizConfig(config).map((slot) => {
     return _bindSlotToColumnId({ slot, columns });
   });

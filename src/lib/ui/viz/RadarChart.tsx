@@ -2,7 +2,7 @@ import { RadarChart as MantineRadarChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { makeLegendPropsFromPosition } from "@/lib/ui/viz/legend/makeLegendPropsFromPosition/makeLegendPropsFromPosition";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { NameBoundRadarSeries as RadarSeries } from "$/models/vizs/ColumnIdVizConfig/NameBoundVizConfig.types";
+import type { NameBoundRadarSeries as RadarSeries } from "$/models/vizs/VizConfig/NameBoundVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {

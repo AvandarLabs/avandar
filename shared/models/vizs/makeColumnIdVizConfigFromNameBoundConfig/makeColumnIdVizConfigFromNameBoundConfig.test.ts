@@ -6,7 +6,7 @@ import { makeColumnIdVizConfigFromNameBoundConfig } from "$/models/vizs/makeColu
 import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { ColumnIdVizConfig } from "$/models/vizs/ColumnIdVizConfig/ColumnIdVizConfig.ts";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
 
 const REVENUE_ID = uuid<QueryColumn.Id>();
 const CATEGORY_ID = uuid<QueryColumn.Id>();
@@ -21,7 +21,7 @@ const SERIES: { key: string; label: string; color: string } = {
   label: "revenue",
   color: "#123456",
 };
-const CONFIGS: ColumnIdVizConfig.NameBound[] = [
+const CONFIGS: VizConfig.NameBound[] = [
   {
     vizType: "bar",
     xAxisKey: "quarter",
@@ -101,7 +101,7 @@ describe("makeColumnIdVizConfigFromNameBoundConfig", () => {
   it.each(["Revenue", "revenue"])(
     "rejects ambiguous QueryResult column name %s without choosing the first column",
     (key) => {
-      const config: ColumnIdVizConfig.NameBound = {
+      const config: VizConfig.NameBound = {
         vizType: "line",
         xAxisKey: undefined,
         series: [{ renderAs: "line", key }],

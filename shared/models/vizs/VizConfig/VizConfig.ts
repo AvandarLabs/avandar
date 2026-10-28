@@ -1,4 +1,4 @@
-import type { NameBoundVizConfig } from "$/models/vizs/ColumnIdVizConfig/NameBoundVizConfig.types.ts";
+import type { NameBoundVizConfig } from "$/models/vizs/VizConfig/NameBoundVizConfig.types.ts";
 /* eslint-disable @typescript-eslint/no-namespace */
 import type {
   VizConfig as VizConfigRead,
