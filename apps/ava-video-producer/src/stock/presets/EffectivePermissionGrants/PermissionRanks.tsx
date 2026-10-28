@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { ROLE_RANK } from "./getEffectiveRoleFromInput";
 import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /** Every role occupies a stable rank with its complete authored label. */
 export function PermissionRanks({ input }: Readonly<Props>): ReactNode {

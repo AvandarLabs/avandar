@@ -11,6 +11,7 @@ import {
   invalidInputs,
 } from "./AidCargoModeHandoff.fixtures";
 import { inputSchema, type Input } from "./AidCargoModeHandoff.schema";
+
 function _render({
   frame,
   input,
@@ -33,6 +34,7 @@ test("The exact parcel identities and counts survive every carrier transfer; a p
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { aidCargoModeHandoffContract } from "./AidCargoModeHandoff.contract";
+
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     input.scenarioCaption,

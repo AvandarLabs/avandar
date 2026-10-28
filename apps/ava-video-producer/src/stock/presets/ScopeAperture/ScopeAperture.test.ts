@@ -10,6 +10,7 @@ import { scopeApertureContract as contract } from "./ScopeAperture.contract";
 import { DEFAULT_INPUT, fixtures } from "./ScopeAperture.fixtures";
 import { inputSchema } from "./ScopeAperture.schema";
 import type { Input } from "./ScopeAperture.schema";
+
 function _topicAttributes({
   markup,
   id,

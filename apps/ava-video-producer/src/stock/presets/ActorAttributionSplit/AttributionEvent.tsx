@@ -6,6 +6,7 @@ import { RecordedStamp } from "./RecordedStamp";
 import { StampHandling } from "./StampHandling";
 import type { Input } from "./ActorAttributionSplit.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   input: Input;

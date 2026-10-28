@@ -2,6 +2,7 @@ import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; accent: string };
 /** Each supplied anchor owns its derived membership subtotal. */
 export function ClusterCounts({ input, accent }: Readonly<Props>): ReactNode {

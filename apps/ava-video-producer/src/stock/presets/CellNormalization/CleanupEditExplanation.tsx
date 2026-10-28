@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
+
 type Props = { row: Input["rows"][number]; input: Input; frame: number };
 /** Authored edit explanations stay beneath their per-row or column label. */
 export function CleanupEditExplanation({

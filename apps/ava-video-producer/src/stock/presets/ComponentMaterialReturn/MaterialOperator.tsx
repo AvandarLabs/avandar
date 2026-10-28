@@ -1,6 +1,7 @@
 import { getOperatorGripFromInputAndFrame } from "./getOperatorGripFromInputAndFrame";
 import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * The operator approaches empty-handed, then grips and carries one whole part.

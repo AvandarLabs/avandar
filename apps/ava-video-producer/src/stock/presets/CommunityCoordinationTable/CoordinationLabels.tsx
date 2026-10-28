@@ -4,6 +4,7 @@ import { CoordinationPlaceCopy } from "./CoordinationPlaceCopy";
 import { CoordinationTeamCopy } from "./CoordinationTeamCopy";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Keyed request and assignment rails retain complete authored labels. */
 export function CoordinationLabels({

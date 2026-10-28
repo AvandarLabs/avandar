@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   labels: Input["labels"];

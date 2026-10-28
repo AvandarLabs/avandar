@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input };
 /** Supplied state legends keep pending and acknowledged meanings explicit. */
 export function JournalCopy({ frame, input }: Readonly<Props>): ReactNode {

@@ -4,6 +4,7 @@ import test from "node:test";
 import { propEq } from "@avandar/utils";
 import { makeStockControlsFromSchema } from "./makeStockControlsFromSchema";
 import type { StockControl, StockJsonSchema } from "../StockContract.types";
+
 const PERSON_SCHEMA: StockJsonSchema = {
   type: "object",
   additionalProperties: false,

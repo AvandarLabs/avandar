@@ -3,6 +3,7 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   index: number;

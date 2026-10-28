@@ -3,6 +3,7 @@ import { getMaterialBalanceFromInput } from "./getMaterialBalanceFromInput";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; assembled: number };
 /**
  * Destination quantities remain visible even when the optional equation hides.

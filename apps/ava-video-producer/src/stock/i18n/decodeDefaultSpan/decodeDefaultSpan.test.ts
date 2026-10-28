@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { decodeDefaultSpan } from "./decodeDefaultSpan";
+
 test("one explicit content pair preserves exact prefix, selection and suffix UTF-16 lengths", () => {
   assert.deepEqual(decodeDefaultSpan("Pré 👩‍🔬 <content>é</content> fin"), {
     text: "Pré 👩‍🔬 é fin",

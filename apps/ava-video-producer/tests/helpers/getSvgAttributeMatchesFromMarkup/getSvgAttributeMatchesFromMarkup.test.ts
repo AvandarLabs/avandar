@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { getSvgAttributeMatchesFromMarkup } from "./getSvgAttributeMatchesFromMarkup";
+
 test("opening tags retain empty and escaped attribute values in document order", () => {
   const markup =
     '<svg><circle data-key=""/><text data-key="a &amp; b &quot;c&quot; &#x27;d&#39; &#x754c;"/></svg>';

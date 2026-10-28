@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 type Props = { id: string; index: number; accent: string };
 /** Highlights the focused assignment record. */
 export function FocusedRecord({

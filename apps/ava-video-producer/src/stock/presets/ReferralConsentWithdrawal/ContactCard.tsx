@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   contact: Input["plannedContacts"][number];
   x: number;

@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { getDuplicateCardLayoutFromGroupAndFrame } from "./getDuplicateCardLayoutFromGroupAndFrame";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   input: Input;

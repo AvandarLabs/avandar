@@ -2,6 +2,7 @@ import { ramp, EASE } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 function _getCompassGeometry({
   input,

@@ -1,6 +1,7 @@
 import { propEq, propNotEq } from "@avandar/utils";
 import { EASE, mix, ramp } from "../../../motion";
 import type { Input } from "./SharedWorkshopBooking.schema";
+
 type Props = { input: Input; frame: number; index: number };
 function _getUse({ input, frame, index }: Readonly<Props>) {
   const bookings = input.requests

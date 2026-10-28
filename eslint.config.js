@@ -39,7 +39,9 @@ export default [
       // bundles here. Gitignored, but still linted, so `pnpm lint` failed with
       // thousands of errors on any machine that had run the e2e suite.
       "playwright-report/**",
-      "src/i18n/locales/**/messages.ts",
+      // Lingui-compiled catalogs, each generated from the `messages.po` beside
+      // it.
+      "**/locales/**/messages.ts",
       // The repo's scratch directory (AGENTS.md sends screenshots and one-off
       // scripts here, per branch). Gitignored, but still linted, so `pnpm lint`
       // failed on whatever throwaway script the last debugging session left
@@ -122,6 +124,9 @@ export default [
           },
         ],
         "import-x/no-duplicates": "error",
+        // oxfmt sorts imports but, unlike the Prettier import-sort plugin it
+        // replaced, never inserts a blank line after the import block.
+        "import-x/newline-after-import": ["error", { count: 1 }],
         // Vite virtual modules (e.g. vite-plugin-pwa's virtual:pwa-register)
         "import-x/no-unresolved": ["error", { ignore: ["^virtual:"] }],
         "import-x/prefer-default-export": "off",

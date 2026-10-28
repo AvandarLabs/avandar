@@ -2,6 +2,7 @@ import { TransferArtifact } from "./TransferArtifact";
 import type { getTransferSceneFromFrame } from "./getTransferSceneFromFrame";
 import type { Input } from "./PortableWorkTransfer.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   scene: ReturnType<typeof getTransferSceneFromFrame>;

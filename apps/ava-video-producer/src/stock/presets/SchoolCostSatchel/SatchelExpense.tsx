@@ -3,6 +3,7 @@ import { ExpenseAmounts } from "./ExpenseAmounts";
 import { ExpenseObject } from "./ExpenseObject";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   expense: Input["expenses"][number];
   index: number;

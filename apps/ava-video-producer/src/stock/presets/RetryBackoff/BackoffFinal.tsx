@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
+
 type Props = { outcome: Input["attempts"][number]["outcome"]; x: number };
 /** The declared final outcome draws a completion socket or stop cap. */
 export function BackoffFinal({ outcome, x }: Readonly<Props>): ReactNode {

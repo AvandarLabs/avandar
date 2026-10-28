@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { ExpectedSheet } from "./ExpectedSheet";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   item: Input["tests"][number];
   y: number;

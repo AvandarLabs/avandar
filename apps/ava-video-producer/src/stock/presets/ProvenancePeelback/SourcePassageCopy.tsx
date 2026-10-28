@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode, ComponentProps } from "react";
+
 type Props = {
   source: Input["sources"][number];
   selected: boolean;

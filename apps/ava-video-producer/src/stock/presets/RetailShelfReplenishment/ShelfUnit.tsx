@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   good: Input["goods"][number];
   unitIndex: number;

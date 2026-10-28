@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { LocalAggregateCell } from "./LocalAggregateCell";
 import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** Aggregate-only local sheet with explicit analysis boundary and shutters. */
 export function LocalCountSheet({ input, frame }: Readonly<Props>): ReactNode {

@@ -8,6 +8,7 @@ import {
   fixtures,
   invalidInputs,
 } from "./PocketInference.fixtures";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -62,6 +63,7 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { pocketInferenceContract } from "./PocketInference.contract";
 import { inputSchema } from "./PocketInference.schema";
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,

@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { ApproachTrait } from "./ApproachTrait";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   accent: string;

@@ -2,6 +2,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import type { Input } from "./OutreachHouseholdRevisits.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * A single worker follows the authored order, including stationary revisits.

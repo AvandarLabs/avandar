@@ -1,6 +1,7 @@
 import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { transfer: number };
 /** Workshop Bench for the authored scene. */
 export function WorkshopBench({ transfer }: Readonly<Props>): ReactNode {

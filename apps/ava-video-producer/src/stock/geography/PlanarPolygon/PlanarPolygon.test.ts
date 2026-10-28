@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { PlanarPolygon } from "./PlanarPolygon";
+
 const SQUARE: Array<[number, number]> = [
   [0, 0],
   [10, 0],

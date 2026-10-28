@@ -1,5 +1,6 @@
 import { mix, ramp, EASE } from "../../../motion";
 import type { Input } from "./BenefitShortfallCorrection.schema";
+
 type Options = {
   payment: Input["payments"][number];
   frame: number;

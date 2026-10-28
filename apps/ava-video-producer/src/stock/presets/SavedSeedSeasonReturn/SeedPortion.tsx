@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 type Props = {
   destination: "current" | "remaining" | "sown" | "loss";
   position: { x: number; y: number };

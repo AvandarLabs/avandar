@@ -5,6 +5,7 @@ import { ReunionMember } from "./ReunionMember";
 import { DEFAULT_INPUT } from "./VoluntaryFamilyReunion.fixtures";
 import type { Input } from "./VoluntaryFamilyReunion.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /**
  * Independent voluntary acceptance precedes travel and an individual greeting.

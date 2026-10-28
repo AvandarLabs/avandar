@@ -1,6 +1,7 @@
 import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; accepted: boolean; accent: string };
 /** Acknowledgement becomes visible before responsibility begins crossing. */
 export function CustodyAcceptance({

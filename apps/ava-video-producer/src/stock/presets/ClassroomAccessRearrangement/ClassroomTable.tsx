@@ -1,6 +1,7 @@
 import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { hasTable: boolean; progress: number; accent: string };
 /** Classroom Table for the authored scene. */
 export function ClassroomTable({

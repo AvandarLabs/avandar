@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 
 /**

@@ -1,6 +1,7 @@
 import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = {
   zoneId: string;
   points: string;

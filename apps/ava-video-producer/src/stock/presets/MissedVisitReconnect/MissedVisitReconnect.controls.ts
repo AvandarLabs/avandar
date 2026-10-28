@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { inputSchema } from "./MissedVisitReconnect.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
+
 function _copy({ path, message }: { path: string; message: string }) {
   return { id: `motionAtlas.missed-visit-reconnect.controls.${path}`, message };
 }

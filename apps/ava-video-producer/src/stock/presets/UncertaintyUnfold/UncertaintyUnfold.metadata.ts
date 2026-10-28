@@ -2,6 +2,7 @@ import { parseStockMetadata } from "../../contracts/parseStockMetadata/parseStoc
 import authoredMetadata from "./UncertaintyUnfold.metadata.yaml";
 import type { StockMetadata } from "../../contracts/StockContract.types";
 import type { Input } from "./UncertaintyUnfold.schema";
+
 export { controls } from "./UncertaintyUnfold.controls";
 /** Public retrieval copy excludes private planning provenance. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);

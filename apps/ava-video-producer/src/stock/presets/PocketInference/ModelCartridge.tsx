@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { CartridgeText } from "./CartridgeText";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /**
  * The resident model seats entirely inside the casing before the single

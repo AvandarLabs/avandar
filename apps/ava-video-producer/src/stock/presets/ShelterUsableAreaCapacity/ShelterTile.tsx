@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { getFloorTileGeometryFromInputAndFrame } from "./getFloorTileGeometryFromInputAndFrame";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   tile: Input["floorTiles"][number];

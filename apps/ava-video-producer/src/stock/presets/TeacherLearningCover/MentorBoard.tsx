@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { SceneText } from "./SceneText";
 import type { Input } from "./TeacherLearningCover.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** Draws the scene's MentorBoard group with fixed authored geometry. */
 export function MentorBoard({ input, frame }: Readonly<Props>): ReactNode {

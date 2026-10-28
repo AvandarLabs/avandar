@@ -11,6 +11,7 @@ import {
   invalidInputs,
 } from "./ColdChainCustody.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -38,6 +39,7 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { coldChainCustodyContract } from "./ColdChainCustody.contract";
 import { inputSchema, type Input } from "./ColdChainCustody.schema";
+
 const textLayoutOptions = {
   inputSchema,
   fixtures,

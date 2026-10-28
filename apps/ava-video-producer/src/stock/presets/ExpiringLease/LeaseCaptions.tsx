@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 const TEXT = {
   x: 480,

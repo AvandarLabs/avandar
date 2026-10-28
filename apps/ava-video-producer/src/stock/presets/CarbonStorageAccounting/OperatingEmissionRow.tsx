@@ -3,6 +3,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   row: Input["operatingEmissions"][number];
   index: number;

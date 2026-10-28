@@ -4,6 +4,7 @@ import { INSTALLATION_COLORS } from "./installationColors";
 import { ShadeStructure } from "./ShadeStructure";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; index: number; frame: number };
 /** One authored object retains its distinct footprint and visible key. */
 export function ShadeFootprint({

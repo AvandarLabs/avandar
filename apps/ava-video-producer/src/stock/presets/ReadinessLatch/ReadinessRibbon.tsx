@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { ReadinessRibbonLabels } from "./ReadinessRibbonLabels";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   participant: Input["participants"][number];
   index: number;

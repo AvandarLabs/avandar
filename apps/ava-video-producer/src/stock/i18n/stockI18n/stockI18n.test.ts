@@ -5,6 +5,7 @@ import { parseStockInput } from "../../contracts/parseStockInput/parseStockInput
 import { stockContracts } from "../../registry/stockContracts";
 import { makeLocalizedStockDataFromContract } from "../makeLocalizedStockDataFromContract";
 import { stockI18n } from "./stockI18n";
+
 test("English omission resolves a cloned complete canonical default", () => {
   const contract = stockContracts["decision-fork"];
   const resolved = makeLocalizedStockDataFromContract({

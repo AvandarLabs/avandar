@@ -2,6 +2,7 @@ import { CleanupEditExplanation } from "./CleanupEditExplanation";
 import { CleanupRetainedValue } from "./CleanupRetainedValue";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
+
 type Props = { row: Input["rows"][number]; input: Input; frame: number };
 /** Original values and edit explanations each retain their supplied labels. */
 export function CleanupRowCopy({

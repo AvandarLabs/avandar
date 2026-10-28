@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Artifact and status captions identify current or restored content. */
 export function RevisionHeadings({

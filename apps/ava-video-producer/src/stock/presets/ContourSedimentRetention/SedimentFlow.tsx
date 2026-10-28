@@ -4,6 +4,7 @@ import { SlopeExit } from "./SlopeExit";
 import { SlopeGround } from "./SlopeGround";
 import type { Input } from "./ContourSedimentRetention.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /**
  * A persistent sediment ribbon separates behind the strip and past the exit.

@@ -3,6 +3,7 @@ import { getKernelSamplesFromInput } from "./getKernelSamplesFromInput";
 import { KernelCones } from "./KernelCones";
 import type { Input } from "./KernelDensitySpread.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Cone heights add into a fixed-scale sampled field beneath source markers. */
 export function KernelField({

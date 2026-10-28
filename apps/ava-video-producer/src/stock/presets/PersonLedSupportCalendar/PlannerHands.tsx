@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { getPlannerHandsFromInputAndFrame } from "./getPlannerHandsFromInputAndFrame";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Articulated hands maintain actual contact with the moving appointment. */
 export function PlannerHands({

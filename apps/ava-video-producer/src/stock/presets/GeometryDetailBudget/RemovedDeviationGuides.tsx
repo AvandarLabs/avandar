@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** Each removed point is paired with its own finite retained segment. */
 export function RemovedDeviationGuides({

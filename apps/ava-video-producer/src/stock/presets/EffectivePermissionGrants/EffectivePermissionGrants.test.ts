@@ -101,6 +101,7 @@ import { registerStockLocalizationAssertions } from "../../../../tests/helpers/r
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { effectivePermissionGrantsContract } from "./EffectivePermissionGrants.contract";
 import { inputSchema, type Input } from "./EffectivePermissionGrants.schema";
+
 function _getVisibleTexts({
   input,
   frame,

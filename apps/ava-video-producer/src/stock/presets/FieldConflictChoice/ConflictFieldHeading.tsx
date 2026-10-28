@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { getConflictChoicePositionFromField } from "./getConflictChoicePositionFromField";
 import type { Input } from "./FieldConflictChoice.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   field: Input["fields"][number];
   input: Input;

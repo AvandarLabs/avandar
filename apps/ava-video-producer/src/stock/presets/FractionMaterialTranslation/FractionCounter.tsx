@@ -1,6 +1,7 @@
 import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = {
   id: string;
   index: number;

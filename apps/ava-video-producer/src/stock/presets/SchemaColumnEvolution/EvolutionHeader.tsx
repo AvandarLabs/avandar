@@ -3,6 +3,7 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SchemaColumnEvolution.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; x: number; expansion: number; accent: string };
 /** The additional header opens from the retained field's seam. */
 export function EvolutionHeader({

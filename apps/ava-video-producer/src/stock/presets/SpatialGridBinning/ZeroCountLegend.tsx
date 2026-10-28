@@ -1,6 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { label: string };
 /** The zero caption names a legend sample, including when no cell is empty. */
 export function ZeroCountLegend({ label }: Readonly<Props>): ReactNode {

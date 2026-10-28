@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   option: Input["options"][number];
   index: number;

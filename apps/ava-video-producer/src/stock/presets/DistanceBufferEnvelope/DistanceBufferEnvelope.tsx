@@ -5,6 +5,7 @@ import { BufferLocations } from "./BufferLocations";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /**
  * Straight-line inclusion separates the complete source set from its results.

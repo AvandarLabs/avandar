@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { getSentenceGlyphsFromInput } from "./getSentenceGlyphsFromInput";
 import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 const PATTERNS: Record<string, string> = {
   subject: "1 0",

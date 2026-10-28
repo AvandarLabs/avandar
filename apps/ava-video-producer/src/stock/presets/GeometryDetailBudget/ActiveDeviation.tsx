@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   event: ReturnType<typeof makeDetailSimplificationFromInput>["events"][number];

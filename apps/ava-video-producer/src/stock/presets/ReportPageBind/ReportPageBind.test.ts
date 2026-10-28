@@ -13,6 +13,7 @@ import {
   invalidInputs,
 } from "./ReportPageBind.fixtures";
 import { inputSchema, type Input } from "./ReportPageBind.schema";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,

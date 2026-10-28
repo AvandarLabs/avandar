@@ -2,6 +2,7 @@ import { propEq } from "@avandar/utils";
 import { makeStockControlsFromSchema } from "../../contracts/makeStockControlsFromSchema/makeStockControlsFromSchema";
 import { jsonSchema } from "./StatePreservingSourceRefresh.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
+
 const COMPATIBLE_PATHS: string[] = [
   "records",
   "sourceRows",

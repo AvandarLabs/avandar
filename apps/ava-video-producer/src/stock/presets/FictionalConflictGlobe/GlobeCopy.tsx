@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./FictionalConflictGlobe.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /**
  * The qualifier, symbol meaning and authored total stay present through

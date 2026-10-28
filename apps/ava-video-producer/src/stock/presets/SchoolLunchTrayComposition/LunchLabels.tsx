@@ -4,6 +4,7 @@ import { LunchLegend } from "./LunchLegend";
 import { LunchTally } from "./LunchTally";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; accent: string; frame: number };
 /** The named plan legend remains visible when direct compartment names hide. */
 export function LunchLabels({

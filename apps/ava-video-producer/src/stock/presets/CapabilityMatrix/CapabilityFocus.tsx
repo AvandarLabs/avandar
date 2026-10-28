@@ -2,6 +2,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /** A scanning rule resolves the rows before an authored row or column opens. */
 export function CapabilityFocus({

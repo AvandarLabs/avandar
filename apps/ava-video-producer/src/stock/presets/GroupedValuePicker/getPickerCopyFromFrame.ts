@@ -3,6 +3,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { getPickerDestinationsFromInput } from "./getPickerDestinationsFromInput";
 import type { PickerValueGroup } from "./getPickerGroupsFromInput";
 import type { Input } from "./GroupedValuePicker.schema";
+
 type Params = {
   input: Input;
   index: number;

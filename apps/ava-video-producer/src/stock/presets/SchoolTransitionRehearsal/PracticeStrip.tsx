@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; learnerX: number; accent: string };
 /** The learner carries the same ordered two-action strip. */
 export function PracticeStrip({

@@ -7,6 +7,7 @@ import { PushdownRows } from "./PushdownRows";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** Source gates filter row copies before they cross a transfer boundary. */
 export function PredicatePushdownBoundary({

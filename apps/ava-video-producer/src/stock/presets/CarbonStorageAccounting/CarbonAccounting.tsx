@@ -3,6 +3,7 @@ import { CarbonNetAccounting } from "./CarbonNetAccounting";
 import { OperatingEmissionRow } from "./OperatingEmissionRow";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Separate operating CO2e rows enter a signed retained-minus-emissions bracket.

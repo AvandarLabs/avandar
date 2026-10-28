@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { ReactNode } from "react";
+
 type Props = {
   text: string;
   x: number;

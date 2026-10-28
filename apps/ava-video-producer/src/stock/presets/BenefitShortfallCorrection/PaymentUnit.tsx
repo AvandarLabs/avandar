@@ -3,6 +3,7 @@ import { getPaymentUnitGeometryFromPayment } from "./getPaymentUnitGeometryFromP
 import { ReceivedToken } from "./ReceivedToken";
 import type { Input } from "./BenefitShortfallCorrection.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   payment: Input["payments"][number];
   frame: number;

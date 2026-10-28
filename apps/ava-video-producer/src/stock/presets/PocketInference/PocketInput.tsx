@@ -3,6 +3,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input };
 /** The supplied input fold enters a writing area entirely inside the device. */
 export function PocketInput({ frame, input }: Readonly<Props>): ReactNode {

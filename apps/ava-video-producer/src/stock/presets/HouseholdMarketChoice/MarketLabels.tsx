@@ -3,6 +3,7 @@ import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /** Shelf and role labels leave a clear physical selection corridor. */
 export function MarketLabels({ input }: Readonly<Props>): ReactNode {

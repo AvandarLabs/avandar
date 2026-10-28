@@ -5,6 +5,7 @@ import { CarbonPhysical } from "./CarbonPhysical";
 import { DEFAULT_INPUT } from "./CarbonStorageAccounting.fixtures";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /**
  * Physical retained mass and signed CO2e accounting share an explicit boundary.

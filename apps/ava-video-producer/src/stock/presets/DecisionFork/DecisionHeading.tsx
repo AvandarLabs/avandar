@@ -2,6 +2,7 @@ import { Arrive, STOCK, Text } from "../../graphics-common";
 import { ForkLabel } from "./ForkLabel/ForkLabel";
 import type { DecisionForkInput } from "./DecisionFork.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   input: DecisionForkInput;

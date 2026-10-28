@@ -1,6 +1,7 @@
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /** Destination captions identify the three simultaneous accounting regions. */
 export function SessionHeadings({ input }: Readonly<Props>): ReactNode {

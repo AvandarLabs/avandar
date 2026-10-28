@@ -5,6 +5,7 @@ import { ConversationPartition } from "./ConversationPartition";
 import { ConversationPeople } from "./ConversationPeople";
 import type { Input } from "./PrivateCaseConversation.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** The supporter waits nearby after a participant requests privacy. */
 export function PrivateCaseConversation({

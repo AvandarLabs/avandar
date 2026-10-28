@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { rowKey: string; y: number; label: string; progress: number };
 /** A left join retains an explicit authored absent-partner label. */
 export function JoinMissingPartner({

@@ -9,6 +9,7 @@ import { ContributionWeave } from "./ContributionWeave";
 import { contributionWeaveContract } from "./ContributionWeave.contract";
 import { DEFAULT_INPUT, fixtures } from "./ContributionWeave.fixtures";
 import { inputSchema, type Input } from "./ContributionWeave.schema";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,

@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { StratumRegion } from "./StratumRegion";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Supplied boundaries retain a denominator for every authored stratum. */
 export function StratumFrame({

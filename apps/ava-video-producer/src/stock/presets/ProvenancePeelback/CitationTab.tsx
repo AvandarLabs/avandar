@@ -3,6 +3,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { label: string; frame: number; accent: string };
 /** A literal citation tab meets the summary's right edge. */
 export function CitationTab({

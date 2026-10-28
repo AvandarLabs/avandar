@@ -1,6 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./PortableWorkTransfer.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; folioX: number };
 /**
  * State captions identify their actual source, moving folio and destination.

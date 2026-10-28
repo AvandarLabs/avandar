@@ -14,6 +14,7 @@ import {
   invalidInputs,
 } from "./HabitatCorridorReconnection.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -70,6 +71,7 @@ import {
   SEMANTIC_RULES,
 } from "./HabitatCorridorReconnection.schema";
 import type { Input } from "./HabitatCorridorReconnection.schema";
+
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     ...input.patches.map(prop("label")),

@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   district: Input["districts"][number];
   index: number;

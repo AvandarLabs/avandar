@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   place: Input["places"][number];
   index: number;

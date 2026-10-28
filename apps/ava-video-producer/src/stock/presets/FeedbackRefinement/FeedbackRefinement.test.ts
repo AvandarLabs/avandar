@@ -14,6 +14,7 @@ import {
   invalidInputs,
 } from "./FeedbackRefinement.fixtures";
 import { inputSchema, type Input } from "./FeedbackRefinement.schema";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,

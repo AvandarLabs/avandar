@@ -2,6 +2,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   visit: Input["visits"][number];

@@ -6,6 +6,7 @@ import type {
   StockMetadata,
   StockMessageDescriptor,
 } from "../../contracts/StockContract.types";
+
 export { CONTROLS } from "./OfflineLedger.controls";
 
 function _message({

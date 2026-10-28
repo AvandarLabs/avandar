@@ -4,6 +4,7 @@ import { RecordedInterval } from "./RecordedInterval";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   record: Input["records"][number];
   index: number;

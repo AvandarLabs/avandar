@@ -1,6 +1,7 @@
 import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; partition: "door" | "screen" };
 /** Both separators close only after the supporter clears the doorway. */
 export function ConversationPartition({

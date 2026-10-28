@@ -12,6 +12,7 @@ import {
   DENSE_INPUT,
   MINIMUM_INPUT,
 } from "./CommunityCoordinationTable.fixtures";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -54,6 +55,7 @@ test("changed authored input emits its physical scene", () => {
 
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+
 test("one team lifts its own marker from maximum initial concentration, preserving all request tags", () => {
   fixtures.forEach(({ input }) => {
     const markers = (frame: number) => [
@@ -125,6 +127,7 @@ test("one team lifts its own marker from maximum initial concentration, preservi
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { communityCoordinationTableContract } from "./CommunityCoordinationTable.contract";
 import { inputSchema, type Input } from "./CommunityCoordinationTable.schema";
+
 function _getVisibleTexts({
   input,
   frame,
@@ -222,4 +225,5 @@ test("emitted marker shapes occupy the exact agreed places with separate concent
 });
 
 import { registerCoordinationReviewAssertions } from "./registerCoordinationReviewAssertions";
+
 registerCoordinationReviewAssertions(_render);

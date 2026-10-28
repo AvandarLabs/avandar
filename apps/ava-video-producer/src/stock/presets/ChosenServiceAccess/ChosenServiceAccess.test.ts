@@ -15,6 +15,7 @@ import {
 import { registerServiceApproachAssertions } from "./registerServiceApproachAssertions";
 import { registerServiceBarrierAssertions } from "./registerServiceBarrierAssertions";
 import { ServiceSvgGeometry } from "./ServiceSvgGeometry";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -54,6 +55,7 @@ test("changed authored input emits its physical scene", () => {
 
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+
 test("changed choice clears only the other entrance and all mobility/barrier combinations work", () => {
   ["unfold-ramp", "clear-entrance"].forEach((accessChange) =>
     ["walking", "wheelchair"].forEach((participantMobility) => {
@@ -123,6 +125,7 @@ test("participant points toward the selected doorway and clears the whole barrie
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { chosenServiceAccessContract } from "./ChosenServiceAccess.contract";
 import { inputSchema, type Input } from "./ChosenServiceAccess.schema";
+
 function _getVisibleTexts({
   input,
   frame,

@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { getHandoverPositionFromInputAndFrame } from "./getHandoverPositionFromInputAndFrame";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string; index: number };
 
 /**

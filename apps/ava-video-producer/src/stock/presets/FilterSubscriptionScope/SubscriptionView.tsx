@@ -5,6 +5,7 @@ import { SubscriptionFrame } from "./SubscriptionFrame";
 import { SubscriptionRecord } from "./SubscriptionRecord";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   view: Input["views"][number];
   index: number;

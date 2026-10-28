@@ -2,6 +2,7 @@ import { mix } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = {
   group: string;
   index: number;

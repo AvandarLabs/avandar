@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import { RegistrationAxes } from "./RegistrationAxes";
 import type { ReactNode } from "react";
+
 type Props = { x: number; index: number; frame: number };
 /**
  * A fixed numeric square gives coordinate representations a stable reference.

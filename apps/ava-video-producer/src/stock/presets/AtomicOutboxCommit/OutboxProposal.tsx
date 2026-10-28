@@ -5,6 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { OutboxProposalSheet } from "./OutboxProposalSheet";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   frame: number;

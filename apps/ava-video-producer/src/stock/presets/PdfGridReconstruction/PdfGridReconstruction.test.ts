@@ -100,6 +100,7 @@ import { getConservativeWidthFromText } from "../../text/getConservativeWidthFro
 import { GridLiteralCell } from "./GridLiteralCell";
 import { pdfGridReconstructionContract } from "./PdfGridReconstruction.contract";
 import { inputSchema, type Input } from "./PdfGridReconstruction.schema";
+
 function _getVisibleTexts({
   input,
   frame,

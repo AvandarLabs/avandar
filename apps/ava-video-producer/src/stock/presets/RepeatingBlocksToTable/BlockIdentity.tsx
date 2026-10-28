@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { BlockCaption } from "./BlockCaption";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string; index: number };
 /** Source block headings retain their identities beside the resulting rows. */
 export function BlockIdentity({

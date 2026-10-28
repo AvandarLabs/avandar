@@ -4,6 +4,7 @@ import { ReconnectOutcomes } from "./ReconnectOutcomes";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** Unique people, attempts and exclusive outcomes retain separate totals. */
 export function ReconnectLedger({ input, frame }: Readonly<Props>): ReactNode {

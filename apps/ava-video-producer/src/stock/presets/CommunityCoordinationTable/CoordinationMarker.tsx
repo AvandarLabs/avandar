@@ -4,6 +4,7 @@ import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorF
 import { getTeamMarkerPoseFromInputAndFrame } from "./getTeamMarkerPoseFromInputAndFrame";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; index: number; frame: number; accent: string };
 /** Physical team tokens retain individual slots even at a shared assignment. */
 export function CoordinationMarker({

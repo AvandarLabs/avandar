@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /** Alignment Guides for the authored scene. */
 export function AlignmentGuides({ input }: Readonly<Props>): ReactNode {

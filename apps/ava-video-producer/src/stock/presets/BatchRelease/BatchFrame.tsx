@@ -1,5 +1,6 @@
 import { ramp } from "../../../motion";
 import type { ReactNode } from "react";
+
 type Props = {
   batchId: string;
   isComplete: boolean;
