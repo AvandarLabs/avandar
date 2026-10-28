@@ -34,10 +34,7 @@ function _mapSeries<Series extends { key: string }>(
 function _mapScatterSeries(
   options: Readonly<{
     series: Readonly<
-      Extract<
-        ColumnIdVizConfig.OutputNameKeyed,
-        { vizType: "scatter" }
-      >["series"]
+      Extract<ColumnIdVizConfig.NameResolved, { vizType: "scatter" }>["series"]
     >;
     getSlotColumnId: GetSlotColumnId;
   }>,
@@ -60,10 +57,7 @@ function _mapScatterSeries(
 function _mapBubbleSeries(
   options: Readonly<{
     series: Readonly<
-      Extract<
-        ColumnIdVizConfig.OutputNameKeyed,
-        { vizType: "bubble" }
-      >["series"]
+      Extract<ColumnIdVizConfig.NameResolved, { vizType: "bubble" }>["series"]
     >;
     getSlotColumnId: GetSlotColumnId;
   }>,
@@ -90,7 +84,7 @@ function _mapBubbleSeries(
 function _mapXYConfig(
   options: Readonly<{
     config: Extract<
-      ColumnIdVizConfig.OutputNameKeyed,
+      ColumnIdVizConfig.NameResolved,
       { vizType: "bar" | "line" | "area" }
     >;
     getSlotColumnId: GetSlotColumnId;
@@ -107,7 +101,7 @@ function _mapXYConfig(
 function _mapCategoryConfig(
   options: Readonly<{
     config: Extract<
-      ColumnIdVizConfig.OutputNameKeyed,
+      ColumnIdVizConfig.NameResolved,
       { vizType: "pie" | "funnel" }
     >;
     getSlotColumnId: GetSlotColumnId;
@@ -123,7 +117,7 @@ function _mapCategoryConfig(
 
 function _mapConfig(
   options: Readonly<{
-    config: Readonly<ColumnIdVizConfig.OutputNameKeyed>;
+    config: Readonly<ColumnIdVizConfig.NameResolved>;
     getSlotColumnId: GetSlotColumnId;
   }>,
 ): ColumnIdVizConfig.T {
@@ -200,11 +194,11 @@ function _bindSlotToColumnId({
  * Replaces each output name in a chart config with the column ID of the one
  * output column that has that name. Leaves the input config unchanged.
  */
-export function makeColumnIdVizConfigFromOutputNameConfig({
+export function makeColumnIdVizConfigFromNameResolvedConfig({
   config,
   columns,
 }: Readonly<{
-  config: Readonly<ColumnIdVizConfig.OutputNameKeyed>;
+  config: Readonly<ColumnIdVizConfig.NameResolved>;
   columns: readonly QueryResult.ColumnWithId[];
 }>): { config: ColumnIdVizConfig.T; issues: ColumnBindingIssue[] } {
   const slots = makeColumnSlotsFromVizConfig(config).map((slot) => {

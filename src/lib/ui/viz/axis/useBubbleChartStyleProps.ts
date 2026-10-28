@@ -4,7 +4,7 @@ import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { OutputNameBubbleSeries as BubbleSeries } from "$/models/vizs/ColumnIdVizConfig/OutputNameVizConfig.types";
+import type { NameResolvedBubbleSeries as BubbleSeries } from "$/models/vizs/ColumnIdVizConfig/NameResolvedVizConfig.types";
 import type { ChartStyleProps } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { UnknownDataFrame } from "@avandar/utils";
 

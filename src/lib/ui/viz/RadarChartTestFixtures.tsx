@@ -15,7 +15,7 @@ import { render } from "@/test-utils";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
 type RadarChartVizConfig = Extract<
-  VizConfig.OutputNameKeyed,
+  VizConfig.NameResolved,
   { vizType: "radar" }
 >;
 

@@ -3,7 +3,7 @@ import type { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColu
 
 const {
   QueryColumn,
-  makeOutputNameVizConfigFromColumnIdConfig,
+  makeNameResolvedVizConfigFromColumnIdConfig,
   act,
   expect,
   it,
@@ -46,7 +46,7 @@ it("keeps a styled series when its aggregation changes and another series surviv
     });
   });
 
-  const resolved = makeOutputNameVizConfigFromColumnIdConfig({
+  const resolved = makeNameResolvedVizConfigFromColumnIdConfig({
     config: result.current[0].vizConfig,
     columns: [
       { id: quarter.id, name: "quarter", dataType: "varchar" },
@@ -134,7 +134,7 @@ it("propagates scatter X-only and bubble size-only changes through the real prov
     return result.current[1].syncVizFromQueryResult(columns);
   });
   expect(
-    makeOutputNameVizConfigFromColumnIdConfig({
+    makeNameResolvedVizConfigFromColumnIdConfig({
       config: result.current[0].vizConfig,
       columns: columns,
     }).config,
@@ -162,7 +162,7 @@ it("propagates scatter X-only and bubble size-only changes through the real prov
     return result.current[1].syncVizFromQueryResult(columns);
   });
   expect(
-    makeOutputNameVizConfigFromColumnIdConfig({
+    makeNameResolvedVizConfigFromColumnIdConfig({
       config: result.current[0].vizConfig,
       columns: columns,
     }).config,

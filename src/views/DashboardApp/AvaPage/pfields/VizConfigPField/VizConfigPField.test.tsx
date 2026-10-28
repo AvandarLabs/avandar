@@ -13,7 +13,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 import type { LegacyLocalFilter } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 type RenderFieldOptions = {
-  value: VizConfig.T | VizConfig.OutputNameKeyed;
+  value: VizConfig.T | VizConfig.NameResolved;
   legacy?: boolean;
   localFilters?: readonly LegacyLocalFilter[];
   local?: boolean;
@@ -205,7 +205,7 @@ describe("VizConfigPField", () => {
 
 it("preserves unresolved legacy siblings when an existing field explicitly changes", () => {
   vi.clearAllMocks();
-  const original: VizConfig.OutputNameKeyed = {
+  const original: VizConfig.NameResolved = {
     vizType: "bar",
     xAxisKey: "missing-category",
     layout: "group",

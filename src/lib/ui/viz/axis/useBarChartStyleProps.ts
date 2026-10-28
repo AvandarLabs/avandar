@@ -6,7 +6,7 @@ import { doesAxisNeedValueExtent } from "@/lib/ui/viz/axis/doesAxisNeedValueExte
 import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { OutputNameXYSeries as XYSeries } from "$/models/vizs/ColumnIdVizConfig/OutputNameVizConfig.types";
+import type { NameResolvedXYSeries as XYSeries } from "$/models/vizs/ColumnIdVizConfig/NameResolvedVizConfig.types";
 import type {
   ApplyChartStyleOptions,
   ChartStyleProps,

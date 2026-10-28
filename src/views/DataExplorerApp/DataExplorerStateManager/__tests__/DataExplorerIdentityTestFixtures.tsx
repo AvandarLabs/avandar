@@ -2,7 +2,7 @@ type Props = { children: ReactNode };
 import { Model } from "@avandar/models";
 import { expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { makeOutputNameVizConfigFromColumnIdConfig } from "$/models/vizs/makeOutputNameVizConfigFromColumnIdConfig/makeOutputNameVizConfigFromColumnIdConfig";
+import { makeNameResolvedVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameResolvedVizConfigFromColumnIdConfig/makeNameResolvedVizConfigFromColumnIdConfig";
 import { act, renderHook } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 /** Exercises column reconstruction and chart edits through the real store. */
@@ -74,7 +74,7 @@ function _renderStateManager(): RenderHookResult<
 /** Shared setup and fixtures for DataExplorerIdentityTestFixtures. */
 export const DataExplorerIdentityTestFixtures = {
   QueryColumn,
-  makeOutputNameVizConfigFromColumnIdConfig,
+  makeNameResolvedVizConfigFromColumnIdConfig,
   act,
   Model,
   expect,

@@ -1,7 +1,7 @@
 import { isDefined, prop } from "@avandar/utils";
 import { getColumnIdFromOutputName } from "$/models/queries/QueryColumnBindings/getColumnIdFromOutputName/getColumnIdFromOutputName";
-import { makeColumnIdVizConfigFromOutputNameConfig } from "$/models/vizs/makeColumnIdVizConfigFromOutputNameConfig/makeColumnIdVizConfigFromOutputNameConfig";
-import { makeOutputNameVizConfigFromColumnIdConfig } from "$/models/vizs/makeOutputNameVizConfigFromColumnIdConfig/makeOutputNameVizConfigFromColumnIdConfig";
+import { makeColumnIdVizConfigFromNameResolvedConfig } from "$/models/vizs/makeColumnIdVizConfigFromNameResolvedConfig/makeColumnIdVizConfigFromNameResolvedConfig";
+import { makeNameResolvedVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameResolvedVizConfigFromColumnIdConfig/makeNameResolvedVizConfigFromColumnIdConfig";
 import type {
   ColumnBindingIssue,
   ResultColumnBindings,
@@ -68,13 +68,13 @@ export function makeSavedColumnBindingsFromDataVizProps({
       props: { ...props, columnBindings: schema.registry },
       runtimeConfig: props.vizConfig,
       localFilters: props.localFilters,
-      issues: makeOutputNameVizConfigFromColumnIdConfig({
+      issues: makeNameResolvedVizConfigFromColumnIdConfig({
         config: props.vizConfig,
         columns: schema.columns,
       }).issues,
     };
   }
-  const columnIdConversion = makeColumnIdVizConfigFromOutputNameConfig({
+  const columnIdConversion = makeColumnIdVizConfigFromNameResolvedConfig({
     config: props.vizConfig,
     columns: schema.columns,
   });

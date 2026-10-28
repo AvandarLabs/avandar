@@ -1,40 +1,40 @@
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 
-type OutputNameVizConfigBar = {
+type NameResolvedVizConfigBar = {
   vizType: "bar";
   xAxisKey: string | undefined;
-  series: OutputNameXYSeries[];
+  series: NameResolvedXYSeries[];
   layout: "group" | "stack" | "percent";
   withLegend: boolean;
   chartStyle?: ChartStyle;
 };
 
-type OutputNameVizConfigLine = {
+type NameResolvedVizConfigLine = {
   vizType: "line";
   xAxisKey: string | undefined;
-  series: OutputNameXYSeries[];
+  series: NameResolvedXYSeries[];
   withLegend: boolean;
   chartStyle?: ChartStyle;
 };
 
-type OutputNameVizConfigArea = {
+type NameResolvedVizConfigArea = {
   vizType: "area";
   xAxisKey: string | undefined;
-  series: OutputNameXYSeries[];
+  series: NameResolvedXYSeries[];
   layout: "default" | "stacked" | "percent" | "split";
   withLegend: boolean;
   chartStyle?: ChartStyle;
 };
 
-type OutputNameVizConfigRadar = {
+type NameResolvedVizConfigRadar = {
   vizType: "radar";
   nameKey: string | undefined;
-  series: OutputNameRadarSeries[];
+  series: NameResolvedRadarSeries[];
   withLegend?: boolean;
   chartStyle?: ChartStyle;
 };
 
-type OutputNameVizConfigPie = {
+type NameResolvedVizConfigPie = {
   vizType: "pie";
   nameKey: string | undefined;
   valueKey: string | undefined;
@@ -44,14 +44,14 @@ type OutputNameVizConfigPie = {
   seriesColors?: Record<string, string>;
 };
 
-type OutputNameVizConfigFunnel = {
+type NameResolvedVizConfigFunnel = {
   vizType: "funnel";
   nameKey: string | undefined;
   valueKey: string | undefined;
   seriesColors?: Record<string, string>;
 };
 
-type OutputNameBarSeriesShape = {
+type NameResolvedBarSeriesShape = {
   renderAs: "bar";
   key: string;
   label?: string;
@@ -60,7 +60,7 @@ type OutputNameBarSeriesShape = {
   stackId?: string;
 };
 
-type OutputNameLineSeriesShape = {
+type NameResolvedLineSeriesShape = {
   renderAs: "line";
   key: string;
   label?: string;
@@ -70,7 +70,7 @@ type OutputNameLineSeriesShape = {
   withDots?: boolean;
 };
 
-type OutputNameAreaSeriesShape = {
+type NameResolvedAreaSeriesShape = {
   renderAs: "area";
   key: string;
   label?: string;
@@ -80,39 +80,40 @@ type OutputNameAreaSeriesShape = {
   fillOpacity?: number;
   withDots?: boolean;
 };
+
 /**
- * Chart configuration whose column slots store output names: the row keys a
- * query result is read by. The renderers in `src/lib/ui/viz` consume it,
- * Explorer URLs store charts in it, and dashboards saved before column IDs
- * still hold it until they bind.
+ * A `VizConfig.T` whose column IDs have each been resolved to a name string:
+ * the output name a query result row is keyed by. The renderers in
+ * `src/lib/ui/viz` consume it, Explorer URLs store charts in it, and dashboards
+ * saved before column IDs still hold it until they bind.
  */
-export type OutputNameVizConfig =
+export type NameResolvedVizConfig =
   | { vizType: "table" }
-  | OutputNameVizConfigBar
-  | OutputNameVizConfigLine
-  | OutputNameVizConfigArea
+  | NameResolvedVizConfigBar
+  | NameResolvedVizConfigLine
+  | NameResolvedVizConfigArea
   | {
       vizType: "scatter";
-      series: OutputNameScatterSeries[];
+      series: NameResolvedScatterSeries[];
       chartStyle?: ChartStyle;
     }
   | {
       vizType: "bubble";
-      series: OutputNameBubbleSeries[];
+      series: NameResolvedBubbleSeries[];
       chartStyle?: ChartStyle;
     }
-  | OutputNameVizConfigRadar
-  | OutputNameVizConfigPie
-  | OutputNameVizConfigFunnel;
+  | NameResolvedVizConfigRadar
+  | NameResolvedVizConfigPie
+  | NameResolvedVizConfigFunnel;
 
 /** Mark settings for mixed XY charts, keyed by output name. */
-export type OutputNameXYSeries =
-  | OutputNameBarSeriesShape
-  | OutputNameLineSeriesShape
-  | OutputNameAreaSeriesShape;
+export type NameResolvedXYSeries =
+  | NameResolvedBarSeriesShape
+  | NameResolvedLineSeriesShape
+  | NameResolvedAreaSeriesShape;
 
 /** Scatter cloud settings, keyed by output name. */
-export type OutputNameScatterSeries = {
+export type NameResolvedScatterSeries = {
   key: string;
   xKey: string;
   label?: string;
@@ -120,12 +121,12 @@ export type OutputNameScatterSeries = {
 };
 
 /** Bubble cloud settings, keyed by output name. */
-export type OutputNameBubbleSeries = OutputNameScatterSeries & {
+export type NameResolvedBubbleSeries = NameResolvedScatterSeries & {
   sizeKey: string;
 };
 
 /** Radar polygon settings, keyed by output name. */
-export type OutputNameRadarSeries = {
+export type NameResolvedRadarSeries = {
   key: string;
   label?: string;
   color?: string;
@@ -134,17 +135,17 @@ export type OutputNameRadarSeries = {
 };
 
 /** Row-key bar marks. */
-export type OutputNameBarSeries = Extract<
-  OutputNameXYSeries,
+export type NameResolvedBarSeries = Extract<
+  NameResolvedXYSeries,
   { renderAs: "bar" }
 >;
 /** Row-key line marks. */
-export type OutputNameLineSeries = Extract<
-  OutputNameXYSeries,
+export type NameResolvedLineSeries = Extract<
+  NameResolvedXYSeries,
   { renderAs: "line" }
 >;
 /** Row-key area marks. */
-export type OutputNameAreaSeries = Extract<
-  OutputNameXYSeries,
+export type NameResolvedAreaSeries = Extract<
+  NameResolvedXYSeries,
   { renderAs: "area" }
 >;

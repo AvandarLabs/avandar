@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
-import { makeOutputNameVizConfigFromColumnIdConfig } from "$/models/vizs/makeOutputNameVizConfigFromColumnIdConfig/makeOutputNameVizConfigFromColumnIdConfig";
+import { makeNameResolvedVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameResolvedVizConfigFromColumnIdConfig/makeNameResolvedVizConfigFromColumnIdConfig";
 import { makeSavedColumnBindingsFromDataVizProps } from "./makeSavedColumnBindingsFromDataVizProps";
 import type { ResultColumnBindings } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { DataVizColumnBindingProps } from "./makeSavedColumnBindingsFromDataVizProps";
@@ -68,7 +68,7 @@ describe("saved DataViz compatibility", () => {
       globalFilterSubscription: legacy.globalFilterSubscription,
     });
     expect(
-      makeOutputNameVizConfigFromColumnIdConfig({
+      makeNameResolvedVizConfigFromColumnIdConfig({
         config: resolved.runtimeConfig,
         columns: columns.columns,
       }).config,
@@ -112,7 +112,7 @@ describe("saved DataViz compatibility", () => {
     });
     expect(resolved.props.vizConfig).toEqual(saved.vizConfig);
     expect(
-      makeOutputNameVizConfigFromColumnIdConfig({
+      makeNameResolvedVizConfigFromColumnIdConfig({
         config: resolved.runtimeConfig,
         columns: replacement.columns,
       }).config,
