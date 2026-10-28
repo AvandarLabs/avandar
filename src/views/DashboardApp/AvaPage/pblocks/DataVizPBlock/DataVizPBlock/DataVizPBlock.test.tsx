@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { screen } from "@/test-utils";
 import { upgradeAvaPageData } from "../../../utils/upgradeAvaPageData";
 import { useDataVizPBlockConfig } from "../useDataVizPBlockConfig";

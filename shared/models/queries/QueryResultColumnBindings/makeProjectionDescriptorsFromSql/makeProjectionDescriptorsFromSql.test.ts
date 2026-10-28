@@ -1,8 +1,8 @@
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql.ts";
+import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql.ts";
 /** SQL lineage must be supported, alias-free, and tied to one source. */
-import type { ProjectionDescriptor } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
+import type { ProjectionDescriptor } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 
 function _describe({
   sql,

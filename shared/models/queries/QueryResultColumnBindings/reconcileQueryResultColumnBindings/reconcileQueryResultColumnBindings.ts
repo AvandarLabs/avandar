@@ -1,14 +1,14 @@
 import { isDefined, prop, propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type {
-  ColumnBindingIssue,
+  QueryResultColumnBindingIssue,
   QueryResultColumnBindings,
   ProjectionDescriptor,
   QueryResultColumnBinding,
   QueryResultColumnBindingRegistry,
-} from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
+} from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 
 type Options = {
   scopeKey: string;
@@ -19,7 +19,7 @@ type Options = {
 };
 type ColumnBindingOutcome = {
   binding?: QueryResultColumnBinding;
-  issue?: ColumnBindingIssue;
+  issue?: QueryResultColumnBindingIssue;
 };
 
 function _hasSameExpression({

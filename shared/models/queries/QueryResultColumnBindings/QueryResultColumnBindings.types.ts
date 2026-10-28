@@ -40,7 +40,7 @@ export type QueryResultColumnBindingRegistry = {
  * A `QueryResult` column, projection, or setting that could not be bound to
  * one column ID.
  */
-export type ColumnBindingIssue = {
+export type QueryResultColumnBindingIssue = {
   target: string;
   reason: "missing" | "ambiguous" | "unsupported";
 };
@@ -53,5 +53,5 @@ export type ColumnBindingIssue = {
 export type QueryResultColumnBindings = {
   registry: QueryResultColumnBindingRegistry;
   columns: readonly QueryResult.ColumnWithId[];
-  issues: readonly ColumnBindingIssue[];
+  issues: readonly QueryResultColumnBindingIssue[];
 };

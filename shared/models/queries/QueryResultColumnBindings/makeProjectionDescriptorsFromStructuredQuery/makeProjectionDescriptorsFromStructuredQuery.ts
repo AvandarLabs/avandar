@@ -1,9 +1,9 @@
 import { Model } from "@avandar/models";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import { makeSqlExpressionKeyFromColumnExpression } from "$/models/queries/QueryColumnBindings/makeSqlExpressionKeyFromColumnExpression.ts";
+import { makeSqlExpressionKeyFromColumnExpression } from "$/models/queries/QueryResultColumnBindings/makeSqlExpressionKeyFromColumnExpression.ts";
 import { makeRelationRefFromQueryDataSource } from "$/models/relations/RelationRef/makeRelationRefFromQueryDataSource.ts";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
-import type { ProjectionDescriptor } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
+import type { ProjectionDescriptor } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 
 /** Describes selected projections using their authoritative aggregation map. */

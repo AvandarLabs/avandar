@@ -8,8 +8,8 @@ import {
 import { match } from "ts-pattern";
 import { makeColumnSlotsFromVizConfig } from "$/models/vizs/makeColumnSlotsFromVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import type { ColumnBindingIssue } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
+import type { QueryResultColumnBindingIssue } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 import type { ColumnIdVizConfig } from "$/models/vizs/ColumnIdVizConfig/ColumnIdVizConfig.ts";
 
 type GetSlotQueryResultColumnName = ({
@@ -211,7 +211,7 @@ export function makeNameBoundVizConfigFromColumnIdConfig({
   columns: readonly QueryResult.ColumnWithId[];
 }>): {
   config: ColumnIdVizConfig.NameBound;
-  issues: ColumnBindingIssue[];
+  issues: QueryResultColumnBindingIssue[];
 } {
   const columnsById = makeIdLookupMap(columns);
   const slots = makeColumnSlotsFromVizConfig<QueryColumn.Id>(config).map(

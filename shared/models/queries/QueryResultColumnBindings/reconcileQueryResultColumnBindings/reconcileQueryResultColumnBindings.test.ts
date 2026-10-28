@@ -2,14 +2,14 @@ import { Model } from "@avandar/models";
 import { prop, propEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings.ts";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings.ts";
 /** Saved targets must read the same expression, never an unrelated label. */
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type {
   QueryResultColumnBindings,
   ProjectionDescriptor,
   QueryResultColumnBindingRegistry,
-} from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
+} from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 
 type ReconcileColumnBindingsOptions = {
   names: string[];

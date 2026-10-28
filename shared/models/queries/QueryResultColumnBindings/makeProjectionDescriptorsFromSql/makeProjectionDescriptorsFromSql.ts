@@ -2,7 +2,7 @@ import { isDefined, isPlainObject } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { Parser } from "node-sql-parser";
 import { uuid } from "$/lib/uuid.ts";
-import { makeSqlExpressionKeyFromColumnExpression } from "$/models/queries/QueryColumnBindings/makeSqlExpressionKeyFromColumnExpression.ts";
+import { makeSqlExpressionKeyFromColumnExpression } from "$/models/queries/QueryResultColumnBindings/makeSqlExpressionKeyFromColumnExpression.ts";
 import {
   columnRefName,
   identifierToString,
@@ -10,8 +10,8 @@ import {
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import type { ProjectionDescriptor } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
+import type { ProjectionDescriptor } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 
 type CreateDescriptorOptions = {
   source: Readonly<Source>;

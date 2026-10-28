@@ -1,8 +1,8 @@
 import { propEq } from "@avandar/utils";
-import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
+import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryResultColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { ColumnBindingIssue } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { QueryResultColumnBindingIssue } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { DashboardFilterRecord } from "../DashboardFilterStateManager";
 
 /** A chart-owned target, independent of the filter control and viewer value. */
@@ -24,7 +24,7 @@ type Options = {
 type DashboardFilterColumnBindings = {
   targets: DashboardFilterTargets;
   resolvedFilters: DashboardFilterRecord[];
-  issues: ColumnBindingIssue[];
+  issues: QueryResultColumnBindingIssue[];
 };
 
 function _buildTarget({
@@ -71,7 +71,7 @@ function _buildFilter({
   filter: Readonly<DashboardFilterRecord>;
   target: DashboardFilterTarget;
   columns: readonly QueryResult.ColumnWithId[];
-}): DashboardFilterRecord | ColumnBindingIssue {
+}): DashboardFilterRecord | QueryResultColumnBindingIssue {
   const matches =
     target.kind === "columnId"
       ? columns.filter(propEq("id", target.columnId))

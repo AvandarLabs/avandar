@@ -1,6 +1,6 @@
 import { useQuery } from "@avandar/query-hooks";
 import { DataVizColumnBindings } from "../DataVizColumnBindings";
-import type { QueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { DataVizColumnBindingsOptions } from "../DataVizColumnBindings";
 
 /** Shares unfiltered schema readiness before chart predicates can execute. */

@@ -1,12 +1,12 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
-import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   QueryResultColumnBindings,
   ProjectionDescriptor,
   QueryResultColumnBindingRegistry,
-} from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+} from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 
 type Options = {
   scopeKey: string;

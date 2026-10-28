@@ -1,12 +1,12 @@
 import { propEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
-import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
+import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { withDuckDb } from "./executedDuckDb";
 import type {
   QueryResultColumnBindings,
   QueryResultColumnBindingRegistry,
-} from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+} from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 /** DuckDB labels retain saved aggregate targets through SQL spelling edits. */
 import type { DuckDBConnection, DuckDBValue } from "@duckdb/node-api";
 

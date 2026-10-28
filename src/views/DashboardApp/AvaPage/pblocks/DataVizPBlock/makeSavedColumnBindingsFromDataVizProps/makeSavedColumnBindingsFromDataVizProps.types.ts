@@ -1,4 +1,4 @@
-import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type {
   GlobalFilterSubscription,

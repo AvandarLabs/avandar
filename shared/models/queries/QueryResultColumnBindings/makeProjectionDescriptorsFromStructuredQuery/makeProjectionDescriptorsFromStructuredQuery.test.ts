@@ -1,8 +1,8 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql.ts";
-import { makeProjectionDescriptorsFromStructuredQuery } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromStructuredQuery/makeProjectionDescriptorsFromStructuredQuery.ts";
+import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql.ts";
+import { makeProjectionDescriptorsFromStructuredQuery } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromStructuredQuery/makeProjectionDescriptorsFromStructuredQuery.ts";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 /** Structured identity follows selected IDs and the aggregation map. */
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";

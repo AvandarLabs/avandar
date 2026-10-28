@@ -158,7 +158,7 @@ it("migrates a v4 chart and executes both saved local and global targets", async
   const { upgradeAvaPageData } =
     await import("@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData");
   const { reconcileQueryResultColumnBindings } =
-    await import("$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings");
+    await import("$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings");
   const { makeSavedColumnBindingsFromDataVizProps } =
     await import("@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeSavedColumnBindingsFromDataVizProps");
   const { useApplyDashboardFiltersToSql } =

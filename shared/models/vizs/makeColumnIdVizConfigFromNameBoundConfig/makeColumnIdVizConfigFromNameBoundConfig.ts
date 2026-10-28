@@ -1,10 +1,10 @@
 import { identity, isDefined, prop, propEq } from "@avandar/utils";
 import { match } from "ts-pattern";
-import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName.ts";
+import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryResultColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName.ts";
 import { makeColumnSlotsFromVizConfig } from "$/models/vizs/makeColumnSlotsFromVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import type { ColumnBindingIssue } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
+import type { QueryResultColumnBindingIssue } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 import type { ColumnIdVizConfig } from "$/models/vizs/ColumnIdVizConfig/ColumnIdVizConfig.ts";
 import type { VizColumnSlot } from "$/models/vizs/makeColumnSlotsFromVizConfig.ts";
 
@@ -163,7 +163,7 @@ function _bindSlotToColumnId({
 }): {
   target: string;
   id: QueryColumn.Id | undefined;
-  issue: ColumnBindingIssue | undefined;
+  issue: QueryResultColumnBindingIssue | undefined;
 } {
   const id =
     slot.key === undefined
@@ -198,7 +198,7 @@ export function makeColumnIdVizConfigFromNameBoundConfig({
 }: Readonly<{
   config: Readonly<ColumnIdVizConfig.NameBound>;
   columns: readonly QueryResult.ColumnWithId[];
-}>): { config: ColumnIdVizConfig.T; issues: ColumnBindingIssue[] } {
+}>): { config: ColumnIdVizConfig.T; issues: QueryResultColumnBindingIssue[] } {
   const slots = makeColumnSlotsFromVizConfig(config).map((slot) => {
     return _bindSlotToColumnId({ slot, columns });
   });

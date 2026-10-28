@@ -1,12 +1,12 @@
 import { isDefined, prop } from "@avandar/utils";
-import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
+import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryResultColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
 import { makeColumnIdVizConfigFromNameBoundConfig } from "$/models/vizs/makeColumnIdVizConfigFromNameBoundConfig/makeColumnIdVizConfigFromNameBoundConfig";
 import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
-import type {
-  ColumnBindingIssue,
-  QueryResultColumnBindings,
-} from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type {
+  QueryResultColumnBindingIssue,
+  QueryResultColumnBindings,
+} from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type {
   LegacyLocalFilter,
@@ -18,7 +18,7 @@ export type { DataVizColumnBindingProps } from "./makeSavedColumnBindingsFromDat
 type SavedDataVizColumnBindings = {
   props: DataVizColumnBindingProps;
   runtimeConfig: VizConfig.T;
-  issues: ColumnBindingIssue[];
+  issues: QueryResultColumnBindingIssue[];
   localFilters: readonly LocalFilter[];
 };
 
@@ -28,7 +28,10 @@ function _getLocalFilterOutcome({
 }: {
   filter: LegacyLocalFilter;
   columns: readonly QueryResult.ColumnWithId[];
-}): { filter: LocalFilter | undefined; issue: ColumnBindingIssue | undefined } {
+}): {
+  filter: LocalFilter | undefined;
+  issue: QueryResultColumnBindingIssue | undefined;
+} {
   const columnId = getQueryColumnIdFromQueryResultColumnName({
     name: filter.columnName,
     columns,

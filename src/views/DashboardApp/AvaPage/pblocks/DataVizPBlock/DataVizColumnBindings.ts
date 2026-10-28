@@ -1,14 +1,14 @@
-import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
-import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
+import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { createQueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import { runQuerySchema } from "@/clients/queries/runQuerySchema/runQuerySchema";
 import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   QueryResultColumnBindings,
   ProjectionDescriptor,
   QueryResultColumnBindingRegistry,
-} from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+} from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { QueryClient } from "@tanstack/react-query";

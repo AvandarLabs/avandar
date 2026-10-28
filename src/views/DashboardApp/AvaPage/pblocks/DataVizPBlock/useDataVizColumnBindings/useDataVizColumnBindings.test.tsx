@@ -1,5 +1,5 @@
 import { DataVizColumnBindingTestFixtures } from "./DataVizColumnBindingTestFixtures";
-import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 const {

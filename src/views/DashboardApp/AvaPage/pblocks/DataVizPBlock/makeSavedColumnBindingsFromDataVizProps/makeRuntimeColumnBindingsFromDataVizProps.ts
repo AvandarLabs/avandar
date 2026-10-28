@@ -4,7 +4,7 @@ import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQ
 import { makeColumnBindingsFromDashboardFilters } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
 import { DataVizFilters } from "../DataVizPBlock/DataVizFilters/DataVizFilters";
 import { makeSavedColumnBindingsFromDataVizProps } from "./makeSavedColumnBindingsFromDataVizProps";
-import type { QueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { LocalFilter } from "../DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { Props } from "../DataVizPBlock/DataVizPBlock";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";

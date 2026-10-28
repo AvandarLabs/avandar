@@ -1,7 +1,7 @@
 import { identity, propEq } from "@avandar/utils";
 import { match } from "ts-pattern";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
 
 function _createTransitionMap({
