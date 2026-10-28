@@ -466,6 +466,14 @@ clause and may run past twenty words when grounding it for a new reader takes
 that; length is not the constraint, and a shorter heading that has stopped
 being specific or clear is worse.
 
+A strand's top-level heading states the one claim that unites its
+subsections, and never chains the subsections' claims one by one: those claims
+are the subsection headings. A heading that lists three or four findings joined
+by commas and "and" cannot be read at a glance, so it fails as navigation
+however accurate each clause is. When no single claim unites the subsections,
+name the area and the change in plain words and let the subsection headings
+carry the specifics.
+
 1. **Purpose.** Why the change exists, as one paragraph, then what it
    changes, as one short bullet per strand of work. No file names, no module
    names. See [Purpose](#purpose).
@@ -1399,8 +1407,10 @@ Two redirects, for passages that fail the test but are worth keeping somewhere:
   [Sections](#sections); past those, the author is enjoying the topic.
 
 A figure's legend is part of the figure, not prose. Never shorten a section by
-trimming a glossary entry or a caption: the entry exists because a label needs
-resolving, and cutting it breaks the figure rather than tightening the section.
+trimming a figure's `Where:` entry or its caption: the entry exists because a
+label needs resolving, and cutting it breaks the figure rather than tightening
+the section. Appendix A's entries are held to their own one-or-two-sentence
+limit, per [Glossary](#glossary).
 
 ### Factual prose
 
@@ -1855,7 +1865,9 @@ looks.
 
 The loop:
 
-1. Render the walkthrough to PDF with `markdown-to-pdf <file.md> --out <pdf>`.
+1. Render the walkthrough to PDF with `markdown-to-pdf <file.md> --out <pdf>`,
+   giving each round its own output name, because the tool writes a `-v2`
+   copy rather than overwrite an existing PDF.
 2. Rasterize the pages that carry diagrams (`pdftoppm -r 80 -png -f N -l N`)
    and **look at each image**.
 3. Judge each diagram against three things, all of them visual:
@@ -1865,17 +1877,20 @@ The loop:
    - **Legible type.** Diagram labels a little under body text, never so small
      that the reader would lean in.
 4. Fix what failed and go back to step 1. Keep looping until every diagram
-   passes, then report how many rounds it took.
+   passes or a diagram has gone three rounds without improving, then report
+   how many rounds it took and which diagrams still fail.
 
 **Only two levers are permitted, and the diagram's text content is not one of
 them.** The wording of every node and edge label is the author's and must
 survive the check byte for byte. What may change:
 
-- **Type size**, via a `%%{init: {'themeVariables': {'fontSize': '16px'}}}%%`
-  line, up or down.
+- **Type size**, via a `%%{init: {'themeVariables': {'fontSize': '20px'}}}%%`
+  line, up or down from mermaid's default of 16px. A diagram scaled to fit the
+  page height prints at the same size whatever this says, so for a tall
+  diagram the layout lever is the one that works.
 - **Layout**: `TD` versus `LR`, where a line breaks inside a label (`<br/>`),
-  node ordering, splitting one diagram into two, or spacing through
-  `nodeSpacing` and `rankSpacing`.
+  the label wrapping width (`wrappingWidth`), node ordering, splitting one
+  diagram into two, or spacing through `nodeSpacing` and `rankSpacing`.
 
 If a diagram cannot be made legible by those two levers alone, the subagent
 says so and leaves it, rather than rewriting a label to make the problem go
