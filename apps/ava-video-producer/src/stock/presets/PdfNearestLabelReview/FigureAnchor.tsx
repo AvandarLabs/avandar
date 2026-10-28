@@ -3,6 +3,7 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** A separate literal-token rail connects to its exact page anchor. */
 export function FigureAnchor({

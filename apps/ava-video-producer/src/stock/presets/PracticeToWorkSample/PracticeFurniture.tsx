@@ -4,6 +4,7 @@ import { MeasuredArtifact } from "./MeasuredArtifact";
 import { WorkshopBench } from "./WorkshopBench";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Furniture changes around the retained learner and measured practice sheet.

@@ -7,6 +7,7 @@ import { CustodySupport } from "./CustodySupport";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./CustodyTransfer.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** Overlapping support transfers responsibility only after acceptance. */
 export function CustodyTransfer({

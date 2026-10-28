@@ -4,6 +4,7 @@ import { DistrictLabels } from "./DistrictLabels";
 import { getAssignmentsFromLocations } from "./getAssignmentsFromLocations";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Full-record accounting is independent of footprint visibility. */
 export function AssignmentLedger({

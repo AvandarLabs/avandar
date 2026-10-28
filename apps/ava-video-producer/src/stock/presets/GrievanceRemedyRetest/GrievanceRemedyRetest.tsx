@@ -6,6 +6,7 @@ import { RemedyObject } from "./RemedyObject";
 import { RemedyResponse } from "./RemedyResponse";
 import type { Input } from "./GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** Repair, participant operation and acceptance remain independent facts. */
 export function GrievanceRemedyRetest({

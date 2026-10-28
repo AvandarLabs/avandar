@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   component: Input["plannedComponents"][number];
   frame: number;

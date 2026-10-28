@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { getObjectFlight } from "./objectFlight";
+
 const flight = {
   at: 80,
   duration: 18,

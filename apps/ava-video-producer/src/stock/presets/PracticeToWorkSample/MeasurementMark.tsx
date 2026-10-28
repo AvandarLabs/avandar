@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   progress: number;

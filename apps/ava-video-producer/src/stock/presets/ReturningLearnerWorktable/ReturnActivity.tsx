@@ -5,6 +5,7 @@ import { ActivityPaper } from "./ActivityPaper";
 import { ReturnActivityLabels } from "./ReturnActivityLabels";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   activity: Input["returnActivities"][number];
   index: number;

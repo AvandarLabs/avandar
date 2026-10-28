@@ -5,6 +5,7 @@ import type {
   StockContract,
   StockMetadata,
 } from "../../contracts/StockContract.types";
+
 export { controls } from "./UtteranceToModelDraft.controls";
 /** Public descriptors with no private provenance. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);

@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import type { Input } from "./FieldConflictChoice.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   sourceLabel: string;
   value: string;

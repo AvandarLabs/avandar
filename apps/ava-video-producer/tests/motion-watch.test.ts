@@ -7,6 +7,7 @@ import { setTimeout as pause } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
 import { buildStockContracts } from "../scripts/stock/buildStockContracts/buildStockContracts";
 import { buildLicenseFixture } from "./license-fixture";
+
 async function _createWatchFixture(root: string) {
   await fs.symlink(
     path.resolve("node_modules"),

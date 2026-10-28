@@ -16,6 +16,7 @@ import {
 } from "./FictionalConflictGlobe.fixtures";
 import { inputSchema, type Input } from "./FictionalConflictGlobe.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,

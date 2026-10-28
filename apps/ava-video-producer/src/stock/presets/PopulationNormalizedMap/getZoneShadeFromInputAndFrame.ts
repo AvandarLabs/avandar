@@ -1,6 +1,7 @@
 import { EASE, ramp } from "../../../motion";
 import { getPopulationRateFromCounts } from "./getPopulationRateFromCounts";
 import type { Input } from "./PopulationNormalizedMap.schema";
+
 type Props = { zone: Input["zones"][number]; input: Input; frame: number };
 /**
  * Explicit domains determine the shade before and after population

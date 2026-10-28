@@ -14,6 +14,7 @@ import {
 } from "./ExceptionDetour.fixtures";
 import { inputSchema } from "./ExceptionDetour.schema";
 import type { Input } from "./ExceptionDetour.schema";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,

@@ -3,6 +3,7 @@ import { SeedBalanceCaptions } from "./SeedBalanceCaptions";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 import type { Input } from "./SavedSeedSeasonReturn.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   scene: ReturnType<typeof getSeedSceneFromFrame>;

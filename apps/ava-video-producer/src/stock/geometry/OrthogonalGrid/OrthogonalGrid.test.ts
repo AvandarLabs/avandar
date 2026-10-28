@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { OrthogonalGrid, type OrthogonalGridCell } from "./OrthogonalGrid";
+
 function _outline(cells: readonly OrthogonalGridCell[]): string {
   return OrthogonalGrid.getOutlineFromCells({
     cells,

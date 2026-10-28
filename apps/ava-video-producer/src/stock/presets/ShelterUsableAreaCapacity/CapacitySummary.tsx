@@ -3,6 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { getCapacityFromFloorTiles } from "./getCapacityFromFloorTiles";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** The resolved area-only comparison keeps shortfall and spare separate. */
 export function CapacitySummary({ input, frame }: Readonly<Props>): ReactNode {

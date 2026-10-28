@@ -4,6 +4,7 @@ import { FractionSurface } from "./FractionSurface";
 import { SceneText } from "./SceneText";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   representation: Input["representations"][number];
   index: number;

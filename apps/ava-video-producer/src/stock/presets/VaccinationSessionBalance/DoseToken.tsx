@@ -3,6 +3,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   unit: Input["units"][number];

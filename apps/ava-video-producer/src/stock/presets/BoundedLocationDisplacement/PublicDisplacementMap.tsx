@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { DisclosedMarker } from "./DisclosedMarker";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** An initially empty public map receives only approximate displaced marks. */
 export function PublicDisplacementMap({

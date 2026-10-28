@@ -2,6 +2,7 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { getShopperPoseFromInputAndFrame } from "./getShopperPoseFromInputAndFrame";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 
 /** A connected arm and hand make product selection and release physical. */

@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import { getGroupingFromCells } from "./getGroupingFromCells";
 import type { ReactNode } from "react";
+
 type Props = {
   zone: ReturnType<typeof getGroupingFromCells>[number];
   accent: string;

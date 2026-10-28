@@ -4,6 +4,7 @@ import { ContentField } from "../ContentField/ContentField";
 import styles from "./CollectionItem.module.css";
 import type { Props as CollectionFieldProps } from "../CollectionField/CollectionField";
 import type { ReactNode } from "react";
+
 type Props = CollectionFieldProps & {
   item: unknown;
   index: number;

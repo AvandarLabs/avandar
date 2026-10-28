@@ -3,6 +3,7 @@ import { SceneText } from "./SceneText";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** Three physical operations preserve one exact supplied fraction. */
 export function FractionMaterialTranslation({

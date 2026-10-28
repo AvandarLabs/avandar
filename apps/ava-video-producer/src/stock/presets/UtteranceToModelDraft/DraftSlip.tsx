@@ -6,6 +6,7 @@ import { PhraseCopy } from "./PhraseCopy";
 import { PhraseSocket } from "./PhraseSocket";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   input: Input;

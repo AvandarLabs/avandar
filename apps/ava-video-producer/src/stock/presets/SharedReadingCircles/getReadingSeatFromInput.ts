@@ -1,4 +1,5 @@
 import { EASE, mix, ramp } from "../../../motion";
+
 type Options = {
   frame: number;
   memberIndex: number;

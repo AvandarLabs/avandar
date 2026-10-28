@@ -4,6 +4,7 @@ import { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import { TravelingCase } from "./TravelingCase";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Temporary identity copies join a map pin only to its own histogram segment.

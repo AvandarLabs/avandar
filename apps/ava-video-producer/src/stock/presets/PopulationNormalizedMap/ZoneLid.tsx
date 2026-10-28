@@ -3,6 +3,7 @@ import { ZoneGround } from "./ZoneGround";
 import { ZoneSurface } from "./ZoneSurface";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   zone: Input["zones"][number];
   index: number;

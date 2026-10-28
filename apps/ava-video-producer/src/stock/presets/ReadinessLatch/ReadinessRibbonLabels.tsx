@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   participant: Input["participants"][number];
   input: Input;

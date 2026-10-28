@@ -2,6 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { DrillSecondSelection } from "./DrillSecondSelection";
 import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /**
  * A parent window opens first. A second supplied group narrows independently.

@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { LocationPin } from "./LocationPin";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   location: Input["locations"][number];
   index: number;

@@ -3,6 +3,7 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; opacity: number; accent: string };
 /**
  * The persistent keyed shelf entry remains after the first response returns.

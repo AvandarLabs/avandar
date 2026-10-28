@@ -1,6 +1,7 @@
 import { EASE, mix, ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   piece: "left" | "right" | "continuous";

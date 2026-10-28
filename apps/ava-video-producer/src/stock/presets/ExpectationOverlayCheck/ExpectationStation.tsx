@@ -4,6 +4,7 @@ import { ComparisonVerdict } from "./ComparisonVerdict";
 import { StationSheets } from "./StationSheets";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   item: Input["tests"][number];
   index: number;

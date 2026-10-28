@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; y: number; accent: string };
 /** A single named count utility with a fixed operation. */
 export function UtilityModule({

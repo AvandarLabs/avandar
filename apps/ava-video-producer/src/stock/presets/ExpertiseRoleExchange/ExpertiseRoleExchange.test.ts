@@ -20,6 +20,7 @@ import {
 } from "./ExpertiseRoleExchange.fixtures";
 import { inputSchema, type Input } from "./ExpertiseRoleExchange.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,

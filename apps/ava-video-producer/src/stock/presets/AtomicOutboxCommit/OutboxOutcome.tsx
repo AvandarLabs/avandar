@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** The outcome caption describes both durable halves together. */
 export function OutboxOutcome({ input, frame }: Readonly<Props>): ReactNode {

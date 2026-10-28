@@ -1,6 +1,7 @@
 import { prop } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
+
 const baseSchema = z.strictObject({
   rows: z
     .array(

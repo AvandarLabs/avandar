@@ -7,6 +7,7 @@ import { KernelField } from "./KernelField";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./KernelDensitySpread.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** Fixed observations and legend expose smoothing as a modeled quantity. */
 export function KernelDensitySpread({

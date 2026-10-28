@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { StratumBoundary } from "./StratumBoundary";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   stratum: Input["strata"][number];

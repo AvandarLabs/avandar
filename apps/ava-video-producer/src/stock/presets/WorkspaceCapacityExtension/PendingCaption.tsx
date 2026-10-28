@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { ReactNode } from "react";
+
 type Props = {
   label: string;
   requestX: number;

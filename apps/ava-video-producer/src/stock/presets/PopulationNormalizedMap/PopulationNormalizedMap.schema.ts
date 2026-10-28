@@ -3,6 +3,7 @@ import { z } from "zod";
 import { PlanarPolygon } from "../../geography/PlanarPolygon/PlanarPolygon";
 import { getPopulationRateFromCounts } from "./getPopulationRateFromCounts";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
+
 const coordinate: z.ZodNumber = z.number().min(0).max(100);
 const polygonSchema: z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>> =
   z

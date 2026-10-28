@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { AttributeAttachments } from "./AttributeAttachments";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /** Arrowhead follows the supplied directed relation in either layout. */
 export function DraftRelation({

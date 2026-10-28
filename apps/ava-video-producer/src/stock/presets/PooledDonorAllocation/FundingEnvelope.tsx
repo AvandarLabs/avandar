@@ -3,6 +3,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   index: number;

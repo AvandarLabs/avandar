@@ -3,6 +3,7 @@ import { ramp } from "../../../motion";
 import { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * An authored investigation bracket encloses only the selected coordinate

@@ -1,5 +1,6 @@
 import type { getBookingFromFrame } from "./getBookingFromFrame";
 import type { ReactNode } from "react";
+
 type Props = {
   scene: ReturnType<typeof getBookingFromFrame>;
   requestId: string;

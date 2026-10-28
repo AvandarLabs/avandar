@@ -1,6 +1,7 @@
 import { EASE, mix, ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { horizontal: boolean; allReady: boolean; frame: number };
 const GATE: { stroke: "#f0ba83"; strokeWidth: number } = {
   stroke: STOCK.orange,

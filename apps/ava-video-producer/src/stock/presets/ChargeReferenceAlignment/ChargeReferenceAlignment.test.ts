@@ -16,6 +16,7 @@ import {
 } from "./ChargeReferenceAlignment.fixtures";
 import { inputSchema, type Input } from "./ChargeReferenceAlignment.schema";
 import { INVALID_INPUTS } from "./rejectedInputs.constants";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -81,6 +82,7 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { chargeReferenceAlignmentContract } from "./ChargeReferenceAlignment.contract";
+
 function _getVisibleTexts({
   input,
   frame,
@@ -133,6 +135,7 @@ registerStockTextLayoutAssertions({
 });
 
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
+
 test("every independent context mismatch suppresses numeric and physical discrepancy", () => {
   const cases = [
     { procedureCode: "demo-p1" },
@@ -281,6 +284,7 @@ test("full literal context values fit inside their actual source windows", () =>
 });
 
 import { getTextEnvelopesFromMarkup } from "../SchemaColumnEvolution/getTextEnvelopesFromMarkup";
+
 test("wrapped source captions clear actual context windows and currency clears amounts", () => {
   const input = {
     ...DENSE_INPUT,

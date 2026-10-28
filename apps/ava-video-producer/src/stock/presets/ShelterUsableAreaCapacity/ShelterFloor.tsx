@@ -3,6 +3,7 @@ import { buildFloorOutlineFromTiles } from "./buildFloorOutlineFromTiles";
 import { ShelterTile } from "./ShelterTile";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** The gross perimeter remains around the cutaway while usable tiles unroll. */
 export function ShelterFloor({

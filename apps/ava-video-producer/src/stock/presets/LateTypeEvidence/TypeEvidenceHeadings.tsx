@@ -2,6 +2,7 @@ import { Text } from "../../graphics-common";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /**
  * Column captions retain provisional source context and explicit policy state.

@@ -15,6 +15,7 @@ import {
   invalidInputs,
 } from "./FilterSubscriptionScope.fixtures";
 import { inputSchema, type Input } from "./FilterSubscriptionScope.schema";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,

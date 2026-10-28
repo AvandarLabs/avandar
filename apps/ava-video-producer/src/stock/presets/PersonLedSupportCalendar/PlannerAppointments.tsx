@@ -4,6 +4,7 @@ import { ExistingPlannerCommitments } from "./ExistingPlannerCommitments";
 import { PlannerBooking } from "./PlannerBooking";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Existing commitments stay readable beneath the single outlined proposal. */
 export function PlannerAppointments({

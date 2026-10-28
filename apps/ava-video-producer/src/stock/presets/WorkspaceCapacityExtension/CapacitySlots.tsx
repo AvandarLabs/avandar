@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; width: number; extension: number; accent: string };
 /** Additional slot outlines remain within the physically unfolding tray. */
 export function CapacitySlots({

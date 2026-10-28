@@ -3,6 +3,7 @@ import { PendingCaption } from "./PendingCaption";
 import { ResourceTab } from "./ResourceTab";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Every request stays pending until the whole authored expansion completes. */
 export function PendingResources({

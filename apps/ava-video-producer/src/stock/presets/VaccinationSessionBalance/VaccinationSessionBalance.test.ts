@@ -11,6 +11,7 @@ import {
   invalidInputs,
 } from "./VaccinationSessionBalance.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -40,6 +41,7 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { vaccinationSessionBalanceContract } from "./VaccinationSessionBalance.contract";
 import { inputSchema, type Input } from "./VaccinationSessionBalance.schema";
+
 const textLayoutOptions = {
   inputSchema,
   fixtures,

@@ -14,6 +14,7 @@ import {
   invalidInputs,
 } from "./LinkedParameterRehearsal.fixtures";
 import { inputSchema, type Input } from "./LinkedParameterRehearsal.schema";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,

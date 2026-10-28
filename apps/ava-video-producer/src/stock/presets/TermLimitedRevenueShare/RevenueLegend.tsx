@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; accent: string };
 /** One ruler and color legend belong equally to both independent periods. */
 export function RevenueLegend({ input, accent }: Readonly<Props>): ReactNode {

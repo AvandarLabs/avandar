@@ -4,6 +4,7 @@ import { GridCell } from "./GridCell";
 import { makeGridSceneFromInputAndFrame } from "./makeGridSceneFromInputAndFrame";
 import type { Input } from "./SpatialGridBinning.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Square source bins and a separate count-token ledger. */
 export function GridCells({

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
+
 const optionSchema: z.ZodObject<
   { label: z.ZodString; reason: z.ZodString },
   z.core.$strict

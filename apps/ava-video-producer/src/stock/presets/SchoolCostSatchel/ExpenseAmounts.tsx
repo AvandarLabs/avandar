@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { SceneText } from "./SceneText";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   expense: Input["expenses"][number];
   targetX: number;

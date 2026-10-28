@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   x: number;
   y: number;

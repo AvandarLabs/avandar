@@ -7,6 +7,7 @@ import { CoordinationPlaceConnections } from "./CoordinationPlaceConnections";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /**
  * One authored reallocation responds to community input on a schematic table.

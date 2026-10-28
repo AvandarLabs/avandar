@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /**
  * Homes, booking calendar and clinic doorway keep distinct physical regions.

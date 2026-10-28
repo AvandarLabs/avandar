@@ -20,6 +20,7 @@ import {
 } from "./SupportRequestResponse.fixtures";
 import { inputSchema, type Input } from "./SupportRequestResponse.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,

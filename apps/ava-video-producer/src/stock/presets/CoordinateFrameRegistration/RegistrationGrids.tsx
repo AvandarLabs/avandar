@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { RegistrationGrid } from "./RegistrationGrid";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /**
  * Both coordinate frames retain their own axes and units throughout transfer.

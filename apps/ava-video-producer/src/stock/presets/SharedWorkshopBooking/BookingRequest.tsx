@@ -5,6 +5,7 @@ import { getBookingFromFrame } from "./getBookingFromFrame";
 import { OriginalRequest } from "./OriginalRequest";
 import type { Input } from "./SharedWorkshopBooking.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; index: number; accent: string };
 /**
  * A participant moves their request, agrees its tab, then takes one use turn.

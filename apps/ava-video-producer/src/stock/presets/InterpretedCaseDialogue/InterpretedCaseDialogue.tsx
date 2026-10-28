@@ -4,6 +4,7 @@ import { DialoguePeople } from "./DialoguePeople";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./InterpretedCaseDialogue.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /**
  * Two authored dialogue turns preserve attribution across supplied wordings.

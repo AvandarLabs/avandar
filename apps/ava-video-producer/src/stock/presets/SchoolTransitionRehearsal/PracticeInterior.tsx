@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { SchoolLocker } from "./SchoolLocker";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   doorWidth: number;

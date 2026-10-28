@@ -1,5 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { x: number; y: number; awning: number; accent: string };
 /** One persistent vehicle folds and unfolds its awning around the drive. */
 export function ClinicVehicle({

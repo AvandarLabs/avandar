@@ -3,6 +3,7 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./DocumentRegionDriftCheck.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Header and fingerprint tags have independent, exact comparison strokes. */
 export function ComparisonTags({

@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { RetainedRecord } from "./RetainedRecord";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; accent: string; frame: number };
 /** Stable rows retain IDs and exact category ownership under the stencil. */
 export function RetainedRecordStrip({

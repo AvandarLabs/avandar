@@ -5,6 +5,7 @@ import { CacheOrigin } from "./CacheOrigin";
 import { CacheRequester } from "./CacheRequester";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; originActive: number; accent: string };
 /** Explicit participant labels distinguish the shelf from the source. */
 export function CacheParticipants({

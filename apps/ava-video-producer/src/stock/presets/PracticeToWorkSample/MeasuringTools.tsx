@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { RulerTicks } from "./RulerTicks";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   isMeasuring: boolean;

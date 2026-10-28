@@ -4,6 +4,7 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; index: number; frame: number; distance: number };
 /**
  * Full candidate text stays clear of arbitrarily close or coincident anchors.

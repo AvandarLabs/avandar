@@ -15,6 +15,7 @@ import {
   minimumInput,
 } from "./SchoolCostSatchel.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,
@@ -56,6 +57,7 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { schoolCostSatchelContract as contract } from "./SchoolCostSatchel.contract";
 import { inputSchema, type Input } from "./SchoolCostSatchel.schema";
+
 function _getVisibleTexts({
   input,
   frame,

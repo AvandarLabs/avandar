@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { TradeoffPoints } from "./TradeoffPoints";
 import type { Input } from "./TradeoffPivot.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   side: "gain" | "concession";

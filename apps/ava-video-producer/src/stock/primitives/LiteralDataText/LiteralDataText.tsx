@@ -1,5 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { value: string; x: number; y: number; color?: string };
 const GRAPHEMES: Intl.Segmenter = new Intl.Segmenter("und", {
   granularity: "grapheme",

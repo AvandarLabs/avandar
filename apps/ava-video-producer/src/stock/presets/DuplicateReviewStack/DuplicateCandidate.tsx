@@ -4,6 +4,7 @@ import { DuplicateCandidateRole } from "./DuplicateCandidateRole";
 import { getDuplicateCardLayoutFromGroupAndFrame } from "./getDuplicateCardLayoutFromGroupAndFrame";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   input: Input;

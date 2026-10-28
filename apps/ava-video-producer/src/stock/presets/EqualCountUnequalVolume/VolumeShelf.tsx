@@ -5,6 +5,7 @@ import { VolumeScale } from "./VolumeScale";
 import { VolumeTotal } from "./VolumeTotal";
 import type { Input } from "./EqualCountUnequalVolume.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   group: Input["groups"][number];
   input: Input;

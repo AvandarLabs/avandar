@@ -5,6 +5,7 @@ import { LayerGeometry } from "./LayerGeometry";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
+
 function _isSelected({
   input,
   household,

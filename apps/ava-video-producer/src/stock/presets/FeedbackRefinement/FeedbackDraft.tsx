@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { getFeedbackStateFromInputAndFrame } from "./getFeedbackStateFromInputAndFrame";
 import type { ReactNode } from "react";
+
 type Props = {
   state: ReturnType<typeof getFeedbackStateFromInputAndFrame>;
   accent: string;

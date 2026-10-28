@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { inputSchema } from "./LinkedParameterRehearsal.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
+
 function _copy({ path, message }: { path: string; message: string }) {
   return {
     id: `motionAtlas.linked-parameter-rehearsal.controls.${path}`,

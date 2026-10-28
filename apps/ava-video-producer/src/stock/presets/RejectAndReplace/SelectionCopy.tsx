@@ -3,6 +3,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; isReplacement: boolean };
 
 function _getLabelsFromSelection({

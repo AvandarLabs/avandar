@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   learner: Input["learners"][number];

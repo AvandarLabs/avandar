@@ -13,6 +13,7 @@ import {
   minimumInput,
 } from "./FractionMaterialTranslation.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,
@@ -47,6 +48,7 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { fractionMaterialTranslationContract as contract } from "./FractionMaterialTranslation.contract";
 import { inputSchema, type Input } from "./FractionMaterialTranslation.schema";
+
 function _getVisibleTexts({
   input,
   frame,

@@ -12,6 +12,7 @@ import {
   DENSE_INPUT,
   MINIMUM_INPUT,
 } from "./VoluntaryFamilyReunion.fixtures";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -56,6 +57,7 @@ test("changed authored input emits its physical scene", () => {
 
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+
 test("changed greeting changes actual arms and every member stays distinct after sequential acceptance", () => {
   const opened = _render({ frame: 150, input: CHANGED_INPUT });
   const waved = _render({
@@ -101,6 +103,7 @@ test("changed greeting changes actual arms and every member stays distinct after
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { voluntaryFamilyReunionContract } from "./VoluntaryFamilyReunion.contract";
 import { inputSchema, type Input } from "./VoluntaryFamilyReunion.schema";
+
 function _getVisibleTexts({
   input,
   frame,

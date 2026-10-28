@@ -5,6 +5,7 @@ import { PaymentLegend } from "./PaymentLegend";
 import { PaymentRow } from "./PaymentRow";
 import type { Input } from "./BenefitShortfallCorrection.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** Original, correction and unresolved units remain separately inspectable. */
 export function BenefitShortfallCorrection({

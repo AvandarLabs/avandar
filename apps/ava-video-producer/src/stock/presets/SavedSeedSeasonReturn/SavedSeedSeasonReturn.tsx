@@ -6,6 +6,7 @@ import { SeedMaterial } from "./SeedMaterial";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./SavedSeedSeasonReturn.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /**
  * A retained seed lot crosses a fallow interval and stops at authored sowing.

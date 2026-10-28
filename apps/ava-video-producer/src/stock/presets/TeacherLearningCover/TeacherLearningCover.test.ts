@@ -14,6 +14,7 @@ import {
   minimumInput,
 } from "./TeacherLearningCover.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,
@@ -51,6 +52,7 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { teacherLearningCoverContract as contract } from "./TeacherLearningCover.contract";
 import { inputSchema, type Input } from "./TeacherLearningCover.schema";
+
 function _getVisibleTexts({
   input,
   frame,

@@ -1,6 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { mix } from "../../../motion";
 import type { Input } from "./FieldConflictChoice.schema";
+
 type Options = {
   source: Input["sources"][number];
   sourceIndex: number;

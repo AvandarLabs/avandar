@@ -9,6 +9,7 @@ import { SceneText } from "./SceneText";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** Carries the same portfolio through absence, return and teacher additions. */
 export function ReturningLearnerWorktable({

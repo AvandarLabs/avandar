@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { BatchItemLabel } from "./BatchItemLabel";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   item: Input["batches"][number]["items"][number];
   batchId: string;

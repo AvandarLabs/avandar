@@ -1,5 +1,6 @@
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; progress: number; accent: string };
 /** Approach Trace for the authored scene. */
 export function ApproachTrace({

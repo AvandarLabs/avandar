@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /**
  * Supplied captions describe this illustrative bounded task without performance

@@ -1,6 +1,7 @@
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /** Storage labels remain above both possible overflow routes. */
 export function BasinCaption({ input }: Readonly<Props>): ReactNode {

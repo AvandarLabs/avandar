@@ -3,6 +3,7 @@ import { getConsentTurnFromPermissionsAndFrame } from "./getConsentTurnFromPermi
 import { PreparedContact } from "./PreparedContact";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /** Each affected contact has its own held slot and handling interval. */
 export function PreparedContacts({

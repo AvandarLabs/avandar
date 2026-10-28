@@ -2,6 +2,7 @@ import { propEq } from "@avandar/utils";
 import { EASE, mix, ramp } from "../../../motion";
 import { getSentenceGlyphsFromInput } from "./getSentenceGlyphsFromInput";
 import type { Input } from "./ProseMeasurementLedger.schema";
+
 const ROLES: readonly [
   "subject",
   "metric",

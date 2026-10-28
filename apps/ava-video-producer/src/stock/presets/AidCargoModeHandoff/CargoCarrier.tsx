@@ -3,6 +3,7 @@ import { CargoCarrierShape } from "./CargoCarrierShape/CargoCarrierShape";
 import { getCarrierPositionFromInputAndFrame } from "./getCarrierPositionFromInputAndFrame";
 import type { Input } from "./AidCargoModeHandoff.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   carrier: Input["carriers"][number];
   input: Input;

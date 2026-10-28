@@ -1,5 +1,6 @@
 import { EASE, mix, ramp } from "../../../motion";
 import type { Input } from "./RetailShelfReplenishment.schema";
+
 type Unit = {
   goodIndex: number;
   unitIndex: number;

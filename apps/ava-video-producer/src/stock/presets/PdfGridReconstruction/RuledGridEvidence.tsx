@@ -1,6 +1,7 @@
 import { ramp } from "../../../motion";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Selected structural evidence derives from the supplied grid geometry. */
 export function RuledGridEvidence({

@@ -4,6 +4,7 @@ import { BallotPaper } from "./BallotPaper";
 import type { getBallotGeometryFromInputAndFrame } from "./getBallotGeometryFromInputAndFrame";
 import type { Input } from "./ResidentBudgetBallots.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   ballot: Input["ballots"][number];
   index: number;

@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   householdId: string;
   railY: number;

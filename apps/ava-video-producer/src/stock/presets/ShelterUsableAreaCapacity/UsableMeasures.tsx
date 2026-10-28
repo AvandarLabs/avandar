@@ -3,6 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { getCapacityFromFloorTiles } from "./getCapacityFromFloorTiles";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /**
  * Usable-area labels appear after the tiles have cleared their travel region.

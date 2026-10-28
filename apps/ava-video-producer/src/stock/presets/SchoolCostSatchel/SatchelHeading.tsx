@@ -1,6 +1,7 @@
 import { SceneText } from "./SceneText";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /** Draws the scene's SatchelHeading group with fixed authored geometry. */
 export function SatchelHeading({ input }: Readonly<Props>): ReactNode {

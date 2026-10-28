@@ -11,6 +11,7 @@ import {
   fixtures,
 } from "./ResidentBudgetBallots.fixtures";
 import { inputSchema, type Input } from "./ResidentBudgetBallots.schema";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -42,6 +43,7 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { residentBudgetBallotsContract as contract } from "./ResidentBudgetBallots.contract";
+
 const EXCLUDED_TEXT_FIELDS: string[] = [
   "id",
   "permissionId",

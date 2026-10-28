@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   x: number;
   y: number;

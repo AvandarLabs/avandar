@@ -3,6 +3,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
 import type { ReactNode } from "react";
+
 type Props = {
   piece: ReturnType<typeof getWorkPartitionFromInput>[number];
   index: number;

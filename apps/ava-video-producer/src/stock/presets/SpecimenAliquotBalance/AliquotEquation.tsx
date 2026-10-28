@@ -2,6 +2,7 @@ import { prop } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /** Exact source equality is displayed only after all transfers settle. */
 export function AliquotEquation({ input }: Readonly<Props>): ReactNode {

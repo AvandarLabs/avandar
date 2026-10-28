@@ -5,6 +5,7 @@ import { getSocketPointFromIndex } from "./getSocketPointFromIndex";
 import { LeaseCollar } from "./LeaseCollar";
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   participant: Input["participants"][number];
   index: number;

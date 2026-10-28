@@ -1,5 +1,6 @@
 import { STOCK } from "../../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { mode: "truck" | "cargo-bike"; accent: string };
 /** Road transport silhouette for the selected carrier mode. */
 export function RoadCarrier({ mode, accent }: Readonly<Props>): ReactNode {

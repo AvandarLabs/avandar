@@ -2,6 +2,7 @@ import { propEq, prop } from "@avandar/utils";
 import { ramp } from "../../../motion";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /** Hand contact follows the edge of the actively turning slip. */
 export function ConsentTurningHand({

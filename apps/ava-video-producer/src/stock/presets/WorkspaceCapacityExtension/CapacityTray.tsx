@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { CapacitySlots } from "./CapacitySlots";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Persistent tray base with a hinged expanding side and exact slot outlines.

@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { CapabilityGlyph } from "./CapabilityGlyph";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input };
 /** Authored legend labels explain all four independent categorical states. */
 export function CapabilityLegend({ frame, input }: Readonly<Props>): ReactNode {
