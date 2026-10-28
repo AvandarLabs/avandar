@@ -20,13 +20,13 @@ type GetSlotOutputName = ({
   target: string;
 }>) => string | undefined;
 
-type NameResolvedXYSeries = Extract<
-  ColumnIdVizConfig.NameResolved,
+type NameBoundXYSeries = Extract<
+  ColumnIdVizConfig.NameBound,
   { vizType: "bar" }
 >["series"][number];
 
-type NameResolvedRadarSeries = Extract<
-  ColumnIdVizConfig.NameResolved,
+type NameBoundRadarSeries = Extract<
+  ColumnIdVizConfig.NameBound,
   { vizType: "radar" }
 >["series"][number];
 
@@ -35,13 +35,13 @@ function _mapSeries(
     series: readonly ColumnIdVizConfig.XYSeries[];
     getSlotOutputName: GetSlotOutputName;
   }>,
-): NameResolvedXYSeries[];
+): NameBoundXYSeries[];
 function _mapSeries(
   options: Readonly<{
     series: readonly ColumnIdVizConfig.RadarSeries[];
     getSlotOutputName: GetSlotOutputName;
   }>,
-): NameResolvedRadarSeries[];
+): NameBoundRadarSeries[];
 function _mapSeries(
   options: Readonly<{
     series: ReadonlyArray<
@@ -49,7 +49,7 @@ function _mapSeries(
     >;
     getSlotOutputName: GetSlotOutputName;
   }>,
-): Array<NameResolvedXYSeries | NameResolvedRadarSeries> {
+): Array<NameBoundXYSeries | NameBoundRadarSeries> {
   return options.series.flatMap((series, index) => {
     const key = options.getSlotOutputName({
       key: series.key,
@@ -64,7 +64,7 @@ function _mapScatterSeries(
     series: readonly ColumnIdVizConfig.ScatterSeries[];
     getSlotOutputName: GetSlotOutputName;
   }>,
-): Extract<ColumnIdVizConfig.NameResolved, { vizType: "scatter" }>["series"] {
+): Extract<ColumnIdVizConfig.NameBound, { vizType: "scatter" }>["series"] {
   return options.series.flatMap((series, index) => {
     const key = options.getSlotOutputName({
       key: series.key,
@@ -85,7 +85,7 @@ function _mapBubbleSeries(
     series: readonly ColumnIdVizConfig.BubbleSeries[];
     getSlotOutputName: GetSlotOutputName;
   }>,
-): Extract<ColumnIdVizConfig.NameResolved, { vizType: "bubble" }>["series"] {
+): Extract<ColumnIdVizConfig.NameBound, { vizType: "bubble" }>["series"] {
   return options.series.flatMap((series, index) => {
     const key = options.getSlotOutputName({
       key: series.key,
@@ -110,10 +110,7 @@ function _mapXYConfig(
     config: Extract<ColumnIdVizConfig.T, { vizType: "bar" | "line" | "area" }>;
     getSlotOutputName: GetSlotOutputName;
   }>,
-): Extract<
-  ColumnIdVizConfig.NameResolved,
-  { vizType: "bar" | "line" | "area" }
-> {
+): Extract<ColumnIdVizConfig.NameBound, { vizType: "bar" | "line" | "area" }> {
   const { config, getSlotOutputName } = options;
   return {
     ...config,
@@ -127,7 +124,7 @@ function _mapCategoryConfig(
     config: Extract<ColumnIdVizConfig.T, { vizType: "pie" | "funnel" }>;
     getSlotOutputName: GetSlotOutputName;
   }>,
-): Extract<ColumnIdVizConfig.NameResolved, { vizType: "pie" | "funnel" }> {
+): Extract<ColumnIdVizConfig.NameBound, { vizType: "pie" | "funnel" }> {
   const { config, getSlotOutputName } = options;
   return {
     ...config,
@@ -141,7 +138,7 @@ function _mapConfig(
     config: Readonly<ColumnIdVizConfig.T>;
     getSlotOutputName: GetSlotOutputName;
   }>,
-): ColumnIdVizConfig.NameResolved {
+): ColumnIdVizConfig.NameBound {
   const { config, getSlotOutputName } = options;
   return match(config)
     .with({ vizType: "table" }, identity)
@@ -182,14 +179,14 @@ function _mapConfig(
  * Replaces each column ID in a chart config with that column's current output
  * name, the row key the renderer reads. Leaves the saved config unchanged.
  */
-export function makeNameResolvedVizConfigFromColumnIdConfig({
+export function makeNameBoundVizConfigFromColumnIdConfig({
   config,
   columns,
 }: Readonly<{
   config: Readonly<ColumnIdVizConfig.T>;
   columns: readonly QueryResult.ColumnWithId[];
 }>): {
-  config: ColumnIdVizConfig.NameResolved;
+  config: ColumnIdVizConfig.NameBound;
   issues: ColumnBindingIssue[];
 } {
   const columnsById = makeIdLookupMap(columns);

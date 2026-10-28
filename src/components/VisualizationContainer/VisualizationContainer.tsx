@@ -5,7 +5,7 @@ import { Box, Flex } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";
-import { makeNameResolvedVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameResolvedVizConfigFromColumnIdConfig/makeNameResolvedVizConfigFromColumnIdConfig";
+import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
@@ -139,7 +139,7 @@ export function VisualizationContainer({
   const columnNames = rawColumns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
 
-  const resolved = makeNameResolvedVizConfigFromColumnIdConfig({
+  const resolved = makeNameBoundVizConfigFromColumnIdConfig({
     config: vizConfig,
     columns: columns,
   });

@@ -1,4 +1,4 @@
-import type { NameResolvedVizConfig } from "$/models/vizs/ColumnIdVizConfig/NameResolvedVizConfig.types.ts";
+import type { NameBoundVizConfig } from "$/models/vizs/ColumnIdVizConfig/NameBoundVizConfig.types.ts";
 /* eslint-disable @typescript-eslint/no-namespace */
 import type {
   VizConfig as VizConfigRead,
@@ -10,7 +10,7 @@ import type {
 
 /** Types shared by all supported visualization configurations. */
 export namespace VizConfig {
-  export type NameResolved = NameResolvedVizConfig;
+  export type NameBound = NameBoundVizConfig;
   export type T = VizConfigRead;
   export type Type = VizType;
   export type Registry = VizConfigRegistry;

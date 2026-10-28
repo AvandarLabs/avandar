@@ -23,7 +23,7 @@ import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyl
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { NameResolvedScatterSeries as ScatterSeries } from "$/models/vizs/ColumnIdVizConfig/NameResolvedVizConfig.types";
+import type { NameBoundScatterSeries as ScatterSeries } from "$/models/vizs/ColumnIdVizConfig/NameBoundVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ScatterChartSeries } from "@mantine/charts";
 

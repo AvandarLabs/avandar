@@ -6,7 +6,7 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import { makeNameResolvedVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameResolvedVizConfigFromColumnIdConfig/makeNameResolvedVizConfigFromColumnIdConfig";
+import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
@@ -61,7 +61,7 @@ export type ParsedUrlState = {
   orderByColName?: string;
   orderDir?: OrderByDirection;
   rawSql?: string;
-  vizConfig?: VizConfig.NameResolved;
+  vizConfig?: VizConfig.NameBound;
   openDataset?: OpenDatasetInfo;
 };
 
@@ -115,7 +115,7 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
 
   if (search.vc) {
     try {
-      result.vizConfig = JSON.parse(search.vc) as VizConfig.NameResolved;
+      result.vizConfig = JSON.parse(search.vc) as VizConfig.NameBound;
     } catch {
       // Ignore malformed JSON — the viz will fall back to defaults.
     }
@@ -156,12 +156,12 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
  * column ID maps to its name in the latest result, and a slot whose column is
  * absent from that result is left out.
  */
-function _getNameResolvedVizConfig(
+function _getNameBoundVizConfig(
   state: DataExplorerAppState,
-): VizConfig.NameResolved {
+): VizConfig.NameBound {
   return (
     state.pendingUrlVizConfig ??
-    makeNameResolvedVizConfigFromColumnIdConfig({
+    makeNameBoundVizConfigFromColumnIdConfig({
       config: state.vizConfig,
       columns: state.lastResultColumns ?? [],
     }).config
@@ -226,7 +226,7 @@ export function serializeStateToUrl(
   // query string could never clear in one action.
   try {
     if (vizConfig.vizType !== "table") {
-      params.vc = JSON.stringify(_getNameResolvedVizConfig(state));
+      params.vc = JSON.stringify(_getNameBoundVizConfig(state));
     }
   } catch {
     // Ignore — viz config will fall back to defaults on next load.

@@ -2,8 +2,8 @@ import { propNotEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 /** Chart output names bind uniquely before renderer resolution. */
 import { uuid } from "$/lib/uuid.ts";
-import { makeColumnIdVizConfigFromNameResolvedConfig } from "$/models/vizs/makeColumnIdVizConfigFromNameResolvedConfig/makeColumnIdVizConfigFromNameResolvedConfig.ts";
-import { makeNameResolvedVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameResolvedVizConfigFromColumnIdConfig/makeNameResolvedVizConfigFromColumnIdConfig.ts";
+import { makeColumnIdVizConfigFromNameBoundConfig } from "$/models/vizs/makeColumnIdVizConfigFromNameBoundConfig/makeColumnIdVizConfigFromNameBoundConfig.ts";
+import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { ColumnIdVizConfig } from "$/models/vizs/ColumnIdVizConfig/ColumnIdVizConfig.ts";
@@ -21,7 +21,7 @@ const SERIES: { key: string; label: string; color: string } = {
   label: "revenue",
   color: "#123456",
 };
-const CONFIGS: ColumnIdVizConfig.NameResolved[] = [
+const CONFIGS: ColumnIdVizConfig.NameBound[] = [
   {
     vizType: "bar",
     xAxisKey: "quarter",
@@ -66,17 +66,17 @@ const CONFIGS: ColumnIdVizConfig.NameResolved[] = [
   { vizType: "table" },
 ];
 
-describe("makeColumnIdVizConfigFromNameResolvedConfig", () => {
+describe("makeColumnIdVizConfigFromNameBoundConfig", () => {
   it.each(CONFIGS)(
     "binds $vizType without changing its style or category values",
     (config) => {
-      const result = makeColumnIdVizConfigFromNameResolvedConfig({
+      const result = makeColumnIdVizConfigFromNameBoundConfig({
         config: config,
         columns: COLUMNS,
       });
       expect(result.issues).toEqual([]);
       expect(
-        makeNameResolvedVizConfigFromColumnIdConfig({
+        makeNameBoundVizConfigFromColumnIdConfig({
           config: result.config,
           columns: COLUMNS,
         }).config,
@@ -101,7 +101,7 @@ describe("makeColumnIdVizConfigFromNameResolvedConfig", () => {
   it.each(["Revenue", "revenue"])(
     "rejects ambiguous output name %s without choosing the first column",
     (key) => {
-      const config: ColumnIdVizConfig.NameResolved = {
+      const config: ColumnIdVizConfig.NameBound = {
         vizType: "line",
         xAxisKey: undefined,
         series: [{ renderAs: "line", key }],
@@ -116,7 +116,7 @@ describe("makeColumnIdVizConfigFromNameResolvedConfig", () => {
           dataType: "double" as const,
         },
       ];
-      const result = makeColumnIdVizConfigFromNameResolvedConfig({
+      const result = makeColumnIdVizConfigFromNameBoundConfig({
         config: config,
         columns: columns,
       });
@@ -129,7 +129,7 @@ describe("makeColumnIdVizConfigFromNameResolvedConfig", () => {
   );
 
   it("accepts a unique case-insensitive output name", () => {
-    const result = makeColumnIdVizConfigFromNameResolvedConfig({
+    const result = makeColumnIdVizConfigFromNameBoundConfig({
       config: { vizType: "funnel", nameKey: "QUARTER", valueKey: "REVENUE" },
       columns: COLUMNS,
     });
@@ -142,7 +142,7 @@ describe("makeColumnIdVizConfigFromNameResolvedConfig", () => {
   it("reports missing required targets without changing the input config", () => {
     const config = CONFIGS[4]!;
     const original = structuredClone(config);
-    const result = makeColumnIdVizConfigFromNameResolvedConfig({
+    const result = makeColumnIdVizConfigFromNameBoundConfig({
       config: config,
       columns: COLUMNS.filter(propNotEq("id", SIZE_ID)),
     });

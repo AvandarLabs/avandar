@@ -2,7 +2,7 @@ import { propEq } from "@avandar/utils";
 import { CompositeChart as MantineCompositeChart } from "@mantine/charts";
 import { Label } from "recharts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { NameResolvedXYSeries as XYSeries } from "$/models/vizs/ColumnIdVizConfig/NameResolvedVizConfig.types";
+import type { NameBoundXYSeries as XYSeries } from "$/models/vizs/ColumnIdVizConfig/NameBoundVizConfig.types";
 import type { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { CompositeChartSeries } from "@mantine/charts";

@@ -14,7 +14,7 @@ import { render } from "@/test-utils";
  */
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
-type LineChartVizConfig = Extract<VizConfig.NameResolved, { vizType: "line" }>;
+type LineChartVizConfig = Extract<VizConfig.NameBound, { vizType: "line" }>;
 
 const mantineLineChartMock = vi.fn();
 

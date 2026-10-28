@@ -21,7 +21,7 @@ import type { ResolveDataTrigger } from "@puckeditor/core";
 export type DataVizConfigMemory = Record<
   string,
   Partial<VizConfig.Registry> & {
-    legacy?: Partial<Record<VizConfig.Type, VizConfig.NameResolved>>;
+    legacy?: Partial<Record<VizConfig.Type, VizConfig.NameBound>>;
   }
 >;
 

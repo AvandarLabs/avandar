@@ -66,7 +66,7 @@ export type DataExplorerAppState = {
    * result's column IDs and clears this field. Until then, URL sync keeps
    * writing it back unchanged, so a slow or failed query does not drop it.
    */
-  pendingUrlVizConfig?: VizConfig.NameResolved;
+  pendingUrlVizConfig?: VizConfig.NameBound;
 
   /**
    * The last config the user actually saw for each viz type, so switching
