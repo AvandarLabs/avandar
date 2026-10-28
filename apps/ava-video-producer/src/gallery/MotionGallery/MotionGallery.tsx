@@ -15,6 +15,7 @@ import { PaletteControls } from "./PaletteControls";
 import { PreviewDialog } from "./PreviewDialog/PreviewDialog";
 import { ReferenceTray } from "./ReferenceTray";
 import { useMotionGalleryState } from "./useMotionGalleryState";
+
 const PRESET_INDEX: Map<(typeof STOCK_CATALOG)[number]["id"], number> = new Map(
   STOCK_CATALOG.map((preset, index) => [preset.id, index]),
 );

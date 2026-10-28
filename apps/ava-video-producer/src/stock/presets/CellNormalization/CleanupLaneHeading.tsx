@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = {
   text: string;
   labelRole: "original" | "result" | "change";

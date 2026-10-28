@@ -85,6 +85,7 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { atomicOutboxCommitContract } from "./AtomicOutboxCommit.contract";
 import { inputSchema, type Input } from "./AtomicOutboxCommit.schema";
+
 function _getVisibleTexts({
   input,
   frame,

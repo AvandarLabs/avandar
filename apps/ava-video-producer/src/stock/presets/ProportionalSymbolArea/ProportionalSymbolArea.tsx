@@ -6,6 +6,7 @@ import { AreaSite } from "./AreaSite";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** Equal-area unit tiles reshape into circles at fixed authored sites. */
 export function ProportionalSymbolArea({

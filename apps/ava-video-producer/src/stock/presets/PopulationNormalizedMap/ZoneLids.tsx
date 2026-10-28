@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { ZoneLid } from "./ZoneLid";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Count shades lift and settle as population-normalized shades on stable zones.

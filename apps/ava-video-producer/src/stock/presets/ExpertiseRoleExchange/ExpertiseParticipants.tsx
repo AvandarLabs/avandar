@@ -4,6 +4,7 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ExpertiseRoleExchange.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string; toolX: number };
 /** Equal-scale participants retain names and organizational roles. */
 export function ExpertiseParticipants({

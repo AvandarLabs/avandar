@@ -1,6 +1,7 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { rows: readonly string[]; x: number; isReload?: boolean };
 /** Literal row occurrences retain empty strings and exact whitespace. */
 export function QuarantinedRows({

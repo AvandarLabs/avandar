@@ -1,6 +1,7 @@
 import { propEq, propNotEq } from "@avandar/utils";
 import { EASE, mix, ramp } from "../../../motion";
 import type { Input } from "./DashboardSlotAssembly.schema";
+
 type Rect = { x: number; y: number; width: number; height: number };
 type SlotOptions = { input: Input; widgetId: string };
 const LOOSE_PANELS: Rect[] = [

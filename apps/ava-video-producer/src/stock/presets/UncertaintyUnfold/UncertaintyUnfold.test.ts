@@ -13,6 +13,7 @@ import {
   invalidInputs,
 } from "./UncertaintyUnfold.fixtures";
 import { inputSchema, type Input } from "./UncertaintyUnfold.schema";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,

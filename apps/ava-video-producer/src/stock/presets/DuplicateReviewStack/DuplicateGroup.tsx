@@ -3,6 +3,7 @@ import { DuplicateGroupHeading } from "./DuplicateGroupHeading";
 import { getDuplicateGroupLayoutFromGroupAndFrame } from "./getDuplicateGroupLayoutFromGroupAndFrame";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   input: Input;

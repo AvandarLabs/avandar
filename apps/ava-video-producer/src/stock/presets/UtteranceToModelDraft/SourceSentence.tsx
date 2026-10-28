@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { getPhrasePositionsFromSentenceParts } from "./getPhrasePositionsFromSentenceParts";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   input: Input;

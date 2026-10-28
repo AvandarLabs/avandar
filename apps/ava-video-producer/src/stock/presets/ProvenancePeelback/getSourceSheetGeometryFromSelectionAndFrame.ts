@@ -1,5 +1,6 @@
 import { EASE, mix, ramp } from "../../../motion";
 import type { Input } from "./ProvenancePeelback.schema";
+
 type Options = {
   index: number;
   otherIndex: number;

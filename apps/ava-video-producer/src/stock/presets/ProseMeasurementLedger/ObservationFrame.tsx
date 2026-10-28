@@ -4,6 +4,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { roleMessages } from "./ProseMeasurementLedger.controls";
 import type { getObservationSlotFromFrame } from "./getObservationSlotFromFrame";
 import type { ReactNode } from "react";
+
 type Props = {
   scene: ReturnType<typeof getObservationSlotFromFrame>;
   frame: number;

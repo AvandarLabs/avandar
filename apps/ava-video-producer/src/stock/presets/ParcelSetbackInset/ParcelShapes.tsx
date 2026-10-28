@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { ParcelEnvelopeGeometry } from "./makeParcelEnvelopeGeometryFromParcel";
 import type { ReactNode } from "react";
+
 type Props = {
   parcelId: string;
   geometry: ParcelEnvelopeGeometry;

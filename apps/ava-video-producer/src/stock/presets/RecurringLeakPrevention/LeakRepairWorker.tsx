@@ -3,6 +3,7 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./RecurringLeakPrevention.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** The worker carries the catch tray and then physically handles the joint. */
 export function LeakRepairWorker({

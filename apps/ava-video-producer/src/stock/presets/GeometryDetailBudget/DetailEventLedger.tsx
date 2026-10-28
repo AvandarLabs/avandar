@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 /**
  * Depth-first segment, farthest-index, deviation and tolerance event values.

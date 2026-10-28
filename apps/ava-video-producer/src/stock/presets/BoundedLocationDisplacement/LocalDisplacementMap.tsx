@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { LocalOffsetMarker } from "./LocalOffsetMarker";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Local analysis contains every supplied source and authored offset. */
 export function LocalDisplacementMap({

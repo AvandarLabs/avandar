@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { getByteLabelFromBytes } from "./getByteLabelFromBytes";
 import type { Input } from "./EqualCountUnequalVolume.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   group: Input["groups"][number];

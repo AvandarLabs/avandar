@@ -4,6 +4,7 @@ import { CleanupCells } from "./CleanupCells";
 import { CleanupRowCopy } from "./CleanupRowCopy";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   row: Input["rows"][number];
   index: number;

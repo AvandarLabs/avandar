@@ -5,6 +5,7 @@ import { audienceMessages } from "./PublicationSnapshotSlice.controls";
 import { SnapshotColumnHeading } from "./SnapshotColumnHeading";
 import type { Input } from "./PublicationSnapshotSlice.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** Frozen snapshot metadata stays separate from the mutable source table. */
 export function SnapshotHeadings({ input, frame }: Readonly<Props>): ReactNode {

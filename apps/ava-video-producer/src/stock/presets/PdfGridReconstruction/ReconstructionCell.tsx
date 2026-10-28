@@ -2,6 +2,7 @@ import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import { GridLiteralCell } from "./GridLiteralCell";
 import type { ReactNode } from "react";
+
 type Props = {
   value: string;
   x: number;

@@ -5,6 +5,7 @@ import { getJournalGeometryFromFrame } from "./getJournalGeometryFromFrame";
 import { JournalEntryText } from "./JournalEntryText";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   entry: Input["entries"][number];
   index: number;

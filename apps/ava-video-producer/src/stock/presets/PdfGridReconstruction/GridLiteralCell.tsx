@@ -1,6 +1,7 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import type { ReactNode } from "react";
+
 type Props = { value: string; x: number; y: number };
 const GRAPHEMES: Intl.Segmenter = new Intl.Segmenter("und", {
   granularity: "grapheme",

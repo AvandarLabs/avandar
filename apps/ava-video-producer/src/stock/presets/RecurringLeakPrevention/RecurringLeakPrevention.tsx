@@ -5,6 +5,7 @@ import { LeakRepairWorker } from "./LeakRepairWorker";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./RecurringLeakPrevention.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 
 /**

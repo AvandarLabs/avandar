@@ -3,6 +3,7 @@ import { ClusterCounts } from "./ClusterCounts";
 import { PointRoster } from "./PointRoster";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; grouping: number; accent: string };
 /**
  * A keyed roster distinguishes coincident identities and overlapping anchors.

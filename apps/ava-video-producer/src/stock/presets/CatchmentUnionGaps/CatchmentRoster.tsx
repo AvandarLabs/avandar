@@ -2,6 +2,7 @@ import { PlanarPolygon } from "../../geography/PlanarPolygon/PlanarPolygon";
 import { HouseholdRecord } from "./HouseholdRecord";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; progress: number; accent: string };
 /**
  * Individually keyed homes remain visible even when coordinate anchors

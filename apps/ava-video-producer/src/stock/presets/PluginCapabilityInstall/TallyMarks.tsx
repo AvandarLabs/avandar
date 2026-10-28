@@ -2,6 +2,7 @@ import { propEq } from "@avandar/utils";
 import { ramp } from "../../../motion";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   records: Input["records"];

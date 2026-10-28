@@ -1,6 +1,7 @@
 import { EASE, mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   start: number;

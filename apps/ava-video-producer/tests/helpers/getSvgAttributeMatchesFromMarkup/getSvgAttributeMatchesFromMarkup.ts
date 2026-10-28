@@ -1,4 +1,5 @@
 import { prop } from "@avandar/utils";
+
 function _decodeAttributeValue(value: string): string {
   return value.replace(/&([^;]+);/g, (_, entity: string) => {
     const named: Record<string, string> = {

@@ -4,6 +4,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { missingMessage } from "./WideTableToObservations.controls";
 import type { getMeasurementStripFromFrame } from "./getMeasurementStripFromFrame";
 import type { ReactNode } from "react";
+
 type Props = {
   scene: ReturnType<typeof getMeasurementStripFromFrame>;
   showSourceGuides: boolean;

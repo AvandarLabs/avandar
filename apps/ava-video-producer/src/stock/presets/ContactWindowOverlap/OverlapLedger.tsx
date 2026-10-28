@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 function _getCounts(input: Input) {
   const unknown = input.records.filter(propEq("start", null)).length;

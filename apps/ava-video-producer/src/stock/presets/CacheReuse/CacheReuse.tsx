@@ -9,6 +9,7 @@ import { getCacheJourneyFromFrame } from "./getCacheJourneyFromFrame";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** An initial miss populates a keyed shelf that alone answers the repeat. */
 export function CacheReuse({

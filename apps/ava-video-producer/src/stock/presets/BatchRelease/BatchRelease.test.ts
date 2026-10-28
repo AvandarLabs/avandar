@@ -9,6 +9,7 @@ import { BatchRelease } from "./BatchRelease";
 import { batchReleaseContract } from "./BatchRelease.contract";
 import { DEFAULT_INPUT, FIXTURES } from "./BatchRelease.fixtures";
 import { inputSchema, type Input } from "./BatchRelease.schema";
+
 function _render({
   frame,
   input,

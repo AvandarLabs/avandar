@@ -4,6 +4,7 @@ import { ConflictChoiceMark } from "./ConflictChoiceMark";
 import { ConflictFieldHeading } from "./ConflictFieldHeading";
 import type { Input } from "./FieldConflictChoice.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   accent: string;

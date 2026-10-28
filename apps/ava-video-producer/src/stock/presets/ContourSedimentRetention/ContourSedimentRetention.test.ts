@@ -12,6 +12,7 @@ import {
   invalidInputs,
 } from "./ContourSedimentRetention.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -61,6 +62,7 @@ test("the physical object changes geometry while preserving its intact extent", 
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { contourSedimentRetentionContract } from "./ContourSedimentRetention.contract";
 import { inputSchema, type Input } from "./ContourSedimentRetention.schema";
+
 function _getVisibleTexts({
   input,
   frame,

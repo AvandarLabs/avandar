@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; index: number; frame: number; accent: string };
 /**
  * A token number and destination letter make each named team's assignment

@@ -3,6 +3,7 @@ import { Text } from "../../graphics-common";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   learnerId: string;

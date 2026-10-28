@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import type { getBookingFromFrame } from "./getBookingFromFrame";
 import type { Input } from "./SharedWorkshopBooking.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   scene: ReturnType<typeof getBookingFromFrame>;

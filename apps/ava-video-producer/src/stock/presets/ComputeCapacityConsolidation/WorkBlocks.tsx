@@ -6,6 +6,7 @@ import { makeJobTransfersFromInput } from "./makeJobTransfersFromInput";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 const COLORS: string[] = [
   STOCK.mint,

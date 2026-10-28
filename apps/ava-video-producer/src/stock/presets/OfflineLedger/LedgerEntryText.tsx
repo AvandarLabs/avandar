@@ -2,6 +2,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   entry: Input["entries"][number];
   y: number;

@@ -4,6 +4,7 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./OrderedLockAcquisition.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   input: Input;

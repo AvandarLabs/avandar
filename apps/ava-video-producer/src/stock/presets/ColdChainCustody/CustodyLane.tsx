@@ -5,6 +5,7 @@ import { CustodyCheckpoint } from "./CustodyCheckpoint";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   crate: Input["crates"][number];
   index: number;

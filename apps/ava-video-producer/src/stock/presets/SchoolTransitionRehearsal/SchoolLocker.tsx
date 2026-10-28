@@ -1,6 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; doorWidth: number; accent: string };
 /** A hinged locker exposes its interior before the learner leaves. */
 export function SchoolLocker({

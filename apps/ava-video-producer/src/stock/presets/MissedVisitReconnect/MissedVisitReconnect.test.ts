@@ -11,6 +11,7 @@ import {
   invalidInputs,
 } from "./MissedVisitReconnect.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -38,6 +39,7 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { missedVisitReconnectContract } from "./MissedVisitReconnect.contract";
 import { inputSchema, type Input } from "./MissedVisitReconnect.schema";
+
 const textLayoutOptions = {
   inputSchema,
   fixtures,

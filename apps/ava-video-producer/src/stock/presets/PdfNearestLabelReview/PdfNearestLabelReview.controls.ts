@@ -2,6 +2,7 @@ import { z } from "zod";
 import { makeStockControlsFromSchema } from "../../contracts/makeStockControlsFromSchema/makeStockControlsFromSchema";
 import { inputSchema } from "./PdfNearestLabelReview.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
+
 const NAMESPACE = "motionAtlas.pdf-nearest-label-review" as const;
 /** Ratio is a proximity heuristic, never a probability. */
 export const ratioMessage: { id: string; message: string } = {

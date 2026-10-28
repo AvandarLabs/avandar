@@ -5,6 +5,7 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SchemaPlanLocalExecution.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Only explicitly supplied question/schema copy leaves; the authored plan

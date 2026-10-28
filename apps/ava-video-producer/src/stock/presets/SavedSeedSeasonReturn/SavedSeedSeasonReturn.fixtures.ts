@@ -1,5 +1,6 @@
 import { DEFAULT_INPUT } from "./defaultInput";
 import type { Input } from "./SavedSeedSeasonReturn.schema";
+
 export { DEFAULT_INPUT as defaultInput } from "./defaultInput";
 export { invalidInputs } from "./invalidInputs";
 /** Accepted minimum, dense, changed and semantic edge cases. */

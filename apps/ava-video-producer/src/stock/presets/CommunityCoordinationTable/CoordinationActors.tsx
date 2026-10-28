@@ -4,6 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { getTeamMarkerPoseFromInputAndFrame } from "./getTeamMarkerPoseFromInputAndFrame";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * A representative indicates the destination and the team handles its token.

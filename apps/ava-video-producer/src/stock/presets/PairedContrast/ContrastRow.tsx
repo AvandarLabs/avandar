@@ -5,6 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { ContrastBand } from "./ContrastBand";
 import type { Input } from "./PairedContrast.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   row: Input["criteria"][number];
   index: number;

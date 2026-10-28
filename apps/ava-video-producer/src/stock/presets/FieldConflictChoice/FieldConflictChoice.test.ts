@@ -13,6 +13,7 @@ import {
   invalidInputs,
 } from "./FieldConflictChoice.fixtures";
 import { inputSchema, type Input } from "./FieldConflictChoice.schema";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,

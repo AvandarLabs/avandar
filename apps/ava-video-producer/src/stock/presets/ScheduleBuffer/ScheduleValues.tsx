@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { value: number; unitLabel: string; x: number; slotWidth: number };
 /** Duration values and their common unit occupy fixed external slots. */
 export function ScheduleValues({

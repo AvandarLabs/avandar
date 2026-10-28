@@ -2,6 +2,7 @@ import { getCatchmentShapesFromInput } from "./getCatchmentShapesFromInput";
 import { IndividualFootprints } from "./IndividualFootprints";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   progress: number;

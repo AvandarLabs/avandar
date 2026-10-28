@@ -5,6 +5,7 @@ import { getPickerCopyFromFrame } from "./getPickerCopyFromFrame";
 import type { PickerValueGroup } from "./getPickerGroupsFromInput";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   index: number;

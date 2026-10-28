@@ -17,6 +17,7 @@ import {
 } from "./ProtectedWorkBoundary.fixtures";
 import { inputSchema, type Input } from "./ProtectedWorkBoundary.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,

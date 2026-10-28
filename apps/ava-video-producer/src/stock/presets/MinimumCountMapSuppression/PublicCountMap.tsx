@@ -5,6 +5,7 @@ import { PublicReleaseTile } from "./PublicReleaseTile";
 import { ReleasedCountToken } from "./ReleasedCountToken";
 import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Public tiles and copied labels consume only sanitized release objects. */
 export function PublicCountMap({

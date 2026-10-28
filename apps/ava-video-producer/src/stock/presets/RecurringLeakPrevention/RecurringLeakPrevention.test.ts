@@ -19,6 +19,7 @@ import {
 } from "./RecurringLeakPrevention.fixtures";
 import { inputSchema, type Input } from "./RecurringLeakPrevention.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,

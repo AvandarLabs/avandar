@@ -15,6 +15,7 @@ import {
   invalidInputs,
 } from "./PredicatePushdownBoundary.fixtures";
 import { inputSchema, type Input } from "./PredicatePushdownBoundary.schema";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,

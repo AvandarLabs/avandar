@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { buildStockMessages } from "./buildStockMessages";
+
 async function _withMessages(action: (root: string) => Promise<void>) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "stock-messages-"));
   try {

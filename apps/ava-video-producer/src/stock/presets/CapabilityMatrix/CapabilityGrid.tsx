@@ -5,6 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { CapabilityColumn } from "./CapabilityColumn";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input };
 /** The table skeleton establishes shared row and column geometry first. */
 export function CapabilityGrid({ frame, input }: Readonly<Props>): ReactNode {

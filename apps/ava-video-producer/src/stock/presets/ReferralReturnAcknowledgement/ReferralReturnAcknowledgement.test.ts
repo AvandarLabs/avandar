@@ -19,6 +19,7 @@ import {
   type Input,
 } from "./ReferralReturnAcknowledgement.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,

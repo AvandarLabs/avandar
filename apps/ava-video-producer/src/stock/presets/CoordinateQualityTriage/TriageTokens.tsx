@@ -4,6 +4,7 @@ import { PlottedRowAssociation } from "./PlottedRowAssociation";
 import { TriageRowToken } from "./TriageRowToken";
 import type { Input } from "./CoordinateQualityTriage.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Fixed plotted coordinates retain all source-key associations after arrival.

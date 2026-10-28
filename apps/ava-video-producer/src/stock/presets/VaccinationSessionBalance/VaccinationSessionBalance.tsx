@@ -6,6 +6,7 @@ import { SessionRecipients } from "./SessionRecipients";
 import { SessionTotals } from "./SessionTotals";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** The supplied stock partitions into exclusive physical destinations. */
 export function VaccinationSessionBalance({

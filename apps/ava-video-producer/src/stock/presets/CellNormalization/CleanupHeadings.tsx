@@ -3,6 +3,7 @@ import { CleanupComparisonHeading } from "./CleanupComparisonHeading";
 import { CleanupPrimaryHeading } from "./CleanupPrimaryHeading";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Headings follow the displayed value type, comparison mode and timeline. */
 export function CleanupHeadings({

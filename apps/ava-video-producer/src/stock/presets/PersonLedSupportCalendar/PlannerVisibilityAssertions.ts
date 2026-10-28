@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
+
 type Box = { x: number; y: number; width: number; height: number };
 /** Read actual booking rectangle geometry from emitted markup. */
 function _getBookingBoxFromMarkup(markup: string): Box {

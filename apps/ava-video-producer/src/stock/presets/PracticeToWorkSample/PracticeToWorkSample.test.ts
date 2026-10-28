@@ -15,6 +15,7 @@ import {
 } from "./PracticeToWorkSample.fixtures";
 import { inputSchema, type Input } from "./PracticeToWorkSample.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
 function _render({
   frame,
   input,

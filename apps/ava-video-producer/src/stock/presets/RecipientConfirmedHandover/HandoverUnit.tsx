@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { getHandoverPositionFromInputAndFrame } from "./getHandoverPositionFromInputAndFrame";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   frame: number;

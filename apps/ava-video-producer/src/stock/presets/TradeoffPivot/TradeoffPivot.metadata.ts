@@ -9,6 +9,7 @@ import type {
   StockMetadata,
   StockMessageDescriptor,
 } from "../../contracts/StockContract.types";
+
 function _message({
   key,
   message,

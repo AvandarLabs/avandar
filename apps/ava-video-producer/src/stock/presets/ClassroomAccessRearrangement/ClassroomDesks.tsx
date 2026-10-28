@@ -1,6 +1,7 @@
 import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { progress: number };
 /** Classroom Desks for the authored scene. */
 export function ClassroomDesks({ progress }: Readonly<Props>): ReactNode {

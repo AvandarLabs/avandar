@@ -2,6 +2,7 @@ import { ramp } from "../../../motion";
 import { getKernelSamplesFromInput } from "./getKernelSamplesFromInput";
 import type { Input } from "./KernelDensitySpread.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Weighted cones rise over fixed observations and change radius together. */
 export function KernelCones({

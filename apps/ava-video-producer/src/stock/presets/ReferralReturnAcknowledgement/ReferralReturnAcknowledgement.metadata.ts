@@ -5,6 +5,7 @@ import type {
   StockContract,
   StockMetadata,
 } from "../../contracts/StockContract.types";
+
 export { controls } from "./ReferralReturnAcknowledgement.controls";
 /** Public retrieval metadata without private provenance. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);

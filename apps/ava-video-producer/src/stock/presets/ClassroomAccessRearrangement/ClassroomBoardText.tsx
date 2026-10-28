@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; hasBoard: boolean };
 /** Classroom Board Text for the authored scene. */
 export function ClassroomBoardText({

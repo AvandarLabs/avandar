@@ -9,6 +9,7 @@ import { ShelfStructure } from "./ShelfStructure";
 import { ShelfUnit } from "./ShelfUnit";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /**
  * Exact replenishment and shopper selection, without duplicated product units.

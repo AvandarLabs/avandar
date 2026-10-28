@@ -12,6 +12,7 @@ import {
   invalidInputs,
 } from "./PipelineStepSplice.fixtures";
 import { inputSchema, type Input } from "./PipelineStepSplice.schema";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,

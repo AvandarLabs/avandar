@@ -15,6 +15,7 @@ import {
   invalidInputs,
 } from "./ProportionalSymbolArea.fixtures";
 import { inputSchema, type Input } from "./ProportionalSymbolArea.schema";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,

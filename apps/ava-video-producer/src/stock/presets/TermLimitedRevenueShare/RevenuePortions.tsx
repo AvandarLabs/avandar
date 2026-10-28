@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { RevenueAmount } from "./RevenueAmount";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   amounts: number[];
   receipts: number;

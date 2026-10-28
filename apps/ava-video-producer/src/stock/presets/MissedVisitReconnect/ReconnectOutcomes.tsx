@@ -4,6 +4,7 @@ import { ReconnectOutcomeMark } from "./ReconnectOutcomeMark";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input };
 const OUTCOMES: readonly ["unreached", "contacted", "booked", "attended"] = [
   "unreached",

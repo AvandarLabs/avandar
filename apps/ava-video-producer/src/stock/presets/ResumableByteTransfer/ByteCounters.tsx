@@ -1,6 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./ResumableByteTransfer.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; confirmed: number; remaining: number };
 /**
  * The two counters always partition the exact file size, with offsets hidden.

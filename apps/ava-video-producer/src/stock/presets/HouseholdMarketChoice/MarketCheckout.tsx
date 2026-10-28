@@ -4,6 +4,7 @@ import { MarketBalance } from "./MarketBalance";
 import { MarketTender } from "./MarketTender";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Tender passes to the retailer while the exact residual remains with shopper.

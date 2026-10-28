@@ -13,6 +13,7 @@ import {
 } from "./StatePreservingSourceRefresh.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import type { Input } from "./StatePreservingSourceRefresh.schema";
+
 function _render({
   frame,
   input,
@@ -66,6 +67,7 @@ import { registerStockLocalizationAssertions } from "../../../../tests/helpers/r
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { statePreservingSourceRefreshContract } from "./StatePreservingSourceRefresh.contract";
 import { inputSchema } from "./StatePreservingSourceRefresh.schema";
+
 function _getVisibleTexts({
   input,
   frame,

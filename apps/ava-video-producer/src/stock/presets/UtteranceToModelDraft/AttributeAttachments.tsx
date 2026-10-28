@@ -2,6 +2,7 @@ import { propEq } from "@avandar/utils";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; stacked: boolean };
 /** Attribute connectors lead only to their supplied owning entity. */
 export function AttributeAttachments({

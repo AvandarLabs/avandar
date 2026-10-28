@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; accent: string };
 /**
  * Captions distinguish complete sources, qualifying results and distance units.

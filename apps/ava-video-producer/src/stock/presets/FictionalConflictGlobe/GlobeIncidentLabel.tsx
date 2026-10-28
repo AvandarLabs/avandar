@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./FictionalConflictGlobe.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   incident: Input["incidents"][number];
   index: number;

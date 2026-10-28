@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./ReferralReturnAcknowledgement.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 /** Exclusive final states and attendance fractions retain separate meanings. */
 export function ReferralLedger({ input, frame }: Readonly<Props>): ReactNode {

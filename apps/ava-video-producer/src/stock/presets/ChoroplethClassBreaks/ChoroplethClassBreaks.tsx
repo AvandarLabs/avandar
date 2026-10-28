@@ -7,6 +7,7 @@ import { ClassZone } from "./ClassZone";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
+
 type Props = GraphicProps & { input: Input };
 /** Moving authored thresholds recolor fixed schematic observations. */
 export function ChoroplethClassBreaks({

@@ -3,6 +3,7 @@ import { getMeasurementStripFromFrame } from "./getMeasurementStripFromFrame";
 import { MeasurementStripLabels } from "./MeasurementStripLabels";
 import type { Input } from "./WideTableToObservations.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   frame: number;

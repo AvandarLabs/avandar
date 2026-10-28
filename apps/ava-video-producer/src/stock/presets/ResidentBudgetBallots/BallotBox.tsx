@@ -1,6 +1,7 @@
 import { EASE, ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { frame: number };
 /** The hinged lid opens after casting and stays open throughout extraction. */
 export function BallotBox({ frame }: Readonly<Props>): ReactNode {

@@ -14,6 +14,7 @@ import {
   invalidInputs,
 } from "./PriorityInsertion.fixtures";
 import { inputSchema, type Input } from "./PriorityInsertion.schema";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,

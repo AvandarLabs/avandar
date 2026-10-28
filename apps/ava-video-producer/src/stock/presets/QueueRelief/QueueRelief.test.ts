@@ -9,6 +9,7 @@ import { QueueRelief } from "./QueueRelief";
 import { queueReliefContract as contract } from "./QueueRelief.contract";
 import { DEFAULT_INPUT, fixtures, invalidInputs } from "./QueueRelief.fixtures";
 import { inputSchema, type Input } from "./QueueRelief.schema";
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,

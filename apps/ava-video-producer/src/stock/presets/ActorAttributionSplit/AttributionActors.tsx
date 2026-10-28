@@ -5,6 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { AttributionCollaborator } from "./AttributionCollaborator";
 import type { Input } from "./ActorAttributionSplit.schema";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; input: Input; accent: string };
 /** Supplied collaborators, the retired shared stamp and distinct new stamps. */
 export function AttributionActors({

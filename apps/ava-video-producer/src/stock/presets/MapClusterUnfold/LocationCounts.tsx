@@ -3,6 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { getClusterPointPositionFromPoint } from "./getClusterPointPositionFromPoint";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; grouping: number; accent: string };
 function _getLocations({ input, grouping }: Readonly<Omit<Props, "accent">>) {
   const positions = input.points.map((point) => {

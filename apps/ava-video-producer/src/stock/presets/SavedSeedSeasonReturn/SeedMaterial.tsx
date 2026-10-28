@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { SeedPortion } from "./SeedPortion";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 import type { ReactNode } from "react";
+
 type Props = {
   scene: ReturnType<typeof getSeedSceneFromFrame>;
   frame: number;

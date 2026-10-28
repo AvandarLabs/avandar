@@ -2,6 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
+
 type Props = { frame: number; accent: string };
 /** The operator's hand stays on the outlet handle while setting it. */
 export function OutletOperator({ frame, accent }: Readonly<Props>): ReactNode {

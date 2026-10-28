@@ -2,6 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { getCatchmentShapesFromInput } from "./getCatchmentShapesFromInput";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; progress: number; accent: string };
 /** Each original service footprint retains its authored outline toggle. */
 export function IndividualFootprints({

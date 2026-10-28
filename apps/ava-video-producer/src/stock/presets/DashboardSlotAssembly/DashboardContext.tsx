@@ -4,6 +4,7 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number };
 const TITLE = {
   x: 24,

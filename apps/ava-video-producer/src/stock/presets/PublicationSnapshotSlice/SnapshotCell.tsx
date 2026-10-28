@@ -4,6 +4,7 @@ import { getSnapshotCellFromFrame } from "./getSnapshotCellFromFrame";
 import { SnapshotCellText } from "./SnapshotCellText";
 import type { Input } from "./PublicationSnapshotSlice.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   input: Input;
   frame: number;

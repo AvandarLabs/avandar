@@ -1,6 +1,7 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import type { Input } from "./PublicWorksMeasurementCheck.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; endX: number; accent: string };
 /** Two named observers hold the moving tape ends with attached hands. */
 export function TapeObservers({

@@ -4,6 +4,7 @@ import { ContactCard } from "./ContactCard";
 import { ContactHandling } from "./ContactHandling";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   labels: Input["labels"];

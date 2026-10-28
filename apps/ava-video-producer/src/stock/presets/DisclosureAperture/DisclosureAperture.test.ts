@@ -8,6 +8,7 @@ import {
   fixtures,
   invalidInputs,
 } from "./DisclosureAperture.fixtures";
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -69,6 +70,7 @@ test("all-retain creates zero outbound copies or apertures at every frame", () =
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { disclosureApertureContract } from "./DisclosureAperture.contract";
 import { inputSchema } from "./DisclosureAperture.schema";
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,

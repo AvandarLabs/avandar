@@ -3,6 +3,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import type { Input } from "./ChosenServiceAccess.schema";
 import type { ReactNode } from "react";
+
 type Props = { input: Input; frame: number; accent: string };
 /** Staff handles the selected barrier and holds its door without pushing. */
 export function ServiceStaff({

@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
+
 function _hundredths(value: number): number {
   const [whole, fraction = ""] = String(value).split(".");
   return Number(whole) * 100 + Number(fraction.padEnd(2, "0"));

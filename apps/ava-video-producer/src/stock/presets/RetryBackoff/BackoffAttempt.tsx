@@ -5,6 +5,7 @@ import { BackoffLabel } from "./BackoffLabel";
 import { BackoffWait } from "./BackoffWait";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
+
 type Props = {
   frame: number;
   x: number;
