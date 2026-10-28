@@ -10,6 +10,7 @@ import type {
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3.types";
 import type { Config as PuckConfig, Data as PuckData } from "@puckeditor/core";
 import type { Simplify } from "type-fest";
+
 type V4_BarSeries = {
   renderAs: "bar";
   key: string;

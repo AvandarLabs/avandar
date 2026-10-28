@@ -18,6 +18,7 @@ import type {
   QueryFilterOperator,
   ColumnNameQueryFilterRule as QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+
 type QueryFilter = ColumnNameQueryFilterGroup | ColumnNameQueryFilterRule;
 
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
