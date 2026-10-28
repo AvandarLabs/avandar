@@ -41,7 +41,7 @@ describe("makeProjectionDescriptorsFromStructuredQuery", () => {
     expect(descriptor).toMatchObject({
       id: COLUMN.id,
       identity: "structured",
-      outputName: "total",
+      queryResultColumnName: "total",
     });
     expect(descriptor?.sqlExpressionKey).toBe(sql?.expressionKey);
     expect(descriptor?.expressionKey).not.toBe(descriptor?.sqlExpressionKey);

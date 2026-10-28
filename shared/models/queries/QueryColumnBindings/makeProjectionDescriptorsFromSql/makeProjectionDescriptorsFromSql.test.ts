@@ -29,7 +29,7 @@ describe("makeProjectionDescriptorsFromSql", () => {
     });
     expect(original).toHaveLength(1);
     expect(renamed[0]?.expressionKey).toBe(original[0]?.expressionKey);
-    expect(renamed[0]?.outputName).toBe("amount");
+    expect(renamed[0]?.queryResultColumnName).toBe("amount");
     expect(renamed[0]?.identity).toBe("sql");
   });
   it("distinguishes physical relation, qualification, column, and aggregation", () => {
@@ -50,7 +50,10 @@ describe("makeProjectionDescriptorsFromSql", () => {
       sql: "SELECT s.* FROM sales s",
       names: ["revenue", "profit"],
     });
-    expect(columns.map(prop("outputName"))).toEqual(["revenue", "profit"]);
+    expect(columns.map(prop("queryResultColumnName"))).toEqual([
+      "revenue",
+      "profit",
+    ]);
     expect(columns[0]?.expressionKey).toBe(
       _describe({ sql: "SELECT revenue FROM sales", names: ["revenue"] })[0]
         ?.expressionKey,
@@ -61,7 +64,7 @@ describe("makeProjectionDescriptorsFromSql", () => {
       _describe({
         sql: "SELECT region, SUM(revenue) AS amount FROM sales GROUP BY region",
         names: ["amount", "region"],
-      }).map(prop("outputName")),
+      }).map(prop("queryResultColumnName")),
     ).toEqual(["region", "amount"]);
   });
   it.each([

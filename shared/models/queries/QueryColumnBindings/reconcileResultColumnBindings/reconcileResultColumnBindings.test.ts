@@ -52,16 +52,16 @@ const PREVIOUS: ResultColumnBindingRegistry = {
   ],
 };
 function _projection({
-  outputName,
+  queryResultColumnName,
   expressionKey = "sum-sales-revenue",
 }: {
-  outputName: string;
+  queryResultColumnName: string;
   expressionKey?: string;
 }): ProjectionDescriptor {
   return {
-    id: _column(outputName).id,
+    id: _column(queryResultColumnName).id,
     identity: "sql",
-    outputName,
+    queryResultColumnName,
     expressionKey,
     sqlExpressionKey: expressionKey,
   };
@@ -89,8 +89,11 @@ describe("reconcileResultColumnBindings", () => {
     const schema = _reconcileColumnBindings({
       names: ["profit", "amount"],
       projections: [
-        _projection({ outputName: "amount" }),
-        _projection({ outputName: "profit", expressionKey: "sales-profit" }),
+        _projection({ queryResultColumnName: "amount" }),
+        _projection({
+          queryResultColumnName: "profit",
+          expressionKey: "sales-profit",
+        }),
       ],
     });
     const selected = schema.columns.find(propEq("id", REVENUE.id));
@@ -104,7 +107,7 @@ describe("reconcileResultColumnBindings", () => {
       names: ["total"],
       projections: [
         _projection({
-          outputName: "total",
+          queryResultColumnName: "total",
           expressionKey: "sum-other-revenue",
         }),
       ],
@@ -114,7 +117,7 @@ describe("reconcileResultColumnBindings", () => {
   it("omits outputs whose names differ only by case", () => {
     const schema = _reconcileColumnBindings({
       names: ["total", "TOTAL"],
-      projections: [_projection({ outputName: "total" })],
+      projections: [_projection({ queryResultColumnName: "total" })],
     });
     expect(schema.columns).toEqual([]);
     expect(schema.issues).toContainEqual({
@@ -142,7 +145,7 @@ describe("reconcileResultColumnBindings", () => {
     expect(
       _reconcileColumnBindings({
         names: ["total"],
-        projections: [_projection({ outputName: "total" })],
+        projections: [_projection({ queryResultColumnName: "total" })],
         previous: PREVIOUS,
         sqlKey: "original",
         scopeKey: "other",
@@ -151,7 +154,7 @@ describe("reconcileResultColumnBindings", () => {
   });
   it("uses a structured ID even when provisional SQL identity already exists", () => {
     const projection = {
-      ..._projection({ outputName: "total" }),
+      ..._projection({ queryResultColumnName: "total" }),
       identity: "structured" as const,
     };
     expect(
@@ -180,8 +183,8 @@ describe("reconcileResultColumnBindings", () => {
     const preserved = _reconcileColumnBindings({
       names: ["second", "total"],
       projections: [
-        _projection({ outputName: "total" }),
-        _projection({ outputName: "second" }),
+        _projection({ queryResultColumnName: "total" }),
+        _projection({ queryResultColumnName: "second" }),
       ],
       previous: previous,
     });
@@ -189,8 +192,8 @@ describe("reconcileResultColumnBindings", () => {
     const ambiguous = _reconcileColumnBindings({
       names: ["amount", "other"],
       projections: [
-        _projection({ outputName: "amount" }),
-        _projection({ outputName: "other" }),
+        _projection({ queryResultColumnName: "amount" }),
+        _projection({ queryResultColumnName: "other" }),
       ],
       previous: previous,
     });
@@ -207,7 +210,7 @@ describe("reconcileResultColumnBindings", () => {
     };
     const schema = _reconcileColumnBindings({
       names: ["amount"],
-      projections: [_projection({ outputName: "amount" })],
+      projections: [_projection({ queryResultColumnName: "amount" })],
       previous: previous,
     });
     expect(schema.columns[0]?.id).toBe(REVENUE.id);
@@ -219,7 +222,7 @@ describe("reconcileResultColumnBindings", () => {
       columns: [{ ...PREVIOUS.columns[0]!, expressionKey: "model-A" }],
     };
     const projection = {
-      ..._projection({ outputName: "total" }),
+      ..._projection({ queryResultColumnName: "total" }),
       expressionKey: "model-B",
     };
     expect(
@@ -235,7 +238,7 @@ describe("reconcileResultColumnBindings", () => {
 it("omits an output that cannot be matched to the supplied supported descriptors", () => {
   const schema = _reconcileColumnBindings({
     names: ["total"],
-    projections: [_projection({ outputName: "amount" })],
+    projections: [_projection({ queryResultColumnName: "amount" })],
   });
   expect(schema.columns).toEqual([]);
   expect(schema.issues).toContainEqual({

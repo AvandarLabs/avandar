@@ -7,7 +7,15 @@ export type ProjectionDescriptor = {
   identity: "structured" | "sql";
   expressionKey: string;
   sqlExpressionKey: string;
-  outputName: string;
+
+  /**
+   * The `QueryResult` column name this projection is expected to produce,
+   * read from the query before it runs. It is the alias when one is given,
+   * otherwise the emitted aggregate name such as `sum(revenue)`, otherwise
+   * the source column's name. Binding checks it against the actual result,
+   * and a projection whose name no result column has is reported missing.
+   */
+  queryResultColumnName: string;
 };
 
 /**

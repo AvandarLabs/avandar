@@ -117,11 +117,13 @@ export function structuredQueryToSql(
       AvaDataType.isDateOrTimestamp(column.baseColumn.dataType)
         ? `strftime(${expression}::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ')`
         : expression;
-    const outputName = QueryColumn.getDerivedColumnName({
+    const queryResultColumnName = QueryColumn.getDerivedColumnName({
       ...column,
       aggregation,
     });
-    return sqlBuilder.raw(`${selection} as ${quoteSqlIdentifier(outputName)}`);
+    return sqlBuilder.raw(
+      `${selection} as ${quoteSqlIdentifier(queryResultColumnName)}`,
+    );
   });
 
   let sqlQuery: Knex.QueryBuilder;

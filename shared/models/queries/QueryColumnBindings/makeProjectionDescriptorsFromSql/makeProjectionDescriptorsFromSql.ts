@@ -16,7 +16,7 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 type CreateDescriptorOptions = {
   source: Readonly<Source>;
   column: string;
-  outputName: string;
+  queryResultColumnName: string;
   aggregation?: QueryAggregationType.T;
 };
 
@@ -62,7 +62,7 @@ function _getColumn({
 function _createDescriptor({
   source,
   column,
-  outputName,
+  queryResultColumnName,
   aggregation,
 }: CreateDescriptorOptions): ProjectionDescriptor {
   const key = makeSqlExpressionKeyFromColumnExpression({
@@ -75,7 +75,7 @@ function _createDescriptor({
     identity: "sql",
     expressionKey: key,
     sqlExpressionKey: key,
-    outputName,
+    queryResultColumnName,
   };
 }
 
@@ -138,7 +138,7 @@ function _getProjection({
     return _createDescriptor({
       source: source,
       column: column,
-      outputName: alias ?? column,
+      queryResultColumnName: alias ?? column,
     });
   }
   if (
@@ -166,19 +166,19 @@ function _getProjection({
   ) {
     return undefined;
   }
-  const outputName =
+  const queryResultColumnName =
     alias ??
     _getAggregateQueryResultColumnName({
       argument: args.expr,
       aggregation: aggregation,
       columns: columns,
     });
-  return outputName === undefined
+  return queryResultColumnName === undefined
     ? undefined
     : _createDescriptor({
         source: source,
         column: argument,
-        outputName: outputName,
+        queryResultColumnName: queryResultColumnName,
         aggregation: aggregation,
       });
 }
@@ -282,7 +282,7 @@ export function makeProjectionDescriptorsFromSql(
       return _createDescriptor({
         source: source,
         column: column.name,
-        outputName: column.name,
+        queryResultColumnName: column.name,
       });
     });
   }

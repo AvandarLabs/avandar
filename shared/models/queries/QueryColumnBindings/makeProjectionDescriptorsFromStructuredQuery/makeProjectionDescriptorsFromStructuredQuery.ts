@@ -34,7 +34,10 @@ export function makeProjectionDescriptorsFromStructuredQuery(
         column: column.baseColumn.name,
         aggregation,
       }),
-      outputName: QueryColumn.getDerivedColumnName({ ...column, aggregation }),
+      queryResultColumnName: QueryColumn.getDerivedColumnName({
+        ...column,
+        aggregation,
+      }),
     };
   });
 }

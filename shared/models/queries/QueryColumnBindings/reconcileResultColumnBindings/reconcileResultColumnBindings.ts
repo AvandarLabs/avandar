@@ -62,9 +62,11 @@ function _getPriorMatch({
     return candidates[0];
   }
   const namedCandidates = candidates.filter(
-    propEq("name", projection.outputName),
+    propEq("name", projection.queryResultColumnName),
   );
-  const namedPeers = peers.filter(propEq("outputName", projection.outputName));
+  const namedPeers = peers.filter(
+    propEq("queryResultColumnName", projection.queryResultColumnName),
+  );
   return namedCandidates.length === 1 && namedPeers.length === 1
     ? namedCandidates[0]
     : candidates.length > 0
@@ -138,7 +140,7 @@ function _bindColumn({
     return other.name.toLowerCase() === column.name.toLowerCase();
   });
   const descriptors = context.projections.filter(
-    propEq("outputName", column.name),
+    propEq("queryResultColumnName", column.name),
   );
   if (!column.name || names.length !== 1 || descriptors.length > 1) {
     return { issue: { target: column.name, reason: "ambiguous" } };
@@ -199,9 +201,14 @@ export function reconcileResultColumnBindings(
   const context = { ...options, sqlKey, previous };
   const missingIssues = options.projections
     .map((projection) => {
-      return options.columns.some(propEq("name", projection.outputName))
+      return options.columns.some(
+        propEq("name", projection.queryResultColumnName),
+      )
         ? undefined
-        : { target: projection.outputName, reason: "missing" as const };
+        : {
+            target: projection.queryResultColumnName,
+            reason: "missing" as const,
+          };
     })
     .filter(isDefined);
   const outcomes = options.columns.map((column) => {
