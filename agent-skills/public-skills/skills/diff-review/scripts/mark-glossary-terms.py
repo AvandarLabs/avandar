@@ -177,6 +177,8 @@ def _renumber_glossary(lines, found):
     heading, first, last = found
     terms, errors = [], []
     for i in range(first, last):
+        if TABLE_SEP_RE.match(lines[i]):
+            continue  # a pasted table's own separator row is not an entry
         spans = _cell_spans(lines[i])
         if len(spans) != 2:
             errors.append(f"line {i + 1}: a glossary row needs exactly 2 cells")
@@ -185,6 +187,8 @@ def _renumber_glossary(lines, found):
         if parsed is None:
             errors.append(f"line {i + 1}: empty glossary term")
             continue
+        if parsed[0].casefold() == "term" and i == first:
+            continue  # a pasted table's own header row is not an entry
         terms.append(Term(parsed[0], parsed[1], lines[i][spans[1][0]:spans[1][1]].strip()))
     seen = {}
     for term in terms:

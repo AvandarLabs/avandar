@@ -600,7 +600,9 @@ Each bullet is a line of a diff summary, not an explanation:
   conditions, and edge cases belong to the strand's own section.
 - **One sentence of about 25 words at most.** A bullet that needs a semicolon,
   a second clause of conditions, or a parenthetical has started explaining;
-  move the detail to the section.
+  move the detail to the section. The one exception is a shared bullet for
+  unrelated changes, which may run longer because it only lists them, a few
+  words each.
 - **Plain words.** The bullets are read before any other section, so they use
   product vocabulary and general engineering terms. A glossary marker helps a
   reader who wants more, and never stands in for a plain description.
@@ -653,9 +655,14 @@ then numbers it and marks every use of its terms, per
 - **Name each entry the way the body says it.** The script matches the term's
   exact words, plus the regular plural, possessive, `-ed`, and `-ing` forms of
   its last word. List any other spelling the body uses in parentheses after the
-  term: `**G20** Reconcile (reconciliation)`. A term that is also an everyday
-  word, such as `Block` or `Issue`, marks every everyday use too, so qualify
-  it: `Dashboard block`.
+  term, each matched exactly as written, plural included:
+  `**G20** Reconcile (reconciliation)`. The parentheses print, so they hold
+  only another name a reader should know, such as the UI's label or a noun
+  form, never a list of every phrasing the text happens to use: where the text
+  says something irregular, reword the sentence to use the term. A term that is also an everyday word,
+  such as `Block` or `Issue`, marks every everyday use too, so when the text
+  also uses the word in its everyday sense, qualify the entry
+  (`Dashboard block`) or reword those sentences.
 - **Define each term in plain words, grounded in the product.** Say what the
   thing is in terms of what a user does or sees, then, only if needed, what the
   code does with it. One or two sentences.
@@ -735,19 +742,25 @@ Two parts, in this order:
    not a file inventory of the change. Mark a unit the change adds `(new)` and
    one it modifies `(changed)`; an unmarked unit is unchanged code the change
    depends on. A directory that only leads to a unit is a path, not a unit: it
-   carries no marker and gets no row. The tree needs no caption, because the
-   table under it is its legend.
+   carries no marker and gets no row. A directory that is itself a unit, such
+   as a page or a module, keeps its marker and row even when units inside it
+   are listed too. The tree needs no caption, because the table under it is
+   its legend.
 2. **A two-column table, `Unit` and `What it is`,** one row per unit in the
    tree, in tree order, and not numbered. Wrap it in `<small>` the same way as
    the [Glossary](#glossary), so it prints a size smaller. Each row is one or
    two short sentences and never more: what the unit is in product terms, then
    the one relationship the reader needs, such as what it writes to or who
-   calls it. The strand sections carry everything else.
+   calls it. A row may name a unit that has no row of its own, such as the
+   client it writes through. The strand sections carry everything else.
 
 The tree and its table are one figure, so they fit on one printed page, per
-[A figure never spans two pages](#a-figure-never-spans-two-pages). When the
-change is too wide for that, show each area's anchor unit and let the strand
-sections introduce the rest. Do not define vocabulary in a row: terms belong
+[A figure never spans two pages](#a-figure-never-spans-two-pages): in practice
+a tree of about 25 lines and about a dozen rows, fewer when rows run to two
+sentences. When the change is too wide for that, show each area's anchor unit
+and let the strand sections introduce the rest. A long name widens the whole
+`Unit` column, so a unit with a long name earns its row only when nothing
+shorter anchors its area. Do not define vocabulary in a row: terms belong
 in the [Glossary](#glossary), which the clarity pass drafts after this section
 exists.
 
@@ -1615,8 +1628,9 @@ Dispatch it with:
 - the branch and comparison the walkthrough describes,
 - the absolute path of this SKILL.md, told to read
   [Writing for a reader new to this code](#writing-for-a-reader-new-to-this-code),
-  [Glossary](#glossary), the heading rules in [Sections](#sections), and
-  [Flow and orientation](#flow-and-orientation) first,
+  [Purpose](#purpose), [Glossary](#glossary), the heading rules in
+  [Sections](#sections), and [Flow and orientation](#flow-and-orientation)
+  first,
 - read-only access to the walkthrough, the diff, the code, and the project's
   docs.
 
@@ -1671,16 +1685,20 @@ It returns four things:
    cold-read test, with its replacement, and every move, each with the
    dependency that motivates it.
 3. **Questions for the parent,** for the stalls only the author can resolve.
-4. **The glossary,** as table rows ready to paste, per [Glossary](#glossary):
-   each term spelled the way the text uses it, with other spellings the text
-   uses in parentheses. It need not number them.
+4. **The glossary,** as table rows ready to paste, per [Glossary](#glossary),
+   without a header or separator row: each term spelled the way the text uses
+   it, with other spellings the text uses in parentheses. It need not number
+   them.
 
 The parent reads every proposal, heading rename, and move, and accepts,
 corrects, or rejects each. It applies the accepted ones, checking that each
 rewrite keeps the original claim, or corrects it on purpose where the author
 knows the original was imprecise, and that every fact a rewrite adds is true,
 tagged or not. A move that leaves a section without its locating sentence
-gets one. It answers the questions in the text or the figures, then writes the
+gets one. A proposal may add a unit to Background technical context when a
+later section depends on it; the parent adds it to the existing tree and
+table rather than starting a new one, and drops a less needed unit when the
+addition would push the figure past one page. It answers the questions in the text or the figures, then writes the
 glossary into Appendix A: dropping any entry for a term the reader no longer
 meets, in prose or in a code name the document asks them to read, and adding
 one for any new term its own rewrites introduced. Last, it runs the marking
@@ -2116,9 +2134,11 @@ does when step 1 runs it, read-only with respect to source.
    Manual testing per [Manual testing](#manual-testing). Write the Background
    technical context heading and `## Appendix A. Glossary` with a one-line
    placeholder each, so section numbers are final from the first draft; the
-   next two passes fill them.
-   When regenerating, keep each section's number where its content still
-   fits, because earlier explainer threads cite those numbers. Do not touch
+   next two passes fill them, and when regenerating they replace the old
+   content of both rather than edit it. When regenerating, keep each section's
+   number where its content still fits, because earlier explainer threads cite
+   those numbers; where the current section order forces a renumber, make it
+   and list the affected threads in step 11. Do not touch
    the transcript, the guides, the reviewed state, or any source file. When a
    strand is a pipeline or a multi-pass algorithm, read
    [`references/pipeline-explanation.md`](references/pipeline-explanation.md)
