@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; origin: number; rulerY: number };
 /** Ruler Ticks for the authored scene. */
 export function RulerTicks({

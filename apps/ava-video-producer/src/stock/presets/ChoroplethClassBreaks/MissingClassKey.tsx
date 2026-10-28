@@ -1,7 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { text: string; y: number };
 /**
  * The missing key uses the same muted fill and dashed stroke as a null tile.

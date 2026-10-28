@@ -5,7 +5,6 @@ import type { StockControl } from "../../../../stock/contracts/StockContract.typ
 import type { Props as ContentFieldProps } from "../ContentField/ContentField";
 import type { ContentFieldContext } from "../useContentField";
 import type { ReactNode } from "react";
-
 type ScalarControl = Extract<
   StockControl,
   {

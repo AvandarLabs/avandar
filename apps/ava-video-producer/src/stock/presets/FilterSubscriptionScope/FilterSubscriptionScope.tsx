@@ -5,7 +5,6 @@ import { SubscriptionView } from "./SubscriptionView";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** A shared category socket reaches only explicitly subscribed views. */
 export function FilterSubscriptionScope({

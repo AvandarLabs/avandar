@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { getDrillRecordLayoutFromInputAndFrame } from "./getDrillRecordLayoutFromInputAndFrame";
 import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   frame: number;
   input: Input;

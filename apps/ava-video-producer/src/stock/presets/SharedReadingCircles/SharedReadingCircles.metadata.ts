@@ -5,7 +5,6 @@ import type {
   StockContract,
   StockMetadata,
 } from "../../contracts/StockContract.types";
-
 export { CONTROLS as controls } from "./SharedReadingCircles.controls";
 /** Public retrieval copy without private source provenance. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);

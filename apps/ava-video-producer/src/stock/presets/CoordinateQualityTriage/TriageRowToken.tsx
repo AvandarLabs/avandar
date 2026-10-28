@@ -3,7 +3,6 @@ import { Text } from "../../graphics-common";
 import { STOCK } from "../../stockPalette";
 import type { makeCoordinateTriageFromInputAndFrame } from "./makeCoordinateTriageFromInputAndFrame";
 import type { ReactNode } from "react";
-
 type Props = {
   row: ReturnType<typeof makeCoordinateTriageFromInputAndFrame>["rows"][number];
   frame: number;

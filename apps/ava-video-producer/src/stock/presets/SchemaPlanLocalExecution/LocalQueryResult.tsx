@@ -2,7 +2,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import type { Input } from "./SchemaPlanLocalExecution.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; accent: string };
 /**
  * Exact equality membership and finite local sum stay beside the retained

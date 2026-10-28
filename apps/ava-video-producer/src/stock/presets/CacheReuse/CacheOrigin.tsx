@@ -4,7 +4,6 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; accent: string; originActive: number };
 /** The distant source holds the supplied result and lights only on a miss. */
 export function CacheOrigin({

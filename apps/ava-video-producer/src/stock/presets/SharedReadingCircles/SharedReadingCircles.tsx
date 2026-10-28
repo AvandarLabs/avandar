@@ -7,7 +7,6 @@ import { SceneText } from "./SceneText";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./SharedReadingCircles.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /**
  * Carries a conserved set of books into explicitly authored reading circles.

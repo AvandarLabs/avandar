@@ -3,7 +3,6 @@ import type {
   StockJsonSchema,
   StockSemanticRule,
 } from "../../contracts/StockContract.types";
-
 const label: z.ZodString = z.string().min(1).max(28);
 /** Strict single-object, two-distinct-holder handoff. */
 export const inputSchema = z

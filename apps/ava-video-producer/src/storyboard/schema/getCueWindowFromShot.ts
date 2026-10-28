@@ -1,7 +1,6 @@
 import { getContinuityTimeline } from "../../continuity/continuityTimeline";
 import type { shotSchema } from "./shotSchema";
 import type { z } from "zod";
-
 type Shot = z.infer<typeof shotSchema>;
 
 type Options = { shot: Shot | undefined; beatId?: string };

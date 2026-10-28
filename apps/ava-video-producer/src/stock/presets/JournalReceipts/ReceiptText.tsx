@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   receipt: Input["receipts"][number];
   input: Input;

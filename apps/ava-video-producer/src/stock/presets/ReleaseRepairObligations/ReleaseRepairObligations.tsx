@@ -5,7 +5,6 @@ import { ReleaseArtifact } from "./ReleaseArtifact";
 import { RepairRegister } from "./RepairRegister";
 import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 
 /**

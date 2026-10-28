@@ -3,7 +3,6 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   frame: number;
   y: number;

@@ -6,7 +6,6 @@ import type {
   StockDefaultSpanBinding,
   StockMetadata,
 } from "../../contracts/StockContract.types";
-
 export { controls } from "./ProseMeasurementLedger.controls";
 /** Public retrieval metadata excludes private source provenance. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);

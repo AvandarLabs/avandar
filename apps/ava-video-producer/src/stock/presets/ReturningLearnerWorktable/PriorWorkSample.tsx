@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import { SceneText } from "./SceneText";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   work: Input["priorWork"][number];
   index: number;

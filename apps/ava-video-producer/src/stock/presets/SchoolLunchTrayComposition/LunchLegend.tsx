@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { FoodSymbol } from "./FoodSymbol";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; accent: string };
 /** Lunch Legend for the authored scene. */
 export function LunchLegend({ input, accent }: Readonly<Props>): ReactNode {

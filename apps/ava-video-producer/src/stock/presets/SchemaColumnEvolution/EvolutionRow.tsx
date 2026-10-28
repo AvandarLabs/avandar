@@ -3,7 +3,6 @@ import { EvolutionAddedValue } from "./EvolutionAddedValue";
 import { EvolutionRowBackdrop } from "./EvolutionRowBackdrop";
 import type { Input } from "./SchemaColumnEvolution.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   record: Input["earlierRecords"][number] & { addedValue?: string | null };
   x: number;

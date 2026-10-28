@@ -2,7 +2,6 @@ import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normali
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; threshold: number };
 /**
  * The moving boundary and optional fixed-value ticks share one numeric domain.

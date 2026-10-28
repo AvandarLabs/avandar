@@ -1,7 +1,6 @@
 import { useLingui as useGalleryLingui } from "@lingui/react/macro";
 import React from "react";
 import { Icon } from "./Icon";
-
 export function PaletteSwatches({
   swatches,
   value,

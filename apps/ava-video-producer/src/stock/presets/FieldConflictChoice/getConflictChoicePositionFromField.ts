@@ -1,7 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { getConflictCandidateStateFromField } from "./getConflictCandidateStateFromField";
 import type { Input } from "./FieldConflictChoice.schema";
-
 type Options = {
   field: Input["fields"][number];
   input: Input;

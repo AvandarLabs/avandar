@@ -4,7 +4,6 @@ import { SetbackHatch } from "./SetbackHatch";
 import { StructureFootprint } from "./StructureFootprint";
 import type { Input } from "./ParcelSetbackInset.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string; id: string };
 /**
  * Equal inward edges and a lowered footprint share the original parcel plane.

@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { SceneText } from "./SceneText";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string; total: number };
 /** Draws the scene's SatchelTotal group with fixed authored geometry. */
 export function SatchelTotal({

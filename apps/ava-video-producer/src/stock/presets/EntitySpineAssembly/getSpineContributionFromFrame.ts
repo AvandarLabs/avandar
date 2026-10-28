@@ -1,6 +1,5 @@
 import { EASE, mix, ramp } from "../../../motion";
 import type { Input } from "./EntitySpineAssembly.schema";
-
 type Params = {
   input: Input;
   observation: Input["observations"][number];

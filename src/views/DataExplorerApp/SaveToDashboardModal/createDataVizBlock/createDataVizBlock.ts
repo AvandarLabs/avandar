@@ -10,7 +10,6 @@ import type {
   LocalFilter,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
-
 type DataVizDashboardBlockProps = {
   id: string;
   columnBindingVersion: 1;

@@ -2,7 +2,6 @@ import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
-
 type ApplyVizConfigFromQueryResultOptions = {
   vizConfig: VizConfig.T;
   rawSql: string | undefined;

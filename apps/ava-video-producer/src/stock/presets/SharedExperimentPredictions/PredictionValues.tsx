@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; learner: Input["learners"][number]; y: number };
 /** Prediction Values for the authored scene. */
 export function PredictionValues({

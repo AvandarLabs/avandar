@@ -6,7 +6,6 @@ import {
 } from "./EffectivePermissionGrants.controls";
 import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Resource, restriction and action labels stay independent of candidates. */
 export function PermissionSceneHeadings({ input }: Readonly<Props>): ReactNode {

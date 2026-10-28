@@ -4,7 +4,6 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; accent: string };
 /** A requester keeps the same literal key across both lookups. */
 export function CacheRequester({ input, accent }: Readonly<Props>): ReactNode {

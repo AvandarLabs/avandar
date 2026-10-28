@@ -3,7 +3,6 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Only referenced recipients appear, with stable dose-adjacent label slots. */
 export function SessionRecipients({

@@ -9,7 +9,6 @@ import { UnionField } from "../UnionField/UnionField";
 import styles from "./ContentFieldBody.module.css";
 import type { ContentFieldContext } from "../useContentField";
 import type { ReactNode } from "react";
-
 type Props = ContentFieldProps & {
   context: ContentFieldContext;
 };

@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ContentFields } from "./ContentFields";
 import type { StockControl } from "../../../../stock/contracts/StockContract.types";
-
 const LABEL: Record<"id" | "message", string> = {
   id: "test.label",
   message: "Value",

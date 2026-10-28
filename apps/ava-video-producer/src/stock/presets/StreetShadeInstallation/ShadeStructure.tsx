@@ -1,6 +1,5 @@
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   kind: Input["installations"][number]["kind"];
   index: number;

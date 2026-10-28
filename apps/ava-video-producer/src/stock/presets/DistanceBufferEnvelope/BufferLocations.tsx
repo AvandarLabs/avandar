@@ -3,7 +3,6 @@ import { BufferSourceMarker } from "./BufferSourceMarker";
 import { BufferSourceRow } from "./BufferSourceRow";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Fixed map sources and their complete keyed rows precede inclusion results.

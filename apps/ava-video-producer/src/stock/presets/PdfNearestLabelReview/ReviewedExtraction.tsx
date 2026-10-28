@@ -4,7 +4,6 @@ import { getAssociationFromInput } from "./getAssociationFromInput";
 import { ReviewChoiceMark } from "./ReviewChoiceMark";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Review carries the source token and coordinates without changing evidence.

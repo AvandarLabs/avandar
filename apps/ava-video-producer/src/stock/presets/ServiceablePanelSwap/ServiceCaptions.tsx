@@ -1,7 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./ServiceablePanelSwap.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /**
  * Labels distinguish retained neighbors and the physically removed original.

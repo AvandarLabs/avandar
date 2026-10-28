@@ -1,7 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   kind: "source" | "excluded" | "transferred";
   label: string;

@@ -6,7 +6,6 @@ import { getSourceSheetGeometryFromSelectionAndFrame } from "./getSourceSheetGeo
 import { SourcePassageCopy } from "./SourcePassageCopy";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   source: Input["sources"][number];
   index: number;

@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { WATER_DESTINATIONS } from "./waterDestinationKeys";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /** Storage fill uses the actual finite capacity and event-volume scale. */
 export function StorageBasin({ input, frame }: Readonly<Props>): ReactNode {

@@ -11,7 +11,6 @@ import {
   fixtures,
 } from "./BenefitShortfallCorrection.fixtures";
 import { inputSchema, type Input } from "./BenefitShortfallCorrection.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -40,7 +39,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { benefitShortfallCorrectionContract as contract } from "./BenefitShortfallCorrection.contract";
-
 const EXCLUDED_TEXT_FIELDS: string[] = [
   "id",
   "permissionId",

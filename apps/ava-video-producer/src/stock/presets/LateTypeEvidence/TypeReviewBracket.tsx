@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /** The source review bracket stays outside the active transfer interval. */
 export function TypeReviewBracket({

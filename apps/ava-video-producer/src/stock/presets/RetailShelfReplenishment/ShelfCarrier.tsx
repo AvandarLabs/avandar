@@ -2,7 +2,6 @@ import { EASE, mix, ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** The intact carrier advances with its authored incoming load. */
 export function ShelfCarrier({

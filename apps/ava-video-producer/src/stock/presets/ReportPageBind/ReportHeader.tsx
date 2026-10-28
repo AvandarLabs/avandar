@@ -5,7 +5,6 @@ import { getReportPageGeometryFromInputAndFrame } from "./getReportPageGeometryF
 import { ReportHeaderPaper } from "./ReportHeaderPaper";
 import type { Input } from "./ReportPageBind.schema";
 import type { ReactNode, ComponentProps } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** The title strip belongs to the first page throughout binding. */
 export function ReportHeader({

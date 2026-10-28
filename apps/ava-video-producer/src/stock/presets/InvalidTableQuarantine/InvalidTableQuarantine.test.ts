@@ -13,7 +13,6 @@ import {
 } from "./InvalidTableQuarantine.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import type { Input } from "./InvalidTableQuarantine.schema";
-
 function _render({
   frame,
   input,
@@ -91,7 +90,6 @@ import { registerStockLocalizationAssertions } from "../../../../tests/helpers/r
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { invalidTableQuarantineContract } from "./InvalidTableQuarantine.contract";
 import { inputSchema } from "./InvalidTableQuarantine.schema";
-
 function _getVisibleTexts({
   input,
   frame,

@@ -4,7 +4,6 @@ import { HouseholdAnchor } from "./HouseholdAnchor";
 import { HouseholdGlyph } from "./HouseholdGlyph";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   household: Input["households"][number];
   index: number;

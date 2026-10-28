@@ -4,7 +4,6 @@ import type {
   StockJsonSchema,
   StockControl,
 } from "../../contracts/StockContract.types";
-
 const NAMESPACE = "motionAtlas.query-column-cache-growth" as const;
 function _label(path: string) {
   return { id: `${NAMESPACE}.controls.${path}`, message: path };

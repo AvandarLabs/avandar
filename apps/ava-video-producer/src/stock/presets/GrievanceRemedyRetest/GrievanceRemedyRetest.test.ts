@@ -10,7 +10,6 @@ import {
   fixtures,
 } from "./GrievanceRemedyRetest.fixtures";
 import { inputSchema, type Input } from "./GrievanceRemedyRetest.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -57,7 +56,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { grievanceRemedyRetestContract as contract } from "./GrievanceRemedyRetest.contract";
-
 const EXCLUDED_TEXT_FIELDS: string[] = [
   "id",
   "permissionId",

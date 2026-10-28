@@ -1,5 +1,4 @@
 import type { Input } from "./GeometryDetailBudget.schema";
-
 type Vertex = Input["vertices"][number];
 type Event = {
   start: number;

@@ -6,7 +6,6 @@ import type {
   StockMessageDescriptor,
 } from "../contracts/StockContract.types";
 import type { I18n } from "@lingui/core";
-
 type ResolvedCopy<Value> = Value extends StockMessageDescriptor
   ? string
   : Value extends Array<infer Item>

@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /**
  * The right lane holds originals in a rail and edit explanations in ghost

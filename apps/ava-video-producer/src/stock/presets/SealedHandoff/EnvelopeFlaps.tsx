@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { EnvelopeCover } from "./EnvelopeCover";
 import type { Input } from "./SealedHandoff.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** Physical flaps finish in an opaque cover before travel can begin. */
 export function EnvelopeFlaps({

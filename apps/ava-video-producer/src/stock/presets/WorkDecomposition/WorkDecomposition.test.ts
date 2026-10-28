@@ -14,7 +14,6 @@ import {
   invalidInputs,
 } from "./WorkDecomposition.fixtures";
 import { inputSchema, type Input } from "./WorkDecomposition.schema";
-
 const render = ({
   frame,
   input = DEFAULT_INPUT,

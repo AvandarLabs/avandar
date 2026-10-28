@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { getOrderSlipPoseFromFrame } from "./getOrderSlipPoseFromFrame";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /** The retailer places a visible authored request on the counter. */
 export function ShelfOrder({ input, frame }: Readonly<Props>): ReactNode {

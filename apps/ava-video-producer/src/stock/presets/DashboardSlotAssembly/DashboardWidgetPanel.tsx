@@ -6,7 +6,6 @@ import { DashboardWidgetContent } from "./DashboardWidgetContent";
 import { getWidgetRectFromInput } from "./getWidgetRectFromInput";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   widget: Input["widgets"][number];
   index: number;

@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { SvgPaintAssertions } from "../SvgPaintAssertions/SvgPaintAssertions";
-
 type LayoutAssertions<Input extends object> = {
   inputSchema: { parse: (value: unknown) => Input };
   fixtures: ReadonlyArray<{ input: Input }>;

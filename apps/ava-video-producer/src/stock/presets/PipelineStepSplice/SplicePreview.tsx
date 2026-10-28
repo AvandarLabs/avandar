@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { PreviewValue } from "./PreviewValue";
 import type { Input } from "./PipelineStepSplice.schema";
 import type { ReactNode } from "react";
-
 type Props = { preview: Input["preview"]; frame: number; accent: string };
 /** The supplied example is displayed literally. No operation executes here. */
 export function SplicePreview({

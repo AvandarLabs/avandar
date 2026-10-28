@@ -3,7 +3,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SupportRequestResponse.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /** Exact authored words stay distinct from the structured response state. */
 export function SupportWords({ input, frame }: Readonly<Props>): ReactNode {

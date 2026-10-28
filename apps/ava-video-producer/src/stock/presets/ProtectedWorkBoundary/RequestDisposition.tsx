@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { getRequestPositionFromInputAndFrame } from "./getRequestPositionFromInputAndFrame";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /**
  * Disposition copy is visibly attached to its actual tray or work-slot target.

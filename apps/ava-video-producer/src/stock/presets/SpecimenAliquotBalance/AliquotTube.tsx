@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import { AliquotTubeLabels } from "./AliquotTubeLabels";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   tube: Input["parent"];
   parentId: string;

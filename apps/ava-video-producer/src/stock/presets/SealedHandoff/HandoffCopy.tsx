@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SealedHandoff.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input };
 /**
  * State copy follows closure, arrival and the separately authored recipient

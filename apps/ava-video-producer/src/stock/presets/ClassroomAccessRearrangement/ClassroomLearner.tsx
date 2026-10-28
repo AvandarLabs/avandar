@@ -3,7 +3,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; index: number; frame: number; accent: string };
 function _getPosition({
   input,

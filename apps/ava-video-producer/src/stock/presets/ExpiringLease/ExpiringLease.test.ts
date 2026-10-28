@@ -9,7 +9,6 @@ import { ExpiringLease } from "./ExpiringLease";
 import { expiringLeaseContract } from "./ExpiringLease.contract";
 import { DEFAULT_INPUT, fixtures } from "./ExpiringLease.fixtures";
 import { inputSchema, type Input } from "./ExpiringLease.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

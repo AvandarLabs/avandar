@@ -6,7 +6,6 @@ import { getShelfUnitsFromInputAndFrame } from "./getShelfUnitsFromInputAndFrame
 import { ShelfActor } from "./ShelfActor";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Pointing and handling hands stay tied to the actual gaps and unit poses. */
 export function ShelfActors({

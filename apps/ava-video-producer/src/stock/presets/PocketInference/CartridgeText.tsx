@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; y: number };
 /** Model identity and optional detail sit on the resident cartridge face. */
 export function CartridgeText({ input, y }: Readonly<Props>): ReactNode {

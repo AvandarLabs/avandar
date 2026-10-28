@@ -3,7 +3,6 @@ import { ObjectGlyph } from "../../primitives/ObjectGlyph/ObjectGlyph";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Three authored role locations define a schematic custody sequence. */
 export function CustodyStops({

@@ -1,6 +1,5 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { hasDrawer: boolean };
 /** Saved impressions sit in a local drawer or a labeled margin recess. */
 export function RevisionDrawer({ hasDrawer }: Readonly<Props>): ReactNode {

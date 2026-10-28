@@ -1,7 +1,6 @@
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /**
  * Context, author and declared installation stage occupy reserved top rails.

@@ -1,6 +1,5 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import type { ReactNode } from "react";
-
 type Props = {
   value: string;
   columnId: string;

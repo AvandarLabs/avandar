@@ -1,7 +1,6 @@
 import { findJobRoute, type JobPoint, type JobRectangle } from "./findJobRoute";
 import { getJobSlotFromInput } from "./getJobSlotFromInput";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
-
 type Slot = { initial: JobRectangle; final: JobRectangle; isMoving: boolean };
 /** One job follows this unobstructed polyline while every other job holds. */
 export type JobTransfer = { index: number; points: JobPoint[]; length: number };

@@ -2,7 +2,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Day headings remain outside the participant's handling corridor. */
 export function PlannerColumns({ input }: Readonly<Props>): ReactNode {

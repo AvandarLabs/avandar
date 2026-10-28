@@ -1,7 +1,6 @@
 import { propEq, propNotEq } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
 import type { Input } from "./DuplicateReviewStack.schema";
-
 type Options = {
   frame: number;
   input: Input;

@@ -21,7 +21,6 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { populationNormalizedMapContract } from "./PopulationNormalizedMap.contract";
 import { inputSchema, type Input } from "./PopulationNormalizedMap.schema";
-
 function _render({
   frame,
   input = defaultInput,

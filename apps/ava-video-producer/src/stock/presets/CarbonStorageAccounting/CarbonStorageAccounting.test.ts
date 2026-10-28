@@ -12,7 +12,6 @@ import {
   DENSE_INPUT,
   MINIMUM_INPUT,
 } from "./CarbonStorageAccounting.fixtures";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -49,7 +48,6 @@ test("changed authored input emits its physical scene", () => {
 
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-
 test("negative, all-released, tiny positive and zero-operation inputs retain exact physical and signed accounting values", () => {
   fixtures.forEach(({ input }) => {
     const retained =
@@ -119,7 +117,6 @@ test("negative, all-released, tiny positive and zero-operation inputs retain exa
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { carbonStorageAccountingContract } from "./CarbonStorageAccounting.contract";
 import { inputSchema, type Input } from "./CarbonStorageAccounting.schema";
-
 function _getVisibleTexts({
   input,
   frame,

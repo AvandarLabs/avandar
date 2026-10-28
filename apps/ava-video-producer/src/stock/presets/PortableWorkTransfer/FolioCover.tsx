@@ -2,7 +2,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PortableWorkTransfer.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; folioX: number; opening: number; frame: number };
 /**
  * The closed cover hides usable contents while retaining the exterior manifest.

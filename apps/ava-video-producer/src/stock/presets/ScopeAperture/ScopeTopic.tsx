@@ -2,7 +2,6 @@ import { EASE, mix, ramp } from "../../../motion";
 import { ScopeTopicCopy } from "./ScopeTopicCopy";
 import type { Input } from "./ScopeAperture.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   frame: number;
   accent: string;

@@ -4,7 +4,6 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PrivateCaseConversation.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   frame: number;
   person: Input["people"][number];

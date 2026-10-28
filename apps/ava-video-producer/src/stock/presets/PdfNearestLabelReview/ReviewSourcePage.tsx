@@ -3,7 +3,6 @@ import { CandidateAnchorGuides } from "./CandidateAnchorGuides";
 import { FigureAnchor } from "./FigureAnchor";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Literal figures and arbitrarily close candidate anchors retain provenance.

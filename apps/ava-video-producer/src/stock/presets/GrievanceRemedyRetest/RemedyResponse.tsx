@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { RemedyStageLabels } from "./RemedyStageLabels";
 import type { Input } from "./GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** The participant response follows the test and independently owns closure. */
 export function RemedyResponse({

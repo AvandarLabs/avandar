@@ -7,7 +7,6 @@ import { WorkPiece } from "./WorkPiece";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./WorkDecomposition.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /**
  * A conserved slab becomes proportionally weighted, externally labeled

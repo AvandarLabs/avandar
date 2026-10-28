@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { makeCountCopyPositionFromFrame } from "./makeCountCopyPositionFromFrame";
 import type { makePublicCellsFromInput } from "./makePublicCellsFromInput";
 import type { ReactNode } from "react";
-
 type Props = {
   cell: ReturnType<typeof makePublicCellsFromInput>[number];
   frame: number;

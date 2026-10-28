@@ -1,7 +1,6 @@
 import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { x: number; y: number; margins: number };
 /** The upper paper margin meets the first section without a gap. */
 export function ReportHeaderPaper({

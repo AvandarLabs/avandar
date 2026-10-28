@@ -3,7 +3,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { getSpliceGeometryFromInputAndFrame } from "./getSpliceGeometryFromInputAndFrame";
 import type { ReactNode } from "react";
-
 type Props = {
   step: ReturnType<typeof getSpliceGeometryFromInputAndFrame>[number];
   index: number;

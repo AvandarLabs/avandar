@@ -1,6 +1,5 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { showPortfolioTrail: boolean; accent: string };
 /** Two work surfaces retain the portfolio through its visible journey. */
 export function ReturnWorktables({

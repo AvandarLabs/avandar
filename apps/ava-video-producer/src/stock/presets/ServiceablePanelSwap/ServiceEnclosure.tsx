@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import type { getServiceSceneFromFrame } from "./getServiceSceneFromFrame";
 import type { Input } from "./ServiceablePanelSwap.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   scene: ReturnType<typeof getServiceSceneFromFrame>;

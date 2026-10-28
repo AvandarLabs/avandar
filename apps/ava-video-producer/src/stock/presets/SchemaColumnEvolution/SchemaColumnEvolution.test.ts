@@ -16,7 +16,6 @@ import {
   INVALID_INPUTS,
 } from "./SchemaColumnEvolution.fixtures";
 import { inputSchema, type Input } from "./SchemaColumnEvolution.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -63,7 +62,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { schemaColumnEvolutionContract } from "./SchemaColumnEvolution.contract";
-
 function _getVisibleTexts({
   input,
   frame,
@@ -178,7 +176,6 @@ test("all three old values stay exact and a hidden-version later null stays miss
 });
 
 import { getTextEnvelopesFromMarkup } from "./getTextEnvelopesFromMarkup";
-
 test("wrapped old and added values stay inside each physical row", () => {
   const input = {
     ...DENSE_INPUT,

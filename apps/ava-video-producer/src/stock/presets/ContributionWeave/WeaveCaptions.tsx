@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ContributionWeave.schema";
 import type { ReactNode } from "react";
-
 type Props = { copy: Input["copy"] };
 const TEXT = {
   x: 480,

@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; shelfQuantities: number[] };
 /** Fixed copy rails remain clear of all product and hand travel. */
 export function ShelfLabels({

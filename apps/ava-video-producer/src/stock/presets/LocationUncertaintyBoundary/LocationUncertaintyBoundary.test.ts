@@ -14,7 +14,6 @@ import {
   invalidInputs,
 } from "./LocationUncertaintyBoundary.fixtures";
 import { inputSchema, type Input } from "./LocationUncertaintyBoundary.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { SceneText } from "./SceneText";
 import type { Input } from "./TeacherLearningCover.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   role: keyof Input["staff"];
   person: Input["staff"]["teacher"];

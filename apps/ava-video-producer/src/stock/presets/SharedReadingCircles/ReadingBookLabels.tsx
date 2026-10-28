@@ -2,7 +2,6 @@ import { propEq } from "@avandar/utils";
 import { SceneText } from "./SceneText";
 import type { Input } from "./SharedReadingCircles.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   groupIndex: number;

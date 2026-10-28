@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { inputSchema } from "./FeedbackRefinement.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
-
 function _copy({ path, message }: { path: string; message: string }) {
   return { id: `motionAtlas.feedback-refinement.controls.${path}`, message };
 }

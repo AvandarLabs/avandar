@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { ScheduleLabelBackdrop } from "./ScheduleLabelBackdrop";
 import { ScheduleValues } from "./ScheduleValues";
 import type { ReactNode } from "react";
-
 type Props = {
   index: number;
   label: string;

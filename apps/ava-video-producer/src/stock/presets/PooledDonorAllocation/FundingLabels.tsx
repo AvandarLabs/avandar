@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Pool restrictions, attribution and units stay outside token travel. */
 export function FundingLabels({ input }: Readonly<Props>): ReactNode {

@@ -18,7 +18,6 @@ import {
   invalidInputs,
 } from "./KernelDensitySpread.fixtures";
 import { inputSchema, type Input } from "./KernelDensitySpread.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

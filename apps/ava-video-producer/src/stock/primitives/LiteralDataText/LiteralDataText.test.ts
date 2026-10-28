@@ -3,7 +3,6 @@ import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { LiteralDataText } from "./LiteralDataText";
-
 const render = ({ value }: Readonly<{ value: string }>): string =>
   renderToStaticMarkup(createElement(LiteralDataText, { value, x: 20, y: 30 }));
 test("exact data retains raw accessible content while whitespace is bounded visible marks", () => {

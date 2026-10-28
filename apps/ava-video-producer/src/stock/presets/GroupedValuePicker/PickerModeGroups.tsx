@@ -5,7 +5,6 @@ import { STOCK } from "../../stockPalette";
 import type { PickerValueGroup } from "./getPickerGroupsFromInput";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   groups: readonly PickerValueGroup[];

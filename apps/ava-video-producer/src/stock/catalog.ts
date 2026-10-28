@@ -3,7 +3,6 @@ import { makeLocalizedStockDataFromContract } from "./i18n/makeLocalizedStockDat
 import { stockI18n } from "./i18n/stockI18n/stockI18n";
 import { stockContracts } from "./registry/stockContracts";
 import type { StockPresetId } from "./contracts/StockContract.types";
-
 export type { StockPresetId } from "./contracts/StockContract.types";
 export { STOCK_FPS, STOCK_LOOP_FRAMES } from "./registry/legacyStockEntry";
 

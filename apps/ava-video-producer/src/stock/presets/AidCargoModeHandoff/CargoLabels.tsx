@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./AidCargoModeHandoff.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; accent: string };
 /** Carrier places and persistent ordinal parcel labels occupy fixed rails. */
 export function CargoLabels({ input, accent }: Readonly<Props>): ReactNode {

@@ -7,7 +7,6 @@ import { SceneLabel } from "./SceneLabel";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** A descending stencil reveals strict positive interval intersections. */
 export function ContactWindowOverlap({

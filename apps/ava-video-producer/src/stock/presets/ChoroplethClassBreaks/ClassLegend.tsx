@@ -4,7 +4,6 @@ import { ClassRange } from "./ClassRange";
 import { MissingClassKey } from "./MissingClassKey";
 import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   scheme: Input["schemes"][number];
   index: number;

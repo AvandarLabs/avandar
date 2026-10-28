@@ -1,7 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   learner: Input["learners"][number];
   personX: number;

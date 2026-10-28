@@ -4,7 +4,6 @@ import { CarbonOperator } from "./CarbonOperator";
 import { CarbonPhysicalLabels } from "./CarbonPhysicalLabels";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** An operator cues separate retained and released physical CO2 ribbons. */
 export function CarbonPhysical({

@@ -4,7 +4,6 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SupportRequestResponse.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Only accepting the request moves a chair and colleague to the shared task.

@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import { getCargoPositionFromInputAndFrame } from "./getCargoPositionFromInputAndFrame";
 import type { Input } from "./AidCargoModeHandoff.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

@@ -12,7 +12,6 @@ import {
   invalidInputs,
 } from "./ConvoyRouteDetour.fixtures";
 import { inputSchema, type Input } from "./ConvoyRouteDetour.schema";
-
 function _render({
   frame,
   input,
@@ -40,7 +39,6 @@ test("The vehicle stops before the blocked segment and uses the authored detour;
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { convoyRouteDetourContract } from "./ConvoyRouteDetour.contract";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     input.scenarioCaption,

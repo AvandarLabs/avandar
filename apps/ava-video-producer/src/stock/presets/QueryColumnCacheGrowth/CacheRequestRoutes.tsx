@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import type { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   scene: ReturnType<typeof getCacheSceneFromFrame>;

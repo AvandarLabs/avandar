@@ -5,7 +5,6 @@ import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFro
 import { RecursiveSplit } from "./RecursiveSplit";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Recursive splits retain their completed trace through the final highlight.

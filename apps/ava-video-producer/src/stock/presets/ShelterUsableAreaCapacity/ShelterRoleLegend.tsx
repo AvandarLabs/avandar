@@ -2,7 +2,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { getCapacityFromFloorTiles } from "./getCapacityFromFloorTiles";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Every role is keyed to its floor geometry and exact area contribution. */
 export function ShelterRoleLegend({ input }: Readonly<Props>): ReactNode {

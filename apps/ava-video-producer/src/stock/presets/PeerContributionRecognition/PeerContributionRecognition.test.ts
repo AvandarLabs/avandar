@@ -20,7 +20,6 @@ import {
 } from "./PeerContributionRecognition.fixtures";
 import { inputSchema, type Input } from "./PeerContributionRecognition.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input,

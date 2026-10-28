@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
-
 type Props = { shape: Input["deviceShape"]; accent: string };
 /** Three casing silhouettes retain the same notebook and storage geometry. */
 export function LedgerCasing({ shape, accent }: Readonly<Props>): ReactNode {

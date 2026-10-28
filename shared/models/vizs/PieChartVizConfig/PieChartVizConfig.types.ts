@@ -1,5 +1,4 @@
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-
 export type PieChartVizConfig = {
   vizType: "pie";
 

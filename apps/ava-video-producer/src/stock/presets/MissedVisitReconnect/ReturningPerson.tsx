@@ -2,7 +2,6 @@ import { EASE, mix, ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   item: Input["cases"][number];
   index: number;

@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

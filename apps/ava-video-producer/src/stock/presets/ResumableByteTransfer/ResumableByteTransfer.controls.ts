@@ -2,7 +2,6 @@ import { z } from "zod";
 import { makeStockControlsFromSchema } from "../../contracts/makeStockControlsFromSchema/makeStockControlsFromSchema";
 import { inputSchema } from "./ResumableByteTransfer.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
-
 const NAMESPACE = "motionAtlas.resumable-byte-transfer" as const;
 const supported: StockControl[] = makeStockControlsFromSchema({
   schema: z.toJSONSchema(

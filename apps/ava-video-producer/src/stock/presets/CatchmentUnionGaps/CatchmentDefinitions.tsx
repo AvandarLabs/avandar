@@ -1,7 +1,6 @@
 import { getCatchmentShapesFromInput } from "./getCatchmentShapesFromInput";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; definitionId: string; accent: string };
 /** Solid union alpha creates a single fill and a fused exterior boundary. */
 export function CatchmentDefinitions({

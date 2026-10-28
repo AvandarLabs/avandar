@@ -15,7 +15,6 @@ import {
 } from "./SharedExperimentPredictions.fixtures";
 import { inputSchema, type Input } from "./SharedExperimentPredictions.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input,

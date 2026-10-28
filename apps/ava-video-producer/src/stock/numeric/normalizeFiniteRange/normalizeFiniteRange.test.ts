@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { normalizeFiniteRange } from "./normalizeFiniteRange";
-
 test("normalization preserves endpoints and central zero across overflowing finite spans", () => {
   [-1e308, -10, 0].forEach((min) => {
     const max = min === 0 ? 10 : -min;

@@ -3,7 +3,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { CustodyObjectShape } from "./CustodyObjectShape";
 import type { Input } from "./CustodyTransfer.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 const DETAILS = {
   x: 534,

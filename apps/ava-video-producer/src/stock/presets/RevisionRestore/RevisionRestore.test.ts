@@ -7,7 +7,6 @@ import { RevisionRestore } from "./RevisionRestore";
 import { revisionRestoreContract } from "./RevisionRestore.contract";
 import { DEFAULT_INPUT, FIXTURES } from "./RevisionRestore.fixtures";
 import { inputSchema, type Input } from "./RevisionRestore.schema";
-
 function _render({
   frame,
   input,

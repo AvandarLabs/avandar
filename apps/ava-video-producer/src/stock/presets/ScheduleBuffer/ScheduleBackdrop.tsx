@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ScheduleBuffer.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** The authored result and deadline frame one fixed schedule endpoint. */
 export function ScheduleBackdrop({ input }: Readonly<Props>): ReactNode {

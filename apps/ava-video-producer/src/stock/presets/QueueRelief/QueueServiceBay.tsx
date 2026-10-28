@@ -3,7 +3,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./QueueRelief.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   slot: Input["serviceSlots"][number];
   index: number;

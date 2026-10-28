@@ -3,7 +3,6 @@ import { EASE, mix, ramp } from "../../../motion";
 import { getAllocationIdentitiesFromInput } from "./getAllocationIdentitiesFromInput";
 import { getDonorTrayFromInputAndFrame } from "./getDonorTrayFromInputAndFrame";
 import type { Input } from "./PooledDonorAllocation.schema";
-
 type Identity = ReturnType<typeof getAllocationIdentitiesFromInput>[number];
 /** Data for getAllocationTokensFromInputAndFrame. */
 type GetAllocationTokensResult = {

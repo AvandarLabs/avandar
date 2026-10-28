@@ -1,7 +1,6 @@
 import { FoundationSlab } from "./FoundationSlab";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   frame: number;
   variant: Input["foundationReveal"];

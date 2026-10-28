@@ -2,7 +2,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   resource: Input["existingResources"][number];
   x: number;

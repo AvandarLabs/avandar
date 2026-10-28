@@ -4,7 +4,6 @@ import { FrontierRoad } from "./FrontierRoad";
 import { getTravelCostsFromInput } from "./getTravelCostsFromInput";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Network time advances independently along both ends of every road. */
 export function NetworkRoads({

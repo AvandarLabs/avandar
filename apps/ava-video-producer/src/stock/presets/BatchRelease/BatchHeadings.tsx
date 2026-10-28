@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Intake, dispatch, and destination captions frame the batch journey. */
 export function BatchHeadings({ input }: Readonly<Props>): ReactNode {

@@ -2,7 +2,6 @@ import { propEq } from "@avandar/utils";
 import { makeStockControlsFromSchema } from "../../contracts/makeStockControlsFromSchema/makeStockControlsFromSchema";
 import { jsonSchema } from "./InvalidTableQuarantine.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
-
 const COMPATIBLE_PATHS: string[] = ["labels", "showAttempt"];
 const compatible: StockControl[] = makeStockControlsFromSchema({
   schema: {

@@ -1,7 +1,6 @@
 import { SceneText } from "./SceneText";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Draws the PriorWorkHeading group with fixed authored geometry. */
 export function PriorWorkHeading({

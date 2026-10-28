@@ -5,7 +5,6 @@ import { getAssociationFromInput } from "./getAssociationFromInput";
 import { unresolvedMessage } from "./PdfNearestLabelReview.controls";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; x: number; accent: string };
 /** The extracted row carries the unchanged token and its source position. */
 export function ExtractionRow({

@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
 import type { ReactNode } from "react";
-
 type Props = {
   text: string;
   slot: readonly [

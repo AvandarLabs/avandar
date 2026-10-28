@@ -3,7 +3,6 @@ import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { stockContracts } from "../../registry/stockContracts";
 import type { StockInputByPreset, StockPresetId } from "../StockContract.types";
 import type { z } from "zod";
-
 function _formatStockInputIssues(
   options: Readonly<{
     preset: StockPresetId;

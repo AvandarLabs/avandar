@@ -2,7 +2,6 @@ import { EASE, mix, ramp } from "../../../motion";
 import { getJarOpeningFromFrame } from "./getJarOpeningFromFrame";
 import { getSeedBalancesFromInput } from "./getSeedBalancesFromInput";
 import type { Input } from "./SavedSeedSeasonReturn.schema";
-
 type Transfer = {
   frame: number;
   start: number;

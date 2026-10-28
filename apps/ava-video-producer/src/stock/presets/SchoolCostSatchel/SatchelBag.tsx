@@ -1,7 +1,6 @@
 import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { opening: number; accent: string };
 /** Draws the scene's SatchelBag group with fixed authored geometry. */
 export function SatchelBag({ opening, accent }: Readonly<Props>): ReactNode {

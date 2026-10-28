@@ -17,7 +17,6 @@ import {
 } from "./ExpectationOverlayCheck.fixtures";
 import { inputSchema, type Input } from "./ExpectationOverlayCheck.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

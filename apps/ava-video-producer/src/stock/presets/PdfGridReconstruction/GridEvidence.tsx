@@ -4,7 +4,6 @@ import { TaggedGridEvidence } from "./TaggedGridEvidence";
 import { WhitespaceGridEvidence } from "./WhitespaceGridEvidence";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Tagged outlines, ruling lines and whitespace corridors remain distinct. */
 export function GridEvidence({

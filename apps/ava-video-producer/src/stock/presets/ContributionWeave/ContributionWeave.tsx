@@ -7,7 +7,6 @@ import { WeaveWarp } from "./WeaveWarp";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./ContributionWeave.schema";
 import type { ComponentProps, ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 const LOOM = {
   x: 320,

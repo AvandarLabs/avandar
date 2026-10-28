@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { GisTally } from "./GisTally";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

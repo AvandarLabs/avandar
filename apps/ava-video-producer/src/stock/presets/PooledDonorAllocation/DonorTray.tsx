@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { getDonorTrayFromInputAndFrame } from "./getDonorTrayFromInputAndFrame";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; donorIndex: number };
 
 /** The contributor's hand tips a small supported stack into the shared tray. */

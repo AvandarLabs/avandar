@@ -4,7 +4,6 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PeerContributionRecognition.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string; focusedX: number };
 /** A pointing arm contacts the focused object before turning to its maker. */
 export function RecognitionExchange({

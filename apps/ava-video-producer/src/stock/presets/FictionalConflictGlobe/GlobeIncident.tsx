@@ -4,7 +4,6 @@ import { buildIncidentLeaderFromPoints } from "./buildIncidentLeaderFromPoints";
 import { GlobeIncidentLabel } from "./GlobeIncidentLabel";
 import type { Input } from "./FictionalConflictGlobe.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   incident: Input["incidents"][number];
   incidents: Input["incidents"];

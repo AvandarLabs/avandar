@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { getReachedIntervalsFromRoad } from "./getReachedIntervalsFromRoad";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 import type { ReactNode } from "react";
-
 type Endpoint = Input["nodes"][number] & { cost: number };
 type Props = {
   road: Input["roads"][number];

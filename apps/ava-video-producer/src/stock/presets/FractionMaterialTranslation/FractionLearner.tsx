@@ -3,7 +3,6 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SceneText } from "./SceneText";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   representation: Input["representations"][number];

@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /**
  * The conservation equation and unique-person count are separate quantities.

@@ -5,7 +5,6 @@ import {
   type WaterDestination,
 } from "./waterDestinationKeys";
 import type { ReactNode } from "react";
-
 type Props = {
   destination: WaterDestination;
   location: "physical" | "caption";

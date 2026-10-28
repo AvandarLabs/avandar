@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { label: string; checkpoint: number; frame: number };
 /** A complete bounded caption connects to the exact acknowledged byte. */
 export function RetryCheckpoint({

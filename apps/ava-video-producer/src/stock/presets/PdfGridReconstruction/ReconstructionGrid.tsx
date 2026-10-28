@@ -4,7 +4,6 @@ import { ReconstructionCell } from "./ReconstructionCell";
 import { ReconstructionHeaders } from "./ReconstructionHeaders";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string; isResult: boolean };
 /** Coordinate occurrences register before an equal sized result unfolds. */
 export function ReconstructionGrid({

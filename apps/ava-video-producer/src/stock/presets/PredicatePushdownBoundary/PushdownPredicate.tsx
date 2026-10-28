@@ -4,7 +4,6 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** The typed numeric condition arrives at the source before gates close. */
 export function PushdownPredicate({

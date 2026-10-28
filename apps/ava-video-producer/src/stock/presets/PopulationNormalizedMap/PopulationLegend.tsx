@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { LegendScale } from "./LegendScale";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** The changed measure has an explicit legend and unchanged period and base. */
 export function PopulationLegend({

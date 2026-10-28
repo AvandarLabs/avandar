@@ -1,5 +1,4 @@
 import type { Input } from "./MinimumCountMapSuppression.schema";
-
 type PublicCell = {
   id: string;
   label: string;

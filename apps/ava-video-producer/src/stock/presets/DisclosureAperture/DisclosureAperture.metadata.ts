@@ -6,7 +6,6 @@ import type {
   StockMetadata,
   StockMessageDescriptor,
 } from "../../contracts/StockContract.types";
-
 export { CONTROLS } from "./DisclosureAperture.controls";
 
 function _message({

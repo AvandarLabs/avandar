@@ -18,7 +18,6 @@ import {
   INVALID_INPUTS,
 } from "./SpatialGridBinning.fixtures";
 import { inputSchema, type Input } from "./SpatialGridBinning.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

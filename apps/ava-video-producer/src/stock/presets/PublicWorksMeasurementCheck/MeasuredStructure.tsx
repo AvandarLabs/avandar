@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import { MeasurementRuler } from "./MeasurementRuler";
 import type { Input } from "./PublicWorksMeasurementCheck.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; accent: string };
 /**
  * One physical dimension uses the same 65-pixel unit for promise and object.

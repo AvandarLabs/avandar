@@ -13,7 +13,6 @@ import {
 } from "./DocumentRegionDriftCheck.fixtures";
 import { inputSchema, type Input } from "./DocumentRegionDriftCheck.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 const render = ({
   frame,
   input = DEFAULT_INPUT,
@@ -130,7 +129,6 @@ test("saved and current outlines register at exact supplied page coordinates eve
 import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { documentRegionDriftCheckContract as contract } from "./DocumentRegionDriftCheck.contract";
-
 const EXCLUDED_TEXT_FIELDS: string[] = [];
 const getVisibleTexts = ({
   input,

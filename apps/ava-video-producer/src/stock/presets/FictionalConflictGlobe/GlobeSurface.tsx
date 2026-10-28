@@ -2,7 +2,6 @@ import { geoGraticule10 } from "d3-geo";
 import { GlobeProjection } from "../../geography/GlobeProjection/GlobeProjection";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { longitude: number; showGraticule: boolean };
 /** Pinned physical land and optional graticules share hemisphere clipping. */
 export function GlobeSurface({

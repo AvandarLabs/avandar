@@ -3,7 +3,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PairedContrast.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input };
 /** The same question and caption frame both alternatives. */
 export function ContrastHeading({ frame, input }: Readonly<Props>): ReactNode {

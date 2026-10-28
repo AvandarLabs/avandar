@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { CapabilityGlyph } from "./CapabilityGlyph";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   cell: Input["capabilities"][number]["cells"][number];
   rowId: string;

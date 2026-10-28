@@ -4,7 +4,6 @@ import { buildZoneOutlineFromCells } from "./buildZoneOutlineFromCells";
 import { getGroupingFromCells } from "./getGroupingFromCells";
 import type { Input } from "./BoundaryRegroupingEffect.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Raised group seams leave the atomic grid fixed below them. */
 export function GroupingSeams({

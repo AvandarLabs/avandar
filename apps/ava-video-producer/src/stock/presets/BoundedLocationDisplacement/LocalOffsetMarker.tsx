@@ -3,7 +3,6 @@ import { Text } from "../../graphics-common";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   location: Input["locations"][number];
   index: number;

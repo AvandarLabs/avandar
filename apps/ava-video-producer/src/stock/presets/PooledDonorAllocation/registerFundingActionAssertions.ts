@@ -7,7 +7,6 @@ import {
   unequalBatchFixtures,
 } from "./PooledDonorAllocation.fixtures";
 import { inputSchema, type Input } from "./PooledDonorAllocation.schema";
-
 type Render = (options: Readonly<{ frame: number; input: Input }>) => string;
 type ScoopAssertion = { render: Render; input: Input };
 

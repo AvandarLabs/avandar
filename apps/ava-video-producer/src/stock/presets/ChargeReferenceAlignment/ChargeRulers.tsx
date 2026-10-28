@@ -4,7 +4,6 @@ import { DifferenceBracket } from "./DifferenceBracket";
 import { getComparisonFromInput } from "./getComparisonFromInput";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Amount rulers share a zero and exact domain only after eligible alignment.

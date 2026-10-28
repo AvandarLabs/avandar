@@ -8,7 +8,6 @@ import {
   fixtures,
   invalidInputs,
 } from "./OfflineLedger.fixtures";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -73,7 +72,6 @@ test("storage visibility preserves notebook strokes and all three casings retain
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { offlineLedgerContract } from "./OfflineLedger.contract";
 import { inputSchema } from "./OfflineLedger.schema";
-
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,

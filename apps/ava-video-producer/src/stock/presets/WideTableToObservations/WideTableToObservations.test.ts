@@ -13,7 +13,6 @@ import {
 } from "./WideTableToObservations.fixtures";
 import { inputSchema, type Input } from "./WideTableToObservations.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 const render = ({
   frame,
   input = DEFAULT_INPUT,
@@ -88,7 +87,6 @@ test("measure strips carry subject copies from wide cells to long rows", () => {
 import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { wideTableToObservationsContract as contract } from "./WideTableToObservations.contract";
-
 const EXCLUDED_TEXT_FIELDS: string[] = ["id", "measureId", "missingPolicy"];
 const getVisibleTexts = ({
   input,

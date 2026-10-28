@@ -6,7 +6,6 @@ import { ReadinessRibbon } from "./ReadinessRibbon";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** Every authored branch must finish and withdraw its pin before release. */
 export function ReadinessLatch({

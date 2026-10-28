@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import { SceneText } from "./SceneText";
 import type { Input } from "./SharedReadingCircles.schema";
 import type { ReactNode } from "react";
-
 type Props = { learner: Input["learners"][number]; index: number };
 /** Matches a fixed roster label to the number on its moving reader. */
 export function ReadingRosterEntry({

@@ -5,7 +5,6 @@ import { SceneLabel } from "./SceneLabel";
 import { VisitHeader } from "./VisitHeader";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** Visit arches pass over a fixed set of identity lanes. */
 export function DoseCohortReturnPaths({

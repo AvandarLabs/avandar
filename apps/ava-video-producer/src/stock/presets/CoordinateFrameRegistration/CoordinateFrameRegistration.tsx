@@ -5,7 +5,6 @@ import { RegistrationPoints } from "./RegistrationPoints";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /**
  * Affine reference-frame registration leaves target landmark references fixed.

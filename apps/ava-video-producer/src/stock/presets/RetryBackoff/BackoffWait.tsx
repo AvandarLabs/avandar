@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { BackoffDelay } from "./BackoffDelay";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; index: number; x: number; width: number };
 /** A bracket encodes a supplied wait without widening for its caption. */
 export function BackoffWait({

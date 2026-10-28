@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { ClassroomRoster } from "./ClassroomRoster";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 type Slot = [
   text: string,

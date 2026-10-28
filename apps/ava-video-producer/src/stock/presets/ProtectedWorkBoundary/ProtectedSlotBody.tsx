@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   slot: Input["slots"][number];
   x: number;

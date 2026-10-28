@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import type { Input } from "./CoordinateQualityTriage.schema";
 import type { makeCoordinateTriageFromInputAndFrame } from "./makeCoordinateTriageFromInputAndFrame";
 import type { ReactNode } from "react";
-
 type Props = {
   outcome: ReturnType<
     typeof makeCoordinateTriageFromInputAndFrame

@@ -14,7 +14,6 @@ import {
 } from "./RepeatingBlocksToTable.fixtures";
 import { inputSchema, type Input } from "./RepeatingBlocksToTable.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 const render = ({
   frame,
   input = DEFAULT_INPUT,
@@ -91,7 +90,6 @@ test("field-value strips physically rotate their block organization into table r
 import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { repeatingBlocksToTableContract as contract } from "./RepeatingBlocksToTable.contract";
-
 const EXCLUDED_TEXT_FIELDS: string[] = ["id", "fieldId"];
 const getVisibleTexts = ({
   input,

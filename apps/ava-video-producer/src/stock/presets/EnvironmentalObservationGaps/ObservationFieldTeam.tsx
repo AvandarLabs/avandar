@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { makeObservationLayoutFromInput } from "./makeObservationLayoutFromInput";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
-
 function _getTeamPosition({
   frame,
   input,

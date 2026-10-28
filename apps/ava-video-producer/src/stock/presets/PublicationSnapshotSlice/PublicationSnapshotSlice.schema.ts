@@ -1,7 +1,6 @@
 import { prop } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
-
 function _unique(values: readonly string[]): boolean {
   return new Set(values).size === values.length;
 }

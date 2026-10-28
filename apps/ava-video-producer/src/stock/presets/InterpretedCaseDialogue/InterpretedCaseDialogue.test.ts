@@ -12,7 +12,6 @@ import {
   invalidInputs,
 } from "./InterpretedCaseDialogue.fixtures";
 import { inputSchema, type Input } from "./InterpretedCaseDialogue.schema";
-
 function _render({
   frame,
   input = defaultInput,
@@ -40,7 +39,6 @@ test("supplied utterances appear participant then worker with original speaker a
 
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { interpretedCaseDialogueContract as contract } from "./InterpretedCaseDialogue.contract";
-
 function _visible({
   input,
   frame,

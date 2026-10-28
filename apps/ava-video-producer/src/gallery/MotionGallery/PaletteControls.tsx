@@ -6,7 +6,6 @@ import {
   DEFAULT_BACKGROUND,
 } from "../palette";
 import { PaletteSwatches } from "./PaletteSwatches";
-
 export type Props = {
   accent: string;
   background: string;

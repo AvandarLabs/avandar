@@ -2,7 +2,6 @@ import { EASE, mix, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./VoluntaryFamilyReunion.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   member: Input["groups"][number]["members"][number];
   index: number;

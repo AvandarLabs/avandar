@@ -15,7 +15,6 @@ import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpa
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
 import type { UseQueryOptions } from "@tanstack/react-query";
-
 type RunSpatialLayerOptions = {
   layer: MapLayer.T;
   workspaceId: Workspace.Id;

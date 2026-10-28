@@ -1,6 +1,5 @@
 import type { Input } from "./ContributionWeave.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   warp: Input["warp"][number];
   column: number;

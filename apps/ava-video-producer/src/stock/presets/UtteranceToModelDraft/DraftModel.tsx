@@ -2,7 +2,6 @@ import { DraftRelation } from "./DraftRelation";
 import { DraftSlip } from "./DraftSlip";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /**
  * Two entity sockets and one authored direction, with an optional attribute.

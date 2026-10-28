@@ -3,7 +3,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { CapabilityCell } from "./CapabilityCell";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   row: Input["capabilities"][number];

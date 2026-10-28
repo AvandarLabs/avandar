@@ -1,6 +1,5 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { x: number; y: number; accent: string } & (
   | { kind: "monitoring"; value: "logged" | "review" | "missing" }
   | { kind: "acknowledgement"; value: boolean }

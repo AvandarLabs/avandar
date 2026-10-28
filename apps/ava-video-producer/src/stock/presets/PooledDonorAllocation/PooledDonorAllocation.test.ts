@@ -13,7 +13,6 @@ import {
   invalidInputs,
 } from "./PooledDonorAllocation.fixtures";
 import { inputSchema, type Input } from "./PooledDonorAllocation.schema";
-
 function _render({
   frame,
   input,
@@ -37,7 +36,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { pooledDonorAllocationContract } from "./PooledDonorAllocation.contract";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     input.scenarioCaption,
@@ -349,5 +347,4 @@ test("coordinator arm and body stay on canvas through every scoop pickup and rel
 });
 
 import { registerFundingActionAssertions } from "./registerFundingActionAssertions";
-
 registerFundingActionAssertions(_render);

@@ -2,7 +2,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { projectGlobePoint } from "./projectGlobePoint";
-
 const VIEW: {
   centerLongitude: number;
   centerLatitude: number;

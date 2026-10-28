@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { StatementContext } from "./StatementContext";
 import type { Input } from "./QualifyApparentConflict.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   frame: number;
   accent: string;

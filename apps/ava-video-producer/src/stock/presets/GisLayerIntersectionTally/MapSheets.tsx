@@ -2,7 +2,6 @@ import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   first: string;

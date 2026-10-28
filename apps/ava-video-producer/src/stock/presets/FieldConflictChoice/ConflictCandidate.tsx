@@ -3,7 +3,6 @@ import { ConflictCandidateCopy } from "./ConflictCandidateCopy";
 import { getConflictCandidateStateFromField } from "./getConflictCandidateStateFromField";
 import type { Input } from "./FieldConflictChoice.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   source: Input["sources"][number];
   sourceIndex: number;

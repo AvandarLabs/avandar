@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import type { getSpliceGeometryFromInputAndFrame } from "./getSpliceGeometryFromInputAndFrame";
 import type { Input } from "./PipelineStepSplice.schema";
 import type { ReactNode } from "react";
-
 type Step = ReturnType<typeof getSpliceGeometryFromInputAndFrame>[number];
 type Props = {
   from: Step;

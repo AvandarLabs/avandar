@@ -5,7 +5,6 @@ import { CitationTab } from "./CitationTab";
 import { SummaryCopy } from "./SummaryCopy";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Lift the statement while keeping its citation aligned to the sheet edge. */
 export function ProvenanceSummary({

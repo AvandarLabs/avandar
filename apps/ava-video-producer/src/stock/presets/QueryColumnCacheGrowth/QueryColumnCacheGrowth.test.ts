@@ -15,7 +15,6 @@ import {
 } from "./QueryColumnCacheGrowth.fixtures";
 import { inputSchema, type Input } from "./QueryColumnCacheGrowth.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input,
@@ -77,7 +76,6 @@ test("one cache widens from key/name to key/name/value preserving both B occurre
 });
 
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-
 function _getVisibleTexts({
   input,
   frame,
@@ -141,7 +139,6 @@ registerStockLocalizationAssertions({
 import { SvgPaintAssertions } from "../../../../tests/helpers/SvgPaintAssertions/SvgPaintAssertions";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { CacheCell } from "./CacheCell";
-
 test("literal cells wrap at whole graphemes and retain exact line concatenation inside their cell", () => {
   [
     "界".repeat(16),

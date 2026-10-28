@@ -5,7 +5,6 @@ import type {
   StockContract,
   StockMetadata,
 } from "../../contracts/StockContract.types";
-
 export { CONTROLS as controls } from "./ComputeCapacityConsolidation.controls";
 /** Public retrieval descriptors contain no private provenance. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);

@@ -3,7 +3,6 @@ import { getGroupingFromCells } from "./getGroupingFromCells";
 import { GroupingZone } from "./GroupingZone";
 import type { Input } from "./BoundaryRegroupingEffect.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Zone summaries change while the complete partition remains accountable. */
 export function GroupingLedger({

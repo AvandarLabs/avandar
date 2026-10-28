@@ -2,7 +2,6 @@ import { EASE, mix, ramp } from "../../../motion";
 import { getRoutePointFromProgress } from "../../primitives/RoutePath/getRoutePointFromProgress";
 import { getClosedInteriorEncounterFromSegments } from "./getClosedInteriorEncounterFromSegments";
 import type { Input } from "./ConvoyRouteDetour.schema";
-
 type Point = { x: number; y: number };
 function _getPoint({
   points,

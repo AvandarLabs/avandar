@@ -95,7 +95,6 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { resumableByteTransferContract } from "./ResumableByteTransfer.contract";
 import { inputSchema, type Input } from "./ResumableByteTransfer.schema";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [input.file.label, ...Object.values(input.labels)];
 }

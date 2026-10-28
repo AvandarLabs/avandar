@@ -14,7 +14,6 @@ import {
   invalidInputs,
 } from "./EnvironmentalObservationGaps.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -75,7 +74,6 @@ import {
   SEMANTIC_RULES,
 } from "./EnvironmentalObservationGaps.schema";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     ...input.cells.map(prop("label")),

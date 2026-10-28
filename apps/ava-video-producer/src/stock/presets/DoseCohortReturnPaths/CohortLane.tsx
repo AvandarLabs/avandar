@@ -6,7 +6,6 @@ import { CohortRecord } from "./CohortRecord";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   participant: Input["participants"][number];

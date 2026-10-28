@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import { getConflictChoicePositionFromField } from "./getConflictChoicePositionFromField";
 import type { Input } from "./FieldConflictChoice.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   field: Input["fields"][number];
   input: Input;

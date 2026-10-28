@@ -6,7 +6,6 @@ import { ReconnectLedger } from "./ReconnectLedger";
 import { ReconnectSetting } from "./ReconnectSetting";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** A worker contacts the fixed group; only attended people enter the clinic. */
 export function MissedVisitReconnect({

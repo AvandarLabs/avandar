@@ -3,7 +3,6 @@ import { RevisionDrawer } from "./RevisionDrawer";
 import { SavedRevision } from "./SavedRevision";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

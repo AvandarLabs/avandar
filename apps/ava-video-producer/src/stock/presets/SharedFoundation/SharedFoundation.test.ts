@@ -13,7 +13,6 @@ import {
 } from "./SharedFoundation.fixtures";
 import { inputSchema } from "./SharedFoundation.schema";
 import type { Input } from "./SharedFoundation.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

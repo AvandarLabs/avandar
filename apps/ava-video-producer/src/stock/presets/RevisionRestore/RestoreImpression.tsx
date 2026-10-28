@@ -2,7 +2,6 @@ import { mix, ramp, EASE } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   revision: Input["revisions"][number];
   index: number;

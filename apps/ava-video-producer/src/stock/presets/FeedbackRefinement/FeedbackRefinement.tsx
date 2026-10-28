@@ -7,7 +7,6 @@ import { getFeedbackStateFromInputAndFrame } from "./getFeedbackStateFromInputAn
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./FeedbackRefinement.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /**
  * Authored feedback travels with a changing draft through sequential

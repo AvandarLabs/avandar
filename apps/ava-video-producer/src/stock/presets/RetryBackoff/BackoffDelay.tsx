@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; index: number; x: number };
 /** Fixed wait values sit outside the proportionally sized brackets. */
 export function BackoffDelay({ input, index, x }: Readonly<Props>): ReactNode {

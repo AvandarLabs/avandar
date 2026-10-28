@@ -3,7 +3,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   record: Input["records"][number];
   index: number;

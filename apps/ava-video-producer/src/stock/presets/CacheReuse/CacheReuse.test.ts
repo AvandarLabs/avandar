@@ -8,7 +8,6 @@ import { CacheReuse } from "./CacheReuse";
 import { cacheReuseContract } from "./CacheReuse.contract";
 import { DEFAULT_INPUT, FIXTURES } from "./CacheReuse.fixtures";
 import { inputSchema, type Input } from "./CacheReuse.schema";
-
 function _render({
   frame,
   input,

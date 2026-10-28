@@ -6,7 +6,6 @@ import { RecognitionObjects } from "./RecognitionObjects";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./PeerContributionRecognition.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 
 /** Specific appreciation retains the contributor's objects and authorship. */

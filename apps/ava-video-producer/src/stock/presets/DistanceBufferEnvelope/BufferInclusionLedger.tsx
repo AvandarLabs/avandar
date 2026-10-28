@@ -2,7 +2,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { BufferClassificationToken } from "./BufferClassificationToken";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * The result rail contains qualifying source identities once in source order.

@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { getShopperPoseFromInputAndFrame } from "./getShopperPoseFromInputAndFrame";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string; total: number };
 
 /**

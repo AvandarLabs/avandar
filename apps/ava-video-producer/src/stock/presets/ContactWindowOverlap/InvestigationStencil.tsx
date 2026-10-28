@@ -2,7 +2,6 @@ import { EASE, mix, ramp } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** The supplied window lowers onto the same axis as each presence ribbon. */
 export function InvestigationStencil({

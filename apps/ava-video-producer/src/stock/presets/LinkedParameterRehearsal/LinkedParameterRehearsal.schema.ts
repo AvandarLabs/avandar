@@ -2,7 +2,6 @@ import { prop, propEq, propNotEq } from "@avandar/utils";
 import { z } from "zod";
 import { evaluateAffineRule } from "./evaluateAffineRule";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
-
 const outputSchema = z.strictObject({
   id: z.string().min(1).max(20),
   label: z.string().min(1).max(28),

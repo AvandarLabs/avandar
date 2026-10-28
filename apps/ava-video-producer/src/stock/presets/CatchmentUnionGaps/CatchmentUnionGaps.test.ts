@@ -22,7 +22,6 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { catchmentUnionGapsContract } from "./CatchmentUnionGaps.contract";
 import { inputSchema, type Input } from "./CatchmentUnionGaps.schema";
-
 function _render({
   frame,
   input = defaultInput,

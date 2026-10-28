@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Full physical mass labels retain exact finite values and separate units. */
 export function CarbonPhysicalLabels({ input }: Readonly<Props>): ReactNode {

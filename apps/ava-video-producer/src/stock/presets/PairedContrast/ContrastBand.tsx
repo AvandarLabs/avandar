@@ -1,6 +1,5 @@
 import { EASE, mix, ramp } from "../../../motion";
 import type { ReactNode } from "react";
-
 type Props = { criterionId: string; y: number; frame: number; accent: string };
 /**
  * The authored focus expands across the existing pair without removing rows.

@@ -1,6 +1,5 @@
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   state: Input["participants"][number]["records"][number]["state"];
   x: number;

@@ -13,7 +13,6 @@ import {
 } from "./SharedJigPreparation.fixtures";
 import { inputSchema, type Input } from "./SharedJigPreparation.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input,
@@ -58,7 +57,6 @@ test("one guide leaves matching marks on each existing workpiece exactly once", 
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-
 function _getVisibleTexts({
   input,
   frame,

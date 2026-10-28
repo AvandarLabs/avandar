@@ -4,7 +4,6 @@ import { CellLiteralValue } from "./CellLiteralValue";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
-
 type Props = { row: Input["rows"][number]; input: Input; frame: number };
 /** Retained originals use the rail heading or their own inline sublabel. */
 export function CleanupRetainedValue({

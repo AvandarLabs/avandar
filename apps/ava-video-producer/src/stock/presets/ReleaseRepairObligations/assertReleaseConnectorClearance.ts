@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
-
 type Point = { x: number; y: number };
 type Bounds = { left: number; right: number; top: number; bottom: number };
 function _intersects({

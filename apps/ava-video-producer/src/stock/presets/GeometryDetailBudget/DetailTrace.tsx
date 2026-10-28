@@ -6,7 +6,6 @@ import { RemovedDeviationGuides } from "./RemovedDeviationGuides";
 import { SourceVertices } from "./SourceVertices";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Original and retained traces share fixed source-vertex coordinates. */
 export function DetailTrace({

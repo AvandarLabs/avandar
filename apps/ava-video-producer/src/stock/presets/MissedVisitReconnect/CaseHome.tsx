@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
-
 type Props = { item: Input["cases"][number]; y: number };
 /** The original person label, home and empty appointment remain visible. */
 export function CaseHome({ item, y }: Readonly<Props>): ReactNode {

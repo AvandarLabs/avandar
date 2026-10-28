@@ -1,7 +1,6 @@
 import { mix, ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; accent: string };
 /** The lid opens before the authored stock leaves the carrier. */
 export function SessionCarrier({ frame, accent }: Readonly<Props>): ReactNode {

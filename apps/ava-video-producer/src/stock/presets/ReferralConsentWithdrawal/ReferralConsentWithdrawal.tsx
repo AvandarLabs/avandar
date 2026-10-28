@@ -7,7 +7,6 @@ import { PreparedContacts } from "./PreparedContacts";
 import { SharingHistory } from "./SharingHistory";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /**
  * Destination-specific withdrawal interrupts preparations, preserving history.

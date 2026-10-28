@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./PublicWorksMeasurementCheck.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /**
  * Supplied labels retain one unit and the signed observed-minus-promised value.

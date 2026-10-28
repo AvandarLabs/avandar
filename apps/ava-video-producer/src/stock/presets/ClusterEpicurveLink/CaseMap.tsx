@@ -4,7 +4,6 @@ import { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import { InvestigationBracket } from "./InvestigationBracket";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** The bracket and bin-focus outlines represent independent selections. */
 export function CaseMap({ input, frame, accent }: Readonly<Props>): ReactNode {

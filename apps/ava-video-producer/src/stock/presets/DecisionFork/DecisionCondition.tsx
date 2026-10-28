@@ -4,7 +4,6 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { ForkLabel } from "./ForkLabel/ForkLabel";
 import type { Props as BranchProps } from "./DecisionBranch";
 import type { ReactNode } from "react";
-
 type Props = Pick<
   BranchProps,
   "branch" | "x" | "frame" | "index" | "accent" | "isSelected"

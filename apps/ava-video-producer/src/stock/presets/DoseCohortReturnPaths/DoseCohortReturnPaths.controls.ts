@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { inputSchema } from "./DoseCohortReturnPaths.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
-
 function _copy({ path, message }: { path: string; message: string }) {
   return {
     id: `motionAtlas.dose-cohort-return-paths.controls.${path}`,

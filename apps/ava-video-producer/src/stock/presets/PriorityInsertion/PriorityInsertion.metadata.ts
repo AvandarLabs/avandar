@@ -2,7 +2,6 @@ import { parseStockMetadata } from "../../contracts/parseStockMetadata/parseStoc
 import authoredMetadata from "./PriorityInsertion.metadata.yaml";
 import type { StockMetadata } from "../../contracts/StockContract.types";
 import type { Input } from "./PriorityInsertion.schema";
-
 export { controls } from "./PriorityInsertion.controls";
 /** Public retrieval copy excludes private planning provenance. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);

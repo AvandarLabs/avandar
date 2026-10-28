@@ -1,7 +1,6 @@
 import { ramp, mix, EASE } from "../../../motion";
 import type { Input } from "./PublicationSnapshotSlice.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

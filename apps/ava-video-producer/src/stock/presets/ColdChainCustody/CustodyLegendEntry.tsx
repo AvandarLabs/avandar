@@ -4,7 +4,6 @@ import { CustodyFactMark } from "./CustodyFactMark";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

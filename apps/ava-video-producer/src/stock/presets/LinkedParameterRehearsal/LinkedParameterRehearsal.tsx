@@ -8,7 +8,6 @@ import { RehearsalRuler } from "./RehearsalRuler";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./LinkedParameterRehearsal.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /**
  * Direct dependent pointers rehearse a source change and restore its

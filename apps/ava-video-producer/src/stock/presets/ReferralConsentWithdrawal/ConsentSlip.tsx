@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { getConsentTurnFromPermissionsAndFrame } from "./getConsentTurnFromPermissionsAndFrame";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   frame: number;
   input: Input;

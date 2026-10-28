@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   portion: number;

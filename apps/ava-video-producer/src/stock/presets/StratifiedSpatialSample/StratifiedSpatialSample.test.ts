@@ -23,7 +23,6 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { stratifiedSpatialSampleContract } from "./StratifiedSpatialSample.contract";
 import { inputSchema, type Input } from "./StratifiedSpatialSample.schema";
-
 function _render({
   frame,
   input = defaultInput,

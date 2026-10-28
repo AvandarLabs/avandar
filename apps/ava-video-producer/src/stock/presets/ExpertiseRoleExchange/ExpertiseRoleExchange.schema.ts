@@ -4,7 +4,6 @@ import type {
   StockJsonSchema,
   StockSemanticRule,
 } from "../../contracts/StockContract.types";
-
 const personSchema: z.ZodObject<
   { id: z.ZodString; label: z.ZodString; roleLabel: z.ZodString },
   z.core.$strict

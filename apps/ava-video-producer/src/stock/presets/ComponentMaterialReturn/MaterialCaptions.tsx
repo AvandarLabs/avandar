@@ -2,7 +2,6 @@ import { ROUTE_COLORS } from "./routeColors";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /**
  * Stable captions and route swatches remain above the complete handling path.

@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-
 type Props = { x: number; accent: string };
 /** A dashed sheet half remains provisional before the shared commit. */
 export function OutboxProposalSheet({ x, accent }: Readonly<Props>): ReactNode {

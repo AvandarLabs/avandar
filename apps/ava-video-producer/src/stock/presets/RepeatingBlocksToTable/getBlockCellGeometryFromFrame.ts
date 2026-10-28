@@ -1,7 +1,6 @@
 import { EASE, mix, ramp } from "../../../motion";
 import { BLOCK_SLIDE_PLANS } from "./blockSlidePlans";
 import type { Input } from "./RepeatingBlocksToTable.schema";
-
 type Params = {
   input: Input;
   frame: number;

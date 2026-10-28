@@ -8,7 +8,6 @@ import {
   type Storyboard,
 } from "./storyboard/schema/schema";
 import { StoryFilm } from "./storyboard/StoryFilm/StoryFilm";
-
 const defaults = storyboardSchema.parse(importPlan);
 function ProductFilm({ plan }: { plan: Storyboard }) {
   return <StoryFilm plan={plan} productScene={AvandarScene} />;

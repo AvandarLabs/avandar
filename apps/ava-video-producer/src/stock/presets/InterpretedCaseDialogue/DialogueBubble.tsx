@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { DialogueWording } from "./DialogueWording";
 import type { Input } from "./InterpretedCaseDialogue.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

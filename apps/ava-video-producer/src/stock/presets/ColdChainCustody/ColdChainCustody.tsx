@@ -6,7 +6,6 @@ import { CustodyStops } from "./CustodyStops";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** Containers travel a schematic route without merging their record facts. */
 export function ColdChainCustody({

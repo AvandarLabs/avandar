@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import type { makeGridSceneFromInputAndFrame } from "./makeGridSceneFromInputAndFrame";
 import type { Input } from "./SpatialGridBinning.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   cell: ReturnType<typeof makeGridSceneFromInputAndFrame>["cells"][number];

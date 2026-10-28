@@ -3,7 +3,6 @@ import type {
   StockPresetId,
 } from "../../stock/contracts/StockContract.types";
 import type { Preset } from "./Preset.types";
-
 type Configuration = {
   preset: Preset;
   input: StockInputByPreset[StockPresetId];

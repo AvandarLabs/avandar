@@ -5,7 +5,6 @@ import { getRequestPositionFromInputAndFrame } from "./getRequestPositionFromInp
 import { RequestDisposition } from "./RequestDisposition";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** Outstanding request remains explicit in the tray or selected empty slot. */
 export function BoundaryRequest({

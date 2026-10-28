@@ -18,7 +18,6 @@ import {
   INVALID_INPUTS,
 } from "./MinimumCountMapSuppression.fixtures";
 import { inputSchema, type Input } from "./MinimumCountMapSuppression.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

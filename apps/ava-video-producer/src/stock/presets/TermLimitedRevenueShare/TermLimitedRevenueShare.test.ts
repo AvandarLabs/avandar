@@ -19,7 +19,6 @@ import {
 } from "./TermLimitedRevenueShare.fixtures";
 import { inputSchema, type Input } from "./TermLimitedRevenueShare.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

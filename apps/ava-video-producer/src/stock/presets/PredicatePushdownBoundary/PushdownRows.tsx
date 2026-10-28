@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { PushdownRow } from "./PushdownRow";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** All originals remain visible while matching copies move as complete rows. */
 export function PushdownRows({

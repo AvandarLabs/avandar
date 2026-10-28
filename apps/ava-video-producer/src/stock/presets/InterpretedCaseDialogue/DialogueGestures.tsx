@@ -1,7 +1,6 @@
 import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; accent: string };
 /** Speaking and interpreting hands pause between the authored turns. */
 export function DialogueGestures({

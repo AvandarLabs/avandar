@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
-
 type State = Input["capabilities"][number]["cells"][number]["state"];
 const GLYPHS: Record<State, { path: string; color: string }> = {
   included: { path: "M-7 0 l5 5 10 -12", color: STOCK.mint },

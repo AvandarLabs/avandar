@@ -5,7 +5,6 @@ import { makeCoordinateTriageFromInputAndFrame } from "./makeCoordinateTriageFro
 import { TriageOutcome } from "./TriageOutcome";
 import type { Input } from "./CoordinateQualityTriage.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /** Numeric graticule, diagnostic trays and reconciled outcome counts. */
 export function TriagePlane({ input, frame }: Readonly<Props>): ReactNode {

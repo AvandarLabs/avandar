@@ -4,7 +4,6 @@ import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromI
 import { ScheduleLabelSlot } from "./ScheduleLabelSlot";
 import type { Input } from "./ScheduleBuffer.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   state: ReturnType<typeof getScheduleGeometryFromInputAndFrame>;
   input: Input;

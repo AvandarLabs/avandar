@@ -17,7 +17,6 @@ import { DECISION_FORK_DENSE_INPUT } from "../src/stock/presets/DecisionFork/Dec
 import { StockCompositions } from "../src/stock/StockCompositions";
 import { StockGraphic } from "../src/stock/StockGraphic";
 import { storyboardSchema } from "../src/storyboard/schema/schema";
-
 const { ShotView } = await import("../src/storyboard/StoryFilm/ShotView");
 import { LEGACY_IDS } from "./fixtures/legacyStockIds";
 import { getSvgAttributeMatchesFromMarkup } from "./helpers/getSvgAttributeMatchesFromMarkup/getSvgAttributeMatchesFromMarkup";

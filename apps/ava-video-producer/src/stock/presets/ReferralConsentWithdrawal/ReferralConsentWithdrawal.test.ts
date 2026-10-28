@@ -11,7 +11,6 @@ import {
   fixtures,
 } from "./ReferralConsentWithdrawal.fixtures";
 import { inputSchema, type Input } from "./ReferralConsentWithdrawal.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -41,7 +40,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { referralConsentWithdrawalContract as contract } from "./ReferralConsentWithdrawal.contract";
-
 const EXCLUDED_TEXT_FIELDS: string[] = [
   "id",
   "permissionId",

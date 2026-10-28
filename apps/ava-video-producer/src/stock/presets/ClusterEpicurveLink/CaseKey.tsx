@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { ReactNode } from "react";
-
 type Props = {
   position: ReturnType<typeof getCasePositionsFromInput>[number];
   frame: number;

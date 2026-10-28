@@ -4,7 +4,6 @@ import { LedgerEntryText } from "./LedgerEntryText";
 import { LedgerImpression } from "./LedgerImpression";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   entry: Input["entries"][number];
   index: number;

@@ -6,7 +6,6 @@ import { getConservativeWidthFromText } from "../../../text/getConservativeWidth
 import { DecisionFork } from "../DecisionFork";
 import { DECISION_FORK_DENSE_INPUT } from "../DecisionFork.fixtures";
 import { ForkLabel } from "./ForkLabel";
-
 function _lines({
   text,
   width = 168,

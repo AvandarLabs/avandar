@@ -4,7 +4,6 @@ import { ROUTE_COLORS } from "./routeColors";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /** Stable numbered components retain source identity in all destinations. */
 export function MaterialParts({ input, frame }: Readonly<Props>): ReactNode {

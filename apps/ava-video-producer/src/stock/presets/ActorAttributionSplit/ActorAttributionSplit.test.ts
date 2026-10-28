@@ -18,7 +18,6 @@ import {
 } from "./ActorAttributionSplit.fixtures";
 import { inputSchema, type Input } from "./ActorAttributionSplit.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

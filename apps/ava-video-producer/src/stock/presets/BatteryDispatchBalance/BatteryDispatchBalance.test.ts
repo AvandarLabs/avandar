@@ -14,7 +14,6 @@ import {
   invalidInputs,
 } from "./BatteryDispatchBalance.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -67,7 +66,6 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { batteryDispatchBalanceContract as contract } from "./BatteryDispatchBalance.contract";
 import { inputSchema, SEMANTIC_RULES } from "./BatteryDispatchBalance.schema";
 import type { Input } from "./BatteryDispatchBalance.schema";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     ...Object.values(input.windows),

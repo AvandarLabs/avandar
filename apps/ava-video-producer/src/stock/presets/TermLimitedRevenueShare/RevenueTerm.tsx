@@ -3,7 +3,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** The authored boundary turns and closes only the distribution outlet. */
 export function RevenueTerm({

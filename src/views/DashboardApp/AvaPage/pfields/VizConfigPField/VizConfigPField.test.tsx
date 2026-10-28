@@ -11,7 +11,6 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { LegacyLocalFilter } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-
 type RenderFieldOptions = {
   value: VizConfig.T | VizConfig.NameBound;
   legacy?: boolean;

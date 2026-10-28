@@ -4,7 +4,6 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { SubscriptionMask } from "./SubscriptionMask";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   record: Input["records"][number];
   rowIndex: number;

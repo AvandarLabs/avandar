@@ -7,7 +7,6 @@ import { SceneText } from "./SceneText";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /**
  * Opens the carried satchel into exactly the authored period-normalized costs.

@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; difference: number; y: number };
 /** Prediction Difference for the authored scene. */
 export function PredictionDifference({

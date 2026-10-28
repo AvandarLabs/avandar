@@ -1,7 +1,6 @@
 import { prop } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
-
 const identifier: z.ZodString = z.string().max(12);
 /** Complete authored case identities, selections and ordered onset bins. */
 export const inputSchema = z

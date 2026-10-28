@@ -2,7 +2,6 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { getRecipientPoseFromInputAndFrame } from "./getRecipientPoseFromInputAndFrame";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 
 /**

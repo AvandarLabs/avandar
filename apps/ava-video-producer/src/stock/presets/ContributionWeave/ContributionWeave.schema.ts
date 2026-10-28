@@ -4,7 +4,6 @@ import type {
   StockJsonSchema,
   StockSemanticRule,
 } from "../../contracts/StockContract.types";
-
 const contributor: z.ZodObject<
   {
     id: z.ZodString;

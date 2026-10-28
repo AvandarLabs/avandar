@@ -2,7 +2,6 @@ import { EASE, ramp } from "../../../motion";
 import { DimensionTicks } from "./DimensionTicks";
 import type { Input } from "./ParcelSetbackInset.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * The whole authored footprint lowers without rotation or automatic resizing.

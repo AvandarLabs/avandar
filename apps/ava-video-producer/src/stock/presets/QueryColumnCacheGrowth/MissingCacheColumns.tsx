@@ -4,7 +4,6 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; missingIds: string[] };
 /**
  * Missing column labels remain explicit independently of set-notation display.

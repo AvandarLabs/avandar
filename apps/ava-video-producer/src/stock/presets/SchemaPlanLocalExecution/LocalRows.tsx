@@ -5,7 +5,6 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SchemaPlanLocalExecution.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Local row occurrences and exact numeric values never cross the device edge.

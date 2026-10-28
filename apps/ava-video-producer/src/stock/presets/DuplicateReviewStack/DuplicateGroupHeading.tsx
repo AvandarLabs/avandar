@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { DuplicateDecisionLabels } from "./DuplicateDecisionLabels";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   frame: number;
   input: Input;

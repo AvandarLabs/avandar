@@ -2,7 +2,6 @@ import { makeRegisteredLandmarksFromInputAndFrame } from "./makeRegisteredLandma
 import { RegistrationReferences } from "./RegistrationReferences";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Target rings are fixed physical references. Only coordinate copies register.

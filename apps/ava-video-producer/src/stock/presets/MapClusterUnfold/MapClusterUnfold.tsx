@@ -6,7 +6,6 @@ import { ClusterPoints } from "./ClusterPoints";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /**
  * The same supplied points contract into clusters and unfold without jitter.

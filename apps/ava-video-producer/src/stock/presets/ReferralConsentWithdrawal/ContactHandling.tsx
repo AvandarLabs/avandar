@@ -1,6 +1,5 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = {
   contactId: string;
   index: number;

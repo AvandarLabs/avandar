@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { ComplaintPlacement } from "./ComplaintPlacement";
 import type { Input } from "./GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** The participant operates and reports; the worker only replaces the part. */
 export function RemedyActions({

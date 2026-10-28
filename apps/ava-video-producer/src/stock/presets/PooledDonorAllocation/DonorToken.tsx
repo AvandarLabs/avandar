@@ -2,7 +2,6 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { STOCK } from "../../stockPalette";
 import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { ReactNode } from "react";
-
 type Props = {
   token: ReturnType<typeof getAllocationTokensFromInputAndFrame>[number];
   requestOrdinal: number;

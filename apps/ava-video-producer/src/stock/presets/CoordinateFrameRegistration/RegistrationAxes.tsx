@@ -1,6 +1,5 @@
 import { Text } from "../../graphics-common";
 import type { ReactNode } from "react";
-
 type Props = { x: number; index: number };
 /** Source circle and target diamond also key their coordinate-pair rows. */
 export function RegistrationAxes({ x, index }: Readonly<Props>): ReactNode {

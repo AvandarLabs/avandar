@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./TradeoffPivot.schema";
 import type { ReactNode } from "react";
-
 type Props = { points: Input["gains"]; x: number; color: string };
 /** Every authored point keeps the same fixed font and independent identity. */
 export function TradeoffPoints({

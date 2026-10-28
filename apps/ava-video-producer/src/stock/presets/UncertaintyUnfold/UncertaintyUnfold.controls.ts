@@ -1,5 +1,4 @@
 import type { StockControl } from "../../contracts/StockContract.types";
-
 function _copy({ path, message }: { path: string; message: string }) {
   return { id: `motionAtlas.uncertainty-unfold.controls.${path}`, message };
 }

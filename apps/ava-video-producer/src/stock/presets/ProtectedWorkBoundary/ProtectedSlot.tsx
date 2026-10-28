@@ -3,7 +3,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { ProtectedSlotBody } from "./ProtectedSlotBody";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   slot: Input["slots"][number];
   index: number;

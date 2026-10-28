@@ -2,7 +2,6 @@ import { useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { downloadFilm } from "../../../../showcase/download.js";
 import type { Props as PreviewProps } from "./PreviewDialogContent";
-
 type Options = Pick<
   PreviewProps,
   "preset" | "contentState" | "accent" | "background"

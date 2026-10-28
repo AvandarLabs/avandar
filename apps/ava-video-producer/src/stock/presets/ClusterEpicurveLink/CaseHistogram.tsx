@@ -3,7 +3,6 @@ import { HistogramLabels } from "./HistogramLabels";
 import { HistogramSegments } from "./HistogramSegments";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * The complete ordered histogram retains a distinct unknown-time compartment.

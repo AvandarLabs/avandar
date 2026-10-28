@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { UtilityModule } from "./UtilityModule";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** A single utility approaches and enters only the authored install socket. */
 export function UtilitySocket({

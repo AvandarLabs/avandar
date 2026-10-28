@@ -5,7 +5,6 @@ import type {
   StockContract,
   StockMetadata,
 } from "../../contracts/StockContract.types";
-
 export { CONTROLS as controls } from "./EqualCountUnequalVolume.controls";
 /** Public retrieval copy without private provenance. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);

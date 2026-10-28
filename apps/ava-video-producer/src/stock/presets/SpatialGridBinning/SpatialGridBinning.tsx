@@ -6,7 +6,6 @@ import { ZeroCountLegend } from "./ZeroCountLegend";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./SpatialGridBinning.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** Exact point-to-cell counting with a source identity legend. */
 export function SpatialGridBinning({

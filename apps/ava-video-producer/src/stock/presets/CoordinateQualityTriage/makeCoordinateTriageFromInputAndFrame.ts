@@ -1,6 +1,5 @@
 import { EASE, mix, ramp } from "../../../motion";
 import type { Input } from "./CoordinateQualityTriage.schema";
-
 type Reason = "plotted" | "missing" | "nonNumeric" | "range";
 /** Data for TriagedRow. */
 type TriagedRowResult = {

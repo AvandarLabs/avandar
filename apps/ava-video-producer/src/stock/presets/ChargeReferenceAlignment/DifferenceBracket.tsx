@@ -2,7 +2,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { getComparisonFromInput } from "./getComparisonFromInput";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   comparison: ReturnType<typeof getComparisonFromInput>;

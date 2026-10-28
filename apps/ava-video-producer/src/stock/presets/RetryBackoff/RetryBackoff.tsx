@@ -5,7 +5,6 @@ import { getBackoffStateFromInputAndFrame } from "./getBackoffStateFromInputAndF
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** One unchanged operation returns from retries across growing waiting gaps. */
 export function RetryBackoff({

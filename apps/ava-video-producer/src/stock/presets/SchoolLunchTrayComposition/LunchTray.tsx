@@ -4,7 +4,6 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { TrayCompartment } from "./TrayCompartment";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; index: number; frame: number; accent: string };
 /**
  * Learner identity stays attached to the same authored tray through serving.

@@ -4,7 +4,6 @@ import type {
   StockJsonSchema,
   StockSemanticRule,
 } from "../../contracts/StockContract.types";
-
 const positionSchema: z.ZodNumber = z.number().min(5).max(95);
 /** Literal source anchors, uncertainty threshold and explicit human choice. */
 export const inputSchema = z

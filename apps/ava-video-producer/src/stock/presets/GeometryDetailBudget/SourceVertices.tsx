@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * All source vertices stay fixed, including removed and backtracking vertices.

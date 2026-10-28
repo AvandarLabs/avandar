@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   tokens: ReturnType<typeof getAllocationTokensFromInputAndFrame>;

@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
-
 type Props = { kind: Input["expenses"][number]["object"]; color: string };
 const OBJECT_PATHS: Record<
   "book" | "ticket" | "clothing" | "meal" | "fee-slip",

@@ -5,7 +5,6 @@ import { ProjectDisplay } from "./ProjectDisplay";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./ResidentBudgetBallots.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** Anonymous papers become an identity-preserving preference tally. */
 export function ResidentBudgetBallots({

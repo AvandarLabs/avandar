@@ -3,7 +3,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Each keyed source identity remains listed through coincident grouping. */
 export function PointRoster({ input }: Readonly<Props>): ReactNode {

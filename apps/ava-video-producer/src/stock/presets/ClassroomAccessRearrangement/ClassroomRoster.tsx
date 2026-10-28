@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Classroom Roster for the authored scene. */
 export function ClassroomRoster({ input }: Readonly<Props>): ReactNode {

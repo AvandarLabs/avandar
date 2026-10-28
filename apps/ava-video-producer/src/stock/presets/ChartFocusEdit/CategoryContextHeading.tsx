@@ -2,7 +2,6 @@ import { EASE, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   category: Input["categories"][number];
   input: Input;

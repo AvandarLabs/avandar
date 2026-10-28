@@ -5,7 +5,6 @@ import { PracticeStrip } from "./PracticeStrip";
 import type { getRehearsalFromFrame } from "./getRehearsalFromFrame";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   scene: ReturnType<typeof getRehearsalFromFrame>;

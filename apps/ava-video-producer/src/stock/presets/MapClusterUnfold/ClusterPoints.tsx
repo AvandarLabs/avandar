@@ -5,7 +5,6 @@ import { getClusterPointPositionFromPoint } from "./getClusterPointPositionFromP
 import { LocationCounts } from "./LocationCounts";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; grouping: number; accent: string };
 /**
  * Every identity follows its own authored source and referenced cluster

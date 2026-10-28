@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import { SceneText } from "./SceneText";
 import type { ReactNode } from "react";
-
 type Props = {
   bookId: string;
   groupIndex: number;

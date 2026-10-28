@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   symbol: Input["plannedComponents"][number]["symbol"];
   color: string;

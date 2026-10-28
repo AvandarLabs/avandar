@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { interpolateFiniteRange } from "./interpolateFiniteRange";
-
 test("bounded interpolation keeps exact endpoints and finite convex values across extreme spans", () => {
   assert.equal(
     interpolateFiniteRange({ from: -1e308, to: 1e308, progress: 0.5 }),

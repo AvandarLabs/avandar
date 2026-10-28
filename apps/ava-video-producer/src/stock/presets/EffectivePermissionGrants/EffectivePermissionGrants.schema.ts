@@ -4,7 +4,6 @@ import type {
   StockJsonSchema,
   StockSemanticRule,
 } from "../../contracts/StockContract.types";
-
 const grantSchema = z.strictObject({
   id: z.string().min(1).max(12),
   label: z.string().min(1).max(20),

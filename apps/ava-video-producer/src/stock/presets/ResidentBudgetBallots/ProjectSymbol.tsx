@@ -1,6 +1,5 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { symbol: "bench" | "books" | "garden"; x: number; y: number };
 /** Concrete project symbols preserve the authored choice identity. */
 export function ProjectSymbol({ symbol, x, y }: Readonly<Props>): ReactNode {

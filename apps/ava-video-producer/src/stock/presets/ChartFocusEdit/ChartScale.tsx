@@ -1,7 +1,6 @@
 import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { axisMaximum: number; refinement: number };
 /** Grid refinement retains a common zero baseline and both scale endpoints. */
 export function ChartScale({

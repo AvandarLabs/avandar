@@ -3,7 +3,6 @@ import { ConversationPerson } from "./ConversationPerson";
 import { WaitingSpace } from "./WaitingSpace";
 import type { Input } from "./PrivateCaseConversation.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** Inset visibility changes neither the meeting roles nor the walking path. */
 export function ConversationPeople({

@@ -3,7 +3,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { DrillSubgroupCompartments } from "./DrillSubgroupCompartments";
 import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   progress: number;

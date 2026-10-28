@@ -16,7 +16,6 @@ import {
 } from "./PersonLedSupportCalendar.fixtures";
 import { inputSchema, type Input } from "./PersonLedSupportCalendar.schema";
 import { PlannerVisibilityAssertions } from "./PlannerVisibilityAssertions";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

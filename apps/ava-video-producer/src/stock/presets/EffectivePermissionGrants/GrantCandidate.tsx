@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { ROLE_RANK } from "./getEffectiveRoleFromInput";
 import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; index: number; frame: number; accent: string };
 /** Each candidate climbs to its own rank before its eligibility gate closes. */
 export function GrantCandidate({

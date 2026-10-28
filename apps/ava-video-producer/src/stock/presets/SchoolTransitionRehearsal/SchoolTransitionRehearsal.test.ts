@@ -13,7 +13,6 @@ import {
   invalidInputs,
 } from "./SchoolTransitionRehearsal.fixtures";
 import { inputSchema, type Input } from "./SchoolTransitionRehearsal.schema";
-
 function _render({
   frame,
   input = defaultInput,
@@ -83,7 +82,6 @@ test("learner opens the locker before approaching the classroom with chosen supp
 
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { schoolTransitionRehearsalContract as contract } from "./SchoolTransitionRehearsal.contract";
-
 function _visible({
   input,
   frame,

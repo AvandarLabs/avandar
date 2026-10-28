@@ -9,7 +9,6 @@ import {
   fixtures,
   invalidInputs,
 } from "./SealedHandoff.fixtures";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -81,7 +80,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { sealedHandoffContract } from "./SealedHandoff.contract";
 import { inputSchema } from "./SealedHandoff.schema";
-
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,

@@ -4,7 +4,6 @@ import { LayerDefinitions } from "./LayerDefinitions";
 import { MapSheets } from "./MapSheets";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 function _buildPath(polygon: ReadonlyArray<readonly [number, number]>): string {
   return `${polygon

@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /** Authored operator cue precedes the supplied placement. */
 export function ComputeHeader({ input, frame }: Readonly<Props>): ReactNode {

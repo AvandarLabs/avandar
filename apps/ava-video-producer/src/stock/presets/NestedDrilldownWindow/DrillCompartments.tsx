@@ -4,7 +4,6 @@ import { DrillParentCompartment } from "./DrillParentCompartment";
 import { DrillSelectionWindow } from "./DrillSelectionWindow";
 import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** Parent group frames recede into a labeled context strip as details open. */
 export function DrillCompartments({

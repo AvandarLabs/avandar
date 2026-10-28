@@ -17,7 +17,6 @@ import {
 } from "./ClassroomAccessRearrangement.fixtures";
 import { inputSchema, type Input } from "./ClassroomAccessRearrangement.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input,

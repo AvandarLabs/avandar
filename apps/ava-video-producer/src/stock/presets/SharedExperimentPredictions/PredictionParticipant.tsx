@@ -6,7 +6,6 @@ import { PredictionFlag } from "./PredictionFlag";
 import { PredictionLabels } from "./PredictionLabels";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; index: number; frame: number; accent: string };
 /**
  * Each participant carries a keyed flag to an authored position in its own

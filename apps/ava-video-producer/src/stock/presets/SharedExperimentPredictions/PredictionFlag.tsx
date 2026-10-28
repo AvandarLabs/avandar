@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   learner: Input["learners"][number];
   frame: number;

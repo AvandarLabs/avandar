@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { TrackLabels } from "./TrackLabels";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * A single released ball stops at the supplied observation after all flags

@@ -1,6 +1,5 @@
 import { EASE, mix, ramp } from "../../../motion";
 import type { Input } from "./WideTableToObservations.schema";
-
 type Params = {
   input: Input;
   frame: number;

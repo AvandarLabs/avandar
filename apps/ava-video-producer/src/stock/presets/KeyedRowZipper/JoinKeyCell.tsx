@@ -1,7 +1,6 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import type { ReactNode } from "react";
-
 type Props = {
   value: string;
   x: number;

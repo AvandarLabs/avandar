@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { getBufferTransferPointFromLocation } from "./getBufferTransferPointFromLocation";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   location: Input["locations"][number];

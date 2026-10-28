@@ -1,7 +1,6 @@
 import { FoodSymbol } from "./FoodSymbol";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   component: Input["plannedComponents"][number];
   frame: number;

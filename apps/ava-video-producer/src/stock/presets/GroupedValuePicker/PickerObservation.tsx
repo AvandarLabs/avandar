@@ -5,7 +5,6 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; index: number; frame: number; accent: string };
 const GRAPHEMES: Intl.Segmenter = new Intl.Segmenter("und", {
   granularity: "grapheme",

@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { HandoverUnit } from "./HandoverUnit";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; index: number; frame: number; accent: string };
 /** One offered-good row preserves its full units and optional quantity list. */
 export function HandoverGoodsRow({

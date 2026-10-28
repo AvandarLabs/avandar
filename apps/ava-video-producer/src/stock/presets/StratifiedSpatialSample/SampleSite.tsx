@@ -5,7 +5,6 @@ import { SiteAnchor } from "./SiteAnchor";
 import { SiteKey } from "./SiteKey";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   site: Input["sites"][number];
   index: number;

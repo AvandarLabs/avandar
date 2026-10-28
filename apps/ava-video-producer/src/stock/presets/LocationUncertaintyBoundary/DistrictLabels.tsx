@@ -3,7 +3,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; focus: { possible: number[] } };
 /** Possible districts lift beside the focused uncertainty footprint. */
 export function DistrictLabels({

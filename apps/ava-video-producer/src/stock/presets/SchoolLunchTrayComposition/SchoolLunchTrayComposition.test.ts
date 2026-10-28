@@ -18,7 +18,6 @@ import {
 } from "./SchoolLunchTrayComposition.fixtures";
 import { inputSchema, type Input } from "./SchoolLunchTrayComposition.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input,

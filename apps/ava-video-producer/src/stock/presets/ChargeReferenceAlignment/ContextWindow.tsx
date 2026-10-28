@@ -5,7 +5,6 @@ import { SourceContextCell } from "./SourceContextCell";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { CONTEXT_FIELDS } from "./CONTEXT_FIELDS.constants";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   field: (typeof CONTEXT_FIELDS)[number][0];

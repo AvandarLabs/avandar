@@ -6,7 +6,6 @@ import { NetworkRoads } from "./NetworkRoads";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** Weighted schematic network reachability, independent of visual distance. */
 export function TravelTimeNetworkFrontier({

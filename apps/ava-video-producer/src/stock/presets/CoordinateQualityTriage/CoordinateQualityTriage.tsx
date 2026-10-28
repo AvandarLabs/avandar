@@ -5,7 +5,6 @@ import { TriageTokens } from "./TriageTokens";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./CoordinateQualityTriage.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** Numeric and range triage retains the complete input denominator. */
 export function CoordinateQualityTriage({

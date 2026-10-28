@@ -11,7 +11,6 @@ import {
   invalidInputs,
 } from "./ContactWindowOverlap.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -35,7 +34,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { contactWindowOverlapContract } from "./ContactWindowOverlap.contract";
 import { inputSchema, type Input } from "./ContactWindowOverlap.schema";
-
 const textLayoutOptions = {
   inputSchema,
   fixtures,

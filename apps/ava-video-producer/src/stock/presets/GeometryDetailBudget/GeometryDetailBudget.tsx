@@ -6,7 +6,6 @@ import { TraceLegend } from "./TraceLegend";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /**
  * Recursive detail reduction preserves source vertices and finite deviations.

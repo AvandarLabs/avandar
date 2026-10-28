@@ -6,7 +6,6 @@ import { PriorityQueueItem } from "./PriorityQueueItem";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./PriorityInsertion.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** Open exactly one queue slot and insert authored work from a side spur. */
 export function PriorityInsertion({

@@ -6,7 +6,6 @@ import { ObservationFrame } from "./ObservationFrame";
 import { roleMessages } from "./ProseMeasurementLedger.controls";
 import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string; index: number };
 /** Exact selected text travels through a clear rail into one role slot. */
 export function ObservationSlot({

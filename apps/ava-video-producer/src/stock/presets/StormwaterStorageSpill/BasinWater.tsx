@@ -5,7 +5,6 @@ import { WaterOutlets } from "./WaterOutlets";
 import { WaterSpill } from "./WaterSpill";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** The finite basin retains every physical water destination. */
 export function BasinWater({

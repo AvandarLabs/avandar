@@ -3,7 +3,6 @@ import { ramp } from "../../../motion";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; index: number; frame: number };
 /** Capacity and idle-state captions stay outside all work paths. */
 export function HostLabels({

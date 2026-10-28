@@ -4,7 +4,6 @@ import { CatchmentFootprints } from "./CatchmentFootprints";
 import { CatchmentNames } from "./CatchmentNames";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; progress: number; accent: string; id: string };
 /**
  * Opaque union masks remove duplicate shading and retain only the outer edge.

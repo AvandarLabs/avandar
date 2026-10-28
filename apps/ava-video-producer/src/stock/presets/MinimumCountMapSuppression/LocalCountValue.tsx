@@ -1,6 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { ReactNode } from "react";
-
 type Props = { count: number; x: number; y: number };
 /**
  * Analytical numerical copy stays readable independently of public suppression.

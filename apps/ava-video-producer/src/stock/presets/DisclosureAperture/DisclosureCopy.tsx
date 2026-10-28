@@ -2,7 +2,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /**
  * Source, destination and explicit policy legends retain their authored

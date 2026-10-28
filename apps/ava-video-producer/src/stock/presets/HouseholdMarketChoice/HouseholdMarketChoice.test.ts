@@ -12,7 +12,6 @@ import {
   invalidInputs,
 } from "./HouseholdMarketChoice.fixtures";
 import { inputSchema, type Input } from "./HouseholdMarketChoice.schema";
-
 function _render({
   frame,
   input,
@@ -36,7 +35,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { householdMarketChoiceContract } from "./HouseholdMarketChoice.contract";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     input.scenarioCaption,
@@ -204,7 +202,6 @@ test("shopper reaches only for chosen products, carries them by hand and release
 });
 
 import { registerMarketActionAssertions } from "./registerMarketActionAssertions";
-
 registerMarketActionAssertions(_render);
 
 test("the shopper holds the authored tender in the free hand while choosing products", () => {

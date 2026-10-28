@@ -5,7 +5,6 @@ import { ByteIntervalRails } from "./ByteIntervalRails";
 import type { TransferChunk } from "./getByteTransferFromFrame";
 import type { Input } from "./ResumableByteTransfer.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   chunk: TransferChunk;
   input: Input;

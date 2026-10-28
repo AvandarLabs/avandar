@@ -3,7 +3,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { getSnapshotCellFromFrame } from "./getSnapshotCellFromFrame";
 import type { ReactNode } from "react";
-
 type Props = {
   scene: ReturnType<typeof getSnapshotCellFromFrame>;
   frame: number;

@@ -18,7 +18,6 @@ import {
   invalidInputs,
 } from "./BoundedLocationDisplacement.fixtures";
 import { inputSchema, type Input } from "./BoundedLocationDisplacement.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

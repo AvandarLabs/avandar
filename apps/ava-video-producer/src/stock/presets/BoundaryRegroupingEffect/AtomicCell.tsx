@@ -2,7 +2,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./BoundaryRegroupingEffect.schema";
 import type { ReactNode } from "react";
-
 type Props = { cell: Input["cells"][number]; showValues: boolean };
 /** Immutable atomic cells retain their original positions and quantities. */
 export function AtomicCell({ cell, showValues }: Readonly<Props>): ReactNode {

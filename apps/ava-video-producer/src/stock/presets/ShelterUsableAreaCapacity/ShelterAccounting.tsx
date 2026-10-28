@@ -5,7 +5,6 @@ import { ShelterRoleLegend } from "./ShelterRoleLegend";
 import { UsableMeasures } from "./UsableMeasures";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /** Role areas remain visible while usable measures and capacity resolve. */
 export function ShelterAccounting({

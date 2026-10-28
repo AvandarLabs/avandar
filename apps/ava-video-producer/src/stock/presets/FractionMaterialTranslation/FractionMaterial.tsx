@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { FractionUnit } from "./FractionUnit";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   representation: Input["representations"][number];
   fraction: Input["fraction"];

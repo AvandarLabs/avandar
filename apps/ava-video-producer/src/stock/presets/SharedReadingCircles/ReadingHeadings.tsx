@@ -1,7 +1,6 @@
 import { SceneText } from "./SceneText";
 import type { Input } from "./SharedReadingCircles.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Draws the scene's ReadingHeadings group with fixed authored geometry. */
 export function ReadingHeadings({ input }: Readonly<Props>): ReactNode {

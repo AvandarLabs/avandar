@@ -3,7 +3,6 @@ import type {
   StockControl,
   StockJsonSchema,
 } from "../../src/stock/contracts/StockContract.types";
-
 type Context = {
   root: StockJsonSchema[];
   current: StockJsonSchema[];

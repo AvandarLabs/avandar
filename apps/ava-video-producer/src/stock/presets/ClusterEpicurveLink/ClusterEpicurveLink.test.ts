@@ -22,7 +22,6 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { clusterEpicurveLinkContract } from "./ClusterEpicurveLink.contract";
 import { inputSchema, type Input } from "./ClusterEpicurveLink.schema";
-
 function _render({
   frame,
   input = defaultInput,

@@ -10,7 +10,6 @@ import {
 } from "./PdfNearestLabelReview.controls";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /**
  * Uncertainty remains explicit independently of optional numeric annotations.

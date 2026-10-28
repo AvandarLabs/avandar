@@ -1,6 +1,5 @@
 import { EASE, mix, ramp } from "../../../motion";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
-
 type Point = { x: number; y: number };
 type Hand = Point & { action?: "reservation" | "loss" | "furrow" | "sowing" };
 type Travel = {

@@ -2,7 +2,6 @@ import { useLingui } from "@lingui/react/macro";
 import { DEFAULT_ACCENT, DEFAULT_BACKGROUND } from "../palette";
 import { getReferenceUrlFromPreset } from "./getReferenceUrlFromPreset";
 import type { Preset } from "./Preset.types";
-
 type ReferenceOptions = {
   preset: Preset;
   accent?: string;

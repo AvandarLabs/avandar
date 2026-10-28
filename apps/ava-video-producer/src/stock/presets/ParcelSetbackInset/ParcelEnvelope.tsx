@@ -4,7 +4,6 @@ import { ParcelDimensions } from "./ParcelDimensions";
 import { ParcelShapes } from "./ParcelShapes";
 import type { Input } from "./ParcelSetbackInset.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   parcel: Input["parcels"][number];
   index: number;

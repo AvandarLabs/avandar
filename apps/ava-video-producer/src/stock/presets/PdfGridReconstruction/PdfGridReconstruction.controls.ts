@@ -2,7 +2,6 @@ import { z } from "zod";
 import { makeStockControlsFromSchema } from "../../contracts/makeStockControlsFromSchema/makeStockControlsFromSchema";
 import { inputSchema } from "./PdfGridReconstruction.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
-
 const NAMESPACE = "motionAtlas.pdf-grid-reconstruction" as const;
 /** The selected whitespace signal always retains its inference qualifier. */
 export const inferredLayoutMessage: { id: string; message: string } = {

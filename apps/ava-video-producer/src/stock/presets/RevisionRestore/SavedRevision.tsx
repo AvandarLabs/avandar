@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { SavedRevisionLines } from "./SavedRevisionLines";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   revision: Input["revisions"][number];
   index: number;

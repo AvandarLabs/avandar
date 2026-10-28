@@ -2,7 +2,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
-
 type Props = { labels: Input["labels"]; accent: string };
 /** Paired line samples identify the two styles overlaid in the source plane. */
 export function TraceLegend({ labels, accent }: Readonly<Props>): ReactNode {

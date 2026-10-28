@@ -4,7 +4,6 @@ import { DisclosureFieldText } from "./DisclosureFieldText";
 import { DisclosurePolicyMark } from "./DisclosurePolicyMark";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   field: Input["fields"][number];
   index: number;

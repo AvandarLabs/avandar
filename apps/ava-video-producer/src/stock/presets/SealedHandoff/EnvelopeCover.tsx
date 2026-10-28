@@ -1,6 +1,5 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { opening: number };
 /**
  * The opaque cover shares the brief's coordinate system and sits above its

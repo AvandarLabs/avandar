@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Persistent fictional qualifier and common material unit. */
 export function AliquotCaption({ input }: Readonly<Props>): ReactNode {

@@ -5,7 +5,6 @@ import { TypeReviewBracket } from "./TypeReviewBracket";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** Type decisions retain every source string and never imply numeric safety. */
 export function LateTypeEvidence({

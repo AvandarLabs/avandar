@@ -17,7 +17,6 @@ import {
 } from "./SpecimenAliquotBalance.fixtures";
 import { inputSchema, type Input } from "./SpecimenAliquotBalance.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input,

@@ -1,7 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./SchemaPlanLocalExecution.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /**
  * Authored boundary and phase copy preserves the actual planning distinction.

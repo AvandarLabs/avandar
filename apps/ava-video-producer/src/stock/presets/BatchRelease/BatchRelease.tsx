@@ -4,7 +4,6 @@ import { BatchHeadings } from "./BatchHeadings";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /** Separate arrivals become intact batches that cross one dispatch boundary. */
 export function BatchRelease({

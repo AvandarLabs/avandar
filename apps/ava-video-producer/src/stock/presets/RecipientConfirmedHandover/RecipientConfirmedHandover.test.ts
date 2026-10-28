@@ -13,7 +13,6 @@ import {
   invalidInputs,
 } from "./RecipientConfirmedHandover.fixtures";
 import { inputSchema, type Input } from "./RecipientConfirmedHandover.schema";
-
 function _render({
   frame,
   input,
@@ -38,7 +37,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { recipientConfirmedHandoverContract } from "./RecipientConfirmedHandover.contract";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     input.scenarioCaption,
@@ -251,5 +249,4 @@ test("recipient hand releases continuously before reaching for another selected 
 });
 
 import { registerRecipientActionAssertions } from "./registerRecipientActionAssertions";
-
 registerRecipientActionAssertions(_render);

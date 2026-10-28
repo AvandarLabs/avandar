@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** One fixed axis owns all record and investigation-window bounds. */
 export function PresenceAxis({ input }: Readonly<Props>): ReactNode {

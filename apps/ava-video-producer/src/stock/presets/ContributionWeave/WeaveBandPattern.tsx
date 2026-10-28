@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ContributionWeave.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   id: string;
   color: string;

@@ -3,7 +3,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { WeaveCrossing } from "./WeaveCrossing";
 import type { Input } from "./ContributionWeave.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   contributor: Input["weft"][number];
   index: number;

@@ -6,7 +6,6 @@ import { ClassroomDesks } from "./ClassroomDesks";
 import { ClassroomTable } from "./ClassroomTable";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * Furniture clears the approach before learners enter, with selected changes

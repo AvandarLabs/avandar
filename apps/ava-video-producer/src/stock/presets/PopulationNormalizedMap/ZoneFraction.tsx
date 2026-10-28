@@ -5,7 +5,6 @@ import { STOCK } from "../../stockPalette";
 import { getPopulationRateFromCounts } from "./getPopulationRateFromCounts";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   zone: Input["zones"][number];
   index: number;

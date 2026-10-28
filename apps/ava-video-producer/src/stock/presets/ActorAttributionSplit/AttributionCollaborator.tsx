@@ -3,7 +3,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ActorAttributionSplit.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   person: Input["collaborators"][number];
   index: number;

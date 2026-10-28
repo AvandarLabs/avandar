@@ -1,6 +1,5 @@
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { x: number; width: number };
 /** Exact byte-width sender and receiver rails remain after each transfer. */
 export function ByteIntervalRails({ x, width }: Readonly<Props>): ReactNode {

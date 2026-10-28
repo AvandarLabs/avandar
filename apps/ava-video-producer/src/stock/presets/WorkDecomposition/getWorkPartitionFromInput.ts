@@ -1,5 +1,4 @@
 import type { Input } from "./WorkDecomposition.schema";
-
 type Piece = {
   id: string;
   label: string;

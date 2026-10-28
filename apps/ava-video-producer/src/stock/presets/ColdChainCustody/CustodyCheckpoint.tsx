@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { CustodyFacts } from "./CustodyFacts";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   checkpoint: Input["crates"][number]["checkpoints"][number];
   stopIndex: number;

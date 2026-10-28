@@ -1,7 +1,6 @@
 import { EASE, mix, ramp } from "../../../motion";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** One shared latch closes before both commit stamps appear. */
 export function OutboxCommitMarks({

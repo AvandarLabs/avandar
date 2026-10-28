@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { getSpineContributionFromFrame } from "./getSpineContributionFromFrame";
 import type { Input } from "./EntitySpineAssembly.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   observation: Input["observations"][number];

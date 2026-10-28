@@ -4,7 +4,6 @@ import { getAllocationHandlingFromTokens } from "./getAllocationHandlingFromToke
 import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

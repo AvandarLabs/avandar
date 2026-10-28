@@ -1,7 +1,6 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { groups: string[]; progress: number };
 /** Exact second-dimension values label the temporary subgroup compartments. */
 export function DrillSubgroupCompartments({

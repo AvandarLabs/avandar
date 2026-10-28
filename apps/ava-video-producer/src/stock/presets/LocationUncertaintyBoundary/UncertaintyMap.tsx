@@ -5,7 +5,6 @@ import { getAssignmentsFromLocations } from "./getAssignmentsFromLocations";
 import { UncertainLocation } from "./UncertainLocation";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Nominal locations stay fixed while their complete supplied disks expand. */
 export function UncertaintyMap({

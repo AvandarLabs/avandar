@@ -16,7 +16,6 @@ import {
   fixtures,
 } from "../WorkspaceCapacityExtension.fixtures";
 import { inputSchema, type Input } from "../WorkspaceCapacityExtension.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -61,7 +60,6 @@ import { registerStockPresetAssertions } from "../../../../../tests/helpers/regi
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
 import { workspaceCapacityExtensionContract } from "../WorkspaceCapacityExtension.contract";
-
 function _getVisibleTexts({
   input,
   frame,
@@ -178,7 +176,6 @@ test("existing tabs remain at identical positions and only complete expansion se
 });
 
 import { getTextEnvelopesFromMarkup } from "../../SchemaColumnEvolution/getTextEnvelopesFromMarkup";
-
 test("full resource names remain inside moving tabs and clear framing captions", () => {
   const input = {
     ...DENSE_INPUT,

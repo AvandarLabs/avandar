@@ -2,7 +2,6 @@ import { ramp, EASE } from "../../../motion";
 import { WATER_DESTINATIONS } from "./waterDestinationKeys";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /** Infiltration and controlled discharge occupy separate physical outlets. */
 export function WaterOutlets({ input, frame }: Readonly<Props>): ReactNode {

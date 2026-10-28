@@ -4,7 +4,6 @@ import { HouseholdBadge } from "./HouseholdBadge";
 import { HouseholdCaption } from "./HouseholdCaption";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   household: Input["households"][number];
   index: number;

@@ -13,7 +13,6 @@ import {
 } from "./CellNormalization.fixtures";
 import { inputSchema, type Input } from "./CellNormalization.schema";
 import { CleanupRow } from "./CleanupRow";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

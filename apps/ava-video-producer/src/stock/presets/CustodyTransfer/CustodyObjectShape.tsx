@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CustodyTransfer.schema";
 import type { ReactNode } from "react";
-
 type Props = { shape: Input["objectShape"]; accent: string };
 const FOLIO: Record<"x" | "y" | "width" | "height" | "rx", number> = {
   x: 452,

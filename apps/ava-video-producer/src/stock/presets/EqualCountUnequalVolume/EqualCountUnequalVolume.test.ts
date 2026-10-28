@@ -16,7 +16,6 @@ import {
 } from "./EqualCountUnequalVolume.fixtures";
 import { inputSchema, type Input } from "./EqualCountUnequalVolume.schema";
 import { invalidInputs } from "./rejectedInputs/rejectedInputs.constants";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -60,7 +59,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { equalCountUnequalVolumeContract } from "./EqualCountUnequalVolume.contract";
-
 function _getVisibleTexts({
   input,
   frame,
@@ -176,7 +174,6 @@ test("count-guide and item-size toggles do not alter byte geometry or totals", (
 });
 
 import { getTextEnvelopesFromMarkup } from "../SchemaColumnEvolution/getTextEnvelopesFromMarkup";
-
 test("first collection total clears the second shelf label and strips clear item copy", () => {
   const input = {
     ...DENSE_INPUT,

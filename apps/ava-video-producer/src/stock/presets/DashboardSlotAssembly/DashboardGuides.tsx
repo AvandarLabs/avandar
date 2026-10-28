@@ -1,7 +1,6 @@
 import { ramp } from "../../../motion";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ReactNode } from "react";
-
 type Props = { layout: Input["layout"]; frame: number; accent: string };
 /** Alignment extends from the featured slot, then withdraws after docking. */
 export function DashboardGuides({

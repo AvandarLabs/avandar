@@ -3,7 +3,6 @@ import { Text } from "../../graphics-common";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /** Captions and aggregate quantities retain the eligible sampling frame. */
 export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {

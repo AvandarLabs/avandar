@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { VisitMark } from "./VisitMark";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   participant: Input["participants"][number];

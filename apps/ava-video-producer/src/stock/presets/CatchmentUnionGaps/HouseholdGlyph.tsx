@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import { GapEmphasis } from "./GapEmphasis";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   householdId: string;
   index: number;

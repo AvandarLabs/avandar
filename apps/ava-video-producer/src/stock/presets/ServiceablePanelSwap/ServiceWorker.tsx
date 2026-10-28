@@ -1,7 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { hand: { x: number; y: number } };
 /**
  * Worker geometry maintains contact with the active latch or carried module.

@@ -14,7 +14,6 @@ import {
   changedInput,
 } from "./ShelterUsableAreaCapacity.fixtures";
 import { inputSchema, type Input } from "./ShelterUsableAreaCapacity.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

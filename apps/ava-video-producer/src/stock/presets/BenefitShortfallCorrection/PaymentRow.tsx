@@ -2,7 +2,6 @@ import { PaymentTray } from "./PaymentTray";
 import { PaymentUnit } from "./PaymentUnit";
 import type { Input } from "./BenefitShortfallCorrection.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   payment: Input["payments"][number];
   frame: number;

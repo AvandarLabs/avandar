@@ -1,7 +1,6 @@
 import { getReconstructionColumnXsFromFrame } from "./getReconstructionColumnXsFromFrame";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Source row guides bridge the retained page and its emerging table. */
 export function GridSourceLinks({

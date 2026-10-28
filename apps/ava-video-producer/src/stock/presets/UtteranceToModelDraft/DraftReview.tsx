@@ -2,7 +2,6 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** Review copy and acceptance reflect only the supplied human decision. */
 export function DraftReview({

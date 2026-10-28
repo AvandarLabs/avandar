@@ -1,7 +1,6 @@
 import { CustodyFactMark } from "./CustodyFactMark";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   checkpoint: Input["crates"][number]["checkpoints"][number];
   accent: string;

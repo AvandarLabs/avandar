@@ -4,7 +4,6 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ReferralReturnAcknowledgement.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   referral: Input["referrals"][number];
   index: number;

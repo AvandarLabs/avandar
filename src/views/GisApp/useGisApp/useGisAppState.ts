@@ -16,7 +16,6 @@ import type { LayerInspectorView } from "@/views/GisApp/panels/LayerInspector/La
 import type { AnnotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { Dispatch, SetStateAction } from "react";
-
 type UseGisAppCanvasOptions = {
   callbacks: ReturnType<typeof useGisAppMapCallbacks>;
   chrome: ReturnType<typeof useGisAppChrome>;

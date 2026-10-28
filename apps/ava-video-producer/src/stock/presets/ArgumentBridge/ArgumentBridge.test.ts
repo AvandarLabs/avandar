@@ -13,7 +13,6 @@ import {
 } from "./ArgumentBridge.fixtures";
 import { inputSchema } from "./ArgumentBridge.schema";
 import type { Input } from "./ArgumentBridge.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

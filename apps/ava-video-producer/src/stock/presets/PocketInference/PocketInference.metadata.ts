@@ -6,7 +6,6 @@ import type {
   StockMetadata,
   StockMessageDescriptor,
 } from "../../contracts/StockContract.types";
-
 export { CONTROLS } from "./PocketInference.controls";
 
 function _message({

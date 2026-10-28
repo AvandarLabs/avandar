@@ -3,7 +3,6 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { PendingDeliveryTicket } from "./PendingDeliveryTicket";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Both durable halves share one atomic frame boundary and correlation ID. */
 export function OutboxDurableState({

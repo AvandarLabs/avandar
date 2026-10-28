@@ -6,7 +6,6 @@ import { PickerModeGroups } from "./PickerModeGroups";
 import { PickerValueCopy } from "./PickerValueCopy";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Retained source values travel into explicit stacks or a numeric fold. */
 export function PickerCalculation({

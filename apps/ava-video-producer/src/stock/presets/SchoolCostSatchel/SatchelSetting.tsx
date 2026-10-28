@@ -3,7 +3,6 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";
 import { SatchelBag } from "./SatchelBag";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; accent: string };
 /** Draws the scene's SatchelSetting group with fixed authored geometry. */
 export function SatchelSetting({ frame, accent }: Readonly<Props>): ReactNode {

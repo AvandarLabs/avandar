@@ -3,7 +3,6 @@ import { PremiseStrip } from "./PremiseStrip";
 import { PremiseSupport } from "./PremiseSupport";
 import type { Input } from "./ArgumentBridge.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   frame: number;
   accent: string;

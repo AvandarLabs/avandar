@@ -13,7 +13,6 @@ import {
 } from "./OrderedLockAcquisition.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import type { Input } from "./OrderedLockAcquisition.schema";
-
 function _render({
   frame,
   input,
@@ -100,7 +99,6 @@ import { registerStockLocalizationAssertions } from "../../../../tests/helpers/r
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { orderedLockAcquisitionContract } from "./OrderedLockAcquisition.contract";
 import { inputSchema } from "./OrderedLockAcquisition.schema";
-
 function _getVisibleTexts({
   input,
   frame,

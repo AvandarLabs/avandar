@@ -6,7 +6,6 @@ import { RevisionHistory } from "./RevisionHistory";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 /**
  * A selected saved revision replaces current text while history stays intact.

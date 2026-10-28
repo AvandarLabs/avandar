@@ -4,7 +4,6 @@ import { getRecordPlacementsFromInputAndFrame } from "./getRecordPlacementsFromI
 import { ReceiptToken } from "./ReceiptToken";
 import type { Input } from "./SurveillanceReportingBackfill.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Event-date bars grow only as their own receipts arrive. */
 export function BackfillChart({

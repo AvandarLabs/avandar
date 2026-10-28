@@ -15,7 +15,6 @@ import {
   invalidInputs,
 } from "./ChoroplethClassBreaks.fixtures";
 import { inputSchema, type Input } from "./ChoroplethClassBreaks.schema";
-
 const render = ({
   frame,
   input = DEFAULT_INPUT,

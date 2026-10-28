@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import type { getTravelCostsFromInput } from "./getTravelCostsFromInput";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   node: ReturnType<typeof getTravelCostsFromInput>[number];
   index: number;

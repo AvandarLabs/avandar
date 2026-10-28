@@ -4,7 +4,6 @@ import { CustodyLegendEntry } from "./CustodyLegendEntry";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Monitoring, receipt and seal counts remain separately interpretable. */
 export function CustodyLegend({

@@ -18,7 +18,6 @@ import {
   INVALID_INPUTS,
 } from "./CoordinateFrameRegistration.fixtures";
 import { inputSchema, type Input } from "./CoordinateFrameRegistration.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; accent: string; rowRight: number };
 /**
  * An unresolved bracket retains both candidates, or one human choice is keyed.

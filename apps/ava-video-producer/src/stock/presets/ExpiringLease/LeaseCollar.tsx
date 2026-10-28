@@ -1,6 +1,5 @@
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

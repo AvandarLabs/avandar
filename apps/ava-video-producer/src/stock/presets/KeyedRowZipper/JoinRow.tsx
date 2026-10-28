@@ -7,7 +7,6 @@ import { JoinKeyCell } from "./JoinKeyCell";
 import { JoinMissingPartner } from "./JoinMissingPartner";
 import type { Input } from "./KeyedRowZipper.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

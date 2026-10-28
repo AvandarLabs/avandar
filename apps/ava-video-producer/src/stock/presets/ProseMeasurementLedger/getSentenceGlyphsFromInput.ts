@@ -1,7 +1,6 @@
 import { prop } from "@avandar/utils";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import type { Input } from "./ProseMeasurementLedger.schema";
-
 const graphemes: Intl.Segmenter = new Intl.Segmenter("und", {
   granularity: "grapheme",
 });

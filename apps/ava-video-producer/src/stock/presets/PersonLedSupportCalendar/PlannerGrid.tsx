@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { PlannerColumns } from "./PlannerColumns";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Fixed tabletop grid keeps all authored commitments in discrete cells. */
 export function PlannerGrid({ input }: Readonly<Props>): ReactNode {

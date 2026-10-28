@@ -6,7 +6,6 @@ import { ReconnectOutcomeMark } from "./ReconnectOutcomeMark";
 import { ReturningPerson } from "./ReturningPerson";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   item: Input["cases"][number];
   index: number;

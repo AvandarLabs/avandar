@@ -11,7 +11,6 @@ import {
   invalidInputs,
 } from "./DoseCohortReturnPaths.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -41,7 +40,6 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { doseCohortReturnPathsContract } from "./DoseCohortReturnPaths.contract";
 import { inputSchema, type Input } from "./DoseCohortReturnPaths.schema";
-
 const textLayoutOptions = {
   inputSchema,
   fixtures,

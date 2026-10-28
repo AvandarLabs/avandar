@@ -5,7 +5,6 @@ import { getPlannerHandsFromInputAndFrame } from "./getPlannerHandsFromInputAndF
 import { PlannerHands } from "./PlannerHands";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Two actors perform the proposal, participant-led move and agreement. */
 export function PlannerPeople({

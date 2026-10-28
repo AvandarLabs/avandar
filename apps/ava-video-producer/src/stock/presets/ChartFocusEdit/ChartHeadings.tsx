@@ -3,7 +3,6 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode, ComponentProps } from "react";
-
 type HeadingSlot = Omit<ComponentProps<typeof FitText>, "x" | "width"> & {
   opacity: number;
 };

@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-
 type Props = {
   identity: string;
   first: string;

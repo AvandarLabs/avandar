@@ -6,7 +6,6 @@ import { ExpertiseParticipants } from "./ExpertiseParticipants";
 import { ExpertiseWorktable } from "./ExpertiseWorktable";
 import type { Input } from "./ExpertiseRoleExchange.schema";
 import type { ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 
 /**

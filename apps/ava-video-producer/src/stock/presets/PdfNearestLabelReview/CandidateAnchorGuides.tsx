@@ -2,7 +2,6 @@ import { EASE, mix, ramp } from "../../../motion";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; index: number; frame: number };
 /** Uniform page units retain the original Euclidean distance anchors. */
 export function CandidateAnchorGuides({

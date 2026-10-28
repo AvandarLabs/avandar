@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Track Labels for the authored scene. */
 export function TrackLabels({ input }: Readonly<Props>): ReactNode {

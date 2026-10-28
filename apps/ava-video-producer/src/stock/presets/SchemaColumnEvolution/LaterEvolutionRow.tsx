@@ -2,7 +2,6 @@ import { EASE, mix, ramp } from "../../../motion";
 import { EvolutionRow } from "./EvolutionRow";
 import type { Input } from "./SchemaColumnEvolution.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

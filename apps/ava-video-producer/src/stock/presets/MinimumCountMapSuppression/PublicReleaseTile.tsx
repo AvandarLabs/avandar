@@ -4,7 +4,6 @@ import { PublicCellSymbol } from "./PublicCellSymbol";
 import type { makePublicCellsFromInput } from "./makePublicCellsFromInput";
 import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   cell: ReturnType<typeof makePublicCellsFromInput>[number];
   labels: Input["labels"];

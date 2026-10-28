@@ -2,7 +2,6 @@ import { EASE, ramp } from "../../../motion";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * The main lane is original at setup and prepared once replacement resolves.

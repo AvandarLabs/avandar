@@ -5,7 +5,6 @@ import type {
   StockContract,
   StockMetadata,
 } from "../../contracts/StockContract.types";
-
 export { CONTROLS as controls } from "./PipelineStepSplice.controls";
 /** Public retrieval descriptors preserve accepted intent and limitations. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);

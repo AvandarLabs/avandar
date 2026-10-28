@@ -4,7 +4,6 @@ import { BatchMembers } from "./BatchMembers";
 import { BatchReleaseCaption } from "./BatchReleaseCaption";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   batch: Input["batches"][number];
   index: number;

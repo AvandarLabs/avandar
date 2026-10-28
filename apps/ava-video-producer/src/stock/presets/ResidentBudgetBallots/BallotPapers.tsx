@@ -2,7 +2,6 @@ import { BallotResident } from "./BallotResident";
 import { getBallotGeometryFromInputAndFrame } from "./getBallotGeometryFromInputAndFrame";
 import type { Input } from "./ResidentBudgetBallots.schema";
 import type { ReactNode } from "react";
-
 type Props = { frame: number; input: Input; accent: string };
 /** Exactly one paper and neutral resident are derived from each ballot. */
 export function BallotPapers({

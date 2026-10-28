@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { CaseKey } from "./CaseKey";
 import type { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { ReactNode } from "react";
-
 type Props = {
   position: ReturnType<typeof getCasePositionsFromInput>[number];
   frame: number;

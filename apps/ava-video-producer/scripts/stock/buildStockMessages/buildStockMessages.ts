@@ -6,7 +6,6 @@ import { compileMessage } from "@lingui/message-utils/compileMessage";
 import { build } from "esbuild";
 import { requireLicense } from "../../require-license.mjs";
 import { yamlPlugin } from "../../yaml/yamlPlugin/yamlPlugin";
-
 function _compileLiteral(message: string): string[] {
   const compiled = compileMessage(
     message.replace(/'/g, "''").replace(/[{}]/g, (brace) => `'${brace}'`),

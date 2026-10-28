@@ -127,7 +127,6 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { SvgPaintAssertions } from "../../../../tests/helpers/SvgPaintAssertions/SvgPaintAssertions";
 import { pdfNearestLabelReviewContract } from "./PdfNearestLabelReview.contract";
 import { inputSchema, type Input } from "./PdfNearestLabelReview.schema";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     ...Object.values(input.copy),

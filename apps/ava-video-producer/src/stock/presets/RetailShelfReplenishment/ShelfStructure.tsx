@@ -1,7 +1,6 @@
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Shelf bays reserve an individual slot for every authored available unit. */
 export function ShelfStructure({ input }: Readonly<Props>): ReactNode {

@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { getBlockCellGeometryFromFrame } from "./getBlockCellGeometryFromFrame";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   input: Input;
   frame: number;

@@ -3,7 +3,6 @@ import { SceneLabel } from "./SceneLabel";
 import { VisitMark } from "./VisitMark";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Distinct visit categories and the fixed denominator remain explicit. */
 export function CohortLegend({ input }: Readonly<Props>): ReactNode {

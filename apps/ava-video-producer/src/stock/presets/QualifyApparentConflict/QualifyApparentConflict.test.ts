@@ -13,7 +13,6 @@ import {
 } from "./QualifyApparentConflict.fixtures";
 import { inputSchema } from "./QualifyApparentConflict.schema";
 import type { Input } from "./QualifyApparentConflict.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

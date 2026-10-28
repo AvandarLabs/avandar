@@ -1,7 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
-
 type Props = { content: string[]; x: number };
 /** Each retained snapshot preserves all of its authored content lines. */
 export function SavedRevisionLines({ content, x }: Readonly<Props>): ReactNode {

@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-
 type Props = {
   zoneId: string;
   points: string;

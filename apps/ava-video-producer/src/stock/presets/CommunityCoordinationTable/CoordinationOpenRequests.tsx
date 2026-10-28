@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; accent: string };
 /** Each remaining request has its own keyed open label, including empty IDs. */
 export function CoordinationOpenRequests({

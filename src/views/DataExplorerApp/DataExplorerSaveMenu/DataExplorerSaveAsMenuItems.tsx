@@ -9,7 +9,6 @@ import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryCol
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactNode } from "react";
-
 type OpenSaveAsNewDatasetModalOptions = {
   dateColumns: ReadonlySet<string>;
   queryResultColumns: readonly QueryResult.Column[];

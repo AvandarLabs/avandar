@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { makeGridSceneFromInputAndFrame } from "./makeGridSceneFromInputAndFrame";
 import type { Input } from "./SpatialGridBinning.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Moving count tokens are painted above cell shading and ledger outlines. */
 export function GridTokens({

@@ -3,7 +3,6 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { inferredLayoutMessage } from "./PdfGridReconstruction.controls";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input };
 /** Page, evidence and result captions keep their own readable rails. */
 export function GridSceneHeadings({ input }: Readonly<Props>): ReactNode {

@@ -18,7 +18,6 @@ import {
   invalidInputs,
 } from "./TravelTimeNetworkFrontier.fixtures";
 import { inputSchema, type Input } from "./TravelTimeNetworkFrontier.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

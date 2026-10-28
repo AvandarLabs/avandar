@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import { makeRegisteredLandmarksFromInputAndFrame } from "./makeRegisteredLandmarksFromInputAndFrame";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number };
 /**
  * Fixed target rings and source ghosts preserve the physical reference sites.

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { inputSchema } from "./VaccinationSessionBalance.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
-
 function _copy({ path, message }: { path: string; message: string }) {
   return {
     id: `motionAtlas.vaccination-session-balance.controls.${path}`,

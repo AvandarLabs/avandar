@@ -4,7 +4,6 @@ import { LocalCountValue } from "./LocalCountValue";
 import { ThresholdShutter } from "./ThresholdShutter";
 import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   cell: Input["cells"][number];
   index: number;

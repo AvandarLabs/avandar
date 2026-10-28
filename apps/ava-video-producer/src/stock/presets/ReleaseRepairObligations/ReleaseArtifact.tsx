@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { getVisibleReleaseIssueRowsFromInput } from "./getVisibleReleaseIssueRowsFromInput";
 import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string; artifactX: number };
 /**
  * Stable issue identities and full limitations travel with the same artifact.

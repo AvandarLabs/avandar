@@ -8,7 +8,6 @@ import { DashboardWidgetPanel } from "./DashboardWidgetPanel";
 import type { GraphicProps } from "../../graphics-common";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ComponentProps, ReactNode } from "react";
-
 type Props = GraphicProps & { input: Input };
 const BOARD = {
   x: 16,

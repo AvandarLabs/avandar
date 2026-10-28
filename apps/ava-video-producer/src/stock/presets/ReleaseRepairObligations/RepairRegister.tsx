@@ -4,7 +4,6 @@ import { STOCK } from "../../stockPalette";
 import { getVisibleReleaseIssueRowsFromInput } from "./getVisibleReleaseIssueRowsFromInput";
 import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string; artifactX: number };
 /**
  * Open follow-ups unfold into keyed owner and due entries without resolution.

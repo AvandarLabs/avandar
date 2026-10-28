@@ -5,7 +5,6 @@ import { SpliceJoint } from "./SpliceJoint";
 import { SpliceModule } from "./SpliceModule";
 import type { Input } from "./PipelineStepSplice.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** Open the old joints and close connectors along the new authored sequence. */
 export function PipelineStrip({

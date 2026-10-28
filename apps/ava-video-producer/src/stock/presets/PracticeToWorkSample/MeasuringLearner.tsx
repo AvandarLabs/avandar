@@ -4,7 +4,6 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { MeasuringTools } from "./MeasuringTools";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /**
  * One learner physically holds a ruler and repeats a pencil marking gesture.

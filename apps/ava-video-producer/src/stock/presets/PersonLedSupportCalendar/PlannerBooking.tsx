@@ -2,7 +2,6 @@ import { STOCK } from "../../stockPalette";
 import { PlannerBookingLabel } from "./PlannerBookingLabel";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   commitment: Input["commitments"][number];
   x: number;

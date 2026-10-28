@@ -3,7 +3,6 @@ import { STOCK } from "../../stockPalette";
 import { LandSteward } from "./LandSteward";
 import type { Input } from "./ContourSedimentRetention.schema";
 import type { ReactNode } from "react";
-
 type Props = { input: Input; frame: number; accent: string };
 /** A steward carries the selected barrier into contact with the slope. */
 export function ContourTreatment({

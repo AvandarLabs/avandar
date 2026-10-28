@@ -13,7 +13,6 @@ import {
   invalidInputs,
 } from "./ProvenancePeelback.fixtures";
 import { inputSchema, type Input } from "./ProvenancePeelback.schema";
-
 function _render({
   frame,
   input = DEFAULT_INPUT,

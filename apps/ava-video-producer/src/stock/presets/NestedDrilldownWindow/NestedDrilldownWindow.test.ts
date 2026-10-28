@@ -13,7 +13,6 @@ import {
   invalidInputs,
 } from "./NestedDrilldownWindow.fixtures";
 import { inputSchema, type Input } from "./NestedDrilldownWindow.schema";
-
 const render = ({
   frame,
   input = DEFAULT_INPUT,

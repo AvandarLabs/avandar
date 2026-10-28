@@ -2,7 +2,6 @@ import { mix } from "../../../motion";
 import { CellLiteralValue } from "./CellLiteralValue";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
-
 type Props = {
   row: Input["rows"][number];
   edit: number;
