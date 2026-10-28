@@ -18,7 +18,7 @@ import { DataExplorerSourceActions } from "./DataExplorerSourceActions";
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
@@ -273,7 +273,7 @@ export const DataExplorerStateManager = createAppStateManager({
     /** Records the completed registry used by explicit save. */
     setColumnBindings: (
       state: DataExplorerAppState,
-      columnBindings: ResultColumnBindingRegistry,
+      columnBindings: QueryResultColumnBindingRegistry,
     ) => {
       const previous = state.columnBindings;
       if (!previous) {

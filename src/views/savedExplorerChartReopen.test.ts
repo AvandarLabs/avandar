@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
-import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
 import { makeSavedColumnBindingsFromDataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeSavedColumnBindingsFromDataVizProps";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
@@ -14,7 +14,7 @@ it("reopens a serialized styled selection against a supported renamed output", (
     { name: "revenue", dataType: "double" as const },
   ];
   const sql = "SELECT region, revenue FROM sales";
-  const schema = reconcileResultColumnBindings({
+  const schema = reconcileQueryResultColumnBindings({
     scopeKey: "explorer",
     sqlKey: sql,
     columns,
@@ -57,7 +57,7 @@ it("reopens a serialized styled selection against a supported renamed output", (
     { name: "amount", dataType: "double" as const },
     { name: "region", dataType: "varchar" as const },
   ];
-  const renamed = reconcileResultColumnBindings({
+  const renamed = reconcileQueryResultColumnBindings({
     scopeKey: chart.props.id,
     sqlKey: renamedSql,
     columns: renamedColumns,

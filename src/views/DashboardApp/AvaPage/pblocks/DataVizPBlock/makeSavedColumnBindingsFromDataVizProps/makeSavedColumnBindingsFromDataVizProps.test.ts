@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
 import { makeSavedColumnBindingsFromDataVizProps } from "./makeSavedColumnBindingsFromDataVizProps";
-import type { ResultColumnBindings } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { DataVizColumnBindingProps } from "./makeSavedColumnBindingsFromDataVizProps";
 
 const legacy: DataVizColumnBindingProps = {
@@ -36,8 +36,8 @@ const legacy: DataVizColumnBindingProps = {
     subscribedFilterIds: ["global"],
   },
 };
-function _schema(names: string[]): ResultColumnBindings {
-  return reconcileResultColumnBindings({
+function _schema(names: string[]): QueryResultColumnBindings {
+  return reconcileQueryResultColumnBindings({
     scopeKey: "chart",
     sqlKey: "SELECT * FROM sales",
     columns: names.map((name) => {

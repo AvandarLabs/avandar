@@ -20,7 +20,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
-import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvandarQueryClientProvider } from "@/components/providers/AvandarQueryClientProvider/AvandarQueryClientProvider";
@@ -90,7 +90,7 @@ const AUTH: Extract<StructuredQueryAuth, { auth: "workspace" }> = {
 };
 
 function _createProps(): DataVizProps & { id: string } {
-  const registry = reconcileResultColumnBindings({
+  const registry = reconcileQueryResultColumnBindings({
     scopeKey: "chart",
     sqlKey: "SELECT * FROM sales",
     projections: makeProjectionDescriptorsFromSql({

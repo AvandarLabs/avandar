@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { screen } from "@/test-utils";
 import { upgradeAvaPageData } from "../../../utils/upgradeAvaPageData";
 import { useDataVizPBlockConfig } from "../useDataVizPBlockConfig";
@@ -51,7 +51,7 @@ vi.mock(
       useDataVizColumnBindings: () => {
         return {
           status: "ready",
-          schema: reconcileResultColumnBindings({
+          schema: reconcileQueryResultColumnBindings({
             scopeKey: "chart",
             sqlKey: "SELECT * FROM foo",
             columns: [

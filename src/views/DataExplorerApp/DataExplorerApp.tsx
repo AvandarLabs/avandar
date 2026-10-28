@@ -170,7 +170,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   });
   const queryResultColumns = schema?.columns ?? [];
   useEffect(
-    function synchronizeResultColumnBindings() {
+    function synchronizeQueryResultColumnBindings() {
       if (schema && !isLoadingResults) {
         dispatch.syncVizFromQueryResult(schema.columns);
         if (schema.registry !== state.columnBindings) {

@@ -9,7 +9,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
-import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { DataVizColumnBindings } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizColumnBindings";
 import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
@@ -69,7 +69,7 @@ function _createProps(id: string): DataVizProps & { id: string } {
   const columns: QueryResult.Column[] = [
     { name: "region", dataType: "varchar" },
   ];
-  const schema = reconcileResultColumnBindings({
+  const schema = reconcileQueryResultColumnBindings({
     scopeKey: id,
     sqlKey: SQL,
     columns,

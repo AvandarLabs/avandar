@@ -18,7 +18,7 @@ import { SaveToDashboardCreateMode } from "@/views/DataExplorerApp/SaveToDashboa
 import { SaveToDashboardListMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
-import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type {
   VizConfig,
   VizType,
@@ -26,7 +26,7 @@ import type {
 import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 type Props = {
-  columnBindings: ResultColumnBindingRegistry;
+  columnBindings: QueryResultColumnBindingRegistry;
   rawSql: string;
   prompt: string | undefined;
   vizType: VizType;

@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { remapProvisionalColumnIdsInVizConfig } from "$/models/vizs/remapProvisionalColumnIdsInVizConfig/remapProvisionalColumnIdsInVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 
 it("rebinds matching physical expressions and preserves unrelated selections", () => {
   const oldId = "sql-id" as QueryColumn.Id;
@@ -10,7 +10,7 @@ it("rebinds matching physical expressions and preserves unrelated selections", (
     vizType: "scatter" as const,
     series: [{ xKey: oldId, key: oldId, color: "#123456" }],
   };
-  const previous: ResultColumnBindingRegistry = {
+  const previous: QueryResultColumnBindingRegistry = {
     version: 1,
     scopeKey: "explorer",
     sqlKey: "select revenue from sales",
@@ -24,7 +24,7 @@ it("rebinds matching physical expressions and preserves unrelated selections", (
       },
     ],
   };
-  const current: ResultColumnBindingRegistry = {
+  const current: QueryResultColumnBindingRegistry = {
     ...previous,
     columns: [
       {

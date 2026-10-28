@@ -1,11 +1,11 @@
 import { propEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
-import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { withDuckDb } from "./executedDuckDb";
 import type {
-  ResultColumnBindings,
-  ResultColumnBindingRegistry,
+  QueryResultColumnBindings,
+  QueryResultColumnBindingRegistry,
 } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 /** DuckDB labels retain saved aggregate targets through SQL spelling edits. */
 import type { DuckDBConnection, DuckDBValue } from "@duckdb/node-api";
@@ -17,10 +17,10 @@ async function _executeAndBindResultColumns({
 }: {
   connection: DuckDBConnection;
   sql: string;
-  previous?: ResultColumnBindingRegistry;
+  previous?: QueryResultColumnBindingRegistry;
 }): Promise<{
   rows: Array<Record<string, DuckDBValue>>;
-  schema: ResultColumnBindings;
+  schema: QueryResultColumnBindings;
 }> {
   const result = await connection.runAndReadAll(sql);
   const columns = result.columnNames().map((name) => {
@@ -28,7 +28,7 @@ async function _executeAndBindResultColumns({
   });
   return {
     rows: result.getRowObjects(),
-    schema: reconcileResultColumnBindings({
+    schema: reconcileQueryResultColumnBindings({
       scopeKey: "saved-chart",
       sqlKey: sql,
       columns,
@@ -44,35 +44,35 @@ describe("query column bindings with real DuckDB metadata", () => {
       column: "revenue",
       expression: "s.revenue",
       source: "sales s",
-      outputName: "sum(s.revenue)",
+      queryResultColumnName: "sum(s.revenue)",
     },
     {
       column: '"revenue"',
       expression: '"revenue"',
       source: "sales",
-      outputName: "sum(revenue)",
+      queryResultColumnName: "sum(revenue)",
     },
     {
       column: '"Revenue Value"',
       expression: '"Revenue Value"',
       source: "sales",
-      outputName: 'sum("Revenue Value")',
+      queryResultColumnName: 'sum("Revenue Value")',
     },
     {
       column: '"Revenue Value"',
       expression: '"S"."Revenue Value"',
       source: 'sales "S"',
-      outputName: 'sum(S."Revenue Value")',
+      queryResultColumnName: 'sum(S."Revenue Value")',
     },
     {
       column: '"select"',
       expression: 's."select"',
       source: "sales s",
-      outputName: 'sum(s."select")',
+      queryResultColumnName: 'sum(s."select")',
     },
   ])(
     "keeps a saved target reading revenue through $expression and alias edits",
-    async ({ column, expression, source, outputName }) => {
+    async ({ column, expression, source, queryResultColumnName }) => {
       await withDuckDb(async (connection) => {
         await connection.run(
           `CREATE TABLE sales AS SELECT 7::DOUBLE AS ${column}, 3::DOUBLE AS profit`,
@@ -91,7 +91,7 @@ describe("query column bindings with real DuckDB metadata", () => {
         });
         const selected = qualified.schema.columns.find(propEq("id", savedId));
         expect(qualified.schema.issues).toEqual([]);
-        expect(selected?.name).toBe(outputName);
+        expect(selected?.name).toBe(queryResultColumnName);
         expect(qualified.rows[0]?.[selected!.name]).toBe(7);
         const renamed = await _executeAndBindResultColumns({
           connection: connection,

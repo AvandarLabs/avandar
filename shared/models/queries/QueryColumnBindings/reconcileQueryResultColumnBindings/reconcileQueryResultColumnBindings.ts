@@ -3,10 +3,10 @@ import { uuid } from "$/lib/uuid.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type {
   ColumnBindingIssue,
-  ResultColumnBindings,
+  QueryResultColumnBindings,
   ProjectionDescriptor,
-  ResultColumnBinding,
-  ResultColumnBindingRegistry,
+  QueryResultColumnBinding,
+  QueryResultColumnBindingRegistry,
 } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
@@ -15,10 +15,10 @@ type Options = {
   sqlKey: string;
   columns: readonly QueryResult.Column[];
   projections: readonly ProjectionDescriptor[];
-  previous: ResultColumnBindingRegistry | undefined;
+  previous: QueryResultColumnBindingRegistry | undefined;
 };
 type ColumnBindingOutcome = {
-  binding?: ResultColumnBinding;
+  binding?: QueryResultColumnBinding;
   issue?: ColumnBindingIssue;
 };
 
@@ -27,7 +27,7 @@ function _hasSameExpression({
   right,
 }: {
   left: Readonly<
-    Pick<ResultColumnBinding, "expressionKey" | "sqlExpressionKey">
+    Pick<QueryResultColumnBinding, "expressionKey" | "sqlExpressionKey">
   >;
   right: Readonly<ProjectionDescriptor>;
 }): boolean {
@@ -50,7 +50,7 @@ function _getPriorMatch({
 }: {
   projection: Readonly<ProjectionDescriptor>;
   context: Readonly<Options>;
-}): ResultColumnBinding | "ambiguous" | undefined {
+}): QueryResultColumnBinding | "ambiguous" | undefined {
   const candidates =
     context.previous?.columns.filter((column) => {
       return _hasSameExpression({ left: column, right: projection });
@@ -154,9 +154,9 @@ function _reuseColumns({
   columns,
   previous,
 }: {
-  columns: readonly ResultColumnBinding[];
-  previous: ResultColumnBindingRegistry | undefined;
-}): readonly ResultColumnBinding[] {
+  columns: readonly QueryResultColumnBinding[];
+  previous: QueryResultColumnBindingRegistry | undefined;
+}): readonly QueryResultColumnBinding[] {
   const reused = columns.map((column) => {
     const prior = previous?.columns.find(propEq("id", column.id));
     return prior &&
@@ -177,7 +177,7 @@ function _reuseColumns({
 }
 
 function _getUniqueOutcomes(
-  candidates: readonly ResultColumnBinding[],
+  candidates: readonly QueryResultColumnBinding[],
 ): ColumnBindingOutcome[] {
   return candidates.map((column) => {
     return candidates.filter(propEq("id", column.id)).length > 1
@@ -187,12 +187,13 @@ function _getUniqueOutcomes(
 }
 
 /**
- * Binds each output column of a completed query to a column ID, reusing the
- * owner's previous IDs only when the expression evidence is unique.
+ * Binds each `QueryResult` column of a completed query to a column ID,
+ * reusing the owner's previous IDs only when the expression evidence is
+ * unique.
  */
-export function reconcileResultColumnBindings(
+export function reconcileQueryResultColumnBindings(
   options: Readonly<Options>,
-): ResultColumnBindings {
+): QueryResultColumnBindings {
   const sqlKey = options.sqlKey.trim().replace(/;$/, "").trimEnd();
   const previous =
     options.previous?.scopeKey === options.scopeKey
@@ -226,7 +227,7 @@ export function reconcileResultColumnBindings(
     columns: unique.map(prop("binding")).filter(isDefined),
     previous,
   });
-  const registry: ResultColumnBindingRegistry =
+  const registry: QueryResultColumnBindingRegistry =
     previous?.sqlKey === sqlKey && columns === previous.columns
       ? previous
       : { version: 1, scopeKey: options.scopeKey, sqlKey, columns };

@@ -1,12 +1,12 @@
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
-import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { createQueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import { runQuerySchema } from "@/clients/queries/runQuerySchema/runQuerySchema";
 import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
 import type {
-  ResultColumnBindings,
+  QueryResultColumnBindings,
   ProjectionDescriptor,
-  ResultColumnBindingRegistry,
+  QueryResultColumnBindingRegistry,
 } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
@@ -16,7 +16,7 @@ import type { QueryClient } from "@tanstack/react-query";
 type CreateSchemaOptions = {
   options: Readonly<DataVizColumnBindingsOptions>;
   columns: readonly QueryResult.Column[];
-  previous: ResultColumnBindingRegistry | undefined;
+  previous: QueryResultColumnBindingRegistry | undefined;
   metadataProvenance: QueryMetadataProvenance;
 };
 
@@ -36,11 +36,11 @@ type RefreshOptions = {
 export type DataVizColumnBindingsOptions = {
   scopeKey: string;
   rawSql: string;
-  initialRegistry: ResultColumnBindingRegistry | undefined;
+  initialRegistry: QueryResultColumnBindingRegistry | undefined;
   auth: StructuredQueryAuth;
   projections: readonly ProjectionDescriptor[];
 };
-type VerifiedSchema = ResultColumnBindings & {
+type VerifiedSchema = QueryResultColumnBindings & {
   metadataProvenance: QueryMetadataProvenance;
   rawColumns: readonly QueryResult.Column[];
 };
@@ -59,7 +59,7 @@ function _createSchema({
   previous,
   metadataProvenance,
 }: CreateSchemaOptions): VerifiedSchema {
-  const schema = reconcileResultColumnBindings({
+  const schema = reconcileQueryResultColumnBindings({
     scopeKey: options.scopeKey,
     sqlKey: normalizeSqlForSubquery(options.rawSql),
     columns,
@@ -111,7 +111,7 @@ async function _get({
 }: Readonly<{
   options: Readonly<DataVizColumnBindingsOptions>;
   queryClient: QueryClient;
-}>): Promise<ResultColumnBindings> {
+}>): Promise<QueryResultColumnBindings> {
   return await queryClient.ensureQueryData(_getQueryOptions(options));
 }
 

@@ -2,19 +2,19 @@ import { Model } from "@avandar/models";
 import { prop, propEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings.ts";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings.ts";
 /** Saved targets must read the same expression, never an unrelated label. */
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type {
-  ResultColumnBindings,
+  QueryResultColumnBindings,
   ProjectionDescriptor,
-  ResultColumnBindingRegistry,
+  QueryResultColumnBindingRegistry,
 } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 
 type ReconcileColumnBindingsOptions = {
   names: string[];
   projections: ProjectionDescriptor[];
-  previous?: ResultColumnBindingRegistry;
+  previous?: QueryResultColumnBindingRegistry;
   sqlKey?: string;
   scopeKey?: string;
 };
@@ -30,7 +30,7 @@ function _column(name: string): QueryColumn.T {
 }
 const REVENUE = _column("revenue");
 const PROFIT = _column("profit");
-const PREVIOUS: ResultColumnBindingRegistry = {
+const PREVIOUS: QueryResultColumnBindingRegistry = {
   version: 1,
   scopeKey: "owner",
   sqlKey: "original",
@@ -72,8 +72,8 @@ function _reconcileColumnBindings({
   previous = PREVIOUS,
   sqlKey = "edited",
   scopeKey = "owner",
-}: ReconcileColumnBindingsOptions): ResultColumnBindings {
-  return reconcileResultColumnBindings({
+}: ReconcileColumnBindingsOptions): QueryResultColumnBindings {
+  return reconcileQueryResultColumnBindings({
     scopeKey,
     sqlKey,
     previous,
@@ -84,7 +84,7 @@ function _reconcileColumnBindings({
   });
 }
 
-describe("reconcileResultColumnBindings", () => {
+describe("reconcileQueryResultColumnBindings", () => {
   it("keeps a saved revenue target reading amount after alias edits and result reordering", () => {
     const schema = _reconcileColumnBindings({
       names: ["profit", "amount"],
@@ -114,7 +114,7 @@ describe("reconcileResultColumnBindings", () => {
     });
     expect(schema.columns.find(propEq("id", REVENUE.id))).toBeUndefined();
   });
-  it("omits outputs whose names differ only by case", () => {
+  it("omits QueryResult columns whose names differ only by case", () => {
     const schema = _reconcileColumnBindings({
       names: ["total", "TOTAL"],
       projections: [_projection({ queryResultColumnName: "total" })],

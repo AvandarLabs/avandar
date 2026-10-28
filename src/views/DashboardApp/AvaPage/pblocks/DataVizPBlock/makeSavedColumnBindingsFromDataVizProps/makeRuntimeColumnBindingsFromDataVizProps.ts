@@ -4,7 +4,7 @@ import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQ
 import { makeColumnBindingsFromDashboardFilters } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
 import { DataVizFilters } from "../DataVizPBlock/DataVizFilters/DataVizFilters";
 import { makeSavedColumnBindingsFromDataVizProps } from "./makeSavedColumnBindingsFromDataVizProps";
-import type { ResultColumnBindings } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { LocalFilter } from "../DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { Props } from "../DataVizPBlock/DataVizPBlock";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
@@ -12,7 +12,7 @@ import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilte
 
 type Options = {
   props: Props;
-  schema: ResultColumnBindings;
+  schema: QueryResultColumnBindings;
   filters: readonly DashboardFilterRecord[];
   cachedTargets?: DashboardFilterTargets;
 };
@@ -34,7 +34,7 @@ function _getTargets({
   cached,
 }: {
   props: Props;
-  schema: ResultColumnBindings;
+  schema: QueryResultColumnBindings;
   cached: DashboardFilterTargets | undefined;
 }): DashboardFilterTargets {
   const targets =

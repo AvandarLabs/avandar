@@ -1,4 +1,4 @@
-import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type {
   GlobalFilterSubscription,
@@ -17,7 +17,7 @@ type DataVizColumnNameProps = {
 type DataVizColumnIdProps = {
   columnBindingVersion: 1;
   vizConfig: VizConfig.T;
-  columnBindings: ResultColumnBindingRegistry;
+  columnBindings: QueryResultColumnBindingRegistry;
   localFilters: readonly LocalFilter[];
   globalFilterSubscription: GlobalFilterSubscription;
   globalFilterTargets: DashboardFilterTargets;

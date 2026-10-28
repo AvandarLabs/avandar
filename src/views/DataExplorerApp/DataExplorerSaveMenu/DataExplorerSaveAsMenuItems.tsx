@@ -5,7 +5,7 @@ import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
-import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactNode } from "react";
@@ -19,7 +19,7 @@ type OpenSaveAsNewDatasetModalOptions = {
 };
 
 type OpenSaveToDashboardModalOptions = {
-  columnBindings: ResultColumnBindingRegistry;
+  columnBindings: QueryResultColumnBindingRegistry;
   forceCreateMode: boolean;
   nlPrompt: string | undefined;
   savableSql: string;

@@ -1,10 +1,10 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
-import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
 import type {
-  ResultColumnBindings,
+  QueryResultColumnBindings,
   ProjectionDescriptor,
-  ResultColumnBindingRegistry,
+  QueryResultColumnBindingRegistry,
 } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
@@ -14,7 +14,7 @@ type Options = {
   resultSqlKey: string | undefined;
   result: QueryResult.T | undefined;
   projections: readonly ProjectionDescriptor[];
-  initialRegistry: ResultColumnBindingRegistry | undefined;
+  initialRegistry: QueryResultColumnBindingRegistry | undefined;
 };
 
 function _getSchema({
@@ -22,8 +22,8 @@ function _getSchema({
   previous,
 }: {
   options: Readonly<Options>;
-  previous: ResultColumnBindings | undefined;
-}): ResultColumnBindings | undefined {
+  previous: QueryResultColumnBindings | undefined;
+}): QueryResultColumnBindings | undefined {
   const sqlKey = normalizeSqlForSubquery(options.sqlKey);
   if (options.result === undefined) {
     return previous?.registry.sqlKey === sqlKey ? previous : undefined;
@@ -35,7 +35,7 @@ function _getSchema({
   ) {
     return undefined;
   }
-  const schema = reconcileResultColumnBindings({
+  const schema = reconcileQueryResultColumnBindings({
     ...options,
     sqlKey,
     columns: options.result.columns,
@@ -53,8 +53,8 @@ function _getSchema({
  */
 export function useQueryResultColumnBindings(
   options: Readonly<Options>,
-): ResultColumnBindings | undefined {
-  const previousRef = useRef<ResultColumnBindings | undefined>(undefined);
+): QueryResultColumnBindings | undefined {
+  const previousRef = useRef<QueryResultColumnBindings | undefined>(undefined);
   const {
     scopeKey,
     sqlKey,

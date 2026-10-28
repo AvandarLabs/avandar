@@ -15,8 +15,9 @@ type RuntimeColumnBindingsState = ReturnType<
 };
 
 /**
- * Discovers a chart query's unfiltered output columns, then binds the chart's
- * settings and filters to their column IDs without saving viewer state.
+ * Discovers a chart query's unfiltered `QueryResult` columns, then binds the
+ * chart's settings and filters to their column IDs without saving viewer
+ * state.
  */
 export function useDataVizRuntimeColumnBindings({
   props,

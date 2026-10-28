@@ -4,7 +4,7 @@ import { makeColumnIdVizConfigFromNameBoundConfig } from "$/models/vizs/makeColu
 import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
 import type {
   ColumnBindingIssue,
-  ResultColumnBindings,
+  QueryResultColumnBindings,
 } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
@@ -61,7 +61,7 @@ export function makeSavedColumnBindingsFromDataVizProps({
   schema,
 }: Readonly<{
   props: Readonly<DataVizColumnBindingProps>;
-  schema: Readonly<ResultColumnBindings>;
+  schema: Readonly<QueryResultColumnBindings>;
 }>): SavedDataVizColumnBindings {
   if (props.columnBindingVersion === 1) {
     return {

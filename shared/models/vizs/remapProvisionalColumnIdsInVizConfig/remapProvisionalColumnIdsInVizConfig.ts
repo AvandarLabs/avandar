@@ -1,15 +1,15 @@
 import { identity, propEq } from "@avandar/utils";
 import { match } from "ts-pattern";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
 
 function _createTransitionMap({
   previous,
   current,
 }: {
-  previous: ResultColumnBindingRegistry;
-  current: ResultColumnBindingRegistry;
+  previous: QueryResultColumnBindingRegistry;
+  current: QueryResultColumnBindingRegistry;
 }): Map<QueryColumn.Id, QueryColumn.Id> {
   const mappings = new Map<QueryColumn.Id, QueryColumn.Id>();
   if (previous.scopeKey !== current.scopeKey) {
@@ -58,8 +58,8 @@ export function remapProvisionalColumnIdsInVizConfig({
   current,
 }: Readonly<{
   config: VizConfig.T;
-  previous: ResultColumnBindingRegistry;
-  current: ResultColumnBindingRegistry;
+  previous: QueryResultColumnBindingRegistry;
+  current: QueryResultColumnBindingRegistry;
 }>): VizConfig.T {
   const mappings = _createTransitionMap({
     previous: previous,

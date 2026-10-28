@@ -8,7 +8,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
-import { reconcileResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
 import { makeColumnBindingsFromDashboardFilters } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
@@ -89,7 +89,7 @@ beforeEach(() => {
 export const DataVizColumnBindingTestFixtures = {
   uuid,
   makeProjectionDescriptorsFromSql,
-  reconcileResultColumnBindings,
+  reconcileQueryResultColumnBindings,
   applyDashboardFiltersToSql,
   makeColumnBindingsFromDashboardFilters,
   act,

@@ -1,6 +1,6 @@
 import { uuid } from "$/lib/uuid";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { ResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type {
   VizConfig,
   VizType,
@@ -14,7 +14,7 @@ import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilte
 type DataVizDashboardBlockProps = {
   id: string;
   columnBindingVersion: 1;
-  columnBindings: ResultColumnBindingRegistry;
+  columnBindings: QueryResultColumnBindingRegistry;
   globalFilterTargets: DashboardFilterTargets;
   nlQuery: {
     prompt: string;
@@ -28,7 +28,7 @@ type DataVizDashboardBlockProps = {
 };
 
 type CreateDataVizBlockOptions = {
-  columnBindings: ResultColumnBindingRegistry;
+  columnBindings: QueryResultColumnBindingRegistry;
   rawSql: string;
   prompt: string | undefined;
   vizType: VizType;

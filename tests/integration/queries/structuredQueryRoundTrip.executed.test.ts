@@ -67,7 +67,7 @@ it.each([
     rows: [{ district: "North", total: 2 }],
   },
 ])(
-  "preserves rows and output names through SQL/form mapping: $sql",
+  "preserves rows and QueryResult column names through SQL/form mapping: $sql",
   async ({ sql, rows }) => {
     const mapped = sqlToStructuredQuery({
       sql,

@@ -157,8 +157,8 @@ describe("chart-owned dashboard filter targets", () => {
 it("migrates a v4 chart and executes both saved local and global targets", async () => {
   const { upgradeAvaPageData } =
     await import("@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData");
-  const { reconcileResultColumnBindings } =
-    await import("$/models/queries/QueryColumnBindings/reconcileResultColumnBindings/reconcileResultColumnBindings");
+  const { reconcileQueryResultColumnBindings } =
+    await import("$/models/queries/QueryColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings");
   const { makeSavedColumnBindingsFromDataVizProps } =
     await import("@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeSavedColumnBindingsFromDataVizProps");
   const { useApplyDashboardFiltersToSql } =
@@ -193,7 +193,7 @@ it("migrates a v4 chart and executes both saved local and global targets", async
   const upgraded = upgradeAvaPageData(JSON.parse(JSON.stringify(document)));
   const props = upgraded.content[0]!
     .props as import("@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock").Props;
-  const schema = reconcileResultColumnBindings({
+  const schema = reconcileQueryResultColumnBindings({
     scopeKey: "saved-chart",
     sqlKey: rawSql,
     columns: [
