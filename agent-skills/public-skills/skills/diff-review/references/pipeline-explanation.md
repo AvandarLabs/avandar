@@ -2,8 +2,8 @@
 
 A walkthrough section covering a pipeline, a multi-pass algorithm, or a command
 that chains several tools. Read
-[`../SKILL.md`](../SKILL.md) section **Explaining a multi-step algorithm or
-pipeline** for the rules; this file is one section written to them, followed by
+[`../walkthrough/code-and-citations.md`](../walkthrough/code-and-citations.md)
+section **Explaining a multi-step algorithm or pipeline** for the rules; this file is one section written to them, followed by
 an annotation naming which rule each part satisfies.
 
 The subject is `pnpm db:new-migration` in the Avandar repository, a six-step
