@@ -42,10 +42,10 @@ then numbers it and marks every use of its terms, per
   holds the ideas those units implement. When the code spells a concept
   differently from the document, the entry gives the code's spelling too, so
   the reader recognizes the concept in the diff.
-- **It does not replace a figure's own glossary.** A diagram still carries its
-  `Where:` list directly under the fence, per
-  [A diagram must stand alone](figures.md#a-diagram-must-stand-alone), because the figure
-  has to read on its own page.
+- **It does not replace a diagram's own key.** A diagram still carries its key
+  in the caption box under the fence, per
+  [The caption box](figures.md#the-caption-box), because the figure has to read
+  on its own page.
 
 | Avoid | Use |
 | --- | --- |

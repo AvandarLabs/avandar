@@ -41,9 +41,9 @@ flowchart TD
   A --> B --> C --> D --> E --> F
 ```
 
-*Both resets are steps, not housekeeping. Step 4 can only compute a delta
-against a database built from migrations, and step 6 can only verify step 4 by
-rebuilding after it.*
+> *Both resets are steps, not housekeeping. Step 4 can only compute a delta
+> against a database built from migrations, and step 6 can only verify step 4
+> by rebuilding after it.*
 
 #### Step 1. `supabase db diff -f <name>`
 

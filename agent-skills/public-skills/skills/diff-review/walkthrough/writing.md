@@ -167,10 +167,10 @@ Two redirects, for passages that fail the test but are worth keeping somewhere:
   still padding. The questions a walkthrough owes answers to are the ones in
   [Sections](structure.md#sections); past those, the author is enjoying the topic.
 
-A figure's legend is part of the figure, not prose. Never shorten a section by
-trimming a figure's `Where:` entry or its caption: the entry exists because a
-label needs resolving, and cutting it breaks the figure rather than tightening
-the section. Appendix B's entries are held to their own one-or-two-sentence
+A figure's caption box is part of the figure, not prose. Never shorten a
+section by trimming a row of a diagram key or the caption: the row exists
+because a label needs resolving, and cutting it breaks the figure rather than
+tightening the section. Appendix B's entries are held to their own one-or-two-sentence
 limit, per [Glossary](glossary.md).
 
 ## Factual prose

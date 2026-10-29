@@ -98,8 +98,8 @@ Beyond the joins, check and fix:
 - **Open questions**, for whether the code has since answered one.
 - **Deliberately not handled**, for whether each gap is still a gap.
 
-Its remit stops at accuracy. A diagram label or caption that states something
-false is a claim, so correcting it is in scope. It does not rewrite for tone,
+Its remit stops at accuracy. A diagram label, caption, or diagram key row that
+states something false is a claim, so correcting it is in scope. It does not rewrite for tone,
 restructure a section, retitle a heading that is merely dull, or touch a
 diagram for legibility: those are the style check's, and doing them here costs the parent
 the ability to tell a correction from a preference. Where a claim is

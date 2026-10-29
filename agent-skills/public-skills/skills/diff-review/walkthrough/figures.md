@@ -18,7 +18,8 @@ renders natively, and pick the type from what the reader needs to conclude:
 | An ordered exchange between components or processes | `sequenceDiagram` |
 | Data model or table relationships | `erDiagram` |
 
-Give every diagram a caption stating what to notice in it. A diagram the reader
+Give every diagram a caption stating what to notice in it, in the caption box
+under the fence, per [The caption box](#the-caption-box). A diagram the reader
 cannot draw a conclusion from is decoration: cut it. Draw the dependency or
 data-flow direction, and when a directory tree is the clearest form for a
 layout decision, a fenced tree is fine alongside the graph.
@@ -38,53 +39,75 @@ That has one consequence that overrides every instinct toward tidiness:
   who already knows the system is.
 - **Label every edge that is not obvious from its endpoints.** An unlabelled
   arrow asserts "related somehow", which is rarely the claim being made.
-- **A glossary is REQUIRED whenever any label is abbreviated.** If a node or
-  edge carries a single word, an acronym, an identifier, or any token a reader
-  outside the change would not resolve, the diagram is immediately followed by
-  a definition list naming every such label. Not in the caption prose, and not
-  further down the section: directly under the fence, so it is on the same page
-  as the drawing.
+- **A diagram key is REQUIRED whenever any label is abbreviated.** If a node
+  or edge carries a single word, an acronym, an identifier, or any token a
+  reader outside the change would not resolve, the caption box carries a key
+  table defining every such label. Not in the caption sentence, and not further
+  down the section: in the box directly under the fence, so it is on the same
+  page as the drawing.
 - **Legends are welcome.** Line style, colour, or shape carrying meaning
   (staged versus committed, synchronous versus deferred) needs a legend, either
-  as a glossary entry or as a `subgraph Legend` in the diagram itself.
+  as a row of the diagram key or as a `subgraph Legend` in the diagram itself.
+
+Prefer the full label and no key. Reach for a short label plus a key only when
+the full one genuinely will not lay out, and never ship a short label with
+neither.
+
+### The caption box
+
+Everything that explains a diagram sits in one blockquote directly under the
+fence, with nothing between them. That blockquote is the caption box, and all
+of it is the caption:
+
+1. **The caption sentence comes first,** in italics: one or two sentences
+   stating what to notice.
+2. **The diagram key follows,** when the drawing needs one: a line holding
+   only `**Diagram key**`, then a two-column table, `Term` and `Meaning`, with
+   one row per abbreviated label or legend entry. Each meaning is one short
+   sentence.
+
+Start every line of the box with `>`, blank lines included, so it stays one
+box. Never put a heading inside it, which would print as a numbered section,
+and never put prose between the fence and the box, which detaches the box from
+the figure. `markdown-to-pdf` 0.13.0 and later print the box a size smaller in
+a shaded panel that stays on the figure's page; GitHub shows it as a quote.
+Either way it reads as part of the figure rather than as the next paragraph.
 
 ```markdown
-Where:
-
-- **staged** - objects uploaded under a transition claim, readable only by the
-  dashboard's editors.
-- **committed** - the generation `snapshot_revision` points at, readable by the
-  dashboard's audience.
-- **fence** - an `abort_publish` claim written over an abandoned `publish`.
+> *A publish never exposes staged objects: viewers keep reading the committed
+> generation until the commit step points them at the new one.*
+>
+> **Diagram key**
+>
+> | Term | Meaning |
+> | --- | --- |
+> | staged | Objects uploaded under a transition claim, readable only by the dashboard's editors. |
+> | committed | The generation `snapshot_revision` points at, readable by the dashboard's audience. |
+> | fence | An `abort_publish` claim written over an abandoned `publish`. |
 ```
-
-Prefer the full label and no glossary. Reach for a short label plus a glossary
-only when the full one genuinely will not lay out, and never ship a short label
-with neither.
 
 ### A figure never spans two pages
 
-The drawing, its glossary, and its caption are one figure and must land on one
-page. A reader who has to turn the page to find out what a label means is doing
-the work the glossary was added to remove.
+The drawing and its caption box are one figure and must land on one page. A
+reader who has to turn the page to find out what a label means is doing the
+work the key was added to remove.
 
-`markdown-to-pdf` 0.9.0 and later enforce this: the italic paragraph after a
-mermaid fence is read as the caption, a `Where:` glossary between the two joins
-the same figure, and the drawing is re-fitted to the page minus whatever the
-explanation needs. So the mechanism is not your problem. The budget is.
+`markdown-to-pdf` 0.13.0 and later enforce this: the caption box directly
+under a mermaid fence joins the figure, and the drawing is re-fitted to the
+page minus the box. So the mechanism is not your problem. The budget is.
 
-Every line of glossary and caption is a line the drawing does not get, and past
-about a third of the page the renderer starts shrinking the explanation's type
-instead. Both are worse than the alternative, which is a smaller figure:
+Every line of the box is a line the drawing does not get, and past about a
+third of the page the renderer starts shrinking the box's type instead. Both
+are worse than the alternative, which is a smaller figure:
 
-- **Keep a glossary to what the diagram actually abbreviates.** A glossary is
-  not a place to explain the mechanism; that is what the section's prose is
-  for. One line per abbreviated label.
+- **Keep a key to what the diagram actually abbreviates.** A key is not a
+  place to explain the mechanism; that is what the section's prose is for. One
+  row per abbreviated label.
 - **Keep a caption to one or two sentences.** It states what to notice, not
   what the diagram shows.
 - **Split a figure that needs more than that.** Two figures, each with its own
-  short explanation, both fit. One figure with a nine-entry glossary does not,
-  and shrinks the drawing that the glossary exists to explain.
+  short caption box, both fit. One figure with a nine-row key does not, and
+  shrinks the drawing that the key exists to explain.
 
 ### Size a diagram by its shape, not by shrinking its type
 
@@ -159,9 +182,9 @@ Two forms work, and the choice is about how many terms are in play:
 - **A zoomed-in capture** of the element alone, when one term needs anchoring.
   Crop to the element plus enough surrounding context to place it on the page.
 - **One full-page capture annotated with letters** (A, B, C) or arrows, when
-  several terms arrive together. Follow the image with a definition list
-  resolving every label, directly under it, the same way a diagram glossary
-  sits directly under its fence.
+  several terms arrive together. Follow the image with a caption box, as for a
+  diagram, whose key resolves every letter, per
+  [The caption box](#the-caption-box).
 
 Prefer the annotated full-page capture once a section introduces three or more
 names, because a reader separating "the rail" from "the slate" needs to see

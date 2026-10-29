@@ -22,7 +22,7 @@ closing check 10, and returns the list of changes it made and anything it
 judged out of scope.
 
 **Its remit is style, never substance.** It may rewrite a heading, cut a tell,
-retitle a caption, add a missing glossary, reflow a diagram, and correct a
+retitle a caption, add a missing diagram key, reflow a diagram, and correct a
 highlight spec. It may not change a technical claim, add or remove a decision
 or an open question, or alter the meaning of any sentence. Nor may it shorten a
 heading or sentence by dropping a qualifier or a phrase that grounds a term for
@@ -126,17 +126,18 @@ own draft.
    step one, and that each guarantee it claims has its own heading, per
    [Explaining a multi-step algorithm or pipeline](code-and-citations.md#explaining-a-multi-step-algorithm-or-pipeline).
 
-4. **Cover the caption and read each diagram cold,** per
+4. **Cover the caption box and read each diagram cold,** per
    [A diagram must stand alone](figures.md#a-diagram-must-stand-alone). Every node and
    edge label must resolve without the surrounding prose. Any label that is a
-   single word, an acronym, or a bare identifier requires a glossary directly
-   under the fence; a missing glossary is a defect, not a stylistic
-   preference. Then check the shape per
+   single word, an acronym, or a bare identifier requires a row in the diagram
+   key; a missing key is a defect, not a stylistic preference. Then confirm the
+   box itself per [The caption box](figures.md#the-caption-box): directly under
+   the fence, caption sentence first, then the key table. Then check the shape per
    [Size a diagram by its shape](figures.md#size-a-diagram-by-its-shape-not-by-shrinking-its-type):
    a diagram wider than it is tall wastes the page and prints small type. Then
    check the budget per
    [A figure never spans two pages](figures.md#a-figure-never-spans-two-pages): a long
-   glossary shrinks the drawing it exists to explain.
+   key shrinks the drawing it exists to explain.
 
 5. **Audit the writing contract.** Read the headings and every bold lead-in
    without the body, and confirm each names a checkable claim that a new

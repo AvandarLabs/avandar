@@ -34,6 +34,7 @@ LIST_ITEM_RE = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
 TABLE_ROW_RE = re.compile(r"^\s*\|")
 TABLE_SEP_RE = re.compile(r"^\s*\|?(\s*:?-+:?\s*\|)+\s*(:?-+:?\s*)?\|?\s*$")
 WRAPPER_RE = re.compile(r"^\s*</?small>\s*$")
+QUOTE_RE = re.compile(r"^\s*>\s?")
 SKIP_SECTION_RE = re.compile(r"\b(sources|references|bibliography)\s*$", re.I)
 GLOSSARY_HEADING_RE = re.compile(r"\bglossary\s*$", re.I)
 PROTECTED_RES = [
@@ -218,14 +219,17 @@ def mark_document(source):
 
     out = list(lines)
     fence, skip_section, in_glossary, block, table_row = None, False, False, [], 0
+    quoted = False
     outside_uses = {term.number: 0 for term in terms}
 
     def flush():
+        # A block's lines are (index, prefix length): a quote's `> ` is kept
+        # out of the text being marked, so a term can wrap across quoted lines.
         if block:
             before = {term.number: term.uses for term in terms}
-            joined = _mark("\n".join(out[i] for i in block), by_length)
-            for offset, text in enumerate(joined.split("\n")):
-                out[block[offset]] = text
+            joined = _mark("\n".join(out[i][p:] for i, p in block), by_length)
+            for (i, p), text in zip(block, joined.split("\n")):
+                out[i] = out[i][:p] + text
             if not in_glossary:
                 for term in terms:
                     outside_uses[term.number] += term.uses - before[term.number]
@@ -248,6 +252,14 @@ def mark_document(source):
             in_glossary = i == glossary_heading
             out[i] = _strip_markers(line)
             continue
+        # A quoted line is classified by what follows its `>`, and a block
+        # never runs from a quote into the text after it.
+        quote = QUOTE_RE.match(line)
+        prefix = quote.end() if quote else 0
+        if bool(quote) != quoted:
+            flush()
+            quoted = bool(quote)
+        line, lead = line[prefix:], line[:prefix]
         if not TABLE_ROW_RE.match(line):
             table_row = 0
         if skip_section:
@@ -259,7 +271,7 @@ def mark_document(source):
             flush()
             table_row += 1
             if table_row == 1 or TABLE_SEP_RE.match(line):
-                out[i] = _strip_markers(line)
+                out[i] = lead + _strip_markers(line)
                 continue
             spans = _cell_spans(line)
             own = None
@@ -280,11 +292,11 @@ def mark_document(source):
                             outside_uses[term.number] += term.uses - before[term.number]
                 last = end
             pieces.append(line[last:])
-            out[i] = "".join(pieces)
+            out[i] = lead + "".join(pieces)
             continue
         if LIST_ITEM_RE.match(line):
             flush()
-        block.append(i)
+        block.append((i, prefix))
     flush()
 
     unused = [f"G{n} {by_number[n].term}" for n, count in outside_uses.items() if count == 0]
