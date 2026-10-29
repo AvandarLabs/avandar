@@ -8,9 +8,13 @@ trusting the prose, and this file's path.
 
 **Read first,** each file whole, before changing anything:
 [`structure.md`](structure.md), which holds
-[The walkthrough stands alone](structure.md#the-walkthrough-stands-alone), and
+[The walkthrough stands alone](structure.md#the-walkthrough-stands-alone);
 [`writing.md`](writing.md), which holds
-[Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code).
+[Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code);
+[`code-and-citations.md`](code-and-citations.md), which holds the excerpt,
+highlight spec, and citation rules it checks; and
+[`manual-testing.md`](manual-testing.md) and [`glossary.md`](glossary.md),
+the contracts for the two appendices it checks.
 
 **Authority:** edit the walkthrough file, and run read-only verification:
 `git show` and `git diff` against the base, reads of the working tree and the

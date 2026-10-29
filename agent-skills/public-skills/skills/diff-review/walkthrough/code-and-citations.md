@@ -129,7 +129,10 @@ database and that the replay runs in a rolled-back transaction on the live
 connection. An accurate description that leaves the reader's wrong model
 standing will be read through that model.
 
-**2. The steps, in execution order, one heading each.** Name each step by the
+**2. The steps, in execution order, one heading each.** The pipeline gets a
+numbered subsection of its own, and each step is a heading one level below it,
+written `Step 1.`, `Step 2.`, and so on, so a reviewer can cite `§6.4 step 3`.
+Name each step by the
 thing that runs it rather than by what it achieves: `supabase db diff -f
 <name>`, then `strip-noop-view-recreations`, then `supabase db reset`. A step
 named for its trigger can be found in the code and grepped for; a step named

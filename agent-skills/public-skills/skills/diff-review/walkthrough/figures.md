@@ -149,10 +149,11 @@ counterproductive: it shrinks labels relative to node padding and edge
 spacing, and since the whole drawing is then scaled up to the page, the only
 lasting effect is smaller text inside larger boxes. Omit the `%%{init}%%` line
 unless you are deliberately raising the label size above mermaid's default of
-16px:
+16px, or setting a layout option such as the label wrapping width. Both go in
+one line when you need both:
 
 ```
-%%{init: {'themeVariables': {'fontSize': '20px'}}}%%
+%%{init: {'themeVariables': {'fontSize': '20px'}, 'flowchart': {'wrappingWidth': 300}}}%%
 ```
 
 One caution carried over from measurement: `direction TB` inside a subgraph

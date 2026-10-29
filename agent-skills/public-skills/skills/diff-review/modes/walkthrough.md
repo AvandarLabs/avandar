@@ -24,7 +24,9 @@ is written to:
 
 1. Resolve the artifacts for the selected comparison. Require `-guide.md` and
    `-guide.json`, because a walkthrough belongs to a prepared review. When
-   either is absent, run Initial. If Initial wrote the walkthrough because
+   either is absent, run Initial. A guide older than the branch head still
+   counts: step 3 reads the current diff, and the walkthrough describes that.
+   If Initial wrote the walkthrough because
    none existed, stop there rather than writing it a second time. If a
    walkthrough already existed, Initial left it untouched, so continue from
    step 2: this request asked for it to change.
@@ -78,7 +80,9 @@ is written to:
 9. Enter the content review phase, by dispatching a subagent per
    [Dispatching a review pass](#dispatching-a-review-pass) with
    [`walkthrough/pass-content-review.md`](../walkthrough/pass-content-review.md).
-   Copy the draft first, so a change you reject can be restored. It checks the draft for accuracy against the code, fixes what it finds, and
+   Copy the draft to a temporary file outside the repository first, so a
+   change you reject can be restored. It checks the draft for accuracy against
+   the code, fixes what it finds, and
    reports each change with its evidence. Read every change and accept or
    reject it: the subagent has read the code more recently, you know what the
    change was for, and neither alone is a good judge of a disputed claim. A
@@ -91,7 +95,10 @@ is written to:
     diagram is visually legible, and runs the marking script after its last
     edit, so nothing needs re-marking after it. Do not skip it because the draft looks
     finished: looking finished to its author is the condition the phase exists
-    to test.
+    to test. When it reports a contract violation outside its remit, such as a
+    Background figure that splits across two pages, fix it yourself, then run
+    the style check again so it stays the last pass. A coverage gap or a
+    judgment call it reports goes into the step 11 report instead.
 11. Report the section count, which units the background context pass
     included, what the clarity pass proposed and what you rejected, what the
     content review changed and what you rejected, what the style check

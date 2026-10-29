@@ -170,7 +170,8 @@ own draft.
 
 8. **Check the opening sections and the appendices against their contracts.**
    Purpose and Background technical context come first, in that order, and
-   after Sources come Appendix A. Manual testing and Appendix B. Glossary, in
+   after Sources, or after Open questions when nothing is cited, come
+   Appendix A. Manual testing and Appendix B. Glossary, in
    that order, each heading directly after its page-break line, per
    [Sections](structure.md#sections). Purpose is one
    problem paragraph and one bullet per strand, and every bullet passes

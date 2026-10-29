@@ -13,9 +13,12 @@ comparison, and this file's path.
 [`writing.md`](writing.md), which holds
 [Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code)
 and [Flow and orientation](writing.md#flow-and-orientation);
-[`purpose.md`](purpose.md); [`glossary.md`](glossary.md); and
+[`purpose.md`](purpose.md); [`glossary.md`](glossary.md);
 [`structure.md`](structure.md), which holds the heading rules in
-[Sections](structure.md#sections).
+[Sections](structure.md#sections); and
+[`code-and-citations.md`](code-and-citations.md), which holds how a pipeline's
+step headings are named in
+[Explaining a multi-step algorithm or pipeline](code-and-citations.md#explaining-a-multi-step-algorithm-or-pipeline).
 
 **Authority:** read-only access to the walkthrough, the diff, the code, and
 the project's docs.

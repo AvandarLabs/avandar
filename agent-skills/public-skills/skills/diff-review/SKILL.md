@@ -18,7 +18,8 @@ Resolve paths such as `scripts/...` relative to this skill's directory,
 represented below as `<skill-dir>`.
 
 1. Require `python3`.
-2. Resolve the repository root, then resolve `difit` in this order:
+2. In the modes that end with a run command (Initial, PR review, and
+   Summary), resolve the repository root, then resolve `difit` in this order:
    - If `<repo-root>/node_modules/.bin/difit` exists, run
      `<repo-root>/node_modules/.bin/difit --version` and use that exact binary.
    - Otherwise, use `command -v difit`, then verify the returned global binary

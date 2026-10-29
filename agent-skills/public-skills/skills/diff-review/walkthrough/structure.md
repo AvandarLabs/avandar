@@ -187,7 +187,8 @@ carry the specifics.
 9. **Sources.** The numbered reference list, present whenever the body cites
    anything.
 
-Then, after Sources, two appendices. They are lettered rather than numbered, so
+Then, after Sources, or after Open questions when nothing is cited, two
+appendices. They are lettered rather than numbered, so
 adding either never shifts a section number:
 
 - **Appendix A. Manual testing.** Numbered steps the reviewer can follow to
