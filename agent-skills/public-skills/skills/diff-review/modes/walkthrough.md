@@ -47,7 +47,9 @@ is written to:
 5. Where a decision's rationale is not recoverable from the code, say so
    rather than inventing one, and add it to Open questions.
 6. Write `-walkthrough.md`, including Purpose per [Purpose](../walkthrough/purpose.md) and
-   Appendix A. Manual testing per [Manual testing](../walkthrough/manual-testing.md). Write the
+   Appendix A. Manual testing per [Manual testing](../walkthrough/manual-testing.md), each
+   appendix after its page-break line per
+   [Sections](../walkthrough/structure.md#sections). Write the
    Background technical context heading and `## Appendix B. Glossary` with a one-line
    placeholder each, so section numbers are final from the first draft; the
    next two passes fill them, and when regenerating they replace the old

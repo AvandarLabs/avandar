@@ -171,7 +171,8 @@ own draft.
 8. **Check the opening sections and the appendices against their contracts.**
    Purpose and Background technical context come first, in that order, and
    after Sources come Appendix A. Manual testing and Appendix B. Glossary, in
-   that order. Purpose is one
+   that order, each heading directly after its page-break line, per
+   [Sections](structure.md#sections). Purpose is one
    problem paragraph and one bullet per strand, and every bullet passes
    [Purpose](purpose.md): it leads with a verb, says what changes rather than
    how, and fits one sentence of about 25 words. Read the bullets alone and
@@ -179,7 +180,7 @@ own draft.
    No glossary definition uses a term that would itself need defining, per
    [Glossary](glossary.md). No Background row runs past two sentences, per
    [Background technical context](background-context.md). Both tables
-   sit inside a `<small>` wrapper. Every Manual testing step is runnable as
+   and the whole of Manual testing sit inside a `<small>` wrapper. Every Manual testing step is runnable as
    written, setup comes first, and each fixed defect has its before-and-after,
    per [Manual testing](manual-testing.md).
 

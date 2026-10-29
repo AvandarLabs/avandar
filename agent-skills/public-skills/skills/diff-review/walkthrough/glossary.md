@@ -53,6 +53,8 @@ then numbers it and marks every use of its terms, per
 | **Owner** - the scope a registry is keyed by. | **Owner** - the one place a query runs from, such as the Data Explorer or a single chart on a dashboard. Column IDs are never carried from one owner to another. |
 
 ```markdown
+<div style="page-break-before: always"></div>
+
 ## Appendix B. Glossary
 
 <small>

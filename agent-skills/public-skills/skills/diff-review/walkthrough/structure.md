@@ -197,6 +197,12 @@ adding either never shifts a section number:
   numbered, with each use in the text pointing to it. See
   [Glossary](glossary.md).
 
+Each appendix starts on a new page. Markdown has no page break, so put a line
+holding only `<div style="page-break-before: always"></div>` directly before each
+appendix heading, with a blank line on each side. It is the CSS page-break
+idiom: `markdown-to-pdf` 0.14.0 and later and HTML-based converters break the
+page there, and GitHub shows nothing.
+
 There is no reading-order or navigation section. Mapping sections to code is
 the explainer threads' job, per [As the reviewer](../contracts/transcript.md#as-the-reviewer), because
 the walkthrough stands alone.
