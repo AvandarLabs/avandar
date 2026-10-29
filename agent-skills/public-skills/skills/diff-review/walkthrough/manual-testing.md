@@ -6,10 +6,9 @@ Sources, because the reviewer follows it at the keyboard once they understand
 the change, not before. For the same reason it is set in smaller type: put a
 line holding only `<small>` and a blank line after the heading, and a blank
 line and a line holding only `</small>` at the end of the section.
-`markdown-to-pdf` 0.14.1 and later print it at the glossary's size with
-tighter spacing between steps; GitHub drops the tag. The author writes this
-section while drafting,
-because the author knows what changed and how to reach it. Start from
+`markdown-to-pdf` 0.14.2 and later print it, code blocks included, at the
+glossary's size with tighter spacing between steps; GitHub drops the tag. The
+author writes this section while drafting, because the author knows what changed and how to reach it. Start from
 `-test-plan.md` when it exists, verify each step against the code, and bring it
 up to this standard. Do not edit `-test-plan.md` itself.
 
