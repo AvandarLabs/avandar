@@ -423,8 +423,7 @@ the guide", comes out whole.
 ### Sections
 
 Use these headings in this order, numbered, omitting any that would be empty.
-Purpose, Background technical context, Manual testing, and the Glossary
-appendix are never omitted. The list gives the order, not literal numbers: each
+Purpose, Background technical context, and both appendices are never omitted. The list gives the order, not literal numbers: each
 strand takes its own top-level number, and the sections after the strands
 number on from the last one. Once the walkthrough is handed over, numbers are
 stable for the life of the review so the reviewer can annotate a printout and
@@ -480,21 +479,19 @@ carry the specifics.
 2. **Background technical context.** A directory tree of the code the reader
    needs to know about, then a table with one or two sentences per model or
    module. See [Background technical context](#background-technical-context).
-3. **Manual testing.** Numbered steps the reviewer can follow to exercise the
-   change themselves. See [Manual testing](#manual-testing).
-4. **Shape of the solution.** The mental model: the moving parts and how data
+3. **Shape of the solution.** The mental model: the moving parts and how data
    flows between them, as prose plus at least one mermaid diagram. When the
    change has more than one strand, say here how they relate, including "these
    two are independent" when that is the truth.
-5. **One section per strand of work,** named after the concern rather than the
-   kind of thing it contains. Use numbered subsections (`5.1`, `5.2`) for the
+4. **One section per strand of work,** named after the concern rather than the
+   kind of thing it contains. Use numbered subsections (`4.1`, `4.2`) for the
    pieces inside a strand, so the reviewer can cite one.
 
    When a section explains one specific defect and its resolution, add `The
    Problem` and `The Solution` one heading level below it:
 
    ```markdown
-   ### 5.1 Ambiguous 404 when getting a file from Drive
+   ### 4.1 Ambiguous 404 when getting a file from Drive
 
    #### The Problem
 
@@ -553,9 +550,9 @@ carry the specifics.
    strand-based one, and it fails by disappearing silently rather than by
    leaving an empty heading. Auditing this list is part of
    [Closing checks](#closing-checks).
-6. **Interface changes.** Any user-visible change, with evidence. See
+5. **Interface changes.** Any user-visible change, with evidence. See
    [Screenshots](#screenshots).
-7. **Decisions.** One bullet per real decision: what was chosen, the
+6. **Decisions.** One bullet per real decision: what was chosen, the
    alternative that was rejected, why, and what evidence would reverse it.
    Lead with the choice as one bold sentence that a reviewer skimming the list
    can parse on its own, per
@@ -563,19 +560,23 @@ carry the specifics.
    decision with no rejected alternative is not a decision, it is narration:
    cut it, or say plainly that the choice was arbitrary. Cite precedent per
    [Citations](#citations).
-8. **Deliberately not handled.** Scope boundaries and known gaps, so the
+7. **Deliberately not handled.** Scope boundaries and known gaps, so the
    reviewer does not spend attention rediscovering them.
-9. **Open questions.** Explicit asks for the reviewer, each answerable. A
+8. **Open questions.** Explicit asks for the reviewer, each answerable. A
    change with genuinely no open question probably did not need a
    walkthrough.
-10. **Sources.** The numbered reference list, present whenever the body cites
-    anything.
+9. **Sources.** The numbered reference list, present whenever the body cites
+   anything.
 
-Then, after Sources, **Appendix A. Glossary**: every term the reader will meet
-that is not general software-engineering vocabulary, defined in plain words and
-numbered, with each use in the text pointing to it. It is lettered rather than
-numbered, so adding it never shifts a section number. See
-[Glossary](#glossary).
+Then, after Sources, two appendices. They are lettered rather than numbered, so
+adding either never shifts a section number:
+
+- **Appendix A. Manual testing.** Numbered steps the reviewer can follow to
+  exercise the change themselves. See [Manual testing](#manual-testing).
+- **Appendix B. Glossary.** Every term the reader will meet that is not
+  general software-engineering vocabulary, defined in plain words and
+  numbered, with each use in the text pointing to it. See
+  [Glossary](#glossary).
 
 There is no reading-order or navigation section. Mapping sections to code is
 the explainer threads' job, per [As the reviewer](#as-the-reviewer), because
@@ -618,7 +619,7 @@ Each bullet is a line of a diff summary, not an explanation:
 | Avoid | Use |
 | --- | --- |
 | A paragraph that chains every strand's mechanism into one sentence: `Done means: dashboards carry a visibility level that survives a copy; publishing writes objects first and commits visibility after, retrying only while the claimed revision is current; the share dialog...` | One bullet per strand, each stating one outcome, as in the example below. |
-| `- Publishing claims a revision, uploads, then settles visibility only if the claim still holds (§6)`: the mechanism, compressed into the code's vocabulary. | `- Publishes in two steps, so a failed upload leaves the previous published copy online (§6)` |
+| `- Publishing claims a revision, uploads, then settles visibility only if the claim still holds (§5)`: the mechanism, compressed into the code's vocabulary. | `- Publishes in two steps, so a failed upload leaves the previous published copy online (§5)` |
 
 ```markdown
 ## 1. Purpose
@@ -633,12 +634,12 @@ without making it public.
 This change:
 
 - Replaces the public on/off switch with three visibility levels: private,
-  workspace, and public (§5).
+  workspace, and public (§4).
 - Publishes in two steps, so a failed upload leaves the previous published
-  copy online (§6).
+  copy online (§5).
 - Adds a **Retry publish** button to the share dialog after a failed
-  publish (§7).
-- Also ships, unrelated: a lint rule against unused imports (§8).
+  publish (§6).
+- Also ships, unrelated: a lint rule against unused imports (§7).
 ```
 
 ### Glossary
@@ -646,7 +647,7 @@ This change:
 Every term the reader will meet in the document that is not general
 software-engineering vocabulary: product terms with a specific meaning here,
 house terms, and the informal vocabulary of this area of the code. One table in
-alphabetical order, not split by kind, placed last as `## Appendix A. Glossary`.
+alphabetical order, not split by kind, placed last as `## Appendix B. Glossary`.
 The clarity pass drafts it and the parent pastes it in, per
 [The clarity pass runs in a subagent](#the-clarity-pass-runs-in-a-subagent),
 then numbers it and marks every use of its terms, per
@@ -695,7 +696,7 @@ then numbers it and marks every use of its terms, per
 | **Owner** - the scope a registry is keyed by. | **Owner** - the one place a query runs from, such as the Data Explorer or a single chart on a dashboard. Column IDs are never carried from one owner to another. |
 
 ```markdown
-## Appendix A. Glossary
+## Appendix B. Glossary
 
 <small>
 
@@ -809,7 +810,9 @@ src/views/
 ### Manual testing
 
 How the reviewer exercises the change themselves, as numbered steps they can
-follow without asking anything. The author writes this section while drafting,
+follow without asking anything. It is `## Appendix A. Manual testing`, after
+Sources, because the reviewer follows it at the keyboard once they understand
+the change, not before. The author writes this section while drafting,
 because the author knows what changed and how to reach it. Start from
 `-test-plan.md` when it exists, verify each step against the code, and bring it
 up to this standard. Do not edit `-test-plan.md` itself.
@@ -843,7 +846,7 @@ up to this standard. Do not edit `-test-plan.md` itself.
   blockquote, as in the test plan.
 
 ````markdown
-## 3. Manual testing
+## Appendix A. Manual testing
 
 1. Confirm `ava supabase status` reports this worktree's own project, running
    `ava supabase switch` first if it does not. Then rebuild the database. The
@@ -1233,7 +1236,7 @@ different steps, and a single section covering both answers neither.
 Three rules apply throughout:
 
 - **Trace one traversal with real values.** The input, the intermediate states,
-  the output, per the algorithm bullet in item 5 of [Sections](#sections).
+  the output, per the algorithm bullet in item 4 of [Sections](#sections).
   For a pipeline this is often a before and after pair of catalog reads, file
   contents, or command output, quoted rather than described.
 - **State what each step deliberately does not do.** An unexplained exclusion
@@ -1409,7 +1412,7 @@ Two redirects, for passages that fail the test but are worth keeping somewhere:
 A figure's legend is part of the figure, not prose. Never shorten a section by
 trimming a figure's `Where:` entry or its caption: the entry exists because a
 label needs resolving, and cutting it breaks the figure rather than tightening
-the section. Appendix A's entries are held to their own one-or-two-sentence
+the section. Appendix B's entries are held to their own one-or-two-sentence
 limit, per [Glossary](#glossary).
 
 ### Factual prose
@@ -1483,7 +1486,7 @@ own draft.
      has a row, and every row's subject is in the tree. A function named
      inside a row is not a unit and needs no node.
 
-2. **Audit the coverage,** per the checklist in item 5 of
+2. **Audit the coverage,** per the checklist in item 4 of
    [Sections](#sections): walk it against every strand and confirm where each
    item landed, saying so when an item does not apply.
 
@@ -1535,9 +1538,10 @@ own draft.
    longest sections first, where the answer is least likely to cover the whole
    length.
 
-8. **Check the opening sections and the appendix against their contracts.**
-   Purpose, Background technical context, and Manual testing come first, in
-   that order, and the Glossary is Appendix A, after Sources. Purpose is one
+8. **Check the opening sections and the appendices against their contracts.**
+   Purpose and Background technical context come first, in that order, and
+   after Sources come Appendix A. Manual testing and Appendix B. Glossary, in
+   that order. Purpose is one
    problem paragraph and one bullet per strand, and every bullet passes
    [Purpose](#purpose): it leads with a verb, says what changes rather than
    how, and fits one sentence of about 25 words. Read the bullets alone and
@@ -1709,7 +1713,7 @@ gets one. A proposal may add a unit to Background technical context when a
 later section depends on it; the parent adds it to the existing tree and
 table rather than starting a new one, and drops a less needed unit when the
 addition would push the figure past one page. It answers the questions in the text or the figures, then writes the
-glossary into Appendix A: dropping any entry for a term the reader no longer
+glossary into Appendix B: dropping any entry for a term the reader no longer
 meets, in prose or in a code name the document asks them to read, and adding
 one for any new term its own rewrites introduced. Last, it runs the marking
 script per
@@ -1793,7 +1797,7 @@ Beyond the joins, check and fix:
 - **Highlight specs**, by counting the printed snippet's lines. A clause the
   prose points at that spans two source lines needs both, and a spec naming
   only the first shades half a claim.
-- **The opening sections.** Every Glossary definition and Background row,
+- **The opening sections and appendices.** Every Glossary definition and Background row,
   against the code. Every command, path, test file, and fixture file in Manual
   testing exists under that name, and each before-and-after matches what the
   base revision and the change actually do. Check these by reading, never by
@@ -2146,8 +2150,8 @@ does when step 1 runs it, read-only with respect to source.
 5. Where a decision's rationale is not recoverable from the code, say so
    rather than inventing one, and add it to Open questions.
 6. Write `-walkthrough.md`, including Purpose per [Purpose](#purpose) and
-   Manual testing per [Manual testing](#manual-testing). Write the Background
-   technical context heading and `## Appendix A. Glossary` with a one-line
+   Appendix A. Manual testing per [Manual testing](#manual-testing). Write the
+   Background technical context heading and `## Appendix B. Glossary` with a one-line
    placeholder each, so section numbers are final from the first draft; the
    next two passes fill them, and when regenerating they replace the old
    content of both rather than edit it. When regenerating, keep each section's
@@ -2165,7 +2169,7 @@ does when step 1 runs it, read-only with respect to source.
 8. Run the clarity pass, by dispatching a subagent per
    [The clarity pass runs in a subagent](#the-clarity-pass-runs-in-a-subagent).
    Read every proposal and accept or reject it, apply the accepted ones, answer
-   its questions in the text, write the glossary it returned into Appendix A,
+   its questions in the text, write the glossary it returned into Appendix B,
    and run the marking script per
    [Marking glossary terms in the text](#marking-glossary-terms-in-the-text).
 9. Enter the content review phase, by dispatching a subagent per
