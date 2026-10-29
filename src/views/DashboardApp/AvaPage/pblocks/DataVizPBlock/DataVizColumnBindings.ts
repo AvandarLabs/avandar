@@ -154,12 +154,16 @@ function _refresh({
   );
 }
 /**
- * Shares verified output identities across renderer, editor, and save paths.
+ * Shares the verified column IDs of a chart query's `QueryResult` columns
+ * across renderer, editor, and save paths.
  */
 export const DataVizColumnBindings = {
   /** Returns the common unfiltered discovery query and cache policy. */
   getQueryOptions: _getQueryOptions,
-  /** Reuses or discovers the owning query's output identities. */
+  /**
+   * Reuses or discovers the column IDs of the owning query's `QueryResult`
+   * columns.
+   */
   get: _get,
   /** Publishes newer execution metadata for the same query owner. */
   refresh: _refresh,

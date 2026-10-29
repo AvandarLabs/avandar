@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
  * Renderer reads follow saved IDs even when `QueryResult` column names change.
  */
 import { uuid } from "$/lib/uuid.ts";
-import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig.ts";
+import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
@@ -136,12 +136,12 @@ const CONFIGS: VizConfig.T[] = [
   { vizType: "table" },
 ];
 
-describe("makeNameBoundVizConfigFromColumnIdConfig", () => {
+describe("makeNameBoundVizConfigFromVizConfig", () => {
   it.each(CONFIGS)(
-    "reads renamed outputs for $vizType while preserving presentation",
+    "reads renamed QueryResult columns for $vizType while preserving presentation",
     (config) => {
       const original = structuredClone(config);
-      const resolved = makeNameBoundVizConfigFromColumnIdConfig({
+      const nameBoundConversion = makeNameBoundVizConfigFromVizConfig({
         config: config,
         columns: COLUMNS,
       });
@@ -151,14 +151,18 @@ describe("makeNameBoundVizConfigFromColumnIdConfig", () => {
           : config.vizType === "bubble"
             ? ["Q1", 7, 3]
             : ["Q1", 7];
-      expect(_readValues({ config: resolved.config })).toEqual(expectedValues);
-      expect(resolved.issues).toEqual([]);
+      expect(_readValues({ config: nameBoundConversion.config })).toEqual(
+        expectedValues,
+      );
+      expect(nameBoundConversion.issues).toEqual([]);
       expect(config).toEqual(original);
       if ("chartStyle" in config) {
-        expect(resolved.config).toMatchObject({ chartStyle: CHART_STYLE });
+        expect(nameBoundConversion.config).toMatchObject({
+          chartStyle: CHART_STYLE,
+        });
       }
       if ("seriesColors" in config) {
-        expect(resolved.config).toMatchObject({
+        expect(nameBoundConversion.config).toMatchObject({
           seriesColors: { revenue: "#123456" },
         });
       }
@@ -166,18 +170,20 @@ describe("makeNameBoundVizConfigFromColumnIdConfig", () => {
   );
 
   it("reads the saved XY measure after revenue is renamed to amount", () => {
-    const resolved = makeNameBoundVizConfigFromColumnIdConfig({
+    const nameBoundConversion = makeNameBoundVizConfigFromVizConfig({
       config: CONFIGS[0]!,
       columns: COLUMNS,
     });
-    if (resolved.config.vizType !== "bar") {
+    if (nameBoundConversion.config.vizType !== "bar") {
       throw new Error("Expected bar configuration");
     }
-    expect(resolved.config.series).toEqual([
+    expect(nameBoundConversion.config.series).toEqual([
       { ...SERIES, key: "amount", renderAs: "line", curveType: "step" },
     ]);
     const row = { amount: 7, revenue: 999 };
-    expect(row[resolved.config.series[0]!.key as keyof typeof row]).toBe(7);
+    expect(
+      row[nameBoundConversion.config.series[0]!.key as keyof typeof row],
+    ).toBe(7);
   });
 
   it.each([
@@ -210,16 +216,21 @@ describe("makeNameBoundVizConfigFromColumnIdConfig", () => {
           name: column.id === movedId ? "moved" : column.name,
         };
       });
-      const resolved = makeNameBoundVizConfigFromColumnIdConfig({
+      const nameBoundConversion = makeNameBoundVizConfigFromVizConfig({
         config: config,
         columns: columns,
       });
-      expect(resolved.config).toMatchObject({ series: [{ [slot]: "moved" }] });
-      expect(resolved.issues).toEqual([]);
+      expect(nameBoundConversion.config).toMatchObject({
+        series: [{ [slot]: "moved" }],
+      });
+      expect(nameBoundConversion.issues).toEqual([]);
       const expectedValues = vizType === "bubble" ? ["Q1", 7, 3] : ["Q1", 7];
       const movedIndex = slot === "xKey" ? 0 : slot === "key" ? 1 : 2;
       expect(
-        _readValues({ config: resolved.config, row: { ...ROW, moved: 42 } }),
+        _readValues({
+          config: nameBoundConversion.config,
+          row: { ...ROW, moved: 42 },
+        }),
       ).toEqual(
         expectedValues.map((value, index) => {
           return index === movedIndex ? 42 : value;
@@ -234,7 +245,7 @@ describe("makeNameBoundVizConfigFromColumnIdConfig", () => {
     }),
   )("omits unusable $vizType series only in output", (config) => {
     const original = structuredClone(config);
-    const result = makeNameBoundVizConfigFromColumnIdConfig({
+    const result = makeNameBoundVizConfigFromVizConfig({
       config: config,
       columns: COLUMNS.filter(propNotEq("id", REVENUE_ID)),
     });
@@ -256,7 +267,7 @@ describe("makeNameBoundVizConfigFromColumnIdConfig", () => {
         name: missingId,
         dataType: "double",
       });
-      const result = makeNameBoundVizConfigFromColumnIdConfig({
+      const result = makeNameBoundVizConfigFromVizConfig({
         config: CONFIGS[4]!,
         columns: columns,
       });
@@ -274,7 +285,7 @@ describe("makeNameBoundVizConfigFromColumnIdConfig", () => {
   )(
     "clears missing $vizType category bindings without a replacement",
     (config) => {
-      const result = makeNameBoundVizConfigFromColumnIdConfig({
+      const result = makeNameBoundVizConfigFromVizConfig({
         config: config,
         columns: COLUMNS.filter(propNotEq("id", CATEGORY_ID)),
       });

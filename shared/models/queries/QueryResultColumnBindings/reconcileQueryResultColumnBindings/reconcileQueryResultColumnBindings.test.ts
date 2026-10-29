@@ -66,7 +66,7 @@ function _projection({
     sqlExpressionKey: expressionKey,
   };
 }
-function _reconcileColumnBindings({
+function _reconcileQueryResultColumnBindings({
   names,
   projections,
   previous = PREVIOUS,
@@ -86,7 +86,7 @@ function _reconcileColumnBindings({
 
 describe("reconcileQueryResultColumnBindings", () => {
   it("keeps a saved revenue target reading amount after alias edits and result reordering", () => {
-    const schema = _reconcileColumnBindings({
+    const schema = _reconcileQueryResultColumnBindings({
       names: ["profit", "amount"],
       projections: [
         _projection({ queryResultColumnName: "amount" }),
@@ -103,7 +103,7 @@ describe("reconcileQueryResultColumnBindings", () => {
     ).toBe(7);
   });
   it("does not let a different source reuse the saved total target", () => {
-    const schema = _reconcileColumnBindings({
+    const schema = _reconcileQueryResultColumnBindings({
       names: ["total"],
       projections: [
         _projection({
@@ -115,7 +115,7 @@ describe("reconcileQueryResultColumnBindings", () => {
     expect(schema.columns.find(propEq("id", REVENUE.id))).toBeUndefined();
   });
   it("omits QueryResult columns whose names differ only by case", () => {
-    const schema = _reconcileColumnBindings({
+    const schema = _reconcileQueryResultColumnBindings({
       names: ["total", "TOTAL"],
       projections: [_projection({ queryResultColumnName: "total" })],
     });
@@ -126,14 +126,14 @@ describe("reconcileQueryResultColumnBindings", () => {
     });
   });
   it("invalidates opaque label identity after SQL changes", () => {
-    const schema = _reconcileColumnBindings({
+    const schema = _reconcileQueryResultColumnBindings({
       names: ["total"],
       projections: [],
     });
     expect(schema.columns.find(propEq("id", REVENUE.id))).toBeUndefined();
   });
-  it("keeps opaque targets through identical-query output reordering", () => {
-    const schema = _reconcileColumnBindings({
+  it("keeps opaque targets when an identical query reorders its QueryResult columns", () => {
+    const schema = _reconcileQueryResultColumnBindings({
       names: ["profit", "total"],
       projections: [],
       previous: PREVIOUS,
@@ -143,7 +143,7 @@ describe("reconcileQueryResultColumnBindings", () => {
   });
   it("does not reuse saved targets across owner scopes", () => {
     expect(
-      _reconcileColumnBindings({
+      _reconcileQueryResultColumnBindings({
         names: ["total"],
         projections: [_projection({ queryResultColumnName: "total" })],
         previous: PREVIOUS,
@@ -158,12 +158,14 @@ describe("reconcileQueryResultColumnBindings", () => {
       identity: "structured" as const,
     };
     expect(
-      _reconcileColumnBindings({ names: ["total"], projections: [projection] })
-        .columns[0]?.id,
+      _reconcileQueryResultColumnBindings({
+        names: ["total"],
+        projections: [projection],
+      }).columns[0]?.id,
     ).toBe(projection.id);
   });
   it("keeps registry and column references on identical refetches", () => {
-    const schema = _reconcileColumnBindings({
+    const schema = _reconcileQueryResultColumnBindings({
       names: ["total", "profit"],
       projections: [],
       previous: PREVIOUS,
@@ -180,7 +182,7 @@ describe("reconcileQueryResultColumnBindings", () => {
         { ...PREVIOUS.columns[0]!, id: PROFIT.id, name: "second" },
       ],
     };
-    const preserved = _reconcileColumnBindings({
+    const preserved = _reconcileQueryResultColumnBindings({
       names: ["second", "total"],
       projections: [
         _projection({ queryResultColumnName: "total" }),
@@ -189,7 +191,7 @@ describe("reconcileQueryResultColumnBindings", () => {
       previous: previous,
     });
     expect(preserved.columns.map(prop("id"))).toEqual([PROFIT.id, REVENUE.id]);
-    const ambiguous = _reconcileColumnBindings({
+    const ambiguous = _reconcileQueryResultColumnBindings({
       names: ["amount", "other"],
       projections: [
         _projection({ queryResultColumnName: "amount" }),
@@ -208,7 +210,7 @@ describe("reconcileQueryResultColumnBindings", () => {
       ...PREVIOUS,
       columns: [{ ...PREVIOUS.columns[0]!, expressionKey: "model-A" }],
     };
-    const schema = _reconcileColumnBindings({
+    const schema = _reconcileQueryResultColumnBindings({
       names: ["amount"],
       projections: [_projection({ queryResultColumnName: "amount" })],
       previous: previous,
@@ -226,7 +228,7 @@ describe("reconcileQueryResultColumnBindings", () => {
       expressionKey: "model-B",
     };
     expect(
-      _reconcileColumnBindings({
+      _reconcileQueryResultColumnBindings({
         names: ["total"],
         projections: [projection],
         previous: previous,
@@ -235,8 +237,8 @@ describe("reconcileQueryResultColumnBindings", () => {
   });
 });
 
-it("omits an output that cannot be matched to the supplied supported descriptors", () => {
-  const schema = _reconcileColumnBindings({
+it("omits a QueryResult column that matches no supplied supported descriptor", () => {
+  const schema = _reconcileQueryResultColumnBindings({
     names: ["total"],
     projections: [_projection({ queryResultColumnName: "amount" })],
   });
@@ -252,7 +254,7 @@ it("rejects ambiguous persisted opaque labels instead of inheriting arbitrary li
     ...PREVIOUS,
     columns: [PREVIOUS.columns[0]!, { ...PREVIOUS.columns[0]!, id: PROFIT.id }],
   };
-  const schema = _reconcileColumnBindings({
+  const schema = _reconcileQueryResultColumnBindings({
     names: ["total"],
     projections: [],
     previous: previous,

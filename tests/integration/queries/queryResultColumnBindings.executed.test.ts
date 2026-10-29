@@ -10,7 +10,7 @@ import type {
 /** DuckDB labels retain saved aggregate targets through SQL spelling edits. */
 import type { DuckDBConnection, DuckDBValue } from "@duckdb/node-api";
 
-async function _executeAndBindResultColumns({
+async function _executeAndBindQueryResultColumns({
   connection,
   sql,
   previous,
@@ -77,14 +77,14 @@ describe("query column bindings with real DuckDB metadata", () => {
         await connection.run(
           `CREATE TABLE sales AS SELECT 7::DOUBLE AS ${column}, 3::DOUBLE AS profit`,
         );
-        const original = await _executeAndBindResultColumns({
+        const original = await _executeAndBindQueryResultColumns({
           connection: connection,
           sql: `SELECT SUM(${column}) AS total, SUM(profit) AS profit FROM sales`,
         });
         const savedId = original.schema.columns.find(
           propEq("name", "total"),
         )!.id;
-        const qualified = await _executeAndBindResultColumns({
+        const qualified = await _executeAndBindQueryResultColumns({
           connection: connection,
           sql: `SELECT SUM(profit) AS profit, SUM(${expression}) FROM ${source}`,
           previous: original.schema.registry,
@@ -93,7 +93,7 @@ describe("query column bindings with real DuckDB metadata", () => {
         expect(qualified.schema.issues).toEqual([]);
         expect(selected?.name).toBe(queryResultColumnName);
         expect(qualified.rows[0]?.[selected!.name]).toBe(7);
-        const renamed = await _executeAndBindResultColumns({
+        const renamed = await _executeAndBindQueryResultColumns({
           connection: connection,
           sql: `SELECT SUM(${expression}) AS amount, SUM(profit) AS profit FROM ${source}`,
           previous: qualified.schema.registry,

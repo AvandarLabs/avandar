@@ -1,5 +1,5 @@
-import { makeColumnIdVizConfigFromNameBoundConfig } from "$/models/vizs/makeColumnIdVizConfigFromNameBoundConfig/makeColumnIdVizConfigFromNameBoundConfig";
-import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
+import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig";
+import { makeVizConfigFromNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromNameBoundVizConfig/makeVizConfigFromNameBoundVizConfig";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
@@ -27,11 +27,11 @@ function _mergeSeries({
   let resolvedIndex = 0;
   const series = legacy.series.flatMap((original) => {
     const single = { ...legacy, series: [original] } as SeriesConfig;
-    const columnIdConfig = makeColumnIdVizConfigFromNameBoundConfig({
+    const vizConfig = makeVizConfigFromNameBoundVizConfig({
       config: single,
       columns: columns,
     }).config;
-    if (!("series" in columnIdConfig) || columnIdConfig.series.length === 0) {
+    if (!("series" in vizConfig) || vizConfig.series.length === 0) {
       return [original];
     }
     const updated = edited.series[resolvedIndex++];
@@ -53,11 +53,11 @@ export function mergeLegacyVizConfigEdit({
   if (legacy.vizType !== after.vizType) {
     return legacy;
   }
-  const previous = makeNameBoundVizConfigFromColumnIdConfig({
+  const previous = makeNameBoundVizConfigFromVizConfig({
     config: before,
     columns: columns,
   }).config;
-  const edited = makeNameBoundVizConfigFromColumnIdConfig({
+  const edited = makeNameBoundVizConfigFromVizConfig({
     config: after,
     columns: columns,
   });

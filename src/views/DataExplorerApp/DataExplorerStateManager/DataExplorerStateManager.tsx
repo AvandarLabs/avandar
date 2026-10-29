@@ -5,7 +5,7 @@ import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
 } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
-import { makeColumnIdVizConfigFromNameBoundConfig } from "$/models/vizs/makeColumnIdVizConfigFromNameBoundConfig/makeColumnIdVizConfigFromNameBoundConfig";
+import { makeVizConfigFromNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromNameBoundVizConfig/makeVizConfigFromNameBoundVizConfig";
 import { remapProvisionalColumnIdsInVizConfig } from "$/models/vizs/remapProvisionalColumnIdsInVizConfig/remapProvisionalColumnIdsInVizConfig";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
@@ -228,9 +228,9 @@ export const DataExplorerStateManager = createAppStateManager({
 
     /**
      * Seeds unconfigured slots from the result's columns and preserves owned
-     * selections while their output is unavailable. A chart config restored
-     * from the URL is first bound to these columns by `QueryResult` column
-     * name.
+     * selections while their `QueryResult` column is unavailable. A chart
+     * config restored from the URL is first bound to these columns by
+     * `QueryResult` column name.
      */
     syncVizFromQueryResult: (
       state: DataExplorerAppState,
@@ -239,7 +239,7 @@ export const DataExplorerStateManager = createAppStateManager({
       const { pendingUrlVizConfig } = state;
       const next = applyVizConfigFromQueryResult({
         vizConfig: pendingUrlVizConfig
-          ? makeColumnIdVizConfigFromNameBoundConfig({
+          ? makeVizConfigFromNameBoundVizConfig({
               config: pendingUrlVizConfig,
               columns: columns,
             }).config

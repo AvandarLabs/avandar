@@ -20,7 +20,7 @@ type RunLatLngLayerOptions = {
   signal?: AbortSignal;
 };
 
-function _getQueryColumnName(
+function _getDerivedColumnName(
   layer: MapLayer.T,
   columnId: QueryColumn.Id | undefined,
 ): string | undefined {
@@ -60,11 +60,11 @@ function _getLatLngPointSource(options: {
     return undefined;
   }
   const sourceSql = _getLatLngOverlayRawSql(options);
-  const latitudeColumnName = _getQueryColumnName(
+  const latitudeColumnName = _getDerivedColumnName(
     options.layer,
     binding.latitude,
   );
-  const longitudeColumnName = _getQueryColumnName(
+  const longitudeColumnName = _getDerivedColumnName(
     options.layer,
     binding.longitude,
   );
@@ -88,11 +88,11 @@ function _getLatLngOverlayRawSql(options: {
     return undefined;
   }
   const sourceSql = structuredQueryToSql(options.layer.source);
-  const latitudeColumnName = _getQueryColumnName(
+  const latitudeColumnName = _getDerivedColumnName(
     options.layer,
     binding.latitude,
   );
-  const longitudeColumnName = _getQueryColumnName(
+  const longitudeColumnName = _getDerivedColumnName(
     options.layer,
     binding.longitude,
   );
@@ -105,7 +105,7 @@ function _getLatLngOverlayRawSql(options: {
     overlay: options.overlay,
     latitudeColumnName,
     longitudeColumnName,
-    timeColumnName: _getQueryColumnName(
+    timeColumnName: _getDerivedColumnName(
       options.layer,
       options.layer.timeColumn,
     ),

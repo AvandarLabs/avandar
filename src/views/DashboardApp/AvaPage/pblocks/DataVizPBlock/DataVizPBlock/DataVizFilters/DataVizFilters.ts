@@ -23,7 +23,7 @@ export type LegacyLocalFilter = {
   defaultValue: string;
 };
 
-/** Local filter with an output identity target. */
+/** Local filter that targets a column ID. */
 export type LocalFilter = Omit<LegacyLocalFilter, "columnName"> & {
   columnId: QueryColumn.Id;
 };

@@ -3,7 +3,7 @@ import { uuid } from "$/lib/uuid";
 import { makeLocalFilterColumnBindingsFromLocalFilters } from "./makeLocalFilterColumnBindingsFromLocalFilters";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
-it("omits a deleted local ID without substituting a same-named output", () => {
+it("omits a deleted local ID without substituting a same-named QueryResult column", () => {
   const result = makeLocalFilterColumnBindingsFromLocalFilters({
     filters: [
       {

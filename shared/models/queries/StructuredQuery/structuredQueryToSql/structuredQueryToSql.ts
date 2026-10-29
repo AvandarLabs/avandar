@@ -23,7 +23,10 @@ import type { Knex } from "knex";
 
 export type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 
-/** Gets the emitted output name using the authoritative aggregation map. */
+/**
+ * Gets the `QueryResult` column name a column emits, using the authoritative
+ * aggregation map.
+ */
 function _getOrderByColumnName(
   column: QueryColumn.T,
   aggregations: PartialStructuredQuery["aggregations"],

@@ -54,7 +54,7 @@ describe("makeColumnBindingsFromDashboardFilters", () => {
       authoringColumnName: "category",
     });
   });
-  it("omits a missing bound ID even when another output has the authoring name", () => {
+  it("omits a missing bound ID even when another QueryResult column has the authoring name", () => {
     const result = makeColumnBindingsFromDashboardFilters({
       filters: [FILTER],
       targets: BOUND,

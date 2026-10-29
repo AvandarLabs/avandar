@@ -257,7 +257,10 @@ function _hasSupportedGrouping({
   );
 }
 
-/** Describes only supported single-source SQL, never ordinal output lineage. */
+/**
+ * Describes only supported single-source SQL, never lineage by `QueryResult`
+ * column position.
+ */
 export function makeProjectionDescriptorsFromSql(
   options: Readonly<{ sql: string; columns: readonly QueryResult.Column[] }>,
 ): ProjectionDescriptor[] {

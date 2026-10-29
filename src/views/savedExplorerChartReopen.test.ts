@@ -2,13 +2,13 @@ import { expect, it } from "vitest";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
 import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
-import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
+import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig";
 import { makeSavedColumnBindingsFromDataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeSavedColumnBindingsFromDataVizProps";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
 import type { Props as DataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 
-it("reopens a serialized styled selection against a supported renamed output", () => {
+it("reopens a serialized styled selection against a supported renamed QueryResult column", () => {
   const columns = [
     { name: "region", dataType: "varchar" as const },
     { name: "revenue", dataType: "double" as const },
@@ -71,7 +71,7 @@ it("reopens a serialized styled selection against a supported renamed output", (
     props: chart.props,
     schema: renamed,
   });
-  const rendered = makeNameBoundVizConfigFromColumnIdConfig({
+  const rendered = makeNameBoundVizConfigFromVizConfig({
     config: runtime.runtimeConfig,
     columns: renamed.columns,
   });

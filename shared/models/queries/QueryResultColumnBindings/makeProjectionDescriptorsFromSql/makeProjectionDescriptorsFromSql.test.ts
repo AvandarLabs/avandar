@@ -45,7 +45,7 @@ describe("makeProjectionDescriptorsFromSql", () => {
     });
     expect(new Set(keys).size).toBe(6);
   });
-  it("expands a sole star from the known single-source output schema", () => {
+  it("expands a sole star from the known single-source QueryResult columns", () => {
     const columns = _describe({
       sql: "SELECT s.* FROM sales s",
       names: ["revenue", "profit"],

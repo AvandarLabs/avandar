@@ -80,7 +80,7 @@ it("discovers unfiltered schema once while filter values change", async () => {
   expect(runQuery).toHaveBeenCalledTimes(1);
 });
 
-it("shares one discovery and identical output IDs across render and settings consumers", async () => {
+it("shares one discovery and identical column IDs across render and settings consumers", async () => {
   const wrapper = _createWrapper();
   const first = renderHook(
     () => {
@@ -295,7 +295,7 @@ it("rediscovers when a saved registry belongs to another block", async () => {
   expect(runQuery).toHaveBeenCalledTimes(1);
 });
 
-it("shares stable new output IDs when a changed opaque query has a stale registry", async () => {
+it("shares stable new column IDs when a changed opaque query has a stale registry", async () => {
   const registry: QueryResultColumnBindingRegistry = {
     version: 1,
     scopeKey: "block-a",

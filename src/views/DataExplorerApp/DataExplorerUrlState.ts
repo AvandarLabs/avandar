@@ -6,7 +6,7 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
+import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
@@ -162,7 +162,7 @@ function _getNameBoundVizConfig(
 ): VizConfig.NameBound {
   return (
     state.pendingUrlVizConfig ??
-    makeNameBoundVizConfigFromColumnIdConfig({
+    makeNameBoundVizConfigFromVizConfig({
       config: state.vizConfig,
       columns: state.lastResultColumns ?? [],
     }).config

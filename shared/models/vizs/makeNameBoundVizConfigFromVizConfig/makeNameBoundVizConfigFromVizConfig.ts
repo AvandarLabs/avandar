@@ -204,10 +204,11 @@ function _mapConfig(
 }
 
 /**
- * Replaces each column ID in a chart config with that column's current output
- * name, the row key the renderer reads. Leaves the saved config unchanged.
+ * Replaces each column ID in a chart config with that column's current
+ * `QueryResult` column name, the row key the renderer reads. Leaves the saved
+ * config unchanged.
  */
-export function makeNameBoundVizConfigFromColumnIdConfig({
+export function makeNameBoundVizConfigFromVizConfig({
   config,
   columns,
 }: Readonly<{

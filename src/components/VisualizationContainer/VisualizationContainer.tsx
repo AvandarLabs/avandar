@@ -5,7 +5,7 @@ import { Box, Flex } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";
-import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
+import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
@@ -24,7 +24,7 @@ import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 type Props = {
   columns: readonly QueryResult.ColumnWithId[];
   /**
-   * Raw output metadata remains available to tables when identity is
+   * Raw `QueryResult` columns remain available to tables when identity is
    * ambiguous.
    */
   rawColumns?: readonly QueryResult.Column[];
@@ -139,11 +139,11 @@ export function VisualizationContainer({
   const columnNames = rawColumns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
 
-  const resolved = makeNameBoundVizConfigFromColumnIdConfig({
+  const nameBoundConversion = makeNameBoundVizConfigFromVizConfig({
     config: vizConfig,
     columns: columns,
   });
-  return match(resolved.config)
+  return match(nameBoundConversion.config)
     .with({ vizType: "table" }, () => {
       return (
         <Box h="100%" w="100%" mih={0}>

@@ -193,7 +193,7 @@ function _bindSlotToColumnId({
  * ID of the one `QueryResult` column that has that name. Leaves the input
  * config unchanged.
  */
-export function makeColumnIdVizConfigFromNameBoundConfig({
+export function makeVizConfigFromNameBoundVizConfig({
   config,
   columns,
 }: Readonly<{

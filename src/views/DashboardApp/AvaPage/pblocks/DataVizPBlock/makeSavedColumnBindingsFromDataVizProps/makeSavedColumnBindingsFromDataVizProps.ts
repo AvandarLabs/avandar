@@ -1,7 +1,7 @@
 import { isDefined, prop } from "@avandar/utils";
 import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryResultColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
-import { makeColumnIdVizConfigFromNameBoundConfig } from "$/models/vizs/makeColumnIdVizConfigFromNameBoundConfig/makeColumnIdVizConfigFromNameBoundConfig";
-import { makeNameBoundVizConfigFromColumnIdConfig } from "$/models/vizs/makeNameBoundVizConfigFromColumnIdConfig/makeNameBoundVizConfigFromColumnIdConfig";
+import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig";
+import { makeVizConfigFromNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromNameBoundVizConfig/makeVizConfigFromNameBoundVizConfig";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   QueryResultColumnBindingIssue,
@@ -56,8 +56,8 @@ function _getLocalFilterOutcome({
 
 /**
  * Binds a chart's saved column references (legacy names or column IDs) to the
- * column IDs of its query's current output. A legacy envelope is upgraded only
- * when every name binds to exactly one column.
+ * column IDs of its query's current `QueryResult` columns. A legacy envelope is
+ * upgraded only when every name binds to exactly one column.
  */
 export function makeSavedColumnBindingsFromDataVizProps({
   props,
@@ -71,13 +71,13 @@ export function makeSavedColumnBindingsFromDataVizProps({
       props: { ...props, columnBindings: schema.registry },
       runtimeConfig: props.vizConfig,
       localFilters: props.localFilters,
-      issues: makeNameBoundVizConfigFromColumnIdConfig({
+      issues: makeNameBoundVizConfigFromVizConfig({
         config: props.vizConfig,
         columns: schema.columns,
       }).issues,
     };
   }
-  const columnIdConversion = makeColumnIdVizConfigFromNameBoundConfig({
+  const vizConfigConversion = makeVizConfigFromNameBoundVizConfig({
     config: props.vizConfig,
     columns: schema.columns,
   });
@@ -85,7 +85,7 @@ export function makeSavedColumnBindingsFromDataVizProps({
     return _getLocalFilterOutcome({ filter, columns: schema.columns });
   });
   const issues = [
-    ...columnIdConversion.issues,
+    ...vizConfigConversion.issues,
     ...outcomes.map(prop("issue")).filter(isDefined),
   ];
   const localFilters = outcomes.map(prop("filter")).filter(isDefined);
@@ -95,12 +95,12 @@ export function makeSavedColumnBindingsFromDataVizProps({
       : {
           ...props,
           columnBindingVersion: 1,
-          vizConfig: columnIdConversion.config,
+          vizConfig: vizConfigConversion.config,
           localFilters,
           columnBindings: schema.registry,
           globalFilterTargets: {},
         },
-    runtimeConfig: columnIdConversion.config,
+    runtimeConfig: vizConfigConversion.config,
     localFilters,
     issues,
   };

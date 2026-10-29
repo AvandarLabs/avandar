@@ -19,10 +19,10 @@ export type FromResolution = {
 };
 
 /**
- * Resolve a single FROM-list entry to a dataset reference (if we know it),
- * a nested subquery, or `undefined` when we can't classify it.
+ * Finds the dataset a FROM-list table name refers to, by dataset ID or
+ * case-insensitive dataset name, or `undefined` when none matches.
  */
-function _resolveDataset(
+function _getDatasetFromTableName(
   tableName: string,
   datasets: readonly DatasetWithColumns[],
 ): DatasetWithColumns | undefined {
@@ -165,7 +165,7 @@ export function parseFromClause(
           unmappedReasons.push({ code: "fromNestedSubqueryUnserializable" });
         }
       } else if (tableName) {
-        base = _resolveDataset(tableName, datasets);
+        base = _getDatasetFromTableName(tableName, datasets);
         baseAlias = alias;
         if (!base) {
           unmappedReasons.push({ code: "fromUnknownDataset", tableName });

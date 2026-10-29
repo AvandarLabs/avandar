@@ -40,7 +40,7 @@ describe("useQueryResultColumnBindings", () => {
     });
     expect(result.current).toBeUndefined();
   });
-  it("distinguishes completed empty output metadata from loading", () => {
+  it("distinguishes a completed result with no QueryResult columns from loading", () => {
     const { result } = renderHook(() => {
       return useQueryResultColumnBindings({
         ..._options(),
