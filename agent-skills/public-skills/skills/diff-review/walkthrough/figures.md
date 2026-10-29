@@ -62,16 +62,19 @@ of it is the caption:
 1. **The caption sentence comes first,** in italics: one or two sentences
    stating what to notice.
 2. **The diagram key follows,** when the drawing needs one: a line holding
-   only `**Diagram key**`, then a two-column table, `Term` and `Meaning`, with
-   one row per abbreviated label or legend entry. Each meaning is one short
-   sentence.
+   only `**Diagram key**`, then a two-column table with one row per
+   abbreviated label or legend entry, the term in bold and then its meaning in
+   one short sentence. Leave the header row's cells empty: the table only
+   lines each term up with its meaning, so it needs no column names.
 
 Start every line of the box with `>`, blank lines included, so it stays one
 box. Never put a heading inside it, which would print as a numbered section,
 and never put prose between the fence and the box, which detaches the box from
-the figure. `markdown-to-pdf` 0.13.0 and later print the box a size smaller in
-a shaded panel that stays on the figure's page; GitHub shows it as a quote.
-Either way it reads as part of the figure rather than as the next paragraph.
+the figure. `markdown-to-pdf` 0.13.1 and later print the box a size smaller in
+a shaded panel that stays on the figure's page, with the label in small
+capitals and the key as an aligned list without lines; GitHub shows it as a
+quote. Either way it reads as part of the figure rather than as the next
+paragraph.
 
 ```markdown
 > *A publish never exposes staged objects: viewers keep reading the committed
@@ -79,11 +82,11 @@ Either way it reads as part of the figure rather than as the next paragraph.
 >
 > **Diagram key**
 >
-> | Term | Meaning |
+> | | |
 > | --- | --- |
-> | staged | Objects uploaded under a transition claim, readable only by the dashboard's editors. |
-> | committed | The generation `snapshot_revision` points at, readable by the dashboard's audience. |
-> | fence | An `abort_publish` claim written over an abandoned `publish`. |
+> | **staged** | Objects uploaded under a transition claim, readable only by the dashboard's editors. |
+> | **committed** | The generation `snapshot_revision` points at, readable by the dashboard's audience. |
+> | **fence** | An `abort_publish` claim written over an abandoned `publish`. |
 ```
 
 ### A figure never spans two pages

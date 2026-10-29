@@ -44,18 +44,18 @@ class FigureCaptionBox(unittest.TestCase):
         ">\n"
         "> **Diagram key**\n"
         ">\n"
-        "> | Term | Meaning |\n"
+        "> | | |\n"
         "> | --- | --- |\n"
-        "> | registry | The registry that holds each column ID. |\n"
+        "> | **registry** | The registry that holds each column ID. |\n"
     )
 
     def test_each_quoted_block_is_marked_on_its_own(self):
         lines = marked(self.BOX).strip().split("\n")
         self.assertEqual(lines[0], "> *Each column ID<sup>G1</sup> survives a rename.*")
-        self.assertEqual(lines[4], "> | Term | Meaning |")
+        self.assertEqual(lines[4], "> | | |")
         self.assertEqual(
             lines[6],
-            "> | registry<sup>G2</sup> | The registry<sup>G2</sup> that holds each column ID<sup>G1</sup>. |",
+            "> | **registry<sup>G2</sup>** | The registry<sup>G2</sup> that holds each column ID<sup>G1</sup>. |",
         )
 
     def test_a_term_wrapped_across_quoted_lines_is_marked(self):
