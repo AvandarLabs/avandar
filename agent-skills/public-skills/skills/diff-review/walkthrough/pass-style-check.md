@@ -119,8 +119,11 @@ own draft.
    [Sections](structure.md#sections): walk it against every strand and confirm where each
    item landed, saying so when an item does not apply. In
    [the short form](structure.md#the-short-form), walk it against Shape of
-   the solution instead, and confirm nothing in it is padded to match a
-   full-form section.
+   the solution instead, and confirm each item after its explanation keeps
+   the length [the short form](structure.md#the-short-form) sets: a decision
+   in at most two sentences, a scope boundary in one, a question in one or
+   two. Shorten an item that runs longer without dropping its claim, or
+   report it when it cannot be shortened.
 
 3. **Read only the headings and each section's first sentence.** If that alone
    does not tell the story of the change, the structure is wrong, and no detail
@@ -216,7 +219,8 @@ own draft.
     a `stateDiagram-v2`, every decision it lists appears in Decisions with its
     rejected alternative and the evidence that would reverse it, and every
     other answer it did not cut lands in a strand. In the short form, the
-    document has the short form's sections, and every answer the plan did not
-    cut lands in Shape of the solution. Report each miss rather
+    document has the short form's sections, every answer the plan did not cut
+    lands in Shape of the solution, and a decision needs only its choice and
+    the alternative it rejected. Report each miss rather
     than fixing it: restoring a dropped answer adds a claim, which is outside
     this pass's remit.

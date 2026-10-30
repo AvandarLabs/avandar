@@ -93,12 +93,14 @@ one:
      how it fits.
    - **Exempt:** formatting, a rename with no change in behavior, and a
      declaration whose name and signature say all a reader needs, such as a
-     type that restates its fields or aliases another type, a constant, or a
-     small helper. So is everything the script leaves out: tests, generated
+     type that restates its fields or aliases another type, a constant whose
+     name and value say what it is for, or a small helper. So is everything the script leaves out: tests, generated
      files, and lockfiles. No thread is owed on a test, though one may explain
      a test whose purpose its test names do not state. A move with no change
      gets one thread at its destination saying where it came from.
-3. Write one thread per core unit, anchored on its declaration line. When one
+3. Write one thread per core unit, anchored on its declaration line when that
+   line is part of the diff, and otherwise on the unit's first changed line,
+   since difit shows threads only on lines in the diff. When one
    explanation serves several units that sit next to each other in one file,
    write one thread anchored on a range from the first unit's declaration line
    to the last one's, so it shows beside the code it explains. Units far

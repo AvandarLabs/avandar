@@ -166,7 +166,9 @@ for a too-wide diagram is always fewer nodes per row.
 
 For any user-visible change, include a screenshot. Drive the app to the changed
 state and capture it. When capture is genuinely blocked, say so in one sentence
-and fall back to an ASCII wireframe of the changed surface. Blocked means
+that names the block, with no further account of it, and fall back to an ASCII
+wireframe of the changed surface. A wireframe is a `text` fence, which the
+renderer does not join to a caption box, so put its key inside the fence. Blocked means
 blocked, not inconvenient: no browser automation available, an unrunnable local
 stack, or a flow gated behind a third-party credential the run does not hold.
 A state that takes setup to reach, such as a warning, an error, or a badge

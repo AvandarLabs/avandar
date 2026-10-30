@@ -218,7 +218,8 @@ Each appendix starts on a new page. Markdown has no page break, so put a line
 holding only `<div style="page-break-before: always"></div>` directly before each
 appendix heading, with a blank line on each side. It is the CSS page-break
 idiom: `markdown-to-pdf` 0.14.0 and later and HTML-based converters break the
-page there, and GitHub shows nothing.
+page there, and GitHub shows nothing. The appendices are the only place a page
+break goes: never add one to move a figure or a section onto a fresh page.
 
 There is no reading-order or navigation section. Mapping sections to code is
 the explainer threads' job, per [Explainer threads](../contracts/transcript.md#explainer-threads), because
@@ -227,19 +228,30 @@ the walkthrough stands alone.
 ## The short form
 
 A change whose plan has nothing that needs a section of its own still gets a
-walkthrough: the short form, which has only the sections such a change needs.
+walkthrough: the short form, which has only the sections such a change needs,
+numbered 1 to 3.
 
 1. **Purpose:** the problem paragraph, then the diff summary, per
    [Purpose](purpose.md#in-the-short-form).
-2. **Background technical context,** as in the full form, and only as large as
-   the reader's need. One unit is a complete section when one is all the
-   reader needs.
+2. **Background technical context,** as in the full form, holding only the
+   units Shape of the solution relies on that the diff does not show. The
+   changed files are the diff, not background, so they get no row unless
+   Shape depends on knowing what one of them is. One unit is a complete
+   section when one is all the reader needs.
 3. **Shape of the solution:** how the change works and why it is shaped that
-   way, in as little as one paragraph. Everything else the change needs said
-   goes here, in a sentence or two each: a decision and the alternative it
-   rejected, a scope boundary, a question for the reviewer, a user-visible
-   change with its capture. A figure belongs here only when it shows what the
-   prose cannot.
+   way, in as little as one paragraph, with a code excerpt only where the
+   paragraph cannot carry the mechanism. After it, and only where they apply:
+   - a user-visible change, with its capture;
+   - each decision, as one bold sentence stating the choice and at most one
+     more naming the alternative it rejected and why; the evidence that would
+     reverse it is added only when the alternative does not make it obvious;
+   - each scope boundary, in one sentence;
+   - the questions for the reviewer, as a numbered list under
+     `Questions for the reviewer:`, each in one or two sentences.
+
+   A figure belongs here only when it shows what the prose cannot. An item
+   that cannot be said at that length is either a strand, which means the
+   plan chose the wrong form, or detail for an explainer thread.
 
 Then Appendix A. Manual testing and Appendix B. Glossary, as in the full form,
 each on its own page.

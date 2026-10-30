@@ -35,7 +35,12 @@ It works in three steps:
    stays out unless it is the only anchor for its layer, and so does a changed
    file nothing in the walkthrough depends on. When the result will not fit on
    one page, keep each area's anchor unit and drop the rest; the style check
-   reports it when the rendered page splits the figure.
+   reports it when the rendered page splits the figure. In
+   [the short form](structure.md#the-short-form), whose only numbered
+   sections are Purpose, Background technical context, and Shape of the
+   solution, keep only the units Shape of the solution relies on that the
+   diff does not show: a changed file gets no row unless Shape depends on
+   knowing what it is.
 
 It returns the units it included, the ones it considered and left out, and why,
 so the parent can judge the cut.

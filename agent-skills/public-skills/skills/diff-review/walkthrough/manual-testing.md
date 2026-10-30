@@ -18,8 +18,10 @@ up to this standard. Do not edit `-test-plan.md` itself.
     so and give the project's reset command (in Avandar, `pnpm db:reset`).
     When the test needs records the seed does not create, give the exact
     command that creates them. Carry over any precondition the project's
-    instructions attach to those commands: in Avandar, a branch other than
-    `develop` runs `ava supabase switch` before any database command.
+    instructions attach to those commands, as they stand at the compared
+    revision: in Avandar, a branch other than `develop` runs
+    `ava supabase switch` before any database command, where that command
+    exists.
   - **Data loaded through the UI.** Name the exact fixture file in the
     repository's test-data directory (in Avandar, a file under `tests/data/`)
     and the clicks that load it.
