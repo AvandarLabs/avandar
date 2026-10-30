@@ -17,6 +17,15 @@
   var REPLY_PLACEHOLDER = "Write a reply...";
   var ARM_WINDOW_MS = 5000;
   var GH_ICON = '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="currentColor"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>';
+  // Toggle a comment box between TUI and PR from the keyboard: Ctrl+G on macOS,
+  // Alt+Shift+G elsewhere (the shell's hotkey leader; "G" for GitHub). It only
+  // acts while focus is inside a comment box.
+  var IS_MAC = /Mac|iP(hone|ad|od)/.test((navigator.platform || "") + " " + (navigator.userAgent || ""));
+  var TOGGLE_HINT = IS_MAC ? "⌃G" : "Alt+Shift+G";
+  function isToggleCombo(e) {
+    if (e.code !== "KeyG" || e.metaKey) return false;
+    return IS_MAC ? e.ctrlKey && !e.altKey && !e.shiftKey : e.altKey && e.shiftKey && !e.ctrlKey;
+  }
   var github = { available: false, reason: "", pr: null, comments: {} };
   var threadsById = {};
   var armedGithubAt = 0;
@@ -30,6 +39,7 @@
     ".dif-dest button[data-dest=github][aria-checked=true]{color:#fff;background:#2f81f7}",
     ".dif-dest button:disabled{opacity:.3;cursor:not-allowed}",
     ".dif-dest button:focus-visible{outline:2px solid #2f81f7;outline-offset:1px}",
+    ".dif-dest kbd{align-self:center;font:inherit;font-size:11px;opacity:.5;padding:0 6px 0 4px}",
     "[data-dif-gh-thread]{border-color:rgba(47,129,247,.45)!important;border-left-color:#2f81f7!important;background-color:rgba(47,129,247,.07)!important}",
     "[data-dif-gh-thread=pending],[data-dif-gh-thread=draft]{border-left-style:dashed!important}",
     "[data-dif-gh-thread=failed]{border-color:rgba(248,81,73,.45)!important;border-left-color:#f85149!important;background-color:rgba(248,81,73,.06)!important}",
@@ -94,8 +104,12 @@
     group.className = "dif-dest";
     group.setAttribute("role", "radiogroup");
     group.setAttribute("aria-label", "Send this comment to");
-    group.appendChild(destButton("local", "TUI", "Send to the LLM in the dif TUI"));
-    group.appendChild(destButton("github", GH_ICON + "<span>PR</span>", "Post to the GitHub PR only (the LLM never sees it)"));
+    group.appendChild(destButton("local", "TUI", "Send to the LLM in the dif TUI (" + TOGGLE_HINT + " toggles)"));
+    group.appendChild(destButton("github", GH_ICON + "<span>PR</span>", "Post to the GitHub PR only (" + TOGGLE_HINT + " toggles)"));
+    var hint = document.createElement("kbd");
+    hint.textContent = TOGGLE_HINT;
+    hint.setAttribute("aria-hidden", "true");
+    group.appendChild(hint);
     group.addEventListener("click", function (e) {
       var b = e.target.closest ? e.target.closest("button[data-dest]") : null;
       if (b && !b.disabled) setDest(form, b.getAttribute("data-dest"));
@@ -115,7 +129,7 @@
       var ghBtn = form.querySelector('.dif-dest button[data-dest="github"]');
       ghBtn.disabled = !github.available;
       ghBtn.title = github.available
-        ? "Post to GitHub PR #" + github.pr.number + " only (the LLM never sees it)"
+        ? "Post to GitHub PR #" + github.pr.number + " only (" + TOGGLE_HINT + " toggles)"
         : github.reason || "No GitHub PR to post to";
       if (!github.available && form.getAttribute("data-dif-dest") === "github") setDest(form, "local");
     }
@@ -128,6 +142,15 @@
     }
   }
   document.addEventListener("submit", function (e) { armIfGithub(e.target); }, true);
+  document.addEventListener("keydown", function (e) {
+    if (!isToggleCombo(e)) return;
+    var form = e.target && e.target.closest ? e.target.closest("form") : null;
+    if (!form || !form.querySelector(".dif-dest")) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var next = form.getAttribute("data-dif-dest") === "github" ? "local" : "github";
+    setDest(form, next); // falls back to TUI when there is no PR
+  }, true);
   document.addEventListener("keydown", function (e) {
     var t = e.target;
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && t && t.tagName === "TEXTAREA") {

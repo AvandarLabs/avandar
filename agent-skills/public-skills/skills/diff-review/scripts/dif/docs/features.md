@@ -156,7 +156,9 @@ them.
 **PR comments are drafts until you submit.** Every comment box in difit has a
 **TUI / PR** toggle beside its buttons. **PR** adds the comment to your pending
 GitHub review (what "Start a review" does on github.com) and never sends it to
-the LLM. A reply box inside a PR thread defaults to PR.
+the LLM. A reply box inside a PR thread defaults to PR. **Ctrl+G** (macOS) or
+**Alt+Shift+G** (Windows/Linux) flips the toggle without leaving the box; the
+box shows the hint beside the toggle.
 
 - Drafts are visible only to you, here and on github.com, until you submit.
   A draft you start on github.com shows up in dif too.

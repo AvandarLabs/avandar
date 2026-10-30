@@ -457,13 +457,15 @@ Windows/Linux the leader is **Alt+Shift**, because browsers reserve
 | `Ctrl`+`D` / `Alt+Shift`+`D` | Show the Diff guide sidebar tab |
 | `Ctrl`+`T` / `Alt+Shift`+`T` | Show the Test plan sidebar tab |
 | `⌘K` / `Ctrl`+`K` | Toggle the command palette |
+| `Ctrl`+`G` (macOS) / `Alt+Shift`+`G` (Windows/Linux) | In a difit comment box: toggle where the comment goes, TUI ↔ PR |
 
 Hotkeys never fire while focus is in an editable field (so difit's comment boxes
 and emacs-style Ctrl keys keep working). Because a keydown inside the difit
 iframe never bubbles to the shell document, **`inject.js` forwards** matching
 combos up to the shell via `postMessage` (`{source:"dif-web-shell",
 type:"hotkey", combo}`), so the hotkeys work even when focus is inside difit.
-This reuses the same message channel as the existing `difit-ready` signal.
+This reuses the same message channel as the existing `difit-ready` signal. The one exception is the TUI ↔ PR toggle, which only acts *inside* a difit
+comment box (handled by `inject/destinations.js`, not forwarded).
 
 > Cross-platform note: on Windows/Linux `Ctrl`+digit / `Ctrl`+`F` /
 > `Ctrl`+`D` / `Ctrl`+`T` are browser shortcuts and cannot be reliably
