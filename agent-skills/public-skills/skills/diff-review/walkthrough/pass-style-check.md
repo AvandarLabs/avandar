@@ -191,9 +191,11 @@ own draft.
 
 9. **Confirm the document stands alone,** per
    [The walkthrough stands alone](structure.md#the-walkthrough-stands-alone). Search it for
-   `.difit`, `guide`, `group`, `transcript`, `test plan`, `thread`, and
-   absolute paths, and remove every pointer to something a reader of the pull
-   request cannot open. There is no reading-order section.
+   `.difit`, `guide`, `group`, `transcript`, `test plan`, `thread`,
+   `explainer`, and absolute paths, and remove every pointer to something a
+   reader of the pull request cannot open. A sentence that mentions the
+   explainer threads, or leaves something to them, comes out whole. There is
+   no reading-order section.
 
 10. **Confirm the glossary markers are current,** per
     [Marking glossary terms in the text](glossary.md#marking-glossary-terms-in-the-text).

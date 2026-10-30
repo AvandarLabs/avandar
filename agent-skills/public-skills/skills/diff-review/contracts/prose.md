@@ -69,7 +69,7 @@ it. In a walkthrough, that is the [Glossary](../walkthrough/glossary.md).
   follows"), and a string of bare process verbs ("charts sync, resolve, and
   write"). Rewrite either with the actor as the subject and the object named.
 - **Text read on its own is grounded like a heading.** A heading, a section's
-  or a comment's opening sentence, the bold lead-in of a list item or a
+  opening sentence, the bold lead-in of a list item or a
   decision, a table's row label, and a caption are each read without the
   paragraph around them, and usually without any glossary, by a reviewer
   skimming. None of them may lean on a defined term in place of a plain

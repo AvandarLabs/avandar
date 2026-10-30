@@ -5,7 +5,7 @@ the change, written to be read before any code. It is indexed by idea, not by
 file. It explains the change's architecture, its design (the UI, the data model,
 and how data flows), and its algorithms. It does not explain every unit the
 diff touches: that is the explainer threads' job, per
-[As the reviewer](../contracts/transcript.md#as-the-reviewer), and a
+[Explainer threads](../contracts/transcript.md#explainer-threads), and a
 walkthrough that goes file by file or unit by unit is longer and no more
 useful. The guide answers "where do I go next", a thread answers "why is this
 line like this", and the walkthrough answers "what is this change, and why is
@@ -43,6 +43,13 @@ to writing it, never references in it: carry over what they established, as a
 claim verified against the code, and drop the pointer. A sentence that exists
 only to point at a local artifact, such as "the authoritative navigation is in
 the guide", comes out whole.
+
+**The walkthrough does not know the explainer threads exist.** The PDF is
+emailed, printed, and attached to the pull request, and none of its readers
+has the threads, which live in the author's local review session. So it never
+mentions them, never sends the reader to them, and never says what it leaves
+to them. References run one way: a thread may cite a walkthrough section, and
+no section cites a thread.
 
 ## Sections
 
@@ -210,7 +217,7 @@ idiom: `markdown-to-pdf` 0.14.0 and later and HTML-based converters break the
 page there, and GitHub shows nothing.
 
 There is no reading-order or navigation section. Mapping sections to code is
-the explainer threads' job, per [As the reviewer](../contracts/transcript.md#as-the-reviewer), because
+the explainer threads' job, per [Explainer threads](../contracts/transcript.md#explainer-threads), because
 the walkthrough stands alone.
 
 ## Rules
