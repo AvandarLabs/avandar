@@ -55,6 +55,53 @@ describe("validate-standard-local-config", () => {
     expect(result.stderr).toContain("ava supabase restore");
   });
 
+  it("indents the warning without ANSI escapes when stderr is redirected", () => {
+    const result = _runValidator(
+      STANDARD_CONFIG.replace('project_id = "avandar"', 'project_id = "temp"'),
+    );
+
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain(
+      "\n  ⚠️ Run 'ava supabase restore', stage the restored files, and retry.\n",
+    );
+    expect(result.stderr).not.toContain("\u001b");
+    expect(result.stdout).toBe("");
+  });
+
+  it("prints the indented warning in bold yellow when stderr is a terminal", () => {
+    const result = spawnSync(
+      "python3",
+      [
+        "-c",
+        `import os, pty, subprocess, sys
+terminal, stderr = pty.openpty()
+result = subprocess.run(
+    ["bash", sys.argv[1]], input=sys.stdin.buffer.read(), stderr=stderr,
+)
+sys.stdout.buffer.write(os.read(terminal, 4096))
+os.close(stderr)
+os.close(terminal)
+sys.exit(result.returncode)`,
+        VALIDATOR_PATH,
+      ],
+      {
+        cwd: process.cwd(),
+        encoding: "utf8",
+        input: STANDARD_CONFIG.replace(
+          'project_id = "avandar"',
+          'project_id = "temp"',
+        ),
+        timeout: 5_000,
+      },
+    );
+
+    expect(result.stderr).toBe("");
+    expect(result.status).toBe(1);
+    expect(result.stdout.replaceAll("\r\n", "\n")).toContain(
+      "\n  \u001b[1;33m⚠️ Run 'ava supabase restore', stage the restored files, and retry.\u001b[0m\n",
+    );
+  });
+
   it.each([
     ["api.port", "port = 54321", "port = 55321"],
     ["db.port", "port = 54322", "port = 55322"],
