@@ -33,6 +33,7 @@ dist-ssr
 
 # Ignorable development files 
 .eslintcache
+__pycache__/
 
 # Supabase
 supabase/.temp
