@@ -1,7 +1,7 @@
 # The clarity pass runs in a subagent
 
 This pass reads the draft as the reader in
-[Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code):
+[Writing for a reader new to this code](../contracts/prose.md#writing-for-a-reader-new-to-this-code):
 a software engineer who knows the product and has never worked in this part of
 the code. It edits nothing. It returns proposals to the parent, and it delivers
 the [Glossary](glossary.md).
@@ -10,9 +10,10 @@ The parent dispatches it with the walkthrough's path, the branch and
 comparison, and this file's path.
 
 **Read first,** each file whole, before reading the walkthrough:
-[`writing.md`](writing.md), which holds
-[Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code)
-and [Flow and orientation](writing.md#flow-and-orientation);
+[`contracts/prose.md`](../contracts/prose.md), which holds
+[Writing for a reader new to this code](../contracts/prose.md#writing-for-a-reader-new-to-this-code);
+[`writing.md`](writing.md), which holds the cold-read test and
+[Flow and orientation](writing.md#flow-and-orientation);
 [`purpose.md`](purpose.md); [`glossary.md`](glossary.md);
 [`structure.md`](structure.md), which holds the heading rules in
 [Sections](structure.md#sections); and

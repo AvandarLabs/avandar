@@ -68,7 +68,7 @@ Three failure modes. The last two survive review because they read well:
   evidence before they can inherit identity` is checkable to its author; a
   reviewer cannot tell what was executed, what the evidence proves, or whose
   identity is inherited. The fix is in
-  [Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code).
+  [Writing for a reader new to this code](../contracts/prose.md#writing-for-a-reader-new-to-this-code).
 
 | Avoid | Use |
 | --- | --- |
@@ -175,7 +175,7 @@ carry the specifics.
    alternative that was rejected, why, and what evidence would reverse it.
    Lead with the choice as one bold sentence that a reviewer skimming the list
    can parse on its own, per
-   [Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code). A
+   [Writing for a reader new to this code](../contracts/prose.md#writing-for-a-reader-new-to-this-code). A
    decision with no rejected alternative is not a decision, it is narration:
    cut it, or say plainly that the choice was arbitrary. Cite precedent per
    [Citations](code-and-citations.md#citations).
@@ -223,7 +223,7 @@ the walkthrough stands alone.
   function whose name already does.
 - Ground the code's informal vocabulary in what a user does or sees, and never
   trade clarity for brevity. See
-  [Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code).
+  [Writing for a reader new to this code](../contracts/prose.md#writing-for-a-reader-new-to-this-code).
 - Never hand-wrap a code excerpt to fit the page. `markdown-to-pdf` 0.8.0 and
   later break a long line at the measured column budget and mark the
   continuation with `\u21b3`, so a manual break only adds a wrap the source does

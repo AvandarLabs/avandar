@@ -74,11 +74,11 @@ when a step tells you to read that file, not before.
 
 | Mode | Read |
 | --- | --- |
-| Initial | `modes/initial.md`, `contracts/transcript.md`, `contracts/guide.md`, `contracts/reporting.md`, and `modes/walkthrough.md` when no walkthrough exists |
+| Initial | `modes/initial.md`, `contracts/transcript.md`, `contracts/guide.md`, `contracts/reporting.md`, `contracts/prose.md`, and `modes/walkthrough.md` when no walkthrough exists |
 | PR review | `modes/pr-review.md`, then every file Initial reads |
-| Continue | `modes/continue.md`, `contracts/transcript.md`, `contracts/guide.md`, `contracts/reporting.md` |
+| Continue | `modes/continue.md`, `contracts/transcript.md`, `contracts/guide.md`, `contracts/reporting.md`, `contracts/prose.md` |
 | Diff guide | `modes/diff-guide.md`, `contracts/guide.md` |
-| Summary | `modes/summary.md`, `contracts/reporting.md` |
+| Summary | `modes/summary.md`, `contracts/reporting.md`, `contracts/prose.md` |
 | Walkthrough, or a prepared review missing its walkthrough | `modes/walkthrough.md`, which names the `walkthrough/` files each step reads |
 | Cleanup | `modes/cleanup.md` |
 
@@ -86,7 +86,8 @@ when a step tells you to read that file, not before.
 SKILL.md        mode selection, artifact names, when a walkthrough is written
 modes/          one procedure per mode
 contracts/      transcript and comment voice, diff guide and reviewed state,
-                run command and chat summary
+                run command and chat summary, and the prose rules every
+                comment, reply, report, and walkthrough follows
 walkthrough/    the walkthrough's contract, one file per part, and one file
                 per review pass for the subagent that runs it
 references/     comment and reply voice, a worked pipeline explanation,

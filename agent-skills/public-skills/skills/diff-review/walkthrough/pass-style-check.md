@@ -13,7 +13,7 @@ against: [`structure.md`](structure.md), [`purpose.md`](purpose.md),
 [`background-context.md`](background-context.md),
 [`manual-testing.md`](manual-testing.md), [`glossary.md`](glossary.md),
 [`figures.md`](figures.md), [`code-and-citations.md`](code-and-citations.md),
-and [`writing.md`](writing.md).
+[`writing.md`](writing.md), and [`contracts/prose.md`](../contracts/prose.md).
 
 **Authority:** edit the walkthrough file and nothing else.
 
@@ -27,7 +27,7 @@ highlight spec. It may not change a technical claim, add or remove a decision
 or an open question, or alter the meaning of any sentence. Nor may it shorten a
 heading or sentence by dropping a qualifier or a phrase that grounds a term for
 a new reader: clarity outranks brevity, per
-[Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code).
+[Writing for a reader new to this code](../contracts/prose.md#writing-for-a-reader-new-to-this-code).
 When a passage reads badly because the underlying claim is unclear, it reports
 that rather than guessing at a fix.
 
@@ -89,7 +89,7 @@ This subagent runs them, and only after the content review has settled, per
 [Review passes](../modes/walkthrough.md#review-passes). The author of a
 document is the worst reader of it: having just chosen every
 sentence, they read the intent rather than the text, and the tells in
-[Factual prose](writing.md#factual-prose) are exactly what an author cannot see in their
+[Factual prose](../contracts/prose.md#factual-prose) are exactly what an author cannot see in their
 own draft.
 
 1. **Find every fact the document states twice, and confirm the copies agree.**
@@ -147,7 +147,7 @@ own draft.
    Check every solved-problem section for `The Problem` and `The Solution`,
    every repository code excerpt for its project-relative file label AND its
    enclosing signature, and every paragraph and caption against
-   [Factual prose](writing.md#factual-prose). Then read the draft once more, sentence by
+   [Factual prose](../contracts/prose.md#factual-prose). Then read the draft once more, sentence by
    sentence, looking only for the tells in that table. They cluster at the
    start of sections and in the sentence before a diagram, but a tell buried
    mid-paragraph is just as much a defect; the clustering is where to expect

@@ -12,8 +12,9 @@ comparison, and this file's path.
 
 **Read first,** each file whole, before writing anything:
 [`background-context.md`](background-context.md), the contract for the
-section, and [`writing.md`](writing.md), which holds
-[Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code).
+section, [`writing.md`](writing.md), and
+[`contracts/prose.md`](../contracts/prose.md), which holds
+[Writing for a reader new to this code](../contracts/prose.md#writing-for-a-reader-new-to-this-code).
 
 **Authority:** edit the Background technical context section of the
 walkthrough and nothing else.

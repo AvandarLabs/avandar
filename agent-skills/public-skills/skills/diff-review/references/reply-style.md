@@ -11,6 +11,10 @@ are different: a reviewer opens a topic, an engineer closes one.
 A personal override may exist at `~/.diff-review/reply-style.md`. When it
 does, read it and let it win on any conflict with this file.
 
+Every reply also follows [`contracts/prose.md`](../contracts/prose.md),
+[Factual prose](../contracts/prose.md#factual-prose) above all: a reply is
+short, so a single tell in it is a large share of what the reviewer reads.
+
 ## The default reply is `Done.`
 
 A reviewer who asked for a change and got it needs one word. They will read

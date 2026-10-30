@@ -9,8 +9,9 @@ trusting the prose, and this file's path.
 **Read first,** each file whole, before changing anything:
 [`structure.md`](structure.md), which holds
 [The walkthrough stands alone](structure.md#the-walkthrough-stands-alone);
-[`writing.md`](writing.md), which holds
-[Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code);
+[`writing.md`](writing.md) and [`contracts/prose.md`](../contracts/prose.md),
+which holds
+[Writing for a reader new to this code](../contracts/prose.md#writing-for-a-reader-new-to-this-code);
 [`code-and-citations.md`](code-and-citations.md), which holds the excerpt,
 highlight spec, and citation rules it checks; and
 [`manual-testing.md`](manual-testing.md) and [`glossary.md`](glossary.md),
@@ -109,5 +110,5 @@ diagram for legibility: those are the style check's, and doing them here costs t
 the ability to tell a correction from a preference. Where a claim is
 unrecoverable from the code, it adds an Open question rather than inventing a
 rationale. A correction it writes follows
-[Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code),
+[Writing for a reader new to this code](../contracts/prose.md#writing-for-a-reader-new-to-this-code),
 so fixing a claim never brings back vernacular the clarity pass grounded.

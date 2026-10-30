@@ -15,8 +15,10 @@ is written to:
 - [`walkthrough/purpose.md`](../walkthrough/purpose.md) and
   [`walkthrough/manual-testing.md`](../walkthrough/manual-testing.md): the two
   parts the author writes besides the strands.
-- [`walkthrough/writing.md`](../walkthrough/writing.md): flow, the reader new
-  to this code, how much to explain, and factual prose.
+- [`contracts/prose.md`](../contracts/prose.md): the reader new to this code
+  and factual prose, which every piece of prose the skill writes follows.
+- [`walkthrough/writing.md`](../walkthrough/writing.md): flow, the cold-read
+  test, and how much to explain.
 - [`walkthrough/figures.md`](../walkthrough/figures.md): diagrams and
   screenshots.
 - [`walkthrough/code-and-citations.md`](../walkthrough/code-and-citations.md):

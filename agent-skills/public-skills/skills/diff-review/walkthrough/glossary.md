@@ -81,7 +81,7 @@ numeral on the line, `[1]`, per [Citations](code-and-citations.md#citations).
 - **Never in** a heading, a table's header row, a code span, a fenced block
   (mermaid included), or Sources. Headings are read without the glossary
   anyway, per
-  [Writing for a reader new to this code](writing.md#writing-for-a-reader-new-to-this-code).
+  [Writing for a reader new to this code](../contracts/prose.md#writing-for-a-reader-new-to-this-code).
   A definition in the glossary marks the other entries it uses, never its own
   term.
 - **The script owns the markers.** Never add, move, or renumber one by hand.

@@ -12,6 +12,11 @@ reviewer opens a topic, an engineer closes one.
 A personal override may exist at `~/.diff-review/review-comment-style.md`.
 When it does, read it and let it win on any conflict with this file.
 
+Every comment also follows [`contracts/prose.md`](../contracts/prose.md):
+ground the vocabulary a reader new to this code would not know, and cut the
+tells in [Factual prose](../contracts/prose.md#factual-prose). This file sets
+the voice and the length; that one sets what each sentence must do.
+
 ## Non-negotiables
 
 1. **No em dashes. Ever.** Use a comma, colon, semicolon, or parentheses. Also
