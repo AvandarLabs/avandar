@@ -74,17 +74,52 @@ it when it exists (`~/.diff-review/review-comment-style.md`,
 
 ### As the reviewer
 
-For explainers on the agent's own diff, comment only when the reviewer benefits
-from context the diff does not state: why an abstraction exists, how data moves,
-which domain rule or invariant applies, or why a fallback or integration works
-that way. Skip formatting, naming-only changes, obvious helpers, and narration
-of the attached line. Never comment outside the requested diff scope.
+**Explainer threads cover the code; the walkthrough covers the design.** The
+walkthrough explains a change's architecture, its UI and data design, and its
+algorithms, and deliberately does not go unit by unit. Explaining each unit is
+the explainer threads' job, so every core unit of the agent's own diff gets
+one:
+
+1. List the units with
+   `python3 <skill-dir>/scripts/list-changed-units.py <comparison-key>`. A
+   unit is one top-level declaration in one file.
+2. Sort each into core or exempt:
+   - **Core:** it carries architecture, data flow, a data model or a stored
+     shape, UI behavior, a business rule or invariant, or an algorithm, so a
+     reader seeing it cold would need to know why it exists, what it
+     guarantees, or how it fits.
+   - **Exempt:** formatting, a rename with no change in behavior, a type that
+     only restates its fields, a helper whose name and signature say all it
+     does, and what the script leaves out (tests, generated files,
+     lockfiles). A move with no change gets one thread at its destination
+     saying where it came from. A test file gets a thread only when what it
+     proves is not evident from its name.
+3. Write one thread per core unit, anchored on its declaration line or on a
+   range over it. When one explanation serves several units of one file,
+   write one thread anchored on a range spanning them.
+4. Run the script again with `--transcript <transcript-path>`. Every unit it
+   still lists must be exempt; a core unit there is a thread still owed.
+
+Never comment outside the requested diff scope.
+
+**What a thread says** is the context the diff does not state: why the unit
+exists, what it guarantees or assumes, how data moves through it, which domain
+rule applies, or why a fallback or integration works that way. Never narrate
+the attached lines.
+
+**How long a thread runs** is as long as a reader new to this code needs to
+understand the unit, and no longer. Usually that is two to four sentences. An
+invariant or an algorithm may need a worked example, and gets one. An essay
+never helps: apply the [deletion test](../walkthrough/writing.md#how-much-to-explain)
+to every sentence, and cut any sentence whose absence would leave the reader
+concluding the same thing. Every thread follows
+[`contracts/prose.md`](prose.md): ground each term the reader would not know,
+and leave out every tell in [Factual prose](prose.md#factual-prose).
 
 **Explainers point into the walkthrough; the walkthrough never points back.**
-When a walkthrough exists, it is where the context lives, so an explainer
-whose context a walkthrough section already explains cites that section by
-number and heading instead of repeating it, and adds only what is specific to
-the attached lines:
+When a walkthrough section already explains the context of a unit, the thread
+cites that section by number and heading instead of repeating it, and adds
+only what is specific to the attached lines:
 
 ```markdown
 Keeps the earlier column ID only for an unchanged expression. Why, with a
@@ -93,11 +128,11 @@ column keeps its earlier column ID only when the app can prove it is the same
 column".
 ```
 
-Point a thread at the walkthrough wherever a reader of those lines needs the
-bigger picture: the strand section that explains the code block, or the
-Background technical context entry for an unfamiliar module. PR findings never
-cite the walkthrough, because they are pasted into GitHub, where it does not
-exist.
+Cite only when the section adds understanding of these lines. Most units are
+not in the walkthrough, by design, and their threads stand alone; a citation
+to a section that does not explain the unit, or that the thread already
+makes redundant, is noise. PR findings never cite the walkthrough, because
+they are pasted into GitHub, where it does not exist.
 
 For PR findings, write text a human can paste into GitHub unchanged, in the
 voice `references/review-comment-style.md` describes:

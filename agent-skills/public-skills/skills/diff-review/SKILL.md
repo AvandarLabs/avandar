@@ -92,7 +92,8 @@ walkthrough/    the walkthrough's contract, one file per part, and one file
                 per review pass for the subagent that runs it
 references/     comment and reply voice, a worked pipeline explanation,
                 worked screenshot examples
-scripts/        validators, helpers, the glossary marker, and the dif runner
+scripts/        validators, helpers, the glossary marker, the changed-unit
+                lister, and the dif runner
 ```
 
 ## Artifact names

@@ -2,7 +2,12 @@
 
 The walkthrough is the as-built design document for one change: the theory of
 the change, written to be read before any code. It is indexed by idea, not by
-file. The guide answers "where do I go next", a thread answers "why is this
+file. It explains the change's architecture, its design (the UI, the data model,
+and how data flows), and its algorithms. It does not explain every unit the
+diff touches: that is the explainer threads' job, per
+[As the reviewer](../contracts/transcript.md#as-the-reviewer), and a
+walkthrough that goes file by file or unit by unit is longer and no more
+useful. The guide answers "where do I go next", a thread answers "why is this
 line like this", and the walkthrough answers "what is this change, and why is
 it shaped this way".
 
