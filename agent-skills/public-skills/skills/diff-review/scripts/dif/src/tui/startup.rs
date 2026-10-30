@@ -24,13 +24,15 @@ use anyhow::Result;
 use crate::cli::Cli;
 use crate::comparison::ComparisonKey;
 use crate::config::DifConfig;
+use crate::difit::editor::DifitHttp;
 use crate::difit::poller::Poller;
 use crate::difit::{server, transcript};
 use crate::git::{self, Git};
 use crate::git_watcher::GitWatcher;
+use crate::github::checkout::GitCheckout;
 use crate::github::client::GhCli;
 use crate::github::registry::SharedRegistry;
-use crate::github::sync::GithubSync;
+use crate::github::sync::{GithubSync, SyncPorts};
 use crate::inject::dispatcher::Dispatcher;
 use crate::inject::mode::DispatchControl;
 use crate::inject::reply_watcher::ReplyWatcher;
@@ -270,6 +272,7 @@ fn start_launch_surface(
         difit,
         poller: start_poller(
             repo_root,
+            comparison,
             port,
             review_paths.transcript.clone(),
             &comment_channels.github,
@@ -279,18 +282,21 @@ fn start_launch_surface(
     })
 }
 
-/// Start the comments poller on `port`, with the GitHub sync pass that posts
-/// PR-bound comments from `github` through `gh` in `repo_root`.
+/// Start the comments poller on `port`, with the GitHub sync pass that keeps
+/// `github`'s PR comments, the checkout, and difit in step with the PR.
 pub(crate) fn start_poller(
     repo_root: &Path,
+    comparison: &ComparisonKey,
     port: u16,
     transcript_path: PathBuf,
     github: &SharedRegistry,
 ) -> Poller {
-    let sync = GithubSync::new(
-        github.clone(),
-        Box::new(GhCli::new(repo_root.to_path_buf())),
-    );
+    let ports = SyncPorts {
+        api: Box::new(GhCli::new(repo_root.to_path_buf())),
+        checkout: Box::new(GitCheckout::new(repo_root.to_path_buf())),
+        editor: Box::new(DifitHttp { port }),
+    };
+    let sync = GithubSync::new(github.clone(), comparison.clone(), ports);
     Poller::start_with_github(port, transcript_path, Duration::from_secs(1), Some(sync))
 }
 

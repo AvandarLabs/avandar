@@ -44,12 +44,6 @@ pub fn handle(route: &Route, mut request: Request, ctx: &Ctx, query: &str) -> st
             ctx.dispatch.request_send_all();
             send_status(request, 202)
         }
-        Route::GithubState => send_bytes_nostore(
-            request,
-            200,
-            "application/json",
-            ctx.github.snapshot().state_json().to_string().into_bytes(),
-        ),
         Route::SaveComments => save_comments(request, ctx, query),
         _ => send_status(request, 404),
     }

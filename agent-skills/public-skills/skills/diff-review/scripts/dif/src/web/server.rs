@@ -12,46 +12,11 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use tiny_http::{Header, Request, Response, Server, StatusCode};
 
+use super::assets::{INJECT_JS, SHELL_CSS, SHELL_HTML, SHELL_JS};
 use super::router::{self, DiffFilter, Route};
-use super::{filter, groups, inject, meta, proxy, review_routes};
+use super::{filter, github_routes, groups, inject, meta, proxy, review_routes};
 use crate::github::registry::SharedRegistry;
 use crate::inject::mode::DispatchControl;
-
-/// The embedded shell frontend + in-difit script (no build step; `include_str!`).
-pub const SHELL_HTML: &str = include_str!("frontend/shell.html");
-pub const SHELL_CSS: &str = include_str!("frontend/shell.css");
-pub const INJECT_JS: &str = include_str!("frontend/inject.js");
-
-/// The shell script, assembled from the ordered fragments under `frontend/shell/`.
-///
-/// They share ONE IIFE + closure scope: `shell.js` opens it and declares shared
-/// state, the feature files add behavior, and `boot.js` runs startup + closes
-/// the IIFE — so the order here is load-bearing (`shell.js` first, `boot.js`
-/// last; see `frontend/shell/shell.js`). The parts are concatenated at compile
-/// time and served as one `/__wrap/shell.js`.
-pub const SHELL_JS: &str = concat!(
-    include_str!("frontend/shell/shell.js"),
-    "\n",
-    include_str!("frontend/shell/tooltip.js"),
-    "\n",
-    include_str!("frontend/shell/helpers.js"),
-    "\n",
-    include_str!("frontend/shell/iframe.js"),
-    "\n",
-    include_str!("frontend/shell/render.js"),
-    "\n",
-    include_str!("frontend/shell/data.js"),
-    "\n",
-    include_str!("frontend/shell/spotlight.js"),
-    "\n",
-    include_str!("frontend/shell/hotkeys.js"),
-    "\n",
-    include_str!("frontend/shell/chrome.js"),
-    "\n",
-    include_str!("frontend/shell/dispatch.js"),
-    "\n",
-    include_str!("frontend/shell/boot.js"),
-);
 
 /// Per-request context shared across handler threads.
 pub struct Ctx {
@@ -268,8 +233,11 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
         route @ (Route::DispatchState
         | Route::SetDispatchMode
         | Route::SendAll
-        | Route::GithubState
         | Route::SaveComments) => review_routes::handle(&route, request, ctx, query),
+        route @ (Route::GithubState
+        | Route::GithubPull
+        | Route::GithubSubmit
+        | Route::GithubViewed) => github_routes::handle(&route, request, ctx),
         Route::DifitDoc => match proxy::get(ctx.difit_port, "/") {
             Ok(up) => send_bytes_nostore(
                 request,
@@ -325,66 +293,5 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
                 }
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::SHELL_JS;
-
-    /// `SHELL_JS` is assembled by concatenating ordered fragments that together
-    /// form ONE IIFE. The ordering is load-bearing — `shell.js` must open the
-    /// IIFE first and `boot.js` must close it last — but no per-file syntax
-    /// check catches a mis-ordered concat. Guard the assembled shape here.
-    #[test]
-    fn shell_js_is_one_well_formed_iife() {
-        // shell.js opens the IIFE + strict mode exactly once (a second wrapper
-        // would mean a fragment was duplicated or the entry file was reordered).
-        assert!(
-            SHELL_JS.contains("(function () {\n  \"use strict\";"),
-            "shell.js (the entry fragment) must open the IIFE first"
-        );
-        assert_eq!(
-            SHELL_JS.matches("\"use strict\";").count(),
-            1,
-            "exactly one strict-mode wrapper across the whole bundle"
-        );
-        // boot.js closes the IIFE and must be last.
-        assert!(
-            SHELL_JS.trim_end().ends_with("})();"),
-            "boot.js (the closing fragment) must come last"
-        );
-        // Ordering: the IIFE open precedes a feature fragment, which precedes
-        // boot — i.e. shell.js → features → boot.
-        let open = SHELL_JS.find("(function () {").expect("IIFE open present");
-        let feature = SHELL_JS
-            .find("hover tooltip")
-            .expect("a feature fragment present");
-        let boot = SHELL_JS
-            .find("===== boot =====")
-            .expect("boot fragment present");
-        assert!(
-            open < feature && feature < boot,
-            "entry → features → boot order"
-        );
-        // A couple of key symbols from different fragments actually made it in.
-        for sym in [
-            "selectView",
-            "renderSidebar",
-            "buildActions",
-            "showNewChanges",
-            "renderGuideTabPanel",
-            "renderTestPlanTabPanel",
-            "diff-summary.md",
-            "test-plan.md",
-            "Alt+Shift+",
-        ] {
-            assert!(SHELL_JS.contains(sym), "assembled bundle is missing {sym}");
-        }
-        // The console diagnostic hook was removed and stays removed.
-        assert!(
-            !SHELL_JS.contains("__difShell"),
-            "the __difShell hook must not return"
-        );
     }
 }

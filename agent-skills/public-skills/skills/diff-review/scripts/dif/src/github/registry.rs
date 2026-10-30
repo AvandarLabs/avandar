@@ -1,13 +1,15 @@
 //! The record of which review comments are bound for (or live on) the GitHub
-//! PR, persisted as `.difit/<branch>-difit-<scope>-github.json`.
+//! PR, persisted as `.difit/<branch>-difit-<scope>-github.json`, plus the
+//! session's live GitHub state.
 //!
 //! The comment itself stays in the transcript like any other, so difit still
-//! shows it after a relaunch. This sidecar only says which message ids are
-//! PR-synced, which GitHub comment each maps to, and how its sync went. Two
-//! threads touch it: the web shell marks a new comment `pending` the moment the
-//! browser saves it (before difit or the poller can see it), and the poller's
-//! sync pass posts it and records the outcome. Every mutation is saved
-//! atomically while the lock is held.
+//! shows it after a relaunch. The persisted part only says which message ids
+//! are PR comments, which GitHub comment and thread each maps to, and where it
+//! is in its lifecycle. Several threads touch it: the web shell marks a new
+//! comment `pending` the moment the browser saves it (before difit or the
+//! poller can see it) and queues reviewer requests; the poller's sync pass talks
+//! to GitHub and records the outcomes. Every mutation is saved atomically while
+//! the lock is held.
 
 use std::collections::{BTreeMap, HashSet};
 use std::fs;
@@ -16,54 +18,43 @@ use std::sync::{Arc, Mutex, MutexGuard};
 
 use serde::{Deserialize, Serialize};
 
+use super::session::Session;
 use crate::difit::transcript;
 
-/// The pull request PR-synced comments are posted to.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PullRequest {
-    pub number: u64,
-    pub url: String,
-    /// The PR head commit new comments are anchored to.
-    pub head_sha: String,
-}
-
-/// Whether a PR is available to post to. Resolved once per session and never
-/// persisted: the branch's PR can open or close between launches.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub enum PrState {
-    /// Not resolved yet.
-    #[default]
-    Unknown,
-    /// The branch has an open PR.
-    Available(PullRequest),
-    /// No PR to post to, with the reason shown to the reviewer.
-    Unavailable(String),
-}
-
-/// Where one PR-synced comment is in its lifecycle.
+/// Where one PR comment is in its lifecycle.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum SyncStatus {
-    /// Marked for GitHub; not posted yet.
+    /// Marked for the PR in dif; not on GitHub yet.
     Pending,
-    /// Posted; edits and deletes are mirrored to GitHub.
-    Synced,
+    /// In the reviewer's pending GitHub review: visible only to them until the
+    /// review is submitted.
+    Draft,
+    /// Visible on the PR.
+    Published,
     /// The last GitHub call failed. Editing the comment retries it.
     Failed,
 }
 
-/// One PR-synced comment, keyed by its difit message id.
+/// One PR comment, keyed by its difit message id.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SyncedComment {
     pub status: SyncStatus,
+    /// The GitHub GraphQL node id of the comment.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub github_id: Option<u64>,
+    pub node_id: Option<String>,
+    /// The GitHub GraphQL node id of the review thread it belongs to.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thread_id: Option<String>,
+    /// Whether it opened its GitHub thread (as opposed to replying in one).
+    #[serde(default)]
+    pub root: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
-    /// The body last sent to GitHub (or last attempted, when failed). A
-    /// different body in difit means the reviewer edited the comment.
+    /// The body last agreed with GitHub (or last attempted, when failed). A
+    /// different body in difit means the reviewer edited the comment; a
+    /// different body on GitHub means someone edited it there.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub body: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -76,46 +67,68 @@ impl SyncedComment {
     pub const fn pending() -> Self {
         Self {
             status: SyncStatus::Pending,
-            github_id: None,
+            node_id: None,
+            thread_id: None,
+            root: false,
             url: None,
             body: None,
             error: None,
         }
     }
+
+    /// Whether the comment exists on GitHub (as a draft or published).
+    #[must_use]
+    pub const fn is_on_github(&self) -> bool {
+        matches!(self.status, SyncStatus::Draft | SyncStatus::Published)
+    }
 }
 
-/// The persisted registry plus the session's PR state.
+/// The persisted registry.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Registry {
     #[serde(default)]
     pub comments: BTreeMap<String, SyncedComment>,
-    #[serde(skip)]
-    pub pr: PrState,
 }
 
 impl Registry {
-    /// The browser's view: PR availability plus every comment's sync state.
+    /// The difit message id mapped to GitHub comment `node_id`, if any.
     #[must_use]
-    pub fn state_json(&self) -> serde_json::Value {
-        let (available, pr, reason) = match &self.pr {
-            PrState::Available(pr) => (true, serde_json::to_value(pr).ok(), None),
-            PrState::Unavailable(reason) => (false, None, Some(reason.clone())),
-            PrState::Unknown => (false, None, Some("Looking up this branch's PR…".to_owned())),
-        };
-        serde_json::json!({
-            "available": available,
-            "pr": pr,
-            "reason": reason,
-            "comments": self.comments,
-        })
+    pub fn message_for_node(&self, node_id: &str) -> Option<&str> {
+        self.comments
+            .iter()
+            .find(|(_, entry)| entry.node_id.as_deref() == Some(node_id))
+            .map(|(id, _)| id.as_str())
+    }
+
+    /// How many comments still wait for a review submit (marked or drafted).
+    #[must_use]
+    pub fn draft_count(&self) -> usize {
+        self.count(|status| matches!(status, SyncStatus::Pending | SyncStatus::Draft))
+    }
+
+    /// How many comments GitHub rejected.
+    #[must_use]
+    pub fn failed_count(&self) -> usize {
+        self.count(|status| status == SyncStatus::Failed)
+    }
+
+    fn count(&self, pred: impl Fn(SyncStatus) -> bool) -> usize {
+        self.comments.values().filter(|c| pred(c.status)).count()
     }
 }
 
-/// The registry shared between the web shell and the poller, saved to `path`
-/// on every change.
+/// Everything the lock guards: the persisted registry and the session.
+#[derive(Debug, Default)]
+pub struct State {
+    pub registry: Registry,
+    pub session: Session,
+}
+
+/// The state shared between the web shell and the poller, with the registry
+/// saved to `path` on every change.
 #[derive(Debug, Clone)]
 pub struct SharedRegistry {
-    inner: Arc<Mutex<Registry>>,
+    inner: Arc<Mutex<State>>,
     path: PathBuf,
 }
 
@@ -128,7 +141,10 @@ impl SharedRegistry {
             .and_then(|text| serde_json::from_str(&text).ok())
             .unwrap_or_default();
         Self {
-            inner: Arc::new(Mutex::new(registry)),
+            inner: Arc::new(Mutex::new(State {
+                registry,
+                session: Session::new(),
+            })),
             path,
         }
     }
@@ -139,20 +155,32 @@ impl SharedRegistry {
         &self.path
     }
 
-    /// A copy of the current registry.
+    /// A copy of the persisted registry.
     #[must_use]
     pub fn snapshot(&self) -> Registry {
-        self.lock().clone()
+        self.lock().registry.clone()
     }
 
-    /// Every message id bound for GitHub, in any state. These never reach the
-    /// LLM pane.
+    /// Read the state under the lock.
+    pub fn read<T>(&self, read: impl FnOnce(&State) -> T) -> T {
+        read(&self.lock())
+    }
+
+    /// Every message id that must never reach the LLM pane: PR comments in any
+    /// state, plus comments removed because GitHub deleted or resolved them.
     #[must_use]
     pub fn github_ids(&self) -> HashSet<String> {
-        self.lock().comments.keys().cloned().collect()
+        let state = self.lock();
+        state
+            .registry
+            .comments
+            .keys()
+            .chain(state.session.tombstones.iter())
+            .cloned()
+            .collect()
     }
 
-    /// Mark `ids` as bound for GitHub. Already-tracked ids are left alone.
+    /// Mark `ids` as bound for the PR. Already-tracked ids are left alone.
     pub fn mark_pending(&self, ids: &[String]) {
         self.update(|registry| {
             for id in ids {
@@ -164,16 +192,31 @@ impl SharedRegistry {
         });
     }
 
-    /// Apply `change` and save the result while still holding the lock.
+    /// Apply `change` to the registry and save it while still holding the lock.
     pub fn update(&self, change: impl FnOnce(&mut Registry)) {
-        let mut registry = self.lock();
-        change(&mut registry);
-        if let Ok(text) = serde_json::to_string_pretty(&*registry) {
-            let _ = transcript::write_text(&self.path, &format!("{text}\n"));
-        }
+        self.update_state(|state| change(&mut state.registry));
     }
 
-    fn lock(&self) -> MutexGuard<'_, Registry> {
+    /// Apply `change` to the whole state, saving the registry afterwards.
+    ///
+    /// The lock is held through the save on purpose, so two writers can never
+    /// interleave their saves out of order.
+    #[allow(clippy::significant_drop_tightening)]
+    pub fn update_state<T>(&self, change: impl FnOnce(&mut State) -> T) -> T {
+        let mut state = self.lock();
+        let out = change(&mut state);
+        if let Ok(text) = serde_json::to_string_pretty(&state.registry) {
+            let _ = transcript::write_text(&self.path, &format!("{text}\n"));
+        }
+        out
+    }
+
+    /// Apply `change` to the session only (nothing to save).
+    pub fn session<T>(&self, change: impl FnOnce(&mut Session) -> T) -> T {
+        change(&mut self.lock().session)
+    }
+
+    fn lock(&self) -> MutexGuard<'_, State> {
         self.inner
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner)
@@ -183,6 +226,7 @@ impl SharedRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::github::session::PrState;
 
     #[test]
     fn marking_persists_and_reloads() {
@@ -200,43 +244,64 @@ mod tests {
     }
 
     #[test]
-    fn marking_never_resets_a_synced_comment() {
+    fn marking_never_resets_a_posted_comment() {
         let dir = tempfile::tempdir().unwrap();
         let registry = SharedRegistry::load(dir.path().join("r.json"));
         registry.update(|r| {
             r.comments.insert(
                 "m1".to_owned(),
                 SyncedComment {
-                    status: SyncStatus::Synced,
-                    github_id: Some(7),
+                    status: SyncStatus::Draft,
+                    node_id: Some("PRRC_1".to_owned()),
                     ..SyncedComment::pending()
                 },
             );
         });
         registry.mark_pending(&["m1".to_owned()]);
-        assert_eq!(registry.snapshot().comments["m1"].github_id, Some(7));
+        assert_eq!(
+            registry.snapshot().comments["m1"].node_id.as_deref(),
+            Some("PRRC_1")
+        );
     }
 
     #[test]
-    fn pr_state_is_not_persisted() {
+    fn session_state_is_not_persisted() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("r.json");
         let registry = SharedRegistry::load(path.clone());
-        registry.update(|r| r.pr = PrState::Unavailable("no PR".to_owned()));
-        assert_eq!(SharedRegistry::load(path).snapshot().pr, PrState::Unknown);
+        registry.update_state(|s| s.session.pr = PrState::Unavailable("no PR".to_owned()));
+        assert_eq!(
+            SharedRegistry::load(path).read(|s| s.session.pr.clone()),
+            PrState::Unknown
+        );
     }
 
     #[test]
-    fn state_json_reports_availability() {
+    fn tombstoned_ids_are_kept_from_the_llm() {
+        let dir = tempfile::tempdir().unwrap();
+        let registry = SharedRegistry::load(dir.path().join("r.json"));
+        registry.session(|s| s.tombstones.insert("gh:gone".to_owned()));
+        assert!(registry.github_ids().contains("gh:gone"));
+    }
+
+    #[test]
+    fn counts_drafts_and_failures() {
         let mut registry = Registry::default();
-        assert_eq!(registry.state_json()["available"], false);
-        registry.pr = PrState::Available(PullRequest {
-            number: 12,
-            url: "https://github.com/o/r/pull/12".to_owned(),
-            head_sha: "abc".to_owned(),
-        });
-        let state = registry.state_json();
-        assert_eq!(state["available"], true);
-        assert_eq!(state["pr"]["number"], 12);
+        for (id, status) in [
+            ("a", SyncStatus::Pending),
+            ("b", SyncStatus::Draft),
+            ("c", SyncStatus::Published),
+            ("d", SyncStatus::Failed),
+        ] {
+            registry.comments.insert(
+                id.to_owned(),
+                SyncedComment {
+                    status,
+                    ..SyncedComment::pending()
+                },
+            );
+        }
+        assert_eq!(registry.draft_count(), 2);
+        assert_eq!(registry.failed_count(), 1);
     }
 }

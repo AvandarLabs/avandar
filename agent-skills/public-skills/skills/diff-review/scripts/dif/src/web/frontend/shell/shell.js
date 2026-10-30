@@ -18,12 +18,12 @@
 //
 // SOURCE LAYOUT — this frontend is split into logical fragments under
 // `frontend/shell/`, concatenated IN ORDER by the Rust server (see `SHELL_JS`
-// in `src/web/server.rs`) into one script served at `/__wrap/shell.js`. They
+// in `src/web/assets.rs`) into one script served at `/__wrap/shell.js`. They
 // share ONE IIFE and one closure scope: THIS file opens the IIFE and declares
 // all shared state + DOM refs (the entry point); the feature files
 // (`tooltip.js`, `helpers.js`, `iframe.js`, `render.js`, `data.js`,
-// `spotlight.js`, `hotkeys.js`, `chrome.js`) add behavior; `boot.js` runs the
-// startup sequence and closes the IIFE. Ordering only requires `shell.js` first
+// `spotlight.js`, `hotkeys.js`, `chrome.js`, `dispatch.js`, `github.js`) add
+// behavior; `boot.js` runs the startup sequence and closes the IIFE. Ordering only requires `shell.js` first
 // and `boot.js` last — the middle files are hoisted function/listener
 // definitions and may be reordered freely. Each middle file is a fragment, not
 // standalone-valid; lint/parse the assembled `/__wrap/shell.js`, not the parts.

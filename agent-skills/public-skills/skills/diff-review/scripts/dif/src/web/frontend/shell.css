@@ -1423,3 +1423,228 @@ kbd {
   min-width: 18px;
   text-align: center;
 }
+
+/* GitHub: the linked PR, sync, the pending review, and its submit panel. */
+.gh-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.gh-nopr {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--warn);
+  background: var(--warn-wash);
+  border: 1px solid color-mix(in oklch, var(--warn) 34%, transparent);
+  border-radius: 999px;
+  padding: 1px 9px;
+  white-space: nowrap;
+}
+.gh-pr {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+.gh-pr:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+.gh-sync {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: var(--ink-3);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.gh-sync:hover {
+  color: var(--ink);
+  border-color: var(--line);
+}
+.gh-sync.busy .gh-sync-ic {
+  animation: gh-spin 0.9s linear infinite;
+}
+@keyframes gh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gh-sync.busy .gh-sync-ic {
+    animation: none;
+  }
+}
+.gh-review {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-ink);
+  background: var(--accent-wash);
+  border: 1px solid color-mix(in oklch, var(--accent) 34%, transparent);
+  border-radius: 999px;
+  padding: 1px 4px 1px 9px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.gh-review .gh-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--surface);
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 0 6px;
+  min-width: 18px;
+  text-align: center;
+}
+.gh-review:not(:has(.gh-count:not([hidden]))) {
+  padding-right: 9px;
+}
+.gh-notice {
+  font-size: 12px;
+  color: var(--warn);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 340px;
+}
+.gh-notice.ok {
+  color: var(--ok);
+}
+.gh-sync:focus-visible,
+.gh-review:focus-visible,
+.gh-pr:focus-visible,
+.gh-pop-submit:focus-visible,
+.gh-pop-cancel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.gh-pop {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+.gh-pop[hidden] {
+  display: none;
+}
+.gh-pop-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.gh-pop-sub {
+  margin: -4px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.gh-pop-body {
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 7px 9px;
+  resize: vertical;
+  min-height: 72px;
+}
+.gh-pop-body:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.gh-pop-events {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.gh-pop-events[hidden] {
+  display: none;
+}
+.gh-event {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.gh-event input {
+  margin-top: 3px;
+  accent-color: var(--accent);
+}
+.gh-event span {
+  display: flex;
+  flex-direction: column;
+}
+.gh-event small {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.gh-pop-error {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--del);
+}
+.gh-pop-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.gh-pop-cancel,
+.gh-pop-submit {
+  font: inherit;
+  font-size: 12.5px;
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  cursor: pointer;
+}
+.gh-pop-cancel {
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+}
+.gh-pop-submit {
+  font-weight: 500;
+  color: var(--surface);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+}
+.gh-pop-submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.gh-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

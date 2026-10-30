@@ -517,7 +517,7 @@ axum. Reuse `ureq` (already a dep) for upstream calls to difit.
   viewed-sync + the `X-Dif-Group` header fallback).
   - **The shell script is split into ordered fragments under `frontend/shell/`**
     rather than one large file. They share ONE IIFE + closure scope and are
-    concatenated at compile time — in order — into `server::SHELL_JS`, served as
+    concatenated at compile time — in order — into `assets::SHELL_JS`, served as
     a single `/__wrap/shell.js`. `shell.js` (the entry) opens the IIFE and
     declares all shared state + DOM refs; feature fragments (`tooltip`,
     `helpers`, `iframe`, `render`, `data`, `spotlight`, `hotkeys`, `chrome`,
@@ -526,7 +526,7 @@ axum. Reuse `ureq` (already a dep) for upstream calls to difit.
     load-bearing only in that `shell.js` is first and `boot.js` last (the middle
     fragments are hoisted function/listener definitions). The fragments are not
     individually parse-valid; lint/syntax-check the assembled `/__wrap/shell.js`.
-    A unit test (`server::tests::shell_js_is_one_well_formed_iife`) guards the
+    A unit test (`assets::tests::shell_js_is_one_well_formed_iife`) guards the
     assembled shape (single wrapper, entry to features to boot order, key symbols
     present).
 

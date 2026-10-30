@@ -359,6 +359,7 @@ impl App {
         }
         self.poller = Some(start_poller(
             &self.repo_root,
+            &self.comparison,
             self.port,
             self.transcript_path.clone(),
             &self.comment_channels.github,

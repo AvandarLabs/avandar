@@ -15,7 +15,9 @@
 //! I/O layer: [`proxy`] (ureq upstream calls) and [`server`] (the `tiny_http`
 //! request loop). [`WebShell`] owns the server thread.
 
+pub mod assets;
 pub mod filter;
+pub mod github_routes;
 pub mod groups;
 pub mod inject;
 pub mod meta;
@@ -56,10 +58,10 @@ pub struct CommentChannels {
 /// after `dif` relaunches with new code: the URL itself differs.
 fn asset_version() -> String {
     let mut h = DefaultHasher::new();
-    server::SHELL_HTML.hash(&mut h);
-    server::SHELL_CSS.hash(&mut h);
-    server::SHELL_JS.hash(&mut h);
-    server::INJECT_JS.hash(&mut h);
+    assets::SHELL_HTML.hash(&mut h);
+    assets::SHELL_CSS.hash(&mut h);
+    assets::SHELL_JS.hash(&mut h);
+    assets::INJECT_JS.hash(&mut h);
     format!("{:x}", h.finish())
 }
 

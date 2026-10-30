@@ -45,6 +45,12 @@ pub enum Route {
     SendAll,
     /// `GET /__wrap/github.json` — PR availability + each PR-bound comment's sync state.
     GithubState,
+    /// `POST /__wrap/github/pull` — pull from GitHub now.
+    GithubPull,
+    /// `POST /__wrap/github/submit` — submit the pending review.
+    GithubSubmit,
+    /// `POST /__wrap/github/viewed` — viewed-file changes to send to GitHub.
+    GithubViewed,
     /// `POST /api/comments` — difit's comment save, inspected for PR-bound comments
     /// before it is proxied.
     SaveComments,
@@ -106,6 +112,9 @@ pub fn route(method: &str, path: &str, query: &str, referer: Option<&str>) -> Ro
         "/__wrap/dispatch" => Route::SetDispatchMode,
         "/__wrap/send-all" => Route::SendAll,
         "/__wrap/github.json" => Route::GithubState,
+        "/__wrap/github/pull" => Route::GithubPull,
+        "/__wrap/github/submit" => Route::GithubSubmit,
+        "/__wrap/github/viewed" => Route::GithubViewed,
         "/" => Route::ShellPage,
         "/__wrap/inject.js" => Route::InjectJs,
         "/__wrap/groups.json" => Route::Groups,
@@ -173,6 +182,22 @@ mod tests {
         assert_eq!(
             route("GET", "/__wrap/github.json", "", None),
             Route::GithubState
+        );
+    }
+
+    #[test]
+    fn github_request_routes() {
+        assert_eq!(
+            route("POST", "/__wrap/github/pull", "", None),
+            Route::GithubPull
+        );
+        assert_eq!(
+            route("POST", "/__wrap/github/submit", "", None),
+            Route::GithubSubmit
+        );
+        assert_eq!(
+            route("POST", "/__wrap/github/viewed", "", None),
+            Route::GithubViewed
         );
     }
 
