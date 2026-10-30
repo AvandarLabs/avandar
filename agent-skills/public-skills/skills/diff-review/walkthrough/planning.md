@@ -9,7 +9,7 @@ The questions cover the four things a walkthrough explains: the change's
 architecture, its UI design, its data model and data flow, and its
 algorithms. They are not a list of the diff's units. Explaining every unit is
 the explainer threads' job, per
-[As the reviewer](../contracts/transcript.md#as-the-reviewer), so a plan that
+[Explainer threads](../contracts/transcript.md#explainer-threads), so a plan that
 walks the diff file by file has answered the wrong question.
 
 Answer from the code, read per step 3 of [Walkthrough](../modes/walkthrough.md),
