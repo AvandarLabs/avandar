@@ -140,28 +140,63 @@ The browser shell's top bar has a **Bulk / Eager** toggle.
 
 The mode resets to Bulk on every launch.
 
-### Sending a comment to the GitHub PR instead
+### Keeping the GitHub PR in sync
 
-Every comment box in difit has a **TUI / PR** toggle beside its buttons. TUI (the
-default) is the local conversation above. **PR** posts the comment to the
-branch's open GitHub PR with `gh api`, as whichever account `gh` is logged into,
-and **never** sends it to the LLM. A reply box inside a PR thread defaults to PR.
+When the branch has an open PR, `dif` keeps it and the review in step. The only
+thing that never goes to GitHub is the local conversation: comments and replies
+sent to the TUI (the default).
 
-- The comment still lives in difit and the transcript, so it survives a relaunch
-  and stays visible in the browser.
-- PR comments are restyled: a blue thread border and a GitHub **On PR** badge
-  that links to the comment on GitHub. A dashed border means it is still being
-  posted; red with **PR sync failed** means GitHub rejected it (hover the badge
+**Header.** The browser shell's top bar shows the PR (`#42`, linking to it), a
+**Sync** button, and a **Review (N)** button counting draft PR comments. With no
+open PR (or no `gh`), it shows a yellow **No linked PR** instead, with the
+reason on hover, and looks again every minute. Problems worth acting on (the PR
+has commits you can't pull yet, a failed sync) appear as a short notice beside
+them.
+
+**PR comments are drafts until you submit.** Every comment box in difit has a
+**TUI / PR** toggle beside its buttons. **PR** adds the comment to your pending
+GitHub review (what "Start a review" does on github.com) and never sends it to
+the LLM. A reply box inside a PR thread defaults to PR.
+
+- Drafts are visible only to you, here and on github.com, until you submit.
+  A draft you start on github.com shows up in dif too.
+- **Review (N)** opens the submit panel: an optional summary and, on someone
+  else's PR, **Comment**, **Approve**, or **Request changes**, as on GitHub. On
+  your own PR GitHub only lets you comment, so the panel offers **Submit
+  comments** alone.
+- PR comments are restyled: a blue thread border and a GitHub badge linking to
+  the comment. Drafts are dashed and say **PR draft**; published comments say
+  **On PR**; a red **PR sync failed** means GitHub rejected the comment (hover
   for GitHub's message; editing the comment retries).
-- Editing a PR comment edits it on GitHub. Deleting a reply, or resolving the
-  thread, deletes it from the PR.
-- A reply in a PR thread is posted as a GitHub reply. A PR reply inside a local
-  thread becomes a new PR comment on the same line.
-- When the branch has no open PR (or `gh` is missing), the PR option is disabled
-  and its tooltip says why.
+- Editing a PR comment edits it on GitHub. Deleting a reply deletes it.
+  Resolving a thread resolves the conversation on GitHub (a draft thread is
+  deleted instead).
 - GitHub only accepts comments on lines that are part of the PR's diff. If `dif`
-  is comparing something other than the PR (say `dif .`), a comment on a line
-  the PR does not change fails with GitHub's message.
+  compares something other than the PR (say `dif .`), a comment on a line the PR
+  does not change fails with GitHub's message.
+
+**Everything on the PR flows back.** dif pulls every minute, and at once when
+you click **Sync** or submit a review:
+
+- New comments and replies from anyone appear under their author's login,
+  including bots (`coderabbitai[bot]`). They are PR comments: the LLM never sees
+  them. Your own comments from github.com come in editable.
+- Edits made on GitHub replace the local text, unless you have an unsent edit of
+  the same comment, which wins. Comments deleted on GitHub, and conversations
+  resolved there, disappear locally.
+- New commits on the PR are pulled in when your branch is simply behind and has
+  no uncommitted changes to tracked files; the diff then reloads in place.
+  Otherwise the header says why (uncommitted changes, unpushed commits, or a
+  diverged branch) and nothing is touched.
+
+**Viewed files stay in sync both ways.** Marking a file viewed in difit marks it
+on GitHub at once, and the reverse arrives with the next pull. Marking a whole
+directory in difit marks each of its files on GitHub (GitHub has no bulk
+version). When a session starts, GitHub's viewed state wins. This only runs
+while dif shows the PR's own diff (comparing against the PR's base, with your
+checkout at the PR head); otherwise the PR link's tooltip says why it is
+paused. When GitHub's state changes a file, difit's view reloads once you have
+no comment half-typed.
 
 ## Command palette
 

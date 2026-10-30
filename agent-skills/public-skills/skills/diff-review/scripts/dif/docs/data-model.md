@@ -122,30 +122,41 @@ side only provides the path helpers so both halves agree on the names.
 
 ### The GitHub sync record
 
-`-github.json` lists the comments the reviewer sent to the branch's GitHub PR
-instead of the LLM. The comments themselves stay in the transcript like any
-other; this file only says which message ids are PR-bound and where they are on
-GitHub:
+`-github.json` lists the comments in the transcript that are PR comments: the
+reviewer's PR comments and everything pulled in from the PR. The comments
+themselves stay in the transcript like any other; this file only says which
+message ids are PR comments and where they are on GitHub:
 
 ```jsonc
 {
   "comments": {
     "<difit message id>": {
-      "status": "pending" | "synced" | "failed",
-      "githubId": 123456,                       // once posted
-      "url": "https://github.com/o/r/pull/7#discussion_r123456",
-      "body": "the body last sent to GitHub",   // a different body in difit = an edit
-      "error": "Validation Failed: …"           // the last failure, if any
+      "status": "pending" | "draft" | "published" | "failed",
+      "nodeId": "PRRC_…",       // the GitHub comment, once it exists
+      "threadId": "PRRT_…",     // the GitHub review thread it is in
+      "root": true,             // it opened that thread
+      "url": "https://github.com/o/r/pull/7#discussion_r…",
+      "body": "the body last agreed with GitHub",
+      "error": "the last failure, if any"
     }
   }
 }
 ```
 
-The web shell adds a `pending` entry when the browser saves a PR-bound comment,
-before difit holds it. The poller's sync pass posts it and records the outcome,
-and removes the entry once the comment is deleted from both difit and GitHub.
-Whether the branch has a PR is looked up once per session and never written
-here. The `diff-review` skill reads this file to leave PR-bound comments alone.
+- `pending`: marked for the PR in dif, not on GitHub yet. The web shell adds it
+  when the browser saves a PR comment, before difit holds it.
+- `draft`: in the reviewer's pending GitHub review, visible only to them.
+- `published`: on the PR. Submitting the review turns every draft published.
+- `failed`: GitHub rejected it; editing the comment retries.
+
+Comments pulled from GitHub get the message id `gh:<node id>`. `body` is
+compared both ways: a different body in difit is a local edit to push, a
+different body on GitHub is a remote edit to pull. Entries are removed when the
+comment is deleted or its thread resolved, on either side.
+
+The session's live GitHub state (the PR, the pending review, sync status, the
+viewed-file events) is never written here. The browser reads it, with these
+comments, from `/__wrap/github.json`.
 
 ## Slug + port derivation
 

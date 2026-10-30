@@ -400,7 +400,7 @@ button does. So a reviewer who reaches for difit's button gets the shell's guide
 and counts refreshed too, and our redundant **Show new changes** affordance
 clears on the next content check rather than lingering.
 
-### Comment delivery and PR comments
+### Comment delivery and the GitHub PR
 
 The top bar's right section starts with a **Bulk / Eager** segmented toggle and,
 in bulk mode while comments are held, a **Send all (N)** pill
@@ -408,12 +408,23 @@ in bulk mode while comments are held, a **Send all (N)** pill
 writes through `POST /__wrap/dispatch` and `POST /__wrap/send-all`. The button
 stays disabled after a click until the TUI reports the queue empty.
 
-`inject.js` adds a **TUI / PR** toggle to every difit comment box and restyles
-PR-bound comments (blue border, a GitHub **On PR** badge linking to the comment;
-dashed while posting, red on failure). Its styles are injected as a `<style>`
-element because difit's document has no shell stylesheet. See
-[integrations.md](integrations.md#github-pr-comments) for the save tagging and
-sync contract.
+The left section, after the branch identity, holds the GitHub controls
+(`frontend/shell/github.js`): a yellow **No linked PR** pill, or the PR link, a
+**Sync** icon button (spins while pulling), a **Review (N)** pill that opens the
+submit panel (a fixed-position dialog under it; Escape or an outside click
+closes it), and a notice line. It polls `/__wrap/github.json` every 2s and posts
+to `/__wrap/github/pull`, `/__wrap/github/submit`, and `/__wrap/github/viewed`.
+It also sends difit's viewed changes to GitHub, diffing difit's viewed index on
+every `storage` event; and after a sync fast-forwards the branch it reloads
+difit in place through the same path as **Show new changes**.
+
+Inside difit, the injected script is three concatenated parts, each its own
+IIFE (`assets::INJECT_JS`): `inject.js` (the core), `inject/destinations.js`
+(the TUI / PR toggle on comment boxes and the PR comment restyling), and
+`inject/viewed.js` (applying GitHub's viewed changes to difit's storage). Their
+styles are injected as a `<style>` element because difit's document has no
+shell stylesheet. See [integrations.md](integrations.md#github-pr-sync) for the
+contracts.
 
 ### Sidebar file rows
 

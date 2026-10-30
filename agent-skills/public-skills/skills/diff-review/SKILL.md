@@ -86,11 +86,14 @@ Use the slug rules in `scripts/dif/src/comparison.rs` and
 The skill writes these artifacts, except `-github.json`. The TUI reads them and
 owns live session metadata, transcript mirroring, and the GitHub sync record.
 
-`-github.json` lists transcript comments the reviewer sent to the GitHub PR
-instead of to you: its `comments` object is keyed by transcript entry `id`. The
-TUI posts, edits, and deletes those on GitHub itself. Treat every entry whose
-`id` is a key there as not addressed to you: never answer it, never count it as
-an open comment, and never edit code for it. Read it only for context.
+`-github.json` lists the transcript comments that belong to the branch's GitHub
+PR rather than to you: comments the reviewer sent to the PR, and every comment
+and reply the TUI pulled in from the PR (other reviewers, bots such as
+`coderabbitai[bot]`, and the reviewer on github.com, with ids like
+`gh:<node id>`). Its `comments` object is keyed by transcript entry `id`. The
+TUI keeps those in sync with GitHub itself. Treat every entry whose `id` is a
+key there as not addressed to you: never answer it, never count it as an open
+comment, and never edit code for it. Read it only for context.
 
 `dif` starts difit as soon as it launches, before any of these exist, and
 creates the transcript as `[]` so the reviewer can comment immediately. Treat an

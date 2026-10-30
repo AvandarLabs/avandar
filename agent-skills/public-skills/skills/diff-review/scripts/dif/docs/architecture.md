@@ -23,14 +23,20 @@ src/
 │   ├── imports.rs     server↔import comment shapes + conversion
 │   ├── transcript.rs  atomic read/write/create of the .difit transcript
 │   ├── importer.rs    entries an out-of-band transcript write adds → POST to difit (pure + POST)
+│   ├── editor.rs      add / edit / remove difit comments in place via comments-json + POST /api/comments
 │   ├── server.rs      build the difit command, pick a free port, spawn, wait-ready
 │   └── poller.rs      background thread: poll comments-json → import inbound, GitHub sync, publish + mirror
 ├── github/
-│   ├── registry.rs    the -github.json record of PR-bound comments + the session's PR state (shared, atomic saves)
+│   ├── registry.rs    the -github.json record of PR comments + the shared lock over it and the session (atomic saves)
+│   ├── session.rs     live GitHub state: PR, viewer, pending review, queued requests, pull status, viewed sync; /__wrap/github.json
 │   ├── anchor.rs      difit thread position → GitHub path / side / line range (pure)
-│   ├── plan.rs        difit comments vs the registry → create / reply / update / delete actions (pure)
-│   ├── client.rs      GithubApi trait + the `gh` CLI implementation
-│   └── sync.rs        runs each poller snapshot's plan against GitHub, records outcomes
+│   ├── plan.rs        push: difit comments vs the registry → draft / reply / update / delete / resolve actions (pure)
+│   ├── pull.rs        pull: the PR's threads vs the registry + difit → difit edits + registry changes; viewed changes (pure)
+│   ├── graphql.rs     the GraphQL documents + pure parsing of GitHub's answers
+│   ├── client.rs      GithubApi trait + the `gh api graphql` implementation
+│   ├── checkout.rs    branch vs PR head, fast-forward only when safe (Checkout trait + git)
+│   ├── sync.rs        the per-snapshot pass: PR lookup, push, viewed queue, review submit
+│   └── sync_pull.rs   the pull half: fetch, branch step, comments, viewed events
 ├── inject/
 │   ├── dispatch.rs    open-comment detection + line/location labels (pure)
 │   ├── prompt.rs      minimal per-comment prompt text (pure)
@@ -122,8 +128,9 @@ cursor instead).
   POSTed to `/api/comment-imports` and the mirror is skipped for that tick. It
   starts with difit at launch, and is momentarily absent only while a comparison
   retarget swaps difit out.
-  When the branch has a PR, the same thread runs the GitHub sync pass
-  (`github::sync`) over every snapshot, so `gh` calls never block the TUI.
+  The same thread runs the GitHub sync pass (`github::sync`) over every
+  snapshot, so `gh` and `git` calls (pushing PR comments, submitting the review,
+  the minute-by-minute pull, fast-forwarding) never block the TUI.
 - **Git-watcher thread** — recomputes the repo's diff signature once a second
   (`git rev-parse HEAD` + `status` + `diff HEAD`, hashed) and publishes it under
   a lock, so the UI loop can notice stale-diff state without spawning git itself.
@@ -194,11 +201,18 @@ difit holds the comment (and the transcript mirrors it, as for any comment)
         ├─► Dispatcher skips every id in the registry
         │
         └─► Poller thread: github::sync plans against the registry
-              create / reply / update / delete via `gh api`  →  the PR
+              drafts / replies / edits / deletes / resolves  →  pending review
+              Review (N) → submit  →  published on the PR
+
+Poller thread, every 60s or on Sync: github::sync_pull
+        PR threads + viewed files  →  difit (editor.rs) + registry
+        PR head ahead + clean branch  →  fast-forward  →  shell reloads difit
+        viewed changes  →  /__wrap/github.json events  →  inject/viewed.js
 ```
- The agent posts
-its reply back to the live server, which pushes it to the browser over SSE — no
-restart. See [integrations.md](integrations.md).
+
+For a local comment, the agent posts its reply back to the live server, which
+pushes it to the browser over SSE, with no restart. See
+[integrations.md](integrations.md), which also covers the GitHub sync contract.
 
 ## Difit-pane activity log
 
