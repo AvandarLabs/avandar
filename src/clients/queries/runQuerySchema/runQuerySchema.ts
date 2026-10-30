@@ -5,8 +5,10 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 
 /**
- * Reads unfiltered metadata through the execution service without user-query
- * analytics.
+ * Returns the columns (names and data types) a chart's SQL produces, without
+ * reading any rows, so dashboard charts can bind each column to a column ID.
+ * Runs the SQL with no dashboard filters, wrapped in `LIMIT 0`, through
+ * `runStructuredQuery`, and records no query analytics.
  */
 export async function runQuerySchema(
   options: Readonly<{
