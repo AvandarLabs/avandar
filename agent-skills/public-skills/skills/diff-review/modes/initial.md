@@ -19,7 +19,7 @@ sections, and the walkthrough takes longer than everything else combined.
    it stands. Initialize reviewed state only when it is absent; otherwise
    preserve and reconcile it. Pass the coverage gate.
 4. When `-walkthrough.md` does not exist for the selected comparison, write it
-   by running steps 2 to 11 of [Walkthrough](walkthrough.md). When it exists,
+   by running steps 2 to 12 of [Walkthrough](walkthrough.md). When it exists,
    leave it untouched, per
    [When a walkthrough is written](../SKILL.md#when-a-walkthrough-is-written).
 5. Write the explainer threads per
@@ -34,7 +34,7 @@ sections, and the walkthrough takes longer than everything else combined.
 6. Validate the transcript, then update the guides' thread counts and pass the
    coverage gate again.
 7. Send the Initial chat summary. When this round wrote the walkthrough, follow
-   it with the report from step 12 of [Walkthrough](walkthrough.md).
+   it with the report from step 13 of [Walkthrough](walkthrough.md).
 
 A reviewer comment may arrive mid-round: `dif` types it into your input as soon
 as it is written, so it lands as a queued message while you work. Before the

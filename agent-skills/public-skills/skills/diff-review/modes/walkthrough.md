@@ -2,13 +2,15 @@
 
 Selected only by an explicit request, such as `/diff-review walkthrough`, and
 the only mode that changes an existing walkthrough. Initial and PR review run
-steps 2 to 11 when no walkthrough exists, and a plain `/diff-review` on a
-prepared review with no walkthrough runs steps 2 to 12. Apart from what Initial
+steps 2 to 12 when no walkthrough exists, and a plain `/diff-review` on a
+prepared review with no walkthrough runs steps 2 to 13. Apart from what Initial
 does when step 1 runs it, read-only with respect to source.
 
 Before step 2, read these in full. Together they are the contract the draft
 is written to:
 
+- [`walkthrough/planning.md`](../walkthrough/planning.md): the questions the
+  plan answers before the draft starts.
 - [`walkthrough/structure.md`](../walkthrough/structure.md): what a walkthrough
   is, what it may cite, its sections in order, and the rules that apply
   throughout.
@@ -46,50 +48,56 @@ is written to:
    is called from. The walkthrough describes the system as it now stands, so
    unchanged collaborators are in scope for understanding even though they are
    out of scope for review.
-4. Capture the changed states of user-visible changes, per
+4. Write the plan, per [`walkthrough/planning.md`](../walkthrough/planning.md):
+   written answers to its questions about the change's architecture, UI and
+   data design, lifecycles, algorithms, and decisions, and the strand list
+   they lead to. Keep it in a scratch file outside the repository; it is an
+   input to the draft, never cited by it.
+5. Capture the changed states of user-visible changes, per
    [Screenshots](../walkthrough/figures.md#screenshots). Keep the app running:
-   step 7 and the review passes may send you back for more captures.
-5. Where a decision's rationale is not recoverable from the code, say so
+   step 8 and the review passes may send you back for more captures.
+6. Where a decision's rationale is not recoverable from the code, say so
    rather than inventing one, and add it to Open questions.
-6. Write `-walkthrough.md`, including Purpose per [Purpose](../walkthrough/purpose.md) and
+7. Write `-walkthrough.md`, including Purpose per [Purpose](../walkthrough/purpose.md) and
    Appendix A. Manual testing per [Manual testing](../walkthrough/manual-testing.md), each
    appendix after its page-break line per
-   [Sections](../walkthrough/structure.md#sections). Write the
+   [Sections](../walkthrough/structure.md#sections), with the plan's strands
+   in the plan's order. Write the
    Background technical context heading and `## Appendix B. Glossary` with a one-line
    placeholder each, so section numbers are final from the first draft; the
    next two passes fill them, and when regenerating they replace the old
    content of both rather than edit it. When regenerating, keep each section's
    number where its content still fits, because earlier explainer threads cite
    those numbers; where the current section order forces a renumber, make it
-   and list the affected threads in step 12. Do not touch
+   and list the affected threads in step 13. Do not touch
    the transcript, the guides, the reviewed state, or any source file. When a
    strand is a pipeline or a multi-pass algorithm, read
    [`references/pipeline-explanation.md`](../references/pipeline-explanation.md)
    before writing that section.
-7. Take the capture inventory, per
-   [Screenshots](../walkthrough/figures.md#screenshots): list every UI
-   element the draft names, and capture, crop, or letter each one that is not
+8. Take the capture inventory, per
+   [Screenshots](../walkthrough/figures.md#screenshots): starting from the
+   plan's UI design answer, list every UI element the draft names, and capture, crop, or letter each one that is not
    exempt and has no capture yet, per
    [Crop and letter the capture](../walkthrough/figures.md#crop-and-letter-the-capture).
    Re-take any capture of a named element that is a bare full-window
    screenshot, under the same file name. A capture skipped for any reason short of a block, per
    [Screenshots](../walkthrough/figures.md#screenshots), is a capture still
    owed.
-8. Run the background context pass, by dispatching a subagent per
+9. Run the background context pass, by dispatching a subagent per
    [Dispatching a review pass](#dispatching-a-review-pass) with
    [`walkthrough/pass-background.md`](../walkthrough/pass-background.md). It
    returns the units it included and the ones it left out, with reasons. Read
    [`walkthrough/background-context.md`](../walkthrough/background-context.md),
    judge the cut, and correct the section when a unit a later section depends
    on is missing.
-9. Run the clarity pass, by dispatching a subagent per
-   [Dispatching a review pass](#dispatching-a-review-pass) with
-   [`walkthrough/pass-clarity.md`](../walkthrough/pass-clarity.md). It edits
-   nothing, and returns proposals, heading renames and moves, questions for
-   you, the UI elements it could not picture, and the glossary rows. Read
-   [`walkthrough/glossary.md`](../walkthrough/glossary.md), then act on the
-   result per [Applying the clarity pass](#applying-the-clarity-pass).
-10. Enter the content review phase, by dispatching a subagent per
+10. Run the clarity pass, by dispatching a subagent per
+    [Dispatching a review pass](#dispatching-a-review-pass) with
+    [`walkthrough/pass-clarity.md`](../walkthrough/pass-clarity.md). It edits
+    nothing, and returns proposals, heading renames and moves, questions for
+    you, the UI elements it could not picture, and the glossary rows. Read
+    [`walkthrough/glossary.md`](../walkthrough/glossary.md), then act on the
+    result per [Applying the clarity pass](#applying-the-clarity-pass).
+11. Enter the content review phase, by dispatching a subagent per
     [Dispatching a review pass](#dispatching-a-review-pass) with
     [`walkthrough/pass-content-review.md`](../walkthrough/pass-content-review.md).
     Copy the draft to a temporary file outside the repository first, so a
@@ -100,7 +108,7 @@ is written to:
     change was for, and neither alone is a good judge of a disputed claim. A
     rejection is a normal outcome, and a change accepted without reading it
     defeats the phase. Then run the marking script again.
-11. Then run the style check, always the last pass, by dispatching a subagent
+12. Then run the style check, always the last pass, by dispatching a subagent
     per [Dispatching a review pass](#dispatching-a-review-pass) with
     [`walkthrough/pass-style-check.md`](../walkthrough/pass-style-check.md).
     It applies the closing checks, loops on the rendered PDF until every
@@ -110,14 +118,17 @@ is written to:
     to test. When it reports a contract violation outside its remit, such as a
     Background figure that splits across two pages, fix it yourself, then run
     the style check again so it stays the last pass. A missing or bare
-    capture it reports under check 6 is one of these: take it per step 7,
+    capture it reports under check 6 is one of these: take it per step 8,
     then run the style check again. Only a capture that is genuinely blocked
-    stays out, with its one-sentence reason in the document. A coverage gap or
-    a judgment call it reports goes into the step 12 report instead.
-12. Report the section count, which units the background context pass
+    stays out, with its one-sentence reason in the document. A plan answer it
+    reports under check 11 as missing from the draft is one too: write it in,
+    checking it against the code, then run the style check again. A coverage gap or
+    a judgment call it reports goes into the step 13 report instead.
+13. Report the plan's path and every answer it cut, the section count, which
+    units the background context pass
     included, what the clarity pass proposed and what you rejected, what the
     content review changed and what you rejected, what the style check
-    changed, the captures steps 7 and 11 added and any left out as blocked,
+    changed, the captures steps 8 and 12 added and any left out as blocked,
     and any section the deletion test shortened or removed. When a
     regeneration moved a section that an existing thread cites, list those
     threads. Then end the response with a table naming the walkthrough. One row is expected; the
@@ -162,6 +173,8 @@ Dispatch each pass to a fresh subagent, one at a time, and give it:
 - the absolute path of `-walkthrough.md`,
 - the branch and comparison the walkthrough describes, so it can read the diff
   itself rather than trusting the prose,
+- for the style check, the absolute path of the plan, which its last closing
+  check reads,
 - the absolute path of its pass file under `walkthrough/`, told to read that
   file and every file it lists under **Read first**, in full, before doing
   anything else.
@@ -181,7 +194,7 @@ it; add it to the existing tree and table rather than starting a new one, and
 drop a less needed unit when the addition would push the figure past one
 page.
 
-Take a capture for each UI element the pass could not picture, per step 7.
+Take a capture for each UI element the pass could not picture, per step 8.
 Answer the questions in the text or the figures, then write the glossary into
 Appendix B per [`walkthrough/glossary.md`](../walkthrough/glossary.md):
 dropping any entry for a term the reader no longer meets, in prose or in a

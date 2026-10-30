@@ -202,3 +202,11 @@ own draft.
     the markers on everyday words and confirm each marks the glossary's
     meaning; where one does not, qualify the entry's term or reword the
     sentence, then run the script again.
+
+11. **Check the draft against the plan,** when the parent gave you its path,
+    per [Planning the walkthrough](planning.md). Every lifecycle it lists has
+    a `stateDiagram-v2`, every decision it lists appears in Decisions with its
+    rejected alternative and the evidence that would reverse it, and every
+    other answer it did not cut lands in a strand. Report each miss rather
+    than fixing it: restoring a dropped answer adds a claim, which is outside
+    this pass's remit.

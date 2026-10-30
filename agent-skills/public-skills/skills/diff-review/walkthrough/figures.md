@@ -221,7 +221,7 @@ capture.
 ### Crop and letter the capture
 
 A full-window screenshot shows the reader everything except where to look. No
-capture of a named element is a bare full-window screenshot, and step 7 of
+capture of a named element is a bare full-window screenshot, and step 8 of
 [Walkthrough](../modes/walkthrough.md) re-takes one that is, under the same
 file name:
 
