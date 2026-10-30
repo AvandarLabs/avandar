@@ -240,18 +240,22 @@ numbered 1 to 3.
    section when one is all the reader needs.
 3. **Shape of the solution:** how the change works and why it is shaped that
    way, in as little as one paragraph, with a code excerpt only where the
-   paragraph cannot carry the mechanism. After it, and only where they apply:
-   - a user-visible change, with its capture;
-   - each decision, as one bold sentence stating the choice and at most one
-     more naming the alternative it rejected and why; the evidence that would
-     reverse it is added only when the alternative does not make it obvious;
-   - each scope boundary, in one sentence;
-   - the questions for the reviewer, as a numbered list under
-     `Questions for the reviewer:`, each in one or two sentences.
+   paragraph cannot carry the mechanism. After it, and only where they apply,
+   each under a plain lead-in line:
+   - `Interface change:` the user-visible change, with its capture, or with
+     the wireframe that stands in for a blocked one;
+   - `Decisions:` a bulleted list, each decision in at most two sentences in
+     all: the choice, in bold, then the alternative it rejected and why;
+   - `Not handled:` a bulleted list, each scope boundary in one sentence;
+   - `Questions for the reviewer:` a numbered list, each question in one or
+     two sentences.
 
-   A figure belongs here only when it shows what the prose cannot. An item
-   that cannot be said at that length is either a strand, which means the
-   plan chose the wrong form, or detail for an explainer thread.
+   A decision whose reason the code does not record is a question, so it is
+   written once, as a question. A decision whose rejected alternative nobody
+   would choose is narration, and comes out. A figure belongs here only when
+   it shows what the prose cannot. An item that cannot be said at its length
+   is either a strand, which means the plan chose the wrong form, or detail
+   for an explainer thread.
 
 Then Appendix A. Manual testing and Appendix B. Glossary, as in the full form,
 each on its own page.

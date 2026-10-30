@@ -26,7 +26,7 @@ change, write `none`, so the omission is a decision rather than a lapse.
 | **Lifecycles.** Which value moves between states over time or across versions, such as draft and saved, an old and a new format, or pending and failed? What moves it? | One list of states and transitions per lifecycle | A `stateDiagram-v2` for each, per [Diagrams](figures.md#diagrams) |
 | **Algorithms.** Which logic would a reader not follow on one read? Which input with real values reaches its boundary cases? | The steps, and the example input with its expected output | The algorithm sections, per [Explaining a multi-step algorithm or pipeline](code-and-citations.md#explaining-a-multi-step-algorithm-or-pipeline) |
 | **UI design.** What does a user see change, and which UI elements will the prose need to name? | The changed screens and states, and the elements | The captures, per [Screenshots](figures.md#screenshots) |
-| **Decisions.** What was chosen, what alternative was rejected, why, and what evidence would reverse the choice? | One line per decision with all four parts | The Decisions section, per [Sections](structure.md#sections); the short form writes the choice and the rejected alternative only |
+| **Decisions.** What was chosen, what alternative was rejected, why, and what evidence would reverse the choice? | One line per decision with all four parts | The Decisions section, per [Sections](structure.md#sections); the short form writes the choice and the rejected alternative, in at most two sentences |
 | **Prerequisites.** What existing code must a reader understand before the first strand makes sense? | The modules, each with what the reader needs from it | A check on the background context pass's cut |
 | **Misreadings.** What would a competent reviewer most likely get wrong, or ask first? | A ranked list | The strand order, the emphasis inside each strand, and Open questions |
 
@@ -41,8 +41,10 @@ that settled it into the plan:
   added or reconnected so that other parts of the system now depend on each
   other differently, a stored or passed shape that changed, a value with
   states and transitions, logic a reader would not follow on one read, or a
-  screen whose behavior changed in more than one way. A helper extracted from
-  duplicated code, called from the same places, is not a new component.
+  screen whose behavior changed in more than one way. These examples
+  illustrate a section of its own; none forces the full form by itself. A
+  helper extracted from duplicated code, called from the same places, is not
+  a new component.
 - **The short form,** per [The short form](structure.md#the-short-form),
   otherwise.
 

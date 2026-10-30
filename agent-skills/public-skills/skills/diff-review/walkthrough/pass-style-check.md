@@ -123,7 +123,8 @@ own draft.
    the length [the short form](structure.md#the-short-form) sets: a decision
    in at most two sentences, a scope boundary in one, a question in one or
    two. Shorten an item that runs longer without dropping its claim, or
-   report it when it cannot be shortened.
+   report it when it cannot be shortened. Cut a decision that only restates a
+   question, or that rejects an alternative nobody would choose.
 
 3. **Read only the headings and each section's first sentence.** If that alone
    does not tell the story of the change, the structure is wrong, and no detail

@@ -29,6 +29,11 @@ then numbers it and marks every use of its terms, per
   such as `Block` or `Issue`, marks every everyday use too, so when the text
   also uses the word in its everyday sense, qualify the entry
   (`Dashboard block`) or reword those sentences.
+- **One concept, one entry.** Two names for the same idea, such as `axis role`
+  and `value axis`, share one entry, with the second name in parentheses. A
+  term the sentence that introduces it already defines needs no entry when
+  the reader meets it only near that sentence, and general vocabulary, such
+  as `fieldset` or `cache`, needs none at all.
 - **Define each term in plain words, grounded in the product.** Say what the
   thing is in terms of what a user does or sees, then, only if needed, what the
   code does with it. One or two sentences.

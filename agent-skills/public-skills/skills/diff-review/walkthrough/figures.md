@@ -166,7 +166,8 @@ for a too-wide diagram is always fewer nodes per row.
 
 For any user-visible change, include a screenshot. Drive the app to the changed
 state and capture it. When capture is genuinely blocked, say so in one sentence
-that names the block, with no further account of it, and fall back to an ASCII
+that names the block, with no further account of it (one sentence covers every
+capture blocked for the same reason), and fall back to an ASCII
 wireframe of the changed surface. A wireframe is a `text` fence, which the
 renderer does not join to a caption box, so put its key inside the fence. Blocked means
 blocked, not inconvenient: no browser automation available, an unrunnable local
