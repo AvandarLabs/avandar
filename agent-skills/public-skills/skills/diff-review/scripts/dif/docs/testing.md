@@ -30,7 +30,24 @@ suite with `cargo test` (it finishes in a couple of seconds).
   (browser `"User"` and skill `"reviewer"` both dispatch; authorless/claude-only do
   not), answered/dispatched skipping, reviewer-reply-after-claude, line labels,
   baseline ids.
-- `inject::dispatcher`: baseline-then-dispatch-once across snapshots.
+- `inject::dispatcher`: baseline-then-dispatch-once across snapshots; bulk
+  holds and counts comments, send-all flushes them as one prompt, eager sends one
+  each, and PR-bound ids are never queued or sent.
+- `inject::mode`: bulk is the default, send-all is taken once, and the
+  `/__wrap/dispatch` JSON in and out.
+- `inject::prompt`: the batched send-all prompt.
+- `github::anchor`: difit positions → GitHub side / line / start line.
+- `github::plan`: create at a range, reply under a synced root, wait on a
+  pending root, update on an edit, delete only once a previous snapshot held the
+  comment, forget unposted removals, retry a failure only after an edit.
+- `github::client`: the create payload, `gh pr view` parsing (open PRs only),
+  the posted-comment id/url, and GitHub's error message.
+- `github::registry`: persistence, marking never resets a synced entry, and the
+  PR state is never persisted.
+- `github::sync`: create → update → delete against a fake `GithubApi`, the PR
+  resolved once, no PR fails the comment without calling GitHub, and a failed
+  post is not retried until edited.
+- `web::review_routes`: new message ids in a comment save (fails closed).
 - `inject::reply_watcher`: baseline-then-log-once for new `claude` replies, with
   the `file:Lx` location; reviewer comments never logged as replies.
 - `tui::keymap`: key→bytes encodings and injected prompt delivery, including
@@ -80,6 +97,11 @@ out-of-band write adds, that the poller's own mirror adds none, that a deleted
 comment is not resurrected, and that an unplaceable or half-written entry never
 poisons the batch.
 
+**Integration (`tests/web_shell.rs`):** the delivery mode round-trips through
+`/__wrap/dispatch`, send-all reaches the shared control, and a save tagged
+`X-Dif-Destination: github` marks only the new comment against a stand-in difit
+while still reaching it.
+
 ## What's not unit-tested
 
 The terminal rendering and the event loop's input routing are exercised by
@@ -88,3 +110,9 @@ running `dif`, not by a unit test; they're thin glue over tested pieces
 tested with a real child rather than a mock. The diff-guide *content* rules
 (numbered groups, group/file reviewed semantics, re-review-on-change) live in
 the `diff-review` skill, not this crate, so they are not unit-tested here.
+
+The browser half of the PR toggle (`inject.js`: adding the toggle to difit's
+comment boxes, tagging the save, restyling PR comments) depends on difit's
+rendered DOM, so it is checked by hand in a browser against a real difit, with a
+stand-in `GithubApi` so nothing is posted to a real PR. Real `gh` calls are never
+made by the suite.

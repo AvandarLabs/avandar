@@ -81,9 +81,16 @@ Use the slug rules in `scripts/dif/src/comparison.rs` and
 | Manual test plan | `-test-plan.md` |
 | Walkthrough | `-walkthrough.md` |
 | Reviewed state | `-reviewed.json` |
+| GitHub sync record (TUI-owned) | `-github.json` |
 
-The skill writes these artifacts. The TUI reads them and owns live session
-metadata and transcript mirroring.
+The skill writes these artifacts, except `-github.json`. The TUI reads them and
+owns live session metadata, transcript mirroring, and the GitHub sync record.
+
+`-github.json` lists transcript comments the reviewer sent to the GitHub PR
+instead of to you: its `comments` object is keyed by transcript entry `id`. The
+TUI posts, edits, and deletes those on GitHub itself. Treat every entry whose
+`id` is a key there as not addressed to you: never answer it, never count it as
+an open comment, and never edit code for it. Read it only for context.
 
 `dif` starts difit as soon as it launches, before any of these exist, and
 creates the transcript as `[]` so the reviewer can comment immediately. Treat an
@@ -1281,9 +1288,11 @@ polishing explainer threads.
    otherwise preserve and reconcile it. Pass the coverage gate.
 6. Send the Initial chat summary.
 
-A reviewer comment may arrive mid-round: `dif` types it into your input as soon
-as it is written, so it lands as a queued message while you work. Finish the
-Initial round first, then address it as a Continue round.
+A reviewer comment may arrive mid-round. By default the browser holds comments
+until the reviewer presses **Send all**, which types them into your input as one
+numbered prompt; in eager mode each comment is typed as soon as it is written.
+Either way it lands as a queued message while you work. Finish the Initial round
+first, then address it as a Continue round.
 
 Except for the package script added by `ensure-command.py`, do not change source
 files, commit, push, or merge in Initial mode.
@@ -1322,7 +1331,8 @@ Do not change, commit, push, or merge the contributor's code.
 
 ### Continue
 
-Continue has two entry paths: Injected handles one comment typed by the TUI;
+Continue has two entry paths: Injected handles the comments the TUI typed (one
+comment, or a numbered batch from **Send all**: address every item in it);
 Manual discovers all open comments from the transcript. This path is unrelated
 to the `/diff-review auto <PR-number>` alias for PR review.
 
@@ -1330,7 +1340,8 @@ to the `/diff-review auto <PR-number>` alias for PR review.
    live `port`, `comments_file`, and `comparison_key`. Read the mirrored
    transcript once for context. Never write it; the TUI poller owns it.
 2. An open comment is a non-`claude` entry without a later `claude` reply at the
-   same `filePath` and `position`. Classify it as a question, change request, or
+   same `filePath` and `position`, and whose `id` is not a key in the review's
+   `-github.json` (those went to the GitHub PR, not to you). Classify it as a question, change request, or
    both. Do not edit code for a question alone.
 3. When changing code, ensure the result remains visible to the active
    comparison. The bundled runner always uses these semantics:

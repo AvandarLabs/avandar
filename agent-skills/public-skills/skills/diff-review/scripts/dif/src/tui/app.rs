@@ -11,7 +11,8 @@ use crate::comparison::ComparisonKey;
 use crate::difit::poller::Poller;
 use crate::difit::{server, transcript};
 use crate::git_watcher::GitWatcher;
-use crate::inject::dispatcher::Dispatcher;
+use crate::github::registry::SharedRegistry;
+use crate::inject::dispatcher::{Delivery, Dispatcher};
 use crate::inject::reply_watcher::ReplyWatcher;
 use crate::paths;
 use crate::pty_pane::PtyPane;
@@ -28,7 +29,7 @@ use super::open_target;
 use super::palette::{PaletteAction, PaletteState};
 use super::session_meta::{self, SessionMeta};
 use super::start_review::StartReviewModal;
-use super::startup::{comparison_label, fresh_llm_command, review_files_ready};
+use super::startup::{comparison_label, fresh_llm_command, review_files_ready, start_poller};
 use super::vim::{VimMotion, VimState};
 
 /// How long the git diff signature must hold steady after diverging from what
@@ -89,6 +90,9 @@ pub struct App {
     pub review_control: ReviewControl,
     /// Turns difit snapshots into LLM prompts, once per comment.
     pub dispatcher: Dispatcher,
+    /// Bulk vs eager delivery and the PR-bound comments, shared with the
+    /// browser shell and the poller.
+    pub comment_channels: web::CommentChannels,
     /// Logs each new agent reply to the difit pane, once.
     pub reply_watcher: ReplyWatcher,
     /// The background comments poller. Momentarily absent only while a
@@ -297,6 +301,11 @@ impl App {
         self.shell_port =
             server::pick_port(slug::port_for(&format!("{branch_slug}-shell"), &scope_slug));
         self.transcript_path = paths::transcript_path(&self.repo_root, &branch_slug, &scope_slug);
+        self.comment_channels.github = SharedRegistry::load(paths::github_sync_path(
+            &self.repo_root,
+            &branch_slug,
+            &scope_slug,
+        ));
         self.session_id_path =
             paths::llm_session_id_path(&self.repo_root, self.agent_kind, &branch_slug, &scope_slug);
         self.session_meta = paths::session_meta_path(&self.repo_root, &branch_slug, &scope_slug);
@@ -348,10 +357,11 @@ impl App {
             ));
             return;
         }
-        self.poller = Some(Poller::start(
+        self.poller = Some(start_poller(
+            &self.repo_root,
             self.port,
             self.transcript_path.clone(),
-            Duration::from_secs(1),
+            &self.comment_channels.github,
         ));
         self.web_shell = web::WebShell::start(
             self.port,
@@ -361,6 +371,7 @@ impl App {
             self.worktree.clone(),
             self.diff_summary_path.clone(),
             self.test_plan_path.clone(),
+            self.comment_channels.clone(),
         )
         .ok();
         let open_url = self.web_shell.as_ref().map_or_else(
@@ -577,9 +588,11 @@ impl App {
         }
     }
 
-    /// Type any newly-open reviewer comments into the LLM pane. Checks the
-    /// pane is alive *before* consuming snapshots so a dispatch is never lost
-    /// to a dead pane.
+    /// Type newly-open reviewer comments into the LLM pane: each one at once in
+    /// eager mode, or all held ones together when the browser asks to "Send
+    /// all" in bulk mode. PR-bound comments are never typed. Checks the pane is
+    /// alive *before* consuming snapshots (or a send-all request) so a dispatch
+    /// is never lost to a dead pane.
     pub fn inject_pending(&mut self) {
         let Some(llm) = self.llm.as_ref().filter(|p| p.is_alive()) else {
             return;
@@ -587,9 +600,27 @@ impl App {
         let Some(snapshot) = self.poller.as_ref().and_then(Poller::latest) else {
             return;
         };
-        let prompts = self.dispatcher.next_prompts(&snapshot);
+        let dispatch = &self.comment_channels.dispatch;
+        let delivery = if !dispatch.is_bulk() {
+            Delivery::Eager
+        } else if dispatch.take_send_all() {
+            Delivery::SendAll
+        } else {
+            Delivery::Hold
+        };
+        let excluded = self.comment_channels.github.github_ids();
+        let outcome = self
+            .dispatcher
+            .next_dispatch(&snapshot, &excluded, delivery);
+        dispatch.set_queued(outcome.queued);
+        let prompts = outcome.prompts;
         if !prompts.is_empty() {
             self.last_inject_at = Some(Instant::now());
+        }
+        if delivery == Delivery::SendAll && !prompts.is_empty() {
+            self.difit.write_to_screen(
+                "\r\n\x1b[36m↪ Sending held review comments to the LLM (requested from the browser)…\x1b[0m\r\n",
+            );
         }
         for prompt in prompts {
             send_prompt_to_pty(llm, &prompt, self.agent_kind);

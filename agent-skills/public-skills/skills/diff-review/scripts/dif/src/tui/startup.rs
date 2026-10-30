@@ -16,6 +16,7 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::Result;
@@ -27,7 +28,11 @@ use crate::difit::poller::Poller;
 use crate::difit::{server, transcript};
 use crate::git::{self, Git};
 use crate::git_watcher::GitWatcher;
+use crate::github::client::GhCli;
+use crate::github::registry::SharedRegistry;
+use crate::github::sync::GithubSync;
 use crate::inject::dispatcher::Dispatcher;
+use crate::inject::mode::DispatchControl;
 use crate::inject::reply_watcher::ReplyWatcher;
 use crate::paths;
 use crate::pty_pane::PtyPane;
@@ -59,6 +64,7 @@ struct ReviewPaths {
     guide_json: PathBuf,
     diff_summary: PathBuf,
     test_plan: PathBuf,
+    github_sync: PathBuf,
 }
 
 /// Launch the LLM and, when review artifacts already exist, difit + poller.
@@ -91,6 +97,10 @@ pub fn launch(cli: &Cli) -> Result<App> {
     // once a guide exists the comparison is settled and updates are refused.
     review_control.set_accepts_updates(!guide_ready);
     let worktree = web::meta::worktree_name(&repo_root, &branch);
+    let comment_channels = web::CommentChannels {
+        dispatch: Arc::new(DispatchControl::new()),
+        github: SharedRegistry::load(review_paths.github_sync.clone()),
+    };
     let surface = start_launch_surface(
         &repo_root,
         &comparison,
@@ -100,6 +110,7 @@ pub fn launch(cli: &Cli) -> Result<App> {
         &review_paths,
         branch.clone(),
         worktree.clone(),
+        &comment_channels,
     )?;
 
     // `dif` never starts a review by itself. The LLM pane opens idle; when no
@@ -131,6 +142,7 @@ pub fn launch(cli: &Cli) -> Result<App> {
         session_id_path: review_paths.session_id,
         review_control,
         dispatcher,
+        comment_channels,
         reply_watcher: ReplyWatcher::new(),
         poller: Some(surface.poller),
         git_watcher,
@@ -160,7 +172,8 @@ pub fn launch(cli: &Cli) -> Result<App> {
     };
     app.write_session_meta(Some(open_url));
     if !guide_ready {
-        app.difit.write_to_screen(&preparing_notice(&app.comparison_label));
+        app.difit
+            .write_to_screen(&preparing_notice(&app.comparison_label));
     }
     Ok(app)
 }
@@ -203,6 +216,7 @@ fn review_paths(
         guide_json: paths::guide_json_path(repo_root, branch_slug, scope_slug),
         diff_summary: paths::diff_summary_path(repo_root, branch_slug, scope_slug),
         test_plan: paths::test_plan_path(repo_root, branch_slug, scope_slug),
+        github_sync: paths::github_sync_path(repo_root, branch_slug, scope_slug),
     }
 }
 
@@ -222,6 +236,7 @@ fn start_launch_surface(
     review_paths: &ReviewPaths,
     branch: String,
     worktree: String,
+    comment_channels: &web::CommentChannels,
 ) -> Result<LaunchSurface> {
     // The transcript is the review's canonical file, and the reviewer can start
     // commenting before any review exists, so it must exist before difit does.
@@ -245,6 +260,7 @@ fn start_launch_surface(
         worktree,
         review_paths.diff_summary.clone(),
         review_paths.test_plan.clone(),
+        comment_channels.clone(),
     );
     let open_url = web_shell
         .as_ref()
@@ -252,14 +268,30 @@ fn start_launch_surface(
     super::open_target::open_url(&open_url);
     Ok(LaunchSurface {
         difit,
-        poller: Poller::start(
+        poller: start_poller(
+            repo_root,
             port,
             review_paths.transcript.clone(),
-            Duration::from_secs(1),
+            &comment_channels.github,
         ),
         web_shell,
         open_url,
     })
+}
+
+/// Start the comments poller on `port`, with the GitHub sync pass that posts
+/// PR-bound comments from `github` through `gh` in `repo_root`.
+pub(crate) fn start_poller(
+    repo_root: &Path,
+    port: u16,
+    transcript_path: PathBuf,
+    github: &SharedRegistry,
+) -> Poller {
+    let sync = GithubSync::new(
+        github.clone(),
+        Box::new(GhCli::new(repo_root.to_path_buf())),
+    );
+    Poller::start_with_github(port, transcript_path, Duration::from_secs(1), Some(sync))
 }
 
 /// Spawn the LLM pane, resuming the saved session when possible.
@@ -364,6 +396,7 @@ pub(crate) fn review_files_ready(
     transcript_path.is_file() && guide_path.is_file() && guide_json_path.is_file()
 }
 
+#[allow(clippy::too_many_arguments)]
 fn start_web_shell(
     port: u16,
     shell_port: u16,
@@ -372,6 +405,7 @@ fn start_web_shell(
     worktree: String,
     diff_summary_path: PathBuf,
     test_plan_path: PathBuf,
+    comment_channels: web::CommentChannels,
 ) -> Option<web::WebShell> {
     // Wrap difit in the browser web shell (guide sidebar + per-group filtered
     // views). If the shell fails to start, callers fall back to raw difit.
@@ -383,6 +417,7 @@ fn start_web_shell(
         worktree,
         diff_summary_path,
         test_plan_path,
+        comment_channels,
     )
     .ok()
 }

@@ -17,6 +17,7 @@ pub mod config;
 pub mod difit;
 pub mod git;
 pub mod git_watcher;
+pub mod github;
 pub mod inject;
 pub mod paths;
 pub mod pty_pane;

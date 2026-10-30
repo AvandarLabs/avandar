@@ -126,6 +126,43 @@ tell the agent to "address the comments," and replies appear without a restart.
 Comments that already exist when `dif` launches are treated as a baseline and
 are not auto-dispatched; only comments added after launch trigger work.
 
+### Bulk vs eager delivery
+
+The browser shell's top bar has a **Bulk / Eager** toggle.
+
+- **Bulk (the default)** holds every new comment. A **Send all (N)** button
+  shows how many are waiting; pressing it types them into the LLM pane as **one**
+  numbered prompt. One prompt per pass of comments costs far fewer tokens than
+  one per comment. A held comment that you edit is sent in its edited form, and
+  one you delete is never sent.
+- **Eager** types each comment into the LLM pane as soon as you save it.
+  Switching to Eager also sends anything still held.
+
+The mode resets to Bulk on every launch.
+
+### Sending a comment to the GitHub PR instead
+
+Every comment box in difit has a **TUI / PR** toggle beside its buttons. TUI (the
+default) is the local conversation above. **PR** posts the comment to the
+branch's open GitHub PR with `gh api`, as whichever account `gh` is logged into,
+and **never** sends it to the LLM. A reply box inside a PR thread defaults to PR.
+
+- The comment still lives in difit and the transcript, so it survives a relaunch
+  and stays visible in the browser.
+- PR comments are restyled: a blue thread border and a GitHub **On PR** badge
+  that links to the comment on GitHub. A dashed border means it is still being
+  posted; red with **PR sync failed** means GitHub rejected it (hover the badge
+  for GitHub's message; editing the comment retries).
+- Editing a PR comment edits it on GitHub. Deleting a reply, or resolving the
+  thread, deletes it from the PR.
+- A reply in a PR thread is posted as a GitHub reply. A PR reply inside a local
+  thread becomes a new PR comment on the same line.
+- When the branch has no open PR (or `gh` is missing), the PR option is disabled
+  and its tooltip says why.
+- GitHub only accepts comments on lines that are part of the PR's diff. If `dif`
+  is comparing something other than the PR (say `dif .`), a comment on a line
+  the PR does not change fails with GitHub's message.
+
 ## Command palette
 
 `Ctrl+P` (from either pane) opens a global command palette: a centered modal

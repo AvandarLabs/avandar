@@ -50,6 +50,7 @@ appends `claude`-authored replies. See the injection contract in
 | `<branch>-difit-<scope>-summary.md` | the `diff-review` skill | the high-level diff summary shown in the web-shell sidebar |
 | `<branch>-difit-<scope>-test-plan.md` | the `diff-review` skill | the manual test plan shown in the TUI Test plan tab and web-shell sidebar tab |
 | `<branch>-difit-<scope>-reviewed.json` | the `diff-review` skill | reviewed-group / reviewed-file state |
+| `<branch>-difit-<scope>-github.json` | `dif` (web shell + poller) | which transcript comments went to the GitHub PR, and their sync state |
 
 Writes to the transcript are atomic (temp file + rename). They all share the
 `<branch>-difit-<scope>` stem so one review's files sort together.
@@ -118,6 +119,33 @@ side only provides the path helpers so both halves agree on the names.
   which individual files are reviewed (kept in their group but tagged), with a
   per-file signature so a later change to a reviewed file flips it back to
   needs-review.
+
+### The GitHub sync record
+
+`-github.json` lists the comments the reviewer sent to the branch's GitHub PR
+instead of the LLM. The comments themselves stay in the transcript like any
+other; this file only says which message ids are PR-bound and where they are on
+GitHub:
+
+```jsonc
+{
+  "comments": {
+    "<difit message id>": {
+      "status": "pending" | "synced" | "failed",
+      "githubId": 123456,                       // once posted
+      "url": "https://github.com/o/r/pull/7#discussion_r123456",
+      "body": "the body last sent to GitHub",   // a different body in difit = an edit
+      "error": "Validation Failed: …"           // the last failure, if any
+    }
+  }
+}
+```
+
+The web shell adds a `pending` entry when the browser saves a PR-bound comment,
+before difit holds it. The poller's sync pass posts it and records the outcome,
+and removes the entry once the comment is deleted from both difit and GitHub.
+Whether the branch has a PR is looked up once per session and never written
+here. The `diff-review` skill reads this file to leave PR-bound comments alone.
 
 ## Slug + port derivation
 

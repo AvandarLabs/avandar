@@ -13,7 +13,9 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use tiny_http::{Header, Request, Response, Server, StatusCode};
 
 use super::router::{self, DiffFilter, Route};
-use super::{filter, groups, inject, meta, proxy};
+use super::{filter, groups, inject, meta, proxy, review_routes};
+use crate::github::registry::SharedRegistry;
+use crate::inject::mode::DispatchControl;
 
 /// The embedded shell frontend + in-difit script (no build step; `include_str!`).
 pub const SHELL_HTML: &str = include_str!("frontend/shell.html");
@@ -46,6 +48,8 @@ pub const SHELL_JS: &str = concat!(
     "\n",
     include_str!("frontend/shell/chrome.js"),
     "\n",
+    include_str!("frontend/shell/dispatch.js"),
+    "\n",
     include_str!("frontend/shell/boot.js"),
 );
 
@@ -69,6 +73,10 @@ pub struct Ctx {
     /// Cache-busting tag appended to `shell.js` / `shell.css` in the served page,
     /// so a browser never runs a stale frontend after a rebuild.
     pub asset_version: String,
+    /// Bulk vs eager comment delivery, shared with the TUI event loop.
+    pub dispatch: Arc<DispatchControl>,
+    /// Which comments are bound for the GitHub PR, shared with the poller.
+    pub github: SharedRegistry,
 }
 
 /// Accept loop. Runs until the [`Server`] is unblocked.
@@ -85,7 +93,7 @@ fn header(name: &str, value: &str) -> Option<Header> {
     Header::from_bytes(name.as_bytes(), value.as_bytes()).ok()
 }
 
-fn send_bytes(
+pub(super) fn send_bytes(
     request: Request,
     status: u16,
     content_type: &str,
@@ -103,7 +111,7 @@ fn send_bytes(
 /// injected difit doc, the filtered `/api/diff`) so a browser never runs a stale
 /// copy after `dif` relaunches with a rebuilt frontend. difit's own hashed
 /// static assets still go through plain [`send_bytes`] and stay cacheable.
-fn send_bytes_nostore(
+pub(super) fn send_bytes_nostore(
     request: Request,
     status: u16,
     content_type: &str,
@@ -119,7 +127,7 @@ fn send_bytes_nostore(
     request.respond(resp)
 }
 
-fn send_status(request: Request, status: u16) -> std::io::Result<()> {
+pub(super) fn send_status(request: Request, status: u16) -> std::io::Result<()> {
     request.respond(Response::empty(StatusCode(status)))
 }
 
@@ -164,7 +172,7 @@ fn is_sse(path: &str) -> bool {
     path == "/api/watch" || path == "/api/heartbeat"
 }
 
-fn with_query(path: &str, query: &str) -> String {
+pub(super) fn with_query(path: &str, query: &str) -> String {
     if query.is_empty() {
         path.to_owned()
     } else {
@@ -180,7 +188,7 @@ fn asset(name: &str) -> Option<(&'static str, &'static str)> {
     }
 }
 
-fn request_content_type(request: &Request) -> String {
+pub(super) fn request_content_type(request: &Request) -> String {
     request
         .headers()
         .iter()
@@ -257,6 +265,11 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
             ctx.regen.store(true, Ordering::Relaxed);
             send_status(request, 202)
         }
+        route @ (Route::DispatchState
+        | Route::SetDispatchMode
+        | Route::SendAll
+        | Route::GithubState
+        | Route::SaveComments) => review_routes::handle(&route, request, ctx, query),
         Route::DifitDoc => match proxy::get(ctx.difit_port, "/") {
             Ok(up) => send_bytes_nostore(
                 request,

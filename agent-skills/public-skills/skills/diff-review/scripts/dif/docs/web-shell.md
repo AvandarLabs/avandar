@@ -400,6 +400,21 @@ button does. So a reviewer who reaches for difit's button gets the shell's guide
 and counts refreshed too, and our redundant **Show new changes** affordance
 clears on the next content check rather than lingering.
 
+### Comment delivery and PR comments
+
+The top bar's right section starts with a **Bulk / Eager** segmented toggle and,
+in bulk mode while comments are held, a **Send all (N)** pill
+(`frontend/shell/dispatch.js`). It polls `/__wrap/dispatch.json` every 1.5s and
+writes through `POST /__wrap/dispatch` and `POST /__wrap/send-all`. The button
+stays disabled after a click until the TUI reports the queue empty.
+
+`inject.js` adds a **TUI / PR** toggle to every difit comment box and restyles
+PR-bound comments (blue border, a GitHub **On PR** badge linking to the comment;
+dashed while posting, red on failure). Its styles are injected as a `<style>`
+element because difit's document has no shell stylesheet. See
+[integrations.md](integrations.md#github-pr-comments) for the save tagging and
+sync contract.
+
 ### Sidebar file rows
 
 Each file row shows the viewed check, the file name, and a short note. The name
@@ -505,7 +520,8 @@ axum. Reuse `ureq` (already a dep) for upstream calls to difit.
     concatenated at compile time — in order — into `server::SHELL_JS`, served as
     a single `/__wrap/shell.js`. `shell.js` (the entry) opens the IIFE and
     declares all shared state + DOM refs; feature fragments (`tooltip`,
-    `helpers`, `iframe`, `render`, `data`, `spotlight`, `hotkeys`, `chrome`) add
+    `helpers`, `iframe`, `render`, `data`, `spotlight`, `hotkeys`, `chrome`,
+    `dispatch`) add
     behavior; `boot.js` runs startup and closes the IIFE. Ordering is
     load-bearing only in that `shell.js` is first and `boot.js` last (the middle
     fragments are hoisted function/listener definitions). The fragments are not

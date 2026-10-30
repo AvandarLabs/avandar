@@ -235,7 +235,7 @@ inside it as pasted text, whereas a discrete delayed `Enter` submits it. Codex
 receives a delayed `Tab`, which queues the prompt behind any active work instead
 of steering or interrupting the current turn.
 
-## Injection: baseline, then once-each
+## Injection: baseline, then once-each, held or eager
 
 - On the first successful poll, every existing reviewer comment id is recorded
   as a **baseline** and *not* dispatched — `dif` only acts on comments added
@@ -248,6 +248,58 @@ of steering or interrupting the current turn.
   `diff-review` skill posts as `"reviewer"`; both (and any other non-claude
   author) count. Matching `reviewer` alone would miss every comment you type in the
   browser, since difit hardcodes that author as `"User"`.
+- **Delivery.** In **bulk** mode (the default) open comments are held and only
+  counted; the count is served to the browser at `/__wrap/dispatch.json`. When
+  the reviewer presses **Send all** (`POST /__wrap/send-all`), the event loop
+  types every held comment as one numbered prompt and marks them dispatched. In
+  **eager** mode (`POST /__wrap/dispatch {"mode":"eager"}`) each open comment
+  is typed as its own prompt the tick it appears. A held comment is not marked
+  dispatched, so its final text is what gets sent.
+- **PR-bound comments are skipped.** Any message id in the `-github.json`
+  registry is never held, counted, or typed. See
+  [GitHub PR comments](#github-pr-comments).
+
+## GitHub PR comments
+
+A comment box's **PR** toggle sends that comment to the branch's GitHub PR
+instead of the LLM. The browser cannot reach `gh`, so the steps split across
+three places:
+
+1. **`inject.js`** adds the TUI / PR toggle to each difit comment box (not to
+   edit boxes: an edit follows the comment's existing destination). When a
+   PR-bound box submits, it tags difit's next `POST /api/comments` with
+   `X-Dif-Destination: github`.
+2. **The web shell** (`web/review_routes.rs`) intercepts that save. Before
+   proxying it, it reads difit's `/api/comments-json` and marks the posted
+   message ids difit does not hold yet as `pending` in the registry. That happens
+   before difit has the comment, so the poller and the dispatcher never see it
+   unmarked.
+3. **The poller thread** runs `github::sync` over each snapshot. On its first
+   pass it resolves the PR (`gh pr view --json number,url,headRefOid,state`).
+   It then plans against the registry and calls `gh api`:
+
+   | difit change | GitHub call |
+   | --- | --- |
+   | new PR-bound thread, or PR reply in a local thread | `POST repos/{owner}/{repo}/pulls/{n}/comments` (`commit_id` = PR head, `side`, `line`, `start_line`/`start_side` for a range) |
+   | PR reply in a PR thread | `POST …/pulls/{n}/comments/{root id}/replies` |
+   | edited body | `PATCH repos/{owner}/{repo}/pulls/comments/{id}` |
+   | deleted reply or resolved thread | `DELETE repos/{owner}/{repo}/pulls/comments/{id}` |
+
+Guards:
+
+- A deletion only counts when the **previous** snapshot held the comment, so a
+  first or incomplete snapshot (difit restarting) never deletes from GitHub.
+- A failed post is recorded with GitHub's message and not retried until the
+  reviewer edits the comment.
+- A PR reply whose root is still being posted waits for the next pass.
+- With no open PR, PR-bound comments fail with the reason instead of calling
+  GitHub, and the browser disables the PR option.
+
+`inject.js` restyles PR comments from `/__wrap/github.json` (PR availability plus
+each comment's sync state). It matches difit's `#comment-thread-<id>` elements
+to `/api/comments-json` threads by message order and sets `data-dif-gh` /
+`data-dif-gh-thread` attributes rather than classes, because React rewrites
+`className` but leaves unknown attributes alone.
 
 ## The injected prompt and the skill handoff
 

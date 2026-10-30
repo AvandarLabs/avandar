@@ -11,8 +11,10 @@
   fetchSummary();
   fetchTestPlan();
   fetchDiff(); // authoritative file counts + "new files not in guide"
+  fetchDispatch(); // bulk vs eager delivery + held comment count
   window.setInterval(fetchGroups, 3000); // reflect the skill regenerating the guide
   window.setInterval(fetchSummary, 3000);
   window.setInterval(fetchTestPlan, 3000);
   window.setInterval(fetchDiff, 3000);   // keep counts + new-files + show-changes in sync
+  window.setInterval(fetchDispatch, 1500); // the held count changes as comments are saved
 })();
