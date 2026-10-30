@@ -5,9 +5,24 @@ import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryData
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 
 type SourceOptions = {
+  /** The data source (Dataset or Concept) whose columns are being reconciled. */
   sourceKey: QueryDataSource.TypedId;
+
+  /**
+   * The data source that `previous` was built for. Previous IDs are only
+   * reused when this matches `sourceKey`, so switching sources never carries
+   * IDs over.
+   */
   previousSourceKey: QueryDataSource.TypedId | undefined;
+
+  /** The source columns we already hold, with their stable IDs. */
   previous: readonly QueryColumn.T[];
+
+  /**
+   * Freshly loaded source columns. These come from
+   * `useQueryColumnsForDataSource`, which wraps each `DatasetColumn` (or
+   * `ConceptAttribute`) in a new `QueryColumn` with a random ID.
+   */
   incoming: readonly QueryColumn.T[];
 };
 
@@ -45,7 +60,24 @@ function _getRetainedProjection(options: {
   );
 }
 
-/** Reconciles source catalogs and the projections selected from them. */
+/**
+ * Reconciles source catalogs and the projections selected from them.
+ *
+ * A source catalog is the full list of columns of the selected data source,
+ * independent of which ones the query selects. Each entry is a `QueryColumn`
+ * wrapping a `DatasetColumn` or `ConceptAttribute` as its `baseColumn`. The
+ * catalog is loaded by `useQueryColumnsForDataSource`, held in the Explorer
+ * state as `sourceCatalog`, and persisted on the query as
+ * `StructuredQuery.sourceColumns`. WHERE filters target these columns.
+ *
+ * Projections are the `QueryColumn`s in `StructuredQuery.queryColumns`. They
+ * are the columns the query selects, and carry aggregation and output alias.
+ * HAVING filters, ORDER BY, and chart bindings target these.
+ *
+ * Every reload of the source metadata produces new random IDs. Reconciling
+ * maps the new columns back onto the old ones (by `baseColumn` identity) so
+ * a column keeps the same ID across reloads and filters stay bound to it.
+ */
 export const QueryColumnReconciliation = {
   /** Reconciles source metadata without carrying projection settings. */
   reconcileSourceColumns: (
