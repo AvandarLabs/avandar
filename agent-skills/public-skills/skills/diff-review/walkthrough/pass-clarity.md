@@ -41,7 +41,7 @@ anything else:
 - **Problems and solutions:** a problem it could not restate as what a user did
   and what went wrong, or a solution whose mechanism it could not name.
 - **Algorithms:** a step it could not trace using the worked example given.
-- **Architecture:** a component it could not place in the Shape diagram or the
+- **Architecture:** a component it could not place in Shape of the solution or the
   Background tree, or a data flow it could not follow end to end.
 - **Interface:** a named UI element it cannot picture from the product alone
   that has no capture beside it, per

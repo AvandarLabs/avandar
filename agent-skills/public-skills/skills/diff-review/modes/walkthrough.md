@@ -50,19 +50,22 @@ is written to:
    out of scope for review.
 4. Write the plan, per [`walkthrough/planning.md`](../walkthrough/planning.md):
    written answers to its questions about the change's architecture, UI and
-   data design, lifecycles, algorithms, and decisions, and the strand list
-   they lead to. Keep it in a scratch file outside the repository; it is an
-   input to the draft, never cited by it.
+   data design, lifecycles, algorithms, and decisions, the form they call
+   for (full or short, per
+   [Choosing the form](../walkthrough/planning.md#choosing-the-form)), and the
+   strand list they lead to. Keep it in a scratch file outside the
+   repository; it is an input to the draft, never cited by it.
 5. Capture the changed states of user-visible changes, per
    [Screenshots](../walkthrough/figures.md#screenshots). Keep the app running:
    step 8 and the review passes may send you back for more captures.
 6. Where a decision's rationale is not recoverable from the code, say so
    rather than inventing one, and add it to Open questions.
-7. Write `-walkthrough.md`, including Purpose per [Purpose](../walkthrough/purpose.md) and
+7. Write `-walkthrough.md` in the form the plan chose, including Purpose per [Purpose](../walkthrough/purpose.md) and
    Appendix A. Manual testing per [Manual testing](../walkthrough/manual-testing.md), each
    appendix after its page-break line per
-   [Sections](../walkthrough/structure.md#sections), with the plan's strands
-   in the plan's order. Write the
+   [Sections](../walkthrough/structure.md#sections) or
+   [The short form](../walkthrough/structure.md#the-short-form), with the
+   plan's strands in the plan's order. Write the
    Background technical context heading and `## Appendix B. Glossary` with a one-line
    placeholder each, so section numbers are final from the first draft; the
    next two passes fill them, and when regenerating they replace the old
@@ -124,7 +127,14 @@ is written to:
     reports under check 11 as missing from the draft is one too: write it in,
     checking it against the code, then run the style check again. A coverage gap or
     a judgment call it reports goes into the step 13 report instead.
-13. Report the plan's path and every answer it cut, the section count, which
+13. Report the plan's path, the form it chose and why, and every answer it
+    cut. Then report the walkthrough's size beside the diff's in one line,
+    so a walkthrough out of proportion to its change is visible: its words
+    and printed pages (from the style check's last render), its strand count,
+    and the summary line of
+    `python3 <skill-dir>/scripts/list-changed-units.py <comparison-key>`,
+    which counts the diff's changed units, files, and lines without tests or
+    generated files. Then report the section count, which
     units the background context pass
     included, what the clarity pass proposed and what you rejected, what the
     content review changed and what you rejected, what the style check

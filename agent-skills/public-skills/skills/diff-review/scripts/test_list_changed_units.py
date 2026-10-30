@@ -147,6 +147,15 @@ class ParseDiff(unittest.TestCase):
         self.assertEqual(units_module.parse_diff(MULTILINE_IMPORT), [])
 
 
+class Summary(unittest.TestCase):
+    def test_counts_units_files_and_changed_lines(self):
+        units = units_module.parse_diff(NEW_FILE + CHANGED_FILE)
+        self.assertEqual(
+            units_module.summary_line(units, "develop"),
+            "4 units in 2 files, +9 -2 lines (comparison: develop).",
+        )
+
+
 class Exclusions(unittest.TestCase):
     def test_names_the_category_of_an_excluded_path(self):
         cases = {

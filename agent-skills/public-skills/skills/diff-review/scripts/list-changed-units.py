@@ -16,8 +16,10 @@ comparison-key mirrors `dif` (defaults to develop if it exists, else main):
     staged   staged changes only
     <branch> git diff <branch>...HEAD (three-dot: merge-base)
 
-With --transcript, print only the units that no `claude` thread is anchored
-inside, so the explainer round can see what it has not yet covered or exempted.
+The summary line counts the units, files, and changed lines listed, which the
+walkthrough report sets beside the walkthrough's own size. With --transcript,
+print only the units that no `claude` thread is anchored inside, so the
+explainer round can see what it has not yet covered or exempted.
 Exit 0 on success, 2 on a usage or git error.
 """
 
@@ -259,6 +261,17 @@ def diff_text(comparison):
     return text
 
 
+def summary_line(units, comparison):
+    """How many units, files, and changed lines the listed units cover."""
+    added = sum(unit.added for unit in units)
+    removed = sum(unit.removed for unit in units)
+    files = len({unit.path for unit in units})
+    return (
+        f"{len(units)} units in {files} files, +{added} -{removed} lines "
+        f"(comparison: {comparison})."
+    )
+
+
 def _range(start, end):
     return f"L{start}" if start == end else f"L{start}-{end}"
 
@@ -303,7 +316,7 @@ def main(argv):
                 kept.append(unit)
         units = kept
 
-    heading = f"{len(units)} units in {len({unit.path for unit in units})} files"
+    heading = summary_line(units, comparison)
     if transcript:
         try:
             with open(transcript) as handle:
@@ -313,9 +326,12 @@ def main(argv):
             return 2
         total = len(units)
         units = uncovered(units, entries)
-        heading = f"{len(units)} of {total} units have no claude thread"
+        heading = (
+            f"{len(units)} of {total} units have no claude thread "
+            f"(comparison: {comparison})."
+        )
 
-    print(f"{heading} (comparison: {comparison}).")
+    print(heading)
     if skipped:
         counts = ", ".join(
             f"{len(paths)} {category}" for category, paths in sorted(skipped.items())

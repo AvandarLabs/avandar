@@ -117,7 +117,10 @@ own draft.
 
 2. **Audit the coverage,** per the checklist in item 4 of
    [Sections](structure.md#sections): walk it against every strand and confirm where each
-   item landed, saying so when an item does not apply.
+   item landed, saying so when an item does not apply. In
+   [the short form](structure.md#the-short-form), walk it against Shape of
+   the solution instead, and confirm nothing in it is padded to match a
+   full-form section.
 
 3. **Read only the headings and each section's first sentence.** If that alone
    does not tell the story of the change, the structure is wrong, and no detail
@@ -177,8 +180,11 @@ own draft.
    after Sources, or after Open questions when nothing is cited, come
    Appendix A. Manual testing and Appendix B. Glossary, in
    that order, each heading directly after its page-break line, per
-   [Sections](structure.md#sections). Purpose is one
-   problem paragraph and one bullet per strand, and every bullet passes
+   [Sections](structure.md#sections). In
+   [the short form](structure.md#the-short-form), the only numbered sections
+   are Purpose, Background technical context, and Shape of the solution.
+   Purpose is one problem paragraph and one bullet per strand (in the short
+   form, one per change, with no section numbers), and every bullet passes
    [Purpose](purpose.md): it leads with a verb, says what changes rather than
    how, and fits one sentence of about 25 words. Read the bullets alone and
    confirm a reviewer could say what the change does without reading further.
@@ -209,6 +215,8 @@ own draft.
     per [Planning the walkthrough](planning.md). Every lifecycle it lists has
     a `stateDiagram-v2`, every decision it lists appears in Decisions with its
     rejected alternative and the evidence that would reverse it, and every
-    other answer it did not cut lands in a strand. Report each miss rather
+    other answer it did not cut lands in a strand. In the short form, the
+    document has the short form's sections, and every answer the plan did not
+    cut lands in Shape of the solution. Report each miss rather
     than fixing it: restoring a dropped answer adds a claim, which is outside
     this pass's remit.

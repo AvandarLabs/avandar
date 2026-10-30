@@ -12,6 +12,8 @@ the explainer threads' job, per
 [Explainer threads](../contracts/transcript.md#explainer-threads), so a plan that
 walks the diff file by file has answered the wrong question.
 
+## The questions
+
 Answer from the code, read per step 3 of [Walkthrough](../modes/walkthrough.md),
 not from the guide or the summary. Where a question has no answer for this
 change, write `none`, so the omission is a decision rather than a lapse.
@@ -28,11 +30,33 @@ change, write `none`, so the omission is a decision rather than a lapse.
 | **Prerequisites.** What existing code must a reader understand before the first strand makes sense? | The modules, each with what the reader needs from it | A check on the background context pass's cut |
 | **Misreadings.** What would a competent reviewer most likely get wrong, or ask first? | A ranked list | The strand order, the emphasis inside each strand, and Open questions |
 
-Then end the plan with **the strands**: each idea the walkthrough will explain,
-in dependency order, with the answers above that it carries. Every answer to
+## Choosing the form
+
+Then decide the walkthrough's form, and write the decision and the answer
+that settled it into the plan:
+
+- **The full form,** per [Sections](structure.md#sections), when at least one
+  answer to Architecture, Data model and data flow, Lifecycles, Algorithms, or
+  UI design needs a section of its own to be understood clearly: a component
+  added or reconnected, a stored or passed shape that changed, a value with
+  states and transitions, logic a reader would not follow on one read, or a
+  screen whose behavior changed in more than one way.
+- **The short form,** per [The short form](structure.md#the-short-form),
+  otherwise.
+
+Judge by the ideas in the change, never by its size: a rename across two
+hundred files is the short form, and a ten-line change to a matching rule may
+not be.
+
+## The strands
+
+End the plan with **the strands**: each idea the walkthrough will explain, in
+dependency order, with the answers above that it carries. Every answer to
 Architecture, Data model and data flow, Lifecycles, Algorithms, UI design, and
 Decisions lands in a strand, or is cut with its reason stated in the plan. A
-cut is fine; an answer that vanished between plan and draft is not.
+cut is fine; an answer that vanished between plan and draft is not. The short
+form has no strands: its answers all land in Shape of the solution, each in
+as few sentences as clarity allows.
 
 The plan is an input, like the guide: the walkthrough never cites it, per
 [The walkthrough stands alone](structure.md#the-walkthrough-stands-alone).

@@ -7,7 +7,9 @@ Contents:
 
 ## Diagrams
 
-Diagrams are expected, not optional. Prefer mermaid, which the published page
+In the full form, diagrams are expected, not optional; in
+[the short form](structure.md#the-short-form), a diagram appears only when it
+shows what the prose cannot. Prefer mermaid, which the published page
 renders natively, and pick the type from what the reader needs to conclude:
 
 | To show | Use |

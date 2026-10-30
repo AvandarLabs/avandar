@@ -57,3 +57,11 @@ This change:
   publish (§6).
 - Also ships, unrelated: a lint rule against unused imports (§7).
 ```
+
+## In the short form
+
+A [short-form walkthrough](structure.md#the-short-form) has no strand sections,
+so the bullets under `This change:` are the diff summary: one bullet per change
+a reviewer will meet in the diff, unrelated changes included, held to the same
+rules as above but without section numbers. The problem paragraph is unchanged,
+and as short as the problem.

@@ -20,6 +20,7 @@ Contents:
 
 - [The walkthrough stands alone](#the-walkthrough-stands-alone)
 - [Sections](#sections)
+- [The short form](#the-short-form)
 - [Rules](#rules)
 
 ## The walkthrough stands alone
@@ -53,7 +54,11 @@ no section cites a thread.
 
 ## Sections
 
-Use these headings in this order, numbered, omitting any that would be empty.
+A walkthrough is always written, in one of two forms, and the plan chooses
+which, per [Choosing the form](planning.md#choosing-the-form). This section
+describes the full form; [The short form](#the-short-form) describes the other.
+In the full form, use these headings in this order, numbered, omitting any that
+would be empty.
 Purpose, Background technical context, and both appendices are never omitted. The list gives the order, not literal numbers: each
 strand takes its own top-level number, and the sections after the strands
 number on from the last one. Once the walkthrough is handed over, numbers are
@@ -111,7 +116,8 @@ carry the specifics.
    needs to know about, then a table with one or two sentences per model or
    module. See [Background technical context](background-context.md).
 3. **Shape of the solution.** The mental model: the moving parts and how data
-   flows between them, as prose plus at least one mermaid diagram. When the
+   flows between them, as prose plus at least one mermaid diagram (in the full
+   form; see [The short form](#the-short-form) for the other). When the
    change has more than one strand, say here how they relate, including "these
    two are independent" when that is the truth.
 4. **One section per strand of work,** named after the concern rather than the
@@ -193,9 +199,7 @@ carry the specifics.
    [Citations](code-and-citations.md#citations).
 7. **Deliberately not handled.** Scope boundaries and known gaps, so the
    reviewer does not spend attention rediscovering them.
-8. **Open questions.** Explicit asks for the reviewer, each answerable. A
-   change with genuinely no open question probably did not need a
-   walkthrough.
+8. **Open questions.** Explicit asks for the reviewer, each answerable.
 9. **Sources.** The numbered reference list, present whenever the body cites
    anything.
 
@@ -219,6 +223,33 @@ page there, and GitHub shows nothing.
 There is no reading-order or navigation section. Mapping sections to code is
 the explainer threads' job, per [Explainer threads](../contracts/transcript.md#explainer-threads), because
 the walkthrough stands alone.
+
+## The short form
+
+A change whose plan has nothing that needs a section of its own still gets a
+walkthrough: the short form, which has only the sections such a change needs.
+
+1. **Purpose:** the problem paragraph, then the diff summary, per
+   [Purpose](purpose.md#in-the-short-form).
+2. **Background technical context,** as in the full form, and only as large as
+   the reader's need. One unit is a complete section when one is all the
+   reader needs.
+3. **Shape of the solution:** how the change works and why it is shaped that
+   way, in as little as one paragraph. Everything else the change needs said
+   goes here, in a sentence or two each: a decision and the alternative it
+   rejected, a scope boundary, a question for the reviewer, a user-visible
+   change with its capture. A figure belongs here only when it shows what the
+   prose cannot.
+
+Then Appendix A. Manual testing and Appendix B. Glossary, as in the full form,
+each on its own page.
+
+There is no floor. No section is padded to look complete, and none grows to
+match its full-form counterpart: the rules in
+[`contracts/prose.md`](../contracts/prose.md) and the deletion test in
+[How much to explain](writing.md#how-much-to-explain) set every passage's
+length, in either form. A short-form walkthrough of a page or two is the
+expected result for a small change.
 
 ## Rules
 
