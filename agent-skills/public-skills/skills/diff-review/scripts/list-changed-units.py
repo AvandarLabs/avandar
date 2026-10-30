@@ -35,9 +35,15 @@ DECLARATION = re.compile(
     r"|def|fn|struct|trait|impl|mod|func"
     r"|pub(\([a-z]+\))?\s+(async\s+)?(fn|struct|enum|trait|const|mod|type|static))\b"
 )
-IMPORT_OR_BLANK = re.compile(
-    r"^\s*$|^\s*(import\b|from\s+\S+\s+import\b|use\s|#include\b"
-    r"|export\s+(\*|\{[^}]*\})\s+from\b|export\s+type\s+\{[^}]*\}\s+from\b)"
+# A comment or blank line. One directly above a declaration documents it.
+COMMENT_OR_BLANK = re.compile(r"^\s*$|^\s*(/\*|\*|//|#(?!include\b)|--)")
+# An import or re-export statement, which may span several lines. A unit made
+# only of these is not a unit.
+IMPORT_STATEMENT = re.compile(
+    r"""\bimport\s+(type\s+)?([\w*${}\s,]+?\s+from\s+)?['"][^'"]+['"]"""
+    r"""|\bexport\s+(type\s+)?(\*(\s+as\s+\w+)?|\{[^}]*\})\s+from\s+['"][^'"]+['"]"""
+    r"|\b(from\s+[\w.]+\s+)?import\s+(\([^)]*\)|[\w., ]+)"
+    r"|\buse\s[^;]*;|#include\b[^\n]*"
 )
 HUNK = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@ ?(.*)$")
 
@@ -103,7 +109,11 @@ def parse_diff(text):
     units = {}
     path = None
     current = None
+    in_header = False
     old_line = new_line = 0
+    # Comment and blank lines wait here until the next code line shows whether
+    # they document a new declaration or belong to the current unit.
+    pending = []
 
     def unit_named(name):
         key = (path, name)
@@ -111,45 +121,79 @@ def parse_diff(text):
             units[key] = Unit(path, name)
         return units[key]
 
+    def flush():
+        for sign, number, body in pending:
+            if sign == "+":
+                current.touch_new(number, body)
+            else:
+                current.touch_old(number, body)
+        pending.clear()
+
     for line in text.splitlines():
         if line.startswith("diff --git "):
-            path = None
+            if current is not None:
+                flush()
+            path, current, in_header = None, None, True
             continue
-        if line.startswith("--- "):
+        if in_header and line.startswith("--- "):
             old_path = line[4:]
             if old_path != "/dev/null":
                 path = old_path[2:] if old_path.startswith("a/") else old_path
             continue
-        if line.startswith("+++ "):
+        if in_header and line.startswith("+++ "):
             new_path = line[4:]
             if new_path != "/dev/null":
                 path = new_path[2:] if new_path.startswith("b/") else new_path
             continue
         hunk = HUNK.match(line)
         if hunk:
+            if current is not None:
+                flush()
+            in_header = False
             old_line, new_line = int(hunk.group(1)), int(hunk.group(3))
             current = unit_named(hunk.group(5).strip() or "(top of file)")
             continue
         if current is None or not line or line.startswith("\\"):
             continue
-        body = line[1:]
-        if line[0] in "+-" and DECLARATION.match(body):
-            current = unit_named(body.strip())
-        if line[0] == "+":
-            current.touch_new(new_line, body)
-            new_line += 1
-        elif line[0] == "-":
-            current.touch_old(old_line, body)
+        sign, body = line[0], line[1:]
+        if sign not in "+-":
+            flush()
             old_line += 1
+            new_line += 1
+            continue
+        if COMMENT_OR_BLANK.match(body):
+            pending.append((sign, new_line if sign == "+" else old_line, body))
+        else:
+            if DECLARATION.match(body):
+                # Blank lines before the comment block stay with the unit
+                # above; the comment block itself documents this declaration.
+                blanks = 0
+                while blanks < len(pending) and not pending[blanks][2].strip():
+                    blanks += 1
+                documenting = pending[blanks:]
+                del pending[blanks:]
+                flush()
+                current = unit_named(body.strip())
+                pending.extend(documenting)
+            flush()
+            if sign == "+":
+                current.touch_new(new_line, body)
+            else:
+                current.touch_old(old_line, body)
+        if sign == "+":
+            new_line += 1
         else:
             old_line += 1
-            new_line += 1
+    if current is not None:
+        flush()
 
-    return [
-        unit
-        for unit in units.values()
-        if unit.lines and not all(IMPORT_OR_BLANK.match(text) for text in unit.lines)
-    ]
+    return [unit for unit in units.values() if unit.lines and not _only_imports(unit)]
+
+
+def _only_imports(unit):
+    """True when every changed line belongs to an import or is blank."""
+    rest = IMPORT_STATEMENT.sub("", "\n".join(unit.lines))
+    return not rest.strip(" \t\n;")
 
 
 def _overlaps(start, end, line):

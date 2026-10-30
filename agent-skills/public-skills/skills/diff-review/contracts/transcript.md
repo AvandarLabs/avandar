@@ -65,14 +65,16 @@ Two different voices live in this skill, and they must not be mixed:
 
 | You are | You write | Follow |
 | --- | --- | --- |
-| The **reviewer**, leaving findings on a diff | PR findings, review summaries, explainer threads | [`references/review-comment-style.md`](../references/review-comment-style.md) |
+| The **reviewer**, leaving findings on someone's diff | PR findings, review summaries | [`references/review-comment-style.md`](../references/review-comment-style.md) |
+| The **author**, explaining your own diff | Explainer threads | [Explainer threads](#explainer-threads), and the Non-negotiables in [`references/review-comment-style.md`](../references/review-comment-style.md#non-negotiables) |
 | The **engineer**, answering a reviewer's comment | Continue-mode replies | [`references/reply-style.md`](../references/reply-style.md) |
 
 Read the matching file before writing, and read the personal override next to
 it when it exists (`~/.diff-review/review-comment-style.md`,
-`~/.diff-review/reply-style.md`); the override wins on any conflict.
+`~/.diff-review/reply-style.md`); the override wins on any conflict. Every
+voice also follows [`contracts/prose.md`](prose.md).
 
-### As the reviewer
+### Explainer threads
 
 **Explainer threads cover the code; the walkthrough covers the design.** The
 walkthrough explains a change's architecture, its UI and data design, and its
@@ -82,39 +84,50 @@ one:
 
 1. List the units with
    `python3 <skill-dir>/scripts/list-changed-units.py <comparison-key>`. A
-   unit is one top-level declaration in one file.
+   unit is one top-level declaration in one file, with the comment above it.
 2. Sort each into core or exempt:
    - **Core:** it carries architecture, data flow, a data model or a stored
-     shape, UI behavior, a business rule or invariant, or an algorithm, so a
-     reader seeing it cold would need to know why it exists, what it
-     guarantees, or how it fits.
-   - **Exempt:** formatting, a rename with no change in behavior, a type that
-     only restates its fields, a helper whose name and signature say all it
-     does, and what the script leaves out (tests, generated files,
-     lockfiles). A move with no change gets one thread at its destination
-     saying where it came from. A test file gets a thread only when what it
-     proves is not evident from its name.
-3. Write one thread per core unit, anchored on its declaration line or on a
-   range over it. When one explanation serves several units of one file,
-   write one thread anchored on a range spanning them.
-4. Run the script again with `--transcript <transcript-path>`. Every unit it
-   still lists must be exempt; a core unit there is a thread still owed.
+     shape, UI behavior, a business rule or invariant, or an algorithm, and a
+     reader seeing it cold would need something its name, signature, and body
+     do not make evident on one read: why it exists, what it guarantees, or
+     how it fits.
+   - **Exempt:** formatting, a rename with no change in behavior, and a
+     declaration whose name and signature say all a reader needs, such as a
+     type that restates its fields or aliases another type, a constant, or a
+     small helper. So is everything the script leaves out: tests, generated
+     files, and lockfiles. No thread is owed on a test, though one may explain
+     a test whose purpose its test names do not state. A move with no change
+     gets one thread at its destination saying where it came from.
+3. Write one thread per core unit, anchored on its declaration line. When one
+   explanation serves several units that sit next to each other in one file,
+   write one thread anchored on a range from the first unit's declaration line
+   to the last one's, so it shows beside the code it explains. Units far
+   apart get a thread each.
+4. Run the script again with `--transcript <transcript-path>`. It lists the
+   units no thread is anchored in; confirm each one it still lists is exempt.
+   A core unit there is a thread still owed.
 
 Never comment outside the requested diff scope.
 
 **What a thread says** is the context the diff does not state: why the unit
 exists, what it guarantees or assumes, how data moves through it, which domain
-rule applies, or why a fallback or integration works that way. Never narrate
-the attached lines.
+rule applies, or why a fallback or integration works that way. Lead with what
+the unit does or guarantees. An explainer is the author speaking about their
+own code, so it never asks the reviewer a question: when a reason is not
+recoverable from the code, leave it out rather than guess. Never narrate the
+attached lines.
 
 **How long a thread runs** is as long as a reader new to this code needs to
 understand the unit, and no longer. Usually that is two to four sentences. An
 invariant or an algorithm may need a worked example, and gets one. An essay
-never helps: apply the [deletion test](../walkthrough/writing.md#how-much-to-explain)
-to every sentence, and cut any sentence whose absence would leave the reader
-concluding the same thing. Every thread follows
-[`contracts/prose.md`](prose.md): ground each term the reader would not know,
-and leave out every tell in [Factual prose](prose.md#factual-prose).
+never helps: cut any sentence whose absence would leave the reader concluding
+the same thing, per the deletion test in
+[How much to explain](../walkthrough/writing.md#how-much-to-explain). Every
+thread follows [`contracts/prose.md`](prose.md): leave out every tell in
+[Factual prose](prose.md#factual-prose), and ground each term the reader would
+not know. A term the walkthrough's glossary defines may be used without
+redefining it, because the reviewer has the walkthrough beside the diff; do
+not repeat the same gloss thread after thread.
 
 **Explainers point into the walkthrough; the walkthrough never points back.**
 When a walkthrough section already explains the context of a unit, the thread
@@ -128,11 +141,24 @@ column keeps its earlier column ID only when the app can prove it is the same
 column".
 ```
 
-Cite only when the section adds understanding of these lines. Most units are
-not in the walkthrough, by design, and their threads stand alone; a citation
-to a section that does not explain the unit, or that the thread already
-makes redundant, is noise. PR findings never cite the walkthrough, because
-they are pasted into GitHub, where it does not exist.
+Cite a section when it holds what a thread cannot: a worked example, a figure,
+or a decision's reasoning. When stating the fact takes fewer words than citing
+the section, state it. Most units are not in the walkthrough, by design, and
+their threads stand alone; a citation to a section that does not explain the
+unit is noise. A heading with no number of its own, such as a pipeline step,
+takes its section's number (`§6, "Step 3. _getPriorMatch"`), and a heading
+longer than about ten words may be cited by its number and opening words.
+
+When writing a thread shows a walkthrough claim to be wrong or imprecise, and
+this round wrote the walkthrough, correct the walkthrough, run its marking
+script again, and cite the corrected section. When the walkthrough predates
+this round, describe the code as it is, leave the walkthrough alone, and name
+the discrepancy and `/diff-review walkthrough` in the chat report.
+
+### As the reviewer
+
+PR findings never cite the walkthrough, because they are pasted into GitHub,
+where it does not exist.
 
 For PR findings, write text a human can paste into GitHub unchanged, in the
 voice `references/review-comment-style.md` describes:

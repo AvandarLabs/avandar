@@ -23,10 +23,10 @@ sections, and the walkthrough takes longer than everything else combined.
    leave it untouched, per
    [When a walkthrough is written](../SKILL.md#when-a-walkthrough-is-written).
 5. Write the explainer threads per
-   [As the reviewer](../contracts/transcript.md#as-the-reviewer): list the
-   changed units, give every core unit a thread, citing the walkthrough only
-   where it adds understanding, and confirm with the script that every unit
-   left without a thread is exempt.
+   [Explainer threads](../contracts/transcript.md#explainer-threads): list
+   the changed units, give every core unit a thread, citing the walkthrough
+   only where it adds understanding, then run the script's `--transcript`
+   check and confirm each unit it still lists is exempt.
    For a new round on an existing transcript, preserve every entry and append
    only new `claude` threads; never replace the conversation with the new
    round alone. With a live session, follow [Writing the transcript while a

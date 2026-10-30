@@ -58,6 +58,43 @@ diff --git a/src/view.tsx b/src/view.tsx
 +import { useThing } from "./useThing";
 """
 
+MULTILINE_IMPORT = """\
+diff --git a/src/view.tsx b/src/view.tsx
+--- a/src/view.tsx
++++ b/src/view.tsx
+@@ -1,0 +2,5 @@
++import {
++  useThing,
++  type Thing,
++} from "./useThing";
++export { other } from "./other";
+"""
+
+DOCSTRING_FIRST = """\
+diff --git a/src/sql.ts b/src/sql.ts
+new file mode 100644
+--- /dev/null
++++ b/src/sql.ts
+@@ -0,0 +1,7 @@
++import { knex } from "knex";
++
++/**
++ * Converts a query to SQL.
++ */
++export function toSql(query) {
++}
+"""
+
+SQL_COMMENT_REMOVED = """\
+diff --git a/supabase/schemas/a.sql b/supabase/schemas/a.sql
+--- a/supabase/schemas/a.sql
++++ b/supabase/schemas/a.sql
+@@ -3,2 +3 @@ create function public.thing()
+--- the old note
+-select 1;
++select 2;
+"""
+
 
 def names(units):
     return [(unit.path, unit.name) for unit in units]
@@ -95,6 +132,19 @@ class ParseDiff(unittest.TestCase):
 
     def test_drops_a_unit_that_only_changes_imports(self):
         self.assertEqual(units_module.parse_diff(IMPORTS_ONLY), [])
+
+    def test_a_docstring_joins_the_declaration_under_it(self):
+        (unit,) = units_module.parse_diff(DOCSTRING_FIRST)
+        self.assertEqual(unit.name, "export function toSql(query) {")
+        self.assertEqual((unit.new_start, unit.new_end), (3, 7))
+
+    def test_a_removed_line_that_starts_with_two_dashes_stays_in_its_hunk(self):
+        (unit,) = units_module.parse_diff(SQL_COMMENT_REMOVED)
+        self.assertEqual(unit.path, "supabase/schemas/a.sql")
+        self.assertEqual((unit.added, unit.removed), (1, 2))
+
+    def test_drops_a_unit_whose_imports_span_several_lines(self):
+        self.assertEqual(units_module.parse_diff(MULTILINE_IMPORT), [])
 
 
 class Exclusions(unittest.TestCase):
