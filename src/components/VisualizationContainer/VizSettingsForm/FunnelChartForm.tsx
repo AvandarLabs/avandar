@@ -1,5 +1,5 @@
 import { makeSelectOptions, Select } from "@avandar/ui";
-import { isDefined, propPasses } from "@avandar/utils";
+import { isDefined, propEq, propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
 import { useMemo } from "react";
@@ -52,15 +52,11 @@ export function FunnelChartForm({
     if (!config.nameKey) {
       return [];
     }
+    const nameColumnName =
+      fields.find(propEq("id", config.nameKey))?.name ?? "";
     const seen = new Set<string>();
     data.forEach((row) => {
-      const name = String(
-        row[
-          fields.find((column) => {
-            return column.id === config.nameKey;
-          })?.name ?? ""
-        ] ?? "",
-      );
+      const name = String(row[nameColumnName] ?? "");
       if (name) {
         seen.add(name);
       }
