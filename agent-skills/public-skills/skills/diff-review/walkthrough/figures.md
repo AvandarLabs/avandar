@@ -274,6 +274,9 @@ await page.evaluate(() =>
 );
 ```
 
+[`references/screenshot-examples.md`](../references/screenshot-examples.md)
+shows captures and their caption boxes in the expected style.
+
 Then look at the capture before placing it. A ring cut off by the window or a
 letter over a label the reader needs means moving the window or the clip and
 capturing again.

@@ -89,7 +89,8 @@ contracts/      transcript and comment voice, diff guide and reviewed state,
                 run command and chat summary
 walkthrough/    the walkthrough's contract, one file per part, and one file
                 per review pass for the subagent that runs it
-references/     comment and reply voice, a worked pipeline explanation
+references/     comment and reply voice, a worked pipeline explanation,
+                worked screenshot examples
 scripts/        validators, helpers, the glossary marker, and the dif runner
 ```
 
