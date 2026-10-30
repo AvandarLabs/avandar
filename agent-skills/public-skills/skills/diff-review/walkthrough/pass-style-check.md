@@ -157,9 +157,13 @@ own draft.
 
 6. **List every UI element the document names,** and confirm each
    non-obvious one has its zoomed-in or annotated capture, per
-   [Name a UI element, show the UI element](figures.md#name-a-ui-element-show-the-ui-element).
-   Report the misses rather than fixing them: this pass cannot drive the app,
-   so the author takes the capture.
+   [Name a UI element, show the UI element](figures.md#name-a-ui-element-show-the-ui-element),
+   and that no capture of a named element is a bare full-window screenshot,
+   per [Crop and letter the capture](figures.md#crop-and-letter-the-capture).
+   A sentence saying a capture was not taken counts as a miss unless it names
+   a block, per [Screenshots](figures.md#screenshots). Report every miss
+   rather than fixing it: this pass cannot drive the app, so the author takes
+   the capture and runs this pass again.
 
 7. **Run the deletion test on every section,** per
    [How much to explain](writing.md#how-much-to-explain): name what a reviewer would get

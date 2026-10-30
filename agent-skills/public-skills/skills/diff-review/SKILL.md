@@ -54,7 +54,7 @@ explicit-only. "Review this PR" and "prepare a diff review" ask the agent to
 review; "prepare the diff for review" only asks for Initial setup. A live
 session with no reviewer comment is Initial coordination state, not Continue.
 For an existing unchanged review with no open comments, do not reset or rewrite
-artifacts. If its walkthrough is missing, write it by running steps 2 to 11 of
+artifacts. If its walkthrough is missing, write it by running steps 2 to 12 of
 [Walkthrough](modes/walkthrough.md), per
 [When a walkthrough is written](#when-a-walkthrough-is-written); otherwise
 report that no comments are open and wait for a concrete request.

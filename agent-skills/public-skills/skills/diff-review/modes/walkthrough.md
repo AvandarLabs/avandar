@@ -2,8 +2,8 @@
 
 Selected only by an explicit request, such as `/diff-review walkthrough`, and
 the only mode that changes an existing walkthrough. Initial and PR review run
-steps 2 to 10 when no walkthrough exists, and a plain `/diff-review` on a
-prepared review with no walkthrough runs steps 2 to 11. Apart from what Initial
+steps 2 to 11 when no walkthrough exists, and a plain `/diff-review` on a
+prepared review with no walkthrough runs steps 2 to 12. Apart from what Initial
 does when step 1 runs it, read-only with respect to source.
 
 Before step 2, read these in full. Together they are the contract the draft
@@ -44,8 +44,9 @@ is written to:
    is called from. The walkthrough describes the system as it now stands, so
    unchanged collaborators are in scope for understanding even though they are
    out of scope for review.
-4. Capture screenshots for user-visible changes, per
-   [Screenshots](../walkthrough/figures.md#screenshots).
+4. Capture the changed states of user-visible changes, per
+   [Screenshots](../walkthrough/figures.md#screenshots). Keep the app running:
+   step 7 and the review passes may send you back for more captures.
 5. Where a decision's rationale is not recoverable from the code, say so
    rather than inventing one, and add it to Open questions.
 6. Write `-walkthrough.md`, including Purpose per [Purpose](../walkthrough/purpose.md) and
@@ -58,37 +59,46 @@ is written to:
    content of both rather than edit it. When regenerating, keep each section's
    number where its content still fits, because earlier explainer threads cite
    those numbers; where the current section order forces a renumber, make it
-   and list the affected threads in step 11. Do not touch
+   and list the affected threads in step 12. Do not touch
    the transcript, the guides, the reviewed state, or any source file. When a
    strand is a pipeline or a multi-pass algorithm, read
    [`references/pipeline-explanation.md`](../references/pipeline-explanation.md)
    before writing that section.
-7. Run the background context pass, by dispatching a subagent per
+7. Take the capture inventory, per
+   [Screenshots](../walkthrough/figures.md#screenshots): list every UI
+   element the draft names, and capture, crop, or letter each one that is not
+   exempt and has no capture yet, per
+   [Crop and letter the capture](../walkthrough/figures.md#crop-and-letter-the-capture).
+   Re-take any capture of a named element that is a bare full-window
+   screenshot, under the same file name. A capture skipped for any reason short of a block, per
+   [Screenshots](../walkthrough/figures.md#screenshots), is a capture still
+   owed.
+8. Run the background context pass, by dispatching a subagent per
    [Dispatching a review pass](#dispatching-a-review-pass) with
    [`walkthrough/pass-background.md`](../walkthrough/pass-background.md). It
    returns the units it included and the ones it left out, with reasons. Read
    [`walkthrough/background-context.md`](../walkthrough/background-context.md),
    judge the cut, and correct the section when a unit a later section depends
    on is missing.
-8. Run the clarity pass, by dispatching a subagent per
+9. Run the clarity pass, by dispatching a subagent per
    [Dispatching a review pass](#dispatching-a-review-pass) with
    [`walkthrough/pass-clarity.md`](../walkthrough/pass-clarity.md). It edits
    nothing, and returns proposals, heading renames and moves, questions for
-   you, and the glossary rows. Read
+   you, the UI elements it could not picture, and the glossary rows. Read
    [`walkthrough/glossary.md`](../walkthrough/glossary.md), then act on the
    result per [Applying the clarity pass](#applying-the-clarity-pass).
-9. Enter the content review phase, by dispatching a subagent per
-   [Dispatching a review pass](#dispatching-a-review-pass) with
-   [`walkthrough/pass-content-review.md`](../walkthrough/pass-content-review.md).
-   Copy the draft to a temporary file outside the repository first, so a
-   change you reject can be restored. It checks the draft for accuracy against
-   the code, fixes what it finds, and
-   reports each change with its evidence. Read every change and accept or
-   reject it: the subagent has read the code more recently, you know what the
-   change was for, and neither alone is a good judge of a disputed claim. A
-   rejection is a normal outcome, and a change accepted without reading it
-   defeats the phase. Then run the marking script again.
-10. Then run the style check, always the last pass, by dispatching a subagent
+10. Enter the content review phase, by dispatching a subagent per
+    [Dispatching a review pass](#dispatching-a-review-pass) with
+    [`walkthrough/pass-content-review.md`](../walkthrough/pass-content-review.md).
+    Copy the draft to a temporary file outside the repository first, so a
+    change you reject can be restored. It checks the draft for accuracy against
+    the code, fixes what it finds, and
+    reports each change with its evidence. Read every change and accept or
+    reject it: the subagent has read the code more recently, you know what the
+    change was for, and neither alone is a good judge of a disputed claim. A
+    rejection is a normal outcome, and a change accepted without reading it
+    defeats the phase. Then run the marking script again.
+11. Then run the style check, always the last pass, by dispatching a subagent
     per [Dispatching a review pass](#dispatching-a-review-pass) with
     [`walkthrough/pass-style-check.md`](../walkthrough/pass-style-check.md).
     It applies the closing checks, loops on the rendered PDF until every
@@ -97,12 +107,16 @@ is written to:
     finished: looking finished to its author is the condition the phase exists
     to test. When it reports a contract violation outside its remit, such as a
     Background figure that splits across two pages, fix it yourself, then run
-    the style check again so it stays the last pass. A coverage gap or a
-    judgment call it reports goes into the step 11 report instead.
-11. Report the section count, which units the background context pass
+    the style check again so it stays the last pass. A missing or bare
+    capture it reports under check 6 is one of these: take it per step 7,
+    then run the style check again. Only a capture that is genuinely blocked
+    stays out, with its one-sentence reason in the document. A coverage gap or
+    a judgment call it reports goes into the step 12 report instead.
+12. Report the section count, which units the background context pass
     included, what the clarity pass proposed and what you rejected, what the
     content review changed and what you rejected, what the style check
-    changed, and any section the deletion test shortened or removed. When a
+    changed, the captures steps 7 and 11 added and any left out as blocked,
+    and any section the deletion test shortened or removed. When a
     regeneration moved a section that an existing thread cites, list those
     threads. Then end the response with a table naming the walkthrough. One row is expected; the
     table is there so the path stands out at the end of a long reply.
@@ -165,6 +179,7 @@ it; add it to the existing tree and table rather than starting a new one, and
 drop a less needed unit when the addition would push the figure past one
 page.
 
+Take a capture for each UI element the pass could not picture, per step 7.
 Answer the questions in the text or the figures, then write the glossary into
 Appendix B per [`walkthrough/glossary.md`](../walkthrough/glossary.md):
 dropping any entry for a term the reader no longer meets, in prose or in a

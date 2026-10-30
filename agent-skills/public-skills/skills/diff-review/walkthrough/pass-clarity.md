@@ -18,7 +18,9 @@ and [Flow and orientation](writing.md#flow-and-orientation);
 [Sections](structure.md#sections); and
 [`code-and-citations.md`](code-and-citations.md), which holds how a pipeline's
 step headings are named in
-[Explaining a multi-step algorithm or pipeline](code-and-citations.md#explaining-a-multi-step-algorithm-or-pipeline).
+[Explaining a multi-step algorithm or pipeline](code-and-citations.md#explaining-a-multi-step-algorithm-or-pipeline);
+and [`figures.md`](figures.md), which holds which UI elements need a capture
+in [Name a UI element, show the UI element](figures.md#name-a-ui-element-show-the-ui-element).
 
 **Authority:** read-only access to the walkthrough, the diff, the code, and
 the project's docs.
@@ -40,6 +42,9 @@ anything else:
 - **Algorithms:** a step it could not trace using the worked example given.
 - **Architecture:** a component it could not place in the Shape diagram or the
   Background tree, or a data flow it could not follow end to end.
+- **Interface:** a named UI element it cannot picture from the product alone
+  that has no capture beside it, per
+  [Name a UI element, show the UI element](figures.md#name-a-ui-element-show-the-ui-element).
 - **Heading order:** a heading that depends on a term or mechanism introduced
   only later, or a heading list that does not tell the story of the change when
   read alone.
@@ -61,7 +66,7 @@ need no rewrite. A sentence still needs one when:
   missing a side, an abstract noun has no owner, or the sentence names a
   process without saying what it acts on.
 
-It returns four things:
+It returns five things:
 
 1. **Proposals,** one per stall that needs a rewrite: the location (section
    number and the quoted text), what the newcomer could not work out, and the
@@ -74,7 +79,9 @@ It returns four things:
    cold-read test, with its replacement, and every move, each with the
    dependency that motivates it.
 3. **Questions for the parent,** for the stalls only the author can resolve.
-4. **The glossary,** as table rows ready to paste, per [Glossary](glossary.md),
+4. **UI elements it could not picture,** each with the section that names it,
+   so the parent can take the capture.
+5. **The glossary,** as table rows ready to paste, per [Glossary](glossary.md),
    without a header or separator row: each term spelled the way the text uses
    it, with other spellings the text uses in parentheses. It need not number
    them.

@@ -96,8 +96,8 @@ reader who has to turn the page to find out what a label means is doing the
 work the key was added to remove.
 
 `markdown-to-pdf` 0.13.0 and later enforce this: the caption box directly
-under a mermaid fence joins the figure, and the drawing is re-fitted to the
-page minus the box. So the mechanism is not your problem. The budget is.
+under a mermaid fence or an image joins the figure, and the drawing is
+re-fitted to the page minus the box. So the mechanism is not your problem. The budget is.
 
 Every line of the box is a line the drawing does not get, and past about a
 third of the page the renderer starts shrinking the box's type instead. Both
@@ -167,9 +167,18 @@ state and capture it. When capture is genuinely blocked, say so in one sentence
 and fall back to an ASCII wireframe of the changed surface. Blocked means
 blocked, not inconvenient: no browser automation available, an unrunnable local
 stack, or a flow gated behind a third-party credential the run does not hold.
+A state that takes setup to reach, such as a warning, an error, or a badge
+that needs particular data, is not blocked: create that data the way Manual
+testing would, and capture it.
 
 Save captures under `.difit/<stem>-walkthrough-assets/` and reference them
 with relative paths, so the links resolve from the markdown file itself.
+
+Captures are taken twice. The changed states are captured while exploring,
+before the draft exists. The draft then names interface the exploration never
+looked at, so once it is written, take the capture inventory: list every UI
+element the draft names, mark each one exempt or not per the rule below, and
+capture every one that is not exempt and has no capture yet.
 
 ### Name a UI element, show the UI element
 
@@ -208,3 +217,72 @@ team and opaque to a reader who has not already built the picture. A house name
 for a region is never self-evident, however settled it feels internally. When
 you are unsure which side a term falls on, it falls on the side that gets a
 capture.
+
+### Crop and letter the capture
+
+A full-window screenshot shows the reader everything except where to look. No
+capture of a named element is a bare full-window screenshot, and step 7 of
+[Walkthrough](../modes/walkthrough.md) re-takes one that is, under the same
+file name:
+
+- **Crop** to the element plus enough margin to place it on the page. Pass the
+  element to the screenshot call (Playwright's `locator.screenshot()`, or the
+  element reference of the browser tool's screenshot action), or pass a `clip`
+  rectangle around it when the margin needs to be wider than the element.
+- **Letter** a capture that has to show several elements, and clip it too
+  when the elements share one part of the window. Draw the letters on the page
+  itself, capture, then remove them, so no image editor is involved. The
+  letters are placed from Playwright locators rather than CSS selectors, which
+  is what lets them reach an element inside an iframe:
+
+```js
+// Run with Playwright's `page`. `marks` pairs each letter with a locator, and a
+// locator may point into an iframe: page.frameLocator("iframe").getByText(...).
+const boxes = [];
+for (const [letter, locator] of marks) {
+  boxes.push([letter, await locator.boundingBox()]);
+}
+await page.evaluate((boxes) => {
+  const draw = (css, text = "") => {
+    const mark = document.createElement("div");
+    mark.className = "walkthrough-mark";
+    mark.textContent = text;
+    mark.style.cssText = `position:fixed;z-index:2147483647;pointer-events:none;
+      box-sizing:border-box;${css}`;
+    document.body.append(mark);
+  };
+  const { clientWidth, clientHeight } = document.documentElement;
+  for (const [letter, box] of boxes) {
+    // Clamped to the window, so a ring around an element at its edge stays whole.
+    const left = Math.max(0, box.x - 4);
+    const top = Math.max(0, box.y - 4);
+    const right = Math.min(clientWidth, box.x + box.width + 4);
+    const bottom = Math.min(clientHeight, box.y + box.height + 4);
+    draw(`left:${left}px;top:${top}px;width:${right - left}px;
+      height:${bottom - top}px;border:3px solid #e8590c;border-radius:4px`);
+    // The letter sits outside the ring, on whichever side has room, so it
+    // never covers the element it names.
+    const badgeLeft = left >= 30 ? left - 28 : right + 4;
+    draw(`left:${badgeLeft}px;top:${(top + bottom) / 2 - 12}px;width:24px;
+      height:24px;border-radius:50%;background:#e8590c;color:#fff;
+      font:700 15px/24px sans-serif;text-align:center`, letter);
+  }
+}, boxes);
+await page.screenshot({ path, clip });
+await page.evaluate(() =>
+  document.querySelectorAll(".walkthrough-mark").forEach((mark) => mark.remove()),
+);
+```
+
+Then look at the capture before placing it. A ring cut off by the window or a
+letter over a label the reader needs means moving the window or the clip and
+capturing again.
+
+The caption box under a lettered capture is the same box as under a diagram,
+per [The caption box](#the-caption-box), labelled `**Diagram key**` too, with
+one row per letter. When the document's name for an element differs from the
+label the screen gives it, the row gives both, so the reader can find it on
+screen.
+
+Purpose carries no figure. An element first named in Purpose gets its capture
+at its first mention in the body.
