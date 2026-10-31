@@ -2,8 +2,8 @@
 
 A walkthrough section covering a pipeline, a multi-pass algorithm, or a command
 that chains several tools. Read
-[`../SKILL.md`](../SKILL.md) section **Explaining a multi-step algorithm or
-pipeline** for the rules; this file is one section written to them, followed by
+[`../walkthrough/code-and-citations.md`](../walkthrough/code-and-citations.md)
+section **Explaining a multi-step algorithm or pipeline** for the rules; this file is one section written to them, followed by
 an annotation naming which rule each part satisfies.
 
 The subject is `pnpm db:new-migration` in the Avandar repository, a six-step
@@ -41,9 +41,9 @@ flowchart TD
   A --> B --> C --> D --> E --> F
 ```
 
-*Both resets are steps, not housekeeping. Step 4 can only compute a delta
-against a database built from migrations, and step 6 can only verify step 4 by
-rebuilding after it.*
+> *Both resets are steps, not housekeeping. Step 4 can only compute a delta
+> against a database built from migrations, and step 6 can only verify step 4
+> by rebuilding after it.*
 
 #### Step 1. `supabase db diff -f <name>`
 
