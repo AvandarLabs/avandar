@@ -10,6 +10,14 @@ on:
   pull_request_review:
     types: [submitted]
 
+env:
+  NODE_VERSION: 24.15.0
+  # Strips credentials such as CLAUDE_CODE_OAUTH_TOKEN from every command
+  # Claude runs, including the git hooks and any PR code those commands
+  # execute. Claude keeps them for its own API calls, and GitHub tokens stay
+  # so gh and git push still work.
+  CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: "1"
+
 jobs:
   # Structured PR review, driven by the code-review plugin. Kept as its own job
   # so it keeps the specialized prompt and plugin rather than freeform @claude.
@@ -30,7 +38,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          # Full history so the review can read git log and blame.
+          fetch-depth: 0
+
+      # Same toolchain as pr-develop.yaml's lint-typecheck job, so the review
+      # can verify claims with the type checker and linter.
+      - run: corepack enable
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          package-manager-cache: true
+      - run: pnpm install --frozen-lockfile
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
 
       - name: Run Claude Code Review
         id: claude-review
@@ -40,6 +62,13 @@ jobs:
           plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
           plugins: "code-review@claude-code-plugins"
           prompt: "/code-review:code-review ${{ github.repository }}/pull/${{ github.event.issue.number }}"
+          # The plugin's command grants its own gh tools. These add read-only
+          # checks on top. Lines starting with # are stripped before parsing.
+          claude_args: |
+            # Type-check and lint
+            --allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm exec tsc:*),Bash(pnpm exec eslint:*)"
+            # Read-only git history
+            --allowedTools "Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git blame:*)"
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
 
@@ -51,6 +80,7 @@ jobs:
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
       pull-requests: read
@@ -61,11 +91,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          # Full history so Claude can rebase onto commits pushed by other
+          # @claude jobs and answer questions about older commits.
+          fetch-depth: 0
+
+      # Same toolchain as pr-develop.yaml's lint-typecheck job, so Claude can
+      # run the type checker, linter, tests, and repo generators.
+      - run: corepack enable
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          package-manager-cache: true
+      - run: pnpm install --frozen-lockfile
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      # Fixed commands for work whose usual tools can run any command:
+      # claude-sync-branch replaces git pull --rebase (--upload-pack), and
+      # claude-replace replaces git grep (-O) piped to xargs. Copied out of
+      # the checkout before Claude switches to the PR branch, so for PR
+      # conversation comments the default branch's copies run, not the PR's.
+      - name: Install @claude helpers
+        run: sudo install -m 755 .github/claude-bot/claude-sync-branch .github/claude-bot/claude-replace /usr/local/bin/
 
       - name: Run Claude Code
         id: claude
         uses: anthropics/claude-code-action@v1
+        env:
+          # git rebase --continue and git merge would otherwise wait on an
+          # editor that a headless run cannot open.
+          GIT_EDITOR: "true"
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
@@ -76,7 +133,38 @@ jobs:
           # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
           # prompt: 'Update the pull request description to include a summary of changes.'
 
-          # Optional: Add claude_args to customize behavior and configuration
+          # The action already allows Read, Glob, Grep, file edits inside the
+          # checkout, git add/commit/rm, and its own push script. Anything not
+          # listed here is denied, because a headless run cannot ask for
+          # approval. Lines starting with # are stripped before parsing.
+          #
+          # Deliberately left out: gh api (its token can write to the repo),
+          # pnpm add/remove (supply-chain risk), rm, xargs, awk, WebSearch, and
+          # WebFetch (a way to send data out of the job). git rebase -x and git
+          # fetch --upload-pack can each run any command, and cat, head, and
+          # tail duplicate Read, so none of them are allowed either. sed is
+          # allowed only with --sandbox, which rejects its e, r, and w
+          # commands, so it can replace text but not run commands or touch
+          # other files.
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
-          # claude_args: '--allowed-tools Bash(gh pr *)'
+          claude_args: |
+            # Git: rename, inspect, undo, and sync with other @claude jobs
+            --allowedTools "Bash(git mv:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git restore:*),Bash(git reset:*)"
+            --allowedTools "Bash(claude-sync-branch),Bash(git fetch origin),Bash(git rebase --continue),Bash(git rebase --abort),Bash(git merge:*)"
+            # GitHub reads
+            --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr list:*),Bash(gh run view:*),Bash(gh issue view:*)"
+            # Files and text
+            --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(grep:*),Bash(sed --sandbox:*),Bash(claude-replace:*)"
+            --allowedTools "Bash(ls:*),Bash(wc:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(jq:*)"
+            # Checks
+            --allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm test:*),Bash(pnpm format:*)"
+            --allowedTools "Bash(pnpm exec tsc:*),Bash(pnpm exec vitest:*),Bash(pnpm exec eslint:*)"
+            # Generators and Lingui catalogs (ava new only, never ava supabase)
+            --allowedTools "Bash(pnpm new:component:*),Bash(pnpm new:route:*),Bash(pnpm build:ava-cli:*),Bash(ava new:*)"
+            --allowedTools "Bash(pnpm i18n:extract:*),Bash(pnpm i18n:compile:*)"
+            # Agent tools
+            --allowedTools "Task,TodoWrite"
+            # Need Supabase, Docker, or browsers that this job does not set up
+            --disallowedTools "Bash(pnpm test:db:*),Bash(pnpm test:e2e:*)"
+            --append-system-prompt "Other @claude jobs may push to this branch while you work. Before every push, run claude-sync-branch, which rebases onto the remote branch. If the rebase stops on a conflict, resolve it with Edit, git add the files, run git rebase --continue, then push. To bring in another branch, run git fetch origin, then git merge origin/<branch>. If the pre-push hook blocks a push because it updated translation catalogs or formatting, commit those files and push again. This job has no OpenAI key, so leave untranslated msgstr entries empty for a developer's next push to fill. For find-and-replace across files, run claude-replace [--fixed] <pattern> <replacement> [<pathspec>...], which edits every tracked file that matches, then review git diff. For a single file, sed --sandbox -i also works. Plain sed, git grep, and xargs are not allowed."
