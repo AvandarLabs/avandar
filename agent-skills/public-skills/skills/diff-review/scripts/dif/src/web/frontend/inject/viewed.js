@@ -44,28 +44,27 @@
     try { window.localStorage.setItem(key, JSON.stringify(value)); } catch (err) { /* quota */ }
   }
   function keysWithPrefix(prefix) {
-    var keys = [];
-    for (var i = 0; i < window.localStorage.length; i++) {
-      var key = window.localStorage.key(i);
-      if (key && key.lastIndexOf(prefix, 0) === 0) keys.push(key);
-    }
-    return keys;
+    return Object.keys(window.localStorage).filter(function (key) {
+      return key.lastIndexOf(prefix, 0) === 0;
+    });
   }
 
   // difit's per-file diff text, hashed with SHA-256 (hex).
   function diffText(file) {
     var chunks = (file.chunks || []).map(function (chunk) {
       var lines = (chunk.lines || [])
-        .filter(function (l) { return l.type !== "hunk" && l.type !== "header"; })
-        .map(function (l) { return l.type + ":" + l.content; })
+        .filter(function (line) { return line.type !== "hunk" && line.type !== "header"; })
+        .map(function (line) { return line.type + ":" + line.content; })
         .join("\n");
       return chunk.header + "\n" + lines;
     }).join("\n\n");
     return file.path + "\n" + file.status + "\n" + chunks;
   }
   function sha256(text) {
-    return window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)).then(function (buf) {
-      return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+    return window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)).then(function (digestBuffer) {
+      return Array.from(new Uint8Array(digestBuffer))
+        .map(function (byteValue) { return byteValue.toString(16).padStart(2, "0"); })
+        .join("");
     });
   }
 
@@ -73,7 +72,9 @@
   // this frame's group).
   function fetchFullDiff() {
     return nativeFetch("/api/diff?" + lastDiffQuery, { cache: "no-store", referrerPolicy: "no-referrer" })
-      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("diff " + r.status)); });
+      .then(function (response) {
+        return response.ok ? response.json() : Promise.reject(new Error("diff " + response.status));
+      });
   }
 
   function markViewed(repositoryId, file) {
@@ -81,7 +82,9 @@
       var key = INDEX_PREFIX + repositoryId;
       var index = readJson(key) || { version: 1, entries: [] };
       if (!Array.isArray(index.entries)) index.entries = [];
-      var present = index.entries.some(function (e) { return e.filePath === file.path && e.diffContentHash === hash; });
+      var present = index.entries.some(function (entry) {
+        return entry.filePath === file.path && entry.diffContentHash === hash;
+      });
       if (present) return false;
       index.entries.push({ filePath: file.path, diffContentHash: hash, hashVersion: 1, viewedAt: new Date().toISOString() });
       index.lastModifiedAt = new Date().toISOString();
@@ -95,7 +98,7 @@
     keysWithPrefix(INDEX_PREFIX + repositoryId).forEach(function (key) {
       var index = readJson(key);
       if (!index || !Array.isArray(index.entries)) return;
-      var kept = index.entries.filter(function (e) { return e.filePath !== path; });
+      var kept = index.entries.filter(function (entry) { return entry.filePath !== path; });
       if (kept.length === index.entries.length) return;
       index.entries = kept;
       writeJson(key, index);
@@ -104,7 +107,7 @@
     keysWithPrefix(CONTEXT_PREFIX + repositoryId + "/").forEach(function (key) {
       var context = readJson(key);
       if (!context || !Array.isArray(context.viewedFiles)) return;
-      var kept = context.viewedFiles.filter(function (v) { return v.filePath !== path; });
+      var kept = context.viewedFiles.filter(function (viewedFile) { return viewedFile.filePath !== path; });
       if (kept.length === context.viewedFiles.length) return;
       context.viewedFiles = kept;
       writeJson(key, context);
@@ -121,15 +124,15 @@
   // The newest event per path, after `from`.
   function latestChanges(events, from) {
     var byPath = {};
-    events.forEach(function (e) { if (e.seq > from) byPath[e.path] = e; });
+    events.forEach(function (event) { if (event.seq > from) byPath[event.path] = event; });
     return Object.keys(byPath).map(function (path) { return byPath[path]; });
   }
 
   // A comment being typed would be lost by a reload, so wait for it.
   function hasDraft() {
-    var areas = document.querySelectorAll("form textarea");
-    for (var i = 0; i < areas.length; i++) if (areas[i].value.trim()) return true;
-    return false;
+    return Array.from(document.querySelectorAll("form textarea")).some(function (textarea) {
+      return textarea.value.trim() !== "";
+    });
   }
   function reloadWhenSafe() {
     if (reloadPending) return;
@@ -150,7 +153,7 @@
     applying = true;
     fetchFullDiff().then(function (diff) {
       var files = {};
-      (diff.files || []).forEach(function (f) { files[f.path] = f; });
+      (diff.files || []).forEach(function (file) { files[file.path] = file; });
       var repositoryId = diff.repositoryId;
       var steps = changes.map(function (change) {
         if (!files[change.path] || !repositoryId) return Promise.resolve(false);
@@ -168,7 +171,7 @@
 
   function poll() {
     nativeFetch("/__wrap/github.json", { cache: "no-store" })
-      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (response) { return response.ok ? response.json() : null; })
       .then(apply)
       .catch(function () { /* the next poll retries */ });
   }

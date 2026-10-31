@@ -140,15 +140,7 @@ impl GithubSync {
                 message_id,
                 node_id,
                 body,
-            } => {
-                let error = self.ports.api.update(&node_id, &body).err();
-                self.edit(&message_id, |entry| {
-                    if error.is_none() {
-                        entry.body = Some(body);
-                    }
-                    entry.error = error.map(|e| e.to_string());
-                });
-            }
+            } => self.apply_update(&message_id, &node_id, body),
             SyncAction::Delete {
                 message_id,
                 node_id,
@@ -159,15 +151,7 @@ impl GithubSync {
             SyncAction::Resolve {
                 message_id,
                 thread_id,
-            } => {
-                // Forgotten either way: if resolving failed, GitHub still has
-                // the open conversation and the next pull brings it back.
-                if let Err(e) = self.ports.api.resolve(&thread_id) {
-                    let notice = format!("Could not resolve a conversation on GitHub: {e}");
-                    self.registry.session(|s| s.notice = Some(notice));
-                }
-                self.forget(&message_id);
-            }
+            } => self.apply_resolve(&message_id, &thread_id),
             SyncAction::Forget { message_id } => self.forget(&message_id),
             SyncAction::Reject {
                 message_id,
@@ -175,6 +159,26 @@ impl GithubSync {
                 reason,
             } => self.record_post(&message_id, &body, false, Err(anyhow!(reason))),
         }
+    }
+
+    fn apply_update(&self, message_id: &str, node_id: &str, body: String) {
+        let error = self.ports.api.update(node_id, &body).err();
+        self.edit(message_id, |entry| {
+            if error.is_none() {
+                entry.body = Some(body);
+            }
+            entry.error = error.map(|e| e.to_string());
+        });
+    }
+
+    fn apply_resolve(&self, message_id: &str, thread_id: &str) {
+        // Forgotten either way: if resolving failed, GitHub still has the open
+        // conversation and the next pull brings it back.
+        if let Err(e) = self.ports.api.resolve(thread_id) {
+            let notice = format!("Could not resolve a conversation on GitHub: {e}");
+            self.registry.session(|s| s.notice = Some(notice));
+        }
+        self.forget(message_id);
     }
 
     /// Run `call` against the reviewer's pending review, starting one if none
@@ -268,14 +272,14 @@ impl GithubSync {
             } else {
                 ViewedState::Unviewed
             };
-            let already = self.registry.read(|s| {
+            let is_already_synced = self.registry.read(|s| {
                 s.session
                     .viewed
                     .remote
                     .get(&path)
                     .is_some_and(|current| (*current == ViewedState::Viewed) == viewed)
             });
-            if already {
+            if is_already_synced {
                 continue;
             }
             match self.ports.api.set_viewed(pr, &path, viewed) {
@@ -302,9 +306,9 @@ impl GithubSync {
             return; // still posting drafts; submit once they are all in
         }
         let outcome = self.submit(pr, &request.body, request.event, &registry);
-        let ok = outcome.is_ok();
+        let is_submitted = outcome.is_ok();
         self.registry.update_state(|state| {
-            if ok {
+            if is_submitted {
                 for entry in state.registry.comments.values_mut() {
                     if entry.status == SyncStatus::Draft {
                         entry.status = SyncStatus::Published;
@@ -315,7 +319,7 @@ impl GithubSync {
             }
             state.session.submit = None;
             state.session.last_submit = Some(SubmitOutcome {
-                ok,
+                ok: is_submitted,
                 message: outcome.unwrap_or_else(|e| e.to_string()),
             });
         });
@@ -328,10 +332,10 @@ impl GithubSync {
         event: ReviewEvent,
         registry: &Registry,
     ) -> Result<String> {
-        let failed = registry.failed_count();
-        if failed > 0 {
+        let num_failed = registry.failed_count();
+        if num_failed > 0 {
             return Err(anyhow!(
-                "{failed} PR comment(s) failed to post. Fix or delete them, then submit again."
+                "{num_failed} PR comment(s) failed to post. Fix or delete them, then submit again."
             ));
         }
         if event != ReviewEvent::Comment && self.registry.read(|s| s.session.is_own_pr()) {

@@ -10,6 +10,8 @@
 
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
+use super::dispatcher::Delivery;
+
 /// Shared delivery state for reviewer comments.
 #[derive(Debug)]
 pub struct DispatchControl {
@@ -55,6 +57,20 @@ impl DispatchControl {
     #[must_use]
     pub fn take_send_all(&self) -> bool {
         self.send_all.swap(false, Ordering::Relaxed)
+    }
+
+    /// What this tick should do with open comments: send each now when eager,
+    /// send all at once when "Send all" was requested (clearing the request),
+    /// and otherwise hold them.
+    #[must_use]
+    pub fn take_delivery(&self) -> Delivery {
+        if !self.is_bulk() {
+            Delivery::Eager
+        } else if self.take_send_all() {
+            Delivery::SendAll
+        } else {
+            Delivery::Hold
+        }
     }
 
     /// Record how many comments are currently held.
@@ -113,6 +129,17 @@ mod tests {
         control.request_send_all();
         assert!(control.take_send_all());
         assert!(!control.take_send_all());
+    }
+
+    #[test]
+    fn delivery_holds_in_bulk_until_send_all_then_sends_once() {
+        let control = DispatchControl::new();
+        assert_eq!(control.take_delivery(), Delivery::Hold);
+        control.request_send_all();
+        assert_eq!(control.take_delivery(), Delivery::SendAll);
+        assert_eq!(control.take_delivery(), Delivery::Hold);
+        control.set_bulk(false);
+        assert_eq!(control.take_delivery(), Delivery::Eager);
     }
 
     #[test]

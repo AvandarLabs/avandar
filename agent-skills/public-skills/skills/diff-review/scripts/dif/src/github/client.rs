@@ -75,7 +75,7 @@ impl GhCli {
         let output = child.wait_with_output()?;
         let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
         if !output.status.success() {
-            if let Err(e) = graphql::data(&stdout) {
+            if let Err(e) = graphql::parse_data_from_answer(&stdout) {
                 bail!("{e}");
             }
             bail!("{}", String::from_utf8_lossy(&output.stderr).trim());
@@ -85,7 +85,9 @@ impl GhCli {
 
     fn graphql(&self, query: &str, variables: &Value) -> Result<Value> {
         let body = json!({ "query": query, "variables": variables });
-        graphql::data(&self.run(&["api", "graphql", "--input", "-"], Some(&body))?)
+        graphql::parse_data_from_answer(
+            &self.run(&["api", "graphql", "--input", "-"], Some(&body))?,
+        )
     }
 
     fn paged<T>(
@@ -98,9 +100,9 @@ impl GhCli {
         let mut after: Option<String> = None;
         loop {
             let data = self.graphql(query, &json!({ "pr": pr.node_id, "after": after }))?;
-            let (batch, next) = page(&data)?;
+            let (batch, next_cursor) = page(&data)?;
             items.extend(batch);
-            match next {
+            match next_cursor {
                 Some(cursor) => after = Some(cursor),
                 None => return Ok(items),
             }

@@ -2,13 +2,27 @@
 //! groups fail-open, and the proxy error path — all without a running difit.
 
 use std::net::TcpListener;
-use std::time::Duration;
-
 use std::sync::Arc;
+use std::time::Duration;
 
 use dif::github::registry::SharedRegistry;
 use dif::inject::mode::DispatchControl;
 use dif::web::{CommentChannels, WebShell};
+
+/// A shell for `develop` with no guide, summary, or test plan on disk.
+fn start_develop_shell(difit_port: u16, shell_port: u16, channels: CommentChannels) -> WebShell {
+    WebShell::start(
+        difit_port,
+        shell_port,
+        "/no/such/guide.json".into(),
+        "develop".into(),
+        "develop".into(),
+        "/no/such/summary.md".into(),
+        "/no/such/test-plan.md".into(),
+        channels,
+    )
+    .expect("shell binds")
+}
 
 fn channels() -> CommentChannels {
     CommentChannels {
@@ -101,8 +115,12 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
         "expanded group file lists should scroll independently"
     );
     assert!(
-        css_text.contains(".grp-body {\n  overflow: hidden;\n  max-height: calc(45vh + 40px);"),
-        "the expanded accordion should leave room for its scroll area and orientation"
+        css_text.contains(".grp-body {\n  display: grid;\n  grid-template-rows: 1fr;"),
+        "the expanded accordion should size to its content, not a fixed max-height"
+    );
+    assert!(
+        css_text.contains(".grp-body-inner {\n  overflow: hidden;\n  min-height: 0;"),
+        "the accordion's inner wrapper should clip only while it collapses"
     );
     assert!(
         css_text.contains(".test-plan-panel {\n  padding: 8px 6px 16px;\n  color: var(--ink-2);\n  font-size: 13.5px;"),
@@ -209,17 +227,7 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
 fn delivery_mode_round_trips_and_send_all_reaches_the_tui() {
     let shell_port = free_port();
     let channels = channels();
-    let mut shell = WebShell::start(
-        free_port(),
-        shell_port,
-        "/no/such/guide.json".into(),
-        "develop".into(),
-        "develop".into(),
-        "/no/such/summary.md".into(),
-        "/no/such/test-plan.md".into(),
-        channels.clone(),
-    )
-    .expect("shell binds");
+    let mut shell = start_develop_shell(free_port(), shell_port, channels.clone());
     std::thread::sleep(Duration::from_millis(50));
     let base = format!("http://127.0.0.1:{shell_port}");
 
@@ -285,17 +293,7 @@ fn a_pr_bound_save_marks_only_the_new_comment_and_still_reaches_difit() {
         github: SharedRegistry::load(dir.path().join("r-github.json")),
     };
     let shell_port = free_port();
-    let mut shell = WebShell::start(
-        difit_port,
-        shell_port,
-        "/no/such/guide.json".into(),
-        "develop".into(),
-        "develop".into(),
-        "/no/such/summary.md".into(),
-        "/no/such/test-plan.md".into(),
-        channels.clone(),
-    )
-    .expect("shell binds");
+    let mut shell = start_develop_shell(difit_port, shell_port, channels.clone());
     std::thread::sleep(Duration::from_millis(50));
     let url = format!("http://127.0.0.1:{shell_port}/api/comments");
     let body = r#"{"threads":[{"id":"t1","messages":[{"id":"m1","body":"held"},{"id":"m2","body":"to the PR"}]}],"baseVersion":1}"#;

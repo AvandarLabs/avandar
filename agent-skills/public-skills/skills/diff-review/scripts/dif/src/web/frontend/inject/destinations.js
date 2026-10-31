@@ -22,14 +22,18 @@
   // acts while focus is inside a comment box.
   var IS_MAC = /Mac|iP(hone|ad|od)/.test((navigator.platform || "") + " " + (navigator.userAgent || ""));
   var TOGGLE_HINT = IS_MAC ? "⌃G" : "Alt+Shift+G";
-  function isToggleCombo(e) {
-    if (e.code !== "KeyG" || e.metaKey) return false;
-    return IS_MAC ? e.ctrlKey && !e.altKey && !e.shiftKey : e.altKey && e.shiftKey && !e.ctrlKey;
+  function isToggleCombo(event) {
+    if (event.code !== "KeyG" || event.metaKey) return false;
+    return IS_MAC
+      ? event.ctrlKey && !event.altKey && !event.shiftKey
+      : event.altKey && event.shiftKey && !event.ctrlKey;
   }
   var github = { available: false, reason: "", pr: null, comments: {} };
   var threadsById = {};
   var armedGithubAt = 0;
 
+  // The rules ship inside this script because it is the only asset the shell
+  // injects into difit's document.
   var destStyle = document.createElement("style");
   destStyle.textContent = [
     ".dif-dest{display:inline-flex;margin-right:auto;border:1px solid rgba(128,128,128,.35);border-radius:6px;padding:1px;font-size:12px;line-height:1}",
@@ -55,17 +59,17 @@
   // ---- sync state + thread structure ----
   function fetchGithubState() {
     return window.fetch("/__wrap/github.json", { cache: "no-store" })
-      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (response) { return response.ok ? response.json() : null; })
       .then(function (state) { if (state) github = state; })
       .catch(function () { /* keep the last known state */ });
   }
   function fetchThreads() {
     return window.fetch("/api/comments-json", { cache: "no-store" })
-      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (response) { return response.ok ? response.json() : null; })
       .then(function (json) {
         if (!json || !Array.isArray(json.threads)) return;
         var byId = {};
-        json.threads.forEach(function (t) { if (t && t.id) byId[t.id] = t; });
+        json.threads.forEach(function (thread) { if (thread && thread.id) byId[thread.id] = thread; });
         threadsById = byId;
       })
       .catch(function () { /* keep the last known threads */ });
@@ -75,8 +79,8 @@
   }
 
   // ---- the per-box destination toggle ----
-  function threadRootEntry(el) {
-    var host = el && el.closest ? el.closest('[id^="comment-thread-"]') : null;
+  function threadRootEntry(element) {
+    var host = element && element.closest ? element.closest('[id^="comment-thread-"]') : null;
     var thread = host ? threadsById[host.id.slice("comment-thread-".length)] : null;
     var root = thread && thread.messages && thread.messages[0];
     return root ? github.comments[root.id] : null;
@@ -84,20 +88,38 @@
   function setDest(form, dest) {
     if (dest === "github" && !github.available) dest = "local";
     form.setAttribute("data-dif-dest", dest);
-    var buttons = form.querySelectorAll(".dif-dest button");
-    for (var i = 0; i < buttons.length; i++) {
-      var on = buttons[i].getAttribute("data-dest") === dest;
-      buttons[i].setAttribute("aria-checked", on ? "true" : "false");
-    }
+    // A roving tabindex: only the checked radio is in the tab order, and the
+    // arrow keys move between them, as the ARIA radio group pattern expects.
+    form.querySelectorAll(".dif-dest button").forEach(function (button) {
+      var isChecked = button.getAttribute("data-dest") === dest;
+      button.setAttribute("aria-checked", isChecked ? "true" : "false");
+      button.tabIndex = isChecked ? 0 : -1;
+    });
+  }
+  // Arrow keys move the selection between a toggle's enabled radios.
+  function onDestArrowKey(form, event) {
+    var step = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[event.key];
+    if (!step) return;
+    event.preventDefault();
+    var enabled = Array.from(form.querySelectorAll(".dif-dest button")).filter(function (button) {
+      return !button.disabled;
+    });
+    var current = enabled.findIndex(function (button) {
+      return button.getAttribute("aria-checked") === "true";
+    });
+    var target = enabled[(current + step + enabled.length) % enabled.length];
+    if (!target) return;
+    setDest(form, target.getAttribute("data-dest"));
+    target.focus();
   }
   function destButton(dest, html, title) {
-    var b = document.createElement("button");
-    b.type = "button";
-    b.setAttribute("role", "radio");
-    b.setAttribute("data-dest", dest);
-    b.title = title;
-    b.innerHTML = html;
-    return b;
+    var button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute("role", "radio");
+    button.setAttribute("data-dest", dest);
+    button.title = title;
+    button.innerHTML = html;
+    return button;
   }
   function addDestToggle(form, cancel) {
     var group = document.createElement("div");
@@ -110,29 +132,28 @@
     hint.textContent = TOGGLE_HINT;
     hint.setAttribute("aria-hidden", "true");
     group.appendChild(hint);
-    group.addEventListener("click", function (e) {
-      var b = e.target.closest ? e.target.closest("button[data-dest]") : null;
-      if (b && !b.disabled) setDest(form, b.getAttribute("data-dest"));
+    group.addEventListener("click", function (event) {
+      var button = event.target.closest ? event.target.closest("button[data-dest]") : null;
+      if (button && !button.disabled) setDest(form, button.getAttribute("data-dest"));
     });
+    group.addEventListener("keydown", function (event) { onDestArrowKey(form, event); });
     cancel.parentNode.insertBefore(group, cancel);
     // A reply in a PR thread defaults to the PR; everything else to the TUI.
     setDest(form, threadRootEntry(form) ? "github" : "local");
   }
   function decorateForms() {
-    var forms = document.querySelectorAll("form");
-    for (var i = 0; i < forms.length; i++) {
-      var form = forms[i];
+    document.querySelectorAll("form").forEach(function (form) {
       var textarea = form.querySelector("textarea");
       var cancel = form.querySelector('[data-comment-cancel="true"]');
-      if (!textarea || !cancel || textarea.placeholder === EDIT_PLACEHOLDER) continue;
+      if (!textarea || !cancel || textarea.placeholder === EDIT_PLACEHOLDER) return;
       if (!form.querySelector(".dif-dest")) addDestToggle(form, cancel);
-      var ghBtn = form.querySelector('.dif-dest button[data-dest="github"]');
-      ghBtn.disabled = !github.available;
-      ghBtn.title = github.available
+      var githubButton = form.querySelector('.dif-dest button[data-dest="github"]');
+      githubButton.disabled = !github.available;
+      githubButton.title = github.available
         ? "Post to GitHub PR #" + github.pr.number + " only (" + TOGGLE_HINT + " toggles)"
         : github.reason || "No GitHub PR to post to";
       if (!github.available && form.getAttribute("data-dif-dest") === "github") setDest(form, "local");
-    }
+    });
   }
 
   // Arm the next comment save when a PR box submits (button or Mod+Enter).
@@ -141,20 +162,20 @@
       armedGithubAt = Date.now();
     }
   }
-  document.addEventListener("submit", function (e) { armIfGithub(e.target); }, true);
-  document.addEventListener("keydown", function (e) {
-    if (!isToggleCombo(e)) return;
-    var form = e.target && e.target.closest ? e.target.closest("form") : null;
+  document.addEventListener("submit", function (event) { armIfGithub(event.target); }, true);
+  document.addEventListener("keydown", function (event) {
+    if (!isToggleCombo(event)) return;
+    var form = event.target && event.target.closest ? event.target.closest("form") : null;
     if (!form || !form.querySelector(".dif-dest")) return;
-    e.preventDefault();
-    e.stopPropagation();
-    var next = form.getAttribute("data-dif-dest") === "github" ? "local" : "github";
-    setDest(form, next); // falls back to TUI when there is no PR
+    event.preventDefault();
+    event.stopPropagation();
+    var toggledDest = form.getAttribute("data-dif-dest") === "github" ? "local" : "github";
+    setDest(form, toggledDest); // falls back to TUI when there is no PR
   }, true);
-  document.addEventListener("keydown", function (e) {
-    var t = e.target;
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && t && t.tagName === "TEXTAREA") {
-      armIfGithub(t.closest("form"));
+  document.addEventListener("keydown", function (event) {
+    var target = event.target;
+    if (event.key === "Enter" && (event.metaKey || event.ctrlKey) && target && target.tagName === "TEXTAREA") {
+      armIfGithub(target.closest("form"));
     }
   }, true);
 
@@ -174,18 +195,18 @@
       var headers = new Headers((init && init.headers) || {});
       headers.set(DEST_HEADER, "github");
       tagged.headers = headers;
-      return nativeFetch(input, tagged).then(function (r) {
+      return nativeFetch(input, tagged).then(function (response) {
         window.setTimeout(refreshDestinations, 300);
-        return r;
+        return response;
       });
     }
     return nativeFetch(input, init);
   };
 
   // ---- restyle PR comments ----
-  function setAttr(el, name, value) {
-    if (value == null) { if (el.hasAttribute(name)) el.removeAttribute(name); }
-    else if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+  function setAttr(element, name, value) {
+    if (value == null) { if (element.hasAttribute(name)) element.removeAttribute(name); }
+    else if (element.getAttribute(name) !== value) element.setAttribute(name, value);
   }
   function badgeLabel(entry) {
     if (entry.status === "published") return "On PR";
@@ -195,21 +216,18 @@
   }
   // The badge is appended to a React-owned element, and React may re-insert its
   // own children after it, so CSS `order` keeps it last in the row.
-  function decorateMessage(el, entry) {
-    if (!el) return;
-    var badge = null;
-    for (var i = 0; i < el.children.length; i++) {
-      if (el.children[i].classList.contains("dif-gh-badge")) badge = el.children[i];
-    }
-    setAttr(el, "data-dif-gh", entry ? entry.status : null);
+  function decorateMessage(messageEl, entry) {
+    if (!messageEl) return;
+    var badge = messageEl.querySelector(":scope > .dif-gh-badge");
+    setAttr(messageEl, "data-dif-gh", entry ? entry.status : null);
     if (!entry) { if (badge) badge.remove(); return; }
     if (!badge) {
       badge = document.createElement("a");
       badge.className = "dif-gh-badge";
       badge.target = "_blank";
       badge.rel = "noopener noreferrer";
-      badge.addEventListener("click", function (e) { e.stopPropagation(); });
-      el.appendChild(badge);
+      badge.addEventListener("click", function (event) { event.stopPropagation(); });
+      messageEl.appendChild(badge);
     }
     var label = badgeLabel(entry);
     var html = GH_ICON + "<span>" + label + "</span>";
@@ -226,28 +244,24 @@
   function messageElements(threadEl) {
     var body = threadEl.children[1];
     if (!body) return [];
-    var out = [];
-    for (var i = 0; i < body.children.length; i++) {
-      var child = body.children[i];
-      var textarea = child.querySelector("textarea");
-      if (i > 0 && textarea && textarea.placeholder === REPLY_PLACEHOLDER) continue;
-      out.push(i === 0 ? child : child.firstElementChild);
-    }
-    return out;
+    return Array.from(body.children)
+      .filter(function (child, idx) {
+        var textarea = child.querySelector("textarea");
+        return idx === 0 || !textarea || textarea.placeholder !== REPLY_PLACEHOLDER;
+      })
+      .map(function (child, idx) { return idx === 0 ? child : child.firstElementChild; });
   }
   function decorateThreads() {
-    var threadEls = document.querySelectorAll('[id^="comment-thread-"]');
-    for (var i = 0; i < threadEls.length; i++) {
-      var el = threadEls[i];
-      var thread = threadsById[el.id.slice("comment-thread-".length)];
-      if (!thread || !Array.isArray(thread.messages)) continue;
-      var slots = messageElements(el);
-      thread.messages.forEach(function (m, index) {
-        decorateMessage(slots[index], github.comments[m.id]);
+    document.querySelectorAll('[id^="comment-thread-"]').forEach(function (threadEl) {
+      var thread = threadsById[threadEl.id.slice("comment-thread-".length)];
+      if (!thread || !Array.isArray(thread.messages)) return;
+      var slots = messageElements(threadEl);
+      thread.messages.forEach(function (message, idx) {
+        decorateMessage(slots[idx], github.comments[message.id]);
       });
       var root = thread.messages[0] && github.comments[thread.messages[0].id];
-      setAttr(el, "data-dif-gh-thread", root ? root.status : null);
-    }
+      setAttr(threadEl, "data-dif-gh-thread", root ? root.status : null);
+    });
   }
   function decorateAll() {
     decorateForms();

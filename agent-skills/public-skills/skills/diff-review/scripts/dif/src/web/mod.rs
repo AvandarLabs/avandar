@@ -25,6 +25,7 @@ pub mod proxy;
 pub mod review_routes;
 pub mod router;
 pub mod server;
+pub mod shell_routes;
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};

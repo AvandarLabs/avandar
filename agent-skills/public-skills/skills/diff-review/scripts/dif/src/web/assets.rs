@@ -1,8 +1,9 @@
 //! The shell frontend and the script injected into difit, embedded at compile
 //! time (`include_str!`, no build step).
 
-/// The embedded shell frontend + in-difit script (no build step; `include_str!`).
+/// The shell page's HTML.
 pub const SHELL_HTML: &str = include_str!("frontend/shell.html");
+/// The shell page's stylesheet.
 pub const SHELL_CSS: &str = include_str!("frontend/shell.css");
 /// The script injected into difit's document: the core (`inject.js`), then the
 /// PR comment destinations and GitHub viewed sync. Each part is its own IIFE.
@@ -18,7 +19,7 @@ pub const INJECT_JS: &str = concat!(
 ///
 /// They share ONE IIFE + closure scope: `shell.js` opens it and declares shared
 /// state, the feature files add behavior, and `boot.js` runs startup + closes
-/// the IIFE — so the order here is load-bearing (`shell.js` first, `boot.js`
+/// the IIFE. The order here is load-bearing (`shell.js` first, `boot.js`
 /// last; see `frontend/shell/shell.js`). The parts are concatenated at compile
 /// time and served as one `/__wrap/shell.js`.
 pub const SHELL_JS: &str = concat!(
@@ -52,9 +53,9 @@ mod tests {
     use super::SHELL_JS;
 
     /// `SHELL_JS` is assembled by concatenating ordered fragments that together
-    /// form ONE IIFE. The ordering is load-bearing — `shell.js` must open the
-    /// IIFE first and `boot.js` must close it last — but no per-file syntax
-    /// check catches a mis-ordered concat. Guard the assembled shape here.
+    /// form ONE IIFE. The ordering is load-bearing: `shell.js` must open the
+    /// IIFE first and `boot.js` must close it last. No per-file syntax check
+    /// catches a mis-ordered concat. Guard the assembled shape here.
     #[test]
     fn shell_js_is_one_well_formed_iife() {
         // shell.js opens the IIFE + strict mode exactly once (a second wrapper
@@ -74,7 +75,7 @@ mod tests {
             "boot.js (the closing fragment) must come last"
         );
         // Ordering: the IIFE open precedes a feature fragment, which precedes
-        // boot — i.e. shell.js → features → boot.
+        // boot (shell.js -> features -> boot).
         let open = SHELL_JS.find("(function () {").expect("IIFE open present");
         let feature = SHELL_JS
             .find("hover tooltip")
@@ -100,7 +101,7 @@ mod tests {
         ] {
             assert!(SHELL_JS.contains(sym), "assembled bundle is missing {sym}");
         }
-        // The console diagnostic hook was removed and stays removed.
+        // The bundle must not expose a console diagnostic hook (`__difShell`).
         assert!(
             !SHELL_JS.contains("__difShell"),
             "the __difShell hook must not return"

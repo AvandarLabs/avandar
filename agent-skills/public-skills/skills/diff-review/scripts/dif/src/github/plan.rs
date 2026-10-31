@@ -66,15 +66,17 @@ impl Previous {
     /// Record `snapshot` for the next pass.
     #[must_use]
     pub fn from_snapshot(snapshot: &Snapshot) -> Self {
-        let mut thread_of = HashMap::new();
-        for thread in &snapshot.threads {
-            let thread_id = thread.id.clone().unwrap_or_default();
-            for message in &thread.messages {
-                if let Some(id) = &message.id {
-                    thread_of.insert(id.clone(), thread_id.clone());
-                }
-            }
-        }
+        let thread_of = snapshot
+            .threads
+            .iter()
+            .flat_map(|thread| {
+                let thread_id = thread.id.clone().unwrap_or_default();
+                thread
+                    .messages
+                    .iter()
+                    .filter_map(move |message| Some((message.id.clone()?, thread_id.clone())))
+            })
+            .collect();
         Self { thread_of }
     }
 
@@ -86,27 +88,29 @@ impl Previous {
 /// The actions that bring the PR in line with `snapshot`.
 #[must_use]
 pub fn plan(snapshot: &Snapshot, previous: &Previous, registry: &Registry) -> Vec<SyncAction> {
-    let mut actions = Vec::new();
-    for thread in &snapshot.threads {
-        plan_thread(thread, registry, &mut actions);
-    }
     let live_messages = message_ids(snapshot);
     let live_threads: HashSet<&str> = snapshot
         .threads
         .iter()
         .filter_map(|t| t.id.as_deref())
         .collect();
-    for (id, entry) in &registry.comments {
-        if live_messages.contains(id) || !previous.held(id) {
-            continue;
-        }
-        let thread_removed = previous
-            .thread_of
-            .get(id)
-            .is_none_or(|thread| !live_threads.contains(thread.as_str()));
-        actions.push(removal(id, entry, thread_removed));
-    }
-    actions
+    let removals = registry
+        .comments
+        .iter()
+        .filter(|(id, _)| !live_messages.contains(*id) && previous.held(id))
+        .map(|(id, entry)| {
+            let thread_removed = previous
+                .thread_of
+                .get(id)
+                .is_none_or(|thread| !live_threads.contains(thread.as_str()));
+            removal(id, entry, thread_removed)
+        });
+    snapshot
+        .threads
+        .iter()
+        .flat_map(|thread| plan_thread(thread, registry))
+        .chain(removals)
+        .collect()
 }
 
 /// What to do on GitHub for a comment that is gone from difit.
@@ -141,24 +145,23 @@ pub fn message_ids(snapshot: &Snapshot) -> HashSet<String> {
         .collect()
 }
 
-fn plan_thread(thread: &ServerThread, registry: &Registry, actions: &mut Vec<SyncAction>) {
+fn plan_thread(thread: &ServerThread, registry: &Registry) -> Vec<SyncAction> {
     let root = thread
         .messages
         .first()
         .and_then(|m| m.id.as_deref())
         .and_then(|id| registry.comments.get(id));
-    for (index, message) in thread.messages.iter().enumerate() {
-        let Some(id) = message.id.as_deref() else {
-            continue;
-        };
-        let Some(entry) = registry.comments.get(id) else {
-            continue;
-        };
-        let parent = if index == 0 { None } else { root };
-        if let Some(action) = plan_message(thread, id, &message.body, entry, parent) {
-            actions.push(action);
-        }
-    }
+    thread
+        .messages
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, message)| {
+            let id = message.id.as_deref()?;
+            let entry = registry.comments.get(id)?;
+            let parent = if idx == 0 { None } else { root };
+            plan_message(thread, id, &message.body, entry, parent)
+        })
+        .collect()
 }
 
 fn plan_message(

@@ -488,7 +488,7 @@ comment box (handled by `inject/destinations.js`, not forwarded).
   iframes toggled by visibility — truly simultaneous, no reload, at the price of
   N SSE connections + more lifecycle. Not built for v1.
 - **Entry point: auto-open the shell, alongside the TUI, as the default.** Today
-  `dif` spawns difit with `open_browser=true` (`startup.rs`) and difit opens the
+  `dif` spawns difit with `open_browser=true` (`tui/startup/surface.rs`) and difit opens the
   browser at its own URL. Flip that to `--no-open`; the shell server opens the
   browser at the **shell** URL instead. No new flag — the wrapped frontend simply
   replaces difit's default frontend as what auto-opens.
@@ -549,7 +549,7 @@ unit-tested; the only I/O is in `server.rs` / `proxy.rs`.
 
 ### Wiring changes
 
-- **`difit/server.rs` + `tui/startup.rs`**: spawn difit with
+- **`difit/server.rs` + `tui/startup/surface.rs`**: spawn difit with
   `open_browser=false`. After difit is ready, `web::WebShell::start(...)`, then
   open the browser at the shell URL (shell out to `open` / `xdg-open`). Shut the
   shell server down alongside difit on exit.

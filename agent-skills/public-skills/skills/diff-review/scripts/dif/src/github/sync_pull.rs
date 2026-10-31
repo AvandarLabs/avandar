@@ -113,9 +113,7 @@ impl GithubSync {
         // Record first: once difit holds an added comment the LLM dispatcher may
         // see it, and it must already be known as a PR comment by then.
         self.registry.update_state(|state| {
-            for (id, entry) in plan.upserts {
-                state.registry.comments.insert(id, entry);
-            }
+            state.registry.comments.extend(plan.upserts);
             for id in &plan.forgets {
                 state.registry.comments.remove(id);
             }

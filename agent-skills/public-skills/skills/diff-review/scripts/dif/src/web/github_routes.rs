@@ -33,8 +33,8 @@ pub fn handle(route: &Route, mut request: Request, ctx: &Ctx) -> std::io::Result
             send_status(request, 202)
         }
         Route::GithubSubmit => {
-            let own = ctx.github.read(|s| s.session.is_own_pr());
-            match parse_submit(&body, own) {
+            let is_own_pr = ctx.github.read(|s| s.session.is_own_pr());
+            match parse_submit(&body, is_own_pr) {
                 Ok(submit) => {
                     ctx.github.session(|s| {
                         s.submit = Some(submit);

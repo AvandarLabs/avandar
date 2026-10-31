@@ -8,13 +8,12 @@
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::AtomicBool;
 
 use tiny_http::{Header, Request, Response, Server, StatusCode};
 
-use super::assets::{INJECT_JS, SHELL_CSS, SHELL_HTML, SHELL_JS};
 use super::router::{self, DiffFilter, Route};
-use super::{filter, github_routes, groups, inject, meta, proxy, review_routes};
+use super::{filter, github_routes, groups, inject, proxy, review_routes, shell_routes};
 use crate::github::registry::SharedRegistry;
 use crate::inject::mode::DispatchControl;
 
@@ -58,6 +57,7 @@ fn header(name: &str, value: &str) -> Option<Header> {
     Header::from_bytes(name.as_bytes(), value.as_bytes()).ok()
 }
 
+/// Respond with `body` as `content_type` at `status`; the browser may cache it.
 pub(super) fn send_bytes(
     request: Request,
     status: u16,
@@ -92,6 +92,7 @@ pub(super) fn send_bytes_nostore(
     request.respond(resp)
 }
 
+/// Respond with an empty body at `status`.
 pub(super) fn send_status(request: Request, status: u16) -> std::io::Result<()> {
     request.respond(Response::empty(StatusCode(status)))
 }
@@ -137,6 +138,7 @@ fn is_sse(path: &str) -> bool {
     path == "/api/watch" || path == "/api/heartbeat"
 }
 
+/// `path` with `?query` appended when `query` is non-empty.
 pub(super) fn with_query(path: &str, query: &str) -> String {
     if query.is_empty() {
         path.to_owned()
@@ -145,14 +147,7 @@ pub(super) fn with_query(path: &str, query: &str) -> String {
     }
 }
 
-fn asset(name: &str) -> Option<(&'static str, &'static str)> {
-    match name {
-        "shell.css" => Some(("text/css; charset=utf-8", SHELL_CSS)),
-        "shell.js" => Some(("application/javascript; charset=utf-8", SHELL_JS)),
-        _ => None,
-    }
-}
-
+/// The request's `Content-Type`, defaulting to `application/json`.
 pub(super) fn request_content_type(request: &Request) -> String {
     request
         .headers()
@@ -164,8 +159,7 @@ pub(super) fn request_content_type(request: &Request) -> String {
         )
 }
 
-#[allow(clippy::too_many_lines)]
-fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
+fn handle(request: Request, ctx: &Ctx) -> std::io::Result<()> {
     let method = request.method().to_string();
     let url = request.url().to_owned();
     let (path, query) = url.split_once('?').unwrap_or((url.as_str(), ""));
@@ -176,60 +170,14 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
         .map(|h| h.value.as_str().to_owned());
 
     match router::route(&method, path, query, referer.as_deref()) {
-        Route::ShellPage => {
-            // Append the build tag to the asset URLs so the browser fetches the
-            // current frontend after a relaunch (belt-and-suspenders with no-store).
-            let html = SHELL_HTML
-                .replace(
-                    "/__wrap/shell.css",
-                    &format!("/__wrap/shell.css?v={}", ctx.asset_version),
-                )
-                .replace(
-                    "/__wrap/shell.js",
-                    &format!("/__wrap/shell.js?v={}", ctx.asset_version),
-                );
-            send_bytes_nostore(request, 200, "text/html; charset=utf-8", html.into_bytes())
-        }
-        Route::InjectJs => send_bytes_nostore(
-            request,
-            200,
-            "application/javascript; charset=utf-8",
-            INJECT_JS.as_bytes().to_vec(),
-        ),
-        Route::ShellAsset(name) => match asset(&name) {
-            Some((ct, body)) => send_bytes_nostore(request, 200, ct, body.as_bytes().to_vec()),
-            None => send_status(request, 404),
-        },
-        Route::Groups => send_bytes_nostore(
-            request,
-            200,
-            "application/json",
-            groups::read_raw(&ctx.guide_json_path),
-        ),
-        Route::DiffSummary => send_bytes_nostore(
-            request,
-            200,
-            "text/markdown; charset=utf-8",
-            std::fs::read(&ctx.diff_summary_path).unwrap_or_default(),
-        ),
-        Route::TestPlan => send_bytes_nostore(
-            request,
-            200,
-            "text/markdown; charset=utf-8",
-            std::fs::read(&ctx.test_plan_path).unwrap_or_default(),
-        ),
-        Route::Meta => send_bytes_nostore(
-            request,
-            200,
-            "application/json",
-            meta::meta_json(&ctx.branch, &ctx.worktree),
-        ),
-        Route::Regenerate => {
-            // Signal the TUI event loop to regenerate the diff guide (it swaps
-            // the flag back and types the request into the LLM pane).
-            ctx.regen.store(true, Ordering::Relaxed);
-            send_status(request, 202)
-        }
+        route @ (Route::ShellPage
+        | Route::InjectJs
+        | Route::ShellAsset(_)
+        | Route::Groups
+        | Route::DiffSummary
+        | Route::TestPlan
+        | Route::Meta
+        | Route::Regenerate) => shell_routes::handle(route, request, ctx),
         route @ (Route::DispatchState
         | Route::SetDispatchMode
         | Route::SendAll
@@ -247,51 +195,65 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
             ),
             Err(_) => send_status(request, 502),
         },
-        Route::ApiDiff { filter } => {
-            match proxy::get(ctx.difit_port, &with_query("/api/diff", query)) {
-                Ok(up) => {
-                    let proxy::Upstream {
-                        status,
-                        content_type,
-                        body,
-                    } = up;
-                    let body = match filter {
-                        DiffFilter::None => body,
-                        DiffFilter::Group(n) => {
-                            let allowed = groups::Groups::load(&ctx.guide_json_path).allowed(n);
-                            filter::filter_diff(&body, &allowed)
-                        }
-                        DiffFilter::Ungrouped => {
-                            let guide = groups::Groups::load(&ctx.guide_json_path).all_files();
-                            filter::filter_ungrouped(&body, &guide)
-                        }
-                    };
-                    send_bytes_nostore(request, status, &content_type, body)
-                }
-                Err(_) => send_status(request, 502),
-            }
+        Route::ApiDiff { filter } => serve_api_diff(request, ctx, query, &filter),
+        Route::Proxy => proxy_to_difit(request, ctx, &method, path, query),
+    }
+}
+
+/// Proxy difit's `/api/diff`, narrowed to the files `filter` selects.
+fn serve_api_diff(
+    request: Request,
+    ctx: &Ctx,
+    query: &str,
+    filter: &DiffFilter,
+) -> std::io::Result<()> {
+    let Ok(upstream) = proxy::get(ctx.difit_port, &with_query("/api/diff", query)) else {
+        return send_status(request, 502);
+    };
+    let proxy::Upstream {
+        status,
+        content_type,
+        body,
+    } = upstream;
+    let body = match filter {
+        DiffFilter::None => body,
+        DiffFilter::Group(n) => {
+            let allowed = groups::Groups::load(&ctx.guide_json_path).allowed(*n);
+            filter::filter_diff(&body, &allowed)
         }
-        Route::Proxy => {
-            let pq = with_query(path, query);
-            if is_sse(path) {
-                match proxy::open_stream(ctx.difit_port, &pq) {
-                    Ok((ct, reader)) => send_stream(request, &ct, reader),
-                    Err(_) => send_status(request, 502),
-                }
-            } else if method == "POST" {
-                let ct = request_content_type(&request);
-                let mut body = Vec::new();
-                request.as_reader().read_to_end(&mut body)?;
-                match proxy::post(ctx.difit_port, &pq, &ct, &body) {
-                    Ok(up) => send_bytes(request, up.status, &up.content_type, up.body),
-                    Err(_) => send_status(request, 502),
-                }
-            } else {
-                match proxy::get(ctx.difit_port, &pq) {
-                    Ok(up) => send_bytes(request, up.status, &up.content_type, up.body),
-                    Err(_) => send_status(request, 502),
-                }
-            }
+        DiffFilter::Ungrouped => {
+            let guide = groups::Groups::load(&ctx.guide_json_path).all_files();
+            filter::filter_ungrouped(&body, &guide)
         }
+    };
+    send_bytes_nostore(request, status, &content_type, body)
+}
+
+/// Relay any other request to difit unchanged, streaming its SSE endpoints.
+fn proxy_to_difit(
+    mut request: Request,
+    ctx: &Ctx,
+    method: &str,
+    path: &str,
+    query: &str,
+) -> std::io::Result<()> {
+    let pq = with_query(path, query);
+    if is_sse(path) {
+        return match proxy::open_stream(ctx.difit_port, &pq) {
+            Ok((ct, reader)) => send_stream(request, &ct, reader),
+            Err(_) => send_status(request, 502),
+        };
+    }
+    let upstream = if method == "POST" {
+        let ct = request_content_type(&request);
+        let mut body = Vec::new();
+        request.as_reader().read_to_end(&mut body)?;
+        proxy::post(ctx.difit_port, &pq, &ct, &body)
+    } else {
+        proxy::get(ctx.difit_port, &pq)
+    };
+    match upstream {
+        Ok(up) => send_bytes(request, up.status, &up.content_type, up.body),
+        Err(_) => send_status(request, 502),
     }
 }

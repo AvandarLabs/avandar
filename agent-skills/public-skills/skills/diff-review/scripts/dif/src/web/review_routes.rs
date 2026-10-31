@@ -50,14 +50,14 @@ pub fn handle(route: &Route, mut request: Request, ctx: &Ctx, query: &str) -> st
 }
 
 fn save_comments(mut request: Request, ctx: &Ctx, query: &str) -> std::io::Result<()> {
-    let to_github = request
+    let is_github_bound = request
         .headers()
         .iter()
         .any(|h| h.field.equiv(DESTINATION_HEADER) && h.value.as_str() == "github");
     let content_type = request_content_type(&request);
     let mut body = Vec::new();
     request.as_reader().read_to_end(&mut body)?;
-    if to_github {
+    if is_github_bound {
         if let Ok(current) = proxy::get(ctx.difit_port, &with_query("/api/comments-json", query)) {
             ctx.github
                 .mark_pending(&new_message_ids(&current.body, &body));

@@ -37,22 +37,23 @@ pub enum Route {
     Meta,
     /// `POST /__wrap/regenerate` — ask the TUI to regenerate the diff guide.
     Regenerate,
-    /// `GET /__wrap/dispatch.json` — comment delivery mode + held count.
+    /// `GET /__wrap/dispatch.json`: comment delivery mode + held count.
     DispatchState,
-    /// `POST /__wrap/dispatch` — switch between bulk and eager delivery.
+    /// `POST /__wrap/dispatch`: switch between bulk and eager delivery.
     SetDispatchMode,
-    /// `POST /__wrap/send-all` — send every held comment to the LLM.
+    /// `POST /__wrap/send-all`: send every held comment to the LLM.
     SendAll,
-    /// `GET /__wrap/github.json` — PR availability + each PR-bound comment's sync state.
+    /// `GET /__wrap/github.json`: PR availability + each PR-bound comment's
+    /// sync state.
     GithubState,
-    /// `POST /__wrap/github/pull` — pull from GitHub now.
+    /// `POST /__wrap/github/pull`: pull from GitHub now.
     GithubPull,
-    /// `POST /__wrap/github/submit` — submit the pending review.
+    /// `POST /__wrap/github/submit`: submit the pending review.
     GithubSubmit,
-    /// `POST /__wrap/github/viewed` — viewed-file changes to send to GitHub.
+    /// `POST /__wrap/github/viewed`: viewed-file changes to send to GitHub.
     GithubViewed,
-    /// `POST /api/comments` — difit's comment save, inspected for PR-bound comments
-    /// before it is proxied.
+    /// `POST /api/comments`: difit's comment save, inspected for PR-bound
+    /// comments before it is proxied.
     SaveComments,
     /// `GET /__wrap/difit[?group=N|?view=new]` — proxy difit's document, inject our script.
     DifitDoc,

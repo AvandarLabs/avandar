@@ -45,8 +45,15 @@ src/
 │   └── reply_watcher.rs  baseline-then-log-once detector for new agent replies (pure)
 └── tui/
     ├── mod.rs         terminal setup/teardown, run()
-    ├── startup.rs     create the transcript, start difit + shell + poller, spawn LLM, assemble App
-    ├── app.rs         App state + guide-ready transition + comparison retarget + focus + main-view switching + inject + scroll + palette/restart
+    ├── startup/
+    │   ├── mod.rs     resolve the launch target (repo, agent, comparison, ports, paths) and assemble App
+    │   ├── surface.rs create the transcript, start difit + poller + browser shell
+    │   └── llm_command.rs  the LLM pane's launch command: resume or fresh, never seeding a review
+    ├── app/
+    │   ├── mod.rs     App state + focus + main-view switching + palette
+    │   ├── review_surface.rs  web-shell requests, comparison retarget, relaunch, new LLM session, difit restart
+    │   ├── llm.rs     difit log, session meta, guide-ready transition, code-change warning, comment injection
+    │   └── scroll.rs  markdown scroll + vim motions + open-under-cursor
     ├── control.rs     local POST /comparison endpoint for retargeting the comparison while the review is still being prepared
     ├── draw.rs        two-half layout, main-view tab strip + log/test-plan/guide routing, palette overlay
     ├── draw_palette.rs  the command-palette modal renderer

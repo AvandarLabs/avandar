@@ -46,22 +46,33 @@ struct Local<'a> {
 
 impl<'a> Local<'a> {
     fn new(snapshot: &'a Snapshot) -> Self {
-        let mut messages = HashMap::new();
-        let mut threads = HashMap::new();
-        for thread in &snapshot.threads {
-            let thread_id = thread.id.as_deref().unwrap_or_default();
-            let ids: Vec<&str> = thread
-                .messages
-                .iter()
-                .filter_map(|m| m.id.as_deref())
-                .collect();
-            for (index, message) in thread.messages.iter().enumerate() {
-                if let Some(id) = message.id.as_deref() {
-                    messages.insert(id, (thread_id, index, message.body.as_str()));
-                }
-            }
-            threads.insert(thread_id, ids);
-        }
+        let messages = snapshot
+            .threads
+            .iter()
+            .flat_map(|thread| {
+                let thread_id = thread.id.as_deref().unwrap_or_default();
+                thread
+                    .messages
+                    .iter()
+                    .enumerate()
+                    .filter_map(move |(idx, message)| {
+                        let id = message.id.as_deref()?;
+                        Some((id, (thread_id, idx, message.body.as_str())))
+                    })
+            })
+            .collect();
+        let threads = snapshot
+            .threads
+            .iter()
+            .map(|thread| {
+                let ids = thread
+                    .messages
+                    .iter()
+                    .filter_map(|m| m.id.as_deref())
+                    .collect();
+                (thread.id.as_deref().unwrap_or_default(), ids)
+            })
+            .collect();
         Self { messages, threads }
     }
 }
@@ -102,11 +113,13 @@ fn reconcile_thread(
             continue;
         }
         let id = format!("gh:{}", comment.node_id);
-        let message = message_value(&id, comment);
+        let message = make_message_json_from_remote(&id, comment);
         if index == 0 {
             if !local.messages.contains_key(id.as_str()) {
                 plan.edits
-                    .push(DifitEdit::AddThread(thread_value(&id, thread, &message)));
+                    .push(DifitEdit::AddThread(make_thread_json_from_remote(
+                        &id, thread, &message,
+                    )));
             }
             local_thread = Some(id.clone());
         } else if let Some(thread_id) = &local_thread {
@@ -117,8 +130,10 @@ fn reconcile_thread(
         } else {
             continue;
         }
-        plan.upserts
-            .push((id, entry_for(comment, thread, index == 0)));
+        plan.upserts.push((
+            id,
+            make_synced_comment_from_remote(comment, thread, index == 0),
+        ));
     }
 }
 
@@ -131,13 +146,9 @@ fn reconcile_known(
     local: &Local,
     plan: &mut PullPlan,
 ) {
-    let mut next = entry.clone();
+    let mut updated_entry = entry.clone();
     if entry.is_on_github() {
-        next.status = if comment.pending {
-            SyncStatus::Draft
-        } else {
-            SyncStatus::Published
-        };
+        updated_entry.status = make_sync_status_from_remote(comment);
     }
     let local_body = local.messages.get(id).map(|(_, _, body)| *body);
     let remote_edited = entry.body.as_deref() != Some(comment.body.as_str());
@@ -147,10 +158,10 @@ fn reconcile_known(
             body: comment.body.clone(),
             updated_at: comment.updated_at.clone(),
         });
-        next.body = Some(comment.body.clone());
+        updated_entry.body = Some(comment.body.clone());
     }
-    if next != *entry {
-        plan.upserts.push((id.to_owned(), next));
+    if updated_entry != *entry {
+        plan.upserts.push((id.to_owned(), updated_entry));
     }
 }
 
@@ -210,13 +221,22 @@ fn remove(local: &Local, registry: &Registry, id: &str, plan: &mut PullPlan) {
     }
 }
 
-fn entry_for(comment: &RemoteComment, thread: &RemoteThread, root: bool) -> SyncedComment {
+/// A pending GitHub comment is a draft; any other is published.
+const fn make_sync_status_from_remote(comment: &RemoteComment) -> SyncStatus {
+    if comment.pending {
+        SyncStatus::Draft
+    } else {
+        SyncStatus::Published
+    }
+}
+
+fn make_synced_comment_from_remote(
+    comment: &RemoteComment,
+    thread: &RemoteThread,
+    root: bool,
+) -> SyncedComment {
     SyncedComment {
-        status: if comment.pending {
-            SyncStatus::Draft
-        } else {
-            SyncStatus::Published
-        },
+        status: make_sync_status_from_remote(comment),
         node_id: Some(comment.node_id.clone()),
         thread_id: Some(thread.node_id.clone()),
         root,
@@ -226,7 +246,7 @@ fn entry_for(comment: &RemoteComment, thread: &RemoteThread, root: bool) -> Sync
     }
 }
 
-fn message_value(id: &str, comment: &RemoteComment) -> Value {
+fn make_message_json_from_remote(id: &str, comment: &RemoteComment) -> Value {
     let author = if comment.viewer_did_author {
         EDITABLE_AUTHOR
     } else {
@@ -241,7 +261,7 @@ fn message_value(id: &str, comment: &RemoteComment) -> Value {
     })
 }
 
-fn thread_value(id: &str, thread: &RemoteThread, message: &Value) -> Value {
+fn make_thread_json_from_remote(id: &str, thread: &RemoteThread, message: &Value) -> Value {
     let side = match thread.side {
         Side::Left => "old",
         Side::Right => "new",

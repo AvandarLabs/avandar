@@ -1,5 +1,5 @@
   // ===== github: the linked PR, sync, the pending review, viewed files =====
-  // Fragment concatenated into the IIFE opened in shell.js — see that file for
+  // Fragment concatenated into the IIFE opened in shell.js. See that file for
   // the module map. Not standalone-valid; parse the assembled shell.js.
   //
   // The header shows the branch's PR (or a yellow "No linked PR"), a Sync
@@ -8,7 +8,7 @@
   // review. Viewed files flow from difit to GitHub here: difit's writes reach
   // this document as storage events, and each changed path is sent to
   // `/__wrap/github/viewed` (marking a directory sends one change per file).
-  // GitHub -> difit viewed changes are applied inside difit by inject.js.
+  // GitHub -> difit viewed changes are applied inside difit by inject/viewed.js.
   var gh = null;
   var ghSubmitting = false;
   var ghFlash = "";
@@ -34,7 +34,7 @@
     popSubmit: document.getElementById("ghPopSubmit"),
   };
 
-  function plural(n, word) { return n + " " + word + (n === 1 ? "" : "s"); }
+  function plural(numItems, word) { return numItems + " " + word + (numItems === 1 ? "" : "s"); }
 
   function ghSyncTitle(sync) {
     if (sync.error) return "Sync from GitHub. The last sync failed: " + sync.error;
@@ -109,7 +109,9 @@
 
   function fetchGithub() {
     fetch("/__wrap/github.json", { cache: "no-store" })
-      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("github " + r.status)); })
+      .then(function (response) {
+        return response.ok ? response.json() : Promise.reject(new Error("github " + response.status));
+      })
       .then(applyGithub)
       .catch(function () { /* keep the last known state */ });
   }
@@ -138,12 +140,12 @@
   }
   function renderReviewPop() {
     if (!gh || !gh.pr) return;
-    var own = gh.pr.isOwn;
+    var isOwnPr = gh.pr.isOwn;
     var drafts = gh.drafts || 0;
-    var sub = drafts ? plural(drafts, "draft comment") + " will be published." : "No draft comments.";
-    if (own) sub += " This is your PR, so GitHub only lets you comment.";
-    ghEls.popSub.textContent = sub;
-    ghEls.popEvents.hidden = own;
+    var subtitle = drafts ? plural(drafts, "draft comment") + " will be published." : "No draft comments.";
+    if (isOwnPr) subtitle += " This is your PR, so GitHub only lets you comment.";
+    ghEls.popSub.textContent = subtitle;
+    ghEls.popEvents.hidden = isOwnPr;
     if (!ghSubmitting) setSubmitBusy(false);
     if (gh.failed && !ghSubmitting) {
       showPopError(plural(gh.failed, "PR comment") + " failed to post. Fix or delete them first.");
@@ -165,8 +167,12 @@
     ghEls.popBody.focus();
   }
   function closeReviewPop() {
+    // Focus inside the panel would be stranded on a hidden element, so hand it
+    // back to the button that opened the panel.
+    var hadFocus = ghEls.pop.contains(document.activeElement);
     ghEls.pop.hidden = true;
     ghEls.review.setAttribute("aria-expanded", "false");
+    if (hadFocus) ghEls.review.focus();
   }
   function submitReview() {
     if (ghSubmitting || !gh || !gh.pr) return;
@@ -179,8 +185,8 @@
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ event: event, body: ghEls.popBody.value }),
-    }).then(function (r) {
-      if (!r.ok) throw new Error("GitHub would not take that review (" + r.status + ").");
+    }).then(function (response) {
+      if (!response.ok) throw new Error("GitHub would not take that review (" + response.status + ").");
       fetchGithub();
     }).catch(function (err) {
       ghSubmitting = false;
@@ -193,14 +199,14 @@
   });
   ghEls.popCancel.addEventListener("click", closeReviewPop);
   ghEls.popSubmit.addEventListener("click", submitReview);
-  ghEls.popBody.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submitReview(); }
+  ghEls.popBody.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) { event.preventDefault(); submitReview(); }
   });
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && !ghEls.pop.hidden) closeReviewPop();
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && !ghEls.pop.hidden) closeReviewPop();
   });
-  document.addEventListener("mousedown", function (e) {
-    if (ghEls.pop.hidden || ghEls.pop.contains(e.target) || ghEls.review.contains(e.target)) return;
+  document.addEventListener("mousedown", function (event) {
+    if (ghEls.pop.hidden || ghEls.pop.contains(event.target) || ghEls.review.contains(event.target)) return;
     closeReviewPop();
   });
   window.addEventListener("resize", function () { if (!ghEls.pop.hidden) positionReviewPop(); });
@@ -223,8 +229,3 @@
       body: JSON.stringify({ changes: changes }),
     }).catch(function () { /* dropped: GitHub keeps its state until the next pull */ });
   }
-  window.addEventListener("storage", function (e) {
-    if (e.key && e.key.lastIndexOf(VIEWED_PREFIX, 0) !== 0) return;
-    readLiveViewed();
-    pushViewedChanges();
-  });

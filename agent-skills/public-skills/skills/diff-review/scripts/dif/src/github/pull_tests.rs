@@ -2,10 +2,7 @@
 //! stays readable.
 
 use super::*;
-
-fn snap(json: &str) -> Snapshot {
-    serde_json::from_str(json).expect("valid snapshot")
-}
+use crate::github::fakes::{registry_from_entries, snapshot_from_json, synced_comment_on_github};
 
 fn comment(node: &str, body: &str) -> RemoteComment {
     RemoteComment {
@@ -42,26 +39,6 @@ fn remote(threads: Vec<RemoteThread>) -> RemoteState {
     }
 }
 
-fn known(node: &str, body: &str, root: bool) -> SyncedComment {
-    SyncedComment {
-        status: SyncStatus::Published,
-        node_id: Some(node.to_owned()),
-        thread_id: Some("T1".to_owned()),
-        root,
-        body: Some(body.to_owned()),
-        ..SyncedComment::pending()
-    }
-}
-
-fn registry(entries: &[(&str, SyncedComment)]) -> Registry {
-    Registry {
-        comments: entries
-            .iter()
-            .map(|(id, e)| ((*id).to_owned(), e.clone()))
-            .collect(),
-    }
-}
-
 const EMPTY: &str = r#"{"version":1,"threads":[]}"#;
 
 const LOCAL_THREAD: &str = r#"{"version":2,"threads":[{"id":"m1","filePath":"a.rs",
@@ -79,7 +56,7 @@ fn new_remote_thread_is_added_under_its_authors() {
     let plan = reconcile(
         &remote(vec![thread("T1", vec![comment("C1", "why?"), bot, mine])]),
         &Registry::default(),
-        &snap(EMPTY),
+        &snapshot_from_json(EMPTY),
     );
 
     let DifitEdit::AddThread(added) = &plan.edits[0] else {
@@ -119,8 +96,11 @@ fn a_reply_on_github_lands_in_the_matching_local_thread() {
             "T1",
             vec![comment("C1", "why?"), comment("C9", "because")],
         )]),
-        &registry(&[("m1", known("C1", "why?", true))]),
-        &snap(LOCAL_THREAD),
+        &registry_from_entries(&[(
+            "m1",
+            synced_comment_on_github(SyncStatus::Published, "C1", true, "why?"),
+        )]),
+        &snapshot_from_json(LOCAL_THREAD),
     );
     assert_eq!(
         plan.edits,
@@ -136,8 +116,11 @@ fn a_reply_on_github_lands_in_the_matching_local_thread() {
 fn a_github_edit_replaces_an_unchanged_local_body() {
     let plan = reconcile(
         &remote(vec![thread("T1", vec![comment("C1", "why not?")])]),
-        &registry(&[("m1", known("C1", "why?", true))]),
-        &snap(LOCAL_THREAD),
+        &registry_from_entries(&[(
+            "m1",
+            synced_comment_on_github(SyncStatus::Published, "C1", true, "why?"),
+        )]),
+        &snapshot_from_json(LOCAL_THREAD),
     );
     assert_eq!(
         plan.edits,
@@ -154,8 +137,11 @@ fn a_github_edit_replaces_an_unchanged_local_body() {
 fn an_unsent_local_edit_wins_over_a_github_edit() {
     let plan = reconcile(
         &remote(vec![thread("T1", vec![comment("C1", "remote words")])]),
-        &registry(&[("m1", known("C1", "the old words", true))]),
-        &snap(LOCAL_THREAD),
+        &registry_from_entries(&[(
+            "m1",
+            synced_comment_on_github(SyncStatus::Published, "C1", true, "the old words"),
+        )]),
+        &snapshot_from_json(LOCAL_THREAD),
     );
     assert!(plan.edits.is_empty(), "{:?}", plan.edits);
 }
@@ -164,12 +150,12 @@ fn an_unsent_local_edit_wins_over_a_github_edit() {
 fn a_submitted_draft_becomes_published() {
     let draft = SyncedComment {
         status: SyncStatus::Draft,
-        ..known("C1", "why?", true)
+        ..synced_comment_on_github(SyncStatus::Published, "C1", true, "why?")
     };
     let plan = reconcile(
         &remote(vec![thread("T1", vec![comment("C1", "why?")])]),
-        &registry(&[("m1", draft)]),
-        &snap(LOCAL_THREAD),
+        &registry_from_entries(&[("m1", draft)]),
+        &snapshot_from_json(LOCAL_THREAD),
     );
     assert_eq!(plan.upserts[0].1.status, SyncStatus::Published);
     assert!(plan.edits.is_empty());
@@ -179,8 +165,11 @@ fn a_submitted_draft_becomes_published() {
 fn a_thread_deleted_on_github_is_removed_with_its_local_replies() {
     let plan = reconcile(
         &remote(Vec::new()),
-        &registry(&[("m1", known("C1", "why?", true))]),
-        &snap(LOCAL_THREAD),
+        &registry_from_entries(&[(
+            "m1",
+            synced_comment_on_github(SyncStatus::Published, "C1", true, "why?"),
+        )]),
+        &snapshot_from_json(LOCAL_THREAD),
     );
     assert_eq!(
         plan.edits,
@@ -196,19 +185,19 @@ fn a_thread_deleted_on_github_is_removed_with_its_local_replies() {
 fn an_unlisted_draft_survives_while_the_pending_review_exists() {
     let draft = SyncedComment {
         status: SyncStatus::Draft,
-        ..known("C1", "why?", true)
+        ..synced_comment_on_github(SyncStatus::Published, "C1", true, "why?")
     };
     let mut state = remote(Vec::new());
     state.has_pending_review = true;
-    let reg = registry(&[("m1", draft)]);
+    let reg = registry_from_entries(&[("m1", draft)]);
     assert_eq!(
-        reconcile(&state, &reg, &snap(LOCAL_THREAD)),
+        reconcile(&state, &reg, &snapshot_from_json(LOCAL_THREAD)),
         PullPlan::default()
     );
 
     state.has_pending_review = false;
     assert_eq!(
-        reconcile(&state, &reg, &snap(LOCAL_THREAD)).forgets,
+        reconcile(&state, &reg, &snapshot_from_json(LOCAL_THREAD)).forgets,
         vec!["m1"],
         "a discarded review takes its drafts with it"
     );
@@ -220,8 +209,11 @@ fn a_resolved_thread_is_removed_locally() {
     resolved.resolved = true;
     let plan = reconcile(
         &remote(vec![resolved]),
-        &registry(&[("m1", known("C1", "why?", true))]),
-        &snap(LOCAL_THREAD),
+        &registry_from_entries(&[(
+            "m1",
+            synced_comment_on_github(SyncStatus::Published, "C1", true, "why?"),
+        )]),
+        &snapshot_from_json(LOCAL_THREAD),
     );
     assert_eq!(plan.forgets, vec!["m1"]);
     assert!(matches!(&plan.edits[0], DifitEdit::Remove { message_id } if message_id == "m1"));
@@ -233,8 +225,11 @@ fn a_partially_fetched_thread_never_removes_anything() {
     partial.complete = false;
     let plan = reconcile(
         &remote(vec![partial]),
-        &registry(&[("m1", known("C1", "why?", true))]),
-        &snap(LOCAL_THREAD),
+        &registry_from_entries(&[(
+            "m1",
+            synced_comment_on_github(SyncStatus::Published, "C1", true, "why?"),
+        )]),
+        &snapshot_from_json(LOCAL_THREAD),
     );
     assert!(plan.edits.is_empty() && plan.forgets.is_empty());
 }
@@ -243,8 +238,8 @@ fn a_partially_fetched_thread_never_removes_anything() {
 fn unposted_comments_are_not_mistaken_for_deletions() {
     let plan = reconcile(
         &remote(Vec::new()),
-        &registry(&[("m1", SyncedComment::pending())]),
-        &snap(LOCAL_THREAD),
+        &registry_from_entries(&[("m1", SyncedComment::pending())]),
+        &snapshot_from_json(LOCAL_THREAD),
     );
     assert_eq!(plan, PullPlan::default());
 }

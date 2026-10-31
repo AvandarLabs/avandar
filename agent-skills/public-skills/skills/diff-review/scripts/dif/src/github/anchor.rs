@@ -71,8 +71,8 @@ pub fn new_comment(thread: &ServerThread, body: &str) -> Result<NewComment, Stri
 /// `(start_line, line)` from a difit `line`: a number, or `{start, end}`.
 fn line_range(line: Option<&Value>) -> Option<(Option<u64>, u64)> {
     let line = line?;
-    if let Some(n) = line.as_u64() {
-        return Some((None, n));
+    if let Some(single_line) = line.as_u64() {
+        return Some((None, single_line));
     }
     let start = line.get("start").and_then(Value::as_u64)?;
     let end = line.get("end").and_then(Value::as_u64)?;

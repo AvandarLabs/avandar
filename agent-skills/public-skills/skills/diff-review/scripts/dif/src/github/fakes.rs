@@ -6,13 +6,47 @@ use std::sync::{Arc, Mutex};
 use anyhow::{Result, bail};
 
 use crate::difit::editor::{DifitEdit, DifitEditor};
+use crate::difit::imports::Snapshot;
 use crate::github::anchor::NewComment;
 use crate::github::checkout::{Checkout, Relation};
 use crate::github::client::GithubApi;
 use crate::github::graphql::{Posted, RemoteComment, RemoteState, RemoteThread};
+use crate::github::registry::{Registry, SyncStatus, SyncedComment};
 use crate::github::session::{PullRequest, ReviewEvent};
 
 type Log = Arc<Mutex<Vec<String>>>;
+
+/// The difit snapshot `json` describes.
+pub fn snapshot_from_json(json: &str) -> Snapshot {
+    serde_json::from_str(json).expect("valid snapshot")
+}
+
+/// A registry holding `entries`, keyed by difit message id.
+pub fn registry_from_entries(entries: &[(&str, SyncedComment)]) -> Registry {
+    Registry {
+        comments: entries
+            .iter()
+            .map(|(id, entry)| ((*id).to_owned(), entry.clone()))
+            .collect(),
+    }
+}
+
+/// A registry entry for comment `node` already on GitHub in thread `T1`.
+pub fn synced_comment_on_github(
+    status: SyncStatus,
+    node: &str,
+    root: bool,
+    body: &str,
+) -> SyncedComment {
+    SyncedComment {
+        status,
+        node_id: Some(node.to_owned()),
+        thread_id: Some("T1".to_owned()),
+        root,
+        body: Some(body.to_owned()),
+        ..SyncedComment::pending()
+    }
+}
 
 /// A stateful stand-in for GitHub: it keeps the pending review and every
 /// thread added to it, like the real PR would.
@@ -27,6 +61,7 @@ pub struct FakeGithub {
 }
 
 impl FakeGithub {
+    /// Every GitHub call made so far, in order.
     pub fn calls(&self) -> Vec<String> {
         self.log.lock().unwrap().clone()
     }
@@ -45,13 +80,14 @@ impl FakeGithub {
             updated_at: "t0".to_owned(),
         }
     }
-    fn each_comment(&self, mut change: impl FnMut(&mut RemoteThread, usize)) {
-        let mut remote = self.remote.lock().unwrap();
-        for thread in &mut remote.threads {
-            for index in 0..thread.comments.len() {
-                change(thread, index);
-            }
-        }
+    fn each_comment(&self, change: impl FnMut(&mut RemoteComment)) {
+        self.remote
+            .lock()
+            .unwrap()
+            .threads
+            .iter_mut()
+            .flat_map(|thread| thread.comments.iter_mut())
+            .for_each(change);
     }
 }
 
@@ -119,9 +155,9 @@ impl GithubApi for FakeGithub {
     }
     fn update(&self, node_id: &str, body: &str) -> Result<()> {
         self.note(format!("update {node_id} {body}"));
-        self.each_comment(|thread, index| {
-            if thread.comments[index].node_id == node_id {
-                body.clone_into(&mut thread.comments[index].body);
+        self.each_comment(|comment| {
+            if comment.node_id == node_id {
+                body.clone_into(&mut comment.body);
             }
         });
         Ok(())
@@ -151,7 +187,7 @@ impl GithubApi for FakeGithub {
     ) -> Result<()> {
         self.note(format!("submit {review} {} {body}", event.as_github()));
         *self.review.lock().unwrap() = None;
-        self.each_comment(|thread, index| thread.comments[index].pending = false);
+        self.each_comment(|comment| comment.pending = false);
         Ok(())
     }
     fn set_viewed(&self, _pr: &PullRequest, path: &str, viewed: bool) -> Result<()> {
@@ -169,6 +205,7 @@ impl GithubApi for FakeGithub {
     }
 }
 
+/// A checkout with a fixed relation to the PR head and a settable HEAD.
 #[derive(Clone)]
 pub struct FakeCheckout {
     pub head: Arc<Mutex<String>>,
@@ -195,6 +232,7 @@ impl Checkout for FakeCheckout {
     }
 }
 
+/// A difit editor that records every edit it is given.
 #[derive(Clone, Default)]
 pub struct FakeEditor(pub Arc<Mutex<Vec<DifitEdit>>>);
 

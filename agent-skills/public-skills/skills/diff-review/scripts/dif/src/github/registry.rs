@@ -103,17 +103,20 @@ impl Registry {
     /// How many comments still wait for a review submit (marked or drafted).
     #[must_use]
     pub fn draft_count(&self) -> usize {
-        self.count(|status| matches!(status, SyncStatus::Pending | SyncStatus::Draft))
+        self.count_matching(|status| matches!(status, SyncStatus::Pending | SyncStatus::Draft))
     }
 
     /// How many comments GitHub rejected.
     #[must_use]
     pub fn failed_count(&self) -> usize {
-        self.count(|status| status == SyncStatus::Failed)
+        self.count_matching(|status| status == SyncStatus::Failed)
     }
 
-    fn count(&self, pred: impl Fn(SyncStatus) -> bool) -> usize {
-        self.comments.values().filter(|c| pred(c.status)).count()
+    fn count_matching(&self, matches_status: impl Fn(SyncStatus) -> bool) -> usize {
+        self.comments
+            .values()
+            .filter(|c| matches_status(c.status))
+            .count()
     }
 }
 
@@ -204,11 +207,11 @@ impl SharedRegistry {
     #[allow(clippy::significant_drop_tightening)]
     pub fn update_state<T>(&self, change: impl FnOnce(&mut State) -> T) -> T {
         let mut state = self.lock();
-        let out = change(&mut state);
+        let change_result = change(&mut state);
         if let Ok(text) = serde_json::to_string_pretty(&state.registry) {
             let _ = transcript::write_text(&self.path, &format!("{text}\n"));
         }
-        out
+        change_result
     }
 
     /// Apply `change` to the session only (nothing to save).
