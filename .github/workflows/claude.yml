@@ -12,6 +12,11 @@ on:
 
 env:
   NODE_VERSION: 24.15.0
+  # Strips credentials such as CLAUDE_CODE_OAUTH_TOKEN from every command
+  # Claude runs, including the git hooks and any PR code those commands
+  # execute. Claude keeps them for its own API calls, and GitHub tokens stay
+  # so gh and git push still work.
+  CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: "1"
 
 jobs:
   # Structured PR review, driven by the code-review plugin. Kept as its own job
@@ -103,22 +108,13 @@ jobs:
         with:
           deno-version: v2.x
 
-      # Gives Claude one fixed command to sync with pushes from other @claude
-      # jobs. An open git fetch or git pull rule would also allow
-      # --upload-pack, which runs any command. Installed outside the checkout
-      # so a PR cannot change what it does.
-      - name: Install branch sync helper
-        run: |
-          sudo tee /usr/local/bin/claude-sync-branch > /dev/null <<'EOF'
-          #!/usr/bin/env bash
-          # Rebase the current branch onto its remote copy, if one exists yet.
-          set -euo pipefail
-          branch="$(git branch --show-current)"
-          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
-            git pull --rebase origin "$branch"
-          fi
-          EOF
-          sudo chmod +x /usr/local/bin/claude-sync-branch
+      # Fixed commands for work whose usual tools can run any command:
+      # claude-sync-branch replaces git pull --rebase (--upload-pack), and
+      # claude-replace replaces git grep (-O) piped to xargs. Copied out of
+      # the checkout before Claude switches to the PR branch, so for PR
+      # conversation comments the default branch's copies run, not the PR's.
+      - name: Install @claude helpers
+        run: sudo install -m 755 .github/claude-bot/claude-sync-branch .github/claude-bot/claude-replace /usr/local/bin/
 
       - name: Run Claude Code
         id: claude
@@ -155,11 +151,11 @@ jobs:
           claude_args: |
             # Git: rename, inspect, undo, and sync with other @claude jobs
             --allowedTools "Bash(git mv:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git restore:*),Bash(git reset:*)"
-            --allowedTools "Bash(claude-sync-branch),Bash(git rebase --continue),Bash(git rebase --abort),Bash(git merge:*)"
+            --allowedTools "Bash(claude-sync-branch),Bash(git fetch origin),Bash(git rebase --continue),Bash(git rebase --abort),Bash(git merge:*)"
             # GitHub reads
             --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr list:*),Bash(gh run view:*),Bash(gh issue view:*)"
             # Files and text
-            --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(grep:*),Bash(sed --sandbox:*)"
+            --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(grep:*),Bash(sed --sandbox:*),Bash(claude-replace:*)"
             --allowedTools "Bash(ls:*),Bash(wc:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(jq:*)"
             # Checks
             --allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm test:*),Bash(pnpm format:*)"
@@ -171,4 +167,4 @@ jobs:
             --allowedTools "Task,TodoWrite"
             # Need Supabase, Docker, or browsers that this job does not set up
             --disallowedTools "Bash(pnpm test:db:*),Bash(pnpm test:e2e:*)"
-            --append-system-prompt "Other @claude jobs may push to this branch while you work. Before every push, run claude-sync-branch, which rebases onto the remote branch. If the rebase stops on a conflict, resolve it with Edit, git add the files, run git rebase --continue, then push. For find-and-replace across many files, use sed --sandbox -i, since plain sed is not allowed."
+            --append-system-prompt "Other @claude jobs may push to this branch while you work. Before every push, run claude-sync-branch, which rebases onto the remote branch. If the rebase stops on a conflict, resolve it with Edit, git add the files, run git rebase --continue, then push. To bring in another branch, run git fetch origin, then git merge origin/<branch>. If the pre-push hook blocks a push because it updated translation catalogs or formatting, commit those files and push again. This job has no OpenAI key, so leave untranslated msgstr entries empty for a developer's next push to fill. For find-and-replace across files, run claude-replace [--fixed] <pattern> <replacement> [<pathspec>...], which edits every tracked file that matches, then review git diff. For a single file, sed --sandbox -i also works. Plain sed, git grep, and xargs are not allowed."
