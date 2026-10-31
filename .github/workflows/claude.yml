@@ -18,6 +18,13 @@ env:
   # so gh and git push still work.
   CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: "1"
 
+# Both jobs run read-only on a PR from a fork. The GitHub App token Claude
+# holds can write to this repo, so a fork's code must never run in the job
+# (pnpm scripts, eslint configs, and tests all execute it), and Claude must
+# not commit or push it here. Only users with write access can trigger
+# either job, so this applies when a maintainer mentions @claude on an
+# external contributor's PR.
+
 jobs:
   # Structured PR review, driven by the code-review plugin. Kept as its own job
   # so it keeps the specialized prompt and plugin rather than freeform @claude.
@@ -35,6 +42,17 @@ jobs:
       id-token: write
 
     steps:
+      # A failed lookup stops the job. Every later step checks
+      # is_fork == 'false', so an unexpected value leaves the job read-only.
+      - name: Detect fork PR
+        id: origin
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          is_fork="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json isCrossRepository --jq .isCrossRepository)"
+          echo "is_fork=$is_fork" >> "$GITHUB_OUTPUT"
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -43,14 +61,18 @@ jobs:
 
       # Same toolchain as pr-develop.yaml's lint-typecheck job, so the review
       # can verify claims with the type checker and linter.
-      - run: corepack enable
-      - uses: actions/setup-node@v5
+      - if: steps.origin.outputs.is_fork == 'false'
+        run: corepack enable
+      - if: steps.origin.outputs.is_fork == 'false'
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
           package-manager-cache: true
-      - run: pnpm install --frozen-lockfile
-      - uses: denoland/setup-deno@v2
+      - if: steps.origin.outputs.is_fork == 'false'
+        run: pnpm install --frozen-lockfile
+      - if: steps.origin.outputs.is_fork == 'false'
+        uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
@@ -63,12 +85,12 @@ jobs:
           plugins: "code-review@claude-code-plugins"
           prompt: "/code-review:code-review ${{ github.repository }}/pull/${{ github.event.issue.number }}"
           # The plugin's command grants its own gh tools. These add read-only
-          # checks on top. Lines starting with # are stripped before parsing.
+          # checks on top, and type-check and lint only for internal PRs.
+          # Lines starting with # are stripped before parsing.
           claude_args: |
-            # Type-check and lint
-            --allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm exec tsc:*),Bash(pnpm exec eslint:*)"
             # Read-only git history
             --allowedTools "Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git blame:*)"
+            ${{ steps.origin.outputs.is_fork == 'false' && '--allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm exec tsc:*),Bash(pnpm exec eslint:*)"' || '--append-system-prompt "This PR comes from a fork, so you cannot run project scripts. Read the CI results with gh pr checks instead."' }}
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
 
@@ -87,7 +109,67 @@ jobs:
       issues: read
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
+    env:
+      # Tools for every run: read code, history, PRs, and CI results.
+      # The action already allows Read, Glob, Grep, file edits inside the
+      # checkout, git add/commit/rm, and its own push script. Anything not
+      # listed here is denied, because a headless run cannot ask for
+      # approval. Lines starting with # are stripped before parsing.
+      #
+      # Deliberately left out: gh api (its token can write to the repo),
+      # pnpm add/remove (supply-chain risk), rm, xargs, awk, WebSearch, and
+      # WebFetch (a way to send data out of the job). git rebase -x and git
+      # fetch --upload-pack can each run any command, and cat, head, and tail
+      # duplicate Read, so none of them are allowed either.
+      READ_ONLY_ARGS: |
+        # Git history
+        --allowedTools "Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
+        # GitHub reads
+        --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr list:*),Bash(gh run view:*),Bash(gh issue view:*)"
+        # Text
+        --allowedTools "Bash(grep:*),Bash(ls:*),Bash(wc:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(jq:*)"
+        # Agent tools
+        --allowedTools "Task,TodoWrite"
+      # Tools for issues and PRs from branches in this repo: edit, run
+      # checks, and push. sed is allowed only with --sandbox, which rejects
+      # its e, r, and w commands, so it can replace text but not run commands
+      # or touch other files.
+      INTERNAL_ARGS: |
+        # Git: rename, undo, and sync with other @claude jobs
+        --allowedTools "Bash(git mv:*),Bash(git restore:*),Bash(git reset:*)"
+        --allowedTools "Bash(claude-sync-branch),Bash(git fetch origin),Bash(git rebase --continue),Bash(git rebase --abort),Bash(git merge:*)"
+        # Files
+        --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(sed --sandbox:*),Bash(claude-replace:*)"
+        # Checks
+        --allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm test:*),Bash(pnpm format:*)"
+        --allowedTools "Bash(pnpm exec tsc:*),Bash(pnpm exec vitest:*),Bash(pnpm exec eslint:*)"
+        # Generators and Lingui catalogs (ava new only, never ava supabase)
+        --allowedTools "Bash(pnpm new:component:*),Bash(pnpm new:route:*),Bash(pnpm build:ava-cli:*),Bash(ava new:*)"
+        --allowedTools "Bash(pnpm i18n:extract:*),Bash(pnpm i18n:compile:*)"
+        # Need Supabase, Docker, or browsers that this job does not set up
+        --disallowedTools "Bash(pnpm test:db:*),Bash(pnpm test:e2e:*)"
+        --append-system-prompt "Other @claude jobs may push to this branch while you work. Before every push, run claude-sync-branch, which rebases onto the remote branch. If the rebase stops on a conflict, resolve it with Edit, git add the files, run git rebase --continue, then push. To bring in another branch, run git fetch origin, then git merge origin/<branch>. If the pre-push hook blocks a push because it updated translation catalogs or formatting, commit those files and push again. This job has no OpenAI key, so leave untranslated msgstr entries empty for a developer's next push to fill. For find-and-replace across files, run claude-replace [--fixed] <pattern> <replacement> [<pathspec>...], which edits every tracked file that matches, then review git diff. For a single file, sed --sandbox -i also works. Plain sed, git grep, and xargs are not allowed."
+      # Tools for PRs from forks: denies the action's own edit, commit, and
+      # push grants. The * in the push rule matches the action's install path.
+      FORK_ARGS: |
+        --disallowedTools "Edit,Write,NotebookEdit,Bash(git add *),Bash(git commit *),Bash(git rm *),Bash(git push *),Bash(*git-push.sh *)"
+        --append-system-prompt "This PR comes from a fork, so you are read-only: you can review code and answer questions, but you cannot edit files, commit, push, or run project scripts. Read the CI results with gh pr checks instead of running checks. If asked for changes, describe them in your reply so the contributor can make them."
     steps:
+      # Issues have no PR, so they count as internal. A failed lookup stops
+      # the job. Every later step checks is_fork == 'false', so an unexpected
+      # value leaves the job read-only.
+      - name: Detect fork PR
+        id: origin
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number || (github.event.issue.pull_request && github.event.issue.number) || '' }}
+        run: |
+          is_fork=false
+          if [ -n "$PR_NUMBER" ]; then
+            is_fork="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json isCrossRepository --jq .isCrossRepository)"
+          fi
+          echo "is_fork=$is_fork" >> "$GITHUB_OUTPUT"
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -97,14 +179,18 @@ jobs:
 
       # Same toolchain as pr-develop.yaml's lint-typecheck job, so Claude can
       # run the type checker, linter, tests, and repo generators.
-      - run: corepack enable
-      - uses: actions/setup-node@v5
+      - if: steps.origin.outputs.is_fork == 'false'
+        run: corepack enable
+      - if: steps.origin.outputs.is_fork == 'false'
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
           package-manager-cache: true
-      - run: pnpm install --frozen-lockfile
-      - uses: denoland/setup-deno@v2
+      - if: steps.origin.outputs.is_fork == 'false'
+        run: pnpm install --frozen-lockfile
+      - if: steps.origin.outputs.is_fork == 'false'
+        uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
@@ -114,6 +200,7 @@ jobs:
       # the checkout before Claude switches to the PR branch, so for PR
       # conversation comments the default branch's copies run, not the PR's.
       - name: Install @claude helpers
+        if: steps.origin.outputs.is_fork == 'false'
         run: sudo install -m 755 .github/claude-bot/claude-sync-branch .github/claude-bot/claude-replace /usr/local/bin/
 
       - name: Run Claude Code
@@ -133,38 +220,8 @@ jobs:
           # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
           # prompt: 'Update the pull request description to include a summary of changes.'
 
-          # The action already allows Read, Glob, Grep, file edits inside the
-          # checkout, git add/commit/rm, and its own push script. Anything not
-          # listed here is denied, because a headless run cannot ask for
-          # approval. Lines starting with # are stripped before parsing.
-          #
-          # Deliberately left out: gh api (its token can write to the repo),
-          # pnpm add/remove (supply-chain risk), rm, xargs, awk, WebSearch, and
-          # WebFetch (a way to send data out of the job). git rebase -x and git
-          # fetch --upload-pack can each run any command, and cat, head, and
-          # tail duplicate Read, so none of them are allowed either. sed is
-          # allowed only with --sandbox, which rejects its e, r, and w
-          # commands, so it can replace text but not run commands or touch
-          # other files.
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
           claude_args: |
-            # Git: rename, inspect, undo, and sync with other @claude jobs
-            --allowedTools "Bash(git mv:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git restore:*),Bash(git reset:*)"
-            --allowedTools "Bash(claude-sync-branch),Bash(git fetch origin),Bash(git rebase --continue),Bash(git rebase --abort),Bash(git merge:*)"
-            # GitHub reads
-            --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr list:*),Bash(gh run view:*),Bash(gh issue view:*)"
-            # Files and text
-            --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(grep:*),Bash(sed --sandbox:*),Bash(claude-replace:*)"
-            --allowedTools "Bash(ls:*),Bash(wc:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(jq:*)"
-            # Checks
-            --allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm test:*),Bash(pnpm format:*)"
-            --allowedTools "Bash(pnpm exec tsc:*),Bash(pnpm exec vitest:*),Bash(pnpm exec eslint:*)"
-            # Generators and Lingui catalogs (ava new only, never ava supabase)
-            --allowedTools "Bash(pnpm new:component:*),Bash(pnpm new:route:*),Bash(pnpm build:ava-cli:*),Bash(ava new:*)"
-            --allowedTools "Bash(pnpm i18n:extract:*),Bash(pnpm i18n:compile:*)"
-            # Agent tools
-            --allowedTools "Task,TodoWrite"
-            # Need Supabase, Docker, or browsers that this job does not set up
-            --disallowedTools "Bash(pnpm test:db:*),Bash(pnpm test:e2e:*)"
-            --append-system-prompt "Other @claude jobs may push to this branch while you work. Before every push, run claude-sync-branch, which rebases onto the remote branch. If the rebase stops on a conflict, resolve it with Edit, git add the files, run git rebase --continue, then push. To bring in another branch, run git fetch origin, then git merge origin/<branch>. If the pre-push hook blocks a push because it updated translation catalogs or formatting, commit those files and push again. This job has no OpenAI key, so leave untranslated msgstr entries empty for a developer's next push to fill. For find-and-replace across files, run claude-replace [--fixed] <pattern> <replacement> [<pathspec>...], which edits every tracked file that matches, then review git diff. For a single file, sed --sandbox -i also works. Plain sed, git grep, and xargs are not allowed."
+            ${{ env.READ_ONLY_ARGS }}
+            ${{ steps.origin.outputs.is_fork == 'false' && env.INTERNAL_ARGS || env.FORK_ARGS }}
