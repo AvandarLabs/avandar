@@ -103,6 +103,23 @@ jobs:
         with:
           deno-version: v2.x
 
+      # Gives Claude one fixed command to sync with pushes from other @claude
+      # jobs. An open git fetch or git pull rule would also allow
+      # --upload-pack, which runs any command. Installed outside the checkout
+      # so a PR cannot change what it does.
+      - name: Install branch sync helper
+        run: |
+          sudo tee /usr/local/bin/claude-sync-branch > /dev/null <<'EOF'
+          #!/usr/bin/env bash
+          # Rebase the current branch onto its remote copy, if one exists yet.
+          set -euo pipefail
+          branch="$(git branch --show-current)"
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            git pull --rebase origin "$branch"
+          fi
+          EOF
+          sudo chmod +x /usr/local/bin/claude-sync-branch
+
       - name: Run Claude Code
         id: claude
         uses: anthropics/claude-code-action@v1
@@ -126,18 +143,21 @@ jobs:
           # approval. Lines starting with # are stripped before parsing.
           #
           # Deliberately left out: gh api (its token can write to the repo),
-          # pnpm add/remove (supply-chain risk), rm, xargs, awk, and WebSearch.
+          # pnpm add/remove (supply-chain risk), rm, xargs, awk, WebSearch, and
+          # WebFetch (a way to send data out of the job). sed, git rebase -x,
+          # and git fetch --upload-pack can each run any command, and cat,
+          # head, and tail duplicate Read, so none of them are allowed either.
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
           claude_args: |
             # Git: rename, inspect, undo, and sync with other @claude jobs
             --allowedTools "Bash(git mv:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git restore:*),Bash(git reset:*)"
-            --allowedTools "Bash(git fetch:*),Bash(git pull --rebase:*),Bash(git rebase:*),Bash(git merge:*)"
+            --allowedTools "Bash(claude-sync-branch),Bash(git rebase --continue),Bash(git rebase --abort),Bash(git merge:*)"
             # GitHub reads
             --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr list:*),Bash(gh run view:*),Bash(gh issue view:*)"
             # Files and text
-            --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(sed:*),Bash(grep:*)"
-            --allowedTools "Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(jq:*)"
+            --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(grep:*)"
+            --allowedTools "Bash(ls:*),Bash(wc:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(jq:*)"
             # Checks
             --allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm test:*),Bash(pnpm format:*)"
             --allowedTools "Bash(pnpm exec tsc:*),Bash(pnpm exec vitest:*),Bash(pnpm exec eslint:*)"
@@ -145,7 +165,7 @@ jobs:
             --allowedTools "Bash(pnpm new:component:*),Bash(pnpm new:route:*),Bash(pnpm build:ava-cli:*),Bash(ava new:*)"
             --allowedTools "Bash(pnpm i18n:extract:*),Bash(pnpm i18n:compile:*)"
             # Agent tools
-            --allowedTools "Task,TodoWrite,WebFetch"
+            --allowedTools "Task,TodoWrite"
             # Need Supabase, Docker, or browsers that this job does not set up
             --disallowedTools "Bash(pnpm test:db:*),Bash(pnpm test:e2e:*)"
-            --append-system-prompt "Other @claude jobs may push to this branch while you work. Before every push, run git pull --rebase origin <branch>. If the rebase stops on a conflict, resolve it with Edit, git add the files, run git rebase --continue, then push."
+            --append-system-prompt "Other @claude jobs may push to this branch while you work. Before every push, run claude-sync-branch, which rebases onto the remote branch. If the rebase stops on a conflict, resolve it with Edit, git add the files, run git rebase --continue, then push."
