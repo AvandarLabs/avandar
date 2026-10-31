@@ -1,3 +1,6 @@
+import { describe, expect, it } from "vitest";
+import { compilePointAggregateSql } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/compilePointAggregateSql";
+import { getPointAggregateCellsAcross } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/getPointAggregateCellsAcross";
 /**
  * Row-level tests for {@link compilePointAggregateSql}. Every case runs the
  * emitted SQL against a real in-memory DuckDB and asserts the rows returned.
@@ -7,11 +10,8 @@
  * losing any of them, and only real rows can show that the Web Mercator cell
  * math, the grouping, and the per-cell sums actually agree.
  */
-import { describe, expect, it } from "vitest";
-import { compilePointAggregateSql } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/compilePointAggregateSql";
-import { getPointAggregateCellsAcross } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/getPointAggregateCellsAcross";
 import { PointAggregateProperties } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.constants";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
 import type { DuckDBConnection } from "@duckdb/node-api";
 
 /**

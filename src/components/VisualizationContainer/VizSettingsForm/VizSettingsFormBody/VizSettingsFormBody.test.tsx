@@ -6,14 +6,15 @@ import {
   getMantineSelectDropdown,
   pickMantineSelectOption,
 } from "@/test-utils/pickMantineSelectOption";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 
-const COLUMNS: readonly QueryResultColumn[] = [
-  { name: "category", dataType: "varchar" },
-  { name: "value", dataType: "double" },
-  { name: "score", dataType: "bigint" },
+const COLUMNS: readonly QueryResult.ColumnWithId[] = [
+  { id: "category" as QueryColumn.Id, name: "category", dataType: "varchar" },
+  { id: "value" as QueryColumn.Id, name: "value", dataType: "double" },
+  { id: "score" as QueryColumn.Id, name: "score", dataType: "bigint" },
 ];
 
 const DATA: UnknownDataFrame = [
@@ -81,7 +82,7 @@ describe("VizSettingsFormBody: bar chart smoke test", () => {
     pickMantineSelectOption(/X axis/i, "category");
     expect(onVizConfigChange).toHaveBeenCalledWith({
       ...baseConfig,
-      xAxisKey: "category",
+      xAxisKey: "category" as QueryColumn.Id,
     });
   });
 
@@ -111,7 +112,7 @@ describe("VizSettingsFormBody: line chart smoke test", () => {
     pickMantineSelectOption(/X axis/i, "category");
     expect(onVizConfigChange).toHaveBeenLastCalledWith({
       ...baseConfig,
-      xAxisKey: "category",
+      xAxisKey: "category" as QueryColumn.Id,
     });
   });
 });
@@ -130,7 +131,7 @@ describe("VizSettingsFormBody: area chart smoke test", () => {
     pickMantineSelectOption(/X axis/i, "category");
     expect(onVizConfigChange).toHaveBeenLastCalledWith({
       ...baseConfig,
-      xAxisKey: "category",
+      xAxisKey: "category" as QueryColumn.Id,
     });
   });
 });
@@ -138,7 +139,9 @@ describe("VizSettingsFormBody: area chart smoke test", () => {
 describe("VizSettingsFormBody: scatter chart controls", () => {
   const baseConfig: VizConfig = {
     vizType: "scatter",
-    series: [{ xKey: "value", key: "score" }],
+    series: [
+      { xKey: "value" as QueryColumn.Id, key: "score" as QueryColumn.Id },
+    ],
   };
 
   it("only offers numeric columns for X and Y axis pickers", () => {
@@ -181,7 +184,7 @@ describe("VizSettingsFormBody: pie chart controls", () => {
     pickMantineSelectOption(/Value column/i, "value");
     expect(onVizConfigChange).toHaveBeenLastCalledWith({
       ...baseConfig,
-      valueKey: "value",
+      valueKey: "value" as QueryColumn.Id,
     });
   });
 
@@ -210,7 +213,7 @@ describe("VizSettingsFormBody: pie chart controls", () => {
 
   it("renders per-slice color inputs when a name column is chosen", () => {
     renderForm({
-      vizConfig: { ...baseConfig, nameKey: "category" },
+      vizConfig: { ...baseConfig, nameKey: "category" as QueryColumn.Id },
     });
     expect(screen.getByText("Slice colors")).toBeInTheDocument();
     expect(screen.getByLabelText("Alpha")).toBeInTheDocument();
@@ -232,13 +235,13 @@ describe("VizSettingsFormBody: funnel chart controls", () => {
     pickMantineSelectOption(/Value column/i, "value");
     expect(onVizConfigChange).toHaveBeenLastCalledWith({
       ...baseConfig,
-      valueKey: "value",
+      valueKey: "value" as QueryColumn.Id,
     });
   });
 
   it("renders per-step color inputs when a name column is chosen", () => {
     renderForm({
-      vizConfig: { ...baseConfig, nameKey: "category" },
+      vizConfig: { ...baseConfig, nameKey: "category" as QueryColumn.Id },
     });
     expect(screen.getByText("Slice colors")).toBeInTheDocument();
     expect(screen.getByLabelText("Alpha")).toBeInTheDocument();
@@ -260,7 +263,7 @@ describe("VizSettingsFormBody: radar chart smoke test", () => {
     pickMantineSelectOption(/Category axis/i, "category");
     expect(onVizConfigChange).toHaveBeenLastCalledWith({
       ...baseConfig,
-      nameKey: "category",
+      nameKey: "category" as QueryColumn.Id,
     });
   });
 });
@@ -268,7 +271,13 @@ describe("VizSettingsFormBody: radar chart smoke test", () => {
 describe("VizSettingsFormBody: bubble chart controls", () => {
   const baseConfig: VizConfig = {
     vizType: "bubble",
-    series: [{ xKey: "value", key: "score", sizeKey: "value" }],
+    series: [
+      {
+        xKey: "value" as QueryColumn.Id,
+        key: "score" as QueryColumn.Id,
+        sizeKey: "value" as QueryColumn.Id,
+      },
+    ],
   };
 
   it("renders X, Y, and Size column pickers for each series", () => {

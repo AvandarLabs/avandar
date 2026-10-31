@@ -1,37 +1,22 @@
-/**
- * Convert a {@link PartialStructuredQuery} into a raw SQL string using knex.
- *
- * This is the canonical "structured query to SQL" path. The Data Explorer
- * calls it whenever the manual query form changes so that the textual SQL
- * stays in sync with the form.
- *
- * Extracted from {@link toRawDuckDbQuery} so it can be reused outside the
- * DuckDB-specific code path and so callers can override identifier quoting
- * or knex options independently.
- */
 import {
   makeIdLookupMap,
-  makeObject,
-  objectEntries,
   objectValues,
   prop,
   sortObjList,
   valNotEq,
 } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@utils/sql/index.ts";
-import { match } from "ts-pattern";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { applyFilters } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyFilters.ts";
 import { applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyHaving/applyHaving.ts";
 import { applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyJoins.ts";
+import { makeFilterColumnFromStructuredQuery } from "$/models/queries/StructuredQuery/structuredQueryToSql/makeFilterColumnFromStructuredQuery.ts";
+import { makeSqlExpressionFromQueryColumn } from "$/models/queries/StructuredQuery/structuredQueryToSql/makeSqlExpressionFromQueryColumn.ts";
 import { sqlBuilder } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
 import { makeRelationRefFromQueryDataSource } from "$/models/relations/RelationRef/makeRelationRefFromQueryDataSource.ts";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
-import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
-import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 import type { Knex } from "knex";
@@ -39,23 +24,8 @@ import type { Knex } from "knex";
 export type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 
 /**
- * The name to sort by, which has to be exactly the name the SELECT list
- * emitted for that column.
- *
- * A query carries each column's aggregation twice: once in the query's
- * `aggregations` map, keyed by column id, and once on the column itself as
- * `QueryColumn.aggregation`. Everything else in this emitter reads the map,
- * including the aliases it emits for aggregated columns, but
- * `QueryColumn.getDerivedColumnName` reads the column's own field. Nothing
- * keeps the two copies equal, so when only the map carries an aggregation the
- * SELECT list aliases `sum(cnt)` while the ORDER BY names the bare `cnt`,
- * which is neither grouped nor aggregated, and DuckDB rejects the statement.
- *
- * So the aggregation is taken from the map here too, and the alias is still
- * spelled by `getDerivedColumnName` rather than by a second copy of the
- * naming rule. The map is the source of truth because it is what the SELECT
- * side already acts on; unifying the other way round would mean teaching
- * every consumer of `getDerivedColumnName` to carry the map.
+ * Gets the `QueryResult` column name a column emits, using the authoritative
+ * aggregation map.
  */
 function _getOrderByColumnName(
   column: QueryColumn.T,
@@ -67,6 +37,7 @@ function _getOrderByColumnName(
   });
 }
 
+/** Emits SQL from selected projections and source/projection filter IDs. */
 export function structuredQueryToSql(
   query: PartialStructuredQuery,
   {
@@ -96,15 +67,6 @@ export function structuredQueryToSql(
     sortBy: prop("id"),
   });
 
-  // Column types the filter renderer uses for typed literals. Built from the
-  // query's own columns and overlaid with any caller-supplied types.
-  const effectiveColumnTypes: QueryFilterColumnTypes = {
-    ...makeObject(queryColumns, {
-      keyFn: prop("baseColumn.name"),
-      valueFn: prop("baseColumn.dataType"),
-    }),
-    ...(columnTypes ?? {}),
-  };
   const queryColumnLookup = makeIdLookupMap(sortedQueryColumns, {
     key: "id",
   });
@@ -122,28 +84,18 @@ export function structuredQueryToSql(
     valNotEq("none"),
   );
 
-  const duckDbAggregations = {} as Record<string, DuckDbQueryAggregationTypeT>;
-  objectEntries(aggregations).forEach(([columnId, aggregation]) => {
-    const column = queryColumnLookup.get(columnId);
-
-    // Any base column at all, not only a `DatasetColumn`. This used to narrow
-    // to `DatasetColumn`, which meant a `ConceptAttribute` fell straight
-    // through and its group-by and its aggregate were silently dropped: the
-    // query still compiled and still returned plausible rows. Both kinds of
-    // base column carry a `name`, which is the only thing needed here, so
-    // there is nothing to narrow for.
-    if (column === undefined) {
-      return;
-    }
-
-    if (aggregation !== "group_by" && aggregation !== "none") {
-      duckDbAggregations[column.baseColumn.name] = aggregation;
-    } else if (atLeastOneColumnHasAggregation || aggregation === "group_by") {
+  sortedQueryColumns.forEach((column) => {
+    const aggregation = aggregations[column.id];
+    if (
+      (aggregation === undefined ||
+        aggregation === "none" ||
+        aggregation === "group_by") &&
+      atLeastOneColumnHasAggregation
+    ) {
       groupByColumnNames.push(column.baseColumn.name);
     }
   });
 
-  const selectColumnNames = sortedQueryColumns.map(prop("baseColumn.name"));
   const orderByColumnName =
     orderByColumn && queryColumnLookup.has(orderByColumn)
       ? _getOrderByColumnName(
@@ -152,26 +104,29 @@ export function structuredQueryToSql(
         )
       : undefined;
 
-  const timestampColumnNames = queryColumns
-    .filter((column) => {
-      return AvaDataType.isDateOrTimestamp(column.baseColumn.dataType);
-    })
-    .map(prop("baseColumn.name"));
-
-  const columnNamesWithoutAggregations = selectColumnNames.filter((colName) => {
-    return duckDbAggregations[colName] === undefined;
-  });
-
-  const adjustedColumnNames = columnNamesWithoutAggregations.map((colName) => {
-    const quotedColName = quoteSqlIdentifier(colName);
-    if (castTimestampsToISO) {
-      return timestampColumnNames.includes(colName)
-        ? sqlBuilder.raw(
-            `strftime(${quotedColName}::TIMESTAMP, "'%Y-%m-%dT%H:%M:%S.%fZ') as ${quotedColName}`,
-          )
-        : sqlBuilder.raw(quotedColName);
-    }
-    return sqlBuilder.raw(quotedColName);
+  const adjustedColumnNames = sortedQueryColumns.map((column) => {
+    const aggregation = aggregations[column.id];
+    const expression = makeSqlExpressionFromQueryColumn({
+      column: column,
+      aggregation: aggregation,
+    });
+    const isPlain =
+      aggregation === undefined ||
+      aggregation === "none" ||
+      aggregation === "group_by";
+    const selection =
+      castTimestampsToISO &&
+      isPlain &&
+      AvaDataType.isDateOrTimestamp(column.baseColumn.dataType)
+        ? `strftime(${expression}::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ')`
+        : expression;
+    const queryResultColumnName = QueryColumn.getDerivedColumnName({
+      ...column,
+      aggregation,
+    });
+    return sqlBuilder.raw(
+      `${selection} as ${quoteSqlIdentifier(queryResultColumnName)}`,
+    );
   });
 
   let sqlQuery: Knex.QueryBuilder;
@@ -195,7 +150,14 @@ export function structuredQueryToSql(
   // apply filters (WHERE clause)
   if (filters && !isEmptyQueryFilter(filters)) {
     sqlQuery = applyFilters(sqlQuery, filters, {
-      columnTypes: effectiveColumnTypes,
+      columnTypes,
+      getColumn: (columnId) => {
+        return makeFilterColumnFromStructuredQuery({
+          columnId,
+          clause: "where",
+          query,
+        });
+      },
     });
   }
 
@@ -207,7 +169,14 @@ export function structuredQueryToSql(
   // apply HAVING clause (after GROUP BY, before ORDER BY)
   if (!isEmptyQueryFilter(having)) {
     sqlQuery = applyHaving(sqlQuery, having, {
-      columnTypes: effectiveColumnTypes,
+      columnTypes,
+      getColumn: (columnId) => {
+        return makeFilterColumnFromStructuredQuery({
+          columnId,
+          clause: "having",
+          query,
+        });
+      },
     });
   }
 
@@ -217,58 +186,6 @@ export function structuredQueryToSql(
       `${quotedOrderByColumn} ${orderByDirection}`,
     );
   }
-
-  sqlQuery = objectEntries(duckDbAggregations).reduce(
-    (newQuery, [columnName, aggType]) => {
-      const aggregationColumnName =
-        DuckDbQueryAggregations.getAggregationColumnName(aggType, columnName);
-      const quotedColumnName = quoteSqlIdentifier(columnName);
-      const quotedAggregationColumnName = quoteSqlIdentifier(
-        aggregationColumnName,
-      );
-
-      return match(aggType)
-        .with("sum", () => {
-          return newQuery.select(
-            sqlBuilder.raw(
-              `sum(${quotedColumnName}) as ${quotedAggregationColumnName}`,
-            ),
-          );
-        })
-        .with("avg", () => {
-          return newQuery.select(
-            sqlBuilder.raw(
-              `avg(${quotedColumnName}) as ${quotedAggregationColumnName}`,
-            ),
-          );
-        })
-        .with("count", () => {
-          return newQuery.select(
-            sqlBuilder.raw(
-              `count(${quotedColumnName}) as ${quotedAggregationColumnName}`,
-            ),
-          );
-        })
-        .with("max", () => {
-          return newQuery.select(
-            sqlBuilder.raw(
-              `max(${quotedColumnName}) as ${quotedAggregationColumnName}`,
-            ),
-          );
-        })
-        .with("min", () => {
-          return newQuery.select(
-            sqlBuilder.raw(
-              `min(${quotedColumnName}) as ${quotedAggregationColumnName}`,
-            ),
-          );
-        })
-        .exhaustive(() => {
-          throw new Error(`Invalid DuckDbQueryAggregationType: "${aggType}"`);
-        });
-    },
-    sqlQuery,
-  );
 
   if (limit) {
     sqlQuery = sqlQuery.limit(limit);

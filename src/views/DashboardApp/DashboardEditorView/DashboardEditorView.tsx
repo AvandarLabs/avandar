@@ -1,9 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
-import { notifySuccess } from "@/utils/notifications/notify";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
+import { DashboardColumnBindingPreparation } from "@/views/DashboardApp/AvaPage/utils/DashboardColumnBindingPreparation/DashboardColumnBindingPreparation";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
@@ -12,8 +14,8 @@ import {
   getDashboardTitleFromPuckData,
   useDashboardPuckConfig,
 } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import "@puckeditor/core/puck.css";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { ReactElement } from "react";
 
@@ -81,6 +83,9 @@ type SaveDashboardOptions = {
 function useSaveDashboard(
   options: Readonly<SaveDashboardOptions>,
 ): (savedData: AvaPageData) => void {
+  const queryClient = useQueryClient();
+  const { t } = useLingui();
+  const workspaceId = options.dashboard.workspaceId;
   const [saveDashboard] = DashboardClient.useUpdate({
     queriesToInvalidate: [
       DashboardClient.QueryKeys.getAll(),
@@ -98,15 +103,27 @@ function useSaveDashboard(
   const { dashboardTitle } = options;
   return useCallback(
     (savedData: AvaPageData): void => {
-      saveDashboard({
-        id: dashboardId,
-        data: {
-          name: getDashboardTitleFromPuckData(savedData) ?? dashboardTitle,
-          config: savedData as Dashboard.T["config"],
-        },
-      });
+      void DashboardColumnBindingPreparation.prepareDocument({
+        data: savedData,
+        auth: { auth: "workspace", workspaceId },
+        queryClient: queryClient,
+      })
+        .then((preparedData) => {
+          return saveDashboard({
+            id: dashboardId,
+            data: {
+              name: getDashboardTitleFromPuckData(savedData) ?? dashboardTitle,
+              config: preparedData as Dashboard.T["config"],
+            },
+          });
+        })
+        .catch((error: unknown) => {
+          return notifyError(
+            t`Failed to save dashboard: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        });
     },
-    [dashboardId, dashboardTitle, saveDashboard],
+    [dashboardId, dashboardTitle, saveDashboard, workspaceId, queryClient, t],
   );
 }
 

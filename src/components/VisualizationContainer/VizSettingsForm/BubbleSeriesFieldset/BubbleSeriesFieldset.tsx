@@ -1,4 +1,4 @@
-import { makeSelectOptions, Select } from "@avandar/ui";
+import { Select, makeSelectOptions } from "@avandar/ui";
 import { propPasses, removeAtIndex } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -19,12 +19,12 @@ import css from "@/components/VisualizationContainer/VizSettingsForm/BubbleSerie
 import { SeriesList } from "@/components/VisualizationContainer/VizSettingsForm/SeriesList/SeriesList";
 import { useUniqueRowKeys } from "@/components/VisualizationContainer/VizSettingsForm/useUniqueRowKeys";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 
 type Props = {
-  fields: readonly QueryResultColumn[];
+  fields: readonly QueryResult.ColumnWithId[];
   series: readonly BubbleSeries[];
   onChange: (next: BubbleSeries[]) => void;
 
@@ -52,7 +52,7 @@ export function BubbleSeriesFieldset({
 
   const numericOptions = useMemo(() => {
     return makeSelectOptions(numericFields, {
-      valueKey: "name",
+      valueKey: "id",
       labelKey: "name",
     });
   }, [numericFields]);
@@ -65,9 +65,9 @@ export function BubbleSeriesFieldset({
     const yField = numericFields[1] ?? xField;
     const sizeField = numericFields[2] ?? yField;
     const next: BubbleSeries = {
-      xKey: xField.name,
-      key: yField.name,
-      sizeKey: sizeField.name,
+      xKey: xField.id,
+      key: yField.id,
+      sizeKey: sizeField.id,
     };
     onChange([...series, next]);
   }, [numericFields, series, onChange]);
@@ -148,7 +148,12 @@ export function BubbleSeriesFieldset({
                       }
                       onChange={(next) => {
                         if (next !== null) {
-                          updateAt(idx, { xKey: next });
+                          const column = fields.find((field) => {
+                            return field.id === next;
+                          });
+                          if (column) {
+                            updateAt(idx, { xKey: column.id });
+                          }
                         }
                       }}
                     />
@@ -165,7 +170,12 @@ export function BubbleSeriesFieldset({
                       }
                       onChange={(next) => {
                         if (next !== null) {
-                          updateAt(idx, { key: next });
+                          const column = fields.find((field) => {
+                            return field.id === next;
+                          });
+                          if (column) {
+                            updateAt(idx, { key: column.id });
+                          }
                         }
                       }}
                     />
@@ -182,7 +192,12 @@ export function BubbleSeriesFieldset({
                       }
                       onChange={(next) => {
                         if (next !== null) {
-                          updateAt(idx, { sizeKey: next });
+                          const column = fields.find((field) => {
+                            return field.id === next;
+                          });
+                          if (column) {
+                            updateAt(idx, { sizeKey: column.id });
+                          }
                         }
                       }}
                     />

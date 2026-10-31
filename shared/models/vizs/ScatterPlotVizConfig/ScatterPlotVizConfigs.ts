@@ -4,7 +4,7 @@ import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatte
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { makeGridDescriptors } from "$/models/vizs/makeGridDescriptors/makeGridDescriptors.ts";
 import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
@@ -74,7 +74,7 @@ export const ScatterPlotVizConfigs = {
    */
   hydrateFromQueryResult: (
     vizConfig: ScatterPlotVizConfig,
-    columns: readonly QueryResultColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): ScatterPlotVizConfig => {
     return hydrateScatterSeriesFromQueryResult(vizConfig, columns);
   },

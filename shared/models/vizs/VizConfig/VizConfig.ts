@@ -1,3 +1,4 @@
+import type { NameBoundVizConfig } from "$/models/vizs/VizConfig/NameBoundVizConfig.types.ts";
 /* eslint-disable @typescript-eslint/no-namespace */
 import type {
   VizConfig as VizConfigRead,
@@ -9,6 +10,7 @@ import type {
 
 /** Types shared by all supported visualization configurations. */
 export namespace VizConfig {
+  export type NameBound = NameBoundVizConfig;
   export type T = VizConfigRead;
   export type Type = VizType;
   export type Registry = VizConfigRegistry;

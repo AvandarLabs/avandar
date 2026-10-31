@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { countFilterRules } from "$/models/queries/StructuredQuery/countFilterRules/countFilterRules.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 describe("countFilterRules", () => {
   it("counts complete rules as applied", () => {
@@ -10,7 +11,7 @@ describe("countFilterRules", () => {
         rules: [
           {
             type: "rule",
-            columnName: "Admin2",
+            columnId: "Admin2" as QueryColumn.Id,
             columnDataType: "varchar",
             operator: "=",
             value: "a",
@@ -28,7 +29,7 @@ describe("countFilterRules", () => {
         rules: [
           {
             type: "rule",
-            columnName: "Admin2",
+            columnId: "Admin2" as QueryColumn.Id,
             columnDataType: "varchar",
             operator: "=",
             value: "",
@@ -46,7 +47,7 @@ describe("countFilterRules", () => {
         rules: [
           {
             type: "rule",
-            columnName: "cases",
+            columnId: "cases" as QueryColumn.Id,
             columnDataType: "bigint",
             operator: ">",
             value: "abc",
@@ -68,14 +69,14 @@ describe("countFilterRules", () => {
             rules: [
               {
                 type: "rule",
-                columnName: "Admin2",
+                columnId: "Admin2" as QueryColumn.Id,
                 columnDataType: "varchar",
                 operator: "=",
                 value: "a",
               },
               {
                 type: "rule",
-                columnName: "Admin2",
+                columnId: "Admin2" as QueryColumn.Id,
                 columnDataType: "varchar",
                 operator: "=",
                 value: "",

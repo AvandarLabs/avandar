@@ -8,6 +8,7 @@ import { useGisAppChrome } from "@/views/GisApp/useGisApp/useGisAppChrome";
 import { useGisAppLayerSelection } from "@/views/GisApp/useGisApp/useGisAppLayerSelection";
 import { useGisAppMapCallbacks } from "@/views/GisApp/useGisApp/useGisAppMapCallbacks";
 import { useGisAppRendering } from "@/views/GisApp/useGisApp/useGisAppRendering";
+import { useHydratedMapSources } from "./MapSourceHydration/useHydratedMapSources/useHydratedMapSources";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -15,6 +16,37 @@ import type { LayerInspectorView } from "@/views/GisApp/panels/LayerInspector/La
 import type { AnnotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { Dispatch, SetStateAction } from "react";
+
+type UseGisAppCanvasOptions = {
+  callbacks: ReturnType<typeof useGisAppMapCallbacks>;
+  chrome: ReturnType<typeof useGisAppChrome>;
+  editor: ReturnType<typeof useAvaMapEditor>;
+  rendering: ReturnType<typeof useGisAppRendering>;
+  mapToolMode: MapToolMode;
+  onMapToolModeChange: (mode: MapToolMode) => void;
+  onEditingTextFeatureIdChange: (
+    featureId: AvaMapConfig.AnnotationFeatureId | undefined,
+  ) => void;
+};
+
+type UseSelectCreatedAnnotationOptions = {
+  lastCreatedAnnotationId: AvaMapConfig.AnnotationFeatureId | undefined;
+  expandPanel: (panel: "inspector") => void;
+  setSelectedAnnotationFeatureId: Dispatch<
+    SetStateAction<AvaMapConfig.AnnotationFeatureId | undefined>
+  >;
+  setIsAnnotationRowSelected: Dispatch<SetStateAction<boolean>>;
+  setSelectedLayerId: Dispatch<SetStateAction<MapLayer.Id | undefined>>;
+};
+
+type GisAppStateExtras = {
+  annotationTextOverlayTarget: AnnotationTextOverlayTarget;
+  avaMap: AvaMap.T;
+  editingTextFeatureId: AvaMapConfig.AnnotationFeatureId | undefined;
+  setEditingTextFeatureId: Dispatch<
+    SetStateAction<AvaMapConfig.AnnotationFeatureId | undefined>
+  >;
+};
 
 /** Opens the inspector and increments its Filter focus request. */
 function useGisAppInspectorFocus(expandPanel: (panel: "inspector") => void): {
@@ -70,17 +102,7 @@ function useGisAppToolMode(): {
 
 /** Connects the rendered map specification to the map canvas hook. */
 function useGisAppCanvas(
-  options: Readonly<{
-    callbacks: ReturnType<typeof useGisAppMapCallbacks>;
-    chrome: ReturnType<typeof useGisAppChrome>;
-    editor: ReturnType<typeof useAvaMapEditor>;
-    rendering: ReturnType<typeof useGisAppRendering>;
-    mapToolMode: MapToolMode;
-    onMapToolModeChange: (mode: MapToolMode) => void;
-    onEditingTextFeatureIdChange: (
-      featureId: AvaMapConfig.AnnotationFeatureId | undefined,
-    ) => void;
-  }>,
+  options: Readonly<UseGisAppCanvasOptions>,
 ): ReturnType<typeof useMapCanvas> {
   return useMapCanvas({
     basemap: options.editor.mapConfig.basemap,
@@ -120,15 +142,9 @@ function useGisAppHotkeys(
 }
 
 /** Selects a newly drawn annotation so the compact inspector can open. */
-function useSelectCreatedAnnotation(options: {
-  lastCreatedAnnotationId: AvaMapConfig.AnnotationFeatureId | undefined;
-  expandPanel: (panel: "inspector") => void;
-  setSelectedAnnotationFeatureId: Dispatch<
-    SetStateAction<AvaMapConfig.AnnotationFeatureId | undefined>
-  >;
-  setIsAnnotationRowSelected: Dispatch<SetStateAction<boolean>>;
-  setSelectedLayerId: Dispatch<SetStateAction<MapLayer.Id | undefined>>;
-}): void {
+function useSelectCreatedAnnotation(
+  options: UseSelectCreatedAnnotationOptions,
+): void {
   const {
     lastCreatedAnnotationId,
     expandPanel,
@@ -157,9 +173,9 @@ function useSelectCreatedAnnotation(options: {
 }
 
 /** Collects the map state, data rendering, and interaction callbacks. */
-export function useGisAppState(avaMap: AvaMap.T): ReturnType<
-  typeof useGisAppMapCallbacks
-> &
+export function useGisAppState(
+  avaMap: AvaMap.T,
+): ReturnType<typeof useGisAppMapCallbacks> &
   ReturnType<typeof useGisAppCanvas> &
   ReturnType<typeof useGisAppChrome> &
   ReturnType<typeof useAvaMapEditor> &
@@ -168,15 +184,13 @@ export function useGisAppState(avaMap: AvaMap.T): ReturnType<
   ReturnType<typeof useGisAppInspectorNavigation> &
   ReturnType<typeof useGisAppRendering> &
   ReturnType<typeof useGisAppLayerSelection> &
-  ReturnType<typeof useGisAppToolMode> & {
-    annotationTextOverlayTarget: AnnotationTextOverlayTarget;
-    avaMap: AvaMap.T;
-    editingTextFeatureId: AvaMapConfig.AnnotationFeatureId | undefined;
-    setEditingTextFeatureId: Dispatch<
-      SetStateAction<AvaMapConfig.AnnotationFeatureId | undefined>
-    >;
-  } {
-  const editor = useAvaMapEditor(avaMap);
+  ReturnType<typeof useGisAppToolMode> &
+  GisAppStateExtras {
+  const draftEditor = useAvaMapEditor(avaMap);
+  const editor = useHydratedMapSources({
+    editor: draftEditor,
+    workspaceId: avaMap.workspaceId,
+  });
   const selection = useGisAppLayerSelection(editor.mapConfig);
   const featureInspector = useFeatureInspector();
   const chrome = useGisAppChrome();

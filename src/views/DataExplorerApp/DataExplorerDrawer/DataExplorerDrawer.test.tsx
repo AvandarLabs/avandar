@@ -15,6 +15,7 @@ import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen } from "@/test-utils";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownDataFrame } from "@avandar/utils";
 
@@ -39,9 +40,13 @@ vi.mock("@/views/DataExplorerApp/SqlQueryView/SqlQueryView", () => {
   };
 });
 
-const COLUMNS: readonly QueryResult.Column[] = [
-  { name: "county", dataType: "varchar" },
-  { name: "population", dataType: "bigint" },
+const COLUMNS: readonly QueryResult.ColumnWithId[] = [
+  { id: "county" as QueryColumn.Id, name: "county", dataType: "varchar" },
+  {
+    id: "population" as QueryColumn.Id,
+    name: "population",
+    dataType: "bigint",
+  },
 ];
 
 const DATA: UnknownDataFrame = [
@@ -50,7 +55,7 @@ const DATA: UnknownDataFrame = [
 ];
 
 function _renderDrawer(
-  options: { columns?: readonly QueryResult.Column[] } = {},
+  options: { columns?: readonly QueryResult.ColumnWithId[] } = {},
 ): void {
   const { columns = COLUMNS } = options;
   render(

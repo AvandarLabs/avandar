@@ -5,15 +5,24 @@ import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizC
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { SeriesAwareVizForm } from "./SeriesAwareVizForm";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 
 i18n.load("en", {});
 i18n.activate("en");
 
-const fields: readonly QueryResultColumn[] = [
-  { name: "region", dataType: "varchar" } as QueryResultColumn,
-  { name: "count", dataType: "double" } as QueryResultColumn,
+const fields: readonly QueryResult.ColumnWithId[] = [
+  {
+    id: "region" as QueryColumn.Id,
+    name: "region",
+    dataType: "varchar",
+  } as QueryResult.ColumnWithId,
+  {
+    id: "count" as QueryColumn.Id,
+    name: "count",
+    dataType: "double",
+  } as QueryResult.ColumnWithId,
 ];
 
 function renderForm(config: BarChartVizConfig): HTMLElement {
@@ -35,8 +44,8 @@ describe("SeriesAwareVizForm layout", () => {
   it("renders Series before X axis in document order", () => {
     const container = renderForm({
       ...BarChartVizConfigs.makeEmptyConfig(),
-      xAxisKey: "region",
-      series: [{ renderAs: "bar", key: "count" }],
+      xAxisKey: "region" as QueryColumn.Id,
+      series: [{ renderAs: "bar", key: "count" as QueryColumn.Id }],
     });
     const legends = Array.from(container.querySelectorAll("legend")).map(
       (l) => {
@@ -53,8 +62,8 @@ describe("SeriesAwareVizForm layout", () => {
   it("wraps each settings group in a Mantine Fieldset", () => {
     const container = renderForm({
       ...BarChartVizConfigs.makeEmptyConfig(),
-      xAxisKey: "region",
-      series: [{ renderAs: "bar", key: "count" }],
+      xAxisKey: "region" as QueryColumn.Id,
+      series: [{ renderAs: "bar", key: "count" as QueryColumn.Id }],
     });
     const legends = Array.from(container.querySelectorAll("legend")).map(
       (l) => {
@@ -67,7 +76,7 @@ describe("SeriesAwareVizForm layout", () => {
   it("still shows the Add series button in the Series fieldset", () => {
     renderForm({
       ...BarChartVizConfigs.makeEmptyConfig(),
-      xAxisKey: "region",
+      xAxisKey: "region" as QueryColumn.Id,
       series: [],
     });
     expect(

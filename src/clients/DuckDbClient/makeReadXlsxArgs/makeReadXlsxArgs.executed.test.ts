@@ -4,7 +4,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import * as XLSX from "xlsx";
 import { makeReadXlsxArgs } from "@/clients/DuckDbClient/makeReadXlsxArgs/makeReadXlsxArgs";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
 
 /**
  * The transcode's `read_xlsx` arguments against a real DuckDB, because the bug

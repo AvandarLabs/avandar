@@ -3,6 +3,7 @@ import { useQuery } from "@avandar/query-hooks";
 import { prop, sortObjList } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { createQueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import { RAW_SQL_KEY_MARKER } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";
 import { useDataQueryAnalytics } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics";
@@ -13,6 +14,7 @@ import type {
 } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import type {
   RunStructuredQueryResult,
   StructuredQueryAuth,
@@ -21,6 +23,7 @@ import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryA
 import type { UseQueryResultTuple } from "@avandar/query-hooks";
 
 type UseDataQueryOptions = {
+  enabled?: boolean;
   query: StructuredQuery.Partial;
   rawSql: string | undefined;
   /**
@@ -180,7 +183,12 @@ function _buildQuerySourceMeta(
  */
 export function useDataQuery(
   options: Readonly<UseDataQueryOptions>,
-): UseQueryResultTuple<QueryResult.T<UnknownRow>> {
+): UseQueryResultTuple<
+  QueryResult.T<UnknownRow> & {
+    executedSql: string | undefined;
+    metadataProvenance?: QueryMetadataProvenance;
+  }
+> {
   const {
     query,
     rawSql,
@@ -201,7 +209,7 @@ export function useDataQuery(
   });
 
   const queryResult = useQuery({
-    enabled: !!dataSource || !!rawSql,
+    enabled: options.enabled !== false && (!!dataSource || !!rawSql),
     // `isWorkspaceRawSqlDataQueryKey` reads the first four positions.
     queryKey: [
       queryAuth,
@@ -215,7 +223,12 @@ export function useDataQuery(
       "structuredInSync",
       isStructuredQueryInSync,
     ],
-    queryFn: async (): Promise<QueryResult.T<UnknownRow>> => {
+    queryFn: async (): Promise<
+      QueryResult.T<UnknownRow> & {
+        executedSql: string | undefined;
+        metadataProvenance?: QueryMetadataProvenance;
+      }
+    > => {
       const recordRun = beginRun();
       try {
         const run = await _runDataQuery({
@@ -230,7 +243,11 @@ export function useDataQuery(
           rowCount: run.result.numRows,
           columnCount: run.result.columns.length,
         });
-        return run.result;
+        return {
+          ...run.result,
+          executedSql: run.executedSql,
+          metadataProvenance: createQueryMetadataProvenance(),
+        };
       } catch (error) {
         // Not just a rethrow: the emitter reads an absent record as "no run
         // happened", so an unrecorded failure is never reported. Connectivity

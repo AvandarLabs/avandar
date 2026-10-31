@@ -1,35 +1,22 @@
-import {
-  pickCategoryColumnName,
-  pickFirstNumericColumnName,
-} from "$/models/vizs/hydrateColumnPicking.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import { VizHydrationColumns } from "$/models/vizs/VizHydrationColumns.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
 type XYAxesConfig = {
-  xAxisKey: string | undefined;
-  yAxisKey: string | undefined;
+  xAxisKey: QueryColumn.Id | undefined;
+  yAxisKey: QueryColumn.Id | undefined;
 };
 
-/**
- * Which XY chart is being configured — affects default X column priority.
- * Scatter is excluded: it uses per-series `xKey` via
- * `hydrateScatterSeriesFromQueryResult`.
- */
+/** XY chart families that use shared axis defaults. */
 export type XYVizChartKind = "bar" | "line";
 
 /**
- * Hydrate X/Y axis keys from query result column metadata when keys are
- * undefined. Does not overwrite keys that are already set. X is inferred only
- * after Y is set (a numeric Y is required before choosing X).
- *
- * @param currVizConfig Current viz config (bar, line, or scatter).
- * @param columns Result columns with names and `AvaDataType`.
- * @param chartKind Bar/line prefer temporal or text on X; scatter prefers a
- * second numeric for X when available.
- * @returns Updated config with any newly inferred axis keys.
+ * Seeds unconfigured slots from column IDs and preserves existing selections
+ * and styles, including identities absent from the current result.
  */
 export function hydrateXYFromQueryResult<VConfig extends XYAxesConfig>(
   currVizConfig: VConfig,
-  columns: readonly QueryResultColumn[],
+  columns: readonly QueryResult.ColumnWithId[],
   _chartKind: XYVizChartKind,
 ): VConfig {
   if (columns.length === 0) {
@@ -39,18 +26,21 @@ export function hydrateXYFromQueryResult<VConfig extends XYAxesConfig>(
   let next: VConfig = { ...currVizConfig };
 
   if (next.yAxisKey === undefined) {
-    const yName = pickFirstNumericColumnName(columns);
-    if (yName !== undefined) {
-      next = { ...next, yAxisKey: yName };
+    const yColumnId = VizHydrationColumns.getFirstNumericColumnId(columns);
+    if (yColumnId !== undefined) {
+      next = { ...next, yAxisKey: yColumnId };
     }
   }
 
   const yKey = next.yAxisKey;
 
   if (next.xAxisKey === undefined && yKey !== undefined) {
-    const xName = pickCategoryColumnName(columns, new Set([yKey]));
-    if (xName !== undefined) {
-      next = { ...next, xAxisKey: xName };
+    const xColumnId = VizHydrationColumns.getCategoryColumnId({
+      columns,
+      excludedIds: new Set([yKey]),
+    });
+    if (xColumnId !== undefined) {
+      next = { ...next, xAxisKey: xColumnId };
     }
   }
 

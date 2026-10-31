@@ -5,7 +5,7 @@ import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisD
 import { makeGridDescriptors } from "$/models/vizs/makeGridDescriptors/makeGridDescriptors.ts";
 import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
@@ -122,7 +122,7 @@ export const LineChartVizConfigs = {
 
   hydrateFromQueryResult: (
     vizConfig: LineChartVizConfig,
-    columns: readonly QueryResultColumn[],
+    columns: readonly QueryResult.ColumnWithId[],
   ): LineChartVizConfig => {
     return hydrateXYSeriesFromQueryResult(vizConfig, columns, "line");
   },

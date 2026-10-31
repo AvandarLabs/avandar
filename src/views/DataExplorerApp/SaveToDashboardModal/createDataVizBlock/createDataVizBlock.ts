@@ -1,5 +1,6 @@
 import { uuid } from "$/lib/uuid";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type {
   VizConfig,
   VizType,
@@ -8,6 +9,31 @@ import type {
   GlobalFilterSubscription,
   LocalFilter,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
+
+type DataVizDashboardBlockProps = {
+  id: string;
+  columnBindingVersion: 1;
+  columnBindings: QueryResultColumnBindingRegistry;
+  globalFilterTargets: DashboardFilterTargets;
+  nlQuery: {
+    prompt: string;
+    rawSql: string;
+    generations: ReadonlyArray<{ prompt: string; rawSql: string }>;
+  };
+  vizType: VizType;
+  vizConfig: VizConfig;
+  globalFilterSubscription: GlobalFilterSubscription;
+  localFilters: readonly LocalFilter[];
+};
+
+type CreateDataVizBlockOptions = {
+  columnBindings: QueryResultColumnBindingRegistry;
+  rawSql: string;
+  prompt: string | undefined;
+  vizType: VizType;
+  vizConfig: VizConfig;
+};
 
 /**
  * Fallback prompt used when the Data Explorer's `state.nlPrompt` is empty
@@ -30,18 +56,7 @@ export const DATA_EXPLORER_FALLBACK_PROMPT = "Saved from Data Explorer";
  */
 export type DataVizDashboardBlock = {
   type: "DataViz";
-  props: {
-    id: string;
-    nlQuery: {
-      prompt: string;
-      rawSql: string;
-      generations: ReadonlyArray<{ prompt: string; rawSql: string }>;
-    };
-    vizType: VizType;
-    vizConfig: VizConfig;
-    globalFilterSubscription: GlobalFilterSubscription;
-    localFilters: readonly LocalFilter[];
-  };
+  props: DataVizDashboardBlockProps;
 };
 
 /**
@@ -53,19 +68,20 @@ export type DataVizDashboardBlock = {
  * into `generations` as the initial generation so the block behaves like one
  * created from the dashboard editor's NL query field.
  */
-export function createDataVizBlock(args: {
-  rawSql: string;
-  prompt: string | undefined;
-  vizType: VizType;
-  vizConfig: VizConfig;
-}): DataVizDashboardBlock {
+export function createDataVizBlock(
+  args: CreateDataVizBlockOptions,
+): DataVizDashboardBlock {
   const trimmedPrompt = args.prompt?.trim() ?? "";
   const normalizedPrompt =
     trimmedPrompt.length > 0 ? trimmedPrompt : DATA_EXPLORER_FALLBACK_PROMPT;
+  const id = uuid();
   return {
     type: "DataViz",
     props: {
-      id: uuid(),
+      id,
+      columnBindingVersion: 1,
+      columnBindings: { ...args.columnBindings, scopeKey: id },
+      globalFilterTargets: {},
       nlQuery: {
         prompt: normalizedPrompt,
         rawSql: args.rawSql,

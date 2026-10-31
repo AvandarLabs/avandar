@@ -1,6 +1,7 @@
 import { objectEntries } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type {
   VizConfig,
@@ -33,11 +34,11 @@ const FIXTURES: { [K in VizType]: VizConfigType<K> } = {
 
   bar: {
     vizType: "bar",
-    xAxisKey: "quarter",
+    xAxisKey: "quarter" as QueryColumn.Id,
     series: [
       {
         renderAs: "bar",
-        key: "revenue",
+        key: "revenue" as QueryColumn.Id,
         label: "Revenue",
         color: "#ff0000",
         fillOpacity: 0.5,
@@ -51,11 +52,11 @@ const FIXTURES: { [K in VizType]: VizConfigType<K> } = {
 
   line: {
     vizType: "line",
-    xAxisKey: "quarter",
+    xAxisKey: "quarter" as QueryColumn.Id,
     series: [
       {
         renderAs: "line",
-        key: "revenue",
+        key: "revenue" as QueryColumn.Id,
         label: "Revenue",
         color: "#ff0000",
         curveType: "step",
@@ -69,11 +70,11 @@ const FIXTURES: { [K in VizType]: VizConfigType<K> } = {
 
   area: {
     vizType: "area",
-    xAxisKey: "quarter",
+    xAxisKey: "quarter" as QueryColumn.Id,
     series: [
       {
         renderAs: "area",
-        key: "revenue",
+        key: "revenue" as QueryColumn.Id,
         label: "Revenue",
         color: "#ff0000",
         curveType: "step",
@@ -90,7 +91,12 @@ const FIXTURES: { [K in VizType]: VizConfigType<K> } = {
   scatter: {
     vizType: "scatter",
     series: [
-      { xKey: "cost", key: "revenue", label: "Revenue", color: "#ff0000" },
+      {
+        xKey: "cost" as QueryColumn.Id,
+        key: "revenue" as QueryColumn.Id,
+        label: "Revenue",
+        color: "#ff0000",
+      },
     ],
     chartStyle: CHART_STYLE,
   },
@@ -99,9 +105,9 @@ const FIXTURES: { [K in VizType]: VizConfigType<K> } = {
     vizType: "bubble",
     series: [
       {
-        xKey: "cost",
-        key: "revenue",
-        sizeKey: "volume",
+        xKey: "cost" as QueryColumn.Id,
+        key: "revenue" as QueryColumn.Id,
+        sizeKey: "volume" as QueryColumn.Id,
         label: "Revenue",
         color: "#ff0000",
       },
@@ -111,10 +117,10 @@ const FIXTURES: { [K in VizType]: VizConfigType<K> } = {
 
   radar: {
     vizType: "radar",
-    nameKey: "quarter",
+    nameKey: "quarter" as QueryColumn.Id,
     series: [
       {
-        key: "revenue",
+        key: "revenue" as QueryColumn.Id,
         label: "Revenue",
         color: "#ff0000",
         strokeWidth: 3,
@@ -127,8 +133,8 @@ const FIXTURES: { [K in VizType]: VizConfigType<K> } = {
 
   pie: {
     vizType: "pie",
-    nameKey: "quarter",
-    valueKey: "revenue",
+    nameKey: "quarter" as QueryColumn.Id,
+    valueKey: "revenue" as QueryColumn.Id,
     isDonut: true,
     withLabels: false,
     labelsType: "percent",
@@ -137,8 +143,8 @@ const FIXTURES: { [K in VizType]: VizConfigType<K> } = {
 
   funnel: {
     vizType: "funnel",
-    nameKey: "quarter",
-    valueKey: "revenue",
+    nameKey: "quarter" as QueryColumn.Id,
+    valueKey: "revenue" as QueryColumn.Id,
     seriesColors: SERIES_COLORS,
   },
 };

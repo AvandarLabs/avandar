@@ -9,24 +9,33 @@ import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm";
 import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
 import { fireEvent, render, screen } from "@/test-utils";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types";
 
-const COLUMNS: readonly QueryResult.Column[] = [
-  { name: "spend", dataType: "double" },
-  { name: "revenue", dataType: "double" },
-  { name: "weight", dataType: "double" },
+const COLUMNS: readonly QueryResult.ColumnWithId[] = [
+  { id: "spend" as QueryColumn.Id, name: "spend", dataType: "double" },
+  { id: "revenue" as QueryColumn.Id, name: "revenue", dataType: "double" },
+  { id: "weight" as QueryColumn.Id, name: "weight", dataType: "double" },
 ];
 
 const SCATTER_CONFIG: ScatterPlotVizConfig = {
   vizType: "scatter",
-  series: [{ key: "revenue", xKey: "spend" }],
+  series: [
+    { key: "revenue" as QueryColumn.Id, xKey: "spend" as QueryColumn.Id },
+  ],
 };
 
 const BUBBLE_CONFIG: BubbleChartVizConfig = {
   vizType: "bubble",
-  series: [{ key: "revenue", xKey: "spend", sizeKey: "weight" }],
+  series: [
+    {
+      key: "revenue" as QueryColumn.Id,
+      xKey: "spend" as QueryColumn.Id,
+      sizeKey: "weight" as QueryColumn.Id,
+    },
+  ],
 };
 
 describe("ScatterChartForm: axis settings", () => {

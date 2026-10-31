@@ -1,11 +1,11 @@
 import { Model } from "@avandar/models";
 import { useEffect, useRef } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { fetchDatasetRowCount } from "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery";
 import {
   largeDatasetAutoLimitFromRowCount,
   shouldAutoLimitLargeDataset,
 } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
-import { fetchDatasetRowCount } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 type Options = {

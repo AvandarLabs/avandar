@@ -1,3 +1,7 @@
+import { isString } from "@avandar/utils";
+import { describe, expect, it } from "vitest";
+import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
+import { makeGeometryExpressionFromValueExpression } from "../makeGeometryExpressionFromValueExpression";
 /**
  * Row-level tests for {@link makeGeometryExpressionFromValueExpression}. Each
  * case runs the emitted expression against a real in-memory DuckDB with the
@@ -17,10 +21,6 @@
  * The fixture values mirror `tests/data/gis/geometry-formats.csv` so the two
  * lanes describe the same data, including its deliberately unparseable row.
  */
-import { isString } from "@avandar/utils";
-import { describe, expect, it } from "vitest";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
-import { makeGeometryExpressionFromValueExpression } from "../makeGeometryExpressionFromValueExpression";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 const _POINT_WKB_HEX = "0101000000000000000000E03F000000000000E03F";

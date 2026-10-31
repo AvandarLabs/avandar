@@ -1,17 +1,19 @@
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+
 export type PieChartVizConfig = {
   vizType: "pie";
 
   /**
    * The column whose values label each slice (name / category).
-   * This is a column name, not an ID.
+   * This is a stable result-column ID.
    */
-  nameKey: string | undefined;
+  nameKey: QueryColumn.Id | undefined;
 
   /**
    * The numeric column whose values determine slice size.
-   * This is a column name, not an ID.
+   * This is a stable result-column ID.
    */
-  valueKey: string | undefined;
+  valueKey: QueryColumn.Id | undefined;
 
   /** Render the chart as a donut instead of a filled pie. */
   isDonut: boolean;

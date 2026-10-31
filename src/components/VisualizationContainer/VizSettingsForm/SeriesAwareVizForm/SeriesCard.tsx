@@ -1,4 +1,4 @@
-import { makeBucketMap, setValue } from "@avandar/utils";
+import { makeBucketMap, propEq, setValue } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -17,7 +17,8 @@ import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   RadarSeries,
   RenderAs,
@@ -44,8 +45,8 @@ function useRenderAsOptions(): ReadonlyArray<{
 }
 
 type SeriesCardProps = {
-  fields: readonly QueryResultColumn[];
-  numericFields: readonly QueryResultColumn[];
+  fields: readonly QueryResult.ColumnWithId[];
+  numericFields: readonly QueryResult.ColumnWithId[];
   series: XYSeries | RadarSeries;
   hostVizType: HostConfig["vizType"];
   isRadarHost: boolean;
@@ -92,7 +93,7 @@ export function SeriesCard({
 
   const numericOptions = useMemo(() => {
     return numericFields.map((c) => {
-      return { value: c.name, label: c.name };
+      return { value: c.id, label: c.name };
     });
   }, [numericFields]);
 
@@ -113,9 +114,15 @@ export function SeriesCard({
       if (nextKey === null) {
         return;
       }
-      onSeriesChange({ ...series, key: nextKey });
+      // `Control` reports a plain string. The lookup confirms it is a real ID.
+      const column = numericFields.find(
+        propEq("id", nextKey as QueryColumn.Id),
+      );
+      if (column) {
+        onSeriesChange({ ...series, key: column.id });
+      }
     },
-    [series, onSeriesChange],
+    [series, onSeriesChange, numericFields],
   );
 
   const setRenderAs = useCallback(

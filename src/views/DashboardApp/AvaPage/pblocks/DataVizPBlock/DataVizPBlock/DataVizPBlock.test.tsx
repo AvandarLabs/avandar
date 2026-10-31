@@ -1,13 +1,19 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { render, screen } from "@/test-utils";
-import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
-import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-import type { PuckContext } from "@puckeditor/core";
-import type { ReactElement } from "react";
+import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
+import { screen } from "@/test-utils";
+import { upgradeAvaPageData } from "../../../utils/upgradeAvaPageData";
+import { useDataVizPBlockConfig } from "../useDataVizPBlockConfig";
+import { createDataVizTestWrapper } from "./createDataVizTestWrapper";
+import { DataVizPBlockTestFixtures } from "./DataVizPBlockTestFixtures";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { Props } from "./DataVizPBlock";
 
-const { useDataQueryMock } = vi.hoisted(() => {
+const { useDataQueryMock } = vi.hoisted<{
+  useDataQueryMock: ReturnType<typeof vi.fn>;
+}>(() => {
   return {
     useDataQueryMock: vi.fn(() => {
       return [
@@ -38,6 +44,31 @@ vi.mock("@/views/DataExplorerApp/useDataQuery/useDataQuery", () => {
   return { useDataQuery: useDataQueryMock };
 });
 
+vi.mock(
+  "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizColumnBindings/useDataVizColumnBindings",
+  () => {
+    return {
+      useDataVizColumnBindings: () => {
+        return {
+          status: "ready",
+          schema: reconcileQueryResultColumnBindings({
+            scopeKey: "chart",
+            sqlKey: "SELECT * FROM foo",
+            columns: [
+              { name: "category", dataType: "varchar" },
+              { name: "value", dataType: "double" },
+              { name: "score", dataType: "double" },
+            ],
+            projections: [],
+            previous: undefined,
+          }),
+          error: undefined,
+        };
+      },
+    };
+  },
+);
+
 vi.mock("@/components/VisualizationContainer/VisualizationContainer", () => {
   return {
     VisualizationContainer: (props: {
@@ -59,56 +90,8 @@ vi.mock("@/components/VisualizationContainer/VisualizationContainer", () => {
   };
 });
 
-const TEST_DASHBOARD_ID = "00000000-0000-4000-8000-000000000001";
-const TEST_WORKSPACE_ID = "00000000-0000-4000-8000-000000000002";
-
-function fakePuckContext(): PuckContext {
-  return {
-    renderDropZone: () => {
-      return null;
-    },
-    metadata: {
-      auth: "workspace",
-      workspaceId: TEST_WORKSPACE_ID,
-      dashboardId: TEST_DASHBOARD_ID,
-    },
-    isEditing: true,
-    dragRef: null,
-  };
-}
-
-function renderBlock(props: {
-  prompt: string;
-  rawSql: string;
-  vizType: string;
-  vizConfig: Parameters<typeof DataVizPBlock>[0]["vizConfig"];
-}): ReactElement {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <AvandarAppProvider>
-        <DashboardFilterStateManager.Provider>
-          <DataVizPBlock
-            puck={fakePuckContext()}
-            nlQuery={{
-              prompt: props.prompt,
-              rawSql: props.rawSql,
-              generations: [],
-            }}
-            vizType={
-              props.vizType as Parameters<typeof DataVizPBlock>[0]["vizType"]
-            }
-            vizConfig={props.vizConfig}
-            globalFilterSubscription={{ mode: "all", subscribedFilterIds: [] }}
-            localFilters={[]}
-          />
-        </DashboardFilterStateManager.Provider>
-      </AvandarAppProvider>
-    </QueryClientProvider>,
-  ) as unknown as ReactElement;
-}
+const { TEST_DASHBOARD_ID, TEST_WORKSPACE_ID, renderBlock } =
+  DataVizPBlockTestFixtures;
 
 describe("DataVizPBlock", () => {
   it("runs its query under the dashboard_block analytics surface", () => {
@@ -300,5 +283,104 @@ describe("DataVizPBlock", () => {
       "data-viz-type",
       "bubble",
     );
+  });
+});
+
+it("converts the migrated top-level type picker and restores unresolved legacy styles on return", async () => {
+  const original = {
+    id: "chart",
+    vizType: "line",
+    nlQuery: { prompt: "Sales", rawSql: "SELECT * FROM foo", generations: [] },
+    vizConfig: {
+      vizType: "line",
+      xAxisKey: "category",
+      withLegend: true,
+      series: [
+        {
+          renderAs: "line",
+          key: "value",
+          label: "Revenue",
+          color: "#123456",
+          strokeWidth: 4,
+        },
+        {
+          renderAs: "line",
+          key: "missing",
+          label: "Missing",
+          color: "#654321",
+          strokeWidth: 3,
+        },
+      ],
+    },
+    localFilters: [],
+    globalFilterSubscription: { mode: "all", subscribedFilterIds: [] },
+  };
+  const upgraded = upgradeAvaPageData({
+    root: { props: { schemaVersion: 4, title: "Legacy chart" } },
+    content: [{ type: "DataViz", props: original }],
+  });
+  const props = upgraded.content[0]!.props as Props & { id: string };
+  const client = new QueryClient();
+  const { result } = renderHook(
+    () => {
+      return useDataVizPBlockConfig({
+        dashboardTitle: "Saved",
+        workspaceId: TEST_WORKSPACE_ID as Workspace.Id,
+        dashboardId: TEST_DASHBOARD_ID as Dashboard.Id,
+      });
+    },
+    {
+      wrapper: createDataVizTestWrapper(client),
+    },
+  );
+  const resolveData = result.current.resolveData!;
+  const load = await resolveData(
+    { type: "DataViz", props } as Parameters<typeof resolveData>[0],
+    { changed: { vizType: true }, trigger: "load" } as Parameters<
+      typeof resolveData
+    >[1],
+  );
+  expect(load.props).toEqual(props);
+  const switched = await resolveData(
+    { type: "DataViz", props: { ...props, vizType: "bar" } } as Parameters<
+      typeof resolveData
+    >[0],
+    { changed: { vizType: true }, trigger: "replace" } as Parameters<
+      typeof resolveData
+    >[1],
+  );
+  expect(switched.props).toMatchObject({
+    columnBindingVersion: 0,
+    vizType: "bar",
+    vizConfig: {
+      vizType: "bar",
+      series: [
+        { key: "value", label: "Revenue", color: "#123456" },
+        { key: "missing", label: "Missing", color: "#654321" },
+      ],
+    },
+  });
+  const barProps = switched.props as Props & { id: string };
+  renderBlock({
+    prompt: barProps.nlQuery.prompt,
+    rawSql: barProps.nlQuery.rawSql,
+    vizType: barProps.vizType,
+    vizConfig: barProps.vizConfig,
+  });
+  expect(screen.getByTestId("visualization-container")).toHaveAttribute(
+    "data-viz-type",
+    "bar",
+  );
+  const restored = await resolveData(
+    { type: "DataViz", props: { ...barProps, vizType: "line" } } as Parameters<
+      typeof resolveData
+    >[0],
+    { changed: { vizType: true }, trigger: "replace" } as Parameters<
+      typeof resolveData
+    >[1],
+  );
+  expect(restored.props).toMatchObject({
+    columnBindingVersion: 0,
+    vizConfig: original.vizConfig,
   });
 });

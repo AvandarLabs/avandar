@@ -7,6 +7,7 @@ import {
   getOptionNameFromUnknown,
 } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControlHelpers";
 import classes from "./FilterOperatorSelector.module.css";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ReactNode } from "react";
 import type { OperatorSelectorProps } from "react-querybuilder";
 
@@ -21,7 +22,8 @@ export function FilterOperatorSelector({
   context,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const dataType = getFilterControlsContext(context).columnTypes[field];
+  const dataType =
+    getFilterControlsContext(context).columnTypes[field as QueryColumn.Id];
   return (
     <Select
       size="sm"

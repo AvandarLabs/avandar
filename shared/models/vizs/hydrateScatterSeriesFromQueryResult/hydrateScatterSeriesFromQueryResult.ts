@@ -1,6 +1,5 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import { columnNameSet } from "$/models/vizs/hydrateColumnPicking.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type ScatterSeriesConfig = {
@@ -8,37 +7,29 @@ type ScatterSeriesConfig = {
 };
 
 /**
- * Reconcile a scatter config against current query columns. Prunes
- * series whose `xKey` or `key` reference columns that no longer exist,
- * then seeds the first series from the first two numeric columns when
- * the series array is empty.
- *
- * Goal: never silently reference a missing column when SQL changes.
- *
- * @param currVizConfig Current scatter viz config.
- * @param columns Result columns with names and `AvaDataType`.
- * @returns Updated config with stale series pruned and defaults seeded.
+ * Seeds unconfigured slots from column IDs and preserves existing selections
+ * and styles, including identities absent from the current result.
  */
 export function hydrateScatterSeriesFromQueryResult<
   VConfig extends ScatterSeriesConfig,
->(currVizConfig: VConfig, columns: readonly QueryResultColumn[]): VConfig {
+>(
+  currVizConfig: VConfig,
+  columns: readonly QueryResult.ColumnWithId[],
+): VConfig {
   if (columns.length === 0) {
     return currVizConfig;
   }
-  const colNames = columnNameSet(columns);
 
-  let nextSeries: ScatterSeries[] = currVizConfig.series.filter((s) => {
-    return colNames.has(s.xKey) && colNames.has(s.key);
-  });
+  let nextSeries: ScatterSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0) {
     const numerics = columns.filter((c) => {
       return AvaDataType.isNumeric(c.dataType);
     });
     if (numerics.length >= 2) {
-      nextSeries = [{ xKey: numerics[0]!.name, key: numerics[1]!.name }];
+      nextSeries = [{ xKey: numerics[0]!.id, key: numerics[1]!.id }];
     } else if (numerics.length === 1) {
-      const only = numerics[0]!.name;
+      const only = numerics[0]!.id;
       nextSeries = [{ xKey: only, key: only }];
     }
   }

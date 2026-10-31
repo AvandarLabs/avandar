@@ -14,6 +14,8 @@ import {
   IconRotateClockwise,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
+import { makeProjectionDescriptorsFromStructuredQuery } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromStructuredQuery/makeProjectionDescriptorsFromStructuredQuery";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
@@ -36,6 +38,7 @@ import { QueryExplorerResultsChrome } from "@/views/DataExplorerApp/QueryExplore
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
+import { useQueryResultColumnBindings } from "@/views/DataExplorerApp/useQueryResultColumnBindings/useQueryResultColumnBindings";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import type { ReactNode } from "react";
@@ -127,8 +130,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     ],
   );
 
-  const queryResultColumns = queryResults?.columns ?? [];
-
   // The SQL behind whatever is currently on screen, whether it came from the
   // chat panel, the SQL editor, or the guided query builder.
   //
@@ -142,46 +143,49 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     executionQuery: state.query,
   });
 
-  const columnSignature = useMemo(() => {
-    if (!queryResults) {
-      return "";
-    }
-
-    return queryResults.columns
-      .map((col) => {
-        return `${col.name}:${col.dataType}`;
-      })
-      .join("|");
-  }, [queryResults]);
-
-  const querySyncSignature = useMemo(() => {
-    return JSON.stringify({
-      queryColumns: state.query.queryColumns,
-      rawSql: state.rawSql,
-      dataSource: state.query.dataSource,
-      orderByColumn: state.query.orderByColumn,
-      orderByDirection: state.query.orderByDirection,
-    });
+  const columnBindingScope = useRef(crypto.randomUUID());
+  const projections = useMemo(() => {
+    const structured = state.isStructuredQueryInSync
+      ? makeProjectionDescriptorsFromStructuredQuery(state.query)
+      : [];
+    return structured.length
+      ? structured
+      : makeProjectionDescriptorsFromSql({
+          sql: savableSql ?? "",
+          columns: queryResults?.columns ?? [],
+        });
   }, [
-    state.query.queryColumns,
-    state.rawSql,
-    state.query.dataSource,
-    state.query.orderByColumn,
-    state.query.orderByDirection,
+    state.isStructuredQueryInSync,
+    state.query,
+    savableSql,
+    queryResults?.columns,
   ]);
-
-  useEffect(() => {
-    if (!isLoadingResults && queryResults?.columns) {
-      dispatch.syncVizFromQueryResult(queryResults.columns);
-    }
-  }, [
-    isLoadingResults,
-    columnSignature,
-    querySyncSignature,
-    state.vizConfig.vizType,
-    queryResults,
-    dispatch,
-  ]);
+  const schema = useQueryResultColumnBindings({
+    scopeKey: `${workspace.id}:${columnBindingScope.current}`,
+    sqlKey: savableSql ?? "",
+    resultSqlKey: queryResults?.executedSql,
+    result: isLoadingResults ? undefined : queryResults,
+    projections,
+    initialRegistry: state.columnBindings,
+  });
+  const queryResultColumns = schema?.columns ?? [];
+  useEffect(
+    function synchronizeQueryResultColumnBindings() {
+      if (schema && !isLoadingResults) {
+        dispatch.syncVizFromQueryResult(schema.columns);
+        if (schema.registry !== state.columnBindings) {
+          dispatch.setColumnBindings(schema.registry);
+        }
+      }
+    },
+    [
+      schema,
+      isLoadingResults,
+      dispatch,
+      state.columnBindings,
+      state.vizConfig.vizType,
+    ],
+  );
 
   useEffect(
     function openChatPanelOnMount() {
@@ -292,6 +296,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           />
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer
+            rawColumns={queryResults?.columns}
             columns={queryResultColumns}
             data={queryResultData}
             dateColumns={dateColumns}

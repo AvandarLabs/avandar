@@ -1,3 +1,6 @@
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
 /**
  * Executed tests for the concept relation view.
  *
@@ -12,13 +15,10 @@
  * deterministic only in the absence of ties is not deterministic, so a fixture
  * without ties would assert nothing about determinism.
  */
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { describe, expect, it } from "vitest";
 import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
+import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
 import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 import type { DuckDBConnection } from "@duckdb/node-api";
 

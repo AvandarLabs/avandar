@@ -1,3 +1,6 @@
+import { Model } from "@avandar/models";
+import { makeObject } from "@avandar/utils";
+import { Parser } from "node-sql-parser";
 /**
  * Best-effort parser from a raw SQL string into a {@link
  * PartialStructuredQuery} that the manual query form can display.
@@ -10,34 +13,26 @@
  * "approximation only" badge.
  *
  * This orchestrator wires together the focused helpers in this directory:
- * `sqlAstReaders` (low-level AST value readers), `resolveFromClause`
+ * `sqlAstReaders` (low-level AST value readers), `parseFromClause`
  * (FROM/JOIN), and `parseFilterClauses` (WHERE/HAVING), plus a few small
  * private column/result helpers below.
  */
-import { Model } from "@avandar/models";
-import { makeObject, propEq } from "@avandar/utils";
-import { Parser } from "node-sql-parser";
 import { uuid } from "$/lib/uuid.ts";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryColumnReconciliation/QueryColumnReconciliation.ts";
+import { normalizeQueryFilters } from "$/models/queries/StructuredQuery/normalizeQueryFilters/normalizeQueryFilters.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import {
   parseHavingNode,
   parseWhereNode,
-  stampFilterColumnTypes,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFilterClauses.ts";
-import { resolveFrom } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/resolveFromClause.ts";
-import {
-  columnRefName,
-  identifierToString,
-  matchAggregation,
-} from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
+import { parseFromClause } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFromClause.ts";
+import { parseSqlProjectionColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseSqlProjectionColumns.ts";
+import { reconcileParsedColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/reconcileParsedColumns.ts";
+import { columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
-import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
-import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
-import type {
-  QueryColumnId,
-  QueryColumnRead,
-} from "$/models/queries/QueryColumn/QueryColumn.types.ts";
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
+import type { ColumnNameQueryFilterGroup as QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 import type {
   SqlMappingInput,
@@ -79,26 +74,6 @@ function _makeUnmappedResult(
     isFullyMapped: false,
     unmappedReasons: reasons,
   };
-}
-
-function _matchColumn(
-  columnName: string,
-  columns: readonly DatasetColumnRead[],
-): DatasetColumnRead | undefined {
-  return columns.find((c) => {
-    return c.name === columnName || c.originalName === columnName;
-  });
-}
-
-function _makeQueryColumn(
-  baseColumn: DatasetColumnRead,
-  aggregation: QueryAggregationTypeT | undefined,
-): QueryColumnRead {
-  return Model.make("QueryColumn", {
-    id: uuid<QueryColumnId>(),
-    baseColumn,
-    aggregation,
-  });
 }
 
 /**
@@ -153,7 +128,11 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   }
 
   // Resolve FROM clause (base + joins + optional nested subquery)
-  const fromResolution = resolveFrom(ast.from, input.datasets, unmappedReasons);
+  const fromResolution = parseFromClause(
+    ast.from,
+    input.datasets,
+    unmappedReasons,
+  );
   if (!fromResolution) {
     return _makeUnmappedResult(unmappedReasons);
   }
@@ -161,117 +140,44 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   const nestedSubquery = fromResolution.nestedSubquery;
   const joins = fromResolution.joins;
 
-  // Walk select columns. When the FROM is a nested subquery or has joins
-  // we can't always tie columns back to a known dataset; in those cases we
-  // skip column hydration and rely on the raw SQL still being the source
-  // of truth.
-  const queryColumns: QueryColumnRead[] = [];
-  const aggregations: Record<QueryColumnId, QueryAggregationTypeT> = {};
-  const columnsList = ast.columns;
-  const skipColumnHydration = !dataset || joins.length > 0 || !!nestedSubquery;
-  if (Array.isArray(columnsList) && !skipColumnHydration && dataset) {
-    columnsList.forEach((item) => {
-      const expr = (item as { expr?: unknown }).expr;
-      if (!expr || typeof expr !== "object") {
-        unmappedReasons.push({ code: "selectItemUnrecognised" });
-        return;
-      }
-      const exprObj = expr as Record<string, unknown>;
-      const exprType = exprObj.type;
-
-      // Star "*": expand all columns. node-sql-parser represents `*` as a
-      // column_ref whose `column` is the literal string "*", or as a
-      // separate `star` node depending on dialect.
-      if (
-        exprType === "star" ||
-        (exprType === "column_ref" && exprObj.column === "*")
-      ) {
-        dataset.columns.forEach((col) => {
-          queryColumns.push(_makeQueryColumn(col, undefined));
-        });
-        return;
-      }
-
-      // Plain column reference
-      if (exprType === "column_ref") {
-        const columnName = identifierToString(exprObj.column);
-        if (!columnName) {
-          unmappedReasons.push({ code: "selectUnnamedExpression" });
-          return;
-        }
-        const matched = _matchColumn(columnName, dataset.columns);
-        if (!matched) {
-          unmappedReasons.push({ code: "selectUnknownColumn", columnName });
-          return;
-        }
-        queryColumns.push(_makeQueryColumn(matched, undefined));
-        return;
-      }
-
-      // Aggregate function: SUM(col), AVG(col), COUNT(col), MAX(col), MIN(col)
-      if (exprType === "aggr_func") {
-        const funcName = String(exprObj.name ?? "");
-        const agg = matchAggregation(funcName);
-        const args = exprObj.args as { expr?: unknown } | undefined;
-        const inner = args?.expr;
-        const colName = columnRefName(inner);
-        if (!agg) {
-          unmappedReasons.push({
-            code: "selectUnsupportedAggregate",
-            funcName,
-          });
-          return;
-        }
-        if (!colName) {
-          unmappedReasons.push({ code: "aggregateComplexArgument", funcName });
-          return;
-        }
-        const matched = _matchColumn(colName, dataset.columns);
-        if (!matched) {
-          unmappedReasons.push({
-            code: "aggregateUnknownColumn",
-            columnName: colName,
-          });
-          return;
-        }
-        const queryColumn = _makeQueryColumn(matched, agg);
-        queryColumns.push(queryColumn);
-        aggregations[queryColumn.id] = agg;
-        return;
-      }
-
-      unmappedReasons.push({
-        code: "selectUnsupportedExpression",
-        exprType: String(exprType),
-      });
-    });
-  }
-
-  // Ensure aggregations map covers all columns
-  queryColumns.forEach((col) => {
-    if (aggregations[col.id] === undefined) {
-      aggregations[col.id] = "none";
-    }
+  const projection = parseSqlProjectionColumns({
+    columnsList: ast.columns,
+    groupBy: ast.groupby,
+    dataset,
+    skipColumnHydration: !dataset || joins.length > 0 || !!nestedSubquery,
   });
+  let { queryColumns, aggregations } = projection;
+  unmappedReasons.push(...projection.unmappedReasons);
 
-  // GROUP BY → mark referenced columns as "group_by" if not already aggregated
-  const groupby = ast.groupby as { columns?: unknown } | null;
-  const groupbyColumns = groupby?.columns;
-  if (Array.isArray(groupbyColumns)) {
-    groupbyColumns.forEach((node) => {
-      const colName = columnRefName(node);
-      if (!colName) {
-        unmappedReasons.push({ code: "groupByNonColumn" });
-        return;
-      }
-      const match = queryColumns.find(propEq("baseColumn.name", colName));
-      if (match) {
-        if (aggregations[match.id] === "none") {
-          aggregations[match.id] = "group_by";
-        }
-      }
-    });
-  }
+  queryColumns = reconcileParsedColumns({
+    columns: queryColumns.map((column) => {
+      return {
+        ...column,
+        aggregation: aggregations[column.id],
+      };
+    }),
+    previousQuery: input.previousQuery,
+    dataSource: dataset?.dataset,
+  });
+  aggregations = makeObject(queryColumns, {
+    key: "id",
+    valueFn: (column) => {
+      return column.aggregation ?? "none";
+    },
+  });
+  const sourceColumns = dataset
+    ? QueryColumnReconciliation.reconcileSourceColumns({
+        sourceKey: Model.getTypedId(dataset.dataset),
+        previousSourceKey: input.previousQuery?.dataSource
+          ? Model.getTypedId(input.previousQuery.dataSource)
+          : input.sourceColumns
+            ? Model.getTypedId(dataset.dataset)
+            : undefined,
+        previous:
+          input.sourceColumns ?? input.previousQuery?.sourceColumns ?? [],
+        incoming: dataset.columns.map(QueryColumn.makeFromDatasetColumn),
+      })
+    : [];
 
   // ORDER BY (we only support a single column)
   let orderByColumn: QueryColumnId | undefined;
@@ -284,7 +190,21 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     const first = orderbyClause[0] as { type?: string; expr?: unknown };
     const colName = columnRefName(first.expr);
     if (colName) {
-      const matchCol = queryColumns.find(propEq("baseColumn.name", colName));
+      const outputMatches = queryColumns.filter((column) => {
+        return QueryColumn.getDerivedColumnName(column) === colName;
+      });
+      const candidates =
+        outputMatches.length > 0
+          ? outputMatches
+          : queryColumns.filter((column) => {
+              return (
+                column.baseColumn.name === colName &&
+                (column.aggregation === undefined ||
+                  column.aggregation === "none" ||
+                  column.aggregation === "group_by")
+              );
+            });
+      const matchCol = candidates.length === 1 ? candidates[0] : undefined;
       if (matchCol) {
         orderByColumn = matchCol.id;
         const dir = String(first.type ?? "").toLowerCase();
@@ -342,24 +262,14 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     }
   }
 
-  // Column data types keyed by name, so parsed filter rules carry the same
-  // `columnDataType` a rule authored in the form would.
-  const filterColumnTypes = makeObject(dataset?.columns ?? [], {
-    key: "name",
-    valueKey: "dataType",
-  });
-
   // WHERE → filters
-  let filters: QueryFilterGroup = EMPTY_QUERY_FILTER;
+  let filters: QueryFilterGroup = {
+    type: "group",
+    combinator: "AND",
+    rules: [],
+  };
   if (ast.where) {
-    const parsedRaw = parseWhereNode(ast.where, unmappedReasons);
-    const parsed =
-      parsedRaw === undefined
-        ? undefined
-        : stampFilterColumnTypes({
-            node: parsedRaw,
-            columnTypes: filterColumnTypes,
-          });
+    const parsed = parseWhereNode(ast.where, unmappedReasons);
     if (parsed) {
       filters =
         parsed.type === "group"
@@ -374,7 +284,11 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
 
   // HAVING → filter group (we re-use the WHERE parser; predicates over
   // aggregate functions get serialised back to the column they aggregate).
-  let having: QueryFilterGroup = EMPTY_QUERY_FILTER;
+  let having: QueryFilterGroup = {
+    type: "group",
+    combinator: "AND",
+    rules: [],
+  };
   if (ast.having) {
     const parsedHaving = parseHavingNode(ast.having, unmappedReasons);
     if (parsedHaving) {
@@ -389,17 +303,43 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     }
   }
 
+  const columnIdFilters = normalizeQueryFilters({
+    filter: filters,
+    columns: sourceColumns,
+    clause: "where",
+  });
+  const columnIdHaving = normalizeQueryFilters({
+    filter: having,
+    columns: queryColumns.filter((column) => {
+      return column.aggregation !== "none" && column.aggregation !== undefined;
+    }),
+    clause: "having",
+  });
+  columnIdFilters.issues.forEach(() => {
+    return unmappedReasons.push({
+      code: "whereUnsupportedNode",
+      nodeType: "unresolved column",
+    });
+  });
+  columnIdHaving.issues.forEach(() => {
+    return unmappedReasons.push({
+      code: "havingUnsupportedNode",
+      nodeType: "unresolved projection",
+    });
+  });
+
   const query: PartialStructuredQuery = Model.make("StructuredQuery", {
     id: uuid<StructuredQueryId>(),
     version: 1,
     dataSource: dataset?.dataset as DatasetModel["Read"],
     ...(nestedSubquery ? { nestedSubquery } : {}),
     queryColumns,
+    sourceColumns,
     orderByColumn,
     orderByDirection,
     aggregations,
-    filters,
-    having,
+    filters: columnIdFilters.filter,
+    having: columnIdHaving.filter,
     joins,
     offset,
     limit,

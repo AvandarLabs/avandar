@@ -1,43 +1,44 @@
 import { isDefined } from "@avandar/utils";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type {
   QueryFilter,
   QueryFilterGroup,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
-/** A pruned filter tree plus the column names whose rules were removed. */
+/** A pruned filter tree plus the column IDs whose rules were removed. */
 export type PruneFilterColumnsResult = {
   filters: QueryFilterGroup;
-  /** Distinct column names whose rules were removed, in tree order. */
-  removedColumnNames: string[];
+  /** Distinct column IDs whose rules were removed, in tree order. */
+  removedColumnIds: QueryColumn.Id[];
 };
 
 /**
- * Collects removed column names in tree order without duplicates. The `Set`
+ * Collects removed column IDs in tree order without duplicates. The `Set`
  * carries membership so the check stays constant-time as the list grows; the
- * array preserves the order the names are reported in.
+ * array preserves the order the IDs are reported in.
  */
 type RemovedColumns = {
-  order: string[];
-  seen: Set<string>;
+  order: QueryColumn.Id[];
+  seen: Set<QueryColumn.Id>;
 };
 
 function _prune(
   group: QueryFilterGroup,
-  columnNames: ReadonlySet<string>,
+  columnIds: ReadonlySet<QueryColumn.Id>,
   removed: RemovedColumns,
 ): QueryFilterGroup {
   const rules = group.rules
     .map((child): QueryFilter | undefined => {
       if (child.type === "group") {
-        const pruned = _prune(child, columnNames, removed);
+        const pruned = _prune(child, columnIds, removed);
         return pruned.rules.length === 0 ? undefined : pruned;
       }
-      if (columnNames.has(child.columnName)) {
+      if (columnIds.has(child.columnId)) {
         return child;
       }
-      if (!removed.seen.has(child.columnName)) {
-        removed.seen.add(child.columnName);
-        removed.order.push(child.columnName);
+      if (!removed.seen.has(child.columnId)) {
+        removed.seen.add(child.columnId);
+        removed.order.push(child.columnId);
       }
       return undefined;
     })
@@ -50,19 +51,19 @@ function _prune(
  *
  * Do not keep those rules: they would query a table without those columns and
  * fail with a binder error the UI reports as zero rows. Returning the removed
- * column names lets the form say what it dropped instead of doing it silently.
+ * column IDs lets the form say what it dropped instead of doing it silently.
  */
 export function pruneFilterColumns(
   options: Readonly<{
     filters: QueryFilterGroup;
-    availableColumnNames: readonly string[];
+    availableColumnIds: readonly QueryColumn.Id[];
   }>,
 ): PruneFilterColumnsResult {
-  const { filters, availableColumnNames } = options;
+  const { filters, availableColumnIds } = options;
   const removed: RemovedColumns = { order: [], seen: new Set() };
-  const pruned = _prune(filters, new Set(availableColumnNames), removed);
+  const pruned = _prune(filters, new Set(availableColumnIds), removed);
   return {
     filters: removed.order.length === 0 ? filters : pruned,
-    removedColumnNames: removed.order,
+    removedColumnIds: removed.order,
   };
 }

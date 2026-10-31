@@ -1,12 +1,12 @@
 import { makeSelectOptions, Select } from "@avandar/ui";
-import { isDefined, propPasses } from "@avandar/utils";
+import { isDefined, propEq, propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
 import { useMemo } from "react";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
 import type {
   SettingsColumnGroup,
@@ -15,7 +15,7 @@ import type {
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
-  fields: readonly QueryResultColumn[];
+  fields: readonly QueryResult.ColumnWithId[];
   config: FunnelChartVizConfig;
   data: UnknownDataFrame;
   onConfigChange: (newConfig: FunnelChartVizConfig) => void;
@@ -38,13 +38,13 @@ export function FunnelChartForm({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const fieldOptions = useMemo(() => {
-    return makeSelectOptions(fields, { valueKey: "name", labelKey: "name" });
+    return makeSelectOptions(fields, { valueKey: "id", labelKey: "name" });
   }, [fields]);
 
   const numericFieldOptions = useMemo(() => {
     return makeSelectOptions(
       fields.filter(propPasses("dataType", AvaDataType.isNumeric)),
-      { valueKey: "name", labelKey: "name" },
+      { valueKey: "id", labelKey: "name" },
     );
   }, [fields]);
 
@@ -52,15 +52,17 @@ export function FunnelChartForm({
     if (!config.nameKey) {
       return [];
     }
+    const nameColumnName =
+      fields.find(propEq("id", config.nameKey))?.name ?? "";
     const seen = new Set<string>();
     data.forEach((row) => {
-      const name = String(row[config.nameKey ?? ""] ?? "");
+      const name = String(row[nameColumnName] ?? "");
       if (name) {
         seen.add(name);
       }
     });
     return Array.from(seen);
-  }, [data, config.nameKey]);
+  }, [data, config.nameKey, fields]);
 
   const { nameKey, valueKey } = config;
 
@@ -82,7 +84,12 @@ export function FunnelChartForm({
                 : t`Select a column`
             }
             onChange={(field) => {
-              onConfigChange({ ...config, nameKey: field ?? undefined });
+              onConfigChange({
+                ...config,
+                nameKey: fields.find((column) => {
+                  return column.id === field;
+                })?.id,
+              });
             }}
           />
 
@@ -98,7 +105,12 @@ export function FunnelChartForm({
                 : t`Select a column`
             }
             onChange={(field) => {
-              onConfigChange({ ...config, valueKey: field ?? undefined });
+              onConfigChange({
+                ...config,
+                valueKey: fields.find((column) => {
+                  return column.id === field;
+                })?.id,
+              });
             }}
           />
         </Stack>

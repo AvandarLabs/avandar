@@ -6,8 +6,26 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactNode } from "react";
+
+type OpenSaveAsNewDatasetModalOptions = {
+  dateColumns: ReadonlySet<string>;
+  queryResultColumns: readonly QueryResult.Column[];
+  queryResultData: UnknownDataFrame;
+  savableSql: string;
+  title: string;
+};
+
+type OpenSaveToDashboardModalOptions = {
+  columnBindings: QueryResultColumnBindingRegistry;
+  forceCreateMode: boolean;
+  nlPrompt: string | undefined;
+  savableSql: string;
+  vizConfig: ReturnType<typeof DataExplorerStateManager.useState>["vizConfig"];
+  workspaceSlug: string;
+};
 
 type Props = {
   savableSql: string;
@@ -20,13 +38,9 @@ type Props = {
   shouldForceCreateMode: boolean;
 };
 
-function _openSaveAsNewDatasetModal(options: {
-  dateColumns: ReadonlySet<string>;
-  queryResultColumns: readonly QueryResult.Column[];
-  queryResultData: UnknownDataFrame;
-  savableSql: string;
-  title: string;
-}): void {
+function _openSaveAsNewDatasetModal(
+  options: OpenSaveAsNewDatasetModalOptions,
+): void {
   const modalId = modals.open({
     title: options.title,
     size: "xl",
@@ -44,18 +58,15 @@ function _openSaveAsNewDatasetModal(options: {
   });
 }
 
-function _openSaveToDashboardModal(options: {
-  forceCreateMode: boolean;
-  nlPrompt: string | undefined;
-  savableSql: string;
-  vizConfig: ReturnType<typeof DataExplorerStateManager.useState>["vizConfig"];
-  workspaceSlug: string;
-}): void {
+function _openSaveToDashboardModal(
+  options: OpenSaveToDashboardModalOptions,
+): void {
   const modalId = modals.open({
     withCloseButton: true,
     size: "lg",
     children: (
       <SaveToDashboardModal
+        columnBindings={options.columnBindings}
         rawSql={options.savableSql}
         prompt={options.nlPrompt}
         vizType={options.vizConfig.vizType}
@@ -101,11 +112,15 @@ export function DataExplorerSaveAsMenuItems({
         <Trans>Save as new dataset</Trans>
       </Menu.Item>
       <Menu.Item
-        disabled={isSaveDisabled}
+        disabled={isSaveDisabled || !state.columnBindings}
         rightSection={runAQueryFirstHint}
         {...NuxAnchors.props(NuxAnchors.ids.explorerSaveToDashboardItem)}
         onClick={() => {
+          if (!state.columnBindings) {
+            return;
+          }
           _openSaveToDashboardModal({
+            columnBindings: state.columnBindings,
             forceCreateMode: shouldForceCreateMode,
             nlPrompt: state.nlPrompt,
             savableSql,

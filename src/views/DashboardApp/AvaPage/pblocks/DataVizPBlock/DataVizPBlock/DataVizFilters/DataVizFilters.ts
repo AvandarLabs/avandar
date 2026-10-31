@@ -1,10 +1,14 @@
 import { matchLiteral, prop } from "@avandar/utils";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { DashboardFilterMode } from "$/types/dashboard.types";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 
 export type GlobalFilterSubscriptionMode = "all" | "selected" | "none";
 
-export type LocalFilter = {
+/**
+ * Saved local filter addressed by its historical `QueryResult` column name.
+ */
+export type LegacyLocalFilter = {
   /** Stable identifier used for viewer state. */
   id: string;
   /** Display label shown above the input. */
@@ -17,6 +21,11 @@ export type LocalFilter = {
   optionsRaw: string;
   /** Default value, encoded as JSON for multi-select filters. */
   defaultValue: string;
+};
+
+/** Local filter that targets a column ID. */
+export type LocalFilter = Omit<LegacyLocalFilter, "columnName"> & {
+  columnId: QueryColumn.Id;
 };
 
 export type GlobalFilterSubscription = {
@@ -33,7 +42,7 @@ export type DataVizFilterProps = {
   localFilters: readonly LocalFilter[];
 };
 
-type ResolveSubscribedFilterIdsOptions = {
+type GetSubscribedFilterIdsFromSubscriptionOptions = {
   subscription: GlobalFilterSubscription;
   registeredFilters: readonly DashboardFilterRecord[];
 };
@@ -44,7 +53,7 @@ type ParseLocalFilterDefaultValueOptions = {
 };
 
 type LocalFilterToRecordOptions = {
-  filter: LocalFilter;
+  filter: LegacyLocalFilter;
   value: string | readonly string[] | undefined;
 };
 
@@ -58,8 +67,8 @@ const DEFAULT_DATA_VIZ_FILTER_PROPS: DataVizFilterProps = {
   localFilters: [],
 };
 
-function _resolveSubscribedFilterIds(
-  options: Readonly<ResolveSubscribedFilterIdsOptions>,
+function _getSubscribedFilterIdsFromSubscription(
+  options: Readonly<GetSubscribedFilterIdsFromSubscriptionOptions>,
 ): string[] | undefined {
   return matchLiteral(options.subscription.mode, {
     all: () => {
@@ -134,8 +143,12 @@ export const DataVizFilters = {
   defaultGlobalFilterSubscription: DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
   /** Default filter properties used by new visualization blocks. */
   defaultDataVizFilterProps: DEFAULT_DATA_VIZ_FILTER_PROPS,
-  /** Returns active dashboard-filter identifiers for a visualization. */
-  resolveSubscribedFilterIds: _resolveSubscribedFilterIds,
+  /**
+   * Returns the dashboard filter IDs a chart's subscription accepts, or
+   * `undefined` when it accepts every filter.
+   */
+  getSubscribedFilterIdsFromSubscription:
+    _getSubscribedFilterIdsFromSubscription,
   /** Returns normalized selection options from comma-separated input. */
   parseLocalFilterOptions: _parseLocalFilterOptions,
   /** Returns the viewer value encoded by a local filter default. */

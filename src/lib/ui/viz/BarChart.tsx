@@ -6,7 +6,7 @@ import { useBarChartStyleProps } from "@/lib/ui/viz/axis/useBarChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { BarSeries } from "$/models/vizs/SeriesConfig";
+import type { NameBoundBarSeries as BarSeries } from "$/models/vizs/VizConfig/NameBoundVizConfig.types";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { BarProps } from "recharts";
 

@@ -3,13 +3,13 @@ import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/Anal
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type {
-  VizConfig,
-  VizConfigRegistry,
-} from "$/models/vizs/VizConfig/VizConfig.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
 /**
  * Identifies the currently open saved dataset in the Data Explorer, if any.
@@ -29,8 +29,20 @@ export type OpenDatasetInfo = {
   virtualDatasetId?: VirtualDatasetId;
 };
 
+/** Metadata available to all controls for one source scope. */
+export type SourceColumnCatalog = {
+  sourceKey: QueryDataSource.TypedId | undefined;
+  status: "loading" | "ready";
+  columns: readonly QueryColumn.T[];
+};
+
 export type DataExplorerAppState = {
   query: PartialStructuredQuery;
+  /** Last completed block-independent Explorer binding registry. */
+  columnBindings?: QueryResultColumnBindingRegistry;
+
+  /** Source metadata is scoped separately from selected projections. */
+  sourceCatalog?: SourceColumnCatalog;
 
   /**
    * If raw SQL was generated, we should use that for our query instead of
@@ -46,7 +58,16 @@ export type DataExplorerAppState = {
    */
   nlPrompt: string | undefined;
 
-  vizConfig: VizConfig;
+  vizConfig: VizConfig.T;
+
+  /**
+   * A chart config restored from the URL, keyed by `QueryResult` column names
+   * because a URL carries no column IDs. The first query result binds those
+   * names to the result's column IDs and clears this field. Until then, URL
+   * sync keeps writing it back unchanged, so a slow or failed query does not
+   * drop it.
+   */
+  pendingUrlVizConfig?: VizConfig.NameBound;
 
   /**
    * The last config the user actually saw for each viz type, so switching
@@ -68,7 +89,7 @@ export type DataExplorerAppState = {
    * In-memory only: this state manager is never persisted, so a reload
    * starts empty.
    */
-  vizConfigMemory: Partial<VizConfigRegistry>;
+  vizConfigMemory: Partial<VizConfig.Registry>;
 
   /** The currently open saved dataset, or `undefined` if none is open. */
   openDataset: OpenDatasetInfo | undefined;
@@ -103,7 +124,7 @@ export type DataExplorerAppState = {
    * current result schema without holding a reference to the React Query
    * cache. `undefined` while no query has succeeded.
    */
-  lastResultColumns: readonly QueryResultColumn[] | undefined;
+  lastResultColumns: readonly QueryResult.ColumnWithId[] | undefined;
 
   /**
    * What caused the query that is about to run, recorded on `query.ran` and

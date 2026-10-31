@@ -636,6 +636,9 @@ finding from Stage 1, spawn an adversarial verifier whose job is to
   exception)?
 - Is the recommended alternative (a helper, a library util) actually
   present in this repo?
+- For an unneeded-cast finding, did the verifier delete the cast and run
+  the type checker? Settle it by the compiler's output, never by reading
+  the code: a clean type check confirms the finding.
 
 Default to refuted when uncertain. A finding survives only if the verifier
 cannot refute it. For high-severity findings, use three verifiers with
@@ -958,8 +961,9 @@ SKILL file.
 - **Reference:**
   [`docs/code-reviews/types-checklist.md`](docs/code-reviews/types-checklist.md)
 - **Covers:** type declarations, assertions and escape hatches (`any`,
-  `as unknown as T`), absence (`undefined` vs. `null`), literal unions, and
-  readonly/variance contracts.
+  `as unknown as T`, and any `as T` cast the type checker does not need),
+  absence (`undefined` vs. `null`), literal unions, and readonly/variance
+  contracts.
 
 ### Phase: functional style
 

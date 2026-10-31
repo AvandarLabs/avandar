@@ -4,16 +4,22 @@ import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
 } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
 function cols(
   pairs: ReadonlyArray<{
+    id?: QueryColumn.Id;
     name: string;
-    dataType: QueryResultColumn["dataType"];
+    dataType: QueryResult.ColumnWithId["dataType"];
   }>,
-): QueryResultColumn[] {
+): QueryResult.ColumnWithId[] {
   return pairs.map((p) => {
-    return { name: p.name, dataType: p.dataType };
+    return {
+      id: p.id ?? (p.name as QueryColumn.Id),
+      name: p.name,
+      dataType: p.dataType,
+    };
   });
 }
 
@@ -45,15 +51,15 @@ describe("isVizConfigEqualForQueryResultSync", () => {
   it("compares xAxisKey and series for bar configs", () => {
     const a = {
       vizType: "bar" as const,
-      xAxisKey: "a",
-      series: [{ renderAs: "bar" as const, key: "b" }],
+      xAxisKey: "a" as QueryColumn.Id,
+      series: [{ renderAs: "bar" as const, key: "b" as QueryColumn.Id }],
       layout: "group" as const,
       withLegend: true,
     };
     const b = {
       vizType: "bar" as const,
-      xAxisKey: "a",
-      series: [{ renderAs: "bar" as const, key: "b" }],
+      xAxisKey: "a" as QueryColumn.Id,
+      series: [{ renderAs: "bar" as const, key: "b" as QueryColumn.Id }],
       layout: "group" as const,
       withLegend: true,
     };
@@ -69,17 +75,19 @@ describe("applyVizConfigFromQueryResult", () => {
       vizConfig: { vizType: "table" },
       rawSql: "SELECT 1",
       query: emptyQuery,
-      columns: cols([{ name: "x", dataType: "double" }]),
+      columns: cols([
+        { id: "x" as QueryColumn.Id, name: "x", dataType: "double" },
+      ]),
     });
     expect(out).toEqual({ vizType: "table" });
   });
 
-  it("clears axis keys not present in the result before hydrating", () => {
+  it("preserves missing owned axis IDs without reseeding", () => {
     const out = applyVizConfigFromQueryResult({
       vizConfig: {
         vizType: "bar",
-        xAxisKey: "gone",
-        series: [{ renderAs: "bar", key: "n" }],
+        xAxisKey: "gone" as QueryColumn.Id,
+        series: [{ renderAs: "bar", key: "n" as QueryColumn.Id }],
         layout: "group",
         withLegend: true,
       },
@@ -88,9 +96,11 @@ describe("applyVizConfigFromQueryResult", () => {
         ...emptyQuery,
         queryColumns: [],
       },
-      columns: cols([{ name: "n", dataType: "double" }]),
+      columns: cols([
+        { id: "n" as QueryColumn.Id, name: "n", dataType: "double" },
+      ]),
     });
-    expect((out as { xAxisKey?: string }).xAxisKey).toBeUndefined();
+    expect((out as { xAxisKey?: string }).xAxisKey).toBe("gone");
     expect((out as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
       "n",
     );
@@ -108,8 +118,8 @@ describe("applyVizConfigFromQueryResult", () => {
       rawSql: "SELECT * FROM t",
       query: emptyQuery,
       columns: cols([
-        { name: "month", dataType: "timestamp" },
-        { name: "total", dataType: "double" },
+        { id: "month" as QueryColumn.Id, name: "month", dataType: "timestamp" },
+        { id: "total" as QueryColumn.Id, name: "total", dataType: "double" },
       ]),
     });
     expect((out as { xAxisKey?: string }).xAxisKey).toBe("month");
@@ -131,8 +141,8 @@ describe("applyVizConfigFromQueryResult", () => {
       rawSql: "SELECT region, count FROM t",
       query: emptyQuery,
       columns: cols([
-        { name: "region", dataType: "varchar" },
-        { name: "count", dataType: "bigint" },
+        { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
+        { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
       ]),
     });
     expect(
@@ -146,9 +156,9 @@ describe("applyVizConfigFromQueryResult", () => {
       rawSql: "SELECT region, count, total FROM t",
       query: emptyQuery,
       columns: cols([
-        { name: "region", dataType: "varchar" },
-        { name: "count", dataType: "bigint" },
-        { name: "total", dataType: "double" },
+        { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
+        { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
+        { id: "total" as QueryColumn.Id, name: "total", dataType: "double" },
       ]),
     });
     expect((next as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
@@ -156,37 +166,37 @@ describe("applyVizConfigFromQueryResult", () => {
     );
   });
 
-  it("falls back to a case-insensitive name match when re-resolving keys", () => {
+  it("does not reinterpret an owned ID as a case-insensitive QueryResult column name", () => {
     const out = applyVizConfigFromQueryResult({
       vizConfig: {
         vizType: "bar",
         // saved config has "Count" but the new query returned "count"
-        xAxisKey: "Region",
-        series: [{ renderAs: "bar", key: "Count" }],
+        xAxisKey: "Region" as QueryColumn.Id,
+        series: [{ renderAs: "bar", key: "Count" as QueryColumn.Id }],
         layout: "group",
         withLegend: true,
       },
       rawSql: undefined,
       query: { ...emptyQuery, queryColumns: [] },
       columns: cols([
-        { name: "region", dataType: "varchar" },
-        { name: "count", dataType: "bigint" },
+        { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
+        { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
       ]),
     });
-    expect((out as { xAxisKey?: string }).xAxisKey).toBe("region");
+    expect((out as { xAxisKey?: string }).xAxisKey).toBe("Region");
     expect((out as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
-      "count",
+      "Count",
     );
   });
 
-  it("drops series whose column is no longer in any form in the result", () => {
+  it("retains missing series IDs for explicit repair", () => {
     const out = applyVizConfigFromQueryResult({
       vizConfig: {
         vizType: "bar",
-        xAxisKey: "region",
+        xAxisKey: "region" as QueryColumn.Id,
         series: [
-          { renderAs: "bar", key: "count" },
-          { renderAs: "bar", key: "removed" },
+          { renderAs: "bar", key: "count" as QueryColumn.Id },
+          { renderAs: "bar", key: "removed" as QueryColumn.Id },
         ],
         layout: "group",
         withLegend: true,
@@ -194,12 +204,13 @@ describe("applyVizConfigFromQueryResult", () => {
       rawSql: undefined,
       query: { ...emptyQuery, queryColumns: [] },
       columns: cols([
-        { name: "region", dataType: "varchar" },
-        { name: "count", dataType: "bigint" },
+        { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
+        { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
       ]),
     });
     const series = (out as { series: Array<{ key: string }> }).series;
-    expect(series.length).toBe(1);
+    expect(series.length).toBe(2);
+    expect(series[1]!.key).toBe("removed");
     expect(series[0]!.key).toBe("count");
   });
 
@@ -207,16 +218,16 @@ describe("applyVizConfigFromQueryResult", () => {
     const out = applyVizConfigFromQueryResult({
       vizConfig: {
         vizType: "bar",
-        xAxisKey: "month",
-        series: [{ renderAs: "bar", key: "total" }],
+        xAxisKey: "month" as QueryColumn.Id,
+        series: [{ renderAs: "bar", key: "total" as QueryColumn.Id }],
         layout: "group",
         withLegend: true,
       },
       rawSql: "SELECT * FROM t",
       query: emptyQuery,
       columns: cols([
-        { name: "month", dataType: "timestamp" },
-        { name: "total", dataType: "double" },
+        { id: "month" as QueryColumn.Id, name: "month", dataType: "timestamp" },
+        { id: "total" as QueryColumn.Id, name: "total", dataType: "double" },
       ]),
     });
     expect((out as { xAxisKey?: string }).xAxisKey).toBe("month");
@@ -224,4 +235,22 @@ describe("applyVizConfigFromQueryResult", () => {
       "total",
     );
   });
+});
+
+it("detects scatter-X and bubble-size changes independently of the Y target", () => {
+  const key = "y" as QueryColumn.Id;
+  const xKey = "x" as QueryColumn.Id;
+  const changed = "changed" as QueryColumn.Id;
+  expect(
+    isVizConfigEqualForQueryResultSync(
+      { vizType: "scatter", series: [{ key, xKey }] },
+      { vizType: "scatter", series: [{ key, xKey: changed }] },
+    ),
+  ).toBe(false);
+  expect(
+    isVizConfigEqualForQueryResultSync(
+      { vizType: "bubble", series: [{ key, xKey, sizeKey: key }] },
+      { vizType: "bubble", series: [{ key, xKey, sizeKey: changed }] },
+    ),
+  ).toBe(false);
 });

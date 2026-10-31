@@ -1,3 +1,4 @@
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
 
@@ -11,9 +12,9 @@ export type RadarChartVizConfig = {
 
   /**
    * The column whose values label each axis of the radar (category).
-   * This is a column name, not an ID.
+   * This is a stable result-column ID.
    */
-  nameKey: string | undefined;
+  nameKey: QueryColumn.Id | undefined;
 
   /** One polygon per entry. */
   series: RadarSeries[];

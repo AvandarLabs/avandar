@@ -469,7 +469,7 @@ helpers `SqlTableAlias` and `matchOfflineDatasetTable`.
 ## 12. Testing: commands and what each suite pins
 
 **Executed tests** run real SQL in Node DuckDB (`@duckdb/node-api`) through
-[`withDuckDb`](../src/lib/sql/__tests__/executedDuckDb.ts), which guarantees the
+[`withDuckDb`](../tests/integration/queries/executedDuckDb.ts), which guarantees the
 instance is closed. They match `**/*.executed.test.ts` and run under
 `vitest.executed.config.ts` (Node environment, not jsdom):
 

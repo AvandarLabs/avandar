@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 /**
  * Row-level tests that the time filter selects the same rows whichever
  * comparison it emits.
@@ -7,9 +8,8 @@
  * against the same rows is what keeps that optimization from quietly changing
  * which rows a map shows.
  */
-import { describe, expect, it } from "vitest";
 import { applyTimePredicateToSourceSql } from "@/clients/maps/MapLayerSpatialQuery/applyTimePredicateToSourceSql/applyTimePredicateToSourceSql";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { withDuckDb } from "../../../../../tests/integration/queries/executedDuckDb";
 import type { DuckDBConnection } from "@duckdb/node-api";
 
 const JUNE = {

@@ -6,9 +6,10 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
@@ -26,6 +27,11 @@ import type {
  *   &orderBy=<colName>&orderDir=asc|desc
  *   &sql=<rawSql>
  *   &vc=<JSON-stringified VizConfig> (omitted when viz is the default table)
+ *
+ * `vc` references columns by `QueryResult` column name, never by column ID.
+ * A URL has no column binding registry, so the IDs of one session mean
+ * nothing to the tab that reopens the URL, which assigns fresh IDs to the same
+ * columns.
  *
  * When `sql` is present it is the authoritative query: `ds`, `cols`, `agg`,
  * and `orderBy`/`orderDir` are not written (and are ignored on hydrate) so a
@@ -56,7 +62,7 @@ export type ParsedUrlState = {
   orderByColName?: string;
   orderDir?: OrderByDirection;
   rawSql?: string;
-  vizConfig?: VizConfig;
+  vizConfig?: VizConfig.NameBound;
   openDataset?: OpenDatasetInfo;
 };
 
@@ -110,7 +116,7 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
 
   if (search.vc) {
     try {
-      result.vizConfig = JSON.parse(search.vc) as VizConfig;
+      result.vizConfig = JSON.parse(search.vc) as VizConfig.NameBound;
     } catch {
       // Ignore malformed JSON — the viz will fall back to defaults.
     }
@@ -143,6 +149,24 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
   }
 
   return result;
+}
+
+/**
+ * Returns the chart config keyed by `QueryResult` column names. A config
+ * restored from the URL and not yet bound to a result is returned unchanged.
+ * Otherwise each column ID maps to its name in the latest result, and a slot
+ * whose column is absent from that result is left out.
+ */
+function _getNameBoundVizConfig(
+  state: DataExplorerAppState,
+): VizConfig.NameBound {
+  return (
+    state.pendingUrlVizConfig ??
+    makeNameBoundVizConfigFromVizConfig({
+      config: state.vizConfig,
+      columns: state.lastResultColumns ?? [],
+    }).config
+  );
 }
 
 /**
@@ -203,7 +227,7 @@ export function serializeStateToUrl(
   // query string could never clear in one action.
   try {
     if (vizConfig.vizType !== "table") {
-      params.vc = JSON.stringify(vizConfig);
+      params.vc = JSON.stringify(_getNameBoundVizConfig(state));
     }
   } catch {
     // Ignore — viz config will fall back to defaults on next load.
