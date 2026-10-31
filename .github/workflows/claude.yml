@@ -144,9 +144,12 @@ jobs:
           #
           # Deliberately left out: gh api (its token can write to the repo),
           # pnpm add/remove (supply-chain risk), rm, xargs, awk, WebSearch, and
-          # WebFetch (a way to send data out of the job). sed, git rebase -x,
-          # and git fetch --upload-pack can each run any command, and cat,
-          # head, and tail duplicate Read, so none of them are allowed either.
+          # WebFetch (a way to send data out of the job). git rebase -x and git
+          # fetch --upload-pack can each run any command, and cat, head, and
+          # tail duplicate Read, so none of them are allowed either. sed is
+          # allowed only with --sandbox, which rejects its e, r, and w
+          # commands, so it can replace text but not run commands or touch
+          # other files.
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
           claude_args: |
@@ -156,7 +159,7 @@ jobs:
             # GitHub reads
             --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr list:*),Bash(gh run view:*),Bash(gh issue view:*)"
             # Files and text
-            --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(grep:*)"
+            --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(grep:*),Bash(sed --sandbox:*)"
             --allowedTools "Bash(ls:*),Bash(wc:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(jq:*)"
             # Checks
             --allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm test:*),Bash(pnpm format:*)"
@@ -168,4 +171,4 @@ jobs:
             --allowedTools "Task,TodoWrite"
             # Need Supabase, Docker, or browsers that this job does not set up
             --disallowedTools "Bash(pnpm test:db:*),Bash(pnpm test:e2e:*)"
-            --append-system-prompt "Other @claude jobs may push to this branch while you work. Before every push, run claude-sync-branch, which rebases onto the remote branch. If the rebase stops on a conflict, resolve it with Edit, git add the files, run git rebase --continue, then push."
+            --append-system-prompt "Other @claude jobs may push to this branch while you work. Before every push, run claude-sync-branch, which rebases onto the remote branch. If the rebase stops on a conflict, resolve it with Edit, git add the files, run git rebase --continue, then push. For find-and-replace across many files, use sed --sandbox -i, since plain sed is not allowed."
