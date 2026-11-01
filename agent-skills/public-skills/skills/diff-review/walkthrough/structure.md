@@ -19,6 +19,7 @@ substitute a hosted page for the file.
 Contents:
 
 - [The walkthrough stands alone](#the-walkthrough-stands-alone)
+- [Blast radius](#blast-radius)
 - [Sections](#sections)
 - [The short form](#the-short-form)
 - [Rules](#rules)
@@ -51,6 +52,46 @@ has the threads, which live in the author's local review session. So it never
 mentions them, never sends the reader to them, and never says what it leaves
 to them. References run one way: a thread may cite a walkthrough section, and
 no section cites a thread.
+
+## Blast radius
+
+Every walkthrough, in either form, opens with a Blast radius callout on the
+line after its H1 title and before section 1. It tells the reader how big the
+change is before they read a word of it. Generate it, never type it:
+
+```bash
+python3 <skill-dir>/scripts/blast-radius.py <comparison-key>
+```
+
+Paste the script's output as it is, and run it again whenever the walkthrough
+is regenerated, so the counts match the compared revision. It prints a quoted
+HTML table inside `<small>` lines, which `markdown-to-pdf` 0.17.0 and later
+print as a shaded box in smaller type and GitHub prints as a block quote:
+
+```markdown
+<small>
+
+> **Blast radius**
+>
+> <table>
+> <tr><th colspan="2">Files</th><th colspan="2">Lines</th></tr>
+> <tr><td>Changed (total)</td><td>63</td><td>Insertions (+)</td><td>8,368</td></tr>
+> <tr><td>Added</td><td>33</td><td>Deletions (-)</td><td>1,571</td></tr>
+> <tr><td>Deleted</td><td>2</td><td>Net change</td><td>+6,797</td></tr>
+> </table>
+
+</small>
+```
+
+The counts are git's own, the ones `git diff --shortstat` prints. A changed
+file is any file the diff touches, so the total includes the added and deleted
+ones. An insertion is a `+` line and a deletion a `-` line, and an edited line
+counts once as each, so neither number alone says how much code was
+rewritten. Net change is insertions minus deletions: how many lines the
+codebase grew, or shrank when negative. Lockfiles, tests, and generated files
+are counted, unlike in `list-changed-units.py`, because they are part of what
+the change touches. The callout is not a section: it takes no number and no
+heading, and nothing cites it.
 
 ## Sections
 
@@ -229,7 +270,8 @@ the walkthrough stands alone.
 
 A change whose plan has nothing that needs a section of its own still gets a
 walkthrough: the short form, which has only the sections such a change needs,
-numbered 1 to 3.
+numbered 1 to 3. It opens with the same
+[Blast radius](#blast-radius) callout.
 
 1. **Purpose:** the problem paragraph, then the diff summary, per
    [Purpose](purpose.md#in-the-short-form).

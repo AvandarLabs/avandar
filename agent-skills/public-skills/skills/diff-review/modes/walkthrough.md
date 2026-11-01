@@ -61,7 +61,9 @@ is written to:
 6. Where a decision's rationale is not recoverable from the code, say so
    rather than inventing one, and add it to Open questions (in the short form,
    to Questions for the reviewer).
-7. Write `-walkthrough.md` in the form the plan chose, including Purpose per [Purpose](../walkthrough/purpose.md) and
+7. Write `-walkthrough.md` in the form the plan chose, opening with the
+   [Blast radius](../walkthrough/structure.md#blast-radius) callout under the
+   title, and including Purpose per [Purpose](../walkthrough/purpose.md) and
    Appendix A. Manual testing per [Manual testing](../walkthrough/manual-testing.md), each
    appendix after its page-break line per
    [Sections](../walkthrough/structure.md#sections) or

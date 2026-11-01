@@ -93,7 +93,7 @@ walkthrough/    the walkthrough's contract, one file per part, and one file
 references/     comment and reply voice, a worked pipeline explanation,
                 worked screenshot examples
 scripts/        validators, helpers, the glossary marker, the changed-unit
-                lister, and the dif runner
+                lister, the blast radius counter, and the dif runner
 ```
 
 ## Artifact names
