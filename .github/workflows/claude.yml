@@ -15,7 +15,9 @@ env:
   # Strips credentials such as CLAUDE_CODE_OAUTH_TOKEN from every command
   # Claude runs, including the git hooks and any PR code those commands
   # execute. Claude keeps them for its own API calls, and GitHub tokens stay
-  # so gh and git push still work.
+  # so gh and git push still work. It also forces Claude Code's permission
+  # mode to default, which overrides the action's acceptEdits mode, so every
+  # tool Claude uses, file edits included, must be allowed explicitly.
   CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: "1"
 
 # Both jobs run read-only on a PR from a fork. The GitHub App token Claude
@@ -110,10 +112,9 @@ jobs:
           plugins: "code-review@claude-code-plugins"
           prompt: "/code-review:code-review ${{ github.repository }}/pull/${{ github.event.issue.number }}"
           # The plugin's command grants its own gh tools. These add read-only
-          # checks on top, and type-check and lint only for internal PRs.
-          # Lines starting with # are stripped before parsing.
+          # git history on top, and type-check and lint only for internal PRs.
+          # The first line must be a flag. See READ_ONLY_ARGS in the claude job.
           claude_args: |
-            # Read-only git history
             --allowedTools "Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git blame:*)"
             ${{ steps.origin.outputs.is_fork == 'false' && '--allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm exec tsc:*),Bash(pnpm exec eslint:*)"' || '--append-system-prompt "This PR comes from a fork, so you cannot run project scripts. Read the CI results with gh pr checks instead."' }}
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
@@ -136,10 +137,15 @@ jobs:
       actions: read # Required for Claude to read CI results on PRs
     env:
       # Tools for every run: read code, history, PRs, and CI results.
-      # The action already allows Read, Glob, Grep, file edits inside the
-      # checkout, git add/commit/rm, and its own push script. Anything not
-      # listed here is denied, because a headless run cannot ask for
-      # approval. Lines starting with # are stripped before parsing.
+      # The action already allows Read, Glob, Grep, git add/commit/rm, and its
+      # own push script. Anything not listed here or there is denied, because
+      # a headless run cannot ask for approval.
+      #
+      # Lines starting with # are stripped before parsing, but the first line
+      # must be a flag. The action appends claude_args to its own flags on the
+      # same line, so a leading # line is not stripped, and the shell parser
+      # then reads it and every line after it as one comment. That silently
+      # drops every flag below.
       #
       # Deliberately left out: gh api (its token can write to the repo),
       # pnpm add/remove (supply-chain risk), rm, xargs, awk, WebSearch, and
@@ -147,7 +153,6 @@ jobs:
       # fetch --upload-pack can each run any command, and cat, head, and tail
       # duplicate Read, so none of them are allowed either.
       READ_ONLY_ARGS: |
-        # Git history
         --allowedTools "Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
         # GitHub reads
         --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr list:*),Bash(gh run view:*),Bash(gh issue view:*)"
@@ -163,7 +168,10 @@ jobs:
         # Git: rename, undo, and sync with other @claude jobs
         --allowedTools "Bash(git mv:*),Bash(git restore:*),Bash(git reset:*)"
         --allowedTools "Bash(claude-sync-branch),Bash(git fetch origin),Bash(git rebase --continue),Bash(git rebase --abort),Bash(git merge:*)"
-        # Files
+        # Files. Edit(./**) covers Edit and Write inside the checkout and
+        # nowhere else. The env scrub turns off the action's acceptEdits mode,
+        # so without it every file edit is denied.
+        --allowedTools "Edit(./**)"
         --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(sed --sandbox:*),Bash(claude-replace:*)"
         # Checks
         --allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm test:*),Bash(pnpm format:*)"

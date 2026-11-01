@@ -2,9 +2,34 @@
 //! groups fail-open, and the proxy error path — all without a running difit.
 
 use std::net::TcpListener;
+use std::sync::Arc;
 use std::time::Duration;
 
-use dif::web::WebShell;
+use dif::github::registry::SharedRegistry;
+use dif::inject::mode::DispatchControl;
+use dif::web::{CommentChannels, WebShell};
+
+/// A shell for `develop` with no guide, summary, or test plan on disk.
+fn start_develop_shell(difit_port: u16, shell_port: u16, channels: CommentChannels) -> WebShell {
+    WebShell::start(
+        difit_port,
+        shell_port,
+        "/no/such/guide.json".into(),
+        "develop".into(),
+        "develop".into(),
+        "/no/such/summary.md".into(),
+        "/no/such/test-plan.md".into(),
+        channels,
+    )
+    .expect("shell binds")
+}
+
+fn channels() -> CommentChannels {
+    CommentChannels {
+        dispatch: Arc::new(DispatchControl::new()),
+        github: SharedRegistry::load("/no/such/dir/r-github.json".into()),
+    }
+}
 
 fn free_port() -> u16 {
     TcpListener::bind("127.0.0.1:0")
@@ -28,6 +53,7 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
         "avandar".into(),
         "/no/such/summary.md".into(),
         "/no/such/test-plan.md".into(),
+        channels(),
     )
     .expect("shell binds");
     std::thread::sleep(Duration::from_millis(50));
@@ -89,8 +115,12 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
         "expanded group file lists should scroll independently"
     );
     assert!(
-        css_text.contains(".grp-body {\n  overflow: hidden;\n  max-height: calc(45vh + 40px);"),
-        "the expanded accordion should leave room for its scroll area and orientation"
+        css_text.contains(".grp-body {\n  display: grid;\n  grid-template-rows: 1fr;"),
+        "the expanded accordion should size to its content, not a fixed max-height"
+    );
+    assert!(
+        css_text.contains(".grp-body-inner {\n  overflow: hidden;\n  min-height: 0;"),
+        "the accordion's inner wrapper should clip only while it collapses"
     );
     assert!(
         css_text.contains(".test-plan-panel {\n  padding: 8px 6px 16px;\n  color: var(--ink-2);\n  font-size: 13.5px;"),
@@ -190,5 +220,96 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
         }
     }
 
+    shell.shutdown();
+}
+
+#[test]
+fn delivery_mode_round_trips_and_send_all_reaches_the_tui() {
+    let shell_port = free_port();
+    let channels = channels();
+    let mut shell = start_develop_shell(free_port(), shell_port, channels.clone());
+    std::thread::sleep(Duration::from_millis(50));
+    let base = format!("http://127.0.0.1:{shell_port}");
+
+    let state: serde_json::Value = ureq::get(&format!("{base}/__wrap/dispatch.json"))
+        .call()
+        .unwrap()
+        .into_json()
+        .unwrap();
+    assert_eq!(state["mode"], "bulk", "bulk delivery is the default");
+
+    let state: serde_json::Value = ureq::post(&format!("{base}/__wrap/dispatch"))
+        .send_string(r#"{"mode":"eager"}"#)
+        .unwrap()
+        .into_json()
+        .unwrap();
+    assert_eq!(state["mode"], "eager");
+    assert!(!channels.dispatch.is_bulk());
+
+    let sent = ureq::post(&format!("{base}/__wrap/send-all"))
+        .call()
+        .unwrap();
+    assert_eq!(sent.status(), 202);
+    assert!(channels.dispatch.take_send_all());
+
+    let github: serde_json::Value = ureq::get(&format!("{base}/__wrap/github.json"))
+        .call()
+        .unwrap()
+        .into_json()
+        .unwrap();
+    assert_eq!(github["available"], false, "no PR looked up yet");
+    shell.shutdown();
+}
+
+/// A stand-in difit that holds one comment and accepts saves, recording the
+/// body of each `POST /api/comments` it receives.
+fn fake_difit(port: u16) -> std::sync::mpsc::Receiver<String> {
+    let server = tiny_http::Server::http(("127.0.0.1", port)).unwrap();
+    let (saved, received) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        for mut request in server.incoming_requests() {
+            let body = if request.url().starts_with("/api/comments-json") {
+                r#"{"version":1,"threads":[{"id":"t1","messages":[{"id":"m1","body":"held"}]}]}"#
+                    .to_owned()
+            } else {
+                let mut posted = String::new();
+                request.as_reader().read_to_string(&mut posted).unwrap();
+                let _ = saved.send(posted);
+                r#"{"success":true,"version":2}"#.to_owned()
+            };
+            let _ = request.respond(tiny_http::Response::from_string(body));
+        }
+    });
+    received
+}
+
+#[test]
+fn a_pr_bound_save_marks_only_the_new_comment_and_still_reaches_difit() {
+    let difit_port = free_port();
+    let saves = fake_difit(difit_port);
+    let dir = tempfile::tempdir().unwrap();
+    let channels = CommentChannels {
+        dispatch: Arc::new(DispatchControl::new()),
+        github: SharedRegistry::load(dir.path().join("r-github.json")),
+    };
+    let shell_port = free_port();
+    let mut shell = start_develop_shell(difit_port, shell_port, channels.clone());
+    std::thread::sleep(Duration::from_millis(50));
+    let url = format!("http://127.0.0.1:{shell_port}/api/comments");
+    let body = r#"{"threads":[{"id":"t1","messages":[{"id":"m1","body":"held"},{"id":"m2","body":"to the PR"}]}],"baseVersion":1}"#;
+
+    // An untagged save (a TUI-bound comment) marks nothing.
+    ureq::post(&url).send_string(body).unwrap();
+    assert!(channels.github.github_ids().is_empty());
+
+    ureq::post(&url)
+        .set("X-Dif-Destination", "github")
+        .send_string(body)
+        .unwrap();
+    let ids = channels.github.github_ids();
+    assert_eq!(ids.len(), 1);
+    assert!(ids.contains("m2"), "{ids:?}");
+    assert_eq!(saves.recv_timeout(Duration::from_secs(1)).unwrap(), body);
+    assert_eq!(saves.recv_timeout(Duration::from_secs(1)).unwrap(), body);
     shell.shutdown();
 }

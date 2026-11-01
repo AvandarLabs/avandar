@@ -195,7 +195,9 @@ own draft.
    No glossary definition uses a term that would itself need defining, per
    [Glossary](glossary.md). No Background row runs past two sentences, per
    [Background technical context](background-context.md). Both tables
-   and the whole of Manual testing sit inside a `<small>` wrapper. Every Manual testing step is runnable as
+   and the whole of Manual testing sit inside a `<small>` wrapper. The
+   [Blast radius](structure.md#blast-radius) callout sits between the title
+   and section 1, exactly as `scripts/blast-radius.py` prints it. Every Manual testing step is runnable as
    written, setup comes first, and each fixed defect has its before-and-after,
    per [Manual testing](manual-testing.md).
 

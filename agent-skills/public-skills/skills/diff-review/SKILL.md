@@ -93,7 +93,7 @@ walkthrough/    the walkthrough's contract, one file per part, and one file
 references/     comment and reply voice, a worked pipeline explanation,
                 worked screenshot examples
 scripts/        validators, helpers, the glossary marker, the changed-unit
-                lister, and the dif runner
+                lister, the blast radius counter, and the dif runner
 ```
 
 ## Artifact names
@@ -123,9 +123,19 @@ Use the slug rules in `scripts/dif/src/comparison.rs` and
 | Manual test plan | `-test-plan.md` |
 | Walkthrough | `-walkthrough.md` |
 | Reviewed state | `-reviewed.json` |
+| GitHub sync record (TUI-owned) | `-github.json` |
 
-The skill writes these artifacts. The TUI reads them and owns live session
-metadata and transcript mirroring.
+The skill writes these artifacts, except `-github.json`. The TUI reads them and
+owns live session metadata, transcript mirroring, and the GitHub sync record.
+
+`-github.json` lists the transcript comments that belong to the branch's GitHub
+PR rather than to you: comments the reviewer sent to the PR, and every comment
+and reply the TUI pulled in from the PR (other reviewers, bots such as
+`coderabbitai[bot]`, and the reviewer on github.com, with ids like
+`gh:<node id>`). Its `comments` object is keyed by transcript entry `id`. The
+TUI keeps those in sync with GitHub itself. Treat every entry whose `id` is a
+key there as not addressed to you: never answer it, never count it as an open
+comment, and never edit code for it. Read it only for context.
 
 `dif` starts difit as soon as it launches, before any of these exist, and
 creates the transcript as `[]` so the reviewer can comment immediately. Treat an

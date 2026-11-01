@@ -36,8 +36,10 @@ sections, and the walkthrough takes longer than everything else combined.
 7. Send the Initial chat summary. When this round wrote the walkthrough, follow
    it with the report from step 13 of [Walkthrough](walkthrough.md).
 
-A reviewer comment may arrive mid-round: `dif` types it into your input as soon
-as it is written, so it lands as a queued message while you work. Before the
+A reviewer comment may arrive mid-round. By default the browser holds comments
+until the reviewer presses **Send all**, which types them into your input as one
+numbered prompt; in eager mode each comment is typed as soon as it is written.
+Either way it lands as a queued message while you work. Before the
 guides are written, finish them first. After that, answer the comment as a
 Continue round at the next break between steps, then resume the Initial round
 where it stopped: a reviewer should not wait for a walkthrough to get a reply.

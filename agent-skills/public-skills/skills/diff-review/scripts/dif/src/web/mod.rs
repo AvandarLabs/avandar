@@ -15,13 +15,17 @@
 //! I/O layer: [`proxy`] (ureq upstream calls) and [`server`] (the `tiny_http`
 //! request loop). [`WebShell`] owns the server thread.
 
+pub mod assets;
 pub mod filter;
+pub mod github_routes;
 pub mod groups;
 pub mod inject;
 pub mod meta;
 pub mod proxy;
+pub mod review_routes;
 pub mod router;
 pub mod server;
+pub mod shell_routes;
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
@@ -35,6 +39,19 @@ use tiny_http::Server;
 
 use server::Ctx;
 
+use crate::github::registry::SharedRegistry;
+use crate::inject::mode::DispatchControl;
+
+/// The state the shell shares with the rest of `dif` to steer reviewer
+/// comments: how they reach the LLM pane, and which go to the GitHub PR.
+#[derive(Clone)]
+pub struct CommentChannels {
+    /// Bulk vs eager delivery to the LLM pane, read by the TUI event loop.
+    pub dispatch: Arc<DispatchControl>,
+    /// PR-bound comments, shared with the poller's GitHub sync pass.
+    pub github: SharedRegistry,
+}
+
 /// A short version tag derived from the embedded frontend. It changes whenever
 /// any frontend asset changes (i.e. on every rebuilt binary), and is appended as
 /// `?v=<tag>` to the `shell.js` / `shell.css` URLs in the served page. Combined
@@ -42,10 +59,10 @@ use server::Ctx;
 /// after `dif` relaunches with new code: the URL itself differs.
 fn asset_version() -> String {
     let mut h = DefaultHasher::new();
-    server::SHELL_HTML.hash(&mut h);
-    server::SHELL_CSS.hash(&mut h);
-    server::SHELL_JS.hash(&mut h);
-    server::INJECT_JS.hash(&mut h);
+    assets::SHELL_HTML.hash(&mut h);
+    assets::SHELL_CSS.hash(&mut h);
+    assets::SHELL_JS.hash(&mut h);
+    assets::INJECT_JS.hash(&mut h);
     format!("{:x}", h.finish())
 }
 
@@ -63,7 +80,8 @@ impl WebShell {
     /// `difit_port` and reading this review's groups from `guide_json_path`.
     ///
     /// `branch` titles the header; `worktree` is the checkout's directory name,
-    /// shown as a pill when it differs from the branch.
+    /// shown as a pill when it differs from the branch. `channels` is the
+    /// comment-steering state the browser reads and changes.
     #[allow(clippy::too_many_arguments)]
     pub fn start(
         difit_port: u16,
@@ -73,6 +91,7 @@ impl WebShell {
         worktree: String,
         diff_summary_path: PathBuf,
         test_plan_path: PathBuf,
+        channels: CommentChannels,
     ) -> Result<Self> {
         let server = Server::http(("127.0.0.1", shell_port))
             .map_err(|e| anyhow!("web shell failed to bind port {shell_port}: {e}"))?;
@@ -87,6 +106,8 @@ impl WebShell {
             worktree,
             regen: Arc::clone(&regen),
             asset_version: asset_version(),
+            dispatch: channels.dispatch,
+            github: channels.github,
         });
         let srv = Arc::clone(&server);
         let handle = std::thread::spawn(move || server::serve(&srv, &ctx));

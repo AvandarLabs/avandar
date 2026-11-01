@@ -37,6 +37,24 @@ pub enum Route {
     Meta,
     /// `POST /__wrap/regenerate` — ask the TUI to regenerate the diff guide.
     Regenerate,
+    /// `GET /__wrap/dispatch.json`: comment delivery mode + held count.
+    DispatchState,
+    /// `POST /__wrap/dispatch`: switch between bulk and eager delivery.
+    SetDispatchMode,
+    /// `POST /__wrap/send-all`: send every held comment to the LLM.
+    SendAll,
+    /// `GET /__wrap/github.json`: PR availability + each PR-bound comment's
+    /// sync state.
+    GithubState,
+    /// `POST /__wrap/github/pull`: pull from GitHub now.
+    GithubPull,
+    /// `POST /__wrap/github/submit`: submit the pending review.
+    GithubSubmit,
+    /// `POST /__wrap/github/viewed`: viewed-file changes to send to GitHub.
+    GithubViewed,
+    /// `POST /api/comments`: difit's comment save, inspected for PR-bound
+    /// comments before it is proxied.
+    SaveComments,
     /// `GET /__wrap/difit[?group=N|?view=new]` — proxy difit's document, inject our script.
     DifitDoc,
     /// `GET /api/diff` — proxy difit's diff, narrowed per the view (from `Referer`).
@@ -88,9 +106,16 @@ pub fn diff_filter_in_referer(referer: Option<&str>) -> DiffFilter {
 /// string (without `?`); `referer` is the `Referer` header, if any.
 #[must_use]
 pub fn route(method: &str, path: &str, query: &str, referer: Option<&str>) -> Route {
-    let _ = method; // all shell routes are GET today; kept for future POST handling
     let _ = query; // difit-doc no longer branches on the query; kept for parity
     match path {
+        "/api/comments" if method == "POST" => Route::SaveComments,
+        "/__wrap/dispatch.json" => Route::DispatchState,
+        "/__wrap/dispatch" => Route::SetDispatchMode,
+        "/__wrap/send-all" => Route::SendAll,
+        "/__wrap/github.json" => Route::GithubState,
+        "/__wrap/github/pull" => Route::GithubPull,
+        "/__wrap/github/submit" => Route::GithubSubmit,
+        "/__wrap/github/viewed" => Route::GithubViewed,
         "/" => Route::ShellPage,
         "/__wrap/inject.js" => Route::InjectJs,
         "/__wrap/groups.json" => Route::Groups,
@@ -141,6 +166,52 @@ mod tests {
         assert_eq!(
             route("GET", "/__wrap/shell.js", "", None),
             Route::ShellAsset("shell.js".to_owned())
+        );
+    }
+
+    #[test]
+    fn delivery_and_github_routes() {
+        assert_eq!(
+            route("GET", "/__wrap/dispatch.json", "", None),
+            Route::DispatchState
+        );
+        assert_eq!(
+            route("POST", "/__wrap/dispatch", "", None),
+            Route::SetDispatchMode
+        );
+        assert_eq!(route("POST", "/__wrap/send-all", "", None), Route::SendAll);
+        assert_eq!(
+            route("GET", "/__wrap/github.json", "", None),
+            Route::GithubState
+        );
+    }
+
+    #[test]
+    fn github_request_routes() {
+        assert_eq!(
+            route("POST", "/__wrap/github/pull", "", None),
+            Route::GithubPull
+        );
+        assert_eq!(
+            route("POST", "/__wrap/github/submit", "", None),
+            Route::GithubSubmit
+        );
+        assert_eq!(
+            route("POST", "/__wrap/github/viewed", "", None),
+            Route::GithubViewed
+        );
+    }
+
+    #[test]
+    fn only_a_comment_save_is_intercepted() {
+        assert_eq!(
+            route("POST", "/api/comments", "", None),
+            Route::SaveComments
+        );
+        assert_eq!(route("GET", "/api/comments", "", None), Route::Proxy);
+        assert_eq!(
+            route("POST", "/api/comment-imports", "", None),
+            Route::Proxy
         );
     }
 

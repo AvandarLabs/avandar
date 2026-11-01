@@ -30,7 +30,47 @@ suite with `cargo test` (it finishes in a couple of seconds).
   (browser `"User"` and skill `"reviewer"` both dispatch; authorless/claude-only do
   not), answered/dispatched skipping, reviewer-reply-after-claude, line labels,
   baseline ids.
-- `inject::dispatcher`: baseline-then-dispatch-once across snapshots.
+- `inject::dispatcher`: baseline-then-dispatch-once across snapshots; bulk
+  holds and counts comments, send-all flushes them as one prompt, eager sends one
+  each, and PR-bound ids are never queued or sent.
+- `inject::mode`: bulk is the default, send-all is taken once, and the
+  `/__wrap/dispatch` JSON in and out.
+- `inject::prompt`: the batched send-all prompt.
+- `github::anchor`: difit positions → GitHub side / line / start line.
+- `github::plan` (`plan_tests.rs`): a draft thread at a range, a draft reply
+  under a root on GitHub, waiting on a pending root, a PR reply in a local
+  thread opening its own thread, update on an edit, nothing removed unless the
+  previous snapshot held it, a removed published thread resolving (replies
+  forgotten), a removed draft thread deleting its drafts, one deleted reply
+  deleting on GitHub, retrying a failure only after an edit.
+- `github::pull` (`pull_tests.rs`): new remote threads and replies under their
+  authors (bots, the viewer's own as editable), placement in the matching local
+  thread, a GitHub edit replacing an unchanged local body but losing to an
+  unsent local edit, drafts turning published, deletions and resolves removing
+  locally (with the thread's local replies), partial threads and unposted
+  comments never removed, a draft kept while the pending review exists; viewed
+  changes (GitHub wins first, then transitions only).
+- `github::graphql`: error answers, the viewer's pending review, new threads and
+  replies, threads with bots / ranges / outdated lines / paging, viewed files.
+- `github::client`: thread variables (range vs single line), `gh pr view`
+  parsing (open PRs only), and "already gone" errors.
+- `github::checkout`: the fast-forward decision, plus a real `origin` / clone
+  pair: fetching `pull/7/head` and fast-forwarding a clean branch, tracked edits
+  blocking it (untracked files don't), and a local commit making it diverged.
+- `github::registry` / `github::session`: persistence, marking never resets a
+  posted entry, session state never persisted, tombstones kept from the LLM,
+  draft/failed counts, own-PR detection, the browser JSON, viewed event capping.
+- `github::sync` (`sync_tests.rs`, against a stateful fake GitHub): draft then
+  publish on submit, edit/resolve mirroring, own PR refusing approve, submit
+  refusing failed comments, no PR failing comments with the reason, a pull
+  importing a bot thread kept from the LLM, viewed sync both ways (one call per
+  file, none for no-ops, paused off the PR's base), fast-forward vs a dirty
+  branch's notice, and pulls only on request or interval.
+- `difit::editor`: adding threads and messages once, setting a body, removing a
+  reply vs a whole thread.
+- `web::review_routes`: new message ids in a comment save (fails closed).
+- `web::github_routes`: submit parsing (events, own PR comment-only) and
+  viewed-change parsing.
 - `inject::reply_watcher`: baseline-then-log-once for new `claude` replies, with
   the `file:Lx` location; reviewer comments never logged as replies.
 - `tui::keymap`: key→bytes encodings and injected prompt delivery, including
@@ -80,6 +120,11 @@ out-of-band write adds, that the poller's own mirror adds none, that a deleted
 comment is not resurrected, and that an unplaceable or half-written entry never
 poisons the batch.
 
+**Integration (`tests/web_shell.rs`):** the delivery mode round-trips through
+`/__wrap/dispatch`, send-all reaches the shared control, and a save tagged
+`X-Dif-Destination: github` marks only the new comment against a stand-in difit
+while still reaching it.
+
 ## What's not unit-tested
 
 The terminal rendering and the event loop's input routing are exercised by
@@ -88,3 +133,10 @@ running `dif`, not by a unit test; they're thin glue over tested pieces
 tested with a real child rather than a mock. The diff-guide *content* rules
 (numbered groups, group/file reviewed semantics, re-review-on-change) live in
 the `diff-review` skill, not this crate, so they are not unit-tested here.
+
+The browser half of GitHub sync (`inject/destinations.js`, `inject/viewed.js`,
+`shell/github.js`: the comment box toggle, the restyling, writing difit's viewed
+storage, the header and review panel) depends on difit's rendered DOM and
+storage, so it is checked by hand in a headless browser against a real difit,
+driving the real `GithubSync` with a scripted stand-in `GithubApi`, so nothing
+reaches a real PR. Real `gh` calls are never made by the suite.

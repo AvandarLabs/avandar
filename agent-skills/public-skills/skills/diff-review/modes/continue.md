@@ -1,6 +1,7 @@
 # Continue
 
-Continue has two entry paths: Injected handles one comment typed by the TUI;
+Continue has two entry paths: Injected handles the comments the TUI typed (one
+comment, or a numbered batch from **Send all**: address every item in it);
 Manual discovers all open comments from the transcript. This path is unrelated
 to the `/diff-review auto <PR-number>` alias for PR review.
 
@@ -8,8 +9,9 @@ to the `/diff-review auto <PR-number>` alias for PR review.
    live `port`, `comments_file`, and `comparison_key`. Read the mirrored
    transcript once for context. Never write it; the TUI poller owns it.
 2. An open comment is a non-`claude` entry without a later `claude` reply at the
-   same `filePath` and `position`. Classify it as a question, change request, or
-   both. Do not edit code for a question alone.
+   same `filePath` and `position`, and whose `id` is not a key in the review's
+   `-github.json` (those went to the GitHub PR, not to you). Classify it as a
+   question, change request, or both. Do not edit code for a question alone.
 3. When changing code, ensure the result remains visible to the active
    comparison. The bundled runner always uses these semantics:
    - A committed branch comparison, such as `develop`, `main`, or another
