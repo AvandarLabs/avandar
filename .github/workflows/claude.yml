@@ -76,15 +76,16 @@ jobs:
         with:
           deno-version: v2.x
 
-      # CLAUDE_CODE_SUBPROCESS_ENV_SCRUB needs bubblewrap, which the runner
-      # image does not ship. Ubuntu 24.04's AppArmor policy blocks the user
+      # CLAUDE_CODE_SUBPROCESS_ENV_SCRUB runs every Bash command in Claude
+      # Code's sandbox, which needs bubblewrap and socat. The runner image
+      # ships neither. Ubuntu 24.04's AppArmor policy blocks the user
       # namespaces bwrap creates, so this also grants bwrap, and only bwrap,
-      # that permission. The last command fails the step here rather than
-      # leaving Claude Code to fail at startup.
-      - name: Install bubblewrap
+      # that permission. The last two commands fail the step here rather than
+      # leaving every Bash command in the Claude step to fail.
+      - name: Install sandbox dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y bubblewrap
+          sudo apt-get install -y bubblewrap socat
           if [ "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null)" = "1" ]; then
             sudo tee /etc/apparmor.d/bwrap > /dev/null <<'PROFILE'
           abi <abi/4.0>,
@@ -98,6 +99,7 @@ jobs:
             sudo systemctl reload apparmor
           fi
           bwrap --ro-bind / / --dev /dev --proc /proc --unshare-all true
+          socat -V > /dev/null
 
       - name: Run Claude Code Review
         id: claude-review
@@ -226,15 +228,16 @@ jobs:
         if: steps.origin.outputs.is_fork == 'false'
         run: sudo install -m 755 .github/claude-bot/claude-sync-branch .github/claude-bot/claude-replace /usr/local/bin/
 
-      # CLAUDE_CODE_SUBPROCESS_ENV_SCRUB needs bubblewrap, which the runner
-      # image does not ship. Ubuntu 24.04's AppArmor policy blocks the user
+      # CLAUDE_CODE_SUBPROCESS_ENV_SCRUB runs every Bash command in Claude
+      # Code's sandbox, which needs bubblewrap and socat. The runner image
+      # ships neither. Ubuntu 24.04's AppArmor policy blocks the user
       # namespaces bwrap creates, so this also grants bwrap, and only bwrap,
-      # that permission. The last command fails the step here rather than
-      # leaving Claude Code to fail at startup.
-      - name: Install bubblewrap
+      # that permission. The last two commands fail the step here rather than
+      # leaving every Bash command in the Claude step to fail.
+      - name: Install sandbox dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y bubblewrap
+          sudo apt-get install -y bubblewrap socat
           if [ "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null)" = "1" ]; then
             sudo tee /etc/apparmor.d/bwrap > /dev/null <<'PROFILE'
           abi <abi/4.0>,
@@ -248,6 +251,7 @@ jobs:
             sudo systemctl reload apparmor
           fi
           bwrap --ro-bind / / --dev /dev --proc /proc --unshare-all true
+          socat -V > /dev/null
 
       - name: Run Claude Code
         id: claude
