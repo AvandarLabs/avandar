@@ -43,7 +43,7 @@ export const QueryAggregationTypeModule = {
    * Aggregate result type within Avandar's supported scalar representation.
    * Integer and boolean SUM widen to whole numbers, including DuckDB HUGEINT.
    */
-  getResultDataType: ({
+  getQueryResultDataType: ({
     aggregation,
     sourceDataType,
   }: Readonly<{

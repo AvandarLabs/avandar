@@ -33,7 +33,7 @@ export function makeFilterColumnFromStructuredQuery(
       column: column,
       aggregation: aggregation,
     }),
-    dataType: QueryAggregationType.getResultDataType({
+    dataType: QueryAggregationType.getQueryResultDataType({
       aggregation: aggregation,
       sourceDataType: column.baseColumn.dataType,
     }),

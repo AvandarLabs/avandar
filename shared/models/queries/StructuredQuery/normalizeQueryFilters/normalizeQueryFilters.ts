@@ -64,7 +64,7 @@ function _getColumnIdRule({
 }): QueryFilterRule {
   const { columnName: _columnName, ...rule } = node;
   const aggregation = clause === "having" ? column.aggregation : undefined;
-  const columnDataType = QueryAggregationType.getResultDataType({
+  const columnDataType = QueryAggregationType.getQueryResultDataType({
     aggregation,
     sourceDataType: column.baseColumn.dataType,
   });
