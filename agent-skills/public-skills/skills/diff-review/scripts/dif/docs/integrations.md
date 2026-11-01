@@ -235,7 +235,7 @@ inside it as pasted text, whereas a discrete delayed `Enter` submits it. Codex
 receives a delayed `Tab`, which queues the prompt behind any active work instead
 of steering or interrupting the current turn.
 
-## Injection: baseline, then once-each
+## Injection: baseline, then once-each, held or eager
 
 - On the first successful poll, every existing reviewer comment id is recorded
   as a **baseline** and *not* dispatched — `dif` only acts on comments added
@@ -248,6 +248,130 @@ of steering or interrupting the current turn.
   `diff-review` skill posts as `"reviewer"`; both (and any other non-claude
   author) count. Matching `reviewer` alone would miss every comment you type in the
   browser, since difit hardcodes that author as `"User"`.
+- **Delivery.** In **bulk** mode (the default) open comments are held and only
+  counted; the count is served to the browser at `/__wrap/dispatch.json`. When
+  the reviewer presses **Send all** (`POST /__wrap/send-all`), the event loop
+  types every held comment as one numbered prompt and marks them dispatched. In
+  **eager** mode (`POST /__wrap/dispatch {"mode":"eager"}`) each open comment
+  is typed as its own prompt the tick it appears. A held comment is not marked
+  dispatched, so its final text is what gets sent.
+- **PR-bound comments are skipped.** Any message id in the `-github.json`
+  registry is never held, counted, or typed. See
+  [GitHub PR sync](#github-pr-sync).
+
+## GitHub PR sync
+
+When the branch has an open PR, `dif` keeps it and the review in step: PR
+comments the reviewer writes in dif, and everything that happens on the PR.
+Only local comments and replies (the TUI conversation, the default) stay off
+GitHub. Every GitHub call is GraphQL through `gh api graphql` (REST cannot add
+to a pending review or mark files viewed) and runs on the poller thread
+(`github::sync`), one at a time.
+
+### Writing PR comments (push)
+
+1. **`inject/destinations.js`** adds the TUI / PR toggle to each difit comment
+   box (not to edit boxes: an edit follows the comment's destination) and
+   relabels the box's submit button for the chosen destination and the
+   shell's Bulk / Eager mode (read from `/__wrap/dispatch.json`). The label is
+   a `data-dif-submit-label` attribute drawn by CSS `::after`, so React keeps
+   owning the button's text. When a PR box submits, it tags difit's next `POST /api/comments` with
+   `X-Dif-Destination: github`.
+2. **The web shell** (`web/review_routes.rs`) intercepts that save. Before
+   proxying it, it reads difit's `/api/comments-json` and marks the posted
+   message ids difit does not hold yet as `pending` in the registry, so the
+   poller and the LLM dispatcher never see the comment unmarked.
+3. **The poller** plans against the registry (`github::plan`) and writes into
+   the reviewer's **pending review**, GitHub's "Start a review". Drafts are
+   visible only to the reviewer until the review is submitted.
+
+| difit change | GitHub call |
+| --- | --- |
+| new PR thread, or PR reply in a local thread | `addPullRequestReviewThread` (draft; `line`/`side`, `startLine`/`startSide` for a range). Starts the pending review first (`addPullRequestReview` on the PR head) when there is none. |
+| PR reply in a PR thread | `addPullRequestReviewThreadReply` (draft) |
+| edited body | `updatePullRequestReviewComment` (draft or published) |
+| one message deleted | `deletePullRequestReviewComment` |
+| whole thread removed (difit's "Resolve") | published: `resolveReviewThread`; draft: delete its drafts |
+
+Guards:
+
+- A removal only counts when the **previous** snapshot held the comment, so a
+  first or incomplete snapshot (difit restarting) changes nothing on GitHub.
+- A failed post is recorded with GitHub's message and not retried until the
+  reviewer edits the comment.
+- A PR reply whose root is still being posted waits for the next pass.
+- A cached pending review GitHub no longer knows (submitted or discarded on
+  github.com) is dropped and the call retried once against a fresh one.
+- With no open PR, PR comments fail with the reason instead of calling GitHub,
+  and the browser disables the PR option and shows **No linked PR**.
+
+### Submitting the review
+
+The shell's **Review (N)** button opens a panel with an optional summary and,
+on someone else's PR, GitHub's three outcomes: Comment, Approve, Request
+changes. On the reviewer's own PR GitHub only allows commenting, so the panel
+offers **Submit comments** alone (the web route and the sync pass both refuse
+anything else). `POST /__wrap/github/submit` queues the request; the poller
+waits until no comment is still `pending`, refuses while any have `failed`,
+then calls `submitPullRequestReview` and marks every draft `published`.
+
+### Pulling from GitHub
+
+The poller pulls every 60 seconds, and at once when the reviewer clicks
+**Sync** (`POST /__wrap/github/pull`) or after a submit. A pull reads every
+review thread and the viewer's per-file viewed state (paged), then:
+
+- **Comments** (`github::pull`, pure): threads and replies the reviewer has not
+  seen are added to difit under their author's login (bots as
+  `name[bot]`); the reviewer's own comments from github.com come in as difit's
+  editable `User`. All of them are recorded in the registry first, so the LLM
+  dispatcher never sees them. An edit on GitHub replaces the local body unless
+  the reviewer has an unsent local edit of that comment, which wins. Comments
+  deleted on GitHub, and threads resolved there, are removed from difit; a
+  removed thread takes its local replies with it. A thread whose comments did
+  not all fetch is never used to infer a deletion, and a missing draft only
+  counts once the pending review itself is gone.
+- **Applying to difit** (`difit::editor`): difit's import endpoint only
+  appends, so a pull reads `/api/comments-json`, edits the threads, and saves
+  them back through `POST /api/comments` with the version it read, exactly as
+  difit's browser does. Removed ids are remembered for the session
+  (`tombstones`): a stale browser save that brings one back is removed again
+  and still never reaches the LLM.
+- **Branch** (`github::checkout`): when the PR head differs from `HEAD`, it
+  fetches `pull/<n>/head` and fast-forwards only if the branch is strictly
+  behind and no tracked file has uncommitted changes. The shell then reloads
+  difit in place. Otherwise the header shows why (dirty, ahead, diverged).
+- **Viewed files**: see below.
+
+### Viewed files
+
+Viewed state syncs both ways, immediately, but only while difit shows the PR's
+own diff: the comparison is the PR's base branch and `HEAD` is the PR head.
+Otherwise the shell's PR pill explains why sync is paused.
+
+- **GitHub → difit.** The first pull of a session makes GitHub win outright;
+  later pulls send only files whose state changed. `VIEWED` marks a file viewed;
+  `UNVIEWED` and `DISMISSED` (changed since viewed) unmark it. The changes are
+  numbered events in `/__wrap/github.json`. `inject/viewed.js` applies new ones
+  by writing difit's own storage (the `difit-viewed-index-v1/<repositoryId>`
+  hash index, and the `viewedFiles` lists under `difit-storage-v1/<repositoryId>/`),
+  hashing each file exactly as difit does (SHA-256 of its path, status, and
+  hunks, from difit's own `/api/diff` query), then reloads difit's frame once no
+  comment draft is open.
+- **difit → GitHub.** difit's writes reach the shell as `storage` events; the
+  shell sends each changed path to `POST /__wrap/github/viewed`. GitHub has no
+  bulk mutation, so marking a directory in difit becomes one
+  `markFileAsViewed` / `unmarkFileAsViewed` call per file. A change GitHub
+  already matches is skipped, which also stops the GitHub → difit writes from
+  echoing back.
+
+### Restyling
+
+`inject/destinations.js` restyles PR comments from `/__wrap/github.json`. It
+matches difit's `#comment-thread-<id>` elements to `/api/comments-json`
+threads by message order and sets `data-dif-gh` / `data-dif-gh-thread`
+attributes rather than classes, because React rewrites `className` but leaves
+unknown attributes alone.
 
 ## The injected prompt and the skill handoff
 

@@ -22,6 +22,7 @@ use std::time::Duration;
 
 use super::imports::{Snapshot, snapshot_to_imports};
 use super::{importer, transcript};
+use crate::github::sync::GithubSync;
 
 /// Handle to the running poller thread + the latest snapshot it has seen.
 pub struct Poller {
@@ -35,12 +36,33 @@ impl Poller {
     /// until [`Poller::stop`] (or drop).
     #[must_use]
     pub fn start(port: u16, transcript_path: PathBuf, interval: Duration) -> Self {
+        Self::start_with_github(port, transcript_path, interval, None)
+    }
+
+    /// Like [`Poller::start`], also running `github` over every snapshot so
+    /// PR-bound comments are posted, edited, and deleted on the PR.
+    #[must_use]
+    pub fn start_with_github(
+        port: u16,
+        transcript_path: PathBuf,
+        interval: Duration,
+        mut github: Option<GithubSync>,
+    ) -> Self {
         let latest = Arc::new(Mutex::new(None));
         let stop = Arc::new(AtomicBool::new(false));
         let handle = {
             let latest = Arc::clone(&latest);
             let stop = Arc::clone(&stop);
-            thread::spawn(move || run(port, &transcript_path, interval, &latest, &stop))
+            thread::spawn(move || {
+                run(
+                    port,
+                    &transcript_path,
+                    interval,
+                    &latest,
+                    &stop,
+                    &mut github,
+                );
+            })
         };
         Self {
             latest,
@@ -76,6 +98,7 @@ fn run(
     interval: Duration,
     latest: &Arc<Mutex<Option<Snapshot>>>,
     stop: &Arc<AtomicBool>,
+    github: &mut Option<GithubSync>,
 ) {
     let url = format!("http://localhost:{port}/api/comments-json");
     // The exact text we last mirrored, so anything else on disk is an inbound
@@ -87,6 +110,9 @@ fn run(
     while !stop.load(Ordering::Relaxed) {
         if let Some(snapshot) = fetch(&url) {
             seen.extend(importer::snapshot_ids(&snapshot));
+            if let Some(github) = github.as_mut() {
+                github.tick(&snapshot);
+            }
             // An inbound write wins this tick: mirroring now would overwrite the
             // skill's round before difit has ingested it. The next poll sees the
             // imported entries in difit and mirrors the merged conversation.

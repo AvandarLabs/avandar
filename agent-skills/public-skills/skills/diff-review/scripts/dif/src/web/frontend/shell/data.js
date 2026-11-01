@@ -114,6 +114,7 @@
       renderedDiffSig = liveDiffSig;
     }
     setChangesAvailable(liveDiffSig !== renderedDiffSig);
+    maybeAutoShowChanges(); // a GitHub sync fast-forwarded the branch
 
     // If we're on the "new files" view and nothing is ungrouped anymore (the
     // guide was regenerated to cover them), fall back to Full.

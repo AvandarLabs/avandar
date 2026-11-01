@@ -38,7 +38,7 @@ The global command palette (`Ctrl+P`, see
 rather than an editable file: the flat, ordered table `PALETTE_COMMANDS` in
 `src/tui/palette.rs`. Each entry is a `PaletteCommand { label, action }`, and
 each `PaletteAction` variant is dispatched by `App::execute_palette_action`
-(`src/tui/app.rs`).
+(`src/tui/app/mod.rs`).
 
 Today the registry has four entries: "Restart diff server" → `PaletteAction::RestartDifit`
 (`Ctrl+R`), "Regenerate diff guide" → `PaletteAction::RegenerateGuide`

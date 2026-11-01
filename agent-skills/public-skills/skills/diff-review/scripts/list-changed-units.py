@@ -249,8 +249,14 @@ def _default_base():
     return "main"
 
 
-def diff_text(comparison):
-    flags = ["diff", "-U0", "--no-color", "--no-ext-diff", "--find-renames"]
+DIFF_FLAGS = ("-U0", "--no-color", "--no-ext-diff", "--find-renames")
+
+
+def diff_text(comparison, diff_flags=DIFF_FLAGS):
+    """The diff for `comparison`, untracked files included where it covers
+    the worktree. `diff_flags` replace the unified-diff flags, so another
+    script can read the same change as a stat."""
+    flags = ["diff", *diff_flags]
     if comparison == "staged":
         return _git([*flags, "--staged"])
     if comparison not in (".", "working"):
