@@ -5,7 +5,9 @@ import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryData
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 
 type SourceOptions = {
-  /** The data source (Dataset or Concept) whose columns are being reconciled. */
+  /**
+   * The data source (Dataset or Concept) whose columns are being reconciled.
+   */
   sourceKey: QueryDataSource.TypedId;
 
   /**
