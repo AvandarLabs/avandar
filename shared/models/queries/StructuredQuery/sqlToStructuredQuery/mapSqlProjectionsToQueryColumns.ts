@@ -44,7 +44,7 @@ function _makeQueryColumn(
 }
 
 /** Maps SELECT expressions and GROUP BY references to query columns. */
-export function parseSqlProjectionColumns({
+export function mapSqlProjectionsToQueryColumns({
   columnsList,
   groupBy,
   dataset,

@@ -27,7 +27,7 @@ import {
   parseWhereNode,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFilterClauses.ts";
 import { parseFromClause } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFromClause.ts";
-import { parseSqlProjectionColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseSqlProjectionColumns.ts";
+import { mapSqlProjectionsToQueryColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/mapSqlProjectionsToQueryColumns.ts";
 import { reconcileParsedColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/reconcileParsedColumns.ts";
 import { columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
@@ -140,7 +140,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   const nestedSubquery = fromResolution.nestedSubquery;
   const joins = fromResolution.joins;
 
-  const projection = parseSqlProjectionColumns({
+  const projection = mapSqlProjectionsToQueryColumns({
     columnsList: ast.columns,
     groupBy: ast.groupby,
     dataset,
