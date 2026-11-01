@@ -8,6 +8,8 @@ own `--shortstat` conventions. A file counts as changed whether it was
 modified, added, deleted, or renamed. A line counts as an insertion (+) or a
 deletion (-), and an edited line counts once as each, so the net change,
 insertions minus deletions, is how much the code grew or shrank. Binary files count as changed files with no lines.
+Files under the repository's top-level docs/ directory, and files that match a
+gitignore rule even though they are tracked, count nothing at all.
 
 Usage:
     blast-radius.py [comparison-key]
@@ -19,6 +21,7 @@ Exit 0 on success, 2 on a git error.
 """
 
 import importlib.util
+import re
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -31,6 +34,9 @@ _units = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_units)
 
 STAT_FLAGS = ("--numstat", "--summary", "--no-color", "--no-ext-diff", "--find-renames")
+EXCLUDED_DIRECTORIES = ("docs/",)
+_BRACED_RENAME = re.compile(r"\{[^{}]* => ([^{}]*)\}")
+_MODE_LINE = re.compile(r"^ (create|delete) mode \d+ (.+)$")
 
 
 @dataclass(frozen=True)
@@ -46,16 +52,62 @@ class Counts:
         return self.insertions - self.deletions
 
 
-def count_stat(text):
-    """Counts from `git diff --numstat --summary` output."""
+def destination_path(path):
+    """The path a numstat entry ends at, past any `old => new` rename."""
+    if _BRACED_RENAME.search(path):
+        return _BRACED_RENAME.sub(r"\1", path).replace("//", "/")
+    return path.split(" => ")[-1]
+
+
+def stat_paths(text):
+    """Every destination path in `git diff --numstat` output."""
+    return [
+        destination_path(line.split("\t", 2)[2])
+        for line in text.splitlines()
+        if "\t" in line
+    ]
+
+
+def ignored_paths(paths):
+    """The paths a gitignore rule matches, tracked or not."""
+    if not paths:
+        return set()
+    result = subprocess.run(
+        ["git", "check-ignore", "--no-index", "--stdin"],
+        input="\n".join(paths), capture_output=True, text=True,
+    )
+    if result.returncode not in (0, 1):
+        raise subprocess.CalledProcessError(
+            result.returncode, result.args, result.stdout, result.stderr
+        )
+    return set(result.stdout.splitlines())
+
+
+def exclusion_check(ignored):
+    """A predicate for paths left out of the counts: the `ignored` paths and
+    anything under an excluded top-level directory."""
+    def is_excluded(path):
+        return path in ignored or path.startswith(EXCLUDED_DIRECTORIES)
+    return is_excluded
+
+
+def count_stat(text, is_excluded=lambda path: False):
+    """Counts from `git diff --numstat --summary` output, skipping every path
+    `is_excluded` accepts."""
     changed = added = deleted = insertions = deletions = 0
     for line in text.splitlines():
-        if line.startswith(" create mode "):
-            added += 1
-        elif line.startswith(" delete mode "):
-            deleted += 1
+        mode = _MODE_LINE.match(line)
+        if mode:
+            if is_excluded(mode.group(2)):
+                continue
+            if mode.group(1) == "create":
+                added += 1
+            else:
+                deleted += 1
         elif "\t" in line:
-            plus, minus, _path = line.split("\t", 2)
+            plus, minus, path = line.split("\t", 2)
+            if is_excluded(destination_path(path)):
+                continue
             changed += 1
             insertions += int(plus) if plus.isdigit() else 0
             deletions += int(minus) if minus.isdigit() else 0
@@ -82,10 +134,11 @@ def main(argv):
     comparison = argv[1] if len(argv) > 1 else _units._default_base()
     try:
         text = _units.diff_text(comparison, STAT_FLAGS)
+        ignored = ignored_paths(stat_paths(text))
     except subprocess.CalledProcessError as err:
-        print(f"ERROR: git diff failed for '{comparison}': {err.stderr.strip()}")
+        print(f"ERROR: git failed for '{comparison}': {err.stderr.strip()}")
         return 2
-    print(render_block(count_stat(text)))
+    print(render_block(count_stat(text, exclusion_check(ignored))))
     return 0
 
 

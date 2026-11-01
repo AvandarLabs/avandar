@@ -92,7 +92,10 @@ counts once as each, so neither number alone says how much code was
 rewritten. Net change is insertions minus deletions: how many lines the
 codebase grew, or shrank when negative. Lockfiles, tests, and generated files
 are counted, unlike in `list-changed-units.py`, because they are part of what
-the change touches. The callout is not a section: it takes no number and no
+the change touches. Two kinds of file count nothing at all: anything under
+the repository's top-level `docs/` directory, and any file a gitignore rule
+matches, even one that is tracked because it was force-added. The callout is
+not a section: it takes no number and no
 heading, and nothing cites it.
 
 ## Sections

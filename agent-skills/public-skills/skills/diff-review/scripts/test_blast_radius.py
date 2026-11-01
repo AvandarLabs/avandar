@@ -38,6 +38,43 @@ class CountStat(unittest.TestCase):
         counts = blast_radius.count_stat("")
         self.assertEqual((counts.changed, counts.insertions, counts.net), (0, 0, 0))
 
+    def test_excluded_paths_count_nothing(self):
+        excluded = {"src/new.ts", "src/after.ts"}
+        counts = blast_radius.count_stat(STAT, excluded.__contains__)
+        self.assertEqual(
+            (counts.changed, counts.added, counts.deleted), (3, 1, 1)
+        )
+        self.assertEqual((counts.insertions, counts.deletions), (3, 45))
+
+
+class DestinationPath(unittest.TestCase):
+    def test_a_plain_path_is_its_own_destination(self):
+        self.assertEqual(blast_radius.destination_path("src/a.ts"), "src/a.ts")
+
+    def test_a_braced_rename_resolves_to_the_new_path(self):
+        self.assertEqual(
+            blast_radius.destination_path("src/{before.ts => after.ts}"),
+            "src/after.ts",
+        )
+        self.assertEqual(
+            blast_radius.destination_path("src/{old => }/a.ts"), "src/a.ts"
+        )
+
+    def test_an_untracked_file_resolves_past_dev_null(self):
+        self.assertEqual(
+            blast_radius.destination_path("/dev/null => new.txt"), "new.txt"
+        )
+
+
+class IsExcluded(unittest.TestCase):
+    def test_docs_and_ignored_paths_are_excluded(self):
+        is_excluded = blast_radius.exclusion_check({"keep.log"})
+        self.assertTrue(is_excluded("docs/guide.md"))
+        self.assertTrue(is_excluded("keep.log"))
+        self.assertFalse(is_excluded("src/docs/guide.md"))
+        self.assertFalse(is_excluded("docsite/index.md"))
+        self.assertFalse(is_excluded("src/a.ts"))
+
 
 class RenderBlock(unittest.TestCase):
     def block(self, insertions=8368, deletions=1571):
