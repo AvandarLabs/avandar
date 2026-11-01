@@ -87,7 +87,10 @@ function _mapBubbleSeries(
 
 function _mapXYConfig(
   options: Readonly<{
-    config: Extract<VizConfig.ColNameBound, { vizType: "bar" | "line" | "area" }>;
+    config: Extract<
+      VizConfig.ColNameBound,
+      { vizType: "bar" | "line" | "area" }
+    >;
     getSlotColumnId: GetSlotColumnId;
   }>,
 ): Extract<VizConfig.T, { vizType: "bar" | "line" | "area" }> {
