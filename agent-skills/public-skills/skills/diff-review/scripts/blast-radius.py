@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Print a walkthrough's Blast radius callout for a comparison.
 
-The callout sits right under the walkthrough's title: a small table of how many
-files the change touches, adds, and deletes, and how many lines it inserts and
-deletes. Counts follow git's own `--shortstat` conventions. A file counts as
-changed whether it was modified, added, deleted, or renamed. A line counts as
-an insertion (+) or a deletion (-), and an edited line counts once as each,
-so the net change, insertions minus deletions, is how much the code grew or
-shrank. Binary files count as changed files with no lines.
+The callout sits right under the walkthrough's title, with no heading of its
+own: a small table of how many files the change touches, adds, and deletes,
+and how many lines it inserts and deletes. Counts follow git's own
+`--shortstat` conventions. A file counts as changed whether it was modified,
+added, deleted, or renamed. A line counts as an insertion (+) or a deletion
+(-), and an edited line counts once as each, so the net change, insertions
+minus deletions, is how much the code grew or shrank. Binary files count as changed files with no lines.
 
 Usage:
     blast-radius.py [comparison-key]
@@ -75,10 +75,7 @@ def render_block(counts):
         *("<tr>" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>" for row in rows),
         "</table>",
     ]
-    quoted = ["**Blast radius**", "", *table]
-    return "\n".join(
-        ["<small>", "", *(f"> {line}".rstrip() for line in quoted), "", "</small>"]
-    )
+    return "\n".join(["<small>", "", *(f"> {line}" for line in table), "", "</small>"])
 
 
 def main(argv):

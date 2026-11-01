@@ -56,8 +56,9 @@ no section cites a thread.
 ## Blast radius
 
 Every walkthrough, in either form, opens with a Blast radius callout on the
-line after its H1 title and before section 1. It tells the reader how big the
-change is before they read a word of it. Generate it, never type it:
+line after its H1 title and before section 1: the table alone, with no heading
+or label. It tells the reader how big the change is before they read a word of
+it. Generate it, never type it:
 
 ```bash
 python3 <skill-dir>/scripts/blast-radius.py <comparison-key>
@@ -71,8 +72,6 @@ print as a shaded box in smaller type and GitHub prints as a block quote:
 ```markdown
 <small>
 
-> **Blast radius**
->
 > <table>
 > <tr><th colspan="2">Files</th><th colspan="2">Lines</th></tr>
 > <tr><td>Changed (total)</td><td>63</td><td>Insertions (+)</td><td>8,368</td></tr>

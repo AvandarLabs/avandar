@@ -48,7 +48,8 @@ class RenderBlock(unittest.TestCase):
         lines = self.block().splitlines()
         self.assertEqual(lines[0], "<small>")
         self.assertEqual(lines[-1], "</small>")
-        self.assertIn("> **Blast radius**", lines)
+        self.assertEqual(lines[2], "> <table>")
+        self.assertNotIn("Blast radius", self.block())
 
     def test_groups_the_columns_under_two_spanned_headers(self):
         self.assertIn(
@@ -65,6 +66,7 @@ class RenderBlock(unittest.TestCase):
 
     def test_every_line_between_the_tags_is_quoted(self):
         inner = self.block().splitlines()[2:-2]
+        self.assertTrue(inner)
         self.assertTrue(all(line.startswith(">") for line in inner))
 
 
