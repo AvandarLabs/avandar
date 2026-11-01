@@ -15,12 +15,14 @@ import type {
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 import type { SqlMappingInput } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
 
-type Options = {
+/** Inputs for `mapSqlProjectionsToQueryColumns`. */
+type MapSqlProjectionsToQueryColumnsOptions = {
   columnsList: unknown;
   groupBy: unknown;
   dataset: SqlMappingInput["datasets"][number] | undefined;
   skipColumnHydration: boolean;
 };
+
 function _matchColumn(
   columnName: string,
   columns: readonly DatasetColumnRead[],
@@ -49,7 +51,7 @@ export function mapSqlProjectionsToQueryColumns({
   groupBy,
   dataset,
   skipColumnHydration,
-}: Readonly<Options>): {
+}: Readonly<MapSqlProjectionsToQueryColumnsOptions>): {
   queryColumns: QueryColumnRead[];
   aggregations: Record<QueryColumnId, QueryAggregationTypeT>;
   unmappedReasons: SqlFailedMappingReason[];
