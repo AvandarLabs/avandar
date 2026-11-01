@@ -830,6 +830,24 @@
   export function foo(options: { name: string; age: number }): void {}
   ```
 
+- Type docstrings must say what the type is and what it is for: where its
+  values come from, and what consumes them. Replace jargon with a plain
+  explanation. If a term is official Avandar nomenclature, link to the doc
+  that defines it. Explain each member of a union and any field whose meaning
+  is not obvious from its name.
+
+  ```ts
+  // Bad: undefined terms, no purpose.
+  /** A supported projection with authoritative identity. */
+
+  // Good: says what it is, what it is for, and when it exists.
+  /**
+   * The query's prediction, made before it runs, of one column its `SELECT`
+   * will output. Binding matches it to the real result column to decide
+   * which column ID that column gets.
+   */
+  ```
+
 - If an object is exported, its top-level methods should also have docstrings.
 
   ```ts
