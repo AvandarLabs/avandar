@@ -1,17 +1,17 @@
-import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig";
-import { makeVizConfigFromNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromNameBoundVizConfig/makeVizConfigFromNameBoundVizConfig";
+import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig";
+import { makeVizConfigFromColNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromColNameBoundVizConfig/makeVizConfigFromColNameBoundVizConfig";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
 type MergeLegacyVizConfigEditOptions = {
-  legacy: VizConfig.NameBound;
+  legacy: VizConfig.ColNameBound;
   before: VizConfig.T;
   after: VizConfig.T;
   columns: readonly QueryResult.ColumnWithId[];
 };
 
 type SeriesConfig = Extract<
-  VizConfig.NameBound,
+  VizConfig.ColNameBound,
   { series: ReadonlyArray<{ key: string }> }
 >;
 
@@ -27,7 +27,7 @@ function _mergeSeries({
   let resolvedIndex = 0;
   const series = legacy.series.flatMap((original) => {
     const single = { ...legacy, series: [original] } as SeriesConfig;
-    const vizConfig = makeVizConfigFromNameBoundVizConfig({
+    const vizConfig = makeVizConfigFromColNameBoundVizConfig({
       config: single,
       columns: columns,
     }).config;
@@ -49,15 +49,15 @@ export function mergeLegacyVizConfigEdit({
   before,
   after,
   columns,
-}: Readonly<MergeLegacyVizConfigEditOptions>): VizConfig.NameBound {
+}: Readonly<MergeLegacyVizConfigEditOptions>): VizConfig.ColNameBound {
   if (legacy.vizType !== after.vizType) {
     return legacy;
   }
-  const previous = makeNameBoundVizConfigFromVizConfig({
+  const previous = makeColNameBoundVizConfigFromVizConfig({
     config: before,
     columns: columns,
   }).config;
-  const edited = makeNameBoundVizConfigFromVizConfig({
+  const edited = makeColNameBoundVizConfigFromVizConfig({
     config: after,
     columns: columns,
   });
@@ -84,5 +84,5 @@ export function mergeLegacyVizConfigEdit({
         }
       : {};
   // The edit keeps the discriminant and changes only fields of that chart.
-  return { ...legacy, ...changes, ...series } as VizConfig.NameBound;
+  return { ...legacy, ...changes, ...series } as VizConfig.ColNameBound;
 }

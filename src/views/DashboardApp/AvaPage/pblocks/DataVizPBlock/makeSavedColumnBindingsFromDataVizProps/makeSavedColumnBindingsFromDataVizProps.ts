@@ -1,7 +1,7 @@
 import { isDefined, prop } from "@avandar/utils";
 import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryResultColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
-import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig";
-import { makeVizConfigFromNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromNameBoundVizConfig/makeVizConfigFromNameBoundVizConfig";
+import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig";
+import { makeVizConfigFromColNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromColNameBoundVizConfig/makeVizConfigFromColNameBoundVizConfig";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   QueryResultColumnBindingIssue,
@@ -71,13 +71,13 @@ export function makeSavedColumnBindingsFromDataVizProps({
       props: { ...props, columnBindings: schema.registry },
       runtimeConfig: props.vizConfig,
       localFilters: props.localFilters,
-      issues: makeNameBoundVizConfigFromVizConfig({
+      issues: makeColNameBoundVizConfigFromVizConfig({
         config: props.vizConfig,
         columns: schema.columns,
       }).issues,
     };
   }
-  const vizConfigConversion = makeVizConfigFromNameBoundVizConfig({
+  const vizConfigConversion = makeVizConfigFromColNameBoundVizConfig({
     config: props.vizConfig,
     columns: schema.columns,
   });

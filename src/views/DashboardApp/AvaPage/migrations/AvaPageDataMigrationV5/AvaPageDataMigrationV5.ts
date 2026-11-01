@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig";
+import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig";
 import { transformAvaPageProps } from "../../utils/makeTraversalConfigFromAvaPageData/transformAvaPageProps";
 import type { AvaPageDataMigration } from "../AvaPageDataMigrator";
 import type {
@@ -38,7 +38,7 @@ function _downgradeChart(
       );
     }
   });
-  const nameBoundConversion = makeNameBoundVizConfigFromVizConfig({
+  const nameBoundConversion = makeColNameBoundVizConfigFromVizConfig({
     config: props.vizConfig,
     columns: columnBindings.columns,
   });

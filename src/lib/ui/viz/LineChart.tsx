@@ -6,7 +6,7 @@ import { useLineChartStyleProps } from "@/lib/ui/viz/axis/useLineChartStyleProps
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { NameBoundLineSeries as LineSeries } from "$/models/vizs/VizConfig/NameBoundVizConfig.types";
+import type { ColNameBoundLineSeries as LineSeries } from "$/models/vizs/VizConfig/ColNameBoundVizConfig.types";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { LineChartSeries } from "@mantine/charts";
 import type { LineProps } from "recharts";

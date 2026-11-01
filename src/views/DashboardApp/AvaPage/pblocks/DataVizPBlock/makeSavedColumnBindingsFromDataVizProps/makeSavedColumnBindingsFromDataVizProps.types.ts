@@ -9,7 +9,7 @@ import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilte
 
 type DataVizColumnNameProps = {
   columnBindingVersion: 0;
-  vizConfig: VizConfig.NameBound;
+  vizConfig: VizConfig.ColNameBound;
   localFilters: readonly LegacyLocalFilter[];
   globalFilterSubscription: GlobalFilterSubscription;
 };

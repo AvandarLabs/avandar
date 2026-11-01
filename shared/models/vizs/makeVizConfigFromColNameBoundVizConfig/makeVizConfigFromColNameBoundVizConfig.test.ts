@@ -2,8 +2,8 @@ import { propNotEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 /** Chart `QueryResult` column names bind uniquely before rendering. */
 import { uuid } from "$/lib/uuid.ts";
-import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig.ts";
-import { makeVizConfigFromNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromNameBoundVizConfig/makeVizConfigFromNameBoundVizConfig.ts";
+import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig.ts";
+import { makeVizConfigFromColNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromColNameBoundVizConfig/makeVizConfigFromColNameBoundVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
@@ -21,7 +21,7 @@ const SERIES: { key: string; label: string; color: string } = {
   label: "revenue",
   color: "#123456",
 };
-const CONFIGS: VizConfig.NameBound[] = [
+const CONFIGS: VizConfig.ColNameBound[] = [
   {
     vizType: "bar",
     xAxisKey: "quarter",
@@ -66,17 +66,17 @@ const CONFIGS: VizConfig.NameBound[] = [
   { vizType: "table" },
 ];
 
-describe("makeVizConfigFromNameBoundVizConfig", () => {
+describe("makeVizConfigFromColNameBoundVizConfig", () => {
   it.each(CONFIGS)(
     "binds $vizType without changing its style or category values",
     (config) => {
-      const result = makeVizConfigFromNameBoundVizConfig({
+      const result = makeVizConfigFromColNameBoundVizConfig({
         config: config,
         columns: COLUMNS,
       });
       expect(result.issues).toEqual([]);
       expect(
-        makeNameBoundVizConfigFromVizConfig({
+        makeColNameBoundVizConfigFromVizConfig({
           config: result.config,
           columns: COLUMNS,
         }).config,
@@ -101,7 +101,7 @@ describe("makeVizConfigFromNameBoundVizConfig", () => {
   it.each(["Revenue", "revenue"])(
     "rejects ambiguous QueryResult column name %s without choosing the first column",
     (key) => {
-      const config: VizConfig.NameBound = {
+      const config: VizConfig.ColNameBound = {
         vizType: "line",
         xAxisKey: undefined,
         series: [{ renderAs: "line", key }],
@@ -116,7 +116,7 @@ describe("makeVizConfigFromNameBoundVizConfig", () => {
           dataType: "double" as const,
         },
       ];
-      const result = makeVizConfigFromNameBoundVizConfig({
+      const result = makeVizConfigFromColNameBoundVizConfig({
         config: config,
         columns: columns,
       });
@@ -129,7 +129,7 @@ describe("makeVizConfigFromNameBoundVizConfig", () => {
   );
 
   it("accepts a unique case-insensitive QueryResult column name", () => {
-    const result = makeVizConfigFromNameBoundVizConfig({
+    const result = makeVizConfigFromColNameBoundVizConfig({
       config: { vizType: "funnel", nameKey: "QUARTER", valueKey: "REVENUE" },
       columns: COLUMNS,
     });
@@ -142,7 +142,7 @@ describe("makeVizConfigFromNameBoundVizConfig", () => {
   it("reports missing required targets without changing the input config", () => {
     const config = CONFIGS[4]!;
     const original = structuredClone(config);
-    const result = makeVizConfigFromNameBoundVizConfig({
+    const result = makeVizConfigFromColNameBoundVizConfig({
       config: config,
       columns: COLUMNS.filter(propNotEq("id", SIZE_ID)),
     });

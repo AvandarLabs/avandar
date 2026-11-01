@@ -1,40 +1,40 @@
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 
-type NameBoundVizConfigBar = {
+type ColNameBoundVizConfigBar = {
   vizType: "bar";
   xAxisKey: string | undefined;
-  series: NameBoundXYSeries[];
+  series: ColNameBoundXYSeries[];
   layout: "group" | "stack" | "percent";
   withLegend: boolean;
   chartStyle?: ChartStyle;
 };
 
-type NameBoundVizConfigLine = {
+type ColNameBoundVizConfigLine = {
   vizType: "line";
   xAxisKey: string | undefined;
-  series: NameBoundXYSeries[];
+  series: ColNameBoundXYSeries[];
   withLegend: boolean;
   chartStyle?: ChartStyle;
 };
 
-type NameBoundVizConfigArea = {
+type ColNameBoundVizConfigArea = {
   vizType: "area";
   xAxisKey: string | undefined;
-  series: NameBoundXYSeries[];
+  series: ColNameBoundXYSeries[];
   layout: "default" | "stacked" | "percent" | "split";
   withLegend: boolean;
   chartStyle?: ChartStyle;
 };
 
-type NameBoundVizConfigRadar = {
+type ColNameBoundVizConfigRadar = {
   vizType: "radar";
   nameKey: string | undefined;
-  series: NameBoundRadarSeries[];
+  series: ColNameBoundRadarSeries[];
   withLegend?: boolean;
   chartStyle?: ChartStyle;
 };
 
-type NameBoundVizConfigPie = {
+type ColNameBoundVizConfigPie = {
   vizType: "pie";
   nameKey: string | undefined;
   valueKey: string | undefined;
@@ -44,14 +44,14 @@ type NameBoundVizConfigPie = {
   seriesColors?: Record<string, string>;
 };
 
-type NameBoundVizConfigFunnel = {
+type ColNameBoundVizConfigFunnel = {
   vizType: "funnel";
   nameKey: string | undefined;
   valueKey: string | undefined;
   seriesColors?: Record<string, string>;
 };
 
-type NameBoundBarSeriesShape = {
+type ColNameBoundBarSeriesShape = {
   renderAs: "bar";
   key: string;
   label?: string;
@@ -60,7 +60,7 @@ type NameBoundBarSeriesShape = {
   stackId?: string;
 };
 
-type NameBoundLineSeriesShape = {
+type ColNameBoundLineSeriesShape = {
   renderAs: "line";
   key: string;
   label?: string;
@@ -70,7 +70,7 @@ type NameBoundLineSeriesShape = {
   withDots?: boolean;
 };
 
-type NameBoundAreaSeriesShape = {
+type ColNameBoundAreaSeriesShape = {
   renderAs: "area";
   key: string;
   label?: string;
@@ -91,33 +91,33 @@ type NameBoundAreaSeriesShape = {
  * aggregate is emitted as `sum(revenue)` rather than `revenue`, and an
  * explicit alias replaces the name entirely.
  */
-export type NameBoundVizConfig =
+export type ColNameBoundVizConfig =
   | { vizType: "table" }
-  | NameBoundVizConfigBar
-  | NameBoundVizConfigLine
-  | NameBoundVizConfigArea
+  | ColNameBoundVizConfigBar
+  | ColNameBoundVizConfigLine
+  | ColNameBoundVizConfigArea
   | {
       vizType: "scatter";
-      series: NameBoundScatterSeries[];
+      series: ColNameBoundScatterSeries[];
       chartStyle?: ChartStyle;
     }
   | {
       vizType: "bubble";
-      series: NameBoundBubbleSeries[];
+      series: ColNameBoundBubbleSeries[];
       chartStyle?: ChartStyle;
     }
-  | NameBoundVizConfigRadar
-  | NameBoundVizConfigPie
-  | NameBoundVizConfigFunnel;
+  | ColNameBoundVizConfigRadar
+  | ColNameBoundVizConfigPie
+  | ColNameBoundVizConfigFunnel;
 
 /** Mark settings for mixed XY charts, keyed by `QueryResult` column name. */
-export type NameBoundXYSeries =
-  | NameBoundBarSeriesShape
-  | NameBoundLineSeriesShape
-  | NameBoundAreaSeriesShape;
+export type ColNameBoundXYSeries =
+  | ColNameBoundBarSeriesShape
+  | ColNameBoundLineSeriesShape
+  | ColNameBoundAreaSeriesShape;
 
 /** Scatter cloud settings, keyed by `QueryResult` column name. */
-export type NameBoundScatterSeries = {
+export type ColNameBoundScatterSeries = {
   key: string;
   xKey: string;
   label?: string;
@@ -125,12 +125,12 @@ export type NameBoundScatterSeries = {
 };
 
 /** Bubble cloud settings, keyed by `QueryResult` column name. */
-export type NameBoundBubbleSeries = NameBoundScatterSeries & {
+export type ColNameBoundBubbleSeries = ColNameBoundScatterSeries & {
   sizeKey: string;
 };
 
 /** Radar polygon settings, keyed by `QueryResult` column name. */
-export type NameBoundRadarSeries = {
+export type ColNameBoundRadarSeries = {
   key: string;
   label?: string;
   color?: string;
@@ -139,17 +139,17 @@ export type NameBoundRadarSeries = {
 };
 
 /** Row-key bar marks. */
-export type NameBoundBarSeries = Extract<
-  NameBoundXYSeries,
+export type ColNameBoundBarSeries = Extract<
+  ColNameBoundXYSeries,
   { renderAs: "bar" }
 >;
 /** Row-key line marks. */
-export type NameBoundLineSeries = Extract<
-  NameBoundXYSeries,
+export type ColNameBoundLineSeries = Extract<
+  ColNameBoundXYSeries,
   { renderAs: "line" }
 >;
 /** Row-key area marks. */
-export type NameBoundAreaSeries = Extract<
-  NameBoundXYSeries,
+export type ColNameBoundAreaSeries = Extract<
+  ColNameBoundXYSeries,
   { renderAs: "area" }
 >;

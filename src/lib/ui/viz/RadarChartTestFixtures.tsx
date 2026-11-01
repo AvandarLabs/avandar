@@ -14,7 +14,7 @@ import { render } from "@/test-utils";
  */
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
-type RadarChartVizConfig = Extract<VizConfig.NameBound, { vizType: "radar" }>;
+type RadarChartVizConfig = Extract<VizConfig.ColNameBound, { vizType: "radar" }>;
 
 const mantineRadarChartMock = vi.fn();
 

@@ -67,7 +67,7 @@ export type DataExplorerAppState = {
    * sync keeps writing it back unchanged, so a slow or failed query does not
    * drop it.
    */
-  pendingUrlVizConfig?: VizConfig.NameBound;
+  pendingUrlVizConfig?: VizConfig.ColNameBound;
 
   /**
    * The last config the user actually saw for each viz type, so switching

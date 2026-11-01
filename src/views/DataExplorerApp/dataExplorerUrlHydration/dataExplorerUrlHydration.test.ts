@@ -7,7 +7,7 @@ import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { ParsedUrlState } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
-const _minimalBarViz: VizConfig.NameBound = {
+const _minimalBarViz: VizConfig.ColNameBound = {
   vizType: "bar",
   xAxisKey: "a",
   series: [{ renderAs: "bar", key: "b" }],

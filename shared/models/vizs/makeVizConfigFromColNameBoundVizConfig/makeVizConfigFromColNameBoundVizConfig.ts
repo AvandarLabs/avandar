@@ -38,7 +38,7 @@ function _mapSeries<Series extends { key: string }>(
 function _mapScatterSeries(
   options: Readonly<{
     series: Readonly<
-      Extract<VizConfig.NameBound, { vizType: "scatter" }>["series"]
+      Extract<VizConfig.ColNameBound, { vizType: "scatter" }>["series"]
     >;
     getSlotColumnId: GetSlotColumnId;
   }>,
@@ -61,7 +61,7 @@ function _mapScatterSeries(
 function _mapBubbleSeries(
   options: Readonly<{
     series: Readonly<
-      Extract<VizConfig.NameBound, { vizType: "bubble" }>["series"]
+      Extract<VizConfig.ColNameBound, { vizType: "bubble" }>["series"]
     >;
     getSlotColumnId: GetSlotColumnId;
   }>,
@@ -87,7 +87,7 @@ function _mapBubbleSeries(
 
 function _mapXYConfig(
   options: Readonly<{
-    config: Extract<VizConfig.NameBound, { vizType: "bar" | "line" | "area" }>;
+    config: Extract<VizConfig.ColNameBound, { vizType: "bar" | "line" | "area" }>;
     getSlotColumnId: GetSlotColumnId;
   }>,
 ): Extract<VizConfig.T, { vizType: "bar" | "line" | "area" }> {
@@ -101,7 +101,7 @@ function _mapXYConfig(
 
 function _mapCategoryConfig(
   options: Readonly<{
-    config: Extract<VizConfig.NameBound, { vizType: "pie" | "funnel" }>;
+    config: Extract<VizConfig.ColNameBound, { vizType: "pie" | "funnel" }>;
     getSlotColumnId: GetSlotColumnId;
   }>,
 ): Extract<VizConfig.T, { vizType: "pie" | "funnel" }> {
@@ -115,7 +115,7 @@ function _mapCategoryConfig(
 
 function _mapConfig(
   options: Readonly<{
-    config: Readonly<VizConfig.NameBound>;
+    config: Readonly<VizConfig.ColNameBound>;
     getSlotColumnId: GetSlotColumnId;
   }>,
 ): VizConfig.T {
@@ -193,11 +193,11 @@ function _bindSlotToColumnId({
  * ID of the one `QueryResult` column that has that name. Leaves the input
  * config unchanged.
  */
-export function makeVizConfigFromNameBoundVizConfig({
+export function makeVizConfigFromColNameBoundVizConfig({
   config,
   columns,
 }: Readonly<{
-  config: Readonly<VizConfig.NameBound>;
+  config: Readonly<VizConfig.ColNameBound>;
   columns: readonly QueryResult.ColumnWithId[];
 }>): { config: VizConfig.T; issues: QueryResultColumnBindingIssue[] } {
   const slots = makeColumnSlotsFromVizConfig(config).map((slot) => {

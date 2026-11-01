@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
  * Renderer reads follow saved IDs even when `QueryResult` column names change.
  */
 import { uuid } from "$/lib/uuid.ts";
-import { makeNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeNameBoundVizConfigFromVizConfig/makeNameBoundVizConfigFromVizConfig.ts";
+import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
@@ -38,7 +38,7 @@ function _readValues({
   config,
   row = ROW,
 }: {
-  config: VizConfig.NameBound;
+  config: VizConfig.ColNameBound;
   row?: Readonly<Record<string, string | number>>;
 }): unknown[] {
   return match(config)
@@ -136,12 +136,12 @@ const CONFIGS: VizConfig.T[] = [
   { vizType: "table" },
 ];
 
-describe("makeNameBoundVizConfigFromVizConfig", () => {
+describe("makeColNameBoundVizConfigFromVizConfig", () => {
   it.each(CONFIGS)(
     "reads renamed QueryResult columns for $vizType while preserving presentation",
     (config) => {
       const original = structuredClone(config);
-      const nameBoundConversion = makeNameBoundVizConfigFromVizConfig({
+      const nameBoundConversion = makeColNameBoundVizConfigFromVizConfig({
         config: config,
         columns: COLUMNS,
       });
@@ -170,7 +170,7 @@ describe("makeNameBoundVizConfigFromVizConfig", () => {
   );
 
   it("reads the saved XY measure after revenue is renamed to amount", () => {
-    const nameBoundConversion = makeNameBoundVizConfigFromVizConfig({
+    const nameBoundConversion = makeColNameBoundVizConfigFromVizConfig({
       config: CONFIGS[0]!,
       columns: COLUMNS,
     });
@@ -216,7 +216,7 @@ describe("makeNameBoundVizConfigFromVizConfig", () => {
           name: column.id === movedId ? "moved" : column.name,
         };
       });
-      const nameBoundConversion = makeNameBoundVizConfigFromVizConfig({
+      const nameBoundConversion = makeColNameBoundVizConfigFromVizConfig({
         config: config,
         columns: columns,
       });
@@ -245,7 +245,7 @@ describe("makeNameBoundVizConfigFromVizConfig", () => {
     }),
   )("omits unusable $vizType series only in output", (config) => {
     const original = structuredClone(config);
-    const result = makeNameBoundVizConfigFromVizConfig({
+    const result = makeColNameBoundVizConfigFromVizConfig({
       config: config,
       columns: COLUMNS.filter(propNotEq("id", REVENUE_ID)),
     });
@@ -267,7 +267,7 @@ describe("makeNameBoundVizConfigFromVizConfig", () => {
         name: missingId,
         dataType: "double",
       });
-      const result = makeNameBoundVizConfigFromVizConfig({
+      const result = makeColNameBoundVizConfigFromVizConfig({
         config: CONFIGS[4]!,
         columns: columns,
       });
@@ -285,7 +285,7 @@ describe("makeNameBoundVizConfigFromVizConfig", () => {
   )(
     "clears missing $vizType category bindings without a replacement",
     (config) => {
-      const result = makeNameBoundVizConfigFromVizConfig({
+      const result = makeColNameBoundVizConfigFromVizConfig({
         config: config,
         columns: COLUMNS.filter(propNotEq("id", CATEGORY_ID)),
       });

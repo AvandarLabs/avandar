@@ -5,7 +5,7 @@ import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
 } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
-import { makeVizConfigFromNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromNameBoundVizConfig/makeVizConfigFromNameBoundVizConfig";
+import { makeVizConfigFromColNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromColNameBoundVizConfig/makeVizConfigFromColNameBoundVizConfig";
 import { remapProvisionalColumnIdsInVizConfig } from "$/models/vizs/remapProvisionalColumnIdsInVizConfig/remapProvisionalColumnIdsInVizConfig";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
@@ -217,7 +217,7 @@ export const DataExplorerStateManager = createAppStateManager({
      */
     restoreVizConfigFromUrl: (
       state: DataExplorerAppState,
-      urlVizConfig: VizConfig.NameBound,
+      urlVizConfig: VizConfig.ColNameBound,
     ): DataExplorerAppState => {
       return {
         ...state,
@@ -239,7 +239,7 @@ export const DataExplorerStateManager = createAppStateManager({
       const { pendingUrlVizConfig } = state;
       const next = applyVizConfigFromQueryResult({
         vizConfig: pendingUrlVizConfig
-          ? makeVizConfigFromNameBoundVizConfig({
+          ? makeVizConfigFromColNameBoundVizConfig({
               config: pendingUrlVizConfig,
               columns: columns,
             }).config
