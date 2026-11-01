@@ -29,6 +29,8 @@
       : event.altKey && event.shiftKey && !event.ctrlKey;
   }
   var github = { available: false, reason: "", pr: null, comments: {} };
+  // The shell's TUI delivery mode ("bulk" holds comments for Send all).
+  var deliveryMode = "bulk";
   var threadsById = {};
   var armedGithubAt = 0;
 
@@ -44,6 +46,11 @@
     ".dif-dest button:disabled{opacity:.3;cursor:not-allowed}",
     ".dif-dest button:focus-visible{outline:2px solid #2f81f7;outline-offset:1px}",
     ".dif-dest kbd{align-self:center;font:inherit;font-size:11px;opacity:.5;padding:0 6px 0 4px}",
+    // The submit button names where the comment goes. Its label is drawn by
+    // CSS from an attribute so React keeps owning the button's text node.
+    "button[data-dif-submit-label]{font-size:0!important;transition:none!important}",
+    "button[data-dif-submit-label]::after{content:attr(data-dif-submit-label);font-size:.75rem;line-height:1rem}",
+    "form[data-dif-dest=github] button[data-dif-submit-label]{color:#fff!important;background-color:#2f81f7!important;border-color:#2f81f7!important}",
     "[data-dif-gh-thread]{border-color:rgba(47,129,247,.45)!important;border-left-color:#2f81f7!important;background-color:rgba(47,129,247,.07)!important}",
     "[data-dif-gh-thread=pending],[data-dif-gh-thread=draft]{border-left-style:dashed!important}",
     "[data-dif-gh-thread=failed]{border-color:rgba(248,81,73,.45)!important;border-left-color:#f85149!important;background-color:rgba(248,81,73,.06)!important}",
@@ -74,8 +81,14 @@
       })
       .catch(function () { /* keep the last known threads */ });
   }
+  function fetchDeliveryMode() {
+    return window.fetch("/__wrap/dispatch.json", { cache: "no-store" })
+      .then(function (response) { return response.ok ? response.json() : null; })
+      .then(function (state) { if (state && state.mode) deliveryMode = state.mode; })
+      .catch(function () { /* keep the last known mode */ });
+  }
   function refreshDestinations() {
-    Promise.all([fetchGithubState(), fetchThreads()]).then(decorateAll);
+    Promise.all([fetchGithubState(), fetchThreads(), fetchDeliveryMode()]).then(decorateAll);
   }
 
   // ---- the per-box destination toggle ----
@@ -84,6 +97,22 @@
     var thread = host ? threadsById[host.id.slice("comment-thread-".length)] : null;
     var root = thread && thread.messages && thread.messages[0];
     return root ? github.comments[root.id] : null;
+  }
+  // What the submit button says for `dest`: where the comment goes, and for
+  // the TUI whether it waits for Send all.
+  function buildSubmitLabel(form, dest) {
+    var textarea = form.querySelector("textarea");
+    var isReply = !!textarea && textarea.placeholder === REPLY_PLACEHOLDER;
+    if (dest === "github") return isReply ? "Add reply to PR review" : "Add to PR review";
+    var reply = isReply ? " reply" : "";
+    return deliveryMode === "eager" ? "Send" + reply + " to TUI" : "Queue" + reply + " for TUI";
+  }
+  function labelSubmit(form) {
+    var submit = form.querySelector('button[type="submit"]');
+    if (!submit) return;
+    var label = buildSubmitLabel(form, form.getAttribute("data-dif-dest"));
+    setAttr(submit, "data-dif-submit-label", label);
+    setAttr(submit, "aria-label", label);
   }
   function setDest(form, dest) {
     if (dest === "github" && !github.available) dest = "local";
@@ -95,6 +124,7 @@
       button.setAttribute("aria-checked", isChecked ? "true" : "false");
       button.tabIndex = isChecked ? 0 : -1;
     });
+    labelSubmit(form);
   }
   // Arrow keys move the selection between a toggle's enabled radios.
   function onDestArrowKey(form, event) {
@@ -153,6 +183,7 @@
         ? "Post to GitHub PR #" + github.pr.number + " only (" + TOGGLE_HINT + " toggles)"
         : github.reason || "No GitHub PR to post to";
       if (!github.available && form.getAttribute("data-dif-dest") === "github") setDest(form, "local");
+      else labelSubmit(form);
     });
   }
 

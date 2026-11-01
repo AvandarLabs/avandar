@@ -271,8 +271,11 @@ to a pending review or mark files viewed) and runs on the poller thread
 ### Writing PR comments (push)
 
 1. **`inject/destinations.js`** adds the TUI / PR toggle to each difit comment
-   box (not to edit boxes: an edit follows the comment's destination). When a
-   PR box submits, it tags difit's next `POST /api/comments` with
+   box (not to edit boxes: an edit follows the comment's destination) and
+   relabels the box's submit button for the chosen destination and the
+   shell's Bulk / Eager mode (read from `/__wrap/dispatch.json`). The label is
+   a `data-dif-submit-label` attribute drawn by CSS `::after`, so React keeps
+   owning the button's text. When a PR box submits, it tags difit's next `POST /api/comments` with
    `X-Dif-Destination: github`.
 2. **The web shell** (`web/review_routes.rs`) intercepts that save. Before
    proxying it, it reads difit's `/api/comments-json` and marks the posted

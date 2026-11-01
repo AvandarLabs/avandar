@@ -158,7 +158,10 @@ them.
 GitHub review (what "Start a review" does on github.com) and never sends it to
 the LLM. A reply box inside a PR thread defaults to PR. **Ctrl+G** (macOS) or
 **Alt+Shift+G** (Windows/Linux) flips the toggle without leaving the box; the
-box shows the hint beside the toggle.
+box shows the hint beside the toggle. The submit button names where the
+comment goes: **Add to PR review** (blue) for PR, and **Queue for TUI** in
+Bulk mode or **Send to TUI** in Eager mode for the TUI ("reply" is added in a
+reply box).
 
 - Drafts are visible only to you, here and on github.com, until you submit.
   A draft you start on github.com shows up in dif too.
