@@ -66,13 +66,16 @@ python3 <skill-dir>/scripts/blast-radius.py <comparison-key>
 
 Paste the script's output as it is, and run it again whenever the walkthrough
 is regenerated, so the counts match the compared revision. It prints a quoted
-HTML table inside `<small>` lines, which `markdown-to-pdf` 0.17.0 and later
-print as a shaded box in smaller type and GitHub prints as a block quote:
+HTML table inside `<small>` lines, which `markdown-to-pdf` 0.18.0 and later
+print as a shaded box in smaller type and GitHub prints as a block quote. The
+table only lays out the counts: `border="0"` tells `markdown-to-pdf` to draw no
+grid lines and no header fill. GitHub ignores the attribute and keeps its own
+table borders:
 
 ```markdown
 <small>
 
-> <table>
+> <table border="0">
 > <tr><th colspan="2">Files</th><th colspan="2">Lines</th></tr>
 > <tr><td>Changed (total)</td><td>63</td><td>Insertions (+)</td><td>8,368</td></tr>
 > <tr><td>Added</td><td>33</td><td>Deletions (-)</td><td>1,571</td></tr>

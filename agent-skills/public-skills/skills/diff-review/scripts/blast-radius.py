@@ -2,12 +2,12 @@
 """Print a walkthrough's Blast radius callout for a comparison.
 
 The callout sits right under the walkthrough's title, with no heading of its
-own: a small table of how many files the change touches, adds, and deletes,
-and how many lines it inserts and deletes. Counts follow git's own
-`--shortstat` conventions. A file counts as changed whether it was modified,
-added, deleted, or renamed. A line counts as an insertion (+) or a deletion
-(-), and an edited line counts once as each, so the net change, insertions
-minus deletions, is how much the code grew or shrank. Binary files count as changed files with no lines.
+own: a small borderless table of how many files the change touches, adds,
+and deletes, and how many lines it inserts and deletes. Counts follow git's
+own `--shortstat` conventions. A file counts as changed whether it was
+modified, added, deleted, or renamed. A line counts as an insertion (+) or a
+deletion (-), and an edited line counts once as each, so the net change,
+insertions minus deletions, is how much the code grew or shrank. Binary files count as changed files with no lines.
 
 Usage:
     blast-radius.py [comparison-key]
@@ -70,7 +70,7 @@ def render_block(counts):
         ("Deleted", f"{counts.deleted:,}", "Net change", f"{counts.net:+,}"),
     ]
     table = [
-        "<table>",
+        '<table border="0">',
         '<tr><th colspan="2">Files</th><th colspan="2">Lines</th></tr>',
         *("<tr>" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>" for row in rows),
         "</table>",

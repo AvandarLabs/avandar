@@ -48,7 +48,7 @@ class RenderBlock(unittest.TestCase):
         lines = self.block().splitlines()
         self.assertEqual(lines[0], "<small>")
         self.assertEqual(lines[-1], "</small>")
-        self.assertEqual(lines[2], "> <table>")
+        self.assertEqual(lines[2], '> <table border="0">')
         self.assertNotIn("Blast radius", self.block())
 
     def test_groups_the_columns_under_two_spanned_headers(self):
