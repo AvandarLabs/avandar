@@ -22,12 +22,12 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryColumnReconciliation/QueryColumnReconciliation.ts";
 import { normalizeQueryFilters } from "$/models/queries/StructuredQuery/normalizeQueryFilters/normalizeQueryFilters.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import { mapSqlProjectionsToQueryColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/mapSqlProjectionsToQueryColumns.ts";
 import {
   parseHavingNode,
   parseWhereNode,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFilterClauses.ts";
 import { parseFromClause } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFromClause.ts";
-import { mapSqlProjectionsToQueryColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/mapSqlProjectionsToQueryColumns.ts";
 import { reconcileParsedColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/reconcileParsedColumns.ts";
 import { columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
