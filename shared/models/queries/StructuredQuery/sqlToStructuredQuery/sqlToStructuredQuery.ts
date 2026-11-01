@@ -28,7 +28,7 @@ import {
   parseWhereNode,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFilterClauses.ts";
 import { parseFromClause } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFromClause.ts";
-import { reconcileParsedColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/reconcileParsedColumns.ts";
+import { reconcileMappedQueryColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/reconcileMappedQueryColumns.ts";
 import { columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
@@ -149,7 +149,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   let { queryColumns, aggregations } = projection;
   unmappedReasons.push(...projection.unmappedReasons);
 
-  queryColumns = reconcileParsedColumns({
+  queryColumns = reconcileMappedQueryColumns({
     columns: queryColumns.map((column) => {
       return {
         ...column,

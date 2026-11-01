@@ -26,7 +26,7 @@ function _isSameExpression({
 }
 
 /** Retains uniquely matched SQL projections across alias-only edits. */
-export function reconcileParsedColumns(
+export function reconcileMappedQueryColumns(
   options: Readonly<{
     columns: readonly QueryColumn.T[];
     previousQuery: StructuredQuery.Partial | undefined;
