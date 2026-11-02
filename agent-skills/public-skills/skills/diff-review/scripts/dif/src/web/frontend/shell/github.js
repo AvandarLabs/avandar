@@ -129,8 +129,49 @@
     renderGithub();
   }
 
+  // Each tab reports a submit's outcome once, including one that finished
+  // before the page loaded (a review queued offline, sent after a relaunch).
+  var SUBMIT_SEEN_KEY = "dif-gh-submit-seen";
+  function submitOutcomeId(state) {
+    return state.sessionId + ":" + state.lastSubmit.ok + ":" + state.lastSubmit.message;
+  }
+  function wasSubmitReported(id) {
+    try { return window.sessionStorage.getItem(SUBMIT_SEEN_KEY) === id; } catch (e) { return false; }
+  }
+  function markSubmitReported(id) {
+    try { window.sessionStorage.setItem(SUBMIT_SEEN_KEY, id); } catch (e) { /* ignore */ }
+  }
+
+  function applySubmit(state, isFirstState) {
+    if (state.submitting && !ghSubmitting) {
+      // Queued before this page loaded (another tab, or before a relaunch):
+      // still report how it ends.
+      ghSubmitting = true;
+      setSubmitBusy(true);
+    }
+    if (ghSubmitting && state.submitting && isOffline(state) && !ghEls.pop.hidden) {
+      closeReviewPop(); // queued: the header says the review sends once back online
+    }
+    var isEarlier = isFirstState && !state.submitting && !!state.lastSubmit;
+    if (!(ghSubmitting && !state.submitting && state.lastSubmit) && !isEarlier) return;
+    ghSubmitting = false;
+    setSubmitBusy(false);
+    var id = submitOutcomeId(state);
+    if (isEarlier && wasSubmitReported(id)) return;
+    markSubmitReported(id);
+    if (state.lastSubmit.ok) {
+      closeReviewPop();
+      ghEls.popBody.value = "";
+      flashGithub(state.lastSubmit.message);
+    } else {
+      if (ghEls.pop.hidden) openReviewPop(); // closed while the review was queued
+      showPopError(state.lastSubmit.message);
+    }
+  }
+
   function applyGithub(state) {
     if (!state || typeof state !== "object") return;
+    var isFirstState = gh === null;
     gh = state;
     var reviewerPulls = state.sync ? state.sync.reviewerPulls : null;
     if (ghReviewerPulls !== null && reviewerPulls > ghReviewerPulls && !state.sync.error) {
@@ -138,21 +179,7 @@
       return;
     }
     ghReviewerPulls = reviewerPulls;
-    if (ghSubmitting && state.submitting && isOffline(state) && !ghEls.pop.hidden) {
-      closeReviewPop(); // queued: the header says the review sends once back online
-    }
-    if (ghSubmitting && !state.submitting && state.lastSubmit) {
-      ghSubmitting = false;
-      setSubmitBusy(false);
-      if (state.lastSubmit.ok) {
-        closeReviewPop();
-        ghEls.popBody.value = "";
-        flashGithub(state.lastSubmit.message);
-      } else {
-        if (ghEls.pop.hidden) openReviewPop(); // closed while the review was queued
-        showPopError(state.lastSubmit.message);
-      }
-    }
+    applySubmit(state, isFirstState);
     if (ghFastForwards !== null && state.fastForwards > ghFastForwards) {
       autoShowChanges = true; // the next /api/diff check reloads difit in place
       fetchDiff();

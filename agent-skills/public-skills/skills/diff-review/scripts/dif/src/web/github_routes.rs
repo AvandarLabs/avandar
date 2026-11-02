@@ -43,9 +43,9 @@ pub fn handle(route: &Route, mut request: Request, ctx: &Ctx) -> std::io::Result
             let is_own_pr = ctx.github.read(|s| s.session.is_own_pr());
             match parse_submit(&body, is_own_pr) {
                 Ok(submit) => {
-                    ctx.github.session(|s| {
-                        s.submit = Some(submit);
-                        s.last_submit = None;
+                    ctx.github.update_state(|s| {
+                        s.registry.queued_submit = Some(submit);
+                        s.session.last_submit = None;
                     });
                     send_status(request, 202)
                 }

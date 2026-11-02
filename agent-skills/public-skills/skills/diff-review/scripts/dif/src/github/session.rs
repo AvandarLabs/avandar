@@ -8,7 +8,7 @@
 use std::collections::{BTreeMap, HashSet};
 use std::time::Instant;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use super::conflicts::{ConflictResolution, llm_resolves_notice, reviewer_resolves_notice};
@@ -44,7 +44,8 @@ pub enum PrState {
 }
 
 /// How the reviewer submits their pending review, as GitHub names it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ReviewEvent {
     Comment,
     Approve,
@@ -75,7 +76,7 @@ impl ReviewEvent {
 }
 
 /// A review submit the browser asked for.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SubmitRequest {
     pub event: ReviewEvent,
     pub body: String,
@@ -185,7 +186,6 @@ pub struct Session {
     /// Conflicted files the reviewer asked the LLM to resolve. The TUI takes
     /// them and types the request into the LLM pane.
     pub conflicts_for_llm: Option<Vec<String>>,
-    pub submit: Option<SubmitRequest>,
     pub last_submit: Option<SubmitOutcome>,
     pub viewed: ViewedSync,
     /// Message ids removed from difit because GitHub deleted or resolved them.
@@ -213,7 +213,6 @@ impl Session {
             fast_forwards: 0,
             conflicts: None,
             conflicts_for_llm: None,
-            submit: None,
             last_submit: None,
             viewed: ViewedSync::default(),
             tombstones: HashSet::new(),
@@ -284,7 +283,7 @@ impl Session {
             "drafts": registry.draft_count(),
             "failed": registry.failed_count(),
             "comments": registry.comments,
-            "submitting": self.submit.is_some(),
+            "submitting": registry.queued_submit.is_some(),
             "lastSubmit": self.last_submit,
             "sync": {
                 "pulling": self.pulling || self.pull_requested,
@@ -305,7 +304,7 @@ impl Session {
                 "comments": registry.unposted_count(),
                 "removals": registry.queued_removal_count(),
                 "viewed": registry.queued_viewed.len(),
-                "submit": self.submit.is_some(),
+                "submit": registry.queued_submit.is_some(),
             },
         })
     }

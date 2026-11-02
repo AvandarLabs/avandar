@@ -154,8 +154,8 @@ impl GithubSync {
 
     /// Record GitHub's viewed state and the changes difit must apply. A path
     /// with a local change still queued keeps the local change: it reaches
-    /// GitHub on the next pass. While sync is blocked the queue is dropped,
-    /// since those changes can never line up with the PR's files.
+    /// GitHub on the next pass. While sync is blocked the queue is kept, and
+    /// sent once sync can run.
     fn pull_viewed(&self, remote: &RemoteState, block: Option<String>) {
         self.registry.update_state(|state| {
             let queued = &mut state.registry.queued_viewed;
@@ -172,7 +172,6 @@ impl GithubSync {
                 viewed.initialized = true;
             } else {
                 viewed.initialized = false;
-                queued.clear();
             }
             viewed.remote = remote.files.iter().cloned().collect();
         });

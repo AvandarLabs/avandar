@@ -349,8 +349,10 @@ reached, and sent once it can (`github::connection`, `github::sync_queue`).
   cannot reach GitHub stops the rest of the pass. A comment stays `pending`, an
   edit keeps a body that differs from GitHub's, a delete or resolve is recorded
   on the comment as `removal`, viewed changes stay in `queuedViewed`, and a
-  submit stays requested. All but the submit live in `-github.json`, so they
-  survive a relaunch.
+  submit stays in `queuedSubmit`. All of it lives in `-github.json`, so it
+  survives a relaunch: a review submitted offline goes out on the next launch
+  that can reach GitHub. A queued submit is refused with the reason once a
+  lookup finds the branch has no open PR.
 - **Coming back.** The browser reporting `online` clears both states and
   requests a pull, so the queue is sent at once. A lost connection the browser
   never saw is retried every 20s (`RETRY_EVERY`) unless the browser reports no
@@ -372,7 +374,7 @@ The shell's **Review (N)** button opens a panel with an optional summary and,
 on someone else's PR, GitHub's three outcomes: Comment, Approve, Request
 changes. On the reviewer's own PR GitHub only allows commenting, so the panel
 offers **Submit comments** alone (the web route and the sync pass both refuse
-anything else). `POST /__wrap/github/submit` queues the request; the poller
+anything else). `POST /__wrap/github/submit` queues the request (persisted as `queuedSubmit`); the poller
 waits until no comment is still `pending` or has a queued removal, refuses while any have `failed`,
 then calls `submitPullRequestReview` and marks every draft `published`.
 
@@ -440,9 +442,9 @@ Otherwise the shell's PR pill explains why sync is paused.
   shell sends each changed path to `POST /__wrap/github/viewed`, which adds it
   to the persisted `queuedViewed` (latest change per path). The shell sends
   unless the server already knows sync is blocked, so changes made before the
-  first pull (say, launched offline) are queued too; a pull that finds sync
-  blocked drops the queue, and the first pull never overwrites a path that is
-  still queued. A change leaves the queue once GitHub has it. GitHub has no
+  first pull (say, launched offline) are queued too. A pull that finds sync
+  blocked keeps the queue for when sync can run, and the first pull never
+  overwrites a path that is still queued. A change leaves the queue once GitHub has it. GitHub has no
   bulk mutation, so marking a directory in difit becomes one
   `markFileAsViewed` / `unmarkFileAsViewed` call per file. A change GitHub
   already matches is skipped, which also stops the GitHub → difit writes from

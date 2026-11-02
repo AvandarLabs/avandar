@@ -218,8 +218,10 @@ keep reviewing. PR comments, edits, deletions, resolved threads, viewed files,
 and a submitted review are all saved and queued; the header says "Offline." and
 lists what is waiting, and a queued comment's badge reads **Queued for PR**.
 When the connection returns, dif sends everything in order and pulls. The queue
-is saved to disk, so it survives quitting dif, except a submitted review, which
-you submit again. dif notices the network itself too: when GitHub stops
+is saved to disk, so it survives quitting dif: a review you submitted offline
+goes out on the next launch that can reach GitHub. Viewed files marked while
+viewed sync is paused (say, your checkout is behind the PR) wait until it can
+run. dif notices the network itself too: when GitHub stops
 answering it holds everything and tries again every 20 seconds.
 
 **Viewed files stay in sync both ways.** Marking a file viewed in difit marks it

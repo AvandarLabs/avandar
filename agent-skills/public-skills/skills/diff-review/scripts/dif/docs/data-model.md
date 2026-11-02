@@ -142,7 +142,9 @@ message ids are PR comments and where they are on GitHub:
     }
   },
   // viewed-file changes GitHub does not have yet, latest per path
-  "queuedViewed": { "src/a.rs": true }
+  "queuedViewed": { "src/a.rs": true },
+  // a review submit GitHub has not taken yet
+  "queuedSubmit": { "event": "COMMENT" | "APPROVE" | "REQUEST_CHANGES", "body": "…" }
 }
 ```
 
@@ -153,8 +155,9 @@ message ids are PR comments and where they are on GitHub:
 - `failed`: GitHub rejected it; editing the comment retries. A call that could
   not reach GitHub never sets it: the comment stays `pending`.
 
-`removal` and `queuedViewed` are the offline queue: they are sent once GitHub
-is reachable, and cleared when GitHub has them (see
+`removal`, `queuedViewed`, and `queuedSubmit` are the offline queue: they are
+sent once GitHub is reachable (viewed changes once viewed sync can run), and
+cleared when GitHub has them (see
 [integrations.md](integrations.md#offline)).
 
 Comments pulled from GitHub get the message id `gh:<node id>`. `body` is
@@ -163,7 +166,7 @@ different body on GitHub is a remote edit to pull. Entries are removed when the
 comment is deleted or its thread resolved, on either side.
 
 The session's live GitHub state (the PR, the pending review, sync status, the
-viewed-file events, the connection, a queued submit) is never written here. The browser reads it, with these
+viewed-file events, the connection) is never written here. The browser reads it, with these
 comments, from `/__wrap/github.json`.
 
 ## Slug + port derivation

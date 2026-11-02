@@ -91,7 +91,7 @@ fn state_json_reports_the_connection_and_everything_still_queued() {
     registry.queued_viewed.insert("a.rs".to_owned(), true);
     let mut session = Session::new();
     session.report_connection(false);
-    session.submit = Some(SubmitRequest {
+    registry.queued_submit = Some(SubmitRequest {
         event: ReviewEvent::Comment,
         body: String::new(),
     });

@@ -23,7 +23,7 @@
 //!   - [`checkout`]: fast-forwarding the branch to the PR head when safe.
 //!   - [`conflicts`]: what a pull's merge conflicts become: a notice for the
 //!     reviewer, or a prompt for the LLM pane.
-//!   - [`sync`] / [`sync_pull`] / `sync_queue`: run all of it on the poller
+//!   - [`sync`] / [`sync_pull`] / `sync_queue` / `sync_submit`: run all of it on the poller
 //!     thread, holding every interaction while GitHub cannot be reached.
 
 pub mod anchor;
@@ -41,3 +41,4 @@ pub mod session;
 pub mod sync;
 mod sync_pull;
 mod sync_queue;
+mod sync_submit;

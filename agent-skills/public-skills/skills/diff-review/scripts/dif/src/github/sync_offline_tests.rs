@@ -181,14 +181,9 @@ fn a_review_submitted_offline_is_submitted_once_back() {
     harness.registry.mark_pending(&["m1".to_owned()]);
     harness.sync.tick(&one_comment_snapshot("why?"));
     harness.github.set_offline(true);
-    harness.registry.session(|s| {
-        s.submit = Some(SubmitRequest {
-            event: ReviewEvent::Comment,
-            body: String::new(),
-        });
-    });
+    queue_submit(&harness, ReviewEvent::Comment, String::new());
     harness.sync.tick(&one_comment_snapshot("why?"));
-    assert!(harness.registry.read(|s| s.session.submit.is_some()));
+    assert!(harness.registry.snapshot().queued_submit.is_some());
     assert_eq!(
         harness.registry.read(|s| s.session.last_submit.clone()),
         None
@@ -202,6 +197,85 @@ fn a_review_submitted_offline_is_submitted_once_back() {
             .registry
             .read(|s| s.session.last_submit.clone().unwrap().ok)
     );
+}
+
+#[test]
+fn a_review_submitted_offline_survives_a_relaunch() {
+    let mut harness = online_rig();
+    harness.registry.mark_pending(&["m1".to_owned()]);
+    harness.sync.tick(&one_comment_snapshot("why?"));
+    harness.github.set_offline(true);
+    queue_submit(&harness, ReviewEvent::Approve, "LGTM");
+    harness.sync.tick(&one_comment_snapshot("why?"));
+
+    // Quit dif and launch it again, back online.
+    harness.github.set_offline(false);
+    let relaunched = SharedRegistry::load(harness.registry.path().to_path_buf());
+    let ports = SyncPorts {
+        api: Box::new(harness.github.clone()),
+        checkout: Box::new(harness.checkout.clone()),
+        editor: Box::new(harness.editor.clone()),
+    };
+    let mut sync = GithubSync::new(relaunched.clone(), ComparisonKey::parse("develop"), ports);
+    sync.tick(&one_comment_snapshot("why?"));
+    assert!(
+        harness
+            .github
+            .calls()
+            .contains(&"submit R1 APPROVE LGTM".to_owned())
+    );
+    assert_eq!(relaunched.snapshot().queued_submit, None);
+    assert!(relaunched.read(|s| s.session.last_submit.clone().unwrap().ok));
+}
+
+#[test]
+fn a_queued_submit_is_dropped_with_the_reason_when_the_branch_has_no_pr() {
+    let mut harness = rig(
+        FakeGithub {
+            no_pr: true,
+            ..FakeGithub::default()
+        },
+        "develop",
+    );
+    queue_submit(&harness, ReviewEvent::Comment, "done");
+    harness.sync.tick(&snapshot_from_json(EMPTY));
+    assert_eq!(harness.registry.snapshot().queued_submit, None);
+    let outcome = harness
+        .registry
+        .read(|s| s.session.last_submit.clone().unwrap());
+    assert!(
+        !outcome.ok && outcome.message.contains("No linked PR"),
+        "{outcome:?}"
+    );
+}
+
+#[test]
+fn viewed_changes_stay_queued_while_sync_is_paused() {
+    let github = FakeGithub::default();
+    github.remote.lock().unwrap().head_sha = "head".to_owned();
+    let mut harness = rig_with(github, "develop", "older", Relation::Ahead, true);
+    harness.registry.update(|registry| {
+        registry.queued_viewed.insert("a.rs".to_owned(), true);
+    });
+    harness.sync.tick(&snapshot_from_json(EMPTY));
+    let reason = harness.registry.read(|s| s.session.viewed.reason.clone());
+    assert!(reason.is_some(), "the checkout is not at the PR head");
+    assert_eq!(
+        harness.registry.snapshot().queued_viewed.get("a.rs"),
+        Some(&true)
+    );
+
+    *harness.checkout.head.lock().unwrap() = "head".to_owned();
+    harness.registry.session(|s| s.pull_requested = true);
+    harness.sync.tick(&snapshot_from_json(EMPTY));
+    harness.sync.tick(&snapshot_from_json(EMPTY));
+    assert!(
+        harness
+            .github
+            .calls()
+            .contains(&"viewed a.rs true".to_owned())
+    );
+    assert!(harness.registry.snapshot().queued_viewed.is_empty());
 }
 
 #[test]

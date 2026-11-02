@@ -9,7 +9,7 @@ use crate::difit::editor::DifitEdit;
 use crate::github::checkout::Relation;
 use crate::github::fakes::{FakeCheckout, FakeEditor, FakeGithub, snapshot_from_json};
 use crate::github::graphql::{RemoteComment, RemoteState, RemoteThread};
-use crate::github::session::{SubmitRequest, ViewedState};
+use crate::github::session::{ReviewEvent, SubmitRequest, ViewedState};
 
 struct Rig {
     _dir: tempfile::TempDir,
@@ -67,6 +67,15 @@ fn one_comment_snapshot(body: &str) -> Snapshot {
 
 const EMPTY: &str = r#"{"version":0,"threads":[]}"#;
 
+fn queue_submit(rig: &Rig, event: ReviewEvent, body: impl Into<String>) {
+    rig.registry.update(|registry| {
+        registry.queued_submit = Some(SubmitRequest {
+            event,
+            body: body.into(),
+        });
+    });
+}
+
 fn status(rig: &Rig, id: &str) -> SyncStatus {
     rig.registry.snapshot().comments[id].status
 }
@@ -78,12 +87,7 @@ fn a_pr_comment_becomes_a_draft_then_publishes_on_submit() {
     harness.sync.tick(&one_comment_snapshot("why?"));
     assert_eq!(status(&harness, "m1"), SyncStatus::Draft);
 
-    harness.registry.session(|s| {
-        s.submit = Some(SubmitRequest {
-            event: ReviewEvent::Approve,
-            body: "LGTM".to_owned(),
-        });
-    });
+    queue_submit(&harness, ReviewEvent::Approve, "LGTM".to_owned());
     harness.sync.tick(&one_comment_snapshot("why?"));
     assert_eq!(status(&harness, "m1"), SyncStatus::Published);
     let calls = harness.github.calls();
@@ -126,12 +130,7 @@ fn own_pr_cannot_be_approved() {
         "develop",
     );
     harness.sync.tick(&snapshot_from_json(EMPTY));
-    harness.registry.session(|s| {
-        s.submit = Some(SubmitRequest {
-            event: ReviewEvent::Approve,
-            body: String::new(),
-        });
-    });
+    queue_submit(&harness, ReviewEvent::Approve, String::new());
     harness.sync.tick(&snapshot_from_json(EMPTY));
     let outcome = harness
         .registry
@@ -154,12 +153,7 @@ fn submit_refuses_while_comments_have_failed() {
     harness.registry.mark_pending(&["m1".to_owned()]);
     harness.sync.tick(&one_comment_snapshot("why?"));
     assert_eq!(status(&harness, "m1"), SyncStatus::Failed);
-    harness.registry.session(|s| {
-        s.submit = Some(SubmitRequest {
-            event: ReviewEvent::Comment,
-            body: String::new(),
-        });
-    });
+    queue_submit(&harness, ReviewEvent::Comment, String::new());
     harness.sync.tick(&one_comment_snapshot("why?"));
     let outcome = harness
         .registry

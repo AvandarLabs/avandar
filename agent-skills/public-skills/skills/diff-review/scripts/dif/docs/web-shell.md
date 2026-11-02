@@ -419,6 +419,9 @@ to `/__wrap/github/pull`, `/__wrap/github/submit`, `/__wrap/github/viewed`, and
 at boot). While GitHub is unreachable the notice says so and lists what is
 queued (`connection` and `queued` in `/__wrap/github.json`), the Sync icon stops
 spinning, and a review submitted offline closes the panel until it goes through.
+Each tab reports a submit's outcome once (keyed in `sessionStorage` by session
+id and outcome), including one that finished before the page loaded, such as a
+review queued offline and sent after a relaunch.
 See [integrations.md](integrations.md#offline).
 It also sends difit's viewed changes to GitHub, diffing difit's viewed index on
 every `storage` event; and after a sync fast-forwards the branch it reloads

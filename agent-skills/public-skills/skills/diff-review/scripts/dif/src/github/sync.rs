@@ -7,7 +7,8 @@
 //!   2. pushes the reviewer's PR comment changes ([`plan`](super::plan)) into
 //!      their pending review;
 //!   3. sends viewed-file changes the browser queued;
-//!   4. submits the pending review when the browser asks;
+//!   4. submits the pending review when the browser asks
+//!      ([`sync_submit`](super::sync_submit));
 //!   5. pulls from GitHub every minute, or at once when asked
 //!      ([`sync_pull`](super::sync_pull)).
 //!
@@ -29,8 +30,8 @@ use super::client::GithubApi;
 use super::connection::{RETRY_EVERY, is_network_error};
 use super::graphql::Posted;
 use super::plan::{Previous, SyncAction, plan};
-use super::registry::{Registry, Removal, SharedRegistry, SyncStatus, SyncedComment};
-use super::session::{PrState, PullRequest, ReviewEvent, SubmitOutcome};
+use super::registry::{Removal, SharedRegistry, SyncStatus, SyncedComment};
+use super::session::{PrState, PullRequest};
 
 /// How often to pull from GitHub without being asked.
 pub const PULL_EVERY: Duration = Duration::from_secs(60);
@@ -78,6 +79,7 @@ impl GithubSync {
         self.push(snapshot, pr.as_ref());
         self.previous = Previous::from_snapshot(snapshot);
         let Some(pr) = pr else {
+            self.refuse_submit_without_pr();
             return;
         };
         if self.may_call() {
@@ -255,7 +257,7 @@ impl GithubSync {
         Ok(id)
     }
 
-    fn no_pr_error(&self) -> anyhow::Error {
+    pub(super) fn no_pr_error(&self) -> anyhow::Error {
         let reason = self.registry.read(|s| match &s.session.pr {
             PrState::Unavailable(reason) => reason.clone(),
             _ => "This branch's PR has not been looked up yet.".to_owned(),
@@ -302,82 +304,6 @@ impl GithubSync {
         self.registry.update(|registry| {
             registry.comments.remove(message_id);
         });
-    }
-
-    fn submit_if_requested(&self, pr: &PullRequest) {
-        let Some(request) = self.registry.read(|s| s.session.submit.clone()) else {
-            return;
-        };
-        let registry = self.registry.snapshot();
-        if registry
-            .comments
-            .values()
-            .any(|c| c.status == SyncStatus::Pending || c.removal.is_some())
-        {
-            return; // still posting or removing drafts; submit once they are done
-        }
-        let outcome = self.submit(pr, &request.body, request.event, &registry);
-        if let Err(e) = &outcome
-            && self.lost(e)
-        {
-            return; // stays requested until GitHub is reachable
-        }
-        let is_submitted = outcome.is_ok();
-        self.registry.update_state(|state| {
-            if is_submitted {
-                for entry in state.registry.comments.values_mut() {
-                    if entry.status == SyncStatus::Draft {
-                        entry.status = SyncStatus::Published;
-                    }
-                }
-                state.session.review_id = None;
-                state.session.pull_requested = true;
-            }
-            state.session.submit = None;
-            state.session.last_submit = Some(SubmitOutcome {
-                ok: is_submitted,
-                message: outcome.unwrap_or_else(|e| e.to_string()),
-            });
-        });
-    }
-
-    fn submit(
-        &self,
-        pr: &PullRequest,
-        body: &str,
-        event: ReviewEvent,
-        registry: &Registry,
-    ) -> Result<String> {
-        let num_failed = registry.failed_count();
-        if num_failed > 0 {
-            return Err(anyhow!(
-                "{num_failed} PR comment(s) failed to post. Fix or delete them, then submit again."
-            ));
-        }
-        if event != ReviewEvent::Comment && self.registry.read(|s| s.session.is_own_pr()) {
-            return Err(anyhow!("GitHub only lets you comment on your own PR."));
-        }
-        let cached = self.registry.read(|s| s.session.review_id.clone());
-        let existing = match cached {
-            Some(id) => Some(id),
-            None => self.ports.api.pending_review(pr)?,
-        };
-        let review = match existing {
-            Some(id) => id,
-            None if event == ReviewEvent::Comment && body.trim().is_empty() => {
-                return Err(anyhow!(
-                    "Nothing to submit: add a PR comment or a summary first."
-                ));
-            }
-            None => self.ports.api.create_review(pr)?,
-        };
-        self.ports.api.submit(pr, &review, event, body)?;
-        Ok(match event {
-            ReviewEvent::Comment => "Review submitted.",
-            ReviewEvent::Approve => "Approved.",
-            ReviewEvent::RequestChanges => "Changes requested.",
-        }
-        .to_owned())
     }
 
     fn pull_due(&self) -> bool {

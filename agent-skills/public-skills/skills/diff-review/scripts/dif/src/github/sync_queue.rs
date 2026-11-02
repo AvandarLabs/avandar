@@ -5,8 +5,8 @@
 //! Nothing is dropped. A PR comment stays `pending` and an edit keeps a body
 //! that differs from GitHub's, so the planner plans both again on every pass. A
 //! removal is recorded on the comment ([`Removal`]), viewed changes stay in
-//! the registry's `queuedViewed`, and a submit stays requested. The registry
-//! is saved to disk, so all of it but the submit survives a relaunch.
+//! the registry's `queuedViewed`, and a submit stays in `queuedSubmit`. The
+//! registry is saved to disk, so all of it survives a relaunch.
 
 use super::connection::is_network_error;
 use super::plan::SyncAction;

@@ -72,7 +72,7 @@ suite with `cargo test` (it finishes in a couple of seconds).
 - `github::registry` / `github::session`: persistence, marking never resets a
   posted entry, session state never persisted, tombstones kept from the LLM,
   draft/failed counts (a draft with a queued removal is not a draft),
-  `queuedViewed` persistence, own-PR detection, the browser JSON (incl.
+  `queuedViewed` and `queuedSubmit` persistence, own-PR detection, the browser JSON (incl.
   `conflicts`, `reviewerPulls`, `connection`, and `queued`), coming back online
   requesting a pull, answering conflicts (LLM vs reviewer), viewed event capping.
 - `github::sync` offline (`sync_offline_tests.rs`, the fake GitHub's
@@ -80,8 +80,10 @@ suite with `cargo test` (it finishes in a couple of seconds).
   reconnect; launching offline leaves the PR unknown instead of failing
   comments; no calls while the browser reports no network; the retry interval;
   a draft deleted and a thread resolved offline reaching GitHub later; queued
-  viewed changes sent later and never undone by the first pull; a review
-  submitted offline; an unreachable pull asked for again, not reported.
+  viewed changes sent later and never undone by the first pull, and kept while
+  viewed sync is paused; a review submitted offline, including across a
+  relaunch, and refused once the branch turns out to have no PR; an unreachable
+  pull asked for again, not reported.
 - `github::sync` (`sync_tests.rs`, against a stateful fake GitHub): draft then
   publish on submit, edit/resolve mirroring, own PR refusing approve, submit
   refusing failed comments, no PR failing comments with the reason, a pull
