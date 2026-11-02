@@ -18,7 +18,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 
 use serde::{Deserialize, Serialize};
 
-use super::session::Session;
+use super::session::{Session, SubmitRequest};
 use crate::difit::transcript;
 
 /// Where one PR comment is in its lifecycle.
@@ -34,6 +34,17 @@ pub enum SyncStatus {
     Published,
     /// The last GitHub call failed. Editing the comment retries it.
     Failed,
+}
+
+/// A removal made in difit that GitHub has not been told about yet, because it
+/// could not be reached.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Removal {
+    /// Delete the comment.
+    Delete,
+    /// Resolve the conversation it opened.
+    Resolve,
 }
 
 /// One PR comment, keyed by its difit message id.
@@ -59,6 +70,9 @@ pub struct SyncedComment {
     pub body: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
+    /// Removed in difit, waiting for GitHub to be reachable.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub removal: Option<Removal>,
 }
 
 impl SyncedComment {
@@ -73,6 +87,7 @@ impl SyncedComment {
             url: None,
             body: None,
             error: None,
+            removal: None,
         }
     }
 
@@ -85,9 +100,17 @@ impl SyncedComment {
 
 /// The persisted registry.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Registry {
     #[serde(default)]
     pub comments: BTreeMap<String, SyncedComment>,
+    /// Viewed-file changes made in difit that GitHub does not have yet: the
+    /// latest one per path.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub queued_viewed: BTreeMap<String, bool>,
+    /// A review submit the browser asked for that GitHub has not taken yet.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub queued_submit: Option<SubmitRequest>,
 }
 
 impl Registry {
@@ -101,22 +124,34 @@ impl Registry {
     }
 
     /// How many comments still wait for a review submit (marked or drafted).
+    /// A draft already removed in difit does not count.
     #[must_use]
     pub fn draft_count(&self) -> usize {
-        self.count_matching(|status| matches!(status, SyncStatus::Pending | SyncStatus::Draft))
+        self.count_matching(|c| {
+            c.removal.is_none() && matches!(c.status, SyncStatus::Pending | SyncStatus::Draft)
+        })
     }
 
     /// How many comments GitHub rejected.
     #[must_use]
     pub fn failed_count(&self) -> usize {
-        self.count_matching(|status| status == SyncStatus::Failed)
+        self.count_matching(|c| c.status == SyncStatus::Failed)
     }
 
-    fn count_matching(&self, matches_status: impl Fn(SyncStatus) -> bool) -> usize {
-        self.comments
-            .values()
-            .filter(|c| matches_status(c.status))
-            .count()
+    /// How many comments are not on GitHub yet.
+    #[must_use]
+    pub fn unposted_count(&self) -> usize {
+        self.count_matching(|c| c.status == SyncStatus::Pending)
+    }
+
+    /// How many removals wait for GitHub to be reachable.
+    #[must_use]
+    pub fn queued_removal_count(&self) -> usize {
+        self.count_matching(|c| c.removal.is_some())
+    }
+
+    fn count_matching(&self, matches: impl Fn(&SyncedComment) -> bool) -> usize {
+        self.comments.values().filter(|c| matches(c)).count()
     }
 }
 
@@ -227,84 +262,5 @@ impl SharedRegistry {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::github::session::PrState;
-
-    #[test]
-    fn marking_persists_and_reloads() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("r-github.json");
-        let registry = SharedRegistry::load(path.clone());
-        registry.mark_pending(&["m1".to_owned()]);
-
-        let reloaded = SharedRegistry::load(path);
-        assert_eq!(
-            reloaded.snapshot().comments["m1"].status,
-            SyncStatus::Pending
-        );
-        assert!(reloaded.github_ids().contains("m1"));
-    }
-
-    #[test]
-    fn marking_never_resets_a_posted_comment() {
-        let dir = tempfile::tempdir().unwrap();
-        let registry = SharedRegistry::load(dir.path().join("r.json"));
-        registry.update(|r| {
-            r.comments.insert(
-                "m1".to_owned(),
-                SyncedComment {
-                    status: SyncStatus::Draft,
-                    node_id: Some("PRRC_1".to_owned()),
-                    ..SyncedComment::pending()
-                },
-            );
-        });
-        registry.mark_pending(&["m1".to_owned()]);
-        assert_eq!(
-            registry.snapshot().comments["m1"].node_id.as_deref(),
-            Some("PRRC_1")
-        );
-    }
-
-    #[test]
-    fn session_state_is_not_persisted() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("r.json");
-        let registry = SharedRegistry::load(path.clone());
-        registry.update_state(|s| s.session.pr = PrState::Unavailable("no PR".to_owned()));
-        assert_eq!(
-            SharedRegistry::load(path).read(|s| s.session.pr.clone()),
-            PrState::Unknown
-        );
-    }
-
-    #[test]
-    fn tombstoned_ids_are_kept_from_the_llm() {
-        let dir = tempfile::tempdir().unwrap();
-        let registry = SharedRegistry::load(dir.path().join("r.json"));
-        registry.session(|s| s.tombstones.insert("gh:gone".to_owned()));
-        assert!(registry.github_ids().contains("gh:gone"));
-    }
-
-    #[test]
-    fn counts_drafts_and_failures() {
-        let mut registry = Registry::default();
-        for (id, status) in [
-            ("a", SyncStatus::Pending),
-            ("b", SyncStatus::Draft),
-            ("c", SyncStatus::Published),
-            ("d", SyncStatus::Failed),
-        ] {
-            registry.comments.insert(
-                id.to_owned(),
-                SyncedComment {
-                    status,
-                    ..SyncedComment::pending()
-                },
-            );
-        }
-        assert_eq!(registry.draft_count(), 2);
-        assert_eq!(registry.failed_count(), 1);
-    }
-}
+#[path = "registry_tests.rs"]
+mod tests;

@@ -414,7 +414,15 @@ The left section, after the branch identity, holds the GitHub controls
 submit panel (a fixed-position dialog under it; Escape or an outside click
 closes it), and a notice line (ellipsized when it doesn't fit; hovering a cut-off notice
 shows the full text in the shell's tooltip). It polls `/__wrap/github.json` every 2s and posts
-to `/__wrap/github/pull`, `/__wrap/github/submit`, and `/__wrap/github/viewed`.
+to `/__wrap/github/pull`, `/__wrap/github/submit`, `/__wrap/github/viewed`, and
+`/__wrap/github/connection` (the browser's `online` / `offline` events, and once
+at boot). While GitHub is unreachable the notice says so and lists what is
+queued (`connection` and `queued` in `/__wrap/github.json`), the Sync icon stops
+spinning, and a review submitted offline closes the panel until it goes through.
+Each tab reports a submit's outcome once (keyed in `sessionStorage` by session
+id and outcome), including one that finished before the page loaded, such as a
+review queued offline and sent after a relaunch.
+See [integrations.md](integrations.md#offline).
 It also sends difit's viewed changes to GitHub, diffing difit's viewed index on
 every `storage` event; and after a sync fast-forwards the branch it reloads
 difit in place through the same path as **Show new changes**.

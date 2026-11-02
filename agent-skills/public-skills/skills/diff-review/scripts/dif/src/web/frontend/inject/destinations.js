@@ -42,6 +42,15 @@
       : event.altKey && event.shiftKey && !event.ctrlKey;
   }
   var github = { available: false, reason: "", pr: null, comments: {} };
+  // Whether GitHub is unreachable, per the shell's sync state.
+  function isGithubOffline() {
+    return !!github.connection && !github.connection.online;
+  }
+  // A PR comment can be written when the branch has a PR, or while offline
+  // before the PR could be looked up: the shell queues it until GitHub answers.
+  function canPostToPr() {
+    return github.available || (!github.lookedUp && isGithubOffline());
+  }
   // The shell's TUI delivery mode ("bulk" holds comments for Send all).
   var deliveryMode = "bulk";
   var threadsById = {};
@@ -129,14 +138,14 @@
     setAttr(submit, "data-dif-submit-label", label);
     setAttr(submit, "aria-label", label);
     var otherDest = oppositeDest(form);
-    var canSendOther = otherDest === "local" || github.available;
+    var canSendOther = otherDest === "local" || canPostToPr();
     var hints = [];
     if (canSendOther) hints.push(SEND_OTHER_HINT + ": " + buildSubmitLabel(form, otherDest) + " instead");
     if (dest !== "github" && deliveryMode === "bulk") hints.push(SEND_NOW_HINT + ": Send to TUI now, skipping the queue");
     setAttr(submit, "title", hints.length ? hints.join("\n") : null);
   }
   function setDest(form, dest) {
-    if (dest === "github" && !github.available) dest = "local";
+    if (dest === "github" && !canPostToPr()) dest = "local";
     form.setAttribute("data-dif-dest", dest);
     // A roving tabindex: only the checked radio is in the tab order, and the
     // arrow keys move between them, as the ARIA radio group pattern expects.
@@ -194,6 +203,17 @@
     // A reply in a PR thread defaults to the PR; everything else to the TUI.
     setDest(form, threadRootEntry(form) ? "github" : "local");
   }
+  function prButtonTitle() {
+    if (github.available) {
+      return "PR: add this comment to your pending review on GitHub PR #" + github.pr.number
+        + " as a draft. The LLM never sees it. " + TOGGLE_HINT + " toggles TUI / PR.";
+    }
+    if (canPostToPr()) {
+      return "PR: you're offline, so this comment is queued. It goes to your pending review on this branch's PR"
+        + " once you're back online. The LLM never sees it. " + TOGGLE_HINT + " toggles TUI / PR.";
+    }
+    return "PR: unavailable. " + (github.reason || "This branch has no GitHub PR to post to.");
+  }
   function decorateForms() {
     document.querySelectorAll("form").forEach(function (form) {
       var textarea = form.querySelector("textarea");
@@ -201,12 +221,9 @@
       if (!textarea || !cancel || textarea.placeholder === EDIT_PLACEHOLDER) return;
       if (!form.querySelector(".dif-dest")) addDestToggle(form, cancel);
       var githubButton = form.querySelector('.dif-dest button[data-dest="github"]');
-      githubButton.disabled = !github.available;
-      githubButton.title = github.available
-        ? "PR: add this comment to your pending review on GitHub PR #" + github.pr.number
-          + " as a draft. The LLM never sees it. " + TOGGLE_HINT + " toggles TUI / PR."
-        : "PR: unavailable. " + (github.reason || "This branch has no GitHub PR to post to.");
-      if (!github.available && form.getAttribute("data-dif-dest") === "github") setDest(form, "local");
+      githubButton.disabled = !canPostToPr();
+      githubButton.title = prButtonTitle();
+      if (!canPostToPr() && form.getAttribute("data-dif-dest") === "github") setDest(form, "local");
       else labelSubmit(form);
     });
   }
@@ -253,7 +270,7 @@
       armedGithubAt = 0;
       return;
     }
-    if (!github.available) {
+    if (!canPostToPr()) {
       // No PR to post to: swallow the save rather than send it to the TUI.
       event.preventDefault();
       event.stopPropagation();
@@ -303,7 +320,15 @@
     if (entry.status === "published") return "On PR";
     if (entry.status === "draft") return "PR draft";
     if (entry.status === "failed") return "PR sync failed";
+    if (isGithubOffline()) return "Queued for PR";
     return "Saving to PR…";
+  }
+  function badgeTitle(entry, href) {
+    if (entry.error) return "GitHub: " + entry.error + " (edit the comment to retry)";
+    if (entry.status === "pending" && isGithubOffline()) {
+      return "GitHub is unreachable. This comment is saved and queued: it goes to your pending review once you're back online.";
+    }
+    return href;
   }
   // The badge is appended to a React-owned element, and React may re-insert its
   // own children after it, so CSS `order` keeps it last in the row.
@@ -328,7 +353,7 @@
     }
     var href = entry.url || (github.pr && github.pr.url) || "";
     setAttr(badge, "href", href || null);
-    setAttr(badge, "title", entry.error ? "GitHub: " + entry.error + " (edit the comment to retry)" : href);
+    setAttr(badge, "title", badgeTitle(entry, href));
   }
   // A thread's body lists the root message, then one wrapper per reply, then
   // (while open) the reply form.

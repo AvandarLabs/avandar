@@ -54,6 +54,8 @@ pub enum Route {
     GithubViewed,
     /// `POST /__wrap/github/conflicts`: who resolves a pull's merge conflicts.
     GithubConflicts,
+    /// `POST /__wrap/github/connection`: whether the browser has a network.
+    GithubConnection,
     /// `POST /api/comments`: difit's comment save, inspected for PR-bound
     /// comments before it is proxied.
     SaveComments,
@@ -138,6 +140,7 @@ pub fn route(method: &str, path: &str, query: &str, referer: Option<&str>) -> Ro
         "/__wrap/github/submit" => Route::GithubSubmit,
         "/__wrap/github/viewed" => Route::GithubViewed,
         "/__wrap/github/conflicts" => Route::GithubConflicts,
+        "/__wrap/github/connection" => Route::GithubConnection,
         "/" => Route::ShellPage,
         "/__wrap/inject.js" => Route::InjectJs,
         "/__wrap/groups.json" => Route::Groups,
@@ -226,6 +229,10 @@ mod tests {
         assert_eq!(
             route("POST", "/__wrap/github/conflicts", "", None),
             Route::GithubConflicts
+        );
+        assert_eq!(
+            route("POST", "/__wrap/github/connection", "", None),
+            Route::GithubConnection
         );
     }
 

@@ -5,9 +5,11 @@
 //! pass is tested through; [`GhCli`] is the real implementation, speaking
 //! GraphQL (see [`graphql`](super::graphql)) via `gh api graphql`.
 
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Output, Stdio};
+use std::thread::{self, JoinHandle};
+use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, anyhow, bail};
 use serde_json::{Value, json};
@@ -44,6 +46,11 @@ pub trait GithubApi: Send {
     fn fetch(&self, pr: &PullRequest) -> Result<RemoteState>;
 }
 
+/// How long one `gh` call may take. On a network that drops packets rather
+/// than refusing connections (captive or in-flight wifi), `gh` hangs instead
+/// of failing, and a hung call would stall the poller thread.
+const GH_TIMEOUT: Duration = Duration::from_secs(30);
+
 /// [`GithubApi`] over `gh`, run in the repo root.
 pub struct GhCli {
     repo_root: PathBuf,
@@ -72,7 +79,7 @@ impl GhCli {
         if let (Some(input), Some(mut stdin)) = (input, child.stdin.take()) {
             stdin.write_all(input.to_string().as_bytes())?;
         }
-        let output = child.wait_with_output()?;
+        let output = wait_with_timeout(child, GH_TIMEOUT)?;
         let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
         if !output.status.success() {
             if let Err(e) = graphql::parse_data_from_answer(&stdout) {
@@ -243,6 +250,44 @@ pub fn parse_pr(stdout: &str) -> Result<PullRequest> {
     })
 }
 
+/// Wait for `child` like [`Child::wait_with_output`], killing it once `timeout`
+/// passes. Running out of time reads as GitHub being unreachable.
+fn wait_with_timeout(mut child: Child, timeout: Duration) -> Result<Output> {
+    // Drain both pipes while waiting, so a large answer cannot block `gh`.
+    let stdout = child.stdout.take().map(read_in_background);
+    let stderr = child.stderr.take().map(read_in_background);
+    let deadline = Instant::now() + timeout;
+    let status = loop {
+        if let Some(status) = child.try_wait()? {
+            break status;
+        }
+        if Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            bail!("gh timed out after {}s", timeout.as_secs_f32());
+        }
+        thread::sleep(Duration::from_millis(20));
+    };
+    let collect = |reader: Option<JoinHandle<Vec<u8>>>| {
+        reader
+            .and_then(|handle| handle.join().ok())
+            .unwrap_or_default()
+    };
+    Ok(Output {
+        status,
+        stdout: collect(stdout),
+        stderr: collect(stderr),
+    })
+}
+
+fn read_in_background(mut pipe: impl Read + Send + 'static) -> JoinHandle<Vec<u8>> {
+    thread::spawn(move || {
+        let mut bytes = Vec::new();
+        let _ = pipe.read_to_end(&mut bytes);
+        bytes
+    })
+}
+
 /// Whether a GitHub error means the target no longer exists.
 fn is_gone(error: &anyhow::Error) -> bool {
     let text = error.to_string();
@@ -311,6 +356,34 @@ mod tests {
     fn rejects_a_closed_pr() {
         let err = parse_pr(r#"{"number":7,"state":"MERGED"}"#).unwrap_err();
         assert!(err.to_string().contains("not open"));
+    }
+
+    #[test]
+    fn a_hung_command_is_killed_and_reported_as_timed_out() {
+        let child = Command::new("sleep")
+            .arg("5")
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        let started = Instant::now();
+        let err = wait_with_timeout(child, Duration::from_millis(100)).unwrap_err();
+        assert!(started.elapsed() < Duration::from_secs(2));
+        assert!(crate::github::connection::is_network_error(&err), "{err}");
+    }
+
+    #[test]
+    fn a_command_that_finishes_in_time_returns_its_output() {
+        let child = Command::new("sh")
+            .args(["-c", "echo out; echo err >&2"])
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        let output = wait_with_timeout(child, Duration::from_secs(5)).unwrap();
+        assert!(output.status.success());
+        assert_eq!(String::from_utf8_lossy(&output.stdout), "out\n");
+        assert_eq!(String::from_utf8_lossy(&output.stderr), "err\n");
     }
 
     #[test]

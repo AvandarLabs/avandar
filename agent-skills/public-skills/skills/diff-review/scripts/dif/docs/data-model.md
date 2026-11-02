@@ -137,9 +137,14 @@ message ids are PR comments and where they are on GitHub:
       "root": true,             // it opened that thread
       "url": "https://github.com/o/r/pull/7#discussion_r…",
       "body": "the body last agreed with GitHub",
-      "error": "the last failure, if any"
+      "error": "the last failure, if any",
+      "removal": "delete" | "resolve" // removed in difit while GitHub was unreachable
     }
-  }
+  },
+  // viewed-file changes GitHub does not have yet, latest per path
+  "queuedViewed": { "src/a.rs": true },
+  // a review submit GitHub has not taken yet
+  "queuedSubmit": { "event": "COMMENT" | "APPROVE" | "REQUEST_CHANGES", "body": "…" }
 }
 ```
 
@@ -147,7 +152,13 @@ message ids are PR comments and where they are on GitHub:
   when the browser saves a PR comment, before difit holds it.
 - `draft`: in the reviewer's pending GitHub review, visible only to them.
 - `published`: on the PR. Submitting the review turns every draft published.
-- `failed`: GitHub rejected it; editing the comment retries.
+- `failed`: GitHub rejected it; editing the comment retries. A call that could
+  not reach GitHub never sets it: the comment stays `pending`.
+
+`removal`, `queuedViewed`, and `queuedSubmit` are the offline queue: they are
+sent once GitHub is reachable (viewed changes once viewed sync can run), and
+cleared when GitHub has them (see
+[integrations.md](integrations.md#offline)).
 
 Comments pulled from GitHub get the message id `gh:<node id>`. `body` is
 compared both ways: a different body in difit is a local edit to push, a
@@ -155,7 +166,7 @@ different body on GitHub is a remote edit to pull. Entries are removed when the
 comment is deleted or its thread resolved, on either side.
 
 The session's live GitHub state (the PR, the pending review, sync status, the
-viewed-file events) is never written here. The browser reads it, with these
+viewed-file events, the connection) is never written here. The browser reads it, with these
 comments, from `/__wrap/github.json`.
 
 ## Slug + port derivation

@@ -33,11 +33,13 @@ src/
 │   ├── plan.rs        push: difit comments vs the registry → draft / reply / update / delete / resolve actions (pure)
 │   ├── pull.rs        pull: the PR's threads vs the registry + difit → difit edits + registry changes; viewed changes (pure)
 │   ├── graphql.rs     the GraphQL documents + pure parsing of GitHub's answers
-│   ├── client.rs      GithubApi trait + the `gh api graphql` implementation
+│   ├── client.rs      GithubApi trait + the `gh api graphql` implementation (30s timeout per call)
+│   ├── connection.rs  whether GitHub is reachable: browser reports, network-error detection, retry (pure)
 │   ├── checkout.rs    branch vs PR head, fast-forward only when safe, stashing around it on Sync (Checkout trait + git)
 │   ├── conflicts.rs   a Sync's merge conflicts: who resolves them, the notices, the LLM prompt (pure)
-│   ├── sync.rs        the per-snapshot pass: PR lookup, push, viewed queue, review submit
-│   └── sync_pull.rs   the pull half: fetch, branch step, comments, viewed events
+│   ├── sync.rs        the per-snapshot pass: PR lookup, push, review submit
+│   ├── sync_pull.rs   the pull half: fetch, branch step, comments, viewed events
+│   └── sync_queue.rs  holding interactions while GitHub is unreachable; sending the viewed queue
 ├── inject/
 │   ├── dispatch.rs    open-comment detection + line/location labels (pure)
 │   ├── prompt.rs      minimal per-comment prompt text (pure)
@@ -211,6 +213,10 @@ difit holds the comment (and the transcript mirrors it, as for any comment)
         └─► Poller thread: github::sync plans against the registry
               drafts / replies / edits / deletes / resolves  →  pending review
               Review (N) → submit  →  published on the PR
+
+Browser online / offline  →  POST /__wrap/github/connection
+        offline, or a gh call that cannot reach GitHub  →  no calls; everything queued
+        back online (or the 20s retry)  →  queue sent, then a pull
 
 Poller thread, every 60s or on Sync: github::sync_pull
         PR threads + viewed files  →  difit (editor.rs) + registry

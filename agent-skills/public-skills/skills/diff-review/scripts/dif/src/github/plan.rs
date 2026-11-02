@@ -9,14 +9,15 @@
 //!
 //! Removals only count when the previous snapshot still held the comment, so a
 //! snapshot that is merely incomplete (difit restarting, a stale read) never
-//! changes anything on GitHub.
+//! changes anything on GitHub. A removal GitHub could not be told about is
+//! queued on the comment and planned again on every pass until it goes through.
 
 use std::collections::{HashMap, HashSet};
 
 use crate::difit::imports::{ServerThread, Snapshot};
 
 use super::anchor::{NewComment, new_comment};
-use super::registry::{Registry, SyncStatus, SyncedComment};
+use super::registry::{Registry, Removal, SyncStatus, SyncedComment};
 
 /// One GitHub call (or local bookkeeping step) the push pass should make.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -97,8 +98,13 @@ pub fn plan(snapshot: &Snapshot, previous: &Previous, registry: &Registry) -> Ve
     let removals = registry
         .comments
         .iter()
-        .filter(|(id, _)| !live_messages.contains(*id) && previous.held(id))
+        .filter(|(id, entry)| {
+            !live_messages.contains(*id) && (previous.held(id) || entry.removal.is_some())
+        })
         .map(|(id, entry)| {
+            if let Some(queued) = entry.removal {
+                return queued_removal(id, entry, queued);
+            }
             let thread_removed = previous
                 .thread_of
                 .get(id)
@@ -132,6 +138,22 @@ fn removal(id: &str, entry: &SyncedComment, thread_removed: bool) -> SyncAction 
             node_id,
         },
         _ => forget(),
+    }
+}
+
+/// The call for a removal queued while GitHub could not be reached.
+fn queued_removal(id: &str, entry: &SyncedComment, queued: Removal) -> SyncAction {
+    let message_id = id.to_owned();
+    match (queued, &entry.node_id, &entry.thread_id) {
+        (Removal::Delete, Some(node_id), _) => SyncAction::Delete {
+            message_id,
+            node_id: node_id.clone(),
+        },
+        (Removal::Resolve, _, Some(thread_id)) => SyncAction::Resolve {
+            message_id,
+            thread_id: thread_id.clone(),
+        },
+        _ => SyncAction::Forget { message_id },
     }
 }
 

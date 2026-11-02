@@ -18,15 +18,19 @@
 //!   - [`pull`]: pure reconciliation of the PR into difit and the registry.
 //!   - [`graphql`]: the GraphQL documents and pure parsing of the answers.
 //!   - [`client`]: the `gh` CLI calls.
+//!   - [`connection`]: whether GitHub can be reached; while it cannot, every
+//!     interaction stays queued.
 //!   - [`checkout`]: fast-forwarding the branch to the PR head when safe.
 //!   - [`conflicts`]: what a pull's merge conflicts become: a notice for the
 //!     reviewer, or a prompt for the LLM pane.
-//!   - [`sync`] / [`sync_pull`]: run all of it on the poller thread.
+//!   - [`sync`] / [`sync_pull`] / `sync_queue` / `sync_submit`: run all of it on the poller
+//!     thread, holding every interaction while GitHub cannot be reached.
 
 pub mod anchor;
 pub mod checkout;
 pub mod client;
 pub mod conflicts;
+pub mod connection;
 #[cfg(test)]
 mod fakes;
 pub mod graphql;
@@ -36,3 +40,5 @@ pub mod registry;
 pub mod session;
 pub mod sync;
 mod sync_pull;
+mod sync_queue;
+mod sync_submit;

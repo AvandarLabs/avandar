@@ -2,13 +2,14 @@
 //! checkout, and difit.
 
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use super::*;
 use crate::difit::editor::DifitEdit;
 use crate::github::checkout::Relation;
 use crate::github::fakes::{FakeCheckout, FakeEditor, FakeGithub, snapshot_from_json};
 use crate::github::graphql::{RemoteComment, RemoteState, RemoteThread};
-use crate::github::session::SubmitRequest;
+use crate::github::session::{ReviewEvent, SubmitRequest, ViewedState};
 
 struct Rig {
     _dir: tempfile::TempDir,
@@ -66,6 +67,15 @@ fn one_comment_snapshot(body: &str) -> Snapshot {
 
 const EMPTY: &str = r#"{"version":0,"threads":[]}"#;
 
+fn queue_submit(rig: &Rig, event: ReviewEvent, body: impl Into<String>) {
+    rig.registry.update(|registry| {
+        registry.queued_submit = Some(SubmitRequest {
+            event,
+            body: body.into(),
+        });
+    });
+}
+
 fn status(rig: &Rig, id: &str) -> SyncStatus {
     rig.registry.snapshot().comments[id].status
 }
@@ -77,12 +87,7 @@ fn a_pr_comment_becomes_a_draft_then_publishes_on_submit() {
     harness.sync.tick(&one_comment_snapshot("why?"));
     assert_eq!(status(&harness, "m1"), SyncStatus::Draft);
 
-    harness.registry.session(|s| {
-        s.submit = Some(SubmitRequest {
-            event: ReviewEvent::Approve,
-            body: "LGTM".to_owned(),
-        });
-    });
+    queue_submit(&harness, ReviewEvent::Approve, "LGTM".to_owned());
     harness.sync.tick(&one_comment_snapshot("why?"));
     assert_eq!(status(&harness, "m1"), SyncStatus::Published);
     let calls = harness.github.calls();
@@ -125,12 +130,7 @@ fn own_pr_cannot_be_approved() {
         "develop",
     );
     harness.sync.tick(&snapshot_from_json(EMPTY));
-    harness.registry.session(|s| {
-        s.submit = Some(SubmitRequest {
-            event: ReviewEvent::Approve,
-            body: String::new(),
-        });
-    });
+    queue_submit(&harness, ReviewEvent::Approve, String::new());
     harness.sync.tick(&snapshot_from_json(EMPTY));
     let outcome = harness
         .registry
@@ -153,12 +153,7 @@ fn submit_refuses_while_comments_have_failed() {
     harness.registry.mark_pending(&["m1".to_owned()]);
     harness.sync.tick(&one_comment_snapshot("why?"));
     assert_eq!(status(&harness, "m1"), SyncStatus::Failed);
-    harness.registry.session(|s| {
-        s.submit = Some(SubmitRequest {
-            event: ReviewEvent::Comment,
-            body: String::new(),
-        });
-    });
+    queue_submit(&harness, ReviewEvent::Comment, String::new());
     harness.sync.tick(&one_comment_snapshot("why?"));
     let outcome = harness
         .registry
@@ -242,12 +237,12 @@ fn viewed_files_sync_both_ways_only_against_the_prs_base() {
     let events = synced.registry.read(|s| s.session.viewed.events.clone());
     assert_eq!(events.len(), 2, "GitHub wins on the first pull");
 
-    synced.registry.session(|s| {
-        s.viewed.queue = vec![
+    synced.registry.update(|registry| {
+        registry.queued_viewed.extend([
             ("a.rs".to_owned(), true),
             ("b.rs".to_owned(), true),
             ("c.rs".to_owned(), true),
-        ];
+        ]);
     });
     synced.sync.tick(&snapshot_from_json(EMPTY));
     let viewed: Vec<_> = synced
@@ -261,6 +256,7 @@ fn viewed_files_sync_both_ways_only_against_the_prs_base() {
         vec!["viewed b.rs true", "viewed c.rs true"],
         "one call per file, none for no-ops"
     );
+    assert!(synced.registry.snapshot().queued_viewed.is_empty());
 
     let mut other = rig(FakeGithub::default(), ".");
     other.sync.tick(&snapshot_from_json(EMPTY));
@@ -349,3 +345,6 @@ fn pulls_happen_on_request_and_on_the_interval_only() {
     harness.sync.tick(&snapshot_from_json(EMPTY));
     assert_eq!(fetches(&harness), 2);
 }
+
+#[path = "sync_offline_tests.rs"]
+mod offline;

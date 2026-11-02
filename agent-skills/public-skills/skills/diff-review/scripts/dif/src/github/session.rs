@@ -1,5 +1,6 @@
 //! The live GitHub state of one `dif` session: the PR, the reviewer's pending
-//! review, requests queued by the browser, the last pull, and viewed-file sync.
+//! review, requests queued by the browser, the last pull, viewed-file sync, and
+//! whether GitHub can be reached.
 //!
 //! None of it is persisted. It is re-derived from GitHub on every launch, and
 //! the browser reads it (with the registry's comments) as `/__wrap/github.json`.
@@ -7,10 +8,11 @@
 use std::collections::{BTreeMap, HashSet};
 use std::time::Instant;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use super::conflicts::{ConflictResolution, llm_resolves_notice, reviewer_resolves_notice};
+use super::connection::Connection;
 use super::registry::Registry;
 
 /// The pull request PR comments go to.
@@ -42,7 +44,8 @@ pub enum PrState {
 }
 
 /// How the reviewer submits their pending review, as GitHub names it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ReviewEvent {
     Comment,
     Approve,
@@ -73,7 +76,7 @@ impl ReviewEvent {
 }
 
 /// A review submit the browser asked for.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SubmitRequest {
     pub event: ReviewEvent,
     pub body: String,
@@ -128,8 +131,6 @@ pub struct ViewedSync {
     pub seq: u64,
     /// Whether the first pull (where GitHub wins outright) has happened.
     pub initialized: bool,
-    /// Local changes waiting to be sent to GitHub.
-    pub queue: Vec<(String, bool)>,
 }
 
 impl ViewedSync {
@@ -185,12 +186,12 @@ pub struct Session {
     /// Conflicted files the reviewer asked the LLM to resolve. The TUI takes
     /// them and types the request into the LLM pane.
     pub conflicts_for_llm: Option<Vec<String>>,
-    pub submit: Option<SubmitRequest>,
     pub last_submit: Option<SubmitOutcome>,
     pub viewed: ViewedSync,
     /// Message ids removed from difit because GitHub deleted or resolved them.
     /// A stale browser save can bring one back; it must never reach the LLM.
     pub tombstones: HashSet<String>,
+    pub connection: Connection,
 }
 
 impl Session {
@@ -212,10 +213,10 @@ impl Session {
             fast_forwards: 0,
             conflicts: None,
             conflicts_for_llm: None,
-            submit: None,
             last_submit: None,
             viewed: ViewedSync::default(),
             tombstones: HashSet::new(),
+            connection: Connection::default(),
         }
     }
 
@@ -233,6 +234,14 @@ impl Session {
     #[must_use]
     pub fn is_own_pr(&self) -> bool {
         matches!((self.pr(), &self.viewer), (Some(pr), Some(viewer)) if &pr.author == viewer)
+    }
+
+    /// Record the browser's network state. Coming back online pulls at once,
+    /// which sends everything queued first.
+    pub fn report_connection(&mut self, online: bool) {
+        if self.connection.report_browser(online) {
+            self.pull_requested = true;
+        }
     }
 
     /// Record who resolves the open merge conflicts. A no-op when none are
@@ -274,7 +283,7 @@ impl Session {
             "drafts": registry.draft_count(),
             "failed": registry.failed_count(),
             "comments": registry.comments,
-            "submitting": self.submit.is_some(),
+            "submitting": registry.queued_submit.is_some(),
             "lastSubmit": self.last_submit,
             "sync": {
                 "pulling": self.pulling || self.pull_requested,
@@ -290,6 +299,13 @@ impl Session {
                 "reason": self.viewed.reason,
                 "events": self.viewed.events,
             },
+            "connection": self.connection.state_json(),
+            "queued": {
+                "comments": registry.unposted_count(),
+                "removals": registry.queued_removal_count(),
+                "viewed": registry.queued_viewed.len(),
+                "submit": registry.queued_submit.is_some(),
+            },
         })
     }
 }
@@ -301,99 +317,5 @@ impl Default for Session {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn pr(author: &str) -> PullRequest {
-        PullRequest {
-            number: 7,
-            url: "https://github.com/o/r/pull/7".to_owned(),
-            node_id: "PR_1".to_owned(),
-            head_sha: "abc".to_owned(),
-            base_ref: "develop".to_owned(),
-            author: author.to_owned(),
-        }
-    }
-
-    #[test]
-    fn own_pr_needs_a_matching_viewer() {
-        let mut session = Session::new();
-        session.pr = PrState::Available(pr("jpsyx"));
-        assert!(!session.is_own_pr(), "viewer unknown");
-        session.viewer = Some("jpsyx".to_owned());
-        assert!(session.is_own_pr());
-        session.viewer = Some("someone".to_owned());
-        assert!(!session.is_own_pr());
-    }
-
-    #[test]
-    fn state_json_reports_availability_and_ownership() {
-        let mut session = Session::new();
-        let state = session.state_json(&Registry::default());
-        assert_eq!(state["available"], false);
-        assert_eq!(state["lookedUp"], false);
-
-        session.pr = PrState::Available(pr("alice"));
-        session.viewer = Some("jpsyx".to_owned());
-        let state = session.state_json(&Registry::default());
-        assert_eq!(state["available"], true);
-        assert_eq!(state["pr"]["isOwn"], false);
-        assert_eq!(state["pr"]["number"], 7);
-    }
-
-    #[test]
-    fn answering_conflicts_hands_them_to_the_llm_or_leaves_them_to_the_reviewer() {
-        let conflicted = || Some(vec!["a.rs".to_owned()]);
-        let mut session = Session::new();
-        session.conflicts = conflicted();
-        session.answer_conflicts(ConflictResolution::Llm);
-        assert_eq!(session.conflicts, None);
-        assert_eq!(session.conflicts_for_llm, conflicted());
-        assert!(session.notice.unwrap().contains("LLM"));
-
-        let mut session = Session::new();
-        session.conflicts = conflicted();
-        session.answer_conflicts(ConflictResolution::Reviewer);
-        assert_eq!(session.conflicts, None);
-        assert_eq!(session.conflicts_for_llm, None);
-        let notice = session.notice.unwrap();
-        assert!(notice.contains("git stash drop"), "{notice}");
-    }
-
-    #[test]
-    fn state_json_carries_open_conflicts_and_finished_reviewer_pulls() {
-        let mut session = Session::new();
-        let state = session.state_json(&Registry::default());
-        assert!(state["conflicts"].is_null());
-        assert_eq!(state["sync"]["reviewerPulls"], 0);
-
-        session.conflicts = Some(vec!["a.rs".to_owned()]);
-        session.reviewer_pulls = 2;
-        let state = session.state_json(&Registry::default());
-        assert_eq!(state["conflicts"], serde_json::json!(["a.rs"]));
-        assert_eq!(state["sync"]["reviewerPulls"], 2);
-    }
-
-    #[test]
-    fn viewed_events_are_numbered_and_capped() {
-        let mut viewed = ViewedSync::default();
-        viewed.push_events((0..MAX_VIEWED_EVENTS + 5).map(|i| (format!("f{i}"), true)));
-        assert_eq!(viewed.events.len(), MAX_VIEWED_EVENTS);
-        assert_eq!(
-            viewed.events.last().unwrap().seq,
-            (MAX_VIEWED_EVENTS + 5) as u64
-        );
-    }
-
-    #[test]
-    fn review_events_round_trip() {
-        for event in [
-            ReviewEvent::Comment,
-            ReviewEvent::Approve,
-            ReviewEvent::RequestChanges,
-        ] {
-            assert_eq!(ReviewEvent::parse(event.as_github()), Some(event));
-        }
-        assert_eq!(ReviewEvent::parse("MERGE"), None);
-    }
-}
+#[path = "session_tests.rs"]
+mod tests;

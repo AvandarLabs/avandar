@@ -21,7 +21,9 @@ impl GithubSync {
     /// Pull everything from GitHub, recording the outcome for the browser.
     ///
     /// The requests are taken up front, so a Sync clicked while this pull runs
-    /// queues another pull instead of being cleared by this one.
+    /// queues another pull instead of being cleared by this one. A pull that
+    /// could not reach GitHub is asked for again, keeping a Sync's permission to
+    /// stash, and is not reported as finished.
     pub(super) fn pull(&self, snapshot: &Snapshot, pr: &PullRequest) {
         let reviewer_asked = self.registry.session(|s| {
             s.pulling = true;
@@ -29,8 +31,14 @@ impl GithubSync {
             std::mem::take(&mut s.reviewer_pull)
         });
         let result = self.pull_inner(snapshot, pr, reviewer_asked);
+        let is_lost = result.as_ref().is_err_and(|e| self.lost(e));
         self.registry.session(|s| {
             s.pulling = false;
+            if is_lost {
+                s.pull_requested = true;
+                s.reviewer_pull |= reviewer_asked;
+                return;
+            }
             s.last_pull = Some(Instant::now());
             s.pull_error = result.err().map(|e| e.to_string());
             if reviewer_asked {
@@ -144,14 +152,23 @@ impl GithubSync {
         self.ports.editor.apply(&plan.edits)
     }
 
+    /// Record GitHub's viewed state and the changes difit must apply. A path
+    /// with a local change still queued keeps the local change: it reaches
+    /// GitHub on the next pass. While sync is blocked the queue is kept, and
+    /// sent once sync can run.
     fn pull_viewed(&self, remote: &RemoteState, block: Option<String>) {
-        self.registry.session(|s| {
-            let viewed = &mut s.viewed;
+        self.registry.update_state(|state| {
+            let queued = &mut state.registry.queued_viewed;
+            let viewed = &mut state.session.viewed;
             viewed.active = block.is_none();
             viewed.reason = block;
             if viewed.active {
                 let changes = viewed_changes(&remote.files, &viewed.remote, viewed.initialized);
-                viewed.push_events(changes);
+                viewed.push_events(
+                    changes
+                        .into_iter()
+                        .filter(|(path, _)| !queued.contains_key(path)),
+                );
                 viewed.initialized = true;
             } else {
                 viewed.initialized = false;
