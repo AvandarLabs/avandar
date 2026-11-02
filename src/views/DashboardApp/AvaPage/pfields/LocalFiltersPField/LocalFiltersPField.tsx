@@ -57,7 +57,7 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
         return { ...definition, columnName: column.name };
       });
       if (legacyFilters.every(isDefined)) {
-        authoring.updateColNameBound({ localFilters: legacyFilters });
+        authoring.updateColumnNameProps({ localFilters: legacyFilters });
       }
     } else if (
       localFilters.every((filter): filter is LocalFilter => {

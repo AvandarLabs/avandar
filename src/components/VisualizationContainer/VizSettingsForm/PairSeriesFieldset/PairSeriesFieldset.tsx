@@ -20,13 +20,13 @@ import { SeriesList } from "@/components/VisualizationContainer/VizSettingsForm/
 import { useUniqueRowKeys } from "@/components/VisualizationContainer/VizSettingsForm/useUniqueRowKeys";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
+import type { AvaScatterSeries } from "$/models/vizs/SeriesConfig";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 
 type Props = {
   fields: readonly QueryResult.ColumnWithId[];
-  series: readonly ScatterSeries[];
-  onChange: (next: ScatterSeries[]) => void;
+  series: readonly AvaScatterSeries[];
+  onChange: (next: AvaScatterSeries[]) => void;
 
   /** How the setting groups are arranged. Defaults to a vertical stack. */
   layout?: SettingsColumnsLayout;
@@ -63,12 +63,12 @@ export function PairSeriesFieldset({
       return;
     }
     const yField = numericFields[1] ?? xField;
-    const nextSeries: ScatterSeries = { xKey: xField.id, key: yField.id };
+    const nextSeries: AvaScatterSeries = { xKey: xField.id, key: yField.id };
     onChange([...series, nextSeries]);
   }, [numericFields, series, onChange]);
 
   const updateAt = useCallback(
-    (idx: number, patch: Partial<ScatterSeries>) => {
+    (idx: number, patch: Partial<AvaScatterSeries>) => {
       const next = series.map((s, i) => {
         return i === idx ? { ...s, ...patch } : s;
       });

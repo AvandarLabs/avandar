@@ -12,12 +12,9 @@ import { render } from "@/test-utils";
  * "changing a control updates the config"; these tests prove
  * "changing a config setting updates what the chart renders".
  */
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 
-type RadarChartVizConfig = Extract<
-  VizConfig.ColNameBound,
-  { vizType: "radar" }
->;
+type AvaRadarChartVizConfig = Extract<UiVizConfig, { vizType: "radar" }>;
 
 const mantineRadarChartMock = vi.fn();
 
@@ -50,7 +47,7 @@ beforeEach(() => {
   mantineRadarChartMock.mockClear();
 });
 
-function renderRadar(config: RadarChartVizConfig): void {
+function renderRadar(config: AvaRadarChartVizConfig): void {
   render(
     <AvandarAppProvider>
       <RadarChart
@@ -64,7 +61,7 @@ function renderRadar(config: RadarChartVizConfig): void {
   );
 }
 
-const RADAR_BASELINE: RadarChartVizConfig = {
+const RADAR_BASELINE: AvaRadarChartVizConfig = {
   vizType: "radar",
   nameKey: "x",
   series: [{ key: "v" }],

@@ -1,5 +1,6 @@
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type {
   GlobalFilterSubscription,
   LegacyLocalFilter,
@@ -9,14 +10,14 @@ import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilte
 
 type DataVizColumnNameProps = {
   columnBindingVersion: 0;
-  vizConfig: VizConfig.ColNameBound;
+  vizConfig: UiVizConfig;
   localFilters: readonly LegacyLocalFilter[];
   globalFilterSubscription: GlobalFilterSubscription;
 };
 
 type DataVizColumnIdProps = {
   columnBindingVersion: 1;
-  vizConfig: VizConfig.T;
+  vizConfig: AvaVizConfig.T;
   columnBindings: QueryResultColumnBindingRegistry;
   localFilters: readonly LocalFilter[];
   globalFilterSubscription: GlobalFilterSubscription;
@@ -26,8 +27,8 @@ type DataVizColumnIdProps = {
 /**
  * Saved column references of a DataViz block. `columnBindingVersion: 0` is the
  * name-keyed form saved before column IDs, kept intact until every name binds.
- * That variant, `LegacyLocalFilter`, `mergeColNameBoundVizConfigEdit`,
- * `synchronizeColNameBoundVizType`, and `updateColNameBound` exist only to
+ * That variant, `LegacyLocalFilter`, `mergeUiVizConfigEdit`,
+ * `synchronizeUiVizType`, and `updateColumnNameProps` exist only to
  * read and edit it, and can be deleted once no `dashboards.config` row holds
  * a version 0 DataViz block.
  */

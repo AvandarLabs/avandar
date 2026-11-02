@@ -5,7 +5,7 @@ import { Box, Flex } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";
-import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
@@ -19,7 +19,7 @@ import { PieChart } from "@/lib/ui/viz/PieChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart/ScatterChart";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
 
 type Props = {
   columns: readonly QueryResult.ColumnWithId[];
@@ -39,11 +39,11 @@ type Props = {
   data: UnknownDataFrame;
 
   /** The visualization config that drives what is rendered. */
-  vizConfig: VizConfig;
+  vizConfig: AvaVizConfig;
 };
 
 /**
- * Builds the Zod schemas used to validate `VizConfig` shapes for each chart
+ * Builds the Zod schemas used to validate `AvaVizConfig` shapes for each chart
  * type. Schemas are rebuilt per call so their error messages stay localized
  * to the current Lingui locale.
  */
@@ -120,7 +120,7 @@ function useVizConfigSchemas() {
 
 /**
  * Renders a visualization (chart or table) for a given query result and
- * `VizConfig`. Pure and prop-driven: holds no state of its own and has no
+ * `AvaVizConfig`. Pure and prop-driven: holds no state of its own and has no
  * coupling to any app-specific store, so it can be reused anywhere a query
  * result needs to be visualized.
  */
@@ -139,11 +139,11 @@ export function VisualizationContainer({
   const columnNames = rawColumns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
 
-  const nameBoundConversion = makeColNameBoundVizConfigFromVizConfig({
+  const uiVizConfigConversion = makeUiVizConfigFromAvaVizConfig({
     config: vizConfig,
     columns: columns,
   });
-  return match(nameBoundConversion.config)
+  return match(uiVizConfigConversion.config)
     .with({ vizType: "table" }, () => {
       return (
         <Box h="100%" w="100%" mih={0}>

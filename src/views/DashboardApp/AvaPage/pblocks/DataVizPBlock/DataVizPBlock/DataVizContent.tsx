@@ -5,7 +5,7 @@ import { VisualizationContainer } from "@/components/VisualizationContainer/Visu
 import { DataVizLocalFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters";
 import { QueryResultsError } from "@/views/DataExplorerApp/QueryResultsError/QueryResultsError";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type {
   DataVizFilterProps,
   useLocalFilterState,
@@ -21,7 +21,7 @@ type Props = {
   rawColumns?: readonly QueryResult.Column[];
   data: UnknownDataFrame;
   dateColumns: ReadonlySet<string>;
-  displayVizConfig: VizConfig.T;
+  displayVizConfig: AvaVizConfig.T;
   filterProps: DataVizFilterProps;
   localFilterState: ReturnType<typeof useLocalFilterState>;
   /** Set when the block's query failed, so the block says so rather than

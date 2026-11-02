@@ -5,7 +5,7 @@ import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsFor
 import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { UnknownDataFrame } from "@avandar/utils";
 
@@ -14,10 +14,10 @@ type Props = {
   data: UnknownDataFrame;
 
   /** Current visualization config. */
-  vizConfig: VizConfig;
+  vizConfig: AvaVizConfig;
 
   /** Called when the user edits any control inside a per-type subform. */
-  onVizConfigChange: (vizConfig: VizConfig) => void;
+  onVizConfigChange: (vizConfig: AvaVizConfig) => void;
 
   /**
    * How each subform arranges its setting groups. Defaults to a vertical
@@ -27,7 +27,7 @@ type Props = {
 };
 
 /**
- * Renders the per-viz-type subform for a given `VizConfig`, **without** the
+ * Renders the per-viz-type subform for a given `AvaVizConfig`, **without** the
  * top-level viz type selector. Pure and prop-driven so it can be reused
  * anywhere a viz config needs to be edited (DataExplorer sidebar, Puck custom
  * field in the dashboard editor, etc.) by composing it with whatever viz-type

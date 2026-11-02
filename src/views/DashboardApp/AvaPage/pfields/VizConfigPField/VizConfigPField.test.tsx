@@ -8,12 +8,13 @@ import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigP
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import { LocalFiltersPField } from "../LocalFiltersPField/LocalFiltersPField";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { LegacyLocalFilter } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 type RenderFieldOptions = {
-  value: VizConfig.T | VizConfig.ColNameBound;
+  value: AvaVizConfig.T | UiVizConfig;
   legacy?: boolean;
   localFilters?: readonly LegacyLocalFilter[];
   local?: boolean;
@@ -205,7 +206,7 @@ describe("VizConfigPField", () => {
 
 it("preserves unresolved legacy siblings when an existing field explicitly changes", () => {
   vi.clearAllMocks();
-  const original: VizConfig.ColNameBound = {
+  const original: UiVizConfig = {
     vizType: "bar",
     xAxisKey: "missing-category",
     layout: "group",

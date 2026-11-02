@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
 import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
-import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
 import { makeSavedColumnBindingsFromDataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeSavedColumnBindingsFromDataVizProps";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
@@ -71,7 +71,7 @@ it("reopens a serialized styled selection against a supported renamed QueryResul
     props: chart.props,
     schema: renamed,
   });
-  const rendered = makeColNameBoundVizConfigFromVizConfig({
+  const rendered = makeUiVizConfigFromAvaVizConfig({
     config: runtime.runtimeConfig,
     columns: renamed.columns,
   });

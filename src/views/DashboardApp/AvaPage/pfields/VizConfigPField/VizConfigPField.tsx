@@ -5,15 +5,16 @@ import { Workspace } from "$/models/Workspace/Workspace";
 import { VizConfigContent } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import { useDataVizAuthoring } from "../useDataVizAuthoring/useDataVizAuthoring";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { ReactElement } from "react";
 
 type Props = {
   /** Current viz config. */
-  value: VizConfig.T | VizConfig.ColNameBound;
+  value: AvaVizConfig.T | UiVizConfig;
 
   /** Called when the user edits any control inside the per-type subform. */
-  onChange: (value: VizConfig.T | VizConfig.ColNameBound) => void;
+  onChange: (value: AvaVizConfig.T | UiVizConfig) => void;
 
   /**
    * Workspace id used to authorize the SQL data query. When undefined the
@@ -29,7 +30,8 @@ type Props = {
 };
 
 /**
- * Puck custom field that renders the per-viz-type controls for a `VizConfig`.
+ * Puck custom field that renders the per-viz-type controls for an
+ * `AvaVizConfig`.
  *
  * Shares the owning block's unfiltered bindings, previews row values, and
  * renders

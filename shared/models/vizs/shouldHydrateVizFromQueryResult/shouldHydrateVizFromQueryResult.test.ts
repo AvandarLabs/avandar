@@ -3,7 +3,7 @@ import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuer
 import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult/shouldHydrateVizFromQueryResult.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 
 function mockColumn(name: string): QueryColumn.T {
   return {
@@ -24,7 +24,7 @@ function _makeQueryWithColumns(
 describe("shouldHydrateVizFromQueryResult", () => {
   const emptyQuery = StructuredQuery.makeEmpty();
 
-  const barEmpty: VizConfig = {
+  const barEmpty: AvaVizConfig = {
     vizType: "bar",
     xAxisKey: undefined,
     series: [],

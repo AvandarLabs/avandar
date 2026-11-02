@@ -1,8 +1,8 @@
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { knownVizSettingControlLabels } from "$/copy/vizSettingControlLabel/vizSettingControlLabel.ts";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
 
 function _keysOf(descriptors: ReadonlyArray<{ key: string }>): string[] {
   return descriptors.map(prop("key"));
@@ -92,7 +92,7 @@ describe("makeAxisDescriptors", () => {
 
 describe("descriptor registry field order", () => {
   it("bar leads with layout, legend, then the axes and grid", () => {
-    expect(_keysOf(VizConfigs.getDescriptors("bar").chart)).toEqual([
+    expect(_keysOf(AvaVizConfigs.getDescriptors("bar").chart)).toEqual([
       "layout",
       "withLegend",
       "chartStyle.legend.position",
@@ -115,14 +115,14 @@ describe("descriptor registry field order", () => {
   });
 
   it("line has the same shape without a layout setting", () => {
-    const keys = _keysOf(VizConfigs.getDescriptors("line").chart);
+    const keys = _keysOf(AvaVizConfigs.getDescriptors("line").chart);
     expect(keys).not.toContain("layout");
     expect(keys).toContain("chartStyle.xAxis.tickAngle");
     expect(keys).toContain("chartStyle.yAxis.tickInterval");
   });
 
   it("area keeps its layout setting and gains the axis settings", () => {
-    const keys = _keysOf(VizConfigs.getDescriptors("area").chart);
+    const keys = _keysOf(AvaVizConfigs.getDescriptors("area").chart);
     expect(keys).toContain("layout");
     expect(keys).toContain("chartStyle.xAxis.tickAngle");
     expect(keys).toContain("chartStyle.yAxis.min");

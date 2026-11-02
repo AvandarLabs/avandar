@@ -2,7 +2,7 @@ import { propEq } from "@avandar/utils";
 import { CompositeChart as MantineCompositeChart } from "@mantine/charts";
 import { Label } from "recharts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { ColNameBoundXYSeries as XYSeries } from "$/models/vizs/VizConfig/ColNameBoundVizConfig.types";
+import type { XYSeries as AvaXYSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { CompositeChartSeries } from "@mantine/charts";
@@ -11,7 +11,7 @@ import type { ComponentProps } from "react";
 type Props = {
   data: UnknownDataFrame;
   xAxisKey: string;
-  series: readonly XYSeries[];
+  series: readonly AvaXYSeries[];
   height: number | string;
   withLegend: boolean;
   tooltipProps?: ComponentProps<typeof MantineCompositeChart>["tooltipProps"];

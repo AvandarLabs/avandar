@@ -1,11 +1,11 @@
 import { isNonEmptyArray } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaRadarSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type RadarSeriesConfig = {
   nameKey: QueryColumn.Id | undefined;
-  series: readonly RadarSeries[];
+  series: readonly AvaRadarSeries[];
 };
 
 /**
@@ -19,7 +19,7 @@ export function hydrateRadarSeriesFromQuery<VConfig extends RadarSeriesConfig>(
   const { queryColumns } = query;
 
   let nextNameKey = currVizConfig.nameKey;
-  let nextSeries: RadarSeries[] = [...currVizConfig.series];
+  let nextSeries: AvaRadarSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0 && isNonEmptyArray(queryColumns)) {
     const firstNumeric = queryColumns.find((col) => {

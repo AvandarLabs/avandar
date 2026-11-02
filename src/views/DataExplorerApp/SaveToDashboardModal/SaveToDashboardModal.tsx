@@ -20,9 +20,9 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type {
-  VizConfig,
+  AvaVizConfig,
   VizType,
-} from "$/models/vizs/VizConfig/VizConfig.types";
+} from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
 import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 type Props = {
@@ -30,7 +30,7 @@ type Props = {
   rawSql: string;
   prompt: string | undefined;
   vizType: VizType;
-  vizConfig: VizConfig;
+  vizConfig: AvaVizConfig;
   workspaceSlug: string;
   onClose: () => void;
   /**

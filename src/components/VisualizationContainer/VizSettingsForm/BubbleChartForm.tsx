@@ -1,17 +1,17 @@
 import { Stack } from "@mantine/core";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { BubbleSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset";
 import { ChartSettingsFieldsets } from "@/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets";
 import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
-import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
+import type { AvaBubbleChartVizConfig } from "$/models/vizs/AvaBubbleChartVizConfig/AvaBubbleChartVizConfig.types";
+import type { AvaBubbleSeries } from "$/models/vizs/SeriesConfig";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 
 type Props = {
   fields: readonly QueryResult.ColumnWithId[];
-  config: BubbleChartVizConfig;
-  onConfigChange: (newConfig: BubbleChartVizConfig) => void;
+  config: AvaBubbleChartVizConfig;
+  onConfigChange: (newConfig: AvaBubbleChartVizConfig) => void;
 
   /** How the setting groups are arranged. Defaults to a vertical stack. */
   layout?: SettingsColumnsLayout;
@@ -36,12 +36,12 @@ export function BubbleChartForm({
         fields={fields}
         series={config.series}
         layout={layout}
-        onChange={(nextSeries: BubbleSeries[]) => {
+        onChange={(nextSeries: AvaBubbleSeries[]) => {
           onConfigChange({ ...config, series: nextSeries });
         }}
       />
       <ChartSettingsFieldsets
-        descriptors={VizConfigs.getDescriptors("bubble").chart}
+        descriptors={AvaVizConfigs.getDescriptors("bubble").chart}
         config={config}
         onSettingChange={updateChartPath}
         layout={layout}

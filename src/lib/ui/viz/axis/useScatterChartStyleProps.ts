@@ -4,7 +4,7 @@ import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { ColNameBoundScatterSeries as ScatterSeries } from "$/models/vizs/VizConfig/ColNameBoundVizConfig.types";
+import type { ScatterSeries as AvaScatterSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { ChartStyleProps } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ScatterChartSeries } from "@mantine/charts";
@@ -17,7 +17,7 @@ export function useScatterChartStyleProps({
   chartStyle,
 }: Readonly<{
   data: Readonly<UnknownDataFrame>;
-  series: readonly ScatterSeries[];
+  series: readonly AvaScatterSeries[];
   scatterSeries: readonly ScatterChartSeries[];
   chartStyle: Readonly<ChartStyle> | undefined;
 }>): ChartStyleProps {

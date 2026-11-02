@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { makeDataVizPBlockStateFromProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { DataVizConfigMemory } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
 
@@ -19,7 +19,7 @@ function _getDataVizPBlockProps(
   }).props;
 }
 
-const STYLED_BAR_CONFIG: BarChartVizConfig = {
+const STYLED_BAR_CONFIG: AvaBarChartVizConfig = {
   vizType: "bar",
   xAxisKey: "category" as QueryColumn.Id,
   series: [{ renderAs: "bar", key: "value" as QueryColumn.Id }],
@@ -202,7 +202,7 @@ describe("makeDataVizPBlockStateFromProps viz config memory", () => {
       vizConfigMemory: {},
     });
 
-    const otherBarConfig: BarChartVizConfig = {
+    const otherBarConfig: AvaBarChartVizConfig = {
       ...STYLED_BAR_CONFIG,
       xAxisKey: "other-category" as QueryColumn.Id,
     };

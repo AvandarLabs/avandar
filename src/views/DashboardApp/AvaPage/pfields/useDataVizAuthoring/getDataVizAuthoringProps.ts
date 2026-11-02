@@ -1,5 +1,5 @@
 import { makeRuntimeColumnBindingsFromDataVizProps } from "../../pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeRuntimeColumnBindingsFromDataVizProps";
-import { mergeColNameBoundVizConfigEdit } from "./mergeColNameBoundVizConfigEdit";
+import { mergeUiVizConfigEdit } from "./mergeUiVizConfigEdit";
 import type { Props } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { useDataVizRuntimeColumnBindings } from "../../pblocks/DataVizPBlock/useDataVizRuntimeColumnBindings/useDataVizRuntimeColumnBindings";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
@@ -21,7 +21,7 @@ export type DataVizAuthoringChange =
       props: Partial<Extract<Props, { columnBindingVersion: 1 }>>;
     }
   | {
-      kind: "colNameBound";
+      kind: "columnName";
       props: Partial<Extract<Props, { columnBindingVersion: 0 }>>;
     };
 
@@ -43,14 +43,14 @@ export function getDataVizAuthoringProps(
     return undefined;
   }
   const changes =
-    change.kind === "colNameBound"
+    change.kind === "columnName"
       ? change.props
       : change.props.vizConfig &&
           columnBindings.runtime &&
           columnBindings.schema
         ? {
-            vizConfig: mergeColNameBoundVizConfigEdit({
-              colNameBoundConfig: props.vizConfig,
+            vizConfig: mergeUiVizConfigEdit({
+              uiVizConfig: props.vizConfig,
               before: columnBindings.runtime.runtimeConfig,
               after: change.props.vizConfig,
               columns: columnBindings.schema.columns,

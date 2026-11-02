@@ -163,7 +163,7 @@ export type SeriesSettingDescriptor<TSeries> = {
 
 /**
  * The full descriptor registry for a viz type. Each per-viz module
- * (BarChartVizConfigs, LineChartVizConfigs, etc.) exports one of
+ * (AvaBarChartVizConfigs, AvaLineChartVizConfigs, etc.) exports one of
  * these.
  *
  * The form layer reads descriptors through {@link AnyVizSettingDescriptors}

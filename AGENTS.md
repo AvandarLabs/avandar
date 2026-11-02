@@ -6,6 +6,7 @@
   (for example `docs/<topic>.md`).
 - Granular workspace permissions: `docs/permissions-architecture.md`.
 - App shell, slate, and z-index nomenclature: `docs/app-shell-nomenclature.md`.
+- What the `Ava` and `Ui` type prefixes mean: `docs/type-prefix-nomenclature.md`.
 - How a view inside the slate is laid out (header band, content column,
   properties rail, section rhythm): `docs/design/app-view-layout.md`. Read it
   before building or restyling any app view.

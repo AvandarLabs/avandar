@@ -11,8 +11,8 @@ import { ScatterChartForm } from "@/components/VisualizationContainer/VizSetting
 import { fireEvent, render, screen } from "@/test-utils";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
-import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types";
+import type { AvaBubbleChartVizConfig } from "$/models/vizs/AvaBubbleChartVizConfig/AvaBubbleChartVizConfig.types";
+import type { AvaScatterPlotVizConfig } from "$/models/vizs/AvaScatterPlotVizConfig/AvaScatterPlotVizConfig.types";
 
 const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "spend" as QueryColumn.Id, name: "spend", dataType: "double" },
@@ -20,14 +20,14 @@ const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "weight" as QueryColumn.Id, name: "weight", dataType: "double" },
 ];
 
-const SCATTER_CONFIG: ScatterPlotVizConfig = {
+const SCATTER_CONFIG: AvaScatterPlotVizConfig = {
   vizType: "scatter",
   series: [
     { key: "revenue" as QueryColumn.Id, xKey: "spend" as QueryColumn.Id },
   ],
 };
 
-const BUBBLE_CONFIG: BubbleChartVizConfig = {
+const BUBBLE_CONFIG: AvaBubbleChartVizConfig = {
   vizType: "bubble",
   series: [
     {

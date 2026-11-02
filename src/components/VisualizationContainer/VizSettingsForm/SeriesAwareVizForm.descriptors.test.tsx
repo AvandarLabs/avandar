@@ -10,17 +10,17 @@
  */
 import { getValue } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
-import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
-import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
+import type { AvaAreaChartVizConfig } from "$/models/vizs/AvaAreaChartVizConfig/AvaAreaChartVizConfig.types";
+import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
+import type { AvaLineChartVizConfig } from "$/models/vizs/AvaLineChartVizConfig/AvaLineChartVizConfig.types";
+import type { AvaRadarChartVizConfig } from "$/models/vizs/AvaRadarChartVizConfig/AvaRadarChartVizConfig.types";
 import type {
   AnyChartSettingDescriptor,
   AnySeriesSettingDescriptor,
@@ -37,7 +37,7 @@ const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "score" as QueryColumn.Id, name: "score", dataType: "double" },
 ];
 
-const barConfig: BarChartVizConfig = {
+const barConfig: AvaBarChartVizConfig = {
   vizType: "bar",
   xAxisKey: "category" as QueryColumn.Id,
   series: [{ renderAs: "bar", key: "value" as QueryColumn.Id }],
@@ -45,14 +45,14 @@ const barConfig: BarChartVizConfig = {
   withLegend: true,
 };
 
-const lineConfig: LineChartVizConfig = {
+const lineConfig: AvaLineChartVizConfig = {
   vizType: "line",
   xAxisKey: "category" as QueryColumn.Id,
   series: [{ renderAs: "line", key: "value" as QueryColumn.Id }],
   withLegend: true,
 };
 
-const areaConfig: AreaChartVizConfig = {
+const areaConfig: AvaAreaChartVizConfig = {
   vizType: "area",
   xAxisKey: "category" as QueryColumn.Id,
   series: [{ renderAs: "area", key: "value" as QueryColumn.Id }],
@@ -60,7 +60,7 @@ const areaConfig: AreaChartVizConfig = {
   withLegend: true,
 };
 
-const radarConfig: RadarChartVizConfig = {
+const radarConfig: AvaRadarChartVizConfig = {
   vizType: "radar",
   nameKey: "category" as QueryColumn.Id,
   series: [{ key: "value" as QueryColumn.Id }],
@@ -133,10 +133,10 @@ function renderForm<
 }
 
 type ConfigsByVizType = {
-  bar: BarChartVizConfig;
-  line: LineChartVizConfig;
-  area: AreaChartVizConfig;
-  radar: RadarChartVizConfig;
+  bar: AvaBarChartVizConfig;
+  line: AvaLineChartVizConfig;
+  area: AvaAreaChartVizConfig;
+  radar: AvaRadarChartVizConfig;
 };
 
 const BASELINE_CONFIGS: ConfigsByVizType = {
@@ -219,7 +219,7 @@ function driveControl(
 (["bar", "line", "area", "radar"] as const).forEach((vizType) => {
   describe(`SeriesAwareVizForm — ${vizType} chart-level descriptors`, () => {
     const config = BASELINE_CONFIGS[vizType];
-    const chartDescriptors = VizConfigs.getDescriptors(vizType).chart;
+    const chartDescriptors = AvaVizConfigs.getDescriptors(vizType).chart;
 
     chartDescriptors.forEach((desc: AnyChartSettingDescriptor) => {
       it(`changes the "${desc.label}" setting via its ${desc.control.kind} control`, () => {
@@ -243,7 +243,7 @@ function driveControl(
 
   describe(`SeriesAwareVizForm — ${vizType} series-level descriptors`, () => {
     const config = BASELINE_CONFIGS[vizType];
-    const seriesDescriptors = VizConfigs.getDescriptors(vizType).series;
+    const seriesDescriptors = AvaVizConfigs.getDescriptors(vizType).series;
 
     seriesDescriptors.forEach((desc: AnySeriesSettingDescriptor) => {
       it(`changes the "${desc.label}" series setting via its ${desc.control.kind} control`, () => {

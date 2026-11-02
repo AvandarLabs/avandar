@@ -7,8 +7,8 @@ import { FunnelChartForm } from "./FunnelChartForm";
 import { PieChartForm } from "./PieChartForm";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
-import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types";
+import type { AvaFunnelChartVizConfig } from "$/models/vizs/AvaFunnelChartVizConfig/AvaFunnelChartVizConfig.types";
+import type { AvaPieChartVizConfig } from "$/models/vizs/AvaPieChartVizConfig/AvaPieChartVizConfig.types";
 
 i18n.load("en", {});
 i18n.activate("en");
@@ -26,7 +26,7 @@ const fields: readonly QueryResult.ColumnWithId[] = [
   } as QueryResult.ColumnWithId,
 ];
 
-const pieConfig: PieChartVizConfig = {
+const pieConfig: AvaPieChartVizConfig = {
   vizType: "pie",
   nameKey: "region" as QueryColumn.Id,
   valueKey: "count" as QueryColumn.Id,
@@ -35,7 +35,7 @@ const pieConfig: PieChartVizConfig = {
   labelsType: "value",
 };
 
-const funnelConfig: FunnelChartVizConfig = {
+const funnelConfig: AvaFunnelChartVizConfig = {
   vizType: "funnel",
   nameKey: "region" as QueryColumn.Id,
   valueKey: "count" as QueryColumn.Id,

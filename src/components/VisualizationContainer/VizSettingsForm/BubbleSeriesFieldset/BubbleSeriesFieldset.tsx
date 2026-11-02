@@ -20,13 +20,13 @@ import { SeriesList } from "@/components/VisualizationContainer/VizSettingsForm/
 import { useUniqueRowKeys } from "@/components/VisualizationContainer/VizSettingsForm/useUniqueRowKeys";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
+import type { AvaBubbleSeries } from "$/models/vizs/SeriesConfig";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 
 type Props = {
   fields: readonly QueryResult.ColumnWithId[];
-  series: readonly BubbleSeries[];
-  onChange: (next: BubbleSeries[]) => void;
+  series: readonly AvaBubbleSeries[];
+  onChange: (next: AvaBubbleSeries[]) => void;
 
   /** How the setting groups are arranged. Defaults to a vertical stack. */
   layout?: SettingsColumnsLayout;
@@ -64,7 +64,7 @@ export function BubbleSeriesFieldset({
     }
     const yField = numericFields[1] ?? xField;
     const sizeField = numericFields[2] ?? yField;
-    const next: BubbleSeries = {
+    const next: AvaBubbleSeries = {
       xKey: xField.id,
       key: yField.id,
       sizeKey: sizeField.id,
@@ -73,7 +73,7 @@ export function BubbleSeriesFieldset({
   }, [numericFields, series, onChange]);
 
   const updateAt = useCallback(
-    (idx: number, patch: Partial<BubbleSeries>) => {
+    (idx: number, patch: Partial<AvaBubbleSeries>) => {
       const next = series.map((s, i) => {
         return i === idx ? { ...s, ...patch } : s;
       });

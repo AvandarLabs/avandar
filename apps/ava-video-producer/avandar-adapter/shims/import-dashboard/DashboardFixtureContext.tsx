@@ -7,7 +7,7 @@ import {
 } from "../../Explorer.constants";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { DataVizFilterProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 /**
@@ -43,7 +43,7 @@ export const chartColumns: QueryResult.ColumnWithId[] = [
 ];
 
 /** The saved chart's bar visualization config. */
-export const chartConfig: VizConfig.T = {
+export const chartConfig: AvaVizConfig.T = {
   vizType: "bar",
   xAxisKey: "film-district" as QueryColumn.Id,
   layout: "group",

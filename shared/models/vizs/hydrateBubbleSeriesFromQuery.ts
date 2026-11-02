@@ -1,10 +1,10 @@
 import { isNonEmptyArray } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { BubbleSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaBubbleSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type BubbleSeriesConfig = {
-  series: readonly BubbleSeries[];
+  series: readonly AvaBubbleSeries[];
 };
 
 /**
@@ -16,7 +16,7 @@ export function hydrateBubbleSeriesFromQuery<
 >(currVizConfig: VConfig, query: PartialStructuredQuery): VConfig {
   const { queryColumns } = query;
 
-  let nextSeries: BubbleSeries[] = [...currVizConfig.series];
+  let nextSeries: AvaBubbleSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0 && isNonEmptyArray(queryColumns)) {
     const numerics = queryColumns.filter(QueryColumn.isNumeric);

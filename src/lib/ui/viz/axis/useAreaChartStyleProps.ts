@@ -7,7 +7,7 @@ import { getAreaStackingFromLayout } from "@/lib/ui/viz/axis/getAreaStackingFrom
 import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { ColNameBoundXYSeries as XYSeries } from "$/models/vizs/VizConfig/ColNameBoundVizConfig.types";
+import type { XYSeries as AvaXYSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type {
   ApplyChartStyleOptions,
   ChartStyleProps,
@@ -24,7 +24,7 @@ function _computeAreaValueExtent({
   allAreas,
 }: Readonly<{
   data: Readonly<UnknownDataFrame>;
-  series: readonly XYSeries[];
+  series: readonly AvaXYSeries[];
   axisStyle: Readonly<AxisStyle> | undefined;
   layout: AreaLayout;
   allAreas: boolean;
@@ -59,7 +59,7 @@ export function useAreaChartStyleProps({
   allAreas,
 }: Readonly<{
   data: Readonly<UnknownDataFrame>;
-  series: readonly XYSeries[];
+  series: readonly AvaXYSeries[];
   chartStyle: Readonly<ChartStyle> | undefined;
   xAxisKey: string;
   tickFormatter: ((value: unknown) => string) | undefined;

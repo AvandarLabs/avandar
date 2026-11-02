@@ -1,17 +1,17 @@
 import { Stack } from "@mantine/core";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { ChartSettingsFieldsets } from "@/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets";
 import { PairSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset";
 import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types";
-import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
+import type { AvaScatterPlotVizConfig } from "$/models/vizs/AvaScatterPlotVizConfig/AvaScatterPlotVizConfig.types";
+import type { AvaScatterSeries } from "$/models/vizs/SeriesConfig";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 
 type Props = {
   fields: readonly QueryResult.ColumnWithId[];
-  config: ScatterPlotVizConfig;
-  onConfigChange: (newConfig: ScatterPlotVizConfig) => void;
+  config: AvaScatterPlotVizConfig;
+  onConfigChange: (newConfig: AvaScatterPlotVizConfig) => void;
 
   /** How the setting groups are arranged. Defaults to a vertical stack. */
   layout?: SettingsColumnsLayout;
@@ -36,12 +36,12 @@ export function ScatterChartForm({
         fields={fields}
         series={config.series}
         layout={layout}
-        onChange={(nextSeries: ScatterSeries[]) => {
+        onChange={(nextSeries: AvaScatterSeries[]) => {
           onConfigChange({ ...config, series: nextSeries });
         }}
       />
       <ChartSettingsFieldsets
-        descriptors={VizConfigs.getDescriptors("scatter").chart}
+        descriptors={AvaVizConfigs.getDescriptors("scatter").chart}
         config={config}
         onSettingChange={updateChartPath}
         layout={layout}

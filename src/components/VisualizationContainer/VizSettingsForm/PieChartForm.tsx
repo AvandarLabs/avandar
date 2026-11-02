@@ -7,7 +7,7 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types";
+import type { AvaPieChartVizConfig } from "$/models/vizs/AvaPieChartVizConfig/AvaPieChartVizConfig.types";
 import type {
   SettingsColumnGroup,
   SettingsColumnsLayout,
@@ -16,9 +16,9 @@ import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
   fields: readonly QueryResult.ColumnWithId[];
-  config: PieChartVizConfig;
+  config: AvaPieChartVizConfig;
   data: UnknownDataFrame;
-  onConfigChange: (newConfig: PieChartVizConfig) => void;
+  onConfigChange: (newConfig: AvaPieChartVizConfig) => void;
 
   /** How the setting groups are arranged. Defaults to a vertical stack. */
   layout?: SettingsColumnsLayout;

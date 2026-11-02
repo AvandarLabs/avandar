@@ -9,7 +9,8 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 
 /**
  * Identifies the currently open saved dataset in the Data Explorer, if any.
@@ -58,7 +59,7 @@ export type DataExplorerAppState = {
    */
   nlPrompt: string | undefined;
 
-  vizConfig: VizConfig.T;
+  vizConfig: AvaVizConfig.T;
 
   /**
    * A chart config restored from the URL, keyed by `QueryResult` column names
@@ -67,7 +68,7 @@ export type DataExplorerAppState = {
    * sync keeps writing it back unchanged, so a slow or failed query does not
    * drop it.
    */
-  pendingUrlVizConfig?: VizConfig.ColNameBound;
+  pendingUrlVizConfig?: UiVizConfig;
 
   /**
    * The last config the user actually saw for each viz type, so switching
@@ -83,13 +84,13 @@ export type DataExplorerAppState = {
    * stale when the query changes; they are reconciled against the current
    * result columns on restore rather than being invalidated up front.
    *
-   * `Partial<VizConfigRegistry>` correlates each entry with the viz type it
+   * `Partial<AvaVizConfigRegistry>` correlates each entry with the viz type it
    * is filed under, so a bar config cannot be stored under `"pie"`.
    *
    * In-memory only: this state manager is never persisted, so a reload
    * starts empty.
    */
-  vizConfigMemory: Partial<VizConfig.Registry>;
+  vizConfigMemory: Partial<AvaVizConfig.Registry>;
 
   /** The currently open saved dataset, or `undefined` if none is open. */
   openDataset: OpenDatasetInfo | undefined;

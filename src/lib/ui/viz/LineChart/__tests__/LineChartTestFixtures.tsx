@@ -12,9 +12,9 @@ import { render } from "@/test-utils";
  * "changing a control updates the config"; these tests prove
  * "changing a config setting updates what the chart renders".
  */
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 
-type LineChartVizConfig = Extract<VizConfig.ColNameBound, { vizType: "line" }>;
+type AvaLineChartVizConfig = Extract<UiVizConfig, { vizType: "line" }>;
 
 const mantineLineChartMock = vi.fn();
 
@@ -47,7 +47,7 @@ beforeEach(() => {
   mantineLineChartMock.mockClear();
 });
 
-function renderLine(config: LineChartVizConfig): void {
+function renderLine(config: AvaLineChartVizConfig): void {
   render(
     <AvandarAppProvider>
       <LineChart
@@ -62,7 +62,7 @@ function renderLine(config: LineChartVizConfig): void {
   );
 }
 
-const LINE_BASELINE: LineChartVizConfig = {
+const LINE_BASELINE: AvaLineChartVizConfig = {
   vizType: "line",
   xAxisKey: "x",
   series: [{ renderAs: "line", key: "v" }],

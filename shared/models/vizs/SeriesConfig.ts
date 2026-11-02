@@ -14,7 +14,7 @@ export type RenderAs = "bar" | "line" | "area";
 export const DEFAULT_AREA_FILL_OPACITY = 0.6;
 
 /** A bar series - renders as bars. */
-export type BarSeries = {
+export type AvaBarSeries = {
   renderAs: "bar";
 
   /** Column ID supplying the bar's values. */
@@ -41,7 +41,7 @@ export type BarSeries = {
 };
 
 /** A line series - renders as a polyline. */
-export type LineSeries = {
+export type AvaLineSeries = {
   renderAs: "line";
 
   /** Column ID supplying the line's Y values. */
@@ -64,7 +64,7 @@ export type LineSeries = {
 };
 
 /** An area series - renders as a filled region under a polyline. */
-export type AreaSeries = {
+export type AvaAreaSeries = {
   renderAs: "area";
 
   /** Column ID supplying the area's Y values. */
@@ -95,14 +95,14 @@ export type AreaSeries = {
  * host's `vizType` (the renderer falls back to a composite chart in
  * that case).
  */
-export type XYSeries = BarSeries | LineSeries | AreaSeries;
+export type AvaXYSeries = AvaBarSeries | AvaLineSeries | AvaAreaSeries;
 
 /**
  * A radar series. Radar does not compose with bar/line/area so there is
  * no `renderAs` discriminator - every radar series renders as a radar
  * polygon.
  */
-export type RadarSeries = {
+export type AvaRadarSeries = {
   /** Column ID supplying the radial values. */
   key: QueryColumn.Id;
 
@@ -124,7 +124,7 @@ export type RadarSeries = {
  * scatter plots pair points, unlike bar/line/area which share an X
  * axis across all series.
  */
-export type ScatterSeries = {
+export type AvaScatterSeries = {
   /** Column ID supplying the Y values. */
   key: QueryColumn.Id;
   /** Column ID supplying the X values. */
@@ -136,9 +136,9 @@ export type ScatterSeries = {
 };
 
 /**
- * A bubble series - like ScatterSeries plus a third column for radius.
+ * A bubble series - like AvaScatterSeries plus a third column for radius.
  */
-export type BubbleSeries = ScatterSeries & {
+export type AvaBubbleSeries = AvaScatterSeries & {
   /** Column ID supplying the bubble size (radius). */
   sizeKey: QueryColumn.Id;
 };
@@ -153,9 +153,9 @@ export type BubbleSeries = ScatterSeries & {
  * mode without manual reassignment.
  */
 export function convertSeriesRenderAs(
-  series: XYSeries,
+  series: AvaXYSeries,
   newRenderAs: RenderAs,
-): XYSeries {
+): AvaXYSeries {
   const { key, label, color } = series;
   return match(newRenderAs)
     .with("bar", () => {

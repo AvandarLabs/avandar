@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import {
   DATA_EXPLORER_FALLBACK_PROMPT,
   createDataVizBlock,
@@ -7,7 +7,7 @@ import {
 
 describe("createDataVizBlock", () => {
   it("returns a DataViz block whose props mirror the input rawSql, prompt, and viz config", () => {
-    const vizConfig = VizConfigs.makeEmptyConfig("table");
+    const vizConfig = AvaVizConfigs.makeEmptyConfig("table");
     const block = createDataVizBlock({
       columnBindings: {
         version: 1,
@@ -42,7 +42,7 @@ describe("createDataVizBlock", () => {
   });
 
   it("stamps a unique UUID into props.id for every call", () => {
-    const vizConfig = VizConfigs.makeEmptyConfig("table");
+    const vizConfig = AvaVizConfigs.makeEmptyConfig("table");
     const blockA = createDataVizBlock({
       columnBindings: {
         version: 1,
@@ -74,7 +74,7 @@ describe("createDataVizBlock", () => {
   });
 
   it("falls back to a non-empty default prompt when prompt is undefined so the block renders", () => {
-    const vizConfig = VizConfigs.makeEmptyConfig("bar");
+    const vizConfig = AvaVizConfigs.makeEmptyConfig("bar");
     const block = createDataVizBlock({
       columnBindings: {
         version: 1,
@@ -98,7 +98,7 @@ describe("createDataVizBlock", () => {
   });
 
   it("falls back to the default prompt when the supplied prompt is just whitespace", () => {
-    const vizConfig = VizConfigs.makeEmptyConfig("table");
+    const vizConfig = AvaVizConfigs.makeEmptyConfig("table");
     const block = createDataVizBlock({
       columnBindings: {
         version: 1,

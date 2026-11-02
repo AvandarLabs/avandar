@@ -1,11 +1,11 @@
 import { VizHydrationColumns } from "$/models/vizs/VizHydrationColumns.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { RenderAs, AvaXYSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type XYSeriesConfig = {
   xAxisKey: QueryColumn.Id | undefined;
-  series: readonly XYSeries[];
+  series: readonly AvaXYSeries[];
 };
 
 /**
@@ -21,7 +21,7 @@ export function hydrateXYSeriesFromQueryResult<VConfig extends XYSeriesConfig>(
     return currVizConfig;
   }
 
-  let nextSeries: XYSeries[] = [...currVizConfig.series];
+  let nextSeries: AvaXYSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0) {
     const firstNumericId = VizHydrationColumns.getFirstNumericColumnId(columns);

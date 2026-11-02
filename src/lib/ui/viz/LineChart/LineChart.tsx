@@ -6,7 +6,7 @@ import { useLineChartStyleProps } from "@/lib/ui/viz/axis/useLineChartStyleProps
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { ColNameBoundLineSeries as LineSeries } from "$/models/vizs/VizConfig/ColNameBoundVizConfig.types";
+import type { LineSeries as AvaLineSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { LineChartSeries } from "@mantine/charts";
 import type { LineProps } from "recharts";
@@ -74,7 +74,7 @@ export function LineChart({
     });
   }
 
-  const lineSeries = series as readonly LineSeries[];
+  const lineSeries = series as readonly AvaLineSeries[];
 
   // Mantine shares one label fill across both axes. Use Recharts labels to
   // preserve per-axis colors and reserve their margins.

@@ -2,17 +2,17 @@ type Props = { children: ReactNode };
 import { Model } from "@avandar/models";
 import { expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
 import { act, renderHook } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 /** Exercises column reconstruction and chart edits through the real store. */
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
 import type { RenderHookResult } from "@testing-library/react";
 import type { ReactNode } from "react";
 
-const _STYLED_BAR_CONFIG: BarChartVizConfig = {
+const _STYLED_BAR_CONFIG: AvaBarChartVizConfig = {
   vizType: "bar",
   xAxisKey: "quarter" as QueryColumn.Id,
   layout: "group",
@@ -74,7 +74,7 @@ function _renderStateManager(): RenderHookResult<
 /** Shared setup and fixtures for DataExplorerIdentityTestFixtures. */
 export const DataExplorerIdentityTestFixtures = {
   QueryColumn,
-  makeColNameBoundVizConfigFromVizConfig,
+  makeUiVizConfigFromAvaVizConfig,
   act,
   Model,
   expect,

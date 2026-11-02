@@ -8,7 +8,7 @@ import {
 } from "@/test-utils/pickMantineSelectOption";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 
 const COLUMNS: readonly QueryResult.ColumnWithId[] = [
@@ -24,13 +24,13 @@ const DATA: UnknownDataFrame = [
 ];
 
 type RenderProps = {
-  vizConfig: VizConfig;
-  onVizConfigChange?: (nextVizConfig: VizConfig) => void;
+  vizConfig: AvaVizConfig;
+  onVizConfigChange?: (nextVizConfig: AvaVizConfig) => void;
 };
 
 function renderForm({ vizConfig, onVizConfigChange = vi.fn() }: RenderProps): {
   onVizConfigChange: ReturnType<typeof vi.fn>;
-  rerenderWith: (nextConfig: VizConfig) => void;
+  rerenderWith: (nextConfig: AvaVizConfig) => void;
 } {
   const vizConfigChangeMock = onVizConfigChange as ReturnType<typeof vi.fn>;
   const result = render(
@@ -69,7 +69,7 @@ describe("VizSettingsFormBody: table viz type", () => {
 });
 
 describe("VizSettingsFormBody: bar chart smoke test", () => {
-  const baseConfig: VizConfig = {
+  const baseConfig: AvaVizConfig = {
     vizType: "bar",
     xAxisKey: undefined,
     series: [],
@@ -100,7 +100,7 @@ describe("VizSettingsFormBody: bar chart smoke test", () => {
 });
 
 describe("VizSettingsFormBody: line chart smoke test", () => {
-  const baseConfig: VizConfig = {
+  const baseConfig: AvaVizConfig = {
     vizType: "line",
     xAxisKey: undefined,
     series: [],
@@ -118,7 +118,7 @@ describe("VizSettingsFormBody: line chart smoke test", () => {
 });
 
 describe("VizSettingsFormBody: area chart smoke test", () => {
-  const baseConfig: VizConfig = {
+  const baseConfig: AvaVizConfig = {
     vizType: "area",
     xAxisKey: undefined,
     series: [],
@@ -137,7 +137,7 @@ describe("VizSettingsFormBody: area chart smoke test", () => {
 });
 
 describe("VizSettingsFormBody: scatter chart controls", () => {
-  const baseConfig: VizConfig = {
+  const baseConfig: AvaVizConfig = {
     vizType: "scatter",
     series: [
       { xKey: "value" as QueryColumn.Id, key: "score" as QueryColumn.Id },
@@ -169,7 +169,7 @@ describe("VizSettingsFormBody: scatter chart controls", () => {
 });
 
 describe("VizSettingsFormBody: pie chart controls", () => {
-  const baseConfig: VizConfig = {
+  const baseConfig: AvaVizConfig = {
     vizType: "pie",
     nameKey: undefined,
     valueKey: undefined,
@@ -223,7 +223,7 @@ describe("VizSettingsFormBody: pie chart controls", () => {
 });
 
 describe("VizSettingsFormBody: funnel chart controls", () => {
-  const baseConfig: VizConfig = {
+  const baseConfig: AvaVizConfig = {
     vizType: "funnel",
     nameKey: undefined,
     valueKey: undefined,
@@ -251,7 +251,7 @@ describe("VizSettingsFormBody: funnel chart controls", () => {
 });
 
 describe("VizSettingsFormBody: radar chart smoke test", () => {
-  const baseConfig: VizConfig = {
+  const baseConfig: AvaVizConfig = {
     vizType: "radar",
     nameKey: undefined,
     series: [],
@@ -269,7 +269,7 @@ describe("VizSettingsFormBody: radar chart smoke test", () => {
 });
 
 describe("VizSettingsFormBody: bubble chart controls", () => {
-  const baseConfig: VizConfig = {
+  const baseConfig: AvaVizConfig = {
     vizType: "bubble",
     series: [
       {

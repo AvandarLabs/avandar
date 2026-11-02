@@ -13,16 +13,16 @@ import { IconTrash } from "@tabler/icons-react";
 import { useCallback, useMemo } from "react";
 import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
-  RadarSeries,
+  AvaRadarSeries,
   RenderAs,
-  XYSeries,
+  AvaXYSeries,
 } from "$/models/vizs/SeriesConfig";
 import type { AnySeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
 import type { HostConfig } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
@@ -47,10 +47,10 @@ function useRenderAsOptions(): ReadonlyArray<{
 type SeriesCardProps = {
   fields: readonly QueryResult.ColumnWithId[];
   numericFields: readonly QueryResult.ColumnWithId[];
-  series: XYSeries | RadarSeries;
+  series: AvaXYSeries | AvaRadarSeries;
   hostVizType: HostConfig["vizType"];
   isRadarHost: boolean;
-  onSeriesChange: (nextSeries: XYSeries | RadarSeries) => void;
+  onSeriesChange: (nextSeries: AvaXYSeries | AvaRadarSeries) => void;
   onRemove: () => void;
 };
 
@@ -66,14 +66,16 @@ export function SeriesCard({
   const renderAsOptions = useRenderAsOptions();
   const seriesRenderAs: RenderAs | "radar" = isRadarHost
     ? "radar"
-    : (series as XYSeries).renderAs;
+    : (series as AvaXYSeries).renderAs;
 
   const descriptors = useMemo(() => {
     const sourceModuleVizType: HostConfig["vizType"] =
       seriesRenderAs === "radar" ? "radar" : seriesRenderAs;
-    return VizConfigs.getDescriptors(sourceModuleVizType).series.filter((d) => {
-      return d.appliesTo === seriesRenderAs;
-    });
+    return AvaVizConfigs.getDescriptors(sourceModuleVizType).series.filter(
+      (d) => {
+        return d.appliesTo === seriesRenderAs;
+      },
+    );
   }, [seriesRenderAs]);
 
   const isComposed = !isRadarHost && seriesRenderAs !== hostVizType;
@@ -103,7 +105,7 @@ export function SeriesCard({
         series as never,
         path as never,
         value as never,
-      ) as XYSeries | RadarSeries;
+      ) as AvaXYSeries | AvaRadarSeries;
       onSeriesChange(nextSeries);
     },
     [series, onSeriesChange],
@@ -131,13 +133,13 @@ export function SeriesCard({
         return;
       }
       const renderAs = nextRenderAs as RenderAs;
-      const xySeries = series as XYSeries;
+      const xySeries = series as AvaXYSeries;
       const sharedSeriesProps = {
         key: xySeries.key,
         label: xySeries.label,
         color: xySeries.color,
       };
-      const updatedSeries: XYSeries =
+      const updatedSeries: AvaXYSeries =
         renderAs === "area"
           ? { renderAs, ...sharedSeriesProps, fillOpacity: 0.6 }
           : { renderAs, ...sharedSeriesProps };

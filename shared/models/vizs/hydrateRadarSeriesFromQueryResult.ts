@@ -2,11 +2,11 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { VizHydrationColumns } from "$/models/vizs/VizHydrationColumns.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaRadarSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type RadarSeriesConfig = {
   nameKey: QueryColumn.Id | undefined;
-  series: readonly RadarSeries[];
+  series: readonly AvaRadarSeries[];
 };
 
 /**
@@ -23,7 +23,7 @@ export function hydrateRadarSeriesFromQueryResult<
     return currVizConfig;
   }
 
-  let nextSeries: RadarSeries[] = [...currVizConfig.series];
+  let nextSeries: AvaRadarSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0) {
     const firstNumericId = VizHydrationColumns.getFirstNumericColumnId(columns);

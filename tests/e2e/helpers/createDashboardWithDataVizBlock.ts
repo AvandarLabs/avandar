@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Shape of the per-viz-type config payload seeded into the DataViz block.
- * Mirrors the in-app `VizConfig` discriminated union but is duplicated here
+ * Mirrors the in-app `AvaVizConfig` discriminated union but is duplicated here
  * so this helper has no compile-time dependency on application code (which
  * keeps Playwright fixtures lightweight and reusable across versions).
  */

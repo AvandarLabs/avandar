@@ -3,7 +3,7 @@ import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render } from "@/test-utils";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { PuckContext } from "@puckeditor/core";
 import type { ReactElement } from "react";
 
@@ -11,7 +11,7 @@ type RenderBlockOptions = {
   prompt: string;
   rawSql: string;
   vizType: string;
-  vizConfig: VizConfig.ColNameBound;
+  vizConfig: UiVizConfig;
 };
 
 const TEST_DASHBOARD_ID = "00000000-0000-4000-8000-000000000001";

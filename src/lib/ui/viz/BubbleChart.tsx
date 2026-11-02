@@ -25,13 +25,13 @@ import {
 } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { ColNameBoundBubbleSeries as BubbleSeries } from "$/models/vizs/VizConfig/ColNameBoundVizConfig.types";
+import type { BubbleSeries as AvaBubbleSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
   data: UnknownDataFrame;
   /** One entry per independent (X, Y, size) cloud of bubbles. */
-  series: readonly BubbleSeries[];
+  series: readonly AvaBubbleSeries[];
   height?: number | string;
   chartStyle?: ChartStyle;
 };

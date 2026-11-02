@@ -4,7 +4,7 @@ import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent";
 import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { ColNameBoundXYSeries as XYSeries } from "$/models/vizs/VizConfig/ColNameBoundVizConfig.types";
+import type { XYSeries as AvaXYSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type {
   ApplyChartStyleOptions,
   ChartStyleProps,
@@ -21,7 +21,7 @@ export function useLineChartStyleProps({
   baseXAxisProps,
 }: Readonly<{
   data: Readonly<UnknownDataFrame>;
-  series: readonly XYSeries[];
+  series: readonly AvaXYSeries[];
   chartStyle: Readonly<ChartStyle> | undefined;
   xAxisKey: string;
   tickFormatter: ((value: unknown) => string) | undefined;

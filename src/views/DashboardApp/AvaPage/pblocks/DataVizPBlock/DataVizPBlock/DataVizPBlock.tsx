@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
@@ -10,7 +10,7 @@ import { useRefreshDataVizColumnBindings } from "../useDataVizColumnBindings/use
 import { useDataVizRuntimeColumnBindings } from "../useDataVizRuntimeColumnBindings/useDataVizRuntimeColumnBindings";
 import { DataVizContent } from "./DataVizContent";
 import { useLocalFilterState } from "./useLocalFilterState";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { DataVizColumnBindingProps } from "../makeSavedColumnBindingsFromDataVizProps/makeSavedColumnBindingsFromDataVizProps";
 import type { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import type { WithPuckProps } from "@puckeditor/core";
@@ -19,7 +19,7 @@ import type { ReactElement } from "react";
 /** Saved visualization with explicit legacy or stable binding ownership. */
 export type Props = {
   nlQuery: NLQuery;
-  vizType: VizConfig.Type;
+  vizType: AvaVizConfig.Type;
 } & DataVizColumnBindingProps;
 
 /** Renders a saved chart with its local and subscribed dashboard filters. */
@@ -75,7 +75,7 @@ export function DataVizPBlock(
       dateColumns={getDateColumns(columns, data)}
       displayVizConfig={
         columnBindings.runtime?.runtimeConfig ??
-        VizConfigs.makeEmptyConfig(props.vizType)
+        AvaVizConfigs.makeEmptyConfig(props.vizType)
       }
       filterProps={{
         globalFilterSubscription: props.globalFilterSubscription,

@@ -4,11 +4,11 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery/hydratePieFromQuery.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
-import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
+import type { AvaPieChartVizConfig } from "$/models/vizs/AvaPieChartVizConfig/AvaPieChartVizConfig.types.ts";
 
 function makePieConfig(
-  overrides: Partial<PieChartVizConfig> = {},
-): PieChartVizConfig {
+  overrides: Partial<AvaPieChartVizConfig> = {},
+): AvaPieChartVizConfig {
   return {
     vizType: "pie",
     nameKey: undefined,

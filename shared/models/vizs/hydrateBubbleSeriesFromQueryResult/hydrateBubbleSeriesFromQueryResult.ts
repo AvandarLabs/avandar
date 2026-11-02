@@ -1,9 +1,9 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { BubbleSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaBubbleSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type BubbleSeriesConfig = {
-  series: readonly BubbleSeries[];
+  series: readonly AvaBubbleSeries[];
 };
 
 /**
@@ -20,7 +20,7 @@ export function hydrateBubbleSeriesFromQueryResult<
     return currVizConfig;
   }
 
-  let nextSeries: BubbleSeries[] = [...currVizConfig.series];
+  let nextSeries: AvaBubbleSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0) {
     const numerics = columns.filter((c) => {

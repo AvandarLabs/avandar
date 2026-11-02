@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryColumnReconciliation/QueryColumnReconciliation";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { applyQueryChange } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
 import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -144,7 +144,10 @@ export const DataExplorerSourceActions = {
         ? state.query.orderByColumn
         : undefined,
     } as StructuredQuery.Partial;
-    const newVizConfig = VizConfigs.hydrateFromQuery(state.vizConfig, newQuery);
+    const newVizConfig = AvaVizConfigs.hydrateFromQuery(
+      state.vizConfig,
+      newQuery,
+    );
     const next = applyQueryChange({ state, newQuery });
     return { ...next, vizConfig: newVizConfig };
   },

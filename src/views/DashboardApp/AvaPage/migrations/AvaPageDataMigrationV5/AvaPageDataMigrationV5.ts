@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
 import { transformAvaPageProps } from "../../utils/makeTraversalConfigFromAvaPageData/transformAvaPageProps";
 import type { AvaPageDataMigration } from "../AvaPageDataMigrator";
 import type {
@@ -38,11 +38,11 @@ function _downgradeChart(
       );
     }
   });
-  const nameBoundConversion = makeColNameBoundVizConfigFromVizConfig({
+  const uiVizConfigConversion = makeUiVizConfigFromAvaVizConfig({
     config: props.vizConfig,
     columns: columnBindings.columns,
   });
-  if (nameBoundConversion.issues.length) {
+  if (uiVizConfigConversion.issues.length) {
     throw new Error(
       "Cannot downgrade DataViz: a chart column has no persisted binding",
     );
@@ -56,7 +56,7 @@ function _downgradeChart(
     }
     return { ...filter, columnName: column.name };
   });
-  return { ...rest, vizConfig: nameBoundConversion.config, localFilters };
+  return { ...rest, vizConfig: uiVizConfigConversion.config, localFilters };
 }
 
 /**

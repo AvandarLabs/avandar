@@ -13,11 +13,11 @@ import { describe, expect, it } from "vitest";
  * source of truth.
  */
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
+import { applyAvaVizConfigFromQueryResult } from "$/models/vizs/applyAvaVizConfigFromQueryResult/applyAvaVizConfigFromQueryResult";
 import { INITIAL_DATA_EXPLORER_STATE } from "../DataExplorerAppState.types";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
 import type { DataExplorerAppState } from "../DataExplorerAppState.types";
 
 function cols(
@@ -44,7 +44,7 @@ function syncVizFromQueryResultReducer(
   state: DataExplorerAppState,
   columns: readonly QueryResult.ColumnWithId[],
 ): DataExplorerAppState {
-  const next = applyVizConfigFromQueryResult({
+  const next = applyAvaVizConfigFromQueryResult({
     vizConfig: state.vizConfig,
     rawSql: state.rawSql,
     query: state.query,
@@ -58,7 +58,7 @@ function syncVizFromQueryResultReducer(
 }
 
 describe("Data Explorer state sync", () => {
-  const initialBarConfig: BarChartVizConfig = {
+  const initialBarConfig: AvaBarChartVizConfig = {
     vizType: "bar",
     xAxisKey: "region" as QueryColumn.Id,
     series: [{ renderAs: "bar", key: "count" as QueryColumn.Id }],
@@ -87,7 +87,7 @@ describe("Data Explorer state sync", () => {
     );
 
     expect(afterRequery.vizConfig.vizType).toBe("bar");
-    const bar = afterRequery.vizConfig as BarChartVizConfig;
+    const bar = afterRequery.vizConfig as AvaBarChartVizConfig;
     expect(
       bar.series.map((s) => {
         return s.key;
@@ -120,7 +120,7 @@ describe("Data Explorer state sync", () => {
       ]),
     );
 
-    const bar = afterRequery.vizConfig as BarChartVizConfig;
+    const bar = afterRequery.vizConfig as AvaBarChartVizConfig;
     expect(
       bar.series.map((s) => {
         return s.key;
@@ -164,7 +164,7 @@ describe("Data Explorer state sync", () => {
       ]),
     );
 
-    const bar = afterRequery.vizConfig as BarChartVizConfig;
+    const bar = afterRequery.vizConfig as AvaBarChartVizConfig;
     expect(bar.xAxisKey).toBe("Region");
     expect(
       bar.series.map((s) => {

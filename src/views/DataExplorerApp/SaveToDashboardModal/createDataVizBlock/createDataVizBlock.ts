@@ -2,9 +2,9 @@ import { uuid } from "$/lib/uuid";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type {
-  VizConfig,
+  AvaVizConfig,
   VizType,
-} from "$/models/vizs/VizConfig/VizConfig.types";
+} from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
 import type {
   GlobalFilterSubscription,
   LocalFilter,
@@ -22,7 +22,7 @@ type DataVizDashboardBlockProps = {
     generations: ReadonlyArray<{ prompt: string; rawSql: string }>;
   };
   vizType: VizType;
-  vizConfig: VizConfig;
+  vizConfig: AvaVizConfig;
   globalFilterSubscription: GlobalFilterSubscription;
   localFilters: readonly LocalFilter[];
 };
@@ -32,7 +32,7 @@ type CreateDataVizBlockOptions = {
   rawSql: string;
   prompt: string | undefined;
   vizType: VizType;
-  vizConfig: VizConfig;
+  vizConfig: AvaVizConfig;
 };
 
 /**

@@ -1,9 +1,9 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { ScatterSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaScatterSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type ScatterSeriesConfig = {
-  series: readonly ScatterSeries[];
+  series: readonly AvaScatterSeries[];
 };
 
 /**
@@ -20,7 +20,7 @@ export function hydrateScatterSeriesFromQueryResult<
     return currVizConfig;
   }
 
-  let nextSeries: ScatterSeries[] = [...currVizConfig.series];
+  let nextSeries: AvaScatterSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0) {
     const numerics = columns.filter((c) => {

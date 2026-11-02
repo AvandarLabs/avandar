@@ -1,4 +1,4 @@
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
@@ -31,7 +31,7 @@ function buildDataVizItem(
         ],
       },
       vizType: block.vizType,
-      vizConfig: VizConfigs.makeEmptyConfig(block.vizType),
+      vizConfig: AvaVizConfigs.makeEmptyConfig(block.vizType),
       globalFilterSubscription: DataVizFilters.defaultGlobalFilterSubscription,
       localFilters: [],
     },

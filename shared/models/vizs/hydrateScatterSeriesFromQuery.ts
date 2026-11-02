@@ -1,10 +1,10 @@
 import { isNonEmptyArray } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { ScatterSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaScatterSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type ScatterSeriesConfig = {
-  series: readonly ScatterSeries[];
+  series: readonly AvaScatterSeries[];
 };
 
 /**
@@ -16,7 +16,7 @@ export function hydrateScatterSeriesFromQuery<
 >(currVizConfig: VConfig, query: PartialStructuredQuery): VConfig {
   const { queryColumns } = query;
 
-  let nextSeries: ScatterSeries[] = [...currVizConfig.series];
+  let nextSeries: AvaScatterSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0 && isNonEmptyArray(queryColumns)) {
     const numerics = queryColumns.filter(QueryColumn.isNumeric);

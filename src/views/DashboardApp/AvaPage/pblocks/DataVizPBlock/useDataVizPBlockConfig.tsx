@@ -3,7 +3,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef } from "react";
 import { vizTypeLabel } from "$/copy/vizTypeLabel";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
-import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
+import {
+  AvaVizConfigs,
+  VizTypes,
+} from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { makeDataVizPBlockStateFromProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
@@ -31,7 +34,7 @@ const defaultProps: DataVizPBlockProps = {
     generations: [],
   },
   vizType: DEFAULT_VIZ_TYPE,
-  vizConfig: VizConfigs.makeEmptyConfig(DEFAULT_VIZ_TYPE),
+  vizConfig: AvaVizConfigs.makeEmptyConfig(DEFAULT_VIZ_TYPE),
   globalFilterSubscription: DataVizFilters.defaultGlobalFilterSubscription,
   localFilters: [],
 };
@@ -118,7 +121,7 @@ function _getDataVizPBlockConfig(
  * regular Puck select so it appears as a first-class control alongside the
  * prompt; `vizConfig` is a custom field that renders the per-type subform
  * (axis pickers, legend toggle, etc.). The `resolveData` hook keeps the two
- * in sync by running `VizConfigs.convertVizConfig` whenever the user picks a
+ * in sync by running `AvaVizConfigs.convertVizConfig` whenever the user picks a
  * different `vizType`, and by falling back to defaults when older saved data
  * is missing either field.
  *

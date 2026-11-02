@@ -29,40 +29,40 @@ directly with a user is reachable even without the app role.
 
 ## 2. Visualization types (9)
 
-Registered in `shared/models/vizs/VizConfig/VizConfigs.ts`. Every type
-implements `IVizConfigModule`: `displayName`, `descriptors`,
+Registered in `shared/models/vizs/AvaVizConfig/AvaVizConfigs.ts`. Every type
+implements `IAvaVizConfigModule`: `displayName`, `descriptors`,
 `makeEmptyConfig`, `hydrateFromQuery`, `hydrateFromQueryResult`,
 `convertVizConfig`.
 
 | Type | Config | Renderer | Library |
 | --- | --- | --- | --- |
-| `table` | `TableVizConfig` (no settings) | `DataGrid` | AG Grid (`themeMaterial`, Avandar-themed) |
-| `bar` | `BarChartVizConfig` | `BarChart` | Mantine Charts `BarChart` |
-| `line` | `LineChartVizConfig` | `LineChart` | Mantine Charts `LineChart` |
-| `area` | `AreaChartVizConfig` | `AreaChart` | Recharts directly (documented Mantine wrapper bug) |
-| `scatter` | `ScatterPlotVizConfig` | `ScatterChart` | Mantine Charts `ScatterChart` |
-| `pie` | `PieChartVizConfig` | `PieChart` / `DonutChart` | Mantine Charts |
-| `funnel` | `FunnelChartVizConfig` | `FunnelChart` | Mantine Charts |
-| `radar` | `RadarChartVizConfig` | `RadarChart` | Mantine Charts |
-| `bubble` | `BubbleChartVizConfig` | `BubbleChart` | Recharts directly (multi-series, Excel parity) |
+| `table` | `AvaTableVizConfig` (no settings) | `DataGrid` | AG Grid (`themeMaterial`, Avandar-themed) |
+| `bar` | `AvaBarChartVizConfig` | `BarChart` | Mantine Charts `BarChart` |
+| `line` | `AvaLineChartVizConfig` | `LineChart` | Mantine Charts `LineChart` |
+| `area` | `AvaAreaChartVizConfig` | `AreaChart` | Recharts directly (documented Mantine wrapper bug) |
+| `scatter` | `AvaScatterPlotVizConfig` | `ScatterChart` | Mantine Charts `ScatterChart` |
+| `pie` | `AvaPieChartVizConfig` | `PieChart` / `DonutChart` | Mantine Charts |
+| `funnel` | `AvaFunnelChartVizConfig` | `FunnelChart` | Mantine Charts |
+| `radar` | `AvaRadarChartVizConfig` | `RadarChart` | Mantine Charts |
+| `bubble` | `AvaBubbleChartVizConfig` | `BubbleChart` | Recharts directly (multi-series, Excel parity) |
 
 ### 2.1 Multi-series model
 
 `shared/models/vizs/SeriesConfig.ts` defines five series shapes:
 
-- **`BarSeries`** — `renderAs: "bar"`, `key`, `label?`, `color?`,
+- **`AvaBarSeries`** — `renderAs: "bar"`, `key`, `label?`, `color?`,
   `fillOpacity?`, `stackId?`
-- **`LineSeries`** — `renderAs: "line"`, `key`, `label?`, `color?`,
+- **`AvaLineSeries`** — `renderAs: "line"`, `key`, `label?`, `color?`,
   `curveType?`, `strokeWidth?`, `withDots?`
-- **`AreaSeries`** — `renderAs: "area"`, `key`, `label?`, `color?`,
+- **`AvaAreaSeries`** — `renderAs: "area"`, `key`, `label?`, `color?`,
   `curveType?`, `strokeWidth?`, `fillOpacity?`, `withDots?`
-- **`RadarSeries`** — `key`, `label?`, `color?`, `strokeWidth?`,
+- **`AvaRadarSeries`** — `key`, `label?`, `color?`, `strokeWidth?`,
   `fillOpacity?` (no `renderAs`; radar does not compose)
-- **`ScatterSeries`** — `key` (Y), `xKey`, `label?`, `color?`; **`BubbleSeries`**
+- **`AvaScatterSeries`** — `key` (Y), `xKey`, `label?`, `color?`; **`AvaBubbleSeries`**
   extends it with `sizeKey`
 
 **Composable hosts.** `bar` / `line` / `area` are hosts that accept any
-`XYSeries`. When any series' `renderAs` differs from the host `vizType`, the
+`AvaXYSeries`. When any series' `renderAs` differs from the host `vizType`, the
 wrapper falls back to `renderXYComposite` (Mantine `CompositeChart`), which
 applies per-series `barProps` / `lineProps` / `areaProps`. A line series can
 live inside a bar host and vice versa.
@@ -77,13 +77,13 @@ share one canvas.
 
 ### 2.2 Chart-level layout and style
 
-- `BarChartVizConfig.layout`: `group` | `stack` | `percent`
-- `AreaChartVizConfig.layout`: `default` (overlapping) | `stacked` |
+- `AvaBarChartVizConfig.layout`: `group` | `stack` | `percent`
+- `AvaAreaChartVizConfig.layout`: `default` (overlapping) | `stacked` |
   `percent` | `split` (+/-)
-- `PieChartVizConfig`: `isDonut`, `withLabels`, `labelsType`
+- `AvaPieChartVizConfig`: `isDonut`, `withLabels`, `labelsType`
   (`value` | `percent`), `seriesColors` (per-slice override, keyed by slice
   name)
-- `FunnelChartVizConfig`: `seriesColors` per step
+- `AvaFunnelChartVizConfig`: `seriesColors` per step
 - `withLegend` on bar / line / area / radar
 - `ChartStyle` (`shared/models/vizs/ChartStyle.types.ts`), host-only and
   deliberately **not** composable:
@@ -216,7 +216,7 @@ All series descriptors above are `composable: true`.
 ### 3.4 Form components
 
 - **`VizSettingsForm`** — viz type `Select` (labels from
-  `VizConfigs.getDisplayName`) + `VizSettingsFormBody`
+  `AvaVizConfigs.getDisplayName`) + `VizSettingsFormBody`
 - **`VizSettingsFormBody`** — dispatches per `vizType`; returns `null` for
   table
 - **`SeriesAwareVizForm`** — the shared descriptor-driven form for bar /
@@ -254,7 +254,7 @@ the Data Explorer sidebar and in the dashboard editor's Puck side panel.
 
 ### 3.5 Config hydration and type conversion
 
-- **`VizConfigs.convertVizConfig`** — every type converts to every other
+- **`AvaVizConfigs.convertVizConfig`** — every type converts to every other
   type, preserving as much as possible (e.g. bubble → scatter drops
   `sizeKey`; funnel → area carries the value column and its slice color into
   a single area series).
@@ -265,7 +265,7 @@ the Data Explorer sidebar and in the dashboard editor's Puck side panel.
 - **`hydrateFromQueryResult`** — seeds from executed-result column metadata;
   prunes series referencing missing columns and seeds from the first N
   numeric columns when empty.
-- **`applyVizConfigFromQueryResult`** — reconciles a persisted config against
+- **`applyAvaVizConfigFromQueryResult`** — reconciles a persisted config against
   the latest result columns. Keys pass through `resolveColumnKey` (exact
   match wins, case-insensitive match falls back to the canonical name,
   unresolved keys are dropped), then result hydration runs only when
@@ -384,7 +384,7 @@ Grouped into three editor categories.
    from each filter's `defaultValue` and stale overrides dropped).
 3. Composes SQL through `useApplyDashboardFiltersToSql`.
 4. Executes via `useDataQuery` (workspace-authed or public-authed).
-5. Derives date columns, runs `applyVizConfigFromQueryResult`, and renders
+5. Derives date columns, runs `applyAvaVizConfigFromQueryResult`, and renders
    `VisualizationContainer` in a fixed 420px-high box with a
    `LoadingOverlay`.
 6. Empty states: "Add a prompt and generate SQL…" when the prompt is empty;
@@ -513,7 +513,7 @@ SELECT * FROM (<original sql>) AS _ava_filtered WHERE <clauses AND …>
 - `buildPendingDashboardBlock` converts a `ChatGeneratedDashboardBlock` into
   a Puck content item, minting a `{type}-{uuid}` id, seeding a `generations`
   history entry for DataViz, and defaulting the viz config via
-  `VizConfigs.makeEmptyConfig`.
+  `AvaVizConfigs.makeEmptyConfig`.
 - Appended blocks emit `dashboard.block_added_via_chat`.
 - `buildPendingDataVizBlock` remains as a deprecated shim over
   `buildPendingDashboardBlock`.
@@ -794,7 +794,7 @@ data is stored directly, and the type is flagged for removal.
 modules (`computeValueExtent`, `needsValueExtent`, `toExtentSeries`,
 `getAreaStacking`, `resolveAxisScale`, `resolveTickRotation`),
 `getAxisRoles`, `makeAxisDescriptors`,
-`applyVizConfigFromQueryResult`, `shouldHydrateVizFromQueryResult`,
+`applyAvaVizConfigFromQueryResult`, `shouldHydrateVizFromQueryResult`,
 `resolveColumnKey`, all `hydrate*FromQuery*` helpers,
 `DashboardEditorView`, `DashboardEditorStateManager`, `DataVizPBlock`,
 `DataVizFilters`, `resolveDataVizPBlockProps`, `buildPendingDashboardBlock`,

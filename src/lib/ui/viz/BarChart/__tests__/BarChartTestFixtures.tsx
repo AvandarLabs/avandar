@@ -12,9 +12,9 @@ import { render } from "@/test-utils";
  * "changing a control updates the config"; these tests prove
  * "changing a config setting updates what the chart renders".
  */
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 
-type BarChartVizConfig = Extract<VizConfig.ColNameBound, { vizType: "bar" }>;
+type AvaBarChartVizConfig = Extract<UiVizConfig, { vizType: "bar" }>;
 
 const mantineBarChartMock = vi.fn();
 
@@ -55,7 +55,7 @@ beforeEach(() => {
   mantineCompositeChartMock.mockClear();
 });
 
-function renderBar(config: BarChartVizConfig): void {
+function renderBar(config: AvaBarChartVizConfig): void {
   render(
     <AvandarAppProvider>
       <BarChart
@@ -71,7 +71,7 @@ function renderBar(config: BarChartVizConfig): void {
   );
 }
 
-const BAR_BASELINE: BarChartVizConfig = {
+const BAR_BASELINE: AvaBarChartVizConfig = {
   vizType: "bar",
   xAxisKey: "x",
   series: [{ renderAs: "bar", key: "v" }],

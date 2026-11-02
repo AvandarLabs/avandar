@@ -14,7 +14,7 @@ import { act, renderHook } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
 import type { RenderHookResult } from "@testing-library/react";
 import type { ReactNode } from "react";
 
@@ -23,7 +23,7 @@ const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "revenue" as QueryColumn.Id, name: "revenue", dataType: "double" },
 ];
 
-const STYLED_BAR_CONFIG: BarChartVizConfig = {
+const STYLED_BAR_CONFIG: AvaBarChartVizConfig = {
   vizType: "bar",
   xAxisKey: "quarter" as QueryColumn.Id,
   series: [{ renderAs: "bar", key: "revenue" as QueryColumn.Id }],
@@ -93,7 +93,8 @@ describe("Data Explorer viz config memory", () => {
       result.current[1].setActiveVizType("bar");
     });
 
-    const restoredVizConfig = result.current[0].vizConfig as BarChartVizConfig;
+    const restoredVizConfig = result.current[0]
+      .vizConfig as AvaBarChartVizConfig;
     expect(restoredVizConfig.chartStyle?.legend?.position).toBe("left");
     expect(restoredVizConfig.chartStyle?.grid?.color).toBe("#e0e0e0");
     expect(restoredVizConfig.layout).toBe("stack");
@@ -189,7 +190,8 @@ describe("Data Explorer viz config memory", () => {
       result.current[1].setActiveVizType("bar");
     });
 
-    const restoredVizConfig = result.current[0].vizConfig as BarChartVizConfig;
+    const restoredVizConfig = result.current[0]
+      .vizConfig as AvaBarChartVizConfig;
 
     // The missing selection remains owned until explicit repair.
     const seriesKeys = restoredVizConfig.series.map((entry) => {

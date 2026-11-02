@@ -4,7 +4,7 @@ import {
   EXPLORER_FILTER_SQL,
 } from "../Explorer.constants";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
 
 export type ExplorerMode = "filter" | "query" | "chart" | "full";
 
@@ -37,7 +37,7 @@ export const aggregateColumns = [
  * The bar chart config shown once the stage reaches its chart/visualizations
  * phase.
  */
-export const barConfig: BarChartVizConfig = {
+export const barConfig: AvaBarChartVizConfig = {
   vizType: "bar",
   xAxisKey: "film-district" as QueryColumn.Id,
   series: [{ key: "film-cases" as QueryColumn.Id, renderAs: "bar" }],

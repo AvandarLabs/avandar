@@ -2,12 +2,12 @@ import { isDefined, prop } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 
 type Options = {
   rawSql: string | undefined;
   query: PartialStructuredQuery;
-  vizConfig: VizConfig;
+  vizConfig: AvaVizConfig;
   /** Column `name` values from the current `QueryResult`. */
   resultColumnNames: ReadonlySet<string>;
 };
@@ -86,7 +86,7 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
  * (e.g. a bar chart with an X axis but no series), so callers should
  * re-hydrate from the result columns instead of preserving the config.
  */
-function _hasMinimumRequiredKeys(vizConfig: VizConfig): boolean {
+function _hasMinimumRequiredKeys(vizConfig: AvaVizConfig): boolean {
   return match(vizConfig)
     .with({ vizType: "table" }, () => {
       return true;
@@ -116,7 +116,7 @@ function _hasMinimumRequiredKeys(vizConfig: VizConfig): boolean {
  * data binding. For series-array hosts (bar / line / area / radar) the
  * x or name axis plus every series key is included.
  */
-function _getKeysToValidate(vizConfig: VizConfig): string[] {
+function _getKeysToValidate(vizConfig: AvaVizConfig): string[] {
   return match(vizConfig)
     .with({ vizType: "table" }, () => {
       return [];

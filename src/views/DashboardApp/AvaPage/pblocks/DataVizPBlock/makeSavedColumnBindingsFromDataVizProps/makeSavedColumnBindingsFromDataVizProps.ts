@@ -1,13 +1,13 @@
 import { isDefined, prop } from "@avandar/utils";
 import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryResultColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
-import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig";
-import { makeVizConfigFromColNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromColNameBoundVizConfig/makeVizConfigFromColNameBoundVizConfig";
+import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   QueryResultColumnBindingIssue,
   QueryResultColumnBindings,
 } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type {
   LegacyLocalFilter,
   LocalFilter,
@@ -17,7 +17,7 @@ import type { DataVizColumnBindingProps } from "./makeSavedColumnBindingsFromDat
 export type { DataVizColumnBindingProps } from "./makeSavedColumnBindingsFromDataVizProps.types";
 type SavedDataVizColumnBindings = {
   props: DataVizColumnBindingProps;
-  runtimeConfig: VizConfig.T;
+  runtimeConfig: AvaVizConfig.T;
   issues: QueryResultColumnBindingIssue[];
   localFilters: readonly LocalFilter[];
 };
@@ -71,13 +71,13 @@ export function makeSavedColumnBindingsFromDataVizProps({
       props: { ...props, columnBindings: schema.registry },
       runtimeConfig: props.vizConfig,
       localFilters: props.localFilters,
-      issues: makeColNameBoundVizConfigFromVizConfig({
+      issues: makeUiVizConfigFromAvaVizConfig({
         config: props.vizConfig,
         columns: schema.columns,
       }).issues,
     };
   }
-  const vizConfigConversion = makeVizConfigFromColNameBoundVizConfig({
+  const vizConfigConversion = makeAvaVizConfigFromUiVizConfig({
     config: props.vizConfig,
     columns: schema.columns,
   });

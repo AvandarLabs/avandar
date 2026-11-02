@@ -7,7 +7,7 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
+import type { AvaFunnelChartVizConfig } from "$/models/vizs/AvaFunnelChartVizConfig/AvaFunnelChartVizConfig.types";
 import type {
   SettingsColumnGroup,
   SettingsColumnsLayout,
@@ -16,9 +16,9 @@ import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
   fields: readonly QueryResult.ColumnWithId[];
-  config: FunnelChartVizConfig;
+  config: AvaFunnelChartVizConfig;
   data: UnknownDataFrame;
-  onConfigChange: (newConfig: FunnelChartVizConfig) => void;
+  onConfigChange: (newConfig: AvaFunnelChartVizConfig) => void;
 
   /** How the setting groups are arranged. Defaults to a vertical stack. */
   layout?: SettingsColumnsLayout;

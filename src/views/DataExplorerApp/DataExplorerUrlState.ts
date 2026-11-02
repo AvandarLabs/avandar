@@ -6,10 +6,10 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import { makeColNameBoundVizConfigFromVizConfig } from "$/models/vizs/makeColNameBoundVizConfigFromVizConfig/makeColNameBoundVizConfigFromVizConfig";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
@@ -26,7 +26,7 @@ import type {
  *   &agg=<colName>:<aggregationType>,...
  *   &orderBy=<colName>&orderDir=asc|desc
  *   &sql=<rawSql>
- *   &vc=<JSON-stringified VizConfig> (omitted when viz is the default table)
+ *   &vc=<JSON-stringified AvaVizConfig> (omitted when viz is the default table)
  *
  * `vc` references columns by `QueryResult` column name, never by column ID.
  * A URL has no column binding registry, so the IDs of one session mean
@@ -62,7 +62,7 @@ export type ParsedUrlState = {
   orderByColName?: string;
   orderDir?: OrderByDirection;
   rawSql?: string;
-  vizConfig?: VizConfig.ColNameBound;
+  vizConfig?: UiVizConfig;
   openDataset?: OpenDatasetInfo;
 };
 
@@ -116,7 +116,7 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
 
   if (search.vc) {
     try {
-      result.vizConfig = JSON.parse(search.vc) as VizConfig.ColNameBound;
+      result.vizConfig = JSON.parse(search.vc) as UiVizConfig;
     } catch {
       // Ignore malformed JSON — the viz will fall back to defaults.
     }
@@ -157,12 +157,10 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
  * Otherwise each column ID maps to its name in the latest result, and a slot
  * whose column is absent from that result is left out.
  */
-function _getColNameBoundVizConfig(
-  state: DataExplorerAppState,
-): VizConfig.ColNameBound {
+function _getUiVizConfig(state: DataExplorerAppState): UiVizConfig {
   return (
     state.pendingUrlVizConfig ??
-    makeColNameBoundVizConfigFromVizConfig({
+    makeUiVizConfigFromAvaVizConfig({
       config: state.vizConfig,
       columns: state.lastResultColumns ?? [],
     }).config
@@ -227,7 +225,7 @@ export function serializeStateToUrl(
   // query string could never clear in one action.
   try {
     if (vizConfig.vizType !== "table") {
-      params.vc = JSON.stringify(_getColNameBoundVizConfig(state));
+      params.vc = JSON.stringify(_getUiVizConfig(state));
     }
   } catch {
     // Ignore — viz config will fall back to defaults on next load.

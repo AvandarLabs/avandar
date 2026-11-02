@@ -2,12 +2,12 @@ import { Model } from "@avandar/models";
 import { setValue } from "@avandar/utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import {
-  applyVizConfigFromQueryResult,
+  applyAvaVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
-} from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
-import { makeVizConfigFromColNameBoundVizConfig } from "$/models/vizs/makeVizConfigFromColNameBoundVizConfig/makeVizConfigFromColNameBoundVizConfig";
-import { remapProvisionalColumnIdsInVizConfig } from "$/models/vizs/remapProvisionalColumnIdsInVizConfig/remapProvisionalColumnIdsInVizConfig";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+} from "$/models/vizs/applyAvaVizConfigFromQueryResult/applyAvaVizConfigFromQueryResult";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig";
+import { remapProvisionalColumnIdsInAvaVizConfig } from "$/models/vizs/remapProvisionalColumnIdsInAvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import {
@@ -21,7 +21,8 @@ import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
@@ -71,7 +72,7 @@ export const DataExplorerStateManager = createAppStateManager({
         queryColumns: newQueryColumns,
         aggregations: newAggregations,
       } as StructuredQuery.Partial;
-      const newVizConfig = VizConfigs.hydrateFromQuery(vizConfig, newQuery);
+      const newVizConfig = AvaVizConfigs.hydrateFromQuery(vizConfig, newQuery);
       const next = applyQueryChange({ state, newQuery });
       return { ...next, vizConfig: newVizConfig };
     },
@@ -169,7 +170,7 @@ export const DataExplorerStateManager = createAppStateManager({
      */
     setActiveVizType: (
       state: DataExplorerAppState,
-      newVizType: VizConfig.Type,
+      newVizType: AvaVizConfig.Type,
     ) => {
       const { vizConfig, query, rawSql, vizConfigMemory, lastResultColumns } =
         state;
@@ -181,17 +182,17 @@ export const DataExplorerStateManager = createAppStateManager({
       const rememberedVizConfig = vizConfigMemory[newVizType];
       const initialVizConfig =
         rememberedVizConfig ??
-        VizConfigs.convertVizConfig(vizConfig, newVizType);
+        AvaVizConfigs.convertVizConfig(vizConfig, newVizType);
       const nextVizConfig =
         lastResultColumns !== undefined
-          ? applyVizConfigFromQueryResult({
+          ? applyAvaVizConfigFromQueryResult({
               vizConfig: initialVizConfig,
               rawSql,
               query,
               columns: lastResultColumns,
             })
           : rememberedVizConfig === undefined && state.isStructuredQueryInSync
-            ? VizConfigs.hydrateFromQuery(initialVizConfig, query)
+            ? AvaVizConfigs.hydrateFromQuery(initialVizConfig, query)
             : initialVizConfig;
 
       // TypeScript widens the computed union key to `string` and so cannot see
@@ -200,7 +201,7 @@ export const DataExplorerStateManager = createAppStateManager({
       const nextVizConfigMemory = {
         ...vizConfigMemory,
         [vizConfig.vizType]: vizConfig,
-      } as Partial<VizConfig.Registry>;
+      } as Partial<AvaVizConfig.Registry>;
 
       return {
         ...state,
@@ -217,11 +218,11 @@ export const DataExplorerStateManager = createAppStateManager({
      */
     restoreVizConfigFromUrl: (
       state: DataExplorerAppState,
-      urlVizConfig: VizConfig.ColNameBound,
+      urlVizConfig: UiVizConfig,
     ): DataExplorerAppState => {
       return {
         ...state,
-        vizConfig: VizConfigs.makeEmptyConfig(urlVizConfig.vizType),
+        vizConfig: AvaVizConfigs.makeEmptyConfig(urlVizConfig.vizType),
         pendingUrlVizConfig: urlVizConfig,
       };
     },
@@ -237,9 +238,9 @@ export const DataExplorerStateManager = createAppStateManager({
       columns: readonly QueryResult.ColumnWithId[],
     ) => {
       const { pendingUrlVizConfig } = state;
-      const next = applyVizConfigFromQueryResult({
+      const next = applyAvaVizConfigFromQueryResult({
         vizConfig: pendingUrlVizConfig
-          ? makeVizConfigFromColNameBoundVizConfig({
+          ? makeAvaVizConfigFromUiVizConfig({
               config: pendingUrlVizConfig,
               columns: columns,
             }).config
@@ -279,7 +280,7 @@ export const DataExplorerStateManager = createAppStateManager({
       if (!previous) {
         return { ...state, columnBindings };
       }
-      const vizConfig = remapProvisionalColumnIdsInVizConfig({
+      const vizConfig = remapProvisionalColumnIdsInAvaVizConfig({
         config: state.vizConfig,
         previous: previous,
         current: columnBindings,
@@ -288,19 +289,19 @@ export const DataExplorerStateManager = createAppStateManager({
         Object.entries(state.vizConfigMemory).map(([type, config]) => {
           return [
             type,
-            remapProvisionalColumnIdsInVizConfig({
+            remapProvisionalColumnIdsInAvaVizConfig({
               config: config,
               previous: previous,
               current: columnBindings,
             }),
           ];
         }),
-      ) as Partial<VizConfig.Registry>;
+      ) as Partial<AvaVizConfig.Registry>;
       return { ...state, columnBindings, vizConfig, vizConfigMemory };
     },
 
     /** Applies an explicit chart edit, replacing any URL-restored chart. */
-    setVizConfig: (state: DataExplorerAppState, vizConfig: VizConfig.T) => {
+    setVizConfig: (state: DataExplorerAppState, vizConfig: AvaVizConfig.T) => {
       // fill in the defaults
       return {
         ...setValue(state, "vizConfig", vizConfig),

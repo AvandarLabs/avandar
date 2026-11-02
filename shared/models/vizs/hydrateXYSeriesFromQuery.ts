@@ -1,11 +1,11 @@
 import { isNonEmptyArray } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { RenderAs, AvaXYSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type XYSeriesConfig = {
   xAxisKey: QueryColumn.Id | undefined;
-  series: readonly XYSeries[];
+  series: readonly AvaXYSeries[];
 };
 
 /**
@@ -21,7 +21,7 @@ export function hydrateXYSeriesFromQuery<VConfig extends XYSeriesConfig>(
 
   let nextXAxisKey = currVizConfig.xAxisKey;
 
-  let nextSeries: XYSeries[] = [...currVizConfig.series];
+  let nextSeries: AvaXYSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0 && isNonEmptyArray(queryColumns)) {
     const firstNumeric = queryColumns.find((col) => {
