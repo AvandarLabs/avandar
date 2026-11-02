@@ -2,13 +2,13 @@ import { RadarChart as MantineRadarChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { makeLegendPropsFromPosition } from "@/lib/ui/viz/legend/makeLegendPropsFromPosition/makeLegendPropsFromPosition";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { RadarSeries as AvaRadarSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
+import type { RadarSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
   data: UnknownDataFrame;
   nameKey: string;
-  series: readonly AvaRadarSeries[];
+  series: readonly RadarSeries[];
   height?: number | string;
   withLegend?: boolean;
   chartStyle?: ChartStyle;

@@ -14,7 +14,7 @@ import { render } from "@/test-utils";
  */
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 
-type AvaRadarChartVizConfig = Extract<UiVizConfig, { vizType: "radar" }>;
+type UiVizConfigRadar = Extract<UiVizConfig, { vizType: "radar" }>;
 
 const mantineRadarChartMock = vi.fn();
 
@@ -47,7 +47,7 @@ beforeEach(() => {
   mantineRadarChartMock.mockClear();
 });
 
-function renderRadar(config: AvaRadarChartVizConfig): void {
+function renderRadar(config: UiVizConfigRadar): void {
   render(
     <AvandarAppProvider>
       <RadarChart
@@ -61,7 +61,7 @@ function renderRadar(config: AvaRadarChartVizConfig): void {
   );
 }
 
-const RADAR_BASELINE: AvaRadarChartVizConfig = {
+const RADAR_BASELINE: UiVizConfigRadar = {
   vizType: "radar",
   nameKey: "x",
   series: [{ key: "v" }],

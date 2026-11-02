@@ -13,7 +13,7 @@ import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
  * "changing a control updates the config"; these tests prove
  * "changing a config setting updates what the chart renders".
  */
-import type { ScatterSeries as AvaScatterSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
+import type { ScatterSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { ReactNode } from "react";
 
 const rechartsXAxisMock = vi.fn();
@@ -84,7 +84,7 @@ beforeEach(() => {
 
 function _renderScatter(
   chartStyle?: ChartStyle,
-  series: AvaScatterSeries[] = [{ key: "w", xKey: "v" }],
+  series: ScatterSeries[] = [{ key: "w", xKey: "v" }],
 ): void {
   render(
     <AvandarAppProvider>

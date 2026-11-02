@@ -14,7 +14,7 @@ import { render } from "@/test-utils";
  */
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 
-type AvaBarChartVizConfig = Extract<UiVizConfig, { vizType: "bar" }>;
+type UiVizConfigBar = Extract<UiVizConfig, { vizType: "bar" }>;
 
 const mantineBarChartMock = vi.fn();
 
@@ -55,7 +55,7 @@ beforeEach(() => {
   mantineCompositeChartMock.mockClear();
 });
 
-function renderBar(config: AvaBarChartVizConfig): void {
+function renderBar(config: UiVizConfigBar): void {
   render(
     <AvandarAppProvider>
       <BarChart
@@ -71,7 +71,7 @@ function renderBar(config: AvaBarChartVizConfig): void {
   );
 }
 
-const BAR_BASELINE: AvaBarChartVizConfig = {
+const BAR_BASELINE: UiVizConfigBar = {
   vizType: "bar",
   xAxisKey: "x",
   series: [{ renderAs: "bar", key: "v" }],

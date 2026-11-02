@@ -23,14 +23,14 @@ import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyl
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { ScatterSeries as AvaScatterSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
+import type { ScatterSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ScatterChartSeries } from "@mantine/charts";
 
 type Props = {
   data: UnknownDataFrame;
   /** One entry per independent (X, Y) cloud of points. */
-  series: readonly AvaScatterSeries[];
+  series: readonly ScatterSeries[];
   height?: number | string;
   chartStyle?: ChartStyle;
 };

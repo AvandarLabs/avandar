@@ -6,7 +6,7 @@ import { useBarChartStyleProps } from "@/lib/ui/viz/axis/useBarChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { BarSeries as AvaBarSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
+import type { BarSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { BarProps } from "recharts";
 
@@ -93,7 +93,7 @@ export function BarChart({
     });
   }
 
-  const barSeries = series as readonly AvaBarSeries[];
+  const barSeries = series as readonly BarSeries[];
 
   // Mantine shares one label fill across both axes. Use Recharts labels to
   // preserve per-axis colors and reserve their margins.

@@ -14,7 +14,7 @@ import { render } from "@/test-utils";
  */
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 
-type AvaLineChartVizConfig = Extract<UiVizConfig, { vizType: "line" }>;
+type UiVizConfigLine = Extract<UiVizConfig, { vizType: "line" }>;
 
 const mantineLineChartMock = vi.fn();
 
@@ -47,7 +47,7 @@ beforeEach(() => {
   mantineLineChartMock.mockClear();
 });
 
-function renderLine(config: AvaLineChartVizConfig): void {
+function renderLine(config: UiVizConfigLine): void {
   render(
     <AvandarAppProvider>
       <LineChart
@@ -62,7 +62,7 @@ function renderLine(config: AvaLineChartVizConfig): void {
   );
 }
 
-const LINE_BASELINE: AvaLineChartVizConfig = {
+const LINE_BASELINE: UiVizConfigLine = {
   vizType: "line",
   xAxisKey: "x",
   series: [{ renderAs: "line", key: "v" }],

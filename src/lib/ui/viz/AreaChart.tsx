@@ -34,7 +34,7 @@ import { useAreaChartStyleProps } from "@/lib/ui/viz/axis/useAreaChartStyleProps
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { AreaSeries as AvaAreaSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
+import type { AreaSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 
@@ -132,7 +132,7 @@ export function AreaChart({
     });
   }
 
-  const areaSeries = series as readonly AvaAreaSeries[];
+  const areaSeries = series as readonly AreaSeries[];
   // Same value the extent calculation bucketed by, so the drawn stacks
   // and the resolved domain can never disagree.
   const { sharedStackId } = getAreaStackingFromLayout(layout);

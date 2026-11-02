@@ -1,5 +1,5 @@
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { XYSeries as AvaXYSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
+import type { XYSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
 
 /**
@@ -11,7 +11,7 @@ import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
 export type XYChartProps = {
   data: UnknownDataFrame;
   xAxisKey: string;
-  series: readonly AvaXYSeries[];
+  series: readonly XYSeries[];
   height: number | string;
   withLegend?: boolean;
   chartStyle?: ChartStyle;
