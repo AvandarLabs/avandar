@@ -10,23 +10,6 @@ import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryRes
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactNode } from "react";
 
-type OpenSaveAsNewDatasetModalOptions = {
-  dateColumns: ReadonlySet<string>;
-  queryResultColumns: readonly QueryResult.Column[];
-  queryResultData: UnknownDataFrame;
-  savableSql: string;
-  title: string;
-};
-
-type OpenSaveToDashboardModalOptions = {
-  columnBindings: QueryResultColumnBindingRegistry;
-  forceCreateMode: boolean;
-  nlPrompt: string | undefined;
-  savableSql: string;
-  vizConfig: ReturnType<typeof DataExplorerStateManager.useState>["vizConfig"];
-  workspaceSlug: string;
-};
-
 type Props = {
   savableSql: string;
   queryResultData: UnknownDataFrame;
@@ -38,9 +21,13 @@ type Props = {
   shouldForceCreateMode: boolean;
 };
 
-function _openSaveAsNewDatasetModal(
-  options: OpenSaveAsNewDatasetModalOptions,
-): void {
+function _openSaveAsNewDatasetModal(options: {
+  dateColumns: ReadonlySet<string>;
+  queryResultColumns: readonly QueryResult.Column[];
+  queryResultData: UnknownDataFrame;
+  savableSql: string;
+  title: string;
+}): void {
   const modalId = modals.open({
     title: options.title,
     size: "xl",
@@ -58,9 +45,14 @@ function _openSaveAsNewDatasetModal(
   });
 }
 
-function _openSaveToDashboardModal(
-  options: OpenSaveToDashboardModalOptions,
-): void {
+function _openSaveToDashboardModal(options: {
+  columnBindings: QueryResultColumnBindingRegistry;
+  forceCreateMode: boolean;
+  nlPrompt: string | undefined;
+  savableSql: string;
+  vizConfig: ReturnType<typeof DataExplorerStateManager.useState>["vizConfig"];
+  workspaceSlug: string;
+}): void {
   const modalId = modals.open({
     withCloseButton: true,
     size: "lg",
