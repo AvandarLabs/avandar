@@ -122,10 +122,17 @@ DuckDbClient/
     DuckDbClient.ownership.fixtures.ts
 ```
 
-The trigger is two or more `{ModuleName}.*test.ts` files for the same module in
-one directory, where the module name is the filename up to the first dot.
-`DuckDbClient.test.ts` and `DuckDbClient.leasing.test.ts` are two files for
-`DuckDbClient`; they belong together.
+The trigger is two or more **test-related files** for the same module in one
+directory. A test-related file is a `{ModuleName}.*test.ts(x)` file, or any
+file used exclusively by tests: a `*Fixtures.ts(x)` or `*.fixtures.ts(x)`
+file, stub, scenario builder, or test wrapper. The module name is the filename
+up to the first dot (or, for a fixtures file, the name without the
+`TestFixtures`/`Fixtures` suffix). `DuckDbClient.test.ts` and
+`DuckDbClient.leasing.test.ts` are two files for `DuckDbClient`. So are
+`BarChart.props.test.tsx` and `BarChartTestFixtures.tsx`: one test plus its
+fixtures is already two, so both move into `__tests__/`.
+
+Only a lone test file with no test-only helpers stays beside its module.
 
 Anything used **exclusively** by those tests moves in too: fixtures, stubs,
 scenario builders, custom assertions. If a helper has even one non-test
@@ -168,3 +175,16 @@ find src shared packages apps -type f \( -name '*.test.ts' -o -name '*.test.tsx'
 
 Each row is a directory holding that many split test files for one module, and
 every row is a violation.
+
+That script only counts test files. Also look for fixtures that sit beside a
+test outside `__tests__/`:
+
+```bash
+find src shared packages apps -type f \
+  \( -name '*Fixtures.ts' -o -name '*Fixtures.tsx' -o -name '*.fixtures.ts' \) \
+  -not -path '*/node_modules/*' -not -path '*/__tests__/*'
+```
+
+Every hit whose directory also holds a test for the same module is a
+violation. A fixtures file shared by tests of several modules belongs at their
+lowest common ancestor instead (see integration tests above).

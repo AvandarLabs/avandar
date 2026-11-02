@@ -10,14 +10,14 @@ import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataL
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
 import { AreaChart } from "@/lib/ui/viz/AreaChart";
-import { BarChart } from "@/lib/ui/viz/BarChart";
+import { BarChart } from "@/lib/ui/viz/BarChart/BarChart";
 import { BubbleChart } from "@/lib/ui/viz/BubbleChart";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { FunnelChart } from "@/lib/ui/viz/FunnelChart";
-import { LineChart } from "@/lib/ui/viz/LineChart";
+import { LineChart } from "@/lib/ui/viz/LineChart/LineChart";
 import { PieChart } from "@/lib/ui/viz/PieChart";
-import { RadarChart } from "@/lib/ui/viz/RadarChart";
-import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
+import { RadarChart } from "@/lib/ui/viz/RadarChart/RadarChart";
+import { ScatterChart } from "@/lib/ui/viz/ScatterChart/ScatterChart";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 

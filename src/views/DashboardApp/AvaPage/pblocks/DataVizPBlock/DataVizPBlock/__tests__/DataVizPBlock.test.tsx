@@ -3,13 +3,13 @@ import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { screen } from "@/test-utils";
-import { upgradeAvaPageData } from "../../../utils/upgradeAvaPageData";
-import { useDataVizPBlockConfig } from "../useDataVizPBlockConfig";
+import { upgradeAvaPageData } from "../../../../utils/upgradeAvaPageData";
+import { useDataVizPBlockConfig } from "../../useDataVizPBlockConfig";
 import { createDataVizTestWrapper } from "./createDataVizTestWrapper";
 import { DataVizPBlockTestFixtures } from "./DataVizPBlockTestFixtures";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { Props } from "./DataVizPBlock";
+import type { Props } from "../DataVizPBlock";
 
 const { useDataQueryMock } = vi.hoisted<{
   useDataQueryMock: ReturnType<typeof vi.fn>;

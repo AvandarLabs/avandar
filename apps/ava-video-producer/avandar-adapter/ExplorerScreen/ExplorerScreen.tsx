@@ -15,7 +15,7 @@ import { CanvasDrawerContext } from "@/components/CanvasDrawer/CanvasDrawerConte
 import { CanvasDrawerResizeHandle } from "@/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
-import { BarChart } from "@/lib/ui/viz/BarChart";
+import { BarChart } from "@/lib/ui/viz/BarChart/BarChart";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { AppliedFilterSummary } from "@/views/DataExplorerApp/AppliedFilterSummary/AppliedFilterSummary";
 import railCss from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.module.css";

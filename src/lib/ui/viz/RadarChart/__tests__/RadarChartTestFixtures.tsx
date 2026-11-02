@@ -1,6 +1,6 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { RadarChart } from "@/lib/ui/viz/RadarChart";
+import { RadarChart } from "@/lib/ui/viz/RadarChart/RadarChart";
 import { render } from "@/test-utils";
 /**
  * Renderer-level prop verification for the series-aware chart wrappers.

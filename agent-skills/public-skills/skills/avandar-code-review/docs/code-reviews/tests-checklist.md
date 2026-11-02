@@ -131,16 +131,22 @@ reach a precondition, move it into setup before the page loads; if a distinct
 label is only needed to disambiguate, make the entity the only one of its kind
 and select it by position/id instead of renaming it mid-test.
 
-- Always move a module's test files into a `__tests__/` directory once two or
-  more of them share a module name in the same directory. A module keeps its
-  test beside it while there is one file; a split suite scattered across the
-  module directory buries the production files among its own tests. The module
-  name is the filename up to the first dot, so `DuckDbClient.test.ts` and
-  `DuckDbClient.leasing.test.ts` are two files for `DuckDbClient`.
+- Always move a module's test-related files into a `__tests__/` directory once
+  two or more of them share a module name in the same directory. Count test
+  files **and** test-only helpers (`*Fixtures.ts(x)`, `*.fixtures.ts`, stubs,
+  scenario builders, test wrappers) together. A module keeps its test beside it
+  only when the test is the lone test-related file; a split suite scattered
+  across the module directory buries the production files among its own tests.
+  The module name is the filename up to the first dot, so `DuckDbClient.test.ts`
+  and `DuckDbClient.leasing.test.ts` are two files for `DuckDbClient`, and so
+  are `BarChart.props.test.tsx` and `BarChartTestFixtures.tsx`. A test plus a
+  fixtures file is already a split suite: flag it.
 
   Anything used **exclusively** by those tests moves in with them: fixtures,
   stubs, scenario builders, custom assertions. Exceptions: 1) a helper with
-  even one non-test importer stays outside, because it is production code; 2) a single test file stays colocated with its module.
+  even one non-test importer stays outside, because it is production code;
+  2) a lone test file with no test-only helpers stays colocated with its
+  module.
 
   **Find candidates** (a directory with 2+ split tests for one module):
 

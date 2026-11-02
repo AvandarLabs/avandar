@@ -138,7 +138,7 @@ vi.mock("@/views/DataExplorerApp/useDataQuery/useDataQuery", async () => {
     },
   };
 });
-vi.mock("@/lib/ui/viz/BarChart", () => {
+vi.mock("@/lib/ui/viz/BarChart/BarChart", () => {
   return {
     BarChart: ({ xAxisKey, series }: BarChartProps) => {
       return (
@@ -149,7 +149,7 @@ vi.mock("@/lib/ui/viz/BarChart", () => {
     },
   };
 });
-vi.mock("@/lib/ui/viz/LineChart", () => {
+vi.mock("@/lib/ui/viz/LineChart/LineChart", () => {
   return {
     LineChart: () => {
       return <output data-testid="line-chart" />;

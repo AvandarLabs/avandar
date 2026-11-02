@@ -1,6 +1,6 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { BarChart } from "@/lib/ui/viz/BarChart";
+import { LineChart } from "@/lib/ui/viz/LineChart/LineChart";
 import { render } from "@/test-utils";
 /**
  * Renderer-level prop verification for the series-aware chart wrappers.
@@ -14,23 +14,17 @@ import { render } from "@/test-utils";
  */
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
-type BarChartVizConfig = Extract<VizConfig.ColNameBound, { vizType: "bar" }>;
+type LineChartVizConfig = Extract<VizConfig.ColNameBound, { vizType: "line" }>;
 
-const mantineBarChartMock = vi.fn();
-
-const mantineCompositeChartMock = vi.fn();
+const mantineLineChartMock = vi.fn();
 
 vi.mock("@mantine/charts", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@mantine/charts")>();
   return {
     ...actual,
-    BarChart: (props: unknown) => {
-      mantineBarChartMock(props);
-      return <div data-testid="mantine-bar" />;
-    },
-    CompositeChart: (props: unknown) => {
-      mantineCompositeChartMock(props);
-      return <div data-testid="mantine-composite" />;
+    LineChart: (props: unknown) => {
+      mantineLineChartMock(props);
+      return <div data-testid="mantine-line" />;
     },
   };
 });
@@ -50,20 +44,17 @@ function lastProps<T>(mock: ReturnType<typeof vi.fn>): T {
 }
 
 beforeEach(() => {
-  mantineBarChartMock.mockClear();
-
-  mantineCompositeChartMock.mockClear();
+  mantineLineChartMock.mockClear();
 });
 
-function renderBar(config: BarChartVizConfig): void {
+function renderLine(config: LineChartVizConfig): void {
   render(
     <AvandarAppProvider>
-      <BarChart
+      <LineChart
         data={DATA}
         height={400}
         xAxisKey={config.xAxisKey ?? "x"}
         series={config.series}
-        layout={config.layout}
         withLegend={config.withLegend}
         chartStyle={config.chartStyle}
       />
@@ -71,24 +62,19 @@ function renderBar(config: BarChartVizConfig): void {
   );
 }
 
-const BAR_BASELINE: BarChartVizConfig = {
-  vizType: "bar",
+const LINE_BASELINE: LineChartVizConfig = {
+  vizType: "line",
   xAxisKey: "x",
-  series: [{ renderAs: "bar", key: "v" }],
-  layout: "group",
+  series: [{ renderAs: "line", key: "v" }],
   withLegend: true,
 };
 
-/** Shared setup and fixtures for BarChartTestFixtures. */
-export const BarChartTestFixtures = {
+/** Shared setup and fixtures for LineChartTestFixtures. */
+export const LineChartTestFixtures = {
   expect,
   it,
-  AvandarAppProvider,
-  BarChart,
-  render,
-  mantineBarChartMock,
-  mantineCompositeChartMock,
+  mantineLineChartMock,
   lastProps,
-  renderBar,
-  BAR_BASELINE,
+  renderLine,
+  LINE_BASELINE,
 };

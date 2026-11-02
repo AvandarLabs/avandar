@@ -39,7 +39,7 @@ vi.mock("@/lib/ui/viz/DataGrid", () => {
   };
 });
 
-vi.mock("@/lib/ui/viz/BarChart", () => {
+vi.mock("@/lib/ui/viz/BarChart/BarChart", () => {
   return {
     BarChart: (props: {
       xAxisKey?: string;
@@ -58,7 +58,7 @@ vi.mock("@/lib/ui/viz/BarChart", () => {
   };
 });
 
-vi.mock("@/lib/ui/viz/LineChart", () => {
+vi.mock("@/lib/ui/viz/LineChart/LineChart", () => {
   return {
     LineChart: (props: {
       xAxisKey?: string;
@@ -92,7 +92,7 @@ vi.mock("@/lib/ui/viz/AreaChart", () => {
   };
 });
 
-vi.mock("@/lib/ui/viz/ScatterChart", () => {
+vi.mock("@/lib/ui/viz/ScatterChart/ScatterChart", () => {
   return {
     ScatterChart: (props: {
       series?: ReadonlyArray<{ xKey: string; key: string }>;
@@ -136,7 +136,7 @@ vi.mock("@/lib/ui/viz/FunnelChart", () => {
   };
 });
 
-vi.mock("@/lib/ui/viz/RadarChart", () => {
+vi.mock("@/lib/ui/viz/RadarChart/RadarChart", () => {
   return {
     RadarChart: (props: {
       nameKey?: string;

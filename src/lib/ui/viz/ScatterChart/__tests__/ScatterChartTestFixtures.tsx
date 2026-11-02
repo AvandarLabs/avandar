@@ -1,6 +1,6 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
+import { ScatterChart } from "@/lib/ui/viz/ScatterChart/ScatterChart";
 import { render } from "@/test-utils";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 /**

@@ -1,4 +1,4 @@
-import type { DataVizColumnBindingsOptions } from "../DataVizColumnBindings";
+import type { DataVizColumnBindingsOptions } from "../../DataVizColumnBindings";
 
 type Props = { children: ReactNode };
 
@@ -12,7 +12,7 @@ import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultCo
 import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
 import { makeColumnBindingsFromDashboardFilters } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
-import { useDataVizColumnBindings } from "./useDataVizColumnBindings";
+import { useDataVizColumnBindings } from "../useDataVizColumnBindings";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
