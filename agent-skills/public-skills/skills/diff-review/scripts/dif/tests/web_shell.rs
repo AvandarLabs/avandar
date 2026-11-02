@@ -40,6 +40,26 @@ fn free_port() -> u16 {
 }
 
 #[test]
+fn meta_json_counts_difit_restarts_so_an_open_tab_reloads_itself() {
+    let shell_port = free_port();
+    let mut shell = start_develop_shell(free_port(), shell_port, channels());
+    std::thread::sleep(Duration::from_millis(50));
+    let restarts = || -> serde_json::Value {
+        let meta: serde_json::Value =
+            ureq::get(&format!("http://127.0.0.1:{shell_port}/__wrap/meta.json"))
+                .call()
+                .unwrap()
+                .into_json()
+                .unwrap();
+        meta["difitRestarts"].clone()
+    };
+    assert_eq!(restarts(), 0);
+    shell.note_difit_restart();
+    assert_eq!(restarts(), 1);
+    shell.shutdown();
+}
+
+#[test]
 fn serves_shell_assets_and_fails_soft_without_difit() {
     let shell_port = free_port();
     // Nothing is listening on this port, so proxied routes must 502, not hang.
@@ -68,6 +88,11 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     assert!(
         html.contains("id=\"brandTitle\""),
         "serves the shell document"
+    );
+    assert_eq!(
+        html.matches(" title=\"").count(),
+        1,
+        "only the iframe keeps a native title (its accessible name); every other hint uses the shell's styled tooltip"
     );
 
     // meta.json carries the branch + worktree pill decision.
@@ -113,6 +138,25 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
         css_text
             .contains(".files {\n  max-height: 45vh;\n  overflow-y: auto;\n  overflow-x: hidden;"),
         "expanded group file lists should scroll independently"
+    );
+    assert!(
+        css_text.contains(".tb-left {\n  display: flex;\n  align-items: center;\n  gap: 9px;\n  min-width: 0;\n  width: 100%;"),
+        "the header's left column must fill only its grid track, so it never runs under the centered view title"
+    );
+    assert!(
+        css_text.contains(
+            ".gh-bar {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  flex: 1 1 auto;"
+        ),
+        "the GitHub bar takes the header's free space and keeps its buttons whole"
+    );
+    assert!(
+        css_text.contains("  flex: 1 1 0;\n  width: 0;\n  max-width: 340px;"),
+        "a long GitHub notice only fills leftover space and ellipsizes, never squeezing the branch title"
+    );
+    assert!(
+        css_text.contains(".tip {\n  position: fixed;")
+            && css_text.contains("  white-space: pre-line;"),
+        "the shell tooltip keeps line breaks for multi-line tips"
     );
     assert!(
         css_text.contains(".grp-body {\n  display: grid;\n  grid-template-rows: 1fr;"),
@@ -310,6 +354,18 @@ fn a_pr_bound_save_marks_only_the_new_comment_and_still_reaches_difit() {
     assert_eq!(ids.len(), 1);
     assert!(ids.contains("m2"), "{ids:?}");
     assert_eq!(saves.recv_timeout(Duration::from_secs(1)).unwrap(), body);
+    assert_eq!(saves.recv_timeout(Duration::from_secs(1)).unwrap(), body);
+    assert!(
+        channels.dispatch.take_send_now().is_empty(),
+        "only a send-now save skips the bulk queue"
+    );
+
+    // A send-now save hands only the new comment to the LLM at once.
+    ureq::post(&url)
+        .set("X-Dif-Send", "now")
+        .send_string(body)
+        .unwrap();
+    assert_eq!(channels.dispatch.take_send_now(), vec!["m2"]);
     assert_eq!(saves.recv_timeout(Duration::from_secs(1)).unwrap(), body);
     shell.shutdown();
 }

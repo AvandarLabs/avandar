@@ -8,7 +8,7 @@
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, AtomicU64};
 
 use tiny_http::{Header, Request, Response, Server, StatusCode};
 
@@ -34,6 +34,9 @@ pub struct Ctx {
     /// Set to `true` when the browser POSTs `/__wrap/regenerate`; the TUI event
     /// loop swaps it back to `false` and triggers a diff-guide regeneration.
     pub regen: Arc<AtomicBool>,
+    /// How many times the TUI restarted difit, served in `meta.json` so an open
+    /// shell tab reloads itself instead of the restart opening another.
+    pub difit_restarts: Arc<AtomicU64>,
     /// Cache-busting tag appended to `shell.js` / `shell.css` in the served page,
     /// so a browser never runs a stale frontend after a rebuild.
     pub asset_version: String,
@@ -185,7 +188,8 @@ fn handle(request: Request, ctx: &Ctx) -> std::io::Result<()> {
         route @ (Route::GithubState
         | Route::GithubPull
         | Route::GithubSubmit
-        | Route::GithubViewed) => github_routes::handle(&route, request, ctx),
+        | Route::GithubViewed
+        | Route::GithubConflicts) => github_routes::handle(&route, request, ctx),
         Route::DifitDoc => match proxy::get(ctx.difit_port, "/") {
             Ok(up) => send_bytes_nostore(
                 request,
@@ -195,17 +199,22 @@ fn handle(request: Request, ctx: &Ctx) -> std::io::Result<()> {
             ),
             Err(_) => send_status(request, 502),
         },
-        Route::ApiDiff { filter } => serve_api_diff(request, ctx, query, &filter),
+        Route::ApiDiff {
+            filter,
+            commented_only,
+        } => serve_api_diff(request, ctx, query, &filter, commented_only),
         Route::Proxy => proxy_to_difit(request, ctx, &method, path, query),
     }
 }
 
-/// Proxy difit's `/api/diff`, narrowed to the files `filter` selects.
+/// Proxy difit's `/api/diff`, narrowed to the files `filter` selects and, when
+/// `commented_only`, to the files with comments.
 fn serve_api_diff(
     request: Request,
     ctx: &Ctx,
     query: &str,
     filter: &DiffFilter,
+    commented_only: bool,
 ) -> std::io::Result<()> {
     let Ok(upstream) = proxy::get(ctx.difit_port, &with_query("/api/diff", query)) else {
         return send_status(request, 502);
@@ -226,7 +235,24 @@ fn serve_api_diff(
             filter::filter_ungrouped(&body, &guide)
         }
     };
+    let body = if commented_only {
+        narrow_to_commented(ctx, body)
+    } else {
+        body
+    };
     send_bytes_nostore(request, status, &content_type, body)
+}
+
+/// Keep only the files difit holds comments on. Fails open: if the comments
+/// can't be read, the diff passes through unnarrowed.
+fn narrow_to_commented(ctx: &Ctx, body: Vec<u8>) -> Vec<u8> {
+    let commented = proxy::get(ctx.difit_port, "/api/comments-json")
+        .ok()
+        .and_then(|up| filter::commented_files(&up.body));
+    match commented {
+        Some(files) => filter::filter_diff(&body, &files),
+        None => body,
+    }
 }
 
 /// Relay any other request to difit unchanged, streaming its SSE endpoints.

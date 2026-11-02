@@ -145,9 +145,12 @@ you're mid-typing in the browser is never dropped. The flow:
    `PtyPane::respawn_shell_command_with_env`, which spawns the new difit into a
    fresh PTY **reusing the same `vt100` parser** — so the log is continuous, not
    cleared.
-4. It reopens the review in the browser via `App::open_in_browser`, which targets
-   the **wrapped-shell URL** (the running `WebShell` still proxies the same port),
-   not raw difit.
+4. It bumps the running `WebShell`'s restart counter
+   (`WebShell::note_difit_restart`). The shell serves it as `difitRestarts` in
+   `/__wrap/meta.json`, which the open tab polls every 2s and reloads itself on.
+   A restart never calls `open`, so it never stacks up another browser tab; the
+   shell still proxies the same port, and `Ctrl+O` opens a tab when none is
+   open.
 
 The poller (still pointed at the unchanged port) and the LLM pane are not
 touched; the poller just reconnects once difit answers again. The dispatcher's
@@ -255,6 +258,11 @@ of steering or interrupting the current turn.
   **eager** mode (`POST /__wrap/dispatch {"mode":"eager"}`) each open comment
   is typed as its own prompt the tick it appears. A held comment is not marked
   dispatched, so its final text is what gets sent.
+- **Send one now.** In bulk mode, `Cmd+Ctrl+Enter` in a TUI comment box makes
+  `inject/destinations.js` tag that save with `X-Dif-Send: now`. The shell diffs
+  it against difit's comments (as for a PR save) and records the new message ids
+  in `DispatchControl`; the event loop hands them to the `Dispatcher`, which
+  types each one alone as soon as difit holds it and keeps holding the rest.
 - **PR-bound comments are skipped.** Any message id in the `-github.json`
   registry is never held, counted, or typed. See
   [GitHub PR sync](#github-pr-sync).
@@ -339,8 +347,25 @@ review thread and the viewer's per-file viewed state (paged), then:
   and still never reaches the LLM.
 - **Branch** (`github::checkout`): when the PR head differs from `HEAD`, it
   fetches `pull/<n>/head` and fast-forwards only if the branch is strictly
-  behind and no tracked file has uncommitted changes. The shell then reloads
-  difit in place. Otherwise the header shows why (dirty, ahead, diverged).
+  behind. The background pull also requires that no tracked file has
+  uncommitted changes, and the shell then reloads difit in place. A pull the
+  reviewer asked for (**Sync** sets `reviewer_pull` beside `pull_requested`)
+  instead stashes the tracked changes (`git stash push`, only when there is
+  something to stash, so an older stash entry is never popped), fast-forwards,
+  and restores them (`git stash pop`). A failed fast-forward still restores them.
+  When the pull finishes, `reviewerPulls` grows in `/__wrap/github.json` and the
+  browser reloads the page. Otherwise the header shows why (dirty, ahead,
+  diverged).
+- **Conflicts** (`github::conflicts`): when the restore conflicts, git keeps the
+  stash entry and the files stay unmerged. The pull records them as `conflicts`
+  in `/__wrap/github.json`, and the browser asks who resolves them, answering on
+  `POST /__wrap/github/conflicts` with `{"resolve": "llm" | "reviewer"}`. For
+  `reviewer`, the header notice says to resolve them and `git stash drop`. For
+  `llm`, the files move to `conflicts_for_llm`; the TUI event loop takes them
+  (`App::poll_web_shell_requests`) and types `conflicts::resolve_prompt` into the
+  LLM pane: resolve the markers, `git reset -q` so the changes end unstaged as
+  before, `git stash drop`, and do not commit. If the LLM pane is not running,
+  the reviewer's notice is shown instead.
 - **Viewed files**: see below.
 
 ### Viewed files

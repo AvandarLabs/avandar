@@ -5,7 +5,9 @@
   // The header shows the branch's PR (or a yellow "No linked PR"), a Sync
   // button that pulls from GitHub now (the poller also pulls every minute), and
   // a Review button that opens the submit panel for the reviewer's pending
-  // review. Viewed files flow from difit to GitHub here: difit's writes reach
+  // review. A Sync may stash local changes to pull the PR's new commits; once
+  // it finishes the page reloads, and any merge conflicts it left open the
+  // modal in conflicts.js. Viewed files flow from difit to GitHub here: difit's writes reach
   // this document as storage events, and each changed path is sent to
   // `/__wrap/github/viewed` (marking a directory sends one change per file).
   // GitHub -> difit viewed changes are applied inside difit by inject/viewed.js.
@@ -14,6 +16,7 @@
   var ghFlash = "";
   var ghFlashTimer = null;
   var ghFastForwards = null;
+  var ghReviewerPulls = null; // Syncs finished as of the last poll
   var autoShowChanges = false; // the branch was fast-forwarded: reload the diff
   var ghPushedViewed = null;   // the viewed set last sent to GitHub
   var ghEls = {
@@ -37,16 +40,19 @@
   function plural(numItems, word) { return numItems + " " + word + (numItems === 1 ? "" : "s"); }
 
   function ghSyncTitle(sync) {
-    if (sync.error) return "Sync from GitHub. The last sync failed: " + sync.error;
-    if (sync.secondsSincePull == null) return "Sync from GitHub";
-    return "Sync from GitHub (last synced " + sync.secondsSincePull + "s ago)";
+    var what = "Sync with GitHub now: pull new PR comments and commits. Your uncommitted changes are stashed and put back, then the page reloads.\n"
+      + "dif also syncs every minute, without touching your changes.";
+    if (sync.error) return what + "\nThe last sync failed: " + sync.error;
+    if (sync.secondsSincePull == null) return what;
+    return what + "\nLast synced " + sync.secondsSincePull + "s ago.";
   }
 
   function renderGithub() {
     var state = gh;
     var available = !!(state && state.available && state.pr);
     ghEls.noPr.hidden = !(state && state.lookedUp && !available);
-    if (state && state.reason) ghEls.noPr.title = state.reason;
+    setTip(ghEls.noPr, "No open GitHub PR for this branch" + (state && state.reason ? ": " + state.reason : "") + ".\n"
+      + "Comments go only to the TUI until a PR exists. dif checks again every minute.");
     ghEls.pr.hidden = !available;
     ghEls.sync.hidden = !available;
     if (!available) {
@@ -57,22 +63,22 @@
     var pr = state.pr;
     ghEls.pr.href = pr.url;
     ghEls.prNum.textContent = "#" + pr.number;
-    ghEls.pr.title = "PR #" + pr.number + " by " + pr.author +
-      (state.viewed.active ? "" : "\n" + (state.viewed.reason || "Viewed files are not syncing."));
+    setTip(ghEls.pr, "Open PR #" + pr.number + " on GitHub, by " + pr.author + ".\n"
+      + (state.viewed.active ? "Viewed files sync both ways with GitHub." : (state.viewed.reason || "Viewed files are not syncing.")));
     ghEls.sync.classList.toggle("busy", !!state.sync.pulling);
-    ghEls.sync.title = ghSyncTitle(state.sync);
+    setTip(ghEls.sync, ghSyncTitle(state.sync));
     var drafts = state.drafts || 0;
     ghEls.review.hidden = !(drafts || state.failed || !pr.isOwn);
     ghEls.reviewLabel.textContent = pr.isOwn ? "Submit comments" : "Review";
     ghEls.reviewCount.hidden = !drafts;
     ghEls.reviewCount.textContent = String(drafts);
-    ghEls.review.title = drafts
-      ? plural(drafts, "draft comment") + " waiting to be submitted"
-      : "Submit a review";
+    setTip(ghEls.review, drafts
+      ? plural(drafts, "draft PR comment") + " waiting to be published. Open the panel to submit your review."
+      : (pr.isOwn ? "Publish your draft comments on your PR" : "Submit a review: comment, approve, or request changes"));
     var notice = ghFlash || state.sync.notice || (state.sync.error ? "GitHub sync failed: " + state.sync.error : "");
     ghEls.notice.hidden = !notice;
     ghEls.notice.textContent = notice;
-    ghEls.notice.title = notice;
+    ghEls.notice.setAttribute("data-tip", notice);
     ghEls.notice.classList.toggle("ok", !!ghFlash);
   }
 
@@ -86,6 +92,12 @@
   function applyGithub(state) {
     if (!state || typeof state !== "object") return;
     gh = state;
+    var reviewerPulls = state.sync ? state.sync.reviewerPulls : null;
+    if (ghReviewerPulls !== null && reviewerPulls > ghReviewerPulls && !state.sync.error) {
+      reloadShell(); // a Sync finished: show the pulled code and comments fresh
+      return;
+    }
+    ghReviewerPulls = reviewerPulls;
     if (ghSubmitting && !state.submitting && state.lastSubmit) {
       ghSubmitting = false;
       setSubmitBusy(false);
@@ -104,6 +116,7 @@
     }
     ghFastForwards = state.fastForwards;
     renderGithub();
+    renderConflicts(state.conflicts);
     if (!ghEls.pop.hidden) renderReviewPop();
   }
 

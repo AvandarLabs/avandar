@@ -52,13 +52,20 @@ pub enum Route {
     GithubSubmit,
     /// `POST /__wrap/github/viewed`: viewed-file changes to send to GitHub.
     GithubViewed,
+    /// `POST /__wrap/github/conflicts`: who resolves a pull's merge conflicts.
+    GithubConflicts,
     /// `POST /api/comments`: difit's comment save, inspected for PR-bound
     /// comments before it is proxied.
     SaveComments,
     /// `GET /__wrap/difit[?group=N|?view=new]` — proxy difit's document, inject our script.
     DifitDoc,
     /// `GET /api/diff` — proxy difit's diff, narrowed per the view (from `Referer`).
-    ApiDiff { filter: DiffFilter },
+    /// `commented_only` further narrows it to files with comments
+    /// (`&commented=1`), on top of any view.
+    ApiDiff {
+        filter: DiffFilter,
+        commented_only: bool,
+    },
     /// Anything else — proxy to difit verbatim (assets, other APIs, SSE).
     Proxy,
 }
@@ -83,6 +90,20 @@ pub fn diff_filter_in_query(query: &str) -> DiffFilter {
         return DiffFilter::Ungrouped;
     }
     group_in_query(query).map_or(DiffFilter::None, DiffFilter::Group)
+}
+
+/// Whether a query string asks to show only files with comments
+/// (`commented=1`).
+#[must_use]
+pub fn commented_only_in_query(query: &str) -> bool {
+    query.split('&').any(|pair| pair == "commented=1")
+}
+
+/// The query string of a `Referer`, or `""` when it has none.
+fn referer_query(referer: Option<&str>) -> &str {
+    referer
+        .and_then(|referer| referer.split_once('?'))
+        .map_or("", |(_, query)| query)
 }
 
 /// Extract the [`DiffFilter`] a `/api/diff` request belongs to from its
@@ -116,6 +137,7 @@ pub fn route(method: &str, path: &str, query: &str, referer: Option<&str>) -> Ro
         "/__wrap/github/pull" => Route::GithubPull,
         "/__wrap/github/submit" => Route::GithubSubmit,
         "/__wrap/github/viewed" => Route::GithubViewed,
+        "/__wrap/github/conflicts" => Route::GithubConflicts,
         "/" => Route::ShellPage,
         "/__wrap/inject.js" => Route::InjectJs,
         "/__wrap/groups.json" => Route::Groups,
@@ -126,6 +148,7 @@ pub fn route(method: &str, path: &str, query: &str, referer: Option<&str>) -> Ro
         "/__wrap/difit" => Route::DifitDoc,
         "/api/diff" => Route::ApiDiff {
             filter: diff_filter_in_referer(referer),
+            commented_only: commented_only_in_query(referer_query(referer)),
         },
         _ => path
             .strip_prefix("/__wrap/")
@@ -200,6 +223,10 @@ mod tests {
             route("POST", "/__wrap/github/viewed", "", None),
             Route::GithubViewed
         );
+        assert_eq!(
+            route("POST", "/__wrap/github/conflicts", "", None),
+            Route::GithubConflicts
+        );
     }
 
     #[test]
@@ -238,7 +265,8 @@ mod tests {
                 Some("http://localhost:4790/__wrap/difit?group=3")
             ),
             Route::ApiDiff {
-                filter: DiffFilter::Group(3)
+                filter: DiffFilter::Group(3),
+                commented_only: false,
             }
         );
         // "new files not in guide" view
@@ -250,7 +278,8 @@ mod tests {
                 Some("http://localhost:4790/__wrap/difit?view=new")
             ),
             Route::ApiDiff {
-                filter: DiffFilter::Ungrouped
+                filter: DiffFilter::Ungrouped,
+                commented_only: false,
             }
         );
         // full-view iframe: referer has no group/view
@@ -262,16 +291,47 @@ mod tests {
                 Some("http://localhost:4790/__wrap/difit")
             ),
             Route::ApiDiff {
-                filter: DiffFilter::None
+                filter: DiffFilter::None,
+                commented_only: false,
             }
         );
         // no referer at all
         assert_eq!(
             route("GET", "/api/diff", "", None),
             Route::ApiDiff {
-                filter: DiffFilter::None
+                filter: DiffFilter::None,
+                commented_only: false,
             }
         );
+    }
+
+    #[test]
+    fn api_diff_narrows_to_commented_files_when_the_view_asks() {
+        assert_eq!(
+            route(
+                "GET",
+                "/api/diff",
+                "",
+                Some("http://localhost:4790/__wrap/difit?group=3&commented=1")
+            ),
+            Route::ApiDiff {
+                filter: DiffFilter::Group(3),
+                commented_only: true,
+            }
+        );
+        assert_eq!(
+            route(
+                "GET",
+                "/api/diff",
+                "",
+                Some("http://localhost:4790/__wrap/difit?commented=1")
+            ),
+            Route::ApiDiff {
+                filter: DiffFilter::None,
+                commented_only: true,
+            }
+        );
+        assert!(!commented_only_in_query("commented=0&group=1"));
     }
 
     #[test]

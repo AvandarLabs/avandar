@@ -19,11 +19,14 @@
 //!   - [`graphql`]: the GraphQL documents and pure parsing of the answers.
 //!   - [`client`]: the `gh` CLI calls.
 //!   - [`checkout`]: fast-forwarding the branch to the PR head when safe.
+//!   - [`conflicts`]: what a pull's merge conflicts become: a notice for the
+//!     reviewer, or a prompt for the LLM pane.
 //!   - [`sync`] / [`sync_pull`]: run all of it on the poller thread.
 
 pub mod anchor;
 pub mod checkout;
 pub mod client;
+pub mod conflicts;
 #[cfg(test)]
 mod fakes;
 pub mod graphql;

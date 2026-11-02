@@ -9,7 +9,9 @@
 //! an `X-Dif-Destination: github` header to that save. Before forwarding it, we
 //! diff the posted threads against what difit holds; the new message ids are
 //! the comment just submitted, and they are marked PR-bound *before* difit (and
-//! so the poller and the LLM dispatcher) can ever see them.
+//! so the poller and the LLM dispatcher) can ever see them. A TUI comment saved
+//! with `Cmd+Ctrl+Enter` in bulk mode carries `X-Dif-Send: now` instead, and its
+//! new message ids are marked to skip the bulk queue the same way.
 
 use std::collections::HashSet;
 
@@ -24,6 +26,9 @@ use super::server::{
 
 /// The header `inject.js` sets on a comment save bound for the GitHub PR.
 pub const DESTINATION_HEADER: &str = "X-Dif-Destination";
+
+/// The header `inject.js` sets on a TUI comment save to send at once in bulk mode.
+pub const SEND_HEADER: &str = "X-Dif-Send";
 
 /// Serve one of the comment-steering routes.
 pub fn handle(route: &Route, mut request: Request, ctx: &Ctx, query: &str) -> std::io::Result<()> {
@@ -49,18 +54,27 @@ pub fn handle(route: &Route, mut request: Request, ctx: &Ctx, query: &str) -> st
     }
 }
 
-fn save_comments(mut request: Request, ctx: &Ctx, query: &str) -> std::io::Result<()> {
-    let is_github_bound = request
+fn has_header(request: &Request, name: &'static str, value: &str) -> bool {
+    request
         .headers()
         .iter()
-        .any(|h| h.field.equiv(DESTINATION_HEADER) && h.value.as_str() == "github");
+        .any(|h| h.field.equiv(name) && h.value.as_str() == value)
+}
+
+fn save_comments(mut request: Request, ctx: &Ctx, query: &str) -> std::io::Result<()> {
+    let is_github_bound = has_header(&request, DESTINATION_HEADER, "github");
+    let is_send_now = has_header(&request, SEND_HEADER, "now");
     let content_type = request_content_type(&request);
     let mut body = Vec::new();
     request.as_reader().read_to_end(&mut body)?;
-    if is_github_bound {
+    if is_github_bound || is_send_now {
         if let Ok(current) = proxy::get(ctx.difit_port, &with_query("/api/comments-json", query)) {
-            ctx.github
-                .mark_pending(&new_message_ids(&current.body, &body));
+            let new_ids = new_message_ids(&current.body, &body);
+            if is_github_bound {
+                ctx.github.mark_pending(&new_ids);
+            } else {
+                ctx.dispatch.request_send_now(new_ids);
+            }
         }
     }
     match proxy::post(

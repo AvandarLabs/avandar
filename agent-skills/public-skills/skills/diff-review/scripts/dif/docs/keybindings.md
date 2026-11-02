@@ -16,7 +16,7 @@ Global (work from either pane):
 | `Alt+U` / `Alt+D` | scroll the focused view a half-page up / down (guide view moves its cursor; a PTY pane scrolls half its visible rows) |
 | `Alt+K` / `Alt+J` | scroll the focused view one line up / down |
 | `Ctrl+P` | open the **command palette** (works from either pane) |
-| `Ctrl+R` | restart the difit server (the palette's "Restart diff server") |
+| `Ctrl+R` | restart the difit server (the palette's "Restart diff server"). The open browser tab reloads itself; no new tab opens |
 | `Ctrl+G` | regenerate the diff guide (the palette's "Regenerate diff guide") |
 | `Ctrl+O` | open the difit server URL in the default browser (the palette's "Open diff in browser") |
 | `Ctrl+N` | start a fresh LLM session (interrupts: kills the running LLM and respawns it on a new session that auto-submits the review-orientation prompt; the palette's "New LLM session") |

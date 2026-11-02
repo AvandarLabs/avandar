@@ -2,12 +2,16 @@
 //! or in bulk, held until the reviewer presses "Send all" in the browser.
 //!
 //! The browser web shell flips the mode and asks for a flush; the TUI event
-//! loop reads both each tick and reports how many comments are waiting. The
-//! state crosses threads (shell server ↔ event loop), so it is all atomics.
+//! loop reads both each tick and reports how many comments are waiting. In
+//! bulk mode the reviewer can also send one comment at once (`Cmd+Ctrl+Enter`),
+//! which the shell records here as that comment's message ids. The state
+//! crosses threads (shell server ↔ event loop), so it is atomics plus one small
+//! lock for those ids.
 //!
 //! Bulk is the default: every injected prompt costs LLM tokens, and one batched
 //! prompt for a whole pass of comments is far cheaper than one per comment.
 
+use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use super::dispatcher::Delivery;
@@ -18,6 +22,7 @@ pub struct DispatchControl {
     bulk: AtomicBool,
     send_all: AtomicBool,
     queued: AtomicUsize,
+    send_now: Mutex<Vec<String>>,
 }
 
 impl Default for DispatchControl {
@@ -26,6 +31,7 @@ impl Default for DispatchControl {
             bulk: AtomicBool::new(true),
             send_all: AtomicBool::new(false),
             queued: AtomicUsize::new(0),
+            send_now: Mutex::new(Vec::new()),
         }
     }
 }
@@ -57,6 +63,22 @@ impl DispatchControl {
     #[must_use]
     pub fn take_send_all(&self) -> bool {
         self.send_all.swap(false, Ordering::Relaxed)
+    }
+
+    /// Mark comments to send to the LLM at once, skipping the bulk queue.
+    pub fn request_send_now(&self, message_ids: Vec<String>) {
+        if let Ok(mut ids) = self.send_now.lock() {
+            ids.extend(message_ids);
+        }
+    }
+
+    /// Take the message ids marked to send at once, clearing them.
+    #[must_use]
+    pub fn take_send_now(&self) -> Vec<String> {
+        self.send_now
+            .lock()
+            .map(|mut ids| std::mem::take(&mut *ids))
+            .unwrap_or_default()
     }
 
     /// What this tick should do with open comments: send each now when eager,
@@ -129,6 +151,15 @@ mod tests {
         control.request_send_all();
         assert!(control.take_send_all());
         assert!(!control.take_send_all());
+    }
+
+    #[test]
+    fn send_now_ids_are_handed_over_once() {
+        let control = DispatchControl::new();
+        control.request_send_now(vec!["m1".to_owned()]);
+        control.request_send_now(vec!["m2".to_owned()]);
+        assert_eq!(control.take_send_now(), vec!["m1", "m2"]);
+        assert!(control.take_send_now().is_empty());
     }
 
     #[test]

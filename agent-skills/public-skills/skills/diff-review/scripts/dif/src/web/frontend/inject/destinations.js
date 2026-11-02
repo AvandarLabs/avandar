@@ -12,7 +12,12 @@
   // comments (including ones pulled in from GitHub) are restyled from the
   // shell's `/__wrap/github.json`: blue with a GitHub badge, dashed while they
   // are still drafts, red when GitHub rejected them.
+  //
+  // In Bulk mode a TUI comment is held for Send all; Cmd+Ctrl+Enter (macOS) or
+  // Ctrl+Alt+Enter saves one with an `X-Dif-Send: now` header instead, and the
+  // shell hands that comment to the LLM at once, leaving the rest held.
   var DEST_HEADER = "X-Dif-Destination";
+  var SEND_HEADER = "X-Dif-Send";
   var EDIT_PLACEHOLDER = "Edit your message...";
   var REPLY_PLACEHOLDER = "Write a reply...";
   var ARM_WINDOW_MS = 5000;
@@ -23,6 +28,13 @@
   var IS_MAC = /Mac|iP(hone|ad|od)/.test((navigator.platform || "") + " " + (navigator.userAgent || ""));
   var TOGGLE_HINT = IS_MAC ? "⌃G" : "Alt+Shift+G";
   var SEND_OTHER_HINT = IS_MAC ? "⌘⇧↵" : "Ctrl+Shift+Enter";
+  var SEND_NOW_HINT = IS_MAC ? "⌘⌃↵" : "Ctrl+Alt+Enter";
+  function isSendNowCombo(event) {
+    if (event.key !== "Enter" || event.shiftKey) return false;
+    return IS_MAC
+      ? event.metaKey && event.ctrlKey && !event.altKey
+      : event.ctrlKey && event.altKey && !event.metaKey;
+  }
   function isToggleCombo(event) {
     if (event.code !== "KeyG" || event.metaKey) return false;
     return IS_MAC
@@ -34,6 +46,7 @@
   var deliveryMode = "bulk";
   var threadsById = {};
   var armedGithubAt = 0;
+  var armedSendNowAt = 0;
 
   // The rules ship inside this script because it is the only asset the shell
   // injects into difit's document.
@@ -117,7 +130,10 @@
     setAttr(submit, "aria-label", label);
     var otherDest = oppositeDest(form);
     var canSendOther = otherDest === "local" || github.available;
-    setAttr(submit, "title", canSendOther ? SEND_OTHER_HINT + ": " + buildSubmitLabel(form, otherDest) + " instead" : null);
+    var hints = [];
+    if (canSendOther) hints.push(SEND_OTHER_HINT + ": " + buildSubmitLabel(form, otherDest) + " instead");
+    if (dest !== "github" && deliveryMode === "bulk") hints.push(SEND_NOW_HINT + ": Send to TUI now, skipping the queue");
+    setAttr(submit, "title", hints.length ? hints.join("\n") : null);
   }
   function setDest(form, dest) {
     if (dest === "github" && !github.available) dest = "local";
@@ -161,8 +177,10 @@
     group.className = "dif-dest";
     group.setAttribute("role", "radiogroup");
     group.setAttribute("aria-label", "Send this comment to");
-    group.appendChild(destButton("local", "TUI", "Send to the LLM in the dif TUI (" + TOGGLE_HINT + " toggles)"));
-    group.appendChild(destButton("github", GH_ICON + "<span>PR</span>", "Post to the GitHub PR only (" + TOGGLE_HINT + " toggles)"));
+    group.appendChild(destButton("local", "TUI",
+      "TUI: send this comment to the LLM in the dif terminal. In Bulk mode it waits for Send all, unless you save with "
+      + SEND_NOW_HINT + ". " + TOGGLE_HINT + " toggles TUI / PR."));
+    group.appendChild(destButton("github", GH_ICON + "<span>PR</span>", "PR: post to the GitHub PR (" + TOGGLE_HINT + " toggles)"));
     var hint = document.createElement("kbd");
     hint.textContent = TOGGLE_HINT;
     hint.setAttribute("aria-hidden", "true");
@@ -185,8 +203,9 @@
       var githubButton = form.querySelector('.dif-dest button[data-dest="github"]');
       githubButton.disabled = !github.available;
       githubButton.title = github.available
-        ? "Post to GitHub PR #" + github.pr.number + " only (" + TOGGLE_HINT + " toggles)"
-        : github.reason || "No GitHub PR to post to";
+        ? "PR: add this comment to your pending review on GitHub PR #" + github.pr.number
+          + " as a draft. The LLM never sees it. " + TOGGLE_HINT + " toggles TUI / PR."
+        : "PR: unavailable. " + (github.reason || "This branch has no GitHub PR to post to.");
       if (!github.available && form.getAttribute("data-dif-dest") === "github") setDest(form, "local");
       else labelSubmit(form);
     });
@@ -219,6 +238,13 @@
     var target = event.target;
     if (event.key !== "Enter" || !(event.metaKey || event.ctrlKey) || !target || target.tagName !== "TEXTAREA") return;
     var form = target.closest("form");
+    // Bulk + TUI: Cmd+Ctrl+Enter sends this comment at once. difit still
+    // submits (it saves on Mod+Enter); this only tags the save.
+    if (isSendNowCombo(event) && form && form.getAttribute("data-dif-dest") !== "github" && deliveryMode === "bulk") {
+      armedGithubAt = 0;
+      armedSendNowAt = Date.now();
+      return;
+    }
     if (!event.shiftKey || !form || !form.querySelector(".dif-dest")) {
       armIfGithub(form);
       return;
@@ -245,17 +271,25 @@
       return method.toUpperCase() === "POST" && new URL(url, window.location.href).pathname === "/api/comments";
     } catch (err) { return false; }
   }
+  function isArmed(armedAt) { return armedAt && Date.now() - armedAt < ARM_WINDOW_MS; }
+  function withHeader(init, name, value) {
+    var tagged = Object.assign({}, init);
+    var headers = new Headers((init && init.headers) || {});
+    headers.set(name, value);
+    tagged.headers = headers;
+    return tagged;
+  }
   window.fetch = function (input, init) {
-    if (armedGithubAt && Date.now() - armedGithubAt < ARM_WINDOW_MS && isCommentSave(input, init)) {
+    if (isArmed(armedGithubAt) && isCommentSave(input, init)) {
       armedGithubAt = 0;
-      var tagged = Object.assign({}, init);
-      var headers = new Headers((init && init.headers) || {});
-      headers.set(DEST_HEADER, "github");
-      tagged.headers = headers;
-      return nativeFetch(input, tagged).then(function (response) {
+      return nativeFetch(input, withHeader(init, DEST_HEADER, "github")).then(function (response) {
         window.setTimeout(refreshDestinations, 300);
         return response;
       });
+    }
+    if (isArmed(armedSendNowAt) && isCommentSave(input, init)) {
+      armedSendNowAt = 0;
+      return nativeFetch(input, withHeader(init, SEND_HEADER, "now"));
     }
     return nativeFetch(input, init);
   };

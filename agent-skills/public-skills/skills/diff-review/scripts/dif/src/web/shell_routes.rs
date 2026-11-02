@@ -38,7 +38,11 @@ pub fn handle(route: Route, request: Request, ctx: &Ctx) -> std::io::Result<()> 
             request,
             200,
             "application/json",
-            meta::meta_json(&ctx.branch, &ctx.worktree),
+            meta::meta_json(
+                &ctx.branch,
+                &ctx.worktree,
+                ctx.difit_restarts.load(Ordering::Relaxed),
+            ),
         ),
         Route::Regenerate => {
             // Signal the TUI event loop to regenerate the diff guide (it swaps

@@ -36,6 +36,8 @@ fn rig_with(
         head: Arc::new(Mutex::new(head.to_owned())),
         relation,
         clean,
+        conflicts: Arc::default(),
+        stash_log: Arc::default(),
     };
     let editor = FakeEditor::default();
     let ports = SyncPorts {
@@ -280,8 +282,56 @@ fn a_clean_branch_behind_the_pr_fast_forwards_and_a_dirty_one_is_told_why() {
     let mut dirty = rig_with(github, "develop", "old", Relation::Behind, false);
     dirty.sync.tick(&snapshot_from_json(EMPTY));
     assert_eq!(dirty.checkout.head().as_deref(), Some("old"));
+    assert!(
+        dirty.checkout.stash_calls().is_empty(),
+        "a background pull never stashes"
+    );
     let notice = dirty.registry.read(|s| s.session.notice.clone()).unwrap();
     assert!(notice.contains("stash"), "{notice}");
+}
+
+/// A dirty branch behind the PR, with the reviewer having clicked Sync.
+fn reviewer_sync_on_a_dirty_branch(conflicts: &[&str]) -> Rig {
+    let github = FakeGithub::default();
+    github.remote.lock().unwrap().head_sha = "new-head".to_owned();
+    let mut harness = rig_with(github, "develop", "old", Relation::Behind, false);
+    *harness.checkout.conflicts.lock().unwrap() = conflicts.iter().map(|&f| f.to_owned()).collect();
+    harness.registry.session(|s| {
+        s.pull_requested = true;
+        s.reviewer_pull = true;
+    });
+    harness.sync.tick(&snapshot_from_json(EMPTY));
+    harness
+}
+
+#[test]
+fn a_reviewer_sync_stashes_pulls_and_restores_a_dirty_branch() {
+    let harness = reviewer_sync_on_a_dirty_branch(&[]);
+    assert_eq!(harness.checkout.head().as_deref(), Some("new-head"));
+    assert_eq!(harness.checkout.stash_calls(), ["stash", "pop"]);
+    harness.registry.read(|s| {
+        assert_eq!(s.session.fast_forwards, 1);
+        assert_eq!(s.session.reviewer_pulls, 1);
+        assert!(!s.session.reviewer_pull, "the request is used up");
+        assert_eq!(s.session.notice, None);
+        assert_eq!(s.session.conflicts, None);
+    });
+}
+
+#[test]
+fn conflicts_from_restoring_the_stash_wait_for_the_reviewers_answer() {
+    let harness = reviewer_sync_on_a_dirty_branch(&["a.rs", "b.rs"]);
+    assert_eq!(harness.checkout.head().as_deref(), Some("new-head"));
+    harness.registry.read(|s| {
+        assert_eq!(s.session.fast_forwards, 1);
+        assert_eq!(s.session.reviewer_pulls, 1);
+        assert_eq!(
+            s.session.conflicts,
+            Some(vec!["a.rs".to_owned(), "b.rs".to_owned()])
+        );
+        let notice = s.session.notice.clone().unwrap();
+        assert!(notice.contains("2 files"), "{notice}");
+    });
 }
 
 #[test]

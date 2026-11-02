@@ -32,9 +32,10 @@ suite with `cargo test` (it finishes in a couple of seconds).
   baseline ids.
 - `inject::dispatcher`: baseline-then-dispatch-once across snapshots; bulk
   holds and counts comments, send-all flushes them as one prompt, eager sends one
-  each, and PR-bound ids are never queued or sent.
-- `inject::mode`: bulk is the default, send-all is taken once, and the
-  `/__wrap/dispatch` JSON in and out.
+  each, PR-bound ids are never queued or sent, and a send-now comment skips the
+  hold alone (once, and only after it reaches difit).
+- `inject::mode`: bulk is the default, send-all and send-now ids are taken once,
+  and the `/__wrap/dispatch` JSON in and out.
 - `inject::prompt`: the batched send-all prompt.
 - `github::anchor`: difit positions → GitHub side / line / start line.
 - `github::plan` (`plan_tests.rs`): a draft thread at a range, a draft reply
@@ -54,23 +55,37 @@ suite with `cargo test` (it finishes in a couple of seconds).
   replies, threads with bots / ranges / outdated lines / paging, viewed files.
 - `github::client`: thread variables (range vs single line), `gh pr view`
   parsing (open PRs only), and "already gone" errors.
-- `github::checkout`: the fast-forward decision, plus a real `origin` / clone
-  pair: fetching `pull/7/head` and fast-forwarding a clean branch, tracked edits
-  blocking it (untracked files don't), and a local commit making it diverged.
+- `github::checkout` (`checkout_tests.rs`): the fast-forward decision (a
+  reviewer's Sync stashes a dirty branch that is behind), plus a real `origin` /
+  clone pair: fetching `pull/7/head` and fast-forwarding a clean branch, tracked
+  edits blocking it (untracked files don't), a local commit making it diverged,
+  stashed changes restored after the fast-forward, a conflicting restore naming
+  the files and keeping the stash, a failed fast-forward still restoring, and a
+  clean checkout never popping an older stash entry.
+- `github::conflicts`: the browser's resolver names, the notice counts, and the
+  LLM prompt (each file listed, `git reset -q`, `git stash drop`, no commit).
 - `github::registry` / `github::session`: persistence, marking never resets a
   posted entry, session state never persisted, tombstones kept from the LLM,
-  draft/failed counts, own-PR detection, the browser JSON, viewed event capping.
+  draft/failed counts, own-PR detection, the browser JSON (incl. `conflicts` and
+  `reviewerPulls`), answering conflicts (LLM vs reviewer), viewed event capping.
 - `github::sync` (`sync_tests.rs`, against a stateful fake GitHub): draft then
   publish on submit, edit/resolve mirroring, own PR refusing approve, submit
   refusing failed comments, no PR failing comments with the reason, a pull
   importing a bot thread kept from the LLM, viewed sync both ways (one call per
   file, none for no-ops, paused off the PR's base), fast-forward vs a dirty
-  branch's notice, and pulls only on request or interval.
+  branch's notice (a background pull never stashes), a reviewer's Sync
+  stashing, pulling, and restoring, its conflicts waiting for an answer, and
+  pulls only on request or interval.
 - `difit::editor`: adding threads and messages once, setting a body, removing a
   reply vs a whole thread.
 - `web::review_routes`: new message ids in a comment save (fails closed).
-- `web::github_routes`: submit parsing (events, own PR comment-only) and
-  viewed-change parsing.
+- `web::github_routes`: submit parsing (events, own PR comment-only),
+  viewed-change parsing, and the conflict answer.
+- `web::router`: `commented=1` on the `/api/diff` referer, composed with a group;
+  `/__wrap/github/conflicts`.
+- `web::filter`: `commented_files` (threads with messages only; unreadable means
+  no filter).
+- `web::meta`: `difitRestarts` in `meta.json`.
 - `inject::reply_watcher`: baseline-then-log-once for new `claude` replies, with
   the `file:Lx` location; reviewer comments never logged as replies.
 - `tui::keymap`: key→bytes encodings and injected prompt delivery, including
@@ -121,9 +136,11 @@ comment is not resurrected, and that an unplaceable or half-written entry never
 poisons the batch.
 
 **Integration (`tests/web_shell.rs`):** the delivery mode round-trips through
-`/__wrap/dispatch`, send-all reaches the shared control, and a save tagged
+`/__wrap/dispatch`, send-all reaches the shared control, a save tagged
 `X-Dif-Destination: github` marks only the new comment against a stand-in difit
-while still reaching it.
+while still reaching it, a save tagged `X-Dif-Send: now` hands only the new
+comment to the send-now queue, and `WebShell::note_difit_restart` shows up in
+`meta.json`.
 
 ## What's not unit-tested
 

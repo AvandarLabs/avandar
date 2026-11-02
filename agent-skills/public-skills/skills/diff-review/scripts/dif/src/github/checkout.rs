@@ -2,13 +2,18 @@
 //!
 //! When the PR has commits the checkout lacks, a pull fast-forwards the branch,
 //! but only when that cannot lose work: the branch must be strictly behind the
-//! PR and no tracked file may have uncommitted changes. Anything else leaves
-//! the checkout alone and tells the reviewer why.
+//! PR. Uncommitted changes to tracked files block the minute-by-minute pull,
+//! but a pull the reviewer asks for (the browser's **Sync**) stashes them,
+//! fast-forwards, and restores them. Anything else leaves the checkout alone
+//! and tells the reviewer why.
 
 use std::path::PathBuf;
 use std::process::Command;
 
-use anyhow::{Result, bail};
+use anyhow::{Context, Result, bail};
+
+/// The message on the stash entry a reviewer-requested pull makes.
+const STASH_MESSAGE: &str = "dif: local changes stashed to pull the PR's new commits";
 
 /// How the checked-out commit relates to the PR head.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -25,39 +30,89 @@ pub enum Relation {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BranchStep {
     pub fast_forward: bool,
+    /// Stash the tracked local changes first and restore them after.
+    pub stash: bool,
     pub notice: Option<String>,
 }
 
-/// Decide the branch step for `relation`, given whether the tracked files are
-/// clean.
+impl BranchStep {
+    const fn stay(notice: Option<String>) -> Self {
+        Self {
+            fast_forward: false,
+            stash: false,
+            notice,
+        }
+    }
+}
+
+/// Decide the branch step for `relation`.
+///
+/// `clean` says whether the tracked files are unchanged. `may_stash` says
+/// whether the reviewer asked for this pull, the only time local changes may
+/// be stashed to let it through.
 #[must_use]
-pub fn branch_step(relation: Relation, clean: bool) -> BranchStep {
+pub fn branch_step(relation: Relation, clean: bool, may_stash: bool) -> BranchStep {
     let notice = |text: &str| Some(text.to_owned());
     match (relation, clean) {
-        (Relation::Same, _) => BranchStep {
-            fast_forward: false,
-            notice: None,
-        },
+        (Relation::Same, _) => BranchStep::stay(None),
         (Relation::Behind, true) => BranchStep {
             fast_forward: true,
+            stash: false,
             notice: None,
         },
-        (Relation::Behind, false) => BranchStep {
-            fast_forward: false,
-            notice: notice(
-                "The PR has new commits. Commit or stash your changes, then sync to pull them.",
-            ),
+        (Relation::Behind, false) if may_stash => BranchStep {
+            fast_forward: true,
+            stash: true,
+            notice: None,
         },
-        (Relation::Ahead, _) => BranchStep {
-            fast_forward: false,
-            notice: notice(
-                "Your branch has commits the PR doesn't. Push them so PR comments line up.",
-            ),
-        },
-        (Relation::Diverged, _) => BranchStep {
-            fast_forward: false,
-            notice: notice("Your branch and the PR have diverged. Rebase or merge to sync them."),
-        },
+        (Relation::Behind, false) => BranchStep::stay(notice(
+            "The PR has new commits. Click Sync to pull them: your local changes are stashed and restored.",
+        )),
+        (Relation::Ahead, _) => BranchStep::stay(notice(
+            "Your branch has commits the PR doesn't. Push them so PR comments line up.",
+        )),
+        (Relation::Diverged, _) => BranchStep::stay(notice(
+            "Your branch and the PR have diverged. Rebase or merge to sync them.",
+        )),
+    }
+}
+
+/// How restoring stashed local changes went.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Unstash {
+    Applied,
+    /// These files conflict. git keeps the stash entry until it is dropped.
+    Conflicts(Vec<String>),
+}
+
+/// Fast-forward to `sha`, first stashing the tracked local changes when `stash`
+/// is set and restoring them after. A failed fast-forward still restores them.
+///
+/// # Errors
+///
+/// When stashing, the fast-forward, or the restore fails. Conflicts on restore
+/// are not an error: they come back as [`Unstash::Conflicts`].
+pub fn fast_forward_keeping_changes(
+    checkout: &dyn Checkout,
+    sha: &str,
+    stash: bool,
+) -> Result<Unstash> {
+    let stashed = stash
+        && checkout
+            .stash()
+            .context("could not stash your local changes")?;
+    let pulled = checkout.fast_forward(sha);
+    let restored = if stashed {
+        checkout.pop_stash()
+    } else {
+        Ok(Unstash::Applied)
+    };
+    match (pulled, restored) {
+        (Ok(()), restored) => restored,
+        (Err(e), Ok(_)) => Err(e),
+        (Err(e), Err(restore)) => {
+            Err(e.context(format!("your local changes are still stashed: {restore}")))
+        }
     }
 }
 
@@ -73,6 +128,11 @@ pub trait Checkout: Send {
     fn is_clean(&self) -> bool;
     /// Fast-forward the checked-out branch to `sha`.
     fn fast_forward(&self, sha: &str) -> Result<()>;
+    /// Stash the tracked local changes. Returns whether a stash entry was made,
+    /// so a clean checkout never restores someone else's older entry.
+    fn stash(&self) -> Result<bool>;
+    /// Restore the newest stash entry, dropping it unless it conflicts.
+    fn pop_stash(&self) -> Result<Unstash>;
 }
 
 /// [`Checkout`] over the `git` CLI in the repo root.
@@ -110,15 +170,31 @@ impl GitCheckout {
         self.git(&["merge-base", "--is-ancestor", ancestor, descendant])
             .is_ok_and(|o| o.status.success())
     }
-}
 
-impl Checkout for GitCheckout {
-    fn head(&self) -> Option<String> {
-        let output = self.git(&["rev-parse", "HEAD"]).ok()?;
+    fn stdout(&self, args: &[&str]) -> Option<String> {
+        let output = self.git(args).ok()?;
         output
             .status
             .success()
             .then(|| String::from_utf8_lossy(&output.stdout).trim().to_owned())
+    }
+
+    /// The newest stash entry's commit, if any.
+    fn stash_top(&self) -> Option<String> {
+        self.stdout(&["rev-parse", "--quiet", "--verify", "refs/stash"])
+    }
+
+    /// Files left with unmerged entries, e.g. by a conflicting `stash pop`.
+    fn conflicted_files(&self) -> Vec<String> {
+        self.stdout(&["diff", "--name-only", "--diff-filter=U"])
+            .map(|out| out.lines().map(str::to_owned).collect())
+            .unwrap_or_default()
+    }
+}
+
+impl Checkout for GitCheckout {
+    fn head(&self) -> Option<String> {
+        self.stdout(&["rev-parse", "HEAD"])
     }
 
     fn fetch_pr(&self, number: u64) -> Result<()> {
@@ -148,108 +224,29 @@ impl Checkout for GitCheckout {
     fn fast_forward(&self, sha: &str) -> Result<()> {
         self.ok(&["merge", "--ff-only", "--quiet", sha])
     }
+
+    fn stash(&self) -> Result<bool> {
+        let before = self.stash_top();
+        self.ok(&["stash", "push", "--quiet", "--message", STASH_MESSAGE])?;
+        Ok(self.stash_top() != before)
+    }
+
+    fn pop_stash(&self) -> Result<Unstash> {
+        let output = self.git(&["stash", "pop", "--quiet"])?;
+        if output.status.success() {
+            return Ok(Unstash::Applied);
+        }
+        let conflicts = self.conflicted_files();
+        if conflicts.is_empty() {
+            bail!(
+                "git stash pop: {}",
+                String::from_utf8_lossy(&output.stderr).trim()
+            );
+        }
+        Ok(Unstash::Conflicts(conflicts))
+    }
 }
 
 #[cfg(test)]
-mod tests {
-    use std::path::Path;
-
-    use super::*;
-
-    #[test]
-    fn only_a_clean_branch_strictly_behind_fast_forwards() {
-        assert!(branch_step(Relation::Behind, true).fast_forward);
-        for (relation, clean) in [
-            (Relation::Behind, false),
-            (Relation::Ahead, true),
-            (Relation::Diverged, true),
-            (Relation::Same, true),
-        ] {
-            assert!(!branch_step(relation, clean).fast_forward, "{relation:?}");
-        }
-        assert!(branch_step(Relation::Same, false).notice.is_none());
-        assert!(
-            branch_step(Relation::Behind, false)
-                .notice
-                .unwrap()
-                .contains("stash")
-        );
-    }
-
-    fn git(dir: &Path, args: &[&str]) -> String {
-        let out = Command::new("git")
-            .args(args)
-            .current_dir(dir)
-            .output()
-            .unwrap();
-        assert!(
-            out.status.success(),
-            "git {args:?}: {}",
-            String::from_utf8_lossy(&out.stderr)
-        );
-        String::from_utf8_lossy(&out.stdout).trim().to_owned()
-    }
-
-    fn commit(dir: &Path, file: &str, text: &str) -> String {
-        std::fs::write(dir.join(file), text).unwrap();
-        git(dir, &["add", "-A"]);
-        git(dir, &["commit", "-qm", text]);
-        git(dir, &["rev-parse", "HEAD"])
-    }
-
-    /// An `origin` holding `refs/pull/7/head` one commit ahead of a clone.
-    fn origin_ahead_of_clone() -> Option<(tempfile::TempDir, PathBuf, String)> {
-        Command::new("git").arg("--version").output().ok()?;
-        let dir = tempfile::tempdir().unwrap();
-        let origin = dir.path().join("origin");
-        std::fs::create_dir(&origin).unwrap();
-        git(&origin, &["init", "-q", "-b", "feat"]);
-        git(&origin, &["config", "user.email", "t@t.co"]);
-        git(&origin, &["config", "user.name", "t"]);
-        commit(&origin, "a.txt", "one");
-        let clone = dir.path().join("clone");
-        git(
-            dir.path(),
-            &["clone", "-q", origin.to_str().unwrap(), "clone"],
-        );
-        git(&clone, &["config", "user.email", "t@t.co"]);
-        git(&clone, &["config", "user.name", "t"]);
-        let ahead = commit(&origin, "a.txt", "two");
-        git(&origin, &["update-ref", "refs/pull/7/head", &ahead]);
-        Some((dir, clone, ahead))
-    }
-
-    #[test]
-    fn fetches_and_fast_forwards_a_clean_branch() {
-        let Some((_dir, clone, ahead)) = origin_ahead_of_clone() else {
-            return;
-        };
-        let checkout = GitCheckout::new(clone);
-        checkout.fetch_pr(7).unwrap();
-        assert_eq!(checkout.relation(&ahead).unwrap(), Relation::Behind);
-        assert!(checkout.is_clean());
-        checkout.fast_forward(&ahead).unwrap();
-        assert_eq!(checkout.head().as_deref(), Some(ahead.as_str()));
-        assert_eq!(checkout.relation(&ahead).unwrap(), Relation::Same);
-    }
-
-    #[test]
-    fn tracked_edits_make_the_checkout_dirty_and_new_commits_put_it_ahead() {
-        let Some((_dir, clone, ahead)) = origin_ahead_of_clone() else {
-            return;
-        };
-        let checkout = GitCheckout::new(clone.clone());
-        std::fs::write(clone.join("a.txt"), "local edit").unwrap();
-        assert!(!checkout.is_clean());
-        std::fs::write(clone.join("untracked.txt"), "x").unwrap();
-        git(&clone, &["checkout", "--", "a.txt"]);
-        assert!(
-            checkout.is_clean(),
-            "untracked files don't block a fast-forward"
-        );
-
-        commit(&clone, "b.txt", "local commit");
-        checkout.fetch_pr(7).unwrap();
-        assert_eq!(checkout.relation(&ahead).unwrap(), Relation::Diverged);
-    }
-}
+#[path = "checkout_tests.rs"]
+mod tests;

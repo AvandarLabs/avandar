@@ -10,13 +10,13 @@
   <div class="app">
     <header class="topbar">
       <div class="tb-left">
-        <button class="icon-btn" id="toggleSide" title="Toggle guide" aria-label="Toggle guide sidebar">
+        <button class="icon-btn" id="toggleSide" aria-label="Toggle guide sidebar">
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="6" y1="2.5" x2="6" y2="13.5" stroke="currentColor" stroke-width="1.2"/></svg>
         </button>
         <div class="brand">
           <span class="mark" id="brandTitle">dif</span>
-          <span class="wt-pill" id="worktreePill" title="worktree" hidden></span>
-          <button class="changes-btn" id="showChangesBtn" type="button" hidden title="The working tree changed — reload difit + the guide in place (keeps your in-progress comment)">
+          <span class="wt-pill" id="worktreePill" hidden></span>
+          <button class="changes-btn" id="showChangesBtn" type="button" hidden>
             <svg class="rfx" width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M13.5 2.5V5H11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span>Show new changes</span>
           </button>
@@ -31,24 +31,29 @@
             <span id="ghReviewLabel">Review</span>
             <span class="gh-count" id="ghReviewCount" hidden></span>
           </button>
-          <span class="gh-notice" id="ghNotice" role="status" hidden></span>
+          <span class="gh-notice" id="ghNotice" role="status" data-tip-trunc hidden></span>
         </div>
       </div>
       <div class="view-info" id="viewInfo"></div>
       <div class="tb-right">
-        <div class="dispatch" title="How your comments reach the LLM: Bulk holds them until Send all, Eager sends each one as soon as you save it">
+        <div class="dispatch">
           <div class="dispatch-seg" id="dispatchMode" role="radiogroup" aria-label="Comment delivery to the LLM">
             <button class="dispatch-opt active" type="button" role="radio" aria-checked="true" data-mode="bulk">Bulk</button>
             <button class="dispatch-opt" type="button" role="radio" aria-checked="false" data-mode="eager">Eager</button>
           </div>
-          <button class="send-all-btn" id="sendAllBtn" type="button" hidden title="Send every held comment to the LLM as one prompt">
+          <button class="send-all-btn" id="sendAllBtn" type="button" hidden>
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h10M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span>Send all</span>
             <span class="send-all-count" id="sendAllCount">0</span>
           </button>
         </div>
+        <button class="commented-btn" id="commentedBtn" type="button" aria-label="With comments" aria-pressed="false" aria-disabled="true">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 3.5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1V10a1 1 0 0 1-1 1H7l-3 2.5V11h-.5a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          <span class="commented-lbl">With comments</span>
+          <span class="commented-count" id="commentedCount">0</span>
+        </button>
         <div class="view-prog" id="viewProg"></div>
-        <button class="cmd-btn" id="cmdBtn" type="button" title="Command palette">
+        <button class="cmd-btn" id="cmdBtn" type="button" aria-label="Command palette">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
           <span class="cmd-lbl">Jump to…</span>
           <kbd class="cmd-kbd" id="cmdKbd">⌘K</kbd>
@@ -61,12 +66,12 @@
       <aside class="sidebar" aria-label="Diff guide">
         <div class="side-head">
           <span class="st">Diff guide</span>
-          <button class="regen-btn" id="regenBtn" type="button" hidden title="A file was added or removed since the guide was generated - refresh it (asks the LLM via /diff-review)">
+          <button class="regen-btn" id="regenBtn" type="button" hidden>
             <svg class="regen-ic" width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13.5 2.5V5H11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span class="regen-lbl">Refresh diff guide</span>
           </button>
           <span class="prog" id="sideProg"></span>
-          <button class="icon-btn" id="collapseBtn" title="Collapse" aria-label="Collapse guide">
+          <button class="icon-btn" id="collapseBtn" aria-label="Collapse guide">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M10 3l-4 5 4 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
@@ -130,6 +135,18 @@
       <button class="gh-pop-submit" id="ghPopSubmit" type="button">Submit review</button>
     </div>
   </div>
+
+  <!-- a GitHub sync's merge conflicts: who resolves them -->
+  <dialog class="gh-conflicts" id="ghConflicts" aria-labelledby="ghConflictsTitle" aria-describedby="ghConflictsSub">
+    <h2 class="gh-pop-title" id="ghConflictsTitle">Merge conflicts after syncing</h2>
+    <p class="gh-pop-sub" id="ghConflictsSub"></p>
+    <ul class="gh-conflicts-files" id="ghConflictsFiles" aria-label="Conflicted files"></ul>
+    <p class="gh-conflicts-ask">Resolve them yourself, or have the LLM resolve them?</p>
+    <div class="gh-pop-actions">
+      <button class="gh-pop-cancel" id="ghConflictsReviewer" type="button">I'll resolve them</button>
+      <button class="gh-pop-submit" id="ghConflictsLlm" type="button" autofocus>Auto-resolve with the LLM</button>
+    </div>
+  </dialog>
 
   <div class="tip" id="tip" role="tooltip" hidden></div>
 
