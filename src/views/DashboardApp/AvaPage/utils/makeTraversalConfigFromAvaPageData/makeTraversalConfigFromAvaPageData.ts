@@ -53,7 +53,27 @@ function _getDescriptors(value: unknown): SlotDescriptor[] {
 }
 
 /**
- * Returns slot metadata for structural traversal of saved content and zones.
+ * Builds a throwaway Puck `Config` from saved page data alone, so that Puck's
+ * `transformProps` can walk the data without the real component registry.
+ *
+ * `transformProps` needs a config to know which props of a block hold nested
+ * blocks (Puck "slots"). The real config lives in the editor and imports
+ * React components, so it is not available to migrations or to dashboard
+ * preparation code that only has the saved JSON. This function infers the
+ * slots from the data instead: any block (an object with a string `type` and
+ * `props.id`) whose prop is an array containing other blocks is treated as a
+ * slot field on that block's component type.
+ *
+ * The returned config has one entry per component type found in the data,
+ * with only the inferred slot fields. Its `render` throws, so it must be used
+ * only for traversal and never for rendering.
+ *
+ * Used by `transformAvaPageProps`, which in turn powers the page data
+ * migrations and dashboard column binding preparation.
+ *
+ * @param data Saved page data. Its shape is not validated, so anything
+ *   unrecognised is ignored.
+ * @returns A Puck config describing only the slot fields found in `data`.
  */
 export function makeTraversalConfigFromAvaPageData(data: unknown): Config {
   const fieldsByType = _getDescriptors(data).reduce<
