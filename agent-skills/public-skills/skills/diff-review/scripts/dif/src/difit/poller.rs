@@ -106,9 +106,19 @@ fn run(
     let mut last_written: Option<String> = None;
     // Every id difit has held this session, plus everything we imported.
     let mut seen: HashSet<String> = HashSet::new();
+    // The version of the last snapshot mirrored, to tell a new difit session
+    // (its version starts over) from the one being mirrored.
+    let mut last_version: Option<i64> = None;
 
     while !stop.load(Ordering::Relaxed) {
         if let Some(snapshot) = fetch(&url) {
+            // A fresh difit session is not a mass deletion: skip the GitHub
+            // pass and the mirror so neither treats every comment as removed.
+            if reseed_new_session(port, transcript_path, &snapshot, last_version) {
+                sleep_interruptible(interval, stop);
+                continue;
+            }
+            last_version = Some(snapshot.version);
             seen.extend(importer::snapshot_ids(&snapshot));
             if let Some(github) = github.as_mut() {
                 github.tick(&snapshot);
@@ -128,6 +138,26 @@ fn run(
         }
         sleep_interruptible(interval, stop);
     }
+}
+
+/// Import the transcript entries a new difit comment session lacks. Returns
+/// whether it did, so the caller skips this tick. A failed POST is retried on
+/// the next tick, since the session still lacks them.
+fn reseed_new_session(
+    port: u16,
+    transcript_path: &Path,
+    snapshot: &Snapshot,
+    last_version: Option<i64>,
+) -> bool {
+    let Ok(text) = std::fs::read_to_string(transcript_path) else {
+        return false;
+    };
+    let entries = importer::reseed_entries(snapshot, &text, last_version);
+    if entries.is_empty() {
+        return false;
+    }
+    let _ = importer::post(port, &entries);
+    true
 }
 
 /// Push transcript entries difit has never held into the live server. Returns
