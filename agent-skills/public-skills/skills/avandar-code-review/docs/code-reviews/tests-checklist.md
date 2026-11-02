@@ -148,18 +148,27 @@ and select it by position/id instead of renaming it mid-test.
   2) a lone test file with no test-only helpers stays colocated with its
   module.
 
-  **Find candidates** (a directory with 2+ split tests for one module):
+  **Find candidates** (a directory with 2+ test files outside `__tests__/`):
 
   ```bash
   find . -type f \( -name '*.test.ts' -o -name '*.test.tsx' \) \
     -not -path '*/node_modules/*' -not -path '*/__tests__/*' \
-  | awk -F/ '{ dir=""; for(i=1;i<NF;i++) dir=dir $i "/";
-               split($NF, p, "."); print dir "\t" p[1] }' \
-  | sort | uniq -c | awk '$1 > 1'
+    -printf '%h\n' | sort | uniq -c | awk '$1 > 1'
   ```
 
-  Every row this prints is a violation. A directory holding one test file each
-  for two different modules is not a match, since the module names differ.
+  Every row this prints is a violation.
+
+- Allow at most one `*.test.ts(x)` file per directory outside a `__tests__/`
+  directory, **whatever the module names are**. Two tests for different modules
+  in one directory (`PairChartForms.test.tsx` next to
+  `PieFunnelChartForm.test.tsx`) are not a loophole around this. Flag the
+  directory and recommend one of: 1) a `__tests__/` beside the module for one
+  module's split suite; 2) a subdirectory per module with the module and its
+  test colocated (the default for tests of different modules); 3) a
+  `__tests__/` at the lowest common directory, only for a test that genuinely
+  spans several sibling modules at once. `tests/e2e/` and `tests/integration/`
+  are exempt. Check every directory touched by the diff, including test files
+  the diff did not add but now sits beside.
 
 - Never put test files for two different modules in one `__tests__/`
   directory. `__tests__/` groups the split suite of a single module; two module

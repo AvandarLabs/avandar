@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { AvaBarChartVizConfigs } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfigs";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
-import { SeriesAwareVizForm } from "./SeriesAwareVizForm";
+import { SeriesAwareVizForm } from "../SeriesAwareVizForm";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";

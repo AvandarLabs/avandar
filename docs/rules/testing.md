@@ -134,6 +134,28 @@ fixtures is already two, so both move into `__tests__/`.
 
 Only a lone test file with no test-only helpers stays beside its module.
 
+### One test file per directory, whatever the module names
+
+The count is per **directory**, not per module name. A directory may hold at
+most one `*.test.ts(x)` file outside a `__tests__/` directory. Different module
+names are not a loophole: `PairChartForms.test.tsx` and
+`PieFunnelChartForm.test.tsx` in one directory are two test files, so the
+directory is a violation even though no two share a module name.
+
+When a directory would hold two or more test files, pick one:
+
+1. **One module's split suite:** move that module's tests and test-only helpers
+   into a `__tests__/` directory beside the module (the rule above).
+2. **Tests for different modules:** give each module its own subdirectory with
+   the module file and its test colocated (`Module1/Module1.ts` and
+   `Module1/Module1.test.ts`).
+3. **One test spanning several sibling modules** (it renders or exercises
+   several of them together, so it belongs to none): put it in a `__tests__/`
+   directory in the lowest directory containing all of those modules.
+
+Option 2 is the default. Use option 3 only when the test genuinely covers
+several modules at once.
+
 Anything used **exclusively** by those tests moves in too: fixtures, stubs,
 scenario builders, custom assertions. If a helper has even one non-test
 importer it stays outside, because it is production code.
@@ -141,7 +163,9 @@ importer it stays outside, because it is production code.
 ### One module per `__tests__/`
 
 A `__tests__/` directory groups the split suite of **one** module. It is not a
-bucket for unrelated test files.
+bucket for unrelated test files. The only exception is a `__tests__/` holding
+tests that each span several sibling modules (option 3 above), which has no
+single owner.
 
 `__tests__/Module1.test.ts` next to `__tests__/Module2.test.ts` means
 `Module2` wants its own directory:
@@ -169,12 +193,12 @@ test. Write an e2e test under `tests/e2e/` instead.
 ```bash
 find src shared packages apps -type f \( -name '*.test.ts' -o -name '*.test.tsx' \) \
   -not -path '*/node_modules/*' -not -path '*/__tests__/*' \
-| awk -F/ '{ dir=""; for(i=1;i<NF;i++) dir=dir $i "/"; split($NF, p, "."); print dir "\t" p[1] }' \
-| sort | uniq -c | awk '$1 > 1 { print $1"  "$2"  module="$3 }'
+  -printf '%h\n' | sort | uniq -c | awk '$1 > 1'
 ```
 
-Each row is a directory holding that many split test files for one module, and
-every row is a violation.
+Each row is a directory holding that many test files outside `__tests__/`, and
+every row is a violation regardless of the module names. Only `tests/e2e/` and
+`tests/integration/` are exempt, since they are dedicated test trees.
 
 That script only counts test files. Also look for fixtures that sit beside a
 test outside `__tests__/`:
