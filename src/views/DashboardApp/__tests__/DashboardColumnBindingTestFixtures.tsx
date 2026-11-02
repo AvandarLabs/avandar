@@ -25,13 +25,13 @@ import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResult
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvandarQueryClientProvider } from "@/components/providers/AvandarQueryClientProvider/AvandarQueryClientProvider";
 import { DataVizColumnBindings } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizColumnBindings";
+import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import { useDataVizRuntimeColumnBindings } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizRuntimeColumnBindings/useDataVizRuntimeColumnBindings";
+import { DashboardColumnBindingPreparation } from "@/views/DashboardApp/AvaPage/utils/DashboardColumnBindingPreparation/DashboardColumnBindingPreparation";
 import { isWorkspaceRawSqlDataQueryKey } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
-import { withDuckDb } from "../../../tests/integration/queries/executedDuckDb";
-import { DataVizPBlock } from "../DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
-import { useDataVizRuntimeColumnBindings } from "../DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizRuntimeColumnBindings/useDataVizRuntimeColumnBindings";
-import { DashboardColumnBindingPreparation } from "../DashboardApp/AvaPage/utils/DashboardColumnBindingPreparation/DashboardColumnBindingPreparation";
-import type { Props as DataVizProps } from "../DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
+import type { Props as DataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { PuckContext } from "@puckeditor/core";
 import type { ReactElement, ReactNode } from "react";
 

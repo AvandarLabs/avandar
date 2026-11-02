@@ -1,5 +1,5 @@
 import { pickProps } from "@avandar/utils";
-import { DashboardColumnBindingTestFixtures } from "./dashboardColumnBindings/DashboardColumnBindingTestFixtures";
+import { DashboardColumnBindingTestFixtures } from "./DashboardColumnBindingTestFixtures";
 
 const {
   QueryResult,

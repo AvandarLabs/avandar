@@ -1,4 +1,4 @@
-import { DashboardColumnBindingTestFixtures } from "./dashboardColumnBindings/DashboardColumnBindingTestFixtures";
+import { DashboardColumnBindingTestFixtures } from "./DashboardColumnBindingTestFixtures";
 import type { QueryResult as QueryResultModel } from "$/models/queries/QueryResult/QueryResult";
 
 const {
