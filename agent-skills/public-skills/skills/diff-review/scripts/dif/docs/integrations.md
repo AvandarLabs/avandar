@@ -275,7 +275,7 @@ of steering or interrupting the current turn.
   **eager** mode (`POST /__wrap/dispatch {"mode":"eager"}`) each open comment
   is typed as its own prompt the tick it appears. A held comment is not marked
   dispatched, so its final text is what gets sent.
-- **Send one now.** In bulk mode, `Cmd+Ctrl+Enter` in a TUI comment box makes
+- **Send one now.** In bulk mode, `Cmd+Alt+Enter` in a TUI comment box makes
   `inject/destinations.js` tag that save with `X-Dif-Send: now`. The shell diffs
   it against difit's comments (as for a PR save) and records the new message ids
   in `DispatchControl`; the event loop hands them to the `Dispatcher`, which

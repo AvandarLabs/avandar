@@ -10,7 +10,7 @@
 //! diff the posted threads against what difit holds; the new message ids are
 //! the comment just submitted, and they are marked PR-bound *before* difit (and
 //! so the poller and the LLM dispatcher) can ever see them. A TUI comment saved
-//! with `Cmd+Ctrl+Enter` in bulk mode carries `X-Dif-Send: now` instead, and its
+//! with `Cmd+Alt+Enter` in bulk mode carries `X-Dif-Send: now` instead, and its
 //! new message ids are marked to skip the bulk queue the same way.
 
 use std::collections::HashSet;

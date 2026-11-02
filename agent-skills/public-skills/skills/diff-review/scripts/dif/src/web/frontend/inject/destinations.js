@@ -13,7 +13,7 @@
   // shell's `/__wrap/github.json`: blue with a GitHub badge, dashed while they
   // are still drafts, red when GitHub rejected them.
   //
-  // In Bulk mode a TUI comment is held for Send all; Cmd+Ctrl+Enter (macOS) or
+  // In Bulk mode a TUI comment is held for Send all; Cmd+Alt+Enter (macOS) or
   // Ctrl+Alt+Enter saves one with an `X-Dif-Send: now` header instead, and the
   // shell hands that comment to the LLM at once, leaving the rest held.
   var DEST_HEADER = "X-Dif-Destination";
@@ -28,11 +28,11 @@
   var IS_MAC = /Mac|iP(hone|ad|od)/.test((navigator.platform || "") + " " + (navigator.userAgent || ""));
   var TOGGLE_HINT = IS_MAC ? "⌃G" : "Alt+Shift+G";
   var SEND_OTHER_HINT = IS_MAC ? "⌘⇧↵" : "Ctrl+Shift+Enter";
-  var SEND_NOW_HINT = IS_MAC ? "⌘⌃↵" : "Ctrl+Alt+Enter";
+  var SEND_NOW_HINT = IS_MAC ? "⌘⌥↵" : "Ctrl+Alt+Enter";
   function isSendNowCombo(event) {
     if (event.key !== "Enter" || event.shiftKey) return false;
     return IS_MAC
-      ? event.metaKey && event.ctrlKey && !event.altKey
+      ? event.metaKey && event.altKey && !event.ctrlKey
       : event.ctrlKey && event.altKey && !event.metaKey;
   }
   function isToggleCombo(event) {
@@ -255,7 +255,7 @@
     var target = event.target;
     if (event.key !== "Enter" || !(event.metaKey || event.ctrlKey) || !target || target.tagName !== "TEXTAREA") return;
     var form = target.closest("form");
-    // Bulk + TUI: Cmd+Ctrl+Enter sends this comment at once. difit still
+    // Bulk + TUI: Cmd+Alt+Enter sends this comment at once. difit still
     // submits (it saves on Mod+Enter); this only tags the save.
     if (isSendNowCombo(event) && form && form.getAttribute("data-dif-dest") !== "github" && deliveryMode === "bulk") {
       armedGithubAt = 0;
