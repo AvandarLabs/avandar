@@ -260,7 +260,10 @@ of steering or interrupting the current turn.
 - On the first successful poll, every existing reviewer comment id is recorded
   as a **baseline** and *not* dispatched — `dif` only acts on comments added
   after launch. (Pre-existing open comments are intentionally left for you to
-  trigger manually in the LLM pane if you want them addressed.)
+  trigger manually in the LLM pane if you want them addressed.) Comments held
+  for **Send all** when `dif` last quit are the exception: their ids are saved
+  to `-held.json` (see [data-model.md](data-model.md#the-held-comments)) and
+  left out of the baseline, so they are held again.
 - After that, any **reviewer** comment with no later `claude` reply in its
   thread is typed into the LLM pane exactly once (tracked by message id). A
   reviewer comment is any authored message whose author is **not** `claude`:

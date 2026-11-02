@@ -11,6 +11,7 @@ use crate::comparison::ComparisonKey;
 use crate::difit::poller::Poller;
 use crate::git_watcher::GitWatcher;
 use crate::inject::dispatcher::Dispatcher;
+use crate::inject::held::HeldComments;
 use crate::inject::reply_watcher::ReplyWatcher;
 use crate::pty_pane::PtyPane;
 use crate::session::AgentKind;
@@ -86,6 +87,8 @@ pub struct App {
     pub review_control: ReviewControl,
     /// Turns difit snapshots into LLM prompts, once per comment.
     pub dispatcher: Dispatcher,
+    /// The comments held for "Send all", saved so a relaunch keeps them.
+    pub held_comments: HeldComments,
     /// Bulk vs eager delivery and the PR-bound comments, shared with the
     /// browser shell and the poller.
     pub comment_channels: web::CommentChannels,

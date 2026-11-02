@@ -9,6 +9,7 @@ use crate::difit::poller::Poller;
 use crate::difit::{server, transcript};
 use crate::github::conflicts::{resolve_prompt, reviewer_resolves_notice};
 use crate::github::registry::SharedRegistry;
+use crate::inject::held::HeldComments;
 use crate::paths;
 use crate::slug;
 use crate::tui::guide::Guide;
@@ -110,6 +111,11 @@ impl App {
             server::pick_port(slug::port_for(&format!("{branch_slug}-shell"), &scope_slug));
         self.transcript_path = paths::transcript_path(&self.repo_root, &branch_slug, &scope_slug);
         self.comment_channels.github = SharedRegistry::load(paths::github_sync_path(
+            &self.repo_root,
+            &branch_slug,
+            &scope_slug,
+        ));
+        self.held_comments = HeldComments::load(paths::held_comments_path(
             &self.repo_root,
             &branch_slug,
             &scope_slug,

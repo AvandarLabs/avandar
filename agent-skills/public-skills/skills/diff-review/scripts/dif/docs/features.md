@@ -124,7 +124,9 @@ tell the agent to "address the comments," and replies appear without a restart.
 `dif` logs a restart warning in the left pane; see below.)
 
 Comments that already exist when `dif` launches are treated as a baseline and
-are not auto-dispatched; only comments added after launch trigger work.
+are not auto-dispatched; only comments added after launch trigger work. The
+exception is comments still held for **Send all** when `dif` quit: they stay
+held across the relaunch.
 
 ### Bulk vs eager delivery
 
@@ -134,7 +136,8 @@ The browser shell's top bar has a **Bulk / Eager** toggle.
   shows how many are waiting; pressing it types them into the LLM pane as **one**
   numbered prompt. One prompt per pass of comments costs far fewer tokens than
   one per comment. A held comment that you edit is sent in its edited form, and
-  one you delete is never sent.
+  one you delete is never sent. Held comments survive quitting and relaunching
+  `dif`.
 - **Eager** types each comment into the LLM pane as soon as you save it.
   Switching to Eager also sends anything still held.
 - **Send one now.** In Bulk, **Cmd+Alt+Enter** (Ctrl+Alt+Enter off macOS) in
