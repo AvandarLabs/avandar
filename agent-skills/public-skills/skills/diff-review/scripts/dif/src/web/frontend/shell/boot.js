@@ -6,8 +6,10 @@
   readLiveViewed();
   initViewedSync(); // later difit viewed changes are sent to GitHub
   baselineUntil = nowMs() + 2500; // absorb difit's cold-start /api/diff settling
-  selectView("full"); // mount difit immediately; the guide fills in around it
+  selectView(restoreViewState()); // mount difit at once; the guide fills in around it
+  renderCommentedBtn();
   fetchMeta();
+  fetchComments(); // which files have comments, for the "With comments" toggle
   fetchGroups();
   fetchSummary();
   fetchTestPlan();
@@ -20,4 +22,6 @@
   window.setInterval(fetchDiff, 3000);   // keep counts + new-files + show-changes in sync
   window.setInterval(fetchDispatch, 1500); // the held count changes as comments are saved
   window.setInterval(fetchGithub, 2000);
+  window.setInterval(fetchMeta, 2000); // a TUI Ctrl+R restart reloads this tab
+  window.setInterval(fetchComments, 3000);
 })();

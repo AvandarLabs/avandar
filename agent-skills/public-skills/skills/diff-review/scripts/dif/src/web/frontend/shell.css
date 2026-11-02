@@ -296,9 +296,68 @@ kbd {
   color: var(--ink);
   border-color: var(--ink-3);
 }
+/* "With comments": narrow the diff to the files with comment threads */
+.commented-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 2px 4px 2px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s var(--ease),
+    border-color 0.15s var(--ease),
+    color 0.15s var(--ease);
+}
+.commented-btn:not(:disabled):hover {
+  color: var(--ink-2);
+  border-color: var(--ink-3);
+}
+.commented-btn.active {
+  color: var(--accent-ink);
+  background: var(--accent-wash);
+  border-color: color-mix(in oklch, var(--accent) 34%, transparent);
+}
+.commented-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.commented-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  color: var(--ink-2);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 6px;
+  min-width: 18px;
+  text-align: center;
+}
+.commented-btn.active .commented-count {
+  color: var(--surface);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+/* The header's three columns share one row: below this width the label would
+   push the centered view title under the left column, so show icon + count. */
+@media (max-width: 1440px) {
+  .commented-btn .commented-lbl {
+    display: none;
+  }
+}
+
 .theme-btn:focus-visible,
 .icon-btn:focus-visible,
-.cmd-btn:focus-visible {
+.cmd-btn:focus-visible,
+.commented-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -1640,6 +1699,48 @@ kbd {
   opacity: 0.6;
   cursor: progress;
 }
+/* a GitHub sync's merge conflicts: who resolves them (a native modal dialog) */
+.gh-conflicts {
+  width: min(440px, calc(100vw - 32px));
+  padding: 16px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+.gh-conflicts[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gh-conflicts::backdrop {
+  background: oklch(0.2 0.01 262 / 0.32);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.gh-conflicts-files {
+  margin: 0;
+  padding: 6px 10px;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  max-height: 30vh;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+.gh-conflicts-files li + li {
+  margin-top: 3px;
+}
+.gh-conflicts-ask {
+  margin: 0;
+  font-size: 13px;
+}
+
 .gh-sr-only {
   position: absolute;
   width: 1px;

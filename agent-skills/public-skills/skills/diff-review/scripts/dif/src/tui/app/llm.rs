@@ -128,7 +128,8 @@ impl App {
 
     /// Type newly-open reviewer comments into the LLM pane: each one at once in
     /// eager mode, or all held ones together when the browser asks to "Send
-    /// all" in bulk mode. PR-bound comments are never typed. Checks the pane is
+    /// all" in bulk mode (a comment marked "send now" goes at once even then).
+    /// PR-bound comments are never typed. Checks the pane is
     /// alive *before* consuming snapshots (or a send-all request) so a dispatch
     /// is never lost to a dead pane.
     pub fn inject_pending(&mut self) {
@@ -139,6 +140,8 @@ impl App {
             return;
         };
         let delivery = self.comment_channels.dispatch.take_delivery();
+        self.dispatcher
+            .send_now(self.comment_channels.dispatch.take_send_now());
         let excluded = self.comment_channels.github.github_ids();
         let outcome = self
             .dispatcher

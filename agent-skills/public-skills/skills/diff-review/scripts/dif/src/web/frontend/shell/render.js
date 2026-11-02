@@ -155,6 +155,7 @@
       title = '<span class="name">Full diff</span>';
       chip = '<span class="filter-chip full">○ all ' + total + ' files</span>';
     }
+    if (commentedOnly) chip += '<span class="filter-chip">◉ Only files with comments</span>';
     var pct = count ? Math.round((rev / count) * 100) : 0;
     els.viewInfo.innerHTML = '<div class="mh-title">' + title + '</div>' + chip;
     els.viewProg.innerHTML = '<span class="txt">' + rev + '/' + count + ' reviewed</span>'
@@ -176,5 +177,6 @@
     renderRail();
     renderHead();
     updateRegenBtn();
+    renderCommentedBtn(); // its count is the commented files in the diff
     if (spotlightOpen()) renderSpotlight();
   }

@@ -1,11 +1,13 @@
-//! Retargeting and relaunching the review surface: the web shell's requests,
-//! a comparison change, a fresh LLM session, and a difit restart.
+//! Retargeting and relaunching the review surface: the web shell's requests
+//! (regenerate the guide, resolve a pull's merge conflicts), a comparison
+//! change, a fresh LLM session, and a difit restart.
 
 use std::time::Instant;
 
 use crate::comparison::ComparisonKey;
 use crate::difit::poller::Poller;
 use crate::difit::{server, transcript};
+use crate::github::conflicts::{resolve_prompt, reviewer_resolves_notice};
 use crate::github::registry::SharedRegistry;
 use crate::paths;
 use crate::slug;
@@ -26,6 +28,7 @@ impl App {
     /// runs the same regeneration as `Ctrl+G`. A no-op when nothing is pending.
     pub fn poll_web_shell_requests(&mut self) {
         self.apply_pending_comparison_update();
+        self.resolve_conflicts_if_asked();
         if self
             .web_shell
             .as_ref()
@@ -36,6 +39,33 @@ impl App {
             );
             self.regenerate_guide();
         }
+    }
+
+    /// Type the "resolve these merge conflicts" request into the LLM pane when
+    /// the reviewer chose auto-resolve in the browser's conflict modal.
+    fn resolve_conflicts_if_asked(&mut self) {
+        let Some(files) = self
+            .comment_channels
+            .github
+            .session(|s| s.conflicts_for_llm.take())
+        else {
+            return;
+        };
+        let Some(llm) = self.llm.as_ref().filter(|p| p.is_alive()) else {
+            self.difit.write_to_screen(
+                "\r\n\x1b[31m[dif] Can't auto-resolve the merge conflicts: the LLM pane isn't running.\x1b[0m\r\n",
+            );
+            let notice = reviewer_resolves_notice(files.len());
+            self.comment_channels
+                .github
+                .session(|s| s.notice = Some(notice));
+            return;
+        };
+        self.difit.write_to_screen(
+            "\r\n\x1b[36m↻ Asking the LLM to resolve the merge conflicts from the GitHub pull…\x1b[0m\r\n",
+        );
+        send_prompt_to_pty(llm, &resolve_prompt(&files), self.agent_kind);
+        self.last_inject_at = Some(Instant::now());
     }
 
     /// Apply a comparison the skill selected inside this already-open TUI.
@@ -231,7 +261,7 @@ impl App {
             transcript_raw.as_deref(),
             // difit must not open its own frontend: the web shell owns the
             // browser surface, so restart spawns difit with `--no-open` (exactly
-            // as the original launch) and we reopen the *shell* URL below.
+            // as the original launch) and the open shell tab reloads itself.
             false,
         );
         self.difit
@@ -257,8 +287,11 @@ impl App {
         self.served_sig = self.git_watcher.current();
         self.pending_change = None;
         self.warned_sig = None;
-        // Reopen the review in the browser at the wrapped-shell URL (difit was
-        // told not to), matching the original launch surface.
-        self.open_in_browser();
+        // The shell keeps serving on the same port, so the open tab reloads
+        // itself once it sees the restart. Opening the URL again would only
+        // stack up tabs (`Ctrl+O` is there when no tab is open).
+        if let Some(shell) = self.web_shell.as_ref() {
+            shell.note_difit_restart();
+        }
     }
 }

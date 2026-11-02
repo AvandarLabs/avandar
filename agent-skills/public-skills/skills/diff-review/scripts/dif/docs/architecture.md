@@ -34,7 +34,8 @@ src/
 │   ├── pull.rs        pull: the PR's threads vs the registry + difit → difit edits + registry changes; viewed changes (pure)
 │   ├── graphql.rs     the GraphQL documents + pure parsing of GitHub's answers
 │   ├── client.rs      GithubApi trait + the `gh api graphql` implementation
-│   ├── checkout.rs    branch vs PR head, fast-forward only when safe (Checkout trait + git)
+│   ├── checkout.rs    branch vs PR head, fast-forward only when safe, stashing around it on Sync (Checkout trait + git)
+│   ├── conflicts.rs   a Sync's merge conflicts: who resolves them, the notices, the LLM prompt (pure)
 │   ├── sync.rs        the per-snapshot pass: PR lookup, push, viewed queue, review submit
 │   └── sync_pull.rs   the pull half: fetch, branch step, comments, viewed events
 ├── inject/
@@ -214,6 +215,8 @@ difit holds the comment (and the transcript mirrors it, as for any comment)
 Poller thread, every 60s or on Sync: github::sync_pull
         PR threads + viewed files  →  difit (editor.rs) + registry
         PR head ahead + clean branch  →  fast-forward  →  shell reloads difit
+        reviewer's Sync + dirty branch  →  stash, fast-forward, restore  →  page reloads
+        restore conflicts  →  browser modal  →  reviewer, or the LLM pane via the TUI
         viewed changes  →  /__wrap/github.json events  →  inject/viewed.js
 ```
 
@@ -285,7 +288,9 @@ gained two capabilities for this:
 kill difit, `server::wait_until_port_free` (so the relaunch rebinds the same
 port rather than letting difit auto-reassign), then respawn with the same
 comparison/port and a freshly re-read transcript. The poller and LLM pane are
-untouched; the poller reconnects on its own.
+untouched; the poller reconnects on its own. It then bumps the web shell's
+restart counter instead of opening the browser: the open tab sees it in
+`meta.json` and reloads itself, so a restart never adds a tab.
 
 ## Dependencies
 

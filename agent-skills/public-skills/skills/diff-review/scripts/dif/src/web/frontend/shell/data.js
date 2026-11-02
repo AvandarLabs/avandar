@@ -49,9 +49,18 @@
       .catch(function () { /* keep last known test plan */ });
   }
 
-  // ---- data: header identity (branch + worktree pill) ----
+  // ---- data: header identity (branch + worktree pill), difit restarts ----
   function applyMeta(meta) {
     if (!meta || typeof meta !== "object") return;
+    // A TUI Ctrl+R restarted difit. The restart no longer opens a new tab, so
+    // this one reloads itself to show the fresh server.
+    if (typeof meta.difitRestarts === "number") {
+      if (seenDifitRestarts !== null && meta.difitRestarts > seenDifitRestarts) {
+        reloadShell();
+        return;
+      }
+      seenDifitRestarts = meta.difitRestarts;
+    }
     if (meta.branch) {
       els.brandTitle.textContent = meta.branch;
       els.brandTitle.title = meta.branch;
@@ -67,7 +76,7 @@
     fetch("/__wrap/meta.json", { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("meta " + r.status)); })
       .then(applyMeta)
-      .catch(function () { /* keep the default title */ });
+      .catch(function () { /* keep the last known title */ });
   }
 
   // ---- data: the authoritative diff (difit's real /api/diff, unfiltered) ----

@@ -137,6 +137,10 @@ The browser shell's top bar has a **Bulk / Eager** toggle.
   one you delete is never sent.
 - **Eager** types each comment into the LLM pane as soon as you save it.
   Switching to Eager also sends anything still held.
+- **Send one now.** In Bulk, **Cmd+Ctrl+Enter** (Ctrl+Alt+Enter off macOS) in
+  a comment box set to TUI saves that one comment and types it into the LLM pane
+  at once. Everything else stays held for **Send all**. The submit button's
+  tooltip shows the shortcut while it applies.
 
 The mode resets to Bulk on every launch.
 
@@ -194,10 +198,19 @@ you click **Sync** or submit a review:
 - Edits made on GitHub replace the local text, unless you have an unsent edit of
   the same comment, which wins. Comments deleted on GitHub, and conversations
   resolved there, disappear locally.
-- New commits on the PR are pulled in when your branch is simply behind and has
-  no uncommitted changes to tracked files; the diff then reloads in place.
-  Otherwise the header says why (uncommitted changes, unpushed commits, or a
-  diverged branch) and nothing is touched.
+- New commits on the PR are pulled in when your branch is simply behind. The
+  minute-by-minute pull does that only when no tracked file has uncommitted
+  changes, and the diff then reloads in place.
+- Clicking **Sync** goes further: it stashes your uncommitted changes,
+  fast-forwards to the PR head, and restores them. Once the sync finishes, the
+  page reloads, keeping your view, sidebar tab, and **With comments** filter.
+- If restoring your changes conflicts, a modal lists the conflicted files and
+  asks who resolves them. **I'll resolve them** (or Esc) leaves them to you; the
+  header reminds you to `git stash drop` afterward, since git keeps the stash
+  when a restore conflicts. **Auto-resolve with the LLM** types a request into
+  the LLM pane to resolve them, leave the changes unstaged, and drop the stash,
+  without committing.
+- Unpushed commits or a diverged branch are never touched; the header says why.
 
 **Viewed files stay in sync both ways.** Marking a file viewed in difit marks it
 on GitHub at once, and the reverse arrives with the next pull. Marking a whole
@@ -207,6 +220,15 @@ while dif shows the PR's own diff (comparing against the PR's base, with your
 checkout at the PR head); otherwise the PR link's tooltip says why it is
 paused. When GitHub's state changes a file, difit's view reloads once you have
 no comment half-typed.
+
+### Only files with comments
+
+For a big diff, the browser shell's top bar has a **With comments** toggle (a
+comment icon and a count of the files with comments). Turning it on narrows the
+diff to the files that have at least one comment thread, on top of whichever view
+is open (the full diff or a group). The command palette has the same toggle:
+**Show only files with comments** / **Show all files**. Below 1440px wide the
+toggle shows only its icon and count.
 
 ## Command palette
 
@@ -231,6 +253,12 @@ The log view is **not cleared**: `dif` writes `[dif] Stopping…` /
 `[dif] Restarting…` status lines into the log and the new server output appends
 below them, so it reads as one continuous log. The poller keeps running and
 reconnects automatically once difit is back on the same port.
+
+A restart **never opens a browser tab**. The browser shell keeps serving on the
+same port, and the tab you already have open reloads itself once it sees the
+restart, keeping your view, sidebar tab, and **With comments** filter. A manual
+browser refresh restores them the same way. If no tab is open, `Ctrl+O` opens
+one.
 
 ### Regenerate diff guide
 

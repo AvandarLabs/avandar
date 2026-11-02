@@ -10,6 +10,7 @@ use std::time::Instant;
 use serde::Serialize;
 use serde_json::{Value, json};
 
+use super::conflicts::{ConflictResolution, llm_resolves_notice, reviewer_resolves_notice};
 use super::registry::Registry;
 
 /// The pull request PR comments go to.
@@ -166,6 +167,11 @@ pub struct Session {
     /// The reviewer's pending review on the PR, if one exists.
     pub review_id: Option<String>,
     pub pull_requested: bool,
+    /// The reviewer clicked Sync: the next pull may stash local changes to
+    /// bring in the PR's new commits. A background pull never touches them.
+    pub reviewer_pull: bool,
+    /// Finished pulls the reviewer asked for. The browser reloads each time this grows.
+    pub reviewer_pulls: u64,
     pub pulling: bool,
     pub last_pull: Option<Instant>,
     pub pull_error: Option<String>,
@@ -174,6 +180,11 @@ pub struct Session {
     /// Bumped each time sync fast-forwards the branch, so the browser reloads
     /// the diff.
     pub fast_forwards: u64,
+    /// Files a pull's stash restore left conflicted, until the reviewer says who resolves them.
+    pub conflicts: Option<Vec<String>>,
+    /// Conflicted files the reviewer asked the LLM to resolve. The TUI takes
+    /// them and types the request into the LLM pane.
+    pub conflicts_for_llm: Option<Vec<String>>,
     pub submit: Option<SubmitRequest>,
     pub last_submit: Option<SubmitOutcome>,
     pub viewed: ViewedSync,
@@ -192,11 +203,15 @@ impl Session {
             viewer: None,
             review_id: None,
             pull_requested: false,
+            reviewer_pull: false,
+            reviewer_pulls: 0,
             pulling: false,
             last_pull: None,
             pull_error: None,
             notice: None,
             fast_forwards: 0,
+            conflicts: None,
+            conflicts_for_llm: None,
             submit: None,
             last_submit: None,
             viewed: ViewedSync::default(),
@@ -218,6 +233,23 @@ impl Session {
     #[must_use]
     pub fn is_own_pr(&self) -> bool {
         matches!((self.pr(), &self.viewer), (Some(pr), Some(viewer)) if &pr.author == viewer)
+    }
+
+    /// Record who resolves the open merge conflicts. A no-op when none are
+    /// open, so a second browser tab answering late changes nothing.
+    pub fn answer_conflicts(&mut self, resolution: ConflictResolution) {
+        let Some(files) = self.conflicts.take() else {
+            return;
+        };
+        match resolution {
+            ConflictResolution::Llm => {
+                self.notice = Some(llm_resolves_notice(files.len()));
+                self.conflicts_for_llm = Some(files);
+            }
+            ConflictResolution::Reviewer => {
+                self.notice = Some(reviewer_resolves_notice(files.len()));
+            }
+        }
     }
 
     /// The browser's view of the session plus the registry's comments.
@@ -249,8 +281,10 @@ impl Session {
                 "secondsSincePull": self.last_pull.map(|at| at.elapsed().as_secs()),
                 "error": self.pull_error,
                 "notice": self.notice,
+                "reviewerPulls": self.reviewer_pulls,
             },
             "fastForwards": self.fast_forwards,
+            "conflicts": self.conflicts,
             "viewed": {
                 "active": self.viewed.active,
                 "reason": self.viewed.reason,
@@ -305,6 +339,39 @@ mod tests {
         assert_eq!(state["available"], true);
         assert_eq!(state["pr"]["isOwn"], false);
         assert_eq!(state["pr"]["number"], 7);
+    }
+
+    #[test]
+    fn answering_conflicts_hands_them_to_the_llm_or_leaves_them_to_the_reviewer() {
+        let conflicted = || Some(vec!["a.rs".to_owned()]);
+        let mut session = Session::new();
+        session.conflicts = conflicted();
+        session.answer_conflicts(ConflictResolution::Llm);
+        assert_eq!(session.conflicts, None);
+        assert_eq!(session.conflicts_for_llm, conflicted());
+        assert!(session.notice.unwrap().contains("LLM"));
+
+        let mut session = Session::new();
+        session.conflicts = conflicted();
+        session.answer_conflicts(ConflictResolution::Reviewer);
+        assert_eq!(session.conflicts, None);
+        assert_eq!(session.conflicts_for_llm, None);
+        let notice = session.notice.unwrap();
+        assert!(notice.contains("git stash drop"), "{notice}");
+    }
+
+    #[test]
+    fn state_json_carries_open_conflicts_and_finished_reviewer_pulls() {
+        let mut session = Session::new();
+        let state = session.state_json(&Registry::default());
+        assert!(state["conflicts"].is_null());
+        assert_eq!(state["sync"]["reviewerPulls"], 0);
+
+        session.conflicts = Some(vec!["a.rs".to_owned()]);
+        session.reviewer_pulls = 2;
+        let state = session.state_json(&Registry::default());
+        assert_eq!(state["conflicts"], serde_json::json!(["a.rs"]));
+        assert_eq!(state["sync"]["reviewerPulls"], 2);
     }
 
     #[test]

@@ -426,6 +426,38 @@ styles are injected as a `<style>` element because difit's document has no
 shell stylesheet. See [integrations.md](integrations.md#github-pr-sync) for the
 contracts.
 
+### Only files with comments
+
+A **With comments** toggle in the top bar's right section (`frontend/shell/commented.js`,
+also a palette action) narrows the difit iframe to files with comment threads.
+It composes with the view: the iframe URL gains `commented=1`
+(`/__wrap/difit?group=2&commented=1`), the router reads it off the `/api/diff`
+`Referer` (`Route::ApiDiff { commented_only }`), and after the view's own filter
+the proxy reads difit's `/api/comments-json` and keeps only files with a
+message (`filter::commented_files`, then `filter::filter_diff`). An unreadable
+comments payload leaves the diff unnarrowed (fail-open). The count polls
+`/api/comments-json` every 3s and counts commented files in the current diff;
+with none, the toggle is disabled while off.
+
+### Reloading after a Sync or a difit restart
+
+The shell reloads the whole page (`reloadShell`) when a reviewer-requested
+**Sync** finishes (`sync.reviewerPulls` grows in `/__wrap/github.json`) and when
+the TUI restarts difit (`difitRestarts` grows in `/__wrap/meta.json`, now polled
+every 2s). Neither ever opens a new tab. The tab's place survives any reload,
+ours or the browser's: `pagehide` saves the view, the sidebar tab, and the
+commented-only toggle to `sessionStorage` (`dif-shell-view`), and boot restores
+them. A new tab starts at the full diff.
+
+### Merge conflicts after a Sync
+
+When a Sync's stash restore conflicts, `/__wrap/github.json` carries
+`conflicts` (the file list) until someone answers. `frontend/shell/conflicts.js`
+shows a native modal `<dialog>` listing the files with **I'll resolve them** and
+**Auto-resolve with the LLM** (focused). Escape counts as the first. The answer
+goes to `POST /__wrap/github/conflicts`; another tab's open modal closes once
+`conflicts` clears. See [integrations.md](integrations.md#pulling-from-github).
+
 ### Sidebar file rows
 
 Each file row shows the viewed check, the file name, and a short note. The name
@@ -436,8 +468,8 @@ not shown in the row.
 
 ### Iframe auto-retry (no manual "Retry")
 
-difit is briefly down right after a `Ctrl+R` restart, so the iframe's first load
-can `502`. `shell.js` retries the load silently (up to `RETRY_MAX`, 500ms apart)
+difit is briefly down right after a `Ctrl+R` restart (which reloads the open
+tab rather than opening a new one), so the iframe's first load can `502`. `shell.js` retries the load silently (up to `RETRY_MAX`, 500ms apart)
 before surfacing the manual "difit didn't load" box — so a restart reopens the
 shell and difit fills in on its own. `difit-ready` (from `inject.js`) cancels the
 retry loop.
@@ -460,6 +492,7 @@ Windows/Linux the leader is **Alt+Shift**, because browsers reserve
 | `Ctrl`+`G` (macOS) / `Alt+Shift`+`G` (Windows/Linux) | In a difit comment box: toggle where the comment goes, TUI ↔ PR |
 | `⌘`+`Enter` / `Ctrl`+`Enter` | In a difit comment box: save to the destination the toggle shows |
 | `⌘`+`Shift`+`Enter` / `Ctrl`+`Shift`+`Enter` | In a difit comment box: save to the *other* destination (TUI → PR, PR → TUI) without flipping the toggle. Ignored when there is no PR to post to |
+| `⌘`+`Ctrl`+`Enter` / `Ctrl`+`Alt`+`Enter` | In a TUI comment box in Bulk mode: save and send this one comment to the LLM at once, skipping the held queue |
 
 Hotkeys never fire while focus is in an editable field (so difit's comment boxes
 and emacs-style Ctrl keys keep working). Because a keydown inside the difit
@@ -536,7 +569,7 @@ axum. Reuse `ureq` (already a dep) for upstream calls to difit.
     a single `/__wrap/shell.js`. `shell.js` (the entry) opens the IIFE and
     declares all shared state + DOM refs; feature fragments (`tooltip`,
     `helpers`, `iframe`, `render`, `data`, `spotlight`, `hotkeys`, `chrome`,
-    `dispatch`) add
+    `commented`, `dispatch`, `github`, `conflicts`) add
     behavior; `boot.js` runs startup and closes the IIFE. Ordering is
     load-bearing only in that `shell.js` is first and `boot.js` last (the middle
     fragments are hoisted function/listener definitions). The fragments are not

@@ -5,7 +5,9 @@
   // The header shows the branch's PR (or a yellow "No linked PR"), a Sync
   // button that pulls from GitHub now (the poller also pulls every minute), and
   // a Review button that opens the submit panel for the reviewer's pending
-  // review. Viewed files flow from difit to GitHub here: difit's writes reach
+  // review. A Sync may stash local changes to pull the PR's new commits; once
+  // it finishes the page reloads, and any merge conflicts it left open the
+  // modal in conflicts.js. Viewed files flow from difit to GitHub here: difit's writes reach
   // this document as storage events, and each changed path is sent to
   // `/__wrap/github/viewed` (marking a directory sends one change per file).
   // GitHub -> difit viewed changes are applied inside difit by inject/viewed.js.
@@ -14,6 +16,7 @@
   var ghFlash = "";
   var ghFlashTimer = null;
   var ghFastForwards = null;
+  var ghReviewerPulls = null; // Syncs finished as of the last poll
   var autoShowChanges = false; // the branch was fast-forwarded: reload the diff
   var ghPushedViewed = null;   // the viewed set last sent to GitHub
   var ghEls = {
@@ -86,6 +89,12 @@
   function applyGithub(state) {
     if (!state || typeof state !== "object") return;
     gh = state;
+    var reviewerPulls = state.sync ? state.sync.reviewerPulls : null;
+    if (ghReviewerPulls !== null && reviewerPulls > ghReviewerPulls && !state.sync.error) {
+      reloadShell(); // a Sync finished: show the pulled code and comments fresh
+      return;
+    }
+    ghReviewerPulls = reviewerPulls;
     if (ghSubmitting && !state.submitting && state.lastSubmit) {
       ghSubmitting = false;
       setSubmitBusy(false);
@@ -104,6 +113,7 @@
     }
     ghFastForwards = state.fastForwards;
     renderGithub();
+    renderConflicts(state.conflicts);
     if (!ghEls.pop.hidden) renderReviewPop();
   }
 

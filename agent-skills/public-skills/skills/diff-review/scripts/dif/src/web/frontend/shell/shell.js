@@ -22,8 +22,8 @@
 // share ONE IIFE and one closure scope: THIS file opens the IIFE and declares
 // all shared state + DOM refs (the entry point); the feature files
 // (`tooltip.js`, `helpers.js`, `iframe.js`, `render.js`, `data.js`,
-// `spotlight.js`, `hotkeys.js`, `chrome.js`, `dispatch.js`, `github.js`) add
-// behavior; `boot.js` runs the startup sequence and closes the IIFE. Ordering only requires `shell.js` first
+// `spotlight.js`, `hotkeys.js`, `chrome.js`, `commented.js`, `dispatch.js`,
+// `github.js`, `conflicts.js`) add behavior; `boot.js` runs the startup sequence and closes the IIFE. Ordering only requires `shell.js` first
 // and `boot.js` last — the middle files are hoisted function/listener
 // definitions and may be reordered freely. Each middle file is a fragment, not
 // standalone-valid; lint/parse the assembled `/__wrap/shell.js`, not the parts.
@@ -74,6 +74,18 @@
   // so we never queue more than one regen at a time.
   var regenInFlight = false;
 
+  // "With comments": narrow the difit iframe to the files difit holds a comment
+  // thread on, on top of the current view (see commented.js).
+  var commentedOnly = false;
+  var commentedPaths = {}; // path -> true, from difit's /api/comments-json
+  var lastCommentedKey = "";
+
+  // This tab's place (view, sidebar tab, commented-only), saved on every
+  // reload (ours or the browser's) and restored on boot. See chrome.js.
+  var VIEW_STATE_KEY = "dif-shell-view";
+  // difit restarts (TUI Ctrl+R) as of boot; a higher count reloads the page.
+  var seenDifitRestarts = null;
+
   // difit's viewed index lives under this localStorage prefix; we mirror it.
   var VIEWED_PREFIX = "difit-viewed-index-v1/";
   var liveViewed = {}; // path -> true, difit's own "viewed" marks (localStorage)
@@ -102,6 +114,8 @@
     guideTab: document.getElementById("guideTab"),
     testPlanTab: document.getElementById("testPlanTab"),
     showChangesBtn: document.getElementById("showChangesBtn"),
+    commentedBtn: document.getElementById("commentedBtn"),
+    commentedCount: document.getElementById("commentedCount"),
     brandTitle: document.getElementById("brandTitle"),
     worktreePill: document.getElementById("worktreePill"),
     cmdBtn: document.getElementById("cmdBtn"),

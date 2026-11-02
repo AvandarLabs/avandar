@@ -9,7 +9,8 @@
 //! Delivery is either eager (one prompt per comment, as soon as it appears) or
 //! held for a bulk "Send all", which flushes every held comment as one prompt.
 //! A held comment is simply not marked dispatched, so an edit made while it
-//! waits is sent in its final form and a deleted one is never sent at all.
+//! waits is sent in its final form and a deleted one is never sent at all. A
+//! comment the reviewer marked "send now" skips the hold and goes alone.
 //! Comments bound for the GitHub PR are excluded entirely: they never reach
 //! the LLM.
 
@@ -46,6 +47,8 @@ pub struct DispatchOutcome {
 pub struct Dispatcher {
     dispatched: HashSet<String>,
     baseline_seeded: bool,
+    /// Comments to send even while delivery holds, once they reach difit.
+    send_now: HashSet<String>,
 }
 
 impl Dispatcher {
@@ -53,6 +56,12 @@ impl Dispatcher {
     #[must_use]
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Send these comments as soon as they are open, even while delivery
+    /// holds the rest for "Send all".
+    pub fn send_now(&mut self, message_ids: impl IntoIterator<Item = String>) {
+        self.send_now.extend(message_ids);
     }
 
     /// Dispatch `snapshot`'s open reviewer comments per `delivery`, skipping
@@ -74,19 +83,23 @@ impl Dispatcher {
             .into_iter()
             .filter(|comment| !excluded.contains(&comment.message_id))
             .collect();
-        if delivery == Delivery::Hold {
-            return DispatchOutcome {
-                prompts: Vec::new(),
-                queued: open.len(),
-            };
+        let (open, queued) = if delivery == Delivery::Hold {
+            let (now, held): (Vec<_>, Vec<_>) = open
+                .into_iter()
+                .partition(|comment| self.send_now.contains(&comment.message_id));
+            (now, held.len())
+        } else {
+            (open, 0)
+        };
+        for comment in &open {
+            self.send_now.remove(&comment.message_id);
+            self.dispatched.insert(comment.message_id.clone());
         }
-        self.dispatched
-            .extend(open.iter().map(|comment| comment.message_id.clone()));
         let prompts = match delivery {
             Delivery::SendAll if !open.is_empty() => vec![build_batch_prompt(&open)],
             _ => open.iter().map(build_prompt).collect(),
         };
-        DispatchOutcome { prompts, queued: 0 }
+        DispatchOutcome { prompts, queued }
     }
 }
 
@@ -169,6 +182,30 @@ mod tests {
         let after = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Hold);
         assert!(after.prompts.is_empty());
         assert_eq!(after.queued, 0, "flushed comments are never re-queued");
+    }
+
+    #[test]
+    fn a_send_now_comment_skips_the_bulk_queue_alone() {
+        let mut d = seeded();
+        d.send_now(["m2".to_owned()]);
+        let out = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Hold);
+        assert_eq!(out.prompts.len(), 1, "{:?}", out.prompts);
+        assert!(out.prompts[0].contains("rename"), "{}", out.prompts[0]);
+        assert_eq!(out.queued, 1, "the other comment stays held");
+        let again = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Hold);
+        assert!(again.prompts.is_empty(), "sent once");
+        assert_eq!(again.queued, 1);
+    }
+
+    #[test]
+    fn a_send_now_id_waits_for_its_comment_to_reach_difit() {
+        let mut d = seeded();
+        d.send_now(["m2".to_owned()]);
+        let early = d.next_dispatch(&snap(ONE_OPEN), &HashSet::new(), Delivery::Hold);
+        assert!(early.prompts.is_empty());
+        let out = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Hold);
+        assert_eq!(out.prompts.len(), 1);
+        assert!(out.prompts[0].contains("rename"), "{}", out.prompts[0]);
     }
 
     #[test]

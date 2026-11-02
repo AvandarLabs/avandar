@@ -31,7 +31,7 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::thread::JoinHandle;
 
 use anyhow::{Result, anyhow};
@@ -73,6 +73,8 @@ pub struct WebShell {
     handle: Option<JoinHandle<()>>,
     /// Shared with the server: set when the browser asks to regenerate the guide.
     regen: Arc<AtomicBool>,
+    /// Shared with the server: bumped on each difit restart (`meta.json`).
+    difit_restarts: Arc<AtomicU64>,
 }
 
 impl WebShell {
@@ -97,6 +99,7 @@ impl WebShell {
             .map_err(|e| anyhow!("web shell failed to bind port {shell_port}: {e}"))?;
         let server = Arc::new(server);
         let regen = Arc::new(AtomicBool::new(false));
+        let difit_restarts = Arc::new(AtomicU64::new(0));
         let ctx = Arc::new(Ctx {
             difit_port,
             guide_json_path,
@@ -105,6 +108,7 @@ impl WebShell {
             branch,
             worktree,
             regen: Arc::clone(&regen),
+            difit_restarts: Arc::clone(&difit_restarts),
             asset_version: asset_version(),
             dispatch: channels.dispatch,
             github: channels.github,
@@ -116,6 +120,7 @@ impl WebShell {
             server,
             handle: Some(handle),
             regen,
+            difit_restarts,
         })
     }
 
@@ -125,6 +130,12 @@ impl WebShell {
     #[must_use]
     pub fn take_regen_request(&self) -> bool {
         self.regen.swap(false, Ordering::Relaxed)
+    }
+
+    /// Record that difit restarted. Open shell tabs see the count grow in
+    /// `meta.json` and reload themselves, so a restart never needs a new tab.
+    pub fn note_difit_restart(&self) {
+        self.difit_restarts.fetch_add(1, Ordering::Relaxed);
     }
 
     /// The URL to open in the browser. Uses `127.0.0.1` to match the shell's

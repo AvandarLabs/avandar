@@ -1,6 +1,8 @@
-//! Shell routes for the GitHub PR: the sync state the browser renders, and the
-//! requests it queues for the poller's sync pass (pull now, submit the review,
-//! viewed-file changes).
+//! Shell routes for the GitHub PR.
+//!
+//! They serve the sync state the browser renders, and queue its requests for
+//! the poller's sync pass (pull now, submit the review, viewed-file changes),
+//! plus the reviewer's answer to a pull's merge conflicts.
 //!
 //! The routes only queue: every GitHub call happens on the poller thread, so
 //! they are made one at a time, in order, without blocking a browser request.
@@ -10,6 +12,7 @@ use tiny_http::Request;
 
 use super::router::Route;
 use super::server::{Ctx, send_bytes_nostore, send_status};
+use crate::github::conflicts::ConflictResolution;
 use crate::github::session::{ReviewEvent, SubmitRequest};
 
 /// Serve one of the GitHub routes.
@@ -29,7 +32,10 @@ pub fn handle(route: &Route, mut request: Request, ctx: &Ctx) -> std::io::Result
             )
         }
         Route::GithubPull => {
-            ctx.github.session(|s| s.pull_requested = true);
+            ctx.github.session(|s| {
+                s.pull_requested = true;
+                s.reviewer_pull = true;
+            });
             send_status(request, 202)
         }
         Route::GithubSubmit => {
@@ -50,8 +56,24 @@ pub fn handle(route: &Route, mut request: Request, ctx: &Ctx) -> std::io::Result
             ctx.github.session(|s| s.viewed.queue.extend(changes));
             send_status(request, 202)
         }
+        Route::GithubConflicts => match parse_conflict_answer(&body) {
+            Some(resolution) => {
+                ctx.github.session(|s| s.answer_conflicts(resolution));
+                send_status(request, 202)
+            }
+            None => send_status(request, 400),
+        },
         _ => send_status(request, 404),
     }
+}
+
+/// Read `{"resolve": "llm" | "reviewer"}`: who resolves the pull's conflicts.
+#[must_use]
+pub fn parse_conflict_answer(body: &[u8]) -> Option<ConflictResolution> {
+    let value: Value = serde_json::from_slice(body).ok()?;
+    value["resolve"]
+        .as_str()
+        .and_then(ConflictResolution::parse)
 }
 
 /// Read `{"event": "COMMENT" | "APPROVE" | "REQUEST_CHANGES", "body": "..."}`.
@@ -109,6 +131,20 @@ mod tests {
     fn own_pr_only_takes_comments() {
         assert!(parse_submit(br#"{"event":"APPROVE"}"#, true).is_err());
         assert!(parse_submit(br#"{"event":"COMMENT"}"#, true).is_ok());
+    }
+
+    #[test]
+    fn a_conflict_answer_names_who_resolves() {
+        assert_eq!(
+            parse_conflict_answer(br#"{"resolve":"llm"}"#),
+            Some(ConflictResolution::Llm)
+        );
+        assert_eq!(
+            parse_conflict_answer(br#"{"resolve":"reviewer"}"#),
+            Some(ConflictResolution::Reviewer)
+        );
+        assert_eq!(parse_conflict_answer(br#"{"resolve":"later"}"#), None);
+        assert_eq!(parse_conflict_answer(b"nope"), None);
     }
 
     #[test]

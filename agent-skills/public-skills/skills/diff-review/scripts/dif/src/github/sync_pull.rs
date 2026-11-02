@@ -9,7 +9,8 @@ use crate::comparison::ComparisonKey;
 use crate::difit::editor::DifitEdit;
 use crate::difit::imports::Snapshot;
 
-use super::checkout::branch_step;
+use super::checkout::{Unstash, branch_step, fast_forward_keeping_changes};
+use super::conflicts::conflicts_notice;
 use super::graphql::RemoteState;
 use super::plan::message_ids;
 use super::pull::{reconcile, viewed_changes};
@@ -18,25 +19,34 @@ use super::sync::GithubSync;
 
 impl GithubSync {
     /// Pull everything from GitHub, recording the outcome for the browser.
+    ///
+    /// The requests are taken up front, so a Sync clicked while this pull runs
+    /// queues another pull instead of being cleared by this one.
     pub(super) fn pull(&self, snapshot: &Snapshot, pr: &PullRequest) {
-        self.registry.session(|s| s.pulling = true);
-        let result = self.pull_inner(snapshot, pr);
+        let reviewer_asked = self.registry.session(|s| {
+            s.pulling = true;
+            s.pull_requested = false;
+            std::mem::take(&mut s.reviewer_pull)
+        });
+        let result = self.pull_inner(snapshot, pr, reviewer_asked);
         self.registry.session(|s| {
             s.pulling = false;
-            s.pull_requested = false;
             s.last_pull = Some(Instant::now());
             s.pull_error = result.err().map(|e| e.to_string());
+            if reviewer_asked {
+                s.reviewer_pulls += 1;
+            }
         });
     }
 
-    fn pull_inner(&self, snapshot: &Snapshot, pr: &PullRequest) -> Result<()> {
+    fn pull_inner(&self, snapshot: &Snapshot, pr: &PullRequest, may_stash: bool) -> Result<()> {
         let remote = self.ports.api.fetch(pr)?;
         let review = if remote.has_pending_review {
             self.ports.api.pending_review(pr).ok().flatten()
         } else {
             None
         };
-        let notice = self.step_branch(pr, &remote.head_sha);
+        let notice = self.step_branch(pr, &remote.head_sha, may_stash);
         let viewed_block = self.viewed_block(pr, &remote.head_sha);
         self.registry.session(|s| {
             s.review_id = review;
@@ -50,27 +60,39 @@ impl GithubSync {
         Ok(())
     }
 
-    /// Fast-forward to the PR head when safe. Returns what the reviewer should
-    /// know about the branch, if anything.
-    fn step_branch(&self, pr: &PullRequest, head: &str) -> Option<String> {
-        let checkout = &self.ports.checkout;
+    /// Fast-forward to the PR head when safe, stashing local changes around
+    /// it when `may_stash`. Returns what the reviewer should know about the
+    /// branch, if anything.
+    fn step_branch(&self, pr: &PullRequest, head: &str, may_stash: bool) -> Option<String> {
+        let checkout = self.ports.checkout.as_ref();
         if checkout.head().as_deref() == Some(head) {
             return None;
         }
         let step = checkout
             .fetch_pr(pr.number)
             .and_then(|()| checkout.relation(head))
-            .map(|relation| branch_step(relation, checkout.is_clean()));
-        match step {
-            Err(e) => Some(format!("Could not check the PR's new commits: {e}")),
-            Ok(step) if step.fast_forward => match checkout.fast_forward(head) {
-                Ok(()) => {
-                    self.registry.session(|s| s.fast_forwards += 1);
-                    None
-                }
-                Err(e) => Some(format!("Could not pull the PR's new commits: {e}")),
-            },
-            Ok(step) => step.notice,
+            .map(|relation| branch_step(relation, checkout.is_clean(), may_stash));
+        let step = match step {
+            Err(e) => return Some(format!("Could not check the PR's new commits: {e}")),
+            Ok(step) if !step.fast_forward => return step.notice,
+            Ok(step) => step,
+        };
+        let outcome = fast_forward_keeping_changes(checkout, head, step.stash);
+        let is_moved = checkout.head().as_deref() == Some(head);
+        if is_moved {
+            self.registry.session(|s| s.fast_forwards += 1);
+        }
+        match outcome {
+            Ok(Unstash::Applied) => None,
+            Ok(Unstash::Conflicts(files)) => {
+                let notice = conflicts_notice(files.len());
+                self.registry.session(|s| s.conflicts = Some(files));
+                Some(notice)
+            }
+            Err(e) if is_moved => Some(format!(
+                "Pulled the PR's new commits, but could not restore your local changes. They are still in `git stash list`: {e:#}"
+            )),
+            Err(e) => Some(format!("Could not pull the PR's new commits: {e:#}")),
         }
     }
 

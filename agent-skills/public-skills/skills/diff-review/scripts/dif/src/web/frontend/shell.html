@@ -47,6 +47,11 @@
             <span class="send-all-count" id="sendAllCount">0</span>
           </button>
         </div>
+        <button class="commented-btn" id="commentedBtn" type="button" aria-label="With comments" aria-pressed="false" disabled title="No file has comments yet">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 3.5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1V10a1 1 0 0 1-1 1H7l-3 2.5V11h-.5a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          <span class="commented-lbl">With comments</span>
+          <span class="commented-count" id="commentedCount">0</span>
+        </button>
         <div class="view-prog" id="viewProg"></div>
         <button class="cmd-btn" id="cmdBtn" type="button" title="Command palette">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
@@ -130,6 +135,18 @@
       <button class="gh-pop-submit" id="ghPopSubmit" type="button">Submit review</button>
     </div>
   </div>
+
+  <!-- a GitHub sync's merge conflicts: who resolves them -->
+  <dialog class="gh-conflicts" id="ghConflicts" aria-labelledby="ghConflictsTitle" aria-describedby="ghConflictsSub">
+    <h2 class="gh-pop-title" id="ghConflictsTitle">Merge conflicts after syncing</h2>
+    <p class="gh-pop-sub" id="ghConflictsSub"></p>
+    <ul class="gh-conflicts-files" id="ghConflictsFiles" aria-label="Conflicted files"></ul>
+    <p class="gh-conflicts-ask">Resolve them yourself, or have the LLM resolve them?</p>
+    <div class="gh-pop-actions">
+      <button class="gh-pop-cancel" id="ghConflictsReviewer" type="button">I'll resolve them</button>
+      <button class="gh-pop-submit" id="ghConflictsLlm" type="button" autofocus>Auto-resolve with the LLM</button>
+    </div>
+  </dialog>
 
   <div class="tip" id="tip" role="tooltip" hidden></div>
 

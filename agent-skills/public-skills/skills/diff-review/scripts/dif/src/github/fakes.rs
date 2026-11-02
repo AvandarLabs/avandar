@@ -8,7 +8,7 @@ use anyhow::{Result, bail};
 use crate::difit::editor::{DifitEdit, DifitEditor};
 use crate::difit::imports::Snapshot;
 use crate::github::anchor::NewComment;
-use crate::github::checkout::{Checkout, Relation};
+use crate::github::checkout::{Checkout, Relation, Unstash};
 use crate::github::client::GithubApi;
 use crate::github::graphql::{Posted, RemoteComment, RemoteState, RemoteThread};
 use crate::github::registry::{Registry, SyncStatus, SyncedComment};
@@ -205,12 +205,21 @@ impl GithubApi for FakeGithub {
     }
 }
 
-/// A checkout with a fixed relation to the PR head and a settable HEAD.
+/// A checkout with a fixed relation to the PR head and a settable HEAD. It
+/// records each stash and restore, and restoring reports `conflicts` (if any).
 #[derive(Clone)]
 pub struct FakeCheckout {
     pub head: Arc<Mutex<String>>,
     pub relation: Relation,
     pub clean: bool,
+    pub conflicts: Arc<Mutex<Vec<String>>>,
+    pub stash_log: Log,
+}
+
+impl FakeCheckout {
+    pub fn stash_calls(&self) -> Vec<String> {
+        self.stash_log.lock().unwrap().clone()
+    }
 }
 
 impl Checkout for FakeCheckout {
@@ -229,6 +238,19 @@ impl Checkout for FakeCheckout {
     fn fast_forward(&self, sha: &str) -> Result<()> {
         sha.clone_into(&mut self.head.lock().unwrap());
         Ok(())
+    }
+    fn stash(&self) -> Result<bool> {
+        self.stash_log.lock().unwrap().push("stash".to_owned());
+        Ok(!self.clean)
+    }
+    fn pop_stash(&self) -> Result<Unstash> {
+        self.stash_log.lock().unwrap().push("pop".to_owned());
+        let conflicts = self.conflicts.lock().unwrap().clone();
+        Ok(if conflicts.is_empty() {
+            Unstash::Applied
+        } else {
+            Unstash::Conflicts(conflicts)
+        })
     }
 }
 
