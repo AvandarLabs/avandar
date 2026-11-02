@@ -22,6 +22,7 @@
   // acts while focus is inside a comment box.
   var IS_MAC = /Mac|iP(hone|ad|od)/.test((navigator.platform || "") + " " + (navigator.userAgent || ""));
   var TOGGLE_HINT = IS_MAC ? "⌃G" : "Alt+Shift+G";
+  var SEND_OTHER_HINT = IS_MAC ? "⌘⇧↵" : "Ctrl+Shift+Enter";
   function isToggleCombo(event) {
     if (event.code !== "KeyG" || event.metaKey) return false;
     return IS_MAC
@@ -110,9 +111,13 @@
   function labelSubmit(form) {
     var submit = form.querySelector('button[type="submit"]');
     if (!submit) return;
-    var label = buildSubmitLabel(form, form.getAttribute("data-dif-dest"));
+    var dest = form.getAttribute("data-dif-dest");
+    var label = buildSubmitLabel(form, dest);
     setAttr(submit, "data-dif-submit-label", label);
     setAttr(submit, "aria-label", label);
+    var otherDest = oppositeDest(form);
+    var canSendOther = otherDest === "local" || github.available;
+    setAttr(submit, "title", canSendOther ? SEND_OTHER_HINT + ": " + buildSubmitLabel(form, otherDest) + " instead" : null);
   }
   function setDest(form, dest) {
     if (dest === "github" && !github.available) dest = "local";
@@ -203,11 +208,32 @@
     var toggledDest = form.getAttribute("data-dif-dest") === "github" ? "local" : "github";
     setDest(form, toggledDest); // falls back to TUI when there is no PR
   }, true);
+  // Mod+Enter saves to the box's toggle; Mod+Shift+Enter saves to the other
+  // destination without flipping the toggle. difit submits on both, so this
+  // only decides whether the save is tagged for the PR. A TUI save is untagged
+  // and follows the shell's Bulk / Eager mode like any other.
+  function oppositeDest(form) {
+    return form.getAttribute("data-dif-dest") === "github" ? "local" : "github";
+  }
   document.addEventListener("keydown", function (event) {
     var target = event.target;
-    if (event.key === "Enter" && (event.metaKey || event.ctrlKey) && target && target.tagName === "TEXTAREA") {
-      armIfGithub(target.closest("form"));
+    if (event.key !== "Enter" || !(event.metaKey || event.ctrlKey) || !target || target.tagName !== "TEXTAREA") return;
+    var form = target.closest("form");
+    if (!event.shiftKey || !form || !form.querySelector(".dif-dest")) {
+      armIfGithub(form);
+      return;
     }
+    if (oppositeDest(form) === "local") {
+      armedGithubAt = 0;
+      return;
+    }
+    if (!github.available) {
+      // No PR to post to: swallow the save rather than send it to the TUI.
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    armedGithubAt = Date.now();
   }, true);
 
   // difit saves comments with fetch; tag the armed save for the shell.

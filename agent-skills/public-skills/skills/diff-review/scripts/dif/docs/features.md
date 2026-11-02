@@ -162,6 +162,11 @@ box shows the hint beside the toggle. The submit button names where the
 comment goes: **Add to PR review** (blue) for PR, and **Queue for TUI** in
 Bulk mode or **Send to TUI** in Eager mode for the TUI ("reply" is added in a
 reply box).
+**Cmd+Enter** (Ctrl+Enter off macOS) saves to the destination the toggle shows;
+**Cmd+Shift+Enter** saves to the other one for that comment only, without
+flipping the toggle. A comment sent to the TUI either way follows the Bulk /
+Eager mode. With no PR, Cmd+Shift+Enter from a TUI box does nothing. Hovering
+the submit button shows the alternate shortcut.
 
 - Drafts are visible only to you, here and on github.com, until you submit.
   A draft you start on github.com shows up in dif too.
