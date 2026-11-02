@@ -1,5 +1,5 @@
 import { makeRuntimeColumnBindingsFromDataVizProps } from "../../pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeRuntimeColumnBindingsFromDataVizProps";
-import { mergeLegacyVizConfigEdit } from "./mergeLegacyVizConfigEdit";
+import { mergeColNameBoundVizConfigEdit } from "./mergeColNameBoundVizConfigEdit";
 import type { Props } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { useDataVizRuntimeColumnBindings } from "../../pblocks/DataVizPBlock/useDataVizRuntimeColumnBindings/useDataVizRuntimeColumnBindings";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
@@ -11,18 +11,24 @@ type GetDataVizAuthoringPropsOptions = {
   change: DataVizAuthoringChange;
 };
 
-/** Explicit edits accepted by current and unresolved legacy field controls. */
+/**
+ * Explicit edits accepted by current and unresolved name-bound field
+ * controls.
+ */
 export type DataVizAuthoringChange =
   | {
       kind: "columnId";
       props: Partial<Extract<Props, { columnBindingVersion: 1 }>>;
     }
   | {
-      kind: "legacy";
+      kind: "colNameBound";
       props: Partial<Extract<Props, { columnBindingVersion: 0 }>>;
     };
 
-/** Returns an atomic field edit without losing unresolved legacy siblings. */
+/**
+ * Returns an atomic field edit without losing unresolved name-bound
+ * siblings.
+ */
 export function getDataVizAuthoringProps(
   options: Readonly<GetDataVizAuthoringPropsOptions>,
 ): Props | undefined {
@@ -37,14 +43,14 @@ export function getDataVizAuthoringProps(
     return undefined;
   }
   const changes =
-    change.kind === "legacy"
+    change.kind === "colNameBound"
       ? change.props
       : change.props.vizConfig &&
           columnBindings.runtime &&
           columnBindings.schema
         ? {
-            vizConfig: mergeLegacyVizConfigEdit({
-              legacy: props.vizConfig,
+            vizConfig: mergeColNameBoundVizConfigEdit({
+              colNameBoundConfig: props.vizConfig,
               before: columnBindings.runtime.runtimeConfig,
               after: change.props.vizConfig,
               columns: columnBindings.schema.columns,

@@ -7,7 +7,7 @@ import { useDataVizAuthoring } from "../useDataVizAuthoring/useDataVizAuthoring"
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type {
-  LegacyLocalFilter,
+  ColNameBoundLocalFilter,
   LocalFilter,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { ReactElement } from "react";
@@ -42,10 +42,10 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
       : (authoring.runtime?.localFilters ?? []);
   const columns = authoring.schema?.columns ?? [];
   const onChange = (
-    localFilters: ReadonlyArray<LocalFilter | LegacyLocalFilter>,
+    localFilters: ReadonlyArray<LocalFilter | ColNameBoundLocalFilter>,
   ): void => {
     if (authoring.props.columnBindingVersion === 0) {
-      const legacyFilters = localFilters.map((filter) => {
+      const colNameBoundFilters = localFilters.map((filter) => {
         if ("columnName" in filter) {
           return filter;
         }
@@ -56,8 +56,8 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
         const { columnId: _columnId, ...definition } = filter;
         return { ...definition, columnName: column.name };
       });
-      if (legacyFilters.every(isDefined)) {
-        authoring.updateLegacy({ localFilters: legacyFilters });
+      if (colNameBoundFilters.every(isDefined)) {
+        authoring.updateColNameBound({ localFilters: colNameBoundFilters });
       }
     } else if (
       localFilters.every((filter): filter is LocalFilter => {
@@ -70,7 +70,7 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
 
   const updateFilter = (
     filterIndex: number,
-    filter: LocalFilter | LegacyLocalFilter,
+    filter: LocalFilter | ColNameBoundLocalFilter,
   ): void => {
     onChange(
       filters.map((currentFilter, currentFilterIndex) => {

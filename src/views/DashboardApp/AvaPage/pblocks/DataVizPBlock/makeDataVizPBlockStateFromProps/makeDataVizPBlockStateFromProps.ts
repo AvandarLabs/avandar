@@ -1,6 +1,6 @@
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import { synchronizeLegacyVizType } from "./synchronizeLegacyVizType";
+import { synchronizeColNameBoundVizType } from "./synchronizeColNameBoundVizType";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { ResolveDataTrigger } from "@puckeditor/core";
@@ -16,12 +16,12 @@ import type { ResolveDataTrigger } from "@puckeditor/core";
  *
  * Bound entries use `Partial<VizConfig.Registry>`, so each entry's config is
  * correlated with the viz type it is filed under: a bar config cannot be
- * stored under `"pie"`. Legacy name-based configs have their own memory.
+ * stored under `"pie"`. Name-bound configs have their own memory.
  */
 export type DataVizConfigMemory = Record<
   string,
   Partial<VizConfig.Registry> & {
-    legacy?: Partial<Record<VizConfig.Type, VizConfig.ColNameBound>>;
+    colNameBound?: Partial<Record<VizConfig.Type, VizConfig.ColNameBound>>;
   }
 >;
 
@@ -58,7 +58,7 @@ export function makeDataVizPBlockStateFromProps(options: {
   }
 
   if (props.columnBindingVersion === 0) {
-    return synchronizeLegacyVizType({
+    return synchronizeColNameBoundVizType({
       props,
       changed,
       blockId,

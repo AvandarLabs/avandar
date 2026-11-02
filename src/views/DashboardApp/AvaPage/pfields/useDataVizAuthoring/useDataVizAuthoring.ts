@@ -14,7 +14,7 @@ type Authoring = ReturnType<typeof useDataVizRuntimeColumnBindings> & {
   update: (
     changes: Partial<Extract<Props, { columnBindingVersion: 1 }>>,
   ) => void;
-  updateLegacy: (
+  updateColNameBound: (
     changes: Partial<Extract<Props, { columnBindingVersion: 0 }>>,
   ) => void;
 };
@@ -71,8 +71,8 @@ export function useDataVizAuthoring(
     update: (changes) => {
       return update({ kind: "columnId", props: changes });
     },
-    updateLegacy: (changes) => {
-      return update({ kind: "legacy", props: changes });
+    updateColNameBound: (changes) => {
+      return update({ kind: "colNameBound", props: changes });
     },
   };
 }

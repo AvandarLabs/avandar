@@ -3,8 +3,8 @@ import { makeVizConfigFromColNameBoundVizConfig } from "$/models/vizs/makeVizCon
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 
-type MergeLegacyVizConfigEditOptions = {
-  legacy: VizConfig.ColNameBound;
+type MergeColNameBoundVizConfigEditOptions = {
+  colNameBoundConfig: VizConfig.ColNameBound;
   before: VizConfig.T;
   after: VizConfig.T;
   columns: readonly QueryResult.ColumnWithId[];
@@ -16,17 +16,20 @@ type SeriesConfig = Extract<
 >;
 
 function _mergeSeries({
-  legacy,
+  colNameBoundConfig,
   edited,
   columns,
 }: {
-  legacy: SeriesConfig;
+  colNameBoundConfig: SeriesConfig;
   edited: SeriesConfig;
   columns: readonly QueryResult.ColumnWithId[];
 }): SeriesConfig["series"] {
   let resolvedIndex = 0;
-  const series = legacy.series.flatMap((original) => {
-    const single = { ...legacy, series: [original] } as SeriesConfig;
+  const series = colNameBoundConfig.series.flatMap((original) => {
+    const single = {
+      ...colNameBoundConfig,
+      series: [original],
+    } as SeriesConfig;
     const vizConfig = makeVizConfigFromColNameBoundVizConfig({
       config: single,
       columns: columns,
@@ -43,15 +46,15 @@ function _mergeSeries({
   ] as SeriesConfig["series"];
 }
 
-/** Applies field changes while retaining unresolved legacy siblings. */
-export function mergeLegacyVizConfigEdit({
-  legacy,
+/** Applies field changes while retaining unresolved name-bound siblings. */
+export function mergeColNameBoundVizConfigEdit({
+  colNameBoundConfig,
   before,
   after,
   columns,
-}: Readonly<MergeLegacyVizConfigEditOptions>): VizConfig.ColNameBound {
-  if (legacy.vizType !== after.vizType) {
-    return legacy;
+}: Readonly<MergeColNameBoundVizConfigEditOptions>): VizConfig.ColNameBound {
+  if (colNameBoundConfig.vizType !== after.vizType) {
+    return colNameBoundConfig;
   }
   const previous = makeColNameBoundVizConfigFromVizConfig({
     config: before,
@@ -62,7 +65,7 @@ export function mergeLegacyVizConfigEdit({
     columns: columns,
   });
   if (edited.issues.length) {
-    return legacy;
+    return colNameBoundConfig;
   }
   const previousValues = new Map(Object.entries(previous));
   const changes = Object.fromEntries(
@@ -74,15 +77,19 @@ export function mergeLegacyVizConfigEdit({
     }),
   );
   const series =
-    "series" in legacy && "series" in edited.config
+    "series" in colNameBoundConfig && "series" in edited.config
       ? {
           series: _mergeSeries({
-            legacy: legacy,
+            colNameBoundConfig: colNameBoundConfig,
             edited: edited.config,
             columns: columns,
           }),
         }
       : {};
   // The edit keeps the discriminant and changes only fields of that chart.
-  return { ...legacy, ...changes, ...series } as VizConfig.ColNameBound;
+  return {
+    ...colNameBoundConfig,
+    ...changes,
+    ...series,
+  } as VizConfig.ColNameBound;
 }

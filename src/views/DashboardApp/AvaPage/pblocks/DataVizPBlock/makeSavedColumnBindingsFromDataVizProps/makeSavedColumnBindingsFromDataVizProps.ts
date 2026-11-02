@@ -9,7 +9,7 @@ import type {
 } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type {
-  LegacyLocalFilter,
+  ColNameBoundLocalFilter,
   LocalFilter,
 } from "../DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { DataVizColumnBindingProps } from "./makeSavedColumnBindingsFromDataVizProps.types";
@@ -26,7 +26,7 @@ function _getLocalFilterOutcome({
   filter,
   columns,
 }: {
-  filter: LegacyLocalFilter;
+  filter: ColNameBoundLocalFilter;
   columns: readonly QueryResult.ColumnWithId[];
 }): {
   filter: LocalFilter | undefined;

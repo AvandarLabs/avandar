@@ -8,7 +8,7 @@ export type GlobalFilterSubscriptionMode = "all" | "selected" | "none";
 /**
  * Saved local filter addressed by its historical `QueryResult` column name.
  */
-export type LegacyLocalFilter = {
+export type ColNameBoundLocalFilter = {
   /** Stable identifier used for viewer state. */
   id: string;
   /** Display label shown above the input. */
@@ -24,7 +24,7 @@ export type LegacyLocalFilter = {
 };
 
 /** Local filter that targets a column ID. */
-export type LocalFilter = Omit<LegacyLocalFilter, "columnName"> & {
+export type LocalFilter = Omit<ColNameBoundLocalFilter, "columnName"> & {
   columnId: QueryColumn.Id;
 };
 
@@ -53,7 +53,7 @@ type ParseLocalFilterDefaultValueOptions = {
 };
 
 type LocalFilterToRecordOptions = {
-  filter: LegacyLocalFilter;
+  filter: ColNameBoundLocalFilter;
   value: string | readonly string[] | undefined;
 };
 
