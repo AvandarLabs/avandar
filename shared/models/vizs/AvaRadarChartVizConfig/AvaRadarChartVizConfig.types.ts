@@ -1,6 +1,6 @@
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
-import type { AvaRadarSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaRadarSeries } from "$/models/vizs/series.types.ts";
 
 /**
  * Configuration for a radar (spider) chart. Each series renders as one

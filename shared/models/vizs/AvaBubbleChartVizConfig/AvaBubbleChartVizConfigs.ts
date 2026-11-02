@@ -25,8 +25,8 @@ import type {
   AvaRadarSeries,
   AvaScatterSeries,
   AvaXYSeries,
-} from "$/models/vizs/SeriesConfig.ts";
-import type { VizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
+} from "$/models/vizs/series.types.ts";
+import type { VizSettingDescriptors } from "$/models/vizs/VizSettingDescriptors.types.ts";
 
 const DESCRIPTORS = {
   chart: [

@@ -10,7 +10,7 @@ import type { VizColumnSlot } from "$/models/vizs/makeColumnSlotsFromAvaVizConfi
 import type {
   AvaBubbleSeries,
   AvaScatterSeries,
-} from "$/models/vizs/SeriesConfig.ts";
+} from "$/models/vizs/series.types.ts";
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types.ts";
 
 type GetSlotColumnId = ({

@@ -23,8 +23,8 @@ import type {
   AvaRadarSeries,
   RenderAs,
   AvaXYSeries,
-} from "$/models/vizs/SeriesConfig";
-import type { AnySeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
+} from "$/models/vizs/series.types";
+import type { AnySeriesSettingDescriptor } from "$/models/vizs/VizSettingDescriptors.types";
 import type { HostConfig } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import type { ReactNode } from "react";
 

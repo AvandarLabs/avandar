@@ -1,7 +1,7 @@
 import { VizHydrationColumns } from "$/models/vizs/VizHydrationColumns.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { RenderAs, AvaXYSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { RenderAs, AvaXYSeries } from "$/models/vizs/series.types.ts";
 
 type XYSeriesConfig = {
   xAxisKey: QueryColumn.Id | undefined;

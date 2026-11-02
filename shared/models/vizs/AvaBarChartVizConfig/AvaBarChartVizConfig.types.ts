@@ -1,6 +1,6 @@
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
-import type { AvaXYSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaXYSeries } from "$/models/vizs/series.types.ts";
 
 /**
  * Configuration for a bar chart. The chart is the host; individual

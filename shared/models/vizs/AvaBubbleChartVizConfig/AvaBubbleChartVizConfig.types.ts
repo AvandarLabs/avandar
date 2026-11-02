@@ -1,5 +1,5 @@
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
-import type { AvaBubbleSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaBubbleSeries } from "$/models/vizs/series.types.ts";
 
 /** Viz config for a multi-series bubble chart. */
 export type AvaBubbleChartVizConfig = {

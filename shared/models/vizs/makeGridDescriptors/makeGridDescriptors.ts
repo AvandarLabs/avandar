@@ -1,5 +1,5 @@
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
-import type { ChartSettingDescriptor } from "$/models/vizs/SettingDescriptor.ts";
+import type { ChartSettingDescriptor } from "$/models/vizs/VizSettingDescriptors.types.ts";
 
 // Fixed `chartStyle.grid.*` keys stay `string` while `TConfig` is generic; the
 // `ChartStyle` constraint guarantees the paths exist.

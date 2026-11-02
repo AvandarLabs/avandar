@@ -5,7 +5,7 @@ import { PairSeriesFieldset } from "@/components/VisualizationContainer/VizSetti
 import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaScatterPlotVizConfig } from "$/models/vizs/AvaScatterPlotVizConfig/AvaScatterPlotVizConfig.types";
-import type { AvaScatterSeries } from "$/models/vizs/SeriesConfig";
+import type { AvaScatterSeries } from "$/models/vizs/series.types";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 
 type Props = {

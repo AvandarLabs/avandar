@@ -1,6 +1,6 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { AvaScatterSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaScatterSeries } from "$/models/vizs/series.types.ts";
 
 type ScatterSeriesConfig = {
   series: readonly AvaScatterSeries[];

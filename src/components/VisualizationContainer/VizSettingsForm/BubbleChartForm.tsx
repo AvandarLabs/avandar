@@ -5,7 +5,7 @@ import { ChartSettingsFieldsets } from "@/components/VisualizationContainer/VizS
 import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaBubbleChartVizConfig } from "$/models/vizs/AvaBubbleChartVizConfig/AvaBubbleChartVizConfig.types";
-import type { AvaBubbleSeries } from "$/models/vizs/SeriesConfig";
+import type { AvaBubbleSeries } from "$/models/vizs/series.types";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 
 type Props = {

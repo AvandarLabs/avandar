@@ -5,7 +5,7 @@ import type {
 import type {
   ChartSettingDescriptor,
   SelectOption,
-} from "$/models/vizs/SettingDescriptor.ts";
+} from "$/models/vizs/VizSettingDescriptors.types.ts";
 
 /**
  * The positions the legend control offers.

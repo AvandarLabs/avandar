@@ -1,4 +1,3 @@
-import { match } from "ts-pattern";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { CurveType } from "$/models/vizs/CurveType.ts";
 
@@ -142,36 +141,3 @@ export type AvaBubbleSeries = AvaScatterSeries & {
   /** Column ID supplying the bubble size (radius). */
   sizeKey: QueryColumn.Id;
 };
-
-/**
- * Convert an XY series from one mark type to another, preserving
- * fields that are common across mark types (`key`, `label`, `color`)
- * and resetting mark-specific fields to type-appropriate defaults.
- *
- * Used by `convertVizConfig` when the user changes the host viz type
- * (e.g. bar -> line), so existing series flip their default render
- * mode without manual reassignment.
- */
-export function convertSeriesRenderAs(
-  series: AvaXYSeries,
-  newRenderAs: RenderAs,
-): AvaXYSeries {
-  const { key, label, color } = series;
-  return match(newRenderAs)
-    .with("bar", () => {
-      return { renderAs: "bar" as const, key, label, color };
-    })
-    .with("line", () => {
-      return { renderAs: "line" as const, key, label, color };
-    })
-    .with("area", () => {
-      return {
-        renderAs: "area" as const,
-        key,
-        label,
-        color,
-        fillOpacity: DEFAULT_AREA_FILL_OPACITY,
-      };
-    })
-    .exhaustive();
-}

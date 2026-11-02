@@ -19,8 +19,8 @@ import type { AvaAreaChartVizConfig } from "$/models/vizs/AvaAreaChartVizConfig/
 import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
 import type { AvaLineChartVizConfig } from "$/models/vizs/AvaLineChartVizConfig/AvaLineChartVizConfig.types";
 import type { AvaRadarChartVizConfig } from "$/models/vizs/AvaRadarChartVizConfig/AvaRadarChartVizConfig.types";
-import type { AvaRadarSeries, AvaXYSeries } from "$/models/vizs/SeriesConfig";
-import type { VizSettingGroup } from "$/models/vizs/SettingDescriptor";
+import type { AvaRadarSeries, AvaXYSeries } from "$/models/vizs/series.types";
+import type { VizSettingGroup } from "$/models/vizs/VizSettingDescriptors.types";
 import type {
   SettingsColumnGroup,
   SettingsColumnsLayout,

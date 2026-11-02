@@ -48,7 +48,7 @@ implements `IAvaVizConfigModule`: `displayName`, `descriptors`,
 
 ### 2.1 Multi-series model
 
-`shared/models/vizs/SeriesConfig.ts` defines five series shapes:
+`shared/models/vizs/series.types.ts` defines five series shapes:
 
 - **`AvaBarSeries`** — `renderAs: "bar"`, `key`, `label?`, `color?`,
   `fillOpacity?`, `stackId?`
@@ -175,7 +175,7 @@ callers.
 
 ### 3.1 Setting vs. control
 
-`shared/models/vizs/SettingDescriptor.ts` establishes the vocabulary used
+`shared/models/vizs/VizSettingDescriptors.types.ts` establishes the vocabulary used
 across the code, tests, and docs:
 
 - **Setting** — the persisted config field, addressed by a typed dotted path

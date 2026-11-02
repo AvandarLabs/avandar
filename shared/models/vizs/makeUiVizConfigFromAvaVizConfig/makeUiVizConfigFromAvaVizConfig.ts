@@ -16,7 +16,7 @@ import type {
   AvaRadarSeries,
   AvaScatterSeries,
   AvaXYSeries,
-} from "$/models/vizs/SeriesConfig.ts";
+} from "$/models/vizs/series.types.ts";
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types.ts";
 
 type GetSlotQueryResultColumnName = ({

@@ -26,7 +26,7 @@
  * when you talk about "the curve type control" you mean the segmented
  * control widget the user clicks.
  */
-import type { RenderAs } from "$/models/vizs/SeriesConfig.ts";
+import type { RenderAs } from "$/models/vizs/series.types.ts";
 import type { ObjectPaths } from "@avandar/utils";
 
 /**

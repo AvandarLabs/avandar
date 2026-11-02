@@ -2,7 +2,7 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { VizHydrationColumns } from "$/models/vizs/VizHydrationColumns.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { AvaRadarSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaRadarSeries } from "$/models/vizs/series.types.ts";
 
 type RadarSeriesConfig = {
   nameKey: QueryColumn.Id | undefined;

@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery/hydratePieFromQuery.ts";
 import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult/hydratePieFromQueryResult.ts";
-import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
+import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/VizSettingDescriptors.types.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AvaAreaChartVizConfig } from "$/models/vizs/AvaAreaChartVizConfig/AvaAreaChartVizConfig.types.ts";
@@ -21,7 +21,7 @@ import type { IAvaVizConfigModule } from "$/models/vizs/AvaVizConfig/IAvaVizConf
 import type {
   AvaRadarSeries,
   AvaXYSeries,
-} from "$/models/vizs/SeriesConfig.ts";
+} from "$/models/vizs/series.types.ts";
 
 export const AvaFunnelChartVizConfigs = {
   vizType: "funnel",

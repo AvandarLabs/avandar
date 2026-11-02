@@ -20,7 +20,7 @@ import { SeriesList } from "@/components/VisualizationContainer/VizSettingsForm/
 import { useUniqueRowKeys } from "@/components/VisualizationContainer/VizSettingsForm/useUniqueRowKeys";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { AvaScatterSeries } from "$/models/vizs/SeriesConfig";
+import type { AvaScatterSeries } from "$/models/vizs/series.types";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 
 type Props = {

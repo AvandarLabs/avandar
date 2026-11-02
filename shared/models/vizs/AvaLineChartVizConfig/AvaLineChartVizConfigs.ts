@@ -1,10 +1,10 @@
 import { match } from "ts-pattern";
+import { convertSeriesRenderAs } from "$/models/vizs/convertSeriesRenderAs/convertSeriesRenderAs.ts";
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { makeGridDescriptors } from "$/models/vizs/makeGridDescriptors/makeGridDescriptors.ts";
 import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
-import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AvaAreaChartVizConfig } from "$/models/vizs/AvaAreaChartVizConfig/AvaAreaChartVizConfig.types.ts";
@@ -25,8 +25,8 @@ import type {
   AvaLineSeries,
   AvaRadarSeries,
   AvaXYSeries,
-} from "$/models/vizs/SeriesConfig.ts";
-import type { VizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
+} from "$/models/vizs/series.types.ts";
+import type { VizSettingDescriptors } from "$/models/vizs/VizSettingDescriptors.types.ts";
 
 const CURVE_TYPE_OPTIONS = [
   { value: "monotone", label: "Smooth" },

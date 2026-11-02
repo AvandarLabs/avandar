@@ -25,7 +25,7 @@ import type {
   AnyChartSettingDescriptor,
   AnySeriesSettingDescriptor,
   ControlSpec,
-} from "$/models/vizs/SettingDescriptor";
+} from "$/models/vizs/VizSettingDescriptors.types";
 
 function readSetting(obj: unknown, key: string): unknown {
   return getValue(obj as never, key as never, { throwError: false });

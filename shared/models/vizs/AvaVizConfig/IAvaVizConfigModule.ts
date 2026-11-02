@@ -4,7 +4,7 @@ import type {
   AvaVizConfigType,
   VizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
-import type { AnyVizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
+import type { AnyVizSettingDescriptors } from "$/models/vizs/VizSettingDescriptors.types.ts";
 
 export interface IAvaVizConfigModule<
   VType extends VizType,

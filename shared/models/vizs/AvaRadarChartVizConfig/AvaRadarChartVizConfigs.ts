@@ -21,8 +21,8 @@ import type { IAvaVizConfigModule } from "$/models/vizs/AvaVizConfig/IAvaVizConf
 import type {
   AvaRadarSeries,
   AvaXYSeries,
-} from "$/models/vizs/SeriesConfig.ts";
-import type { VizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
+} from "$/models/vizs/series.types.ts";
+import type { VizSettingDescriptors } from "$/models/vizs/VizSettingDescriptors.types.ts";
 
 const descriptors: VizSettingDescriptors<
   AvaRadarChartVizConfig,

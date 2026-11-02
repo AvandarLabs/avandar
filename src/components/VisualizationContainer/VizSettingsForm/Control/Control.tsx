@@ -10,7 +10,7 @@ import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSetting
 import { ColumnPickerControl } from "@/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { ControlSpec } from "$/models/vizs/SettingDescriptor";
+import type { ControlSpec } from "$/models/vizs/VizSettingDescriptors.types";
 import type { ReactNode } from "react";
 
 type Props = {

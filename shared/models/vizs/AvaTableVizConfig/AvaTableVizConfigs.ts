@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
+import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/VizSettingDescriptors.types.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { AvaAreaChartVizConfig } from "$/models/vizs/AvaAreaChartVizConfig/AvaAreaChartVizConfig.types.ts";
 import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types.ts";

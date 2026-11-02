@@ -1,6 +1,6 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { AvaBubbleSeries } from "$/models/vizs/SeriesConfig.ts";
+import type { AvaBubbleSeries } from "$/models/vizs/series.types.ts";
 
 type BubbleSeriesConfig = {
   series: readonly AvaBubbleSeries[];
