@@ -5,7 +5,8 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 
-type Options = {
+/** Inputs for publishing a completed query result to its data viz block. */
+type UseRefreshDataVizColumnBindingsOptions = {
   id: string;
   rawSql: string;
   auth: StructuredQueryAuth;
@@ -21,7 +22,7 @@ type Options = {
 
 /** Publishes the current query observer's completed metadata to its block. */
 export function useRefreshDataVizColumnBindings(
-  options: Readonly<Options>,
+  options: Readonly<UseRefreshDataVizColumnBindingsOptions>,
 ): void {
   const queryClient = useQueryClient();
   const { id, rawSql, auth, expectedSql, result, isSuccess } = options;
