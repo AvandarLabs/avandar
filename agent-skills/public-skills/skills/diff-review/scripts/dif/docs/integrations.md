@@ -107,6 +107,23 @@ The skill may still POST its entries itself (Continue mode does). That is
 idempotent with this path: entries already in difit are, by definition, not
 inbound.
 
+### Reseeding a new difit comment session
+
+difit keys its comments by the comparison's *resolved* commits, not by the
+requested names. Once HEAD or the base moves (a commit, a merge, a pull), the
+browser's next `/api/diff` request opens a new comment session, and
+`/api/comments-json` then answers from it: version 0 and no threads. A plain
+mirror would write that over the transcript and wipe the conversation, and the
+GitHub sync would read every PR-bound comment as deleted and resolve or delete
+it on the PR.
+
+So before anything else in a tick, the poller checks for a new session:
+`difit::importer::reseed_entries` treats a snapshot as new when it is version 0
+with no threads, or when its version is below the last one mirrored. In that
+case, the poller POSTs every transcript entry the new session lacks and skips
+the GitHub pass and the mirror for that tick. A session the reviewer emptied by
+deleting comments keeps counting up, so it is mirrored as usual.
+
 ### Comparison handoff
 
 If the skill chooses a comparison inside an already-open TUI (for example the
