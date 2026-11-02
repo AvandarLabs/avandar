@@ -208,3 +208,71 @@ fn a_transcript_the_skill_wrote_reaches_the_live_server() {
         "the transcript did not settle on the merged conversation"
     );
 }
+
+#[test]
+fn comments_survive_difit_switching_to_a_new_session_when_head_moves() {
+    if !have("git", "--version") || !have("difit", "--version") {
+        eprintln!("SKIP: git or difit not available");
+        return;
+    }
+
+    let tmp = tempfile::tempdir().expect("tempdir");
+    let repo = tmp.path();
+    repo_with_a_change(repo);
+
+    // A resumed review: the transcript already holds the conversation, and
+    // difit is seeded with it.
+    let transcript = repo.join(".difit").join("rt-difit-dot.json");
+    let raw = serde_json::to_string_pretty(&serde_json::json!([
+        {"type": "thread", "id": "reviewer-1", "filePath": "file.txt",
+         "position": {"side": "new", "line": 2}, "body": "why line two?",
+         "author": "reviewer"}
+    ]))
+    .unwrap();
+    std::fs::create_dir_all(transcript.parent().unwrap()).unwrap();
+    std::fs::write(&transcript, &raw).unwrap();
+
+    let port = server::pick_port(4960);
+    let _difit = server::spawn(
+        repo,
+        &ComparisonKey::Uncommitted,
+        port,
+        "127.0.0.1",
+        Some(&raw),
+        false,
+        24,
+        80,
+    )
+    .expect("spawn difit");
+    assert!(
+        server::wait_until_ready(port, 75),
+        "difit never became ready on port {port}"
+    );
+    let _poller = Poller::start(port, transcript.clone(), Duration::from_millis(300));
+
+    // HEAD moves, then the browser refetches the diff. difit keys comments by
+    // the resolved commits, so it now serves a new, empty comment session.
+    std::fs::write(repo.join("other.txt"), "other\n").unwrap();
+    git(repo, &["add", "other.txt"]);
+    git(repo, &["commit", "-q", "-m", "move HEAD"]);
+    ureq::get(&format!(
+        "http://localhost:{port}/api/diff?ignoreWhitespace=true"
+    ))
+    .call()
+    .expect("refetch the diff like the browser");
+
+    let comments_url = format!("http://localhost:{port}/api/comments-json");
+    assert!(
+        wait_for(10, || ureq::get(&comments_url)
+            .call()
+            .ok()
+            .and_then(|r| r.into_string().ok())
+            .is_some_and(|live| live.contains("why line two?"))),
+        "the conversation never reached difit's new comment session"
+    );
+    thread::sleep(Duration::from_millis(900));
+    assert!(
+        std::fs::read_to_string(&transcript).is_ok_and(|t| t.contains("why line two?")),
+        "the new, empty session was mirrored over the transcript"
+    );
+}
