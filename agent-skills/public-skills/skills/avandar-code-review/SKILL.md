@@ -162,7 +162,8 @@ Apply **only**:
 - From `docs/code-reviews/typescript-checklist.md`, only the comment and
   docstring bullets: JSDoc for public classes and methods; comment and
   docstring lines at 80 characters or fewer; if a docstring fits on one
-  line within 80 characters, keep it single-line; all exported classes,
+  line within 80 characters, keep it single-line, without ever cutting
+  content to make it fit; all exported classes,
   objects, and functions need docstrings; if an exported object defines
   top-level methods inline, those methods need docstrings too; function
   docstrings should explain purpose and output, not interior
