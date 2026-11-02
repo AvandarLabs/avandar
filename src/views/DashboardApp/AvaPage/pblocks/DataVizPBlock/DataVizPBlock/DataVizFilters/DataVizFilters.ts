@@ -6,9 +6,15 @@ import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilter
 export type GlobalFilterSubscriptionMode = "all" | "selected" | "none";
 
 /**
- * Saved local filter addressed by its historical `QueryResult` column name.
+ * A local filter saved on a version 0 chart. It names its column by
+ * `QueryResult` column name instead of a column ID. `LocalFilter` replaces it:
+ * a chart's filters convert once every name binds and the dashboard is saved.
+ *
+ * Safe to delete, along with the rest of the version 0 chart code, once no
+ * `dashboards.config` row holds a DataViz block with `columnBindingVersion: 0`.
+ * A chart nobody re-saves stays at version 0, so that takes a backfill first.
  */
-export type ColNameBoundLocalFilter = {
+export type LegacyLocalFilter = {
   /** Stable identifier used for viewer state. */
   id: string;
   /** Display label shown above the input. */
@@ -24,7 +30,7 @@ export type ColNameBoundLocalFilter = {
 };
 
 /** Local filter that targets a column ID. */
-export type LocalFilter = Omit<ColNameBoundLocalFilter, "columnName"> & {
+export type LocalFilter = Omit<LegacyLocalFilter, "columnName"> & {
   columnId: QueryColumn.Id;
 };
 
@@ -53,7 +59,7 @@ type ParseLocalFilterDefaultValueOptions = {
 };
 
 type LocalFilterToRecordOptions = {
-  filter: ColNameBoundLocalFilter;
+  filter: LegacyLocalFilter;
   value: string | readonly string[] | undefined;
 };
 

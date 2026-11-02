@@ -12,15 +12,15 @@ import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/Quer
 import css from "./LocalFiltersPField.module.css";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
-  ColNameBoundLocalFilter,
+  LegacyLocalFilter,
   LocalFilter,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { ReactNode } from "react";
 
 type Props = {
   columns: readonly QueryResult.ColumnWithId[];
-  filter: LocalFilter | ColNameBoundLocalFilter;
-  onChange: (filter: LocalFilter | ColNameBoundLocalFilter) => void;
+  filter: LocalFilter | LegacyLocalFilter;
+  onChange: (filter: LocalFilter | LegacyLocalFilter) => void;
   onRemove: () => void;
 };
 
@@ -38,7 +38,7 @@ export function LocalFilterEditor({
     { value: "contains" as const, label: t`Text contains` },
   ];
   const updateFilter = (
-    changes: Partial<LocalFilter | ColNameBoundLocalFilter>,
+    changes: Partial<LocalFilter | LegacyLocalFilter>,
   ): void => {
     onChange({ ...filter, ...changes });
   };

@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { LocalFiltersPField } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type {
-  ColNameBoundLocalFilter,
+  LegacyLocalFilter,
   LocalFilter,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
@@ -15,7 +15,7 @@ import type {
  */
 export function useLocalFiltersPFieldConfig(
   auth: Readonly<StructuredQueryAuth>,
-): CustomField<readonly LocalFilter[] | readonly ColNameBoundLocalFilter[]> {
+): CustomField<readonly LocalFilter[] | readonly LegacyLocalFilter[]> {
   const { t } = useLingui();
   return useMemo(() => {
     return {

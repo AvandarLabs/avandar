@@ -10,12 +10,12 @@ import { LocalFiltersPField } from "../LocalFiltersPField/LocalFiltersPField";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ColNameBoundLocalFilter } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { LegacyLocalFilter } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 type RenderFieldOptions = {
   value: VizConfig.T | VizConfig.ColNameBound;
   legacy?: boolean;
-  localFilters?: readonly ColNameBoundLocalFilter[];
+  localFilters?: readonly LegacyLocalFilter[];
   local?: boolean;
 };
 
@@ -253,7 +253,7 @@ it("preserves unresolved legacy siblings when an existing field explicitly chang
 
 it("edits legacy local controls without discarding an unresolved sibling", () => {
   vi.clearAllMocks();
-  const localFilters: ColNameBoundLocalFilter[] = [
+  const localFilters: LegacyLocalFilter[] = [
     {
       id: "one",
       columnName: "missing-one",
