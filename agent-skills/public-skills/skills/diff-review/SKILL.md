@@ -124,8 +124,9 @@ Use the slug rules in `scripts/dif/src/comparison.rs` and
 | Walkthrough | `-walkthrough.md` |
 | Reviewed state | `-reviewed.json` |
 | GitHub sync record (TUI-owned) | `-github.json` |
+| Held comments (TUI-owned) | `-held.json` |
 
-The skill writes these artifacts, except `-github.json`. The TUI reads them and
+The skill writes these artifacts, except `-github.json` and `-held.json`. The TUI reads them and
 owns live session metadata, transcript mirroring, and the GitHub sync record.
 
 `-github.json` lists the transcript comments that belong to the branch's GitHub

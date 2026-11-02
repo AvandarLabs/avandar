@@ -51,6 +51,7 @@ appends `claude`-authored replies. See the injection contract in
 | `<branch>-difit-<scope>-test-plan.md` | the `diff-review` skill | the manual test plan shown in the TUI Test plan tab and web-shell sidebar tab |
 | `<branch>-difit-<scope>-reviewed.json` | the `diff-review` skill | reviewed-group / reviewed-file state |
 | `<branch>-difit-<scope>-github.json` | `dif` (web shell + poller) | which transcript comments went to the GitHub PR, and their sync state |
+| `<branch>-difit-<scope>-held.json` | `dif` (event loop) | message ids held for **Send all**, as a JSON array; removed when nothing is held |
 
 Writes to the transcript are atomic (temp file + rename). They all share the
 `<branch>-difit-<scope>` stem so one review's files sort together.
@@ -168,6 +169,15 @@ comment is deleted or its thread resolved, on either side.
 The session's live GitHub state (the PR, the pending review, sync status, the
 viewed-file events, the connection) is never written here. The browser reads it, with these
 comments, from `/__wrap/github.json`.
+
+### The held comments
+
+`-held.json` is a JSON array of the reviewer message ids held for **Send all**
+in Bulk mode. The event loop rewrites it whenever the held set changes and
+deletes it once nothing is held. On launch they are kept out of the dispatch
+baseline, so a comment held when `dif` quit is held again (and counted in
+**Send all**) instead of being taken as already sent. This relies on difit
+keeping message ids when it is reseeded from the transcript, which it does.
 
 ## Slug + port derivation
 
