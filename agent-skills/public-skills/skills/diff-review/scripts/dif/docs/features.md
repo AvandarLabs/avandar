@@ -137,7 +137,7 @@ The browser shell's top bar has a **Bulk / Eager** toggle.
   one you delete is never sent.
 - **Eager** types each comment into the LLM pane as soon as you save it.
   Switching to Eager also sends anything still held.
-- **Send one now.** In Bulk, **Cmd+Ctrl+Enter** (Ctrl+Alt+Enter off macOS) in
+- **Send one now.** In Bulk, **Cmd+Alt+Enter** (Ctrl+Alt+Enter off macOS) in
   a comment box set to TUI saves that one comment and types it into the LLM pane
   at once. Everything else stays held for **Send all**. The submit button's
   tooltip shows the shortcut while it applies.

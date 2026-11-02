@@ -7,7 +7,7 @@
   // state set `data-tip` where they render: the GitHub bar (github.js), the
   // With comments toggle (commented.js), Send all (dispatch.js), the branch and
   // worktree (data.js), and the sidebar, rail, and view header (render.js).
-  var SEND_NOW_KEYS = IS_MAC ? "⌘⌃↵" : "Ctrl+Alt+Enter";
+  var SEND_NOW_KEYS = IS_MAC ? "⌘⌥↵" : "Ctrl+Alt+Enter";
 
   function setTip(el, text) {
     if (!el) return;

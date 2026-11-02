@@ -3,7 +3,7 @@
 //!
 //! The browser web shell flips the mode and asks for a flush; the TUI event
 //! loop reads both each tick and reports how many comments are waiting. In
-//! bulk mode the reviewer can also send one comment at once (`Cmd+Ctrl+Enter`),
+//! bulk mode the reviewer can also send one comment at once (`Cmd+Alt+Enter`),
 //! which the shell records here as that comment's message ids. The state
 //! crosses threads (shell server ↔ event loop), so it is atomics plus one small
 //! lock for those ids.
