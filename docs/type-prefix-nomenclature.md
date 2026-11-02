@@ -30,6 +30,12 @@ A `Ui` prefix marks the conventional form of an `Ava` type, with no business
 logic: the shape a UI component or chart library consumes. The pair converts
 one way at the boundary.
 
+`Ui` plays the role a `ViewModel` suffix plays in the MVVM pattern: the `Ava`
+type is the domain model, and the `Ui` type is that model converted for
+display. `UiVizConfig` is what MVVM would call `VizConfigViewModel`. We use the
+`Ui` prefix only because it is shorter, and because it pairs with the `Ava`
+prefix.
+
 - `UiVizConfig` is an `AvaVizConfig` with each column ID replaced by its
   `QueryResult` column name, the key each result row is read by.
   `makeUiVizConfigFromAvaVizConfig` converts an `AvaVizConfig` to a
