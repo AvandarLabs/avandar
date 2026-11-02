@@ -9,8 +9,13 @@ type XYSeriesConfig = {
 };
 
 /**
- * Seeds unconfigured slots from column IDs and preserves existing selections
- * and styles, including identities absent from the current result.
+ * Fills the empty slots of an XY chart config, such as a bar, line, or area
+ * chart, from a structured query's columns: one `defaultRenderAs` series on a
+ * numeric column when there are none, and the X axis on a column no series
+ * uses. Set slots keep their column ID, even if the query no longer selects it.
+ *
+ * Use it so a chart has something to draw before the user assigns its
+ * columns, for example after the query's selected columns change.
  */
 export function hydrateXYSeriesFromQuery<VConfig extends XYSeriesConfig>(
   currVizConfig: VConfig,

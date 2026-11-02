@@ -114,19 +114,14 @@ function _getDataVizPBlockConfig(
 }
 
 /**
- * Build the Puck component config for the dashboard's Data Visualization
- * block.
+ * Builds the Puck component config for the dashboard's DataViz block: the
+ * query, viz type, viz settings, and filter fields, and `DataVizPBlock` as
+ * its render. Its `resolveData` keeps `vizType` and `vizConfig` in step and,
+ * after an edit, binds a chart that uses column IDs to its query's columns.
+ * Use it wherever a dashboard's Puck config is built, for example in the
+ * dashboard editor.
  *
- * Top-level fields are `nlQuery`, `vizType`, and `vizConfig`. `vizType` is a
- * regular Puck select so it appears as a first-class control alongside the
- * prompt; `vizConfig` is a custom field that renders the per-type subform
- * (axis pickers, legend toggle, etc.). The `resolveData` hook keeps the two
- * in sync by running `AvaVizConfigs.convertVizConfig` whenever the user picks a
- * different `vizType`, and by falling back to defaults when older saved data
- * is missing either field.
- *
- * This is a React hook because it composes the per-field configs (which are
- * themselves hooks). It must be invoked from a React component / hook.
+ * A hook because the field configs it composes are hooks.
  */
 export function useDataVizPBlockConfig(
   options: Readonly<UseDataVizPBlockConfigOptions>,

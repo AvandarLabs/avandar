@@ -55,9 +55,11 @@ function _getLocalFilterOutcome({
 }
 
 /**
- * Binds a chart's saved column references (legacy names or column IDs) to the
- * column IDs of its query's current `QueryResult` columns. A legacy envelope is
- * upgraded only when every name binds to exactly one column.
+ * Binds a chart's saved column references, `QueryResult` column names on a
+ * version 0 chart or column IDs otherwise, to the column IDs of its query's
+ * current `QueryResult` columns. A version 0 chart is upgraded only when every
+ * name binds to exactly one column. Use it when a saved chart meets its live
+ * query, for example to build the bindings it renders with.
  */
 export function makeSavedColumnBindingsFromDataVizProps({
   props,

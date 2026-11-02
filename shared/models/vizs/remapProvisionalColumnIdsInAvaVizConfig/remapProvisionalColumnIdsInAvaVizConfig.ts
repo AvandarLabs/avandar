@@ -51,6 +51,10 @@ function _createTransitionMap({
  * Replaces provisional SQL column IDs in a chart config with the IDs of the
  * same expressions in the current result, when that match is unique. Slots
  * without a unique match keep their ID.
+ *
+ * Use it when a new result's column bindings replace the previous ones for
+ * the same query owner, for example so a chart built on a raw SQL result
+ * keeps its columns once those columns get query builder IDs.
  */
 export function remapProvisionalColumnIdsInAvaVizConfig({
   config,

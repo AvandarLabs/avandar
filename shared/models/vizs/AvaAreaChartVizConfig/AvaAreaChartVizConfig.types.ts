@@ -3,22 +3,25 @@ import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type { AvaXYSeries } from "$/models/vizs/series.types.ts";
 
 /**
- * Configuration for an area chart. Each series carries its own
- * `curveType`, `fillOpacity`, and so on; the host config holds canvas
- * styling, the shared X axis, and the multi-series layout.
+ * The `AvaVizConfig` of an area chart, keyed by column ID. Each series
+ * carries its own mark settings, such as `curveType` and `fillOpacity`,
+ * and the host holds the shared X axis, the layout, and canvas styling.
+ *
+ * Use it wherever an area chart is edited or saved, for example a chart on
+ * a dashboard. Renderers take the `UiVizConfig` form instead.
  */
 export type AvaAreaChartVizConfig = {
   vizType: "area";
 
   /**
-   * The key of the column to use for the X axis. This is a column
-   * name, not an ID.
+   * The key of the column to use for the X axis. This is a column ID, not a
+   * `QueryResult` column name.
    */
   xAxisKey: QueryColumn.Id | undefined;
 
   /**
    * One entry per rendered series. Each series carries its own `key`
-   * (column name), `renderAs` (area by default - bar / line allowed),
+   * (column ID), `renderAs` (area by default - bar / line allowed),
    * `color`, `curveType`, `fillOpacity`, and other mark-level
    * settings.
    */

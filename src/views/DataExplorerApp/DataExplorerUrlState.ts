@@ -16,7 +16,9 @@ import type {
 } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
 /**
- * Zod schema for the Data Explorer URL search params.
+ * Validates the Data Explorer route's URL search params, which
+ * `serializeStateToUrl` writes and `parseUrlSearch` reads so a reload or a
+ * shared link reopens the same query and chart.
  *
  * We persist a minimal set of identifiers rather than serialising full
  * model objects, keeping URLs short and human-readable:
@@ -26,7 +28,7 @@ import type {
  *   &agg=<colName>:<aggregationType>,...
  *   &orderBy=<colName>&orderDir=asc|desc
  *   &sql=<rawSql>
- *   &vc=<JSON-stringified AvaVizConfig> (omitted when viz is the default table)
+ *   &vc=<JSON-stringified UiVizConfig> (omitted when viz is the default table)
  *
  * `vc` references columns by `QueryResult` column name, never by column ID.
  * A URL has no column binding registry, so the IDs of one session mean
@@ -152,8 +154,9 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
 }
 
 /**
- * Returns the chart config keyed by `QueryResult` column names. A config
- * restored from the URL and not yet bound to a result is returned unchanged.
+ * Returns the chart config keyed by `QueryResult` column names, for
+ * `serializeStateToUrl` to write as `vc`. A config restored from the URL and
+ * not yet bound to a result is returned unchanged.
  * Otherwise each column ID maps to its name in the latest result, and a slot
  * whose column is absent from that result is left out.
  */

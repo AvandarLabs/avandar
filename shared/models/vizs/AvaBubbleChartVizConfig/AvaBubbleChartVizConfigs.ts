@@ -59,9 +59,9 @@ export const AvaBubbleChartVizConfigs = {
   },
 
   /**
-   * Hydrate a bubble config from a structured query's column list.
-   * Prunes series referencing missing columns; seeds from the first three
-   * numeric columns when the series array is empty.
+   * Gives a bubble config with no series one series on the structured
+   * query's first three numeric columns, for X, Y, and size, reusing a
+   * column when there are fewer. Existing series are kept as they are.
    */
   hydrateFromQuery: (
     vizConfig: AvaBubbleChartVizConfig,
@@ -71,9 +71,10 @@ export const AvaBubbleChartVizConfigs = {
   },
 
   /**
-   * Hydrate a bubble config from query result columns.
-   * Prunes series referencing missing columns; seeds from the first three
-   * numeric columns when the series array is empty.
+   * Gives a bubble config with no series one series on the result's first
+   * three numeric columns, for X, Y, and size, reusing a column when there
+   * are fewer. Existing series are kept, even ones whose columns the result
+   * does not have.
    */
   hydrateFromQueryResult: (
     vizConfig: AvaBubbleChartVizConfig,

@@ -85,13 +85,13 @@ function _buildFilter({
 }
 
 /**
- * Binds each subscribed dashboard filter to a column ID in this chart's query,
- * then maps that ID to its current `QueryResult` column name for the wrapper
- * SQL.
- * Preserve returned targets across value updates. Explicit query edits may
- * reset only unresolved targets to `columnName`. Column ID targets keep
- * their IDs even when absent. Definition name edits are detected from
- * authoring metadata.
+ * Binds each subscribed dashboard filter to a column ID in a chart's query
+ * and maps it to that column's current `QueryResult` column name, so the
+ * filter can go into the chart's wrapper SQL. Filters that do not bind come
+ * back as issues. Use it when a chart applies dashboard filters, for example
+ * on each render. Pass in the targets it last returned: a bound target keeps
+ * its column ID, even when the column is gone, until the filter's own column
+ * name changes.
  */
 export function makeColumnBindingsFromDashboardFilters(
   options: Readonly<{

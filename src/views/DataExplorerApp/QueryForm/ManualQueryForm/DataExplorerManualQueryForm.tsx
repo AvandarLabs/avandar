@@ -10,9 +10,10 @@ import type { ReactNode } from "react";
 type Props = { withinPortal: boolean; layout: SettingsColumnsLayout };
 
 /**
- * Legacy wrapper that wires the form to the global Data Explorer state
- * manager. Kept so existing callers in the Data Explorer don't have to
- * thread state and handlers through props.
+ * Renders the manual query form on the Data Explorer's own state: it reads
+ * the query from `DataExplorerStateManager`, keeps the selected source's
+ * columns there as `sourceCatalog`, and dispatches every edit there.
+ * Rendered only by `ManualQueryForm`, when it is given no `query`.
  */
 export function DataExplorerManualQueryForm({
   withinPortal,

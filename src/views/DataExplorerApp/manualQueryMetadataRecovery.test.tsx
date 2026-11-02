@@ -8,7 +8,11 @@ import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryFo
 import type { ReactNode } from "react";
 
 type Props = { children: ReactNode };
-/** Exercises column reconstruction and chart edits through the real store. */
+/**
+ * Checks that reopening the manual query form keeps the query's column IDs,
+ * aggregation, ordering, and SQL while the source's columns fail to load,
+ * and clears them only once a successful load has none of those columns.
+ */
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";

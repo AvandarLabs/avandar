@@ -4,8 +4,11 @@ import type { Props } from "../DataVizPBlock/DataVizPBlock";
 import type { makeDataVizPBlockStateFromProps } from "./makeDataVizPBlockStateFromProps";
 
 /**
- * Synchronizes explicit viz type edits on name-bound props without resolving
- * column names.
+ * Keeps `vizType` and `vizConfig` in step on a version 0 DataViz block, whose
+ * config is keyed by `QueryResult` column name. Called only by
+ * `makeDataVizPBlockStateFromProps`: on a viz type change it restores the
+ * remembered config or converts the current one, and it never binds a
+ * column name to a column ID.
  */
 export function synchronizeUiVizType(
   options: Omit<

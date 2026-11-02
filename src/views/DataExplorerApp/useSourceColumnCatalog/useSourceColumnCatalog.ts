@@ -30,7 +30,13 @@ function _createCatalog(options: {
   };
 }
 
-/** Owns stable source wrappers for controls outside the Explorer provider. */
+/**
+ * Loads a data source's columns as a `SourceColumnCatalog`. Each column keeps
+ * its ID when the same source reloads, and the same object comes back until
+ * the source, its columns, or their status change. Use it in a control with no
+ * Data Explorer state to hold the catalog, for example a column picker
+ * outside the Data Explorer.
+ */
 export function useSourceColumnCatalog(
   sourceKey: Readonly<QueryDataSource.TypedId> | undefined,
 ): SourceColumnCatalog {

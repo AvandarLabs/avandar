@@ -2,16 +2,6 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { RadarChart } from "@/lib/ui/viz/RadarChart/RadarChart";
 import { render } from "@/test-utils";
-/**
- * Renderer-level prop verification for the series-aware chart wrappers.
- *
- * These tests intercept the underlying Mantine / Recharts components and
- * assert that each chart-level and series-level setting flows through to
- * the right prop on the rendered chart. Pairs with
- * `SeriesAwareVizForm.descriptors.test.tsx`: the form tests prove
- * "changing a control updates the config"; these tests prove
- * "changing a config setting updates what the chart renders".
- */
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 
 type UiVizConfigRadar = Extract<UiVizConfig, { vizType: "radar" }>;
@@ -68,7 +58,13 @@ const RADAR_BASELINE: UiVizConfigRadar = {
   withLegend: true,
 };
 
-/** Shared setup and fixtures for RadarChartTestFixtures. */
+/**
+ * Setup for the `RadarChart` props tests, which check that each chart and
+ * series setting in a radar `UiVizConfig` reaches the right prop on the
+ * chart it renders. Importing it mocks Mantine's `RadarChart` to record its
+ * props, and `renderRadar` and `lastProps` render a config and read them
+ * back.
+ */
 export const RadarChartTestFixtures = {
   expect,
   it,

@@ -37,7 +37,13 @@ function _makeSeriesSlots<Key extends string>({
 }
 
 /**
- * Lists every axis and series slot in rendering order, including absent slots.
+ * Lists every column slot in a chart config, such as the X axis or a series'
+ * size column, with its key and its `target` path (for example
+ * `series.0.xKey`), including slots with no column set. Works on configs keyed
+ * by column ID or by `QueryResult` column name.
+ *
+ * Use it to visit each column a chart reads in one pass, for example to
+ * convert every key or to report which slot failed to resolve.
  */
 export function makeColumnSlotsFromAvaVizConfig<Key extends string>(
   config: Readonly<SlotConfig<Key>>,

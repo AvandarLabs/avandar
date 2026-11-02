@@ -70,8 +70,11 @@ function _hasReadySourceFilters(layer: MapLayer.T): boolean {
 /** Queryability and cache-key helpers for map-layer data. */
 export const MapLayerData = {
   /**
-   * True when both filter clauses are hydrated for this layer and its buffer
-   * dependencies. Missing sources and cycles retain the compiler's diagnostics.
+   * True when the filters and having clauses of this layer, and of each layer
+   * it buffers, are hydrated, with every rule targeting a column ID. Check it
+   * before running a layer's SQL, for example to hold a layer's data query or
+   * the time slider's extent until saved filters can apply. Missing sources
+   * and cycles return true, so the compiler can report them.
    */
   hasReadySourceFilters: ({
     layer,

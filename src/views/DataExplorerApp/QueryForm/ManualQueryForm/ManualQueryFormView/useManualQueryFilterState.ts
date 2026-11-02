@@ -65,7 +65,14 @@ function useFilterPruning({
   );
 }
 
-/** Reconciles source filters and confirms edits that overwrite manual SQL. */
+/**
+ * Holds the manual query form's filter state. Once the source's columns are
+ * ready, it binds filters to their column IDs and, while the form matches
+ * the SQL, drops filters on columns the source does not have and warns the
+ * user. While the form does not match hand-written SQL, an edit waits in
+ * `pendingFilters` until the user confirms the overwrite.
+ * Used only by `ManualQueryFormView`.
+ */
 export function useManualQueryFilterState(
   options: Readonly<UseManualQueryFilterStateOptions>,
 ): FilterState {

@@ -10,7 +10,11 @@ type ApplyAvaVizConfigFromQueryResultOptions = {
   columns: readonly QueryResult.ColumnWithId[];
 };
 
-/** Compares every configured slot and style before emitting a state update. */
+/**
+ * Whether two viz configs match in every slot and setting. Use it to skip a
+ * state update when filling a config from a query result changed nothing,
+ * for example when the same result arrives again.
+ */
 export function isVizConfigEqualForQueryResultSync(
   a: Readonly<AvaVizConfig.T>,
   b: Readonly<AvaVizConfig.T>,
@@ -18,7 +22,12 @@ export function isVizConfigEqualForQueryResultSync(
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-/** Seeds unconfigured slots without replacing unresolved owned selections. */
+/**
+ * Fills a viz config's empty slots from a query result's columns, keeping
+ * every slot already set, even when the result lacks its column. Use it
+ * whenever a chart's query returns a result, for example after raw SQL
+ * runs, so the chart has something to draw.
+ */
 export function applyAvaVizConfigFromQueryResult(
   input: Readonly<ApplyAvaVizConfigFromQueryResultOptions>,
 ): AvaVizConfig.T {

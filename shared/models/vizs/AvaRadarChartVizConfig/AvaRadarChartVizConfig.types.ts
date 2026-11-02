@@ -3,9 +3,12 @@ import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type { AvaRadarSeries } from "$/models/vizs/series.types.ts";
 
 /**
- * Configuration for a radar (spider) chart. Each series renders as one
- * radar polygon; multiple polygons share the categorical axis defined
- * by `nameKey`.
+ * The `AvaVizConfig` of a radar (spider) chart, keyed by column ID. Each
+ * series renders as one polygon, and all polygons share the category axes
+ * that `nameKey` defines.
+ *
+ * Use it wherever a radar chart is edited or saved, for example a chart on
+ * a dashboard. Renderers take the `UiVizConfig` form instead.
  */
 export type AvaRadarChartVizConfig = {
   vizType: "radar";

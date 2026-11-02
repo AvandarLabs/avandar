@@ -116,9 +116,12 @@ function _stringifyNodeSqlParserSelect(node: unknown): string {
 }
 
 /**
- * Walk the FROM list and produce a FromResolution: pick a base dataset
- * (either a known table or a nested subquery), collect any JOINs, and
- * record unmapped reasons.
+ * Reads the FROM list of parsed SQL into a `FromResolution`: the base dataset
+ * or nested subquery, plus any JOINs. Adds to `unmappedReasons` for each part
+ * it cannot represent, and returns `undefined` when it finds no base.
+ *
+ * Use it when turning parsed SQL into a structured query, for example so the
+ * manual query form can show SQL that was written by hand.
  */
 export function parseFromClause(
   fromList: unknown,

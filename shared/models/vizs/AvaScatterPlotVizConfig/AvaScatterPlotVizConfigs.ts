@@ -59,9 +59,9 @@ export const AvaScatterPlotVizConfigs = {
   },
 
   /**
-   * Hydrate a scatter config from a structured query's column list.
-   * Prunes series referencing missing columns; seeds from the first two
-   * numeric columns when the series array is empty.
+   * Gives a scatter config with no series one series on the structured
+   * query's first two numeric columns, for X and Y, reusing the column when
+   * there is only one. Existing series are kept as they are.
    */
   hydrateFromQuery: (
     vizConfig: AvaScatterPlotVizConfig,
@@ -71,9 +71,10 @@ export const AvaScatterPlotVizConfigs = {
   },
 
   /**
-   * Hydrate a scatter config from query result columns.
-   * Prunes series referencing missing columns; seeds from the first two
-   * numeric columns when the series array is empty.
+   * Gives a scatter config with no series one series on the result's first
+   * two numeric columns, for X and Y, reusing the column when there is only
+   * one. Existing series are kept, even ones whose columns the result does
+   * not have.
    */
   hydrateFromQueryResult: (
     vizConfig: AvaScatterPlotVizConfig,

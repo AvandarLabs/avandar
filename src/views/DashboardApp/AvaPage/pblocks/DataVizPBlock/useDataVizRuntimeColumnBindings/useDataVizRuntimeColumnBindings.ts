@@ -16,8 +16,9 @@ type RuntimeColumnBindingsState = ReturnType<
 
 /**
  * Discovers a chart query's unfiltered `QueryResult` columns, then binds the
- * chart's settings and filters to their column IDs without saving viewer
- * state.
+ * chart's settings and filters to their column IDs in memory, saving nothing
+ * to the dashboard. Use it wherever a chart needs its bindings while it is on
+ * screen, for example to render it or to edit its settings.
  */
 export function useDataVizRuntimeColumnBindings({
   props,

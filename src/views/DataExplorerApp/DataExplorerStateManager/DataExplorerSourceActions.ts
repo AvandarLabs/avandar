@@ -39,7 +39,14 @@ function _getQueryFromSourceColumns(options: {
       : undefined,
   };
 }
-/** Source selection and metadata reconciliation actions for Data Explorer. */
+/**
+ * The Data Explorer actions that pick the query's data source, take in that
+ * source's columns once they load, and set which of them the query selects.
+ * Column IDs carry over when the same source's columns reload, so filters
+ * and chart settings stay bound to the same columns.
+ *
+ * Spread into the actions of `DataExplorerStateManager`, its only user.
+ */
 export const DataExplorerSourceActions = {
   /** Set the data source for the query. */
   setDataSource: (

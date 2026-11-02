@@ -117,7 +117,12 @@ beforeEach(() => {
     };
   });
 });
-/** Shared setup and fixtures for DashboardFilterColumnBindingTestFixtures. */
+/**
+ * Mocks `runStructuredQuery` and the dashboard filter state, and bundles a
+ * column ID chart, a region filter, and a query wrapper for tests of which
+ * column a dashboard filter binds to. Used only by the dashboard filter
+ * target ownership and reopen tests.
+ */
 export const DashboardFilterColumnBindingTestFixtures = {
   DashboardConfigs,
   withDuckDb,

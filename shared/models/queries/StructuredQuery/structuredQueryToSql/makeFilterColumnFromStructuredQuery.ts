@@ -5,7 +5,15 @@ import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 
-/** Gets the model-derived expression and effective type for a filter target. */
+/**
+ * Gets the SQL expression and data type a filter on a column ID compares
+ * against: a source column for WHERE, or an aggregated projection for
+ * HAVING. Undefined when the ID matches no column or several, or when a
+ * HAVING column's aggregation is unset or `none`.
+ *
+ * Use it wherever a filter rule is rendered as SQL, for example as the
+ * column lookup when emitting a WHERE or HAVING clause.
+ */
 export function makeFilterColumnFromStructuredQuery(
   options: Readonly<{
     columnId: QueryColumn.Id;

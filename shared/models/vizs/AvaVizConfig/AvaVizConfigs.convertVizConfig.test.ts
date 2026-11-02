@@ -213,11 +213,6 @@ describe("AvaVizConfigs.convertVizConfig shape matrix", () => {
   });
 });
 
-/**
- * Viz types that declare each shared field. A field must survive any single
- * hop between two types that both declare it: that is the whole contract
- * `convertVizConfig` owes the user.
- */
 type SharedVizFields = {
   vizType: VizType;
   chartStyle?: ChartStyle;
@@ -225,6 +220,11 @@ type SharedVizFields = {
   seriesColors?: Record<string, string>;
 };
 
+/**
+ * Viz types that declare each shared field. A field must survive any single
+ * hop between two types that both declare it: that is the whole contract
+ * `convertVizConfig` owes the user.
+ */
 const DECLARED_BY = {
   chartStyle: ["bar", "line", "area", "scatter", "bubble", "radar"],
   withLegend: ["bar", "line", "area", "radar"],

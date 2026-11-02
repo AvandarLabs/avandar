@@ -5,10 +5,11 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 
 /**
- * Returns the columns (names and data types) a chart's SQL produces, without
- * reading any rows, so dashboard charts can bind each column to a column ID.
- * Runs the SQL with no dashboard filters, wrapped in `LIMIT 0`, through
- * `runStructuredQuery`, and records no query analytics.
+ * Returns the `QueryResult` columns, with their names and data types, that
+ * some SQL produces, without reading any rows or recording query analytics.
+ *
+ * Use it when only a query's shape matters, for example to give each column
+ * of a dashboard chart's SQL a column ID.
  */
 export async function runQuerySchema(
   options: Readonly<{

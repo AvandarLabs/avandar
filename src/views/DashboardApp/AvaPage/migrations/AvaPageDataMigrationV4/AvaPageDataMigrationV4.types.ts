@@ -1,6 +1,9 @@
 /**
- * Frozen AvaPage v4 root, block, filter, and row-key chart shapes.
- * Only external library types and isolated historical schemas may be imported.
+ * Frozen shapes of a version 4 dashboard: its root, blocks, filters, and
+ * charts keyed by `QueryResult` column name. `AvaPageDataMigrationV4` and
+ * `AvaPageDataMigrationV5` type the v4 side of their migrations with them,
+ * so they never change. Import only external library types and earlier
+ * frozen schemas here.
  */
 import type {
   V3_AvaPageData,

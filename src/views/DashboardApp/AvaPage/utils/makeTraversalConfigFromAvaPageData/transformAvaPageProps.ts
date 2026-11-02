@@ -9,7 +9,12 @@ type PropTransforms<Components, Root> = {
   ) => Components[Name];
 } & { root?: (props: Root) => Root };
 
-/** Transforms every saved block, including detached zones and nested slots. */
+/**
+ * Runs per-block-type prop transforms, and an optional root transform, over
+ * saved page data, reaching blocks in detached zones and nested slots without
+ * the editor's Puck config. Use it on saved JSON, for example to migrate a
+ * dashboard between schema versions or to collect its charts before a save.
+ */
 export function transformAvaPageProps<
   Components extends Record<string, Record<string, unknown>>,
   Root extends Record<string, unknown>,

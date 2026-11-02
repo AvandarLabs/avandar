@@ -24,8 +24,9 @@ import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types
 type Props = {
   columns: readonly QueryResult.ColumnWithId[];
   /**
-   * Raw `QueryResult` columns remain available to tables when identity is
-   * ambiguous.
+   * Every `QueryResult` column the query returned, including any that could
+   * not be given a column ID. The table view lists these, so it shows every
+   * column even when `columns` leaves some out. Defaults to `columns`.
    */
   rawColumns?: readonly QueryResult.Column[];
 
@@ -43,9 +44,11 @@ type Props = {
 };
 
 /**
- * Builds the Zod schemas used to validate `AvaVizConfig` shapes for each chart
- * type. Schemas are rebuilt per call so their error messages stay localized
- * to the current Lingui locale.
+ * Builds the Zod schemas `VisualizationContainer` uses to check each chart
+ * type's `UiVizConfig` before rendering it, so a missing axis, series, or
+ * name column shows as an error message instead of a broken chart. The
+ * schemas are rebuilt when the Lingui locale changes, so their messages stay
+ * translated.
  */
 function useVizConfigSchemas() {
   // Hook-bound `t` intentionally shadows the module-level macro `t` so this

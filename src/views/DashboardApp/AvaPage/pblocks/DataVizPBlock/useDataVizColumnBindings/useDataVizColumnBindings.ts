@@ -3,7 +3,12 @@ import { DataVizColumnBindings } from "../DataVizColumnBindings";
 import type { QueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { DataVizColumnBindingsOptions } from "../DataVizColumnBindings";
 
-/** Shares unfiltered schema readiness before chart predicates can execute. */
+/**
+ * Gets the column IDs of a chart query's `QueryResult` columns through the
+ * shared `DataVizColumnBindings` cache, with a loading, ready, or error
+ * status. Use it to learn a chart's columns before its filtered query runs,
+ * for example to bind filters to column IDs before building their SQL.
+ */
 export function useDataVizColumnBindings(
   options: Readonly<DataVizColumnBindingsOptions>,
 ): {

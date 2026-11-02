@@ -85,9 +85,9 @@ type AreaSeriesShape = {
  * The conventional chart config a renderer takes, with no business logic: an
  * `AvaVizConfig.T` with each column ID replaced by its `QueryResult` column
  * name, the key each result row is read by. `makeUiVizConfigFromAvaVizConfig`
- * builds one. The renderers in `src/lib/ui/viz` consume it, Explorer URLs
- * store charts in it, and dashboards saved before column IDs still hold it
- * until they bind.
+ * builds one. Chart renderers consume it. It also holds charts where there
+ * are no column IDs yet, for example in Explorer URLs and in dashboards saved
+ * before column IDs, until they bind.
  *
  * A `QueryResult` column name is not always the source column's name. An
  * aggregate is emitted as `sum(revenue)` rather than `revenue`, and an

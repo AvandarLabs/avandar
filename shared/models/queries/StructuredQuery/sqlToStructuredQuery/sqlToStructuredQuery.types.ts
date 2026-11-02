@@ -21,9 +21,16 @@ export type SqlMappingResult = {
 export type SqlMappingInput = {
   /** The SQL string to parse. */
   sql: string;
-  /** Existing identity context for SQL edits and reloads. */
+  /**
+   * The structured query this SQL replaces, if any. A column the SQL still
+   * selects keeps its ID from this query when it matches one unambiguously,
+   * for example after a hand edit that only renames an alias.
+   */
   previousQuery?: StructuredQuery.Partial;
-  /** Complete ready source catalog for the current data source. */
+  /**
+   * The current data source's fully loaded columns. When given, the parsed
+   * query's source columns reuse these IDs ahead of `previousQuery`'s.
+   */
   sourceColumns?: readonly QueryColumn.T[];
   /**
    * Datasets in the current workspace that the query may reference. We use

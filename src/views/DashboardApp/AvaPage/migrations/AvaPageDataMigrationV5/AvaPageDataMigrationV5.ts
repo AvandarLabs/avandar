@@ -60,7 +60,12 @@ function _downgradeChart(
 }
 
 /**
- * Structural v5 migration. Live schema resolution belongs to runtime ingress.
+ * Moves a saved dashboard between schema versions 4 and 5.
+ * `upgradeAvaPageData` registers it with `AvaPageDataMigrator`, which
+ * upgrades every saved dashboard before it is used. The upgrade marks each
+ * DataViz block as version 0 without running its query, so its column names
+ * bind to column IDs later, when the chart renders or the dashboard is saved.
+ * The downgrade writes column IDs back as names and throws when it cannot.
  */
 export const AvaPageDataMigrationV5 = {
   downgradedVersion: 4,

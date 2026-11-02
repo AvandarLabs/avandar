@@ -187,8 +187,12 @@ function _bindSlotToColumnId({
 
 /**
  * Replaces each `QueryResult` column name in a chart config with the column
- * ID of the one `QueryResult` column that has that name. Leaves the input
- * config unchanged.
+ * ID of the one `QueryResult` column that has that name. A name that matches
+ * no column, or several, is returned in `issues`, and its axis is left unset
+ * or its series dropped. Leaves the input config unchanged.
+ *
+ * Use it to bind a name-keyed chart config to column IDs, for example one
+ * restored from a URL or saved on a dashboard before column IDs.
  */
 export function makeAvaVizConfigFromUiVizConfig({
   config,

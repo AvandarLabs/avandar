@@ -1,4 +1,4 @@
-/** Verifies explicit SQL output naming for selected projections. */
+/** Verifies that `outputAlias` sets the `QueryResult` column name. */
 import { Model } from "@avandar/models";
 import { expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";

@@ -6,7 +6,12 @@ import type { ComponentProps, ReactNode } from "react";
 
 type Props = Omit<ComponentProps<typeof ManualQueryFormView>, "sourceCatalog">;
 
-/** Shares the controlled query's source identities across its form fields. */
+/**
+ * Renders the manual query form for a query its caller owns. It loads the
+ * source's columns itself, keeps the column IDs already on
+ * `query.sourceColumns`, and passes those columns along with each filter
+ * edit. Rendered only by `ManualQueryForm`, when it is given a `query`.
+ */
 export function ControlledManualQueryForm({
   query,
   handlers,

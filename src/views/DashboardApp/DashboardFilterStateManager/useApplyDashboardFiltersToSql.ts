@@ -13,7 +13,13 @@ type UseApplyDashboardFiltersToSqlOptions = {
   localFilterState: LocalFilterStateApi;
 };
 
-/** Builds predicates only from resolved targets after unfiltered discovery. */
+/**
+ * Returns a chart's SQL wrapped with its bound dashboard filters and its local
+ * filters, each local filter applied by the current `QueryResult` column name
+ * of its column ID. Undefined until the chart's columns are known, so no
+ * filtered query runs before the filters can bind. Use it to get the SQL a
+ * chart runs, for example to fetch a dashboard chart's rows.
+ */
 export function useApplyDashboardFiltersToSql(
   options: Readonly<UseApplyDashboardFiltersToSqlOptions>,
 ): string | undefined {

@@ -10,16 +10,16 @@ import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/St
 
 /**
  * When the manual query can return unbounded rows from a large dataset,
- * resolves row count (cached) and writes the auto LIMIT into structured-query
- * state so the
- * form and executed SQL stay aligned.
+ * resolves the row count (cached) and passes the automatic LIMIT to
+ * `onApplyAutoLimit` to store on the query, so the form and the executed SQL
+ * use the same limit.
  */
 export function useSyncLargeDatasetAutoLimit(opts: {
   query: PartialStructuredQuery;
   /**
    * When a `rawSql` string is present (set by direct SQL edits or
-   * LLM-generated SQL) the auto-limit is suppressed — those SQL strings are
-   * sacrosanct and must run verbatim.
+   * LLM-generated SQL) the auto-limit is suppressed: those SQL strings must
+   * run verbatim.
    */
   rawSql: string | undefined;
   onApplyAutoLimit: (limit: number) => void;

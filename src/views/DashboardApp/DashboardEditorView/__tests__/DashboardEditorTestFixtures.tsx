@@ -66,7 +66,11 @@ function _makeDashboard(): Dashboard.T {
   };
 }
 
-/** Fixtures for the surrounding rendering tests. */
+/**
+ * Renders inside a query client and `DashboardEditorStateManager.Provider`,
+ * and builds a minimal draft `Dashboard.T` to edit. Used only by the
+ * `DashboardEditorView` tests.
+ */
 export const DashboardEditorTestFixtures = {
   renderWithProviders,
   _makeDashboard,

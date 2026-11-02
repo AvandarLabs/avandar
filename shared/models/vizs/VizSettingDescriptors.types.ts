@@ -5,12 +5,12 @@
  * **settings** and **controls**. Use these terms everywhere: in code,
  * tests, comments, and documentation.
  *
- * - **Setting**: a configurable property on a viz config — the persisted
+ * - **Setting**: a configurable property on a viz config: the persisted
  *   data field. Identified by a typed dotted path into the config
  *   object: `color`, `curveType`, `chartStyle.xAxis.labelColor`. A
  *   setting is "what the user changes".
  *
- * - **Control**: the UI widget the form uses to edit a setting — a
+ * - **Control**: the UI widget the form uses to edit a setting, such as a
  *   `ColorInput`, `Switch`, `SegmentedControl`, `NumberInput`. A control
  *   is "what the user uses to change it".
  *
@@ -92,7 +92,7 @@ export type TextControlSpec = {
 };
 
 /**
- * Column picker — a {@link SelectControlSpec} whose options are derived
+ * Column picker: a {@link SelectControlSpec} whose options are derived
  * at render time from the query result columns. The optional
  * `dataType` filter narrows the dropdown (e.g. `"numeric"` for a Y
  * axis or series key).

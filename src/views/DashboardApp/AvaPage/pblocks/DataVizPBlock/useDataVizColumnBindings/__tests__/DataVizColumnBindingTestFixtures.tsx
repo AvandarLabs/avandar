@@ -85,7 +85,12 @@ beforeEach(() => {
   reportError.mockReset();
   runQuery.mockResolvedValue(_createResult());
 });
-/** Shared setup and fixtures for DataVizColumnBindingTestFixtures. */
+/**
+ * Mocks `runStructuredQuery` and the query error reporter, resets them before
+ * each test, and bundles the options, results, and wrapper the
+ * `useDataVizColumnBindings` tests render the hook with. Used only by those
+ * tests.
+ */
 export const DataVizColumnBindingTestFixtures = {
   uuid,
   makeProjectionDescriptorsFromSql,

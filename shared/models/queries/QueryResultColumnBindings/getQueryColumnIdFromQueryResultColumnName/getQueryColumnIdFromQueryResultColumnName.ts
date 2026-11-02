@@ -7,6 +7,9 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
  * matching exactly first and then case-insensitively. Undefined when none or
  * several match.
  *
+ * Use it wherever something names a column but needs its ID, for example a
+ * chart setting or a filter that was written against a column name.
+ *
  * A `QueryResult` column name is the name the query emits, which is not
  * always the name of the source column it reads. An aggregate is emitted as
  * `sum(revenue)` rather than `revenue`, and an explicit alias replaces the

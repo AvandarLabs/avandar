@@ -12,7 +12,11 @@ export type RenderAs = "bar" | "line" | "area";
 /** Default fill opacity used when seeding a new area series. */
 export const DEFAULT_AREA_FILL_OPACITY = 0.6;
 
-/** A bar series - renders as bars. */
+/**
+ * A series drawn as bars in an `AvaVizConfig` bar, line, or area chart, keyed
+ * by column ID. Renderers take the `BarSeries` form, keyed by `QueryResult`
+ * column name.
+ */
 export type AvaBarSeries = {
   renderAs: "bar";
 
@@ -39,7 +43,11 @@ export type AvaBarSeries = {
   stackId?: string;
 };
 
-/** A line series - renders as a polyline. */
+/**
+ * A series drawn as a line in an `AvaVizConfig` bar, line, or area chart,
+ * keyed by column ID. Renderers take the `LineSeries` form, keyed by
+ * `QueryResult` column name.
+ */
 export type AvaLineSeries = {
   renderAs: "line";
 
@@ -62,7 +70,11 @@ export type AvaLineSeries = {
   withDots?: boolean;
 };
 
-/** An area series - renders as a filled region under a polyline. */
+/**
+ * A series drawn as a filled region under a line in an `AvaVizConfig` bar,
+ * line, or area chart, keyed by column ID. Renderers take the `AreaSeries`
+ * form, keyed by `QueryResult` column name.
+ */
 export type AvaAreaSeries = {
   renderAs: "area";
 
@@ -81,7 +93,7 @@ export type AvaAreaSeries = {
   /** Stroke width of the top edge. Defaults to `2`. */
   strokeWidth?: number;
 
-  /** Fill opacity in `[0, 1]`. Defaults to ~`0.2`. */
+  /** Fill opacity in `[0, 1]`. Defaults to `0.6` in an area chart. */
   fillOpacity?: number;
 
   /** Show dot markers at each data point. */
@@ -97,9 +109,10 @@ export type AvaAreaSeries = {
 export type AvaXYSeries = AvaBarSeries | AvaLineSeries | AvaAreaSeries;
 
 /**
- * A radar series. Radar does not compose with bar/line/area so there is
- * no `renderAs` discriminator - every radar series renders as a radar
- * polygon.
+ * A polygon in an `AvaVizConfig` radar chart, keyed by column ID. Radar does
+ * not compose with bar, line, or area, so there is no `renderAs`
+ * discriminator. Renderers take the `RadarSeries` form, keyed by
+ * `QueryResult` column name.
  */
 export type AvaRadarSeries = {
   /** Column ID supplying the radial values. */
@@ -119,9 +132,10 @@ export type AvaRadarSeries = {
 };
 
 /**
- * A scatter series - each carries its own X and Y columns since
- * scatter plots pair points, unlike bar/line/area which share an X
- * axis across all series.
+ * A point cloud in an `AvaVizConfig` scatter plot, keyed by column ID. Each
+ * series carries its own X and Y columns since scatter plots pair points,
+ * unlike bar, line, and area charts, whose series share one X axis.
+ * Renderers take the `ScatterSeries` form, keyed by `QueryResult` column name.
  */
 export type AvaScatterSeries = {
   /** Column ID supplying the Y values. */
@@ -135,7 +149,9 @@ export type AvaScatterSeries = {
 };
 
 /**
- * A bubble series - like AvaScatterSeries plus a third column for radius.
+ * A bubble cloud in an `AvaVizConfig` bubble chart: an `AvaScatterSeries` plus
+ * a third column ID for each bubble's radius. Renderers take the
+ * `BubbleSeries` form, keyed by `QueryResult` column name.
  */
 export type AvaBubbleSeries = AvaScatterSeries & {
   /** Column ID supplying the bubble size (radius). */

@@ -8,8 +8,13 @@ type PieAxesConfig = {
 };
 
 /**
- * Seeds unconfigured slots from column IDs and preserves existing selections
- * and styles, including identities absent from the current result.
+ * Fills the empty name and value slots of a config such as a pie or funnel
+ * chart from a structured query's columns: the first numeric column for the
+ * value and another column, preferably non-numeric, for the name. Set slots
+ * keep their column ID, even when the query no longer selects that column.
+ *
+ * Use it so a chart has something to draw before the user assigns its
+ * columns, for example after the query's selected columns change.
  */
 export function hydratePieFromQuery<VConfig extends PieAxesConfig>(
   currVizConfig: VConfig,

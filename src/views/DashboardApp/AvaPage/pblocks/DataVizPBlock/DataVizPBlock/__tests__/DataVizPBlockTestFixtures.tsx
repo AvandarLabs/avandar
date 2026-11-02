@@ -63,7 +63,11 @@ function renderBlock(props: RenderBlockOptions): ReactElement {
   ) as unknown as ReactElement;
 }
 
-/** Fixtures for the surrounding rendering tests. */
+/**
+ * Renders a version 0 `DataVizPBlock` inside the providers it needs, with a
+ * fake Puck context and fixed workspace and dashboard IDs. Used only by the
+ * `DataVizPBlock` tests.
+ */
 export const DataVizPBlockTestFixtures = {
   TEST_DASHBOARD_ID,
   TEST_WORKSPACE_ID,

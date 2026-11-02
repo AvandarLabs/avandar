@@ -117,12 +117,10 @@ function _getLatLngOverlayRawSql(options: {
 }
 
 /**
- * Loads a lat/lng layer, letting DuckDB aggregate it when the row count would
- * cost the browser more heap than it has.
- *
- * The aggregating path needs the layer's own SQL, so it only applies when the
- * binding resolves to one. A layer that cannot compile its own source SQL falls
- * back to structured-query execution, which is also where the Data Explorer's
+ * Loads a lat/lng point layer's rows for `useMapLayersData`, letting DuckDB
+ * aggregate the points when the row count would cost the browser more heap
+ * than it has. A layer that cannot compile its own source SQL falls back to
+ * structured-query execution, which is also where the Data Explorer's
  * large-dataset guard lives.
  */
 export async function runLatLngLayer(

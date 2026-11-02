@@ -154,8 +154,14 @@ function _refresh({
   );
 }
 /**
- * Shares the verified column IDs of a chart query's `QueryResult` columns
- * across renderer, editor, and save paths.
+ * Caches, for each chart, the column IDs of its query's `QueryResult` columns,
+ * read from the schema of the chart's SQL before any filter applies and
+ * seeded with the chart's saved bindings. Rendering, field edits, and the
+ * dashboard save share one entry, so a column keeps one ID across them.
+ *
+ * `useDataVizColumnBindings` reads it through `getQueryOptions`,
+ * `useRefreshDataVizColumnBindings` calls `refresh` after a chart's query
+ * runs, and `DashboardColumnBindingPreparation` calls `get` to prepare a chart.
  */
 export const DataVizColumnBindings = {
   /** Returns the common unfiltered discovery query and cache policy. */

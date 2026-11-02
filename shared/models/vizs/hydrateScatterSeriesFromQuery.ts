@@ -8,8 +8,13 @@ type ScatterSeriesConfig = {
 };
 
 /**
- * Seeds unconfigured slots from column IDs and preserves existing selections
- * and styles, including identities absent from the current result.
+ * Gives a scatter plot config with no series one series on a structured
+ * query's first two numeric columns for X and Y, or on its only numeric
+ * column for both. Existing series are kept, even ones whose columns the
+ * query no longer selects.
+ *
+ * Use it so a chart has something to draw before the user assigns its
+ * columns, for example after the query's selected columns change.
  */
 export function hydrateScatterSeriesFromQuery<
   VConfig extends ScatterSeriesConfig,

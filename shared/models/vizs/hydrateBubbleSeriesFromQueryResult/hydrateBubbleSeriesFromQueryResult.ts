@@ -7,8 +7,13 @@ type BubbleSeriesConfig = {
 };
 
 /**
- * Seeds unconfigured slots from column IDs and preserves existing selections
- * and styles, including identities absent from the current result.
+ * Gives a bubble chart config with no series one series on the numeric
+ * `QueryResult` columns for X, Y, and size, reusing a column when there are
+ * fewer than three. Existing series are kept, even ones whose columns the
+ * result does not have.
+ *
+ * Use it so a chart has something to draw once a result arrives, for example
+ * from raw SQL, where there is no structured query to seed from.
  */
 export function hydrateBubbleSeriesFromQueryResult<
   VConfig extends BubbleSeriesConfig,

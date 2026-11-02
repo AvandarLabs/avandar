@@ -258,8 +258,13 @@ function _hasSupportedGrouping({
 }
 
 /**
- * Describes only supported single-source SQL, never lineage by `QueryResult`
- * column position.
+ * Reads raw SQL to predict a `ProjectionDescriptor` for each column its
+ * `SELECT` outputs, so hand-written SQL keeps stable column IDs across runs.
+ * Empty unless every item is a plain column or one aggregate of a column from
+ * a single table. Never infers lineage from `QueryResult` column position.
+ *
+ * Use it when a query has no query builder model, for example SQL typed in
+ * the editor or the saved SQL of a dashboard chart.
  */
 export function makeProjectionDescriptorsFromSql(
   options: Readonly<{ sql: string; columns: readonly QueryResult.Column[] }>,

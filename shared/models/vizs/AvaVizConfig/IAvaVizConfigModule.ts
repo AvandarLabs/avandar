@@ -12,7 +12,10 @@ export interface IAvaVizConfigModule<
 > {
   readonly vizType: VType;
 
-  /** The display name of the viz config type. Used for UI display purposes. */
+  /**
+   * The viz type's untranslated English name. User-facing text comes from
+   * `vizTypeLabel` instead, which follows the active locale.
+   */
   readonly displayName: string;
 
   /**
@@ -22,8 +25,8 @@ export interface IAvaVizConfigModule<
    * series's `renderAs` viz module (filtered by `composable` when
    * embedded across types).
    *
-   * See the doc comment at the top of {@link SettingDescriptor} for
-   * the "setting vs. control" nomenclature.
+   * The "setting vs. control" nomenclature is defined in the comment at the
+   * top of the file that declares {@link AnyVizSettingDescriptors}.
    */
   readonly descriptors: AnyVizSettingDescriptors;
 
@@ -43,9 +46,12 @@ export interface IAvaVizConfigModule<
   ): TVizConfig;
 
   /**
-   * Hydrate empty values from query result column metadata (names and types).
-   * Fills only where structured query hydration is insufficient (see app
-   * layer). Typically fills undefined axis keys only.
+   * Fills the config's empty slots, such as an unset axis or an empty series
+   * list, from a query result's columns. Set slots keep their column ID, even
+   * when the result lacks that column.
+   *
+   * Use it so a chart has something to draw once a result arrives, for
+   * example from raw SQL, where there is no structured query to seed from.
    * @param vizConfig The viz config
    * @param columns Columns returned with the query result
    * @returns The updated viz config

@@ -38,6 +38,8 @@ async function _createExecutedDuckDb(): Promise<_ExecutedDuckDb> {
 /**
  * Runs `run` with a fresh in-memory DuckDB connection and guarantees the
  * connection and its instance are closed afterward, even if `run` throws.
+ * Use it in any test that executes real SQL, for example to assert the rows
+ * an emitted query returns.
  */
 export async function withDuckDb<T>(
   run: (connection: DuckDBConnection) => Promise<T>,

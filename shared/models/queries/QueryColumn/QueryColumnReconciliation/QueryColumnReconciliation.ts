@@ -21,9 +21,8 @@ type SourceOptions = {
   previous: readonly QueryColumn.T[];
 
   /**
-   * Freshly loaded source columns. These come from
-   * `useQueryColumnsForDataSource`, which wraps each `DatasetColumn` (or
-   * `ConceptAttribute`) in a new `QueryColumn` with a random ID.
+   * Freshly loaded source columns, each `DatasetColumn` or `ConceptAttribute`
+   * wrapped in a new `QueryColumn` with a random ID.
    */
   incoming: readonly QueryColumn.T[];
 };
@@ -63,25 +62,21 @@ function _getRetainedProjection(options: {
 }
 
 /**
- * Reconciles source catalogs and the projections selected from them.
+ * Keeps query column IDs stable when a data source's columns reload. Each
+ * reload wraps every source column in a new `QueryColumn` with a random ID,
+ * and reconciling maps it back onto the column it replaces, by `baseColumn`
+ * identity, so filters and chart bindings stay bound to the same column.
  *
- * A source catalog is the full list of columns of the selected data source,
- * independent of which ones the query selects. Each entry is a `QueryColumn`
- * wrapping a `DatasetColumn` or `ConceptAttribute` as its `baseColumn`. The
- * catalog is loaded by `useQueryColumnsForDataSource`, held in the Explorer
- * state as `sourceCatalog`, and persisted on the query as
- * `StructuredQuery.sourceColumns`. WHERE filters target these columns.
- *
- * Projections are the `QueryColumn`s in `StructuredQuery.queryColumns`. They
- * are the columns the query selects, and carry aggregation and output alias.
- * HAVING filters, ORDER BY, and chart bindings target these.
- *
- * Every reload of the source metadata produces new random IDs. Reconciling
- * maps the new columns back onto the old ones (by `baseColumn` identity) so
- * a column keeps the same ID across reloads and filters stay bound to it.
+ * Use it wherever column metadata is loaded again, for example when a
+ * dataset's columns finish loading or when SQL is parsed into a query.
  */
 export const QueryColumnReconciliation = {
-  /** Reconciles source metadata without carrying projection settings. */
+  /**
+   * Reconciles a data source's full column list, the
+   * `StructuredQuery.sourceColumns` that WHERE filters target. Reuses an ID
+   * only while the data source is unchanged, and drops aggregation and output
+   * alias, which belong to projections.
+   */
   reconcileSourceColumns: (
     options: Readonly<SourceOptions>,
   ): QueryColumn.T[] => {
@@ -105,7 +100,10 @@ export const QueryColumnReconciliation = {
   },
 
   /**
-   * Retains projection identity, aggregation, and refreshed source metadata.
+   * Reconciles the columns a query selects, the `StructuredQuery.queryColumns`
+   * that HAVING filters, ORDER BY, and chart bindings target. A retained
+   * column keeps its ID, aggregation, and output alias and takes its refreshed
+   * `baseColumn`. Returns the columns with a matching aggregation map.
    */
   reconcileSelectedColumns: (
     options: Readonly<{

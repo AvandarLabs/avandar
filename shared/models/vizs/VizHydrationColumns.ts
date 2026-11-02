@@ -3,7 +3,12 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
-/** Chooses default visualization axes and series from result identities. */
+/**
+ * Picks default columns, by column ID, for a viz config's empty slots from a
+ * query result's columns. Use it when filling a chart's empty slots once a
+ * result arrives, for example to choose a bar chart's first series and its
+ * X axis.
+ */
 export const VizHydrationColumns = {
   /** Returns the available result identities for membership checks. */
   getIdSet: (

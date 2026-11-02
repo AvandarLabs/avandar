@@ -9,8 +9,13 @@ type RadarSeriesConfig = {
 };
 
 /**
- * Seeds unconfigured slots from column IDs and preserves existing selections
- * and styles, including identities absent from the current result.
+ * Fills a radar chart config's empty slots from a structured query's columns:
+ * one series on a numeric column when there are none, and the name axis on a
+ * column no series uses. Set slots keep their column ID, even when the query
+ * no longer selects that column.
+ *
+ * Use it so a chart has something to draw before the user assigns its
+ * columns, for example after the query's selected columns change.
  */
 export function hydrateRadarSeriesFromQuery<VConfig extends RadarSeriesConfig>(
   currVizConfig: VConfig,

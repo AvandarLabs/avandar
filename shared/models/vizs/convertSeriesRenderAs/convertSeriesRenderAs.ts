@@ -3,13 +3,12 @@ import { DEFAULT_AREA_FILL_OPACITY } from "$/models/vizs/series.types.ts";
 import type { AvaXYSeries, RenderAs } from "$/models/vizs/series.types.ts";
 
 /**
- * Convert an XY series from one mark type to another, preserving
- * fields that are common across mark types (`key`, `label`, `color`)
- * and resetting mark-specific fields to type-appropriate defaults.
+ * Converts an XY series to another mark type, keeping the fields every mark
+ * type shares (`key`, `label`, `color`) and resetting mark-specific fields
+ * to that type's defaults.
  *
- * Used by `convertVizConfig` when the user changes the host viz type
- * (e.g. bar -> line), so existing series flip their default render
- * mode without manual reassignment.
+ * Use it when a chart's series must render as a different mark, for example
+ * when a bar chart becomes a line chart and its series become lines.
  */
 export function convertSeriesRenderAs(
   series: AvaXYSeries,

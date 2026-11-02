@@ -4,7 +4,12 @@ import {
 } from "./supabaseAdminClient";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
-/** Removes a tracked dataset and its Parquet object without UI navigation. */
+/**
+ * Deletes a dataset a test created, with its shares and its Parquet file in
+ * storage, through the admin client rather than the UI. Use it in a test's
+ * cleanup when deleting the dataset is not what the test checks, for example
+ * after a spec that imports a dataset to filter it.
+ */
 export async function deleteDatasetFixture(options: {
   admin: AvaSupabaseDBClient;
   datasetId: string;

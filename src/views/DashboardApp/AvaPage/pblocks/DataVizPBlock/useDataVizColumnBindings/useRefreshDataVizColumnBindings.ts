@@ -5,7 +5,12 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 
-/** Publishes the current query observer's completed metadata to its block. */
+/**
+ * Updates a chart's entry in the `DataVizColumnBindings` cache after the
+ * chart's query succeeds, so the cached column IDs follow the `QueryResult`
+ * columns that query returned. Use it beside a query that runs a chart's
+ * SQL, for example the query that fetches a dashboard chart's rows.
+ */
 export function useRefreshDataVizColumnBindings(
   options: Readonly<{
     id: string;

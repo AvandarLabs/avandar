@@ -7,21 +7,6 @@ import { makeFilterColumnFromStructuredQuery } from "$/models/queries/Structured
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { withDuckDb } from "./executedDuckDb";
-/**
- * Row-level tests for {@link structuredQueryToSql}. Every case builds a
- * structured query, runs the emitted SQL against a real in-memory DuckDB,
- * and asserts the rows that come back.
- *
- * Asserting rows rather than SQL text is the point of this suite: a
- * snapshot of emitted SQL stays green when the SQL is subtly wrong, while
- * executing it does not.
- *
- * The suite lives under `src/` rather than beside its module because the
- * DuckDB harness it needs is browser-side code, and `deno check shared`
- * type-checks every file under `shared/`. A `shared/` test importing `@/`
- * fails that check, and mapping `@/` for Deno would let Deno-reachable code
- * import browser code, which is the boundary the rule exists to protect.
- */
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types";
@@ -71,15 +56,11 @@ type MakeQueryOptions = {
 };
 
 /**
- * A concept, and the table name the emitter has to derive for it.
- *
- * The concept cases below stand the view up by hand rather than through
- * `buildConceptViewSql` and the spine loader, because those are another lane's
- * work and are not wired into relation loading yet. What this suite owns is the
- * emitter: that a `Concept` source resolves to `RelationRef.toTableName`'s
- * spelling, and that group-by and aggregation reach a `ConceptAttribute`. A
- * hand-built table is enough to hold both, and it stays honest because the
- * name is derived here the same way the emitter derives it.
+ * The concept the concept cases query. `_FIXTURE_SQL` builds its table by
+ * hand rather than through `buildConceptViewSql`, because those cases check
+ * the emitter: that a `Concept` source resolves to the table name
+ * `RelationRef.toTableName` derives, and that group-by and aggregation reach
+ * a `ConceptAttribute`.
  */
 const _CONCEPT_ID = "cccccccc-3333-4333-8333-cccccccccccc";
 
@@ -88,7 +69,10 @@ const _CONCEPT_TABLE_NAME = RelationRef.toTableName({
   id: _CONCEPT_ID as Concept.Id,
 });
 
-/** The DDL every case in this suite runs before its query. */
+/**
+ * The DDL for the tables every case queries. `_runQuery` runs it before each
+ * query, and a case that opens its own connection runs it directly.
+ */
 const _FIXTURE_SQL = `
   CREATE TABLE cases AS SELECT * FROM (VALUES
     ('North', 'confirmed', 5),
@@ -251,7 +235,13 @@ function _getParserDatasets(): Array<{
     },
   ];
 }
-/** Shared setup and fixtures for StructuredQueryTestFixtures. */
+/**
+ * Builders and a DuckDB runner for the executed `structuredQueryToSql` tests
+ * of plain queries, concept sources, and the SQL and form round trip. Each
+ * case builds a structured query, runs the emitted SQL against real tables
+ * in an in-memory DuckDB, and asserts the rows, since a snapshot of SQL text
+ * stays green when the SQL is subtly wrong.
+ */
 export const StructuredQueryTestFixtures = {
   propEq,
   sqlToStructuredQuery,

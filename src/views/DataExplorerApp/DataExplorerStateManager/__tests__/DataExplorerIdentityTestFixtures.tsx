@@ -5,7 +5,6 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
 import { act, renderHook } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-/** Exercises column reconstruction and chart edits through the real store. */
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
@@ -71,7 +70,11 @@ function _renderStateManager(): RenderHookResult<
     },
   );
 }
-/** Shared setup and fixtures for DataExplorerIdentityTestFixtures. */
+/**
+ * Shared setup for the column identity and source identity test suites of
+ * `DataExplorerStateManager`, which exercise column reconstruction and chart
+ * edits through the real store. Those two suites are its only users.
+ */
 export const DataExplorerIdentityTestFixtures = {
   QueryColumn,
   makeUiVizConfigFromAvaVizConfig,

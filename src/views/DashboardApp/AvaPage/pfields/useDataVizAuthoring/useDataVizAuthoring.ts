@@ -44,7 +44,12 @@ function useSelectedDataVizOwner(): {
   return { props, replace };
 }
 
-/** Commits owning-block bindings only on explicit field edits. */
+/**
+ * Gives a Puck field the selected DataViz block's props and column bindings,
+ * and functions that write a field edit back to that block. The block is
+ * rewritten only on a field edit, never on render. Use it in a field that
+ * edits a chart, for example its viz settings or its local filters.
+ */
 export function useDataVizAuthoring(
   auth: Readonly<StructuredQueryAuth>,
 ): Authoring {

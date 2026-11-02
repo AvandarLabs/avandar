@@ -102,7 +102,14 @@ function _getRuleOutcome({
       };
 }
 
-/** Binds column-name rules to column IDs and validates existing ID rules. */
+/**
+ * Binds each column-name rule in a filter tree to the ID of the one column it
+ * names, and keeps a column-ID rule only while its column exists. A rule that
+ * matches no column or several is dropped and reported as an issue.
+ *
+ * Use it wherever filters enter a structured query, for example when SQL is
+ * parsed into one or a saved map layer is loaded against fresh metadata.
+ */
 export function normalizeQueryFilters({
   filter,
   columns,

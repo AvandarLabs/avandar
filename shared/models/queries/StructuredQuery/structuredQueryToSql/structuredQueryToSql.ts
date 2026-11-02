@@ -37,7 +37,14 @@ function _getOrderByColumnName(
   });
 }
 
-/** Emits SQL from selected projections and source/projection filter IDs. */
+/**
+ * Builds the SQL for a structured query. Each projection is aliased to its
+ * `QueryResult` column name, and filters reach their columns by column ID.
+ * Empty when the query has neither a data source nor a nested subquery.
+ *
+ * Use it wherever a structured query has to run as SQL, for example to run a
+ * query built in the query builder or to wrap a map layer's source query.
+ */
 export function structuredQueryToSql(
   query: PartialStructuredQuery,
   {

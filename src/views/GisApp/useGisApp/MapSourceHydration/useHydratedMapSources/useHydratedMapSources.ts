@@ -101,7 +101,13 @@ function useMissingFilterNotification(
   );
 }
 
-/** Shares ready source catalogs across map execution and the inspector. */
+/**
+ * Wraps the map editor so its `mapConfig` carries every layer's source
+ * columns and filters hydrated from the workspace's column metadata, and its
+ * `updateConfig` edits that hydrated config. Map queries and the inspector
+ * then read the same source columns. Warns when hydration drops a filter.
+ * Called by `useGisAppState`.
+ */
 export function useHydratedMapSources({
   editor,
   workspaceId,

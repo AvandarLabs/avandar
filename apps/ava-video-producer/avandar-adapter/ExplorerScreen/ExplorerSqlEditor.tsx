@@ -9,7 +9,13 @@ import type { EditorView } from "@codemirror/view";
 import type { ReactNode } from "react";
 
 type Props = { sql: string; isEditingSql: boolean };
-/** SQL editor fixture driven by the current video frame. */
+/**
+ * Draws the Data Explorer's SQL panel for the explorer film, so its pointer
+ * presses real, tagged controls. While `isEditingSql` it shows a focused
+ * editor with its re-run and cancel buttons, and otherwise the read-only
+ * query with its edit button. No button does anything. Rendered only by
+ * `ExplorerScreen`, which drives both props from the frame.
+ */
 export function ExplorerSqlEditor({
   sql,
   isEditingSql,

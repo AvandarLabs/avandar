@@ -16,7 +16,15 @@ function _buildScopeKey({ id, auth }: Readonly<Scope>): string {
   ]);
 }
 
-/** Session-only target ownership shared by rendering and explicit edits. */
+/**
+ * Remembers, for this browser session, which column each dashboard filter
+ * applies to in each chart, so a filter that bound to a column ID keeps it
+ * when the chart's SQL is edited. Nothing here is saved to the dashboard.
+ *
+ * Read and written by `useDataVizRuntimeColumnBindings` on render and by
+ * `DashboardColumnBindingPreparation` at save, so a saved chart keeps the
+ * filter targets the editor was already seeing.
+ */
 export const DataVizRuntimeTargets = {
   /** Retains bound IDs. Only unbound names retry on SQL edits. */
   get: ({

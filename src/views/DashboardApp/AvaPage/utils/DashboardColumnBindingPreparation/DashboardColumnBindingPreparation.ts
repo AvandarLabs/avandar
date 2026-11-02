@@ -124,8 +124,11 @@ async function _prepareDocument({
 }
 
 /**
- * Binds every chart's settings and filters to its query's column IDs at the
- * explicit dashboard save.
+ * Binds each chart's settings and filters to its query's column IDs, so a
+ * saved dashboard holds column IDs. A version 0 chart whose names do not all
+ * bind is left as it is. `useSaveDashboard` runs `prepareDocument` at an
+ * explicit save, and `useDataVizPBlockConfig` runs `prepareChart` in the
+ * DataViz block's `resolveData` after a field edit.
  */
 export const DashboardColumnBindingPreparation = {
   /** Retains unresolved authored input while preparing one chart. */

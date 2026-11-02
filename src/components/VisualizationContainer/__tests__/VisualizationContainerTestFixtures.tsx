@@ -35,7 +35,11 @@ function renderViz(
   );
 }
 
-/** Fixtures for the surrounding rendering tests. */
+/**
+ * Columns, rows, and a `renderViz` helper that mounts `VisualizationContainer`
+ * over them inside the app providers, so each test supplies only the
+ * `AvaVizConfig` it checks. Used by the `VisualizationContainer` tests.
+ */
 export const VisualizationContainerTestFixtures = {
   COLUMNS,
   DATA,

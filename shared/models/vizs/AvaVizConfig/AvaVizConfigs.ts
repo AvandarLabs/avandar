@@ -42,7 +42,10 @@ export const VizTypes = registry<VizType>().keys(
   "bubble",
 );
 
-/** Get the specific utils module for a given viz type.*/
+/**
+ * Looks up the `IAvaVizConfigModule` for a viz type, so each `AvaVizConfigs`
+ * method can dispatch to that type's implementation.
+ */
 function _getVizTypeModule<VType extends VizType>(
   type: VType,
 ): IAvaVizConfigModule<VType, AvaVizConfigType<VType>> {
@@ -72,7 +75,9 @@ export const AvaVizConfigs = {
   },
 
   /**
-   * Convert a viz config from one type to another.
+   * Converts a viz config to another viz type, keeping as many of its columns
+   * and settings as the new type can hold. Use it when a chart's type
+   * changes, for example when the user picks a new type for a chart.
    * @param currentConfig The current viz config
    * @param newVizType The viz type we are converting to
    * @returns The new viz config
@@ -86,8 +91,9 @@ export const AvaVizConfigs = {
   },
 
   /**
-   * Hydrate a viz config from a query. This will populate, if possible, any
-   * empty values with reasonable defaults from the query config.
+   * Fills a viz config's empty slots with columns picked from a structured
+   * query, keeping every slot already set. Use it when the structured query
+   * changes, for example when the user changes a column's aggregation.
    * @param vizConfig The viz config
    * @param query The query to hydrate values from
    * @returns The new viz config
@@ -101,7 +107,9 @@ export const AvaVizConfigs = {
   },
 
   /**
-   * Hydrate a viz config from query result column metadata.
+   * Fills a viz config's empty slots from a query result's columns, keeping
+   * every slot already set. Use it once a result arrives, for example from
+   * raw SQL, where there is no structured query to seed from.
    * @param vizConfig The viz config
    * @param columns Columns from the executed query result
    * @returns The updated viz config

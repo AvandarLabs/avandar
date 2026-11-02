@@ -27,15 +27,13 @@ type Props = {
 };
 
 /**
- * Renders the per-viz-type subform for a given `AvaVizConfig`, **without** the
- * top-level viz type selector. Pure and prop-driven so it can be reused
- * anywhere a viz config needs to be edited (DataExplorer sidebar, Puck custom
- * field in the dashboard editor, etc.) by composing it with whatever viz-type
- * picker is appropriate for that context.
+ * Renders the settings subform for an `AvaVizConfig`'s viz type, without the
+ * viz type selector, so any place that edits a chart's settings can pair it
+ * with its own viz type picker, for example the Data Explorer drawer's
+ * visualization tab or the dashboard editor's chart settings field.
  *
- * Bar / line / area / radar share a descriptor-driven form
- * (`SeriesAwareVizForm`). The remaining single-series vizs (pie,
- * funnel, scatter, bubble) keep their hand-coded forms for now.
+ * Bar, line, area, and radar share the descriptor-driven
+ * `SeriesAwareVizForm`. Pie, funnel, scatter, and bubble have their own forms.
  */
 export function VizSettingsFormBody({
   columns,

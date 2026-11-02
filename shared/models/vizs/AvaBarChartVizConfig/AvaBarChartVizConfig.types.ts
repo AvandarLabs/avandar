@@ -3,10 +3,12 @@ import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type { AvaXYSeries } from "$/models/vizs/series.types.ts";
 
 /**
- * Configuration for a bar chart. The chart is the host; individual
- * series declare how they render (bar by default - but a line or area
- * series can be embedded, in which case the renderer falls back to a
- * composite chart).
+ * The `AvaVizConfig` of a bar chart, keyed by column ID. The chart is the
+ * host. Each series declares how it renders, bar by default, and a line or
+ * area series makes the renderer fall back to a composite chart.
+ *
+ * Use it wherever a bar chart is edited or saved, for example a chart on a
+ * dashboard. Renderers take the `UiVizConfig` form instead.
  */
 export type AvaBarChartVizConfig = {
   vizType: "bar";
@@ -20,7 +22,7 @@ export type AvaBarChartVizConfig = {
 
   /**
    * One entry per rendered series. Each series carries its own `key`
-   * (column name), `renderAs` (bar / line / area), color, and other
+   * (column ID), `renderAs` (bar / line / area), color, and other
    * mark-level settings.
    */
   series: AvaXYSeries[];

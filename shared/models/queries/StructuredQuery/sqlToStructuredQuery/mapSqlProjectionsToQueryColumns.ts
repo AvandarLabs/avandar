@@ -45,7 +45,14 @@ function _makeQueryColumn(
   });
 }
 
-/** Maps SELECT expressions and GROUP BY references to query columns. */
+/**
+ * Maps the SELECT list of parsed SQL onto query columns of its dataset, with
+ * each column's aggregation and `outputAlias`, and marks the columns GROUP BY
+ * names as `group_by`. Reports why each item it cannot map was dropped.
+ *
+ * Use it when turning parsed SQL into a structured query, for example so the
+ * manual query form can show SQL that was written by hand.
+ */
 export function mapSqlProjectionsToQueryColumns({
   columnsList,
   groupBy,

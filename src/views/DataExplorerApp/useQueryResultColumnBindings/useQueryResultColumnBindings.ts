@@ -48,8 +48,13 @@ function _getSchema({
 }
 
 /**
- * Binds completed results only to the execution that produced them.
- * Structured descriptors replace provisional SQL IDs authoritatively.
+ * Binds each column of a finished query result to a column ID, reusing the
+ * IDs of earlier results in the same `scopeKey` so chart settings and filters
+ * stay on the same columns across runs. Undefined until a result of the
+ * current SQL is bound, so a late result of an earlier query is never used.
+ *
+ * Use it in a view that runs a query and keys settings by column ID, for
+ * example a chart editor.
  */
 export function useQueryResultColumnBindings(
   options: Readonly<UseQueryResultColumnBindingsOptions>,

@@ -25,7 +25,15 @@ function _isSameExpression({
   );
 }
 
-/** Retains uniquely matched SQL projections across alias-only edits. */
+/**
+ * Gives each projection parsed from SQL the column ID of the one previous
+ * projection that selects the same source column and aggregation, falling
+ * back to a matching output alias when several do. Nothing carries over when
+ * the data source changed.
+ *
+ * Use it after parsing edited SQL, for example so an edit that only renames
+ * an alias keeps the column's ID and the filters bound to it.
+ */
 export function reconcileMappedQueryColumns(
   options: Readonly<{
     columns: readonly QueryColumn.T[];

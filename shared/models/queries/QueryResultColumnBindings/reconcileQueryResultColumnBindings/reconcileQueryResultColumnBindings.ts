@@ -189,7 +189,11 @@ function _getUniqueOutcomes(
 /**
  * Binds each `QueryResult` column of a completed query to a column ID,
  * reusing the owner's previous IDs only when the expression evidence is
- * unique.
+ * unique. Returns the bindings, the registry to pass back on the next run,
+ * and an issue for each column or projection it could not bind.
+ *
+ * Use it after a query runs, so settings and filters saved against a column
+ * ID keep finding their column, for example after the SQL is edited.
  */
 export function reconcileQueryResultColumnBindings(
   options: Readonly<ReconcileQueryResultColumnBindingsOptions>,

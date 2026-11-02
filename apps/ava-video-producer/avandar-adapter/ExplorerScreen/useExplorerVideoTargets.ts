@@ -1,7 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
 import type { ExplorerMode } from "./explorerStage";
 import type { RefObject } from "react";
-/** Labels rendered controls for video pointer choreography. */
+/**
+ * Tags the explorer film's rendered product controls with
+ * `data-video-target`, so the film can measure where its pointer lands, and
+ * keeps the filter value input focused while the film types into it. Returns
+ * the ref to attach to the root it searches. Called only by `ExplorerScreen`.
+ */
 export function useExplorerVideoTargets({
   frame,
   mode,

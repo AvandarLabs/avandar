@@ -9,7 +9,7 @@ import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 /**
- * React hook that builds the Puck `CustomField` config for editing a
+ * React hook that builds the Puck `CustomField` config for editing an
  * `AvaVizConfig`. Takes the workspace and dashboard ids at config-build time so
  * the field can resolve the right auth strategy when fetching the query
  * result columns it needs to populate its axis pickers. The field `label` is

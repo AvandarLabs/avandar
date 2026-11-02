@@ -30,7 +30,12 @@ export type OpenDatasetInfo = {
   virtualDatasetId?: VirtualDatasetId;
 };
 
-/** Metadata available to all controls for one source scope. */
+/**
+ * Every column of one data source, whether or not a query selects it, and
+ * whether those columns have finished loading. Lets a query control, such as
+ * a column picker or a filter builder, offer the source's columns and wait
+ * for them to load before judging which columns the source has.
+ */
 export type SourceColumnCatalog = {
   sourceKey: QueryDataSource.TypedId | undefined;
   status: "loading" | "ready";
@@ -39,10 +44,20 @@ export type SourceColumnCatalog = {
 
 export type DataExplorerAppState = {
   query: PartialStructuredQuery;
-  /** Last completed block-independent Explorer binding registry. */
+  /**
+   * The column bindings of the latest bound query result, which keep each
+   * `QueryResult` column on the same column ID across runs. Written by
+   * `setColumnBindings`. Read by `DataExplorerApp` to bind the next result
+   * and by `DataExplorerSaveAsMenuItems` to save the chart to a dashboard.
+   */
   columnBindings?: QueryResultColumnBindingRegistry;
 
-  /** Source metadata is scoped separately from selected projections. */
+  /**
+   * Every column of the selected data source, whether or not the query
+   * selects it. Read by `DataExplorerManualQueryForm`, which offers these
+   * columns to pick and filter on. Written by `setDataSource`,
+   * `setSourceColumns`, and `applySqlMapping`.
+   */
   sourceCatalog?: SourceColumnCatalog;
 
   /**

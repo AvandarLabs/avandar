@@ -30,7 +30,9 @@ export type ExecutableManualQuery = {
 };
 
 /**
- * Fetches (or reads from cache) the row count for a dataset table.
+ * Gets a dataset's row count, reusing one already fetched in this browser
+ * session. Use it to decide whether a manual query needs an automatic LIMIT,
+ * for example when the user picks a dataset and the query has no limit.
  */
 export async function fetchDatasetRowCount(params: {
   datasetId: DatasetId;
@@ -50,8 +52,11 @@ export async function fetchDatasetRowCount(params: {
 }
 
 /**
- * When the manual query can return unbounded rows, COUNT first and apply an
- * auto LIMIT when the dataset exceeds {@link LARGE_DATASET_ROW_THRESHOLD}.
+ * Returns the manual query to run, with an automatic LIMIT added when the
+ * query would return every row of a dataset larger than
+ * {@link LARGE_DATASET_ROW_THRESHOLD}. Use it just before a structured query
+ * runs, for example when compiling a workspace query to SQL, so a large
+ * dataset is never loaded in full by accident.
  */
 export async function makeExecutableQueryFromManualQuery(params: {
   query: PartialStructuredQuery;

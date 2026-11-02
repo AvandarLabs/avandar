@@ -56,8 +56,9 @@ function _getTargets({
 
 /**
  * Binds a chart's settings, local filters, and subscribed dashboard filters to
- * the column IDs of its query's current `QueryResult` columns, for rendering
- * and for an explicit save.
+ * the column IDs of its query's current `QueryResult` columns. Use it whenever
+ * a chart needs those bindings, for example to render it, apply a field edit,
+ * or prepare it for an explicit save.
  */
 export function makeRuntimeColumnBindingsFromDataVizProps({
   props,

@@ -64,7 +64,11 @@ export type QueryResultColumnBinding = QueryResult.Column & {
   sqlExpressionKey?: string;
 };
 
-/** The column bindings of the latest result for one query owner. */
+/**
+ * The column bindings of the latest result for one query owner. Passed back
+ * as `previous` on the next run so the same columns keep the same IDs, and
+ * saved with whatever refers to those IDs, such as a chart on a dashboard.
+ */
 export type QueryResultColumnBindingRegistry = {
   version: 1;
   scopeKey: string;

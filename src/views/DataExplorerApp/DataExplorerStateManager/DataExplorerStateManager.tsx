@@ -271,7 +271,12 @@ export const DataExplorerStateManager = createAppStateManager({
       };
     },
 
-    /** Records the completed registry used by explicit save. */
+    /**
+     * Stores the column bindings of the latest bound query result, which the
+     * next result is bound from and "Save to dashboard" saves with the chart.
+     * Chart configs on provisional SQL column IDs move to the IDs these
+     * bindings give the same expressions.
+     */
     setColumnBindings: (
       state: DataExplorerAppState,
       columnBindings: QueryResultColumnBindingRegistry,

@@ -11,8 +11,10 @@ import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { DataVizFilterProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 /**
- * Frame and chart-reveal-start carried down to `FixtureDataViz` without a
- * product data client.
+ * Hands the current frame, and the frame the saved chart starts revealing
+ * on, from `DashboardScreen` down to `FixtureDataViz`. The chart renders
+ * inside the dashboard's memoized block config, so this context is how each
+ * frame reaches it without a product data client.
  */
 export const DashboardFixtureContext = createContext({
   frame: 0,
@@ -20,8 +22,9 @@ export const DashboardFixtureContext = createContext({
 });
 
 /**
- * The fixture dashboard's display name, reused for its saved chart and
- * preview banner.
+ * The fixture dashboard's name. `CreateModal` types it into the new
+ * dashboard form, and `DashboardScreen` gives it to the dashboard record,
+ * its page title, and its block config.
  */
 export const DASHBOARD_NAME = "Video - Harborfield response overview - pilot";
 
@@ -59,8 +62,8 @@ export const chartConfig: AvaVizConfig.T = {
 };
 
 /**
- * The saved chart with no subscribed filters, since this film never changes
- * them.
+ * The filter props `FixtureDataViz` gives the saved chart: no local filters
+ * and no subscribed dashboard filters, since this film never changes them.
  */
 const chartFilterProps: DataVizFilterProps = {
   localFilters: [],
@@ -68,8 +71,11 @@ const chartFilterProps: DataVizFilterProps = {
 };
 
 /**
- * The dashboard's saved chart, revealed bar-by-bar as `chartAt` advances
- * across frames.
+ * Draws the film dashboard's saved chart through the product's
+ * `DataVizContent` with fixture rows, revealing one bar at a time once the
+ * frame passes `chartAt`. It is the data viz block's `render` in
+ * `useDataVizPBlockConfig`, so it reads the frame from
+ * `DashboardFixtureContext`.
  */
 export function FixtureDataViz() {
   const { frame, chartAt } = useContext(DashboardFixtureContext);

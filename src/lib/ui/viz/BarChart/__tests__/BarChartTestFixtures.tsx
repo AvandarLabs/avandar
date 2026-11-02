@@ -2,16 +2,6 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { BarChart } from "@/lib/ui/viz/BarChart/BarChart";
 import { render } from "@/test-utils";
-/**
- * Renderer-level prop verification for the series-aware chart wrappers.
- *
- * These tests intercept the underlying Mantine / Recharts components and
- * assert that each chart-level and series-level setting flows through to
- * the right prop on the rendered chart. Pairs with
- * `SeriesAwareVizForm.descriptors.test.tsx`: the form tests prove
- * "changing a control updates the config"; these tests prove
- * "changing a config setting updates what the chart renders".
- */
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 
 type UiVizConfigBar = Extract<UiVizConfig, { vizType: "bar" }>;
@@ -79,7 +69,13 @@ const BAR_BASELINE: UiVizConfigBar = {
   withLegend: true,
 };
 
-/** Shared setup and fixtures for BarChartTestFixtures. */
+/**
+ * Setup for the `BarChart` props tests, which check that each chart and
+ * series setting in a bar `UiVizConfig` reaches the right prop on the chart
+ * it renders. Importing it mocks Mantine's `BarChart` and `CompositeChart`
+ * to record their props, and `renderBar` and `lastProps` render a config and
+ * read those props back.
+ */
 export const BarChartTestFixtures = {
   expect,
   it,

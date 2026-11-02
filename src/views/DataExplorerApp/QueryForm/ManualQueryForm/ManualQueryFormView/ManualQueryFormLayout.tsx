@@ -20,7 +20,12 @@ type Props = {
   limitFields: ReactNode;
 };
 
-/** Arranges manual-query controls in column or stacked settings layouts. */
+/**
+ * Places the manual query form's field groups in the `columns` or `stacked`
+ * settings layout, showing the aggregations group only once the query
+ * selects a column. Rendered only by `ManualQueryFormView`, which builds
+ * each group.
+ */
 export function ManualQueryFormLayout({
   layout,
   hasQueryColumns,

@@ -6,7 +6,15 @@ import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import type { ProjectionDescriptor } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 
-/** Describes selected projections using their authoritative aggregation map. */
+/**
+ * Gets a `ProjectionDescriptor` for each column a structured query selects,
+ * taking aggregations from the query's aggregation map, so its `QueryResult`
+ * columns bind to the IDs the query builder assigned. Empty for a query with
+ * joins, a nested subquery, or no data source.
+ *
+ * Use it before binding the result of a query built in the query builder,
+ * for example while its SQL is still in sync with the structured query.
+ */
 export function makeProjectionDescriptorsFromStructuredQuery(
   query: Readonly<StructuredQuery.Partial>,
 ): ProjectionDescriptor[] {

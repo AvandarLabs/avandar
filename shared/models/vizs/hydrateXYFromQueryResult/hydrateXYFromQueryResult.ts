@@ -7,12 +7,20 @@ type XYAxesConfig = {
   yAxisKey: QueryColumn.Id | undefined;
 };
 
-/** XY chart families that use shared axis defaults. */
+/**
+ * Which XY chart a `hydrateXYFromQueryResult` caller is seeding. Bar and line
+ * charts get the same axis defaults, so the kind does not change the result.
+ */
 export type XYVizChartKind = "bar" | "line";
 
 /**
- * Seeds unconfigured slots from column IDs and preserves existing selections
- * and styles, including identities absent from the current result.
+ * Fills the empty axis slots of a config with one X and one Y column from
+ * `QueryResult` columns: the first numeric column for Y, then a column for X
+ * preferring temporal, text, then boolean. X is filled only once Y has a
+ * column. Set slots keep their column ID, even when the result lacks it.
+ *
+ * Use it so such a chart has something to draw once a result arrives, for
+ * example from raw SQL, where there is no structured query to seed from.
  */
 export function hydrateXYFromQueryResult<VConfig extends XYAxesConfig>(
   currVizConfig: VConfig,

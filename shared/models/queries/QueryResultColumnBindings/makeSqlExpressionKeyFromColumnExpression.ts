@@ -1,6 +1,11 @@
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 
-/** Encodes an alias-free physical expression without delimiter collisions. */
+/**
+ * Builds a key for a selected expression (table, column, and aggregation)
+ * that ignores aliases and cannot collide across delimiters. Use it wherever
+ * projections must be compared by what they select, for example to match a
+ * projection read from SQL with one from a structured query.
+ */
 export function makeSqlExpressionKeyFromColumnExpression(
   options: Readonly<{
     database?: string;

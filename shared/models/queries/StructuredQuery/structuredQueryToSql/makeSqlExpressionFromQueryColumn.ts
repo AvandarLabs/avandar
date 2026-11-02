@@ -3,7 +3,12 @@ import { match } from "ts-pattern";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
-/** Builds the typed SQL expression shared by SELECT and HAVING. */
+/**
+ * Builds the SQL expression for a query column: its quoted base column name,
+ * wrapped in its aggregation function when it has one. Use it wherever SQL
+ * must refer to a column the way the SELECT list does, for example in a
+ * HAVING filter on an aggregated column.
+ */
 export function makeSqlExpressionFromQueryColumn({
   column,
   aggregation,

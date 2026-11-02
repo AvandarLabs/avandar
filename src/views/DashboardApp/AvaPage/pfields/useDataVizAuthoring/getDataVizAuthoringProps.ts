@@ -26,8 +26,11 @@ export type DataVizAuthoringChange =
     };
 
 /**
- * Returns an atomic field edit without losing unresolved name-bound
- * siblings.
+ * Applies one field edit to a DataViz block's props and binds the result to
+ * its query's column IDs. On a version 0 chart, settings whose column names
+ * do not bind stay as saved. Undefined when the edit cannot apply yet, such
+ * as before the chart's columns are known. Called only by
+ * `useDataVizAuthoring` for each field edit.
  */
 export function getDataVizAuthoringProps(
   options: Readonly<GetDataVizAuthoringPropsOptions>,

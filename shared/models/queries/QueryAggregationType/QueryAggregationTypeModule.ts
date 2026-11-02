@@ -40,8 +40,12 @@ export const QueryAggregationTypeModule = {
   },
 
   /**
-   * Aggregate result type within Avandar's supported scalar representation.
-   * Integer and boolean SUM widen to whole numbers, including DuckDB HUGEINT.
+   * Gets the data type a column has in the `QueryResult` once an aggregation
+   * is applied, within Avandar's supported scalar types. Integer and boolean
+   * SUM widen to whole numbers, including DuckDB HUGEINT.
+   *
+   * Use it wherever the type after aggregation matters rather than the source
+   * type, for example to type a HAVING filter on an aggregated column.
    */
   getQueryResultDataType: ({
     aggregation,

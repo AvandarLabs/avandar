@@ -16,7 +16,10 @@ export type RenderFilterRuleOptions = {
    * the new type.
    */
   columnTypes?: Readonly<QueryFilterColumnTypes>;
-  /** Model-derived expression for the source or projection identity. */
+  /**
+   * Resolves a rule's column ID to the SQL expression and data type it
+   * filters on. A rule whose column it cannot resolve renders no SQL.
+   */
   getColumn?: (
     columnId: QueryColumn.Id,
   ) => { sql: string; dataType: AvaDataType.T } | undefined;

@@ -173,7 +173,13 @@ function _getPendingLayer({
     : layer;
 }
 
-/** Hydrates persisted layer source filters without scheduling a map save. */
+/**
+ * Fills in each map layer's source columns from loaded dataset and concept
+ * metadata and binds its saved filters to column IDs, so the layer's query
+ * can apply them. A filter that matches no column, or several, is dropped
+ * and reported as an issue. Hydrating never schedules a map save. Used by
+ * `useHydratedMapSources`.
+ */
 export const MapSourceHydration = {
   fromMetadata: (
     options: Readonly<MapSourceHydrationOptions>,

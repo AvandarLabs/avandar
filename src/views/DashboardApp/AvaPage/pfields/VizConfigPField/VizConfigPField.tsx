@@ -30,15 +30,12 @@ type Props = {
 };
 
 /**
- * Puck custom field that renders the per-viz-type controls for an
- * `AvaVizConfig`.
- *
- * Shares the owning block's unfiltered bindings, previews row values, and
- * renders
- * the shared `VizSettingsBody` so the same controls used in `DataExplorerApp`
- * drive dashboard visualizations. The viz-type picker itself lives as a
- * separate top-level Puck `select` field; this field only renders the
- * per-type subform.
+ * Puck custom field for a DataViz block's per-viz-type settings, such as axis
+ * pickers and the legend toggle, built from the `VizSettingsFormBody` the
+ * Data Explorer also uses. It reads and edits the selected block through
+ * `useDataVizAuthoring`, so edits bind to the chart's column IDs. Use it as
+ * the `vizConfig` field of a chart block, for example the dashboard's DataViz
+ * block. The viz type picker is a separate field.
  */
 export function VizConfigPField({
   workspaceId,

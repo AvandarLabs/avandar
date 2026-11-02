@@ -47,7 +47,12 @@ function _mergeSeries({
   ] as SeriesConfig["series"];
 }
 
-/** Applies field changes while retaining unresolved name-bound siblings. */
+/**
+ * Applies a settings edit, made on the column ID form of a version 0 chart's
+ * config, back onto its config keyed by `QueryResult` column name. Settings
+ * and series whose names do not bind stay as saved. Called only by
+ * `getDataVizAuthoringProps` when a version 0 chart's viz settings change.
+ */
 export function mergeUiVizConfigEdit({
   uiVizConfig,
   before,

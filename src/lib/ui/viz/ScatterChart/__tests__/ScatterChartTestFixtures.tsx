@@ -3,16 +3,6 @@ import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart/ScatterChart";
 import { render } from "@/test-utils";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-/**
- * Renderer-level prop verification for the series-aware chart wrappers.
- *
- * These tests intercept the underlying Mantine / Recharts components and
- * assert that each chart-level and series-level setting flows through to
- * the right prop on the rendered chart. Pairs with
- * `SeriesAwareVizForm.descriptors.test.tsx`: the form tests prove
- * "changing a control updates the config"; these tests prove
- * "changing a config setting updates what the chart renders".
- */
 import type { ScatterSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { ReactNode } from "react";
 
@@ -92,7 +82,13 @@ function _renderScatter(
     </AvandarAppProvider>,
   );
 }
-/** Shared setup and fixtures for ScatterChartTestFixtures. */
+/**
+ * Setup for the `ScatterChart` props tests, which check that each chart
+ * style setting and scatter series reaches the right prop on the Recharts
+ * elements it renders. Importing it mocks those elements to record their
+ * props, and `_renderScatter` and `lastProps` render a chart and read them
+ * back.
+ */
 export const ScatterChartTestFixtures = {
   expect,
   it,

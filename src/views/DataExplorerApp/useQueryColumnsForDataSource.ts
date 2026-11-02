@@ -12,7 +12,11 @@ type Result = {
   /** Every column of the data source, as query columns. */
   columns: QueryColumn.T[];
   isLoading: boolean;
-  /** True after a successful active query, or when no source is selected. */
+  /**
+   * True once the selected source's columns have loaded, or when no source
+   * is selected. Unlike `!isLoading`, it stays false after a failed load, so
+   * a caller can tell a final column list from an incomplete one.
+   */
   isReady: boolean;
 };
 

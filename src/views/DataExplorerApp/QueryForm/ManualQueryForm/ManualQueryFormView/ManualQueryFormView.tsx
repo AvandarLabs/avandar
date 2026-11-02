@@ -24,7 +24,13 @@ type Props = {
   layout: SettingsColumnsLayout;
 };
 
-/** Displays manual-query controls with source-aware filter reconciliation. */
+/**
+ * Renders the manual query form's fields from a query and its source's
+ * column catalog, and reports every edit through `handlers`. Filters are
+ * bound to the catalog's column IDs once it is ready. Rendered by
+ * `ControlledManualQueryForm` and `DataExplorerManualQueryForm`, which
+ * supply the query and catalog from their own state.
+ */
 export function ManualQueryFormView({
   query,
   sourceCatalog,

@@ -200,8 +200,12 @@ function _mapConfig(
 
 /**
  * Replaces each column ID in a chart config with that column's current
- * `QueryResult` column name, the row key the renderer reads. Leaves the saved
- * config unchanged.
+ * `QueryResult` column name, the row key the renderer reads. An ID that no
+ * column has is returned in `issues` as missing, and its axis is left unset
+ * or its series dropped. Leaves the saved config unchanged.
+ *
+ * Use it wherever a chart config must be read by name, for example to render
+ * a chart or to write it into a URL.
  */
 export function makeUiVizConfigFromAvaVizConfig({
   config,

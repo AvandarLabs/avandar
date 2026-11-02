@@ -7,17 +7,14 @@ import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/p
 import type { ResolveDataTrigger } from "@puckeditor/core";
 
 /**
- * The last config the user saw for each viz type, per DataViz block.
+ * The last config each DataViz block showed for each viz type, so switching
+ * a chart back to a viz type restores the settings it had. Held by
+ * `useDataVizPBlockConfig` and updated on a viz type change by
+ * `makeDataVizPBlockStateFromProps` and `synchronizeUiVizType`.
  *
- * Keyed by block id first because Puck registers one `ComponentConfig` per
- * component *type*, so a single `resolveData` closure serves every DataViz
- * block on the page. Without the outer key, two blocks would overwrite each
- * other's memory, which looks correct until a dashboard holds more than one
- * chart.
- *
- * Bound entries use `Partial<AvaVizConfig.Registry>`, so each entry's config is
- * correlated with the viz type it is filed under: a bar config cannot be
- * stored under `"pie"`. Name-bound configs have their own memory.
+ * Keyed by block ID because Puck runs one `resolveData` for every DataViz
+ * block. Configs keyed by column ID sit under their viz type, and version 0
+ * configs keyed by `QueryResult` column name sit under `uiVizConfigs`.
  */
 export type DataVizConfigMemory = Record<
   string,
