@@ -30,6 +30,7 @@
     dispatchEls.sendAll.hidden = !bulk || !queued;
     dispatchEls.sendAll.disabled = sendAllInFlight;
     dispatchEls.count.textContent = String(queued);
+    setTip(dispatchEls.sendAll, "Send the " + plural(queued, "held comment") + " to the LLM together as one prompt");
   }
 
   function applyDispatch(state) {

@@ -89,6 +89,11 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
         html.contains("id=\"brandTitle\""),
         "serves the shell document"
     );
+    assert_eq!(
+        html.matches(" title=\"").count(),
+        1,
+        "only the iframe keeps a native title (its accessible name); every other hint uses the shell's styled tooltip"
+    );
 
     // meta.json carries the branch + worktree pill decision.
     let meta: serde_json::Value = ureq::get(&format!("{base}/__wrap/meta.json"))
@@ -133,6 +138,25 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
         css_text
             .contains(".files {\n  max-height: 45vh;\n  overflow-y: auto;\n  overflow-x: hidden;"),
         "expanded group file lists should scroll independently"
+    );
+    assert!(
+        css_text.contains(".tb-left {\n  display: flex;\n  align-items: center;\n  gap: 9px;\n  min-width: 0;\n  width: 100%;"),
+        "the header's left column must fill only its grid track, so it never runs under the centered view title"
+    );
+    assert!(
+        css_text.contains(
+            ".gh-bar {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  flex: 1 1 auto;"
+        ),
+        "the GitHub bar takes the header's free space and keeps its buttons whole"
+    );
+    assert!(
+        css_text.contains("  flex: 1 1 0;\n  width: 0;\n  max-width: 340px;"),
+        "a long GitHub notice only fills leftover space and ellipsizes, never squeezing the branch title"
+    );
+    assert!(
+        css_text.contains(".tip {\n  position: fixed;")
+            && css_text.contains("  white-space: pre-line;"),
+        "the shell tooltip keeps line breaks for multi-line tips"
     );
     assert!(
         css_text.contains(".grp-body {\n  display: grid;\n  grid-template-rows: 1fr;"),

@@ -18,10 +18,12 @@
     els.commentedBtn.classList.toggle("active", commentedOnly);
     els.commentedBtn.setAttribute("aria-pressed", commentedOnly ? "true" : "false");
     // Nothing to narrow to: off stays off. On stays clickable so it can be undone.
-    els.commentedBtn.disabled = !commentedOnly && count === 0;
-    els.commentedBtn.title = commentedOnly
-      ? "Showing only files with comments. Click to show every file."
-      : (count ? "Show only the " + plural(count, "file") + " with comments" : "No file has comments yet");
+    els.commentedBtn.setAttribute("aria-disabled", !commentedOnly && count === 0 ? "true" : "false");
+    setTip(els.commentedBtn, commentedOnly
+      ? "Showing only files with comments. Click to show every file again."
+      : (count
+        ? "Show only the " + plural(count, "file") + " with comments, on top of the current view. Handy for big diffs."
+        : "Show only files with comments. No file has comments yet."));
   }
 
   function setCommentedOnly(isOn) {
@@ -53,4 +55,7 @@
       .catch(function () { /* keep the last known comments */ });
   }
 
-  els.commentedBtn.addEventListener("click", function () { setCommentedOnly(!commentedOnly); });
+  els.commentedBtn.addEventListener("click", function () {
+    if (els.commentedBtn.getAttribute("aria-disabled") === "true") return;
+    setCommentedOnly(!commentedOnly);
+  });

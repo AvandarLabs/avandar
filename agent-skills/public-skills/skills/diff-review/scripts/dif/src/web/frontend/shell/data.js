@@ -63,10 +63,11 @@
     }
     if (meta.branch) {
       els.brandTitle.textContent = meta.branch;
-      els.brandTitle.title = meta.branch;
+      setTip(els.brandTitle, "Branch under review: " + meta.branch);
     }
     if (meta.showWorktree && meta.worktree) {
       els.worktreePill.textContent = meta.worktree;
+      setTip(els.worktreePill, "Worktree folder: " + meta.worktree + ". Shown because its name differs from the branch.");
       els.worktreePill.hidden = false;
     } else {
       els.worktreePill.hidden = true;

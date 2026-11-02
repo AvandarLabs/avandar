@@ -22,8 +22,8 @@
 // share ONE IIFE and one closure scope: THIS file opens the IIFE and declares
 // all shared state + DOM refs (the entry point); the feature files
 // (`tooltip.js`, `helpers.js`, `iframe.js`, `render.js`, `data.js`,
-// `spotlight.js`, `hotkeys.js`, `chrome.js`, `commented.js`, `dispatch.js`,
-// `github.js`, `conflicts.js`) add behavior; `boot.js` runs the startup sequence and closes the IIFE. Ordering only requires `shell.js` first
+// `spotlight.js`, `hotkeys.js`, `chrome.js`, `tips.js`, `commented.js`,
+// `dispatch.js`, `github.js`, `conflicts.js`) add behavior; `boot.js` runs the startup sequence and closes the IIFE. Ordering only requires `shell.js` first
 // and `boot.js` last — the middle files are hoisted function/listener
 // definitions and may be reordered freely. Each middle file is a fragment, not
 // standalone-valid; lint/parse the assembled `/__wrap/shell.js`, not the parts.

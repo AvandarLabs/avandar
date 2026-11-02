@@ -177,8 +177,10 @@
     group.className = "dif-dest";
     group.setAttribute("role", "radiogroup");
     group.setAttribute("aria-label", "Send this comment to");
-    group.appendChild(destButton("local", "TUI", "Send to the LLM in the dif TUI (" + TOGGLE_HINT + " toggles)"));
-    group.appendChild(destButton("github", GH_ICON + "<span>PR</span>", "Post to the GitHub PR only (" + TOGGLE_HINT + " toggles)"));
+    group.appendChild(destButton("local", "TUI",
+      "TUI: send this comment to the LLM in the dif terminal. In Bulk mode it waits for Send all, unless you save with "
+      + SEND_NOW_HINT + ". " + TOGGLE_HINT + " toggles TUI / PR."));
+    group.appendChild(destButton("github", GH_ICON + "<span>PR</span>", "PR: post to the GitHub PR (" + TOGGLE_HINT + " toggles)"));
     var hint = document.createElement("kbd");
     hint.textContent = TOGGLE_HINT;
     hint.setAttribute("aria-hidden", "true");
@@ -201,8 +203,9 @@
       var githubButton = form.querySelector('.dif-dest button[data-dest="github"]');
       githubButton.disabled = !github.available;
       githubButton.title = github.available
-        ? "Post to GitHub PR #" + github.pr.number + " only (" + TOGGLE_HINT + " toggles)"
-        : github.reason || "No GitHub PR to post to";
+        ? "PR: add this comment to your pending review on GitHub PR #" + github.pr.number
+          + " as a draft. The LLM never sees it. " + TOGGLE_HINT + " toggles TUI / PR."
+        : "PR: unavailable. " + (github.reason || "This branch has no GitHub PR to post to.");
       if (!github.available && form.getAttribute("data-dif-dest") === "github") setDest(form, "local");
       else labelSubmit(form);
     });

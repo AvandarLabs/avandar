@@ -142,7 +142,8 @@ The browser shell's top bar has a **Bulk / Eager** toggle.
   at once. Everything else stays held for **Send all**. The submit button's
   tooltip shows the shortcut while it applies.
 
-The mode resets to Bulk on every launch.
+The mode resets to Bulk on every launch. Hovering **Bulk** or **Eager** (or
+any other control in the browser shell) shows a tooltip explaining it.
 
 ### Keeping the GitHub PR in sync
 

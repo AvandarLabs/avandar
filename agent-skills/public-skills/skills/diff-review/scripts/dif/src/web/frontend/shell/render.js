@@ -21,6 +21,7 @@
 
   function renderTestPlanTabPanel() {
     els.sideProg.textContent = "";
+    setTip(els.sideProg, "");
     els.sideScroll.innerHTML = renderTestPlanMarkdown(testPlan);
     setupCopyButtons(els.sideScroll);
   }
@@ -28,6 +29,7 @@
   function renderGuideTabPanel() {
     var total = totalFiles();
     els.sideProg.textContent = total ? reviewedTotal() + "/" + total : "";
+    setTip(els.sideProg, total ? reviewedTotal() + " of " + total + " files in the diff are marked Viewed in difit" : "");
 
     if (!groups.length) {
       els.sideScroll.innerHTML =
@@ -39,12 +41,13 @@
     var h = diffSummary.trim()
       ? '<div class="diff-summary">' + renderSummaryMarkdown(diffSummary.trim()) + '</div>'
       : "";
-    h += '<button class="nav-item ' + (view === "full" ? "active" : "") + '" data-view="full">'
+    h += '<button class="nav-item ' + (view === "full" ? "active" : "") + '" data-view="full"'
+      + ' data-tip="' + esc("Show every file in the diff" + hotkeyHint("F")) + '">'
       + '<svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
       + '<span class="lbl">Full diff</span><span class="rt">' + total + ' files</span></button>';
     if (newFiles.length) {
       h += '<button class="nav-item newfiles ' + (view === "new" ? "active" : "") + '" data-view="new"'
-        + ' title="' + esc(newFiles.join("\n")) + '">'
+        + ' data-tip="' + esc("Files in the diff that no guide group covers yet:\n" + newFiles.join("\n")) + '">'
         + '<svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'
         + '<span class="lbl">New files not in guide</span>'
         + '<span class="rt">' + newFiles.length + ' files</span></button>';
@@ -58,14 +61,16 @@
       var active = view === "g" + g.n;
       var collapsed = collapsedGroups[g.n] === true;
       h += '<div class="grp-block ' + (active ? "active" : "") + '" data-group-block="g' + g.n + '">'
-        + '<button class="grp-head" data-group-head="' + g.n + '" aria-expanded="' + (!collapsed) + '">'
+        + '<button class="grp-head" data-group-head="' + g.n + '" aria-expanded="' + (!collapsed) + '"'
+        + ' data-tip="' + esc("Show or hide group " + g.n + "'s files. Click its summary or a file to open the group" + (g.n <= 9 ? hotkeyHint(g.n) : "") + ".") + '">'
         + '<svg class="grp-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-        + '<span class="kindmark" style="background:' + kindColor(g.kind) + '"></span>'
+        + '<span class="kindmark" style="background:' + kindColor(g.kind) + '"' + (g.kind ? ' data-tip="' + esc("Kind of change: " + g.kind) + '"' : "") + '></span>'
         + '<span class="grp-min">'
         + '<span class="grp-ticket">' + pad(g.n) + (g.ticket ? " · " + esc(g.ticket) : "") + '</span>'
         + '<span class="grp-name">' + esc(g.name) + '</span>'
         + '</span>'
-        + '<span class="grp-frac">' + (done ? "✓" : rev + "/" + gfiles.length) + '</span>'
+        + '<span class="grp-frac" data-tip="' + esc(done ? "Every file in this group is marked Viewed" : rev + " of " + gfiles.length + " files in this group are marked Viewed") + '">'
+        + (done ? "✓" : rev + "/" + gfiles.length) + '</span>'
         + '</button>';
       h += '<div class="grp-body ' + (collapsed ? "collapsed" : "") + '">';
       h += '<div class="grp-body-inner">';
@@ -73,7 +78,7 @@
       h += '<div class="files">';
       gfiles.forEach(function (f) {
         h += '<button class="fitem ' + (reviewedLive(f) ? "viewed" : "") + '" data-view="g' + g.n + '" data-file="' + esc(f.path) + '">'
-          + '<span class="fchk">' + checkSvg(f) + '</span>'
+          + '<span class="fchk" data-tip="' + esc(fileStateTip(f)) + '">' + checkSvg(f) + '</span>'
           + '<span class="fmid">'
           + '<span class="fname" data-tip="' + esc(f.path) + '">' + esc(baseName(f.path)) + '</span>'
           + (f.tag ? '<span class="ftag" data-tip="' + esc(f.tag) + '" data-tip-trunc>' + esc(f.tag) + '</span>' : "")
@@ -109,14 +114,23 @@
     });
   }
 
+  function fileStateTip(f) {
+    if (reviewedLive(f)) return "Viewed";
+    if (isChangedOnly(f)) return "Changed since it was reviewed: take another look";
+    return "Not viewed yet";
+  }
+
   // ---- render: collapsed rail ----
   function renderRail() {
-    var h = '<button class="rail-btn" id="expandBtn" title="Expand guide" aria-label="Expand guide">'
+    var h = '<button class="rail-btn" id="expandBtn" aria-label="Expand guide" data-tip="' + esc("Expand the sidebar" + hotkeyHint("H")) + '">'
       + '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l4 5-4 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
       + '</button><div class="rail-sep"></div>'
-      + '<button class="rail-btn ' + (view === "full" ? "active" : "") + '" data-view="full" title="Full diff">F</button>';
+      + '<button class="rail-btn ' + (view === "full" ? "active" : "") + '" data-view="full" aria-label="Full diff"'
+      + ' data-tip="' + esc("Full diff" + hotkeyHint("F")) + '">F</button>';
     groups.forEach(function (g) {
-      h += '<button class="rail-btn ' + (view === "g" + g.n ? "active" : "") + '" data-view="g' + g.n + '" title="Group ' + g.n + (g.ticket ? " — " + esc(g.ticket) : "") + '">'
+      var railLabel = "Group " + g.n + (g.ticket ? " · " + g.ticket : "") + ": " + (g.name || "");
+      h += '<button class="rail-btn ' + (view === "g" + g.n ? "active" : "") + '" data-view="g' + g.n + '" aria-label="' + esc(railLabel) + '"'
+        + ' data-tip="' + esc(railLabel + (g.n <= 9 ? hotkeyHint(g.n) : "")) + '">'
         + g.n + '<span class="kd" style="background:' + kindColor(g.kind) + '"></span></button>';
     });
     els.rail.innerHTML = h;
@@ -131,16 +145,21 @@
   // reviewed count + progress bar go on the right (before the palette button).
   // Both live in the top bar so the shell spends no vertical space on a separate
   // per-view sub-header.
+  function chipHtml(cls, text, tip) {
+    return '<span class="filter-chip' + (cls ? " " + cls : "") + '" data-tip="' + esc(tip) + '">' + text + '</span>';
+  }
   function renderHead() {
     var total = totalFiles();
     var g = groupByView();
-    var title, chip, count, rev;
+    var title, titleTip, chip, count, rev;
     if (view === "new") {
       var nf = newFilePaths();
       count = nf.length;
       rev = nf.filter(isViewedPath).length;
       title = '<span class="name">New files not in guide</span>';
-      chip = '<span class="filter-chip newfiles">◉ Not in guide · ' + count + ' of ' + total + ' files</span>';
+      titleTip = "Files in the diff that no guide group covers yet. Refresh the diff guide to place them in groups.";
+      chip = chipHtml("newfiles", "◉ Not in guide · " + count + " of " + total + " files",
+        count + " of the diff's " + total + " files are in no guide group");
     } else if (g) {
       var gfiles = g.files || [];
       count = gfiles.length;
@@ -148,18 +167,24 @@
       title = '<span class="num">' + pad(g.n) + '</span>'
         + (g.ticket ? '<span class="ticket">' + esc(g.ticket) + '</span>' : "")
         + '<span class="name">' + esc(g.name) + '</span>';
-      chip = '<span class="filter-chip">◉ Filtered · ' + count + ' of ' + total + ' files</span>';
+      titleTip = "Group " + g.n + ": " + g.name + (g.orient ? "\n" + g.orient : "");
+      chip = chipHtml("", "◉ Filtered · " + count + " of " + total + " files",
+        "Only this group's " + count + " files are shown. Full diff shows all " + total + hotkeyHint("F") + ".");
     } else {
       count = total;
       rev = reviewedTotal();
       title = '<span class="name">Full diff</span>';
-      chip = '<span class="filter-chip full">○ all ' + total + ' files</span>';
+      titleTip = "Every file in the diff";
+      chip = chipHtml("full", "○ all " + total + " files", "Showing all " + total + " files in the diff");
     }
-    if (commentedOnly) chip += '<span class="filter-chip">◉ Only files with comments</span>';
+    if (commentedOnly) {
+      chip += chipHtml("", "◉ Only files with comments", "Narrowed to files with comments. Turn off With comments to see every file in this view.");
+    }
     var pct = count ? Math.round((rev / count) * 100) : 0;
-    els.viewInfo.innerHTML = '<div class="mh-title">' + title + '</div>' + chip;
+    els.viewInfo.innerHTML = '<div class="mh-title" data-tip="' + esc(titleTip) + '">' + title + '</div>' + chip;
     els.viewProg.innerHTML = '<span class="txt">' + rev + '/' + count + ' reviewed</span>'
       + '<span class="bar"><i style="width:' + pct + '%"></i></span>';
+    setTip(els.viewProg, rev + " of " + count + " files in this view are marked Viewed in difit. Generated and deleted files count as viewed.");
   }
 
   // Show "Refresh diff guide" only when the guide's file list differs from the

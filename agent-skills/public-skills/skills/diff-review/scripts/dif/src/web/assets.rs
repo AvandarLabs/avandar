@@ -41,6 +41,8 @@ pub const SHELL_JS: &str = concat!(
     "\n",
     include_str!("frontend/shell/chrome.js"),
     "\n",
+    include_str!("frontend/shell/tips.js"),
+    "\n",
     include_str!("frontend/shell/commented.js"),
     "\n",
     include_str!("frontend/shell/dispatch.js"),
@@ -107,6 +109,12 @@ mod tests {
             "/api/comments-json",
             "renderConflicts",
             "/__wrap/github/conflicts",
+            "ghEls.notice.setAttribute(\"data-tip\"",
+            "applyChromeTips",
+            "focusin",
+            "aria-describedby",
+            "Bulk (the default)",
+            "Eager: ",
         ] {
             assert!(SHELL_JS.contains(sym), "assembled bundle is missing {sym}");
         }

@@ -412,7 +412,8 @@ The left section, after the branch identity, holds the GitHub controls
 (`frontend/shell/github.js`): a yellow **No linked PR** pill, or the PR link, a
 **Sync** icon button (spins while pulling), a **Review (N)** pill that opens the
 submit panel (a fixed-position dialog under it; Escape or an outside click
-closes it), and a notice line. It polls `/__wrap/github.json` every 2s and posts
+closes it), and a notice line (ellipsized when it doesn't fit; hovering a cut-off notice
+shows the full text in the shell's tooltip). It polls `/__wrap/github.json` every 2s and posts
 to `/__wrap/github/pull`, `/__wrap/github/submit`, and `/__wrap/github/viewed`.
 It also sends difit's viewed changes to GitHub, diffing difit's viewed index on
 every `storage` event; and after a sync fast-forwards the branch it reloads
@@ -461,10 +462,34 @@ goes to `POST /__wrap/github/conflicts`; another tab's open modal closes once
 ### Sidebar file rows
 
 Each file row shows the viewed check, the file name, and a short note. The name
-stays full; the **note ellipsizes** when it doesn't fit and a hover **tooltip**
-(a small dependency-free Mantine-style popover, `#tip` in `shell.js`) shows the
-full note. Hovering the name shows the full repo-relative path. Thread counts are
-not shown in the row.
+stays full; the **note ellipsizes** when it doesn't fit and its tooltip shows the
+full note. Hovering the name shows the full repo-relative path, and hovering the
+check says whether the file is viewed, not yet viewed, or changed since review.
+Thread counts are not shown in the row.
+
+### Tooltips
+
+Every control in the shell explains itself in one styled tooltip (`#tip`, a
+small dependency-free popover, `frontend/shell/tooltip.js`). Elements opt in
+with `data-tip` (line breaks are kept); `data-tip-trunc` shows it only when the
+element is actually ellipsized (a file note, the GitHub notice). Hovers and
+keyboard focus are delegated on the document, so the header, sidebar, and rail
+share it, and while it shows it describes its element (`aria-describedby`).
+Static controls get their text in `frontend/shell/tips.js` (it names the
+platform's hotkeys); state-dependent ones set it where they render (the GitHub
+bar, With comments, Send all, the branch and worktree, the view header, the
+sidebar and rail). The shell page keeps no native `title` except the difit
+iframe's accessible name; `tests/web_shell.rs` guards that. Bulk and Eager each
+carry their own explanation.
+
+Inside difit's iframe the shell's tooltip can't reach, so the injected comment
+box controls (the TUI / PR toggle and the submit button) keep native titles that
+say what each destination does and which shortcuts apply.
+
+The header's left column fills exactly its grid track: the GitHub notice has no
+intrinsic width and only fills leftover space, ellipsizing first; the branch
+title gives way only when the buttons are tight. Nothing runs under the
+centered view title.
 
 ### Iframe auto-retry (no manual "Retry")
 
@@ -569,7 +594,7 @@ axum. Reuse `ureq` (already a dep) for upstream calls to difit.
     a single `/__wrap/shell.js`. `shell.js` (the entry) opens the IIFE and
     declares all shared state + DOM refs; feature fragments (`tooltip`,
     `helpers`, `iframe`, `render`, `data`, `spotlight`, `hotkeys`, `chrome`,
-    `commented`, `dispatch`, `github`, `conflicts`) add
+    `tips`, `commented`, `dispatch`, `github`, `conflicts`) add
     behavior; `boot.js` runs startup and closes the IIFE. Ordering is
     load-bearing only in that `shell.js` is first and `boot.js` last (the middle
     fragments are hoisted function/listener definitions). The fragments are not
