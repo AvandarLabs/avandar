@@ -5,24 +5,21 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 
-/** Inputs for publishing a completed query result to its data viz block. */
-type UseRefreshDataVizColumnBindingsOptions = {
-  id: string;
-  rawSql: string;
-  auth: StructuredQueryAuth;
-  expectedSql: string | undefined;
-  result:
-    | (QueryResult.T & {
-        executedSql: string | undefined;
-        metadataProvenance?: QueryMetadataProvenance;
-      })
-    | undefined;
-  isSuccess: boolean;
-};
-
 /** Publishes the current query observer's completed metadata to its block. */
 export function useRefreshDataVizColumnBindings(
-  options: Readonly<UseRefreshDataVizColumnBindingsOptions>,
+  options: Readonly<{
+    id: string;
+    rawSql: string;
+    auth: StructuredQueryAuth;
+    expectedSql: string | undefined;
+    result:
+      | (QueryResult.T & {
+          executedSql: string | undefined;
+          metadataProvenance?: QueryMetadataProvenance;
+        })
+      | undefined;
+    isSuccess: boolean;
+  }>,
 ): void {
   const queryClient = useQueryClient();
   const { id, rawSql, auth, expectedSql, result, isSuccess } = options;

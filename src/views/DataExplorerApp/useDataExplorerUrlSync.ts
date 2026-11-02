@@ -23,7 +23,7 @@ import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/makeExecut
 import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
-type Options = {
+type UseDataExplorerUrlSyncOptions = {
   urlSearch: DataExplorerUrlSearch;
   navigate: (options: {
     search: DataExplorerUrlSearch;
@@ -51,7 +51,10 @@ type Options = {
  *   history stays clean. Failed queries do not write `sql` to the URL; once a
  *   bad `?sql=` link errors, the param is removed so refresh does not loop.
  */
-export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
+export function useDataExplorerUrlSync({
+  urlSearch,
+  navigate,
+}: UseDataExplorerUrlSyncOptions): void {
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
   const workspace = useCurrentWorkspace();

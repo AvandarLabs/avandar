@@ -5,7 +5,9 @@ import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
 import { useQueryResultColumnBindings } from "@/views/DataExplorerApp/useQueryResultColumnBindings/useQueryResultColumnBindings";
 
-type Options = Parameters<typeof useQueryResultColumnBindings>[0];
+type UseQueryResultColumnBindingsOptions = Parameters<
+  typeof useQueryResultColumnBindings
+>[0];
 const SQL_A = "SELECT revenue AS total FROM sales";
 const SQL_B = "SELECT revenue AS amount FROM sales";
 function _options({
@@ -14,7 +16,7 @@ function _options({
 }: {
   sqlKey?: string;
   name?: string;
-} = {}): Options {
+} = {}): UseQueryResultColumnBindingsOptions {
   const result = {
     ...QueryResult.makeEmpty(),
     columns: [{ name, dataType: "double" as const }],

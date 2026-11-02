@@ -10,7 +10,7 @@ import type { Props } from "../DataVizPBlock/DataVizPBlock";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
 
-type Options = {
+type MakeRuntimeColumnBindingsOptions = {
   props: Props;
   schema: QueryResultColumnBindings;
   filters: readonly DashboardFilterRecord[];
@@ -64,7 +64,7 @@ export function makeRuntimeColumnBindingsFromDataVizProps({
   schema,
   filters,
   cachedTargets,
-}: Readonly<Options>): DataVizRuntimeColumnBindings {
+}: Readonly<MakeRuntimeColumnBindingsOptions>): DataVizRuntimeColumnBindings {
   const result = makeSavedColumnBindingsFromDataVizProps({
     props: props,
     schema: schema,

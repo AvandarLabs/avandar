@@ -8,7 +8,7 @@ import type {
   QueryResultColumnBindingRegistry,
 } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 
-type Options = {
+type UseQueryResultColumnBindingsOptions = {
   scopeKey: string;
   sqlKey: string;
   resultSqlKey: string | undefined;
@@ -21,7 +21,7 @@ function _getSchema({
   options,
   previous,
 }: {
-  options: Readonly<Options>;
+  options: Readonly<UseQueryResultColumnBindingsOptions>;
   previous: QueryResultColumnBindings | undefined;
 }): QueryResultColumnBindings | undefined {
   const sqlKey = normalizeSqlForSubquery(options.sqlKey);
@@ -52,7 +52,7 @@ function _getSchema({
  * Structured descriptors replace provisional SQL IDs authoritatively.
  */
 export function useQueryResultColumnBindings(
-  options: Readonly<Options>,
+  options: Readonly<UseQueryResultColumnBindingsOptions>,
 ): QueryResultColumnBindings | undefined {
   const previousRef = useRef<QueryResultColumnBindings | undefined>(undefined);
   const {

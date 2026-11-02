@@ -18,11 +18,6 @@ export type DashboardManualQueryState = {
   handlers: ManualQueryFormHandlers;
 };
 
-type Options = {
-  rawSql: string;
-  onRawSqlChange: (nextSql: string) => void;
-};
-
 /**
  * Backs the dashboard DataViz block's manual query form. Mirrors the slice of
  * `DataExplorerStateManager` that the form depends on, but keeps the
@@ -30,7 +25,10 @@ type Options = {
  * regenerated SQL back through `onRawSqlChange`.
  */
 export function useDashboardManualQueryState(
-  options: Readonly<Options>,
+  options: Readonly<{
+    rawSql: string;
+    onRawSqlChange: (nextSql: string) => void;
+  }>,
 ): DashboardManualQueryState {
   const { rawSql, onRawSqlChange } = options;
   const { parseSql, isReady } = useSqlToStructuredQuery();

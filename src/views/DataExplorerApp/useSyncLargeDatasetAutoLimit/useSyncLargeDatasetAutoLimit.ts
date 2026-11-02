@@ -8,7 +8,13 @@ import {
 } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
-type Options = {
+/**
+ * When the manual query can return unbounded rows from a large dataset,
+ * resolves row count (cached) and writes the auto LIMIT into structured-query
+ * state so the
+ * form and executed SQL stay aligned.
+ */
+export function useSyncLargeDatasetAutoLimit(opts: {
   query: PartialStructuredQuery;
   /**
    * When a `rawSql` string is present (set by direct SQL edits or
@@ -17,15 +23,7 @@ type Options = {
    */
   rawSql: string | undefined;
   onApplyAutoLimit: (limit: number) => void;
-};
-
-/**
- * When the manual query can return unbounded rows from a large dataset,
- * resolves row count (cached) and writes the auto LIMIT into structured-query
- * state so the
- * form and executed SQL stay aligned.
- */
-export function useSyncLargeDatasetAutoLimit(opts: Options): void {
+}): void {
   const { query, rawSql, onApplyAutoLimit } = opts;
   const workspace = useCurrentWorkspace();
   const syncRequestIdRef = useRef(0);

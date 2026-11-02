@@ -14,12 +14,6 @@ export type DashboardFilterTarget =
 export type DashboardFilterTargets = Readonly<
   Record<string, DashboardFilterTarget>
 >;
-type Options = {
-  filters: readonly DashboardFilterRecord[];
-  targets: DashboardFilterTargets;
-  columns: readonly QueryResult.ColumnWithId[];
-  subscribedFilterIds?: readonly string[];
-};
 
 type DashboardFilterColumnBindings = {
   targets: DashboardFilterTargets;
@@ -100,7 +94,12 @@ function _buildFilter({
  * authoring metadata.
  */
 export function makeColumnBindingsFromDashboardFilters(
-  options: Readonly<Options>,
+  options: Readonly<{
+    filters: readonly DashboardFilterRecord[];
+    targets: DashboardFilterTargets;
+    columns: readonly QueryResult.ColumnWithId[];
+    subscribedFilterIds?: readonly string[];
+  }>,
 ): DashboardFilterColumnBindings {
   return options.filters
     .filter((filter) => {

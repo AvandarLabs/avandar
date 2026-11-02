@@ -15,7 +15,7 @@ type GetQueryOptions = {
   columns: readonly QueryColumn.T[];
 };
 
-type Options = {
+type MapSourceHydrationOptions = {
   config: AvaMapConfig.T;
   previousConfig?: AvaMapConfig.T;
   previousInput?: AvaMapConfig.T;
@@ -33,7 +33,7 @@ function _getLayerFromMetadata({
   options,
 }: {
   layer: AvaMapConfig.T["layers"][number];
-  options: Readonly<Options>;
+  options: Readonly<MapSourceHydrationOptions>;
 }): {
   layer: AvaMapConfig.T["layers"][number];
   issues: HydrationResult["issues"];
@@ -100,7 +100,7 @@ function _getColumns({
   options,
 }: {
   source: NonNullable<StructuredQuery.Partial["dataSource"]>;
-  options: Readonly<Options>;
+  options: Readonly<MapSourceHydrationOptions>;
 }): QueryColumn.T[] | undefined {
   return Model.isOfModelType(source, "Dataset")
     ? options.datasetColumns
@@ -175,7 +175,9 @@ function _getPendingLayer({
 
 /** Hydrates persisted layer source filters without scheduling a map save. */
 export const MapSourceHydration = {
-  fromMetadata: (options: Readonly<Options>): HydrationResult => {
+  fromMetadata: (
+    options: Readonly<MapSourceHydrationOptions>,
+  ): HydrationResult => {
     const results = options.config.layers.map((layer) => {
       return _getLayerFromMetadata({ layer: layer, options: options });
     });

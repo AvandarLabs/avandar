@@ -10,7 +10,7 @@ import type {
   QueryResultColumnBindingRegistry,
 } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 
-type Options = {
+type ReconcileQueryResultColumnBindingsOptions = {
   scopeKey: string;
   sqlKey: string;
   columns: readonly QueryResult.Column[];
@@ -49,7 +49,7 @@ function _getPriorMatch({
   context,
 }: {
   projection: Readonly<ProjectionDescriptor>;
-  context: Readonly<Options>;
+  context: Readonly<ReconcileQueryResultColumnBindingsOptions>;
 }): QueryResultColumnBinding | "ambiguous" | undefined {
   const candidates =
     context.previous?.columns.filter((column) => {
@@ -79,7 +79,7 @@ function _bindOpaqueColumn({
   context,
 }: {
   column: Readonly<QueryResult.Column>;
-  context: Readonly<Options>;
+  context: Readonly<ReconcileQueryResultColumnBindingsOptions>;
 }): ColumnBindingOutcome {
   if (context.projections.length > 0) {
     return { issue: { target: column.name, reason: "unsupported" } };
@@ -106,7 +106,7 @@ function _bindProjection({
 }: {
   column: Readonly<QueryResult.Column>;
   projection: Readonly<ProjectionDescriptor>;
-  context: Readonly<Options>;
+  context: Readonly<ReconcileQueryResultColumnBindingsOptions>;
 }): ColumnBindingOutcome {
   const prior = _getPriorMatch({ projection, context });
   if (projection.identity !== "structured" && prior === "ambiguous") {
@@ -134,7 +134,7 @@ function _bindColumn({
   context,
 }: {
   column: Readonly<QueryResult.Column>;
-  context: Readonly<Options>;
+  context: Readonly<ReconcileQueryResultColumnBindingsOptions>;
 }): ColumnBindingOutcome {
   const names = context.columns.filter((other) => {
     return other.name.toLowerCase() === column.name.toLowerCase();
@@ -192,7 +192,7 @@ function _getUniqueOutcomes(
  * unique.
  */
 export function reconcileQueryResultColumnBindings(
-  options: Readonly<Options>,
+  options: Readonly<ReconcileQueryResultColumnBindingsOptions>,
 ): QueryResultColumnBindings {
   const sqlKey = options.sqlKey.trim().replace(/;$/, "").trimEnd();
   const previous =

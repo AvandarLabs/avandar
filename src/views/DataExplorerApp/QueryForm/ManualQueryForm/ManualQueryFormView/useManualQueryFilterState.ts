@@ -6,13 +6,13 @@ import type { StructuredQuery } from "$/models/queries/StructuredQuery/Structure
 import type { ManualQueryFormHandlers } from "../ManualQueryForm";
 import type { SourceColumnCatalog } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
-type Options = {
+type UseManualQueryFilterStateOptions = {
   filters: StructuredQuery.FilterGroup;
   sourceCatalog: SourceColumnCatalog;
   isStructuredQueryInSync: boolean;
   onSetFilters: ManualQueryFormHandlers["onSetFilters"];
 };
-type PruningOptions = Options & {
+type PruningOptions = UseManualQueryFilterStateOptions & {
   normalized: ReturnType<typeof normalizeQueryFilters> | undefined;
 };
 type FilterState = {
@@ -67,7 +67,7 @@ function useFilterPruning({
 
 /** Reconciles source filters and confirms edits that overwrite manual SQL. */
 export function useManualQueryFilterState(
-  options: Readonly<Options>,
+  options: Readonly<UseManualQueryFilterStateOptions>,
 ): FilterState {
   const { filters, sourceCatalog, isStructuredQueryInSync, onSetFilters } =
     options;
