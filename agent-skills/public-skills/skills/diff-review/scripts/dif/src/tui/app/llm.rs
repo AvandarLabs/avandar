@@ -146,7 +146,10 @@ impl App {
         let outcome = self
             .dispatcher
             .next_dispatch(&snapshot, &excluded, delivery);
-        self.comment_channels.dispatch.set_queued(outcome.queued);
+        self.comment_channels
+            .dispatch
+            .set_queued(outcome.held.len());
+        self.held_comments.save(&outcome.held);
         let prompts = outcome.prompts;
         if !prompts.is_empty() {
             self.last_inject_at = Some(Instant::now());

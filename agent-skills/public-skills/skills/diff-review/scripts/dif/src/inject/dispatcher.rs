@@ -3,8 +3,9 @@
 //!
 //! Kept free of any PTY so the baseline-then-dispatch-once behavior is unit
 //! testable. The first snapshot seeds a baseline of existing reviewer comment
-//! ids (so only comments added *after* launch trigger work); every later
-//! snapshot yields prompts for newly-open comments and marks them dispatched.
+//! ids (so only comments added *after* launch trigger work), except the ones
+//! still held for "Send all" when `dif` last quit; every snapshot yields
+//! prompts for newly-open comments and marks them dispatched.
 //!
 //! Delivery is either eager (one prompt per comment, as soon as it appears) or
 //! held for a bulk "Send all", which flushes every held comment as one prompt.
@@ -38,8 +39,8 @@ pub enum Delivery {
 pub struct DispatchOutcome {
     /// Prompts to type into the LLM pane, in order.
     pub prompts: Vec<String>,
-    /// Open comments still held for a later "Send all".
-    pub queued: usize,
+    /// Message ids of the open comments still held for a later "Send all".
+    pub held: Vec<String>,
 }
 
 /// Tracks which reviewer comments have already been handed to the LLM.
@@ -49,6 +50,8 @@ pub struct Dispatcher {
     baseline_seeded: bool,
     /// Comments to send even while delivery holds, once they reach difit.
     send_now: HashSet<String>,
+    /// Comments held when `dif` last quit, kept out of the launch baseline.
+    restored: HashSet<String>,
 }
 
 impl Dispatcher {
@@ -56,6 +59,17 @@ impl Dispatcher {
     #[must_use]
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// A fresh dispatcher that keeps `held` (the comments still held for
+    /// "Send all" when `dif` last quit) out of the launch baseline, so they are
+    /// held again instead of being taken as already sent.
+    #[must_use]
+    pub fn restoring(held: impl IntoIterator<Item = String>) -> Self {
+        Self {
+            restored: held.into_iter().collect(),
+            ..Self::default()
+        }
     }
 
     /// Send these comments as soon as they are open, even while delivery
@@ -67,7 +81,8 @@ impl Dispatcher {
     /// Dispatch `snapshot`'s open reviewer comments per `delivery`, skipping
     /// every message id in `excluded` (comments bound for the GitHub PR).
     ///
-    /// The first call only establishes the baseline and returns nothing.
+    /// The first call establishes the baseline: only comments restored as held
+    /// can come out of it.
     pub fn next_dispatch<S: BuildHasher>(
         &mut self,
         snapshot: &Snapshot,
@@ -75,21 +90,24 @@ impl Dispatcher {
         delivery: Delivery,
     ) -> DispatchOutcome {
         if !self.baseline_seeded {
-            self.dispatched = reviewer_message_ids(snapshot);
+            self.dispatched = reviewer_message_ids(snapshot)
+                .into_iter()
+                .filter(|id| !self.restored.contains(id))
+                .collect();
             self.baseline_seeded = true;
-            return DispatchOutcome::default();
         }
         let open: Vec<PendingComment> = pending_dispatches(snapshot, &self.dispatched)
             .into_iter()
             .filter(|comment| !excluded.contains(&comment.message_id))
             .collect();
-        let (open, queued) = if delivery == Delivery::Hold {
+        let (open, held) = if delivery == Delivery::Hold {
             let (now, held): (Vec<_>, Vec<_>) = open
                 .into_iter()
                 .partition(|comment| self.send_now.contains(&comment.message_id));
-            (now, held.len())
+            let held = held.into_iter().map(|comment| comment.message_id).collect();
+            (now, held)
         } else {
-            (open, 0)
+            (open, Vec::new())
         };
         for comment in &open {
             self.send_now.remove(&comment.message_id);
@@ -99,7 +117,7 @@ impl Dispatcher {
             Delivery::SendAll if !open.is_empty() => vec![build_batch_prompt(&open)],
             _ => open.iter().map(build_prompt).collect(),
         };
-        DispatchOutcome { prompts, queued }
+        DispatchOutcome { prompts, held }
     }
 }
 
@@ -160,10 +178,10 @@ mod tests {
         let mut d = seeded();
         let out = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Hold);
         assert!(out.prompts.is_empty());
-        assert_eq!(out.queued, 2);
+        assert_eq!(out.held.len(), 2);
         // Still held on the next tick: nothing was marked dispatched.
         let again = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Hold);
-        assert_eq!(again.queued, 2);
+        assert_eq!(again.held.len(), 2);
     }
 
     #[test]
@@ -178,10 +196,10 @@ mod tests {
             out.prompts
         );
         assert!(out.prompts[0].contains("fix") && out.prompts[0].contains("rename"));
-        assert_eq!(out.queued, 0);
+        assert_eq!(out.held.len(), 0);
         let after = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Hold);
         assert!(after.prompts.is_empty());
-        assert_eq!(after.queued, 0, "flushed comments are never re-queued");
+        assert_eq!(after.held.len(), 0, "flushed comments are never re-queued");
     }
 
     #[test]
@@ -191,10 +209,10 @@ mod tests {
         let out = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Hold);
         assert_eq!(out.prompts.len(), 1, "{:?}", out.prompts);
         assert!(out.prompts[0].contains("rename"), "{}", out.prompts[0]);
-        assert_eq!(out.queued, 1, "the other comment stays held");
+        assert_eq!(out.held.len(), 1, "the other comment stays held");
         let again = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Hold);
         assert!(again.prompts.is_empty(), "sent once");
-        assert_eq!(again.queued, 1);
+        assert_eq!(again.held.len(), 1);
     }
 
     #[test]
@@ -213,7 +231,7 @@ mod tests {
         let mut d = seeded();
         let out = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Eager);
         assert_eq!(out.prompts.len(), 2);
-        assert_eq!(out.queued, 0);
+        assert_eq!(out.held.len(), 0);
     }
 
     #[test]
@@ -221,9 +239,21 @@ mod tests {
         let mut d = seeded();
         let github = HashSet::from(["m2".to_owned()]);
         let held = d.next_dispatch(&snap(TWO_OPEN), &github, Delivery::Hold);
-        assert_eq!(held.queued, 1);
+        assert_eq!(held.held.len(), 1);
         let out = d.next_dispatch(&snap(TWO_OPEN), &github, Delivery::SendAll);
         assert_eq!(out.prompts.len(), 1);
+        assert!(!out.prompts[0].contains("rename"), "{}", out.prompts[0]);
+    }
+
+    #[test]
+    fn comments_held_when_dif_last_quit_are_held_again() {
+        let mut d = Dispatcher::restoring(["m1".to_owned()]);
+        let launch = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::Hold);
+        assert!(launch.prompts.is_empty());
+        assert_eq!(launch.held, vec!["m1"], "m2 is baseline, m1 is still held");
+        let out = d.next_dispatch(&snap(TWO_OPEN), &HashSet::new(), Delivery::SendAll);
+        assert_eq!(out.prompts.len(), 1);
+        assert!(out.prompts[0].contains("fix"), "{}", out.prompts[0]);
         assert!(!out.prompts[0].contains("rename"), "{}", out.prompts[0]);
     }
 

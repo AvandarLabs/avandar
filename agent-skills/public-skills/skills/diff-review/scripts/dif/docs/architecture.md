@@ -45,6 +45,7 @@ src/
 │   ├── prompt.rs      minimal per-comment prompt text (pure)
 │   ├── dispatcher.rs  stateful baseline-then-dispatch-once driver: eager, hold, or send-all (pure)
 │   ├── mode.rs        DispatchControl: bulk vs eager, the send-all request, the held count (atomics)
+│   ├── held.rs        HeldComments: the held message ids saved to -held.json across relaunches
 │   └── reply_watcher.rs  baseline-then-log-once detector for new agent replies (pure)
 └── tui/
     ├── mod.rs         terminal setup/teardown, run()

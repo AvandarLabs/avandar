@@ -30,6 +30,7 @@ use crate::git::{self, Git};
 use crate::git_watcher::GitWatcher;
 use crate::github::registry::SharedRegistry;
 use crate::inject::dispatcher::Dispatcher;
+use crate::inject::held::HeldComments;
 use crate::inject::mode::DispatchControl;
 use crate::inject::reply_watcher::ReplyWatcher;
 use crate::paths;
@@ -76,6 +77,7 @@ struct ReviewPaths {
     diff_summary: PathBuf,
     test_plan: PathBuf,
     github_sync: PathBuf,
+    held_comments: PathBuf,
 }
 
 /// Everything a launch resolves before starting anything: the repository,
@@ -179,6 +181,7 @@ fn create_app(
     comment_channels: web::CommentChannels,
     start_review: Option<StartReviewModal>,
 ) -> App {
+    let held_comments = HeldComments::load(target.review_paths.held_comments.clone());
     App {
         llm: spawn_llm(
             &target.repo_root,
@@ -201,7 +204,8 @@ fn create_app(
         transcript_path: target.review_paths.transcript,
         session_id_path: target.review_paths.session_id,
         review_control,
-        dispatcher: Dispatcher::new(),
+        dispatcher: Dispatcher::restoring(held_comments.ids().to_vec()),
+        held_comments,
         comment_channels,
         reply_watcher: ReplyWatcher::new(),
         poller: Some(surface.poller),
@@ -268,6 +272,7 @@ fn review_paths(
         diff_summary: paths::diff_summary_path(repo_root, branch_slug, scope_slug),
         test_plan: paths::test_plan_path(repo_root, branch_slug, scope_slug),
         github_sync: paths::github_sync_path(repo_root, branch_slug, scope_slug),
+        held_comments: paths::held_comments_path(repo_root, branch_slug, scope_slug),
     }
 }
 
