@@ -1,5 +1,5 @@
-import type { GeneralAccessValue } from "@/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { GeneralAccessValue } from "@/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule";
 
 /** Which publication state each General access value asks for. */
 const _TARGET_VISIBILITY_BY_ACCESS_VALUE = {
@@ -74,8 +74,8 @@ function _getPublishActionKindFromVisibilities(
   }>,
 ): PublishActionKind {
   if (options.targetVisibility === "draft") {
-    return options.visibility === "draft" ?
-        "disabled_no_audience"
+    return options.visibility === "draft"
+      ? "disabled_no_audience"
       : "unpublish";
   }
   if (options.visibility === options.targetVisibility) {
@@ -84,8 +84,8 @@ function _getPublishActionKindFromVisibilities(
   if (options.targetVisibility === "public") {
     return "publish_public";
   }
-  return options.visibility === "public" ?
-      "make_internal"
+  return options.visibility === "public"
+    ? "make_internal"
     : "publish_workspace";
 }
 

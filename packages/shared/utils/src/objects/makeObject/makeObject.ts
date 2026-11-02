@@ -136,13 +136,17 @@ export function makeObject<
   T,
   InK extends ConditionalKeys<T, PropertyKey> | undefined,
   ValueKey extends ConditionalKeys<T, PropertyKey> | undefined,
-  OutK extends undefined extends InK ? PropertyKey
-  : Extract<T[Extract<InK, PropertyKey>], PropertyKey> = undefined extends InK ?
-    DefaultObjectKey<T>
-  : Extract<T[Extract<InK, PropertyKey>], PropertyKey>,
-  OutV extends undefined extends ValueKey ? unknown
-  : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
-  : T[Extract<ValueKey, PropertyKey>],
+  OutK extends (undefined extends InK
+    ? PropertyKey
+    : Extract<T[Extract<InK, PropertyKey>], PropertyKey>) =
+    undefined extends InK
+      ? DefaultObjectKey<T>
+      : Extract<T[Extract<InK, PropertyKey>], PropertyKey>,
+  OutV extends (undefined extends ValueKey
+    ? unknown
+    : T[Extract<ValueKey, PropertyKey>]) = undefined extends ValueKey
+    ? T
+    : T[Extract<ValueKey, PropertyKey>],
 >(
   list: readonly T[],
   options:
@@ -164,17 +168,20 @@ export function makeObject<
       return String(item);
     })) as (item: T) => OutK;
   const valueFn =
-    "valueFn" in options && options.valueFn ? options.valueFn
-    : "defaultValue" in options ? constant(options.defaultValue)
-    : (identity as (item: T) => OutV);
+    "valueFn" in options && options.valueFn
+      ? options.valueFn
+      : "defaultValue" in options
+        ? constant(options.defaultValue)
+        : (identity as (item: T) => OutV);
 
   const obj = {} as Record<OutK, OutV>;
   list.forEach((item) => {
     const key = (options.key ? item[options.key] : keyFn(item)) as OutK;
     const value = (
-      "valueKey" in options && options.valueKey ?
-        item[options.valueKey]
-      : valueFn(item)) as OutV;
+      "valueKey" in options && options.valueKey
+        ? item[options.valueKey]
+        : valueFn(item)
+    ) as OutV;
     if (key !== undefined && key !== null) {
       obj[key] = value;
     }

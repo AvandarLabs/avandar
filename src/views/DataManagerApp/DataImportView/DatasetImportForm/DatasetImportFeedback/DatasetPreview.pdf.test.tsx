@@ -1,9 +1,9 @@
-import { uuid } from "$/lib/uuid";
 import { describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { render, screen } from "@/test-utils";
 import { DatasetPreview } from "./DatasetPreview";
-import type { PdfDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { PdfDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 
 const PDF_DATASET_ID = "33333333-3333-3333-3333-333333333333" as Dataset.Id;
 
@@ -68,24 +68,22 @@ describe("DatasetPreview for a PDF awaiting selection", () => {
     render(
       <DatasetPreview
         columns={[]}
-        columnsMessage="0 columns were detected."
+        columnsMeta="0 detected"
         dataSourceMetadata={_pdfDataSourceMetadata()}
         isProcessing={false}
         onDataSourceMetadataChange={vi.fn()}
         onRequestDataReparse={vi.fn()}
-        previewMessage="These are the first 0 rows of your dataset."
+        previewMeta="First 0 rows"
         previewRows={[]}
       />,
     );
 
-    expect(
-      screen.getByText(/select a region .* to see data/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/draw a box around a table/i)).toBeInTheDocument();
     // The generic empty state would be actively misleading here: it tells the
     // user their file contained nothing, when in fact they simply have not
     // chosen anything yet. Neither the empty grid nor the reparse control
     // belongs on screen until a region exists.
-    expect(screen.queryByText(/rows of your dataset/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/first 0 rows/i)).not.toBeInTheDocument();
     expect(screen.queryByTestId("data-grid-mock")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /process data again/i }),
@@ -99,12 +97,12 @@ describe("DatasetPreview for a PDF awaiting selection", () => {
     render(
       <DatasetPreview
         columns={[]}
-        columnsMessage="0 columns were detected."
+        columnsMeta="0 detected"
         dataSourceMetadata={_pdfDataSourceMetadata()}
         isProcessing={false}
         onDataSourceMetadataChange={vi.fn()}
         onRequestDataReparse={vi.fn()}
-        previewMessage="These are the first 0 rows of your dataset."
+        previewMeta="First 0 rows"
         previewRows={[]}
         sourceFile={new File([], "report.pdf", { type: "application/pdf" })}
       />,

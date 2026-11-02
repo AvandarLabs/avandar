@@ -7,9 +7,9 @@ import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxS
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
 import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
 function _openNuxMilestone(options: {
   artifacts: NuxWorkspaceArtifacts | undefined;

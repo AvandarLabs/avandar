@@ -1,5 +1,5 @@
-import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { match } from "ts-pattern";
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { applyTimePredicateToSourceSql } from "../applyTimePredicateToSourceSql/applyTimePredicateToSourceSql";
 import { compileBufferOfLayerQuery } from "../compileBufferOfLayerQuery/compileBufferOfLayerQuery";
 import { compileBoundaryJoinQuery } from "./compileBoundaryJoinQuery";

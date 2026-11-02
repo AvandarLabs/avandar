@@ -2,10 +2,10 @@ import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import css from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList.module.css";
 import { LayerRows } from "@/views/GisApp/panels/LayerPanel/LayerList/LayerRows";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { LayerPanelItem } from "@/views/GisApp/panels/LayerPanel/LayerList/makeLayerPanelItemsFromRows";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { LayerPanelItem } from "@/views/GisApp/panels/LayerPanel/LayerList/makeLayerPanelItemsFromRows";
 import type { ReactNode } from "react";
 
 type Props = {

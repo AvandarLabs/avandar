@@ -1,10 +1,14 @@
   // ===== iframe / view selection + scroll-to-file =====
   // Fragment concatenated into the IIFE opened in shell.js — see that file for
   // the module map. Not standalone-valid; parse the assembled shell.js.
+  // The proxy reads these params back off the iframe's Referer to filter
+  // /api/diff: the view's files, then (commented=1) only those with comments.
   function difitUrl(v) {
-    if (v === "full") return "/__wrap/difit";
-    if (v === "new") return "/__wrap/difit?view=new";
-    return "/__wrap/difit?group=" + v.slice(1);
+    var params = [];
+    if (v === "new") params.push("view=new");
+    else if (v !== "full") params.push("group=" + v.slice(1));
+    if (commentedOnly) params.push("commented=1");
+    return "/__wrap/difit" + (params.length ? "?" + params.join("&") : "");
   }
   function showLoading() { els.loading.classList.remove("hidden"); }
   function hideLoading() { els.loading.classList.add("hidden"); }

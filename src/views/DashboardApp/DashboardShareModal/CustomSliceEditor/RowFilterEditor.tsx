@@ -32,14 +32,15 @@ export function RowFilterEditor({
           }}
         />
       </Group>
-      {rowFilters.length === 0 ?
+      {rowFilters.length === 0 ? (
         <Text size="xs" c="dimmed">
           <Trans>
             No row filters. The slice will include every row in the dataset (for
             the selected columns).
           </Trans>
         </Text>
-      : <Stack gap="xs">
+      ) : (
+        <Stack gap="xs">
           {rowFilters.map((rowFilter, rowFilterIndex) => {
             return (
               <PublishSliceRowFilter
@@ -67,7 +68,7 @@ export function RowFilterEditor({
             );
           })}
         </Stack>
-      }
+      )}
     </Stack>
   );
 }

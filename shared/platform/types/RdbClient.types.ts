@@ -3,8 +3,8 @@ import type { Brand } from "@avandar/utils";
 /**
  * Platform-agnostic relational database client.
  *
- * On web this wraps the Supabase JS client. On desktop (Phase 2+) this is an
- * IPC client that talks to bun:sqlite in the Bun main process.
+ * On web this wraps the Supabase JS client. On desktop this is an IPC client
+ * that talks to bun:sqlite in the Bun main process.
  */
 export interface RdbClient {
   query<TRow>(model: ModelName, filter: RdbFilter): Promise<readonly TRow[]>;

@@ -40,12 +40,12 @@ export function makeJoyrideStepsFromMilestone(options: {
   const { milestone, i18n } = options;
   return milestone.steps.map((step): Step => {
     const data: NuxJoyrideStepData = {
-      ...(step.disableNextUntilAnchor !== undefined ?
-        { disableNextUntilAnchor: step.disableNextUntilAnchor }
-      : {}),
-      ...(step.disableNextUntilEvent !== undefined ?
-        { disableNextUntilEvent: step.disableNextUntilEvent }
-      : {}),
+      ...(step.disableNextUntilAnchor !== undefined
+        ? { disableNextUntilAnchor: step.disableNextUntilAnchor }
+        : {}),
+      ...(step.disableNextUntilEvent !== undefined
+        ? { disableNextUntilEvent: step.disableNextUntilEvent }
+        : {}),
       ...(step.hideBack === true ? { hideBack: true } : {}),
     };
     return {
@@ -61,26 +61,26 @@ export function makeJoyrideStepsFromMilestone(options: {
       isFixed: true,
       // Skip zero-size copies (Puck's collapsed header menu sits at 0,0).
       target: _laidOutTarget(step.anchor),
-      ...(step.spotlightAnchor !== undefined ?
-        { spotlightTarget: _laidOutTarget(step.spotlightAnchor) }
-      : {}),
+      ...(step.spotlightAnchor !== undefined
+        ? { spotlightTarget: _laidOutTarget(step.spotlightAnchor) }
+        : {}),
       // Steps whose target only appears after the user acts declare their own
       // timeout; the rest keep Joyride's 1000ms default.
-      ...(step.targetWaitTimeoutMs !== undefined ?
-        { targetWaitTimeout: step.targetWaitTimeoutMs }
-      : {}),
+      ...(step.targetWaitTimeoutMs !== undefined
+        ? { targetWaitTimeout: step.targetWaitTimeoutMs }
+        : {}),
       // Joyride's own scroll is a 300ms tween. Combined with the overlay it
       // paints mid-flight, that tween stops short of the top. We jump the
       // nested scroller ourselves instead.
       ...(step.scrollParentToTop === true ? { skipScroll: true } : {}),
-      ...(step.hideCaret === true || step.floatingOptions !== undefined ?
-        {
-          floatingOptions: {
-            ...step.floatingOptions,
-            ...(step.hideCaret === true ? { hideArrow: true } : {}),
-          },
-        }
-      : {}),
+      ...(step.hideCaret === true || step.floatingOptions !== undefined
+        ? {
+            floatingOptions: {
+              ...step.floatingOptions,
+              ...(step.hideCaret === true ? { hideArrow: true } : {}),
+            },
+          }
+        : {}),
       data,
     };
   });
@@ -126,11 +126,11 @@ function _passthroughJoyrideProps(step: NuxStep): Partial<Step> {
  */
 function _contentFromStep(step: NuxStep): ReactNode {
   const components =
-    step.bodyLinkHref === undefined ?
-      undefined
-    : {
-        0: <Anchor href={step.bodyLinkHref} download size="sm" />,
-      };
+    step.bodyLinkHref === undefined
+      ? undefined
+      : {
+          0: <Anchor href={step.bodyLinkHref} download size="sm" />,
+        };
   return (
     <Trans
       id={step.body.id}

@@ -1,8 +1,8 @@
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import type { DisplayShare } from "../SharePrincipalList";
 import type { ResourceShareMutations } from "./useResourceShareMutations";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
-import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
 /** What the "add a person or group" row emits when it is committed. */
 export type AddPrincipalSelection = {

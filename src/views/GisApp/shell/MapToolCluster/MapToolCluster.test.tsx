@@ -1,11 +1,11 @@
+import { useState } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 /**
  * Tool cluster: Area gating, pressed state, Escape, and AOI commit.
  */
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { useState } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, within } from "@/test-utils";
 import {
   createFakeMap,
@@ -16,9 +16,9 @@ import {
   AreaToolHarness,
   MeasureToolHarness,
 } from "@/views/GisApp/shell/MapToolCluster/mapToolClusterHarness";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { FeatureFlag } from "@/config/FeatureFlagConfig";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ReactNode } from "react";
 
 const spatialAvailability = vi.hoisted(() => {
@@ -89,9 +89,9 @@ describe("MapToolCluster", () => {
 
     expect(labels).toEqual([
       "Pan and select",
-      "Draw an area to filter by. This tool needs DuckDB Spatial, which is unavailable.",
+      "Draw an area to filter by. This tool needs geometry support, which could not be loaded.",
       "Measure distance and area",
-      "Buffer around a layer. This tool needs DuckDB Spatial, which is unavailable.",
+      "Buffer around a layer. This tool needs geometry support, which could not be loaded.",
       "Annotate the map",
       "Erase annotations",
     ]);
@@ -253,7 +253,7 @@ describe("MapToolCluster", () => {
 
     expect(
       screen.getByRole("button", {
-        name: "Draw an area to filter by. This tool needs DuckDB Spatial, which is unavailable.",
+        name: "Draw an area to filter by. This tool needs geometry support, which could not be loaded.",
       }),
     ).toHaveAttribute("aria-disabled", "true");
   });

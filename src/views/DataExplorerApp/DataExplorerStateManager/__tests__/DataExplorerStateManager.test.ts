@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 /**
  * Integration tests for the Data Explorer state syncing contract.
  *
@@ -13,11 +14,10 @@
  */
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
-import { describe, expect, it } from "vitest";
 import { INITIAL_DATA_EXPLORER_STATE } from "../DataExplorerAppState.types";
-import type { DataExplorerAppState } from "../DataExplorerAppState.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { DataExplorerAppState } from "../DataExplorerAppState.types";
 
 function cols(
   pairs: ReadonlyArray<{

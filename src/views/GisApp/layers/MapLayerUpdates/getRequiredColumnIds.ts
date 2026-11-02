@@ -17,8 +17,8 @@ function _getGeoBindingColumnIds(
       return [column];
     })
     .with({ type: "binPointsToGrid" }, ({ points }) => {
-      return points.type === "latLngColumns" ?
-          [points.latitude, points.longitude]
+      return points.type === "latLngColumns"
+        ? [points.latitude, points.longitude]
         : [points.column];
     })
     .with({ type: "joinToBoundaries" }, () => {
@@ -42,12 +42,10 @@ function _getColorColumnIds(
   const valueColumn =
     color.value.type === "queryColumn" ? color.value.column : undefined;
   const denominatorColumn =
-    (
-      color.type === "graduated" &&
-      color.normalization?.denominator.type === "queryColumn"
-    ) ?
-      color.normalization.denominator.column
-    : undefined;
+    color.type === "graduated" &&
+    color.normalization?.denominator.type === "queryColumn"
+      ? color.normalization.denominator.column
+      : undefined;
   return [valueColumn, denominatorColumn];
 }
 
@@ -64,22 +62,20 @@ export function getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
   const color =
     layer.symbology.type === "heatmap" ? undefined : layer.symbology.color;
   const areaAggregationMeasureColumnId =
-    (
-      binding?.type === "joinToBoundaries" ||
-      binding?.type === "aggregatePointsToBoundaries" ||
-      binding?.type === "binPointsToGrid"
-    ) ?
-      binding.aggregation.operation === "count" ?
-        undefined
-      : binding.aggregation.measureColumn
-    : undefined;
+    binding?.type === "joinToBoundaries" ||
+    binding?.type === "aggregatePointsToBoundaries" ||
+    binding?.type === "binPointsToGrid"
+      ? binding.aggregation.operation === "count"
+        ? undefined
+        : binding.aggregation.measureColumn
+      : undefined;
   return makeSet(
     [
       ..._getGeoBindingColumnIds(binding),
       areaAggregationMeasureColumnId,
-      layer.symbology.type === "proportionalSymbol" ?
-        layer.symbology.value
-      : undefined,
+      layer.symbology.type === "proportionalSymbol"
+        ? layer.symbology.value
+        : undefined,
       layer.symbology.type === "heatmap" ? layer.symbology.weight : undefined,
       ..._getColorColumnIds(color),
       layer.timeColumn,

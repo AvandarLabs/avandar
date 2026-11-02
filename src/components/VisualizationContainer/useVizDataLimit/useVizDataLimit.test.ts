@@ -1,6 +1,6 @@
 import { makeArrayWithLength } from "@avandar/utils";
-import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import { renderHook } from "@/test-utils";
 

@@ -35,11 +35,11 @@ export function DataImportTabs({
       }}
       renderTabPanel={{
         "upload-view": () => {
-          return <ManualUploadView py="md" onSaveSuccess={onSaveSuccess} />;
+          return <ManualUploadView pt="lg" onSaveSuccess={onSaveSuccess} />;
         },
         "connectors-view": () => {
           return (
-            <GoogleSheetsImportView py="md" onSaveSuccess={onSaveSuccess} />
+            <GoogleSheetsImportView pt="lg" onSaveSuccess={onSaveSuccess} />
           );
         },
         "open-data-catalog": () => {
@@ -47,7 +47,7 @@ export function DataImportTabs({
             <OpenDataCatalogView
               isAddAllowed={isAddAllowed}
               onSaveSuccess={onSaveSuccess}
-              py="md"
+              pt="lg"
             />
           );
         },

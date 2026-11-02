@@ -8,14 +8,14 @@ import {
   undefinedsToNullsDeep,
 } from "@avandar/utils";
 import { z } from "zod";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
 import type {
   IndividualId,
   IndividualModel,
 } from "$/models/ontology/Individual/Individual.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 
 const DBReadSchema = z.object({
   assigned_to: z.string().nullable(),
@@ -23,6 +23,7 @@ const DBReadSchema = z.object({
   concept_id: z.uuid(),
   external_id: z.string(),
   id: z.uuid(),
+  missing_from_source_at: z.iso.datetime({ offset: true }).nullable(),
   name: z.string(),
   status: z.string(),
   updated_at: z.iso.datetime({ offset: true }),
@@ -47,12 +48,12 @@ export const IndividualParsers = makeParserRegistry<IndividualModel>().build({
   fromModelInsertToDBInsert: pipe(
     snakeCaseKeysDeep,
     undefinedsToNullsDeep,
-    excludeNullsExceptInProps("assigned_to"),
+    excludeNullsExceptInProps(["assigned_to", "missing_from_source_at"]),
   ),
   fromModelUpdateToDBUpdate: pipe(
     snakeCaseKeysDeep,
     undefinedsToNullsDeep,
-    excludeNullsExceptInProps("assigned_to"),
+    excludeNullsExceptInProps(["assigned_to", "missing_from_source_at"]),
   ),
 });
 

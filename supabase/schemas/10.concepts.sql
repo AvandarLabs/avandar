@@ -78,9 +78,6 @@ create policy "
   )
 );
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_concept__set_updated_at before
 update on public.concepts for each row
 execute function public.util__set_updated_at ();

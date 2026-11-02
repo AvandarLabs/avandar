@@ -11,17 +11,19 @@ type ValidMatchedValues<Key> =
 
 type ValueRecord<Key extends PropertyKey> = UnionToIntersection<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Key extends any ?
-    {
-      [K in Key]: ValidMatchedValues<K>;
-    }
-  : never
+  Key extends any
+    ? {
+        [K in Key]: ValidMatchedValues<K>;
+      }
+    : never
 > & { _otherwise?: ValidMatchedValues<unknown> };
 
-type MappedValue<Key extends PropertyKey, Values extends ValueRecord<Key>> =
-  Key extends keyof Values ?
-    Values[Key] extends (key: Key) => infer R ?
-      R
+type MappedValue<
+  Key extends PropertyKey,
+  Values extends ValueRecord<Key>,
+> = Key extends keyof Values
+  ? Values[Key] extends (key: Key) => infer R
+    ? R
     : Values[Key]
   : never;
 
@@ -55,12 +57,8 @@ export function matchLiteral<
   } else {
     if (_otherwise) {
       return (
-        typeof _otherwise === "function" ?
-          _otherwise(key)
-        : _otherwise) as MappedValue<
-        "_otherwise",
-        SetRequired<Values, "_otherwise">
-      >;
+        typeof _otherwise === "function" ? _otherwise(key) : _otherwise
+      ) as MappedValue<"_otherwise", SetRequired<Values, "_otherwise">>;
     } else {
       return fallbackError(key);
     }

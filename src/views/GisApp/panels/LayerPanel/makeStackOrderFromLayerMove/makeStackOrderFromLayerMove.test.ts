@@ -1,5 +1,5 @@
-import { uuid } from "$/lib/uuid";
 import { describe, expect, it } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { makeStackOrderFromLayerMove } from "@/views/GisApp/panels/LayerPanel/makeStackOrderFromLayerMove/makeStackOrderFromLayerMove";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 

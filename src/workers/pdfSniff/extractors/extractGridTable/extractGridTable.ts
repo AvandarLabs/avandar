@@ -28,9 +28,9 @@ export function extractGridTable(
 ): ExtractedTable {
   const lines = groupLines(region.textItems);
   const columns =
-    options.gridX && options.gridX.length > 0 ?
-      [...options.gridX]
-    : deriveColumns(lines);
+    options.gridX && options.gridX.length > 0
+      ? [...options.gridX]
+      : deriveColumns(lines);
 
   if (lines.length < MIN_ROWS || columns.length < 2) {
     return {

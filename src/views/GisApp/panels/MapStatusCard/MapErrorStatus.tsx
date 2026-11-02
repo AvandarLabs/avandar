@@ -20,8 +20,8 @@ function _errorDetails(
   options: Readonly<{ error: Error | undefined; i18n: I18n }>,
 ): string {
   const { error, i18n } = options;
-  return error instanceof SensitivityViolationError ?
-      matchLiteral(error.code, {
+  return error instanceof SensitivityViolationError
+    ? matchLiteral(error.code, {
         aggregateOnly: i18n._(
           msg`Aggregate-only layers cannot be drawn from individual coordinates.`,
         ),
@@ -63,11 +63,11 @@ export function MapErrorStatus({
           {i18n._(msg`Show details`)}
         </Button>
       </span>
-      {areDetailsOpen ?
+      {areDetailsOpen ? (
         <Text className={css.mapStatusCardDetails} size="xs" c="dimmed" mt="xs">
           {_errorDetails({ error: viewState.error, i18n })}
         </Text>
-      : null}
+      ) : null}
     </>
   );
 }

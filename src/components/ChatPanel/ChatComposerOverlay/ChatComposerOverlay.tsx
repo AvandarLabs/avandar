@@ -6,7 +6,7 @@ type Props = {
 };
 
 /**
- * Dims the navbar and canvas while Ask Avandar is expanded, so the panel
+ * Dims the navbar and slate while Ask Avandar is expanded, so the panel
  * reads as floating above the chrome. Clicking the overlay docks chat back
  * to the side column.
  */

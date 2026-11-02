@@ -151,13 +151,11 @@ export function PdfPagePreview({
             // be flipped as well as scaled.
             const [x0, y0, x1, y1] = highlight.bbox;
             context.save();
-            context.strokeStyle =
-              highlight.isActive ?
-                "rgba(34, 139, 230, 0.95)"
+            context.strokeStyle = highlight.isActive
+              ? "rgba(34, 139, 230, 0.95)"
               : "rgba(34, 139, 230, 0.5)";
-            context.fillStyle =
-              highlight.isActive ?
-                "rgba(34, 139, 230, 0.18)"
+            context.fillStyle = highlight.isActive
+              ? "rgba(34, 139, 230, 0.18)"
               : "rgba(34, 139, 230, 0.08)";
             // Multiplied by the pixel ratio so the outline keeps the same
             // weight on screen rather than thinning to a hairline.
@@ -207,14 +205,14 @@ export function PdfPagePreview({
         className={css.canvas}
         aria-label={t`PDF page ${pageIndex + 1}`}
       />
-      {status === "loading" ?
+      {status === "loading" ? (
         <Loader size="sm" pos="absolute" top={8} left={8} />
-      : null}
-      {status === "error" ?
+      ) : null}
+      {status === "error" ? (
         <Text size="xs" c="dimmed">
           {t`Could not render this page.`}
         </Text>
-      : null}
+      ) : null}
     </Box>
   );
 }

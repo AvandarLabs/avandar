@@ -1,21 +1,23 @@
--- The reporting schema.
---
--- Every view in `91.analytics_view__*.sql` lives here and aggregates events
--- across every workspace, so none of them may ever be reachable from the
--- browser. Three things keep that true, and all three are required:
---
--- 1. `analytics` is absent from `config.toml`'s `[api] schemas` list, so
---    PostgREST does not serve it at all. That is the structural guarantee.
--- 2. The views are owned by `postgres` and deliberately not `security_invoker`,
---    which is what lets them read past RLS for the service role. A view in
---    `public` without `security_invoker` would bypass RLS *and* be served by
---    PostgREST, which is the combination this schema exists to avoid.
--- 3. `USAGE` is the only privilege ever granted on this schema, and it goes
---    only to `service_role`. A newly created schema starts with no privileges
---    for anyone but its owner, so there is nothing to revoke first.
---
--- Reads happen with the service role over a direct connection. There is no
--- in-app reader and no platform-admin concept anywhere in this schema.
+/**
+ * The reporting schema.
+ *
+ * Every view in `91.analytics_view__*.sql` lives here and aggregates events
+ * across every workspace, so none of them may ever be reachable from the
+ * browser. Three things keep that true, and all three are required:
+ *
+ * 1. `analytics` is absent from `config.toml`'s `[api] schemas` list, so
+ *    PostgREST does not serve it at all. That is the structural guarantee.
+ * 2. The views are owned by `postgres` and deliberately not `security_invoker`,
+ *    which is what lets them read past RLS for the service role. A view in
+ *    `public` without `security_invoker` would bypass RLS *and* be served by
+ *    PostgREST, which is the combination this schema exists to avoid.
+ * 3. `USAGE` is the only privilege ever granted on this schema, and it goes
+ *    only to `service_role`. A newly created schema starts with no privileges
+ *    for anyone but its owner, so there is nothing to revoke first.
+ *
+ * Reads happen with the service role over a direct connection. There is no
+ * in-app reader and no platform-admin concept anywhere in this schema.
+ */
 create schema if not exists analytics;
 
 -- KNOWN DIFF ARTIFACT, not a defect to chase.

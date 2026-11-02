@@ -8,6 +8,7 @@ import {
   snakeCaseKeysDeep,
   undefinedsToNullsDeep,
 } from "@avandar/utils";
+import { z } from "zod";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
 import {
@@ -15,7 +16,6 @@ import {
   ConceptAttributeModel,
 } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
 import { Workspace } from "$/models/Workspace/Workspace.ts";
-import { z } from "zod";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 

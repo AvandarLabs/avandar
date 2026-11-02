@@ -1,16 +1,21 @@
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
-import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
-import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
+import type { AppliedSqlOutcome } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
+import type { ChatModelRunResult } from "@assistant-ui/react";
 
 export type ApplyChatTurnResponseOptions = {
   response: ChatResponse.T;
-  sqlApplied: boolean;
   /**
-   * Shown when generated SQL was applied to the canvas and the model did
-   * not provide other assistant prose.
+   * How the explorer query for the generated SQL ended, or `undefined` when
+   * the SQL was not applied.
    */
-  sqlResultsOnCanvas: string;
+  sqlOutcome: AppliedSqlOutcome | undefined;
+  /**
+   * The reply for each outcome, shown when generated SQL was applied and the
+   * model did not provide other assistant prose.
+   */
+  sqlOutcomeCopy: Readonly<Record<AppliedSqlOutcome, string>>;
   handlers: {
     queueDashboardBlock: (
       block: NonNullable<ChatResponse.T["dashboardBlock"]>,
@@ -33,8 +38,8 @@ export type ApplyChatTurnResponseOptions = {
 type AssistantThreadTextOptions = {
   assistantText: string;
   hasGeneratedSql: boolean;
-  sqlApplied: boolean;
-  sqlResultsOnCanvas: string;
+  sqlOutcome: AppliedSqlOutcome | undefined;
+  sqlOutcomeCopy: Readonly<Record<AppliedSqlOutcome, string>>;
 };
 
 function _stripSqlFences(text: string): string {
@@ -49,21 +54,21 @@ function _buildAssistantThreadText(
   options: Readonly<AssistantThreadTextOptions>,
 ): string {
   const withoutSql = _stripSqlFences(options.assistantText);
-  const shouldUseCanvasCopy =
-    options.hasGeneratedSql &&
-    options.sqlApplied &&
-    (withoutSql.length === 0 || _isSqlAnnouncement(withoutSql));
-  return shouldUseCanvasCopy ? options.sqlResultsOnCanvas : withoutSql;
+  const hasNoOtherProse =
+    withoutSql.length === 0 || _isSqlAnnouncement(withoutSql);
+  return options.hasGeneratedSql && options.sqlOutcome && hasNoOtherProse
+    ? options.sqlOutcomeCopy[options.sqlOutcome]
+    : withoutSql;
 }
 
 /**
  * Maps a `ChatResponse` (cloud or offline-shaped) into assistant-ui content and
- * dispatches canvas / panel side effects.
+ * dispatches Explorer / panel side effects.
  */
 export async function applyChatTurnResponse(
   options: Readonly<ApplyChatTurnResponseOptions>,
 ): Promise<ChatModelRunResult> {
-  const { response, handlers, sqlApplied, sqlResultsOnCanvas } = options;
+  const { response, handlers, sqlOutcome, sqlOutcomeCopy } = options;
 
   if (response.dashboardBlock) {
     handlers.queueDashboardBlock(response.dashboardBlock);
@@ -101,13 +106,13 @@ export async function applyChatTurnResponse(
         text: _buildAssistantThreadText({
           assistantText: response.assistantText,
           hasGeneratedSql: Boolean(response.generatedSql),
-          sqlApplied,
-          sqlResultsOnCanvas,
+          sqlOutcome,
+          sqlOutcomeCopy,
         }),
       },
     ],
-    ...(isDiscoveryContinuation ?
-      { metadata: DiscoveryContinuationMessage.metadata }
-    : {}),
+    ...(isDiscoveryContinuation
+      ? { metadata: DiscoveryContinuationMessage.metadata }
+      : {}),
   };
 }

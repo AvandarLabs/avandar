@@ -2,10 +2,10 @@ import { useMutation } from "@avandar/query-hooks";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { useRef } from "react";
 import { buildWorkspaceInviteRolePayload } from "$/models/Permissions/inviteRolePayload";
 import { Subscription } from "$/models/Subscription/Subscription";
 import { Workspace } from "$/models/Workspace/Workspace";
-import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
@@ -17,9 +17,9 @@ import { notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { PurchaseSeatsModalContents } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents";
 import { WorkspaceInviteModalFields } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields";
+import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
 import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
 import type { WorkspaceInviteModalFieldsRef } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields";
-import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
 
 export function useWorkspaceInviteModal({
   numberOfSeats,

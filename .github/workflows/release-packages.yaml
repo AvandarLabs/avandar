@@ -56,6 +56,23 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Configure git identity for automated changeset commits
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Generates a changeset for every merged PR in this push that touches
+      # packages/** and has not already added its own, so `pnpm changeset`
+      # never has to be run by hand. See AGENTS.md for the PR-title format
+      # this reads to infer the version bump.
+      - name: Auto-generate changesets for merged PRs
+        if: github.event_name == 'push'
+        run: pnpm vite-script scripts/ci/ensure-changesets/ensureChangesets.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.event.after }}
+
       # Gate: never publish something that does not type-check, test, build,
       # and validate as a real tarball.
       - uses: denoland/setup-deno@v2

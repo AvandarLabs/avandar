@@ -5,7 +5,7 @@ import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts
  * keychain and never exposes it to the webview; only short-lived access
  * tokens cross the IPC boundary. The Bun-main handlers live in
  * `apps/desktop/main/ipc/auth.ts` and call into
- * `apps/desktop/main/services/Keychain.ts` (Phase 2 Task 11).
+ * `apps/desktop/main/services/Keychain.ts`.
  */
 export const AuthContracts = {
   signIn: defineIpcContract<

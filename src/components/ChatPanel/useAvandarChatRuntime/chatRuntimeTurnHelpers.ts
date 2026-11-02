@@ -12,7 +12,14 @@ export type ChatRuntimeCopy = OfflineChatPipelineCopy & {
   offlineModelRequired: string;
   sqlApprovalRequired: string;
   sqlSignInRequired: string;
-  sqlResultsOnCanvas: string;
+  /** The applied SQL's query returned rows. */
+  sqlResultsReady: string;
+  /** The applied SQL's query succeeded with no rows. */
+  sqlResultsEmpty: string;
+  /** The applied SQL's query failed. */
+  sqlQueryFailed: string;
+  /** The SQL was applied but no query outcome was observed. */
+  sqlQueryApplied: string;
   fallbackTitle: string;
   fallbackMessage: string;
   contextWindowExceeded: string;
@@ -44,23 +51,23 @@ export function buildRetryContext(
   response: ChatResponse.T,
 ): ChatRetryContext | undefined {
   const retryContext: ChatRetryContext = {
-    ...(response.assistantText?.trim() ?
-      { priorAssistantText: response.assistantText.slice(0, 2000) }
-    : {}),
-    ...(response.generatedSql?.sql ?
-      { priorGeneratedSql: response.generatedSql.sql.slice(0, 8000) }
-    : {}),
-    ...(response.clarification?.question ?
-      {
-        priorClarificationQuestion: response.clarification.question.slice(
-          0,
-          400,
-        ),
-      }
-    : {}),
-    ...(response.dashboardBlock?.kind ?
-      { priorDashboardBlockKind: response.dashboardBlock.kind.slice(0, 40) }
-    : {}),
+    ...(response.assistantText?.trim()
+      ? { priorAssistantText: response.assistantText.slice(0, 2000) }
+      : {}),
+    ...(response.generatedSql?.sql
+      ? { priorGeneratedSql: response.generatedSql.sql.slice(0, 8000) }
+      : {}),
+    ...(response.clarification?.question
+      ? {
+          priorClarificationQuestion: response.clarification.question.slice(
+            0,
+            400,
+          ),
+        }
+      : {}),
+    ...(response.dashboardBlock?.kind
+      ? { priorDashboardBlockKind: response.dashboardBlock.kind.slice(0, 40) }
+      : {}),
   };
   return Object.keys(retryContext).length > 0 ? retryContext : undefined;
 }

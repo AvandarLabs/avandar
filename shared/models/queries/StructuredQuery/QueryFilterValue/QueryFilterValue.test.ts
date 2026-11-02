@@ -1,5 +1,5 @@
-import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue.ts";
 import { describe, expect, it } from "vitest";
+import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue.ts";
 
 describe("QueryFilterValue.getScalar", () => {
   it("passes primitives through", () => {

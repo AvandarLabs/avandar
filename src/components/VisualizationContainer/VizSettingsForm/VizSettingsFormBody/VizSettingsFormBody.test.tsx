@@ -6,9 +6,9 @@ import {
   getMantineSelectDropdown,
   pickMantineSelectOption,
 } from "@/test-utils/pickMantineSelectOption";
-import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { UnknownDataFrame } from "@avandar/utils";
 
 const COLUMNS: readonly QueryResultColumn[] = [
   { name: "category", dataType: "varchar" },

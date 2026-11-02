@@ -121,9 +121,6 @@ test.describe("Data Explorer query drawer", () => {
     await uploadPanel
       .locator('input[type="file"]')
       .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-    await uploadPanel
-      .getByRole("button", { name: "Upload", exact: true })
-      .click();
     await ensureCloudStorageCheckedAndSaveDataset({
       page,
       workspaceSlug,

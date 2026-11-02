@@ -1,7 +1,7 @@
 import { makeSet, propIsDefined, sortObjList } from "@avandar/utils";
 import { AvaDataTypeModule } from "$/models/datasets/AvaDataType/AvaDataTypeModule";
-import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 
 const ENUM_LIKE_DISTINCT_MAX = 10;
 

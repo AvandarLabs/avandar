@@ -28,9 +28,11 @@ export function LegendEntries({ entries, showNoData }: Props): ReactNode {
         }
         const label =
           entry.label.trim() ||
-          (entry.type === "suppressed" ? t`Suppressed`
-          : entry.type === "noData" ? t`Not reported`
-          : t`Other`);
+          (entry.type === "suppressed"
+            ? t`Suppressed`
+            : entry.type === "noData"
+              ? t`Not reported`
+              : t`Other`);
         return (
           <li className={css.mapLegendGroupItem} key={JSON.stringify(entry)}>
             <span

@@ -16,9 +16,11 @@ type Props = {
 /** Renders the icon for the selected layer's status. */
 export function MapStatusIcon({ status, hasPartialMapping }: Props): ReactNode {
   const informationIcon = (): ReactNode => {
-    return hasPartialMapping ?
-        <IconAlertTriangle size={15} stroke={1.8} />
-      : <IconInfoCircle size={15} stroke={1.8} />;
+    return hasPartialMapping ? (
+      <IconAlertTriangle size={15} stroke={1.8} />
+    ) : (
+      <IconInfoCircle size={15} stroke={1.8} />
+    );
   };
   return matchLiteral(status, {
     unbound: informationIcon,

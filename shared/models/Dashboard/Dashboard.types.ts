@@ -1,5 +1,3 @@
-import type { Model } from "@avandar/models";
-import type { SwapDeep, UUID } from "@avandar/utils";
 import type {
   DASHBOARD_SNAPSHOT_TRANSITION_KINDS,
   DASHBOARD_VISIBILITIES,
@@ -9,6 +7,8 @@ import type { UserId } from "$/models/User/User.types.ts";
 import type { UserProfileId } from "$/models/User/UserProfile.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Json } from "$/types/database.types.ts";
+import type { Model } from "@avandar/models";
+import type { SwapDeep, UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
 type ModelType = "Dashboard";

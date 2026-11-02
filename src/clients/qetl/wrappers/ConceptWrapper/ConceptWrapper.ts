@@ -2,7 +2,6 @@ import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { buildConceptQueryResult } from "@/clients/qetl/wrappers/ConceptWrapper/buildConceptQueryResult";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -19,6 +18,7 @@ import type {
   WrapperContext,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 /**
  * The two reads a concept relation is built from, injected so a test needs no
@@ -62,10 +62,10 @@ const CAPABILITIES = {
    * `no`, and deliberately, even though Postgres could return the whole
    * extension. A capability record states what this wrapper can be *asked*,
    * and the registry rejects a wrapper declaring one it does not implement.
-   * This wrapper implements `pushDown` only, which is also the mode the
-   * proposal selects for concepts: full pushdown plus a result cache, with no
-   * acquisition machinery. Spec 3 flips this to `yes` on the day it adds an
-   * `acquire`, and not before.
+   * This wrapper implements `pushDown` only, which is the mode chosen for
+   * concepts: full pushdown plus a result cache, with no acquisition
+   * machinery. Flip this to `yes` on the day an `acquire` is added here, and
+   * not before.
    */
   wholeRelationAcquirable: "no",
 
@@ -134,9 +134,9 @@ function _createDefaultDependencies(): ConceptWrapperDependencies {
  * `pushDown` ignores the request's SQL and returns the concept's full
  * extension, exactly as `runStructuredQueryWithMetadata` does today: filters,
  * group-bys and sorts are still unapplied, and the returned superset satisfies
- * any projection the caller asked for. Registering the extension as a DuckDB
- * relation, which is what makes the SQL meaningful, is spec 3's work. Nothing
- * calls this method until then.
+ * any projection the caller asked for. Nothing calls this method yet: it
+ * becomes meaningful only once the extension is registered as a DuckDB
+ * relation, which nothing does today.
  */
 export function createConceptWrapper(
   dependencies: ConceptWrapperDependencies = _createDefaultDependencies(),

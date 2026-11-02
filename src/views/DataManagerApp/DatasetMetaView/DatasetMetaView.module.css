@@ -1,0 +1,8 @@
+/*
+ * The tab strip is the first thing in the content column, directly under the
+ * header band, so it takes the space that a section heading would have taken
+ * rather than adding to it.
+ */
+.datasetMetaViewTabList {
+  margin-bottom: var(--mantine-spacing-lg);
+}

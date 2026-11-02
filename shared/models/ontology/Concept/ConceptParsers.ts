@@ -9,14 +9,14 @@ import {
   undefinedsToNullsDeep,
 } from "@avandar/utils";
 import { z } from "zod";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type {
   ConceptId,
   ConceptModel,
 } from "$/models/ontology/Concept/Concept.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 
 const DBReadSchema = z.object({
   created_at: z.string().datetime({ offset: true }),

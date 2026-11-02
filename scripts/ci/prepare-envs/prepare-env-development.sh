@@ -20,6 +20,7 @@ declare -A _development_env=(
   [VITE_HIDE_DEV_TOOLS]="true"
   [VITE_FEATURE_FLAGS]=""
   [VITE_GOOGLE_PICKER_API_KEY]="$VITE_GOOGLE_PICKER_API_KEY"
+  [VITE_GOOGLE_PICKER_APP_ID]="$VITE_GOOGLE_PICKER_APP_ID"
 
   # Environment variables for scripts
   [SUPABASE_POSTGRES_URL]="$(get_supabase_env_var DB_URL)"

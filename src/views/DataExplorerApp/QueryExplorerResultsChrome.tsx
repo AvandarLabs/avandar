@@ -23,11 +23,11 @@ export function QueryExplorerResultsChrome({
 }: Props): ReactNode {
   return (
     <>
-      {lastQueryError !== undefined ?
+      {lastQueryError !== undefined ? (
         <Box px="md" pb="xs" bg="var(--mantine-color-body)">
           <QueryResultsError message={lastQueryError} sql={sql} />
         </Box>
-      : null}
+      ) : null}
       <Group justify="flex-end" px="md" bg="var(--mantine-color-body)">
         <AppliedFilterSummary filters={filters} isStatusRegion />
       </Group>

@@ -48,9 +48,8 @@ function useTextSelectPointer(
         if (event.button === 2) {
           return;
         }
-        dragRef.current =
-          _isResizeHandle(event.target) ?
-            beginTextResizeDrag(map, event, feature.sizePx)
+        dragRef.current = _isResizeHandle(event.target)
+          ? beginTextResizeDrag(map, event, feature.sizePx)
           : beginTextMoveDrag(map, event, feature.geometry.coordinates);
       };
       const onPointerMove = (event: PointerEvent): void => {

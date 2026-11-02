@@ -1,13 +1,15 @@
--- Monthly subscription movement: new subscriptions, upgrades, downgrades, and
--- cancellations.
---
--- Churn is `subscription.status_changed` where `toStatus = 'canceled'`, which
--- is the only definition of churn in this codebase.
---
--- `lateral_moves` should always be zero. `direction` can only be `lateral` when
--- a plan has been added to `subscriptions__feature_plan_type` without being
--- ranked in `util__subscription_plan_rank`, so a non-zero value here is a
--- signal that the ranking function needs updating, not a business event.
+/**
+ * Monthly subscription movement: new subscriptions, upgrades, downgrades, and
+ * cancellations.
+ *
+ * Churn is `subscription.status_changed` where `toStatus = 'canceled'`, which
+ * is the only definition of churn in this codebase.
+ *
+ * `lateral_moves` should always be zero. `direction` can only be `lateral` when
+ * a plan has been added to `subscriptions__feature_plan_type` without being
+ * ranked in `util__subscription_plan_rank`, so a non-zero value here is a
+ * signal that the ranking function needs updating, not a business event.
+ */
 create or replace view analytics.plan_movement as
 select
   date_trunc('month', e.created_at) as month,

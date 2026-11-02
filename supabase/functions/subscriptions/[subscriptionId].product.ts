@@ -4,8 +4,8 @@ import {
   PolarProductMetadataSchema,
   PolarSubscriptionMetadataSchema,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
-import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { z } from "zod";
+import { Subscription } from "$/models/Subscription/Subscription.ts";
 
 /**
  * Update a subscription's subscribed-to product.

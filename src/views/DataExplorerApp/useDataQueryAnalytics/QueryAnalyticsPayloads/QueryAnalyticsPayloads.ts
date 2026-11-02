@@ -1,9 +1,9 @@
-import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 import type {
   AnalyticsEventPayloads,
   QueryAnalyticsSurface,
   QueryErrorClass,
 } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
+import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 
 /** Caps what one failure can add to a usage_analytics_events row. */
 const MAX_ERROR_MESSAGE_CHARS = 500;

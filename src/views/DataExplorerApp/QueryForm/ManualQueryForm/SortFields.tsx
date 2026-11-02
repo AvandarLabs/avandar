@@ -3,8 +3,8 @@ import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { useOrderDirectionOptions } from "@/views/DataExplorerApp/QueryForm/useOrderDirectionOptions";
-import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import type { ReactNode } from "react";
 
 type Props = {

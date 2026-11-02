@@ -4,8 +4,8 @@ import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/Inspector
 import { AggregateSensitivityControls } from "@/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls";
 import { JitterSensitivityControl } from "@/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl";
 import { SensitivityModeSelect } from "@/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
@@ -28,12 +28,12 @@ export function SensitivitySection({ layer, onLayerChange }: Props): ReactNode {
   return (
     <InspectorSection title={t`Sensitivity`} note={note}>
       <SensitivityModeSelect {...{ sensitivity, onLayerChange }} />
-      {sensitivity.mode === "jitter" ?
+      {sensitivity.mode === "jitter" ? (
         <JitterSensitivityControl {...{ sensitivity, onLayerChange }} />
-      : null}
-      {sensitivity.mode === "aggregateOnly" ?
+      ) : null}
+      {sensitivity.mode === "aggregateOnly" ? (
         <AggregateSensitivityControls {...{ sensitivity, onLayerChange }} />
-      : null}
+      ) : null}
     </InspectorSection>
   );
 }

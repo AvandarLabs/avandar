@@ -1,7 +1,7 @@
 import { propEq } from "@avandar/utils";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { TextFeature } from "@/views/GisApp/shell/AnnotationTextOverlay/useProjectedOverlayPoint";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 type Options = {
   annotationFeatures: readonly AvaMapConfig.AnnotationFeature[];
@@ -25,11 +25,11 @@ export function annotationTextOverlayTarget(
   options: Options,
 ): AnnotationTextOverlayTarget {
   const editingFeature =
-    options.editingTextFeatureId === undefined ?
-      undefined
-    : options.annotationFeatures.find(
-        propEq("id", options.editingTextFeatureId),
-      );
+    options.editingTextFeatureId === undefined
+      ? undefined
+      : options.annotationFeatures.find(
+          propEq("id", options.editingTextFeatureId),
+        );
   if (editingFeature?.kind === "text") {
     return { mode: "edit", feature: editingFeature };
   }

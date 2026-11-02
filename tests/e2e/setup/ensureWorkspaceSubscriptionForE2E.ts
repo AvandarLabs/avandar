@@ -1,8 +1,8 @@
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
+import type { UserId } from "$/models/User/User.types";
 import type { TablesInsert } from "../../../shared/types/database.types";
 import type { UUID } from "@avandar/utils";
-import type { UserId } from "$/models/User/User.types";
 
 /**
  * Legacy shared id that collided across worker workspaces when the PK

@@ -20,7 +20,7 @@ export function FilterRemoveAction({
   return (
     <ActionIcon
       variant="subtle"
-      color="gray"
+      color="neutral"
       size="md"
       aria-label={isGroup ? t`Remove group` : t`Remove condition`}
       onClick={(event) => {

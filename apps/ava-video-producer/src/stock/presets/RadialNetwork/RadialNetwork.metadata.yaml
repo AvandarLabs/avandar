@@ -1,0 +1,58 @@
+name:
+  id: motionAtlas.radial-network.name
+  message: Hub & spokes
+description:
+  id: motionAtlas.radial-network.description
+  message: A central hub exchanges signals with its satellites.
+category:
+  id: motionAtlas.radial-network.category
+  message: Networks
+tags:
+  - id: motionAtlas.radial-network.tags.0
+    message: hub
+  - id: motionAtlas.radial-network.tags.1
+    message: radial
+  - id: motionAtlas.radial-network.tags.2
+    message: connections
+  - id: motionAtlas.radial-network.tags.3
+    message: sync
+useWhen:
+  id: motionAtlas.radial-network.useWhen
+  message: Explain a shared workspace, central service, or coordination point.
+prompt:
+  id: motionAtlas.radial-network.prompt
+  message:
+    Use Motion Atlas "Hub & spokes" (radial-network) as a conceptual graphic.
+    Explain a shared workspace, central service, or coordination point. Keep the
+    restrained motion and readable labels; replace sample content with approved facts
+    before making product claims.
+creativeDirection:
+  id: motionAtlas.radial-network.creativeDirection
+  message: A central hub exchanges signals with its satellites.
+goodFor:
+  - id: motionAtlas.radial-network.goodFor.0
+    message: Explain a shared workspace, central service, or coordination point.
+intent:
+  id: motionAtlas.radial-network.intent
+  message: Explain a shared workspace, central service, or coordination point.
+domains:
+  - id: motionAtlas.radial-network.domains.0
+    message: Networks
+aliases:
+  - id: motionAtlas.radial-network.aliases.0
+    message: hub
+  - id: motionAtlas.radial-network.aliases.1
+    message: radial
+  - id: motionAtlas.radial-network.aliases.2
+    message: connections
+  - id: motionAtlas.radial-network.aliases.3
+    message: sync
+notFor:
+  - id: motionAtlas.radial-network.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.radial-network.distinction
+  message: A central hub exchanges signals with its satellites.

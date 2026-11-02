@@ -15,7 +15,7 @@ import {
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/NuxStepFactsStore";
@@ -90,9 +90,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
 
   useEffect(
     function syncLastQueryError() {
-      const message =
-        dataQuery.isError ?
-          (formatOfflineQueryError(dataQuery.error) ?? dataQuery.error.message)
+      const message = dataQuery.isError
+        ? (formatOfflineQueryError(dataQuery.error) ?? dataQuery.error.message)
         : undefined;
       if (message !== state.lastQueryError) {
         dispatch.setLastQueryError(message);
@@ -219,7 +218,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   }, []);
 
   return (
-    <AppLayout title={t`Data Explorer`}>
+    <AppSlate title={t`Data Explorer`}>
       <Stack flex={1} h="100%" gap={0} mih={0}>
         <Group
           bg="white"
@@ -315,7 +314,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           closeOpenDatasetModal();
         }}
       />
-    </AppLayout>
+    </AppSlate>
   );
 }
 

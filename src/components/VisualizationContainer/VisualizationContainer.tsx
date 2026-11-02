@@ -49,22 +49,22 @@ function useVizConfigSchemas() {
   return useMemo(() => {
     const XAxisKeySchema = string({
       error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen an X axis`
+        return issue.input === undefined
+          ? t`You haven't chosen an X axis`
           : t`Invalid X axis selected`;
       },
     });
     const NameKeySchema = string({
       error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen a name column`
+        return issue.input === undefined
+          ? t`You haven't chosen a name column`
           : t`Invalid name column selected`;
       },
     });
     const ValueKeySchema = string({
       error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen a value column`
+        return issue.input === undefined
+          ? t`You haven't chosen a value column`
           : t`Invalid value column selected`;
       },
     });
@@ -78,8 +78,11 @@ function useVizConfigSchemas() {
         series: SeriesArraySchema,
       }),
       ScatterPlotConfigSchema: object({
+        // `looseObject` (not `object`) so per-series `label` / `color` survive
+        // the parse — `object` strips unknown keys, dropping them before the
+        // renderer sees them. Matches SeriesArraySchema used by XY / radar.
         series: array(
-          object({ key: string().min(1), xKey: string().min(1) }),
+          looseObject({ key: string().min(1), xKey: string().min(1) }),
         ).min(1, { error: t`Add at least one X / Y series` }),
       }),
       PieChartConfigSchema: object({
@@ -95,8 +98,10 @@ function useVizConfigSchemas() {
         series: SeriesArraySchema,
       }),
       BubbleChartConfigSchema: object({
+        // `looseObject` so per-series `label` / `color` survive the parse; see
+        // ScatterPlotConfigSchema above.
         series: array(
-          object({
+          looseObject({
             key: string().min(1),
             xKey: string().min(1),
             sizeKey: string().min(1),

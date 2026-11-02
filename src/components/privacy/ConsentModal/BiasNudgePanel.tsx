@@ -34,23 +34,23 @@ export function BiasNudgePanel({
 
       <BiasHitBadges label={<Trans>Detected:</Trans>} hits={bias} />
 
-      {userText ?
+      {userText ? (
         <Stack gap={4}>
           <Text size="xs" c="dimmed">
             <Trans>You wrote:</Trans>
           </Text>
           <Code block>{userText}</Code>
         </Stack>
-      : null}
+      ) : null}
 
-      {bias[0]?.suggestion ?
+      {bias[0]?.suggestion ? (
         <Stack gap={4}>
           <Text size="xs" c="dimmed">
             <Trans>Suggested:</Trans>
           </Text>
           <Text size="sm">{bias[0].suggestion}</Text>
         </Stack>
-      : null}
+      ) : null}
     </>
   );
 }

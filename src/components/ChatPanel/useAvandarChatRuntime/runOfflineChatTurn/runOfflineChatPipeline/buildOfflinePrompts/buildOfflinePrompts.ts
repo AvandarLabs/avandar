@@ -104,17 +104,16 @@ function formatSqlTurnContext(args: {
   lastError?: string;
   lastUserPrompt: string;
 }): string {
-  const refinementLead =
-    REFINEMENT_HINTS.test(args.lastUserPrompt) ?
-      "The user is refining prior SQL. Edit this query; do not start over."
+  const refinementLead = REFINEMENT_HINTS.test(args.lastUserPrompt)
+    ? "The user is refining prior SQL. Edit this query; do not start over."
     : "Prior SQL from this session (reuse or edit if the question asks to change it).";
   const parts = [
-    args.lastSql ?
-      `${refinementLead}\n\nPrevious SQL:\n\`\`\`sql\n${args.lastSql}\n\`\`\``
-    : undefined,
-    args.lastError ?
-      `Previous SQL failed in DuckDB:\n${args.lastError}\nUse only Allowed table names and Schema columns below.`
-    : undefined,
+    args.lastSql
+      ? `${refinementLead}\n\nPrevious SQL:\n\`\`\`sql\n${args.lastSql}\n\`\`\``
+      : undefined,
+    args.lastError
+      ? `Previous SQL failed in DuckDB:\n${args.lastError}\nUse only Allowed table names and Schema columns below.`
+      : undefined,
   ].filter(isDefined);
   if (parts.length === 0) {
     return "";
@@ -163,9 +162,8 @@ export function buildOfflineSqlPrompt(args: {
   lastError?: string;
 }): string {
   const aliases = aliasesFromSchema(args.schema);
-  const resolvedBlock =
-    args.resolvedDataset ?
-      formatResolvedDatasetRequirement(args.resolvedDataset, aliases)
+  const resolvedBlock = args.resolvedDataset
+    ? formatResolvedDatasetRequirement(args.resolvedDataset, aliases)
     : "";
 
   return `You are a DuckDB SQL generator for Avandar offline chat.
@@ -194,9 +192,8 @@ export function buildOfflineFixSqlPrompt(args: {
   resolvedDataset?: OfflineChatSchemaDataset;
 }): string {
   const aliases = aliasesFromSchema(args.schema);
-  const resolvedBlock =
-    args.resolvedDataset ?
-      formatResolvedDatasetRequirement(args.resolvedDataset, aliases)
+  const resolvedBlock = args.resolvedDataset
+    ? formatResolvedDatasetRequirement(args.resolvedDataset, aliases)
     : "";
 
   return `Fix this DuckDB SQL. Use ONLY Allowed table names and Schema columns.

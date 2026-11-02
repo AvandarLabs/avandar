@@ -1,27 +1,6 @@
 {
-  "experimentalTernaries": true,
-  "printWidth": 80,
-  "semi": true,
-  "tabWidth": 2,
-  "plugins": [
-    "@ianvs/prettier-plugin-sort-imports",
-    "prettier-plugin-tailwindcss",
-    "prettier-plugin-sql"
-  ],
-  "importOrder": [
-    "<BUILTIN_MODULES>",
-    "<THIRD_PARTY_MODULES>",
-    "^@/(.*)$",
-    "^[.]",
-    "<TYPES>"
-  ],
+  "plugins": ["prettier-plugin-sql"],
   "overrides": [
-    {
-      "files": ["*.jsonc"],
-      "options": {
-        "trailingComma": "none"
-      }
-    },
     {
       "files": ["*.sql"],
       "options": {

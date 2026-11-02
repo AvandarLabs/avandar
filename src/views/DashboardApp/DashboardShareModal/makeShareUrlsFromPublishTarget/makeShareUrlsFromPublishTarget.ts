@@ -48,9 +48,9 @@ export function makeShareUrlsFromPublishTarget(
 ): ShareUrls {
   const base = _origin().replace(/\/$/, "");
   const prefix =
-    args.visibility === "public" ?
-      `${base}/d`
-    : `${base}/${args.workspaceSlug}/d`;
+    args.visibility === "public"
+      ? `${base}/d`
+      : `${base}/${args.workspaceSlug}/d`;
   const pathPrefix = `${prefix}/`;
   return {
     canonical: `${pathPrefix}${args.dashboardId}`,

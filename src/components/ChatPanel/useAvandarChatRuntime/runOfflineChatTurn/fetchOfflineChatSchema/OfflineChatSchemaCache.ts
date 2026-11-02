@@ -19,8 +19,9 @@ function _read(workspaceId: string): OfflineChatSchema | undefined {
     return {
       ...parsed,
       concepts: Array.isArray(parsed.concepts) ? parsed.concepts : [],
-      conceptAttributes:
-        Array.isArray(parsed.conceptAttributes) ? parsed.conceptAttributes : [],
+      conceptAttributes: Array.isArray(parsed.conceptAttributes)
+        ? parsed.conceptAttributes
+        : [],
     };
   } catch {
     return undefined;

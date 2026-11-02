@@ -175,8 +175,8 @@ describe("proposedCaseTypeToCreatedCaseType", () => {
     const created = proposedCaseTypeToCreatedCaseType({
       ...draft,
       attributes: draft.attributes.map((attribute) => {
-        return attribute.columnId === STATE_COLUMN_ID ?
-            { ...attribute, isIncluded: false }
+        return attribute.columnId === STATE_COLUMN_ID
+          ? { ...attribute, isIncluded: false }
           : attribute;
       }),
     });
@@ -196,8 +196,8 @@ describe("proposedCaseTypeToCreatedCaseType", () => {
     const created = proposedCaseTypeToCreatedCaseType({
       ...draft,
       attributes: draft.attributes.map((attribute) => {
-        return attribute.columnId === CENSUS_KEY_COLUMN_ID ?
-            { ...attribute, isIncluded: false }
+        return attribute.columnId === CENSUS_KEY_COLUMN_ID
+          ? { ...attribute, isIncluded: false }
           : attribute;
       }),
     });

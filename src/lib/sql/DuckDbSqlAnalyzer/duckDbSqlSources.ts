@@ -127,9 +127,9 @@ function _getFunctionArgumentTokens(
     return undefined;
   }
   const closingIndex = getClosingParenthesisIndex({ tokens, openingIndex });
-  return closingIndex === undefined ? undefined : (
-      tokens.slice(openingIndex + 1, closingIndex)
-    );
+  return closingIndex === undefined
+    ? undefined
+    : tokens.slice(openingIndex + 1, closingIndex);
 }
 
 function _getAnalysisFromQueryFunction(
@@ -170,12 +170,12 @@ function _getAnalysisFromTableFunction(
       return _unsafeSourceAnalysis("dynamic-query");
     }
     const datasetId = getDatasetIdFromTableName(argumentTokens[0].value);
-    return datasetId === undefined ?
-        _unsafeSourceAnalysis("uninspectable-source")
+    return datasetId === undefined
+      ? _unsafeSourceAnalysis("uninspectable-source")
       : _readSourceAnalysis([datasetId]);
   }
-  return INSPECTABLE_TABLE_FUNCTIONS.has(functionName) ?
-      _readSourceAnalysis([])
+  return INSPECTABLE_TABLE_FUNCTIONS.has(functionName)
+    ? _readSourceAnalysis([])
     : _unsafeSourceAnalysis("uninspectable-source");
 }
 
@@ -211,9 +211,9 @@ function _getAnalysisFromIdentifierSource(
   // contributing nothing would let raw SQL read a dataset the caller was never
   // authorized for.
   const rowNumberedTableName =
-    tableName === undefined ? undefined : (
-      getTableNameFromRowNumberedViewName(tableName)
-    );
+    tableName === undefined
+      ? undefined
+      : getTableNameFromRowNumberedViewName(tableName);
   if (
     identifier.parts.length === 1 &&
     rowNumberedTableName !== undefined &&
@@ -266,8 +266,8 @@ function _getAnalysisFromCopyRelation(
   options: Readonly<{ tokens: readonly SqlToken[]; relationIndex: number }>,
 ): SourceAnalysis {
   const datasetId = getDatasetIdFromRelationAtIndex(options);
-  return datasetId === undefined ?
-      _unsafeSourceAnalysis("uninspectable-source")
+  return datasetId === undefined
+    ? _unsafeSourceAnalysis("uninspectable-source")
     : _readSourceAnalysis([datasetId]);
 }
 
@@ -343,8 +343,8 @@ function _getCommaSourceIndexes(tokens: readonly SqlToken[]): number[] {
       activeFromDepths.delete(depth + 1);
       return [];
     }
-    return token.value === "," && activeFromDepths.has(depth) ?
-        [index + 1]
+    return token.value === "," && activeFromDepths.has(depth)
+      ? [index + 1]
       : [];
   });
 }

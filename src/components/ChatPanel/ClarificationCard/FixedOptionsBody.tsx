@@ -14,7 +14,9 @@ export function FixedOptionsBody({
   multi,
   onSubmit,
 }: Readonly<Props>): React.ReactNode {
-  return multi ?
-      <MultiOptionBody options={options} onSubmit={onSubmit} />
-    : <SingleOptionBody options={options} onSubmit={onSubmit} />;
+  return multi ? (
+    <MultiOptionBody options={options} onSubmit={onSubmit} />
+  ) : (
+    <SingleOptionBody options={options} onSubmit={onSubmit} />
+  );
 }

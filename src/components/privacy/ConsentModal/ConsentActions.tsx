@@ -42,12 +42,10 @@ export function ConsentActions({
         <Trans>Cancel</Trans>
       </Button>
 
-      {(
-        (mode === "bias_nudge" || mode === "composite") &&
-        bias &&
-        bias.length > 0 &&
-        bias[0]?.suggestion
-      ) ?
+      {(mode === "bias_nudge" || mode === "composite") &&
+      bias &&
+      bias.length > 0 &&
+      bias[0]?.suggestion ? (
         <Button
           variant="outline"
           color="blue"
@@ -58,14 +56,15 @@ export function ConsentActions({
         >
           <Trans>Use suggestion</Trans>
         </Button>
-      : null}
+      ) : null}
 
       <Button
         color={
-          mode === "medical_strict" ? "red"
-          : mode === "pii_warning" || mode === "composite" ?
-            "red"
-          : "primary"
+          mode === "medical_strict"
+            ? "red"
+            : mode === "pii_warning" || mode === "composite"
+              ? "red"
+              : "primary"
         }
         disabled={sendDisabled}
         onClick={() => {

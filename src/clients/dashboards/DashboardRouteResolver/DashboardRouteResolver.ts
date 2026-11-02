@@ -58,8 +58,8 @@ async function _buildWorkspaceRedirect(
   );
 
   if (workspace === undefined) {
-    return (await deps.isAuthenticated()) ?
-        { kind: "denied" }
+    return (await deps.isAuthenticated())
+      ? { kind: "denied" }
       : { kind: "signIn" };
   }
 
@@ -91,9 +91,9 @@ async function _buildPublicMissOutcome(
     visibility: "workspace",
   });
   const onlyMatchingWorkspaceDashboard =
-    matchingWorkspaceDashboards.length === 1 ?
-      matchingWorkspaceDashboards[0]
-    : undefined;
+    matchingWorkspaceDashboards.length === 1
+      ? matchingWorkspaceDashboards[0]
+      : undefined;
 
   if (onlyMatchingWorkspaceDashboard === undefined) {
     return { kind: "denied" };
@@ -110,9 +110,8 @@ async function _makeDashboardRouteOutcomeFromPublicRoute(
   params: Readonly<{ slugOrId: string; deps: IDashboardRouteUtils }>,
 ): Promise<DashboardRouteOutcome> {
   const { slugOrId, deps } = params;
-  const candidate =
-    _isUuidShaped(slugOrId) ?
-      await deps.getById(_getDashboardIdFromSlugOrId(slugOrId))
+  const candidate = _isUuidShaped(slugOrId)
+    ? await deps.getById(_getDashboardIdFromSlugOrId(slugOrId))
     : (await deps.findBySlug({ slug: slugOrId, visibility: "public" }))[0];
 
   if (candidate === undefined) {

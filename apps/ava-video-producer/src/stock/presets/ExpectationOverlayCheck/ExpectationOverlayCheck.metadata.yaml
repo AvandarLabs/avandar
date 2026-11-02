@@ -1,0 +1,121 @@
+name:
+  id: motionAtlas.expectation-overlay-check.name
+  message: Compare the observed result with its expectation
+description:
+  id: motionAtlas.expectation-overlay-check.description
+  message:
+    An expected-result sheet aligns over an observed-result sheet for each authored
+    test. Matching wording registers exactly, mismatches separate into a visible gap,
+    and unobserved results remain untested.
+category:
+  id: motionAtlas.expectation-overlay-check.category
+  message: Evidence and verification
+useWhen:
+  id: motionAtlas.expectation-overlay-check.useWhen
+  message: Make a test judgment inspectable through its expected and observed values.
+intent:
+  id: motionAtlas.expectation-overlay-check.intent
+  message: Make a test judgment inspectable through its expected and observed values.
+creativeDirection:
+  id: motionAtlas.expectation-overlay-check.creativeDirection
+  message:
+    Frames 12..42 reveal up to three test stations with short input captions.
+    Frames 43..108 register the expected translucent strip over each observed strip,
+    matching their fixed left edges. For lower, translate it vertically into place. For
+    hinge, rotate it around its fixed upper edge and settle it flat before judging
+    equality. Equal strings register into a double outline. Unequal strings separate
+    vertically and retain both complete values with a mismatch bracket. A null
+    observation retains an empty lower slot and never receives a verdict. Frames
+    109..167 hold all tests, expected results, observations and derived states together.
+    Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the
+    shared palette. Reveal during frames 0..11 and fade to the common opaque ground
+    during frames 168..179.
+distinction:
+  id: motionAtlas.expectation-overlay-check.distinction
+  message:
+    Unlike capability-matrix, test states are derived from explicit expected and
+    observed values rather than entered as capability claims. Unlike scan-lines, the
+    animation exposes the comparison oracle and retains the discrepant result.
+prompt:
+  id: motionAtlas.expectation-overlay-check.prompt
+  message:
+    An expected-result sheet aligns over an observed-result sheet for each authored
+    test. Matching wording registers exactly, mismatches separate into a visible gap,
+    and unobserved results remain untested.
+tags:
+  - id: motionAtlas.expectation-overlay-check.tags.0
+    message: testing
+  - id: motionAtlas.expectation-overlay-check.tags.1
+    message: expectation
+  - id: motionAtlas.expectation-overlay-check.tags.2
+    message: observed result
+  - id: motionAtlas.expectation-overlay-check.tags.3
+    message: red team
+  - id: motionAtlas.expectation-overlay-check.tags.4
+    message: quality
+  - id: motionAtlas.expectation-overlay-check.tags.5
+    message: untested
+  - id: motionAtlas.expectation-overlay-check.tags.6
+    message: oracle
+goodFor:
+  - id: motionAtlas.expectation-overlay-check.goodFor.0
+    message: Explain the role of a test oracle
+  - id: motionAtlas.expectation-overlay-check.goodFor.1
+    message: Show an adversarial test without claiming a comprehensive audit
+  - id: motionAtlas.expectation-overlay-check.goodFor.2
+    message: Distinguish missing test evidence from a failed test
+domains:
+  - id: motionAtlas.expectation-overlay-check.domains.0
+    message: Evidence and verification
+aliases:
+  - id: motionAtlas.expectation-overlay-check.aliases.0
+    message: testing
+  - id: motionAtlas.expectation-overlay-check.aliases.1
+    message: expectation
+  - id: motionAtlas.expectation-overlay-check.aliases.2
+    message: observed result
+notFor:
+  - id: motionAtlas.expectation-overlay-check.notFor.0
+    message: No software or model is executed. The cases and observations are authored examples.
+  - id: motionAtlas.expectation-overlay-check.notFor.1
+    message:
+      A finite set of matches does not establish safety, reliability, quality, or
+      complete test coverage.
+  - id: motionAtlas.expectation-overlay-check.notFor.2
+    message:
+      String equality is the only comparison. No semantic equivalence, tolerance,
+      hidden normalization, or causal diagnosis is inferred.
+  - id: motionAtlas.expectation-overlay-check.notFor.3
+    message:
+      Free prose is author supplied; only structural, reference, numeric and
+      documented lexical constraints are runtime-validated.
+  - id: motionAtlas.expectation-overlay-check.literal-whitespace
+    message:
+      Whitespace uses amber presentation markers, distinct from authored marker
+      glyphs. Exact original values remain unchanged.
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.expectation-overlay-check.beats.0
+      message: Reveal the authored scene.
+  - startFrame: 12
+    endFrame: 42
+    description:
+      id: motionAtlas.expectation-overlay-check.beats.1
+      message: Reveal all authored test stations.
+  - startFrame: 43
+    endFrame: 108
+    description:
+      id: motionAtlas.expectation-overlay-check.beats.2
+      message: Register expected sheets, then separate mismatches.
+  - startFrame: 109
+    endFrame: 167
+    description:
+      id: motionAtlas.expectation-overlay-check.beats.3
+      message: Hold exact observations and unobserved slots without inferred verdicts.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.expectation-overlay-check.beats.4
+      message: Return to the common opaque ground.

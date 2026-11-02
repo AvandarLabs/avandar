@@ -9,6 +9,7 @@ import { PdfRegionCard } from "../PdfRegionCard";
 import { PdfRegionOverlay } from "../PdfRegionOverlay/PdfRegionOverlay";
 import { runRegionModelAssist } from "../runRegionModelAssist/runRegionModelAssist";
 import { usePdfAxisCalibration } from "../usePdfAxisCalibration";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { Highlight } from "../PdfPagePreview";
 import type { AssistStatus } from "../PdfRegionCard";
 import type { RegionAssistSkipReason } from "../runRegionModelAssist/runRegionModelAssist";
@@ -20,7 +21,6 @@ import type {
   PageGeometry,
   PdfRegion,
 } from "@/workers/pdfSniff/pdfSniff.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
 
 const PREVIEW_WIDTH = 420;
@@ -217,10 +217,9 @@ export function PdfRegionPicker({
           };
         });
     });
-    return (
-        focusedProvenance !== undefined && focusedProvenance.page === pageIndex
-      ) ?
-        [...regionHighlights, { bbox: focusedProvenance.bbox, isActive: true }]
+    return focusedProvenance !== undefined &&
+      focusedProvenance.page === pageIndex
+      ? [...regionHighlights, { bbox: focusedProvenance.bbox, isActive: true }]
       : regionHighlights;
   }, [regions, pageIndex, activeRegionId, focusedProvenance]);
 
@@ -269,7 +268,7 @@ export function PdfRegionPicker({
             onPointPicked={calibration.pick}
           />
         </Box>
-        {pageCount > 1 ?
+        {pageCount > 1 ? (
           <Pagination
             total={pageCount}
             value={pageIndex + 1}
@@ -278,17 +277,17 @@ export function PdfRegionPicker({
             }}
             size="sm"
           />
-        : null}
+        ) : null}
       </Stack>
 
       <Stack gap="sm" flex={1}>
-        {regions.length === 0 ?
+        {regions.length === 0 ? (
           <Alert variant="light" color="blue" title={t`Nothing selected yet`}>
             <Text size="sm">
               {t`Draw a box around a table, chart, map or block of text to extract it.`}
             </Text>
           </Alert>
-        : null}
+        ) : null}
 
         {regions.map((region) => {
           const table = tablesByRegionId.get(region.id);

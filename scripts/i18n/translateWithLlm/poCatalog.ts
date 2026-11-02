@@ -48,9 +48,9 @@ function _readMessageValue(
     return !/^"(.*)"\s*$/.test(line);
   });
   const continuationCount =
-    firstNonContinuationIndex === -1 ?
-      remainingLines.length
-    : firstNonContinuationIndex;
+    firstNonContinuationIndex === -1
+      ? remainingLines.length
+      : firstNonContinuationIndex;
   const parts = [
     match[1] ?? "",
     ...remainingLines.slice(0, continuationCount).map((line) => {

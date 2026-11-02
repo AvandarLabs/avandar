@@ -129,9 +129,9 @@ function _formatSchemaBlock(
   return args.aliases
     .map((entry) => {
       const names =
-        entry.kind === "dataset" ?
-          (namesByDatasetId.get(entry.datasetId) ?? [])
-        : (namesByConceptId.get(entry.conceptId) ?? []);
+        entry.kind === "dataset"
+          ? (namesByDatasetId.get(entry.datasetId) ?? [])
+          : (namesByConceptId.get(entry.conceptId) ?? []);
       return _formatAliasLine(entry, names);
     })
     .join("\n");

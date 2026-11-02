@@ -45,11 +45,11 @@ export function AppliedFilterSummary({
         one="# filter applied"
         other="# filters applied"
       />
-      {ignored > 0 ?
+      {ignored > 0 ? (
         <Trans>
           , <Plural value={ignored} one="# not applied" other="# not applied" />
         </Trans>
-      : null}
+      ) : null}
     </Text>
   );
 }

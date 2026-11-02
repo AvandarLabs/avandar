@@ -1,4 +1,3 @@
-import type { ObjectRegistry } from "@avandar/utils";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
 import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types.ts";
@@ -9,6 +8,7 @@ import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/Rada
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
+import type { ObjectRegistry } from "@avandar/utils";
 
 export type VizConfig =
   | TableVizConfig

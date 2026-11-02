@@ -106,4 +106,5 @@
     if (e.key && e.key.lastIndexOf(VIEWED_PREFIX, 0) !== 0) return; // unrelated key
     readLiveViewed();
     renderAll();
+    pushViewedChanges();
   });

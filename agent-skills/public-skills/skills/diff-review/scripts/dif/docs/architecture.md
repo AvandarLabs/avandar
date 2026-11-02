@@ -16,24 +16,47 @@ src/
 ├── slug.rs            slugify, branch_slug, deterministic port_for
 ├── git.rs             repo_root, current_branch, default-comparison, diff_signature
 ├── git_watcher.rs     background thread publishing the repo's diff signature
-├── paths.rs           .difit transcript + session-id + guide + summary + test-plan + reviewed-state paths
+├── paths.rs           .difit transcript + session-id + guide + summary + test-plan + reviewed-state + github-sync paths
 ├── session.rs         pure LLM command builder (resume/fresh + prompt)
 ├── pty_pane.rs        PTY-backed pane parsed through vt100 (reused by both panes)
 ├── difit/
 │   ├── imports.rs     server↔import comment shapes + conversion
 │   ├── transcript.rs  atomic read/write/create of the .difit transcript
 │   ├── importer.rs    entries an out-of-band transcript write adds → POST to difit (pure + POST)
+│   ├── editor.rs      add / edit / remove difit comments in place via comments-json + POST /api/comments
 │   ├── server.rs      build the difit command, pick a free port, spawn, wait-ready
-│   └── poller.rs      background thread: poll comments-json → import inbound, publish + mirror
+│   └── poller.rs      background thread: poll comments-json → import inbound, GitHub sync, publish + mirror
+├── github/
+│   ├── registry.rs    the -github.json record of PR comments + the shared lock over it and the session (atomic saves)
+│   ├── session.rs     live GitHub state: PR, viewer, pending review, queued requests, pull status, viewed sync; /__wrap/github.json
+│   ├── anchor.rs      difit thread position → GitHub path / side / line range (pure)
+│   ├── plan.rs        push: difit comments vs the registry → draft / reply / update / delete / resolve actions (pure)
+│   ├── pull.rs        pull: the PR's threads vs the registry + difit → difit edits + registry changes; viewed changes (pure)
+│   ├── graphql.rs     the GraphQL documents + pure parsing of GitHub's answers
+│   ├── client.rs      GithubApi trait + the `gh api graphql` implementation (30s timeout per call)
+│   ├── connection.rs  whether GitHub is reachable: browser reports, network-error detection, retry (pure)
+│   ├── checkout.rs    branch vs PR head, fast-forward only when safe, stashing around it on Sync (Checkout trait + git)
+│   ├── conflicts.rs   a Sync's merge conflicts: who resolves them, the notices, the LLM prompt (pure)
+│   ├── sync.rs        the per-snapshot pass: PR lookup, push, review submit
+│   ├── sync_pull.rs   the pull half: fetch, branch step, comments, viewed events
+│   └── sync_queue.rs  holding interactions while GitHub is unreachable; sending the viewed queue
 ├── inject/
 │   ├── dispatch.rs    open-comment detection + line/location labels (pure)
 │   ├── prompt.rs      minimal per-comment prompt text (pure)
-│   ├── dispatcher.rs  stateful baseline-then-dispatch-once driver (pure)
+│   ├── dispatcher.rs  stateful baseline-then-dispatch-once driver: eager, hold, or send-all (pure)
+│   ├── mode.rs        DispatchControl: bulk vs eager, the send-all request, the held count (atomics)
 │   └── reply_watcher.rs  baseline-then-log-once detector for new agent replies (pure)
 └── tui/
     ├── mod.rs         terminal setup/teardown, run()
-    ├── startup.rs     create the transcript, start difit + shell + poller, spawn LLM, assemble App
-    ├── app.rs         App state + guide-ready transition + comparison retarget + focus + main-view switching + inject + scroll + palette/restart
+    ├── startup/
+    │   ├── mod.rs     resolve the launch target (repo, agent, comparison, ports, paths) and assemble App
+    │   ├── surface.rs create the transcript, start difit + poller + browser shell
+    │   └── llm_command.rs  the LLM pane's launch command: resume or fresh, never seeding a review
+    ├── app/
+    │   ├── mod.rs     App state + focus + main-view switching + palette
+    │   ├── review_surface.rs  web-shell requests, comparison retarget, relaunch, new LLM session, difit restart
+    │   ├── llm.rs     difit log, session meta, guide-ready transition, code-change warning, comment injection
+    │   └── scroll.rs  markdown scroll + vim motions + open-under-cursor
     ├── control.rs     local POST /comparison endpoint for retargeting the comparison while the review is still being prepared
     ├── draw.rs        two-half layout, main-view tab strip + log/test-plan/guide routing, palette overlay
     ├── draw_palette.rs  the command-palette modal renderer
@@ -115,6 +138,9 @@ cursor instead).
   POSTed to `/api/comment-imports` and the mirror is skipped for that tick. It
   starts with difit at launch, and is momentarily absent only while a comparison
   retarget swaps difit out.
+  The same thread runs the GitHub sync pass (`github::sync`) over every
+  snapshot, so `gh` and `git` calls (pushing PR comments, submitting the review,
+  the minute-by-minute pull, fast-forwarding) never block the TUI.
 - **Git-watcher thread** — recomputes the repo's diff signature once a second
   (`git rev-parse HEAD` + `status` + `diff HEAD`, hashed) and publishes it under
   a lock, so the UI loop can notice stale-diff state without spawning git itself.
@@ -168,9 +194,41 @@ the comparison is settled (control endpoint stops accepting updates)
 ```
 
 The reviewer never has to ask the agent to "address the comments": the poller
-sees each new reviewer comment and the loop types it into the LLM. The agent posts
-its reply back to the live server, which pushes it to the browser over SSE — no
-restart. See [integrations.md](integrations.md).
+sees each new reviewer comment and the loop types it into the LLM, either at once
+(eager) or when the reviewer presses **Send all** in the browser (bulk, the
+default). A comment the reviewer sent to the GitHub PR instead takes a separate
+path and never reaches the LLM:
+
+```
+comment box toggle = PR  →  inject.js tags the save (X-Dif-Destination: github)
+        │
+        ▼
+web shell (review_routes.rs): new message ids vs difit's comments-json
+        │  marks them pending in .difit/<…>-github.json, then proxies the save
+        ▼
+difit holds the comment (and the transcript mirrors it, as for any comment)
+        │
+        ├─► Dispatcher skips every id in the registry
+        │
+        └─► Poller thread: github::sync plans against the registry
+              drafts / replies / edits / deletes / resolves  →  pending review
+              Review (N) → submit  →  published on the PR
+
+Browser online / offline  →  POST /__wrap/github/connection
+        offline, or a gh call that cannot reach GitHub  →  no calls; everything queued
+        back online (or the 20s retry)  →  queue sent, then a pull
+
+Poller thread, every 60s or on Sync: github::sync_pull
+        PR threads + viewed files  →  difit (editor.rs) + registry
+        PR head ahead + clean branch  →  fast-forward  →  shell reloads difit
+        reviewer's Sync + dirty branch  →  stash, fast-forward, restore  →  page reloads
+        restore conflicts  →  browser modal  →  reviewer, or the LLM pane via the TUI
+        viewed changes  →  /__wrap/github.json events  →  inject/viewed.js
+```
+
+For a local comment, the agent posts its reply back to the live server, which
+pushes it to the browser over SSE, with no restart. See
+[integrations.md](integrations.md), which also covers the GitHub sync contract.
 
 ## Difit-pane activity log
 
@@ -236,7 +294,9 @@ gained two capabilities for this:
 kill difit, `server::wait_until_port_free` (so the relaunch rebinds the same
 port rather than letting difit auto-reassign), then respawn with the same
 comparison/port and a freshly re-read transcript. The poller and LLM pane are
-untouched; the poller reconnects on its own.
+untouched; the poller reconnects on its own. It then bumps the web shell's
+restart counter instead of opening the browser: the open tab sees it in
+`meta.json` and reloads itself, so a restart never adds a tab.
 
 ## Dependencies
 

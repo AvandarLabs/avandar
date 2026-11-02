@@ -80,14 +80,15 @@ export function ShareUrlQrModal({ url, isOpened, onClose }: Props): ReactNode {
       size="sm"
     >
       <Stack align="center" gap="md">
-        {qrDataUrl ?
+        {qrDataUrl ? (
           <Box>
             <Image src={qrDataUrl} alt={t`QR code`} w={256} h={256} />
           </Box>
-        : <Text size="sm" c="dimmed">
+        ) : (
+          <Text size="sm" c="dimmed">
             <Trans>Generating…</Trans>
           </Text>
-        }
+        )}
         <Button
           leftSection={<IconDownload size={14} />}
           variant="outline"

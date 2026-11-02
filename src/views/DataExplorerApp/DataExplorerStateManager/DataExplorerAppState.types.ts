@@ -6,7 +6,10 @@ import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualD
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type {
+  VizConfig,
+  VizConfigRegistry,
+} from "$/models/vizs/VizConfig/VizConfig.types";
 
 /**
  * Identifies the currently open saved dataset in the Data Explorer, if any.
@@ -44,6 +47,28 @@ export type DataExplorerAppState = {
   nlPrompt: string | undefined;
 
   vizConfig: VizConfig;
+
+  /**
+   * The last config the user actually saw for each viz type, so switching
+   * away from a chart and back restores what they had rather than a fresh
+   * projection of the current config.
+   *
+   * `convertVizConfig` is deliberately lossy: a pie chart has no axes or
+   * grid, so a hop through it would otherwise discard the bar chart's
+   * styling for good. This map is what makes that round trip survive, and
+   * it is why the converters stay a pure projection.
+   *
+   * Written on the way out of a type, keyed by that type. Entries can go
+   * stale when the query changes; they are reconciled against the current
+   * result columns on restore rather than being invalidated up front.
+   *
+   * `Partial<VizConfigRegistry>` correlates each entry with the viz type it
+   * is filed under, so a bar config cannot be stored under `"pie"`.
+   *
+   * In-memory only: this state manager is never persisted, so a reload
+   * starts empty.
+   */
+  vizConfigMemory: Partial<VizConfigRegistry>;
 
   /** The currently open saved dataset, or `undefined` if none is open. */
   openDataset: OpenDatasetInfo | undefined;
@@ -104,6 +129,7 @@ export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
   vizConfig: {
     vizType: "table",
   },
+  vizConfigMemory: {},
   rawSql: undefined,
   nlPrompt: undefined,
   openDataset: undefined,

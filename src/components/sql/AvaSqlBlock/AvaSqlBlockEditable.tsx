@@ -67,14 +67,13 @@ export function AvaSqlBlockEditable({
           editorViewRef.current = view;
         }}
       />
-      {scope.outOfScopeColumnTokens.length > 0 ?
+      {scope.outOfScopeColumnTokens.length > 0 ? (
         <div className={css.errorNotice} data-testid="ava-sql-out-of-scope">
-          {scope.outOfScopeColumnTokens.length === 1 ?
-            `1 column is not in the current dataset scope.`
-          : `${scope.outOfScopeColumnTokens.length} columns are not in the current dataset scope.`
-          }
+          {scope.outOfScopeColumnTokens.length === 1
+            ? `1 column is not in the current dataset scope.`
+            : `${scope.outOfScopeColumnTokens.length} columns are not in the current dataset scope.`}
         </div>
-      : null}
+      ) : null}
       <PillEditPopover
         pill={activePill}
         catalog={catalog}

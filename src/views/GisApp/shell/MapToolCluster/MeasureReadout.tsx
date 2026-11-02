@@ -25,9 +25,8 @@ export function MeasureReadout({ vertices }: Readonly<Props>): ReactNode {
     return null;
   }
   const meters = getSphericalDistanceMeters(vertices);
-  const squareMeters =
-    isClosedRingValid(vertices) ?
-      getSphericalPolygonAreaSquareMeters(vertices)
+  const squareMeters = isClosedRingValid(vertices)
+    ? getSphericalPolygonAreaSquareMeters(vertices)
     : undefined;
   const readout = formatMapMeasureReadout({ meters, squareMeters });
   const lengthValue = _formatMeasureNumber(readout.lengthValue);

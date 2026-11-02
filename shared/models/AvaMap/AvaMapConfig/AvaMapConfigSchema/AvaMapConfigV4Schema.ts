@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { uuidType } from "$/lib/zodHelpers.ts";
 import {
   AggregateOnlySensitivitySchema,
@@ -22,7 +23,6 @@ import {
   V3GeoBindingSchema,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV3Schema.ts";
 import { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues.ts";
-import { z } from "zod";
 
 /** Polygon rings produced by buffering another layer's features. */
 export const BufferOfLayerBindingSchema = z.strictObject({

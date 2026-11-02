@@ -1,0 +1,526 @@
+{
+  "schemaVersion": 1,
+  "status": "implementation-and-review-complete-artifact-QA-separate",
+  "preparedFromDocumentationHead": "9550af213f9f65cfe776429d6ca4e5d7d65ede7e",
+  "originalWholeBranchReview": {
+    "base": "5ae60463fc23971d9b1f2e882a22ad426bd41631",
+    "head": "9550af213f9f65cfe776429d6ca4e5d7d65ede7e",
+    "markdown": "whole-branch-review.md",
+    "markdownSha256": "0db829e996c87650a1be1bb5c97a59c9fd97eed6dfddb141dd4e7a952c8f99fc",
+    "structuredDispositions": "whole-branch-review-findings.json",
+    "structuredDispositionsSha256": "3b29413d6cb77ba1c4aee7a25484fa058cd54aeda8ee45b4b2ac8e3279e7c80c",
+    "exactOriginalCopies": true,
+    "findingCounts": {
+      "Critical": 0,
+      "Important": 0,
+      "Minor": 3,
+      "canonicalIdsNeedingRecommendedFix": 4,
+      "canonicalDispositionCounts": {
+        "retained-process-limitation": 3,
+        "retained-minor-debt": 43,
+        "resolved": 27,
+        "fix-recommended-minor": 4,
+        "retained-nonblocking-diagnostic": 19,
+        "retained-minor-observation": 12
+      }
+    },
+    "verdicts": {
+      "specCompliance": "Substantially compliant; three Minor control-copy/public-metadata corrections recommended before final handoff.",
+      "codeQuality": "Approved with minor corrections and explicitly retained nonblocking style, diagnostic, coverage and visual debt.",
+      "readiness": "With fixes",
+      "authorization": "Readiness is a technical verdict only. No push, merge, PR or publication authorization."
+    },
+    "canonicalDispositions": 108,
+    "rulingDispositions": 69,
+    "laterSourceEditorSamplingDocumentationDispositions": 10,
+    "mediaOccurrenceDispositions": 64,
+    "browserOccurrenceDispositions": 16,
+    "specialEvidenceDispositions": 7,
+    "occurrencePolicy": "These counts overlap across source registries and are not a sum of unique defects. Null original IDs remain null; source occurrence locators are not new finding IDs.",
+    "rulingsPolicy": "The exact 69 dispositions point to implementation-rulings.md, where full R1..R69 wording and costs remain unchanged.",
+    "artifact": {
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/whole-branch-review-artifact.json",
+      "recordSha256": "152a4e43113becdb8053c78f24a6cd25df8e3d9454ace2ac5f908f43ff7222c3",
+      "pdfSha256": "6abbf339b937c18a62287d301e268166a22349a52bf70468e2591bedc982119d",
+      "pages": 26,
+      "allPagesInspected": true
+    }
+  },
+  "finalCorrection": {
+    "status": "approved-with-no-new-findings",
+    "base": "9550af213f9f65cfe776429d6ca4e5d7d65ede7e",
+    "head": "76f3cac4d85ff9712280f1be71541534ec791d11",
+    "stockSourceSha256": "9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1",
+    "supplementalManifestSha256": "a45c8795d9bb2cbe0ccb503d3217f8650e4c2af66aab94bd37afbf9f4f8c4d57",
+    "implementationReport": {
+      "path": "final-copy-fix-report.md",
+      "sha256": "f74d04d670edfd313db08ba94c23d5e03e114d3387d90a65ed433f8ef524e26e"
+    },
+    "scopedRereview": {
+      "path": "final-copy-rereview.md",
+      "sha256": "a42cd0da3035d1874f704a3141eb32d5e2b5b5806d816b11a65ff38566608389",
+      "spec": "approved",
+      "quality": "approved",
+      "critical": 0,
+      "important": 0,
+      "minor": 0,
+      "scope": "One 12-file correction, not a second whole-branch review."
+    },
+    "controllerContinuityAndUI": {
+      "path": "final-copy-controller-verification.json",
+      "sha256": "aea82cf1b341f519e65a0b100e079d3f44021f0bc3915f1e247e6c5df0fba52b"
+    },
+    "sourceContinuity": {
+      "path": "final-copy-source-continuity.json",
+      "sha256": "af1ad41ed652ab694739a4170a03d9aefb22c4c8ea905c4ea76a323cfa8cf5b3"
+    },
+    "rulings": ["R70", "R71"],
+    "rendererChanged": false,
+    "sourceScope": [
+      "apps/ava-video-producer/src/stock/contracts/recursiveControls.test.ts",
+      "apps/ava-video-producer/src/stock/i18n/messages.en.generated.ts",
+      "apps/ava-video-producer/src/stock/presets/ClusterEpicurveLink/investigationCaseIdsControl.ts",
+      "apps/ava-video-producer/src/stock/presets/CoordinateQualityTriage/CoordinateQualityTriage.controls.ts",
+      "apps/ava-video-producer/src/stock/presets/DocumentRegionDriftCheck/DocumentRegionDriftCheck.controls.ts",
+      "apps/ava-video-producer/src/stock/presets/InvalidTableQuarantine/InvalidTableQuarantine.controls.ts",
+      "apps/ava-video-producer/src/stock/presets/JournalReceipts/JournalReceipts.metadata.ts",
+      "apps/ava-video-producer/src/stock/presets/JournalReceipts/JournalReceipts.test.ts",
+      "apps/ava-video-producer/src/stock/presets/OrderedLockAcquisition/OrderedLockAcquisition.controls.ts",
+      "apps/ava-video-producer/src/stock/presets/PublicationSnapshotSlice/PublicationSnapshotSlice.controls.ts",
+      "apps/ava-video-producer/src/stock/presets/SchoolLunchTrayComposition/SchoolLunchTrayComposition.controls.ts",
+      "apps/ava-video-producer/src/stock/presets/StratifiedSpatialSample/selectedSiteIdsControl.ts"
+    ],
+    "messageDelta": {
+      "formerlyEmptyDescriptorOccurrences": 11,
+      "affectedPresets": 5,
+      "purposefulDistinctLabelsReplacingEmptyCopy": 9,
+      "visibleLabelsIncludingOptionsAndThreeSelectors": 14,
+      "changedRemovedOrAddedMessageIDs": 17,
+      "otherUnchangedSourceMessageIDs": 10677
+    },
+    "metadata": {
+      "preset": "journal-receipts",
+      "setup": [12, 35],
+      "action": [36, 135],
+      "completedHold": [136, 167],
+      "fifthReceiptTransfer": [108, 128],
+      "fifthTabClosure": [128, 136],
+      "publicContentHash": "adb91a3b0a8b2caeeb1acea70355f822acd7159826386e40a30f7a2a0385c7c0"
+    },
+    "focusedVerification": {
+      "testsPassed": 200,
+      "testFiles": 19,
+      "finalRegressionsPassed": 13,
+      "regressionsOverlapFocusedTests": true,
+      "sourceTypecheck": "passed",
+      "toolsTypecheck": "passed",
+      "scopedLint": "passed",
+      "authoredFormat": "passed",
+      "galleryBuild": "passed",
+      "rendererFreeCatalogExport": "passed",
+      "fullSvg": {
+        "presets": 170,
+        "fixtures": 758,
+        "sampledFrames": 6822,
+        "failures": 0
+      },
+      "broadSuiteNotRerun": true
+    },
+    "exactContinuity": {
+      "presets": 170,
+      "fixtures": 758,
+      "sampledFrameHashes": 6822,
+      "completePerPresetValidationRecordsEqual": true,
+      "beforeValidation": {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-svg/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/validation.json",
+        "sha256": "881d053b1fa230e8f3b87bc30995943bf09ec5e7a25f4975ffb6416092589bdd"
+      },
+      "afterValidation": {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-svg/9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1/validation.json",
+        "sha256": "c92a1f098711da24523d433edc9f5c9814b97cb19f210447dc7b07c5578e1ce8"
+      },
+      "supplementalUnchangedFiles": 40,
+      "supplementalChangedFiles": ["out/showcase/browser/motion-gallery.js"]
+    },
+    "affectedGallery": {
+      "presets": 8,
+      "distinctFieldLabels": 12,
+      "outcomeOptions": ["Failed", "Completed"],
+      "nativeUnionVariants": 4,
+      "personallyViewedFieldCaptures": 16,
+      "errors": 0,
+      "implementationIDFallbacks": 0,
+      "reviewer": "Codex controller",
+      "initialHarnessFailureRetained": {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-copy-ui-b-initial-raw.json",
+        "reason": "Exact getByLabel for wrapped union select omitted its option text from the actual accessible name; no source defect. Read actual DOM labels and retried with anchored combobox accessible-name prefix.",
+        "retained": true
+      },
+      "limits": [
+        "Affected actual editor labels and native type selections only, not a new MP4/playback run.",
+        "Sixteen captured fields were personally inspected; no claim for all editor pixels or every locale.",
+        "Unloaded-locale fallback was source-tested by worker, not actual browser locale-switch tested.",
+        "Historical media/source identities remain unchanged.",
+        "Union field values north/20 were intentional temporary UI edits for label verification."
+      ]
+    },
+    "evidenceLimits": [
+      "Exact sampled SVG and complete per-preset validation record equality is regression evidence, not continuous pixel inspection or fresh MP4 rendering.",
+      "Historical150default+16configured+HTTP media remains source2ad/HEAD498c. Sampling correction media remains source38c/e5a.",
+      "Only descriptor copy/translation IDs and JournalReceipts public phase metadata changed. Renderer, schemas, defaults and motion source remained untouched.",
+      "Affected editor labels require separate actual browser checks.",
+      "Generated gallery JavaScript changes to expose new descriptors; other supplemental gallery bytes must match."
+    ]
+  },
+  "findingOverlays": [
+    {
+      "id": "WB-M1",
+      "originalCanonicalIds": ["packet-25/review/M4"],
+      "status": "addressed-by-scoped-fix-and-independent-rereview",
+      "originalFindingPreserved": true,
+      "rootCauseClarification": "The current generated English stockI18n resolves the empty descriptors to empty strings, producing blank/missing visible or accessible labels. An unloaded locale falls back to the raw message ID. The original reviewer Lingui fallback probe was correct but did not establish which path the actual current gallery took. Source descriptor and derived catalog corrections must cover both.",
+      "schemaInputAndRendererPolicy": "Keep descriptor paths, authored schema values, complete inputs and renderer behavior unchanged."
+    },
+    {
+      "id": "WB-M2",
+      "originalCanonicalIds": ["packet-16/review/M1", "packet-17/review/M2"],
+      "status": "addressed-by-scoped-fix-and-independent-rereview",
+      "originalFindingPreserved": true,
+      "acceptedChange": "Correct only Component, Investigation case and Selected site messages while preserving existing preset-scoped IDs and selection semantics."
+    },
+    {
+      "id": "WB-M3",
+      "originalCanonicalIds": ["packet-03/review/M1"],
+      "status": "addressed-by-scoped-fix-and-independent-rereview",
+      "originalFindingPreserved": true,
+      "acceptedChange": "Retain choreography. Public metadata action ends at 135 and completed hold is 136..167 for the fifth receipt/tab."
+    }
+  ],
+  "canonicalPreservation": {
+    "source": "implementation-findings.json",
+    "sha256": "e1600045d89d3c69c0e02c63ccc0d0c6eee4a254ca1e9d1542128ba6e072db4f",
+    "supplementSource": "implementation-findings-supplement.json",
+    "supplementSha256": "4d9acdeccca7000b9f3cadf9f4ff1e366a614307ad308b2cde2711f98cd09130",
+    "policy": "Preserve exact original108 IDs/findings and supplement; record correction overlays separately. Original review9550 disposition groups remain historical.",
+    "originalReviewGroups": {
+      "resolved": 27,
+      "fix-copy-or-metadata": 4,
+      "historical-process": 3,
+      "test-coverage": 7,
+      "bounded-diagnostics": 19,
+      "visual-or-editorial": 12,
+      "repository-conventions": 36
+    }
+  },
+  "historicalEvidenceVersions": [
+    {
+      "scope": "Original167 media deliveries and166 standalone posters plus separate HTTP preview",
+      "head": "498c717d53240d15a29396830759a571a938f492",
+      "stockSourceSha256": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+      "evidence": "implementation-media-validation-498c717d.md",
+      "notRelabeledAsFinalSource": true
+    },
+    {
+      "scope": "R67 corrected sampling media/live and R68 exact169-unaffected continuity",
+      "head": "e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e",
+      "stockSourceSha256": "38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9",
+      "evidence": "implementation-sampling-correction-controller-verification.json",
+      "notRelabeledAsFinalSource": true
+    },
+    {
+      "scope": "Documentation examples/links and 17PDF/517page artifact version",
+      "head": "9550af213f9f65cfe776429d6ca4e5d7d65ede7e",
+      "evidence": "implementation-documentation-validation.json",
+      "preservedLocalArtifactClosure": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-artifact-qa-closure-9550af213.json",
+      "artifactClosureSha256": "b707d81feb921ddec1779afcaa5a7cd09478d354bb804ea4ab5420454b55180e",
+      "notRelabeledAsFinalSource": true
+    }
+  ],
+  "retainedNonblockingDebt": {
+    "policy": "All exact item-by-item dispositions and observation/source boundaries remain in whole-branch-review-findings.json; this summary does not erase them.",
+    "canonicalGroups": {
+      "historical-process": 3,
+      "test-coverage": 7,
+      "bounded-diagnostics": 19,
+      "visual-or-editorial": 12,
+      "repository-conventions": 36
+    },
+    "specificExamples": [
+      "Mandatory file-size/split and repository-convention debt remains; no broad refactor was requested.",
+      "Broad producer history remains 2,213 passing of 2,219 with 6 counted failures; 71 later affected checks do not constitute a full rerun.",
+      "Oracle/title gaps, warning diagnostics, 42 inherited CSS violations versus 43 baseline, historical TDD/lint/fixture ordering and color-environment limitations remain.",
+      "Persistent default/N6 connector/tick contact, transition/poster occlusions and editorial wrapping remain at their own sampled configurations/frames.",
+      "Historical ExpiringLease reports 1 dropped frame; no blanket zero-drop claim.",
+      "HTTP L3 attachment GET status/headers were not observed; native CR/CRLF paste normalizes to LF.",
+      "Six span witnesses do not establish actual browser locale switching.",
+      "Custody has arrival text/data receipt but no separate numeric arrival value; preserve the prose correction.",
+      "R69 exact raw originals stay ignored and in Downloads; a fresh clone cannot personally inspect those local pixels.",
+      "Sampling test-helper RO-RO, editor ownership/style and source/export-test observability/size debt remain."
+    ],
+    "acceptance": {
+      "ruling": "R71",
+      "status": "explicitly-accepted-and-preserved-for-local-handoff",
+      "policy": "No Critical/Important issue or new fix regression remains. Residual style/size, diagnostics, coverage, process, visual/editorial and evidence limitations remain real and may need future scoped work. No universal clean-output claim."
+    }
+  },
+  "limits": [
+    "No line-by-line claim for all 2,450 changed files or all metadata. Full diff/package was inspected through bounded structural passes, followed by deep source reads for named risks and canonical findings.",
+    "No new unit suite, typecheck, browser, renderer, MP4, frame gate, probe or PDF operation in this review. Fresh work consists of read-only source/diff/provenance analysis and bounded renderer-free registry/Lingui data probes.",
+    "The broad producer run remains 2,219 tests: 2,213 pass and 6 counted failures. Later 71 affected checks pass, but no full rerun exists. Historical TDD/lint/fixture-order limitations and inherited CSS warnings remain.",
+    "Historical 167 actual decoded media belong to source2ad/HEAD498c: 150 defaults, 16 configured CLI files and one actual native HTTP L3 delivery. Their 835 natural captures, 368 image views and 166 standalone posters plus L3 preview are retained observations, not new inspection by this reviewer.",
+    "R67 corrected sampling source38c/e5a has its own 13 actual image views, 180 live states/one wrap/zero errors and fresh default decoded media with 179 callbacks/six seconds/zero reported drops. The 169 other renderers have exact 754 fixture / 6,786 frame hash continuity; this is not a 170-preset fresh media rerun.",
+    "HEAD9550 is docs-only after e5a with the stock source38c and 41 supplemental gallery files unchanged. Any recommended control/metadata change creates new source metadata and requires explicit continuity and affected UI verification before handoff.",
+    "Native textarea paste normalizes CR/CRLF to LF. Exact LF/TAB/Unicode/spaces and direct JSON preservation have separate retained evidence.",
+    "HTTP attachment GET status/headers were not observed. Six resolved span cases do not prove actual browser locale switching.",
+    "Legacy connector/orbit overlaps, action/poster readability concerns, persistent default/N6 tick contact, and one reported ExpiringLease dropped frame remain nonblocking observations. No universal every-frame readability or zero-drop claim is made.",
+    "Raw image/session evidence is ignored plus Downloads under R69. Tracked compact observations/hashes support traceability but do not let a fresh clone personally inspect all old pixels.",
+    "Root reports PDF QA closed at 17 PDFs/517 pages. PDF/artifact production is outside this source-review lane; no source reviewer PDF approval is inferred.",
+    "The original review applies to 9550; its recommendations are closed only by the separately versioned 76f3 correction, scoped rereview and controller proofs.",
+    "Final source 9eaa changes control/translation copy and public receipt phase metadata, not renderer/schema/default behavior. Sampled SVG equality is not continuous pixel coverage or new MP4 delivery.",
+    "Final documentation commit identity and completed convenience-artifact QA are recorded in the ignored handoff/artifact manifest, rather than a fabricated self-referential tracked HEAD."
+  ],
+  "publicationScope": "Curated review narrative and structured per-finding/ruling/occurrence dispositions only. No raw clock/callback/frame/session array, recording, trace, credential or full original media-report dump is introduced.",
+  "finalReadiness": {
+    "status": "implementation-and-review-complete",
+    "acceptedResidualRuling": "R71",
+    "artifactQAAtDocumentationPlacement": "Pending synchronization and changed-page inspection for this documentation revision. Final local artifact manifest records completion separately.",
+    "noPushMergePRorPublicationRequested": true,
+    "preserveWorktreeRawEvidenceAndPrivateVideoProjects": true
+  },
+  "canonicalClosureOverlay": {
+    "closedCanonicalIDs": [
+      "packet-03/review/M1",
+      "packet-16/review/M1",
+      "packet-17/review/M2",
+      "packet-25/review/M4"
+    ],
+    "closedBy": "76f3cac4d85ff9712280f1be71541534ec791d11",
+    "review": "final-copy-rereview.md",
+    "rulings": ["R70", "R71"],
+    "originalReview9550GroupsUnchanged": true,
+    "policy": "The four original copy/metadata recommendations are closed by this overlay. All other exact original and later dispositions remain in the unmodified whole-branch review."
+  },
+  "documentationVerification": "Final focused link/JSON/hash/status commands and direct stdout/stderr/exit records are retained in the ignored Task8 finalization report and validation directory. Source checks above retain their original command records.",
+  "directCommandRecordIndex": [
+    {
+      "name": "red-controls",
+      "exitCode": 1,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/red-controls/result.json",
+      "recordSha256": "7c8e2c56c024be60f19ca7b0a95cfcc16365691872f93fe04ef9976cda711d59",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/red-controls/stdout.log",
+      "stdoutSha256": "2d01eaf94f971a1879d9db7f03f63329316e294d07a8fde6f93e28ae952cbc49",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/red-controls/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "red-journal-hold",
+      "exitCode": 1,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/red-journal-hold/result.json",
+      "recordSha256": "864de1faccd014c0e87383f70402742825a0fb35c288da928bb0e4cbcc43f8b6",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/red-journal-hold/stdout.log",
+      "stdoutSha256": "5d1df0ad12dd803868fd555c29c9ec12a8c43b9453b8b709dbd53ce83b96f516",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/red-journal-hold/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "red-controls-corrected",
+      "exitCode": 1,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/red-controls-corrected/result.json",
+      "recordSha256": "f161c887d56a372f0dbeac9b4fdff091027d49330f39e1777beefcacb6c56528",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/red-controls-corrected/stdout.log",
+      "stdoutSha256": "13a760bfdb1e751e4ba0c0c5d4cc5cb71c88a8bc196adff44d3b0645d8ae9a52",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/red-controls-corrected/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "generate-stock-messages",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/generate-stock-messages/result.json",
+      "recordSha256": "a6b025029da56ed9d108903c84b2cce0a0412d3620b4577e0518eb105f779915",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/generate-stock-messages/stdout.log",
+      "stdoutSha256": "cd1b6820dd7f1a6e1dc047a92c3e147f8c3546c517070293bf5c711a94dc85fd",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/generate-stock-messages/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "green-controls-and-journal",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/green-controls-and-journal/result.json",
+      "recordSha256": "63461108f58b6a39a1251ebf2a6b76e5062957c7625dd94a407e3d33eab35857",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/green-controls-and-journal/stdout.log",
+      "stdoutSha256": "a6cd7fbb0ba4fe0b00349f2dd235b16956ce1f1fba201d1c019c512e35c457c0",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/green-controls-and-journal/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "format-scoped",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-scoped/result.json",
+      "recordSha256": "4d58cb3b4145cfe8d535c0f4a5da31ed5c103a311978bc516dfe4e10e97bf819",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-scoped/stdout.log",
+      "stdoutSha256": "5c566246eac22ec4c4884e04527625bc9cb9eea6ccf73df0108b3f2d72d2d05e",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-scoped/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "focused-tests",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/focused-tests/result.json",
+      "recordSha256": "70eaada5b4b5ee932d750be01de866f9aef0e9e31ae54f8abef27f93e15ef4a9",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/focused-tests/stdout.log",
+      "stdoutSha256": "37960ee9ed73c04fcdfa26e98d44279945d55a24ed064883752ccd66c2dd48db",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/focused-tests/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lint-scoped",
+      "exitCode": 1,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/lint-scoped/result.json",
+      "recordSha256": "7887ee369e724315975deec2bfeb82c4b9207027377225ce0e8a30c8c5f60555",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/lint-scoped/stdout.log",
+      "stdoutSha256": "f8118fbb926eef8005a2b39afeca6238c752a5ae58bb29fcede59e3faf904173",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/lint-scoped/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "typecheck-source",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/typecheck-source/result.json",
+      "recordSha256": "e5af9434b60d76b13871bdb093b4d455ba02976f18dedf30feebc5e39b39d8e5",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/typecheck-source/stdout.log",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/typecheck-source/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lint-scoped-after-import-dedup",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/lint-scoped-after-import-dedup/result.json",
+      "recordSha256": "1e283931bbf0a0ba46b56597a0e43a5dce6a87e8f291c3f7edc491e76647ddb4",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/lint-scoped-after-import-dedup/stdout.log",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/lint-scoped-after-import-dedup/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "typecheck-tools",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/typecheck-tools/result.json",
+      "recordSha256": "49bf065b2115cbe2fc092bacc434b505e7ebf6ad6f3e763c41d55f3137205bbb",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/typecheck-tools/stdout.log",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/typecheck-tools/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "gallery-build",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/gallery-build/result.json",
+      "recordSha256": "08acb6d1dbb997592a73ab9c3bbf86db8c586387c3f4481c04cd9ba8024ce424",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/gallery-build/stdout.log",
+      "stdoutSha256": "d9dd2bb5bda7baa56feaada48a634ae7bcbbc65f177a9db22144b1603bc76520",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/gallery-build/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "format-check-authored",
+      "exitCode": 1,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-check-authored/result.json",
+      "recordSha256": "f5f32fb6dda49dece3576709d452cc05e2e0903cf620b9c1daed01f150d3b91c",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-check-authored/stdout.log",
+      "stdoutSha256": "8d197b7128300ca6fcb7e6c9e35c7157ad888b10e22c212e4083f79987c8bd37",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-check-authored/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "format-receipt-import",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-receipt-import/result.json",
+      "recordSha256": "0a14b322366fd2010c38f8ba8e7f4fa0162a2020cb93779c334a145709008383",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-receipt-import/stdout.log",
+      "stdoutSha256": "0aa51f610f42145489fd6fb8d19a713ffc73ed27896f920cb757d34a7f4b60ee",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-receipt-import/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "format-check-final",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-check-final/result.json",
+      "recordSha256": "8f27429a7266966141ed9cfe5615e64130c460cab8112b4d99cada3223da5a01",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-check-final/stdout.log",
+      "stdoutSha256": "04e201afe9362cd6a33df8b78f673f5fd99f02ae5a8c004044e32483592fb248",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/format-check-final/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "final-regressions",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/final-regressions/result.json",
+      "recordSha256": "152e06e1d06bd648ce3fc6cb8040894e3174234bfe4f5f4db9a8a770687f6049",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/final-regressions/stdout.log",
+      "stdoutSha256": "3f590a6e61a2efbbcf96655a0e38124c5795e91a4ebbf2aa47da18f3034f672b",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/final-regressions/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "source-hash",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/source-hash/result.json",
+      "recordSha256": "f9429ca30167793b0208b891c30a95a1880031ff605bcbd5122799e0e5a96bd1",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/source-hash/stdout.log",
+      "stdoutSha256": "b8d992288f4e068af01880483f6f23d729cbfb4f4850ba4ab22380ead95b737f",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/source-hash/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "export-catalog",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/export-catalog/result.json",
+      "recordSha256": "b86a43855df646328d79d07556afb06a0f17cef1dfb8a50514fd0b434065df8a",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/export-catalog/stdout.log",
+      "stdoutSha256": "b09bd3f4bf4052c4ce8c697159c1ca0621f3e7897aa32fe74147fa9d13f43225",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/export-catalog/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "copy-delta",
+      "exitCode": 1,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/copy-delta/result.json",
+      "recordSha256": "c79a25286af6edc9857e2a46ab7c3bbeb283699740f54b002ad5e2a4b00a88c2",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/copy-delta/stdout.log",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/copy-delta/stderr.log",
+      "stderrSha256": "50651b39a3791500dfc2a69dd806e2ca0ee1cb6c81a22b41da762ba7dd9ef122"
+    },
+    {
+      "name": "copy-delta-retry",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/copy-delta-retry/result.json",
+      "recordSha256": "d6b7387e2c9c9eab9345858688de467d9934794a4119065e9135471891f5ac2c",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/copy-delta-retry/stdout.log",
+      "stdoutSha256": "67e77f60f407c22b68c032318944235ccfc16af34017949da8696e95c498ee00",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/copy-delta-retry/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "full-svg-validation",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/full-svg-validation/result.json",
+      "recordSha256": "1996c8419803e0a9d369366f1d7ea7707b60f91c4121fe38b5a4cbb6d912caeb",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/full-svg-validation/stdout.log",
+      "stdoutSha256": "d0fd5380ff24578bcc1cfacb1934bdfb75c8cf8067d1e39cddb4acad5a5f42ba",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/full-svg-validation/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lint-committed",
+      "exitCode": 0,
+      "record": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/lint-committed/result.json",
+      "recordSha256": "79a74e172aa80672cb1b144967c2477a9e1da3a3235ae2d6fb0004d1cecef2fd",
+      "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/lint-committed/stdout.log",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-copy-fix/lint-committed/stderr.log",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

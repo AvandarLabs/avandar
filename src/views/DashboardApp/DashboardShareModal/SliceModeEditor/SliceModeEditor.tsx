@@ -30,10 +30,11 @@ function _getSliceFromMode(
   return {
     mode: "custom",
     columns:
-      options.slice.mode === "custom" ? [...options.slice.columns]
-      : options.dataset.queriedColumns.length > 0 ?
-        [...options.dataset.queriedColumns]
-      : options.dataset.columns.map(prop("name")),
+      options.slice.mode === "custom"
+        ? [...options.slice.columns]
+        : options.dataset.queriedColumns.length > 0
+          ? [...options.dataset.queriedColumns]
+          : options.dataset.columns.map(prop("name")),
     rowFilters:
       options.slice.mode === "custom" ? [...options.slice.rowFilters] : [],
   };
@@ -66,16 +67,16 @@ export function SliceModeEditor({
           onChange(_getSliceFromMode({ dataset, mode, slice }));
         }}
       />
-      {slice.mode === "queried" ?
+      {slice.mode === "queried" ? (
         <QueriedSlicePreview dataset={dataset} />
-      : null}
-      {slice.mode === "custom" ?
+      ) : null}
+      {slice.mode === "custom" ? (
         <CustomSliceEditor
           dataset={dataset}
           slice={slice}
           onChange={onChange}
         />
-      : null}
+      ) : null}
     </Stack>
   );
 }

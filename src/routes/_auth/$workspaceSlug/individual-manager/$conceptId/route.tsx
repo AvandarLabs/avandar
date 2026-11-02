@@ -6,8 +6,8 @@ import {
   ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
-import { uuid } from "$/lib/uuid";
 import { useEffect } from "react";
+import { uuid } from "$/lib/uuid";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { Logger } from "@/utils/Logger";
 import { IndividualManagerApp } from "@/views/IndividualManagerApp";

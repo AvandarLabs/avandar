@@ -10,8 +10,8 @@ import {
 import { match } from "ts-pattern";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 /** Why a source row produced no feature. */
 export type DropReason =
@@ -163,9 +163,9 @@ function _createPointFeature({
   rowIndex,
 }: CreatePointFeatureInput): GeoJSON.Feature {
   const properties: GeoJSON.GeoJsonProperties =
-    propertyColumnNames === "all" ?
-      omit(row, [binding.latitudeColumnName, binding.longitudeColumnName])
-    : _pickOwnProperties({ row, propertyColumnNames });
+    propertyColumnNames === "all"
+      ? omit(row, [binding.latitudeColumnName, binding.longitudeColumnName])
+      : _pickOwnProperties({ row, propertyColumnNames });
   return {
     type: "Feature",
     id: rowIndex,
@@ -198,8 +198,8 @@ function _readCoordinate(
     return { dropReason: "nonNumericCoordinate" };
   }
   const invalidReason = _classifyCoordinate(latitude, longitude);
-  return invalidReason === undefined ?
-      { coordinate: { longitude, latitude } }
+  return invalidReason === undefined
+    ? { coordinate: { longitude, latitude } }
     : { dropReason: invalidReason };
 }
 

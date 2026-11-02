@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Flex, ScrollArea } from "@mantine/core";
 import { Outlet, useMatchRoute } from "@tanstack/react-router";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ConceptNavbar } from "@/views/OntologyDesignerApp/ConceptNavbar";
 import { NewCaseTypeButton } from "@/views/OntologyDesignerApp/NewCaseTypeButton";
@@ -29,25 +29,27 @@ export function OntologyDesignerApp(): JSX.Element {
   const caseTypes = concepts ?? [];
 
   return (
-    <AppLayout
+    <AppSlate
       title={t`Case Manager`}
       toolbarButtonSection={<NewCaseTypeButton />}
       containerProps={showMasterDetail ? undefined : { p: "md" }}
     >
-      {showMasterDetail ?
+      {showMasterDetail ? (
         <Flex align="stretch" h="100%">
-          {caseTypes.length > 0 || isLoading ?
+          {caseTypes.length > 0 || isLoading ? (
             <ConceptNavbar
               miw={240}
               concepts={caseTypes}
               isLoading={isLoading}
             />
-          : null}
+          ) : null}
           <ScrollArea h="100%" w="100%">
             <Outlet />
           </ScrollArea>
         </Flex>
-      : <Outlet />}
-    </AppLayout>
+      ) : (
+        <Outlet />
+      )}
+    </AppSlate>
   );
 }

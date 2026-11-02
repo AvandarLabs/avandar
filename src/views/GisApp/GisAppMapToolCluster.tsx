@@ -8,9 +8,9 @@ export function GisAppMapToolCluster({ app }: { app: GisAppState }): ReactNode {
   return (
     <>
       <ClearAoiButton aoi={app.mapConfig.aoi} updateConfig={app.updateConfig} />
-      {app.invalidRingStatus ?
+      {app.invalidRingStatus ? (
         <div role="status">{app.invalidRingStatus}</div>
-      : null}
+      ) : null}
       <MapToolCluster
         mapToolMode={app.mapToolMode}
         onMapToolModeChange={app.setMapToolMode}

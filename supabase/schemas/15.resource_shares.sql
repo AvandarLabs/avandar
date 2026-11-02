@@ -1,11 +1,16 @@
--- Grants a role on one resource (dashboard or dataset) to a principal (see
--- share_principal_type): one user, one user_group tag, or the whole workspace.
--- principal_id is null only for workspace-wide shares.
--- requires_app_access only applies when principal_type = 'user_group';
--- when true, members of that group also need any role on the resource's app
--- for the share to contribute (see util__resource_effective_role).
--- Merged with owner/settings shortcuts and the workspace app-role candidate
--- in util__resource_effective_role using max rank.
+/**
+ * Grants a role on one resource to a principal (see `share_principal_type`):
+ * one user, one `user_groups` tag, or the whole workspace. `principal_id` is
+ * null only for workspace-wide shares.
+ *
+ * `requires_app_access` only applies to a `user_group` principal. When true,
+ * members of that group also need any role on the resource's app before the
+ * share contributes.
+ *
+ * `util__resource_effective_role` merges these rows with the owner and
+ * settings shortcuts and the workspace app-role candidate, taking the highest
+ * rank.
+ */
 create table public.resource_shares (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
@@ -101,6 +106,16 @@ begin
 end;
 $$;
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.resource_shares__validate_resource_workspace ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 /** Rejects user and user-group principals outside the resource workspace. */
 create or replace function public.resource_shares__validate_principal_workspace () returns trigger language plpgsql security definer
 set
@@ -136,6 +151,16 @@ begin
   return new;
 end;
 $$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.resource_shares__validate_principal_workspace ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
 
 -- Enable row level security
 alter table public.resource_shares enable row level security;

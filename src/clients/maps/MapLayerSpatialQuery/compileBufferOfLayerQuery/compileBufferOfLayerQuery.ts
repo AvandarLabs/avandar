@@ -5,9 +5,9 @@ import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery/comp
 import { makeSpatialQueryPlan } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQueryHelpers";
 import { makeMetersCrsSql } from "../makeMetersCrsSql";
 import { MapLayerSpatialQueryColumns } from "../MapLayerSpatialQuery.constants";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { CompileOptions } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 function _getBufferBinding(layer: MapLayer.T): MapLayer.BufferOfLayerBinding {
   const binding = layer.geoBinding;

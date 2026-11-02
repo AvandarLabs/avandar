@@ -26,7 +26,7 @@ export function ClarificationAnswerActions({
       pos="sticky"
       pt="xs"
     >
-      {noneOfAboveLabel && onNoneOfAbove ?
+      {noneOfAboveLabel && onNoneOfAbove ? (
         <Button
           variant="subtle"
           color="neutral"
@@ -36,7 +36,7 @@ export function ClarificationAnswerActions({
         >
           {noneOfAboveLabel}
         </Button>
-      : null}
+      ) : null}
       <Button size="xs" onClick={onConfirm} disabled={!canSubmit}>
         <Trans>Confirm</Trans>
       </Button>

@@ -1,0 +1,8 @@
+.nullableFieldNullToggle {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  gap: 7px;
+  margin-top: 10px;
+}

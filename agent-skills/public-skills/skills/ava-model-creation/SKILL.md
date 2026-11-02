@@ -125,7 +125,7 @@ Important:
 - The current generator writes models under `shared/models`.
 - The current generator only auto-generates a client in Supabase mode.
 - The current generator does not fully match the latest hand-written client conventions.
-- In the current repo snapshot, running bare `ava new model` errors because `modelName` is required. Use the explicit forms above and inspect `apps/ava-cli/src/DevCLI/NewBoilerplateCLI/NewTSModelCLI` if you need option details.
+- In the current repo snapshot, running bare `ava new model` errors because `modelName` is required. Use the explicit forms above and inspect `apps/ava-cli/src/DevCli/NewBoilerplateCli/NewAvaModelCli` if you need option details.
 
 ## Supabase-Backed Workflow
 

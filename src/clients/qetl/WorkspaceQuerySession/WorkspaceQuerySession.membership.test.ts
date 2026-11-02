@@ -4,10 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import type { QueryClient } from "@tanstack/react-query";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { QueryClient } from "@tanstack/react-query";
 
 const USER_ID = "66666666-6666-4666-8666-666666666666" as UserId;
 const DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;

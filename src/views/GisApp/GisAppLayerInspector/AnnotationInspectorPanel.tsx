@@ -64,7 +64,7 @@ export function AnnotationInspectorPanel({ app }: Readonly<Props>): ReactNode {
       collapseLabel={t`Collapse the inspector`}
       expandLabel={t`Expand the inspector`}
     >
-      {showFeatureEditor ?
+      {showFeatureEditor ? (
         <AnnotationFeatureInspector
           feature={feature}
           onFeatureChange={(nextFeature) => {
@@ -74,10 +74,11 @@ export function AnnotationInspectorPanel({ app }: Readonly<Props>): ReactNode {
             _deleteAnnotationFeature(app);
           }}
         />
-      : <div className={css.gisAppLayerInspectorEmptyState}>
+      ) : (
+        <div className={css.gisAppLayerInspectorEmptyState}>
           {t`Select an annotation on the map to edit it.`}
         </div>
-      }
+      )}
     </MapChromePanel>
   );
 }

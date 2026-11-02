@@ -30,9 +30,11 @@ export function excludeNullsIn<T extends UnknownObject, K extends keyof T>(
 ): ExcludeNullsIn<T, K> {
   const newObj = { ...obj };
   const keys =
-    typeof keysToTest === "string" ? [keysToTest]
-    : keysToTest.length === 0 ? objectKeys(obj)
-    : keysToTest;
+    typeof keysToTest === "string"
+      ? [keysToTest]
+      : keysToTest.length === 0
+        ? objectKeys(obj)
+        : keysToTest;
   keys.forEach((key) => {
     if (isNull(obj[key])) {
       delete newObj[key];

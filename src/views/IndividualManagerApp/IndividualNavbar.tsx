@@ -38,15 +38,16 @@ export function IndividualNavbar({
 
   return (
     <Box className={clsx(css.pane, className)} {...boxProps}>
-      {isLoading ?
+      {isLoading ? (
         <Loader m="md" size="sm" />
-      : allIndividuals.length === 0 ?
+      ) : allIndividuals.length === 0 ? (
         <Box ta="center" py="md">
           <Text>
             <Trans>No records yet</Trans>
           </Text>
         </Box>
-      : <ScrollArea viewportRef={parentRef} h="100%" w="100%">
+      ) : (
+        <ScrollArea viewportRef={parentRef} h="100%" w="100%">
           <NavLinkList
             links={individualLinks}
             pr="md"
@@ -57,7 +58,7 @@ export function IndividualNavbar({
             style={{ height: listHeight }}
           />
         </ScrollArea>
-      }
+      )}
     </Box>
   );
 }

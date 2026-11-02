@@ -61,9 +61,9 @@ export function useFilterPBlockConfig(): ComponentConfig<FilterPBlockProps> {
         ...data.props,
         // Auto-assign a stable id if missing so newly dropped filters work.
         filterId:
-          data.props.filterId && data.props.filterId.length > 0 ?
-            data.props.filterId
-          : `filter-${data.props.id ?? crypto.randomUUID()}`,
+          data.props.filterId && data.props.filterId.length > 0
+            ? data.props.filterId
+            : `filter-${data.props.id ?? crypto.randomUUID()}`,
       };
       return { props };
     },

@@ -9,10 +9,8 @@ import {
   snakeCaseKeysDeep,
   undefinedsToNullsDeep,
 } from "@avandar/utils";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 import { z } from "zod";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 import type {
   PolarCustomerId,
   PolarProductId,
@@ -23,6 +21,8 @@ import type {
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type { SetOptional } from "type-fest";
 
 export type SubscriptionModel = SupabaseCrudModelSpec<
@@ -101,19 +101,19 @@ export const SubscriptionParsers =
           workspaceId: obj.workspaceId as WorkspaceId,
           subscriptionOwnerId: obj.subscriptionOwnerId as UserId,
           polarCustomerId:
-            obj.polarCustomerId != null ?
-              (obj.polarCustomerId as PolarCustomerId)
-            : undefined,
+            obj.polarCustomerId != null
+              ? (obj.polarCustomerId as PolarCustomerId)
+              : undefined,
           polarCustomerEmail:
             obj.polarCustomerEmail != null ? obj.polarCustomerEmail : undefined,
           polarProductId:
-            obj.polarProductId != null ?
-              (obj.polarProductId as PolarProductId)
-            : undefined,
+            obj.polarProductId != null
+              ? (obj.polarProductId as PolarProductId)
+              : undefined,
           polarSubscriptionId:
-            obj.polarSubscriptionId != null ?
-              (obj.polarSubscriptionId as SubscriptionPolarId)
-            : undefined,
+            obj.polarSubscriptionId != null
+              ? (obj.polarSubscriptionId as SubscriptionPolarId)
+              : undefined,
         };
       },
     ),

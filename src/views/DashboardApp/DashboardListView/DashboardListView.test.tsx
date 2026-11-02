@@ -79,9 +79,9 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   };
 });
 
-vi.mock("@/components/layouts/AppLayout/AppLayout", () => {
+vi.mock("@/components/layouts/AppSlate/AppSlate", () => {
   return {
-    AppLayout: ({ children }: { children: ReactNode }): ReactNode => {
+    AppSlate: ({ children }: { children: ReactNode }): ReactNode => {
       return children;
     },
   };

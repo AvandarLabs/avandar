@@ -1,0 +1,123 @@
+name:
+  id: motionAtlas.missed-visit-reconnect.name
+  message: Reconnect after a missed visit
+description:
+  id: motionAtlas.missed-visit-reconnect.description
+  message:
+    A field worker follows up a small, explicitly defined group whose visits were
+    missed. A conversation, a booking, and an attended return resolve into separate
+    outcomes.
+category:
+  id: motionAtlas.missed-visit-reconnect.category
+  message: Human outreach and return
+useWhen:
+  id: motionAtlas.missed-visit-reconnect.useWhen
+  message:
+    Show that reaching someone, booking a visit, and recording attendance are
+    different achievements.
+intent:
+  id: motionAtlas.missed-visit-reconnect.intent
+  message:
+    Show that reaching someone, booking a visit, and recording attendance are
+    different achievements.
+creativeDirection:
+  id: motionAtlas.missed-visit-reconnect.creativeDirection
+  message:
+    Frames 12..38 show four silhouettes with empty appointment marks beside their
+    homes. Frames 39..114 animate one worker making the authored phone or doorstep
+    contacts; a booking tab folds onto a calendar for one person, while only a
+    documented attendee walks back through the clinic door. Frames 115..167 hold
+    everyone in a distinct final state with the original group total; fade to ground by
+    frame 179.
+distinction:
+  id: motionAtlas.missed-visit-reconnect.distinction
+  message:
+    Unlike status-cycle or node-traversal, this shows a worker contacting people in
+    their physical setting and an actual return through a clinic doorway only for
+    attended records. Unlike dose-cohort-return-paths, its denominator is a preselected
+    missed-visit group and its action is reconnection.
+prompt:
+  id: motionAtlas.missed-visit-reconnect.prompt
+  message:
+    Use Reconnect after a missed visit (missed-visit-reconnect) for a fictional or
+    approved authored example. Show that reaching someone, booking a visit, and
+    recording attendance are different achievements.
+tags:
+  - id: motionAtlas.missed-visit-reconnect.tags.0
+    message: missed-dose follow-up
+  - id: motionAtlas.missed-visit-reconnect.tags.1
+    message: missed appointment
+  - id: motionAtlas.missed-visit-reconnect.tags.2
+    message: outreach worker
+  - id: motionAtlas.missed-visit-reconnect.tags.3
+    message: re-engagement
+  - id: motionAtlas.missed-visit-reconnect.tags.4
+    message: recall
+  - id: motionAtlas.missed-visit-reconnect.tags.5
+    message: return booking
+  - id: motionAtlas.missed-visit-reconnect.tags.6
+    message: contact attempt
+  - id: motionAtlas.missed-visit-reconnect.tags.7
+    message: care continuity
+goodFor:
+  - id: motionAtlas.missed-visit-reconnect.goodFor.0
+    message: Explain the operational work after missed appointments.
+  - id: motionAtlas.missed-visit-reconnect.goodFor.1
+    message: Distinguish successful contact from a booked or completed return.
+  - id: motionAtlas.missed-visit-reconnect.goodFor.2
+    message: Show unresolved follow-up honestly in a fictional public health story.
+domains:
+  - id: motionAtlas.missed-visit-reconnect.domains.0
+    message: Human outreach and return
+aliases:
+  - id: motionAtlas.missed-visit-reconnect.aliases.0
+    message: missed-dose follow-up
+  - id: motionAtlas.missed-visit-reconnect.aliases.1
+    message: missed appointment
+  - id: motionAtlas.missed-visit-reconnect.aliases.2
+    message: outreach worker
+notFor:
+  - id: motionAtlas.missed-visit-reconnect.notFor.0
+    message:
+      "The denominator is cases.length: the authored missed-visit group, not the
+      whole service population. Each person has one exclusive final state, so state
+      subtotals sum to the group total."
+  - id: motionAtlas.missed-visit-reconnect.notFor.1
+    message:
+      Attempts are contact events and may exceed unique people. A contact or booking
+      does not imply attendance, vaccination, eligibility, or health benefit.
+  - id: motionAtlas.missed-visit-reconnect.notFor.2
+    message:
+      The sequence depicts recorded administrative outcomes and supplies no follow-up
+      timing, clinical priority, or dosing advice.
+  - id: motionAtlas.missed-visit-reconnect.notFor.3
+    message:
+      Identities are fictional. Household and phone graphics must not imply a
+      particular reason for the missed visit.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.missed-visit-reconnect.motionBeats.0
+      message: Establish the supplied identities and setting.
+  - startFrame: 36
+    endFrame: 115
+    description:
+      id: motionAtlas.missed-visit-reconnect.motionBeats.1
+      message:
+        Frames 12..38 show four silhouettes with empty appointment marks beside their
+        homes. Frames 39..114 animate one worker making the authored phone or doorstep
+        contacts; a booking tab folds onto a calendar for one person, while only a
+        documented attendee walks back through the clinic door. Frames 115..167 hold
+        everyone in a distinct final state with the original group total; fade to ground
+        by frame 179.
+  - startFrame: 116
+    endFrame: 167
+    description:
+      id: motionAtlas.missed-visit-reconnect.motionBeats.2
+      message: Hold the authored final records and derived quantities.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.missed-visit-reconnect.motionBeats.3
+      message: Return to the opaque ground through the shared envelope.

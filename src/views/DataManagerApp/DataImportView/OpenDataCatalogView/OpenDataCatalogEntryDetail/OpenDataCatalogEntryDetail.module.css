@@ -1,0 +1,37 @@
+.openDataCatalogEntryDetail {
+  padding: var(--mantine-spacing-md);
+}
+
+.openDataCatalogEntryDetailTitle {
+  min-width: 0;
+}
+
+.openDataCatalogEntryDetailRawMetadata {
+  background-color: var(--ava-surface-body);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  font-family: var(--mantine-font-family-monospace);
+  margin: 0;
+  max-height: 16rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: var(--mantine-spacing-xs);
+  white-space: pre-wrap;
+}
+
+.openDataCatalogEntryDetailChevronClosed,
+.openDataCatalogEntryDetailChevronOpen {
+  transition: transform var(--ava-animation-duration-fast)
+    var(--ava-animation-easing-out);
+}
+
+.openDataCatalogEntryDetailChevronOpen {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .openDataCatalogEntryDetailChevronClosed,
+  .openDataCatalogEntryDetailChevronOpen {
+    transition: none;
+  }
+}

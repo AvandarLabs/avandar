@@ -1,6 +1,6 @@
-import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { ClientAnalyticsEvent } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 type DashboardPublishAnalyticsEvent = Extract<
   ClientAnalyticsEvent,
@@ -13,11 +13,11 @@ function _getSlugAction(options: {
   previousSlug: string | undefined;
   updatedSlug: string | undefined;
 }): "set" | "clear" | "unchanged" {
-  return (
-    options.previousSlug === options.updatedSlug ? "unchanged"
-    : options.updatedSlug === undefined ? "clear"
-    : "set"
-  );
+  return options.previousSlug === options.updatedSlug
+    ? "unchanged"
+    : options.updatedSlug === undefined
+      ? "clear"
+      : "set";
 }
 
 /** Classifies analytics for a successful dashboard publishing mutation. */
@@ -31,8 +31,8 @@ export function makeDashboardPublishAnalyticsEventFromDashboards(
   // `isPublic` is a generated column that is false for a workspace-published
   // dashboard, so branching on it would report every internal republish as a
   // first publish. The question this branch asks is "was it published at all".
-  return previousDashboard.visibility !== "draft" ?
-      {
+  return previousDashboard.visibility !== "draft"
+    ? {
         event: "dashboard.share_settings_updated",
         payload: {
           dashboardId: updatedDashboard.id,

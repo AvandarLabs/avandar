@@ -10,11 +10,11 @@ export function makeColorExpressionFromColor(
     return color.color;
   }
   const classColors =
-    color.type === "graduated" ?
-      color.ramp
-    : color.categories.map(({ color: categoryColor }) => {
-        return categoryColor;
-      });
+    color.type === "graduated"
+      ? color.ramp
+      : color.categories.map(({ color: categoryColor }) => {
+          return categoryColor;
+        });
   const noDataColor = color.noData.color;
   const classMatch = [
     "match",

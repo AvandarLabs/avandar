@@ -57,8 +57,9 @@ export function PdfAnnotator({
   });
 
   // Derive display dimensions from the captured canvas.
-  const displayWidth =
-    baseCanvas ? Math.min(MAX_DISPLAY_WIDTH, baseCanvas.width / 2) : 800;
+  const displayWidth = baseCanvas
+    ? Math.min(MAX_DISPLAY_WIDTH, baseCanvas.width / 2)
+    : 800;
   const displayScale = baseCanvas ? displayWidth / baseCanvas.width : 1;
   const displayHeight = baseCanvas ? baseCanvas.height * displayScale : 600;
 

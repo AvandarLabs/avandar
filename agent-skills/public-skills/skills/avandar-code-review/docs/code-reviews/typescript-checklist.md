@@ -419,14 +419,6 @@ repo) so the output stays small and tied to the diff.
     | grep -Ev '\btype Props\b'
   ```
 
-- Preserve `e2e` or `E2E` casing exactly; do not invent mixed variants.
-
-  **Find candidates:**
-
-  ```bash
-  grep -rEn '\b(E2e|e2E|E_2e|e_2E)\b' --include="*.ts" --include="*.tsx" .
-  ```
-
 - Prefer default parameter values over nullish guard logic.
 
 - Use RO-RO for multiple parameters and multiple return values.
@@ -499,29 +491,36 @@ repo) so the output stays small and tied to the diff.
   architectural/design decisions in the docstring only when developers using
   the function need that context.
 
-- Acronyms longer than two letters in identifiers, type names, and file
-  names use PascalCase, not all-caps. Treat them as words: `Url`, `Sql`,
-  `Json`, `Http`, `Api`, `Css`, `Html`. Two-letter forms like `Id` and
-  `Db` stay as written. Mixed forms like `useDataExplorerURLSync` or
-  `parseSQL` should become `useDataExplorerUrlSync` and `parseSql`.
-  Apply the same rule to file names: `DataExplorerURLState.ts` should be
-  `DataExplorerUrlState.ts`.
+- Acronyms in identifiers, type names, file names and directory names use
+  PascalCase, not all-caps. Treat them as words, whatever their length and
+  with no exceptions: `Url`, `Sql`, `Json`, `Http`, `Api`, `Css`, `Html`,
+  and equally `Id`, `Db`, `Ci`, `Io`, `E2e`. Mixed forms like
+  `useDataExplorerURLSync` or `parseSQL` should become
+  `useDataExplorerUrlSync` and `parseSql`. Apply the same rule to file and
+  directory names: `DataExplorerURLState.ts` should be
+  `DataExplorerUrlState.ts`, and `SupabaseCLI/` should be `SupabaseCli/`.
+
+  This is about camelCase and PascalCase names only. `UPPERCASE` constants
+  and environment variable names are unaffected, so `E2E_GOOGLE_SHEET_ID`
+  and `PLAYWRIGHT_E2E_THIRD_PARTY` stay as they are, and so does a string
+  literal that names something outside this repo.
 
   **Find candidates** (identifiers and file names containing the
   common offenders):
 
   ```bash
   # Identifiers
-  grep -rEn '\b[a-zA-Z_]*(URL|SQL|JSON|HTTP|API|CSS|HTML|UUID|XML|YAML)[a-zA-Z_]*\b' \
+  grep -rEn '[a-z][A-Z_]*(URL|SQL|JSON|HTTP|API|CSS|HTML|UUID|XML|YAML|CLI|E2E|ID|DB|CI|IO)([A-Z]|\b)' \
     --include="*.ts" --include="*.tsx" .
-  # File names
-  find . -type f \( -name "*.ts" -o -name "*.tsx" \) \
+  # File and directory names
+  find . \( -name "*.ts" -o -name "*.tsx" -o -type d \) \
     -not -path "*/node_modules/*" \
-    | grep -E '(URL|SQL|JSON|HTTP|API|CSS|HTML|UUID|XML|YAML)'
+    | grep -E '(URL|SQL|JSON|HTTP|API|CSS|HTML|UUID|XML|YAML|CLI|E2E|ID|DB|CI|IO)'
   ```
 
-  Allow-list: `ID` and `DB` may stay as written. Hits that are already
-  in PascalCase (`Url`, `Sql`, etc.) will not match.
+  There is no allow-list: a two-letter acronym is a word like any other.
+  Hits that are already in PascalCase (`Url`, `Sql`, etc.) will not match.
+  A hit inside an `UPPERCASE` constant or env var name is not a finding.
 
 - Files that export only types should use the `.types.ts` filename suffix.
   This makes the file's contents self-evident from the import path and

@@ -1,10 +1,10 @@
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
 import type { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues.ts";
 import type {
-  ExportLayout, // prettier-ignore
+  ExportLayout, // oxfmt-ignore
 } from "$/models/AvaMap/AvaMapConfig/ExportLayout.types.ts";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 
 /**
  * Where the map is looking. `center` is `[longitude, latitude]`, MapLibre

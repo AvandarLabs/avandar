@@ -6,8 +6,8 @@ import { IconShare } from "@tabler/icons-react";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useShareButtonState } from "@/components/permissions/useShareButtonState";
 import { DashboardShareModal } from "@/views/DashboardApp/DashboardShareModal/DashboardShareModal";
-import type { ButtonProps } from "@mantine/core";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ButtonProps } from "@mantine/core";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -87,11 +87,11 @@ export function DashboardShareButton({
           size={size}
           variant={isPublished ? "filled" : "default"}
           color={
-            isPublished ?
-              dashboard.visibility === "public" ?
-                "orange"
-              : "teal"
-            : undefined
+            isPublished
+              ? dashboard.visibility === "public"
+                ? "orange"
+                : "teal"
+              : undefined
           }
           leftSection={<IconShare size={16} />}
           data-disabled={isDisabled || undefined}

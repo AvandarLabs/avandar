@@ -17,7 +17,7 @@ import { useEffect } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -88,7 +88,7 @@ function CheckoutPage() {
   }, [subscriptions, workspace.id, workspace.slug, navigate, queryClient]);
 
   const contents =
-    success === true ?
+    success === true ? (
       <>
         <ThemeIcon size={64} radius="xl" variant="light" color="green">
           <IconCheck size={32} stroke={2.5} />
@@ -116,11 +116,11 @@ function CheckoutPage() {
           <Trans>Continue to your workspace</Trans>
         </Button>
       </>
-    : null;
+    ) : null;
 
   // This shouldn't be reached due to beforeLoad redirect
   return (
-    <AppLayout>
+    <AppSlate>
       <Container size="sm" py="xl">
         <Center h="100%">
           <Paper
@@ -138,6 +138,6 @@ function CheckoutPage() {
           </Paper>
         </Center>
       </Container>
-    </AppLayout>
+    </AppSlate>
   );
 }

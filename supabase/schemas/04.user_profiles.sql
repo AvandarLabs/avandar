@@ -33,10 +33,7 @@ update,
 delete on table public.user_profiles to authenticated,
 service_role;
 
-/**
- * Prevent changes to user_id, workspace_id, and membership_id
- * This function must be used in a trigger.
- */
+/** Rejects updates that change `user_id`, `workspace_id` or `membership_id`. */
 create or replace function user_profiles__prevent_id_changes () returns trigger as $$
 begin
   if new.user_id <> old.user_id or new.workspace_id <> old.workspace_id or
@@ -47,17 +44,20 @@ begin
 end;
 $$ language plpgsql;
 
-/**
- * Trigger the `user_profiles__prevent_id_changes` function to make sure
- * that certain protected ids do not get changed.
- */
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.user_profiles__prevent_id_changes ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 create trigger tr_user_profiles__prevent_id_changes before
 update on public.user_profiles for each row
 execute function user_profiles__prevent_id_changes ();
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_user_profiles__set_updated_at before
 update on public.user_profiles for each row
 execute function public.util__set_updated_at ();

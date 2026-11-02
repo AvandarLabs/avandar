@@ -2,18 +2,23 @@ import { useLingui } from "@lingui/react/macro";
 
 /** Every localised sentence the import feedback section may show. */
 export type DatasetImportCopy = {
-  columnsMessage: string;
+  columnsMeta: string;
   errorMessage: string;
   errorTitle: string;
   failureMessage: string;
   failureTitle: string;
   offlineOnlyTitle: string;
-  previewMessage: string;
+  previewMeta: string;
 };
 
 /**
  * The import feedback copy, localised here so the presentational components
  * below take plain strings.
+ *
+ * The two lines beside the section headings are counts, not instructions.
+ * What to do when the numbers look wrong is answered by the parse settings
+ * sitting directly above the grid, which is a better answer than a
+ * paragraph explaining that they exist.
  */
 export function useDatasetImportCopy(
   options: Readonly<{
@@ -23,12 +28,12 @@ export function useDatasetImportCopy(
 ): DatasetImportCopy {
   const { t } = useLingui();
   return {
-    columnsMessage: t`${options.numColumns} columns were detected. Review the column info below to make sure they are correct. If they are not, change the import options above and click Upload again.`,
-    errorMessage: t`Scroll up to the fields above, or use the list below.`,
+    columnsMeta: t`${options.numColumns} detected`,
+    errorMessage: t`Fix the fields above, then save.`,
     errorTitle: t`Fix these issues before saving`,
-    failureMessage: t`No rows were read successfully`,
+    failureMessage: t`No rows were read successfully. Adjust the parse settings below, or check that the file is not empty.`,
     failureTitle: t`Data processing failed`,
     offlineOnlyTitle: t`This dataset will be offline-only`,
-    previewMessage: t`These are the first ${options.numPreviewRows} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here.`,
+    previewMeta: t`First ${options.numPreviewRows} rows`,
   };
 }

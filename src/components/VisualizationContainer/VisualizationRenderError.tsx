@@ -45,9 +45,9 @@ export function VisualizationRenderError({
   );
 
   const summaryMessage =
-    errors.xAxisKey || errors.series ?
-      t`The ${chartName} cannot be displayed because there are missing axes or series.`
-    : t`The ${chartName} cannot be displayed.`;
+    errors.xAxisKey || errors.series
+      ? t`The ${chartName} cannot be displayed because there are missing axes or series.`
+      : t`The ${chartName} cannot be displayed.`;
   return (
     <Callout.Error
       title={t`Cannot display ${chartName}`}

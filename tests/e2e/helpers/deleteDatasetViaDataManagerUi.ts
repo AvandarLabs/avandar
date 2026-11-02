@@ -5,8 +5,8 @@ import type { Page } from "@playwright/test";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * Deletes the dataset on the current Data Manager metadata page using the
- * Delete Dataset button, confirms the modal, then verifies redirect to the
+ * Deletes the dataset on the current Data Manager metadata page through the
+ * header's overflow menu, confirms the modal, then verifies redirect to the
  * data sources list, removal of the dataset row, and Parquet object cleanup
  * in storage.
  */
@@ -24,7 +24,8 @@ export async function deleteDatasetViaDataManagerUiAndVerify(options: {
     "i",
   );
 
-  await page.getByRole("button", { name: "Delete Dataset" }).click();
+  await page.getByRole("button", { name: "More dataset actions" }).click();
+  await page.getByRole("menuitem", { name: "Delete Dataset" }).click();
 
   const deleteConfirmButton = page
     .getByRole("dialog")

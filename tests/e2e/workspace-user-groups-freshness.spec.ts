@@ -48,9 +48,9 @@ async function _waitForPersistedQuery(options: {
                 };
                 getRequest.onsuccess = () => {
                   return resolve(
-                    typeof getRequest.result === "string" ?
-                      getRequest.result
-                    : "",
+                    typeof getRequest.result === "string"
+                      ? getRequest.result
+                      : "",
                   );
                 };
               };

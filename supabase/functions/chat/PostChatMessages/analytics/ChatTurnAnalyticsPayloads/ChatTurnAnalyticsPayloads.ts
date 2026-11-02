@@ -1,9 +1,9 @@
-import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 import type {
   AnalyticsEventPayloads,
   ChatTurnErrorClass,
   ChatTurnOutcome,
 } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types.ts";
+import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 
 /**
  * Reduces a parsed attempt to the single outcome recorded on the turn.
@@ -18,14 +18,17 @@ import type {
  * produced SQL counts as SQL even if it also asked something.
  */
 function _classifyOutcome(parsed: ParsedAttempt): ChatTurnOutcome {
-  return (
-    parsed.generatedSql ? "sql"
-    : parsed.clarification ? "clarification"
-    : parsed.dashboardBlock ? "dashboard_block"
-    : parsed.createdCaseTypes && parsed.createdCaseTypes.length > 0 ? "text"
-    : parsed.text ? "text"
-    : "empty"
-  );
+  return parsed.generatedSql
+    ? "sql"
+    : parsed.clarification
+      ? "clarification"
+      : parsed.dashboardBlock
+        ? "dashboard_block"
+        : parsed.createdCaseTypes && parsed.createdCaseTypes.length > 0
+          ? "text"
+          : parsed.text
+            ? "text"
+            : "empty";
 }
 
 /**
@@ -35,16 +38,14 @@ function _classifyOutcome(parsed: ParsedAttempt): ChatTurnOutcome {
  */
 function _classifyError(error: unknown): ChatTurnErrorClass {
   const message = error instanceof Error ? error.message : String(error);
-  return (
-    error instanceof SyntaxError ? "parse"
-    : /OpenRouter API error/i.test(message) ? "upstream_error"
-    : (
-      error instanceof TypeError &&
-      /fetch|network|sending request/i.test(message)
-    ) ?
-      "network"
-    : "unknown"
-  );
+  return error instanceof SyntaxError
+    ? "parse"
+    : /OpenRouter API error/i.test(message)
+      ? "upstream_error"
+      : error instanceof TypeError &&
+          /fetch|network|sending request/i.test(message)
+        ? "network"
+        : "unknown";
 }
 
 /** Privacy-safe payload builders for server-side chat turn analytics. */

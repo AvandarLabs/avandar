@@ -97,14 +97,12 @@ async function _ensureTransformCsvsFromExtractOrTransform(options: {
       await copyFile(src, dest);
     } catch (error: unknown) {
       const code =
-        (
-          error !== null &&
-          typeof error === "object" &&
-          "code" in error &&
-          typeof error.code === "string"
-        ) ?
-          error.code
-        : undefined;
+        error !== null &&
+        typeof error === "object" &&
+        "code" in error &&
+        typeof error.code === "string"
+          ? error.code
+          : undefined;
       if (code !== "ENOENT") {
         throw error;
       }

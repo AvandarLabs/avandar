@@ -36,8 +36,8 @@ function _joinLines(lines: readonly TextLine[]): string {
       if (index === 0) {
         return line.text;
       }
-      return text.endsWith("-") ?
-          `${text.slice(0, -1)}${line.text}`
+      return text.endsWith("-")
+        ? `${text.slice(0, -1)}${line.text}`
         : `${text} ${line.text}`;
     }, "")
     .replace(/\s+/gu, " ")

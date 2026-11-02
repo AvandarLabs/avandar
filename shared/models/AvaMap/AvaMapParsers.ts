@@ -7,15 +7,15 @@ import {
   snakeCaseKeysDeep,
   undefinedsToNullsDeep,
 } from "@avandar/utils";
+import { z } from "zod";
 import { supabaseJSONSchema as supabaseJsonSchema } from "$/lib/zodHelpers.ts";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.ts";
-import { z } from "zod";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type { AvaMapId, AvaMapModel } from "$/models/AvaMap/AvaMap.types.ts";
 import type { User } from "$/models/User/User.ts";
 import type { UserProfile } from "$/models/User/UserProfile.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 
 const DBReadSchema = z.object({
   config: supabaseJsonSchema,
@@ -100,11 +100,11 @@ export const AvaMapParsers = makeParserRegistry<AvaMapModel>().build({
 
     return {
       ...dbRow,
-      ...(config === undefined ?
-        {}
-      : {
-          config: AvaMapConfigSchema.toJson(config),
-        }),
+      ...(config === undefined
+        ? {}
+        : {
+            config: AvaMapConfigSchema.toJson(config),
+          }),
     };
   },
 });

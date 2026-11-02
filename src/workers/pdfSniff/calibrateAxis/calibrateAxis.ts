@@ -127,8 +127,8 @@ export function invertCalibration(
   value: number,
 ): number | undefined {
   if (calibration.scale === "log") {
-    return value > 0 ?
-        (Math.log(value) - calibration.b) / calibration.a
+    return value > 0
+      ? (Math.log(value) - calibration.b) / calibration.a
       : undefined;
   }
   return (value - calibration.b) / calibration.a;

@@ -1,7 +1,7 @@
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { openSqliteDatabase, runMigrations } from "../../SqliteService/Sqlite";
 import { bootstrapSnapshotIfNeeded } from "../SnapshotBootstrap";
 import { makeRest } from "./SnapshotBootstrap.fixtures";
@@ -43,10 +43,9 @@ describe("bootstrapSnapshotIfNeeded", () => {
     });
 
     const rows = db
-      .query<
-        { id: string; name: string },
-        []
-      >("select id, name from datasets order by id")
+      .query<{ id: string; name: string }, []>(
+        "select id, name from datasets order by id",
+      )
       .all();
     expect(rows).toEqual([
       { id: "a", name: "Alpha" },
@@ -141,10 +140,9 @@ describe("bootstrapSnapshotIfNeeded", () => {
     });
 
     const rows = db
-      .query<
-        { id: string; config: string },
-        []
-      >("select id, config from dashboards")
+      .query<{ id: string; config: string }, []>(
+        "select id, config from dashboards",
+      )
       .all();
     expect(rows[0]?.id).toBe("d1");
     expect(JSON.parse(rows[0]!.config)).toEqual({
@@ -177,10 +175,9 @@ describe("bootstrapSnapshotIfNeeded", () => {
     });
 
     const rows = db
-      .query<
-        { id: string; ok: number },
-        []
-      >("select id, ok from flags order by id")
+      .query<{ id: string; ok: number }, []>(
+        "select id, ok from flags order by id",
+      )
       .all();
     expect(rows).toEqual([
       { id: "x", ok: 1 },
@@ -212,10 +209,9 @@ describe("bootstrapSnapshotIfNeeded", () => {
     });
 
     const rows = db
-      .query<
-        { id: string; description: string | null },
-        []
-      >("select id, description from datasets order by id")
+      .query<{ id: string; description: string | null }, []>(
+        "select id, description from datasets order by id",
+      )
       .all();
     expect(rows).toEqual([
       { id: "a", description: "an alpha" },
@@ -253,10 +249,9 @@ describe("bootstrapSnapshotIfNeeded", () => {
     });
 
     const rows = db
-      .query<
-        { id: string; is_public: number; visibility: string },
-        []
-      >("select id, visibility, is_public from dashboards order by id")
+      .query<{ id: string; is_public: number; visibility: string }, []>(
+        "select id, visibility, is_public from dashboards order by id",
+      )
       .all();
     expect(rows).toEqual([
       { id: "draft", visibility: "draft", is_public: 0 },

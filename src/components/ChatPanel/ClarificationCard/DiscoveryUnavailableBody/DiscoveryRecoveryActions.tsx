@@ -13,12 +13,12 @@ export function DiscoveryRecoveryActions({
 }: Readonly<Props>): React.ReactNode {
   return (
     <Group gap="xs" wrap="wrap">
-      {onRetry ?
+      {onRetry ? (
         <Button size="xs" variant="light" onClick={onRetry}>
           <Trans>Retry lookup</Trans>
         </Button>
-      : null}
-      {onRequestDifferentDiscovery ?
+      ) : null}
+      {onRequestDifferentDiscovery ? (
         <Button
           size="xs"
           variant="subtle"
@@ -26,7 +26,7 @@ export function DiscoveryRecoveryActions({
         >
           <Trans>Try a different lookup</Trans>
         </Button>
-      : null}
+      ) : null}
     </Group>
   );
 }

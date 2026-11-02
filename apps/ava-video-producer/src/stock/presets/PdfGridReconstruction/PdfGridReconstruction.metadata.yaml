@@ -1,0 +1,97 @@
+name:
+  id: motionAtlas.pdf-grid-reconstruction.name
+  message: Recover cells from page geometry
+description:
+  id: motionAtlas.pdf-grid-reconstruction.description
+  message:
+    Positioned text on a schematic document acquires row and column boundaries,
+    then becomes a table while the original page remains visible. A selected structural
+    signal stays named.
+category:
+  id: motionAtlas.pdf-grid-reconstruction.category
+  message: Document geometry extraction
+useWhen:
+  id: motionAtlas.pdf-grid-reconstruction.useWhen
+  message: Reveal the geometric evidence behind an extracted table.
+prompt:
+  id: motionAtlas.pdf-grid-reconstruction.prompt
+  message: Reveal the geometric evidence behind an extracted table.
+creativeDirection:
+  id: motionAtlas.pdf-grid-reconstruction.creativeDirection
+  message:
+    "960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+    0-12 reveal the scene. Frames 13-55 draw the selected evidence: tagged-cell
+    outlines, ruling lines or whitespace corridors. Frames 56-105 register the supplied
+    text items inside their cells. Frames 106-139 unfold an equal-sized grid beside the
+    page with every cell still linked to its source position. Hold the resolved
+    relationship at frames 140-165, then fade to the same opaque ground at 166-179.
+    Reset is editorial."
+intent:
+  id: motionAtlas.pdf-grid-reconstruction.intent
+  message: Reveal the geometric evidence behind an extracted table.
+distinction:
+  id: motionAtlas.pdf-grid-reconstruction.distinction
+  message:
+    Unlike schema-mapping, field names are not translated. Cell structure is
+    recovered from two-dimensional page evidence before textual data becomes a grid.
+tags:
+  - id: motionAtlas.pdf-grid-reconstruction.tags.0
+    message: PDF
+  - id: motionAtlas.pdf-grid-reconstruction.tags.1
+    message: table extraction
+  - id: motionAtlas.pdf-grid-reconstruction.tags.2
+    message: ruling lines
+  - id: motionAtlas.pdf-grid-reconstruction.tags.3
+    message: whitespace clustering
+  - id: motionAtlas.pdf-grid-reconstruction.tags.4
+    message: tagged structure
+goodFor:
+  - id: motionAtlas.pdf-grid-reconstruction.goodFor.0
+    message: Explain table extraction from PDF ruling lines
+  - id: motionAtlas.pdf-grid-reconstruction.goodFor.1
+    message: Distinguish tagged, ruled and inferred page structure
+domains:
+  - id: motionAtlas.pdf-grid-reconstruction.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.pdf-grid-reconstruction.aliases.0
+    message: pdf grid reconstruction
+notFor:
+  - id: motionAtlas.pdf-grid-reconstruction.notFor.0
+    message: The preset depicts a bounded supplied grid, not a general PDF detector.
+  - id: motionAtlas.pdf-grid-reconstruction.notFor.1
+    message:
+      The evidence signal is supplied and may be incomplete or misleading in a real
+      document.
+  - id: motionAtlas.pdf-grid-reconstruction.notFor.2
+    message: No OCR or image-only reading is implied.
+  - id: motionAtlas.pdf-grid-reconstruction.notFor.3
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
+      authored explanation, not actual document extraction or product evidence.
+  - id: motionAtlas.pdf-grid-reconstruction.notFor.4
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 13
+    endFrame: 55
+    description:
+      id: motionAtlas.pdf-grid-reconstruction.motionBeats.0
+      message: Draw the selected structural evidence.
+  - startFrame: 56
+    endFrame: 105
+    description:
+      id: motionAtlas.pdf-grid-reconstruction.motionBeats.1
+      message: Register every literal cell at its source coordinate.
+  - startFrame: 106
+    endFrame: 139
+    description:
+      id: motionAtlas.pdf-grid-reconstruction.motionBeats.2
+      message: Unfold an equal sized result grid beside the retained source.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.pdf-grid-reconstruction.motionBeats.3
+      message: Hold the resolved relationship.

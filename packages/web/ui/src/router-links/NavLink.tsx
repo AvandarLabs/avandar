@@ -19,9 +19,9 @@ import {
 import type { LinkComponent, LinkComponentProps } from "@tanstack/react-router";
 
 const DEFAULT_PRIMARY_SHADE =
-  typeof DEFAULT_THEME.primaryShade === "object" ?
-    DEFAULT_THEME.primaryShade.light
-  : DEFAULT_THEME.primaryShade;
+  typeof DEFAULT_THEME.primaryShade === "object"
+    ? DEFAULT_THEME.primaryShade.light
+    : DEFAULT_THEME.primaryShade;
 
 interface NewMantineNavLinkProps extends Omit<
   MantineNavLinkProps &
@@ -88,9 +88,9 @@ export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
       }
 
       const primaryShade =
-        typeof theme.primaryShade === "object" ?
-          theme.primaryShade.light
-        : theme.primaryShade;
+        typeof theme.primaryShade === "object"
+          ? theme.primaryShade.light
+          : theme.primaryShade;
       return themeColors[primaryShade ?? DEFAULT_PRIMARY_SHADE];
     }
     return inactiveHoverColor;
@@ -106,9 +106,9 @@ export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
       style={{
         ...style,
         backgroundColor:
-          !!inactiveHoverColorHex && hovered && !isActive ?
-            inactiveHoverColorHex
-          : undefined,
+          !!inactiveHoverColorHex && hovered && !isActive
+            ? inactiveHoverColorHex
+            : undefined,
       }}
       {...(rest as Omit<NavLinkProps, "style" | "inactiveHoverColor">)}
     />

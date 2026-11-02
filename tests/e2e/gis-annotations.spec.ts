@@ -102,9 +102,9 @@ async function _readAnnotationSnapshot(
     const map = window.__avandarE2EMap;
     const source = map?.getStyle()?.sources["ava-map-annotations"];
     const data =
-      source && source.type === "geojson" && typeof source.data === "object" ?
-        (source.data as GeoJSON.FeatureCollection)
-      : { type: "FeatureCollection" as const, features: [] };
+      source && source.type === "geojson" && typeof source.data === "object"
+        ? (source.data as GeoJSON.FeatureCollection)
+        : { type: "FeatureCollection" as const, features: [] };
     return {
       featureCount: data.features.length,
       kinds: data.features.map((feature) => {

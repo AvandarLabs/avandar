@@ -7,14 +7,15 @@ export type ValidReturnType = Record<string, unknown> | void | Response;
 type _URLParamNameExtractor<
   Pattern extends `/${string}`,
   ParamNames extends readonly string[] = [],
-> =
-  Pattern extends "/" ? ParamNames
-  : Pattern extends `/${infer Head}/${infer Rest}` ?
-    Head extends `:${infer ParamName}` ?
-      [...ParamNames, ParamName, ..._URLParamNameExtractor<`/${Rest}`>]
-    : [...ParamNames, ..._URLParamNameExtractor<`/${Rest}`>]
-  : Pattern extends `/:${infer ParamName}` ? [...ParamNames, ParamName]
-  : ParamNames;
+> = Pattern extends "/"
+  ? ParamNames
+  : Pattern extends `/${infer Head}/${infer Rest}`
+    ? Head extends `:${infer ParamName}`
+      ? [...ParamNames, ParamName, ..._URLParamNameExtractor<`/${Rest}`>]
+      : [...ParamNames, ..._URLParamNameExtractor<`/${Rest}`>]
+    : Pattern extends `/:${infer ParamName}`
+      ? [...ParamNames, ParamName]
+      : ParamNames;
 
 type ValidPathParamValue = string | number;
 

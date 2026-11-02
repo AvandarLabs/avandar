@@ -56,7 +56,7 @@ type Props = {
  *
  * The `columns` layout is driven purely by the container's width via
  * `auto-fit` + `minmax`, never by the viewport. That matters because the Data
- * Explorer canvas loses 380px the moment the AI chat panel opens, with no
+ * Explorer slate loses 380px the moment the AI chat panel opens, with no
  * viewport change at all, and because the same forms render inside the much
  * narrower dashboard settings panel.
  */
@@ -69,9 +69,9 @@ export function SettingsColumns({
   // Left undefined so the grid falls through to the theme's floor; only a
   // caller that wants a different one writes the property.
   const gridStyle: CSSProperties | undefined =
-    minColumnWidth === undefined ? undefined : (
-      { ["--settings-columns-min-width" as string]: `${minColumnWidth}px` }
-    );
+    minColumnWidth === undefined
+      ? undefined
+      : { ["--settings-columns-min-width" as string]: `${minColumnWidth}px` };
 
   return matchLiteral(layout, {
     stacked: () => {
@@ -99,9 +99,9 @@ export function SettingsColumns({
                 key={group.id}
                 className={css.settingsColumnsColumn}
                 style={
-                  group.span !== undefined && group.span > 1 ?
-                    { gridColumn: `span ${group.span}` }
-                  : undefined
+                  group.span !== undefined && group.span > 1
+                    ? { gridColumn: `span ${group.span}` }
+                    : undefined
                 }
               >
                 <Fieldset

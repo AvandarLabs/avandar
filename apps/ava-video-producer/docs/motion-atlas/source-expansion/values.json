@@ -1,0 +1,2281 @@
+{
+  "sourceGroup": "values",
+  "sources": [
+    {
+      "sourceId": "values-pdf",
+      "path": "~/brain/areas/avandar/docs/avandar-values.pdf",
+      "title": "Avandar Values",
+      "pages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "headings": [
+        "Advocacy and Justice",
+        "Community and Wholeness",
+        "Honesty, Vulnerability, and Trust",
+        "No Heroes"
+      ],
+      "status": "values",
+      "sha256": "24bce26b90510f4eba378342861a2f440eaddabe97192d6f03b8aa08d59c6aee",
+      "locationKind": "personal-vault"
+    }
+  ],
+  "coverage": [
+    {
+      "concept": "Values translated into beliefs and observable behavior",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 1 / introduction",
+          "rationale": "The source treats values as the basis for beliefs and the standards used to assess behavior."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["argument-bridge"],
+      "reason": "Existing authored premises, connector and conclusion can state this relationship without inventing a culture score."
+    },
+    {
+      "concept": "Unequal access to suitable technology under resource constraints",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 1 and 2 / Advocacy and Justice",
+          "rationale": "The source describes resource-constrained organizations accepting unsuitable or costly tools."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["paired-contrast", "capability-matrix"],
+      "reason": "Existing comparisons can distinguish affordability, fit and availability using authored evidence. No additional reskinned comparison is needed."
+    },
+    {
+      "concept": "Affordability and technical quality can be considered jointly",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 2 / technical excellence",
+          "rationale": "The source rejects treating affordable access and dependable software as inevitably incompatible."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["capability-matrix"],
+      "reason": "Add this use case and an explicit claim boundary to the existing categorical comparison contract."
+    },
+    {
+      "concept": "People and their chosen aims take precedence over tools",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 2 / people before technology",
+          "rationale": "The source treats technology as a means to serve people and communities."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["chosen-service-access", "person-led-support-calendar"],
+      "reason": "Existing participant-directed actions already preserve the person and goal while a service arrangement changes."
+    },
+    {
+      "concept": "Ethical technical design as a constraint",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 2 / technical excellence",
+          "rationale": "The source rejects privacy-invasive or exclusionary practices even when pursuing quality."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["decision-fork"],
+      "reason": "Authored decision conditions can express ethical constraints without calculating moral correctness."
+    },
+    {
+      "concept": "Unspecified innovative algorithms and architectures",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 2 / technical excellence",
+          "rationale": "The source calls for creative architecture but does not define a concrete algorithm or data structure here."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "There is no specific technical mechanism to animate from this source. Detailed architecture is owned by the separate architecture review."
+    },
+    {
+      "concept": "Consequential software requires explicit verification",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 3 / software quality",
+          "rationale": "The source links dependable software with experts being able to perform consequential work."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["expectation-overlay-check"],
+      "reason": "The expected-versus-observed overlay makes verification inspectable without reusing the source's mortality claims."
+    },
+    {
+      "concept": "Adversarial cases and model red-team checks",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 3 / software quality",
+          "rationale": "The source explicitly includes extensive testing and adversarial examination of models."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["expectation-overlay-check"],
+      "reason": "The same bounded oracle comparison accepts adversarial case labels and retains failures or missing observations. It does not imply exhaustive red teaming."
+    },
+    {
+      "concept": "Historical crisis outcomes and individual causal impact claims",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 3 / software quality",
+          "rationale": "The author recalls consequential crisis work and makes large outcome claims."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "Private anecdotes and unsourced causal quantities are not generalized into stock examples or presented as verified impact."
+    },
+    {
+      "concept": "Fix encountered problems without waiting for another owner",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 3 and 8 / initiative and collaboration",
+          "rationale": "The source encourages repairing unclear documentation, defects and neglected support needs."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["feedback-refinement", "grievance-remedy-retest"],
+      "reason": "Existing revision and retest actions cover concrete repair. The broad attitude does not require another generic task-progress scene."
+    },
+    {
+      "concept": "Offer practical support to a coworker",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 3 / fixing what is broken",
+          "rationale": "The source names noticing a colleague's need and asking how to help."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["support-request-response"],
+      "reason": "A request and authored response can add shared effort without transferring task ownership."
+    },
+    {
+      "concept": "Reciprocal dignity, fairness and accountability at work",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 3 and 4 / individual trust and respect",
+          "rationale": "The source calls for treating coworkers as people and maintaining mutual commitments."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["shared-foundation", "support-request-response"],
+      "reason": "A shared-principle graphic can frame mutual obligations, while the support exchange supplies one bounded observable behavior."
+    },
+    {
+      "concept": "Founder biography, finances and personal sacrifices",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 4 / individual trust and respect",
+          "rationale": "The author grounds obligations in personal founding circumstances."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "Biographical and private financial claims are not reusable generic stock concepts."
+    },
+    {
+      "concept": "Community at local, sector and workplace scales",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 4 / Community and Wholeness",
+          "rationale": "The source distinguishes community participation at several organizational scales."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "scope-aperture",
+        "contribution-weave",
+        "community-coordination-table"
+      ],
+      "reason": "Existing semantic scope and participant-led coordination actions can retain the different scales without equating them."
+    },
+    {
+      "concept": "Open-source co-creation and a voice in product decisions",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 4 / Community and Wholeness",
+          "rationale": "The source aspires to a platform shaped by developers and organizations in its sector."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["contribution-weave", "feedback-refinement"],
+      "reason": "Retained contributor identities and explicit review notes already express participation. Add provenance-aware co-creation use cases rather than a duplicate merge animation."
+    },
+    {
+      "concept": "Safety to speak, contribute or ask for space",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 4 and 7 / community and trust",
+          "rationale": "The source describes workplace conditions in which people can express needs and be themselves."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["support-request-response"],
+      "reason": "A specific help request and respectful authored response is an observable slice. The broader safety condition is not inferred."
+    },
+    {
+      "concept": "Social contribution need not require low compensation",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 4 / social good and wealth",
+          "rationale": "The source treats social value as deserving fair compensation rather than a reason to underpay."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["qualify-apparent-conflict", "capability-matrix"],
+      "reason": "Authored claims can distinguish how value is defined and show whether two requirements are met. No salary figure or universal compensation benchmark is introduced."
+    },
+    {
+      "concept": "Protected recovery time and avoiding overwork",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 5 / relaxation and growth",
+          "rationale": "The source treats rest and sustainable work as compatible with serious technical standards."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["protected-work-boundary"],
+      "reason": "A visible boundary and explicit deferral explain what happens to a new request when protected time remains protected."
+    },
+    {
+      "concept": "Employee-directed timing and location of work",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 5 / relaxation and growth",
+          "rationale": "The source gives workers discretion over how they arrange their time."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["protected-work-boundary"],
+      "reason": "The worker makes the placement decision. The animation does not silently allocate overtime or assign a manager-imposed timetable."
+    },
+    {
+      "concept": "Learning and community participation within protected time",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 5 / relaxation and growth",
+          "rationale": "The source includes personal learning and participating in local life as legitimate uses of time."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["protected-work-boundary"],
+      "reason": "The protected-kind choices preserve these distinct uses without treating them as spare capacity for new work."
+    },
+    {
+      "concept": "Exact leave and workweek policies and productivity assertions",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 5 / relaxation and growth",
+          "rationale": "The source states company-specific time policies and an associated productivity belief."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "The policy quantities and asserted productivity effects are not included in stock defaults. General protected-time behavior is covered separately."
+    },
+    {
+      "concept": "Community participation rather than outside observation",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 5 / relaxation and growth",
+          "rationale": "The source calls for participating in local life and organizations."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["community-coordination-table", "contribution-weave"],
+      "reason": "Existing participant-led action can show membership and contribution without savior imagery or an invented social outcome."
+    },
+    {
+      "concept": "Continual technical and cross-domain learning",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 6 / continual learning",
+          "rationale": "The source values ongoing study across technical fields and social-sector subjects."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["expertise-role-exchange"],
+      "reason": "A bounded exchange shows learning from another person without claiming mastery or simulating a long course."
+    },
+    {
+      "concept": "Learning social context to recognize possible harm",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 6 / continual learning",
+          "rationale": "The source warns that technology is embedded in communities and benefits from learning their context."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["decision-fork"],
+      "reason": "The choice can retain an explicit community concern as an authored condition; this does not become an automated ethics test."
+    },
+    {
+      "concept": "Subject expertise is different from rank or seniority",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 6 / learning requires humility",
+          "rationale": "The source rejects assuming that a senior person knows more on every subject."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["expertise-role-exchange"],
+      "reason": "Teaching roles change between topics while the organizational role labels remain stable."
+    },
+    {
+      "concept": "Community lived experience and domain expertise deserve attention",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 6 / learning requires humility",
+          "rationale": "The source values expertise held by people who study or live with the issues being addressed."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["expertise-role-exchange"],
+      "reason": "Topic-specific teaching roles can center a community adviser without transferring all authority or assigning a numerical knowledge score."
+    },
+    {
+      "concept": "Limits to what an individual knows",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 6 / learning requires humility",
+          "rationale": "The source explicitly acknowledges that nobody knows everything."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["scope-aperture", "expertise-role-exchange"],
+      "reason": "The existing scope boundary and the topic-specific exchange show limits to a current question or expertise. An invented numeric uncertainty range would be inappropriate."
+    },
+    {
+      "concept": "Vendor dependence and lock-in as a trust concern",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 6 / honesty and trust",
+          "rationale": "The source names vendor lock-in among harmful vendor practices."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["portable-work-transfer"],
+      "reason": "A person carrying retained work identities to another tool is a generic visual response, explicitly marked as source-inferred rather than an implemented capability."
+    },
+    {
+      "concept": "Open design decisions, documented methods and reasons",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 6 and 7 / honesty and trust",
+          "rationale": "The source commits to documenting choices and opening reasoning to community discussion."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["provenance-peelback", "feedback-refinement"],
+      "reason": "The existing source sheet and review exchange can expose a decision record and subsequent community comment without new mechanics."
+    },
+    {
+      "concept": "Kind, direct feedback and expression of concerns",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 7 / honesty and trust",
+          "rationale": "The source pairs candor with a desire to understand and support another person."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["feedback-refinement"],
+      "reason": "Add a respectful peer-review context while preserving authored outcomes and unresolved comments."
+    },
+    {
+      "concept": "Trust and vulnerability reinforce one another over time",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 7 / honesty and trust",
+          "rationale": "The source describes a reciprocal relationship between feeling safe and communicating honestly."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "A six-second exchange can show a request or response, but cannot establish or measure the reciprocal formation of trust. The behavioral slice is covered separately."
+    },
+    {
+      "concept": "Specific gratitude and celebrating a colleague's contribution",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 7 / beyond constructive criticism",
+          "rationale": "The source gives appreciation equal standing with constructive criticism."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["peer-contribution-recognition"],
+      "reason": "A person-to-person acknowledgment tied to an intact work object is distinct from correcting the object."
+    },
+    {
+      "concept": "Plain, human language instead of distancing euphemisms",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 7 / beyond constructive criticism",
+          "rationale": "The source asks for direct communication instead of impersonal corporate phrasing."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["feedback-refinement", "peer-contribution-recognition"],
+      "reason": "Brief authored wording can demonstrate the principle within an existing exchange, without a separate decorative text animation."
+    },
+    {
+      "concept": "Find a bounded next action in a tangled situation",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 7 / next right action",
+          "rationale": "The source recommends concentrating on the next concrete action when a situation is complicated."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["scope-aperture", "decision-fork"],
+      "reason": "Existing scope narrowing and an authored choice already represent this semantic operation."
+    },
+    {
+      "concept": "Acknowledge mistakes and retain responsibility for repair",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 7 and 10 / next action and follow-through",
+          "rationale": "The source connects honest acknowledgment of flaws to subsequent action and documented repair."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["release-repair-obligations"],
+      "reason": "An unresolved limitation remains attached to the delivered artifact and a named commitment, rather than vanishing at release."
+    },
+    {
+      "concept": "Ethical priorities ahead of immediate financial advantage",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 8 / business success as secondary",
+          "rationale": "The source states a priority for principled action even under business pressure."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["decision-fork"],
+      "reason": "An authored decision criterion can express the priority without inventing comparative financial figures."
+    },
+    {
+      "concept": "Financial success as a consequence of ethical choices",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 8 / business success as secondary",
+          "rationale": "The author explicitly frames the proposed relationship as a company hypothesis."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "A hypothetical causal business outcome cannot be presented as a verified mechanism or inevitable reward."
+    },
+    {
+      "concept": "Partnership rather than saviorism",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 8 / No Heroes",
+          "rationale": "The source rejects heroic outsiders and emphasizes belonging to the communities served."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "community-coordination-table",
+        "chosen-service-access",
+        "contribution-weave"
+      ],
+      "reason": "Existing participant-led decisions, retained identities and shared contributions already carry this behavior."
+    },
+    {
+      "concept": "Diverse backgrounds within a shared effort",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 8 / No Heroes",
+          "rationale": "The source aspires to a team with different backgrounds and community experiences."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["contribution-weave", "expertise-role-exchange"],
+      "reason": "Distinct contributions and topic-specific expertise preserve difference without inventing demographic characteristics."
+    },
+    {
+      "concept": "Recognize emergency effort while preventing recurrence",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 8 / No Heroes",
+          "rationale": "The source separates appreciation for urgent work from the need to investigate and prevent repeated emergencies."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": [
+        "peer-contribution-recognition",
+        "recurring-leak-prevention"
+      ],
+      "reason": "Two separate stock actions retain the distinction. Combining praise, root-cause investigation and system repair into one scene would overload six seconds."
+    },
+    {
+      "concept": "Repair the conditions that repeatedly create emergencies",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 8 and 9 / No Heroes",
+          "rationale": "The source names testing, planning and sustainable working conditions as alternatives to recurring heroics."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["recurring-leak-prevention"],
+      "reason": "Containing the consequence and changing the source become separate visible operations, with an explicit retest outcome."
+    },
+    {
+      "concept": "Deliberate preparation can coexist with later speed",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 9 and 10 / deliberate work and readiness",
+          "rationale": "The source distinguishes taking necessary preparation time from delaying useful action."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["qualify-apparent-conflict"],
+      "reason": "Its apparently conflicting statements apply to different time horizons, exactly the existing context-reveal mechanic."
+    },
+    {
+      "concept": "Under-hiring and exceptional individual productivity assumptions",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 9 / deliberate work",
+          "rationale": "The source proposes a specific hiring strategy and large talent/productivity multipliers."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "These are aspirational organizational assumptions without a supplied measurement method. No quantitative talent ranking or staffing guarantee is invented."
+    },
+    {
+      "concept": "Enable the team through reusable preparation",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 9 and 10 / deliberate work and future change",
+          "rationale": "The source values improvements that help colleagues and reduce later difficulty."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["shared-jig-preparation"],
+      "reason": "A reusable guide acts on distinct colleagues' workpieces without asserting a speed multiplier."
+    },
+    {
+      "concept": "Design for reading, editing and future maintenance",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 10 / moving slowly today",
+          "rationale": "The source treats future reading and modification as central software work."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["serviceable-panel-swap"],
+      "reason": "A single designed seam enables a bounded local change while the rest of the system remains visually intact."
+    },
+    {
+      "concept": "Avoid shortcuts that create repeated reconstruction",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 10 / moving slowly today",
+          "rationale": "The source warns about technical debt that leads to rework and repeated architectural changes."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["serviceable-panel-swap", "release-repair-obligations"],
+      "reason": "Designed replaceability and visible remaining obligations cover the maintenance principle without claiming all debt is removed."
+    },
+    {
+      "concept": "Deliver bounded useful work instead of pursuing perfection indefinitely",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 10 / exception to slow preparation",
+          "rationale": "The source allows limited imperfection while requiring attention to harm and follow-through."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["release-repair-obligations"],
+      "reason": "Open blocking issues stop delivery, while explicitly classified follow-ups remain attached and owned. The author supplies the classification."
+    },
+    {
+      "concept": "Learn from users after delivery",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 10 / exception to slow preparation",
+          "rationale": "The source treats user response as an input to subsequent development."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["feedback-refinement"],
+      "reason": "The existing repeated review exchange already shows a changing artifact and preserved notes."
+    },
+    {
+      "concept": "Document brittle points and commit time to repair",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 10 / exception to slow preparation",
+          "rationale": "The source requires known shortcomings and a plan to be recorded rather than forgotten after release."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["release-repair-obligations"],
+      "reason": "The repair register keeps flaw identity, owner and due wording together without claiming that future repair has occurred."
+    },
+    {
+      "concept": "Preparation enables a change in direction during an emergency",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 10 / react fast",
+          "rationale": "The source presents resilient foundations and sustainable capacity as preparation for an urgent response."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "shared-jig-preparation",
+        "serviceable-panel-swap",
+        "protected-work-boundary"
+      ],
+      "reason": "The relevant component principles are covered. A full preparation-to-emergency outcome story would exceed the stock duration."
+    },
+    {
+      "concept": "Attributed sharpening metaphor",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 10 / moving slowly today",
+          "rationale": "The source uses a historical quotation as a rhetorical illustration of preparation."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "The catalog does not repeat or validate the attribution. The general preparation principle has an original physical-guide metaphor."
+    }
+  ],
+  "proposals": [
+    {
+      "id": "expectation-overlay-check",
+      "title": "Compare the observed result with its expectation",
+      "description": "An expected-result sheet aligns over an observed-result sheet for each authored test. Matching wording registers exactly, mismatches separate into a visible gap, and unobserved results remain untested.",
+      "creativeDirection": "Frames 12..42 reveal up to three test stations with short input captions. Frames 43..108 register the expected translucent strip over each observed strip, matching their fixed left edges. For lower, translate it vertically into place. For hinge, rotate it around its fixed upper edge and settle it flat before judging equality. Equal strings register into a double outline. Unequal strings separate vertically and retain both complete values with a mismatch bracket. A null observation retains an empty lower slot and never receives a verdict. Frames 109..167 hold all tests, expected results, observations and derived states together. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to the common opaque ground during frames 168..179.",
+      "goodFor": [
+        "Explain the role of a test oracle",
+        "Show an adversarial test without claiming a comprehensive audit",
+        "Distinguish missing test evidence from a failed test"
+      ],
+      "tags": [
+        "testing",
+        "expectation",
+        "observed result",
+        "red team",
+        "quality",
+        "untested",
+        "oracle"
+      ],
+      "intent": "Make a test judgment inspectable through its expected and observed values.",
+      "family": "Evidence and verification",
+      "inputs": [
+        {
+          "name": "tests",
+          "type": "Array<{id:string;label:string;inputLabel:string;expected:string;observed:string|null}>",
+          "default": [
+            {
+              "id": "valid",
+              "label": "Known ticket",
+              "inputLabel": "Ticket A",
+              "expected": "Admit",
+              "observed": "Admit"
+            },
+            {
+              "id": "expired",
+              "label": "Expired ticket",
+              "inputLabel": "Ticket B",
+              "expected": "Hold",
+              "observed": "Admit"
+            }
+          ],
+          "control": "collection",
+          "description": "The complete authored set of test cases and observations.",
+          "constraints": "1..3 cases; unique IDs 1..20 characters; label and inputLabel 1..24 characters; expected and non-null observed 1..20 characters; exact case-sensitive string equality defines match; null means unobserved, never failure."
+        },
+        {
+          "name": "labels",
+          "type": "{expected:string;observed:string;match:string;mismatch:string;untested:string} ",
+          "default": {
+            "expected": "Expected",
+            "observed": "Observed",
+            "match": "Matches",
+            "mismatch": "Differs",
+            "untested": "Not observed"
+          },
+          "control": "object",
+          "description": "Visible comparison states.",
+          "constraints": "Each value 1..22 characters."
+        },
+        {
+          "name": "sheetMotion",
+          "type": "'lower'|'hinge'",
+          "default": "lower",
+          "control": "select",
+          "description": "How the expected sheet registers with its observation.",
+          "constraints": "Presentation only; both modes use identical case comparisons."
+        },
+        {
+          "name": "showInputs",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Keep the short input cue visible during comparison.",
+          "constraints": "Boolean; hiding it does not change results."
+        },
+        {
+          "name": "showStateGlyphs",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Add a distinct outline, mismatch bracket or question marker beside the text state.",
+          "constraints": "Boolean; state wording always remains visible."
+        },
+        {
+          "name": "exampleLabel",
+          "type": "string",
+          "default": "Fictional test observations",
+          "control": "text",
+          "description": "Persistent evidence qualifier.",
+          "constraints": "1..48 characters."
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "A fictional ticket checker is expected to admit Ticket A and hold expired Ticket B. The observed checker admits both, exposing one mismatch.",
+        "inputBindings": {
+          "tests": [
+            {
+              "id": "valid",
+              "label": "Known ticket",
+              "inputLabel": "Ticket A",
+              "expected": "Admit",
+              "observed": "Admit"
+            },
+            {
+              "id": "expired",
+              "label": "Expired ticket",
+              "inputLabel": "Ticket B",
+              "expected": "Hold",
+              "observed": "Admit"
+            }
+          ],
+          "labels": {
+            "expected": "Expected",
+            "observed": "Observed",
+            "match": "Matches",
+            "mismatch": "Differs",
+            "untested": "Not observed"
+          },
+          "sheetMotion": "lower",
+          "showInputs": true,
+          "showStateGlyphs": true,
+          "exampleLabel": "Fictional test observations"
+        }
+      },
+      "distinction": "Unlike capability-matrix, test states are derived from explicit expected and observed values rather than entered as capability claims. Unlike scan-lines, the animation exposes the comparison oracle and retains the discrepant result.",
+      "limits": [
+        "No software or model is executed. The cases and observations are authored examples.",
+        "A finite set of matches does not establish safety, reliability, quality, or complete test coverage.",
+        "String equality is the only comparison. No semantic equivalence, tolerance, hidden normalization, or causal diagnosis is inferred."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Changing an observation from the expected string to a different string changes only that case to mismatch. Setting it to null produces an unobserved slot with no pass or fail.",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 3 / software quality and testing",
+          "rationale": "The source connects dependable tools to consequential work and calls for extensive testing and adversarial model review."
+        }
+      ]
+    },
+    {
+      "id": "protected-work-boundary",
+      "title": "Keep protected time inside a finite schedule",
+      "description": "A worker declines to squeeze a new request into a protected time block. The request moves to a visible deferred tray, or to an explicitly available work block, while the schedule retains its original size.",
+      "creativeDirection": "Frames 12..38 reveal one fixed strip of equal time blocks containing existing commitments and protected rest, learning or community time. Frames 39..76 bring a new request toward its named protected block. The worker lifts the request away before it covers that block. Frames 77..130 place it in the deferred tray or the supplied empty work slot. Frames 131..167 hold the unchanged protected blocks, retained commitments and visible request disposition. Never stretch the strip or accelerate existing work to create room. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to the common opaque ground during frames 168..179.",
+      "goodFor": [
+        "Explain finite capacity without glorifying overtime",
+        "Show personal control over protected learning time",
+        "Depict an explicit deferral rather than invisible extra work"
+      ],
+      "tags": [
+        "sustainable work",
+        "protected time",
+        "capacity",
+        "rest",
+        "learning",
+        "community",
+        "deferral"
+      ],
+      "intent": "Make a work boundary concrete without claiming a productivity or health effect.",
+      "family": "Work and wellbeing",
+      "inputs": [
+        {
+          "name": "slots",
+          "type": "Array<{id:string;label:string;kind:'work'|'rest'|'learning'|'community';workLabel:string|null}>",
+          "default": [
+            {
+              "id": "a",
+              "label": "Block A",
+              "kind": "work",
+              "workLabel": "Draft guide"
+            },
+            {
+              "id": "b",
+              "label": "Block B",
+              "kind": "work",
+              "workLabel": "Review notes"
+            },
+            {
+              "id": "c",
+              "label": "Block C",
+              "kind": "rest",
+              "workLabel": null
+            },
+            {
+              "id": "d",
+              "label": "Block D",
+              "kind": "learning",
+              "workLabel": null
+            }
+          ],
+          "control": "collection",
+          "description": "Equal illustrative time blocks, with their existing commitments.",
+          "constraints": "3..8 slots; unique IDs 1..20 characters; labels and non-null workLabel 1..22 characters; at least one work and one non-work slot; non-work slots require workLabel null; each slot is one equal unit, with no implied hours or workweek policy."
+        },
+        {
+          "name": "request",
+          "type": "{label:string;requestedSlotId:string;placement:'defer'|'reschedule';agreedSlotId:string|null}",
+          "default": {
+            "label": "New review",
+            "requestedSlotId": "c",
+            "placement": "defer",
+            "agreedSlotId": null
+          },
+          "control": "object",
+          "description": "The incoming request and the worker-authored disposition.",
+          "constraints": "Label 1..24 characters; requestedSlotId refers to a non-work slot; defer requires agreedSlotId null; reschedule requires an existing work slot with workLabel null; no other slot may change."
+        },
+        {
+          "name": "workerLabel",
+          "type": "string",
+          "default": "Team member",
+          "control": "text",
+          "description": "The person who moves the request.",
+          "constraints": "1..24 characters."
+        },
+        {
+          "name": "labels",
+          "type": "{work:string;rest:string;learning:string;community:string;protected:string;deferred:string;rescheduled:string;unit:string;example:string}",
+          "default": {
+            "work": "Work",
+            "rest": "Rest",
+            "learning": "Learning",
+            "community": "Community",
+            "protected": "Protected time",
+            "deferred": "Still to schedule",
+            "rescheduled": "Agreed work slot",
+            "unit": "Illustrative block",
+            "example": "Fictional schedule"
+          },
+          "control": "object",
+          "description": "Schedule, decision and evidence labels.",
+          "constraints": "Each value 1..32 characters; no label may imply that deferred work is complete."
+        },
+        {
+          "name": "showSlotLabels",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Show the names of the authored equal time blocks.",
+          "constraints": "Boolean; commitments and protected kinds remain visible."
+        },
+        {
+          "name": "protectedPattern",
+          "type": "'hatch'|'dots'",
+          "default": "hatch",
+          "control": "select",
+          "description": "Non-color cue for protected time.",
+          "constraints": "Presentation only; all non-work slots retain this cue."
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "In a fictional team schedule, two blocks already contain work and two are reserved for rest and learning. A new review is explicitly deferred rather than placed over the rest block.",
+        "inputBindings": {
+          "slots": [
+            {
+              "id": "a",
+              "label": "Block A",
+              "kind": "work",
+              "workLabel": "Draft guide"
+            },
+            {
+              "id": "b",
+              "label": "Block B",
+              "kind": "work",
+              "workLabel": "Review notes"
+            },
+            {
+              "id": "c",
+              "label": "Block C",
+              "kind": "rest",
+              "workLabel": null
+            },
+            {
+              "id": "d",
+              "label": "Block D",
+              "kind": "learning",
+              "workLabel": null
+            }
+          ],
+          "request": {
+            "label": "New review",
+            "requestedSlotId": "c",
+            "placement": "defer",
+            "agreedSlotId": null
+          },
+          "workerLabel": "Team member",
+          "labels": {
+            "work": "Work",
+            "rest": "Rest",
+            "learning": "Learning",
+            "community": "Community",
+            "protected": "Protected time",
+            "deferred": "Still to schedule",
+            "rescheduled": "Agreed work slot",
+            "unit": "Illustrative block",
+            "example": "Fictional schedule"
+          },
+          "showSlotLabels": true,
+          "protectedPattern": "hatch"
+        }
+      },
+      "distinction": "Unlike schedule-buffer, no interruption consumes reserve time. Unlike person-led-support-calendar, the central decision can leave work deliberately unscheduled, preserving a finite workload boundary instead of finding a new appointment.",
+      "limits": [
+        "This is an authored scheduling decision, not a clinical burnout model or a claim about productivity.",
+        "Rest, learning and community time are illustrative categories. The animation does not reproduce any company leave or working-hours policy.",
+        "A deferred request remains outstanding. Deferral does not assign it to someone else or invent future capacity."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "All existing slots retain their kind and commitment. Defer preserves a visibly outstanding request. Reschedule is rejected unless its target is an empty work slot.",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 5 / relaxation, community and personal growth",
+          "rationale": "The source advocates avoiding overwork and preserving employee-directed time for recovery, learning and participation in community."
+        }
+      ]
+    },
+    {
+      "id": "expertise-role-exchange",
+      "title": "Let expertise change who teaches",
+      "description": "Two colleagues alternate teaching and learning around two concrete tasks. Their job-role labels stay fixed while the demonstration position changes according to subject-specific expertise.",
+      "creativeDirection": "Frames 12..34 reveal two people beside one shared worktable with unchanged role labels. Frames 35..82 show the first topic expert aligning a guide on the table while the other observes. The topic strip then turns to the second topic. Frames 83..130 pass the demonstration tool to the other person, who demonstrates their supplied topic while the first takes the observing position. Frames 131..167 hold both topic-expert attributions and both unchanged job roles. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to the common opaque ground during frames 168..179.",
+      "goodFor": [
+        "Explain that seniority is not universal expertise",
+        "Show reciprocal peer learning",
+        "Center knowledge from different fields or lived experience"
+      ],
+      "tags": [
+        "humility",
+        "expertise",
+        "peer learning",
+        "seniority",
+        "subject knowledge",
+        "reciprocity"
+      ],
+      "intent": "Separate authority in one topic from a permanent ranking of people.",
+      "family": "Learning and collaboration",
+      "inputs": [
+        {
+          "name": "people",
+          "type": "Array<{id:string;label:string;roleLabel:string}>",
+          "default": [
+            {
+              "id": "mara",
+              "label": "Mara",
+              "roleLabel": "Project lead"
+            },
+            {
+              "id": "eli",
+              "label": "Eli",
+              "roleLabel": "Local adviser"
+            }
+          ],
+          "control": "collection",
+          "description": "The two fictional participants whose roles remain stable.",
+          "constraints": "Exactly 2 people; unique IDs 1..20 characters; names 1..18 characters; roleLabel 1..24 characters."
+        },
+        {
+          "name": "topics",
+          "type": "Array<{id:string;label:string;expertId:string;demonstration:'fold-guide'|'align-ruler'}>",
+          "default": [
+            {
+              "id": "layout",
+              "label": "Document layout",
+              "expertId": "mara",
+              "demonstration": "fold-guide"
+            },
+            {
+              "id": "marking",
+              "label": "Workshop marking",
+              "expertId": "eli",
+              "demonstration": "align-ruler"
+            }
+          ],
+          "control": "collection",
+          "description": "Two short demonstrations with different experts. The other participant observes each one.",
+          "constraints": "Exactly 2 topics; unique IDs 1..20 characters; label 1..24 characters; expertId references people; the two expertIds must differ; each demonstration is a qualitative object gesture, not a scored skill test."
+        },
+        {
+          "name": "labels",
+          "type": "{demonstrates:string;learns:string;example:string}",
+          "default": {
+            "demonstrates": "Demonstrates",
+            "learns": "Learns",
+            "example": "Fictional peer learning"
+          },
+          "control": "object",
+          "description": "Role-in-the-moment and evidence labels.",
+          "constraints": "Each value 1..30 characters."
+        },
+        {
+          "name": "showJobRoles",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Keep job roles visible as the learning roles reverse.",
+          "constraints": "Boolean; person identities always remain visible."
+        },
+        {
+          "name": "tableArrangement",
+          "type": "'side-by-side'|'opposite-sides'",
+          "default": "side-by-side",
+          "control": "select",
+          "description": "How the participants share the worktable.",
+          "constraints": "Equal visual scale for both people in either arrangement."
+        },
+        {
+          "name": "closingLabel",
+          "type": "string",
+          "default": "Different knowledge, shared learning",
+          "control": "text",
+          "description": "Short summary beneath both topic attributions.",
+          "constraints": "1..48 characters."
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "In a fictional workshop, Mara demonstrates document layout and Eli demonstrates workshop marking. Each learns from the other while their organizational roles stay unchanged.",
+        "inputBindings": {
+          "people": [
+            {
+              "id": "mara",
+              "label": "Mara",
+              "roleLabel": "Project lead"
+            },
+            {
+              "id": "eli",
+              "label": "Eli",
+              "roleLabel": "Local adviser"
+            }
+          ],
+          "topics": [
+            {
+              "id": "layout",
+              "label": "Document layout",
+              "expertId": "mara",
+              "demonstration": "fold-guide"
+            },
+            {
+              "id": "marking",
+              "label": "Workshop marking",
+              "expertId": "eli",
+              "demonstration": "align-ruler"
+            }
+          ],
+          "labels": {
+            "demonstrates": "Demonstrates",
+            "learns": "Learns",
+            "example": "Fictional peer learning"
+          },
+          "showJobRoles": true,
+          "tableArrangement": "side-by-side",
+          "closingLabel": "Different knowledge, shared learning"
+        }
+      },
+      "distinction": "Unlike contribution-weave, participants exchange the active teaching role instead of combining outputs. Unlike interpreted-case-dialogue, no statement is translated or mediated; each person demonstrates a different subject of expertise.",
+      "limits": [
+        "Expertise is supplied by the author and is specific to the shown topic. The animation does not assess competence.",
+        "A brief demonstration does not establish mastery or prove that learning occurred.",
+        "Do not use clothing, size, age or posture to imply a hierarchy of human worth."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Swapping the expert IDs reverses the demonstration roles for the two topics while names and job-role labels remain attached to the same people.",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 6 / learning requires humility",
+          "rationale": "The source distinguishes subject expertise from organizational seniority and calls for listening to domain experts, coworkers and community members."
+        }
+      ]
+    },
+    {
+      "id": "peer-contribution-recognition",
+      "title": "Recognize the person behind a specific contribution",
+      "description": "A colleague identifies a concrete contribution, turns toward its maker, and gives a supplied acknowledgment. The contribution keeps its authorship and receives no ranking or score.",
+      "creativeDirection": "Frames 12..44 establish the contributor beside one or two authored work objects. Frames 45..88 let the colleague point to the focused object and trace its existing authorship tab back toward the contributor. Frames 89..128 turn the colleague toward the person and deliver the acknowledgment as a speech bubble or note. Frames 129..167 hold the contribution, authorship and acknowledgment together. If the authorship tab is hidden, keep the contributor's supplied name as a fixed byline beside the focused object instead. The colleague does not take the object or the credit. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to the common opaque ground during frames 168..179.",
+      "goodFor": [
+        "Express specific gratitude rather than generic praise",
+        "Show peer acknowledgment after a repair or useful guide",
+        "Recognize help without creating a competition"
+      ],
+      "tags": [
+        "gratitude",
+        "recognition",
+        "credit",
+        "authorship",
+        "peer support",
+        "specific praise"
+      ],
+      "intent": "Tie appreciation to a person and a concrete contribution.",
+      "family": "Learning and collaboration",
+      "inputs": [
+        {
+          "name": "people",
+          "type": "{contributor:string;colleague:string}",
+          "default": {
+            "contributor": "Rin",
+            "colleague": "Jo"
+          },
+          "control": "object",
+          "description": "Fictional people in the exchange.",
+          "constraints": "Distinct labels, each 1..18 characters."
+        },
+        {
+          "name": "contributions",
+          "type": "Array<{id:string;label:string;artifact:'guide'|'repair'|'drawing'}>",
+          "default": [
+            {
+              "id": "guide",
+              "label": "Clear setup guide",
+              "artifact": "guide"
+            }
+          ],
+          "control": "collection",
+          "description": "The contributor-authored work objects.",
+          "constraints": "1..2 objects; unique IDs 1..20 characters; labels 1..28 characters; every object belongs to the supplied contributor."
+        },
+        {
+          "name": "focusedContributionId",
+          "type": "string",
+          "default": "guide",
+          "control": "select",
+          "description": "The contribution receiving specific acknowledgment.",
+          "constraints": "Must reference contributions."
+        },
+        {
+          "name": "acknowledgment",
+          "type": "{text:string;form:'spoken'|'note'}",
+          "default": {
+            "text": "Your guide made the steps clear.",
+            "form": "spoken"
+          },
+          "control": "object",
+          "description": "The exact fictional acknowledgment.",
+          "constraints": "Text 1..52 characters; no numerical performance or impact claim without separate evidence."
+        },
+        {
+          "name": "showAuthorshipTab",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Keep the contributor attribution attached to the object.",
+          "constraints": "Boolean; when false, keep the contributor name as a fixed byline beside the focused object throughout the hold."
+        },
+        {
+          "name": "exampleLabel",
+          "type": "string",
+          "default": "Fictional peer acknowledgment",
+          "control": "text",
+          "description": "Persistent evidence label.",
+          "constraints": "1..44 characters."
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "In a fictional team, Jo thanks Rin for making a clear setup guide. The acknowledgment refers to that guide and retains Rin as its author.",
+        "inputBindings": {
+          "people": {
+            "contributor": "Rin",
+            "colleague": "Jo"
+          },
+          "contributions": [
+            {
+              "id": "guide",
+              "label": "Clear setup guide",
+              "artifact": "guide"
+            }
+          ],
+          "focusedContributionId": "guide",
+          "acknowledgment": {
+            "text": "Your guide made the steps clear.",
+            "form": "spoken"
+          },
+          "showAuthorshipTab": true,
+          "exampleLabel": "Fictional peer acknowledgment"
+        }
+      },
+      "distinction": "Unlike word-reveal, meaning comes from one person identifying another person's work and directing appreciation to them. Unlike feedback-refinement, the artifact does not need to be corrected or returned for another approval.",
+      "limits": [
+        "Acknowledgment is not a measurement of performance, trust, wellbeing or team success.",
+        "The recipient is not obliged to respond with a prescribed emotion or gesture.",
+        "The same work object and authorship remain intact throughout."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Changing the focus directs both the pointing gesture and acknowledgment toward that object while all authorship remains with the contributor. Hiding the tab retains a named byline at hold.",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 7 / honesty and vulnerability beyond criticism",
+          "rationale": "The source treats gratitude, specific praise and celebrating colleagues as part of honest team relationships."
+        }
+      ]
+    },
+    {
+      "id": "support-request-response",
+      "title": "Ask for help without losing ownership",
+      "description": "A team member makes a concrete request for support. A colleague gives an authored response and joins the same work surface only when the response accepts, while the requester keeps ownership of the task.",
+      "creativeDirection": "Frames 12..42 show the requester with one unfinished work object and a short help request. Frames 43..88 let the colleague turn toward the requester, pause to acknowledge them and display the supplied response. Frames 89..130 bring a second chair to the same worktable only for joins. For later or declines, the colleague remains at their position and the task stays visibly open. Frames 131..167 hold the requester, unchanged work object and explicit response. Do not replace the request with a completed or emotionally resolved state. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to the common opaque ground during frames 168..179.",
+      "goodFor": [
+        "Show a concrete support request",
+        "Distinguish hearing a concern from agreeing to help now",
+        "Depict collaboration without an ownership handoff"
+      ],
+      "tags": [
+        "asking for help",
+        "vulnerability",
+        "support",
+        "psychological safety",
+        "shared work",
+        "boundaries"
+      ],
+      "intent": "Show a respectful request and response while preserving both people's agency.",
+      "family": "Learning and collaboration",
+      "inputs": [
+        {
+          "name": "people",
+          "type": "{requester:string;colleague:string}",
+          "default": {
+            "requester": "Sam",
+            "colleague": "Lee"
+          },
+          "control": "object",
+          "description": "The fictional participants.",
+          "constraints": "Distinct labels 1..18 characters."
+        },
+        {
+          "name": "task",
+          "type": "{label:string;kind:'document'|'assembly'}",
+          "default": {
+            "label": "Review the draft",
+            "kind": "document"
+          },
+          "control": "object",
+          "description": "One unfinished object that remains with the requester.",
+          "constraints": "Label 1..28 characters; no final completion state is inferred."
+        },
+        {
+          "name": "requestText",
+          "type": "string",
+          "default": "Can we check this together?",
+          "control": "text",
+          "description": "The requester-authored ask.",
+          "constraints": "1..48 characters."
+        },
+        {
+          "name": "response",
+          "type": "{state:'joins'|'later'|'declines';text:string}",
+          "default": {
+            "state": "joins",
+            "text": "Yes, let us look together."
+          },
+          "control": "object",
+          "description": "The explicit reply and resulting participation.",
+          "constraints": "Text 1..48 characters; joins alone causes a shared-work gesture; later never implies a scheduled commitment unless the wording explicitly supplies one, and no later work is shown."
+        },
+        {
+          "name": "labels",
+          "type": "{ownedBy:string;open:string;shared:string;example:string}",
+          "default": {
+            "ownedBy": "Task owner",
+            "open": "Work remains open",
+            "shared": "Working together",
+            "example": "Fictional support exchange"
+          },
+          "control": "object",
+          "description": "Ownership, disposition and evidence labels.",
+          "constraints": "Each value 1..32 characters."
+        },
+        {
+          "name": "showRequestAtHold",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Retain the original request beside the response.",
+          "constraints": "Boolean; the response and owner remain visible."
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "In a fictional team, Sam asks Lee to check a draft together. Lee agrees and joins the same desk. The work remains Sam's and is not marked complete.",
+        "inputBindings": {
+          "people": {
+            "requester": "Sam",
+            "colleague": "Lee"
+          },
+          "task": {
+            "label": "Review the draft",
+            "kind": "document"
+          },
+          "requestText": "Can we check this together?",
+          "response": {
+            "state": "joins",
+            "text": "Yes, let us look together."
+          },
+          "labels": {
+            "ownedBy": "Task owner",
+            "open": "Work remains open",
+            "shared": "Working together",
+            "example": "Fictional support exchange"
+          },
+          "showRequestAtHold": true
+        }
+      },
+      "distinction": "Unlike custody-transfer, responsibility does not move to a successor. Unlike grievance-remedy-retest, there is no complaint, repair or acceptance test; the explanatory action is requesting support and joining ongoing work.",
+      "limits": [
+        "One supportive exchange does not establish psychological safety or a lasting level of trust.",
+        "A respectful decline or later response remains a valid visible outcome.",
+        "Do not imply that support automatically resolves distress, improves performance or completes the task."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Only joins adds a second chair at the shared task. Later and declines leave the task open, keep its owner unchanged and show their supplied wording.",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 3, 4 and 7 / support, community and vulnerable communication",
+          "rationale": "The source calls for offering practical help and maintaining relationships where people can speak candidly and receive a respectful response."
+        }
+      ]
+    },
+    {
+      "id": "recurring-leak-prevention",
+      "title": "Fix the source after containing the leak",
+      "description": "A worker first contains a recurring leak, then repairs its source and performs one supplied retest. Temporary containment and prevention remain visibly different actions.",
+      "creativeDirection": "Frames 12..38 reveal a schematic pipe joint leaking beside its normal outlet. Frames 39..62 place a catch tray under the leak while flow continues through the joint. Frames 63..106 pause the flow and let the worker apply the authored joint repair. Frames 107..140 restore the normal outlet flow only when a retest exists, showing either no side leak or a continued side leak according to the supplied result. For not-tested, retain the paused flow and an untested tag. Frames 141..167 hold the catch tray, repaired joint and explicit observation. The normal outlet must still run for a stopped-leak result so closing the supply cannot masquerade as prevention. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to the common opaque ground during frames 168..179.",
+      "goodFor": [
+        "Distinguish immediate relief from recurring-cause repair",
+        "Explain incident follow-through without celebrating constant crisis",
+        "Retain a failed or unperformed retest"
+      ],
+      "tags": [
+        "prevention",
+        "recurrence",
+        "root cause",
+        "incident learning",
+        "temporary relief",
+        "retest"
+      ],
+      "intent": "Make source repair visibly different from repeatedly managing its consequences.",
+      "family": "Resilience and maintenance",
+      "inputs": [
+        {
+          "name": "fixtureLabel",
+          "type": "string",
+          "default": "Illustrative joint",
+          "control": "text",
+          "description": "The schematic object used as a systems metaphor.",
+          "constraints": "1..28 characters."
+        },
+        {
+          "name": "workerLabel",
+          "type": "string",
+          "default": "Maintenance partner",
+          "control": "text",
+          "description": "The person who contains and repairs the leak.",
+          "constraints": "1..24 characters."
+        },
+        {
+          "name": "repair",
+          "type": "{label:string;gesture:'tighten'|'replace-seal'}",
+          "default": {
+            "label": "Replace the joint seal",
+            "gesture": "replace-seal"
+          },
+          "control": "object",
+          "description": "The supplied intervention at the cause.",
+          "constraints": "Label 1..32 characters; gestures are qualitative illustrations, not maintenance instructions."
+        },
+        {
+          "name": "retest",
+          "type": "'stopped'|'still-leaking'|'not-tested'",
+          "default": "stopped",
+          "control": "select",
+          "description": "Authored observation after the source repair.",
+          "constraints": "stopped requires normal outlet flow without a side leak; still-leaking requires both; not-tested shows neither resumed flow nor a successful result."
+        },
+        {
+          "name": "labels",
+          "type": "{containment:string;repair:string;test:string;stopped:string;continued:string;untested:string;example:string}",
+          "default": {
+            "containment": "Temporary containment",
+            "repair": "Source repair",
+            "test": "Illustrated retest",
+            "stopped": "No leak observed",
+            "continued": "Leak still observed",
+            "untested": "Not retested",
+            "example": "Fictional system metaphor"
+          },
+          "control": "object",
+          "description": "The distinction between response, intervention and evidence.",
+          "constraints": "Each value 1..28 characters."
+        },
+        {
+          "name": "showPhaseCaptions",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Show the three phase captions near the active physical action.",
+          "constraints": "Boolean; the final observation label is always shown."
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "A fictional team first catches a leak, then replaces a joint seal. One illustrated retest shows the normal outlet running without a side leak; it does not prove permanent reliability.",
+        "inputBindings": {
+          "fixtureLabel": "Illustrative joint",
+          "workerLabel": "Maintenance partner",
+          "repair": {
+            "label": "Replace the joint seal",
+            "gesture": "replace-seal"
+          },
+          "retest": "stopped",
+          "labels": {
+            "containment": "Temporary containment",
+            "repair": "Source repair",
+            "test": "Illustrated retest",
+            "stopped": "No leak observed",
+            "continued": "Leak still observed",
+            "untested": "Not retested",
+            "example": "Fictional system metaphor"
+          },
+          "showPhaseCaptions": true
+        }
+      },
+      "distinction": "Unlike grievance-remedy-retest, this explicitly separates downstream containment from upstream intervention and checks recurrence under resumed operation. Unlike retry-backoff, the underlying object changes before the retry.",
+      "limits": [
+        "This is a schematic operational metaphor, not a plumbing tutorial or a diagnosis of a real incident.",
+        "Drops and line thickness are nonquantitative motion cues. No volume, loss rate or saved cost is claimed.",
+        "One authored observation cannot establish permanent prevention. A repair action alone never determines the test outcome."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "A stopped-leak retest retains normal outlet flow. still-leaking retains the leak after repair. not-tested never displays a success state.",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 8 and 9 / No Heroes",
+          "rationale": "The source distinguishes appreciating emergency effort from investigating recurring causes and preventing environments that require repeated emergency work."
+        }
+      ]
+    },
+    {
+      "id": "release-repair-obligations",
+      "title": "Deliver with the remaining repair obligations visible",
+      "description": "An artifact may move to a recipient only when no open blocking issue remains. Every open follow-up issue stays attached as a visible limitation and creates an owned, dated repair obligation.",
+      "creativeDirection": "Frames 12..40 reveal an artifact with its authored issue tabs and an empty repair register. Frames 41..90 unfold each open follow-up tab into a matching register entry with its owner and due label, leaving the original limitation attached to the artifact. Resolved issues keep a resolved mark. Frames 91..130 move the artifact to the recipient only if every blocking issue is resolved. Otherwise keep it behind a held bracket. Frames 131..167 hold the actual artifact location and all unresolved obligations. A due label is a commitment, never a completed repair. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to the common opaque ground during frames 168..179.",
+      "goodFor": [
+        "Explain a bounded release without erasing known limitations",
+        "Keep technical debt ownership visible after delivery",
+        "Distinguish an open blocker from an explicitly deferred follow-up"
+      ],
+      "tags": [
+        "release",
+        "known limitations",
+        "technical debt",
+        "follow-through",
+        "ownership",
+        "blocking issue"
+      ],
+      "intent": "Separate delivery from the continuing duty to address known flaws.",
+      "family": "Resilience and maintenance",
+      "inputs": [
+        {
+          "name": "artifact",
+          "type": "{label:string;kind:'guide'|'prototype'}",
+          "default": {
+            "label": "Workshop guide",
+            "kind": "guide"
+          },
+          "control": "object",
+          "description": "The fictional deliverable.",
+          "constraints": "Label 1..28 characters."
+        },
+        {
+          "name": "issues",
+          "type": "Array<{id:string;label:string;state:'resolved'|'open';releaseRole:'blocking'|'follow-up';owner:string;dueLabel:string}>",
+          "default": [
+            {
+              "id": "steps",
+              "label": "Missing setup steps",
+              "state": "resolved",
+              "releaseRole": "blocking",
+              "owner": "Rin",
+              "dueLabel": "Before sharing"
+            },
+            {
+              "id": "index",
+              "label": "Add an index",
+              "state": "open",
+              "releaseRole": "follow-up",
+              "owner": "Jo",
+              "dueLabel": "Next review"
+            }
+          ],
+          "control": "collection",
+          "description": "The complete bounded issue set.",
+          "constraints": "1..4 issues; unique IDs 1..20 characters; issue label 1..28 characters; owner 0..18 and dueLabel 0..24 characters for every issue; open follow-up requires both owner and dueLabel nonempty; other issues may use empty values; blocking/open prevents delivery; classifications are authored and are not a safety assessment."
+        },
+        {
+          "name": "recipientLabel",
+          "type": "string",
+          "default": "Workshop team",
+          "control": "text",
+          "description": "The destination for a permitted delivery.",
+          "constraints": "1..24 characters."
+        },
+        {
+          "name": "labels",
+          "type": "{ready:string;held:string;limitations:string;register:string;resolved:string;open:string;example:string}",
+          "default": {
+            "ready": "Ready to share",
+            "held": "Held for blocker",
+            "limitations": "Known limitations",
+            "register": "Repair commitments",
+            "resolved": "Resolved",
+            "open": "Still open",
+            "example": "Fictional release decision"
+          },
+          "control": "object",
+          "description": "Visible release and obligation wording.",
+          "constraints": "Each value 1..28 characters."
+        },
+        {
+          "name": "showResolvedIssues",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Keep resolved tabs alongside the open limitations.",
+          "constraints": "Boolean; hidden resolved issues still participate in gate evaluation."
+        },
+        {
+          "name": "issueMarks",
+          "type": "'tabs'|'margin-notches'",
+          "default": "tabs",
+          "control": "select",
+          "description": "How issue identities stay attached to the artifact.",
+          "constraints": "Presentation only; every open issue remains visible at hold."
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "A fictional workshop guide has its missing setup steps fixed before sharing. An optional index remains open, assigned to Jo for the next review, and stays visible after the guide is delivered.",
+        "inputBindings": {
+          "artifact": {
+            "label": "Workshop guide",
+            "kind": "guide"
+          },
+          "issues": [
+            {
+              "id": "steps",
+              "label": "Missing setup steps",
+              "state": "resolved",
+              "releaseRole": "blocking",
+              "owner": "Rin",
+              "dueLabel": "Before sharing"
+            },
+            {
+              "id": "index",
+              "label": "Add an index",
+              "state": "open",
+              "releaseRole": "follow-up",
+              "owner": "Jo",
+              "dueLabel": "Next review"
+            }
+          ],
+          "recipientLabel": "Workshop team",
+          "labels": {
+            "ready": "Ready to share",
+            "held": "Held for blocker",
+            "limitations": "Known limitations",
+            "register": "Repair commitments",
+            "resolved": "Resolved",
+            "open": "Still open",
+            "example": "Fictional release decision"
+          },
+          "showResolvedIssues": true,
+          "issueMarks": "tabs"
+        }
+      },
+      "distinction": "Unlike readiness-latch, the result may move while explicitly classified follow-up obligations remain open. Unlike feedback-refinement, delivery does not imply a finished revision cycle; unresolved work retains identity, an owner and a due label.",
+      "limits": [
+        "Issue severity and release acceptability are authored, never inferred from text. The renderer cannot decide whether a flaw is safe.",
+        "Do not use the generic example to justify releasing software with dangerous or unknown consequences.",
+        "The register proves only that a commitment was stated. It does not show or guarantee that a later repair occurs."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Any open blocking issue holds the artifact. Resolving the last blocker permits delivery while every open follow-up retains its attached limitation and matching owner/due entry.",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 10 / moving slowly today and bounded imperfection",
+          "rationale": "The source rejects endless perfectionism while requiring flaws to be bounded, documented and followed by a committed repair plan."
+        }
+      ]
+    },
+    {
+      "id": "shared-jig-preparation",
+      "title": "Prepare one guide that the whole team can reuse",
+      "description": "One maker prepares a physical marking guide. The same guide then moves between coworkers, who apply its pattern to their own supplied workpieces while keeping the reusable guide intact.",
+      "creativeDirection": "Frames 12..48 show a maker forming the authored guide by opening two marking holes or a corner notch. Frames 49..130 carry that same guide to each collaborator in input order. At each station the collaborator aligns the guide with their existing blank workpiece and makes the matching marks, then releases the unchanged guide for the next person. Frames 131..167 hold all separate marked workpieces and the retained guide together. Do not turn the guide into copies of itself or show a numeric acceleration. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to the common opaque ground during frames 168..179.",
+      "goodFor": [
+        "Explain preparatory work that supports teammates",
+        "Show a reusable method applied to distinct outputs",
+        "Distinguish shared enablement from an individual speed claim"
+      ],
+      "tags": [
+        "team enablement",
+        "reusable guide",
+        "preparation",
+        "shared tooling",
+        "maintainability",
+        "multiplying contribution"
+      ],
+      "intent": "Make the benefit of shared preparation concrete without inventing a performance multiplier.",
+      "family": "Learning and collaboration",
+      "inputs": [
+        {
+          "name": "makerLabel",
+          "type": "string",
+          "default": "Guide maker",
+          "control": "text",
+          "description": "The person who prepares the reusable tool.",
+          "constraints": "1..24 characters."
+        },
+        {
+          "name": "guide",
+          "type": "{label:string;pattern:'two-holes'|'corner-mark'}",
+          "default": {
+            "label": "Marking guide",
+            "pattern": "two-holes"
+          },
+          "control": "object",
+          "description": "The one reusable guide and qualitative pattern.",
+          "constraints": "Label 1..24 characters; pattern is categorical and has no measurement or precision claim."
+        },
+        {
+          "name": "collaborators",
+          "type": "Array<{id:string;label:string;workpieceLabel:string}>",
+          "default": [
+            {
+              "id": "a",
+              "label": "Ari",
+              "workpieceLabel": "Panel A"
+            },
+            {
+              "id": "b",
+              "label": "Bo",
+              "workpieceLabel": "Panel B"
+            }
+          ],
+          "control": "collection",
+          "description": "The coworkers and their distinct pre-existing workpieces.",
+          "constraints": "1..3 collaborators; unique IDs 1..20 characters; label 1..18 and workpieceLabel 1..24 characters; one workpiece per collaborator; array order owns application order and count."
+        },
+        {
+          "name": "labels",
+          "type": "{prepare:string;apply:string;retained:string;example:string}",
+          "default": {
+            "prepare": "Prepare the guide",
+            "apply": "Apply the same pattern",
+            "retained": "Guide remains reusable",
+            "example": "Fictional preparation example"
+          },
+          "control": "object",
+          "description": "Action and evidence labels.",
+          "constraints": "Each value 1..34 characters."
+        },
+        {
+          "name": "workpieceMaterial",
+          "type": "'card'|'fabric'",
+          "default": "card",
+          "control": "select",
+          "description": "The schematic surface receiving the marks.",
+          "constraints": "Presentation only; no material performance is implied."
+        },
+        {
+          "name": "showAlignmentGuides",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Show matching edges while the reusable guide is seated.",
+          "constraints": "Boolean; marks still follow the exact selected pattern."
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "In a fictional workshop, one maker prepares a two-hole marking guide. Ari and Bo use that same guide on separate panels, and the guide remains available afterward.",
+        "inputBindings": {
+          "makerLabel": "Guide maker",
+          "guide": {
+            "label": "Marking guide",
+            "pattern": "two-holes"
+          },
+          "collaborators": [
+            {
+              "id": "a",
+              "label": "Ari",
+              "workpieceLabel": "Panel A"
+            },
+            {
+              "id": "b",
+              "label": "Bo",
+              "workpieceLabel": "Panel B"
+            }
+          ],
+          "labels": {
+            "prepare": "Prepare the guide",
+            "apply": "Apply the same pattern",
+            "retained": "Guide remains reusable",
+            "example": "Fictional preparation example"
+          },
+          "workpieceMaterial": "card",
+          "showAlignmentGuides": true
+        }
+      },
+      "distinction": "Unlike contribution-weave, the team does not combine its outputs into one object. Unlike practice-to-work-sample, the reusable artifact itself travels to multiple coworkers. Unlike cache-reuse, different workpieces receive a repeatable procedure rather than repeated requests receiving a stored answer.",
+      "limits": [
+        "No elapsed-time comparison, productivity multiplier or quality improvement is inferred from the choreography.",
+        "The physical guide is an authored preparation metaphor, not evidence of a particular product workflow or a measured team effect.",
+        "All workpieces exist at the start. Applying a pattern creates marks, not extra material or workers."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Each collaborator receives exactly one application of the selected pattern on their existing workpiece. Only one guide exists and it is retained after the final application.",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 9 / deliberate work amplifies the team",
+          "rationale": "The source locates individual contribution in enabling colleagues rather than personal typing speed."
+        },
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 10 / preparation before later work",
+          "rationale": "The source argues for deliberate preparation that makes later maintenance and change easier."
+        }
+      ]
+    },
+    {
+      "id": "portable-work-transfer",
+      "title": "Take the work to another tool",
+      "description": "A person packs copies of their work into a portable folio and brings it to another workbench. Artifact identities survive the transfer, and the original work remains visible at the source.",
+      "creativeDirection": "Frames 12..42 reveal the owner with a bounded collection at the source tool. Frames 43..92 lift one labeled copy of each artifact into a single portable folio while originals stay anchored in place. Frames 93..130 let the owner carry the folio to the destination. For accepted, open it and place each same-ID copy on the destination surface. For awaiting-open, retain the closed folio without a success mark. Frames 131..167 hold both tool labels, the owner and the actual transfer state. Do not animate format conversion or infer compatibility. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to the common opaque ground during frames 168..179.",
+      "goodFor": [
+        "Explain ownership across a change of tool",
+        "Illustrate portability as a response to vendor dependence",
+        "Keep source retention separate from destination acceptance"
+      ],
+      "tags": [
+        "portability",
+        "vendor lock-in",
+        "ownership",
+        "tool choice",
+        "export",
+        "retained identity"
+      ],
+      "intent": "Show that changing a tool should not erase the person's work.",
+      "family": "Agency and shared infrastructure",
+      "inputs": [
+        {
+          "name": "ownerLabel",
+          "type": "string",
+          "default": "Project owner",
+          "control": "text",
+          "description": "The person directing the move.",
+          "constraints": "1..24 characters."
+        },
+        {
+          "name": "tools",
+          "type": "{source:string;destination:string}",
+          "default": {
+            "source": "Tool A",
+            "destination": "Tool B"
+          },
+          "control": "object",
+          "description": "The two generic work environments.",
+          "constraints": "Distinct labels, each 1..24 characters; no logos, URLs or product claims."
+        },
+        {
+          "name": "artifacts",
+          "type": "Array<{id:string;label:string;kind:'sheet'|'chart'|'note'}>",
+          "default": [
+            {
+              "id": "a",
+              "label": "Project notes",
+              "kind": "note"
+            },
+            {
+              "id": "b",
+              "label": "Activity sheet",
+              "kind": "sheet"
+            }
+          ],
+          "control": "collection",
+          "description": "The work items whose identities are retained.",
+          "constraints": "1..4 items; unique IDs 1..20 characters; labels 1..24 characters; one original and one transfer copy per ID; copies must not be counted as additional unique work."
+        },
+        {
+          "name": "transferState",
+          "type": "'accepted'|'awaiting-open'",
+          "default": "accepted",
+          "control": "select",
+          "description": "The authored destination outcome.",
+          "constraints": "accepted permits the destination to open the folio; awaiting-open keeps the folio closed and never shows usable destination contents."
+        },
+        {
+          "name": "labels",
+          "type": "{originals:string;copies:string;portable:string;received:string;pending:string;example:string}",
+          "default": {
+            "originals": "Retained originals",
+            "copies": "Same-ID copies",
+            "portable": "Portable work",
+            "received": "Opened at destination",
+            "pending": "Awaiting opening",
+            "example": "Fictional portability principle"
+          },
+          "control": "object",
+          "description": "Identity, outcome and evidence labels.",
+          "constraints": "Each value 1..34 characters."
+        },
+        {
+          "name": "showIdentityTabs",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Keep IDs on originals and corresponding copies.",
+          "constraints": "Boolean; matching artifact labels remain visible even if ID tabs are hidden."
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "A fictional project owner retains notes in Tool A and carries same-ID copies to Tool B. The destination is explicitly shown opening the folio in this authored example.",
+        "inputBindings": {
+          "ownerLabel": "Project owner",
+          "tools": {
+            "source": "Tool A",
+            "destination": "Tool B"
+          },
+          "artifacts": [
+            {
+              "id": "a",
+              "label": "Project notes",
+              "kind": "note"
+            },
+            {
+              "id": "b",
+              "label": "Activity sheet",
+              "kind": "sheet"
+            }
+          ],
+          "transferState": "accepted",
+          "labels": {
+            "originals": "Retained originals",
+            "copies": "Same-ID copies",
+            "portable": "Portable work",
+            "received": "Opened at destination",
+            "pending": "Awaiting opening",
+            "example": "Fictional portability principle"
+          },
+          "showIdentityTabs": true
+        }
+      },
+      "distinction": "Unlike report-page-bind, a heterogeneous existing work collection changes tool without being rewritten into a new report. Unlike custody-transfer, ownership stays with the same person and source originals remain present. Unlike sealed-handoff, confidentiality is not the explanatory purpose.",
+      "limits": [
+        "The portable folio illustrates a portability principle. It is not evidence of an implemented export or import feature.",
+        "No file format, schema conversion, compatibility, migration completeness or vendor policy is demonstrated.",
+        "Source and destination copies represent the same unique work IDs and must not inflate a unique-artifact total."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Every artifact retains one source original and one same-ID transfer copy. Awaiting-open never displays successful destination use.",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 6 / honesty, vulnerability and trust",
+          "rationale": "The source identifies vendor lock-in as a reason that mission-driven organizations need earned trust and transparency. Portability is a generalized visual response to that concern."
+        }
+      ]
+    },
+    {
+      "id": "serviceable-panel-swap",
+      "title": "Change one part through a designed seam",
+      "description": "A modular enclosure exposes one replaceable panel. A worker removes and replaces only that part while the surrounding modules retain their positions, labels and identities.",
+      "creativeDirection": "Frames 12..42 reveal a single enclosure with a bounded row of modules. Frames 43..78 open a service latch around the targeted module and expose its existing connector. Frames 79..116 withdraw that module into a retained-parts tray, seat the supplied replacement on the same connector and close the latch. Frames 117..167 hold the changed module, unchanged neighbors and removed original together. Never dissolve or rebuild the enclosure to suggest local maintainability. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to the common opaque ground during frames 168..179.",
+      "goodFor": [
+        "Explain design for later change",
+        "Show a stable interface supporting a local replacement",
+        "Distinguish replacing one component from rebuilding a whole system"
+      ],
+      "tags": [
+        "maintainability",
+        "modularity",
+        "designed seam",
+        "replaceable component",
+        "local change",
+        "interface"
+      ],
+      "intent": "Make planned replaceability visible through one bounded operation.",
+      "family": "Resilience and maintenance",
+      "inputs": [
+        {
+          "name": "modules",
+          "type": "Array<{id:string;label:string}>",
+          "default": [
+            {
+              "id": "input",
+              "label": "Input unit"
+            },
+            {
+              "id": "control",
+              "label": "Control unit"
+            },
+            {
+              "id": "output",
+              "label": "Output unit"
+            }
+          ],
+          "control": "collection",
+          "description": "The initial modules in fixed display order.",
+          "constraints": "2..4 modules; unique IDs 1..20 characters; labels 1..22 characters; array order owns slot positions."
+        },
+        {
+          "name": "replacement",
+          "type": "{targetModuleId:string;id:string;label:string}",
+          "default": {
+            "targetModuleId": "control",
+            "id": "control-b",
+            "label": "Revised control"
+          },
+          "control": "object",
+          "description": "The single replacement module.",
+          "constraints": "targetModuleId must exist; id 1..20 characters must differ from all original IDs; label 1..22 characters; only the target slot changes."
+        },
+        {
+          "name": "workerLabel",
+          "type": "string",
+          "default": "Maintainer",
+          "control": "text",
+          "description": "The person making the bounded change.",
+          "constraints": "1..20 characters."
+        },
+        {
+          "name": "enclosure",
+          "type": "'console'|'cabinet'",
+          "default": "console",
+          "control": "select",
+          "description": "The schematic whole that stays intact.",
+          "constraints": "Presentation only; no specific hardware is depicted."
+        },
+        {
+          "name": "labels",
+          "type": "{whole:string;changed:string;retained:string;removed:string;example:string}",
+          "default": {
+            "whole": "Stable enclosure",
+            "changed": "One local change",
+            "retained": "Unchanged modules",
+            "removed": "Removed original",
+            "example": "Fictional maintainability metaphor"
+          },
+          "control": "object",
+          "description": "Boundary, identity and evidence labels.",
+          "constraints": "Each value 1..36 characters."
+        },
+        {
+          "name": "showConnectorGuide",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Show the existing connector alignment at the replacement slot.",
+          "constraints": "Boolean; the slot still remains fixed if the guide is hidden."
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "In a fictional modular console, a maintainer replaces the control unit through its service opening. The input and output modules remain unchanged, and the removed control remains visible.",
+        "inputBindings": {
+          "modules": [
+            {
+              "id": "input",
+              "label": "Input unit"
+            },
+            {
+              "id": "control",
+              "label": "Control unit"
+            },
+            {
+              "id": "output",
+              "label": "Output unit"
+            }
+          ],
+          "replacement": {
+            "targetModuleId": "control",
+            "id": "control-b",
+            "label": "Revised control"
+          },
+          "workerLabel": "Maintainer",
+          "enclosure": "console",
+          "labels": {
+            "whole": "Stable enclosure",
+            "changed": "One local change",
+            "retained": "Unchanged modules",
+            "removed": "Removed original",
+            "example": "Fictional maintainability metaphor"
+          },
+          "showConnectorGuide": true
+        }
+      },
+      "distinction": "Unlike component-material-return, the object is not dismantled into recovery streams or rebuilt from mixed material. Unlike revision-restore, it does not revert the whole artifact to an earlier snapshot. Only one designed seam opens around a local replacement.",
+      "limits": [
+        "This is a physical metaphor for maintainability, not a claim that a software dependency can always be replaced independently.",
+        "A seated replacement is not a functional test, a compatibility guarantee or evidence of zero downtime.",
+        "All original modules remain accounted for: unchanged modules stay inside and the removed module remains in its tray."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Changing targetModuleId moves the entire service action to that slot. Every unaffected module retains its exact position and ID, and the removed original remains visible.",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 10 / moving slowly today speeds us up tomorrow",
+          "rationale": "The source emphasizes readable, editable software and foundations that avoid repeated reconstruction during later maintenance."
+        }
+      ]
+    }
+  ],
+  "enrichments": [
+    {
+      "targetId": "capability-matrix",
+      "concept": "Joint affordability and quality requirements",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "page 2 / technical excellence",
+          "rationale": "The source rejects a mandatory choice between affordable access and dependable tools."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Show whether affordability and defined quality requirements are both met in an authored example"
+        ],
+        "tags": ["affordability", "joint requirements", "digital access"],
+        "limits": [
+          "A quality row needs an explicit criterion and source. Included affordability and quality cells do not prove that every organization can afford the tool or that it is safe."
+        ]
+      },
+      "reason": "The existing grid already supports independently stated categorical criteria. No new comparison mechanism is needed."
+    },
+    {
+      "targetId": "decision-fork",
+      "concept": "Ethical constraints and participant concerns in a choice",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 2, 6, 7 and 8 / technical ethics and next action",
+          "rationale": "The source treats community wellbeing and honest acknowledgment of implications as decision priorities."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Explain a decision constrained by an explicitly stated community concern",
+          "Show a principled next action in a bounded scenario"
+        ],
+        "tags": ["ethical constraint", "community concern", "next action"],
+        "limits": [
+          "Branch conditions and moral priorities are authored. The animation neither determines ethical correctness nor infers absence of harm."
+        ]
+      },
+      "reason": "The existing prompt, condition and selected branch already express a constrained choice without a new value-scoring system."
+    },
+    {
+      "targetId": "contribution-weave",
+      "concept": "Community co-creation with retained individual identities",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 4 and 8 / community and partnership",
+          "rationale": "The source values shared creation and participation while treating contributors as distinct people."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Explain sector-wide co-creation without erasing contributor identity",
+          "Show partnership without a central savior"
+        ],
+        "tags": ["co-creation", "partnership", "community contribution"],
+        "limits": [
+          "The weave is a relationship metaphor. Thread widths and crossings do not quantify labor, ownership, compensation or social impact."
+        ]
+      },
+      "reason": "The retained contributor ends and physical interlock already support this meaning."
+    },
+    {
+      "targetId": "feedback-refinement",
+      "concept": "Open, respectful community review",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 4, 7 and 10 / co-creation, candor and user learning",
+          "rationale": "The source calls for community discussion, kind direct feedback and learning from users after delivery."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Show an open design draft revised after an authored community comment",
+          "Explain respectful peer feedback with a retained comment trail"
+        ],
+        "tags": [
+          "community review",
+          "open development",
+          "kind feedback",
+          "user learning"
+        ],
+        "limits": [
+          "A submitted comment does not prove consent, adoption, representation of the whole community or that every concern has been resolved. The closing label must reflect the authored outcome."
+        ]
+      },
+      "reason": "The current author, reviewer, feedback note and changed draft already model the interaction."
+    },
+    {
+      "targetId": "provenance-peelback",
+      "concept": "Expose a documented decision rationale",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 6 and 7 / open decisions",
+          "rationale": "The source calls for explaining methods, choices and their reasons."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": ["Show the decision record behind a design choice"],
+        "tags": ["decision rationale", "transparency", "documented choice"],
+        "limits": [
+          "An exposed decision record makes reasoning inspectable. It does not prove that the decision was correct or publicly accepted."
+        ]
+      },
+      "reason": "An existing source sheet can be a decision record. The summary-to-source alignment needs no new renderer or input contract."
+    },
+    {
+      "targetId": "qualify-apparent-conflict",
+      "concept": "Preparation today and rapid response later",
+      "sourceRefs": [
+        {
+          "sourceId": "values-pdf",
+          "locator": "pages 9 and 10 / deliberate work",
+          "rationale": "The source distinguishes deliberate preparation from readiness to act in a later urgent situation."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Separate the time spent preparing from the time needed for a later response"
+        ],
+        "tags": ["preparation", "time horizon", "deliberate work", "readiness"],
+        "limits": [
+          "Separate time contexts explain how the authored statements can coexist. They do not establish a measured speed improvement or a guarantee of emergency performance."
+        ]
+      },
+      "reason": "The existing context divider resolves an apparent contradiction by exposing different time horizons."
+    }
+  ],
+  "limitations": [
+    "All 10 PDF pages were extracted with Poppler and visually inspected at page level. The PDF is a values statement, not verification of implemented product behavior, labor policies in force or measured business results.",
+    "Company names, private financial circumstances, exact policy quantities, claimed crisis outcomes and asserted productivity multipliers are omitted from stock examples. Defaults are invented bounded examples and are explicitly labeled fictional.",
+    "The physical jig, leak, modular enclosure and portable folio are original explanatory metaphors inferred from stated principles. They are not literal workflows documented in the source.",
+    "The values document names technical excellence and creative architecture without specifying algorithms, statistical methods or detailed system internals. Those gaps are not filled from general knowledge.",
+    "The company profile was loaded only to satisfy the source repository's context rule. No profile numbers, feature claims or policies were used as proposal evidence.",
+    "No source files were changed and no source content was uploaded externally. The source skill requests brain cleanup after retrieval, but the task's explicit read-only source constraint takes precedence; no cleanup mutation was run."
+  ],
+  "review": {
+    "date": "2026-10-16",
+    "reasoningEffort": "xhigh",
+    "mode": "read-only source extraction",
+    "status": "proposal inventory; coordinator decisions govern acceptance"
+  }
+}

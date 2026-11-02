@@ -1,7 +1,7 @@
-import type { UUID } from "@avandar/utils";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
 export type IndividualId = UUID<"Individual">;
@@ -12,6 +12,7 @@ type IndividualRead = {
   conceptId: ConceptId;
   externalId: string;
   id: IndividualId;
+  missingFromSourceAt: string | undefined;
   name: string;
   status: string;
   updatedAt: string;
@@ -30,7 +31,12 @@ export type IndividualModel = SupabaseCrudModelSpec<
       Read: IndividualRead;
       Insert: SetOptional<
         IndividualRead,
-        "assignedTo" | "createdAt" | "id" | "updatedAt"
+        | "assignedTo"
+        | "createdAt"
+        | "id"
+        | "missingFromSourceAt"
+        | "status"
+        | "updatedAt"
       >;
       Update: Partial<IndividualRead>;
     };

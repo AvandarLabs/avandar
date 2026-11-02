@@ -32,9 +32,8 @@ function useDeleteDashboard(
 } {
   const navigate = useNavigate();
   const [deleteDashboard, isDeleting] = DashboardClient.useFullDelete({
-    queriesToInvalidate:
-      options.dashboardId ?
-        [
+    queriesToInvalidate: options.dashboardId
+      ? [
           DashboardClient.QueryKeys.getAll(),
           DashboardClient.QueryKeys.getById({ id: options.dashboardId }),
           getNuxWorkspaceArtifactsQueryKey(),

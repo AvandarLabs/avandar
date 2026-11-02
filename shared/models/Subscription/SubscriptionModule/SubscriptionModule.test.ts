@@ -1,5 +1,5 @@
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 import { describe, expect, it } from "vitest";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 import type {
   SubscriptionId,
   SubscriptionRead,

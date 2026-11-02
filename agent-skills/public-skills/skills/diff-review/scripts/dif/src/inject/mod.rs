@@ -3,5 +3,6 @@
 
 pub mod dispatch;
 pub mod dispatcher;
+pub mod mode;
 pub mod prompt;
 pub mod reply_watcher;

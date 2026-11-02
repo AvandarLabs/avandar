@@ -49,13 +49,13 @@ export function PointGeometryTypeSelect({
       allowDeselect={false}
       onChange={(value) => {
         onPointsTypeChange(
-          value === "geometryColumn" ?
-            _createPointGeometryBinding(sourceColumns)
-          : {
-              type: "latLngColumns",
-              latitude: undefined,
-              longitude: undefined,
-            },
+          value === "geometryColumn"
+            ? _createPointGeometryBinding(sourceColumns)
+            : {
+                type: "latLngColumns",
+                latitude: undefined,
+                longitude: undefined,
+              },
         );
       }}
     />

@@ -1,8 +1,8 @@
 import { useRef } from "react";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { AvailableSymbologyType } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 /** Retains each available symbol type's settings while switching types. */
 export function useSymbologyTypeChange(
@@ -17,12 +17,12 @@ export function useSymbologyTypeChange(
   >({});
   rememberedRef.current[layer.symbology.type] = layer.symbology;
   const sizeColumn =
-    layer.symbology.type === "proportionalSymbol" ?
-      MapLayerUpdates.getQueryColumnFromLayer({
-        layer: layer,
-        columnId: layer.symbology.value,
-      })
-    : undefined;
+    layer.symbology.type === "proportionalSymbol"
+      ? MapLayerUpdates.getQueryColumnFromLayer({
+          layer: layer,
+          columnId: layer.symbology.value,
+        })
+      : undefined;
   const valueColumn = sizeColumn ?? layer.source.queryColumns[0];
   return (nextType) => {
     onLayerChange((current) => {

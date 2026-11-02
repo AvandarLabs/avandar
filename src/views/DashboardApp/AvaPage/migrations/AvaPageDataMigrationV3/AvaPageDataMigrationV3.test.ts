@@ -33,16 +33,16 @@ const V2_ROOT_PROPS = {
 };
 
 function v2Dashboard(
-  vizConfig: V2_AvaPageData["content"][number]["props"] extends infer P ?
-    P extends { vizConfig: infer V } ?
-      V
-    : never
-  : never,
-  vizType: V2_AvaPageData["content"][number]["props"] extends infer P ?
-    P extends { vizType: infer T } ?
-      T
-    : never
-  : never,
+  vizConfig: V2_AvaPageData["content"][number]["props"] extends infer P
+    ? P extends { vizConfig: infer V }
+      ? V
+      : never
+    : never,
+  vizType: V2_AvaPageData["content"][number]["props"] extends infer P
+    ? P extends { vizType: infer T }
+      ? T
+      : never
+    : never,
 ): V2_AvaPageData {
   return {
     root: { props: { ...V2_ROOT_PROPS, schemaVersion: 2 } },

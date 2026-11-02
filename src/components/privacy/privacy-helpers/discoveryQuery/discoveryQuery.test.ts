@@ -1,8 +1,8 @@
+import { describe, expect, test } from "vitest";
 import {
   isReadOnlyDiscoveryQuery,
   MAX_DISCOVERY_QUERY_CHARS,
 } from "$/utils/privacy/isReadOnlyDiscoveryQuery";
-import { describe, expect, test } from "vitest";
 
 describe("isReadOnlyDiscoveryQuery", () => {
   test("accepts simple SELECT", () => {

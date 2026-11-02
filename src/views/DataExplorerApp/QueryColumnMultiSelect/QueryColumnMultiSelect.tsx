@@ -8,19 +8,19 @@ import {
   MultiSelect,
 } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
-import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { matchSorter } from "match-sorter";
 import { useMemo } from "react";
+import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId/remapColumnsByBaseId";
 import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type {
   ComboboxItem,
   ComboboxParsedItem,
   MultiSelectProps,
   OptionsFilter,
 } from "@mantine/core";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { ReactNode } from "react";
 
 /**

@@ -53,13 +53,13 @@ export function DashboardViewerContent({
   return (
     <DashboardFilterStateManager.Provider>
       <Box>
-        {mode === "preview" && workspaceSlug ?
+        {mode === "preview" && workspaceSlug ? (
           <DashboardPreviewBanner
             dashboard={dashboard}
             workspaceSlug={workspaceSlug}
             canEdit={canEdit}
           />
-        : null}
+        ) : null}
         <PuckPageRender config={config} data={data} metadata={metadata} />
       </Box>
     </DashboardFilterStateManager.Provider>

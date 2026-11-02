@@ -20,32 +20,32 @@ export function AssistantMessage(): React.ReactNode {
   const { t } = useLingui();
   const isHidden = useMessage(isHiddenChatThreadMessage);
   return isHidden ? null : (
-      <MessagePrimitive.Root className={css.assistantMessageRow}>
-        <div className={css.assistantMessageStack}>
-          <div className={css.assistantMessageBubble}>
-            <MessagePrimitive.If hasContent={false}>
-              <Loader
-                type="dots"
-                size="sm"
-                color="neutral.5"
-                aria-label={t`Assistant is typing`}
-              />
-            </MessagePrimitive.If>
-            <MessagePrimitive.Parts components={{ Text: MarkdownTextPart }} />
-          </div>
-          <MessagePrimitive.If hasContent={true}>
-            <ActionBarPrimitive.Root className={css.assistantMessageActions}>
-              <ActionBarPrimitive.Reload
-                className={css.assistantMessageTryAgainButton}
-                aria-label={t`Try again`}
-                title={t`Try again`}
-              >
-                <IconRefresh size={12} />
-                <span>{t`Try again`}</span>
-              </ActionBarPrimitive.Reload>
-            </ActionBarPrimitive.Root>
+    <MessagePrimitive.Root className={css.assistantMessageRow}>
+      <div className={css.assistantMessageStack}>
+        <div className={css.assistantMessageBubble}>
+          <MessagePrimitive.If hasContent={false}>
+            <Loader
+              type="dots"
+              size="sm"
+              color="neutral.5"
+              aria-label={t`Assistant is typing`}
+            />
           </MessagePrimitive.If>
+          <MessagePrimitive.Parts components={{ Text: MarkdownTextPart }} />
         </div>
-      </MessagePrimitive.Root>
-    );
+        <MessagePrimitive.If hasContent={true}>
+          <ActionBarPrimitive.Root className={css.assistantMessageActions}>
+            <ActionBarPrimitive.Reload
+              className={css.assistantMessageTryAgainButton}
+              aria-label={t`Try again`}
+              title={t`Try again`}
+            >
+              <IconRefresh size={12} />
+              <span>{t`Try again`}</span>
+            </ActionBarPrimitive.Reload>
+          </ActionBarPrimitive.Root>
+        </MessagePrimitive.If>
+      </div>
+    </MessagePrimitive.Root>
+  );
 }

@@ -1,5 +1,5 @@
-import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.ts";
 import { describe, expect, it } from "vitest";
+import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 

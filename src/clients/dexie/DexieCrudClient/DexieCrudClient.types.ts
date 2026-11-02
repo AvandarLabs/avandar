@@ -56,11 +56,11 @@ type DexieCompoundModelPrimaryKeyType<
   ModelTypes extends DefaultModelTypes,
   PrimaryKey extends DexieCompoundModelPrimaryKey<ModelTypes>,
 > = {
-  [Index in keyof PrimaryKey]: PrimaryKey[Index] extends (
-    keyof ModelTypes["dbTypes"]["DBRead"]
-  ) ?
-    ModelTypes["dbTypes"]["DBRead"][PrimaryKey[Index]]
-  : never;
+  [
+    Index in keyof PrimaryKey
+  ]: PrimaryKey[Index] extends keyof ModelTypes["dbTypes"]["DBRead"]
+    ? ModelTypes["dbTypes"]["DBRead"][PrimaryKey[Index]]
+    : never;
 };
 
 /**
@@ -73,11 +73,11 @@ type DexieModelPrimaryKeyType<
   ModelTypes extends DefaultModelTypes,
   PrimaryKey extends ModelTypes["primaryKey"] = ModelTypes["primaryKey"],
 > =
-  PrimaryKey extends DexieCompoundModelPrimaryKey<ModelTypes> ?
-    DexieCompoundModelPrimaryKeyType<ModelTypes, PrimaryKey>
-  : PrimaryKey extends DexieModelPrimaryKeyName<ModelTypes> ?
-    ModelTypes["dbTypes"]["DBRead"][PrimaryKey]
-  : never;
+  PrimaryKey extends DexieCompoundModelPrimaryKey<ModelTypes>
+    ? DexieCompoundModelPrimaryKeyType<ModelTypes, PrimaryKey>
+    : PrimaryKey extends DexieModelPrimaryKeyName<ModelTypes>
+      ? ModelTypes["dbTypes"]["DBRead"][PrimaryKey]
+      : never;
 
 /**
  * A wrapper type to create the Dexie CRUD types for a model.

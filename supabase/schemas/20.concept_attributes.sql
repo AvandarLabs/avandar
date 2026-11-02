@@ -85,19 +85,14 @@ create policy "
   )
 );
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_concept_attribute__set_updated_at before
 update on public.concept_attributes for each row
 execute function public.util__set_updated_at ();
 
 /**
- * Validate label and identifier attributes.
- * A concept should have at least 1 concept_attribute with `is_label` and, for
- * attributes mapped from datasets, each dataset should have exactly 1 with
- * `is_identifier`.
- * This function must be used in a trigger.
+ * Validates a concept's label and identifier attributes. A concept needs at
+ * least one attribute with `is_label`, and each dataset that attributes are
+ * mapped from needs exactly one with `is_identifier`.
  */
 create or replace function public.concept_attributes__validate_label_and_identifiers () returns trigger as $$
 begin
@@ -132,19 +127,20 @@ begin
 end;
 $$ language plpgsql;
 
-/**
- * Triggers the label and identifier validations for the attributes and
- * mappings.
- *
- * **NOTE:** this trigger is intentionally set for *after* insert or update.
- * This is because when a Concept is inserted, the attributes do not exist
- * yet, so if we triggered this "before" insert, then the attribute count will
- * be 0, so it will raise an error. But, because we insert attributes via a
- * bulk insert, then *after* the insert we know the attributes are fair game to
- * query now. On the flip side, the disadvantage is that if there's an error
- * now, we need to manually rollback the changes. Currently the rollback needs
- * to be handled on the frontend by sending DELETE requests.
- */
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.concept_attributes__validate_label_and_identifiers ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+-- Deliberately `after insert or update`. A concept's attributes are inserted in
+-- bulk after the concept row itself, so a `before` trigger would count zero
+-- attributes and raise. The cost is that a failure here has to be undone by the
+-- caller: the frontend rolls the partial write back with DELETE requests.
 create trigger tr_concept_attributes__validate_label_and_identifiers
 after insert or
 update on public.concept_attributes for each row

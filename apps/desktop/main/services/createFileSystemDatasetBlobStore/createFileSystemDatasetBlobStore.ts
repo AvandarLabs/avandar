@@ -132,9 +132,9 @@ export function createFileSystemDatasetBlobStore(
         return [];
       }
       const baseDir =
-        normalisedPrefix.length === 0 ?
-          rootDir
-        : join(rootDir, normalisedPrefix);
+        normalisedPrefix.length === 0
+          ? rootDir
+          : join(rootDir, normalisedPrefix);
       if (!fs.existsSync(baseDir)) {
         return [];
       }

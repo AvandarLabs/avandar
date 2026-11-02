@@ -14,11 +14,11 @@ export function convertDatesToISOInProps<
 >(
   keys: readonly K[],
 ): (obj: T) => {
-  [Key in keyof T]: Key extends K ?
-    undefined extends T[Key] ?
-      string | undefined
-    : string
-  : T[Key];
+  [Key in keyof T]: Key extends K
+    ? undefined extends T[Key]
+      ? string | undefined
+      : string
+    : T[Key];
 } {
   return (obj: T) => {
     return convertDatesToISOIn(obj, keys);

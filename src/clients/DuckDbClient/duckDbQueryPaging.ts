@@ -1,9 +1,9 @@
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   DuckDbStructuredQuery,
   UnknownRow,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 type PageQueryParams = Omit<
   DuckDbStructuredQuery & {
@@ -58,9 +58,9 @@ function _getPageNavigation(
   }>,
 ): Pick<QueryResult.Page<UnknownRow>, "totalPages" | "nextPage" | "prevPage"> {
   const totalPages =
-    options.totalRows === 0 ?
-      1
-    : Math.ceil(options.totalRows / options.pageSize);
+    options.totalRows === 0
+      ? 1
+      : Math.ceil(options.totalRows / options.pageSize);
   return {
     totalPages,
     nextPage:

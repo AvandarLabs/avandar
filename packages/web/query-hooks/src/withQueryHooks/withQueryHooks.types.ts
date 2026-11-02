@@ -37,10 +37,9 @@ export type ClientFnFirstParameter<
   Client extends ServiceClient,
   FnName extends keyof Client,
   Fn extends Client[FnName] = Client[FnName],
-> =
-  Fn extends AnyFunction ?
-    undefined extends Parameters<Fn>[0] ?
-      void | Parameters<Fn>[0]
+> = Fn extends AnyFunction
+  ? undefined extends Parameters<Fn>[0]
+    ? void | Parameters<Fn>[0]
     : Parameters<Fn>[0]
   : never;
 
@@ -55,22 +54,25 @@ export type UseClientQueryArg<
   FnName extends keyof Client,
   ClientParam extends ClientFnFirstParameter<Client, FnName> =
     ClientFnFirstParameter<Client, FnName>,
-> =
-  [Exclude<ClientParam, void>] extends [never] ?
-    { useQueryOptions?: RefinedQueryOptions } | void
-  : undefined extends ClientParam ?
-    Simplify<
-      NonNullable<ClientParam> extends object ?
-        | (NonNullable<ClientParam> & { useQueryOptions?: RefinedQueryOptions })
-        | void
-      : | ({ arg?: NonNullable<ClientParam> } & {
-            useQueryOptions?: RefinedQueryOptions;
-          })
-        | void
-    >
-  : ClientParam extends object ?
-    ClientParam & { useQueryOptions?: RefinedQueryOptions }
-  : { arg: ClientParam } & { useQueryOptions?: RefinedQueryOptions };
+> = [Exclude<ClientParam, void>] extends [never]
+  ? { useQueryOptions?: RefinedQueryOptions } | void
+  : undefined extends ClientParam
+    ? Simplify<
+        NonNullable<ClientParam> extends object
+          ?
+              | (NonNullable<ClientParam> & {
+                  useQueryOptions?: RefinedQueryOptions;
+                })
+              | void
+          :
+              | ({ arg?: NonNullable<ClientParam> } & {
+                  useQueryOptions?: RefinedQueryOptions;
+                })
+              | void
+      >
+    : ClientParam extends object
+      ? ClientParam & { useQueryOptions?: RefinedQueryOptions }
+      : { arg: ClientParam } & { useQueryOptions?: RefinedQueryOptions };
 
 /**
  * Helper type to generate a function that returns a `QueryKey`
@@ -97,53 +99,56 @@ export type UseQueryFunctionsRecord<
   Client extends ServiceClient,
   QueryFnName extends FnNameReturningPromise<Client>,
 > = {
-  [QName in QueryFnName as `use${Capitalize<QName>}`]: Client[QName] extends (
-    AnyFunctionWithReturn<Promise<infer Result>>
-  ) ?
-    (options: UseClientQueryArg<Client, QName>) => UseQueryResultTuple<Result>
-  : never;
+  [
+    QName in QueryFnName as `use${Capitalize<QName>}`
+  ]: Client[QName] extends AnyFunctionWithReturn<Promise<infer Result>>
+    ? (options: UseClientQueryArg<Client, QName>) => UseQueryResultTuple<Result>
+    : never;
 };
 
 export type UseMutationFunctionsRecord<
   Client extends ServiceClient,
   MutationFnName extends FnNameReturningPromise<Client>,
 > = {
-  [MutName in MutationFnName as `use${Capitalize<MutName>}`]: Client[MutName] extends (
-    AnyFunctionWithSignature<infer Params, Promise<infer Result>>
-  ) ?
-    (
-      useMutationOptions?: Simplify<
-        Omit<
-          UseMutationOptions<Result, Params[0], DefaultError, unknown>,
-          "mutationFn"
-        > &
-          ExtraUseClientMutationArgs
-      >,
-    ) => UseMutationResultTuple<Result, Params[0], DefaultError, unknown>
-  : never;
+  [
+    MutName in MutationFnName as `use${Capitalize<MutName>}`
+  ]: Client[MutName] extends AnyFunctionWithSignature<
+    infer Params,
+    Promise<infer Result>
+  >
+    ? (
+        useMutationOptions?: Simplify<
+          Omit<
+            UseMutationOptions<Result, Params[0], DefaultError, unknown>,
+            "mutationFn"
+          > &
+            ExtraUseClientMutationArgs
+        >,
+      ) => UseMutationResultTuple<Result, Params[0], DefaultError, unknown>
+    : never;
 };
 
 export type QueryKeysRecord<
   Client extends ServiceClient,
   QueryFnName extends FnNameReturningPromise<Client>,
 > = {
-  [QName in QueryFnName]: Client[QName] extends (
+  [QName in QueryFnName]: Client[QName] extends AnyFunctionWithReturn<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    AnyFunctionWithReturn<Promise<any>>
-  ) ?
-    ClientQueryKeyBuilderFn<Client, QName>
-  : never;
+    Promise<any>
+  >
+    ? ClientQueryKeyBuilderFn<Client, QName>
+    : never;
 };
 
 export type QueryFnsRecord<
   Client extends ServiceClient,
   QueryFnName extends FnNameReturningPromise<Client>,
 > = {
-  [QName in QueryFnName]: Client[QName] extends (
-    AnyFunctionWithReturn<Promise<infer Result>>
-  ) ?
-    (options: ClientFnFirstParameter<Client, QName>) => Promise<Result>
-  : never;
+  [QName in QueryFnName]: Client[QName] extends AnyFunctionWithReturn<
+    Promise<infer Result>
+  >
+    ? (options: ClientFnFirstParameter<Client, QName>) => Promise<Result>
+    : never;
 };
 
 /**

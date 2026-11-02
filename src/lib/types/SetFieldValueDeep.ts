@@ -35,64 +35,66 @@ export type SetFieldValueDeep<
   // `never` on a record. E.g. ObjectPaths<string, string> = never.
   // So if `ObjectPaths<>` can't compute a set of paths, we can fall back
   // to using `keyof T` which works fine for records.
-  K extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>,
+  K extends ([ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>),
   V,
-> =
-  T extends UnknownArray ?
-    K extends number | `${number}` ?
-      T extends Array<infer Item> ? Array<Item | V>
-      : T extends ReadonlyArray<infer Item> ? ReadonlyArray<Item | V>
-      : never
-    : K extends `${number}.${infer PathTail}` ?
-      // dig in recursively
-      T extends Array<infer Item extends UnknownObject | UnknownArray> ?
-        PathTail extends ObjectPaths<Item> ?
-          Array<
-            SetFieldValueDeep<
-              Item,
-              [PathTail] extends [never] ? keyof Item : PathTail,
-              V
-            >
-          >
+> = T extends UnknownArray
+  ? K extends number | `${number}`
+    ? T extends Array<infer Item>
+      ? Array<Item | V>
+      : T extends ReadonlyArray<infer Item>
+        ? ReadonlyArray<Item | V>
         : never
-      : T extends (
-        ReadonlyArray<infer Item extends UnknownObject | UnknownArray>
-      ) ?
-        PathTail extends ObjectPaths<Item> ?
-          ReadonlyArray<
-            SetFieldValueDeep<
-              Item,
-              [PathTail] extends [never] ? keyof Item : PathTail,
-              V
+    : K extends `${number}.${infer PathTail}`
+      ? // dig in recursively
+        T extends Array<infer Item extends UnknownObject | UnknownArray>
+        ? PathTail extends ObjectPaths<Item>
+          ? Array<
+              SetFieldValueDeep<
+                Item,
+                [PathTail] extends [never] ? keyof Item : PathTail,
+                V
+              >
             >
-          >
-        : never
-      : never
-    : never
-  : K extends keyof T ?
-    // K is a direct key of T, so we replace the value at `K` with `V`
-    SetFieldValueShallow<T, K, V>
-  : T extends UnknownObject ?
-    K extends keyof T ?
-      // K is a direct key of T, so we replace the value at `K` with `V`
-      SetFieldValueShallow<T, K, V>
-    : K extends `${infer PathHead}.${infer PathTail}` ?
-      PathHead extends keyof T ?
-        {
-          [Key in keyof T]: Key extends PathHead ?
-            // We need to dig in recursively, but we need to assert our types
-            // are still valid for the recursive SetFieldValueDeep call
-            T[Key] extends UnknownObject | UnknownArray ?
-              PathTail extends ObjectPaths<T[Key]> ?
+          : never
+        : T extends ReadonlyArray<
+              infer Item extends UnknownObject | UnknownArray
+            >
+          ? PathTail extends ObjectPaths<Item>
+            ? ReadonlyArray<
                 SetFieldValueDeep<
-                  T[Key],
-                  [PathTail] extends [never] ? keyof T[Key] : PathTail,
+                  Item,
+                  [PathTail] extends [never] ? keyof Item : PathTail,
                   V
                 >
-              : never
+              >
             : never
-          : T[Key];
-        }
+          : never
       : never
-    : never
-  : never;
+  : K extends keyof T
+    ? // K is a direct key of T, so we replace the value at `K` with `V`
+      SetFieldValueShallow<T, K, V>
+    : T extends UnknownObject
+      ? K extends keyof T
+        ? // K is a direct key of T, so we replace the value at `K` with `V`
+          SetFieldValueShallow<T, K, V>
+        : K extends `${infer PathHead}.${infer PathTail}`
+          ? PathHead extends keyof T
+            ? {
+                [Key in keyof T]: Key extends PathHead
+                  ? // We need to dig in recursively, but we need to
+                    // assert our types are still valid for the recursive
+                    // SetFieldValueDeep call
+                    T[Key] extends UnknownObject | UnknownArray
+                    ? PathTail extends ObjectPaths<T[Key]>
+                      ? SetFieldValueDeep<
+                          T[Key],
+                          [PathTail] extends [never] ? keyof T[Key] : PathTail,
+                          V
+                        >
+                      : never
+                    : never
+                  : T[Key];
+              }
+            : never
+          : never
+      : never;

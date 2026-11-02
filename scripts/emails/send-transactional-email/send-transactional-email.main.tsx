@@ -1,13 +1,13 @@
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
+import { program } from "commander";
+import { z } from "zod";
 import { EmailClient } from "$/EmailClient/EmailClient";
 import { NOTIFICATION_EMAIL_FROM } from "$/EmailClient/EmailClientConfig";
 import { isDevOverrideEmail } from "$/EmailClient/isDevOverrideEmail";
 import { EmailMarkdown } from "$/emails/lib/EmailMarkdown";
 import { EmailTemplate } from "$/emails/lib/EmailTemplate";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail";
-import { program } from "commander";
-import { z } from "zod";
 
 const RED = "\x1b[31m";
 const BLUE = "\x1b[34m";
@@ -15,15 +15,15 @@ const GREEN = "\x1b[32m";
 const YELLOW = "\x1b[33m";
 const RESET = "\x1b[0m";
 
-const CLIOptionSchema = z.object({
+const CliOptionSchema = z.object({
   to: z.email(),
   body: z.string(),
   subject: z.string(),
 });
 
-type CLIOptions = z.infer<typeof CLIOptionSchema>;
+type CliOptions = z.infer<typeof CliOptionSchema>;
 
-function setupCLI() {
+function setupCli() {
   program
     .name("pnpm email:send-email --")
     .description("Send a transactional email to a recipient")
@@ -35,7 +35,7 @@ function setupCLI() {
   program.parse();
 }
 
-async function sendEmail(options: CLIOptions): Promise<void> {
+async function sendEmail(options: CliOptions): Promise<void> {
   const { to, subject, body } = options;
   console.log(
     `\x1b[36m📧\x1b[0m Sending email to ${to} with subject "${subject}"`,
@@ -85,8 +85,8 @@ async function confirmSend(recipient: string): Promise<void> {
 }
 
 async function main() {
-  setupCLI();
-  const cliOptions = CLIOptionSchema.parse(program.opts());
+  setupCli();
+  const cliOptions = CliOptionSchema.parse(program.opts());
   try {
     const { to, subject, body } = cliOptions;
     console.log(`Preparing to send email to ${GREEN}${to}${RESET}.

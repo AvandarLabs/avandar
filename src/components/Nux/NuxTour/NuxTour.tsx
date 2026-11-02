@@ -39,8 +39,8 @@ export function NuxTour(): ReactNode {
     visibleSteps[state.activeStepIndex]?.anchor,
   );
   const steps = useMemo(() => {
-    return milestone ?
-        makeJoyrideStepsFromMilestone({
+    return milestone
+      ? makeJoyrideStepsFromMilestone({
           milestone: { ...milestone, steps: visibleSteps },
           i18n,
         })

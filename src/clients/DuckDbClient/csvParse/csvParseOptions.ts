@@ -64,22 +64,22 @@ export function mergeSniffCsvRowIntoParseOptions(options: {
       userHints.numRowsToSkip ?? sniffRow.SkipRows ?? base.numRowsToSkip,
     delimiter: userHints.delimiter ?? sniffRow.Delimiter ?? base.delimiter,
     quoteChar:
-      userHints.quoteChar != null ?
-        normalizeDuckDbCsvOptionToken(userHints.quoteChar)
-      : normalizeDuckDbCsvOptionToken(sniffRow.Quote),
+      userHints.quoteChar != null
+        ? normalizeDuckDbCsvOptionToken(userHints.quoteChar)
+        : normalizeDuckDbCsvOptionToken(sniffRow.Quote),
     escapeChar:
-      userHints.escapeChar != null ?
-        normalizeDuckDbCsvOptionToken(userHints.escapeChar)
-      : normalizeDuckDbCsvOptionToken(sniffRow.Escape),
+      userHints.escapeChar != null
+        ? normalizeDuckDbCsvOptionToken(userHints.escapeChar)
+        : normalizeDuckDbCsvOptionToken(sniffRow.Escape),
     newlineDelimiter: normalizeNewlineDelimiterForDuckDb(
       userHints.newlineDelimiter ??
         sniffRow.NewLineDelimiter ??
         base.newlineDelimiter,
     ),
     commentChar:
-      userHints.commentChar != null ?
-        normalizeDuckDbCsvOptionToken(userHints.commentChar)
-      : normalizeDuckDbCsvOptionToken(sniffRow.Comment),
+      userHints.commentChar != null
+        ? normalizeDuckDbCsvOptionToken(userHints.commentChar)
+        : normalizeDuckDbCsvOptionToken(sniffRow.Comment),
     hasHeader: userHints.hasHeader ?? sniffRow.HasHeader ?? base.hasHeader,
     dateFormat:
       optionalTrimmedCsvFormat(userHints.dateFormat) ??
@@ -90,9 +90,11 @@ export function mergeSniffCsvRowIntoParseOptions(options: {
       optionalTrimmedCsvFormat(sniffRow.TimestampFormat) ??
       base.timestampFormat,
     columns:
-      userHints.columns && userHints.columns.length > 0 ? [...userHints.columns]
-      : sniffColumns.length > 0 ? sniffColumns
-      : base.columns,
+      userHints.columns && userHints.columns.length > 0
+        ? [...userHints.columns]
+        : sniffColumns.length > 0
+          ? sniffColumns
+          : base.columns,
     strictMode: base.strictMode,
   };
 }

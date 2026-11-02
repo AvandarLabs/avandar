@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 /**
  * Builds a {@link SqlDisplayCatalog} from workspace dataset and column lists.

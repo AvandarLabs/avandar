@@ -1,6 +1,6 @@
 import { where } from "@avandar/utils";
-import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
@@ -182,9 +182,8 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           // suppresses every rule on the next line. Keep the line it guards to
           // the single `const commitOptions` declaration.
           // react-doctor-disable-next-line
-          const commitOptions =
-            isDatasetSource ?
-              await buildDataSourceCommitOptions({
+          const commitOptions = isDatasetSource
+            ? await buildDataSourceCommitOptions({
                 dataSource: restoredDataSource,
                 query: state.query,
                 workspaceId: workspace.id,
@@ -326,9 +325,9 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
       }
       lastSyncedRef.current = serialized;
       const searchToWrite =
-        Object.keys(urlParams).length === 0 ?
-          EMPTY_EXPLORER_URL_SEARCH
-        : urlParams;
+        Object.keys(urlParams).length === 0
+          ? EMPTY_EXPLORER_URL_SEARCH
+          : urlParams;
       navigate({ search: searchToWrite, replace: true });
     },
     [isHydrated, urlParams, urlSearch, navigate],

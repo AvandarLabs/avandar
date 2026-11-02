@@ -20,8 +20,8 @@ function _noopOnly(
   name: string,
 ): (create: Readonly<CreateViewStatement>) => NoopVerdict {
   return (create) => {
-    return create.view.name === name ?
-        { isNoop: true, reason: "test stub" }
+    return create.view.name === name
+      ? { isNoop: true, reason: "test stub" }
       : { isNoop: false, reason: "test stub" };
   };
 }

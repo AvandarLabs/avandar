@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 /**
  * Paint decisions for a layer whose features are DuckDB-aggregated cells
  * rather than source rows.
@@ -8,7 +9,6 @@
  * cells carry instead of the ones MapLibre would have written.
  */
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { describe, expect, it } from "vitest";
 import { PointAggregateProperties } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.constants";
 import { valueColumnId } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/__tests__/makeLayerSpecFromMapLayer.fixtures";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";

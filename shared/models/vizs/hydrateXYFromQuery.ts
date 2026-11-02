@@ -46,9 +46,8 @@ export function hydrateXYFromQuery<VConfig extends XYAxesConfig>(
       const firstNumericColumn = queryColumns.find(QueryColumn.isNumeric);
       newVizConfig = {
         ...newVizConfig,
-        yAxisKey:
-          firstNumericColumn ?
-            QueryColumn.getDerivedColumnName(firstNumericColumn)
+        yAxisKey: firstNumericColumn
+          ? QueryColumn.getDerivedColumnName(firstNumericColumn)
           : undefined,
       };
     }
@@ -64,9 +63,8 @@ export function hydrateXYFromQuery<VConfig extends XYAxesConfig>(
 
       newVizConfig = {
         ...newVizConfig,
-        xAxisKey:
-          firstColumn ?
-            QueryColumn.getDerivedColumnName(firstColumn)
+        xAxisKey: firstColumn
+          ? QueryColumn.getDerivedColumnName(firstColumn)
           : undefined,
       };
     }

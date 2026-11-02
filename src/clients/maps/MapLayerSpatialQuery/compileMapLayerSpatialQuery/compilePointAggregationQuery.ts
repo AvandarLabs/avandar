@@ -17,6 +17,8 @@ import {
   makeSpatialQueryPlan,
   makeSuppressedAreaFeatureSql,
 } from "./compileMapLayerSpatialQueryHelpers";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type {
   MapLayerSpatialQueryPlan,
   ResolvedBoundarySource,
@@ -26,8 +28,6 @@ import type {
   CompileOptions,
   CompileSourceOptions,
 } from "./compileMapLayerSpatialQuery.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 type PointAggregationBinding = Extract<
   MapLayer.GeoBinding,
@@ -70,8 +70,8 @@ function _buildPointAggregationDenominatorSql(
   const alias = quoteSqlIdentifier(
     MapLayerSpatialFeatureProperties.denominator,
   );
-  return denominator?.type === "boundaryColumn" ?
-      {
+  return denominator?.type === "boundaryColumn"
+    ? {
         selectSql: `, ${quoteSqlIdentifier(denominator.columnName)} AS ${alias}`,
         reportableSql: alias,
       }
@@ -86,8 +86,8 @@ function _buildPointAggregationDisputedStatusSql(
   const alias = quoteSqlIdentifier(
     MapLayerSpatialFeatureProperties.disputedStatus,
   );
-  return reference?.type === "boundaryColumn" ?
-      {
+  return reference?.type === "boundaryColumn"
+    ? {
         selectSql: `, ${quoteSqlIdentifier(reference.columnName)} AS ${alias}`,
         reportableSql: alias,
       }
@@ -95,8 +95,8 @@ function _buildPointAggregationDisputedStatusSql(
 }
 
 function _getMinimumContributorCount(layer: MapLayer.T): number {
-  return layer.sensitivity.mode === "aggregateOnly" ?
-      layer.sensitivity.minCellCount
+  return layer.sensitivity.mode === "aggregateOnly"
+    ? layer.sensitivity.minCellCount
     : 0;
 }
 
@@ -108,9 +108,8 @@ function _buildParsedPointsCte(pointParser: string): string {
 }
 
 function _buildPointAggregationCtes(parts: PointAggregationCteParts): string {
-  const sourceAoiWhere =
-    parts.aoi ?
-      ` AND ${makeSourceAoiPredicateSql("point_geometry", parts.aoi)}`
+  const sourceAoiWhere = parts.aoi
+    ? ` AND ${makeSourceAoiPredicateSql("point_geometry", parts.aoi)}`
     : "";
   return `source_rows AS (${parts.sourceSql}),
 ${_buildParsedPointsCte(parts.pointParser)},
@@ -166,9 +165,8 @@ function _buildPointFeatureRowsCte(options: {
   disputedStatusSql: string;
   aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
-  const outputAoiWhere =
-    options.aoi ?
-      `\n  WHERE ${makeOutputAoiPredicateSql(options.geometry, options.aoi)}`
+  const outputAoiWhere = options.aoi
+    ? `\n  WHERE ${makeOutputAoiPredicateSql(options.geometry, options.aoi)}`
     : "";
   return `feature_rows AS (
   SELECT ${makeSuppressedAreaFeatureSql({
@@ -248,8 +246,8 @@ function _buildPointAggregationBoundaryParser(options: {
 }
 
 function _getPointDisplayNameSql(boundary: ResolvedBoundarySource): string {
-  return boundary.displayNameColumnName ?
-      quoteSqlIdentifier(boundary.displayNameColumnName)
+  return boundary.displayNameColumnName
+    ? quoteSqlIdentifier(boundary.displayNameColumnName)
     : quoteSqlIdentifier(boundary.keyColumnName);
 }
 

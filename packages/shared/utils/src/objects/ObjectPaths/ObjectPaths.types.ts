@@ -5,18 +5,19 @@
 type PreviousDepth = [never, 0, 1, 2, 3, 4, 5];
 
 /** True when `T` is a union of two or more members. */
-type IsUnion<T, Union = T> =
-  [T] extends [never] ? false
-  : T extends unknown ?
-    [Union] extends [T] ?
-      false
-    : true
-  : never;
+type IsUnion<T, Union = T> = [T] extends [never]
+  ? false
+  : T extends unknown
+    ? [Union] extends [T]
+      ? false
+      : true
+    : never;
 
 /** The keys of `T` whose values are functions. */
 type FunctionKeys<T> = {
-  [K in keyof T]-?: NonNullable<T[K]> extends (...args: never[]) => unknown ? K
-  : never;
+  [K in keyof T]-?: NonNullable<T[K]> extends (...args: never[]) => unknown
+    ? K
+    : never;
 }[keyof T];
 
 /**
@@ -40,14 +41,15 @@ type IsBehaviorCarrying<T> = IsUnion<FunctionKeys<T>>;
  * through their keys. Functions, primitives, and behavior-carrying objects
  * are leaves.
  */
-type IsPathable<V> =
-  V extends (...args: never[]) => unknown ? false
-  : V extends readonly unknown[] ? true
-  : V extends object ?
-    IsBehaviorCarrying<V> extends true ?
-      false
-    : true
-  : false;
+type IsPathable<V> = V extends (...args: never[]) => unknown
+  ? false
+  : V extends readonly unknown[]
+    ? true
+    : V extends object
+      ? IsBehaviorCarrying<V> extends true
+        ? false
+        : true
+      : false;
 
 /**
  * Every dot-notation path into `T`, including `${number}` segments for array
@@ -75,35 +77,37 @@ type IsPathable<V> =
  * ObjectPaths<{ current: HTMLDivElement | null }>
  * //=> "current"
  */
-export type ObjectPaths<T, Depth extends number = 5> =
-  [Depth] extends [never] ? never
-  : T extends readonly unknown[] ?
-    | `${number}`
-    | (IsPathable<NonNullable<T[number]>> extends true ?
-        `${number}.${ObjectPaths<NonNullable<T[number]>, PreviousDepth[Depth]> & string}`
-      : never)
-  : T extends object ?
-    {
-      [K in Extract<keyof T, string>]:
-        | K
-        | (IsPathable<NonNullable<T[K]>> extends true ?
-            `${K}.${ObjectPaths<NonNullable<T[K]>, PreviousDepth[Depth]> & string}`
-          : never);
-    }[Extract<keyof T, string>]
-  : never;
+export type ObjectPaths<T, Depth extends number = 5> = [Depth] extends [never]
+  ? never
+  : T extends readonly unknown[]
+    ?
+        | `${number}`
+        | (IsPathable<NonNullable<T[number]>> extends true
+            ? `${number}.${ObjectPaths<NonNullable<T[number]>, PreviousDepth[Depth]> & string}`
+            : never)
+    : T extends object
+      ? {
+          [K in Extract<keyof T, string>]:
+            | K
+            | (IsPathable<NonNullable<T[K]>> extends true
+                ? `${K}.${ObjectPaths<NonNullable<T[K]>, PreviousDepth[Depth]> & string}`
+                : never);
+        }[Extract<keyof T, string>]
+      : never;
 
 /** The type of the value that path `P` addresses in `T`. */
-export type ObjectPathValue<T, P> =
-  P extends `${infer Key}.${infer Rest}` ?
-    T extends readonly unknown[] ?
-      Key extends `${number}` ?
-        ObjectPathValue<NonNullable<T[number]>, Rest>
+export type ObjectPathValue<T, P> = P extends `${infer Key}.${infer Rest}`
+  ? T extends readonly unknown[]
+    ? Key extends `${number}`
+      ? ObjectPathValue<NonNullable<T[number]>, Rest>
       : never
-    : Key extends keyof T ? ObjectPathValue<NonNullable<T[Key]>, Rest>
-    : never
-  : T extends readonly unknown[] ?
-    P extends `${number}` ?
-      T[number]
-    : never
-  : P extends keyof T ? T[P]
-  : never;
+    : Key extends keyof T
+      ? ObjectPathValue<NonNullable<T[Key]>, Rest>
+      : never
+  : T extends readonly unknown[]
+    ? P extends `${number}`
+      ? T[number]
+      : never
+    : P extends keyof T
+      ? T[P]
+      : never;

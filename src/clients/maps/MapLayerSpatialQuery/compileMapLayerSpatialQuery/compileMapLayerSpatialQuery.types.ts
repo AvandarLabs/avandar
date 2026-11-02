@@ -1,6 +1,6 @@
-import type { ResolvedMapLayerMetadata } from "../MapLayerSpatialQuery.types";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ResolvedMapLayerMetadata } from "../MapLayerSpatialQuery.types";
 
 /** Map-level AOI and time window applied while compiling a layer query. */
 export type MapOverlay = {

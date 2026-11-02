@@ -68,14 +68,14 @@ export function CompositePanel({
 
       <RowValueList values={previewValues} />
 
-      {bias[0]?.suggestion ?
+      {bias[0]?.suggestion ? (
         <Stack gap={4}>
           <Text size="xs" c="dimmed">
             <Trans>Suggested rewrite:</Trans>
           </Text>
           <Text size="sm">{bias[0].suggestion}</Text>
         </Stack>
-      : null}
+      ) : null}
 
       <Checkbox
         label={acknowledgeLabel}

@@ -140,9 +140,9 @@ export function Tabs<TabId extends string>({
   const panels = tabIds.map((tabId) => {
     return (
       <MantineTabs.Panel key={tabId} value={tabId}>
-        {typeof renderTabPanel === "function" ?
-          renderTabPanel(tabId)
-        : renderTabPanel[tabId](tabId)}
+        {typeof renderTabPanel === "function"
+          ? renderTabPanel(tabId)
+          : renderTabPanel[tabId](tabId)}
       </MantineTabs.Panel>
     );
   });
@@ -173,11 +173,11 @@ export function Tabs<TabId extends string>({
           tabsClassNamesObj?.list,
         )}
         style={
-          isFloating ? undefined : (
-            {
-              borderBottom: "2px solid var(--mantine-color-neutral-1)",
-            }
-          )
+          isFloating
+            ? undefined
+            : {
+                borderBottom: "2px solid var(--mantine-color-neutral-1)",
+              }
         }
       >
         {tabIds.map((tabId) => {
@@ -197,17 +197,17 @@ export function Tabs<TabId extends string>({
                 size={isSmall ? "xs" : undefined}
                 fw={isActive ? 500 : 400}
               >
-                {typeof renderTabHeader === "function" ?
-                  renderTabHeader(tabId)
-                : typeof renderTabHeader[tabId] === "function" ?
-                  renderTabHeader[tabId](tabId)
-                : renderTabHeader[tabId]}
+                {typeof renderTabHeader === "function"
+                  ? renderTabHeader(tabId)
+                  : typeof renderTabHeader[tabId] === "function"
+                    ? renderTabHeader[tabId](tabId)
+                    : renderTabHeader[tabId]}
               </Text>
             </MantineTabs.Tab>
           );
         })}
 
-        {withActiveIndicator ?
+        {withActiveIndicator ? (
           <FloatingIndicator
             key={indicatorRemountKey}
             target={tabItemRefs[currentTab]}
@@ -215,20 +215,20 @@ export function Tabs<TabId extends string>({
             data-testid="tabs-active-indicator"
             className={isFloating ? classes.indicator : undefined}
             style={
-              isFloating ? undefined : (
-                {
-                  position: "absolute",
-                  top: "2px",
-                  borderBottom: "2px solid var(--mantine-color-primary-6)",
-                }
-              )
+              isFloating
+                ? undefined
+                : {
+                    position: "absolute",
+                    top: "2px",
+                    borderBottom: "2px solid var(--mantine-color-primary-6)",
+                  }
             }
           />
-        : null}
+        ) : null}
 
-        {listRightSection !== undefined ?
+        {listRightSection !== undefined ? (
           <div className={classes.listRightSection}>{listRightSection}</div>
-        : null}
+        ) : null}
       </MantineTabs.List>
 
       {wrapPanels !== undefined ? wrapPanels(panels) : panels}

@@ -1,11 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import { SegmentedControlItem } from "@mantine/core";
+import { match } from "ts-pattern";
 import {
   BasicPlanConfig,
   FreePlanConfig,
   PremiumPlanConfig,
 } from "$/config/FeaturePlansConfig";
-import { match } from "ts-pattern";
 import { isOneOf } from "@/lib/utils/guards/guards";
 import { Logger } from "@/utils/Logger";
 import {

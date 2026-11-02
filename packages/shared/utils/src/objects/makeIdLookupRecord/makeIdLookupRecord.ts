@@ -32,12 +32,13 @@ export function makeIdLookupRecord<
 ): Record<Extract<T[IdKey], PropertyKey>, T>;
 export function makeIdLookupRecord<
   T extends object,
-  IdKey extends ConditionalKeys<T, PropertyKey> = "id" extends (
-    ConditionalKeys<T, PropertyKey>
-  ) ?
-    "id"
-  : never,
-  OutKey extends T[IdKey] extends PropertyKey ? T[IdKey] : never =
+  IdKey extends ConditionalKeys<T, PropertyKey> = "id" extends ConditionalKeys<
+    T,
+    PropertyKey
+  >
+    ? "id"
+    : never,
+  OutKey extends (T[IdKey] extends PropertyKey ? T[IdKey] : never) =
     T[IdKey] extends PropertyKey ? T[IdKey] : never,
 >(
   list: readonly T[],

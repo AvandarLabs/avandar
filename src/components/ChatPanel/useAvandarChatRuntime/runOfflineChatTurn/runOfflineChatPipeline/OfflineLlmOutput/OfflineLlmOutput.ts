@@ -20,29 +20,28 @@ function _parseAnalyzeJson(raw: string): OfflineAnalyzeResult | undefined {
     }
     const proceed = parsed.proceed === true;
     const clarifyQuestion =
-      typeof parsed.clarifyQuestion === "string" ?
-        parsed.clarifyQuestion.trim()
-      : undefined;
-    const clarifyOptions =
-      Array.isArray(parsed.clarifyOptions) ?
-        parsed.clarifyOptions
+      typeof parsed.clarifyQuestion === "string"
+        ? parsed.clarifyQuestion.trim()
+        : undefined;
+    const clarifyOptions = Array.isArray(parsed.clarifyOptions)
+      ? parsed.clarifyOptions
           .filter((option): option is string => {
             return typeof option === "string";
           })
           .slice(0, 6)
       : undefined;
     const tableName =
-      typeof parsed.tableName === "string" ?
-        parsed.tableName.trim()
-      : undefined;
+      typeof parsed.tableName === "string"
+        ? parsed.tableName.trim()
+        : undefined;
     return {
       summary: parsed.summary.trim(),
       proceed,
       ...(tableName ? { tableName } : {}),
       ...(clarifyQuestion ? { clarifyQuestion } : {}),
-      ...(clarifyOptions && clarifyOptions.length >= 2 ?
-        { clarifyOptions }
-      : {}),
+      ...(clarifyOptions && clarifyOptions.length >= 2
+        ? { clarifyOptions }
+        : {}),
     };
   } catch {
     return undefined;

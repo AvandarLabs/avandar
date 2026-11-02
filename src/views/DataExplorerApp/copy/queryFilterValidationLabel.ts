@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { match } from "ts-pattern";
-import { avaDataTypeLabel } from "@/views/DataExplorerApp/copy/avaDataTypeLabel";
+import { avaDataTypeLabel } from "$/copy/avaDataTypeLabel";
 import type { QueryFilterValidationReason } from "$/models/queries/StructuredQuery/QueryFilterValidation/QueryFilterValidation";
 
 /**

@@ -83,14 +83,14 @@ export function DisplayNameSection({
           </Button>
         </Group>
       </form>
-      {isInMultipleWorkspaces ?
+      {isInMultipleWorkspaces ? (
         <Text c="dimmed" size="xs">
           <Trans>
             This name only applies in {workspaceName}. Your other workspaces
             keep their own.
           </Trans>
         </Text>
-      : null}
+      ) : null}
     </Stack>
   );
 }

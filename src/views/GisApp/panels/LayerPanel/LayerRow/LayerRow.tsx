@@ -5,8 +5,8 @@ import { LayerRowDragHandle } from "@/views/GisApp/panels/LayerPanel/LayerRow/La
 import { LayerRowInstructions } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions";
 import { LayerRowSelection } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowSelection/LayerRowSelection";
 import { LayerVisibilityButton } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { ReactNode } from "react";
 
 type Props = {

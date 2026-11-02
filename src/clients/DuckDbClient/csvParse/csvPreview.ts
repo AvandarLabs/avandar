@@ -70,8 +70,8 @@ export async function getCsvPreviewData(
 function _getCsvPreviewSniff(
   options: Readonly<CsvPreviewResultOptions>,
 ): DuckDbCsvSniffResult {
-  return options.sniffRow ?
-      buildDuckDbCsvSniffResultFromSniffRow({
+  return options.sniffRow
+    ? buildDuckDbCsvSniffResultFromSniffRow({
         tableName: options.stagingFile,
         sniffRow: options.sniffRow,
         parseOptions: options.parseOptions,

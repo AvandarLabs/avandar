@@ -1,8 +1,8 @@
 /**
  * The scatter and bubble forms keep their hand-coded pair-series
  * editors but render chart-level descriptors through the shared
- * `ChartSettingsFieldsets`. These tests prove the axis settings appear
- * and write back to the config.
+ * `ChartSettingsFieldsets`. These tests prove the axis and legend
+ * settings appear and write back to the config.
  */
 import { describe, expect, it, vi } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
@@ -119,6 +119,66 @@ describe("BubbleChartForm: axis settings", () => {
       expect.objectContaining({
         chartStyle: expect.objectContaining({
           yAxis: expect.objectContaining({ max: 500 }),
+        }),
+      }),
+    );
+  });
+});
+
+describe("ScatterChartForm: legend settings", () => {
+  it("renders the legend position control", () => {
+    render(
+      <AvandarAppProvider>
+        <ScatterChartForm
+          fields={COLUMNS}
+          config={SCATTER_CONFIG}
+          onConfigChange={vi.fn()}
+        />
+      </AvandarAppProvider>,
+    );
+    expect(screen.getByRole("radio", { name: /^Left$/ })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /^Right$/ })).toBeInTheDocument();
+  });
+
+  it("writes the legend position back to the config", () => {
+    const onConfigChange = vi.fn();
+    render(
+      <AvandarAppProvider>
+        <ScatterChartForm
+          fields={COLUMNS}
+          config={SCATTER_CONFIG}
+          onConfigChange={onConfigChange}
+        />
+      </AvandarAppProvider>,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: /^Right$/ }));
+    expect(onConfigChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chartStyle: expect.objectContaining({
+          legend: expect.objectContaining({ position: "right" }),
+        }),
+      }),
+    );
+  });
+});
+
+describe("BubbleChartForm: legend settings", () => {
+  it("writes the legend position back to the config", () => {
+    const onConfigChange = vi.fn();
+    render(
+      <AvandarAppProvider>
+        <BubbleChartForm
+          fields={COLUMNS}
+          config={BUBBLE_CONFIG}
+          onConfigChange={onConfigChange}
+        />
+      </AvandarAppProvider>,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: /^Left$/ }));
+    expect(onConfigChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chartStyle: expect.objectContaining({
+          legend: expect.objectContaining({ position: "left" }),
         }),
       }),
     );

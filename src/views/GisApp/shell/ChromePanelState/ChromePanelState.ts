@@ -30,13 +30,11 @@ const TABLET_AT_PX = 792;
  * @param canvasWidth Width of the map canvas in CSS pixels, not the viewport.
  */
 function _panelStateFromCanvasWidth(canvasWidth: number): ChromePanelState {
-  return (
-    canvasWidth <= TABLET_AT_PX ?
-      { layers: true, inspector: true, legend: true }
-    : canvasWidth < INSPECTOR_YIELDS_AT_PX ?
-      { layers: false, inspector: true, legend: false }
-    : { layers: false, inspector: false, legend: false }
-  );
+  return canvasWidth <= TABLET_AT_PX
+    ? { layers: true, inspector: true, legend: true }
+    : canvasWidth < INSPECTOR_YIELDS_AT_PX
+      ? { layers: false, inspector: true, legend: false }
+      : { layers: false, inspector: false, legend: false };
 }
 
 /**

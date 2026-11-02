@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 /**
  * Guards the viz setting label catalog against drift. The descriptor
  * registries hold untranslated labels as their stable message ids, so a new or
@@ -6,7 +7,6 @@
  */
 import { knownVizSettingControlLabels } from "$/copy/vizSettingControlLabel/vizSettingControlLabel.ts";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs.ts";
-import { describe, expect, it } from "vitest";
 
 function collectRegistryLabels(): string[] {
   return VizTypes.flatMap((vizType) => {
@@ -15,11 +15,11 @@ function collectRegistryLabels(): string[] {
       (descriptor) => {
         const control = descriptor.control;
         const optionLabels =
-          "options" in control ?
-            control.options.map((option) => {
-              return option.label;
-            })
-          : [];
+          "options" in control
+            ? control.options.map((option) => {
+                return option.label;
+              })
+            : [];
         return [descriptor.label, ...optionLabels];
       },
     );

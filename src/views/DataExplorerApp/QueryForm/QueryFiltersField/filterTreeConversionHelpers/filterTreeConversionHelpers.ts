@@ -1,7 +1,7 @@
 import { isArray } from "@avandar/utils";
+import { match } from "ts-pattern";
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { match } from "ts-pattern";
 import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
 
 /**
@@ -114,8 +114,9 @@ export function makeQueryFilterGroupFromLibraryGroup(
         type: "rule",
         id,
         columnName: child.field,
-        operator:
-          QueryFilterOperator.isOperator(child.operator) ? child.operator : "=",
+        operator: QueryFilterOperator.isOperator(child.operator)
+          ? child.operator
+          : "=",
         value: getFilterValueFromLibraryValue(child.value),
         ...(columnDataType === undefined ? {} : { columnDataType }),
         ...(matchCase ? { matchCase: true } : {}),
@@ -136,8 +137,8 @@ export function getMatchCaseByIdFromFilterGroup(
           return Object.entries(getMatchCaseByIdFromFilterGroup(nestedGroup));
         })
         .with({ type: "rule" }, (rule): Array<[string, boolean]> => {
-          return rule.id !== undefined && rule.matchCase === true ?
-              [[rule.id, true]]
+          return rule.id !== undefined && rule.matchCase === true
+            ? [[rule.id, true]]
             : [];
         })
         .exhaustive();
@@ -169,11 +170,9 @@ export function normalizeLibraryTree(
         });
       }
       const dataType = options.columnTypes[child.field];
-      return (
-          dataType === undefined ||
-            QueryFilterOperator.isOfferedForDataType(child.operator, dataType)
-        ) ?
-          child
+      return dataType === undefined ||
+        QueryFilterOperator.isOfferedForDataType(child.operator, dataType)
+        ? child
         : {
             ...child,
             operator: QueryFilterOperator.getDefaultForDataType(dataType),

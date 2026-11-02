@@ -8,10 +8,8 @@ import {
   snakeCaseKeysDeep,
   undefinedsToNullsDeep,
 } from "@avandar/utils";
-import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
 import { z } from "zod";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
+import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type {
   WorkspaceId,
@@ -23,6 +21,8 @@ import type {
   WorkspaceInviteRead,
   WorkspaceInviteStatus,
 } from "$/models/WorkspaceInvite/WorkspaceInvite.types.ts";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 
 const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),

@@ -1,0 +1,104 @@
+{
+  "bundle": "harborfield-response",
+  "version": 1,
+  "seed": 20261014,
+  "synthetic": true,
+  "as_of": "2026-09-13",
+  "period_start": "2026-08-03",
+  "coordinate_system": "EPSG:4326",
+  "provenance": "Entirely invented by this generator. No real individuals, facilities, districts, boundaries, or event observations.",
+  "files": [
+    {
+      "path": "facilities.csv",
+      "rows": 12,
+      "columns": [
+        "facility_id",
+        "facility_name",
+        "district_id",
+        "facility_type",
+        "latitude",
+        "longitude",
+        "staff_count",
+        "supply_kits_available",
+        "stock_as_of"
+      ],
+      "bytes": 932,
+      "sha256": "cea0c3a889bb1c8d5840632daa05199cebeb3fa0b4b6b0a33f8ef72b672d85df"
+    },
+    {
+      "path": "cases.csv",
+      "rows": 240,
+      "columns": [
+        "case_id",
+        "case_label",
+        "district_id",
+        "district_name",
+        "facility_id",
+        "report_date",
+        "week_start",
+        "age_band",
+        "support_need",
+        "referral_status",
+        "latitude",
+        "longitude",
+        "household_size"
+      ],
+      "bytes": 26703,
+      "sha256": "7bea7ec9cb955948c9fda184f2a8f4dde24da7acbf81692b33088af6443c1f79"
+    },
+    {
+      "path": "visits.csv",
+      "rows": 297,
+      "columns": [
+        "visit_id",
+        "case_id",
+        "facility_id",
+        "visit_date",
+        "contact_method",
+        "supply_kits_delivered",
+        "staff_minutes"
+      ],
+      "bytes": 12855,
+      "sha256": "3c67bd23a5388930e22555da3be0cb0e3d024d11eb2a52577a4bb05f51124598"
+    },
+    {
+      "path": "districts.csv",
+      "rows": 6,
+      "columns": [
+        "district_id",
+        "district_name",
+        "population",
+        "recorded_cases",
+        "awaiting_contact",
+        "supply_kits_available",
+        "latest_reporting_status",
+        "as_of",
+        "geometry"
+      ],
+      "bytes": 880,
+      "sha256": "06b15552cf2febea7bcdf6e23c0e2f4c12891d8d5b9cd7a91e2ac28fbfb6d838"
+    },
+    {
+      "path": "weekly_reports.csv",
+      "rows": 36,
+      "columns": [
+        "district_id",
+        "district_name",
+        "week_start",
+        "reported_cases",
+        "awaiting_contact",
+        "reporting_status"
+      ],
+      "bytes": 1463,
+      "sha256": "c7b1b3d9b47ecc0f24e4761d449fe47a3d43682b84d872021f915e93e652bef4"
+    }
+  ],
+  "expected": {
+    "cases": 240,
+    "districts": 6,
+    "facilities": 12,
+    "visits": 297,
+    "missing_weekly_reports": 2,
+    "awaiting_contact": 19
+  }
+}

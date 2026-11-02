@@ -12,8 +12,8 @@ import {
   Text,
 } from "@mantine/core";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
-import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { useCallback, useMemo, useState } from "react";
+import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnPickerList } from "@/components/DatasetColumnPickerList";
 import { useMap } from "@/lib/hooks/state/useMap";
@@ -234,11 +234,12 @@ export function DatasetColumnAttributesBlock({
               <Trans>{conceptName} fields</Trans>
             </Text>
             <Divider />
-            {addedAttributes.length === 0 ?
+            {addedAttributes.length === 0 ? (
               <Text>
                 <Trans>No columns have been added yet.</Trans>
               </Text>
-            : <ScrollArea h={300}>
+            ) : (
+              <ScrollArea h={300}>
                 <SegmentedControl
                   orientation="vertical"
                   data={attributeItems}
@@ -246,9 +247,9 @@ export function DatasetColumnAttributesBlock({
                   onChange={setSelectedAttributeId}
                 />
               </ScrollArea>
-            }
+            )}
           </Stack>
-          {selectedAttributeId ?
+          {selectedAttributeId ? (
             <Box pt="sm">
               <DatasetColumnMappingCreator
                 conceptForm={conceptForm}
@@ -260,11 +261,11 @@ export function DatasetColumnAttributesBlock({
                 }
               />
             </Box>
-          : null}
+          ) : null}
         </Group>
 
         <Divider my="xs" />
-        {sourceDatasets.length > 1 ?
+        {sourceDatasets.length > 1 ? (
           <Stack gap="xs">
             <Text fw={500}>
               <Trans>Configure how to join datasets</Trans>
@@ -277,16 +278,17 @@ export function DatasetColumnAttributesBlock({
               </Trans>
             </Text>
           </Stack>
-        : null}
-        {addedAttributes.length > 0 ?
+        ) : null}
+        {addedAttributes.length > 0 ? (
           <IdentifierBlock
             conceptForm={conceptForm}
             conceptName={conceptName}
           />
-        : <Text>
+        ) : (
+          <Text>
             <Trans>No columns have been added yet.</Trans>
           </Text>
-        }
+        )}
       </Stack>
     </Fieldset>
   );

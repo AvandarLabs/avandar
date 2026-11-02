@@ -1,0 +1,240 @@
+{
+  "version": 1,
+  "id": "occlusion-wipe",
+  "title": "Occlusion wipe",
+  "description": "Cover a scene boundary with a moving opaque edge, retaining an opaque background throughout.",
+  "sourceNotes": [
+    "Extracted from product-to-qetl; uses the same continuity renderer and typed content contracts.",
+    "Reusable geometry, timing and editorial relationships. Product state remains scripted demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 456,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "Occlusion wipe",
+        "category": "product-motion",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#f0ba83",
+        "beats": [
+          {
+            "id": "example-0",
+            "title": "One source becomes part of a question.",
+            "subtitle": "Connected-source integration is the architectural explanation.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "source-merge",
+                "schemaVersion": 1,
+                "input": {
+                  "sources": [
+                    {
+                      "name": "Cases",
+                      "kind": "CSV",
+                      "color": "#82c8f2"
+                    },
+                    {
+                      "name": "Visits",
+                      "kind": "API",
+                      "color": "#9fefca"
+                    },
+                    {
+                      "name": "Facilities",
+                      "kind": "DB",
+                      "color": "#f0ba83"
+                    }
+                  ],
+                  "destination": {
+                    "label": "Query inputs",
+                    "detail": "Requested subsets"
+                  },
+                  "showPackets": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 57,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 81,
+                  "x": 290,
+                  "y": 275,
+                  "zoom": 1.7,
+                  "ease": "push"
+                },
+                {
+                  "at": 136,
+                  "x": 290,
+                  "y": 275,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 150,
+                  "x": 650,
+                  "y": 325,
+                  "zoom": 1.7,
+                  "ease": "whip"
+                },
+                {
+                  "at": 198,
+                  "x": 650,
+                  "y": 325,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 226,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 240,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "example-1",
+            "title": "Choose where the work belongs.",
+            "subtitle": "Placement depends on source support and workload.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "decision-fork",
+                "schemaVersion": 1,
+                "input": {
+                  "prompt": "Where should this request run?",
+                  "branches": [
+                    {
+                      "id": "local",
+                      "condition": "Data available locally",
+                      "outcome": "Device"
+                    },
+                    {
+                      "id": "remote",
+                      "condition": "Source can compute",
+                      "outcome": "Source"
+                    },
+                    {
+                      "id": "cloud",
+                      "condition": "Remote capacity needed",
+                      "outcome": "Cloud"
+                    }
+                  ],
+                  "selectedBranchId": "local",
+                  "scenarioLabel": "Illustrative placement choice",
+                  "selectionLabel": "Local execution in this example",
+                  "showUnchosenOutcomes": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 57,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 81,
+                  "x": 480,
+                  "y": 210,
+                  "zoom": 1.65,
+                  "ease": "push"
+                },
+                {
+                  "at": 136,
+                  "x": 480,
+                  "y": 210,
+                  "zoom": 1.65,
+                  "ease": "glide"
+                },
+                {
+                  "at": 150,
+                  "x": 660,
+                  "y": 360,
+                  "zoom": 1.8,
+                  "ease": "whip"
+                },
+                {
+                  "at": 198,
+                  "x": 660,
+                  "y": 360,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 226,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 240,
+            "transition": {
+              "kind": "wipe",
+              "frames": 24
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "cue-0",
+      "shotId": "explanation",
+      "startFrame": 15,
+      "endFrame": 205,
+      "text": "Keep a meaningful object or relationship in view.",
+      "beatId": "example-0"
+    },
+    {
+      "id": "cue-1",
+      "shotId": "explanation",
+      "startFrame": 39,
+      "endFrame": 205,
+      "text": "Let the next scene continue the explanation.",
+      "beatId": "example-1"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

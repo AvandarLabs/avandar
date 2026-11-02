@@ -1,9 +1,9 @@
-import type { UUID } from "@avandar/utils";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
+import type { UUID } from "@avandar/utils";
 
 export type {
-  DuckDbSpatialAvailability, // prettier-ignore
+  DuckDbSpatialAvailability, // oxfmt-ignore
 } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 
 /**

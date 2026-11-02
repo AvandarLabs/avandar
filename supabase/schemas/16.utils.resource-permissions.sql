@@ -1,8 +1,4 @@
-/**
- * Distinct user_group ids the auth user belongs to in this workspace.
- *
- * @returns Array of user_group ids (possibly empty).
- */
+/** Distinct `user_groups` ids the auth user belongs to in this workspace. */
 create or replace function public.util__get_auth_user_user_group_ids (p_workspace_id uuid) returns uuid[] language sql security definer stable
 set
   search_path = public as $$
@@ -14,6 +10,17 @@ set
   inner join public.user_groups ug on ug.id = ugm.user_group_id
   where ugm.user_id = auth.uid () and ug.workspace_id = p_workspace_id;
 $$;
+
+-- No caller anywhere: no policy, no function body, no client. Revoked
+-- rather than dropped, because whether the helper is still wanted is a
+-- product question, not a privilege one.
+revoke
+execute on function public.util__get_auth_user_user_group_ids (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
 
 /**
  * Whether any share on this resource grants a principal other than its owner.
@@ -155,18 +162,18 @@ from
  * those candidates, not "most roles" or "first match".
  *
  * Short-circuits (no merge with shares):
- * - Resource owner → admin.
- * - Settings (global) admin in the workspace → admin, UNLESS the resource is
+ * - Resource owner -> admin.
+ * - Settings (global) admin in the workspace -> admin, UNLESS the resource is
  *   private to its owner (restricted with zero non-owner shares) and not a
  *   public dashboard.
  *
  * Examples (non-owner, non-settings-admin):
- * - Workspace share viewer + app role editor → editor.
- * - Direct user share admin + app role viewer → admin (ranks 3 vs 1).
- * - Only workspace share viewer, resource is_restricted, no other grant →
+ * - Workspace share viewer + app role editor -> editor.
+ * - Direct user share admin + app role viewer -> admin (ranks 3 vs 1).
+ * - Only workspace share viewer, resource is_restricted, no other grant ->
  *   viewer.
- * - Group share editor + requires_app_access=true, user has no app role on
- *   resource's app → that share candidate is dropped; merge proceeds without it.
+ * - Group share editor + requires_app_access=true, user has no app role on the
+ *   resource's app -> that candidate is dropped; the merge proceeds without it.
  *
  * After owner and settings-admin short-circuits, every other grant path
  * requires a `workspace_memberships` row for this resource's workspace so
@@ -336,11 +343,19 @@ begin
 end;
 $$;
 
-/**
- * Whether the auth user meets at least the minimum role on a resource.
- *
- * @returns True when effective role is at least p_min_role.
- */
+-- `authenticated` only, the one role that calls this as an rpc.
+revoke
+execute on function public.util__resource_effective_role (public.resource_type, uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__resource_effective_role (public.resource_type, uuid) to authenticated;
+
+/** Whether the auth user's effective role on a resource meets `p_min_role`. */
 create or replace function public.util__auth_user_can_access_resource (
   p_resource_type public.resource_type,
   p_resource_id uuid,
@@ -364,6 +379,28 @@ begin
   return v_eff_rank >= v_min_rank;
 end;
 $$;
+
+-- `authenticated` only: named by `to authenticated` policies, which are
+-- evaluated as the calling role, and called directly as an rpc by the
+-- signed-in client.
+revoke
+execute on function public.util__auth_user_can_access_resource (
+  public.resource_type,
+  uuid,
+  public.role_level
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_can_access_resource (
+  public.resource_type,
+  uuid,
+  public.role_level
+) to authenticated;
 
 /**
  * Whether the auth user has the requested resource role in the given workspace.
@@ -408,9 +445,30 @@ begin
 end;
 $$;
 
-/**
- * App catalog entry for a resource type.
- */
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_can_access_resource_in_workspace (
+  public.resource_type,
+  uuid,
+  uuid,
+  public.role_level
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_can_access_resource_in_workspace (
+  public.resource_type,
+  uuid,
+  uuid,
+  public.role_level
+) to authenticated;
+
+/** App catalog entry for a resource type. */
 create or replace function public.util__resource_type_to_app_type (p_resource_type public.resource_type) returns public.app_type language sql immutable
 set
   search_path = public as $$
@@ -420,6 +478,16 @@ set
     when 'map'::public.resource_type then 'gis'::public.app_type
   end;
 $$;
+
+-- Reached only from inside SECURITY DEFINER bodies, which run as this
+-- function's owner, so no Data API role needs EXECUTE.
+revoke
+execute on function public.util__resource_type_to_app_type (public.resource_type)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
 
 /**
  * INSERT on `dashboards` / `datasets`: editor+ app role in workspace, caller
@@ -461,9 +529,20 @@ begin
 end;
 $$;
 
-/**
- * UPDATE on a dashboard or dataset: effective role is at least editor.
- */
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_can_insert_workspace_resource (uuid, public.resource_type, uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_can_insert_workspace_resource (uuid, public.resource_type, uuid) to authenticated;
+
+/** UPDATE on a dashboard or dataset: effective role is at least editor. */
 create or replace function public.util__auth_user_can_update_resource (
   p_resource_type public.resource_type,
   p_resource_id uuid
@@ -477,9 +556,20 @@ set
   );
 $$;
 
-/**
- * DELETE on a dashboard or dataset: effective role is at least admin.
- */
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_can_update_resource (public.resource_type, uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_can_update_resource (public.resource_type, uuid) to authenticated;
+
+/** DELETE on a dashboard or dataset: effective role is at least admin. */
 create or replace function public.util__auth_user_can_delete_resource (
   p_resource_type public.resource_type,
   p_resource_id uuid
@@ -493,12 +583,25 @@ set
   );
 $$;
 
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_can_delete_resource (public.resource_type, uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_can_delete_resource (public.resource_type, uuid) to authenticated;
+
 /**
  * Whether the auth user may SELECT a dataset row under hardened RLS.
  *
  * Blocks workspace members whose only grant on an unrestricted row is a
  * workspace-wide app role at editor+ (e.g. Global Editor) from reading
- * another user’s dataset, while keeping viewers, owners, settings/workspace
+ * another user's dataset, while keeping viewers, owners, settings/workspace
  * managers, restricted-resource paths, and explicit `resource_shares` grants.
  * Group shares with requires_app_access=true additionally require the auth
  * user to have a data_sources app role.
@@ -625,6 +728,19 @@ begin
 end;
 $$;
 
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_may_select_dataset (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_may_select_dataset (uuid) to authenticated;
+
 /**
  * Whether the auth user may SELECT a dashboard row under hardened RLS.
  *
@@ -726,10 +842,9 @@ begin
   end if;
 
   -- `draft` means the owner has not decided this dashboard is ready for anyone
-  -- else, which is the product meaning P2 gave the state and P3's publishing
-  -- control finally makes actionable. Owners and settings admins short-circuit
-  -- above; what remains here is share holders and workspace app roles, and for
-  -- a draft those need edit rights rather than mere read access.
+  -- else. Owners and settings admins short-circuit above; what remains here is
+  -- share holders and workspace app roles, and for a draft those need edit
+  -- rights rather than mere read access.
   if v_visibility = 'draft'::public.dashboard_visibility
     and v_eff_rank < v_editor_rank then
     return false;
@@ -795,6 +910,19 @@ begin
   return false;
 end;
 $$;
+
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_may_select_dashboard (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_may_select_dashboard (uuid) to authenticated;
 
 /** Whether the auth user has a share that applies to a resource row. */
 create or replace function public.util__auth_user_has_resource_share (
@@ -878,7 +1006,34 @@ from
   authenticated,
   service_role;
 
-/** Applies map-specific visibility grants after workspace checks. */
+/**
+ * Whether a GIS grant lets the auth user SELECT one map row.
+ *
+ * `maps__auth_user_may_select` calls this after workspace membership and
+ * viewer-level access have already passed, so this decides the grant
+ * question alone. It takes the row's fields as arguments because that
+ * caller has already fetched them.
+ *
+ * A restricted map ignores workspace app roles and needs a share. On an
+ * unrestricted map a GIS app role of `editor` or above is deliberately
+ * NOT sufficient on its own, while a role below `editor` is. The editor
+ * role exists so a member can create their own maps, and without this
+ * rule granting it would also hand them read access to every
+ * colleague's map; such a member needs a share like anyone else. A
+ * viewer-tier role is the read-only consumption grant, so reading the
+ * workspace's unrestricted maps is what it is for.
+ * `util__auth_user_may_select_dataset` and
+ * `util__auth_user_may_select_dashboard` apply the same rule.
+ *
+ * A group share carrying `requires_app_access` additionally requires
+ * some GIS app role, which `util__auth_user_has_resource_share`
+ * enforces.
+ *
+ * The `coalesce` around the rank is defensive rather than a case that
+ * reaches here: a member with no GIS app role and no share has no
+ * effective role at all, so the caller's viewer-level check has already
+ * refused them.
+ */
 create or replace function public.maps__auth_user_may_select_grant (
   p_map_id uuid,
   p_workspace_id uuid,
@@ -978,17 +1133,17 @@ execute on function public.maps__auth_user_may_select (uuid) to authenticated;
  * src/clients/storage/DatasetParquetStorageClient/utils.ts.
  *
  * The dataset id lives in the FILENAME, not a folder segment, so
- * storage.foldername() cannot reach it and the name is matched whole instead.
+ * `storage.foldername()` cannot reach it and the name is matched whole instead.
  *
- * Returns null rather than raising when the name does not match those shapes,
- * so a storage policy referencing this can never error on an unexpected object
- * name. Callers MUST treat null as "deny": an object whose dataset cannot be
- * identified is not one we can prove the caller may read.
+ * SECURITY: every policy on the `workspaces` bucket gates on this function, so
+ * whatever it accepts is granted the named dataset's permissions. Callers MUST
+ * treat null as "deny": an object whose dataset cannot be identified is not one
+ * we can prove the caller may read. It returns null rather than raising so that
+ * a storage policy referencing it can never error on an unexpected name.
  *
- * SECURITY. Every policy on the `workspaces` bucket gates on this function, so
- * whatever it accepts is granted the named dataset's permissions. Three
- * properties carry that weight, and each is pinned by
- * supabase/tests/database/permissions/storage_original_file_object_names.test.sql:
+ * Three properties of the pattern below carry that weight, and each is pinned
+ * by `storage_original_file_object_names.test.sql` in
+ * `supabase/tests/database/permissions/`:
  *
  *   1. The suffix is an allow-list, not a prefix match. Accepting any name
  *      that merely BEGINS with a uuid would let an arbitrary object claim a
@@ -998,11 +1153,11 @@ execute on function public.maps__auth_user_may_select (uuid) to authenticated;
  *      sufficient: split_part returns '' both for a trailing slash
  *      (`ws/datasets/x.parquet/`) and for an empty segment followed by more
  *      (`ws/datasets/x.parquet//extra`).
- *   3. Anchoring is whole-string. Postgres ARE only makes `^`/`$` line
- *      anchors under newline-sensitive matching, which is off here, so
- *      neither a trailing newline nor a valid line smuggled after a newline
- *      matches. That differs from PCRE, where `$` matches before a trailing
- *      newline by default, and object names are arbitrary text.
+ *   3. Anchoring is whole-string. Postgres ARE only makes `^`/`$` line anchors
+ *      under newline-sensitive matching, which is off here, so neither a
+ *      trailing newline nor a valid line smuggled after a newline matches.
+ *      That differs from PCRE, where `$` matches before a trailing newline by
+ *      default, and object names are arbitrary text.
  *
  * The extension is capped at ten characters so an over-long tail reads as
  * smuggled content rather than a file type, and is case-insensitive because
@@ -1024,6 +1179,19 @@ set
   end;
 $$;
 
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__storage_object_dataset_id (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__storage_object_dataset_id (text) to authenticated;
+
 /**
  * Extracts a workspace UUID from the first segment of a storage object path.
  *
@@ -1039,6 +1207,19 @@ set
     else null
   end;
 $$;
+
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__storage_object_workspace_id (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__storage_object_workspace_id (text) to authenticated;
 
 /**
  * Extracts a dashboard UUID from a published snapshot object path.
@@ -1069,6 +1250,23 @@ set
   end;
 $$;
 
+-- `anon` too, and that is load-bearing: the anon SELECT policy on the
+-- `published` bucket calls this to parse a public dashboard's snapshot
+-- path, and a policy is evaluated as the calling role.
+revoke
+execute on function public.util__storage_object_dashboard_id (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__storage_object_dashboard_id (text) to anon;
+
+grant
+execute on function public.util__storage_object_dashboard_id (text) to authenticated;
+
 /**
  * Extracts a revision UUID from an exact published snapshot object path.
  *
@@ -1092,6 +1290,23 @@ set
     else null
   end;
 $$;
+
+-- `anon` too, and that is load-bearing: the anon SELECT policy on the
+-- `published` bucket calls this to parse a public dashboard's snapshot
+-- path, and a policy is evaluated as the calling role.
+revoke
+execute on function public.util__storage_object_snapshot_revision (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__storage_object_snapshot_revision (text) to anon;
+
+grant
+execute on function public.util__storage_object_snapshot_revision (text) to authenticated;
 
 /**
  * Whether the auth user may mutate an uncommitted dashboard snapshot object.

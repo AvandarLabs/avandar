@@ -62,20 +62,19 @@ export function DataGrid({
         field: field,
         headerName: field,
         filter: true,
-        valueFormatter:
-          isDate ?
-            (p: { value: unknown }) => {
+        valueFormatter: isDate
+          ? (p: { value: unknown }) => {
               return formatDate(p.value, {
                 format: dateFormat,
                 zone: timezone,
               });
             }
           : (p: { value: unknown }) => {
-              return (
-                typeof p.value === "number" ? formatChartNumber(p.value)
-                : p.value == null ? ""
-                : String(p.value)
-              );
+              return typeof p.value === "number"
+                ? formatChartNumber(p.value)
+                : p.value == null
+                  ? ""
+                  : String(p.value);
             },
       };
     });

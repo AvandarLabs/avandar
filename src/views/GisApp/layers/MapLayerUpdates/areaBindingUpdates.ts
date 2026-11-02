@@ -56,9 +56,9 @@ function _withSelectedPointColumns(
 ): MapLayer.T {
   const { layer, points, pointColumns } = options;
   const pointColumnIds =
-    points.type === "latLngColumns" ?
-      [points.latitude, points.longitude]
-    : [points.column];
+    points.type === "latLngColumns"
+      ? [points.latitude, points.longitude]
+      : [points.column];
   const pointColumnIdSet = makeSet(pointColumnIds.filter(isDefined));
   return pointColumns
     .filter((column) => {
@@ -82,13 +82,13 @@ function withBoundaryJoin(
   const withColumn = withQueryColumn({ layer, column: dataKeyColumn });
   const currentBinding = layer.geoBinding;
   const outputValueId =
-    currentBinding?.type === "joinToBoundaries" ?
-      currentBinding.aggregation.outputValueId
-    : uuid<MapLayer.AreaAggregationOutputId>();
+    currentBinding?.type === "joinToBoundaries"
+      ? currentBinding.aggregation.outputValueId
+      : uuid<MapLayer.AreaAggregationOutputId>();
   const aggregation =
-    currentBinding?.type === "joinToBoundaries" ?
-      currentBinding.aggregation
-    : { operation: "count" as const, outputValueId };
+    currentBinding?.type === "joinToBoundaries"
+      ? currentBinding.aggregation
+      : { operation: "count" as const, outputValueId };
   return {
     ...withColumn,
     geoBinding: {
@@ -119,12 +119,12 @@ function withPointAggregation(
   });
   const currentBinding = layer.geoBinding;
   const aggregation =
-    currentBinding?.type === "aggregatePointsToBoundaries" ?
-      currentBinding.aggregation
-    : {
-        operation: "count" as const,
-        outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
-      };
+    currentBinding?.type === "aggregatePointsToBoundaries"
+      ? currentBinding.aggregation
+      : {
+          operation: "count" as const,
+          outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+        };
   return {
     ...withPointColumns,
     geoBinding: {
@@ -155,9 +155,9 @@ function withGridBin(layer: MapLayer.T): MapLayer.T {
       },
     },
     symbology:
-      layer.symbology.type === "fill" ?
-        layer.symbology
-      : MapLayer.createDefaultFillSymbology(),
+      layer.symbology.type === "fill"
+        ? layer.symbology
+        : MapLayer.createDefaultFillSymbology(),
   } as MapLayer.T;
 }
 
@@ -213,20 +213,20 @@ function withAreaAggregation(
     return layer;
   }
   const withMeasure =
-    options.operation === "count" ?
-      layer
-    : withQueryColumn({ layer, column: options.measureColumn });
+    options.operation === "count"
+      ? layer
+      : withQueryColumn({ layer, column: options.measureColumn });
   const aggregation: MapLayer.AreaAggregation =
-    options.operation === "count" ?
-      {
-        operation: "count",
-        outputValueId: binding.aggregation.outputValueId,
-      }
-    : {
-        operation: options.operation,
-        measureColumn: options.measureColumn.id,
-        outputValueId: binding.aggregation.outputValueId,
-      };
+    options.operation === "count"
+      ? {
+          operation: "count",
+          outputValueId: binding.aggregation.outputValueId,
+        }
+      : {
+          operation: options.operation,
+          measureColumn: options.measureColumn.id,
+          outputValueId: binding.aggregation.outputValueId,
+        };
   return {
     ...withMeasure,
     geoBinding: { ...binding, aggregation },

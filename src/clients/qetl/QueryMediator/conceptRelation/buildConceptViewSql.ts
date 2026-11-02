@@ -95,8 +95,8 @@ function _buildColumnSelector(column: ConceptAttributeColumn): string {
     return `CAST(NULL AS ${column.duckDbDataType}) AS ${quoteSqlIdentifier(column.attributeName)}`;
   }
 
-  return column.isArray ?
-      _buildArraySelector(column)
+  return column.isArray
+    ? _buildArraySelector(column)
     : getSQLSelectOfMapping({
         selectColumnName: column.selectColumnName,
         primaryKeyColumnName: column.primaryKeyColumnName,

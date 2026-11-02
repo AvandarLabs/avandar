@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetMutationConfig } from "@/clients/datasets/DatasetClient/DatasetClient.types";
 import type { ILogger } from "@avandar/logger";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const { rpcMock } = vi.hoisted(() => {
   return { rpcMock: vi.fn() };

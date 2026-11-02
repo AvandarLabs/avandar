@@ -191,8 +191,9 @@ export function AvaForm<
       mode: "uncontrolled" as const,
       initialValues: initValues,
       validate: validations,
-      touchTrigger:
-        anyFieldRequiresSync ? ("focus" as const) : ("change" as const),
+      touchTrigger: anyFieldRequiresSync
+        ? ("focus" as const)
+        : ("change" as const),
     };
     // disable exhaustive-deps because we only want to generate these once
     // eslint-disable-next-line react-hooks/exhaustive-deps

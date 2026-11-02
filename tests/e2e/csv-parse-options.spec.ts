@@ -12,6 +12,7 @@ import {
   parseDatasetIdFromDataManagerUrl,
 } from "./helpers/manualUploadCloudSyncFlow";
 import {
+  clearWorkspaceResourcesForE2E,
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
@@ -44,13 +45,12 @@ const COLUMN_NAMES_AFTER_SKIP_1 = [
 ] as const;
 
 async function uploadSmallCaliforniaCsv(page: Page): Promise<void> {
+  // Choosing the file is the whole upload gesture: the parse starts on
+  // change, so there is no confirm button to press afterwards.
   const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
   await uploadPanel
     .locator('input[type="file"]')
     .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-  await uploadPanel
-    .getByRole("button", { name: "Upload", exact: true })
-    .click();
 }
 
 /** Yields so parse-option edits commit before "Process data again". */
@@ -134,8 +134,8 @@ async function clickReparse(page: Page): Promise<void> {
 }
 
 /**
- * Waits for the parse-success callout reporting the given row count. Use
- * this when a positive number of rows is expected.
+ * Waits for the data-preview heading to report the given row count. Use this
+ * when a positive number of rows is expected.
  */
 async function expectParsedRowCount(
   page: Page,
@@ -143,7 +143,7 @@ async function expectParsedRowCount(
 ): Promise<void> {
   const formatted = formatImportPreviewRowCount(expectedRowCount);
   await expect(
-    page.getByText(`These are the first ${formatted} rows`, { exact: false }),
+    page.getByText(`First ${formatted} rows`, { exact: false }),
   ).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 
@@ -155,7 +155,9 @@ async function expectParseFailedEmpty(page: Page): Promise<void> {
   await expect(page.getByText("Data processing failed")).toBeVisible({
     timeout: MEDIUM_WAIT,
   });
-  await expect(page.getByText("No rows were read successfully")).toBeVisible({
+  await expect(
+    page.getByText("No rows were read successfully", { exact: false }),
+  ).toBeVisible({
     timeout: MEDIUM_WAIT,
   });
 }
@@ -174,8 +176,19 @@ test.describe("CSV parsing options", () => {
       workspaceSlug,
     });
 
+    // The empty state is an assertion, so the workspace has to actually be
+    // empty. The worker's workspace is shared, and a dataset left by whichever
+    // spec ran before this one would fail this line on run order alone.
+    await clearWorkspaceResourcesForE2E({
+      supabaseAdminClient: admin,
+      workspaceId: await getWorkspaceIdBySlug({
+        supabaseAdminClient: admin,
+        slug: workspaceSlug,
+      }),
+    });
+
     await page.goto(`/${workspaceSlug}/data-manager/data-import`);
-    await expect(page.getByText("No datasets added yet")).toBeVisible({
+    await expect(page.getByText("No datasets yet")).toBeVisible({
       timeout: MEDIUM_WAIT,
     });
 

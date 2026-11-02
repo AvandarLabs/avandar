@@ -28,9 +28,8 @@ export function hydrateTextFieldSchema<
 >(
   fieldSchema: TextFieldSchema<FieldKey, FormValues>,
 ): TextFieldSchema<FieldKey, FormValues> {
-  const processedSchema =
-    fieldSchema.semanticType ?
-      match(fieldSchema.semanticType)
+  const processedSchema = fieldSchema.semanticType
+    ? match(fieldSchema.semanticType)
         .with("email", () => {
           return {
             autoComplete: "email",

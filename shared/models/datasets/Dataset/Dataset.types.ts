@@ -1,11 +1,11 @@
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { UserProfileId } from "$/models/User/UserProfile.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
 type ModelType = "Dataset";

@@ -169,13 +169,11 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
     const { data } = supabase.storage.from(bucket).getPublicUrl(objectPath);
     const publicParquetUrl = data.publicUrl;
 
-    const coverageStart =
-      summary.yearCoverage ?
-        _coverageStartIso(summary.yearCoverage.minYear)
+    const coverageStart = summary.yearCoverage
+      ? _coverageStartIso(summary.yearCoverage.minYear)
       : undefined;
-    const coverageEnd =
-      summary.yearCoverage ?
-        _coverageEndIso(summary.yearCoverage.maxYear)
+    const coverageEnd = summary.yearCoverage
+      ? _coverageEndIso(summary.yearCoverage.maxYear)
       : undefined;
 
     const parquetFileName = `${summary.tableBaseName}.parquet`;

@@ -23,8 +23,8 @@ const DEFAULT_VALUE_PICKER_RULE_TYPE: ChatCaseValuePickerRuleType =
   "most_frequent";
 
 function _asTrimmedString(value: unknown): string | undefined {
-  return typeof value === "string" && value.trim().length > 0 ?
-      value.trim()
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
     : undefined;
 }
 

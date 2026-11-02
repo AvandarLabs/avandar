@@ -91,8 +91,8 @@ function _apply(sql: string): {
   return SUBSTITUTION_RULES.reduce(
     (result, rule) => {
       const substitutedSql = rule.apply(result.sql);
-      return substitutedSql === result.sql ?
-          result
+      return substitutedSql === result.sql
+        ? result
         : {
             sql: substitutedSql,
             appliedRuleIds: [...result.appliedRuleIds, rule.id],

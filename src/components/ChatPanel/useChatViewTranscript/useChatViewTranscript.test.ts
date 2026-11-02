@@ -1,8 +1,8 @@
 /** Behavioral tests for the reset payload built from live thread messages. */
 import { useThreadRuntime } from "@assistant-ui/react";
 import { useRouterState } from "@tanstack/react-router";
-import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { renderHook } from "@/test-utils";

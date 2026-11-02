@@ -22,29 +22,35 @@ export type FormRule<
   FullFormValues,
   FormPath extends ObjectPaths<FullFormValues>,
 > =
-  NonNullable<Value> extends ReadonlyArray<infer ListElementType> ?
-    | ({
-        [K in keyof NonNullable<ListElementType>]?:
-          | RuleFn<NonNullable<ListElementType>[K], FullFormValues, FormPath>
-          | (NonNullable<ListElementType>[K] extends (
-              ReadonlyArray<infer NestedListItem>
-            ) ?
-              FormRulesRecord<NestedListItem, FullFormValues, FormPath>
-            : NonNullable<ListElementType>[K] extends UnknownObject ?
-              FormRulesRecord<
-                NonNullable<ListElementType>[K],
-                FullFormValues,
-                FormPath
-              >
-            : never);
-      } & {
-        [formRootRule]?: RuleFn<Value, FullFormValues, FormPath>;
-      })
-    | RuleFn<Value, FullFormValues, FormPath>
-  : NonNullable<Value> extends UnknownObject ?
-    | FormRulesRecord<Value, FullFormValues, FormPath>
-    | RuleFn<Value, FullFormValues, FormPath>
-  : RuleFn<Value, FullFormValues, FormPath>;
+  NonNullable<Value> extends ReadonlyArray<infer ListElementType>
+    ?
+        | ({
+            [K in keyof NonNullable<ListElementType>]?:
+              | RuleFn<
+                  NonNullable<ListElementType>[K],
+                  FullFormValues,
+                  FormPath
+                >
+              | (NonNullable<ListElementType>[K] extends ReadonlyArray<
+                  infer NestedListItem
+                >
+                  ? FormRulesRecord<NestedListItem, FullFormValues, FormPath>
+                  : NonNullable<ListElementType>[K] extends UnknownObject
+                    ? FormRulesRecord<
+                        NonNullable<ListElementType>[K],
+                        FullFormValues,
+                        FormPath
+                      >
+                    : never);
+          } & {
+            [formRootRule]?: RuleFn<Value, FullFormValues, FormPath>;
+          })
+        | RuleFn<Value, FullFormValues, FormPath>
+    : NonNullable<Value> extends UnknownObject
+      ?
+          | FormRulesRecord<Value, FullFormValues, FormPath>
+          | RuleFn<Value, FullFormValues, FormPath>
+      : RuleFn<Value, FullFormValues, FormPath>;
 
 // Improved type safety for a FormRules record in how it handles potentially
 // nullable types

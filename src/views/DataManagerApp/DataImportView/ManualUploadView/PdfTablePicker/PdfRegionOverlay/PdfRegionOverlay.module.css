@@ -3,9 +3,15 @@
   touch-action: none;
 }
 
+/*
+ * The rectangle the user is dragging out. It takes the brand accent because
+ * it marks the current selection, which is the accent's job everywhere else
+ * in the app.
+ */
 .preview {
-  background: rgb(34 139 230 / 12%);
-  border: 2px dashed var(--mantine-color-blue-6);
+  background: var(--mantine-color-primary-1);
+  border: 2px dashed var(--mantine-color-primary-6);
+  opacity: 0.55;
   pointer-events: none;
 }
 

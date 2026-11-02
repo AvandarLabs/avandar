@@ -1,0 +1,64 @@
+import { sendNgrokUrlManagerRequest } from "@ava-cli/DevCli/NgrokUrlCli/sendNgrokUrlManagerRequest";
+import {
+  printError,
+  printInfo,
+  printSuccess,
+} from "@ava-cli/utils/cliOutput/cliOutput";
+import { Acclimate } from "@avandar/acclimate";
+import type { NgrokDevUrlTarget } from "@ava-cli/DevCli/NgrokUrlCli/sendNgrokUrlManagerRequest";
+
+function _formatTimestampForDisplay(isoTimestamp: string): string {
+  return new Date(isoTimestamp).toUTCString();
+}
+
+function _formatLastAccessedForDisplay(value: string | null): string {
+  if (value === null) {
+    return "Never";
+  }
+
+  return _formatTimestampForDisplay(value);
+}
+
+/**
+ * List all registered dev ngrok URLs.
+ *
+ * This is separated from the CLI wiring so it can be unit-tested.
+ */
+export async function runNgrokUrlList(): Promise<void> {
+  try {
+    printInfo("Fetching registered ngrok URLs...");
+    const { targets } = await sendNgrokUrlManagerRequest({
+      path: "/ngrok-url/list",
+      method: "GET",
+    });
+
+    if (targets.length === 0) {
+      printSuccess("No registered ngrok URLs.");
+      return;
+    }
+
+    printSuccess("Registered ngrok URLs:");
+    targets.forEach((target: NgrokDevUrlTarget) => {
+      const dateAdded: string = _formatTimestampForDisplay(target.dateAdded);
+      const lastAccessed: string = _formatLastAccessedForDisplay(
+        target.lastAccessedDate,
+      );
+
+      const line: string =
+        `${target.url} (added: ${dateAdded}, ` +
+        `last accessed: ${lastAccessed})`;
+      Acclimate.log(line);
+    });
+  } catch (error: unknown) {
+    const message: string =
+      error instanceof Error ? error.message : String(error);
+    printError("Failed to list ngrok URLs.");
+    printError(message);
+    throw error;
+  }
+}
+
+/** List all registered dev ngrok URLs. */
+export const NgrokUrlListCli = Acclimate.createCLI("list")
+  .description("List all registered dev ngrok URLs.")
+  .action(runNgrokUrlList);

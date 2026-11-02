@@ -20,10 +20,10 @@ import {
   makeSimplifiedGeometrySql,
   makeSpatialQueryPlan,
 } from "./compileMapLayerSpatialQueryHelpers";
-import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
-import type { CompileSourceOptions } from "./compileMapLayerSpatialQuery.types";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
+import type { CompileSourceOptions } from "./compileMapLayerSpatialQuery.types";
 
 type GeometryColumnBinding = Extract<
   MapLayer.GeoBinding,
@@ -37,13 +37,13 @@ function _getPropertyColumnNames(options: {
 }): string[] {
   const { layer, metadata } = options;
   const geometryColumnId =
-    layer.geoBinding?.type === "geometryColumn" ?
-      layer.geoBinding.column
-    : undefined;
+    layer.geoBinding?.type === "geometryColumn"
+      ? layer.geoBinding.column
+      : undefined;
   const selectedIds =
-    layer.popup.columnIds === "all" ?
-      layer.source.queryColumns.map(prop("id"))
-    : layer.popup.columnIds;
+    layer.popup.columnIds === "all"
+      ? layer.source.queryColumns.map(prop("id"))
+      : layer.popup.columnIds;
   const columnNames = selectedIds
     .filter((columnId) => {
       return columnId !== geometryColumnId;
@@ -53,14 +53,12 @@ function _getPropertyColumnNames(options: {
     })
     .filter(isDefined);
   const disputedStatusColumnName =
-    metadata.disputedStatusColumn?.type === "queryColumn" ?
-      metadata.disputedStatusColumn.columnName
-    : undefined;
-  return (
-      disputedStatusColumnName &&
-        !columnNames.includes(disputedStatusColumnName)
-    ) ?
-      [...columnNames, disputedStatusColumnName]
+    metadata.disputedStatusColumn?.type === "queryColumn"
+      ? metadata.disputedStatusColumn.columnName
+      : undefined;
+  return disputedStatusColumnName &&
+    !columnNames.includes(disputedStatusColumnName)
+    ? [...columnNames, disputedStatusColumnName]
     : columnNames;
 }
 
@@ -82,16 +80,14 @@ function _buildPropertiesExpression(options: {
   const columnEntries = columnNames.flatMap((columnName) => {
     return [quoteSqlLiteral(columnName), quoteSqlIdentifier(columnName)];
   });
-  const denominatorEntries =
-    denominatorColumnName ?
-      [
+  const denominatorEntries = denominatorColumnName
+    ? [
         quoteSqlLiteral(MapLayerSpatialFeatureProperties.denominator),
         quoteSqlIdentifier(denominatorColumnName),
       ]
     : [];
-  const disputedStatusEntries =
-    disputedStatusColumnName ?
-      [
+  const disputedStatusEntries = disputedStatusColumnName
+    ? [
         quoteSqlLiteral(MapLayerSpatialFeatureProperties.disputedStatus),
         quoteSqlIdentifier(disputedStatusColumnName),
       ]
@@ -202,13 +198,11 @@ function _buildGeometryColumnSql(options: {
     denominatorColumnName: options.denominatorColumnName,
     disputedStatusColumnName: options.disputedStatusColumnName,
   });
-  const sourceAoiWhere =
-    options.aoi ?
-      `\n    AND ${makeSourceAoiPredicateSql(geometry, options.aoi)}`
+  const sourceAoiWhere = options.aoi
+    ? `\n    AND ${makeSourceAoiPredicateSql(geometry, options.aoi)}`
     : "";
-  const outputAoiWhere =
-    options.aoi ?
-      `\n    AND ${makeOutputAoiPredicateSql(geometry, options.aoi)}`
+  const outputAoiWhere = options.aoi
+    ? `\n    AND ${makeOutputAoiPredicateSql(geometry, options.aoi)}`
     : "";
   return `WITH source_rows AS (${options.sourceSql}),
 ${_buildParsedRowsCte({
@@ -243,13 +237,13 @@ export function compileGeometryColumnQuery(
     metadata: options.metadata,
   });
   const denominatorColumnName =
-    options.metadata.normalizationDenominator?.type === "queryColumn" ?
-      options.metadata.normalizationDenominator.columnName
-    : undefined;
+    options.metadata.normalizationDenominator?.type === "queryColumn"
+      ? options.metadata.normalizationDenominator.columnName
+      : undefined;
   const disputedStatusColumnName =
-    options.metadata.disputedStatusColumn?.type === "queryColumn" ?
-      options.metadata.disputedStatusColumn.columnName
-    : undefined;
+    options.metadata.disputedStatusColumn?.type === "queryColumn"
+      ? options.metadata.disputedStatusColumn.columnName
+      : undefined;
   return makeSpatialQueryPlan({
     compile: options,
     rawSql: _buildGeometryColumnSql({

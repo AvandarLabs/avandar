@@ -45,9 +45,9 @@ function _formatDatasets(
   return datasets
     .map((dataset) => {
       const description =
-        dataset.description && dataset.description.trim().length > 0 ?
-          `\n  description: ${dataset.description.trim()}`
-        : "";
+        dataset.description && dataset.description.trim().length > 0
+          ? `\n  description: ${dataset.description.trim()}`
+          : "";
       return `- ${dataset.name} id=${dataset.id}${description}\n${_formatColumns(dataset.id, columns)}`;
     })
     .join("\n");

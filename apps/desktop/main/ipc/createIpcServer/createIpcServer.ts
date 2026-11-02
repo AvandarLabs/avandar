@@ -15,7 +15,7 @@ import type { RequestEnvelope } from "$/platform/ipc/envelopes";
 /**
  * Minimal transport surface that {@link createIpcServer} needs from
  * Electrobun's Bun-main API. Adapter code in `apps/desktop/main/index.ts`
- * (Phase 2 Task 8) wires the real webview IPC channels into this shape.
+ * wires the real webview IPC channels into this shape.
  */
 export type IpcTransport = {
   on: (channel: string, callback: (message: unknown) => void) => void;

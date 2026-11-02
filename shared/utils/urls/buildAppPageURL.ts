@@ -1,8 +1,8 @@
 import { getAppURL } from "$/env/getAppURL.ts";
-import { buildHTTPQueryString } from "$/utils/urls/buildHTTPQueryString.ts";
+import { buildHttpQueryString } from "$/utils/urls/buildHttpQueryString/buildHttpQueryString.ts";
 import { replaceURLPathParams } from "$/utils/urls/replaceURLPathParams.ts";
 import type { AvaRoutePaths } from "$/config/AvaRoutePaths.types.ts";
-import type { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString.ts";
+import type { ValidUrlQueryParamValue } from "$/utils/urls/buildHttpQueryString/buildHttpQueryString.ts";
 import type { PathParams } from "$/utils/urls/replaceURLPathParams.ts";
 
 /**
@@ -23,12 +23,12 @@ export function buildAppPageURL<RoutePath extends AvaRoutePaths>({
   pathParams,
 }: {
   path: RoutePath;
-  queryParams?: Record<string, ValidURLQueryParamValue>;
+  queryParams?: Record<string, ValidUrlQueryParamValue>;
   pathParams?: PathParams<RoutePath>;
 }): string {
   const origin = getAppURL();
   const parsedPath = replaceURLPathParams({ path, pathParams });
   const url = new URL(parsedPath, origin);
-  const queryString = buildHTTPQueryString(queryParams);
+  const queryString = buildHttpQueryString(queryParams);
   return `${url.toString()}${queryString === "" ? "" : `?${queryString}`}`;
 }

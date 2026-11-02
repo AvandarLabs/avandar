@@ -4,13 +4,13 @@ import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { DataVizLocalFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters";
 import { QueryResultsError } from "@/views/DataExplorerApp/QueryResultsError/QueryResultsError";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type {
   DataVizFilterProps,
   useLocalFilterState,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import type { UnknownDataFrame } from "@avandar/utils";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { ReactElement } from "react";
 
 type Props = {
@@ -47,12 +47,13 @@ export function DataVizContent({
   queryErrorMessage,
 }: Readonly<Props>): ReactElement {
   const emptyMessage =
-    prompt.length === 0 ?
+    prompt.length === 0 ? (
       <Trans>
         Add a prompt and generate SQL to configure this visualization.
       </Trans>
-    : rawSql.trim().length === 0 ? <Trans>Run a query to see results.</Trans>
-    : undefined;
+    ) : rawSql.trim().length === 0 ? (
+      <Trans>Run a query to see results.</Trans>
+    ) : undefined;
 
   if (emptyMessage !== undefined) {
     return (

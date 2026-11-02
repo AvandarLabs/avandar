@@ -34,9 +34,7 @@ export function BillingPortalButton({ children }: Props): JSX.Element {
       }}
     >
       {children}
-      {isLoadingCustomerPortalURL ?
-        <Loader size="xs" ml="xs" />
-      : null}
+      {isLoadingCustomerPortalURL ? <Loader size="xs" ml="xs" /> : null}
     </Button>
   );
 }

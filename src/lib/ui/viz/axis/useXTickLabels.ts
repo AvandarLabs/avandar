@@ -19,8 +19,8 @@ export function useXTickLabels({
     }
     return data.map((row) => {
       const value = row[xAxisKey];
-      return tickFormatter !== undefined ?
-          tickFormatter(value)
+      return tickFormatter !== undefined
+        ? tickFormatter(value)
         : String(value ?? "");
     });
   }, [data, xAxisKey, tickAngle, tickFormatter]);

@@ -1,7 +1,7 @@
 import { SYMBOLOGY_OPTIONS } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
 import css from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.module.css";
-import type { AvailableSymbologyType } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { AvailableSymbologyType } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
 import type { ReactNode } from "react";
 
 type Props = {

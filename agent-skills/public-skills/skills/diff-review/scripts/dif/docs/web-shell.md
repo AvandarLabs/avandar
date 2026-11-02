@@ -400,18 +400,109 @@ button does. So a reviewer who reaches for difit's button gets the shell's guide
 and counts refreshed too, and our redundant **Show new changes** affordance
 clears on the next content check rather than lingering.
 
+### Comment delivery and the GitHub PR
+
+The top bar's right section starts with a **Bulk / Eager** segmented toggle and,
+in bulk mode while comments are held, a **Send all (N)** pill
+(`frontend/shell/dispatch.js`). It polls `/__wrap/dispatch.json` every 1.5s and
+writes through `POST /__wrap/dispatch` and `POST /__wrap/send-all`. The button
+stays disabled after a click until the TUI reports the queue empty.
+
+The left section, after the branch identity, holds the GitHub controls
+(`frontend/shell/github.js`): a yellow **No linked PR** pill, or the PR link, a
+**Sync** icon button (spins while pulling), a **Review (N)** pill that opens the
+submit panel (a fixed-position dialog under it; Escape or an outside click
+closes it), and a notice line (ellipsized when it doesn't fit; hovering a cut-off notice
+shows the full text in the shell's tooltip). It polls `/__wrap/github.json` every 2s and posts
+to `/__wrap/github/pull`, `/__wrap/github/submit`, `/__wrap/github/viewed`, and
+`/__wrap/github/connection` (the browser's `online` / `offline` events, and once
+at boot). While GitHub is unreachable the notice says so and lists what is
+queued (`connection` and `queued` in `/__wrap/github.json`), the Sync icon stops
+spinning, and a review submitted offline closes the panel until it goes through.
+Each tab reports a submit's outcome once (keyed in `sessionStorage` by session
+id and outcome), including one that finished before the page loaded, such as a
+review queued offline and sent after a relaunch.
+See [integrations.md](integrations.md#offline).
+It also sends difit's viewed changes to GitHub, diffing difit's viewed index on
+every `storage` event; and after a sync fast-forwards the branch it reloads
+difit in place through the same path as **Show new changes**.
+
+Inside difit, the injected script is three concatenated parts, each its own
+IIFE (`assets::INJECT_JS`): `inject.js` (the core), `inject/destinations.js`
+(the TUI / PR toggle on comment boxes and the PR comment restyling), and
+`inject/viewed.js` (applying GitHub's viewed changes to difit's storage). Their
+styles are injected as a `<style>` element because difit's document has no
+shell stylesheet. See [integrations.md](integrations.md#github-pr-sync) for the
+contracts.
+
+### Only files with comments
+
+A **With comments** toggle in the top bar's right section (`frontend/shell/commented.js`,
+also a palette action) narrows the difit iframe to files with comment threads.
+It composes with the view: the iframe URL gains `commented=1`
+(`/__wrap/difit?group=2&commented=1`), the router reads it off the `/api/diff`
+`Referer` (`Route::ApiDiff { commented_only }`), and after the view's own filter
+the proxy reads difit's `/api/comments-json` and keeps only files with a
+message (`filter::commented_files`, then `filter::filter_diff`). An unreadable
+comments payload leaves the diff unnarrowed (fail-open). The count polls
+`/api/comments-json` every 3s and counts commented files in the current diff;
+with none, the toggle is disabled while off.
+
+### Reloading after a Sync or a difit restart
+
+The shell reloads the whole page (`reloadShell`) when a reviewer-requested
+**Sync** finishes (`sync.reviewerPulls` grows in `/__wrap/github.json`) and when
+the TUI restarts difit (`difitRestarts` grows in `/__wrap/meta.json`, now polled
+every 2s). Neither ever opens a new tab. The tab's place survives any reload,
+ours or the browser's: `pagehide` saves the view, the sidebar tab, and the
+commented-only toggle to `sessionStorage` (`dif-shell-view`), and boot restores
+them. A new tab starts at the full diff.
+
+### Merge conflicts after a Sync
+
+When a Sync's stash restore conflicts, `/__wrap/github.json` carries
+`conflicts` (the file list) until someone answers. `frontend/shell/conflicts.js`
+shows a native modal `<dialog>` listing the files with **I'll resolve them** and
+**Auto-resolve with the LLM** (focused). Escape counts as the first. The answer
+goes to `POST /__wrap/github/conflicts`; another tab's open modal closes once
+`conflicts` clears. See [integrations.md](integrations.md#pulling-from-github).
+
 ### Sidebar file rows
 
 Each file row shows the viewed check, the file name, and a short note. The name
-stays full; the **note ellipsizes** when it doesn't fit and a hover **tooltip**
-(a small dependency-free Mantine-style popover, `#tip` in `shell.js`) shows the
-full note. Hovering the name shows the full repo-relative path. Thread counts are
-not shown in the row.
+stays full; the **note ellipsizes** when it doesn't fit and its tooltip shows the
+full note. Hovering the name shows the full repo-relative path, and hovering the
+check says whether the file is viewed, not yet viewed, or changed since review.
+Thread counts are not shown in the row.
+
+### Tooltips
+
+Every control in the shell explains itself in one styled tooltip (`#tip`, a
+small dependency-free popover, `frontend/shell/tooltip.js`). Elements opt in
+with `data-tip` (line breaks are kept); `data-tip-trunc` shows it only when the
+element is actually ellipsized (a file note, the GitHub notice). Hovers and
+keyboard focus are delegated on the document, so the header, sidebar, and rail
+share it, and while it shows it describes its element (`aria-describedby`).
+Static controls get their text in `frontend/shell/tips.js` (it names the
+platform's hotkeys); state-dependent ones set it where they render (the GitHub
+bar, With comments, Send all, the branch and worktree, the view header, the
+sidebar and rail). The shell page keeps no native `title` except the difit
+iframe's accessible name; `tests/web_shell.rs` guards that. Bulk and Eager each
+carry their own explanation.
+
+Inside difit's iframe the shell's tooltip can't reach, so the injected comment
+box controls (the TUI / PR toggle and the submit button) keep native titles that
+say what each destination does and which shortcuts apply.
+
+The header's left column fills exactly its grid track: the GitHub notice has no
+intrinsic width and only fills leftover space, ellipsizing first; the branch
+title gives way only when the buttons are tight. Nothing runs under the
+centered view title.
 
 ### Iframe auto-retry (no manual "Retry")
 
-difit is briefly down right after a `Ctrl+R` restart, so the iframe's first load
-can `502`. `shell.js` retries the load silently (up to `RETRY_MAX`, 500ms apart)
+difit is briefly down right after a `Ctrl+R` restart (which reloads the open
+tab rather than opening a new one), so the iframe's first load can `502`. `shell.js` retries the load silently (up to `RETRY_MAX`, 500ms apart)
 before surfacing the manual "difit didn't load" box — so a restart reopens the
 shell and difit fills in on its own. `difit-ready` (from `inject.js`) cancels the
 retry loop.
@@ -431,13 +522,18 @@ Windows/Linux the leader is **Alt+Shift**, because browsers reserve
 | `Ctrl`+`D` / `Alt+Shift`+`D` | Show the Diff guide sidebar tab |
 | `Ctrl`+`T` / `Alt+Shift`+`T` | Show the Test plan sidebar tab |
 | `⌘K` / `Ctrl`+`K` | Toggle the command palette |
+| `Ctrl`+`G` (macOS) / `Alt+Shift`+`G` (Windows/Linux) | In a difit comment box: toggle where the comment goes, TUI ↔ PR |
+| `⌘`+`Enter` / `Ctrl`+`Enter` | In a difit comment box: save to the destination the toggle shows |
+| `⌘`+`Shift`+`Enter` / `Ctrl`+`Shift`+`Enter` | In a difit comment box: save to the *other* destination (TUI → PR, PR → TUI) without flipping the toggle. Ignored when there is no PR to post to |
+| `⌘`+`Ctrl`+`Enter` / `Ctrl`+`Alt`+`Enter` | In a TUI comment box in Bulk mode: save and send this one comment to the LLM at once, skipping the held queue |
 
 Hotkeys never fire while focus is in an editable field (so difit's comment boxes
 and emacs-style Ctrl keys keep working). Because a keydown inside the difit
 iframe never bubbles to the shell document, **`inject.js` forwards** matching
 combos up to the shell via `postMessage` (`{source:"dif-web-shell",
 type:"hotkey", combo}`), so the hotkeys work even when focus is inside difit.
-This reuses the same message channel as the existing `difit-ready` signal.
+This reuses the same message channel as the existing `difit-ready` signal. The exceptions are the TUI ↔ PR toggle and the comment-save keys, which only act *inside* a difit
+comment box (handled by `inject/destinations.js`, not forwarded).
 
 > Cross-platform note: on Windows/Linux `Ctrl`+digit / `Ctrl`+`F` /
 > `Ctrl`+`D` / `Ctrl`+`T` are browser shortcuts and cannot be reliably
@@ -460,7 +556,7 @@ This reuses the same message channel as the existing `difit-ready` signal.
   iframes toggled by visibility — truly simultaneous, no reload, at the price of
   N SSE connections + more lifecycle. Not built for v1.
 - **Entry point: auto-open the shell, alongside the TUI, as the default.** Today
-  `dif` spawns difit with `open_browser=true` (`startup.rs`) and difit opens the
+  `dif` spawns difit with `open_browser=true` (`tui/startup/surface.rs`) and difit opens the
   browser at its own URL. Flip that to `--no-open`; the shell server opens the
   browser at the **shell** URL instead. No new flag — the wrapped frontend simply
   replaces difit's default frontend as what auto-opens.
@@ -502,15 +598,16 @@ axum. Reuse `ureq` (already a dep) for upstream calls to difit.
   viewed-sync + the `X-Dif-Group` header fallback).
   - **The shell script is split into ordered fragments under `frontend/shell/`**
     rather than one large file. They share ONE IIFE + closure scope and are
-    concatenated at compile time — in order — into `server::SHELL_JS`, served as
+    concatenated at compile time — in order — into `assets::SHELL_JS`, served as
     a single `/__wrap/shell.js`. `shell.js` (the entry) opens the IIFE and
     declares all shared state + DOM refs; feature fragments (`tooltip`,
-    `helpers`, `iframe`, `render`, `data`, `spotlight`, `hotkeys`, `chrome`) add
+    `helpers`, `iframe`, `render`, `data`, `spotlight`, `hotkeys`, `chrome`,
+    `tips`, `commented`, `dispatch`, `github`, `conflicts`) add
     behavior; `boot.js` runs startup and closes the IIFE. Ordering is
     load-bearing only in that `shell.js` is first and `boot.js` last (the middle
     fragments are hoisted function/listener definitions). The fragments are not
     individually parse-valid; lint/syntax-check the assembled `/__wrap/shell.js`.
-    A unit test (`server::tests::shell_js_is_one_well_formed_iife`) guards the
+    A unit test (`assets::tests::shell_js_is_one_well_formed_iife`) guards the
     assembled shape (single wrapper, entry to features to boot order, key symbols
     present).
 
@@ -520,7 +617,7 @@ unit-tested; the only I/O is in `server.rs` / `proxy.rs`.
 
 ### Wiring changes
 
-- **`difit/server.rs` + `tui/startup.rs`**: spawn difit with
+- **`difit/server.rs` + `tui/startup/surface.rs`**: spawn difit with
   `open_browser=false`. After difit is ready, `web::WebShell::start(...)`, then
   open the browser at the shell URL (shell out to `open` / `xdg-open`). Shut the
   shell server down alongside difit on exit.

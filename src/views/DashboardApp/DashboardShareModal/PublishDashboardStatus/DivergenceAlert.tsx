@@ -35,16 +35,17 @@ export function DivergenceAlert({ visibility }: Readonly<Props>): ReactNode {
       <Text size="sm">
         {/* A draft has no published copy to be stale, so it must not claim one:
             the "Not published yet" alert sits directly above this. */}
-        {visibility === "draft" ?
+        {visibility === "draft" ? (
           <Trans>
             This dashboard is not published yet. Use the button below to publish
             it to the audience you picked.
           </Trans>
-        : <Trans>
+        ) : (
+          <Trans>
             The published copy still serves the previous audience. Use the
             button below to apply your change.
           </Trans>
-        }
+        )}
       </Text>
     </Alert>
   );

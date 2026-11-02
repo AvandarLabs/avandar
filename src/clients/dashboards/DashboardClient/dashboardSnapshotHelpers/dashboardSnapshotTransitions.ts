@@ -4,13 +4,13 @@ import { DashboardSnapshotTransition } from "@/clients/dashboards/DashboardSnaps
 import { updateDashboardRowIfUnchanged } from "@/clients/dashboards/updateDashboardRowIfUnchanged";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardMutationContext } from "@/clients/dashboards/DashboardClient/DashboardClient.types";
 import type {
   PublishedVisibility,
   SnapshotBucketName,
 } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import type { ILogger } from "@avandar/logger";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type TransitionClaimOptions = {
   context: DashboardMutationContext;
@@ -55,9 +55,9 @@ export async function updateDashboardModelIfUnchanged(
     dashboard: options.dashboard,
     dbUpdate,
   });
-  return updatedDashboard === undefined ? undefined : (
-      options.context.parsers.fromDBReadToModelRead(updatedDashboard)
-    );
+  return updatedDashboard === undefined
+    ? undefined
+    : options.context.parsers.fromDBReadToModelRead(updatedDashboard);
 }
 
 /** Deletes the previous published generation, tolerating storage failures. */

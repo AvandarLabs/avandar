@@ -1,7 +1,7 @@
 import { pickProps } from "@avandar/utils";
 import { useRouterState } from "@tanstack/react-router";
-import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { useMemo } from "react";
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { makeChatPageContextFromPathname } from "@/components/ChatPanel/makeChatPageContextFromPathname/makeChatPageContextFromPathname";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 

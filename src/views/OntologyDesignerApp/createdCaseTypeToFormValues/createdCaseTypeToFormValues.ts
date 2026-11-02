@@ -1,10 +1,6 @@
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
 import { makeDefaultManualEntryAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-import type {
-  AttributeFormValues,
-  ConceptFormSubmitValues,
-} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
@@ -14,6 +10,10 @@ import type {
   ChatCaseSourceDataset,
   ChatCreatedCaseType,
 } from "$/types/chat.types";
+import type {
+  AttributeFormValues,
+  ConceptFormSubmitValues,
+} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
 /** Matches the concept creator form's default for a new mapped attribute. */
 const DEFAULT_VALUE_PICKER_RULE_TYPE: ValuePickerRuleType = "most_frequent";

@@ -13,8 +13,8 @@ import {
   POINT_AGGREGATE_CELL_COUNT_COLUMN,
   runPointLayerQuery,
 } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/runPointLayerQuery";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 const SOURCE_SQL = 'SELECT * FROM "cases"';
 
@@ -160,8 +160,8 @@ describe("runPointLayerQuery", () => {
       distinctCoordinateCount: POINT_AGGREGATE_MAX_CELLS * 10,
       // Only resolutions well below the requested one fit under the ceiling.
       cellCountByCellsAcross: (cellsAcross) => {
-        return cellsAcross > requested / 8 ?
-            POINT_AGGREGATE_MAX_CELLS + 1
+        return cellsAcross > requested / 8
+          ? POINT_AGGREGATE_MAX_CELLS + 1
           : POINT_AGGREGATE_MAX_CELLS - 1;
       },
     });

@@ -6,9 +6,9 @@ import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { DuckDbTablesContent } from "@/components/spotlight-modals/DevDuckDbTableSchemaView/DuckDbTablesContent";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { UseQueryResultTuple } from "@avandar/query-hooks";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
+import type { UseQueryResultTuple } from "@avandar/query-hooks";
 import type { ReactNode } from "react";
 
 export type DevDuckDbTable = {

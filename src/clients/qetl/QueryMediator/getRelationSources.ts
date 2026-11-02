@@ -17,12 +17,12 @@ import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFi
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { getQueryableColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   DatasetsById,
   DatasetsBySourceType,
   RelationSource,
 } from "@/clients/qetl/QueryMediator/QueryMediator.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type SourceRecordReaderOptions = {
   ids: readonly Dataset.Id[];

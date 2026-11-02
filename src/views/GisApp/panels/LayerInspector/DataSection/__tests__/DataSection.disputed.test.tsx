@@ -1,8 +1,8 @@
 import { Model } from "@avandar/models";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import {
   createBoundLayer,
@@ -11,9 +11,9 @@ import {
   resetDataSectionFixtures,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
 import { DisputedStatusControls } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 
 /** The DuckDB spelling of each `AvaDataType` used by this test file. */
 const DUCK_DB_DATA_TYPES = {

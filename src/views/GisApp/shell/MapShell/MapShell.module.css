@@ -1,5 +1,5 @@
 /*
- * The shell fills the AppLayout canvas. The map surface takes remaining
+ * The shell fills the AppSlate. The map surface takes remaining
  * height; the feature drawer and furniture strip sit below it in flow so
  * opening the drawer shrinks the map instead of covering chrome.
  *

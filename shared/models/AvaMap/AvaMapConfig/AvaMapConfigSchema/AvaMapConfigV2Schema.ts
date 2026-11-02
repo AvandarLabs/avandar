@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { uuidType } from "$/lib/zodHelpers.ts";
 import {
   AggregateOnlySensitivitySchema,
@@ -19,7 +20,6 @@ import {
   GEOMETRY_FAMILIES,
   LEGEND_ENTRY_TYPES,
 } from "$/models/AvaMap/MapLayer/MapLayer.ts";
-import { z } from "zod";
 
 const GeometryEncodingSchema = z.enum(GEOMETRY_ENCODINGS);
 const GeometrySimplificationSchema = z.strictObject({

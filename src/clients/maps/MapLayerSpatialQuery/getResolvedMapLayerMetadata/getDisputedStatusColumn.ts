@@ -1,11 +1,14 @@
 import { propEq } from "@avandar/utils";
+import { match } from "ts-pattern";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { match } from "ts-pattern";
 import {
   createRebindRequired,
   findBoundaryColumn,
 } from "./getResolvedMapLayerMetadataHelpers";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type {
   MapLayerRebindRequired,
   ResolvedColumnRef,
@@ -14,9 +17,6 @@ import type {
   BoundaryBinding,
   ResolveOptions,
 } from "./getResolvedMapLayerMetadata.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 /** Resolves the found-or-missing state of a `queryColumn` disputed ref. */
 function _findQueryDisputedColumn(

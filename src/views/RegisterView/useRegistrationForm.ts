@@ -26,8 +26,8 @@ export function useRegistrationForm(): RegistrationFormController {
     validate: {
       email: isEmail(t`Invalid email address`),
       confirmPassword: (value, formValues) => {
-        return value !== formValues.password ?
-            t`Passwords do not match`
+        return value !== formValues.password
+          ? t`Passwords do not match`
           : undefined;
       },
     },

@@ -53,31 +53,31 @@ export function MapFurnitureBar({
   return (
     <div className={css.mapFurnitureBar} data-testid="map-furniture-bar">
       <span className={css.mapFurnitureBarCoordinates}>
-        {coordinates ?
-          `${formatNumber(Math.abs(coordinates.latitude), {
-            locale: i18n.locale,
-            minimumFractionDigits: 3,
-            maximumFractionDigits: 3,
-            useGrouping: false,
-          })} ${i18n._(
-            _hemisphereMessage({ value: coordinates.latitude, axis: "lat" }),
-          )}, ${formatNumber(Math.abs(coordinates.longitude), {
-            locale: i18n.locale,
-            minimumFractionDigits: 3,
-            maximumFractionDigits: 3,
-            useGrouping: false,
-          })} ${i18n._(
-            _hemisphereMessage({ value: coordinates.longitude, axis: "lng" }),
-          )}`
-        : t`Move the pointer over the map to read a coordinate`}
+        {coordinates
+          ? `${formatNumber(Math.abs(coordinates.latitude), {
+              locale: i18n.locale,
+              minimumFractionDigits: 3,
+              maximumFractionDigits: 3,
+              useGrouping: false,
+            })} ${i18n._(
+              _hemisphereMessage({ value: coordinates.latitude, axis: "lat" }),
+            )}, ${formatNumber(Math.abs(coordinates.longitude), {
+              locale: i18n.locale,
+              minimumFractionDigits: 3,
+              maximumFractionDigits: 3,
+              useGrouping: false,
+            })} ${i18n._(
+              _hemisphereMessage({ value: coordinates.longitude, axis: "lng" }),
+            )}`
+          : t`Move the pointer over the map to read a coordinate`}
       </span>
       <span className={css.mapFurnitureBarSpacer} />
-      {scale?.kind === "bar" ?
+      {scale?.kind === "bar" ? (
         <span className={css.mapFurnitureBarScale}>
           <span>
-            {scale.meters >= 1000 ?
-              t`${scale.meters / 1000} km`
-            : t`${scale.meters} m`}
+            {scale.meters >= 1000
+              ? t`${scale.meters / 1000} km`
+              : t`${scale.meters} m`}
           </span>
           <span
             aria-hidden
@@ -85,12 +85,12 @@ export function MapFurnitureBar({
             style={{ width: scale.widthPx }}
           />
         </span>
-      : null}
-      {scale?.kind === "varies" ?
+      ) : null}
+      {scale?.kind === "varies" ? (
         <span className={css.mapFurnitureBarScale}>
           {t`Scale varies across this map`}
         </span>
-      : null}
+      ) : null}
       <span className={css.mapFurnitureBarAttribution}>{attribution}</span>
       <span className={css.mapFurnitureBarDisclaimer}>
         {disclaimer ??

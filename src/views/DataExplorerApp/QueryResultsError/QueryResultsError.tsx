@@ -34,7 +34,7 @@ export function QueryResultsError({ message, sql }: Props): ReactNode {
     >
       <Stack gap="xs">
         <span>{message}</span>
-        {sql ?
+        {sql ? (
           <>
             <Anchor
               component="button"
@@ -43,15 +43,11 @@ export function QueryResultsError({ message, sql }: Props): ReactNode {
               aria-expanded={isSqlOpen}
               onClick={toggleSql}
             >
-              {isSqlOpen ?
-                <Trans>Hide SQL</Trans>
-              : <Trans>Show SQL</Trans>}
+              {isSqlOpen ? <Trans>Hide SQL</Trans> : <Trans>Show SQL</Trans>}
             </Anchor>
-            {isSqlOpen ?
-              <Code block>{sql}</Code>
-            : null}
+            {isSqlOpen ? <Code block>{sql}</Code> : null}
           </>
-        : null}
+        ) : null}
       </Stack>
     </Alert>
   );

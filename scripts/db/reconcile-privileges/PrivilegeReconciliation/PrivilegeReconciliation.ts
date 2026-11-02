@@ -13,7 +13,7 @@
  * in `reconcile-privileges.main.ts`.
  */
 
-import { splitSqlStatements } from "../../lib/splitSqlStatements";
+import { splitSqlStatements } from "../../utils/splitSqlStatements/splitSqlStatements";
 
 /** The four grantees that make up the Data API surface. */
 export const DATA_API_GRANTEES = [
@@ -169,11 +169,15 @@ function _getDefaultAclParts(object: string): {
 } {
   const [schema = "", objectType = ""] = object.split("|");
   const objectClass =
-    objectType === "r" ? "tables"
-    : objectType === "S" ? "sequences"
-    : objectType === "f" ? "functions"
-    : objectType === "T" ? "types"
-    : "";
+    objectType === "r"
+      ? "tables"
+      : objectType === "S"
+        ? "sequences"
+        : objectType === "f"
+          ? "functions"
+          : objectType === "T"
+            ? "types"
+            : "";
   return { schema, objectClass };
 }
 

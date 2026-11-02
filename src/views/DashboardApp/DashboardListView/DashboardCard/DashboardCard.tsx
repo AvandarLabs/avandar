@@ -1,4 +1,4 @@
-import { mantineColorVar } from "@avandar/ui";
+import { cssAvaVar, mantineColorVar } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconLayoutDashboard } from "@tabler/icons-react";
@@ -48,10 +48,9 @@ export function DashboardCard({
         root: {
           cursor: onClick ? "pointer" : "default",
           transform: isHovered ? "translateY(-2px)" : "translateY(0)",
-          borderColor:
-            isHovered ?
-              mantineColorVar("primary.3")
-            : mantineColorVar("gray.3"),
+          borderColor: isHovered
+            ? mantineColorVar("primary.3")
+            : cssAvaVar("border-default"),
           transition:
             "transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease",
         },
