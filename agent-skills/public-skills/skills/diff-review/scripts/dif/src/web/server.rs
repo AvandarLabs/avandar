@@ -189,7 +189,8 @@ fn handle(request: Request, ctx: &Ctx) -> std::io::Result<()> {
         | Route::GithubPull
         | Route::GithubSubmit
         | Route::GithubViewed
-        | Route::GithubConflicts) => github_routes::handle(&route, request, ctx),
+        | Route::GithubConflicts
+        | Route::GithubConnection) => github_routes::handle(&route, request, ctx),
         Route::DifitDoc => match proxy::get(ctx.difit_port, "/") {
             Ok(up) => send_bytes_nostore(
                 request,

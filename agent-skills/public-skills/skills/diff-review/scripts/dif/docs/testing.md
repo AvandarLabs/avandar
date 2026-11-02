@@ -43,7 +43,8 @@ suite with `cargo test` (it finishes in a couple of seconds).
   thread opening its own thread, update on an edit, nothing removed unless the
   previous snapshot held it, a removed published thread resolving (replies
   forgotten), a removed draft thread deleting its drafts, one deleted reply
-  deleting on GitHub, retrying a failure only after an edit.
+  deleting on GitHub, retrying a failure only after an edit, a queued removal
+  planned again after the snapshot that dropped it.
 - `github::pull` (`pull_tests.rs`): new remote threads and replies under their
   authors (bots, the viewer's own as editable), placement in the matching local
   thread, a GitHub edit replacing an unchanged local body but losing to an
@@ -54,7 +55,11 @@ suite with `cargo test` (it finishes in a couple of seconds).
 - `github::graphql`: error answers, the viewer's pending review, new threads and
   replies, threads with bots / ranges / outdated lines / paging, viewed files.
 - `github::client`: thread variables (range vs single line), `gh pr view`
-  parsing (open PRs only), and "already gone" errors.
+  parsing (open PRs only), "already gone" errors, and a hung command killed
+  after the timeout (reported as a network error).
+- `github::connection`: `gh`'s real unreachable-network messages vs GitHub
+  refusals, the retry interval (never while the browser is offline), and the
+  browser coming back online.
 - `github::checkout` (`checkout_tests.rs`): the fast-forward decision (a
   reviewer's Sync stashes a dirty branch that is behind), plus a real `origin` /
   clone pair: fetching `pull/7/head` and fast-forwarding a clean branch, tracked
@@ -66,8 +71,17 @@ suite with `cargo test` (it finishes in a couple of seconds).
   LLM prompt (each file listed, `git reset -q`, `git stash drop`, no commit).
 - `github::registry` / `github::session`: persistence, marking never resets a
   posted entry, session state never persisted, tombstones kept from the LLM,
-  draft/failed counts, own-PR detection, the browser JSON (incl. `conflicts` and
-  `reviewerPulls`), answering conflicts (LLM vs reviewer), viewed event capping.
+  draft/failed counts (a draft with a queued removal is not a draft),
+  `queuedViewed` persistence, own-PR detection, the browser JSON (incl.
+  `conflicts`, `reviewerPulls`, `connection`, and `queued`), coming back online
+  requesting a pull, answering conflicts (LLM vs reviewer), viewed event capping.
+- `github::sync` offline (`sync_offline_tests.rs`, the fake GitHub's
+  `set_offline`): a comment saved after the drop stays `pending` and posts on
+  reconnect; launching offline leaves the PR unknown instead of failing
+  comments; no calls while the browser reports no network; the retry interval;
+  a draft deleted and a thread resolved offline reaching GitHub later; queued
+  viewed changes sent later and never undone by the first pull; a review
+  submitted offline; an unreachable pull asked for again, not reported.
 - `github::sync` (`sync_tests.rs`, against a stateful fake GitHub): draft then
   publish on submit, edit/resolve mirroring, own PR refusing approve, submit
   refusing failed comments, no PR failing comments with the reason, a pull

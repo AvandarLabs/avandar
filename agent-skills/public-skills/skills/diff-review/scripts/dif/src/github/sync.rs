@@ -10,6 +10,11 @@
 //!   4. submits the pending review when the browser asks;
 //!   5. pulls from GitHub every minute, or at once when asked
 //!      ([`sync_pull`](super::sync_pull)).
+//!
+//! While GitHub cannot be reached ([`connection`](super::connection)) the steps
+//! make no calls and every interaction stays queued
+//! ([`sync_queue`](super::sync_queue)); the first call that cannot reach
+//! GitHub stops the rest of the pass.
 
 use std::time::{Duration, Instant};
 
@@ -21,10 +26,11 @@ use crate::difit::imports::Snapshot;
 
 use super::checkout::Checkout;
 use super::client::GithubApi;
+use super::connection::{RETRY_EVERY, is_network_error};
 use super::graphql::Posted;
 use super::plan::{Previous, SyncAction, plan};
-use super::registry::{Registry, SharedRegistry, SyncStatus, SyncedComment};
-use super::session::{PrState, PullRequest, ReviewEvent, SubmitOutcome, ViewedState};
+use super::registry::{Registry, Removal, SharedRegistry, SyncStatus, SyncedComment};
+use super::session::{PrState, PullRequest, ReviewEvent, SubmitOutcome};
 
 /// How often to pull from GitHub without being asked.
 pub const PULL_EVERY: Duration = Duration::from_secs(60);
@@ -43,6 +49,7 @@ pub struct GithubSync {
     pub(super) comparison: ComparisonKey,
     previous: Previous,
     pub(super) pull_every: Duration,
+    pub(super) retry_every: Duration,
     looked_up_at: Option<Instant>,
 }
 
@@ -56,13 +63,15 @@ impl GithubSync {
             comparison,
             previous: Previous::default(),
             pull_every: PULL_EVERY,
+            retry_every: RETRY_EVERY,
             looked_up_at: None,
         }
     }
 
     /// Run one pass against `snapshot`.
     pub fn tick(&mut self, snapshot: &Snapshot) {
-        if self.lookup_due() {
+        self.retry_connection_if_due();
+        if self.may_call() && self.lookup_due() {
             self.look_up();
         }
         let pr = self.registry.read(|s| s.session.pr().cloned());
@@ -71,9 +80,13 @@ impl GithubSync {
         let Some(pr) = pr else {
             return;
         };
-        self.flush_viewed(&pr);
-        self.submit_if_requested(&pr);
-        if self.pull_due() {
+        if self.may_call() {
+            self.flush_viewed(&pr);
+        }
+        if self.may_call() {
+            self.submit_if_requested(&pr);
+        }
+        if self.may_call() && self.pull_due() {
             self.pull(snapshot, &pr);
         }
     }
@@ -92,16 +105,25 @@ impl GithubSync {
                     .is_none_or(|at| at.elapsed() >= self.pull_every))
     }
 
+    /// Look the PR up. When GitHub cannot be reached the PR stays unknown, so
+    /// PR comments wait for it instead of failing as if there were no PR.
     fn look_up(&mut self) {
         self.looked_up_at = Some(Instant::now());
         let api = &self.ports.api;
         let state = match api.resolve_pr() {
             Ok(pr) => PrState::Available(pr),
+            Err(e) if self.lost(&e) => return,
             Err(e) => PrState::Unavailable(e.to_string()),
         };
-        let viewer = api.viewer().ok();
+        let viewer = match api.viewer() {
+            Err(e) if self.lost(&e) => return,
+            viewer => viewer.ok(),
+        };
         let review = match &state {
-            PrState::Available(pr) => api.pending_review(pr).ok().flatten(),
+            PrState::Available(pr) => match api.pending_review(pr) {
+                Err(e) if self.lost(&e) => return,
+                review => review.ok().flatten(),
+            },
             _ => None,
         };
         self.registry.session(|s| {
@@ -113,12 +135,17 @@ impl GithubSync {
     }
 
     fn push(&self, snapshot: &Snapshot, pr: Option<&PullRequest>) {
+        let is_pr_known = self.registry.read(|s| s.session.pr != PrState::Unknown);
         for action in plan(snapshot, &self.previous, &self.registry.snapshot()) {
-            self.apply(pr, action);
+            if is_pr_known && self.may_call() {
+                self.apply(pr, action);
+            } else {
+                self.defer(action);
+            }
         }
     }
 
-    fn apply(&self, pr: Option<&PullRequest>, action: SyncAction) {
+    pub(super) fn apply(&self, pr: Option<&PullRequest>, action: SyncAction) {
         match action {
             SyncAction::AddThread {
                 message_id,
@@ -146,7 +173,11 @@ impl GithubSync {
                 node_id,
             } => match self.ports.api.delete(&node_id) {
                 Ok(()) => self.forget(&message_id),
-                Err(e) => self.edit(&message_id, |entry| entry.error = Some(e.to_string())),
+                Err(e) if self.lost(&e) => self.queue_removal(&message_id, Removal::Delete),
+                Err(e) => self.edit(&message_id, |entry| {
+                    entry.removal = None;
+                    entry.error = Some(e.to_string());
+                }),
             },
             SyncAction::Resolve {
                 message_id,
@@ -162,7 +193,12 @@ impl GithubSync {
     }
 
     fn apply_update(&self, message_id: &str, node_id: &str, body: String) {
-        let error = self.ports.api.update(node_id, &body).err();
+        // Unreachable: the body still differs from GitHub's, so the next pass
+        // plans the update again.
+        let error = match self.ports.api.update(node_id, &body) {
+            Err(e) if self.lost(&e) => return,
+            result => result.err(),
+        };
         self.edit(message_id, |entry| {
             if error.is_none() {
                 entry.body = Some(body);
@@ -172,18 +208,23 @@ impl GithubSync {
     }
 
     fn apply_resolve(&self, message_id: &str, thread_id: &str) {
-        // Forgotten either way: if resolving failed, GitHub still has the open
-        // conversation and the next pull brings it back.
-        if let Err(e) = self.ports.api.resolve(thread_id) {
-            let notice = format!("Could not resolve a conversation on GitHub: {e}");
-            self.registry.session(|s| s.notice = Some(notice));
+        // Forgotten unless GitHub was unreachable: if GitHub refused, it still
+        // has the open conversation and the next pull brings it back.
+        match self.ports.api.resolve(thread_id) {
+            Err(e) if self.lost(&e) => return self.queue_removal(message_id, Removal::Resolve),
+            Err(e) => {
+                let notice = format!("Could not resolve a conversation on GitHub: {e}");
+                self.registry.session(|s| s.notice = Some(notice));
+            }
+            Ok(()) => {}
         }
         self.forget(message_id);
     }
 
     /// Run `call` against the reviewer's pending review, starting one if none
     /// exists. A cached review that GitHub no longer knows (submitted or
-    /// deleted on github.com) is dropped and the call retried once.
+    /// deleted on github.com) is dropped and the call retried once; a call that
+    /// could not reach GitHub is not retried.
     fn with_review(
         &self,
         pr: Option<&PullRequest>,
@@ -193,7 +234,7 @@ impl GithubSync {
         let cached = self.registry.read(|s| s.session.review_id.clone());
         let review = self.review(pr, cached.clone())?;
         match call(self.ports.api.as_ref(), &review) {
-            Err(_) if cached.is_some() => {
+            Err(e) if cached.is_some() && !is_network_error(&e) => {
                 let fresh = self.review(pr, None)?;
                 call(self.ports.api.as_ref(), &fresh)
             }
@@ -222,7 +263,14 @@ impl GithubSync {
         anyhow!("No linked PR: {reason}")
     }
 
+    /// Record a post's outcome. A post that could not reach GitHub leaves the
+    /// comment `pending`, to be posted once GitHub is reachable.
     fn record_post(&self, message_id: &str, body: &str, root: bool, result: Result<Posted>) {
+        if let Err(e) = &result
+            && self.lost(e)
+        {
+            return;
+        }
         self.edit(message_id, |entry| {
             entry.body = Some(body.to_owned());
             match result {
@@ -242,7 +290,7 @@ impl GithubSync {
         });
     }
 
-    fn edit(&self, message_id: &str, change: impl FnOnce(&mut SyncedComment)) {
+    pub(super) fn edit(&self, message_id: &str, change: impl FnOnce(&mut SyncedComment)) {
         self.registry.update(|registry| {
             if let Some(entry) = registry.comments.get_mut(message_id) {
                 change(entry);
@@ -250,47 +298,10 @@ impl GithubSync {
         });
     }
 
-    fn forget(&self, message_id: &str) {
+    pub(super) fn forget(&self, message_id: &str) {
         self.registry.update(|registry| {
             registry.comments.remove(message_id);
         });
-    }
-
-    /// Send the viewed changes the browser queued. A change GitHub already
-    /// matches is skipped. A directory marked in difit arrives as one change per
-    /// file: GitHub only marks files one at a time.
-    fn flush_viewed(&self, pr: &PullRequest) {
-        let (active, queue) = self
-            .registry
-            .session(|s| (s.viewed.active, std::mem::take(&mut s.viewed.queue)));
-        if !active {
-            return;
-        }
-        for (path, viewed) in queue {
-            let state = if viewed {
-                ViewedState::Viewed
-            } else {
-                ViewedState::Unviewed
-            };
-            let is_already_synced = self.registry.read(|s| {
-                s.session
-                    .viewed
-                    .remote
-                    .get(&path)
-                    .is_some_and(|current| (*current == ViewedState::Viewed) == viewed)
-            });
-            if is_already_synced {
-                continue;
-            }
-            match self.ports.api.set_viewed(pr, &path, viewed) {
-                Ok(()) => self.registry.session(|s| {
-                    s.viewed.remote.insert(path, state);
-                }),
-                Err(e) => self.registry.session(|s| {
-                    s.notice = Some(format!("Could not update viewed files on GitHub: {e}"));
-                }),
-            }
-        }
     }
 
     fn submit_if_requested(&self, pr: &PullRequest) {
@@ -301,11 +312,16 @@ impl GithubSync {
         if registry
             .comments
             .values()
-            .any(|c| c.status == SyncStatus::Pending)
+            .any(|c| c.status == SyncStatus::Pending || c.removal.is_some())
         {
-            return; // still posting drafts; submit once they are all in
+            return; // still posting or removing drafts; submit once they are done
         }
         let outcome = self.submit(pr, &request.body, request.event, &registry);
+        if let Err(e) = &outcome
+            && self.lost(e)
+        {
+            return; // stays requested until GitHub is reachable
+        }
         let is_submitted = outcome.is_ok();
         self.registry.update_state(|state| {
             if is_submitted {

@@ -2,13 +2,14 @@
 //! checkout, and difit.
 
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use super::*;
 use crate::difit::editor::DifitEdit;
 use crate::github::checkout::Relation;
 use crate::github::fakes::{FakeCheckout, FakeEditor, FakeGithub, snapshot_from_json};
 use crate::github::graphql::{RemoteComment, RemoteState, RemoteThread};
-use crate::github::session::SubmitRequest;
+use crate::github::session::{SubmitRequest, ViewedState};
 
 struct Rig {
     _dir: tempfile::TempDir,
@@ -242,12 +243,12 @@ fn viewed_files_sync_both_ways_only_against_the_prs_base() {
     let events = synced.registry.read(|s| s.session.viewed.events.clone());
     assert_eq!(events.len(), 2, "GitHub wins on the first pull");
 
-    synced.registry.session(|s| {
-        s.viewed.queue = vec![
+    synced.registry.update(|registry| {
+        registry.queued_viewed.extend([
             ("a.rs".to_owned(), true),
             ("b.rs".to_owned(), true),
             ("c.rs".to_owned(), true),
-        ];
+        ]);
     });
     synced.sync.tick(&snapshot_from_json(EMPTY));
     let viewed: Vec<_> = synced
@@ -261,6 +262,7 @@ fn viewed_files_sync_both_ways_only_against_the_prs_base() {
         vec!["viewed b.rs true", "viewed c.rs true"],
         "one call per file, none for no-ops"
     );
+    assert!(synced.registry.snapshot().queued_viewed.is_empty());
 
     let mut other = rig(FakeGithub::default(), ".");
     other.sync.tick(&snapshot_from_json(EMPTY));
@@ -349,3 +351,6 @@ fn pulls_happen_on_request_and_on_the_interval_only() {
     harness.sync.tick(&snapshot_from_json(EMPTY));
     assert_eq!(fetches(&harness), 2);
 }
+
+#[path = "sync_offline_tests.rs"]
+mod offline;

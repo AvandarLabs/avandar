@@ -11,6 +11,12 @@
   // this document as storage events, and each changed path is sent to
   // `/__wrap/github/viewed` (marking a directory sends one change per file).
   // GitHub -> difit viewed changes are applied inside difit by inject/viewed.js.
+  //
+  // Offline: the browser's `online` / `offline` events go to
+  // `/__wrap/github/connection`, so the server holds every GitHub call while
+  // the network is down and sends its queue the moment it is back. Everything
+  // the reviewer does in the meantime is saved locally and queued; the header
+  // says what is waiting.
   var gh = null;
   var ghSubmitting = false;
   var ghFlash = "";
@@ -39,6 +45,37 @@
 
   function plural(numItems, word) { return numItems + " " + word + (numItems === 1 ? "" : "s"); }
 
+  function isOffline(state) {
+    return !!(state && state.connection && !state.connection.online);
+  }
+
+  // What is waiting for GitHub, e.g. "2 PR comments, your review".
+  function queuedSummary(queued) {
+    if (!queued) return "";
+    var parts = [];
+    if (queued.comments) parts.push(plural(queued.comments, "PR comment"));
+    if (queued.removals) parts.push(plural(queued.removals, "PR comment removal"));
+    if (queued.viewed) parts.push(plural(queued.viewed, "viewed-file change"));
+    if (queued.submit) parts.push("your review");
+    return parts.join(", ");
+  }
+
+  function offlineNotice(state) {
+    if (!isOffline(state)) return "";
+    var what = state.connection.browserOffline ? "Offline." : "Can't reach GitHub.";
+    var queued = queuedSummary(state.queued);
+    return queued
+      ? what + " Queued: " + queued + ". All of it sends when you're back online."
+      : what + " PR comments and viewed files you change now send when you're back online.";
+  }
+
+  function showNotice(notice, isOk, tip) {
+    ghEls.notice.hidden = !notice;
+    ghEls.notice.textContent = notice;
+    ghEls.notice.setAttribute("data-tip", tip || notice);
+    ghEls.notice.classList.toggle("ok", isOk);
+  }
+
   function ghSyncTitle(sync) {
     var what = "Sync with GitHub now: pull new PR comments and commits. Your uncommitted changes are stashed and put back, then the page reloads.\n"
       + "dif also syncs every minute, without touching your changes.";
@@ -50,6 +87,8 @@
   function renderGithub() {
     var state = gh;
     var available = !!(state && state.available && state.pr);
+    var offline = offlineNotice(state);
+    var offlineTip = offline && state.connection.error ? offline + "\nGitHub: " + state.connection.error : offline;
     ghEls.noPr.hidden = !(state && state.lookedUp && !available);
     setTip(ghEls.noPr, "No open GitHub PR for this branch" + (state && state.reason ? ": " + state.reason : "") + ".\n"
       + "Comments go only to the TUI until a PR exists. dif checks again every minute.");
@@ -57,7 +96,7 @@
     ghEls.sync.hidden = !available;
     if (!available) {
       ghEls.review.hidden = true;
-      ghEls.notice.hidden = true;
+      showNotice(offline, false, offlineTip);
       return;
     }
     var pr = state.pr;
@@ -65,7 +104,7 @@
     ghEls.prNum.textContent = "#" + pr.number;
     setTip(ghEls.pr, "Open PR #" + pr.number + " on GitHub, by " + pr.author + ".\n"
       + (state.viewed.active ? "Viewed files sync both ways with GitHub." : (state.viewed.reason || "Viewed files are not syncing.")));
-    ghEls.sync.classList.toggle("busy", !!state.sync.pulling);
+    ghEls.sync.classList.toggle("busy", !!state.sync.pulling && !offline);
     setTip(ghEls.sync, ghSyncTitle(state.sync));
     var drafts = state.drafts || 0;
     ghEls.review.hidden = !(drafts || state.failed || !pr.isOwn);
@@ -75,11 +114,12 @@
     setTip(ghEls.review, drafts
       ? plural(drafts, "draft PR comment") + " waiting to be published. Open the panel to submit your review."
       : (pr.isOwn ? "Publish your draft comments on your PR" : "Submit a review: comment, approve, or request changes"));
+    if (!ghFlash && offline) {
+      showNotice(offline, false, offlineTip);
+      return;
+    }
     var notice = ghFlash || state.sync.notice || (state.sync.error ? "GitHub sync failed: " + state.sync.error : "");
-    ghEls.notice.hidden = !notice;
-    ghEls.notice.textContent = notice;
-    ghEls.notice.setAttribute("data-tip", notice);
-    ghEls.notice.classList.toggle("ok", !!ghFlash);
+    showNotice(notice, !!ghFlash);
   }
 
   function flashGithub(message) {
@@ -98,6 +138,9 @@
       return;
     }
     ghReviewerPulls = reviewerPulls;
+    if (ghSubmitting && state.submitting && isOffline(state) && !ghEls.pop.hidden) {
+      closeReviewPop(); // queued: the header says the review sends once back online
+    }
     if (ghSubmitting && !state.submitting && state.lastSubmit) {
       ghSubmitting = false;
       setSubmitBusy(false);
@@ -106,6 +149,7 @@
         ghEls.popBody.value = "";
         flashGithub(state.lastSubmit.message);
       } else {
+        if (ghEls.pop.hidden) openReviewPop(); // closed while the review was queued
         showPopError(state.lastSubmit.message);
       }
     }
@@ -136,6 +180,17 @@
       showNewChanges();
     }
   }
+
+  // ---- the network: the server holds GitHub calls while it is down ----
+  function reportConnection() {
+    fetch("/__wrap/github/connection", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ online: navigator.onLine }),
+    }).then(fetchGithub, function () { /* the shell is down; the next network event reports again */ });
+  }
+  window.addEventListener("online", reportConnection);
+  window.addEventListener("offline", reportConnection);
 
   ghEls.sync.addEventListener("click", function () {
     ghEls.sync.classList.add("busy");
@@ -227,6 +282,14 @@
   // ---- viewed files: difit -> GitHub ----
   function snapshotViewed() { return Object.assign({}, liveViewed); }
   function initViewedSync() { ghPushedViewed = snapshotViewed(); }
+  // Send unless the server knows viewed files cannot sync: no PR, or difit not
+  // showing the PR's own diff. Before its first pull (say, launched offline) it
+  // cannot know, so it queues the change and drops it if sync turns out blocked.
+  function viewedMaySync() {
+    if (!gh) return true;
+    if (gh.lookedUp && !gh.available) return false;
+    return !(gh.viewed && gh.viewed.reason);
+  }
   function pushViewedChanges() {
     var now = snapshotViewed();
     var before = ghPushedViewed || {};
@@ -235,10 +298,10 @@
     Object.keys(Object.assign({}, before, now)).forEach(function (path) {
       if (!!before[path] !== !!now[path]) changes.push({ path: path, viewed: !!now[path] });
     });
-    if (!changes.length || !gh || !gh.viewed || !gh.viewed.active) return;
+    if (!changes.length || !viewedMaySync()) return;
     fetch("/__wrap/github/viewed", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ changes: changes }),
-    }).catch(function () { /* dropped: GitHub keeps its state until the next pull */ });
+    }).catch(function () { /* the shell is down: nothing reaches GitHub until it is back */ });
   }

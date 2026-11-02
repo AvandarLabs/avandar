@@ -17,6 +17,7 @@
   fetchDiff(); // authoritative file counts + "new files not in guide"
   fetchDispatch(); // bulk vs eager delivery + held comment count
   fetchGithub(); // the linked PR, drafts, sync state
+  reportConnection(); // a tab opened offline holds GitHub calls at once
   window.setInterval(fetchGroups, 3000); // reflect the skill regenerating the guide
   window.setInterval(fetchSummary, 3000);
   window.setInterval(fetchTestPlan, 3000);

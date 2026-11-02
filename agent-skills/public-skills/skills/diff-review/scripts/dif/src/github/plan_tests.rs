@@ -269,3 +269,35 @@ fn comment_without_a_line_is_rejected() {
     );
     assert!(matches!(&actions[0], SyncAction::Reject { message_id, .. } if message_id == "m1"));
 }
+
+#[test]
+fn a_queued_removal_is_planned_again_after_the_snapshot_that_dropped_it() {
+    let queued = |removal| SyncedComment {
+        removal: Some(removal),
+        ..synced_comment_on_github(SyncStatus::Published, "C1", true, "why?")
+    };
+    let actions = plan(
+        &snapshot_from_json(EMPTY),
+        &no_previous_snapshot(),
+        &registry_from_entries(&[("m1", queued(Removal::Resolve))]),
+    );
+    assert_eq!(
+        actions,
+        vec![SyncAction::Resolve {
+            message_id: "m1".to_owned(),
+            thread_id: "T1".to_owned(),
+        }]
+    );
+    let actions = plan(
+        &snapshot_from_json(EMPTY),
+        &no_previous_snapshot(),
+        &registry_from_entries(&[("m1", queued(Removal::Delete))]),
+    );
+    assert_eq!(
+        actions,
+        vec![SyncAction::Delete {
+            message_id: "m1".to_owned(),
+            node_id: "C1".to_owned(),
+        }]
+    );
+}

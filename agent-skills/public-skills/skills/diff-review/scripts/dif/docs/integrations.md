@@ -306,12 +306,48 @@ Guards:
 - A removal only counts when the **previous** snapshot held the comment, so a
   first or incomplete snapshot (difit restarting) changes nothing on GitHub.
 - A failed post is recorded with GitHub's message and not retried until the
-  reviewer edits the comment.
+  reviewer edits the comment. A post that could not *reach* GitHub is not a
+  failure: see [Offline](#offline).
 - A PR reply whose root is still being posted waits for the next pass.
 - A cached pending review GitHub no longer knows (submitted or discarded on
   github.com) is dropped and the call retried once against a fresh one.
 - With no open PR, PR comments fail with the reason instead of calling GitHub,
-  and the browser disables the PR option and shows **No linked PR**.
+  and the browser disables the PR option and shows **No linked PR**. A lookup
+  that could not reach GitHub leaves the PR unknown instead, and PR comments
+  wait for it.
+
+### Offline
+
+Every GitHub interaction is queued rather than dropped when GitHub cannot be
+reached, and sent once it can (`github::connection`, `github::sync_queue`).
+
+- **Detecting it.** The browser posts `navigator.onLine` to
+  `POST /__wrap/github/connection` (`{"online": bool}`) at boot and on every
+  `online` / `offline` event. Independently, a `gh` call whose error says it
+  never got an answer (`error connecting to`, `dial tcp`, `no such host`,
+  timeouts, HTTP 502/503/504; see `NETWORK_ERROR_MARKERS`) marks the connection
+  lost. Every `gh` call is killed after 30s, because on a network that drops
+  packets (captive or in-flight wifi) `gh` hangs instead of failing.
+- **While offline** the sync pass makes no GitHub calls, and the first call that
+  cannot reach GitHub stops the rest of the pass. A comment stays `pending`, an
+  edit keeps a body that differs from GitHub's, a delete or resolve is recorded
+  on the comment as `removal`, viewed changes stay in `queuedViewed`, and a
+  submit stays requested. All but the submit live in `-github.json`, so they
+  survive a relaunch.
+- **Coming back.** The browser reporting `online` clears both states and
+  requests a pull, so the queue is sent at once. A lost connection the browser
+  never saw is retried every 20s (`RETRY_EVERY`) unless the browser reports no
+  network. A pull that could not reach GitHub is asked for again, keeping a
+  Sync's permission to stash, and is not reported as finished or failed.
+- **The browser** shows the header notice "Offline." (browser) or "Can't reach
+  GitHub." (`gh`) with what is queued, from `connection` and `queued` in
+  `/__wrap/github.json`. A pending PR comment's badge reads **Queued for PR**.
+  The PR option stays selectable when offline before the PR could be looked up.
+  A review submitted offline closes the panel; a later refusal reopens it with
+  GitHub's message.
+- **Known limit.** A mutation whose answer was lost (the connection dropped
+  after GitHub applied it, or the 30s timeout) is retried, so a draft comment
+  can be posted twice.
 
 ### Submitting the review
 
@@ -320,7 +356,7 @@ on someone else's PR, GitHub's three outcomes: Comment, Approve, Request
 changes. On the reviewer's own PR GitHub only allows commenting, so the panel
 offers **Submit comments** alone (the web route and the sync pass both refuse
 anything else). `POST /__wrap/github/submit` queues the request; the poller
-waits until no comment is still `pending`, refuses while any have `failed`,
+waits until no comment is still `pending` or has a queued removal, refuses while any have `failed`,
 then calls `submitPullRequestReview` and marks every draft `published`.
 
 ### Pulling from GitHub
@@ -384,7 +420,12 @@ Otherwise the shell's PR pill explains why sync is paused.
   hunks, from difit's own `/api/diff` query), then reloads difit's frame once no
   comment draft is open.
 - **difit → GitHub.** difit's writes reach the shell as `storage` events; the
-  shell sends each changed path to `POST /__wrap/github/viewed`. GitHub has no
+  shell sends each changed path to `POST /__wrap/github/viewed`, which adds it
+  to the persisted `queuedViewed` (latest change per path). The shell sends
+  unless the server already knows sync is blocked, so changes made before the
+  first pull (say, launched offline) are queued too; a pull that finds sync
+  blocked drops the queue, and the first pull never overwrites a path that is
+  still queued. A change leaves the queue once GitHub has it. GitHub has no
   bulk mutation, so marking a directory in difit becomes one
   `markFileAsViewed` / `unmarkFileAsViewed` call per file. A change GitHub
   already matches is skipped, which also stops the GitHub → difit writes from

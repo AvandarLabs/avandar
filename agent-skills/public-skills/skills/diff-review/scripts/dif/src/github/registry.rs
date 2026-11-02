@@ -36,6 +36,17 @@ pub enum SyncStatus {
     Failed,
 }
 
+/// A removal made in difit that GitHub has not been told about yet, because it
+/// could not be reached.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Removal {
+    /// Delete the comment.
+    Delete,
+    /// Resolve the conversation it opened.
+    Resolve,
+}
+
 /// One PR comment, keyed by its difit message id.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -59,6 +70,9 @@ pub struct SyncedComment {
     pub body: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
+    /// Removed in difit, waiting for GitHub to be reachable.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub removal: Option<Removal>,
 }
 
 impl SyncedComment {
@@ -73,6 +87,7 @@ impl SyncedComment {
             url: None,
             body: None,
             error: None,
+            removal: None,
         }
     }
 
@@ -85,9 +100,14 @@ impl SyncedComment {
 
 /// The persisted registry.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Registry {
     #[serde(default)]
     pub comments: BTreeMap<String, SyncedComment>,
+    /// Viewed-file changes made in difit that GitHub does not have yet: the
+    /// latest one per path.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub queued_viewed: BTreeMap<String, bool>,
 }
 
 impl Registry {
@@ -101,22 +121,34 @@ impl Registry {
     }
 
     /// How many comments still wait for a review submit (marked or drafted).
+    /// A draft already removed in difit does not count.
     #[must_use]
     pub fn draft_count(&self) -> usize {
-        self.count_matching(|status| matches!(status, SyncStatus::Pending | SyncStatus::Draft))
+        self.count_matching(|c| {
+            c.removal.is_none() && matches!(c.status, SyncStatus::Pending | SyncStatus::Draft)
+        })
     }
 
     /// How many comments GitHub rejected.
     #[must_use]
     pub fn failed_count(&self) -> usize {
-        self.count_matching(|status| status == SyncStatus::Failed)
+        self.count_matching(|c| c.status == SyncStatus::Failed)
     }
 
-    fn count_matching(&self, matches_status: impl Fn(SyncStatus) -> bool) -> usize {
-        self.comments
-            .values()
-            .filter(|c| matches_status(c.status))
-            .count()
+    /// How many comments are not on GitHub yet.
+    #[must_use]
+    pub fn unposted_count(&self) -> usize {
+        self.count_matching(|c| c.status == SyncStatus::Pending)
+    }
+
+    /// How many removals wait for GitHub to be reachable.
+    #[must_use]
+    pub fn queued_removal_count(&self) -> usize {
+        self.count_matching(|c| c.removal.is_some())
+    }
+
+    fn count_matching(&self, matches: impl Fn(&SyncedComment) -> bool) -> usize {
+        self.comments.values().filter(|c| matches(c)).count()
     }
 }
 
@@ -306,5 +338,39 @@ mod tests {
         }
         assert_eq!(registry.draft_count(), 2);
         assert_eq!(registry.failed_count(), 1);
+        assert_eq!(registry.unposted_count(), 1);
+    }
+
+    #[test]
+    fn a_draft_with_a_queued_removal_is_no_longer_counted_as_a_draft() {
+        let mut registry = Registry::default();
+        registry.comments.insert(
+            "a".to_owned(),
+            SyncedComment {
+                status: SyncStatus::Draft,
+                removal: Some(Removal::Delete),
+                ..SyncedComment::pending()
+            },
+        );
+        assert_eq!(registry.draft_count(), 0);
+        assert_eq!(registry.queued_removal_count(), 1);
+    }
+
+    #[test]
+    fn queued_viewed_changes_persist_and_reload() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("r-github.json");
+        SharedRegistry::load(path.clone()).update(|registry| {
+            registry.queued_viewed.insert("a.rs".to_owned(), true);
+        });
+        let text = fs::read_to_string(&path).unwrap();
+        assert!(text.contains("\"queuedViewed\""), "{text}");
+        assert_eq!(
+            SharedRegistry::load(path)
+                .snapshot()
+                .queued_viewed
+                .get("a.rs"),
+            Some(&true)
+        );
     }
 }

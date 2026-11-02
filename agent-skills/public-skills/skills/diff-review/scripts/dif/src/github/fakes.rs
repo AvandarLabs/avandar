@@ -1,6 +1,7 @@
 //! Test doubles for the GitHub sync pass: a stateful GitHub, a checkout, and
 //! a difit editor that only record and simulate.
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use anyhow::{Result, bail};
@@ -28,6 +29,7 @@ pub fn registry_from_entries(entries: &[(&str, SyncedComment)]) -> Registry {
             .iter()
             .map(|(id, entry)| ((*id).to_owned(), entry.clone()))
             .collect(),
+        ..Registry::default()
     }
 }
 
@@ -56,6 +58,8 @@ pub struct FakeGithub {
     pub no_pr: bool,
     pub author: Option<String>,
     pub fail_thread: bool,
+    /// While set, every call fails the way `gh` does with no network.
+    pub offline: Arc<AtomicBool>,
     pub review: Arc<Mutex<Option<String>>>,
     pub remote: Arc<Mutex<RemoteState>>,
 }
@@ -64,6 +68,18 @@ impl FakeGithub {
     /// Every GitHub call made so far, in order.
     pub fn calls(&self) -> Vec<String> {
         self.log.lock().unwrap().clone()
+    }
+    /// Take the network down (`true`) or bring it back.
+    pub fn set_offline(&self, offline: bool) {
+        self.offline.store(offline, Ordering::SeqCst);
+    }
+    fn reach(&self) -> Result<()> {
+        if self.offline.load(Ordering::SeqCst) {
+            bail!(
+                "error connecting to api.github.com\ncheck your internet connection or https://githubstatus.com"
+            );
+        }
+        Ok(())
     }
     fn note(&self, call: impl Into<String>) {
         self.log.lock().unwrap().push(call.into());
@@ -93,6 +109,7 @@ impl FakeGithub {
 
 impl GithubApi for FakeGithub {
     fn resolve_pr(&self) -> Result<PullRequest> {
+        self.reach()?;
         if self.no_pr {
             bail!("no pull requests found for branch \"feat/x\"");
         }
@@ -106,17 +123,21 @@ impl GithubApi for FakeGithub {
         })
     }
     fn viewer(&self) -> Result<String> {
+        self.reach()?;
         Ok("jpsyx".to_owned())
     }
     fn pending_review(&self, _pr: &PullRequest) -> Result<Option<String>> {
+        self.reach()?;
         Ok(self.review.lock().unwrap().clone())
     }
     fn create_review(&self, _pr: &PullRequest) -> Result<String> {
+        self.reach()?;
         self.note("create_review");
         *self.review.lock().unwrap() = Some("R1".to_owned());
         Ok("R1".to_owned())
     }
     fn add_thread(&self, review: &str, comment: &NewComment) -> Result<Posted> {
+        self.reach()?;
         self.note(format!(
             "add_thread {review} {}:{}",
             comment.path, comment.line
@@ -141,6 +162,7 @@ impl GithubApi for FakeGithub {
         })
     }
     fn add_reply(&self, review: &str, thread_id: &str, body: &str) -> Result<Posted> {
+        self.reach()?;
         self.note(format!("add_reply {review} {thread_id}"));
         let mut remote = self.remote.lock().unwrap();
         if let Some(thread) = remote.threads.iter_mut().find(|t| t.node_id == thread_id) {
@@ -154,6 +176,7 @@ impl GithubApi for FakeGithub {
         })
     }
     fn update(&self, node_id: &str, body: &str) -> Result<()> {
+        self.reach()?;
         self.note(format!("update {node_id} {body}"));
         self.each_comment(|comment| {
             if comment.node_id == node_id {
@@ -163,6 +186,7 @@ impl GithubApi for FakeGithub {
         Ok(())
     }
     fn delete(&self, node_id: &str) -> Result<()> {
+        self.reach()?;
         self.note(format!("delete {node_id}"));
         for thread in &mut self.remote.lock().unwrap().threads {
             thread.comments.retain(|c| c.node_id != node_id);
@@ -170,6 +194,7 @@ impl GithubApi for FakeGithub {
         Ok(())
     }
     fn resolve(&self, thread_id: &str) -> Result<()> {
+        self.reach()?;
         self.note(format!("resolve {thread_id}"));
         for thread in &mut self.remote.lock().unwrap().threads {
             if thread.node_id == thread_id {
@@ -185,16 +210,19 @@ impl GithubApi for FakeGithub {
         event: ReviewEvent,
         body: &str,
     ) -> Result<()> {
+        self.reach()?;
         self.note(format!("submit {review} {} {body}", event.as_github()));
         *self.review.lock().unwrap() = None;
         self.each_comment(|comment| comment.pending = false);
         Ok(())
     }
     fn set_viewed(&self, _pr: &PullRequest, path: &str, viewed: bool) -> Result<()> {
+        self.reach()?;
         self.note(format!("viewed {path} {viewed}"));
         Ok(())
     }
     fn fetch(&self, _pr: &PullRequest) -> Result<RemoteState> {
+        self.reach()?;
         self.note("fetch");
         let mut remote = self.remote.lock().unwrap().clone();
         remote.has_pending_review = self.review.lock().unwrap().is_some();

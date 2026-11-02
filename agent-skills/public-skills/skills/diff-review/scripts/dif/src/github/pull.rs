@@ -243,6 +243,7 @@ fn make_synced_comment_from_remote(
         url: Some(comment.url.clone()),
         body: Some(comment.body.clone()),
         error: None,
+        removal: None,
     }
 }
 
