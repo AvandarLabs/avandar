@@ -11,13 +11,17 @@ import {
   unwrapLowerCall,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type {
-  QueryFilter,
-  QueryFilterColumnTypes,
+  ColumnNameQueryFilterGroup,
+  ColumnNameQueryFilterRule,
   QueryFilterCombinator,
-  QueryFilterGroup,
+  ColumnNameQueryFilterGroup as QueryFilterGroup,
   QueryFilterOperator,
-  QueryFilterRule,
+  ColumnNameQueryFilterRule as QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+
+type QueryFilter = ColumnNameQueryFilterGroup | ColumnNameQueryFilterRule;
+
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 
 const _NEGATED_OPERATOR: Partial<
@@ -89,7 +93,7 @@ function _parseFunctionPredicate(node: unknown): QueryFilterRule | undefined {
  * parsed rules so a rule read back from SQL renders typed literals exactly like
  * one authored in the form.
  */
-export type ParsedFilterColumnTypes = Readonly<QueryFilterColumnTypes>;
+export type ParsedFilterColumnTypes = Record<string, AvaDataType.T>;
 
 /**
  * Stamps each rule with its column's data type, so a filter read back from SQL
@@ -99,7 +103,7 @@ export type ParsedFilterColumnTypes = Readonly<QueryFilterColumnTypes>;
 export function stampFilterColumnTypes(
   options: Readonly<{
     node: QueryFilter;
-    columnTypes: ParsedFilterColumnTypes;
+    columnTypes: Readonly<ParsedFilterColumnTypes>;
   }>,
 ): QueryFilter {
   const { node, columnTypes } = options;

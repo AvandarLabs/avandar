@@ -1,3 +1,4 @@
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type {
   QueryResultColumn,
   QueryResultId,
@@ -14,6 +15,8 @@ export namespace QueryResult {
     QueryResultT<TRow>;
   export type Id = QueryResultId;
   export type Column = QueryResultColumn;
+  /** A result column paired with the column ID its owning query assigned. */
+  export type ColumnWithId = QueryResultColumn & { id: QueryColumn.Id };
   export type Page<TRow extends UnknownObject = UnknownObject> =
     QueryResultPage<TRow>;
 }

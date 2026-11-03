@@ -66,7 +66,7 @@ export function QueryFiltersField({
 
   const columnTypes: QueryFilterColumnTypes = useMemo(() => {
     return makeObject(columns, {
-      keyFn: prop("baseColumn.name"),
+      keyFn: prop("id"),
       valueFn: prop("baseColumn.dataType"),
     });
   }, [columns]);
@@ -74,7 +74,7 @@ export function QueryFiltersField({
   const fields: Field[] = useMemo(() => {
     return columns.map((column) => {
       return {
-        name: column.baseColumn.name,
+        name: column.id,
         label: column.baseColumn.name,
       };
     });
@@ -85,18 +85,20 @@ export function QueryFiltersField({
 
   const getOperators = useCallback(
     (field: string) => {
-      return QueryFilterOperator.getForDataType(columnTypes[field]).map(
-        (operator) => {
-          return { name: operator, label: operator };
-        },
-      );
+      return QueryFilterOperator.getForDataType(
+        columnTypes[field as QueryColumn.Id],
+      ).map((operator) => {
+        return { name: operator, label: operator };
+      });
     },
     [columnTypes],
   );
 
   const getDefaultOperator = useCallback(
     (field: string) => {
-      return QueryFilterOperator.getDefaultForDataType(columnTypes[field]);
+      return QueryFilterOperator.getDefaultForDataType(
+        columnTypes[field as QueryColumn.Id],
+      );
     },
     [columnTypes],
   );

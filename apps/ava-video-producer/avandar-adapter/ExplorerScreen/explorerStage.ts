@@ -3,7 +3,8 @@ import {
   EXPLORER_AGGREGATE_SQL,
   EXPLORER_FILTER_SQL,
 } from "../Explorer.constants";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
 
 export type ExplorerMode = "filter" | "query" | "chart" | "full";
 
@@ -15,22 +16,43 @@ export const emptyFilter = {
   rules: [],
 } as const;
 
-/** Column metadata for the chart-mode series editor, matching the aggregate SQL. */
+/**
+ * The `QueryResult` columns the aggregate SQL returns, with the column IDs
+ * `barConfig` refers to. `ExplorerScreen` passes them to `SeriesAwareVizForm`
+ * as its fields once the stage shows the chart.
+ */
 export const aggregateColumns = [
-  { name: "district_name", dataType: "varchar" },
-  { name: "recorded_cases", dataType: "bigint" },
+  {
+    id: "film-district" as QueryColumn.Id,
+    name: "district_name",
+    dataType: "varchar",
+  },
+  {
+    id: "film-cases" as QueryColumn.Id,
+    name: "recorded_cases",
+    dataType: "bigint",
+  },
 ] as const;
 
-/** The bar chart config shown once the stage reaches its chart/visualizations phase. */
-export const barConfig: BarChartVizConfig = {
+/**
+ * The film's bar chart settings, keyed by the `aggregateColumns` column IDs.
+ * Once the stage shows the chart, `ExplorerScreen` shows them in
+ * `SeriesAwareVizForm` and passes their series to `BarChart`.
+ */
+export const barConfig: AvaBarChartVizConfig = {
   vizType: "bar",
-  xAxisKey: "district_name",
-  series: [{ key: "recorded_cases", renderAs: "bar" }],
+  xAxisKey: "film-district" as QueryColumn.Id,
+  series: [{ key: "film-cases" as QueryColumn.Id, renderAs: "bar" }],
   layout: "group",
   withLegend: true,
 };
 
-/** Body-frame click targets. The outer film measures these DOM nodes before assigning cursor positions. */
+/**
+ * The explorer film's pointer actions: the frame each happens on and the
+ * `data-video-target` it presses. The outer film measures each target in a
+ * rendered frame before placing its cursor. Read by `FEATURE_BEATS` and,
+ * for a focused variant, by `explorerBeats`.
+ */
 export const EXPLORER_BEATS = [
   { frame: 48, target: "explorer-query-tab", action: "click" },
   { frame: 88, target: "explorer-add-condition", action: "click" },
@@ -45,7 +67,12 @@ export const EXPLORER_BEATS = [
   { frame: 650, target: "explorer-viz-type", action: "click" },
 ] as const;
 
-/** The focused variants retain a readable action sequence and hold their completed state. */
+/**
+ * Works out what the explorer film shows on a frame: which panels are open,
+ * the filter being typed, and the SQL in the editor. A focused `mode` plays
+ * one part of the full sequence from its own frame 0 and holds its completed
+ * state. Called by `ExplorerScreen` on every frame.
+ */
 export function explorerStage(frame: number, mode: ExplorerMode = "full") {
   const time =
     mode === "query"

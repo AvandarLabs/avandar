@@ -1,27 +1,34 @@
 import { DangerText } from "@avandar/ui";
-import { prop, UnknownDataFrame } from "@avandar/utils";
+import { UnknownDataFrame, prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Box, Flex } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
 import { AreaChart } from "@/lib/ui/viz/AreaChart";
-import { BarChart } from "@/lib/ui/viz/BarChart";
+import { BarChart } from "@/lib/ui/viz/BarChart/BarChart";
 import { BubbleChart } from "@/lib/ui/viz/BubbleChart";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { FunnelChart } from "@/lib/ui/viz/FunnelChart";
-import { LineChart } from "@/lib/ui/viz/LineChart";
+import { LineChart } from "@/lib/ui/viz/LineChart/LineChart";
 import { PieChart } from "@/lib/ui/viz/PieChart";
-import { RadarChart } from "@/lib/ui/viz/RadarChart";
-import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import { RadarChart } from "@/lib/ui/viz/RadarChart/RadarChart";
+import { ScatterChart } from "@/lib/ui/viz/ScatterChart/ScatterChart";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
 
 type Props = {
-  columns: readonly QueryResultColumn[];
+  columns: readonly QueryResult.ColumnWithId[];
+  /**
+   * Every `QueryResult` column the query returned, including any that could
+   * not be given a column ID. The table view lists these, so it shows every
+   * column even when `columns` leaves some out. Defaults to `columns`.
+   */
+  rawColumns?: readonly QueryResult.Column[];
 
   /**
    * The names of the query result columns that are dates.
@@ -33,13 +40,15 @@ type Props = {
   data: UnknownDataFrame;
 
   /** The visualization config that drives what is rendered. */
-  vizConfig: VizConfig;
+  vizConfig: AvaVizConfig;
 };
 
 /**
- * Builds the Zod schemas used to validate `VizConfig` shapes for each chart
- * type. Schemas are rebuilt per call so their error messages stay localized
- * to the current Lingui locale.
+ * Builds the Zod schemas `VisualizationContainer` uses to check each chart
+ * type's `UiVizConfig` before rendering it, so a missing axis, series, or
+ * name column shows as an error message instead of a broken chart. The
+ * schemas are rebuilt when the Lingui locale changes, so their messages stay
+ * translated.
  */
 function useVizConfigSchemas() {
   // Hook-bound `t` intentionally shadows the module-level macro `t` so this
@@ -114,12 +123,13 @@ function useVizConfigSchemas() {
 
 /**
  * Renders a visualization (chart or table) for a given query result and
- * `VizConfig`. Pure and prop-driven: holds no state of its own and has no
+ * `AvaVizConfig`. Pure and prop-driven: holds no state of its own and has no
  * coupling to any app-specific store, so it can be reused anywhere a query
  * result needs to be visualized.
  */
 export function VisualizationContainer({
   columns,
+  rawColumns = columns,
   data,
   dateColumns,
   vizConfig,
@@ -129,10 +139,14 @@ export function VisualizationContainer({
 
   const { t } = useLingui();
   const schemas = useVizConfigSchemas();
-  const columnNames = columns.map(prop("name"));
+  const columnNames = rawColumns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
 
-  return match(vizConfig)
+  const uiVizConfigConversion = AvaVizConfigs.toUiVizConfig({
+    config: vizConfig,
+    columns: columns,
+  });
+  return match(uiVizConfigConversion.config)
     .with({ vizType: "table" }, () => {
       return (
         <Box h="100%" w="100%" mih={0}>

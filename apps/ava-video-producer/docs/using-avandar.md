@@ -75,7 +75,7 @@ Source references: `src/views/DataManagerApp/DataImportView/AGENTS.md`, `DataImp
 5. Open visualization settings and choose a supported chart. Bar/line/area accept series, X-axis selection, legend, grid and axis controls. Scatter/bubble use numeric pairs; pie uses name/value columns. Keep a table shot to make the result auditable.
 6. Use **Save** -> **Save as new dataset** for a derived result, or **Save** -> **Save to dashboard** for the current SQL and visualization. Save is disabled until a successful nonempty result exists.
 
-Registered visualization types are table, bar, line, area, scatter, pie/donut, funnel, radar and bubble (`shared/models/vizs/VizConfig/VizConfigs.ts`). Supported manual chart types exceed the AI tool's subset. The existence of a visualization selector does not guarantee a particular query automatically configures a useful chart.
+Registered visualization types are table, bar, line, area, scatter, pie/donut, funnel, radar and bubble (`shared/models/vizs/AvaVizConfig/AvaVizConfigs.ts`). Supported manual chart types exceed the AI tool's subset. The existence of a visualization selector does not guarantee a particular query automatically configures a useful chart.
 
 The generated data provides these checkable answers:
 

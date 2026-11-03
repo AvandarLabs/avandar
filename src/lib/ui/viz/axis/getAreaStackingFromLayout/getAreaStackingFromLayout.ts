@@ -1,5 +1,5 @@
 import { matchLiteral } from "@avandar/utils";
-import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
+import type { AvaAreaChartVizConfig } from "$/models/vizs/AvaAreaChartVizConfig/AvaAreaChartVizConfig.types";
 
 /**
  * The single stack id every area shares when its layout stacks. Named
@@ -11,7 +11,7 @@ export const AREA_STACK_ID = "1";
  * The area chart's layout modes, taken from the persisted config so the
  * two cannot drift.
  */
-export type AreaLayout = AreaChartVizConfig["layout"];
+export type AreaLayout = AvaAreaChartVizConfig["layout"];
 
 /** How an area layout stacks, as far as the value extent is concerned. */
 export type AreaStacking = {
