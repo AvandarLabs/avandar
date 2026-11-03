@@ -1,6 +1,6 @@
 # `@avandar/modules` factory redesign and `HttpClientFactory`
 
-Design spec, 2026-10-18. Built on `feat/demo/measles`. The modules refactor
+Design spec, 2026-10-18. Built on `demo/measles`. The modules refactor
 is extracted and merged as its own PR under
 [AVA-383](https://linear.app/avandar/issue/AVA-383). Converting
 `ServiceClient`, `withQueryHooks` and `withLogger` onto the new API is
@@ -445,7 +445,7 @@ package.
 
 ## 10. Delivery
 
-- Commits land on `feat/demo/measles`. Every `packages/shared/modules` change
+- Commits land on `demo/measles`. Every `packages/shared/modules` change
   goes in its own commits, with no other files, so AVA-383 can lift them
   onto a branch off `develop`.
 - That PR is titled `feat(modules)!: ...`, a breaking change that bumps the

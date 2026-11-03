@@ -1,6 +1,6 @@
-# `feat/demo/measles` PR feature log
+# `demo/measles` PR feature log
 
-The running list of features built on `feat/demo/measles` that must each land
+The running list of features built on `demo/measles` that must each land
 in `develop` as their own PR. When every feature below reads `merged`,
 everything this branch built is in `develop`.
 
@@ -21,9 +21,9 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
    with the `using-wt` skill.
 3. Read every commit listed under the feature with `git show <sha>`, and read
    each listed file at its final state with
-   `git show feat/demo/measles:<path>`.
+   `git show demo/measles:<path>`.
 4. Rebuild the feature on the new branch. Two rules decide what to copy:
-   - **Default:** take the file's final content on `feat/demo/measles`.
+   - **Default:** take the file's final content on `demo/measles`.
    - **Shared files:** some files hold code from several features (see
      **Files shared by several features**). For those, take only the hunks
      this feature owns. Hunks belonging to a feature that is not merged yet
@@ -43,7 +43,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
    - `pnpm-lock.yaml`: `pnpm install` or `pnpm add`
 7. Run the feature's **Verification** commands. Open the PR with the
    Conventional Commits title given.
-8. Update this log on `feat/demo/measles`: set the status to `PR open` with the
+8. Update this log on `demo/measles`: set the status to `PR open` with the
    PR link, then to `merged` once it merges.
 
 ## Features
@@ -754,4 +754,4 @@ Commits that only update this log are branch-only and are not listed.
 **Not part of any feature:**
 - `b920bee1b` (desktop SQLite generator catch-up) is on the Postgres branch.
 - `7dbb2210a`'s non-open-data files (`db_connections*`, `PostgresTableWrapper*`, the Postgres import views, `supabase/functions/connectors/*`, `supabase/functions/_shared/*`, `createRegistryForFetch.ts`, `http-api.types.ts`, `ConnectorsAdvisory.tsx`, `save*Dataset.ts`, `postgres-connector-option-a-prototype.html`, `tests/e2e/postgres-connector-import.spec.ts`) are formatting and Postgres work. They belong to the Postgres branch, not to any feature here.
-- `supabase/config.toml`: `7dbb2210a` committed this branch's Supabase switch (project `feat-demo-measles`, ports 553xx). Never port it. Run `ava supabase restore` and commit the standard config before this branch itself is ever merged anywhere.
+- `supabase/config.toml`: `7dbb2210a` committed this branch's Supabase switch (project `feat-demo-measles`, ports 553xx). Never port it. Run `ava supabase restore` and commit the standard config before this branch itself is ever merged anywhere. Done in `f710dcb68`.

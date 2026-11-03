@@ -3,7 +3,7 @@
 - **Status:** Draft for review
 - **Date:** 2026-10-20
 - **Author:** pablo@avandarlabs.com
-- **Branch:** `feat/demo/measles`
+- **Branch:** `demo/measles`
 - **Packages touched:** `@avandar/etl` (`packages/node/etl`), `apps/pipeline-server`,
   `apps/ava-cli`, `supabase/schemas`
 

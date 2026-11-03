@@ -3,7 +3,7 @@
 - **Status:** Draft for review
 - **Date:** 2026-10-21
 - **Author:** pablo@avandarlabs.com
-- **Branch:** `feat/demo/measles`
+- **Branch:** `demo/measles`
 - **Builds on:** [`2026-10-20-etl-engine-supabase-load-and-incremental-runs-design.md`](2026-10-20-etl-engine-supabase-load-and-incremental-runs-design.md)
 - **Packages touched:** `@avandar/etl` (`packages/node/etl`), `apps/pipeline-server`,
   `apps/ava-cli`, `shared/connectors/open-data`, `supabase/schemas`

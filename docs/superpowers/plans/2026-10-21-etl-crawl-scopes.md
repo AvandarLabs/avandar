@@ -17,7 +17,7 @@ Test ids (S1 to S16, M1 to M5) refer to the spec's section 8.
 
 Read these once. Every task assumes them.
 
-1. **Worktree and database.** Work in `/Users/pablo/src/worktrees/avandar/feat/demo/measles`.
+1. **Worktree and database.** Work in `/Users/pablo/src/worktrees/avandar/demo/measles`.
    Before any `pnpm db:*`, `pnpm test:db`, `supabase *`, or the `test:supabase`
    suite, run `ava supabase status` and confirm the first line reads
    `SWITCHED` (green). If it does not, stop and report BLOCKED. Never run
@@ -198,10 +198,10 @@ Expected: first line starts with `SWITCHED`.
 migration against real listings, so save them first (local stack only):
 
 ```bash
-mkdir -p .temp/feat-demo-measles
+mkdir -p .temp/demo-measles
 psql "postgresql://postgres:postgres@127.0.0.1:55342/postgres" -c \
-  "\copy public.data_catalog_listings to '.temp/feat-demo-measles/listings-before-scopes.csv' with (format csv, header true)"
-wc -l .temp/feat-demo-measles/listings-before-scopes.csv
+  "\copy public.data_catalog_listings to '.temp/demo-measles/listings-before-scopes.csv' with (format csv, header true)"
+wc -l .temp/demo-measles/listings-before-scopes.csv
 ```
 
 Expected: a CSV with a header line and one line per listing (about 36,700 on
@@ -8584,7 +8584,7 @@ and replay the seed migration (local Postgres only):
 
 ```bash
 DB="postgresql://postgres:postgres@127.0.0.1:55342/postgres"
-CSV=.temp/feat-demo-measles/listings-before-scopes.csv
+CSV=.temp/demo-measles/listings-before-scopes.csv
 COLUMNS=$(head -1 "$CSV")
 psql "$DB" -c "delete from public.pipeline_scope_checkpoints; delete from public.data_catalog_listings where pipeline_name in ('hdx', 'socrata');"
 psql "$DB" -c "\copy public.data_catalog_listings ($COLUMNS) from '$CSV' with (format csv, header true)"
@@ -8646,7 +8646,7 @@ Expected: one line for `https://data.cityofnewyork.us [all]`, deleting the
 listings outside Education, detaching the Education ones, and deleting one
 checkpoint. Before the real prune, add one non-Education NYC listing to a
 workspace through the app (seed user from `seed/SeedData.ts`, headless
-Playwright, screenshots in `.temp/feat-demo-measles/`), or record that you
+Playwright, screenshots in `.temp/demo-measles/`), or record that you
 skipped this part and why. Then:
 
 ```bash

@@ -16,7 +16,7 @@
 
 Read these once. Every task assumes them.
 
-1. **Worktree and database.** Work in `/Users/pablo/src/worktrees/avandar/feat/demo/measles`.
+1. **Worktree and database.** Work in `/Users/pablo/src/worktrees/avandar/demo/measles`.
    Before any `pnpm db:*`, `pnpm test:db`, `supabase *`, or the `test:supabase`
    suite, run `ava supabase status` and confirm the first line reads
    `SWITCHED` (green). If `ava` says it is out of date, run

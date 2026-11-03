@@ -17,7 +17,7 @@ Test ids (E1, L4, S3, ...) below refer to the spec's section 8.
 
 Read these once. Every task assumes them.
 
-1. **Worktree and database.** Work in `/Users/pablo/src/worktrees/avandar/feat/demo/measles`.
+1. **Worktree and database.** Work in `/Users/pablo/src/worktrees/avandar/demo/measles`.
    Before any `pnpm db:*`, `pnpm test:db`, `supabase *`, or the `test:supabase`
    suite, run `ava supabase status` and confirm the first line reads
    `SWITCHED` (green). If it does not, run `ava supabase switch` and re-check.

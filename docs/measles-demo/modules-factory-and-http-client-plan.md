@@ -33,7 +33,7 @@ row), `deno check`, and a Deno runtime run of a rate-limited client.
 
 ## Ground rules
 
-- Work on `feat/demo/measles` in this worktree. Do not push, merge or open a
+- Work on `demo/measles` in this worktree. Do not push, merge or open a
   PR. Commit as you go.
 - **Never stage `supabase/config.toml`** (it holds this branch's Supabase
   switch) or any file not named in a task's commit step. The worktree has
@@ -98,7 +98,7 @@ row), `deno check`, and a Deno runtime run of a rate-limited client.
 
 Run: `git branch --show-current && git status --short`
 
-Expected: `feat/demo/measles`, plus pre-existing modified files. Note them. None
+Expected: `demo/measles`, plus pre-existing modified files. Note them. None
 of them are yours to commit in this plan.
 
 - [ ] **Step 2: Record the baseline**
@@ -1843,7 +1843,7 @@ AnyModule, MembersOfModule and BaseModule are removed."
 
 - [ ] **Step 1: Write the codemod**
 
-Create `.temp/feat-demo-measles/codemods/migrateFactoryCreate.mjs`:
+Create `.temp/demo-measles/codemods/migrateFactoryCreate.mjs`:
 
 ```js
 // Rewrites `Factory.create({ ...state })` to
@@ -1907,7 +1907,7 @@ for (const filePath of process.argv.slice(2)) {
 - [ ] **Step 2: Run it**
 
 ```bash
-node .temp/feat-demo-measles/codemods/migrateFactoryCreate.mjs \
+node .temp/demo-measles/codemods/migrateFactoryCreate.mjs \
   apps/pipeline-server/pipelines/world-bank__wdi/run.ts \
   packages/node/etl/src/EtlEngine/EtlEngine.test.ts \
   src/clients/qetl/PublicQuerySession/PublicQuerySession.ts \
@@ -3780,5 +3780,5 @@ Report to the user:
 - Which commits are the AVA-383 modules PR: Tasks 1 to 4, which touch only
   `packages/shared/modules`, plus Task 8's caller migration, which has to go
   with them.
-- That the scratch copies under `.temp/feat-demo-measles/` (`modimpl`,
+- That the scratch copies under `.temp/demo-measles/` (`modimpl`,
   `httpimpl`, `codemods`) can be deleted.

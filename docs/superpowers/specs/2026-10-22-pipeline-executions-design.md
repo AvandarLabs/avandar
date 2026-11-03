@@ -3,7 +3,7 @@
 - **Status:** Draft for review
 - **Date:** 2026-10-22
 - **Author:** pablo@avandarlabs.com
-- **Branch:** `feat/demo/measles`
+- **Branch:** `demo/measles`
 - **Builds on:** [`2026-10-21-etl-crawl-scopes-design.md`](2026-10-21-etl-crawl-scopes-design.md)
 - **Packages touched:** `@avandar/etl` (`packages/node/etl`), `apps/pipeline-server`,
   `apps/ava-cli`, `scripts/runPipelineOnce.ts`, `supabase/schemas`

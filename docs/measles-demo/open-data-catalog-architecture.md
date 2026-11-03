@@ -7,7 +7,7 @@ deferred. It assumes
 [`connector-nomenclature.md`](connector-nomenclature.md) (drive, connection,
 relation, drive index, the connector-vs-discovery distinction) and
 [`qetl-architecture.md`](../qetl-architecture.md) section 2.1 (client vs.
-wrapper). Facts are as of 2026-10-16 (`feat/demo/measles`, with
+wrapper). Facts are as of 2026-10-16 (`demo/measles`, with
 `feat/postgres-connector` merged in); section 8 lists what is proposed rather
 than built.
 
