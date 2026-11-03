@@ -70,7 +70,8 @@ right **Claude/Codex** pane.
     `dif`'s own activity lines (see below). Read-only; scroll with the mouse
     wheel, arrows/PageUp/PageDown, `Alt+U`/`Alt+D` for a half-page, or
     `Alt+K`/`Alt+J` for one line. The `Alt` bindings also scroll while the
-    Claude or Codex pane is focused.
+    Claude or Codex pane is focused. Drag to select text in any pane and it is
+    copied on release (see [Mouse](#mouse)).
   - **Test plan view** (`Test plan`): the review's manual test plan, rendered
     from markdown. The `diff-review` skill writes it as a separate artifact from
     the diff guide, and `dif` refreshes it in place.
@@ -91,6 +92,18 @@ right **Claude/Codex** pane.
 
 The diff itself is reviewed in the **browser** difit opens; the log view is the
 server console, not the diff.
+
+### Mouse
+
+The wheel scrolls whichever pane is under the pointer, and a click focuses it.
+Dragging selects text in a pane the way tmux does: the selection is highlighted,
+releasing the button copies it to the clipboard, and the statusline briefly
+shows `Copied N characters`. It works in the log view, the Claude or Codex
+pane, and the markdown views. Dragging past a terminal pane's top or bottom
+edge scrolls it, so a selection can be longer than the pane. iTerm2's ⌘-click
+on links still works. Hold Option (iTerm2) or Fn (Terminal) to use the
+terminal's own selection instead. Details are in
+[keybindings.md](keybindings.md#mouse).
 
 ### Activity log in the log view
 

@@ -12,19 +12,21 @@ pub mod guide;
 pub mod keymap;
 pub mod main_diff_view;
 pub mod modal_layout;
+pub mod mouse;
 pub mod markdown;
 pub mod open_target;
 pub mod palette;
+pub mod selection;
 pub mod session_meta;
 pub mod shortcuts;
 pub mod start_review;
 pub mod startup;
 pub mod vim;
 
-use std::io::{Stdout, stdout};
+use std::io::{Stdout, Write, stdout};
 
 use anyhow::{Context, Result};
-use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
+use crossterm::event::DisableMouseCapture;
 use crossterm::execute;
 use crossterm::terminal::{
     EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
@@ -52,20 +54,11 @@ pub fn run(cli: &Cli) -> Result<()> {
 fn setup_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>> {
     enable_raw_mode().context("enabling raw mode")?;
     let mut out = stdout();
-    execute!(out, EnterAlternateScreen, EnableMouseCapture).context("entering alternate screen")?;
-    disable_mouse_motion_reporting(&mut out);
+    execute!(out, EnterAlternateScreen).context("entering alternate screen")?;
+    out.write_all(mouse::ENABLE_MOUSE_REPORTING)
+        .and_then(|()| out.flush())
+        .context("enabling mouse reporting")?;
     Terminal::new(CrosstermBackend::new(out)).context("creating terminal")
-}
-
-/// Turn off mouse *motion* reporting (DECSET 1002 button-drag + 1003 any-event)
-/// that `EnableMouseCapture` also enables, keeping only button + wheel
-/// reporting. With motion reporting on, iTerm2 won't let ⌘-hover / ⌘-click reach
-/// its native link / Semantic-History handler; with only button + wheel, holding
-/// ⌘ bypasses to native links while we still capture the scroll wheel.
-/// Best-effort: a write failure just leaves the default capture in place.
-fn disable_mouse_motion_reporting<W: std::io::Write>(w: &mut W) {
-    let _ = w.write_all(b"\x1b[?1002l\x1b[?1003l");
-    let _ = w.flush();
 }
 
 fn restore_terminal(terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<()> {

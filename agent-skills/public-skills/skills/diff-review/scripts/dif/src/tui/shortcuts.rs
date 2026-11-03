@@ -85,6 +85,20 @@ pub const ALL: &[Shortcut] = &[
         group: Group::Focus,
         in_footer: true,
     },
+    Shortcut {
+        keys: "Wheel",
+        label: "scroll",
+        desc: "Scroll the pane under the pointer; a click focuses it",
+        group: Group::Focus,
+        in_footer: false,
+    },
+    Shortcut {
+        keys: "Drag",
+        label: "copy",
+        desc: "Select text in a pane and copy it on release (Option-drag for iTerm2's own selection)",
+        group: Group::Focus,
+        in_footer: false,
+    },
     // --- Commands (from either pane) ---
     Shortcut {
         keys: "^P",
@@ -283,6 +297,21 @@ mod tests {
         assert!(
             cmds.iter()
                 .any(|s| s.keys == "^S" && s.desc.contains("GitHub"))
+        );
+    }
+
+    #[test]
+    fn focus_group_lists_mouse_scroll_and_drag_to_copy() {
+        let focus = in_group(Group::Focus);
+        assert!(
+            focus
+                .iter()
+                .any(|s| s.keys == "Wheel" && s.desc.contains("under the pointer"))
+        );
+        assert!(
+            focus
+                .iter()
+                .any(|s| s.keys == "Drag" && s.desc.contains("copy"))
         );
     }
 

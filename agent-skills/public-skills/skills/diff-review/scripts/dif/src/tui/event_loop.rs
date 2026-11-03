@@ -10,18 +10,17 @@ use std::io::Stdout;
 use std::time::Duration;
 
 use anyhow::Result;
-use crossterm::event::{
-    self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEventKind,
-};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ratatui::Terminal;
 use ratatui::backend::CrosstermBackend;
 
 use super::app::{App, Panel};
 use super::draw::draw;
 use super::keymap::key_to_bytes;
+use super::mouse::handle_mouse;
 use super::start_review::handle_start_review_key;
 
-/// Rows scrolled per wheel notch / arrow press in the read-only difit pane.
+/// Rows scrolled per arrow press in the read-only difit pane.
 const SCROLL_STEP: usize = 3;
 /// Rows scrolled per page key.
 const PAGE_STEP: usize = 20;
@@ -50,16 +49,16 @@ pub fn run_event_loop(
         if !event::poll(poll)? {
             continue;
         }
-        // Resize needs no handling: the next draw resizes both PTYs to fit.
+        // The next draw resizes both PTYs to fit, so a resize only drops the
+        // selection (its cells no longer line up). A key press drops it too:
+        // typing snaps the LLM pane to its tail, moving the text under it.
         match event::read()? {
-            Event::Mouse(me) => match me.kind {
-                MouseEventKind::ScrollUp => app.scroll_focused_up(SCROLL_STEP),
-                MouseEventKind::ScrollDown => app.scroll_focused_down(SCROLL_STEP),
-                _ => {}
-            },
+            Event::Mouse(me) => handle_mouse(app, me),
             Event::Key(k) if matches!(k.kind, KeyEventKind::Press | KeyEventKind::Repeat) => {
+                app.clear_selection();
                 handle_key(app, &k);
             }
+            Event::Resize(..) => app.clear_selection(),
             _ => {}
         }
     }

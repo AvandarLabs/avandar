@@ -57,7 +57,8 @@ src/
     │   ├── mod.rs     App state + focus + main-view switching + palette
     │   ├── review_surface.rs  web-shell requests, comparison retarget, relaunch, new LLM session, difit restart
     │   ├── llm.rs     difit log, session meta, guide-ready transition, code-change warning, comment injection
-    │   └── scroll.rs  markdown scroll + vim motions + open-under-cursor
+    │   ├── scroll.rs  markdown scroll + vim motions + open-under-cursor; per-pane scrolling for the wheel
+    │   └── select.rs  drag-to-copy: map mouse cells onto a pane, extend, copy on release
     ├── control.rs     local POST /comparison endpoint for retargeting the comparison while the review is still being prepared
     ├── draw.rs        two-half layout, main-view tab strip + log/test-plan/guide routing, palette overlay
     ├── draw_palette.rs  the command-palette modal renderer
@@ -75,7 +76,9 @@ src/
     ├── markdown/      diff-guide markdown → ratatui Text (mod.rs walk, inline.rs, table.rs)
     ├── change_alert.rs  pure change-author attribution + restart-alert wording
     ├── session_meta.rs  the live-session metadata file
-    ├── event_loop.rs  50ms loop: draw, inject, route input (incl. palette + main-view keys + mouse hover)
+    ├── event_loop.rs  50ms loop: draw, inject, route input (incl. palette + main-view keys)
+    ├── mouse.rs       mouse routing: wheel scrolls the pane under the pointer, click focuses, drag selects; the mouse modes dif enables
+    ├── selection.rs   the selection model in content coordinates, its highlight, and text extraction from vt100 / rendered markdown (pure)
     └── keymap.rs      key→bytes encoder + prompt injection into the LLM pane
 ```
 
@@ -113,16 +116,37 @@ We render the cursor ourselves (rather than using a text-editor widget like
 keeping the colored markdown render matters more than offloading the small
 cursor/scroll overlay.
 
-## Mouse capture and native ⌘-click links
+## Mouse: wheel, click, drag-to-copy
 
-All three sibling shells (`dif`, `tasks`, `brain`) capture the mouse for the
-scroll wheel, but right after `EnableMouseCapture` they emit `\x1b[?1002l\x1b[?1003l`
-to turn **off** mouse *motion* reporting (button-drag + any-event) that crossterm
-also enables. Motion reporting suppresses iTerm2's native ⌘-hover / ⌘-click link
-and Semantic-History handling; with only button + wheel reporting, holding ⌘
-bypasses to the native handler while the wheel still scrolls. `dif` therefore
-does **not** track the mouse position itself (the keyboard `o` opens under the
-cursor instead).
+`dif` runs on the alternate screen, which has no terminal scrollback, so the
+terminal cannot scroll or select inside the panes by itself. `dif` turns on
+mouse reporting for button presses (DECSET 1000), drags while a button is held
+(1002), and SGR coordinates (1006), and does the rest itself (`tui/mouse.rs`):
+
+- **Wheel** scrolls the pane under the pointer (vt100 scrollback for a PTY
+  pane, the cursor for a markdown view), whichever pane has focus.
+- **Click** focuses the pane under the pointer.
+- **Drag** selects text, tmux-style, and **release** copies it
+  (`clipboard.rs`). The selection lives in *content* coordinates (a PTY line is
+  its viewport row minus the vt100 scrollback offset), so it stays on the same
+  text while the pane scrolls. Copying reads the cells back out of the vt100
+  screen, stepping the scrollback so a selection taller than the pane copies in
+  full, and joining soft-wrapped rows without a newline. Markdown views copy
+  from the plain text of their rendered lines.
+
+Bare pointer motion (1003) stays off: hover never floods the loop, and iTerm2
+keeps its ⌘-hover link underline and ⌘-click. iTerm2 keeps 1000/1002/1003 in
+one slot, and resetting any of them turns reporting off entirely, so `dif`
+only ever sets modes and never resets one until teardown. (Before this, `dif`
+reset 1002/1003 after crossterm's `EnableMouseCapture`, which silently turned
+off the wheel too.)
+
+The clipboard is written with `pbcopy`. Over SSH (`SSH_CONNECTION` /
+`SSH_TTY`), `dif` also emits an OSC 52 escape so the user's own terminal sets
+its clipboard. Inside tmux it sends the escape both plain (accepted with
+`set-clipboard on`) and wrapped in a DCS passthrough (forwarded with
+`allow-passthrough on`); with neither option set, tmux drops it. The base64 for
+OSC 52 is a few lines in `clipboard.rs` rather than a new dependency.
 
 ## Threads
 

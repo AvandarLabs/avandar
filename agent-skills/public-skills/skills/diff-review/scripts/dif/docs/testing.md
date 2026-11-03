@@ -118,6 +118,18 @@ suite with `cargo test` (it finishes in a couple of seconds).
   trimming that keeps `:`), URL vs path classification, line-ref parsing
   (`:L1-L6`, `:7`, none → 1), plain-word rejection, and the iTerm tab script.
 - `tui::main_diff_view`: `Tab` / `Shift+Tab` cycle wrapping and the view labels.
+- `tui::selection`: selection ordering and containment in content coordinates,
+  the highlight painting exactly the selected cells, and copying out of a real
+  `vt100` screen: partial rows, newlines between rows, soft-wrapped rows joined,
+  trailing blanks trimmed, a wide character kept whole, and lines scrolled out
+  of view read back with the scroll offset restored. Markdown views copy by
+  character from their rendered lines.
+- `tui::mouse`: mapping a cell onto the pane under it (borders, the tab strip,
+  and the statusline map to none), clamping a drag into a pane and detecting it
+  overshooting the top or bottom, and the exact mouse modes enabled (never 1003,
+  never a reset).
+- `clipboard`: base64 against the RFC 4648 vectors and the OSC 52 escape,
+  plain and for tmux. `pbcopy` itself is not unit-tested.
 - `tui::guide`: `refresh` detecting content changes (and file removal) on a
   real temp file; cursor motions moving + clamping within the content; word
   motions stepping between words across lines; `target_under_cursor` reading the

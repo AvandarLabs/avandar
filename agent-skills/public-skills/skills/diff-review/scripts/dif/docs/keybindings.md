@@ -78,7 +78,7 @@ When the **main** (diff) view is focused (read-only). Keys common to both views:
 | `Tab` / `Shift+Tab` | cycle the main view forward / backward (Logs ↔ Test plan ↔ Diff guide) |
 | `Up` / `Down` | scroll the active view 3 rows |
 | `PageUp` / `PageDown` | scroll the active view 20 rows |
-| mouse wheel | scroll the focused pane |
+| mouse wheel | scroll the pane under the pointer |
 
 There are **no bare-letter shortcuts to switch views** — use `Tab` /
 `Shift+Tab`. In the **Test plan** and **Diff guide** views, the bare letters
@@ -105,28 +105,25 @@ forwards every key, including `Tab` and bare letters, straight to the frontend, 
 focus it with `Alt+H` first. These follow the sibling `tasks`/`brain` focus
 convention: `Alt+H` for the left pane, `Alt+L` for the right LLM pane.
 
-## Mouse, and native ⌘-click links
+## Mouse
 
-`dif` (like the sibling `tasks` / `brain` shells) captures the mouse only for
-**button + wheel** events — it deliberately turns off mouse *motion* reporting
-(DECSET 1002/1003) that crossterm's `EnableMouseCapture` would also enable. With
-motion reporting off, holding **⌘** lets iTerm2 bypass mouse reporting and use
-its native link / Semantic-History handling: ⌘-hover underlines a URL or file
-path and ⌘-click opens it (the same handler `o` uses from the keyboard).
+| Action | Effect |
+| --- | --- |
+| wheel | scroll the pane under the pointer, focused or not (a markdown view moves its cursor) |
+| click | focus the pane under the pointer |
+| drag | select text in that pane, highlighted. Dragging past its top or bottom edge scrolls a terminal pane to reach more |
+| release | copy the selection to the clipboard. The statusline shows `Copied N characters`, and the highlight stays until the next click or key |
+| ⌘-click (iTerm2) | open a URL or file path, unchanged: iTerm2 handles it before mouse reporting |
+| Option-drag (iTerm2) / Fn-drag (Terminal) | the terminal's own selection, bypassing `dif` |
 
-**The scroll wheel is best-effort, not guaranteed.** Keeping ⌘-click working
-(motion reporting off) is in tension with wheel delivery: on the user's iTerm2
-the wheel emits **no** mouse events while motion reporting is off, so the panes
-don't scroll with it. We deliberately do **not** re-enable motion reporting to
-recover the wheel — it risks silently breaking ⌘-click (unconfirmed on that
-iTerm2 version) and is fragile, terminal-specific behavior these shells
-shouldn't depend on. Use **`Alt+U` / `Alt+D`** for half-page scrolls or
-**`Alt+K` / `Alt+J`** for single-line scrolls (see the focus/command table
-above): they are plain key events, intercepted before forwarding to the LLM, so
-they scroll the focused view in any terminal and even while the LLM pane is
-focused, with no dependency on mouse reporting. The
-`brain` sibling records the full analysis in its `docs/decisions.md`; `dif`
-keeps no decisions log, so the reasoning lives here.
+A selection never spans panes and copies as plain text, with soft-wrapped lines
+joined and trailing blanks trimmed. Over SSH the copy also reaches your local
+clipboard through OSC 52; in iTerm2 that needs **Settings > General >
+Selection > Applications in terminal may access clipboard**, and inside tmux
+it needs `set -g set-clipboard on` (or `allow-passthrough on`). The keyboard
+scrolls (`Alt+U` / `Alt+D`, `Alt+K` / `Alt+J`) still work without the mouse.
+See [architecture.md](architecture.md#mouse-wheel-click-drag-to-copy) for how it
+works.
 
 ## Shortcut-label rule (for agents)
 
