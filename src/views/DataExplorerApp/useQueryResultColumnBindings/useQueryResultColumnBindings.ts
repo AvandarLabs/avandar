@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
-import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
+import { normalizeSqlForSubquery } from "@avandar/utils/sql";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   QueryResultColumnBindings,

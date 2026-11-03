@@ -2,7 +2,7 @@ import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultCo
 import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { createQueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import { runColumnSchemaQuery } from "@/clients/queries/runColumnSchemaQuery/runColumnSchemaQuery";
-import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
+import { normalizeSqlForSubquery } from "@avandar/utils/sql";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   QueryResultColumnBindings,
