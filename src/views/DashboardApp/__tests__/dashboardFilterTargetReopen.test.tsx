@@ -1,6 +1,6 @@
 import { DashboardFilterColumnBindingTestFixtures } from "./DashboardFilterColumnBindingTestFixtures";
-import type { AvaPageData } from "./AvaPage/AvaPage.types";
-import type { Props } from "./AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { Props } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 
 const {
   DashboardConfigs,

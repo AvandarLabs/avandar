@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, expect, it, vi } from "vitest";
-import { makeBufferLayersFromSource } from "./makeBufferLayersFromSource";
+import { makeBufferLayersFromSource } from "@/views/GisApp/makeBufferLayersFromSource";
 import type { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 
 type Props = { children: ReactNode };
@@ -13,9 +13,9 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import * as StructuredQueryCompiler from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import * as SpatialCompiler from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
 import { TestProviders, renderHook, waitFor } from "@/test-utils";
-import { useMapLayersData } from "./layers/useMapLayersData/useMapLayersData";
-import { useMapTimeExtent } from "./shell/MapTimeSlider/useMapTimeExtent";
-import { useHydratedMapSources } from "./useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources";
+import { useMapLayersData } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
+import { useMapTimeExtent } from "@/views/GisApp/shell/MapTimeSlider/useMapTimeExtent";
+import { useHydratedMapSources } from "@/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";

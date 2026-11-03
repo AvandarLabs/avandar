@@ -1,8 +1,8 @@
 import { DashboardFilterColumnBindingTestFixtures } from "./DashboardFilterColumnBindingTestFixtures";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { Props } from "./AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
+import type { Props } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 
 const {
   withDuckDb,

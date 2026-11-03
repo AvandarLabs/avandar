@@ -1,5 +1,5 @@
-import type { Props as DataVizProps } from "./AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
-import type { DashboardFilterRecord } from "./DashboardFilterStateManager/DashboardFilterStateManager";
+import type { Props as DataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 
 type Props = { children: ReactNode };
 
@@ -12,11 +12,11 @@ import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
 import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { DataVizColumnBindings } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizColumnBindings";
+import { makeRuntimeColumnBindingsFromDataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeRuntimeColumnBindingsFromDataVizProps";
+import { useDataVizRuntimeColumnBindings } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizRuntimeColumnBindings/useDataVizRuntimeColumnBindings";
+import { DashboardColumnBindingPreparation } from "@/views/DashboardApp/AvaPage/utils/DashboardColumnBindingPreparation/DashboardColumnBindingPreparation";
 import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
-import { withDuckDb } from "../../../tests/integration/queries/executedDuckDb";
-import { makeRuntimeColumnBindingsFromDataVizProps } from "./AvaPage/pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeRuntimeColumnBindingsFromDataVizProps";
-import { useDataVizRuntimeColumnBindings } from "./AvaPage/pblocks/DataVizPBlock/useDataVizRuntimeColumnBindings/useDataVizRuntimeColumnBindings";
-import { DashboardColumnBindingPreparation } from "./AvaPage/utils/DashboardColumnBindingPreparation/DashboardColumnBindingPreparation";
+import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { ReactNode } from "react";

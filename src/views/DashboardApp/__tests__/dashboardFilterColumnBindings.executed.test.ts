@@ -4,7 +4,7 @@ import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlo
 import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
 import { makeColumnBindingsFromDashboardFilters } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
 import { makeLocalFilterColumnBindingsFromLocalFilters } from "@/views/DashboardApp/DashboardFilterStateManager/makeLocalFilterColumnBindingsFromLocalFilters/makeLocalFilterColumnBindingsFromLocalFilters";
-import { withDuckDb } from "../../../tests/integration/queries/executedDuckDb";
+import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
