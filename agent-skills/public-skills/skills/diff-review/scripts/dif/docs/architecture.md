@@ -129,7 +129,7 @@ cursor instead).
 - **Main thread** — the TUI event loop (draw + input at ~50ms).
 - **Per-pane reader/writer/waiter threads** — each `PtyPane` spawns three (PTY
   master → vt100 parser, mpsc channel → PTY master, child wait → exit status).
-  Two panes (difit, LLM) → six. A "Restart diff server" respawns the difit pane: its
+  Two panes (difit, LLM) → six. A "Refresh diff" respawns the difit pane: its
   old three threads wind down on EOF and three fresh ones start against the same
   parser.
 - **Poller thread** — polls difit's `/api/comments-json` once a second,
@@ -259,14 +259,14 @@ uses), so the pane reads as a running activity log. Each UI tick,
     ("Claude made code changes…"), otherwise it reads as a manual edit ("New
     manual changes detected…").
 
-## Command palette & difit restart
+## Command palette, Refresh diff & Resync with GitHub
 
 `Ctrl+P` opens an in-memory command palette (`palette.rs`); the event loop
 captures its keys while open and `App::execute_palette_action` dispatches the
-chosen `PaletteAction` (`RestartDifit`, `RegenerateGuide`, `OpenInBrowser`, or
-`NewLlmSession`). `Ctrl+R` / `Ctrl+G` / `Ctrl+O` / `Ctrl+N` run those
-directly; each is also the palette row's dimmed `[^R]` / `[^G]` / `[^O]` /
-`[^N]` shortcut hint, via `palette::shortcut_for` (the source of truth
+chosen `PaletteAction` (`RestartDifit`, `RegenerateGuide`, `OpenInBrowser`,
+`NewLlmSession`, or `ResyncGithub`). `Ctrl+R` / `Ctrl+G` / `Ctrl+O` / `Ctrl+N`
+/ `Ctrl+S` run those directly; each is also the palette row's dimmed `[^R]` /
+`[^G]` / `[^O]` / `[^N]` / `[^S]` shortcut hint, via `palette::shortcut_for` (the source of truth
 for the hint, per the shortcut-label rule in `AGENTS.md`). "Regenerate diff
 guide" types a minimal request into the LLM pane; the skill writes the guide
 file and the diff guide view picks it up on its next refresh. "New LLM
@@ -279,7 +279,11 @@ typing `/new` so it takes effect immediately even when the LLM is mid-thought. T
 palette is a
 pure registry + filter/selection state, so it is unit-tested without a terminal.
 
-The "Restart diff server" action restarts the difit server **in place**. `PtyPane`
+"Resync with GitHub" calls `Session::request_reviewer_pull`, the same request
+the browser's **Sync** button makes, and writes a status line into the log
+view. The pull itself runs on the poller thread like every GitHub call.
+
+The "Refresh diff" action relaunches the difit server **in place**. `PtyPane`
 gained two capabilities for this:
 
 - `kill_child()` — signal the current child without tearing down the pane.
@@ -297,7 +301,7 @@ port rather than letting difit auto-reassign), then respawn with the same
 comparison/port and a freshly re-read transcript. The poller and LLM pane are
 untouched; the poller reconnects on its own. It then bumps the web shell's
 restart counter instead of opening the browser: the open tab sees it in
-`meta.json` and reloads itself, so a restart never adds a tab.
+`meta.json` and reloads itself, so a refresh never adds a tab.
 
 ## Dependencies
 

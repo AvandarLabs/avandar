@@ -14,7 +14,7 @@ use tiny_http::Request;
 use super::router::Route;
 use super::server::{Ctx, send_bytes_nostore, send_status};
 use crate::github::conflicts::ConflictResolution;
-use crate::github::session::{ReviewEvent, SubmitRequest};
+use crate::github::session::{ReviewEvent, Session, SubmitRequest};
 
 /// Serve one of the GitHub routes.
 pub fn handle(route: &Route, mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
@@ -33,10 +33,7 @@ pub fn handle(route: &Route, mut request: Request, ctx: &Ctx) -> std::io::Result
             )
         }
         Route::GithubPull => {
-            ctx.github.session(|s| {
-                s.pull_requested = true;
-                s.reviewer_pull = true;
-            });
+            ctx.github.session(Session::request_reviewer_pull);
             send_status(request, 202)
         }
         Route::GithubSubmit => {

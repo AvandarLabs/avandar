@@ -99,15 +99,15 @@ log:
 
 - **`💬 Added response to comment on <file>:Lx`** (cyan) each time the agent posts a
   reply back to difit.
-- **A restart-needed warning** (orange) when the code changes since launch. The
-  wording names the likely author: **`⚠️  Claude made code changes - restart
-  difit (Ctrl+R) 🔁`** when the LLM likely just edited (it was handed a comment
+- **A refresh-needed warning** (orange) when the code changes since launch. The
+  wording names the likely author: **`⚠️  Claude made code changes. Refresh the
+  diff to show them (Ctrl+R) 🔁`** when the LLM likely just edited (it was handed a comment
   or a `Ctrl+G` moments before), or **`⚠️  New manual changes detected - …`** when the
   change came from outside the shell. It appears once the change settles, and
-  `dif` **never auto-restarts**; that would drop a comment you're mid-typing in
-  the browser. Press `Ctrl+R` (or run "Restart diff server" from the palette) when ready.
+  `dif` **never auto-refreshes**; that would drop a comment you're mid-typing in
+  the browser. Press `Ctrl+R` (or run "Refresh diff" from the palette) when ready.
   The warning **re-arms on each new change**, so a manual edit after a prior
-  warning still alerts; it also re-baselines after a restart.
+  warning still alerts; it also re-baselines after a refresh.
 
 ## Live comment handling
 
@@ -121,7 +121,7 @@ live); a change gets edited (committing or not per the
 the chat, with at most a terse `Done.` posted to the thread. You never have to
 tell the agent to "address the comments," and replies appear without a restart.
 (Code *changes* are different: the diff difit rendered at launch goes stale, so
-`dif` logs a restart warning in the left pane; see below.)
+`dif` logs a refresh warning in the left pane; see below.)
 
 Comments that already exist when `dif` launches are treated as a baseline and
 are not auto-dispatched; only comments added after launch trigger work. The
@@ -253,25 +253,26 @@ with a filter input and a numbered command list. Type to filter, `↑`/`↓` (or
 `Ctrl+C`) to close. The available commands are a fixed in-code registry; see
 [config.md](config.md#command-registry).
 
-### Restart Diff Server
+### Refresh Diff
 
-"Restart diff server", the palette command, or its direct **`Ctrl+R`** shortcut (shown
-dimmed as `[^R]` on the palette row), restarts only the **difit server** (the
-left pane), not the whole shell and not the LLM session. It:
+"Refresh diff", the palette command, or its direct **`Ctrl+R`** shortcut (shown
+dimmed as `[^R]` on the palette row), relaunches only the **difit server** (the
+left pane) so it shows the current diff, not the whole shell and not the LLM
+session. It:
 
 1. Kills the running difit server.
 2. Waits for the port to free, then relaunches difit with the **same**
    comparison and port it was started with (`dif` → `dif`, `dif <args>` →
    `dif <args>`), reseeding the current `.difit` transcript.
 
-The log view is **not cleared**: `dif` writes `[dif] Stopping…` /
-`[dif] Restarting…` status lines into the log and the new server output appends
+The log view is **not cleared**: `dif` writes `[dif] Refreshing diff: stopping
+difit…` / `[dif] Refreshing diff: starting difit…` status lines into the log and the new server output appends
 below them, so it reads as one continuous log. The poller keeps running and
 reconnects automatically once difit is back on the same port.
 
-A restart **never opens a browser tab**. The browser shell keeps serving on the
+A refresh **never opens a browser tab**. The browser shell keeps serving on the
 same port, and the tab you already have open reloads itself once it sees the
-restart, keeping your view, sidebar tab, and **With comments** filter. A manual
+refresh, keeping your view, sidebar tab, and **With comments** filter. A manual
 browser refresh restores them the same way. If no tab is open, `Ctrl+O` opens
 one.
 
@@ -281,7 +282,7 @@ one.
 shortcut (shown dimmed as `[^G]` on the palette row), asks the LLM to rebuild the
 diff guide for this review via the `/diff-review` skill. `dif` only types
 the request into the LLM pane; the skill writes the guide markdown file, and
-the diff guide view picks it up automatically on its next refresh (no restart).
+the diff guide view picks it up automatically on its next refresh (no Refresh diff needed).
 Use it after the agent (or you) changes code so the guide reflects the current diff.
 
 ### Open Diff In Browser
@@ -289,7 +290,7 @@ Use it after the agent (or you) changes code so the guide reflects the current d
 "Open diff in browser", the palette command, or its direct **`Ctrl+O`**
 shortcut (shown dimmed as `[^O]` on the palette row), opens the running difit
 server's URL (`http://localhost:<port>`) in the system default browser. It does
-**not** restart the server; it just reopens the same review page (handy if you
+**not** refresh the diff; it just reopens the same review page (handy if you
 closed the tab difit opened on launch).
 
 ### New LLM Session
@@ -306,6 +307,19 @@ reuses the pane, so its size and scrollback log carry over; the difit server and
 the poller are untouched. Claude fresh session ids are persisted, so a later
 `dif` launch can resume them when possible. Codex fresh sessions currently do
 not persist a `dif`-chosen id because the Codex CLI does not expose that option.
+
+### Resync With GitHub
+
+"Resync with GitHub", the palette command, or its direct **`Ctrl+S`** shortcut
+(shown dimmed as `[^S]` on the palette row), does exactly what the browser's
+**Sync** button does: it pulls new PR comments, replies, and commits now instead
+of waiting for the once-a-minute pull, stashing and restoring your uncommitted
+changes to bring in new commits (see
+[Keeping the GitHub PR in sync](#keeping-the-github-pr-in-sync)). The log view shows
+`↻ Resyncing with GitHub…`, and the open browser tab reloads itself once the
+pull finishes. On a branch with no open PR it logs that there is nothing to
+resync and asks for nothing. `Ctrl+S` is intercepted before the LLM pane, so it
+does not reach Claude Code's own `Ctrl+S` (stash prompt).
 
 ## The diff guide, test plan, and reviewed state
 

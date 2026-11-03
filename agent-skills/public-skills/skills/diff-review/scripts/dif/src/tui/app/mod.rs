@@ -72,7 +72,7 @@ pub struct App {
     /// A label for the difit comparison, e.g. `@ develop` or `.`.
     pub comparison_label: String,
     /// The repo root difit + LLM run in (needed to relaunch difit on a
-    /// "Restart diff server" with the original `cd` target).
+    /// "Refresh diff" with the original `cd` target).
     pub repo_root: PathBuf,
     /// The comparison difit was launched with, replayed verbatim on restart so
     /// the relaunched server shows the same diff.
@@ -227,6 +227,7 @@ impl App {
             PaletteAction::RegenerateGuide => self.regenerate_guide(),
             PaletteAction::OpenInBrowser => self.open_in_browser(),
             PaletteAction::NewLlmSession => self.new_llm_session(),
+            PaletteAction::ResyncGithub => self.resync_with_github(),
         }
         self.close_palette();
     }

@@ -2,9 +2,9 @@
 //!
 //! Keystrokes route to the focused pane. The difit pane is read-only (scroll
 //! keys only); the LLM pane receives full keyboard input. `Alt+H`/`Alt+L`
-//! switch focus; `Ctrl+P` opens the command palette, `Ctrl+R` restarts the
-//! difit server, `Ctrl+N` starts a fresh LLM session, and `Ctrl+Q` quits
-//! (all intercepted globally, so they never reach the LLM).
+//! switch focus; `Ctrl+P` opens the command palette, `Ctrl+R` refreshes the
+//! diff, `Ctrl+S` resyncs with GitHub, `Ctrl+N` starts a fresh LLM session,
+//! and `Ctrl+Q` quits (all intercepted globally, so they never reach the LLM).
 
 use std::io::Stdout;
 use std::time::Duration;
@@ -86,7 +86,7 @@ fn handle_key(app: &mut App, k: &KeyEvent) {
     }
 
     // Global commands intercepted before keys reach the focused pane. The
-    // palette (Ctrl+P), restart (Ctrl+R), and quit (Ctrl+Q) work from either
+    // palette (Ctrl+P), refresh (Ctrl+R), and quit (Ctrl+Q) work from either
     // pane; Alt+H / Alt+L switch focus. These Ctrl keys are not forwarded to
     // the LLM.
     let ctrl = k.modifiers.contains(KeyModifiers::CONTROL);
@@ -98,6 +98,10 @@ fn handle_key(app: &mut App, k: &KeyEvent) {
             }
             KeyCode::Char('r' | 'R') => {
                 app.restart_difit();
+                return;
+            }
+            KeyCode::Char('s' | 'S') => {
+                app.resync_with_github();
                 return;
             }
             KeyCode::Char('g' | 'G') => {

@@ -109,10 +109,17 @@ pub const ALL: &[Shortcut] = &[
     },
     Shortcut {
         keys: "^R",
-        label: "restart",
-        desc: "Restart the difit server",
+        label: "refresh",
+        desc: "Refresh the diff",
         group: Group::Commands,
         in_footer: true,
+    },
+    Shortcut {
+        keys: "^S",
+        label: "resync",
+        desc: "Resync with GitHub: pull new PR comments and commits now",
+        group: Group::Commands,
+        in_footer: false,
     },
     Shortcut {
         keys: "^N",
@@ -262,11 +269,20 @@ mod tests {
     }
 
     #[test]
-    fn footer_advertises_restart_shortcut() {
+    fn footer_advertises_refresh_shortcut() {
         assert!(
             footer_subset()
                 .iter()
-                .any(|s| s.keys == "^R" && s.label == "restart")
+                .any(|s| s.keys == "^R" && s.label == "refresh")
+        );
+    }
+
+    #[test]
+    fn commands_group_lists_the_github_resync() {
+        let cmds = in_group(Group::Commands);
+        assert!(
+            cmds.iter()
+                .any(|s| s.keys == "^S" && s.desc.contains("GitHub"))
         );
     }
 

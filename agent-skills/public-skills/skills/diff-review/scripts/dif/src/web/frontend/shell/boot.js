@@ -24,6 +24,6 @@
   window.setInterval(fetchDiff, 3000);   // keep counts + new-files + show-changes in sync
   window.setInterval(fetchDispatch, 1500); // the held count changes as comments are saved
   window.setInterval(fetchGithub, 2000);
-  window.setInterval(fetchMeta, 2000); // a TUI Ctrl+R restart reloads this tab
+  window.setInterval(fetchMeta, 2000); // a TUI Ctrl+R Refresh diff reloads this tab
   window.setInterval(fetchComments, 3000);
 })();

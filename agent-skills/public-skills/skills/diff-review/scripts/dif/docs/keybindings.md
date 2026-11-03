@@ -16,7 +16,8 @@ Global (work from either pane):
 | `Alt+U` / `Alt+D` | scroll the focused view a half-page up / down (guide view moves its cursor; a PTY pane scrolls half its visible rows) |
 | `Alt+K` / `Alt+J` | scroll the focused view one line up / down |
 | `Ctrl+P` | open the **command palette** (works from either pane) |
-| `Ctrl+R` | restart the difit server (the palette's "Restart diff server"). The open browser tab reloads itself; no new tab opens |
+| `Ctrl+R` | refresh the diff by relaunching the difit server (the palette's "Refresh diff"). The open browser tab reloads itself; no new tab opens |
+| `Ctrl+S` | resync with GitHub now: pull new PR comments and commits, the same as the browser's **Sync** (the palette's "Resync with GitHub") |
 | `Ctrl+G` | regenerate the diff guide (the palette's "Regenerate diff guide") |
 | `Ctrl+O` | open the difit server URL in the default browser (the palette's "Open diff in browser") |
 | `Ctrl+N` | start a fresh LLM session (interrupts: kills the running LLM and respawns it on a new session that auto-submits the review-orientation prompt; the palette's "New LLM session") |
@@ -26,7 +27,7 @@ Global (work from either pane):
 `Alt+H` / `Alt+L` switch focus; `Alt+U` / `Alt+D` scroll the focused view a
 half-page, while `Alt+K` / `Alt+J` scroll it one line at a time. These are
 keyboard-only alternatives to the wheel that never depend on terminal mouse
-reporting. `Ctrl+P` / `Ctrl+R` / `Ctrl+G` / `Ctrl+O` /
+reporting. `Ctrl+P` / `Ctrl+R` / `Ctrl+S` / `Ctrl+G` / `Ctrl+O` /
 `Ctrl+N` / `Ctrl+Q` are the command keys. The `Alt` and `Ctrl` commands are intercepted
 globally **before** keys are forwarded to the LLM, so they never reach the
 LLM session. That is what lets `Alt+U`/`Alt+D` and `Alt+K`/`Alt+J` scroll while
@@ -130,8 +131,9 @@ keeps no decisions log, so the reasoning lives here.
 ## Shortcut-label rule (for agents)
 
 When a shortcut is **also** a command-palette action (today: `Ctrl+R` →
-"Restart diff server", `Ctrl+G` → "Regenerate diff guide", `Ctrl+O` → "Open
-diff in browser", `Ctrl+N` → "New LLM session"), its dimmed `[…]` hint on the
+"Refresh diff", `Ctrl+G` → "Regenerate diff guide", `Ctrl+O` → "Open
+diff in browser", `Ctrl+N` → "New LLM session", `Ctrl+S` → "Resync with
+GitHub"), its dimmed `[…]` hint on the
 palette row is derived from
 `palette::shortcut_for`. If you add or change such a
 shortcut, update `shortcut_for` so the hint matches — the rule is enforced in
