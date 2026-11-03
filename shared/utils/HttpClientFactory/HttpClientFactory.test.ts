@@ -413,9 +413,9 @@ describe("HttpClient: network failures", () => {
     const fetchImpl: FetchLike = vi.fn(async () => {
       throw abortError;
     });
-    await expect(
-      _createClient(fetchImpl).get(`${BASE_URL}/x`),
-    ).rejects.toBe(abortError);
+    await expect(_createClient(fetchImpl).get(`${BASE_URL}/x`)).rejects.toBe(
+      abortError,
+    );
   });
 });
 

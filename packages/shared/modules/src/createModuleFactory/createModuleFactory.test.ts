@@ -1,10 +1,10 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
 import { createLambdaMixin } from "@modules/createLambdaMixin.ts";
 import { createModuleFactory } from "@modules/createModuleFactory/createModuleFactory.ts";
 import { withNewMembers } from "@modules/mixins/withNewMembers/withNewMembers.ts";
+import { describe, expect, expectTypeOf, it } from "vitest";
+import type { EmptyObject } from "@avandar/utils";
 import type { LambdaMixin, MixinTypeLambda } from "@modules/Mixin.types.ts";
 import type { BuilderModule } from "@modules/Module.types.ts";
-import type { EmptyObject } from "@avandar/utils";
 
 type _AsyncFn = (...args: never[]) => Promise<unknown>;
 

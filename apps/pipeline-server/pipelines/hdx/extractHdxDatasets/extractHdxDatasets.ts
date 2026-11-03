@@ -1,11 +1,11 @@
 import { getHdxDatasetTimestamp } from "@pipelines/hdx/getHdxDatasetTimestamp/getHdxDatasetTimestamp";
-import type { EtlRunWindow } from "@avandar/etl";
 import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type {
   CkanDatasetSearchCursor,
   CkanDatasetSearchPage,
   CkanDiscoveryClient,
 } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.types";
+import type { EtlRunWindow } from "@avandar/etl";
 import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
 
 /**
@@ -45,8 +45,7 @@ function _isAfterCursor(
   const time = position.modifiedAt.getTime();
   const cursorTime = cursor.modifiedAt.getTime();
   return (
-    time > cursorTime ||
-    (time === cursorTime && position.name > cursor.name)
+    time > cursorTime || (time === cursorTime && position.name > cursor.name)
   );
 }
 

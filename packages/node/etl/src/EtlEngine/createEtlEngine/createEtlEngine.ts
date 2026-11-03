@@ -5,6 +5,7 @@ import {
   buildUncrawledCrawlResult,
   crawlScope,
 } from "@etl/EtlEngine/crawlScope/crawlScope";
+import { createRunProgressReporter } from "@etl/EtlEngine/createRunProgressReporter/createRunProgressReporter";
 import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
 import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
 import {
@@ -12,7 +13,6 @@ import {
   ETL_UNLISTED_SCOPE_KEY,
 } from "@etl/EtlEngine/etlScopes";
 import { createRunExecutionRecorder } from "@etl/EtlEngine/recordRunExecution/createRunExecutionRecorder";
-import { createRunProgressReporter } from "@etl/EtlEngine/createRunProgressReporter/createRunProgressReporter";
 import { resolveDriveScopes } from "@etl/EtlEngine/resolveDriveScopes/resolveDriveScopes";
 import { selectRequestedScopes } from "@etl/EtlEngine/selectRequestedScopes/selectRequestedScopes";
 import { createSupabaseCheckpointStore } from "@etl/stores/SupabaseCheckpointStore/createSupabaseCheckpointStore";
@@ -21,6 +21,10 @@ import { createSupabaseListingsStore } from "@etl/stores/SupabaseListingsStore/c
 import { createSupabaseObjectStore } from "@etl/stores/SupabaseObjectStore/createSupabaseObjectStore";
 import { createClient } from "@supabase/supabase-js";
 import type { CrawlScopeResult } from "@etl/EtlEngine/crawlScope/crawlScope";
+import type {
+  ProgressCrawl,
+  RunProgressReporter,
+} from "@etl/EtlEngine/createRunProgressReporter/createRunProgressReporter";
 import type {
   EtlClock,
   EtlCrawlReport,
@@ -35,10 +39,6 @@ import type {
   EtlScope,
   EtlStores,
 } from "@etl/EtlEngine/EtlEngine.types";
-import type {
-  ProgressCrawl,
-  RunProgressReporter,
-} from "@etl/EtlEngine/createRunProgressReporter/createRunProgressReporter";
 import type { RunExecutionRecorder } from "@etl/EtlEngine/recordRunExecution/createRunExecutionRecorder";
 import type { ResolvedDrive } from "@etl/EtlEngine/resolveDriveScopes/resolveDriveScopes";
 

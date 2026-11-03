@@ -58,7 +58,10 @@ describe("failureToInvalidDatasetReason", () => {
     ],
     [{ code: "socrata-unreachable", socrataDatasetId: "erm2-nwe9" }],
     [{ code: "access-shape-invalid", accessKind: "api_resource" }],
-  ])("leaves the listing valid for %o, which says nothing about the dataset", (failure) => {
-    expect(failureToInvalidDatasetReason(failure)).toBeUndefined();
-  });
+  ])(
+    "leaves the listing valid for %o, which says nothing about the dataset",
+    (failure) => {
+      expect(failureToInvalidDatasetReason(failure)).toBeUndefined();
+    },
+  );
 });

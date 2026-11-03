@@ -177,38 +177,44 @@ describe("verifyOpenDataColumnTypes", () => {
         return [];
       },
     ],
-  ])("reports the sample as unparseable when %s", async (_label, inferColumnTypes) => {
-    vi.mocked(fetch)
-      .mockResolvedValueOnce(
-        new Response("\u0000\u0001", {
-          status: 200,
-          headers: { "X-Ava-Column-Type-Token": "token-1" },
-        }),
-      )
-      .mockResolvedValueOnce(new Response("{}", { status: 200 }));
+  ])(
+    "reports the sample as unparseable when %s",
+    async (_label, inferColumnTypes) => {
+      vi.mocked(fetch)
+        .mockResolvedValueOnce(
+          new Response("\u0000\u0001", {
+            status: 200,
+            headers: { "X-Ava-Column-Type-Token": "token-1" },
+          }),
+        )
+        .mockResolvedValueOnce(new Response("{}", { status: 200 }));
 
-    await expect(
-      verifyOpenDataColumnTypes(LISTING_ID, { inferColumnTypes }),
-    ).rejects.toThrow("could not be parsed");
-    expect(fetch).toHaveBeenNthCalledWith(
-      2,
-      `${EDGE_FUNCTIONS_URL}/open-data/data-catalog-listings/${LISTING_ID}/unparseable`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer session-token",
-          "Content-Type": "application/json",
+      await expect(
+        verifyOpenDataColumnTypes(LISTING_ID, { inferColumnTypes }),
+      ).rejects.toThrow("could not be parsed");
+      expect(fetch).toHaveBeenNthCalledWith(
+        2,
+        `${EDGE_FUNCTIONS_URL}/open-data/data-catalog-listings/${LISTING_ID}/unparseable`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer session-token",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: "token-1" }),
         },
-        body: JSON.stringify({ token: "token-1" }),
-      },
-    );
-  });
+      );
+    },
+  );
 
   it("names why the sample could not be read when the server says", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(
       new Response(
         JSON.stringify({
-          error: { code: "resource-empty", invalidDatasetReason: "empty_dataset" },
+          error: {
+            code: "resource-empty",
+            invalidDatasetReason: "empty_dataset",
+          },
         }),
         { status: 409 },
       ),

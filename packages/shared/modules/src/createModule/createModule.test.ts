@@ -1,6 +1,6 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
 import { createModule } from "@modules/createModule/createModule.ts";
 import { withNewMembers } from "@modules/mixins/withNewMembers/withNewMembers.ts";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 function _createCounter() {
   return createModule("Counter", {

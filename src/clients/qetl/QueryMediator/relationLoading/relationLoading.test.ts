@@ -47,8 +47,6 @@ describe("probeStorageRelationCache", () => {
     expect(cachedRelations[0]?.parquetBlob.type).toBe(
       MIMEType.APPLICATION_PARQUET,
     );
-    expect(cachedRelations[0]?.parquetBlob.size).toBe(
-      "parquet-bytes".length,
-    );
+    expect(cachedRelations[0]?.parquetBlob.size).toBe("parquet-bytes".length);
   });
 });

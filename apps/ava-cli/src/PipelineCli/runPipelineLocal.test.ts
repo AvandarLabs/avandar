@@ -131,10 +131,10 @@ describe("runPipelineLocal", () => {
 
   it("keeps a failed run's report JSON out of its error text", async () => {
     _mockNextChild({
-        status: 1,
-        stdout: `log line\n${REPORT_LINE}\n`,
-        stderrChunks: ["Every drive failed.\n"],
-      });
+      status: 1,
+      stdout: `log line\n${REPORT_LINE}\n`,
+      stderrChunks: ["Every drive failed.\n"],
+    });
 
     const result = await runPipelineLocal({
       pipelineName: "hdx",
@@ -151,10 +151,10 @@ describe("runPipelineLocal", () => {
 
   it("keeps a failed run's whole output as error text when its JSON is not a report", async () => {
     _mockNextChild({
-        status: 1,
-        stdout: '{"level":"error"}\n',
-        stderrChunks: ["Error: boom\n"],
-      });
+      status: 1,
+      stdout: '{"level":"error"}\n',
+      stderrChunks: ["Error: boom\n"],
+    });
 
     const result = await runPipelineLocal({
       pipelineName: "hdx",

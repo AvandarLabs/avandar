@@ -1,8 +1,8 @@
-import type { EtlRunWindow } from "@avandar/etl";
 import type {
   SocrataDiscoveryClient,
   SocrataDiscoveryResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
+import type { EtlRunWindow } from "@avandar/etl";
 import type {
   ConfiguredDrive,
   SocrataScope,
@@ -118,8 +118,8 @@ function _takeBeforeUntil(
   const firstAtOrAfter = results.findIndex((result) => {
     return until !== undefined && !_isBefore(result, until);
   });
-  return firstAtOrAfter === -1 ?
-      [...results]
+  return firstAtOrAfter === -1
+    ? [...results]
     : results.slice(0, firstAtOrAfter);
 }
 

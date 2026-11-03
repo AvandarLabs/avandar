@@ -49,13 +49,13 @@ export function selectRequestedScopes<TDrive, TScope extends EtlScope>(args: {
   const requestedKeys = new Set(requestedScopeKeys);
   return args.resolvedDrives.flatMap(
     (resolved): Array<ResolvedDrive<TDrive, TScope>> => {
-    if (!resolved.isResolved) {
-      return [resolved];
-    }
-    const scopes = resolved.scopes.filter((scope) => {
-      return requestedKeys.has(scope.key);
-    });
-    return scopes.length === 0 ? [] : [{ ...resolved, scopes }];
-  },
+      if (!resolved.isResolved) {
+        return [resolved];
+      }
+      const scopes = resolved.scopes.filter((scope) => {
+        return requestedKeys.has(scope.key);
+      });
+      return scopes.length === 0 ? [] : [{ ...resolved, scopes }];
+    },
   );
 }

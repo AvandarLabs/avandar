@@ -7,12 +7,12 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import { DuckDbDataTypes } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
+import type { DataCatalogListingId } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 import type {
   DataCatalogRelationColumnId,
   DataCatalogRelationColumnModel,
   DataCatalogRelationColumnRead,
 } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn.types.ts";
-import type { DataCatalogListingId } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 

@@ -153,7 +153,9 @@ describe("fetchLivePipelineScopes", () => {
       (error as Error).message.includes(html),
       (error as Error).cause instanceof SyntaxError,
     ]).toEqual([
-      expect.stringMatching(/hdx pipeline's scopes from the pipeline server.*<!doctype html>/),
+      expect.stringMatching(
+        /hdx pipeline's scopes from the pipeline server.*<!doctype html>/,
+      ),
       false,
       true,
     ]);

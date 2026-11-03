@@ -4,6 +4,7 @@ import {
   createBuilderLayer,
 } from "@modules/buildModuleFromRecipe.ts";
 import { createModule } from "@modules/createModule/createModule.ts";
+import type { EmptyObject, UnknownObject } from "@avandar/utils";
 import type {
   ModuleLayer,
   RuntimeMixin,
@@ -16,7 +17,6 @@ import type {
   MixinRequirementCheck,
 } from "@modules/Mixin.types.ts";
 import type { BuilderModule, Merge, Module } from "@modules/Module.types.ts";
-import type { EmptyObject, UnknownObject } from "@avandar/utils";
 import type { OptionalKeysOf } from "type-fest";
 
 /**

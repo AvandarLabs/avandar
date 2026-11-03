@@ -1,9 +1,9 @@
-import type { Mixin } from "@avandar/modules";
 import type {
   HttpClientState,
   HttpMiddleware,
   HttpMiddlewareRequest,
 } from "$/utils/HttpClientFactory/HttpClientFactory.types.ts";
+import type { Mixin } from "@avandar/modules";
 
 type _RetryBase = {
   getMiddlewares(): HttpClientState["middlewares"];

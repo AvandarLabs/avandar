@@ -3,13 +3,13 @@ import {
   buildModuleFromRecipe,
   createBuilderLayer,
 } from "@modules/buildModuleFromRecipe.ts";
+import type { EmptyObject, UnknownObject } from "@avandar/utils";
 import type {
   BuilderModule,
   Module,
   ReservedMemberName,
   ReservedStateKey,
 } from "@modules/Module.types.ts";
-import type { EmptyObject, UnknownObject } from "@avandar/utils";
 
 /** Rejects, at compile time, a state key whose accessors would be reserved. */
 export type NoReservedStateKeys = {

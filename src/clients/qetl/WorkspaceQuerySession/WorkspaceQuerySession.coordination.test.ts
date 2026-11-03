@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator";
 
 /**
  * The real `QueryMediatorFactory.create` parameters, so the fake tracks its

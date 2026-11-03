@@ -1,12 +1,12 @@
 import { extractHdxDatasets } from "@pipelines/hdx/extractHdxDatasets/extractHdxDatasets";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { parseCkanTimestamp } from "$/connectors/open-data/parseCkanTimestamp/parseCkanTimestamp";
-import type { EtlRunWindow } from "@avandar/etl";
 import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type {
   CkanDatasetSearchPage,
   CkanDiscoveryClient,
 } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.types";
+import type { EtlRunWindow } from "@avandar/etl";
 
 const DRIVE = {
   baseUrl: "https://data.humdata.org",
@@ -59,9 +59,9 @@ function _page(
         };
       }),
     nextCursor:
-      lastRow === undefined ? undefined : (
-        { modifiedAt: _modifiedAt(lastRow), name: lastRow.name }
-      ),
+      lastRow === undefined
+        ? undefined
+        : { modifiedAt: _modifiedAt(lastRow), name: lastRow.name },
     resultCount: rawRows.length,
   };
 }
@@ -74,16 +74,16 @@ function _keysetDiscovery(
   return {
     searchDatasets: vi.fn(async ({ after, rows }) => {
       const remaining =
-        after === undefined ? catalog : (
-          catalog.filter((dataset) => {
-            const time = _modifiedAt(dataset).getTime();
-            const afterTime = after.modifiedAt.getTime();
-            return (
-              time > afterTime ||
-              (time === afterTime && dataset.name > after.name)
-            );
-          })
-        );
+        after === undefined
+          ? catalog
+          : catalog.filter((dataset) => {
+              const time = _modifiedAt(dataset).getTime();
+              const afterTime = after.modifiedAt.getTime();
+              return (
+                time > afterTime ||
+                (time === afterTime && dataset.name > after.name)
+              );
+            });
       return _page(remaining.slice(0, rows), invalidNames);
     }),
   };
