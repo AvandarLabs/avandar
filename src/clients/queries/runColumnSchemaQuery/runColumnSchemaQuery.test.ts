@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import { runQuerySchema } from "./runQuerySchema";
+import { runColumnSchemaQuery } from "./runColumnSchemaQuery";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
@@ -85,11 +85,11 @@ beforeEach(() => {
     columns: COLUMNS,
   });
 });
-describe("runQuerySchema", () => {
+describe("runColumnSchemaQuery", () => {
   it.each(CASES)(
     "reads zero-row metadata with $auth.auth execution credentials",
     async ({ auth, expected }) => {
-      const columns = await runQuerySchema({
+      const columns = await runColumnSchemaQuery({
         rawSql: " SELECT region FROM sales; ",
         auth,
       });

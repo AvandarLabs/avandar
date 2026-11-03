@@ -1,6 +1,6 @@
+import { normalizeSqlForSubquery } from "@avandar/utils/sql";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
-import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 
@@ -11,7 +11,7 @@ import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/r
  * Use it when only a query's shape matters, for example to give each column
  * of a dashboard chart's SQL a column ID.
  */
-export async function runQuerySchema(
+export async function runColumnSchemaQuery(
   options: Readonly<{
     rawSql: string;
     auth: StructuredQueryAuth;

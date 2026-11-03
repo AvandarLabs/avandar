@@ -1,8 +1,8 @@
+import { normalizeSqlForSubquery } from "@avandar/utils/sql";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
 import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
 import { createQueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
-import { runQuerySchema } from "@/clients/queries/runQuerySchema/runQuerySchema";
-import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
+import { runColumnSchemaQuery } from "@/clients/queries/runColumnSchemaQuery/runColumnSchemaQuery";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   QueryResultColumnBindings,
@@ -75,7 +75,7 @@ function _createSchema({
 async function _discoverSchema(
   options: Readonly<DataVizColumnBindingsOptions>,
 ): Promise<VerifiedSchema> {
-  const columns = await runQuerySchema({
+  const columns = await runColumnSchemaQuery({
     rawSql: normalizeSqlForSubquery(options.rawSql),
     auth: options.auth,
   });
