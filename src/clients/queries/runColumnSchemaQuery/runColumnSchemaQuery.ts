@@ -10,7 +10,7 @@ import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/r
  * Runs the SQL with no dashboard filters, wrapped in `LIMIT 0`, through
  * `runStructuredQuery`, and records no query analytics.
  */
-export async function runQuerySchema(
+export async function runColumnSchemaQuery(
   options: Readonly<{
     rawSql: string;
     auth: StructuredQueryAuth;
