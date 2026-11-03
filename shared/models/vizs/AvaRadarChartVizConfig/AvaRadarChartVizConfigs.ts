@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { makeLegendPositionDescriptor } from "$/models/vizs/descriptors/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
+import { makeLegendPositionDescriptor } from "$/models/vizs/descriptors/makeLegendPositionDescriptor.ts";
 import { hydrateRadarSeriesFromQuery } from "$/models/vizs/hydrations/fromQuery/hydrateRadarSeriesFromQuery.ts";
 import { hydrateRadarSeriesFromQueryResult } from "$/models/vizs/hydrations/fromQueryResult/hydrateRadarSeriesFromQueryResult.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";

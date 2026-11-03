@@ -1,8 +1,8 @@
 import { match } from "ts-pattern";
-import { convertSeriesRenderAs } from "$/models/vizs/convertSeriesRenderAs/convertSeriesRenderAs.ts";
+import { convertSeriesRenderAs } from "$/models/vizs/convertSeriesRenderAs.ts";
 import { makeAxisDescriptors } from "$/models/vizs/descriptors/makeAxisDescriptors/makeAxisDescriptors.ts";
-import { makeGridDescriptors } from "$/models/vizs/descriptors/makeGridDescriptors/makeGridDescriptors.ts";
-import { makeLegendPositionDescriptor } from "$/models/vizs/descriptors/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
+import { makeGridDescriptors } from "$/models/vizs/descriptors/makeGridDescriptors.ts";
+import { makeLegendPositionDescriptor } from "$/models/vizs/descriptors/makeLegendPositionDescriptor.ts";
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrations/fromQuery/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrations/fromQueryResult/hydrateXYSeriesFromQueryResult.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
