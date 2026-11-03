@@ -1,5 +1,4 @@
 import { downloadFilm } from "./download.js";
-/* eslint-disable-next-line import-x/extensions -- Native browser modules require the .js extension. */
 import { watchFilms } from "./watch-films.js";
 
 const clips = [

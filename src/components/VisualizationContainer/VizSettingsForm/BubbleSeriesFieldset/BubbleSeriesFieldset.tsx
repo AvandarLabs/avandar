@@ -1,5 +1,5 @@
 import { Select, makeSelectOptions } from "@avandar/ui";
-import { propEq, propPasses, removeAtIndex } from "@avandar/utils";
+import { propPasses, removeAtIndex } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -148,7 +148,9 @@ export function BubbleSeriesFieldset({
                       }
                       onChange={(next) => {
                         if (next !== null) {
-                          const column = fields.find(propEq("id", next));
+                          const column = fields.find((field) => {
+                            return field.id === next;
+                          });
                           if (column) {
                             updateAt(idx, { xKey: column.id });
                           }
@@ -168,7 +170,9 @@ export function BubbleSeriesFieldset({
                       }
                       onChange={(next) => {
                         if (next !== null) {
-                          const column = fields.find(propEq("id", next));
+                          const column = fields.find((field) => {
+                            return field.id === next;
+                          });
                           if (column) {
                             updateAt(idx, { key: column.id });
                           }
@@ -188,7 +192,9 @@ export function BubbleSeriesFieldset({
                       }
                       onChange={(next) => {
                         if (next !== null) {
-                          const column = fields.find(propEq("id", next));
+                          const column = fields.find((field) => {
+                            return field.id === next;
+                          });
                           if (column) {
                             updateAt(idx, { sizeKey: column.id });
                           }
