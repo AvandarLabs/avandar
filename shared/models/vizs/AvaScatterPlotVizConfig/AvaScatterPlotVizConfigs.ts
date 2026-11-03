@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
-import { hydrateScatterSeriesFromQuery } from "$/models/vizs/hydrateScatterSeriesFromQuery.ts";
-import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
+import { hydrateScatterSeriesFromQuery } from "$/models/vizs/hydrations/hydrateScatterSeriesFromQuery.ts";
+import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrations/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { makeGridDescriptors } from "$/models/vizs/makeGridDescriptors/makeGridDescriptors.ts";
 import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";

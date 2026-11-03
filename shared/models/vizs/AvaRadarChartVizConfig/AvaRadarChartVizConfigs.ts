@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
-import { hydrateRadarSeriesFromQuery } from "$/models/vizs/hydrateRadarSeriesFromQuery.ts";
-import { hydrateRadarSeriesFromQueryResult } from "$/models/vizs/hydrateRadarSeriesFromQueryResult.ts";
+import { hydrateRadarSeriesFromQuery } from "$/models/vizs/hydrations/hydrateRadarSeriesFromQuery.ts";
+import { hydrateRadarSeriesFromQueryResult } from "$/models/vizs/hydrations/hydrateRadarSeriesFromQueryResult.ts";
 import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";

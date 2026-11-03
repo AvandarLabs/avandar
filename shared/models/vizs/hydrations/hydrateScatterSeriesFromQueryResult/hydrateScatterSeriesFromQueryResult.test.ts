@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
+import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrations/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 

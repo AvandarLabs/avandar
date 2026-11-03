@@ -2,7 +2,7 @@ import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
-import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery/hydratePieFromQuery.ts";
+import { hydratePieFromQuery } from "$/models/vizs/hydrations/hydratePieFromQuery/hydratePieFromQuery.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type { AvaPieChartVizConfig } from "$/models/vizs/AvaPieChartVizConfig/AvaPieChartVizConfig.types.ts";
 
