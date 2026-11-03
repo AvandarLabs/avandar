@@ -132,8 +132,7 @@ label is only needed to disambiguate, make the entity the only one of its kind
 and select it by position/id instead of renaming it mid-test.
 
 - Always name a test file outside a `__tests__/` directory after a module file
-  in the same directory: `Foo.test.ts` or `Foo.aspect.test.ts` sits beside
-  `Foo.ts` or `Foo.tsx`. The module name is the filename up to the first dot.
+  in the same directory: `Foo.test.ts` sits beside `Foo.ts` or `Foo.tsx`. The module name is the filename up to the first dot.
   A reader finds the code under test by that name, so a test named after no
   file beside it leaves them guessing which modules it covers. Recommend one
   of: 1) rename the test after the one module it exercises; 2) when it
@@ -158,7 +157,37 @@ and select it by position/id instead of renaming it mid-test.
     formatOrderTotal.ts
     useCartItems/useCartItems.ts
     __tests__/
-      checkoutTotals.test.tsx
+      checkoutTotals.integration.test.tsx
+  ```
+
+- Never put an aspect label between the module name and `.test` when the
+  file is the module's only test file. Name it `{ModuleName}.test.ts(x)`, not
+  `{ModuleName}.{aspect}.test.ts(x)`. An aspect label such as `.filters` or
+  `.props` exists to tell one test file of a module from another, so on a
+  lone test file it distinguishes nothing and makes the reader look for the
+  sibling test files it implies. Count every test file for the module,
+  beside it and in its `__tests__/`; test-only helpers such as fixtures do
+  not count. Exceptions: 1) the segment is part of the module's own filename
+  (`Foo.worker.test.ts` tests `Foo.worker.ts`); 2) a test runner or test
+  config selects files by that segment (check the `include` and `exclude`
+  globs of every test config), since renaming the file would move it to
+  another runner or out of every runner; 3) the `.integration` label on an
+  integration test, per the integration-test naming bullet below.
+
+  This is bad:
+
+  ```txt
+  ManualQueryForm/
+    ManualQueryForm.tsx
+    ManualQueryForm.filters.test.tsx
+  ```
+
+  This is good:
+
+  ```txt
+  ManualQueryForm/
+    ManualQueryForm.tsx
+    ManualQueryForm.test.tsx
   ```
 
 - Always move a module's test-related files into a `__tests__/` directory once
@@ -169,7 +198,7 @@ and select it by position/id instead of renaming it mid-test.
   across the module directory buries the production files among its own tests.
   The module name is the filename up to the first dot, so `DuckDbClient.test.ts`
   and `DuckDbClient.leasing.test.ts` are two files for `DuckDbClient`, and so
-  are `BarChart.props.test.tsx` and `BarChartTestFixtures.tsx`. A test plus a
+  are `BarChart.test.tsx` and `BarChartTestFixtures.tsx`. A test plus a
   fixtures file is already a split suite: flag it.
 
   Anything used **exclusively** by those tests moves in with them: fixtures,
@@ -231,3 +260,35 @@ and select it by position/id instead of renaming it mid-test.
   module lives where the test cannot run (for example a module that must stay
   loadable by another runtime, tested with a harness only Node can load) may
   sit in a `__tests__/` elsewhere and keeps the module's name.
+
+- Always name an integration test `{behavior}.integration.test.ts(x)`: the
+  behavior it covers, then `.integration`, then `.test`. Its name matches no
+  module, so without the label a reader cannot tell it from a unit test whose
+  module was renamed or deleted. Flag any test file in a `__tests__/`
+  directory whose name up to the first dot matches no module in the
+  directory that holds that `__tests__/`, and that lacks `.integration`.
+  Recommend `.integration` when the test exercises several modules together;
+  otherwise recommend renaming it after the one module it covers.
+  Exceptions: 1) when a test runner selects the file by a suffix, such as
+  `.executed.test.ts`, `.integration` goes before that suffix
+  (`{behavior}.integration.executed.test.ts`) so the runner still matches it;
+  2) a test that keeps a module's name because the module lives where the
+  test cannot run (the integration-placement exception above) takes no
+  `.integration`; 3) `tests/e2e/` and `tests/integration/` are dedicated test
+  trees and exempt.
+
+  This is bad:
+
+  ```txt
+  checkout/
+    __tests__/
+      checkoutTotals.test.tsx
+  ```
+
+  This is good:
+
+  ```txt
+  checkout/
+    __tests__/
+      checkoutTotals.integration.test.tsx
+  ```

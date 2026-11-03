@@ -432,7 +432,7 @@ hypothetical `postgres_table` reached through a server-side proxy:
 | 28 to 33 | `SourceBadge.tsx`, `DatasetSourceIcon.tsx`, `QueryDataSourceSelect.tsx`, `SavedDatasetsView.tsx`, `DatasetNavbar.tsx`, `DatasetMetaView.tsx` | label, icon, group title | compiler |
 | 34 | `ResyncDatasetCard.tsx` | an arm only if the type is restored from a local file | inherent, situational |
 | 35 | `src/i18n/locales/*/messages.po` | `pnpm i18n:extract` | generated |
-| 36 | `getRelationSources.characterization.test.ts`, an e2e import spec | pin the reader and the flow | inherent |
+| 36 | `getRelationSources.test.ts`, an e2e import spec | pin the reader and the flow | inherent |
 
 Not needed: `Dataset/DatasetParsers.ts` (derives from `SourceTypes`), chat schema
 code, `assertWorkspaceRelations`, and both cache ports, which are source-type
@@ -487,7 +487,7 @@ pnpm vitest run src/clients/qetl src/clients/DuckDbClient src/lib/sql src/client
 | --- | --- |
 | Storage probe precedes dataset reads; cached Sheets are not re-acquired | `QueryMediator/__tests__/relationCacheOrdering.test.ts` |
 | Subset hits, wider misses, `growFrom`, `CREATE TABLE AS` overrides | `QueryMediator/__tests__/relationCacheProjection.test.ts` |
-| Source-row reads per source type | `QueryMediator/__tests__/getRelationSources.characterization.test.ts` |
+| Source-row reads per source type | `QueryMediator/__tests__/getRelationSources.test.ts` |
 | Lease reuse for nested virtual queries | `QueryMediator/QueryMediator.coordination.test.ts` |
 | Concepts load after their datasets | `QueryMediator/__tests__/QueryMediator.concepts.test.ts` |
 | Column inference shapes | `getNeededColumnsFromQuery.test.ts` |

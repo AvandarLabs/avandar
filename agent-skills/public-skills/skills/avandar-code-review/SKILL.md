@@ -251,9 +251,10 @@ Apply **only**:
   assertion-free tests, observable-behavior assertions, placeholder
   tests, runtime assertions that restate the type system, e2e specs
   that write the behavior under test through the database instead of
-  the UI, test files named after no module beside them, `__tests__/`
-  layout once a module has two or more test files, and integration-test
-  placement in a `__tests__/` directory.
+  the UI, test files named after no module beside them, aspect labels on
+  a module's only test file, `__tests__/` layout once a module has two or
+  more test files, integration-test placement in a `__tests__/`
+  directory, and the `.integration` label on integration tests.
 
 This pack does not pull extra bullets from Most Common Mistakes,
 General Checks, or the TypeScript checklist. Running the tests

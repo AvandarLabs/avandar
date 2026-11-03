@@ -110,8 +110,8 @@ honestly; a passing tautology hides it behind a green check.
 
 A test file outside a `__tests__/` directory takes the name of the module file
 beside it: `DuckDbClient.test.ts` tests `DuckDbClient.ts` in the same
-directory, and `ManualQueryForm.filters.test.tsx` tests `ManualQueryForm.tsx`.
-The module name is the filename up to the first dot. A reader finds the code
+directory, and `ManualQueryForm.test.tsx` tests `ManualQueryForm.tsx`. The
+module name is the filename up to the first dot. A reader finds the code
 under test by that name, so a test named after no file beside it
 (`mapSourceReadiness.test.tsx` in a directory with no `mapSourceReadiness.ts`)
 leaves them guessing which modules it covers.
@@ -120,6 +120,44 @@ A test with no single module to take its name from exercises several modules
 together, so it is an integration test. Move it into a `__tests__/` directory,
 per
 [Integration tests go in a `__tests__/` directory](#integration-tests-go-in-a-__tests__-directory).
+
+## Add an aspect label only when a module has several test files
+
+A module's only test file is `{ModuleName}.test.ts(x)`, with nothing between
+the module name and `.test`. An aspect label such as `.filters` or `.props`
+exists to tell one test file of a module from another, so a module with one
+test file has nothing to tell apart. Use `{ModuleName}.{aspect}.test.ts(x)`
+only once the module has two or more test files, which by then live in a
+`__tests__/` directory (see below).
+
+```txt
+# Bad: the module's only test file carries a label
+ManualQueryForm/
+  ManualQueryForm.tsx
+  ManualQueryForm.filters.test.tsx
+
+# Good
+ManualQueryForm/
+  ManualQueryForm.tsx
+  ManualQueryForm.test.tsx
+```
+
+Count every test file for the module, both beside it and in its
+`__tests__/`. Test-only helpers such as fixtures do not count: one test plus a
+fixtures file in `__tests__/` is still `__tests__/BarChart.test.tsx`.
+
+These segments are not aspect labels and stay on a lone test file:
+
+1. A segment that is part of the module's own filename.
+   `ChartFocusEdit.contract.test.ts` tests `ChartFocusEdit.contract.ts`, and
+   `pdfSniff.worker.test.ts` tests `pdfSniff.worker.ts`.
+2. A segment a test runner selects files by. The root
+   `vitest.executed.config.ts` runs only `*.executed.test.ts`, and
+   `apps/desktop` runs `*.integration.test.ts` under `bun test` instead of
+   Vitest. Renaming one of these moves the test to a different runner or out
+   of every runner.
+3. The `.integration` label on an integration test, per
+   [Name an integration test `{behavior}.integration.test.ts`](#name-an-integration-test-behaviorintegrationtestts).
 
 ## Split test files live in a `__tests__/` directory
 
@@ -144,7 +182,7 @@ file, stub, scenario builder, or test wrapper. The module name is the filename
 up to the first dot (or, for a fixtures file, the name without the
 `TestFixtures`/`Fixtures` suffix). `DuckDbClient.test.ts` and
 `DuckDbClient.leasing.test.ts` are two files for `DuckDbClient`. So are
-`BarChart.props.test.tsx` and `BarChartTestFixtures.tsx`: one test plus its
+`BarChart.test.tsx` and `BarChartTestFixtures.tsx`: one test plus its
 fixtures is already two, so both move into `__tests__/`.
 
 Only a lone test file with no test-only helpers stays beside its module.
@@ -209,7 +247,7 @@ GisApp/
   layers/useMapLayersData/useMapLayersData.ts
   useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
   __tests__/
-    mapSourceReadiness.test.tsx
+    mapSourceReadiness.integration.test.tsx
 ```
 
 If that directory is the app root, the test is too broad to be an integration
@@ -222,6 +260,22 @@ Exception: a test whose module lives where the test cannot run. A file under
 through `$/`, as
 `src/lib/openData/__tests__/buildCsvFromDatastoreRecords.executed.test.ts`
 does. It keeps the module's name.
+
+### Name an integration test `{behavior}.integration.test.ts`
+
+An integration test's filename is the behavior it covers, then
+`.integration`, then `.test.ts(x)`: `mapSourceReadiness.integration.test.tsx`.
+The behavior name matches no module, so without the label a reader cannot
+tell an integration test from a unit test whose module was renamed or
+deleted. With it, a `__tests__/` file named after no module is visibly either
+an integration test or a mistake.
+
+When the test also runs under a runner that selects files by suffix,
+`.integration` goes before the runner's suffix so the runner still matches
+it: `dashboardFilterColumnBindings.integration.executed.test.ts`.
+
+A test that keeps a module's name (a split suite, or the executed-test
+exception above) is not an integration test and takes no `.integration`.
 
 ### Find violations
 
@@ -245,6 +299,29 @@ find src shared packages apps -type f \( -name '*.test.ts' -o -name '*.test.tsx'
   while read -r test; do
     module="$(dirname "$test")/$(basename "$test" | cut -d. -f1)"
     ls "$module".* 2>/dev/null | grep -qv '\.test\.' || echo "$test"
+  done
+```
+
+List the lone test files that carry an aspect label. Each one is a module's
+only test file, so it should drop the label, unless the label is one of the
+exceptions in
+[Add an aspect label only when a module has several test files](#add-an-aspect-label-only-when-a-module-has-several-test-files):
+
+```bash
+git ls-files '*.test.ts' '*.test.tsx' | grep -v '^tests/' |
+  while read -r test; do
+    name="$(basename "$test")"
+    module="${name%%.*}"
+    stem="${name%.test.*}"
+    [ "$stem" = "$module" ] && continue
+    case "$name" in *.integration.test.* | *.executed.test.*) continue ;; esac
+    dir="$(dirname "$test")"
+    owner="$dir"
+    [ "$(basename "$dir")" = __tests__ ] && owner="$(dirname "$dir")"
+    { [ -e "$owner/$stem.ts" ] || [ -e "$owner/$stem.tsx" ]; } && continue
+    count="$(ls "$owner" "$owner/__tests__" 2>/dev/null |
+      grep -c "^$module\..*test\.")"
+    [ "$count" -eq 1 ] && echo "$test"
   done
 ```
 
