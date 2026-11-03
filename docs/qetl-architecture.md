@@ -497,7 +497,7 @@ pnpm vitest run src/clients/qetl src/clients/DuckDbClient src/lib/sql src/client
 | Lock order, nesting, release on throw, no-locks fallback | `DatasetDuckDbCoordinator.test.ts` |
 | Leases across loads, poisoning, public versus workspace reads | `DuckDbClient/__tests__/*.test.ts` |
 | Analyzer verdicts | `DuckDbSqlAnalyzer.test.ts` |
-| Concept view grain and value pickers in real DuckDB | `src/lib/sql/__tests__/buildConceptViewSql.executed.test.ts`, `conceptAttributeColumns.executed.test.ts` |
+| Concept view grain and value pickers in real DuckDB | `src/lib/sql/__tests__/buildConceptViewSql.executed.test.ts`, `conceptAttributeColumns.integration.executed.test.ts` |
 | Sheets CSV read through a real DuckDB reader | `acquireGoogleSheetRelation.executed.test.ts` |
 | CKAN resource selection and refusals | `shared/open-data/*.test.ts`, `statusFromOpenDataFailure.test.ts` |
 
