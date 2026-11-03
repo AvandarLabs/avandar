@@ -1,6 +1,6 @@
+import { normalizeSqlForSubquery } from "@avandar/utils/sql";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
-import { normalizeSqlForSubquery } from "@avandar/utils/sql";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 

@@ -1,6 +1,5 @@
 import { isDefined, matchLiteral } from "@avandar/utils";
-import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import { normalizeSqlForSubquery } from "@avandar/utils/sql";
+import { quoteSqlIdentifier, normalizeSqlForSubquery  } from "@avandar/utils/sql";
 import type {
   DashboardFilterRecord,
   DashboardFilterValue,
