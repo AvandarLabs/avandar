@@ -2,9 +2,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
-import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
+import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
-import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
+import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
 /**
  * Executed tests for the step that turns a concept's ontology rows into the
  * columns its DuckDB view emits.

@@ -12,8 +12,8 @@ import { describe, expect, it } from "vitest";
  * round trip silently drops or merges individuals, so the spine's grain depends
  * on this.
  */
-import { toCsvColumn } from "@/clients/qetl/QueryMediator/conceptRelation/toCsvColumn";
-import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
+import { toCsvColumn } from "@/clients/qetl/QueryMediator/conceptRelation/toCsvColumn/toCsvColumn";
+import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
 
 /**
  * Writes the CSV, reads it back through DuckDB, returns the column values.
