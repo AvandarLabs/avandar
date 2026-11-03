@@ -3,11 +3,9 @@ import { I18nProvider } from "@lingui/react";
 import { describe, expect, it } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render } from "@/test-utils";
-import { FunnelChartForm } from "../FunnelChartForm";
-import { PieChartForm } from "../PieChartForm";
+import { PieChartForm } from "./PieChartForm";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { AvaFunnelChartVizConfig } from "$/models/vizs/AvaFunnelChartVizConfig/AvaFunnelChartVizConfig.types";
 import type { AvaPieChartVizConfig } from "$/models/vizs/AvaPieChartVizConfig/AvaPieChartVizConfig.types";
 
 i18n.load("en", {});
@@ -33,12 +31,6 @@ const pieConfig: AvaPieChartVizConfig = {
   isDonut: false,
   withLabels: true,
   labelsType: "value",
-};
-
-const funnelConfig: AvaFunnelChartVizConfig = {
-  vizType: "funnel",
-  nameKey: "region" as QueryColumn.Id,
-  valueKey: "count" as QueryColumn.Id,
 };
 
 describe("PieChartForm layout", () => {
@@ -82,28 +74,5 @@ describe("PieChartForm layout", () => {
       },
     );
     expect(legends).toEqual(expect.arrayContaining(["Chart settings"]));
-  });
-});
-
-describe("FunnelChartForm layout", () => {
-  it("wraps the value pickers in a Series fieldset", () => {
-    const { container } = render(
-      <I18nProvider i18n={i18n}>
-        <AvandarAppProvider>
-          <FunnelChartForm
-            fields={fields}
-            config={funnelConfig}
-            data={[]}
-            onConfigChange={() => {}}
-          />
-        </AvandarAppProvider>
-      </I18nProvider>,
-    );
-    const legends = Array.from(container.querySelectorAll("legend")).map(
-      (l) => {
-        return l.textContent ?? "";
-      },
-    );
-    expect(legends).toEqual(expect.arrayContaining(["Series"]));
   });
 });

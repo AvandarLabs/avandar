@@ -1,17 +1,15 @@
 /**
- * The scatter and bubble forms keep their hand-coded pair-series
- * editors but render chart-level descriptors through the shared
- * `ChartSettingsFieldsets`. These tests prove the axis and legend
- * settings appear and write back to the config.
+ * The scatter form keeps its hand-coded pair-series editor but renders
+ * chart-level descriptors through the shared `ChartSettingsFieldsets`. These
+ * tests prove the axis and legend settings appear and write back to the
+ * config.
  */
 import { describe, expect, it, vi } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm";
-import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
+import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm/ScatterChartForm";
 import { fireEvent, render, screen } from "@/test-utils";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { AvaBubbleChartVizConfig } from "$/models/vizs/AvaBubbleChartVizConfig/AvaBubbleChartVizConfig.types";
 import type { AvaScatterPlotVizConfig } from "$/models/vizs/AvaScatterPlotVizConfig/AvaScatterPlotVizConfig.types";
 
 const COLUMNS: readonly QueryResult.ColumnWithId[] = [
@@ -24,17 +22,6 @@ const SCATTER_CONFIG: AvaScatterPlotVizConfig = {
   vizType: "scatter",
   series: [
     { key: "revenue" as QueryColumn.Id, xKey: "spend" as QueryColumn.Id },
-  ],
-};
-
-const BUBBLE_CONFIG: AvaBubbleChartVizConfig = {
-  vizType: "bubble",
-  series: [
-    {
-      key: "revenue" as QueryColumn.Id,
-      xKey: "spend" as QueryColumn.Id,
-      sizeKey: "weight" as QueryColumn.Id,
-    },
   ],
 };
 
@@ -95,45 +82,6 @@ describe("ScatterChartForm: axis settings", () => {
   });
 });
 
-describe("BubbleChartForm: axis settings", () => {
-  it("renders the axis controls", () => {
-    render(
-      <AvandarAppProvider>
-        <BubbleChartForm
-          fields={COLUMNS}
-          config={BUBBLE_CONFIG}
-          onConfigChange={vi.fn()}
-        />
-      </AvandarAppProvider>,
-    );
-    expect(screen.getByLabelText(/^X axis maximum$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Y axis maximum$/i)).toBeInTheDocument();
-  });
-
-  it("writes a maximum back to the config", () => {
-    const onConfigChange = vi.fn();
-    render(
-      <AvandarAppProvider>
-        <BubbleChartForm
-          fields={COLUMNS}
-          config={BUBBLE_CONFIG}
-          onConfigChange={onConfigChange}
-        />
-      </AvandarAppProvider>,
-    );
-    fireEvent.change(screen.getByLabelText(/^Y axis maximum$/i), {
-      target: { value: "500" },
-    });
-    expect(onConfigChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        chartStyle: expect.objectContaining({
-          yAxis: expect.objectContaining({ max: 500 }),
-        }),
-      }),
-    );
-  });
-});
-
 describe("ScatterChartForm: legend settings", () => {
   it("renders the legend position control", () => {
     render(
@@ -165,29 +113,6 @@ describe("ScatterChartForm: legend settings", () => {
       expect.objectContaining({
         chartStyle: expect.objectContaining({
           legend: expect.objectContaining({ position: "right" }),
-        }),
-      }),
-    );
-  });
-});
-
-describe("BubbleChartForm: legend settings", () => {
-  it("writes the legend position back to the config", () => {
-    const onConfigChange = vi.fn();
-    render(
-      <AvandarAppProvider>
-        <BubbleChartForm
-          fields={COLUMNS}
-          config={BUBBLE_CONFIG}
-          onConfigChange={onConfigChange}
-        />
-      </AvandarAppProvider>,
-    );
-    fireEvent.click(screen.getByRole("radio", { name: /^Left$/ }));
-    expect(onConfigChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        chartStyle: expect.objectContaining({
-          legend: expect.objectContaining({ position: "left" }),
         }),
       }),
     );

@@ -1,8 +1,8 @@
 import { match } from "ts-pattern";
-import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm";
-import { FunnelChartForm } from "@/components/VisualizationContainer/VizSettingsForm/FunnelChartForm";
-import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsForm/PieChartForm";
-import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
+import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm/BubbleChartForm";
+import { FunnelChartForm } from "@/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm";
+import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm";
+import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm/ScatterChartForm";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
