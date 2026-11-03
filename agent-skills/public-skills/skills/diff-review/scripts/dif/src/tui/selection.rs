@@ -47,7 +47,19 @@ impl ContentOrigin {
     }
 }
 
-/// An in-progress or finished drag selection within one pane.
+/// What a selection was made by: a drag over cells, a double-click (a word),
+/// or a triple-click (a line).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Unit {
+    /// A press-and-drag; a press without a drag is a plain click.
+    Cell,
+    /// A double-click on a word.
+    Word,
+    /// A triple-click on a line.
+    Line,
+}
+
+/// An in-progress or finished selection within one pane.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Selection {
     /// The pane the drag started in. A selection never spans panes.
@@ -59,17 +71,32 @@ pub struct Selection {
     pub anchor: Point,
     /// Where the pointer is now (or was on release).
     pub head: Point,
+    /// What made the selection. Only a [`Unit::Cell`] selection follows a drag.
+    pub unit: Unit,
 }
 
 impl Selection {
     /// A zero-width selection at `point`, as a button press starts one.
     #[must_use]
     pub const fn start(panel: Panel, view: MainDiffView, point: Point) -> Self {
+        Self::span(panel, view, Unit::Cell, point, point)
+    }
+
+    /// A word or line selection from `first` to `last`, both inclusive.
+    #[must_use]
+    pub const fn span(
+        panel: Panel,
+        view: MainDiffView,
+        unit: Unit,
+        first: Point,
+        last: Point,
+    ) -> Self {
         Self {
             panel,
             view,
-            anchor: point,
-            head: point,
+            anchor: first,
+            head: last,
+            unit,
         }
     }
 
@@ -86,7 +113,7 @@ impl Selection {
     /// Whether the pointer never moved off the cell it pressed: a plain click.
     #[must_use]
     pub fn is_click(&self) -> bool {
-        self.anchor == self.head
+        self.unit == Unit::Cell && self.anchor == self.head
     }
 
     /// Whether `point` falls inside the selection.
@@ -222,6 +249,15 @@ mod tests {
     fn a_selection_that_never_moved_is_a_click() {
         assert!(selection(point(2, 2), point(2, 2)).is_click());
         assert!(!selection(point(2, 2), point(2, 3)).is_click());
+    }
+
+    #[test]
+    fn a_one_character_word_or_line_selection_is_not_a_click() {
+        let one = point(2, 2);
+        let word = Selection::span(Panel::Llm, MainDiffView::Log, Unit::Word, one, one);
+        assert!(!word.is_click());
+        let line = Selection::span(Panel::Llm, MainDiffView::Log, Unit::Line, one, one);
+        assert!(!line.is_click());
     }
 
     #[test]

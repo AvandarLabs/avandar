@@ -21,6 +21,7 @@ use super::control::ReviewControl;
 use super::guide::Guide;
 use super::main_diff_view::MainDiffView;
 use super::mouse::PaneAreas;
+use super::multi_click::ClickTracker;
 use super::open_target;
 use super::palette::{PaletteAction, PaletteState};
 use super::selection::Selection;
@@ -133,6 +134,9 @@ pub struct App {
     pub pane_areas: PaneAreas,
     /// The mouse text selection, highlighted until the next click or key.
     pub selection: Option<Selection>,
+    /// Counts rapid presses so a double-click selects a word and a
+    /// triple-click a line.
+    pub clicks: ClickTracker,
     /// A short status message (e.g. "Copied 42 characters") and when it was
     /// raised; the statusline shows it briefly in place of the shortcut chips.
     pub notice: Option<(String, Instant)>,

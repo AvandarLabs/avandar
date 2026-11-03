@@ -128,6 +128,10 @@ suite with `cargo test` (it finishes in a couple of seconds).
   and the statusline map to none), clamping a drag into a pane and detecting it
   overshooting the top or bottom, and the exact mouse modes enabled (never 1003,
   never a reset).
+- `tui::multi_click`: press counting (1, 2, 3, then restart; a slow press or a
+  new cell starts over), the word-character set, the word under a cell in a real
+  `vt100` screen (brackets and blanks excluded, wide characters whole), soft-wrap
+  line spans, and the word under a markdown column.
 - `clipboard`: base64 against the RFC 4648 vectors and the OSC 52 escape,
   plain and for tmux. `pbcopy` itself is not unit-tested.
 - `tui::guide`: `refresh` detecting content changes (and file removal) on a

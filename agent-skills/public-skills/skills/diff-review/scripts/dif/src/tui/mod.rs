@@ -13,6 +13,7 @@ pub mod keymap;
 pub mod main_diff_view;
 pub mod modal_layout;
 pub mod mouse;
+pub mod multi_click;
 pub mod markdown;
 pub mod open_target;
 pub mod palette;

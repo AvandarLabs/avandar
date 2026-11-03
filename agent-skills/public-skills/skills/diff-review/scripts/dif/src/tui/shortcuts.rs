@@ -99,6 +99,13 @@ pub const ALL: &[Shortcut] = &[
         group: Group::Focus,
         in_footer: false,
     },
+    Shortcut {
+        keys: "2× / 3× click",
+        label: "word",
+        desc: "Copy the word / the line under the pointer (a line never runs past its pane)",
+        group: Group::Focus,
+        in_footer: false,
+    },
     // --- Commands (from either pane) ---
     Shortcut {
         keys: "^P",
@@ -313,6 +320,14 @@ mod tests {
                 .iter()
                 .any(|s| s.keys == "Drag" && s.desc.contains("copy"))
         );
+    }
+
+    #[test]
+    fn focus_group_lists_double_and_triple_click_selection() {
+        let focus = in_group(Group::Focus);
+        assert!(focus.iter().any(|s| s.keys == "2× / 3× click"
+            && s.desc.contains("word")
+            && s.desc.contains("line")));
     }
 
     #[test]

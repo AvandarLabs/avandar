@@ -44,6 +44,7 @@ use super::control::ReviewControl;
 use super::guide::Guide;
 use super::main_diff_view::MainDiffView;
 use super::mouse::PaneAreas;
+use super::multi_click::ClickTracker;
 use super::start_review::StartReviewModal;
 use super::vim::VimState;
 
@@ -222,6 +223,7 @@ fn create_app(
         help_open: false,
         pane_areas: PaneAreas::default(),
         selection: None,
+        clicks: ClickTracker::default(),
         notice: None,
         web_shell: surface.web_shell,
         open_url: Some(surface.open_url),

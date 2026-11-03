@@ -113,10 +113,15 @@ convention: `Alt+H` for the left pane, `Alt+L` for the right LLM pane.
 | click | focus the pane under the pointer |
 | drag | select text in that pane, highlighted. Dragging past its top or bottom edge scrolls a terminal pane to reach more |
 | release | copy the selection to the clipboard. The statusline shows `Copied N characters`, and the highlight stays until the next click or key |
+| double-click | select and copy the word under the pointer. A word is letters, digits, and `_-./~:@+%#?&=`, so a path, URL, or `file.rs:12` comes whole, without surrounding brackets or quotes |
+| triple-click | select and copy the line under the pointer, clipped to its pane: a terminal pane's row plus the soft-wrapped rows joined to it that are in view, or the visible columns of a markdown line. It never reaches into the other pane |
 | ⌘-click (iTerm2) | open a URL or file path, unchanged: iTerm2 handles it before mouse reporting |
 | Option-drag (iTerm2) / Fn-drag (Terminal) | the terminal's own selection, bypassing `dif` |
 
-A selection never spans panes and copies as plain text, with soft-wrapped lines
+Presses count as a double or triple click when they land on the same cell
+within 500ms; a fourth starts over. Dragging after a double or triple click
+leaves the word or line selection as it is. A selection never spans panes and
+copies as plain text, with soft-wrapped lines
 joined and trailing blanks trimmed. Over SSH the copy also reaches your local
 clipboard through OSC 52; in iTerm2 that needs **Settings > General >
 Selection > Applications in terminal may access clipboard**, and inside tmux

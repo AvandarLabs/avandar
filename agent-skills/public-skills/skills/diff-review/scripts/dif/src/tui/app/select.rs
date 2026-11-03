@@ -6,7 +6,8 @@ use std::time::Instant;
 
 use crate::clipboard;
 use crate::tui::mouse::{Overshoot, clamp_into};
-use crate::tui::selection::{self, ContentOrigin, Selection};
+use crate::tui::multi_click::{pty_line_rows, pty_word, text_word};
+use crate::tui::selection::{self, ContentOrigin, Point, Selection, Unit};
 
 use super::{App, Panel};
 
@@ -46,28 +47,86 @@ impl App {
         Some((sel, self.content_origin(sel.panel)?))
     }
 
-    /// A left-button press: focus the pane under the pointer and start a
-    /// selection there. A press outside both panes just clears the selection.
-    pub fn begin_selection(&mut self, column: u16, row: u16) {
+    /// A left-button press, the `clicks`-th in a quick run on one cell: focus
+    /// the pane under the pointer and start a selection there. A double-click
+    /// selects the word under the pointer and a triple-click its line, never
+    /// wider than the pane. A press outside both panes clears the selection.
+    pub fn begin_selection(&mut self, column: u16, row: u16, clicks: u8) {
         self.selection = None;
         let Some(panel) = self.pane_areas.panel_at(column, row) else {
             return;
         };
         self.focus = panel;
-        let Some(((r, c), _)) = clamp_into(self.pane_areas.of(panel), column, row) else {
+        let area = self.pane_areas.of(panel);
+        let Some(((r, c), _)) = clamp_into(area, column, row) else {
             return;
         };
-        if let Some(origin) = self.content_origin(panel) {
-            let point = origin.point_at(r, c);
-            self.selection = Some(Selection::start(panel, self.active_diff_view, point));
+        let Some(origin) = self.content_origin(panel) else {
+            return;
+        };
+        let view = self.active_diff_view;
+        self.selection = match clicks {
+            2 => self
+                .word_at(panel, origin, (r, c))
+                .map(|(first, last)| Selection::span(panel, view, Unit::Word, first, last)),
+            3 => {
+                let (first, last) = self.line_at(panel, origin, r, area.width);
+                Some(Selection::span(panel, view, Unit::Line, first, last))
+            }
+            _ => Some(Selection::start(panel, view, origin.point_at(r, c))),
+        };
+    }
+
+    /// The word under the viewport cell `(r, c)` of `panel`, as content points.
+    fn word_at(
+        &self,
+        panel: Panel,
+        origin: ContentOrigin,
+        (r, c): (u16, u16),
+    ) -> Option<(Point, Point)> {
+        if self.markdown_view_for(panel) {
+            let at = origin.point_at(r, c);
+            let line = self
+                .active_markdown_ref()
+                .lines()
+                .get(usize::try_from(at.line).ok()?)?;
+            let (first, last) = text_word(line, usize::from(at.col))?;
+            let point = |col: usize| {
+                u16::try_from(col)
+                    .ok()
+                    .map(|col| Point { line: at.line, col })
+            };
+            return Some((point(first)?, point(last)?));
         }
+        let span = pty_word(self.pane_for(panel)?.parser.read().ok()?.screen(), r, c);
+        let (first, last) = span?;
+        Some((origin.point_at(r, first), origin.point_at(r, last)))
+    }
+
+    /// The line through viewport row `r` of `panel`, clipped to the pane's
+    /// `width`: a terminal row plus its soft-wrapped rows in view, or the
+    /// visible columns of a markdown line.
+    fn line_at(&self, panel: Panel, origin: ContentOrigin, r: u16, width: u16) -> (Point, Point) {
+        let last_col = width.saturating_sub(1);
+        let rows = if self.markdown_view_for(panel) {
+            None
+        } else {
+            self.pane_for(panel)
+                .and_then(|pane| pane.parser.read().ok())
+                .map(|parser| pty_line_rows(parser.screen(), r))
+        };
+        let (first_row, last_row) = rows.unwrap_or((r, r));
+        (
+            origin.point_at(first_row, 0),
+            origin.point_at(last_row, last_col),
+        )
     }
 
     /// A drag with the left button held: move the selection's head. Dragging
     /// past the top or bottom of a terminal pane scrolls it one row, so a
     /// selection can reach text that is out of view.
     pub fn extend_selection(&mut self, column: u16, row: u16) {
-        let Some(sel) = self.selection else {
+        let Some(sel) = self.selection.filter(|sel| sel.unit == Unit::Cell) else {
             return;
         };
         let Some(((r, c), overshoot)) = clamp_into(self.pane_areas.of(sel.panel), column, row)

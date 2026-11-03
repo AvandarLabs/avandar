@@ -78,6 +78,7 @@ src/
     ├── session_meta.rs  the live-session metadata file
     ├── event_loop.rs  50ms loop: draw, inject, route input (incl. palette + main-view keys)
     ├── mouse.rs       mouse routing: wheel scrolls the pane under the pointer, click focuses, drag selects; the mouse modes dif enables
+    ├── multi_click.rs  double/triple-click counting and the word / line under the pointer (pure)
     ├── selection.rs   the selection model in content coordinates, its highlight, and text extraction from vt100 / rendered markdown (pure)
     └── keymap.rs      key→bytes encoder + prompt injection into the LLM pane
 ```
@@ -133,6 +134,11 @@ mouse reporting for button presses (DECSET 1000), drags while a button is held
   screen, stepping the scrollback so a selection taller than the pane copies in
   full, and joining soft-wrapped rows without a newline. Markdown views copy
   from the plain text of their rendered lines.
+- **Double-click** selects the word under the pointer and **triple-click** its
+  line (`tui/multi_click.rs` counts presses on one cell within 500ms). A line
+  is bounded by its pane, never the terminal: a PTY row is already the pane's
+  width (plus soft-wrapped rows in view), and a markdown line is clipped to the
+  visible columns.
 
 Bare pointer motion (1003) stays off: hover never floods the loop, and iTerm2
 keeps its ⌘-hover link underline and ⌘-click. iTerm2 keeps 1000/1002/1003 in

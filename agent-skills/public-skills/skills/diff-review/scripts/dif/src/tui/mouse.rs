@@ -1,9 +1,12 @@
 //! Mouse input: the wheel scrolls the pane under the pointer, a click focuses a
-//! pane, and a left-button drag selects text that is copied on release.
+//! pane, and a left-button drag, double-click (word), or triple-click (line)
+//! selects text that is copied on release.
 //!
 //! The terminal reports button presses, drags, and the wheel (DECSET 1000 +
 //! 1002, SGR-encoded via 1006). Bare pointer motion (1003) stays off, so hover
 //! never floods the loop and iTerm2 keeps its own ⌘-hover link handling.
+
+use std::time::Instant;
 
 use crossterm::event::{MouseButton, MouseEvent, MouseEventKind};
 use ratatui::layout::Rect;
@@ -101,7 +104,10 @@ pub fn handle_mouse(app: &mut App, event: MouseEvent) {
                 app.scroll_panel_down(panel, WHEEL_STEP);
             }
         }
-        MouseEventKind::Down(MouseButton::Left) => app.begin_selection(column, row),
+        MouseEventKind::Down(MouseButton::Left) => {
+            let clicks = app.clicks.press(Instant::now(), column, row);
+            app.begin_selection(column, row, clicks);
+        }
         MouseEventKind::Drag(MouseButton::Left) => app.extend_selection(column, row),
         MouseEventKind::Up(MouseButton::Left) => app.finish_selection(),
         _ => {}

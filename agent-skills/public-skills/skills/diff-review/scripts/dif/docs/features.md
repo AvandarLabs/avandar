@@ -98,7 +98,9 @@ server console, not the diff.
 The wheel scrolls whichever pane is under the pointer, and a click focuses it.
 Dragging selects text in a pane the way tmux does: the selection is highlighted,
 releasing the button copies it to the clipboard, and the statusline briefly
-shows `Copied N characters`. It works in the log view, the Claude or Codex
+shows `Copied N characters`. A double-click copies the word under the pointer
+(a whole path or URL), and a triple-click copies its line, clipped to the pane
+so it never picks up the pane beside it. It works in the log view, the Claude or Codex
 pane, and the markdown views. Dragging past a terminal pane's top or bottom
 edge scrolls it, so a selection can be longer than the pane. iTerm2's ⌘-click
 on links still works. Hold Option (iTerm2) or Fn (Terminal) to use the
