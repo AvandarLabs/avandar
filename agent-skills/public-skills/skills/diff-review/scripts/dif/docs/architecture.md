@@ -320,4 +320,8 @@ anyhow, clap, serde/serde_json, chrono, uuid) plus two additions:
   diff guide view draws this styled output directly and overlays its own cursor
   (see "Diff guide navigation" above), so no text-editor widget is needed.
 
+`vt100` is held at 0.16: `tui-term` implements its `Screen` trait for one
+`vt100` line, and 0.16 is the newest one it supports. Move to 0.18 once
+`tui-term` does.
+
 `#![forbid(unsafe_code)]`.

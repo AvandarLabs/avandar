@@ -149,8 +149,8 @@ mod tests {
     fn posted_comparison_key_can_be_taken_once() {
         let control = ReviewControl::start(free_port()).unwrap();
         let resp = ureq::post(&control.comparison_url())
-            .set("Content-Type", "application/json")
-            .send_string(r#"{"comparisonKey":"."}"#)
+            .header("Content-Type", "application/json")
+            .send(r#"{"comparisonKey":"."}"#)
             .unwrap();
         assert_eq!(resp.status(), 202);
         assert_eq!(control.take_comparison_key().as_deref(), Some("."));
@@ -161,9 +161,9 @@ mod tests {
     fn invalid_payload_is_rejected() {
         let control = ReviewControl::start(free_port()).unwrap();
         let err = ureq::post(&control.comparison_url())
-            .send_string(r#"{"comparisonKey":""}"#)
+            .send(r#"{"comparisonKey":""}"#)
             .unwrap_err();
-        let ureq::Error::Status(status, _) = err else {
+        let ureq::Error::StatusCode(status) = err else {
             panic!("expected HTTP status error");
         };
         assert_eq!(status, 400);
@@ -175,10 +175,10 @@ mod tests {
         let control = ReviewControl::start(free_port()).unwrap();
         control.set_accepts_updates(false);
         let err = ureq::post(&control.comparison_url())
-            .set("Content-Type", "application/json")
-            .send_string(r#"{"comparisonKey":"."}"#)
+            .header("Content-Type", "application/json")
+            .send(r#"{"comparisonKey":"."}"#)
             .unwrap_err();
-        let ureq::Error::Status(status, _) = err else {
+        let ureq::Error::StatusCode(status) = err else {
             panic!("expected HTTP status error");
         };
         assert_eq!(status, 409);

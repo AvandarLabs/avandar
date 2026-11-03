@@ -244,7 +244,7 @@ impl PtyPane {
             pixel_height: 0,
         });
         if let Ok(mut p) = self.parser.write() {
-            p.set_size(rows, cols);
+            p.screen_mut().set_size(rows, cols);
         }
     }
 
@@ -273,7 +273,7 @@ impl PtyPane {
     pub fn scroll_up(&self, n: usize) {
         if let Ok(mut p) = self.parser.write() {
             let target = p.screen().scrollback().saturating_add(n);
-            p.set_scrollback(target);
+            p.screen_mut().set_scrollback(target);
         }
     }
 
@@ -281,7 +281,7 @@ impl PtyPane {
     pub fn scroll_down(&self, n: usize) {
         if let Ok(mut p) = self.parser.write() {
             let target = p.screen().scrollback().saturating_sub(n);
-            p.set_scrollback(target);
+            p.screen_mut().set_scrollback(target);
         }
     }
 
@@ -289,7 +289,7 @@ impl PtyPane {
     /// typing always jumps the user to the prompt.
     pub fn scroll_to_bottom(&self) {
         if let Ok(mut p) = self.parser.write() {
-            p.set_scrollback(0);
+            p.screen_mut().set_scrollback(0);
         }
     }
 

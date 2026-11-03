@@ -143,7 +143,9 @@ pub fn wait_until_ready(port: u16, tries: u32) -> bool {
     let url = format!("http://localhost:{port}/api/comments-json");
     for _ in 0..tries {
         if ureq::get(&url)
-            .timeout(Duration::from_millis(500))
+            .config()
+            .timeout_global(Some(Duration::from_millis(500)))
+            .build()
             .call()
             .is_ok()
         {

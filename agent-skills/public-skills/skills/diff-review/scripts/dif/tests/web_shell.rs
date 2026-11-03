@@ -31,6 +31,18 @@ fn channels() -> CommentChannels {
     }
 }
 
+/// The response's media type without parameters (`text/css; charset=utf-8` ->
+/// `text/css`).
+fn mime(resp: &ureq::http::Response<ureq::Body>) -> String {
+    resp.headers()
+        .get("content-type")
+        .and_then(|value| value.to_str().ok())
+        .and_then(|value| value.split(';').next())
+        .unwrap_or_default()
+        .trim()
+        .to_owned()
+}
+
 fn free_port() -> u16 {
     TcpListener::bind("127.0.0.1:0")
         .unwrap()
@@ -49,7 +61,7 @@ fn meta_json_counts_difit_restarts_so_an_open_tab_reloads_itself() {
             ureq::get(&format!("http://127.0.0.1:{shell_port}/__wrap/meta.json"))
                 .call()
                 .unwrap()
-                .into_json()
+                .into_body().read_json()
                 .unwrap();
         meta["difitRestarts"].clone()
     };
@@ -83,7 +95,7 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     let html = ureq::get(&format!("{base}/"))
         .call()
         .unwrap()
-        .into_string()
+        .into_body().read_to_string()
         .unwrap();
     assert!(
         html.contains("id=\"brandTitle\""),
@@ -99,7 +111,7 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     let meta: serde_json::Value = ureq::get(&format!("{base}/__wrap/meta.json"))
         .call()
         .unwrap()
-        .into_json()
+        .into_body().read_json()
         .unwrap();
     assert_eq!(meta["branch"], "develop", "branch titles the header");
     assert_eq!(meta["worktree"], "avandar");
@@ -112,8 +124,8 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     let css = ureq::get(&format!("{base}/__wrap/shell.css"))
         .call()
         .unwrap();
-    assert_eq!(css.content_type(), "text/css");
-    let css_text = css.into_string().unwrap();
+    assert_eq!(mime(&css), "text/css");
+    let css_text = css.into_body().read_to_string().unwrap();
     assert!(
         css_text.contains("font-size: 13.5px;"),
         "diff summary font size should be 1px larger"
@@ -181,11 +193,13 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     // copy after `dif` relaunches with a rebuilt frontend.
     assert!(
         js_resp
-            .header("Cache-Control")
+            .headers()
+            .get("Cache-Control")
+            .and_then(|c| c.to_str().ok())
             .is_some_and(|c| c.contains("no-store")),
         "shell.js must be served no-store"
     );
-    let js = js_resp.into_string().unwrap();
+    let js = js_resp.into_body().read_to_string().unwrap();
     assert!(js.contains("selectView"), "serves shell.js");
     assert!(
         js.contains("renderSummaryMarkdown"),
@@ -208,7 +222,7 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     let inject = ureq::get(&format!("{base}/__wrap/inject.js"))
         .call()
         .unwrap()
-        .into_string()
+        .into_body().read_to_string()
         .unwrap();
     assert!(
         inject.contains("difit-viewed-index-v1/"),
@@ -219,19 +233,19 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     let groups = ureq::get(&format!("{base}/__wrap/groups.json"))
         .call()
         .unwrap()
-        .into_string()
+        .into_body().read_to_string()
         .unwrap();
     assert_eq!(groups, "[]");
     let summary = ureq::get(&format!("{base}/__wrap/diff-summary.md"))
         .call()
         .unwrap()
-        .into_string()
+        .into_body().read_to_string()
         .unwrap();
     assert_eq!(summary, "", "missing summary fails soft");
     let test_plan = ureq::get(&format!("{base}/__wrap/test-plan.md"))
         .call()
         .unwrap()
-        .into_string()
+        .into_body().read_to_string()
         .unwrap();
     assert_eq!(test_plan, "", "missing test plan fails soft");
 
@@ -241,7 +255,7 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
         "no request pending before the POST"
     );
     let regen = ureq::post(&format!("{base}/__wrap/regenerate"))
-        .send_bytes(b"")
+        .send(b"")
         .unwrap();
     assert_eq!(regen.status(), 202, "regenerate is accepted");
     assert!(shell.take_regen_request(), "the POST set the flag");
@@ -252,14 +266,14 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
 
     // Unknown shell asset → 404.
     match ureq::get(&format!("{base}/__wrap/nope.css")).call() {
-        Err(ureq::Error::Status(404, _)) => {}
+        Err(ureq::Error::StatusCode(404)) => {}
         other => panic!("expected 404 for unknown asset, got {other:?}"),
     }
 
     // Proxied routes with difit down → 502 (never hang).
     for path in ["/api/diff", "/__wrap/difit", "/assets/x.js"] {
         match ureq::get(&format!("{base}{path}")).call() {
-            Err(ureq::Error::Status(502, _)) => {}
+            Err(ureq::Error::StatusCode(502)) => {}
             other => panic!("expected 502 for {path} with difit down, got {other:?}"),
         }
     }
@@ -278,20 +292,20 @@ fn delivery_mode_round_trips_and_send_all_reaches_the_tui() {
     let state: serde_json::Value = ureq::get(&format!("{base}/__wrap/dispatch.json"))
         .call()
         .unwrap()
-        .into_json()
+        .into_body().read_json()
         .unwrap();
     assert_eq!(state["mode"], "bulk", "bulk delivery is the default");
 
     let state: serde_json::Value = ureq::post(&format!("{base}/__wrap/dispatch"))
-        .send_string(r#"{"mode":"eager"}"#)
+        .send(r#"{"mode":"eager"}"#)
         .unwrap()
-        .into_json()
+        .into_body().read_json()
         .unwrap();
     assert_eq!(state["mode"], "eager");
     assert!(!channels.dispatch.is_bulk());
 
     let sent = ureq::post(&format!("{base}/__wrap/send-all"))
-        .call()
+        .send_empty()
         .unwrap();
     assert_eq!(sent.status(), 202);
     assert!(channels.dispatch.take_send_all());
@@ -299,7 +313,7 @@ fn delivery_mode_round_trips_and_send_all_reaches_the_tui() {
     let github: serde_json::Value = ureq::get(&format!("{base}/__wrap/github.json"))
         .call()
         .unwrap()
-        .into_json()
+        .into_body().read_json()
         .unwrap();
     assert_eq!(github["available"], false, "no PR looked up yet");
     shell.shutdown();
@@ -343,12 +357,12 @@ fn a_pr_bound_save_marks_only_the_new_comment_and_still_reaches_difit() {
     let body = r#"{"threads":[{"id":"t1","messages":[{"id":"m1","body":"held"},{"id":"m2","body":"to the PR"}]}],"baseVersion":1}"#;
 
     // An untagged save (a TUI-bound comment) marks nothing.
-    ureq::post(&url).send_string(body).unwrap();
+    ureq::post(&url).send(body).unwrap();
     assert!(channels.github.github_ids().is_empty());
 
     ureq::post(&url)
-        .set("X-Dif-Destination", "github")
-        .send_string(body)
+        .header("X-Dif-Destination", "github")
+        .send(body)
         .unwrap();
     let ids = channels.github.github_ids();
     assert_eq!(ids.len(), 1);
@@ -362,8 +376,8 @@ fn a_pr_bound_save_marks_only_the_new_comment_and_still_reaches_difit() {
 
     // A send-now save hands only the new comment to the LLM at once.
     ureq::post(&url)
-        .set("X-Dif-Send", "now")
-        .send_string(body)
+        .header("X-Dif-Send", "now")
+        .send(body)
         .unwrap();
     assert_eq!(channels.dispatch.take_send_now(), vec!["m2"]);
     assert_eq!(saves.recv_timeout(Duration::from_secs(1)).unwrap(), body);
