@@ -1,4 +1,4 @@
-import { VizHydrationColumns } from "$/models/vizs/hydrations/VizHydrationColumns.ts";
+import { VizHydrationColumns } from "$/models/vizs/hydrations/fromQueryResult/VizHydrationColumns.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { RenderAs, AvaXYSeries } from "$/models/vizs/series.types.ts";

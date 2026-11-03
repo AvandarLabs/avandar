@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hydratePieFromQueryResult } from "$/models/vizs/hydrations/hydratePieFromQueryResult/hydratePieFromQueryResult.ts";
+import { hydratePieFromQueryResult } from "$/models/vizs/hydrations/fromQueryResult/hydratePieFromQueryResult/hydratePieFromQueryResult.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 

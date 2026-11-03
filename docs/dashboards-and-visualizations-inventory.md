@@ -259,7 +259,7 @@ the Data Explorer sidebar and in the dashboard editor's Puck side panel.
   `sizeKey`; funnel → area carries the value column and its slice color into
   a single area series).
 - **`AvaVizConfigs.hydrateFromQuery`** — seeds empty configs from a
-  `PartialStructuredQuery` (per-type helpers in `shared/models/vizs/hydrations/`:
+  `PartialStructuredQuery` (per-type helpers in `shared/models/vizs/hydrations/fromQuery/`:
   `hydrateXYSeriesFromQuery`, `hydratePieFromQuery`,
   `hydrateRadarSeriesFromQuery`, `hydrateScatterSeriesFromQuery`,
   `hydrateBubbleSeriesFromQuery`).

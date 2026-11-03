@@ -3,8 +3,8 @@ import { convertSeriesRenderAs } from "$/models/vizs/convertSeriesRenderAs/conve
 import { makeAxisDescriptors } from "$/models/vizs/descriptors/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { makeGridDescriptors } from "$/models/vizs/descriptors/makeGridDescriptors/makeGridDescriptors.ts";
 import { makeLegendPositionDescriptor } from "$/models/vizs/descriptors/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
-import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrations/hydrateXYSeriesFromQuery.ts";
-import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrations/hydrateXYSeriesFromQueryResult.ts";
+import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrations/fromQuery/hydrateXYSeriesFromQuery.ts";
+import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrations/fromQueryResult/hydrateXYSeriesFromQueryResult.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AvaAreaChartVizConfig } from "$/models/vizs/AvaAreaChartVizConfig/AvaAreaChartVizConfig.types.ts";
