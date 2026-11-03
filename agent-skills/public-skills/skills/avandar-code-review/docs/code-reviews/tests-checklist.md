@@ -131,6 +131,36 @@ reach a precondition, move it into setup before the page loads; if a distinct
 label is only needed to disambiguate, make the entity the only one of its kind
 and select it by position/id instead of renaming it mid-test.
 
+- Always name a test file outside a `__tests__/` directory after a module file
+  in the same directory: `Foo.test.ts` or `Foo.aspect.test.ts` sits beside
+  `Foo.ts` or `Foo.tsx`. The module name is the filename up to the first dot.
+  A reader finds the code under test by that name, so a test named after no
+  file beside it leaves them guessing which modules it covers. Recommend one
+  of: 1) rename the test after the one module it exercises; 2) when it
+  exercises several modules together, it is an integration test, so move it
+  into a `__tests__/` directory per the integration-test bullet below.
+  Exception: `tests/e2e/` and `tests/integration/` are dedicated test trees
+  and exempt.
+
+  This is bad:
+
+  ```txt
+  checkout/
+    formatOrderTotal.ts
+    useCartItems/useCartItems.ts
+    checkoutTotals.test.tsx
+  ```
+
+  This is good:
+
+  ```txt
+  checkout/
+    formatOrderTotal.ts
+    useCartItems/useCartItems.ts
+    __tests__/
+      checkoutTotals.test.tsx
+  ```
+
 - Always move a module's test-related files into a `__tests__/` directory once
   two or more of them share a module name in the same directory. Count test
   files **and** test-only helpers (`*Fixtures.ts(x)`, `*.fixtures.ts`, stubs,
@@ -191,9 +221,13 @@ and select it by position/id instead of renaming it mid-test.
   clients/QetlClient/QetlClient.test.ts
   ```
 
-- Place an integration test at the lowest directory containing every module it
-  exercises. It covers several modules by definition, so it cannot belong to
-  any one module's `__tests__/`, and putting it under one of them implies an
-  ownership that is not real. If that lowest common directory is the
-  application root, the test is too broad to be an integration test: recommend
-  an e2e test instead.
+- Place an integration test in a `__tests__/` directory inside the lowest
+  directory containing every module it exercises, and name it after the
+  behavior it covers. It covers several modules by definition, so it cannot
+  sit beside any one of them or belong to any one module's `__tests__/`:
+  either placement implies an ownership that is not real. If that lowest
+  common directory is the application root, the test is too broad to be an
+  integration test: recommend an e2e test instead. Exception: a test whose
+  module lives where the test cannot run (for example a module that must stay
+  loadable by another runtime, tested with a harness only Node can load) may
+  sit in a `__tests__/` elsewhere and keeps the module's name.

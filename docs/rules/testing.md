@@ -106,6 +106,21 @@ existence/`typeof` test to fill the gap. Leave an `it.todo("...")` or a comment
 describing the contract instead. A `todo` documents the missing coverage
 honestly; a passing tautology hides it behind a green check.
 
+## Name a test file after the module beside it
+
+A test file outside a `__tests__/` directory takes the name of the module file
+beside it: `DuckDbClient.test.ts` tests `DuckDbClient.ts` in the same
+directory, and `ManualQueryForm.filters.test.tsx` tests `ManualQueryForm.tsx`.
+The module name is the filename up to the first dot. A reader finds the code
+under test by that name, so a test named after no file beside it
+(`mapSourceReadiness.test.tsx` in a directory with no `mapSourceReadiness.ts`)
+leaves them guessing which modules it covers.
+
+A test with no single module to take its name from exercises several modules
+together, so it is an integration test. Move it into a `__tests__/` directory,
+per
+[Integration tests go in a `__tests__/` directory](#integration-tests-go-in-a-__tests__-directory).
+
 ## Split test files live in a `__tests__/` directory
 
 A module keeps its test beside it while there is one test file:
@@ -179,14 +194,34 @@ Module2/
 That is the same directory-for-coupling rule components follow, applied to a
 module and its test.
 
-### Integration tests go at the highest common ancestor
+### Integration tests go in a `__tests__/` directory
 
 An integration test covers several modules by definition, so it cannot sit
-inside any one module's `__tests__/`. Put it at the lowest directory that
-contains every module it exercises.
+beside any one of them or inside any one module's `__tests__/`. Put it in a
+`__tests__/` directory inside the lowest directory that contains every module
+it exercises, and name it after the behavior it covers, since no module name
+fits:
+
+```txt
+GisApp/
+  GisApp.tsx
+  GisApp.test.tsx
+  layers/useMapLayersData/useMapLayersData.ts
+  useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
+  __tests__/
+    mapSourceReadiness.test.tsx
+```
 
 If that directory is the app root, the test is too broad to be an integration
 test. Write an e2e test under `tests/e2e/` instead.
+
+Exception: a test whose module lives where the test cannot run. A file under
+`shared/` cannot import the Node-only executed-test harness
+(`tests/integration/queries/executedDuckDb.ts`), so an executed test of a
+`shared/` module goes in a `__tests__/` under `src/` and imports the module
+through `$/`, as
+`src/lib/openData/__tests__/buildCsvFromDatastoreRecords.executed.test.ts`
+does. It keeps the module's name.
 
 ### Find violations
 
@@ -200,7 +235,20 @@ Each row is a directory holding that many test files outside `__tests__/`, and
 every row is a violation regardless of the module names. Only `tests/e2e/` and
 `tests/integration/` are exempt, since they are dedicated test trees.
 
-That script only counts test files. Also look for fixtures that sit beside a
+Also list the test files named after no module beside them. Each one is either
+a test to rename after the one module it covers, or an integration test to
+move into a `__tests__/` directory:
+
+```bash
+find src shared packages apps -type f \( -name '*.test.ts' -o -name '*.test.tsx' \) \
+  -not -path '*/node_modules/*' -not -path '*/__tests__/*' |
+  while read -r test; do
+    module="$(dirname "$test")/$(basename "$test" | cut -d. -f1)"
+    ls "$module".* 2>/dev/null | grep -qv '\.test\.' || echo "$test"
+  done
+```
+
+Those scripts only look at test files. Also look for fixtures that sit beside a
 test outside `__tests__/`:
 
 ```bash
@@ -210,5 +258,6 @@ find src shared packages apps -type f \
 ```
 
 Every hit whose directory also holds a test for the same module is a
-violation. A fixtures file shared by tests of several modules belongs at their
-lowest common ancestor instead (see integration tests above).
+violation. A fixtures file shared by tests of several modules belongs in a
+`__tests__/` directory at their lowest common directory instead (see
+integration tests above).

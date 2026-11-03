@@ -251,8 +251,9 @@ Apply **only**:
   assertion-free tests, observable-behavior assertions, placeholder
   tests, runtime assertions that restate the type system, e2e specs
   that write the behavior under test through the database instead of
-  the UI, `__tests__/` layout once a module has two or more test
-  files, and integration-test placement.
+  the UI, test files named after no module beside them, `__tests__/`
+  layout once a module has two or more test files, and integration-test
+  placement in a `__tests__/` directory.
 
 This pack does not pull extra bullets from Most Common Mistakes,
 General Checks, or the TypeScript checklist. Running the tests
@@ -1061,7 +1062,8 @@ SKILL file.
   guarantees, and — for **e2e tests only** — direct database writes that
   perform the behavior under test instead of driving it through the UI (direct
   writes are for seeding preconditions before page load, teardown, bypassing
-  slow/external systems, or read-only oracles).
+  slow/external systems, or read-only oracles), and test file names and
+  `__tests__/` placement.
 
 ## Library-Gated Phases
 
