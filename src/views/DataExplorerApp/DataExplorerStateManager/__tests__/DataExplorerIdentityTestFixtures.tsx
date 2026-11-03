@@ -2,7 +2,6 @@ type Props = { children: ReactNode };
 import { Model } from "@avandar/models";
 import { expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
 import { act, renderHook } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
@@ -77,7 +76,6 @@ function _renderStateManager(): RenderHookResult<
  */
 export const DataExplorerIdentityTestFixtures = {
   QueryColumn,
-  makeUiVizConfigFromAvaVizConfig,
   act,
   Model,
   expect,

@@ -1,5 +1,4 @@
-import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig";
-import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
@@ -31,7 +30,7 @@ function _mergeSeries({
       ...uiVizConfig,
       series: [original],
     } as SeriesConfig;
-    const vizConfig = makeAvaVizConfigFromUiVizConfig({
+    const vizConfig = AvaVizConfigs.makeFromUiVizConfig({
       config: single,
       columns: columns,
     }).config;
@@ -62,11 +61,11 @@ export function mergeUiVizConfigEdit({
   if (uiVizConfig.vizType !== after.vizType) {
     return uiVizConfig;
   }
-  const previous = makeUiVizConfigFromAvaVizConfig({
+  const previous = AvaVizConfigs.toUiVizConfig({
     config: before,
     columns: columns,
   }).config;
-  const edited = makeUiVizConfigFromAvaVizConfig({
+  const edited = AvaVizConfigs.toUiVizConfig({
     config: after,
     columns: columns,
   });

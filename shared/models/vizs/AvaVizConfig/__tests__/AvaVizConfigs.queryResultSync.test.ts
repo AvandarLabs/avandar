@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
-import {
-  applyAvaVizConfigFromQueryResult,
-  isVizConfigEqualForQueryResultSync,
-} from "$/models/vizs/applyAvaVizConfigFromQueryResult/applyAvaVizConfigFromQueryResult.ts";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
@@ -23,19 +19,16 @@ function cols(
   });
 }
 
-describe("isVizConfigEqualForQueryResultSync", () => {
+describe("AvaVizConfigs.isEqual", () => {
   it("returns true for two table configs", () => {
     expect(
-      isVizConfigEqualForQueryResultSync(
-        { vizType: "table" },
-        { vizType: "table" },
-      ),
+      AvaVizConfigs.isEqual({ vizType: "table" }, { vizType: "table" }),
     ).toBe(true);
   });
 
   it("returns false when viz types differ", () => {
     expect(
-      isVizConfigEqualForQueryResultSync(
+      AvaVizConfigs.isEqual(
         { vizType: "table" },
         {
           vizType: "bar",
@@ -63,65 +56,50 @@ describe("isVizConfigEqualForQueryResultSync", () => {
       layout: "group" as const,
       withLegend: true,
     };
-    expect(isVizConfigEqualForQueryResultSync(a, b)).toBe(true);
+    expect(AvaVizConfigs.isEqual(a, b)).toBe(true);
   });
 });
 
-describe("applyAvaVizConfigFromQueryResult", () => {
-  const emptyQuery = StructuredQuery.makeEmpty();
-
+describe("AvaVizConfigs.hydrateFromQueryResult", () => {
   it("leaves table viz unchanged", () => {
-    const out = applyAvaVizConfigFromQueryResult({
-      vizConfig: { vizType: "table" },
-      rawSql: "SELECT 1",
-      query: emptyQuery,
-      columns: cols([
-        { id: "x" as QueryColumn.Id, name: "x", dataType: "double" },
-      ]),
-    });
+    const out = AvaVizConfigs.hydrateFromQueryResult(
+      { vizType: "table" },
+      cols([{ id: "x" as QueryColumn.Id, name: "x", dataType: "double" }]),
+    );
     expect(out).toEqual({ vizType: "table" });
   });
 
   it("preserves missing owned axis IDs without reseeding", () => {
-    const out = applyAvaVizConfigFromQueryResult({
-      vizConfig: {
+    const out = AvaVizConfigs.hydrateFromQueryResult(
+      {
         vizType: "bar",
         xAxisKey: "gone" as QueryColumn.Id,
         series: [{ renderAs: "bar", key: "n" as QueryColumn.Id }],
         layout: "group",
         withLegend: true,
       },
-      rawSql: undefined,
-      query: {
-        ...emptyQuery,
-        queryColumns: [],
-      },
-      columns: cols([
-        { id: "n" as QueryColumn.Id, name: "n", dataType: "double" },
-      ]),
-    });
+      cols([{ id: "n" as QueryColumn.Id, name: "n", dataType: "double" }]),
+    );
     expect((out as { xAxisKey?: string }).xAxisKey).toBe("gone");
     expect((out as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
       "n",
     );
   });
 
-  it("hydrates from result when raw SQL is set", () => {
-    const out = applyAvaVizConfigFromQueryResult({
-      vizConfig: {
+  it("fills empty axis and series slots from the result columns", () => {
+    const out = AvaVizConfigs.hydrateFromQueryResult(
+      {
         vizType: "bar",
         xAxisKey: undefined,
         series: [],
         layout: "group",
         withLegend: true,
       },
-      rawSql: "SELECT * FROM t",
-      query: emptyQuery,
-      columns: cols([
+      cols([
         { id: "month" as QueryColumn.Id, name: "month", dataType: "timestamp" },
         { id: "total" as QueryColumn.Id, name: "total", dataType: "double" },
       ]),
-    });
+    );
     expect((out as { xAxisKey?: string }).xAxisKey).toBe("month");
     expect((out as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
       "total",
@@ -130,45 +108,41 @@ describe("applyAvaVizConfigFromQueryResult", () => {
 
   it("preserves the same-named series across a re-query with new columns", () => {
     // First query: bar chart with "count" series and "region" x-axis.
-    const initial = applyAvaVizConfigFromQueryResult({
-      vizConfig: {
+    const initial = AvaVizConfigs.hydrateFromQueryResult(
+      {
         vizType: "bar",
         xAxisKey: undefined,
         series: [],
         layout: "group",
         withLegend: true,
       },
-      rawSql: "SELECT region, count FROM t",
-      query: emptyQuery,
-      columns: cols([
+      cols([
         { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
         { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
       ]),
-    });
+    );
     expect(
       (initial as { series?: Array<{ key: string }> }).series?.[0]?.key,
     ).toBe("count");
 
     // Second query: same column names plus a new column. The user-set
     // "count" series must survive — the bars should still render.
-    const next = applyAvaVizConfigFromQueryResult({
-      vizConfig: initial,
-      rawSql: "SELECT region, count, total FROM t",
-      query: emptyQuery,
-      columns: cols([
+    const next = AvaVizConfigs.hydrateFromQueryResult(
+      initial,
+      cols([
         { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
         { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
         { id: "total" as QueryColumn.Id, name: "total", dataType: "double" },
       ]),
-    });
+    );
     expect((next as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
       "count",
     );
   });
 
   it("does not reinterpret an owned ID as a case-insensitive QueryResult column name", () => {
-    const out = applyAvaVizConfigFromQueryResult({
-      vizConfig: {
+    const out = AvaVizConfigs.hydrateFromQueryResult(
+      {
         vizType: "bar",
         // saved config has "Count" but the new query returned "count"
         xAxisKey: "Region" as QueryColumn.Id,
@@ -176,13 +150,11 @@ describe("applyAvaVizConfigFromQueryResult", () => {
         layout: "group",
         withLegend: true,
       },
-      rawSql: undefined,
-      query: { ...emptyQuery, queryColumns: [] },
-      columns: cols([
+      cols([
         { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
         { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
       ]),
-    });
+    );
     expect((out as { xAxisKey?: string }).xAxisKey).toBe("Region");
     expect((out as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
       "Count",
@@ -190,8 +162,8 @@ describe("applyAvaVizConfigFromQueryResult", () => {
   });
 
   it("retains missing series IDs for explicit repair", () => {
-    const out = applyAvaVizConfigFromQueryResult({
-      vizConfig: {
+    const out = AvaVizConfigs.hydrateFromQueryResult(
+      {
         vizType: "bar",
         xAxisKey: "region" as QueryColumn.Id,
         series: [
@@ -201,13 +173,11 @@ describe("applyAvaVizConfigFromQueryResult", () => {
         layout: "group",
         withLegend: true,
       },
-      rawSql: undefined,
-      query: { ...emptyQuery, queryColumns: [] },
-      columns: cols([
+      cols([
         { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
         { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
       ]),
-    });
+    );
     const series = (out as { series: Array<{ key: string }> }).series;
     expect(series.length).toBe(2);
     expect(series[1]!.key).toBe("removed");
@@ -215,21 +185,19 @@ describe("applyAvaVizConfigFromQueryResult", () => {
   });
 
   it("does not change axes when both are valid in result (2B)", () => {
-    const out = applyAvaVizConfigFromQueryResult({
-      vizConfig: {
+    const out = AvaVizConfigs.hydrateFromQueryResult(
+      {
         vizType: "bar",
         xAxisKey: "month" as QueryColumn.Id,
         series: [{ renderAs: "bar", key: "total" as QueryColumn.Id }],
         layout: "group",
         withLegend: true,
       },
-      rawSql: "SELECT * FROM t",
-      query: emptyQuery,
-      columns: cols([
+      cols([
         { id: "month" as QueryColumn.Id, name: "month", dataType: "timestamp" },
         { id: "total" as QueryColumn.Id, name: "total", dataType: "double" },
       ]),
-    });
+    );
     expect((out as { xAxisKey?: string }).xAxisKey).toBe("month");
     expect((out as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
       "total",
@@ -242,13 +210,13 @@ it("detects scatter-X and bubble-size changes independently of the Y target", ()
   const xKey = "x" as QueryColumn.Id;
   const changed = "changed" as QueryColumn.Id;
   expect(
-    isVizConfigEqualForQueryResultSync(
+    AvaVizConfigs.isEqual(
       { vizType: "scatter", series: [{ key, xKey }] },
       { vizType: "scatter", series: [{ key, xKey: changed }] },
     ),
   ).toBe(false);
   expect(
-    isVizConfigEqualForQueryResultSync(
+    AvaVizConfigs.isEqual(
       { vizType: "bubble", series: [{ key, xKey, sizeKey: key }] },
       { vizType: "bubble", series: [{ key, xKey, sizeKey: changed }] },
     ),

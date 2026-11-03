@@ -13,7 +13,7 @@ import { describe, expect, it } from "vitest";
  * source of truth.
  */
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { applyAvaVizConfigFromQueryResult } from "$/models/vizs/applyAvaVizConfigFromQueryResult/applyAvaVizConfigFromQueryResult";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { INITIAL_DATA_EXPLORER_STATE } from "../DataExplorerAppState.types";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -44,12 +44,7 @@ function syncVizFromQueryResultReducer(
   state: DataExplorerAppState,
   columns: readonly QueryResult.ColumnWithId[],
 ): DataExplorerAppState {
-  const next = applyAvaVizConfigFromQueryResult({
-    vizConfig: state.vizConfig,
-    rawSql: state.rawSql,
-    query: state.query,
-    columns,
-  });
+  const next = AvaVizConfigs.hydrateFromQueryResult(state.vizConfig, columns);
   return {
     ...state,
     vizConfig: next,

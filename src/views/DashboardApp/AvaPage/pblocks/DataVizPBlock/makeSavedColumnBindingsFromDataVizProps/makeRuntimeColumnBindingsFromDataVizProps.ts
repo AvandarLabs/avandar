@@ -1,6 +1,5 @@
 import { objectValuesMap } from "@avandar/utils";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { applyAvaVizConfigFromQueryResult } from "$/models/vizs/applyAvaVizConfigFromQueryResult/applyAvaVizConfigFromQueryResult";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { makeColumnBindingsFromDashboardFilters } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
 import { DataVizFilters } from "../DataVizPBlock/DataVizFilters/DataVizFilters";
 import { makeSavedColumnBindingsFromDataVizProps } from "./makeSavedColumnBindingsFromDataVizProps";
@@ -86,12 +85,10 @@ export function makeRuntimeColumnBindingsFromDataVizProps({
   const runtimeConfig =
     props.columnBindingVersion === 0 && result.issues.length
       ? result.runtimeConfig
-      : applyAvaVizConfigFromQueryResult({
-          vizConfig: result.runtimeConfig,
-          columns: schema.columns,
-          rawSql: props.nlQuery.rawSql,
-          query: StructuredQuery.makeEmpty(),
-        });
+      : AvaVizConfigs.hydrateFromQueryResult(
+          result.runtimeConfig,
+          schema.columns,
+        );
   const canPersistColumnIds =
     result.props.columnBindingVersion === 1 &&
     (props.columnBindingVersion === 1 || global.issues.length === 0);

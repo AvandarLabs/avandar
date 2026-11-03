@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { transformAvaPageProps } from "../../utils/makeTraversalConfigFromAvaPageData/transformAvaPageProps";
 import type { AvaPageDataMigration } from "../AvaPageDataMigrator";
 import type {
@@ -38,7 +38,7 @@ function _downgradeChart(
       );
     }
   });
-  const uiVizConfigConversion = makeUiVizConfigFromAvaVizConfig({
+  const uiVizConfigConversion = AvaVizConfigs.toUiVizConfig({
     config: props.vizConfig,
     columns: columnBindings.columns,
   });

@@ -2,8 +2,8 @@ import { propNotEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 /** Chart `QueryResult` column names bind uniquely before rendering. */
 import { uuid } from "$/lib/uuid.ts";
-import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig.ts";
-import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig.ts";
+import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/AvaVizConfig/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig.ts";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/AvaVizConfig/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types.ts";

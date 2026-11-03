@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
  * Renderer reads follow saved IDs even when `QueryResult` column names change.
  */
 import { uuid } from "$/lib/uuid.ts";
-import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig.ts";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/AvaVizConfig/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.ts";

@@ -1,9 +1,9 @@
 import { match } from "ts-pattern";
+import { makeAxisDescriptors } from "$/models/vizs/descriptors/makeAxisDescriptors/makeAxisDescriptors.ts";
+import { makeGridDescriptors } from "$/models/vizs/descriptors/makeGridDescriptors/makeGridDescriptors.ts";
+import { makeLegendPositionDescriptor } from "$/models/vizs/descriptors/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import { hydrateScatterSeriesFromQuery } from "$/models/vizs/hydrations/hydrateScatterSeriesFromQuery.ts";
 import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrations/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
-import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
-import { makeGridDescriptors } from "$/models/vizs/makeGridDescriptors/makeGridDescriptors.ts";
-import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AvaAreaChartVizConfig } from "$/models/vizs/AvaAreaChartVizConfig/AvaAreaChartVizConfig.types.ts";

@@ -6,7 +6,7 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
@@ -163,7 +163,7 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
 function _getUiVizConfig(state: DataExplorerAppState): UiVizConfig {
   return (
     state.pendingUrlVizConfig ??
-    makeUiVizConfigFromAvaVizConfig({
+    AvaVizConfigs.toUiVizConfig({
       config: state.vizConfig,
       columns: state.lastResultColumns ?? [],
     }).config

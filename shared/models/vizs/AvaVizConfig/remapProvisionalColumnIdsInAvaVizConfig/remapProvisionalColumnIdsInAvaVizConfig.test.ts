@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { remapProvisionalColumnIdsInAvaVizConfig } from "$/models/vizs/remapProvisionalColumnIdsInAvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig.ts";
+import { remapProvisionalColumnIdsInAvaVizConfig } from "$/models/vizs/AvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
 

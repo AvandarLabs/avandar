@@ -1,13 +1,7 @@
 import { Model } from "@avandar/models";
 import { setValue } from "@avandar/utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import {
-  applyAvaVizConfigFromQueryResult,
-  isVizConfigEqualForQueryResultSync,
-} from "$/models/vizs/applyAvaVizConfigFromQueryResult/applyAvaVizConfigFromQueryResult";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
-import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig";
-import { remapProvisionalColumnIdsInAvaVizConfig } from "$/models/vizs/remapProvisionalColumnIdsInAvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import {
@@ -172,8 +166,7 @@ export const DataExplorerStateManager = createAppStateManager({
       state: DataExplorerAppState,
       newVizType: AvaVizConfig.Type,
     ) => {
-      const { vizConfig, query, rawSql, vizConfigMemory, lastResultColumns } =
-        state;
+      const { vizConfig, query, vizConfigMemory, lastResultColumns } = state;
 
       if (vizConfig.vizType === newVizType) {
         return state;
@@ -185,12 +178,10 @@ export const DataExplorerStateManager = createAppStateManager({
         AvaVizConfigs.convertVizConfig(vizConfig, newVizType);
       const nextVizConfig =
         lastResultColumns !== undefined
-          ? applyAvaVizConfigFromQueryResult({
-              vizConfig: initialVizConfig,
-              rawSql,
-              query,
-              columns: lastResultColumns,
-            })
+          ? AvaVizConfigs.hydrateFromQueryResult(
+              initialVizConfig,
+              lastResultColumns,
+            )
           : rememberedVizConfig === undefined && state.isStructuredQueryInSync
             ? AvaVizConfigs.hydrateFromQuery(initialVizConfig, query)
             : initialVizConfig;
@@ -238,26 +229,21 @@ export const DataExplorerStateManager = createAppStateManager({
       columns: readonly QueryResult.ColumnWithId[],
     ) => {
       const { pendingUrlVizConfig } = state;
-      const next = applyAvaVizConfigFromQueryResult({
-        vizConfig: pendingUrlVizConfig
-          ? makeAvaVizConfigFromUiVizConfig({
+      const next = AvaVizConfigs.hydrateFromQueryResult(
+        pendingUrlVizConfig
+          ? AvaVizConfigs.makeFromUiVizConfig({
               config: pendingUrlVizConfig,
               columns: columns,
             }).config
           : state.vizConfig,
-        rawSql: state.rawSql,
-        query: state.query,
         columns,
-      });
+      );
 
       const columnsChanged = !isSameColumnSchema({
         previousColumns: state.lastResultColumns,
         currentColumns: columns,
       });
-      const vizConfigChanged = !isVizConfigEqualForQueryResultSync(
-        next,
-        state.vizConfig,
-      );
+      const vizConfigChanged = !AvaVizConfigs.isEqual(next, state.vizConfig);
 
       if (!columnsChanged && !vizConfigChanged && !pendingUrlVizConfig) {
         return state;
@@ -285,7 +271,7 @@ export const DataExplorerStateManager = createAppStateManager({
       if (!previous) {
         return { ...state, columnBindings };
       }
-      const vizConfig = remapProvisionalColumnIdsInAvaVizConfig({
+      const vizConfig = AvaVizConfigs.remapProvisionalColumnIds({
         config: state.vizConfig,
         previous: previous,
         current: columnBindings,
@@ -294,7 +280,7 @@ export const DataExplorerStateManager = createAppStateManager({
         Object.entries(state.vizConfigMemory).map(([type, config]) => {
           return [
             type,
-            remapProvisionalColumnIdsInAvaVizConfig({
+            AvaVizConfigs.remapProvisionalColumnIds({
               config: config,
               previous: previous,
               current: columnBindings,

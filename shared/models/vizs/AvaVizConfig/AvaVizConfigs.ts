@@ -14,6 +14,9 @@ import {
   AvaVizConfigUtilRegistry,
   VizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
+import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/AvaVizConfig/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig.ts";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/AvaVizConfig/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig.ts";
+import { remapProvisionalColumnIdsInAvaVizConfig } from "$/models/vizs/AvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { IAvaVizConfigModule } from "$/models/vizs/AvaVizConfig/IAvaVizConfigModule.ts";
@@ -121,4 +124,31 @@ export const AvaVizConfigs = {
     const vizUtils = _getVizTypeModule(vizConfig.vizType as VType);
     return vizUtils.hydrateFromQueryResult(vizConfig, columns);
   },
+
+  /**
+   * Whether two viz configs match in every slot and setting. Use it to skip a
+   * state update when filling a config from a query result changed nothing,
+   * for example when the same result arrives again.
+   */
+  isEqual: (a: Readonly<AvaVizConfig>, b: Readonly<AvaVizConfig>): boolean => {
+    return JSON.stringify(a) === JSON.stringify(b);
+  },
+
+  /**
+   * Replaces each column ID in a chart config with that column's current
+   * `QueryResult` column name, the form renderers read.
+   */
+  toUiVizConfig: makeUiVizConfigFromAvaVizConfig,
+
+  /**
+   * Replaces each `QueryResult` column name in a name-keyed chart config with
+   * the ID of the one column that has that name.
+   */
+  makeFromUiVizConfig: makeAvaVizConfigFromUiVizConfig,
+
+  /**
+   * Replaces provisional SQL column IDs in a chart config with the IDs of the
+   * same expressions in the current result.
+   */
+  remapProvisionalColumnIds: remapProvisionalColumnIdsInAvaVizConfig,
 };

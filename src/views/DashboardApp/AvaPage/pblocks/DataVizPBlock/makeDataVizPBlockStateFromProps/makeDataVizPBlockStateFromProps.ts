@@ -92,9 +92,9 @@ export function makeDataVizPBlockStateFromProps(options: {
     const rememberedVizConfig = blockVizConfigMemory[nextProps.vizType];
 
     // A remembered config can name columns the current query no longer
-    // returns. `DataVizPBlock` runs `applyAvaVizConfigFromQueryResult` on every
-    // render, so it is reconciled there rather than here, where the result
-    // columns are not available.
+    // returns. `DataVizPBlock` runs `AvaVizConfigs.hydrateFromQueryResult` on
+    // every render, so it is reconciled there rather than here, where the
+    // result columns are not available.
     nextProps.vizConfig =
       rememberedVizConfig ??
       AvaVizConfigs.convertVizConfig(outgoingVizConfig, nextProps.vizType);

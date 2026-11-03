@@ -5,7 +5,7 @@ import { Box, Flex } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";
-import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
@@ -142,7 +142,7 @@ export function VisualizationContainer({
   const columnNames = rawColumns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
 
-  const uiVizConfigConversion = makeUiVizConfigFromAvaVizConfig({
+  const uiVizConfigConversion = AvaVizConfigs.toUiVizConfig({
     config: vizConfig,
     columns: columns,
   });

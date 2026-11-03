@@ -1,7 +1,6 @@
 import { isDefined, prop } from "@avandar/utils";
 import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryResultColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
-import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig";
-import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   QueryResultColumnBindingIssue,
@@ -73,13 +72,13 @@ export function makeSavedColumnBindingsFromDataVizProps({
       props: { ...props, columnBindings: schema.registry },
       runtimeConfig: props.vizConfig,
       localFilters: props.localFilters,
-      issues: makeUiVizConfigFromAvaVizConfig({
+      issues: AvaVizConfigs.toUiVizConfig({
         config: props.vizConfig,
         columns: schema.columns,
       }).issues,
     };
   }
-  const vizConfigConversion = makeAvaVizConfigFromUiVizConfig({
+  const vizConfigConversion = AvaVizConfigs.makeFromUiVizConfig({
     config: props.vizConfig,
     columns: schema.columns,
   });
