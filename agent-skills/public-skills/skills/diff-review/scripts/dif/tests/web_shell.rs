@@ -61,7 +61,8 @@ fn meta_json_counts_difit_restarts_so_an_open_tab_reloads_itself() {
             ureq::get(&format!("http://127.0.0.1:{shell_port}/__wrap/meta.json"))
                 .call()
                 .unwrap()
-                .into_body().read_json()
+                .into_body()
+                .read_json()
                 .unwrap();
         meta["difitRestarts"].clone()
     };
@@ -95,7 +96,8 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     let html = ureq::get(&format!("{base}/"))
         .call()
         .unwrap()
-        .into_body().read_to_string()
+        .into_body()
+        .read_to_string()
         .unwrap();
     assert!(
         html.contains("id=\"brandTitle\""),
@@ -111,7 +113,8 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     let meta: serde_json::Value = ureq::get(&format!("{base}/__wrap/meta.json"))
         .call()
         .unwrap()
-        .into_body().read_json()
+        .into_body()
+        .read_json()
         .unwrap();
     assert_eq!(meta["branch"], "develop", "branch titles the header");
     assert_eq!(meta["worktree"], "avandar");
@@ -222,7 +225,8 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     let inject = ureq::get(&format!("{base}/__wrap/inject.js"))
         .call()
         .unwrap()
-        .into_body().read_to_string()
+        .into_body()
+        .read_to_string()
         .unwrap();
     assert!(
         inject.contains("difit-viewed-index-v1/"),
@@ -233,19 +237,22 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     let groups = ureq::get(&format!("{base}/__wrap/groups.json"))
         .call()
         .unwrap()
-        .into_body().read_to_string()
+        .into_body()
+        .read_to_string()
         .unwrap();
     assert_eq!(groups, "[]");
     let summary = ureq::get(&format!("{base}/__wrap/diff-summary.md"))
         .call()
         .unwrap()
-        .into_body().read_to_string()
+        .into_body()
+        .read_to_string()
         .unwrap();
     assert_eq!(summary, "", "missing summary fails soft");
     let test_plan = ureq::get(&format!("{base}/__wrap/test-plan.md"))
         .call()
         .unwrap()
-        .into_body().read_to_string()
+        .into_body()
+        .read_to_string()
         .unwrap();
     assert_eq!(test_plan, "", "missing test plan fails soft");
 
@@ -292,14 +299,16 @@ fn delivery_mode_round_trips_and_send_all_reaches_the_tui() {
     let state: serde_json::Value = ureq::get(&format!("{base}/__wrap/dispatch.json"))
         .call()
         .unwrap()
-        .into_body().read_json()
+        .into_body()
+        .read_json()
         .unwrap();
     assert_eq!(state["mode"], "bulk", "bulk delivery is the default");
 
     let state: serde_json::Value = ureq::post(&format!("{base}/__wrap/dispatch"))
         .send(r#"{"mode":"eager"}"#)
         .unwrap()
-        .into_body().read_json()
+        .into_body()
+        .read_json()
         .unwrap();
     assert_eq!(state["mode"], "eager");
     assert!(!channels.dispatch.is_bulk());
@@ -313,7 +322,8 @@ fn delivery_mode_round_trips_and_send_all_reaches_the_tui() {
     let github: serde_json::Value = ureq::get(&format!("{base}/__wrap/github.json"))
         .call()
         .unwrap()
-        .into_body().read_json()
+        .into_body()
+        .read_json()
         .unwrap();
     assert_eq!(github["available"], false, "no PR looked up yet");
     shell.shutdown();

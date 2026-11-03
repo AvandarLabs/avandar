@@ -166,10 +166,10 @@ impl PtyPane {
         {
             let exit_status = Arc::clone(&exit_status);
             thread::spawn(move || {
-                if let Ok(status) = child.wait() {
-                    if let Ok(mut slot) = exit_status.write() {
-                        *slot = Some(status);
-                    }
+                if let Ok(status) = child.wait()
+                    && let Ok(mut slot) = exit_status.write()
+                {
+                    *slot = Some(status);
                 }
             });
         }

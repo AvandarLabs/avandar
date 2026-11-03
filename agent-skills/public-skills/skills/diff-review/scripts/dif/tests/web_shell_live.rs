@@ -129,7 +129,8 @@ fn injects_and_filters_against_real_difit() {
     let doc = ureq::get(&format!("{base}/__wrap/difit"))
         .call()
         .unwrap()
-        .into_body().read_to_string()
+        .into_body()
+        .read_to_string()
         .unwrap();
     assert!(
         doc.contains(r#"<script src="/__wrap/inject.js"></script>"#),
@@ -144,7 +145,8 @@ fn injects_and_filters_against_real_difit() {
     let full: serde_json::Value = ureq::get(&format!("{base}/api/diff"))
         .call()
         .unwrap()
-        .into_body().read_json()
+        .into_body()
+        .read_json()
         .unwrap();
     let full_paths: Vec<&str> = full["files"]
         .as_array()
@@ -163,7 +165,8 @@ fn injects_and_filters_against_real_difit() {
         .header("Referer", &format!("{base}/__wrap/difit?group=1"))
         .call()
         .unwrap()
-        .into_body().read_json()
+        .into_body()
+        .read_json()
         .unwrap();
     let filtered_paths: Vec<&str> = filtered["files"]
         .as_array()
@@ -212,7 +215,8 @@ fn injects_and_filters_against_real_difit() {
     let comments = ureq::get(&format!("{base}/api/comments-json"))
         .call()
         .unwrap()
-        .into_body().read_to_string()
+        .into_body()
+        .read_to_string()
         .unwrap();
     assert!(
         comments.contains("live-test-marker") || comments.contains("live-test-c1"),
