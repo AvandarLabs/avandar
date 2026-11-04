@@ -9,7 +9,6 @@ import { SupabaseSwitchPreparation } from "@ava-cli/SupabaseCli/SupabaseLocalEnv
 import type {
   CommandResult,
   RestorePreparation,
-  SupabaseBackupManifest,
   SupabaseLocalBackupManifest,
   SupabaseLocalEnvironmentIo,
   SupabaseLocalStatus,
@@ -24,15 +23,6 @@ type RollbackSwitchOptions = {
   manifest: SupabaseLocalBackupManifest;
   switchError: unknown;
 };
-
-/** The project a manifest's switch moved onto, for messages. */
-function _getProjectLabelFromManifest(
-  manifest: Readonly<SupabaseBackupManifest>,
-): string {
-  return manifest.kind === "local"
-    ? manifest.temporaryProjectId
-    : manifest.remoteProjectId;
-}
 
 function _requireCommandSuccess(
   options: Readonly<{ result: Readonly<CommandResult>; stage: string }>,
@@ -282,7 +272,7 @@ async function _removeRestoredBackup(
       : [backupError];
     throw new AggregateError(
       errors,
-      `Files were restored, but backup removal failed at ${options.preparation.backupDirectory}.${_manualCleanupSuffix({ temporaryProjectId: _getProjectLabelFromManifest(options.preparation.manifest), cleanupError: options.cleanupError })}`,
+      `Files were restored, but backup removal failed at ${options.preparation.backupDirectory}.${_manualCleanupSuffix({ temporaryProjectId: SupabaseBackupStore.getProjectIdFromManifest(options.preparation.manifest), cleanupError: options.cleanupError })}`,
     );
   }
 }
@@ -302,7 +292,7 @@ async function _restoreCleanupError(
   }
   if (!preparation.hasProvenOwnership) {
     return new Error(
-      `Temporary project ownership could not be safely proven; manual cleanup is required for ${manifest.temporaryProjectId}.`,
+      `Temporary project ownership could not be safely proven; manual cleanup is required for ${manifest.temporaryProjectId}. Delete it with \`pnpm exec supabase stop --project-id ${manifest.temporaryProjectId} --no-backup\`.`,
     );
   }
   return await SupabaseDockerCleanup.cleanupTemporaryProject({
@@ -334,13 +324,13 @@ async function _restore(
     const errors = cleanupError ? [cleanupError, restoreError] : [restoreError];
     throw new AggregateError(
       errors,
-      `Supabase file restoration failed. Backup retained at ${preparation.backupDirectory}.${_manualCleanupSuffix({ temporaryProjectId: _getProjectLabelFromManifest(preparation.manifest), cleanupError })}`,
+      `Supabase file restoration failed. Backup retained at ${preparation.backupDirectory}.${_manualCleanupSuffix({ temporaryProjectId: SupabaseBackupStore.getProjectIdFromManifest(preparation.manifest), cleanupError })}`,
     );
   }
   await _removeRestoredBackup({ io, preparation, cleanupError });
   if (cleanupError) {
     throw new Error(
-      `Files were restored, but ${_getProjectLabelFromManifest(preparation.manifest)} requires manual cleanup: ${cleanupError.message}`,
+      `Files were restored, but ${SupabaseBackupStore.getProjectIdFromManifest(preparation.manifest)} requires manual cleanup: ${cleanupError.message}`,
     );
   }
 }

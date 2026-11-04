@@ -34,7 +34,16 @@ export type KeepReason =
 
 /** Which Docker projects `ava supabase prune` may delete, and why. */
 export type SupabasePrunePlanResult = {
-  candidates: Array<{ project: DockerSupabaseProject; reason: PruneReason }>;
+  candidates: Array<{
+    project: DockerSupabaseProject;
+    reason: PruneReason;
+    /**
+     * Whether a container recorded which removed worktree started it. A
+     * project known only by its name could come from another repository, so
+     * it is never deleted without being picked by hand.
+     */
+    isVerified: boolean;
+  }>;
   kept: Array<{ project: DockerSupabaseProject; reason: KeepReason }>;
   /** Projects that do not come from this repository's worktrees. */
   ignoredProjectIds: string[];
@@ -46,6 +55,8 @@ type MakePrunePlanOptions = {
   localBranches: readonly string[];
   worktrees: readonly BranchWorktree[];
   worktreeProjectIds: readonly WorktreeProjectId[];
+  /** Container workdirs that still exist on disk. */
+  existingWorkdirs: readonly string[];
 };
 
 /** Branch prefixes a branch-derived project id starts with. */
@@ -139,13 +150,27 @@ function _getPruneReason(
     project: DockerSupabaseProject;
     worktreeRoots: readonly string[];
     branchPrefixes: ReadonlySet<string>;
+    existingWorkdirs: readonly string[];
   }>,
 ): PruneReason | undefined {
   const { project, worktreeRoots, branchPrefixes } = options;
+  // A removed worktree's path is gone from disk and reads as a prefixed
+  // branch under the worktree root, e.g. `<root>/feat/old`. Requiring both
+  // keeps a sibling repository out when a short branch's parent is `~/src`.
   const removedWorkdir = project.workdirs.find((workdir) => {
-    return worktreeRoots.some((root) => {
-      return workdir.startsWith(`${root}${path.sep}`);
-    });
+    return (
+      !options.existingWorkdirs.includes(workdir) &&
+      worktreeRoots.some((root) => {
+        const [prefix = "", ...rest] = workdir
+          .slice(root.length + 1)
+          .split(path.sep);
+        return (
+          workdir.startsWith(`${root}${path.sep}`) &&
+          branchPrefixes.has(prefix) &&
+          rest.length > 0
+        );
+      })
+    );
   });
   if (removedWorkdir !== undefined) {
     return { kind: "worktreeRemoved", worktreePath: removedWorkdir };
@@ -195,6 +220,7 @@ function _make(
         project,
         worktreeRoots,
         branchPrefixes,
+        existingWorkdirs: options.existingWorkdirs,
       });
       return pruneReason === undefined
         ? {
@@ -203,7 +229,14 @@ function _make(
           }
         : {
             ...plan,
-            candidates: [...plan.candidates, { project, reason: pruneReason }],
+            candidates: [
+              ...plan.candidates,
+              {
+                project,
+                reason: pruneReason,
+                isVerified: pruneReason.kind === "worktreeRemoved",
+              },
+            ],
           };
     }, initialPlan);
 }

@@ -89,7 +89,8 @@ export async function readExistingSwitchProject(
   if (existing === undefined) {
     return undefined;
   }
-  return existing.manifest.kind === "local"
-    ? { kind: "local", projectId: existing.manifest.temporaryProjectId }
-    : { kind: "remote", projectId: existing.manifest.remoteProjectId };
+  return {
+    kind: existing.manifest.kind,
+    projectId: SupabaseBackupStore.getProjectIdFromManifest(existing.manifest),
+  };
 }

@@ -8,6 +8,7 @@ import { promiseMap } from "@avandar/utils";
 import type {
   DevelopmentEnvFile,
   SupabaseBackupManifest,
+  SupabaseConfigState,
   SupabaseLocalEnvironmentIo,
   SupabaseSwitchKind,
   SupabaseSwitchSummary,
@@ -143,6 +144,24 @@ export const SupabaseSwitchState = {
 
   /** Reads the files that decide a worktree's switch state. */
   readSources: _readSources,
+
+  /**
+   * The project id and ports the Supabase CLI uses in a worktree: the
+   * `.env.development` overrides on top of `config.toml`.
+   */
+  readEffectiveConfig: async (
+    io: Readonly<SupabaseLocalEnvironmentIo>,
+  ): Promise<SupabaseConfigState> => {
+    const envPath = path.join(io.projectRoot, ".env.development");
+    const [configContents, envContents] = await Promise.all([
+      io.readTextFile(path.join(io.projectRoot, "supabase", "config.toml")),
+      (await io.pathExists(envPath)) ? io.readTextFile(envPath) : "",
+    ]);
+    return SupabaseConfigOverrides.makeEffectiveState({
+      config: SupabaseConfig.makeStateFromContents(configContents),
+      envContents,
+    });
+  },
 
   /** Reads and decides a worktree's switch state in one step. */
   read: async (

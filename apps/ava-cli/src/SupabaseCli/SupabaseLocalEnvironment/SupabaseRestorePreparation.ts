@@ -2,13 +2,13 @@ import path from "node:path";
 import { SupabaseBackupHierarchy } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupHierarchy";
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupPaths";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
-import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
 import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
 import {
   MANIFEST_FILE,
   PROJECT_ID_PATTERN,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import { SupabaseManifestPathChecks } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseManifestPathChecks";
+import { SupabaseSwitchState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState/SupabaseSwitchState";
 import { makeMap, makeSet, promiseMap, propEq } from "@avandar/utils";
 import type {
   RestorePaths,
@@ -47,10 +47,9 @@ function _requireRestoreIdentity(
       `Supabase backup belongs to worktree ${options.manifest.worktreePath}, not ${options.worktreePath}.`,
     );
   }
-  const projectId =
-    options.manifest.kind === "local"
-      ? options.manifest.temporaryProjectId
-      : options.manifest.remoteProjectId;
+  const projectId = SupabaseBackupStore.getProjectIdFromManifest(
+    options.manifest,
+  );
   if (!PROJECT_ID_PATTERN.test(projectId)) {
     throw new Error("Supabase backup has an unsafe temporary project id.");
   }
@@ -192,22 +191,11 @@ async function _validateRestoreManifest(
   });
 }
 
-/**
- * The project id the Supabase CLI uses in this worktree: the
- * `.env.development` override when there is one, `config.toml` otherwise.
- */
+/** The project id the Supabase CLI uses in this worktree. */
 async function _readActiveProjectId(
   io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<string> {
-  const envPath = path.join(io.projectRoot, ".env.development");
-  const [configContents, envContents] = await Promise.all([
-    io.readTextFile(path.join(io.projectRoot, "supabase", "config.toml")),
-    (await io.pathExists(envPath)) ? io.readTextFile(envPath) : "",
-  ]);
-  return SupabaseConfigOverrides.makeEffectiveState({
-    config: SupabaseConfig.makeStateFromContents(configContents),
-    envContents,
-  }).projectId;
+  return (await SupabaseSwitchState.readEffectiveConfig(io)).projectId;
 }
 
 /** The hosted project `.env.development` says this worktree points at. */
@@ -242,14 +230,17 @@ async function _hasProvenRestoreOwnership(
     }
   })();
   if (
-    activeProjectId ===
-    (manifest.kind === "local"
-      ? manifest.temporaryProjectId
-      : manifest.remoteProjectId)
+    activeProjectId === SupabaseBackupStore.getProjectIdFromManifest(manifest)
   ) {
     return true;
   }
-  if (manifest.state === "active") {
+  // A switch made by an older `ava` rewrote config.toml, and the git hooks
+  // tell anyone blocked by that to put the file back by hand. Its backup still
+  // restores everything, so only cleanup of the project waits on proof.
+  const isLegacySwitch = manifest.files.some(({ sourcePath }) => {
+    return sourcePath === path.join(io.projectRoot, "supabase", "config.toml");
+  });
+  if (manifest.state === "active" && !isLegacySwitch) {
     throw new Error(
       "Supabase backup project id does not match the active Supabase project.",
     );

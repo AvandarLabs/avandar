@@ -130,7 +130,7 @@ async function _run(options: Readonly<RemoteOptions>): Promise<void> {
     `This worktree now uses the hosted Supabase project ${result.remoteProjectId} (${result.apiUrl}).`,
   );
   CliTheme.warning(
-    "Scripts that read .env.development now reach that project too: `pnpm db:seed` and `pnpm db:reset` would seed it. Do not run them while switched.",
+    "Database scripts such as `pnpm db:reset`, `pnpm db:seed`, and `pnpm test:db` refuse to run until you restore, so neither the shared local stack nor the hosted project gets reset or seeded.",
   );
   CliTheme.info("Run `ava supabase restore` to go back to a local Supabase.");
 }

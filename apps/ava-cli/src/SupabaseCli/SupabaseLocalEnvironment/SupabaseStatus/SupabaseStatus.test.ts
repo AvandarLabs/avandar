@@ -1,3 +1,5 @@
+import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
+import { SupabaseLocalEnvironmentFakeIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { SupabaseStatus } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseStatus/SupabaseStatus";
 import { prop, propEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
@@ -383,5 +385,26 @@ describe("makeStatusReport", () => {
       },
       { filePath: "/repo/.env.development.edge", staleKeys: [] },
     ]);
+  });
+});
+
+describe("readStatusReport", () => {
+  it("skips the Supabase CLI for a worktree on a hosted project", async () => {
+    const fake = SupabaseLocalEnvironmentFakeIo.create();
+    await SupabaseLocalEnvironment.switchRemote({
+      io: fake.io,
+      connection: {
+        projectId: "abcdefghijklmnopqrst",
+        apiUrl: "https://abcdefghijklmnopqrst.supabase.co",
+        databaseUrl: "postgresql://u:p@h:5432/postgres",
+        publishableKey: "sb_publishable_x",
+        secretKey: "sb_secret_x",
+      },
+    });
+
+    const report = await SupabaseStatus.readStatusReport(fake.io);
+
+    expect(report.switchKind).toBe("remote");
+    expect(fake.commands).toEqual([]);
   });
 });

@@ -189,6 +189,15 @@ async function _restoreFiles(
 
 /** Reads and writes the backup manifest and its copied files. */
 export const SupabaseBackupStore = {
+  /** The project a manifest's switch moved onto, local or hosted. */
+  getProjectIdFromManifest: (
+    manifest: Readonly<SupabaseBackupManifest>,
+  ): string => {
+    return manifest.kind === "local"
+      ? manifest.temporaryProjectId
+      : manifest.remoteProjectId;
+  },
+
   createBackup: _createBackup,
   readManifest: _readManifest,
   restoreFiles: _restoreFiles,

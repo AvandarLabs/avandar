@@ -1,11 +1,11 @@
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { BranchWorktrees } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/BranchWorktrees/BranchWorktrees";
 import { createSupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/createSupabaseLocalEnvironmentIo";
 import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
-import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
 import { SupabaseDockerCleanup } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseDockerCleanup";
+import { SupabaseSwitchState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState/SupabaseSwitchState";
 import { DockerInventory } from "@ava-cli/SupabaseCli/SupabasePrune/DockerInventory/DockerInventory";
 import { SupabasePrunePlan } from "@ava-cli/SupabaseCli/SupabasePrune/SupabasePrunePlan/SupabasePrunePlan";
 import { CliTheme } from "@ava-cli/utils/CliTheme/CliTheme";
@@ -25,6 +25,7 @@ const COMMAND_NAME = "ava supabase prune";
 
 type PruneOptions = {
   all?: boolean;
+  includeUnverified?: boolean;
   keep?: string;
   dryRun?: boolean;
   images?: boolean;
@@ -37,7 +38,9 @@ export const SupabasePruneHelp: CommandHelpSpec = {
   commandPath: ["supabase", "prune"],
   summary:
     "Delete the local Supabase projects whose branch or worktree no longer exists: their containers, networks, and database volumes. The shared develop project and every project a current branch uses are never offered.",
-  usage: ["ava supabase prune [--all | --keep <id...>] [--images] [--dry-run]"],
+  usage: [
+    "ava supabase prune [--all | --keep <id...>] [--include-unverified] [--images] [--dry-run]",
+  ],
   options: [
     {
       label: "--all",
@@ -47,6 +50,11 @@ export const SupabasePruneHelp: CommandHelpSpec = {
       label: "--keep <id...>",
       description:
         "Delete every candidate except these project ids, without asking.",
+    },
+    {
+      label: "--include-unverified",
+      description:
+        "With --all or --keep, also delete candidates known only by their name. Their containers are gone, so nothing proves they came from this repository.",
     },
     {
       label: "--images",
@@ -104,7 +112,10 @@ function _getResourceText(project: Readonly<DockerSupabaseProject>): string {
 }
 
 function _makeCandidateLabel(candidate: Readonly<PruneCandidate>): string {
-  return `${candidate.project.projectId}  (${_getReasonText(candidate.reason)}; ${_getResourceText(candidate.project)})`;
+  const unverified = candidate.isVerified
+    ? ""
+    : " [name only, not preselected]";
+  return `${candidate.project.projectId}  (${_getReasonText(candidate.reason)}; ${_getResourceText(candidate.project)})${unverified}`;
 }
 
 /** The project id each worktree's Supabase CLI resolves to right now. */
@@ -113,20 +124,9 @@ async function _readWorktreeProjectIds(
 ): Promise<WorktreeProjectId[]> {
   const projectIds = await promiseMap(worktreePaths, async (worktreePath) => {
     try {
-      const configContents = await readFile(
-        path.join(worktreePath, "supabase", "config.toml"),
-        "utf8",
+      const { projectId } = await SupabaseSwitchState.readEffectiveConfig(
+        createSupabaseLocalEnvironmentIo(worktreePath),
       );
-      const envContents = await readFile(
-        path.join(worktreePath, ".env.development"),
-        "utf8",
-      ).catch(() => {
-        return "";
-      });
-      const { projectId } = SupabaseConfigOverrides.makeEffectiveState({
-        config: SupabaseConfig.makeStateFromContents(configContents),
-        envContents,
-      });
       return [{ worktreePath, projectId }];
     } catch {
       // A worktree whose directory is gone has no project to protect.
@@ -144,8 +144,28 @@ async function _readPlan(repoRoot: string): Promise<SupabasePrunePlanResult> {
       BranchWorktrees.readWorktrees(repoRoot),
       readFile(path.join(repoRoot, "supabase", "config.toml"), "utf8"),
     ]);
+  const workdirs = [
+    ...new Set(
+      dockerProjects.flatMap(({ workdirs: projectWorkdirs }) => {
+        return projectWorkdirs;
+      }),
+    ),
+  ];
+  const existingWorkdirs = (
+    await promiseMap(workdirs, async (workdir) => {
+      return await access(workdir).then(
+        () => {
+          return [workdir];
+        },
+        () => {
+          return [];
+        },
+      );
+    })
+  ).flat();
   return SupabasePrunePlan.make({
     dockerProjects,
+    existingWorkdirs,
     sharedProjectId:
       SupabaseConfig.makeStateFromContents(configContents).projectId,
     localBranches,
@@ -181,8 +201,11 @@ async function _selectCandidates(
   | { kind: "cancelled" }
 > {
   const { candidates, flags } = options;
+  const unattendedCandidates = candidates.filter(({ isVerified }) => {
+    return isVerified || flags.includeUnverified === true;
+  });
   if (flags.all === true) {
-    return { kind: "selected", candidates };
+    return { kind: "selected", candidates: unattendedCandidates };
   }
   if (flags.keep !== undefined) {
     const keepIds = flags.keep.split(/[\s,]+/).filter((id) => {
@@ -201,7 +224,7 @@ async function _selectCandidates(
         }
       : {
           kind: "selected",
-          candidates: candidates.filter(({ project }) => {
+          candidates: unattendedCandidates.filter(({ project }) => {
             return !keepIds.includes(project.projectId);
           }),
         };
@@ -220,8 +243,8 @@ async function _selectCandidates(
     isMultiSelect: true,
     initialState: {
       cursorIndex: 0,
-      selectedIndexes: candidates.map((_candidate, index) => {
-        return index;
+      selectedIndexes: candidates.flatMap(({ isVerified }, index) => {
+        return isVerified ? [index] : [];
       }),
     },
   });
@@ -417,6 +440,12 @@ export const SupabasePruneCli = Acclimate.createCLI("prune")
     description: "Project ids to keep; every other candidate is deleted.",
     required: false,
     type: "string",
+  })
+  .addOption({
+    name: "--include-unverified",
+    description: "With --all or --keep, include name-only candidates.",
+    required: false,
+    type: "boolean",
   })
   .addOption({
     name: "--images",

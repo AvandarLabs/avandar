@@ -34,8 +34,15 @@ const BASE_INPUT = {
   ],
 };
 
-function _makePlan(dockerProjects: readonly DockerSupabaseProject[]) {
-  return SupabasePrunePlan.make({ ...BASE_INPUT, dockerProjects });
+function _makePlan(
+  dockerProjects: readonly DockerSupabaseProject[],
+  existingWorkdirs: readonly string[] = [],
+) {
+  return SupabasePrunePlan.make({
+    ...BASE_INPUT,
+    dockerProjects,
+    existingWorkdirs,
+  });
 }
 
 describe("SupabasePrunePlan.make", () => {
@@ -74,8 +81,33 @@ describe("SupabasePrunePlan.make", () => {
       {
         project,
         reason: { kind: "worktreeRemoved", worktreePath: `${ROOT}/feat/old` },
+        isVerified: true,
       },
     ]);
+  });
+
+  it("leaves alone a project whose workdir still exists on disk", () => {
+    const workdir = `${ROOT}/feat/old`;
+
+    expect(
+      _makePlan([_makeProject("feat-old", [workdir])], [workdir])
+        .ignoredProjectIds,
+    ).toEqual(["feat-old"]);
+  });
+
+  it("leaves alone a sibling repository under a short branch's parent", () => {
+    const plan = SupabasePrunePlan.make({
+      ...BASE_INPUT,
+      localBranches: [...BASE_INPUT.localBranches, "nux"],
+      worktrees: [
+        ...BASE_INPUT.worktrees,
+        { worktreePath: "/src/nux", branch: "nux" },
+      ],
+      dockerProjects: [_makeProject("other-app", ["/src/other-app"])],
+      existingWorkdirs: [],
+    });
+
+    expect(plan.ignoredProjectIds).toEqual(["other-app"]);
   });
 
   it("keeps a project whose worktree is gone but whose branch still exists", () => {
@@ -84,6 +116,7 @@ describe("SupabasePrunePlan.make", () => {
       ...BASE_INPUT,
       localBranches: [...BASE_INPUT.localBranches, "feat/nux-old"],
       dockerProjects: [project],
+      existingWorkdirs: [],
     });
 
     expect(plan.candidates).toEqual([]);
@@ -97,7 +130,7 @@ describe("SupabasePrunePlan.make", () => {
     const project = _makeProject("fix-gone");
 
     expect(_makePlan([project]).candidates).toEqual([
-      { project, reason: { kind: "branchGone" } },
+      { project, reason: { kind: "branchGone" }, isVerified: false },
     ]);
   });
 

@@ -214,10 +214,13 @@ async function _readStatusJson(
 async function _readStatusReport(
   io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<SupabaseStatusReport> {
-  const [sources, statusJson] = await Promise.all([
-    SupabaseSwitchState.readSources(io),
-    _readStatusJson(io),
-  ]);
+  const sources = await SupabaseSwitchState.readSources(io);
+  // A hosted project has no local stack to ask, and the shared stack's
+  // status would describe a database this worktree does not use.
+  const statusJson =
+    SupabaseSwitchState.makeFromSources(sources).switchKind === "remote"
+      ? undefined
+      : await _readStatusJson(io);
   return _makeStatusReport({ ...sources, statusJson });
 }
 
