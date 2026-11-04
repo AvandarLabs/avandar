@@ -669,6 +669,7 @@ Auth URLs), then builds the app against it and deploys it to the Vercel
 |---|---|---|
 | `69cbdad98` | feat(ci): deploy demo/* branches to demo.avandarlabs.com | All of it |
 | `14888b6f0` | fix(ci): stop recording demo deploys as staging deployments | All of it |
+| `e36dcb1c9` | fix(ci): catch a bad Vercel team ID early and keep Sensitive placeholders out of the demo build | All of it |
 
 **Files:** `.github/workflows/demo.yaml`,
 `scripts/demo/ensureSupabaseBranch.sh`,
