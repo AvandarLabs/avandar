@@ -1,0 +1,167 @@
+name:
+  id: motionAtlas.cold-chain-custody.name
+  message: Track monitored custody
+description:
+  id: motionAtlas.cold-chain-custody.description
+  message:
+    The same vaccine carrier or specimen container passes through authored custody
+    stops. Identity, seal state, monitoring records and acknowledgements stay visible
+    and distinct throughout the handoffs.
+category:
+  id: motionAtlas.cold-chain-custody.category
+  message: Physical logistics and custody
+useWhen:
+  id: motionAtlas.cold-chain-custody.useWhen
+  message:
+    Show that arriving at the destination does not by itself establish a complete
+    condition record.
+intent:
+  id: motionAtlas.cold-chain-custody.intent
+  message:
+    Show that arriving at the destination does not by itself establish a complete
+    condition record.
+creativeDirection:
+  id: motionAtlas.cold-chain-custody.creativeDirection
+  message:
+    Establish one to five labeled containers and their persistent identity ribbons.
+    Between frames 36..115 carry each container through three custody stops; attach a
+    seal marker, monitoring tab and acknowledgement stub at each stop, keeping missing
+    records visibly open. The same identifier stays attached through every handoff. Hold
+    the received containers beside a checkpoint ledger at frames 116..167 before the
+    common exit. A small globe is optional context; the local route is always schematic.
+distinction:
+  id: motionAtlas.cold-chain-custody.distinction
+  message:
+    Merges cold-chain monitoring and specimen identity tracking. Unlike the generic
+    custody-transfer gate, this preserves a multi-stop identity/record ledger and may
+    show missing evidence after physical receipt.
+prompt:
+  id: motionAtlas.cold-chain-custody.prompt
+  message:
+    Use Track monitored custody (cold-chain-custody) for a fictional or approved
+    authored example. Show that arriving at the destination does not by itself establish
+    a complete condition record.
+tags:
+  - id: motionAtlas.cold-chain-custody.tags.0
+    message: cold chain
+  - id: motionAtlas.cold-chain-custody.tags.1
+    message: vaccine distribution
+  - id: motionAtlas.cold-chain-custody.tags.2
+    message: shipment
+  - id: motionAtlas.cold-chain-custody.tags.3
+    message: temperature records
+  - id: motionAtlas.cold-chain-custody.tags.4
+    message: custody
+  - id: motionAtlas.cold-chain-custody.tags.5
+    message: refrigerated transport
+  - id: motionAtlas.cold-chain-custody.tags.6
+    message: last mile
+  - id: motionAtlas.cold-chain-custody.tags.7
+    message: receiving
+  - id: motionAtlas.cold-chain-custody.tags.8
+    message: laboratory specimen
+  - id: motionAtlas.cold-chain-custody.tags.9
+    message: chain of custody
+  - id: motionAtlas.cold-chain-custody.tags.10
+    message: sample handoff
+  - id: motionAtlas.cold-chain-custody.tags.11
+    message: courier
+  - id: motionAtlas.cold-chain-custody.tags.12
+    message: traceability
+  - id: motionAtlas.cold-chain-custody.tags.13
+    message: specimen ID
+  - id: motionAtlas.cold-chain-custody.tags.14
+    message: receipt acknowledgement
+  - id: motionAtlas.cold-chain-custody.tags.15
+    message: transport pouch
+goodFor:
+  - id: motionAtlas.cold-chain-custody.goodFor.0
+    message: Explain why a shipment needs both custody and condition records.
+  - id: motionAtlas.cold-chain-custody.goodFor.1
+    message:
+      Introduce a fictional vaccine distribution story before showing sourced
+      operational evidence.
+  - id: motionAtlas.cold-chain-custody.goodFor.2
+    message: Distinguish containers delivered from containers with complete monitoring records.
+  - id: motionAtlas.cold-chain-custody.goodFor.3
+    message: Introduce specimen traceability without depicting a test result.
+  - id: motionAtlas.cold-chain-custody.goodFor.4
+    message: Explain a missing custody acknowledgement despite physical receipt.
+  - id: motionAtlas.cold-chain-custody.goodFor.5
+    message: Distinguish the specimen's identity from its transport packaging.
+domains:
+  - id: motionAtlas.cold-chain-custody.domains.0
+    message: Physical logistics and custody
+aliases:
+  - id: motionAtlas.cold-chain-custody.aliases.0
+    message: cold chain
+  - id: motionAtlas.cold-chain-custody.aliases.1
+    message: vaccine distribution
+  - id: motionAtlas.cold-chain-custody.aliases.2
+    message: shipment
+notFor:
+  - id: motionAtlas.cold-chain-custody.notFor.0
+    message:
+      One container glyph represents one shipping container, never one dose or one
+      vaccinated person. Container count is crates.length and remains constant
+      throughout all handoffs.
+  - id: motionAtlas.cold-chain-custody.notFor.1
+    message:
+      Every crate has exactly one checkpoint per stop. Monitoring categories are
+      authored records, not temperature calculations, clinical clearance, or evidence of
+      potency.
+  - id: motionAtlas.cold-chain-custody.notFor.2
+    message:
+      The globe provides general world context only. The route and local map are
+      fictional, have no real coordinates or borders, and must carry the configured
+      schematic caption.
+  - id: motionAtlas.cold-chain-custody.notFor.3
+    message:
+      No temperatures, thresholds, vaccine recommendations, handling instructions, or
+      real delivery speed are inferred. All delivery motion is editorial compression.
+  - id: motionAtlas.cold-chain-custody.notFor.4
+    message:
+      A receipt acknowledgement proves only the authored administrative event, not
+      specimen suitability, test completion, a result, or diagnostic validity.
+  - id: motionAtlas.cold-chain-custody.notFor.5
+    message:
+      Transport and packaging are stylized props. This animation gives no clinical
+      collection, biosafety, shipping, storage, or chain-of-custody compliance
+      instructions.
+  - id: motionAtlas.cold-chain-custody.notFor.6
+    message:
+      The example has one linear custody sequence and cannot depict pooled specimens,
+      aliquots, split ownership, or bulk shipment counts.
+  - id: motionAtlas.cold-chain-custody.notFor.7
+    message:
+      The legend treats monitoring, custody acknowledgement and seal records as
+      distinct. None establishes temperature compliance, specimen validity or clinical
+      safety without supplied evidence.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.cold-chain-custody.motionBeats.0
+      message: Establish the supplied identities and setting.
+  - startFrame: 36
+    endFrame: 115
+    description:
+      id: motionAtlas.cold-chain-custody.motionBeats.1
+      message:
+        Establish one to five labeled containers and their persistent identity ribbons.
+        Between frames 36..115 carry each container through three custody stops; attach
+        a seal marker, monitoring tab and acknowledgement stub at each stop, keeping
+        missing records visibly open. The same identifier stays attached through every
+        handoff. Hold the received containers beside a checkpoint ledger at frames
+        116..167 before the common exit. A small globe is optional context; the local
+        route is always schematic.
+  - startFrame: 116
+    endFrame: 167
+    description:
+      id: motionAtlas.cold-chain-custody.motionBeats.2
+      message: Hold the authored final records and derived quantities.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.cold-chain-custody.motionBeats.3
+      message: Return to the opaque ground through the shared envelope.

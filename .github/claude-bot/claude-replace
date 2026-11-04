@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# Finds and replaces text across every tracked file that matches.
+#
+# Usage:
+#   claude-replace [--fixed] <pattern> <replacement> [<pathspec>...]
+#
+#   --fixed      Treat <pattern> and <replacement> as literal text. Without it,
+#                <pattern> is an extended regex and <replacement> may use \1
+#                and & as in sed.
+#   <pathspec>   Limits the search, e.g. 'src/**/*.tsx'. Defaults to the
+#                whole repo.
+#
+# Only files tracked by git are searched, so node_modules and build output are
+# skipped. Prints a diff stat of what changed.
+#
+# The @claude bot uses this instead of git grep or xargs, which can each run
+# any command. Edits go through sed --sandbox, which rejects the sed commands
+# that run programs or read and write other files.
+
+set -euo pipefail
+
+# Separates the parts of the sed s command. A control character, so a
+# pattern or replacement containing / needs no escaping.
+readonly DELIMITER=$'\x01'
+
+usage() {
+  echo "Usage: claude-replace [--fixed] <pattern> <replacement> [<pathspec>...]" >&2
+  exit 1
+}
+
+# Escapes text so sed's extended regex matches it literally.
+escape_pattern() {
+  printf '%s' "$1" | sed -e 's/[][\.*^$+?(){}|]/\\&/g'
+}
+
+# Escapes text so sed inserts it literally as a replacement.
+escape_replacement() {
+  printf '%s' "$1" | sed -e 's/[\&]/\\&/g'
+}
+
+is_fixed=false
+if [[ "${1:-}" == "--fixed" ]]; then
+  is_fixed=true
+  shift
+fi
+[[ $# -ge 2 ]] || usage
+
+pattern="$1"
+replacement="$2"
+shift 2
+
+if [[ -z "$pattern" ]]; then
+  echo "Error: pattern must not be empty" >&2
+  exit 1
+fi
+if [[ "$pattern$replacement" == *"$DELIMITER"* || "$pattern$replacement" == *$'\n'* ]]; then
+  echo "Error: pattern and replacement must be single lines without control characters" >&2
+  exit 1
+fi
+
+if [[ "$is_fixed" == true ]]; then
+  grep_mode=(--fixed-strings)
+  sed_pattern="$(escape_pattern "$pattern")"
+  sed_replacement="$(escape_replacement "$replacement")"
+else
+  grep_mode=(--extended-regexp)
+  sed_pattern="$pattern"
+  sed_replacement="$replacement"
+fi
+
+mapfile -d '' matching_files < <(
+  git grep -z -I --files-with-matches "${grep_mode[@]}" -e "$pattern" -- "$@" || true
+)
+
+if [[ ${#matching_files[@]} -eq 0 ]]; then
+  echo "No tracked files match." >&2
+  exit 0
+fi
+
+# xargs splits a long file list across several sed runs, so a repo-wide
+# replace cannot exceed the argument length limit.
+sed_script="s${DELIMITER}${sed_pattern}${DELIMITER}${sed_replacement}${DELIMITER}g"
+printf '%s\0' "${matching_files[@]}" | xargs -0 sed --sandbox -i -E "$sed_script" --
+printf '%s\0' "${matching_files[@]}" | xargs -0 git diff --stat --

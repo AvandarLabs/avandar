@@ -1,0 +1,52 @@
+.contentFieldHelp {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 5px 0 12px;
+}
+
+.contentFieldField {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0;
+  min-width: 0;
+}
+
+.contentFieldField label {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.contentFieldField input:not([type="checkbox"]),
+.contentFieldField textarea,
+.contentFieldField select {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-sizing: border-box;
+  caret-color: var(--ink);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  min-width: 0;
+  padding: 9px;
+  width: 100%;
+}
+
+.contentFieldField input[aria-invalid="true"],
+.contentFieldField textarea[aria-invalid="true"],
+.contentFieldField select[aria-invalid="true"] {
+  border-color: #a73135;
+}
+
+.contentFieldField input[type="checkbox"] {
+  accent-color: var(--ink);
+}
+
+.contentFieldField input:focus-visible,
+.contentFieldField select:focus-visible,
+.contentFieldField textarea:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}

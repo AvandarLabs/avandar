@@ -1,0 +1,121 @@
+name:
+  id: motionAtlas.referral-return-acknowledgement.name
+  message: Close the referral loop
+description:
+  id: motionAtlas.referral-return-acknowledgement.description
+  message: People move from a referring clinic to a receiving service, while an
+    acknowledgement travels back independently. Attendance and a closed communication
+    loop remain visibly distinct.
+category:
+  id: motionAtlas.referral-return-acknowledgement.category
+  message: People and return communication
+useWhen:
+  id: motionAtlas.referral-return-acknowledgement.useWhen
+  message: Show that a referral is not fully communicated merely because the person attended.
+intent:
+  id: motionAtlas.referral-return-acknowledgement.intent
+  message: Show that a referral is not fully communicated merely because the person attended.
+creativeDirection:
+  id: motionAtlas.referral-return-acknowledgement.creativeDirection
+  message:
+    Frames 12..40 reveal the referring clinic with three people and three matching
+    referral slips. Frames 41..113 let only attended people cross to the receiving
+    service, then send a returned acknowledgement slip back for only the supplied
+    completed loop. Frames 114..167 hold one returned loop, one
+    attended-but-unacknowledged case, and one waiting case in their physical locations;
+    fade to ground by frame 179.
+distinction:
+  id: motionAtlas.referral-return-acknowledgement.distinction
+  message:
+    Unlike node-traversal or data-pipeline, person movement and document return are
+    independent motions traveling in opposite directions. The resolved view can contain
+    attendance without a returned acknowledgement.
+prompt:
+  id: motionAtlas.referral-return-acknowledgement.prompt
+  message:
+    Use Close the referral loop (referral-return-acknowledgement) for a fictional
+    or approved authored example. Show that a referral is not fully communicated merely
+    because the person attended.
+tags:
+  - id: motionAtlas.referral-return-acknowledgement.tags.0
+    message: referral
+  - id: motionAtlas.referral-return-acknowledgement.tags.1
+    message: care continuity
+  - id: motionAtlas.referral-return-acknowledgement.tags.2
+    message: closed loop
+  - id: motionAtlas.referral-return-acknowledgement.tags.3
+    message: return acknowledgement
+  - id: motionAtlas.referral-return-acknowledgement.tags.4
+    message: service handoff
+  - id: motionAtlas.referral-return-acknowledgement.tags.5
+    message: attendance
+  - id: motionAtlas.referral-return-acknowledgement.tags.6
+    message: referring clinic
+  - id: motionAtlas.referral-return-acknowledgement.tags.7
+    message: receiving service
+goodFor:
+  - id: motionAtlas.referral-return-acknowledgement.goodFor.0
+    message: Explain referral tracking across separate care teams.
+  - id: motionAtlas.referral-return-acknowledgement.goodFor.1
+    message:
+      Distinguish attendance at another service from confirmation returned to the
+      referring team.
+  - id: motionAtlas.referral-return-acknowledgement.goodFor.2
+    message: Show an unresolved handoff without implying treatment failure.
+domains:
+  - id: motionAtlas.referral-return-acknowledgement.domains.0
+    message: People and return communication
+aliases:
+  - id: motionAtlas.referral-return-acknowledgement.aliases.0
+    message: referral
+  - id: motionAtlas.referral-return-acknowledgement.aliases.1
+    message: care continuity
+  - id: motionAtlas.referral-return-acknowledgement.aliases.2
+    message: closed loop
+notFor:
+  - id: motionAtlas.referral-return-acknowledgement.notFor.0
+    message:
+      The denominator is referrals.length, one referral for one distinct person in
+      this example. Waiting + attended without return + returned acknowledgement equals
+      the total.
+  - id: motionAtlas.referral-return-acknowledgement.notFor.1
+    message:
+      acknowledged=true requires attended=true. Derived attendance counts and
+      returned-acknowledgement counts are labeled separately and may overlap; they must
+      not be summed as exclusive categories.
+  - id: motionAtlas.referral-return-acknowledgement.notFor.2
+    message:
+      An acknowledgement is communication evidence only. It does not establish
+      diagnosis, treatment completion, recovery, clinical quality, or an appropriate
+      referral.
+  - id: motionAtlas.referral-return-acknowledgement.notFor.3
+    message:
+      No emergency priorities, treatment choices, clinical referral criteria, travel
+      durations, or personal medical information are depicted.
+motionBeats:
+  - startFrame: 12
+    endFrame: 40
+    description:
+      id: motionAtlas.referral-return-acknowledgement.motionBeats.0
+      message: Reveal the supplied setting and identities.
+  - startFrame: 41
+    endFrame: 113
+    description:
+      id: motionAtlas.referral-return-acknowledgement.motionBeats.1
+      message:
+        Frames 12..40 reveal the referring clinic with three people and three matching
+        referral slips. Frames 41..113 let only attended people cross to the receiving
+        service, then send a returned acknowledgement slip back for only the supplied
+        completed loop. Frames 114..167 hold one returned loop, one
+        attended-but-unacknowledged case, and one waiting case in their physical
+        locations; fade to ground by frame 179.
+  - startFrame: 114
+    endFrame: 167
+    description:
+      id: motionAtlas.referral-return-acknowledgement.motionBeats.2
+      message: Hold the supplied final records and separate derived quantities.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.referral-return-acknowledgement.motionBeats.3
+      message: Return to the opaque ground through the shared envelope.

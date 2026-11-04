@@ -104,6 +104,10 @@ fn injects_and_filters_against_real_difit() {
         "web-shell".into(),
         root.join("summary.md"),
         root.join("test-plan.md"),
+        dif::web::CommentChannels {
+            dispatch: std::sync::Arc::new(dif::inject::mode::DispatchControl::new()),
+            github: dif::github::registry::SharedRegistry::load(root.join("r-github.json")),
+        },
     )
     .unwrap();
     std::thread::sleep(Duration::from_millis(50));

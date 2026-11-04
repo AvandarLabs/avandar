@@ -40,7 +40,7 @@ const ONE_TEXT_RULE: StructuredQuery.FilterGroup = {
     {
       type: "rule",
       id: "r1",
-      columnName: "Admin2",
+      columnId: "qc_Admin2" as QueryColumn.Id,
       columnDataType: "varchar",
       operator: "contains",
       value: "",
@@ -61,6 +61,47 @@ function _renderField(
 }
 
 describe("QueryFiltersField", () => {
+  it("keeps the selected filter column after that source column is renamed", async () => {
+    const onChange = vi.fn<(filter: StructuredQuery.FilterGroup) => void>();
+    const { rerender } = render(
+      <QueryFiltersField
+        columns={COLUMNS}
+        value={ONE_TEXT_RULE}
+        onChange={onChange}
+      />,
+      { wrapper: AvandarAppProvider },
+    );
+    fireEvent.change(screen.getByTestId("filter-value-scalar"), {
+      target: { value: "Butte" },
+    });
+    fireEvent.blur(screen.getByTestId("filter-value-scalar"));
+    await waitFor(() => {
+      return expect(onChange).toHaveBeenCalled();
+    });
+    const committedFilter = onChange.mock.calls.at(-1)![0];
+    const originalColumn = COLUMNS[0]!;
+    const renamedColumn = {
+      ...originalColumn,
+      baseColumn: { ...originalColumn.baseColumn, name: "County" },
+    };
+
+    rerender(
+      <QueryFiltersField
+        columns={[COLUMNS[1]!, renamedColumn, COLUMNS[2]!]}
+        value={committedFilter}
+        onChange={onChange}
+      />,
+    );
+
+    expect(screen.getByLabelText("Column", { selector: "input" })).toHaveValue(
+      "County",
+    );
+    expect(screen.getByTestId("filter-value-scalar")).toHaveValue("Butte");
+    expect(
+      screen.getByLabelText("Condition", { selector: "input" }),
+    ).toHaveValue("contains");
+  });
+
   it("keeps focus in the value input across several keystrokes", () => {
     _renderField(ONE_TEXT_RULE);
     const input = screen.getByTestId("filter-value-scalar");
@@ -94,7 +135,7 @@ describe("QueryFiltersField", () => {
         {
           type: "rule",
           id: "r2",
-          columnName: "Admin2",
+          columnId: "qc_Admin2" as QueryColumn.Id,
           columnDataType: "varchar",
           operator: "=",
           value: "Butte",
@@ -126,7 +167,7 @@ describe("QueryFiltersField", () => {
         {
           type: "rule",
           id: "r1",
-          columnName: "daily_new_cases",
+          columnId: "qc_daily_new_cases" as QueryColumn.Id,
           columnDataType: "bigint",
           operator: ">",
           value: 5,
@@ -173,7 +214,7 @@ describe("QueryFiltersField", () => {
         {
           type: "rule",
           id: "r1",
-          columnName: "daily_new_cases",
+          columnId: "qc_daily_new_cases" as QueryColumn.Id,
           columnDataType: "bigint",
           operator: ">",
           value: "abc",

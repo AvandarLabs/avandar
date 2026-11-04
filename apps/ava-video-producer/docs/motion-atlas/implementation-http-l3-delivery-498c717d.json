@@ -1,0 +1,1627 @@
+{
+  "schemaVersion": 1,
+  "status": "historical-L3-delivery-and-decoded-playback-inspection-recorded-no-global-acceptance",
+  "head": "498c717d53240d15a29396830759a571a938f492",
+  "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+  "candidateId": "L3",
+  "verification": {
+    "originalPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-delivery-verification.json",
+    "sha256": "f6a4239d0289d044d5a4b6e837c989c92a3d03ffeac013635fca51723f960a21",
+    "bytes": 41880,
+    "document": {
+      "head": "498c717d53240d15a29396830759a571a938f492",
+      "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+      "candidateId": "L3",
+      "preset": "schema-mapping",
+      "jobId": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+      "verifiedAt": "2026-10-18T01:02:24.070888+00:00",
+      "status": "Actual HTTP/native delivery verified for bytes, request/film semantics, metadata and existing gate evidence. Decoded browser playback pending.",
+      "checks": {
+        "completeEditedAndNativeCopiedRequest": true,
+        "exactSinglePostAndJobPollComplete": true,
+        "nativeSavedAtExactCompletedJobRoute": true,
+        "nativeServerGatedPictureByteEquality": true,
+        "deliveryShaMatchesActualBytes": true,
+        "productionSourceFingerprintRecomputed": true,
+        "productionStockRequestFingerprintRecomputed": true,
+        "productionShowcaseFilmFingerprintRecomputed": true,
+        "distinctEnvelopeSemanticsEstablished": true,
+        "silentH2641280x80030fps180frames6secondsIndependentFfprobe": true,
+        "actualFrameGateSuccessLogVerified": true,
+        "gateThresholdsUnchangedAndSourceByteIdenticalToDevelop": true,
+        "preview90And150PersonallyInspected": true,
+        "immutableNativePlaybackCopyCreated": true,
+        "allowlistAndSingleEntryBatchPrepared": true
+      },
+      "fingerprints": {
+        "stockRequest": {
+          "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+          "configurationHash": "b5a890418fecb49b849ece445337b4ed8a8e1ce5e34a0f78005c7bce6fbfb181"
+        },
+        "showcaseFilm": {
+          "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+          "configurationHash": "56701f8aa9d35c96191a735010b246c50f5a35d802589a12a3f86f5568766bc3"
+        },
+        "equal": false,
+        "reason": "Same authored preset/input/palette; production film includes delivery/id/loop/captions/source wrapper fields. Both use createStockFingerprint with identical parameters/current source, so envelope differences intentionally yield distinct configuration hashes."
+      },
+      "native": {
+        "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-schema-mapping.mp4",
+        "sha256": "4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47",
+        "bytes": 116018
+      },
+      "server": {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/stock-schema-mapping.mp4",
+        "sha256": "4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47",
+        "bytes": 116018
+      },
+      "existingGateEvidence": {
+        "gateSha256": "ced692668c37cc06a5af82ddbf87406d865c710446fbf747f07a03c405462bd0",
+        "developGateSha256": "ced692668c37cc06a5af82ddbf87406d865c710446fbf747f07a03c405462bd0",
+        "byteIdenticalToDevelop": true,
+        "thresholds": {
+          "TILE_SPIKE_DB": "3",
+          "LUMA_JUMP": "25",
+          "FLAT": "120"
+        },
+        "failureExitPresent": true,
+        "actualGateLogPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/frame-check.txt",
+        "actualGateLogSha256": "97e269ba82a23a6eed96dc86aa8b2bb9a3fc9114125cbe3b53f504de81cf6ab0",
+        "actualGateOutput": "180 frames, 1280x800\n\ntiled frames: none\n\nluminance jumps over 25: none\n\nloop seam: frame 179 Y=19.0 -> frame 0 Y=19.0   jump 0.0\n",
+        "seam": {
+          "lastY": 19.0,
+          "firstY": 19.0,
+          "jump": 0.0
+        },
+        "gatedPicturePath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/picture.mp4",
+        "gatedPictureSha256": "4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47",
+        "gatedPictureEqualsNativeAndServer": true,
+        "gateRerun": false
+      },
+      "httpTransportEvidence": {
+        "ruling": 66,
+        "post": {
+          "observedAt": 1792284878523,
+          "requestId": 1,
+          "method": "POST",
+          "url": "http://127.0.0.1:4183/api/exports",
+          "route": "/api/exports",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "rawBody": "{\"id\":\"stock-schema-mapping\",\"options\":{\"accent\":\"#d5e681\",\"background\":\"#111318\",\"input\":{\"mappings\":[{\"source\":\"person_key\",\"target\":\"case_key\",\"type\":\"string\"},{\"source\":\"visit_day\",\"target\":\"event_date\",\"type\":\"date\"}],\"showChecks\":true,\"sourceLabel\":\"Field intake\",\"targetLabel\":\"Case register\"},\"schemaVersion\":1}}",
+          "parsedBody": {
+            "id": "stock-schema-mapping",
+            "options": {
+              "accent": "#d5e681",
+              "background": "#111318",
+              "input": {
+                "mappings": [
+                  {
+                    "source": "person_key",
+                    "target": "case_key",
+                    "type": "string"
+                  },
+                  {
+                    "source": "visit_day",
+                    "target": "event_date",
+                    "type": "date"
+                  }
+                ],
+                "showChecks": true,
+                "sourceLabel": "Field intake",
+                "targetLabel": "Case register"
+              },
+              "schemaVersion": 1
+            }
+          },
+          "exactExpectedBody": true
+        },
+        "postResponse": {
+          "observedAt": 1792284878525,
+          "requestId": 1,
+          "method": "POST",
+          "url": "http://127.0.0.1:4183/api/exports",
+          "route": "/api/exports",
+          "status": 202,
+          "headers": {
+            "content-type": "application/json"
+          },
+          "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+          "body": {
+            "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "state": "running",
+            "message": "Preparing current composition…"
+          }
+        },
+        "completedPoll": {
+          "observedAt": 1792284916372,
+          "requestId": 24,
+          "method": "GET",
+          "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+          "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+          "status": 200,
+          "headers": {
+            "content-type": "application/json"
+          },
+          "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"complete\",\"message\":\"Download ready\",\"download\":\"/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/download\"}",
+          "body": {
+            "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "state": "complete",
+            "message": "Download ready",
+            "download": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/download"
+          }
+        },
+        "nativeDownload": {
+          "observedAt": 1792284916397,
+          "eventAt": 1792284916397,
+          "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/download",
+          "suggestedFilename": "stock-schema-mapping.mp4",
+          "savedPath": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-schema-mapping.mp4",
+          "state": "saved",
+          "failure": null,
+          "savedAt": 1792284916399
+        },
+        "actualDownloadGetStatus": null,
+        "actualDownloadGetHeaders": null,
+        "pageDownloadGetResponseObserved": false,
+        "interpretation": "Successful direct native attachment is bound to exact same-origin completed-job URL. Independent native/server/gated-picture byte equality is verified. Page GET response status/headers remain unobserved.",
+        "galleryAndDialogPausedBeforeStart": {
+          "observedAt": 1792284877456,
+          "phase": "before-start",
+          "galleryControl": "Play all animations",
+          "activeCardIndicators": 0,
+          "previewFrame": "150",
+          "previewControl": "Play preview",
+          "notice": "Configured JSON copied",
+          "downloadControl": "Download MP4"
+        },
+        "observerErrors": [],
+        "originalStrictStatus02Path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-498c717d-status-02.json",
+        "assessorRevision": {
+          "ruling": 66,
+          "originalFinalizer": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/finalize.js",
+          "originalSha256": "be48fe373ba69664c408b92b1804e8d11e7331939aaf5a18614a0c041b08b859",
+          "revisedFinalizer": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/finalize-native-attachment.js",
+          "revisedSha256": "d8a7edf86c5afb606ee7e9a85fd671e04ff30ce5dfec453897af20b8c07286aa",
+          "changes": "Only cdAssess accepts direct native attachment at exact completed same-origin job URL when page GET response is not exposed. Blob path remains response-dependent. Original observation state/helper identity preserved. No status/headers invented."
+        }
+      },
+      "independentFfprobe": {
+        "command": [
+          "ffprobe",
+          "-v",
+          "error",
+          "-count_frames",
+          "-show_streams",
+          "-show_format",
+          "-of",
+          "json",
+          "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-schema-mapping.mp4"
+        ],
+        "exitCode": 0,
+        "preservedRawStdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/proof/native-ffprobe-stdout.json",
+        "result": {
+          "streams": [
+            {
+              "index": 0,
+              "codec_name": "h264",
+              "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+              "profile": "High",
+              "codec_type": "video",
+              "codec_tag_string": "avc1",
+              "codec_tag": "0x31637661",
+              "mime_codec_string": "avc1.640028",
+              "width": 1280,
+              "height": 800,
+              "coded_width": 1280,
+              "coded_height": 800,
+              "has_b_frames": 0,
+              "sample_aspect_ratio": "1:1",
+              "display_aspect_ratio": "8:5",
+              "pix_fmt": "yuvj420p",
+              "level": 40,
+              "color_range": "pc",
+              "color_space": "bt470bg",
+              "chroma_location": "left",
+              "field_order": "progressive",
+              "refs": 3,
+              "is_avc": "true",
+              "nal_length_size": "4",
+              "id": "0x1",
+              "r_frame_rate": "30/1",
+              "avg_frame_rate": "30/1",
+              "time_base": "1/15360",
+              "start_pts": 0,
+              "start_time": "0.000000",
+              "duration_ts": 92160,
+              "duration": "6.000000",
+              "bit_rate": "151941",
+              "bits_per_raw_sample": "8",
+              "nb_frames": "180",
+              "nb_read_frames": "180",
+              "extradata_size": 50,
+              "disposition": {
+                "default": 1,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+              },
+              "tags": {
+                "language": "und",
+                "handler_name": "VideoHandler",
+                "encoder": "Lavc63.1.102 libx264"
+              },
+              "side_data_list": [
+                {
+                  "side_data_type": "ICC Profile"
+                }
+              ]
+            }
+          ],
+          "format": {
+            "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-schema-mapping.mp4",
+            "nb_streams": 1,
+            "nb_programs": 0,
+            "nb_stream_groups": 0,
+            "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+            "format_long_name": "QuickTime / MOV",
+            "start_time": "0.000000",
+            "duration": "6.000000",
+            "size": "116018",
+            "bit_rate": "154690",
+            "probe_score": 100,
+            "tags": {
+              "major_brand": "isom",
+              "minor_version": "512",
+              "compatible_brands": "isomiso2avc1mp41",
+              "encoder": "Lavf63.1.102"
+            }
+          }
+        }
+      },
+      "previewPixelInspection": {
+        "viewedFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/90.jpg",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/150.jpg"
+        ],
+        "viewedImageEvidence": [
+          {
+            "frame": 90,
+            "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/90.jpg",
+            "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/90.jpg",
+            "sha256": "c4b4b415006f0e8e229da928f3541f454a46ccff0b9304fabbbaa8c74efabd8f",
+            "personallyViewed": true,
+            "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+          },
+          {
+            "frame": 150,
+            "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/150.jpg",
+            "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/150.jpg",
+            "sha256": "c4b4b415006f0e8e229da928f3541f454a46ccff0b9304fabbbaa8c74efabd8f",
+            "personallyViewed": true,
+            "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+          }
+        ],
+        "observations": [
+          "Personally viewed actual HTTP export JPEG previews 90 and 150 individually with view_image. Both show Field intake on the left and Case register on the right.",
+          "Exactly two visible relationships are person_key to case_key with string type, and visit_day to event_date with date type. Each has its own checked connector, with no crossing or wrong row association.",
+          "The first connector/check uses the authored yellow-green accent and the second retains the preset's cyan secondary series color, against the authored dark background. Exact hex values are established by copied input and production film props, rather than inferred solely from JPEG pixels.",
+          "Both native preview pictures keep all labels, checks, connectors and the footer caption intact. Type labels are subdued gray but readable at native size. No concrete clipping, overlap or incorrect relationship is visible in these two samples.",
+          "These existing export previews are poster evidence only. They are not screenshots of decoded saved MP4 playback and cannot establish all intermediate states or loop quality."
+        ],
+        "findings": []
+      },
+      "standaloneStockPosterGenerated": false,
+      "selectedPosterEvidence": {
+        "frame": 150,
+        "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/150.jpg",
+        "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/150.jpg",
+        "sha256": "c4b4b415006f0e8e229da928f3541f454a46ccff0b9304fabbbaa8c74efabd8f",
+        "personallyViewed": true,
+        "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+      },
+      "rawFileHashes": {
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-498c717d-configure.json": {
+          "sha256": "463fb5a827b1739f90415858ac08b44fbb2bd192942c8ed328b260ff288e1892",
+          "bytes": 4304
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-498c717d-start.json": {
+          "sha256": "89a1add6d12560c2956d7b3bbe0429c7c8a5cd9d2aa7ef15c8d2fe575eed2156",
+          "bytes": 6320
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-498c717d-status-01.json": {
+          "sha256": "cdd5d02301c6a7f12b767eef9ae73f8ce6e96d112843205d7773ceffa0be720e",
+          "bytes": 18965
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-498c717d-status-02.json": {
+          "sha256": "35f91dd97b45beb0c884a9cf6cac97ede4eedefa9d2a1d2d9a05067e06e2a895",
+          "bytes": 33921
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-498c717d-transport-diagnostic.json": {
+          "sha256": "598c0d0b2283e15856583efd22cdd87780b4f14eb13e31bf545e67290b2a1d51",
+          "bytes": 14044
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-498c717d-finalize.json": {
+          "sha256": "f9702d694ae19331b50333c1898057d18287b4010a17b7718222acac83943311",
+          "bytes": 35464
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-498c717d-preview-inspection.json": {
+          "sha256": "df583bc2872e570da286f72a816ea63ab0c8cb0e7e1a25b3306945a2920cb48b",
+          "bytes": 736
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-assessor-revision.json": {
+          "sha256": "d4955554d9ee4aff2b69f31498b47780edb55f10a934deca80eea15fb469417b",
+          "bytes": 900
+        },
+        "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/finalize.js": {
+          "sha256": "be48fe373ba69664c408b92b1804e8d11e7331939aaf5a18614a0c041b08b859",
+          "bytes": 32408
+        },
+        "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/finalize-native-attachment.js": {
+          "sha256": "d8a7edf86c5afb606ee7e9a85fd671e04ff30ce5dfec453897af20b8c07286aa",
+          "bytes": 33019
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/progress.md": {
+          "sha256": "266da63139b2f89123c9bfa790085b3fbed71d21434bfb0fc9b72c6b2fde9d65",
+          "bytes": 427258
+        },
+        "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-schema-mapping.mp4": {
+          "sha256": "4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47",
+          "bytes": 116018
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/stock-schema-mapping.mp4": {
+          "sha256": "4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47",
+          "bytes": 116018
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/picture.mp4": {
+          "sha256": "4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47",
+          "bytes": 116018
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/delivery.json": {
+          "sha256": "3be16d00555712bc704e7a45ce535abc01b463719ce48c974b4779d49a3d7dd2",
+          "bytes": 2323
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/inputs.json": {
+          "sha256": "30922c12e041cf6f60b43f7ba7dc36d4f275a6ec9d96fe8c7ecd23d00bcf62d7",
+          "bytes": 726
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/frame-check.txt": {
+          "sha256": "97e269ba82a23a6eed96dc86aa8b2bb9a3fc9114125cbe3b53f504de81cf6ab0",
+          "bytes": 130
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/scripts/check-frames.mjs": {
+          "sha256": "ced692668c37cc06a5af82ddbf87406d865c710446fbf747f07a03c405462bd0",
+          "bytes": 6043
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/scripts/showcase/loadFilm/loadFilm.ts": {
+          "sha256": "6b2e691343a91e6fd93e2f66ee93a7d0914d0a61a77793814759fd16ce6fa6eb",
+          "bytes": 5087
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/scripts/showcase/render.ts": {
+          "sha256": "5fbf3d4c730d06c82903b4b1b7447fc354c2a837f36a3bf15eb3fd2edf7d9f78",
+          "bytes": 6267
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/scripts/stock/stockFingerprint/stockFingerprint.ts": {
+          "sha256": "19c29eb53f20dabc8c6918516e02ec4d8713765a8c791e7820c21c7004ad2f3c",
+          "bytes": 7943
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/src/stock/contracts/stockRequestSchema/stockRequestSchema.ts": {
+          "sha256": "134975d0b48df20d12d5bea59a48c0875076ce26a66807ca6fa38402af41b1eb",
+          "bytes": 1616
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/qa/stageMp4Witness.py": {
+          "sha256": "1f9b2c667e2a6c5b73de856c0099d9610280bf56e510d8f37f09e31672abe5a6",
+          "bytes": 7251
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/qa/inspectFinalMp4.js": {
+          "sha256": "c530a0a84a1c6b95e203e20b3164529811ac05bba32bac61f4164fb835a6297d",
+          "bytes": 4757
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/qa/serveFinalPlayback.mjs": {
+          "sha256": "88d7a5afd8baa2894fee1ecb3f9fd4c963c89bd72a511ad13870ef42576b8879",
+          "bytes": 3515
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/100.bundle.js": {
+          "sha256": "8890993f2f44cd671b8f59c6a20c9b82b6c743202b2baf2a1d2adc0298980b44",
+          "bytes": 207
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/100.bundle.js.map": {
+          "sha256": "9b7623a16af596fd6e6afec7cc967b484aea958a1f1098029e137a0b11b94695",
+          "bytes": 346
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/206.bundle.js": {
+          "sha256": "4d35940bb0ed6cdabd557c5d33920e9a08a499cedfec1ee3b2533a93dee8aebc",
+          "bytes": 655804
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/206.bundle.js.map": {
+          "sha256": "f203af98d566b127e655ea8ee4da56d4d508253f9a9f99958f6d01ff80a781ac",
+          "bytes": 700695
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/232.bundle.js": {
+          "sha256": "fa25df8f2462da687e1e92590623069c5457b95ebaf96581cc39fd8c4de793db",
+          "bytes": 327523
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/232.bundle.js.map": {
+          "sha256": "cc9911ac2292e333cbb8cc3eb48458a4b3b8a2000af413c30c354e0eac3337c2",
+          "bytes": 654335
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/474.bundle.js": {
+          "sha256": "96a67880c90e4dfdbc6e1ffc3983dc935a045be4681aacb7dc5ffa03208624f5",
+          "bytes": 157226
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/474.bundle.js.map": {
+          "sha256": "07b07320ddc17bb3996b0d832bce070d2c6f1aa1c274043e0acad78215a3b2bd",
+          "bytes": 177344
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/499.bundle.js": {
+          "sha256": "9620edd72a3fe61fb75cd9746487dd9ea62d4ccdc10e7af42873c6c4dca15e81",
+          "bytes": 998051
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/499.bundle.js.map": {
+          "sha256": "4173ab02422b52d6d7eae307c7d0ad5467e56a325fb4e45e4fd5cd9787231696",
+          "bytes": 1915886
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/50.bundle.js": {
+          "sha256": "444ed5aef53f232cd28d33ad1b90cae7c15f78fc290d4ce5c191bfc80cd56738",
+          "bytes": 205
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/50.bundle.js.map": {
+          "sha256": "3fa963f4dcbdea771bf8c26a4e21230e2475c2ef06de068b370f84fb2d7f2351",
+          "bytes": 347
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/537.bundle.js": {
+          "sha256": "b17b2e563540f428e6a8005c7c5124ade6b0e471014813b2b60d7baa355f04b4",
+          "bytes": 210
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/537.bundle.js.map": {
+          "sha256": "614f39aae7b4786892979bbd766cc953caad147041ee19a7977a6dac8c7192c4",
+          "bytes": 301
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/632.bundle.js": {
+          "sha256": "c0082d20d134e34c41e9acdeadc02581ba708ec686e021e7099ced355001ced3",
+          "bytes": 207
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/632.bundle.js.map": {
+          "sha256": "182c48b077f99ce945bf5a4bd367b4208dddec0782f8f9e4ddb0e9fed6837015",
+          "bytes": 346
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/633.bundle.js": {
+          "sha256": "81f7a316fe6a2d6e44072b1b4cd1d70b03b5a17e3615218347fc60166a104cb0",
+          "bytes": 327703
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/633.bundle.js.map": {
+          "sha256": "25ecb2b75552a67560e42355c61e46d9bd6aa47f9728cbbb5736a135efb5dcd9",
+          "bytes": 348987
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/660.bundle.js": {
+          "sha256": "f87b7e05ee45f9a5896d1abb752c46940a6a4161b1d66555a68715de815a9d48",
+          "bytes": 317528
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/660.bundle.js.map": {
+          "sha256": "efc9542bba166d091130f2d2ebd5c7ce6dbd2e3bb43a4ca7c1336c87d4fbd31a",
+          "bytes": 319743
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/830.bundle.js": {
+          "sha256": "8ed376305f81c678fb1650c7ab632ed0b4ec9a75778b66a3b7caf155465b0c13",
+          "bytes": 712034
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/830.bundle.js.map": {
+          "sha256": "0666336648bff8cfd886f5bcfc909c3d397a496e9d85797b209d775a3d1330bd",
+          "bytes": 773499
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/918.bundle.js": {
+          "sha256": "8136d2b70c620668a126756ab24cddc896d9a22e712b74927a65e8d328d1cf3d",
+          "bytes": 10572
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/918.bundle.js.map": {
+          "sha256": "5259f3360bd1b92828438f4e1c31277bda440297ec8a23ddbebb5d7a0ec144de",
+          "bytes": 9228
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/928.bundle.js": {
+          "sha256": "5c773c4f472620a27f4e762501cd6cd3c83271e6ba9f1191fff720025958710a",
+          "bytes": 2292
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/928.bundle.js.map": {
+          "sha256": "558fcebd723a17183bab8a5b6443b5acd6d3f3dcf864e5ba402c68e41399f650",
+          "bytes": 1996
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/980.bundle.js": {
+          "sha256": "cba593088308c7087f618682b5abb356ae83f016eda60e7d7fa07b609820ef85",
+          "bytes": 4795222
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/980.bundle.js.map": {
+          "sha256": "ca445e1bfdeb94938f3ca28a7358fc3a3c1aae00a89664286a2582556deb74c4",
+          "bytes": 5609211
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/bundle.js": {
+          "sha256": "27906b8d9b6118ef03728c51b47abaae7b1840937d8c57e9008d7872fcfe9766",
+          "bytes": 25068300
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/bundle.js.map": {
+          "sha256": "f2d83bee00fc1542e38cf10043f95f8dde8b0261636a475b7c68ba2fc19afdd9",
+          "bytes": 29457560
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/favicon.ico": {
+          "sha256": "4b00984723c2fed999967eebf9b59f88350f7ab38716f2faf3587829e0f9be77",
+          "bytes": 104640
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/index.html": {
+          "sha256": "5d31cb265e6c4aad82efec442691b39f2087115b9931246564fd8bfa025e0b43",
+          "bytes": 3214
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/public/fonts/OFL-Geist.txt": {
+          "sha256": "f12f59163d92084b0473315ae4566cde0c1233d940ae464f5225a69c347cc691",
+          "bytes": 4387
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/public/fonts/README.md": {
+          "sha256": "3e551ab52c6ce77d12da72e1f90f4ab15b9ceca324434d166fa33fffb62e25b0",
+          "bytes": 441
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/bundle/public/fonts/geist-latin.woff2": {
+          "sha256": "19f9c92546aa300c312235e3125af1b81394d8db9a4bc4a425cd5b641d2d54e1",
+          "bytes": 29400
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/0.jpg": {
+          "sha256": "bbdb3b7fd2bc3968bd7d0aaad22343d0de81a24d98d61eef59f721f48d5cc3ca",
+          "bytes": 6760
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/150.jpg": {
+          "sha256": "c4b4b415006f0e8e229da928f3541f454a46ccff0b9304fabbbaa8c74efabd8f",
+          "bytes": 32048
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/179.jpg": {
+          "sha256": "bbdb3b7fd2bc3968bd7d0aaad22343d0de81a24d98d61eef59f721f48d5cc3ca",
+          "bytes": 6760
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/18.jpg": {
+          "sha256": "979468d6d857eed2087b47eab73ac4cd7cc4b6c71a0eef36e7d3bf149acb71ae",
+          "bytes": 21717
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/36.jpg": {
+          "sha256": "2e2c66bb0dc1fdbe1305f36676a4ce3820818bc4789fe85ec2f61be0fbd12d69",
+          "bytes": 30716
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/90.jpg": {
+          "sha256": "c4b4b415006f0e8e229da928f3541f454a46ccff0b9304fabbbaa8c74efabd8f",
+          "bytes": 32048
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/public/fonts/OFL-Geist.txt": {
+          "sha256": "f12f59163d92084b0473315ae4566cde0c1233d940ae464f5225a69c347cc691",
+          "bytes": 4387
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/public/fonts/README.md": {
+          "sha256": "3e551ab52c6ce77d12da72e1f90f4ab15b9ceca324434d166fa33fffb62e25b0",
+          "bytes": 441
+        },
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/public/fonts/geist-latin.woff2": {
+          "sha256": "19f9c92546aa300c312235e3125af1b81394d8db9a4bc4a425cd5b641d2d54e1",
+          "bytes": 29400
+        },
+        "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configure.js": {
+          "sha256": "feb4bbcd50823b88095fd92d486db4c3bca47a9efc5ccd78815e5059a24b4163",
+          "bytes": 32409
+        },
+        "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-preview.png": {
+          "sha256": "35dd5b714bae5a2984fe82c7287a884b2e932807dc3c30d53c90da872e86b29a",
+          "bytes": 35609
+        },
+        "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/export-ui-final.png": {
+          "sha256": "407e0b7c15883a06e7700b141970c20ff31c62eebf6abbe27ddc865e5e7505d4",
+          "bytes": 126050
+        },
+        "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/pinned-settings.json": {
+          "sha256": "6204f08b06dad23c2cef6c91dd143e102436433b5cf3a2d78e740df434c07777",
+          "bytes": 4725
+        },
+        "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/start.js": {
+          "sha256": "aa5dc2a389a70c57f4ad123f9776b6774218f0d28b397eb81f0d187cfb8ad140",
+          "bytes": 32405
+        },
+        "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/status.js": {
+          "sha256": "d6774c0b2e6803068d639cdd9ea2e688f29a0072339de58b61765088f82414c3",
+          "bytes": 32406
+        }
+      },
+      "snapshot": {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/configured-http-l3-delivery-snapshot.json",
+        "sha256": "d825798dbc7befaf944e236bdae07030db7114292b5e9d9b05c497f2d0f9243d",
+        "nativeCopy": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/native/configured-schema-mapping.mp4",
+        "playbackServerSettings": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/playback-server-settings.json",
+        "playbackServerSettingsSha256": "76b5f6175b335fd037ec6fe1434355c365ae61ae9f0d9ed94f89166b44e3ceb8",
+        "singleEntryBatch": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/mp4-witness-batches/mp4-000.json",
+        "singleEntryBatchSha256": "4d118d2bdfe52196983f11f24b01f934e58af7f79ec45f557e1bc0c61b7f46d3",
+        "plannedPort": 4195,
+        "serverStarted": false,
+        "downloadsEvidenceCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/final-http-l3-evidence"
+      },
+      "decodedBrowserPlayback": "pending",
+      "findings": [],
+      "limits": [
+        "No browser, render, PDF, server request, export click or gate rerun occurred during this verification. ffprobe counted actual file frames; that is separate from browser playback.",
+        "Actual decoded browser playback of the preserved native download remains pending. No MP4 visual, loop, motion or production acceptance is asserted.",
+        "Only actual export preview JPEGs90/150 were personally viewed. They do not establish decoded MP4 pixels or all intermediate states.",
+        "This HTTP export creates no standalone stock poster. Frame150 preview is explicitly used as poster evidence; frame90 is retained separately.",
+        "R66 native attachment GET status and headers remain unobserved. No inferred response code, content-type, length, range or disposition is presented as observed transport evidence.",
+        "Film configuration hash and stock-request configuration hash intentionally differ because the canonical request envelopes differ. Source and authored preset/input/palette semantics match.",
+        "Planned playback port4195 is unbound and untested. Root will check it is free and combine exact allowlist entries later while preserving these original settings.",
+        "L3 is one separate HTTP candidate. This does not establish16 CLI, all17 configured or150 default acceptance."
+      ],
+      "visualAcceptance": null,
+      "mp4Acceptance": null,
+      "productionAcceptance": null
+    }
+  },
+  "assessorRevision": {
+    "originalPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-assessor-revision.json",
+    "sha256": "d4955554d9ee4aff2b69f31498b47780edb55f10a934deca80eea15fb469417b",
+    "bytes": 900,
+    "document": {
+      "ruling": 66,
+      "originalFinalizer": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/finalize.js",
+      "originalSha256": "be48fe373ba69664c408b92b1804e8d11e7331939aaf5a18614a0c041b08b859",
+      "revisedFinalizer": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/finalize-native-attachment.js",
+      "revisedSha256": "d8a7edf86c5afb606ee7e9a85fd671e04ff30ce5dfec453897af20b8c07286aa",
+      "changes": "Only cdAssess accepts direct native attachment at exact completed same-origin job URL when page GET response is not exposed. Blob path remains response-dependent. Original observation state/helper identity preserved. No status/headers invented."
+    }
+  },
+  "originalStrictStatus02": {
+    "originalPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-498c717d-status-02.json",
+    "sha256": "35f91dd97b45beb0c884a9cf6cac97ede4eedefa9d2a1d2d9a05067e06e2a895",
+    "bytes": 33921,
+    "document": {
+      "phase": "running-observed",
+      "elapsedMs": 47226,
+      "observation": {
+        "runId": "final-2ad04707",
+        "head": "498c717d53240d15a29396830759a571a938f492",
+        "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+        "configurationHash": "b5a890418fecb49b849ece445337b4ed8a8e1ce5e34a0f78005c7bce6fbfb181",
+        "staging": {
+          "settingsSha256": "0de114a4948dbf24e0a41c9f82c92a29f97fa227d87758af52b41ffa6d0555f2",
+          "helperSha256": {
+            "configuredHttpDownloadBrowser.js": "eaf939b6840558516c6bedc18a6234526ca4c77c40cc0ae106aa13f93786391b",
+            "configureThroughGallery.cjs": "c91deb845119f6c7c62b8c96b2716a842504f94f353229b3f6a9737eb3929959"
+          },
+          "headAndSourceVerification": "Externally required before and after invocation"
+        },
+        "createdAt": 1792284835341,
+        "updatedAt": 1792284924693,
+        "configuration": {
+          "edited": {
+            "method": "Actual gallery fields and native clipboard copy after success notification",
+            "copied": {
+              "preset": "schema-mapping",
+              "schemaVersion": 1,
+              "input": {
+                "mappings": [
+                  {
+                    "source": "person_key",
+                    "target": "case_key",
+                    "type": "string"
+                  },
+                  {
+                    "source": "visit_day",
+                    "target": "event_date",
+                    "type": "date"
+                  }
+                ],
+                "sourceLabel": "Field intake",
+                "targetLabel": "Case register",
+                "showChecks": true
+              },
+              "accent": "#d5e681",
+              "background": "#111318"
+            }
+          },
+          "nativeCopy": {
+            "method": "Real Copy configured JSON button after native clipboard precondition",
+            "copied": {
+              "preset": "schema-mapping",
+              "schemaVersion": 1,
+              "input": {
+                "mappings": [
+                  {
+                    "source": "person_key",
+                    "target": "case_key",
+                    "type": "string"
+                  },
+                  {
+                    "source": "visit_day",
+                    "target": "event_date",
+                    "type": "date"
+                  }
+                ],
+                "sourceLabel": "Field intake",
+                "targetLabel": "Case register",
+                "showChecks": true
+              },
+              "accent": "#d5e681",
+              "background": "#111318"
+            },
+            "rawText": "{\n  \"preset\": \"schema-mapping\",\n  \"schemaVersion\": 1,\n  \"input\": {\n    \"mappings\": [\n      {\n        \"source\": \"person_key\",\n        \"target\": \"case_key\",\n        \"type\": \"string\"\n      },\n      {\n        \"source\": \"visit_day\",\n        \"target\": \"event_date\",\n        \"type\": \"date\"\n      }\n    ],\n    \"sourceLabel\": \"Field intake\",\n    \"targetLabel\": \"Case register\",\n    \"showChecks\": true\n  },\n  \"accent\": \"#d5e681\",\n  \"background\": \"#111318\"\n}"
+          },
+          "paused": {
+            "galleryControl": "Play all animations",
+            "activeCardIndicators": 0,
+            "previewFrame": "150",
+            "previewControl": "Play preview",
+            "notice": "Configured JSON copied",
+            "downloadControl": "Download MP4"
+          },
+          "downloadEnabled": true,
+          "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-preview.png"
+        },
+        "expectedPost": {
+          "id": "stock-schema-mapping",
+          "options": {
+            "accent": "#d5e681",
+            "background": "#111318",
+            "schemaVersion": 1,
+            "input": {
+              "mappings": [
+                {
+                  "source": "person_key",
+                  "target": "case_key",
+                  "type": "string"
+                },
+                {
+                  "source": "visit_day",
+                  "target": "event_date",
+                  "type": "date"
+                }
+              ],
+              "sourceLabel": "Field intake",
+              "targetLabel": "Case register",
+              "showChecks": true
+            }
+          }
+        },
+        "observerAttached": true,
+        "pendingHandlers": 0,
+        "requests": [
+          {
+            "observedAt": 1792284878523,
+            "requestId": 1,
+            "method": "POST",
+            "url": "http://127.0.0.1:4183/api/exports",
+            "route": "/api/exports",
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"stock-schema-mapping\",\"options\":{\"accent\":\"#d5e681\",\"background\":\"#111318\",\"input\":{\"mappings\":[{\"source\":\"person_key\",\"target\":\"case_key\",\"type\":\"string\"},{\"source\":\"visit_day\",\"target\":\"event_date\",\"type\":\"date\"}],\"showChecks\":true,\"sourceLabel\":\"Field intake\",\"targetLabel\":\"Case register\"},\"schemaVersion\":1}}",
+            "parsedBody": {
+              "id": "stock-schema-mapping",
+              "options": {
+                "accent": "#d5e681",
+                "background": "#111318",
+                "input": {
+                  "mappings": [
+                    {
+                      "source": "person_key",
+                      "target": "case_key",
+                      "type": "string"
+                    },
+                    {
+                      "source": "visit_day",
+                      "target": "event_date",
+                      "type": "date"
+                    }
+                  ],
+                  "showChecks": true,
+                  "sourceLabel": "Field intake",
+                  "targetLabel": "Case register"
+                },
+                "schemaVersion": 1
+              }
+            },
+            "exactExpectedBody": true
+          },
+          {
+            "observedAt": 1792284881349,
+            "requestId": 2,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284882351,
+            "requestId": 3,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284883439,
+            "requestId": 4,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284884442,
+            "requestId": 5,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284885931,
+            "requestId": 6,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284899097,
+            "requestId": 7,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284900338,
+            "requestId": 8,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284901341,
+            "requestId": 9,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284902343,
+            "requestId": 10,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284903344,
+            "requestId": 11,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284904347,
+            "requestId": 12,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284905349,
+            "requestId": 13,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284906350,
+            "requestId": 14,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284907352,
+            "requestId": 15,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284908354,
+            "requestId": 16,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284909355,
+            "requestId": 17,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284910357,
+            "requestId": 18,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284911359,
+            "requestId": 19,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284912361,
+            "requestId": 20,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284913363,
+            "requestId": 21,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284914364,
+            "requestId": 22,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284915366,
+            "requestId": 23,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          },
+          {
+            "observedAt": 1792284916370,
+            "requestId": 24,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "headers": {},
+            "rawBody": null
+          }
+        ],
+        "responses": [
+          {
+            "observedAt": 1792284878525,
+            "requestId": 1,
+            "method": "POST",
+            "url": "http://127.0.0.1:4183/api/exports",
+            "route": "/api/exports",
+            "status": 202,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Preparing current composition…"
+            }
+          },
+          {
+            "observedAt": 1792284881350,
+            "requestId": 2,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Preparing current composition…"
+            }
+          },
+          {
+            "observedAt": 1792284882352,
+            "requestId": 3,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Preparing current composition…"
+            }
+          },
+          {
+            "observedAt": 1792284883440,
+            "requestId": 4,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Preparing current composition…"
+            }
+          },
+          {
+            "observedAt": 1792284884444,
+            "requestId": 5,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Preparing current composition…"
+            }
+          },
+          {
+            "observedAt": 1792284885932,
+            "requestId": 6,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Preparing current composition…"
+            }
+          },
+          {
+            "observedAt": 1792284899098,
+            "requestId": 7,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Preparing current composition…"
+            }
+          },
+          {
+            "observedAt": 1792284900339,
+            "requestId": 8,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Preparing current composition…"
+            }
+          },
+          {
+            "observedAt": 1792284901341,
+            "requestId": 9,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Preparing current composition…"
+            }
+          },
+          {
+            "observedAt": 1792284902344,
+            "requestId": 10,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Preparing current composition…"
+            }
+          },
+          {
+            "observedAt": 1792284903346,
+            "requestId": 11,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Checking preview frame 1 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Checking preview frame 1 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284904350,
+            "requestId": 12,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Checking preview frame 19 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Checking preview frame 19 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284905351,
+            "requestId": 13,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Checking preview frame 37 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Checking preview frame 37 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284906351,
+            "requestId": 14,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Checking preview frame 91 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Checking preview frame 91 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284907356,
+            "requestId": 15,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Checking preview frame 151 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Checking preview frame 151 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284908355,
+            "requestId": 16,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Checking preview frame 180 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Checking preview frame 180 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284909357,
+            "requestId": 17,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Rendering frames…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Rendering frames…"
+            }
+          },
+          {
+            "observedAt": 1792284910358,
+            "requestId": 18,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Rendering frame 15 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Rendering frame 15 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284911360,
+            "requestId": 19,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Rendering frame 47 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Rendering frame 47 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284912363,
+            "requestId": 20,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Rendering frame 84 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Rendering frame 84 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284913365,
+            "requestId": 21,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Rendering frame 123 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Rendering frame 123 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284914366,
+            "requestId": 22,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Rendering frame 163 of 180…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Rendering frame 163 of 180…"
+            }
+          },
+          {
+            "observedAt": 1792284915368,
+            "requestId": 23,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Encoding and checking the finished picture…\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "running",
+              "message": "Encoding and checking the finished picture…"
+            }
+          },
+          {
+            "observedAt": 1792284916372,
+            "requestId": 24,
+            "method": "GET",
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+            "status": 200,
+            "headers": {
+              "content-type": "application/json"
+            },
+            "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"complete\",\"message\":\"Download ready\",\"download\":\"/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/download\"}",
+            "body": {
+              "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+              "state": "complete",
+              "message": "Download ready",
+              "download": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/download"
+            }
+          }
+        ],
+        "nativeDownloads": [
+          {
+            "observedAt": 1792284916397,
+            "eventAt": 1792284916397,
+            "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/download",
+            "suggestedFilename": "stock-schema-mapping.mp4",
+            "savedPath": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-schema-mapping.mp4",
+            "state": "saved",
+            "failure": null,
+            "savedAt": 1792284916399
+          }
+        ],
+        "errors": [],
+        "uiSnapshots": [
+          {
+            "observedAt": 1792284877456,
+            "phase": "before-start",
+            "galleryControl": "Play all animations",
+            "activeCardIndicators": 0,
+            "previewFrame": "150",
+            "previewControl": "Play preview",
+            "notice": "Configured JSON copied",
+            "downloadControl": "Download MP4"
+          },
+          {
+            "observedAt": 1792284887715,
+            "phase": "status",
+            "galleryControl": "Play all animations",
+            "activeCardIndicators": 0,
+            "previewFrame": "150",
+            "previewControl": "Play preview",
+            "notice": "Preparing current composition…",
+            "downloadControl": "Rendering MP4…"
+          },
+          {
+            "observedAt": 1792284924693,
+            "phase": "status",
+            "galleryControl": "Play all animations",
+            "activeCardIndicators": 0,
+            "previewFrame": "150",
+            "previewControl": "Play preview",
+            "notice": "Download ready",
+            "downloadControl": "Download MP4"
+          }
+        ],
+        "listenerProbes": [
+          {
+            "observedAt": 1792284877471,
+            "token": "atlas-configured-download:final-2ad04707:probe:1792284877460:0.500013541090308",
+            "meaning": "Actual console-event liveness probe only. Not API or render-completion evidence."
+          },
+          {
+            "observedAt": 1792284887713,
+            "token": "atlas-configured-download:final-2ad04707:probe:1792284887713:0.38788161184002234",
+            "meaning": "Actual console-event liveness probe only. Not API or render-completion evidence."
+          },
+          {
+            "observedAt": 1792284924691,
+            "token": "atlas-configured-download:final-2ad04707:probe:1792284924691:0.39034045943619233",
+            "meaning": "Actual console-event liveness probe only. Not API or render-completion evidence."
+          }
+        ],
+        "listenersAttachedAt": 1792284877459,
+        "clickIssuedAt": 1792284877472,
+        "startNativeCopy": {
+          "method": "Real Copy configured JSON button after native clipboard precondition",
+          "copied": {
+            "preset": "schema-mapping",
+            "schemaVersion": 1,
+            "input": {
+              "mappings": [
+                {
+                  "source": "person_key",
+                  "target": "case_key",
+                  "type": "string"
+                },
+                {
+                  "source": "visit_day",
+                  "target": "event_date",
+                  "type": "date"
+                }
+              ],
+              "sourceLabel": "Field intake",
+              "targetLabel": "Case register",
+              "showChecks": true
+            },
+            "accent": "#d5e681",
+            "background": "#111318"
+          },
+          "rawText": "{\n  \"preset\": \"schema-mapping\",\n  \"schemaVersion\": 1,\n  \"input\": {\n    \"mappings\": [\n      {\n        \"source\": \"person_key\",\n        \"target\": \"case_key\",\n        \"type\": \"string\"\n      },\n      {\n        \"source\": \"visit_day\",\n        \"target\": \"event_date\",\n        \"type\": \"date\"\n      }\n    ],\n    \"sourceLabel\": \"Field intake\",\n    \"targetLabel\": \"Case register\",\n    \"showChecks\": true\n  },\n  \"accent\": \"#d5e681\",\n  \"background\": \"#111318\"\n}"
+        }
+      },
+      "assessment": {
+        "ready": false,
+        "jobId": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+        "problems": ["Actual same-origin GET MP4 response missing"],
+        "expectedPost": {
+          "id": "stock-schema-mapping",
+          "options": {
+            "accent": "#d5e681",
+            "background": "#111318",
+            "schemaVersion": 1,
+            "input": {
+              "mappings": [
+                {
+                  "source": "person_key",
+                  "target": "case_key",
+                  "type": "string"
+                },
+                {
+                  "source": "visit_day",
+                  "target": "event_date",
+                  "type": "date"
+                }
+              ],
+              "sourceLabel": "Field intake",
+              "targetLabel": "Case register",
+              "showChecks": true
+            }
+          }
+        },
+        "actualDownloadResponse": null,
+        "interpretation": "Blob native addresses are allowed only with independently observed real same-origin MP4 GET headers and complete job."
+      },
+      "deadlineExceeded": false,
+      "next": "Report this actual observation and continue status if still running. Do not retry or claim completion from time elapsed."
+    }
+  },
+  "assessorSources": [
+    {
+      "role": "originalFinalizer",
+      "originalPath": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/finalize.js",
+      "sha256": "be48fe373ba69664c408b92b1804e8d11e7331939aaf5a18614a0c041b08b859",
+      "bytes": 32408,
+      "boundary": "Retained assessor source only. Not executed or modified by this documentation worker."
+    },
+    {
+      "role": "revisedFinalizer",
+      "originalPath": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/finalize-native-attachment.js",
+      "sha256": "d8a7edf86c5afb606ee7e9a85fd671e04ff30ce5dfec453897af20b8c07286aa",
+      "bytes": 33019,
+      "boundary": "Retained assessor source only. Not executed or modified by this documentation worker."
+    }
+  ],
+  "observedAttachmentGetStatus": null,
+  "observedAttachmentGetHeaders": null,
+  "fingerprintPolicy": "Stock request and showcase film intentionally have different configuration hashes for different canonical envelopes, while source/preset/input/palette semantics match. Do not substitute or compare them as if they were one request.",
+  "decodedBrowserPlayback": {
+    "durableRecord": "implementation-http-l3-decoded-inspection-498c717d.json",
+    "head": "498c717d53240d15a29396830759a571a938f492",
+    "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+    "callbackCount": 179,
+    "endedAtSeconds": 6,
+    "actualNativeCaptures": 5,
+    "personallyViewedImages": 5,
+    "findings": [],
+    "acceptance": null
+  },
+  "mp4VisualAcceptance": null,
+  "productionAcceptance": null,
+  "remaining": "GET status/headers remain unobserved underR66; no repeated-loop/continuous-pixel/global acceptance. Current-source R68 carry-forward awaits final evidence.",
+  "documentationWorkerBoundary": "Read supplied completed records and assessor source only. No new browser, server, render, probe, frame-gate rerun, PDF or test. Evolving poster reports are not consumed.",
+  "historicalPartialStatus": {
+    "status": "actual-native-HTTP-delivery-bytes-probe-and-gate-verified-decoded-MP4-pending",
+    "decodedBrowserPlayback": null,
+    "remaining": "Decoded native MP4 inspection/playback,150 default/16 other configured consolidated MP4 records and final whole-branch review remain pending."
+  },
+  "publicationPolicy": "R69 compact durable record. Raw session/clock/callback traces and full original report envelopes remain ignored and in exact Downloads mirrors. This record preserves outcomes, all findings/dispositions/narratives, identities and limits.",
+  "preservedIgnoredOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-finalization-raw-drafts/motion-atlas/implementation-http-l3-delivery-498c717d.json",
+    "sha256": "18d56ce110ffe22db63abbb11333b8a29e8e0c800ae07a30bf14881ce53e64fc",
+    "bytes": 154725
+  }
+}

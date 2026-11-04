@@ -503,7 +503,7 @@ come with proxying a connection to an arbitrary user-supplied host.
 | 28 to 33 | `SourceBadge.tsx`, `DatasetSourceIcon.tsx`, `QueryDataSourceSelect.tsx`, `SavedDatasetsView.tsx`, `DatasetNavbar.tsx`, `DatasetMetaView.tsx` | label, icon, group title | compiler |
 | 34 | `ResyncDatasetCard.tsx` | an arm only if the type is restored from a local file | inherent, situational |
 | 35 | `src/i18n/locales/*/messages.po` | `pnpm i18n:extract` | generated |
-| 36 | `getRelationSources.characterization.test.ts`, an e2e import spec | pin the reader and the flow | inherent |
+| 36 | `getRelationSources.test.ts`, an e2e import spec | pin the reader and the flow | inherent |
 
 Not needed: `Dataset/DatasetParsers.ts` (derives from `SourceTypes`), chat schema
 code, `assertWorkspaceRelations`, and both cache ports, which are source-type
@@ -540,7 +540,7 @@ helpers `SqlTableAlias` and `matchOfflineDatasetTable`.
 ## 12. Testing: commands and what each suite pins
 
 **Executed tests** run real SQL in Node DuckDB (`@duckdb/node-api`) through
-[`withDuckDb`](../src/lib/sql/__tests__/executedDuckDb.ts), which guarantees the
+[`withDuckDb`](../tests/integration/queries/executedDuckDb.ts), which guarantees the
 instance is closed. They match `**/*.executed.test.ts` and run under
 `vitest.executed.config.ts` (Node environment, not jsdom):
 
@@ -558,7 +558,7 @@ pnpm vitest run src/clients/qetl src/clients/DuckDbClient src/lib/sql src/client
 | --- | --- |
 | Storage probe precedes dataset reads; cached Sheets are not re-acquired | `QueryMediator/__tests__/relationCacheOrdering.test.ts` |
 | Subset hits, wider misses, `growFrom`, `CREATE TABLE AS` overrides | `QueryMediator/__tests__/relationCacheProjection.test.ts` |
-| Source-row reads per source type | `QueryMediator/__tests__/getRelationSources.characterization.test.ts` |
+| Source-row reads per source type | `QueryMediator/__tests__/getRelationSources.test.ts` |
 | Lease reuse for nested virtual queries | `QueryMediator/QueryMediator.coordination.test.ts` |
 | Concepts load after their datasets | `QueryMediator/__tests__/QueryMediator.concepts.test.ts` |
 | Column inference shapes | `getNeededColumnsFromQuery.test.ts` |
@@ -568,7 +568,7 @@ pnpm vitest run src/clients/qetl src/clients/DuckDbClient src/lib/sql src/client
 | Lock order, nesting, release on throw, no-locks fallback | `DatasetDuckDbCoordinator.test.ts` |
 | Leases across loads, poisoning, public versus workspace reads | `DuckDbClient/__tests__/*.test.ts` |
 | Analyzer verdicts | `DuckDbSqlAnalyzer.test.ts` |
-| Concept view grain and value pickers in real DuckDB | `src/lib/sql/__tests__/buildConceptViewSql.executed.test.ts`, `conceptAttributeColumns.executed.test.ts` |
+| Concept view grain and value pickers in real DuckDB | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/__tests__/conceptAttributeColumns.integration.executed.test.ts` |
 | Sheets CSV read through a real DuckDB reader | `acquireGoogleSheetRelation.executed.test.ts` |
 | CKAN resource selection and refusals | `shared/open-data/*.test.ts`, `statusFromOpenDataFailure.test.ts` |
 

@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { QueryFilterValidation } from "$/models/queries/StructuredQuery/QueryFilterValidation/QueryFilterValidation.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 function _rule(overrides: Partial<QueryFilterRule> = {}): QueryFilterRule {
   return {
     type: "rule",
-    columnName: "Admin2",
+    columnId: "Admin2" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "=",
     value: "Alameda",
@@ -43,7 +44,10 @@ describe("QueryFilterValidation.isRuleComplete", () => {
   });
 
   it("requires both bounds for between", () => {
-    const numeric = { columnName: "cases", columnDataType: "bigint" } as const;
+    const numeric = {
+      columnId: "cases" as QueryColumn.Id,
+      columnDataType: "bigint",
+    } as const;
     expect(
       QueryFilterValidation.isRuleComplete(
         _rule({ ...numeric, operator: "between", value: [1, 2] }),
@@ -65,7 +69,7 @@ describe("QueryFilterValidation.isRuleComplete", () => {
     expect(
       QueryFilterValidation.isRuleComplete(
         _rule({
-          columnName: "flag",
+          columnId: "flag" as QueryColumn.Id,
           columnDataType: "boolean",
           operator: "is_true",
           value: null,
@@ -76,7 +80,9 @@ describe("QueryFilterValidation.isRuleComplete", () => {
 
   it("treats an empty column name as incomplete", () => {
     expect(
-      QueryFilterValidation.isRuleComplete(_rule({ columnName: "" })),
+      QueryFilterValidation.isRuleComplete(
+        _rule({ columnId: "" as QueryColumn.Id }),
+      ),
     ).toBe(false);
   });
 });
@@ -101,7 +107,11 @@ describe("QueryFilterValidation.validateRule", () => {
   it("rejects a non-numeric value on a numeric column", () => {
     expect(
       QueryFilterValidation.validateRule(
-        _rule({ columnName: "cases", columnDataType: "bigint", value: "abc" }),
+        _rule({
+          columnId: "cases" as QueryColumn.Id,
+          columnDataType: "bigint",
+          value: "abc",
+        }),
       ),
     ).toEqual({ code: "valueNotANumber", value: "abc" });
   });
@@ -109,7 +119,11 @@ describe("QueryFilterValidation.validateRule", () => {
   it("rejects an unparseable date on a temporal column", () => {
     expect(
       QueryFilterValidation.validateRule(
-        _rule({ columnName: "date", columnDataType: "date", value: "nope" }),
+        _rule({
+          columnId: "date" as QueryColumn.Id,
+          columnDataType: "date",
+          value: "nope",
+        }),
       ),
     ).toEqual({ code: "valueNotADate", value: "nope" });
   });
@@ -118,7 +132,7 @@ describe("QueryFilterValidation.validateRule", () => {
     expect(
       QueryFilterValidation.validateRule(
         _rule({
-          columnName: "date",
+          columnId: "date" as QueryColumn.Id,
           columnDataType: "date",
           value: "2020-05-01",
         }),
@@ -138,7 +152,7 @@ describe("QueryFilterValidation.validateRule", () => {
     expect(
       QueryFilterValidation.validateRule(
         _rule({
-          columnName: "cases",
+          columnId: "cases" as QueryColumn.Id,
           columnDataType: "bigint",
           operator: "between",
           value: [200, 100],

@@ -50,6 +50,8 @@ appends `claude`-authored replies. See the injection contract in
 | `<branch>-difit-<scope>-summary.md` | the `diff-review` skill | the high-level diff summary shown in the web-shell sidebar |
 | `<branch>-difit-<scope>-test-plan.md` | the `diff-review` skill | the manual test plan shown in the TUI Test plan tab and web-shell sidebar tab |
 | `<branch>-difit-<scope>-reviewed.json` | the `diff-review` skill | reviewed-group / reviewed-file state |
+| `<branch>-difit-<scope>-github.json` | `dif` (web shell + poller) | which transcript comments went to the GitHub PR, and their sync state |
+| `<branch>-difit-<scope>-held.json` | `dif` (event loop) | message ids held for **Send all**, as a JSON array; removed when nothing is held |
 
 Writes to the transcript are atomic (temp file + rename). They all share the
 `<branch>-difit-<scope>` stem so one review's files sort together.
@@ -118,6 +120,64 @@ side only provides the path helpers so both halves agree on the names.
   which individual files are reviewed (kept in their group but tagged), with a
   per-file signature so a later change to a reviewed file flips it back to
   needs-review.
+
+### The GitHub sync record
+
+`-github.json` lists the comments in the transcript that are PR comments: the
+reviewer's PR comments and everything pulled in from the PR. The comments
+themselves stay in the transcript like any other; this file only says which
+message ids are PR comments and where they are on GitHub:
+
+```jsonc
+{
+  "comments": {
+    "<difit message id>": {
+      "status": "pending" | "draft" | "published" | "failed",
+      "nodeId": "PRRC_…",       // the GitHub comment, once it exists
+      "threadId": "PRRT_…",     // the GitHub review thread it is in
+      "root": true,             // it opened that thread
+      "url": "https://github.com/o/r/pull/7#discussion_r…",
+      "body": "the body last agreed with GitHub",
+      "error": "the last failure, if any",
+      "removal": "delete" | "resolve" // removed in difit while GitHub was unreachable
+    }
+  },
+  // viewed-file changes GitHub does not have yet, latest per path
+  "queuedViewed": { "src/a.rs": true },
+  // a review submit GitHub has not taken yet
+  "queuedSubmit": { "event": "COMMENT" | "APPROVE" | "REQUEST_CHANGES", "body": "…" }
+}
+```
+
+- `pending`: marked for the PR in dif, not on GitHub yet. The web shell adds it
+  when the browser saves a PR comment, before difit holds it.
+- `draft`: in the reviewer's pending GitHub review, visible only to them.
+- `published`: on the PR. Submitting the review turns every draft published.
+- `failed`: GitHub rejected it; editing the comment retries. A call that could
+  not reach GitHub never sets it: the comment stays `pending`.
+
+`removal`, `queuedViewed`, and `queuedSubmit` are the offline queue: they are
+sent once GitHub is reachable (viewed changes once viewed sync can run), and
+cleared when GitHub has them (see
+[integrations.md](integrations.md#offline)).
+
+Comments pulled from GitHub get the message id `gh:<node id>`. `body` is
+compared both ways: a different body in difit is a local edit to push, a
+different body on GitHub is a remote edit to pull. Entries are removed when the
+comment is deleted or its thread resolved, on either side.
+
+The session's live GitHub state (the PR, the pending review, sync status, the
+viewed-file events, the connection) is never written here. The browser reads it, with these
+comments, from `/__wrap/github.json`.
+
+### The held comments
+
+`-held.json` is a JSON array of the reviewer message ids held for **Send all**
+in Bulk mode. The event loop rewrites it whenever the held set changes and
+deletes it once nothing is held. On launch they are kept out of the dispatch
+baseline, so a comment held when `dif` quit is held again (and counted in
+**Send all**) instead of being taken as already sent. This relies on difit
+keeping message ids when it is reseeded from the transcript, which it does.
 
 ## Slug + port derivation
 

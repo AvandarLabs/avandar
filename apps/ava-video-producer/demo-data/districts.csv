@@ -1,0 +1,7 @@
+district_id,district_name,population,recorded_cases,awaiting_contact,supply_kits_available,latest_reporting_status,as_of,geometry
+D01,North Quay,18400,51,0,92,reported,2026-09-13,"POLYGON ((10.0 10.0, 10.08 10.0, 10.08 10.08, 10.0 10.08, 10.0 10.0))"
+D02,Eastbank,22100,56,19,17,reported,2026-09-13,"POLYGON ((10.08 10.0, 10.16 10.0, 10.16 10.08, 10.08 10.08, 10.08 10.0))"
+D03,South Gardens,16500,40,0,128,reported,2026-09-13,"POLYGON ((10.16 10.0, 10.24 10.0, 10.24 10.08, 10.16 10.08, 10.16 10.0))"
+D04,Ridge,12400,29,0,146,reported,2026-09-13,"POLYGON ((10.0 10.08, 10.08 10.08, 10.08 10.16, 10.0 10.16, 10.0 10.08))"
+D05,Lakeside,15300,39,0,164,reported,2026-09-13,"POLYGON ((10.08 10.08, 10.16 10.08, 10.16 10.16, 10.08 10.16, 10.08 10.08))"
+D06,West Marsh,13200,25,0,182,not_received,2026-09-13,"POLYGON ((10.16 10.08, 10.24 10.08, 10.24 10.16, 10.16 10.16, 10.16 10.08))"

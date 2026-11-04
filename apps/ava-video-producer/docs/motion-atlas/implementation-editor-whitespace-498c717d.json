@@ -1,0 +1,541 @@
+{
+  "schemaVersion": 1,
+  "status": "accepted-gallery-source-new-N1-retry-recorded-remaining-media-pending",
+  "head": "498c717d53240d15a29396830759a571a938f492",
+  "stockSourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+  "stockFingerprintChanged": false,
+  "historicalBrowserHead": "02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a",
+  "newSupplementalGalleryManifestHash": "fa18ca3352e0984260977b15d837ed060cbca8ee9f2dc0940a67450cf41ca2d0",
+  "configuredInputRecordsExactlyIdentical": 17,
+  "sourceReview": {
+    "spec": "compliant",
+    "quality": "approved",
+    "critical": 0,
+    "important": 0,
+    "minor": 2
+  },
+  "deferredMinors": [
+    {
+      "id": "editor-whitespace-M1",
+      "description": "ScalarField newly imports enclosing editor stylesheet for generic .text class. Styling ownership/domain naming convention concern.",
+      "disposition": "Deferred to whole-branch review; no behavioral defect reported."
+    },
+    {
+      "id": "editor-whitespace-M2",
+      "description": "CSS lint42 inherited violations vs43base; inherited NO_COLOR/FORCE_COLOR warning in focused runs.",
+      "disposition": "Preserve baseline distinction; no unrelated formatting change in boundedfix."
+    }
+  ],
+  "nativeEditingLimit": {
+    "observedPasteInput": "A\rB\r\nC\nD\tE",
+    "observedNativeValueAndCopiedJson": "A\nB\nC\nD\tE",
+    "scope": "Chromium native textarea clipboard paste normalizes CR and CRLF to LF. No application normalizer was introduced. LF/TAB/Unicode/spaces preserve their submitted values. This does not promise arbitrary original line-ending bytes through native editing.",
+    "automationDifference": "Playwright fill with CR behaved differently; the accepted regression tests actual clipboard paste instead of treating fill as a native-paste oracle."
+  },
+  "reportedChecks": {
+    "focusedE2E": "Three separate one-test passing invocations: authored whitespace, native pasted CR, edited branches. Not a broad suite rerun.",
+    "typechecks": "Both producer TypeScript projects passed as reported.",
+    "scopedLintAndFormat": "TypeScript ESLint and scoped oxfmt passed. CSS lint remains nonzero:42 inherited violations vs43base.",
+    "reactDoctor": "Changed-only:100/100,2files,0issues. Initial broad branch scan78/100 with119pre-existing warnings remains historical.",
+    "transportLimit": "New whitespace regression intercepts export with HTTP400 after capturing the request; it proves payload equality, not a rendered/downloaded MP4."
+  },
+  "report": {
+    "originalPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-editor-whitespace-report.md",
+    "sha256": "4ee86230550b03b99c5abe365c850aade303709f712101fe700f34881fb6fc20",
+    "bytes": 11534,
+    "text": "# Task 7: Gallery authored whitespace correction\n\n**Status: bounded editor correction complete, with native line-ending limitations.**\n\n## Scope and ownership\n\n- Worktree: `/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog`\n- Base: `02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a`\n- Commit: `498c717d5` (`fix(motion): preserve authored gallery text whitespace`)\n- Sole production writer: Codex task agent `atlas_editor_whitespace`. No subagents were used.\n- Coordinating agent owns showcase PID 53692 on port 4183. Its lifecycle was untouched.\n- Chromium was exclusively held for focused headless E2E, then this report. No concurrent browser, render, or PDF work was started.\n- No actual HTTP export, MP4 rendering, frame gating, or global media acceptance was performed by this task. The coordinator owns fresh review and configured N1 acceptance.\n\n## Root cause and correction\n\nOrdinary text descriptors selected `input type=text`, although their schemas accept LF. Real field filling followed by native clipboard copy reproduced the N1 mismatch: `A\\nB\\tC\\nD\\nE` became `A B\\tC D E`. The explicit multiline branch already used a textarea.\n\nEvery generic text descriptor now uses a native textarea. Ordinary controls start at one row with wrapping off and can be resized vertically. Explicit multiline descriptors retain their prior default row count and soft wrapping. Native labels, field IDs, descriptions, validation flags, and maxLength remain attached to the visible control. No hidden JSON authoring path or application whitespace transformation was added. Textareas receive the existing invalid-border styling.\n\nNumber and boolean controls still use native inputs with the same conversion, bounds, step, and checked behavior. Select, union, nullable, collection, draft validation, descriptors, schemas, defaults, and renderers were not changed.\n\n## Files committed\n\n| File under `apps/ava-video-producer/` | Change |\n| --- | --- |\n| `src/gallery/MotionGallery/ContentControls/ScalarField.tsx` | Use native textareas for all text controls, preserve descriptor sizing, and narrow the remaining input helper to non-text scalars. |\n| `src/gallery/MotionGallery/ContentControls/ContentControls.module.css` | Retain invalid styling on textareas and allow vertical resizing. |\n| `tests/e2e/motion-content.spec.ts` | Add native clipboard whitespace/export-input regression and native CR/CRLF paste/copy coverage. Keep the existing branch editor regression. |\n\nNo source files outside the authorized editor/test scope were changed. This ignored SDD report and its Downloads copies are the required reporting artifacts.\n\n## Red/green evidence\n\nAll browser commands ran from `apps/ava-video-producer`, against the existing server. The producer config uses headless Chromium, one worker, zero retries, and a 45-second local timeout. Each test was run separately.\n\nExact red command:\n\n```sh\nREMOTION_KEYS_FILE=/Users/juanpablosarmiento/src/avandar/apps/ava-video-producer/.env.local pnpm exec playwright test --config playwright.motion.config.ts tests/e2e/motion-content.spec.ts --grep 'authored whitespace' --workers=1\n```\n\nBefore production changes: exit 1, one failed test in 719 ms. The failure was the exact native copied-JSON mismatch described above, at the `copied.input.approach` equality assertion.\n\nExact final green command for the same regression:\n\n```sh\nREMOTION_KEYS_FILE=/Users/juanpablosarmiento/src/avandar/apps/ava-video-producer/.env.local pnpm exec playwright test --config playwright.motion.config.ts tests/e2e/motion-content.spec.ts --grep 'authored whitespace' --workers=1\n```\n\nAfter correction: exit 0, one passed test in 741 ms, 2.0 seconds total. Visible top-level and collection text fields preserve submitted LF, TAB, leading/repeated/trailing literal spaces, decomposed `e` plus U+0301, and joined emoji sequences in native copied configured JSON. Schema parsing returns the same object. Live SVG labels retain the exact approach and priority content. The Download MP4 button submits the same input, schemaVersion, accent, and background as copied JSON.\n\nThe export endpoint is deliberately intercepted with HTTP 400 in this regression after capturing the outgoing request. This proves UI transport payload equality only. It does not create, download, inspect, or approve a real rendered MP4. The existing branch test separately checks its already-mocked download transport.\n\nExact CR/CRLF green command:\n\n```sh\nREMOTION_KEYS_FILE=/Users/juanpablosarmiento/src/avandar/apps/ava-video-producer/.env.local pnpm exec playwright test --config playwright.motion.config.ts tests/e2e/motion-content.spec.ts --grep 'native pasted CR' --workers=1\n```\n\nResult: exit 0, one passed test in 564 ms, 1.8 seconds total. Native clipboard paste of `A\\rB\\r\\nC\\nD\\tE` produces `A\\nB\\nC\\nD\\tE` in the visible control and native copied JSON.\n\nExact existing-flow green command:\n\n```sh\nREMOTION_KEYS_FILE=/Users/juanpablosarmiento/src/avandar/apps/ava-video-producer/.env.local pnpm exec playwright test --config playwright.motion.config.ts tests/e2e/motion-content.spec.ts --grep 'edited branches' --workers=1\n```\n\nResult: exit 0, one passed test in 767 ms, 2.1 seconds total. Collection editing/removal, invalid selection feedback, disabled actions, preview retention, corrected selection, copied request, mocked download content/payload, reset, and dialog focus return still pass.\n\nIntermediate observations were resolved before the final green: an anchored title filter matched no tests; an initial immediate run still served the prior gallery bundle; an SVG label selector matched both a parent group and text node. The filter was corrected, the licensed gallery builder completed, and the preview assertion was scoped to its first authored label. No production change was made in response to these test-harness issues. Browser runs print the inherited NO_COLOR/FORCE_COLOR warning.\n\n## Native CR/CRLF limitations\n\nThe [HTML textarea standard](https://html.spec.whatwg.org/multipage/form-elements.html#the-textarea-element) defines its API value with LF line endings. This task observed actual Chromium clipboard paste converting CR and CRLF to LF. Accordingly, these controls preserve authored LF/TAB/Unicode/spaces, but cannot promise arbitrary-byte or original CR-versus-CRLF round trips through native editing. No application normalizer was introduced to conceal this limitation.\n\nA separate investigation using Playwright `fill` with CR produced a different automation result: Chromium retained literal CR characters in that insertion path. The first assumption that this automation path would match native paste failed. The committed regression therefore exercises actual clipboard paste and checks the resulting native control and copied JSON, rather than treating automation insertion as evidence of universal CR preservation or normalization.\n\nTextarea Enter inserts LF. TAB can be pasted and is preserved. Keyboard Tab retains native focus navigation. The compact one-row control can scroll or be resized to edit additional lines. Exact preserved editor content does not promise that glyph layout paints literal whitespace: existing stock text layout intentionally normalizes display whitespace, and was not changed.\n\n## Static verification and unchanged stock\n\nFrom `apps/ava-video-producer`, both commands completed with exit 0 and no diagnostics:\n\n```sh\npnpm exec tsc --noEmit\npnpm exec tsc --noEmit -p tsconfig.tools.json\n```\n\nFrom the worktree root, scoped ESLint completed with exit 0:\n\n```sh\npnpm exec eslint apps/ava-video-producer/src/gallery/MotionGallery/ContentControls/ScalarField.tsx apps/ava-video-producer/tests/e2e/motion-content.spec.ts\n```\n\nScoped formatting completed with exit 0, all three files formatted:\n\n```sh\npnpm exec oxfmt --ignore-path .oxfmtignore --check apps/ava-video-producer/src/gallery/MotionGallery/ContentControls/ScalarField.tsx apps/ava-video-producer/src/gallery/MotionGallery/ContentControls/ContentControls.module.css apps/ava-video-producer/tests/e2e/motion-content.spec.ts\n```\n\nScoped CSS lint was run and remains nonzero from pre-existing formatting rules:\n\n```sh\npnpm exec stylelint apps/ava-video-producer/src/gallery/MotionGallery/ContentControls/ContentControls.module.css\n```\n\nBase commit 02d6cfbb6 had 43 violations: 26 alphabetical-property-order and 17 missing-empty-line violations. Current CSS has 42: the same 26 ordering and 16 empty-line violations. A comparison used `git show HEAD:<file>` before committing versus working-file contents as stylelint stdin with the same filename/config. There are no new lint rules or suppressions. Unrelated CSS formatting was left outside this fix.\n\nChanged-only React Doctor from the app directory completed with exit 0, 100/100, two files scanned, zero issues:\n\n```sh\nCI=1 npx react-doctor@latest --verbose --scope changed --base HEAD\n```\n\nThe skill's initial `--diff` command also ran. It scanned the entire existing branch against origin/develop: 78/100, 119 warnings in pre-existing files, with no finding in this correction. No unrelated remediation was made.\n\n`git diff --check` completed with exit 0. The licensed gallery builder ran successfully; no generated catalog or palette diff resulted:\n\n```sh\nREMOTION_KEYS_FILE=/Users/juanpablosarmiento/src/avandar/apps/ava-video-producer/.env.local node scripts/build-motion-gallery.mjs\n```\n\nThe source fingerprint command from the app directory completed with exit 0:\n\n```sh\nREMOTION_KEYS_FILE=/Users/juanpablosarmiento/src/avandar/apps/ava-video-producer/.env.local pnpm exec tsx -e 'import { fingerprintStockSources } from \"./scripts/stock/stockFingerprint/stockFingerprint.ts\"; fingerprintStockSources(process.cwd()).then(console.log)'\n```\n\nRequired and actual source hash:\n\n`2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae`\n\nStock sources, descriptors, schema/default content, timing, palette, renderer, dimensions, and the frame gate were not edited. The accepted 170 presets, 150 additions (86 general/64 social), 180 frames at 30 fps, 960 x 600 viewBox and 1280 x 800 delivery, and opaque envelope therefore retain the same stock source fingerprint. This task adds no new media-acceptance claim.\n\nNo product source, database, Supabase, Vercel, package files, embeddings, ingestion, pushes, merges, PRs, or publication were touched. The license file path was passed only to consumers. Credentials were not read, printed, or copied.\n\n## Artifacts and next ownership\n\nThe verified browser screenshot shows compact text controls and current preview. It is stored under `.temp/feat-motion-catalog/task-7-editor-whitespace.png` and copied beside the report in Downloads. The screenshot is evidence of the editor presentation; its current animation frame is not a final media acceptance image.\n\nThe SDD report is authoritative. Downloads contains convenience MD, PDF and screenshot copies. All six PDF pages were inspected. Chromium is released to the coordinator. Showcase ownership is unchanged.\n\n| # | Owner and next action |\n| --- | --- |\n| 1 | Codex: Fresh-review commit 498c717d5. Retry N1 as the multiline UI/live witness followed by the CLI configured export. Keep L3/schema-mapping as the separate real HTTP native export check. |\n| 2 | Codex: Own any further source/media acceptance and the existing showcase server lifecycle. |\n| 3 | Pablo: Review convenient copies at `~/Downloads/avandar_motion-catalog/motion-atlas-integration/task-7-editor-whitespace-report.md` and `.pdf`. No implementation action is blocked on Pablo. |\n"
+  },
+  "review": {
+    "originalPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-editor-whitespace-review.md",
+    "sha256": "2afddaedaab4bd93248ea96346e6e46e86e825f0d86e80f7d84b3db7be20559e",
+    "bytes": 8300,
+    "text": "### Spec Compliance\n\n- ✅ Spec compliant for the bounded editor correction. `apps/ava-video-producer/src/gallery/MotionGallery/ContentControls/ScalarField.tsx:22` now routes every text descriptor through the same native textarea, forwards the accessible field attributes, retains `maxLength`, and passes the native value directly to the existing updater. Ordinary controls use one row and wrapping off at `ScalarField.tsx:29`; explicit multiline descriptors retain the prior native default rows and soft wrapping. No application trim, replacement, normalization, hidden JSON editing path, or new frontend copy appears in the diff.\n- ✅ Scalar behavior and scope are preserved. `ScalarField.tsx:50` narrows the remaining input helper to number/boolean and retains their value, checked, bounds, and step behavior. The package contains only this source file, its editor CSS, and directly relevant E2E additions. Select/union/nullable/collection implementations, validation, descriptors, schemas, defaults, rendering, palette, timing, catalogs, package files, product code, and services are untouched.\n- ✅ Observable regression coverage uses the real gallery controls and native clipboard. `apps/ava-video-producer/tests/e2e/motion-content.spec.ts:32` supplies LF, TAB, decomposed combining characters, joined emoji, and leading/repeated/trailing spaces across top-level and collection text fields. Exact copied JSON assertions begin at `motion-content.spec.ts:55`; schema identity is checked at `:58`, live SVG accessible text at `:64` and `:70`, and outgoing export-input equality at `:75`.\n- ✅ CR/CRLF investigation meets the task's native-editing limitation requirement. `motion-content.spec.ts:93` tests actual clipboard paste, observes LF in the visible control at `:116`, and checks copied JSON at `:127`. `.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-editor-whitespace-report.md:75` explicitly limits preservation claims and distinguishes native paste from the different Playwright `fill` observation. It does not promise arbitrary-byte line-ending preservation.\n- ⚠️ Cannot verify from this diff: a real HTTP MP4 export, rendered media acceptance, the 170/150/86/64 preset totals, 180 frames/30 fps, 960 x 600 viewBox/1280 x 800 delivery, opaque envelope, frame-gate results, or the actual recomputed stock fingerprint. These live outside this correction. The implementer reports the required unchanged fingerprint at `task-7-editor-whitespace-report.md:130`; the controller owns integration verification. `motion-content.spec.ts:12` deliberately mocks export transport with HTTP 400, so its request assertion proves payload equality only.\n\n### Strengths\n\n- The fix addresses the generic representation once rather than adding a preset-specific escape hatch. Native editing, labels, validation state, and unchanged accepted content stay on the visible control at `ScalarField.tsx:24`.\n- The new tests can fail on the original defect: native copied JSON is compared with independently submitted strings at `motion-content.spec.ts:55`. They also protect downstream schema/preview/request consistency without describing the mocked response as a rendered download.\n- Textarea invalid styling is restored at `apps/ava-video-producer/src/gallery/MotionGallery/ContentControls/ContentControls.module.css:64`, and vertical resizing preserves native access to additional lines at `:69`.\n- The reported red and green commands, three separate focused E2E outcomes, both producer typechecks, ESLint, formatter, and changed-only React Doctor are explicitly recorded in `task-7-editor-whitespace-report.md:43`, `:51`, `:61`, `:69`, `:83`, and `:110`. They were inspected as reported evidence, not independently rerun.\n\n### Issues\n\n#### Critical (Must Fix)\n\n- None found in the task diff.\n\n#### Important (Should Fix)\n\n- None found in the task diff.\n\n#### Minor (Nice to Have)\n\n1. **Keep scalar CSS ownership and naming explicit.** `apps/ava-video-producer/src/gallery/MotionGallery/ContentControls/ScalarField.tsx:1` newly imports the enclosing editor's `ContentControls.module.css` only for the generic `.text` class at `ContentControls.module.css:69`. The Avandar CSS module checklist asks each component to own its stylesheet and use domain-prefixed class names. This introduces a small styling dependency with an ambiguous class name. Prefer keeping this editor-wide textarea resize rule on an existing editor-owned textarea selector, or give `ScalarField` its own colocated stylesheet with a name such as `scalarFieldText`. Current editing behavior is unaffected.\n2. **Reported validation output is not fully clean.** `task-7-editor-whitespace-report.md:102` and `:108` report a nonzero CSS lint run with 42 inherited violations, compared with 43 at the base. `task-7-editor-whitespace-report.md:71` also records inherited `NO_COLOR`/`FORCE_COLOR` warnings during E2E. These are evidence concerns, not introduced text-preservation failures: the diff adds no property-order violation or suppression. Retain the baseline distinction in acceptance records; when separately authorized, correct the existing CSS formatting and conflicting color environment so future regressions stand out. The other reported scoped checks are clean.\n\n### Assessment\n\n**Task quality:** Approved, with 0 Critical, 0 Important, and 2 Minor findings.\n\n**Reasoning:** The small generic textarea change preserves the requested authored content through the native UI, and the regressions check exact clipboard and outgoing request values. Native CR/CRLF behavior and mocked transport limits are described accurately. The minor styling conventions and inherited validation noise do not undermine this correction's behavior.\n\n### Checks and Review Boundary\n\n- Reviewed exact `02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a..498c717d53240d15a29396830759a571a938f492` from the supplied complete commit/stat/diff package. The initial batched tool output was truncated, so the package was read separately to obtain the complete diff. No changed source file was reread. A mechanical line-number extraction from the package supplied exact finding anchors.\n- Named risk: converting ordinary inputs to textareas could change compact sizing or drop common field styling. Checked only the missing initial CSS rule at `ContentControls.module.css:48`, which already gives textareas the same width, box sizing, padding, colors, and font as the inputs. Inspected the existing `.temp/feat-motion-catalog/task-7-editor-whitespace.png` without launching Chromium: ordinary controls retain compact heights and the multiline authored approach remains editable within that height. No new application screenshot was produced.\n- Named risk: the new branch could disconnect accessible labels, errors, or authored draft values. Checked unchanged `apps/ava-video-producer/src/gallery/MotionGallery/ContentControls/useContentField.ts:9`, which supplies the existing field id, label, invalid/description attributes, raw value, and common update path. The new textarea spreads that same field object and forwards the event value.\n- Named risk: focused browser checks could evade the local timeout or concurrency restrictions. Checked unchanged `apps/ava-video-producer/playwright.motion.config.ts:7`: timeout is 45000 ms, one worker, no retries, and headless operation. The report lists separate focused invocations.\n- Applied the task-reviewer template and relevant Avandar TypeScript/React/CSS/test review rules to the supplied additions. No broad repository crawl, source/index/branch mutation, subagent, repeated test, fresh lint/typecheck, runtime browser session, media render, server action, or credential access was performed. After this assessment, the controller authorized report-only PDF conversion and page-image inspection. This does not add runtime or media acceptance evidence.\n\n| # | Owner | Next action |\n| --- | --- | --- |\n| 1 | Codex | Controller resolves the listed integration-only verification items and decides disposition of the two minor findings. |\n| 2 | Codex | Review PDF is generated under the controller's exclusive report-only authorization. No runtime or browser tests are part of that operation. |\n| 3 | Pablo | No action is required for this scoped review. The exact Markdown copy and PDF are in Downloads. |\n"
+  },
+  "controllerDisposition": {
+    "originalPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/editor-whitespace-review-disposition.json",
+    "sha256": "54a512c923834da99bb5fba0142b82e39e1563a413868e9e86ceca5a82a2b79e",
+    "bytes": 1814,
+    "document": {
+      "status": "source-correction-accepted; media-validation-pending",
+      "base": "02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a",
+      "head": "498c717d53240d15a29396830759a571a938f492",
+      "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+      "review": {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-editor-whitespace-review.md",
+        "sha256": "bc658ddb3627df34bc5a2212cdadbc089c2294adbe924771a7e0854b492d21ce",
+        "spec": "compliant",
+        "quality": "approved",
+        "critical": 0,
+        "important": 0,
+        "minor": 2
+      },
+      "deferredMinors": [
+        {
+          "id": "editor-whitespace-M1",
+          "description": "ScalarField newly imports enclosing editor stylesheet for generic .text class. Styling ownership/domain naming convention concern.",
+          "disposition": "Deferred to whole-branch review; no behavioral defect reported."
+        },
+        {
+          "id": "editor-whitespace-M2",
+          "description": "CSS lint42 inherited violations vs43base; inherited NO_COLOR/FORCE_COLOR warning in focused runs.",
+          "disposition": "Preserve baseline distinction; no unrelated formatting change in boundedfix."
+        }
+      ],
+      "controllerVerification": {
+        "stockFingerprint": "Root snapshotSupplementalSources/prepareConfiguredInputFiles verified identical source2ad at newHEAD;41supplementalrecords4changedonlyeditor source/CSS and generatedJS/CSS.",
+        "presetCounts": "Current preparation validates170registered/17configured; accepted150additionmembership established in current sourceaudit; unchangedstocksource retains count and dimensions contracts.",
+        "media": "RealHTTP,MP4 and framegate remain pending overallTask7; not claimed by sourcefix acceptance."
+      },
+      "productionMediaAcceptance": null
+    }
+  },
+  "editorOnlyContinuity": {
+    "originalPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/editor-only-source-continuity-498c717d.json",
+    "sha256": "e91bcb635d981712799fcb3d32e4650531885a9e512af13dc89d1b12b44ed911",
+    "bytes": 3160,
+    "document": {
+      "oldHead": "02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a",
+      "newHead": "498c717d53240d15a29396830759a571a938f492",
+      "unchangedStockSourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+      "configuredInputRecordsExactlyIdentical": 17,
+      "oldSupplementalManifestHash": "70fb7b8c2c034be24445a7a93065e3a80b32a30fc53e42b808932256cb4f79a8",
+      "newSupplementalManifestHash": "fa18ca3352e0984260977b15d837ed060cbca8ee9f2dc0940a67450cf41ca2d0",
+      "changedSupplementalFiles": [
+        {
+          "path": "out/showcase/browser/motion-gallery.css",
+          "before": {
+            "path": "out/showcase/browser/motion-gallery.css",
+            "bytes": 1588,
+            "sha256": "107dfb028b10e7a5514972b207737e1946dc25ac4b47459bf808e28f76988cf3",
+            "role": "generated-gallery-build"
+          },
+          "after": {
+            "path": "out/showcase/browser/motion-gallery.css",
+            "bytes": 1638,
+            "sha256": "1d98d91e8e37e6873fe553d7292c4bd8472e88eaf5e8da2a2495bd60023fac7c",
+            "role": "generated-gallery-build"
+          }
+        },
+        {
+          "path": "out/showcase/browser/motion-gallery.js",
+          "before": {
+            "path": "out/showcase/browser/motion-gallery.js",
+            "bytes": 5725783,
+            "sha256": "fb155a341248cc3a42e995b34f718c4aec2b38f2a8c14a8f551f6daf89c6aa21",
+            "role": "generated-gallery-build"
+          },
+          "after": {
+            "path": "out/showcase/browser/motion-gallery.js",
+            "bytes": 5725783,
+            "sha256": "389d913401b88240bc179120e6e3671bbdc12dbcce96da22dcda37ea257a4ea6",
+            "role": "generated-gallery-build"
+          }
+        },
+        {
+          "path": "src/gallery/MotionGallery/ContentControls/ContentControls.module.css",
+          "before": {
+            "path": "src/gallery/MotionGallery/ContentControls/ContentControls.module.css",
+            "bytes": 2126,
+            "sha256": "cf1cbfdab55e82ca2e23c35adc3d443ef457a524ddf2458f438a56a6abf40ea2",
+            "role": "gallery-source"
+          },
+          "after": {
+            "path": "src/gallery/MotionGallery/ContentControls/ContentControls.module.css",
+            "bytes": 2196,
+            "sha256": "e8024408e30fe6ad3514db183dbbbd0083cfb71a2d6c79ff78456244afddda3b",
+            "role": "gallery-source"
+          }
+        },
+        {
+          "path": "src/gallery/MotionGallery/ContentControls/ScalarField.tsx",
+          "before": {
+            "path": "src/gallery/MotionGallery/ContentControls/ScalarField.tsx",
+            "bytes": 2053,
+            "sha256": "1cf38628ceb77aec02423ed35ad1d74a4f0ac98bf89fe5fbfd00178bd6adb923",
+            "role": "gallery-source"
+          },
+          "after": {
+            "path": "src/gallery/MotionGallery/ContentControls/ScalarField.tsx",
+            "bytes": 2090,
+            "sha256": "2bff02979c22aa42914779fece34aca6911b145a47aac98de58d9dd5fc4da827",
+            "role": "gallery-source"
+          }
+        }
+      ],
+      "oldPreparationArchive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a",
+      "status": "Provenance comparison only; independent source review and N1 retry still separate. Existing170defaultlive evidence retains oldHead and old supplemental identity."
+    }
+  },
+  "preEditorArchive": {
+    "originalPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/pre-editor-fix-provenance-archive.json",
+    "sha256": "53c069739b21ed1a36876c00facdc534b791fe66758e3600140fb83384e14ac9",
+    "bytes": 43922,
+    "document": {
+      "head": "02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a",
+      "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+      "records": [
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-freeze/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/supplemental-gallery-source.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-freeze/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/supplemental-gallery-source.json",
+          "sha256": "785b80ddb9dc43097055c3ab610eb77638ca83466eb736f775f02ec5d4398e10"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N4-fictional-conflict-globe.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N4-fictional-conflict-globe.json",
+          "sha256": "ba49a2eef45922cc21b188d0c0df391bdbc29e369f4d9590230b134ad37fba25"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N6-linked-parameter-rehearsal.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N6-linked-parameter-rehearsal.json",
+          "sha256": "fc4dbbfe4474d5cd00af08b51b7934e665878402edac9013732841a38581767a"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N5-habitat-corridor-reconnection.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N5-habitat-corridor-reconnection.json",
+          "sha256": "b55018afbf17bf5dc5a0a4a44b8cdee8523e78ef0cce7618b5b3b10045a0ff50"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/L2-code-focus.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/L2-code-focus.json",
+          "sha256": "dd1991f8664e343bdc2bf1e436db14cb0962e48dab1502b139cdceb5eded0809"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/L4-network-graph.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/L4-network-graph.json",
+          "sha256": "5ed69279e61f805c394eac3a61d8efe6120e080883b88aaa9afe65f20d3eab99"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N8-location-uncertainty-boundary.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N8-location-uncertainty-boundary.json",
+          "sha256": "d3c49e512b63002bceec7d582d929855eed2e1599b4a85a9b9c011a54bd8f2d2"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/L3-schema-mapping.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/L3-schema-mapping.json",
+          "sha256": "a5ad99cfb3af32798dca0b454306eb9067e9002b04e5fe6591f11e348ca89315"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N3-cold-chain-custody.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N3-cold-chain-custody.json",
+          "sha256": "83a788b78f6a688b28d8f1174b5283540b925e6bcebbcb9defff04450afa3ede"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/L5-stagger-cards.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/L5-stagger-cards.json",
+          "sha256": "1c6b580f2a0acfeced8be0708b5e87cc72beb60b5bbd2f0eb3ad6bb76403a115"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/L1-bar-race.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/L1-bar-race.json",
+          "sha256": "100e506d0a97c9bca735b8d66ea43a2a4c69ed86197aa288a7f27a3e79a86c5e"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N2-keyed-row-zipper.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N2-keyed-row-zipper.json",
+          "sha256": "ff7277ef84cf114b4432b0b49bd25d6e30c7528a73872cac3badf6bf359afd4e"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N7-gis-layer-intersection-tally.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N7-gis-layer-intersection-tally.json",
+          "sha256": "b92b52d25522603380d1e1ffbe06989103d84ccdb8a62ffc59c5bc4c864194bc"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N1-tradeoff-pivot.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N1-tradeoff-pivot.json",
+          "sha256": "11e4d70a90e5c57370565bd6bf7474c580a4d4f8219aee87dd97af118f97df69"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/manifest.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/manifest.json",
+          "sha256": "43aa14f16f1cc7c7fbecb549851627f5a0b9ff5f6afc8e08a22c5db1451c8b21"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N9-boundary-regrouping-effect.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N9-boundary-regrouping-effect.json",
+          "sha256": "3805cdcd4e573da3fc0e5e3396474600a4564d1979f433b8ff036a822226d11f"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N12-grouped-value-picker.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N12-grouped-value-picker.json",
+          "sha256": "08a2f4313c98553fe54407dfed410d3f7498944dd1458f31a925200d458777e0"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N11-decision-fork.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N11-decision-fork.json",
+          "sha256": "accaf6dd638ec95392ca226a381d4f07191cc26a6792ffcde403393c84b7d20a"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N10-benefit-shortfall-correction.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/N10-benefit-shortfall-correction.json",
+          "sha256": "a74b1a00c2bbc6303cd90a01161ca086b0ed00154f9bd95fc97f564b4a12d723"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-00.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-00.json",
+          "sha256": "453781422b86912621a917216488972f7f7303a74a10e91d1ea17574636e7ed4"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-01.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-01.json",
+          "sha256": "2a95657677b6ce4ce2fa2433b5048b246a5870c9b250d349a04716c77cf6903f"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/readiness-horizontal-true.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/readiness-horizontal-true.json",
+          "sha256": "7cd4713de949033f4ec9898375a814cc8c05fccd3e25bedfad0010f761752a45"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/readiness-vertical-true.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/readiness-vertical-true.json",
+          "sha256": "780f2aa3f318e6311a3f86813e74d46f486b1d764aa9a49364676cfb95cd7af5"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-00-retry-1.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-00-retry-1.json",
+          "sha256": "37725b69533b8ddee260b685d8a78016cabe0bba40d292ae79f76ee1656513fd"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/spans-01.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/spans-01.json",
+          "sha256": "3a8a08dc3a21028181e583e314bb11eabbf4f59a0efdb3d5bcaa0f9fa9b91d5a"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-02-retry-1.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-02-retry-1.json",
+          "sha256": "f7037daf29cee0e10718b3c1317fb3d57be2d153154ff75e719db75db852c31f"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/readiness-vertical-false.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/readiness-vertical-false.json",
+          "sha256": "4e17eb5242d67fc43dc4965bc3fbac435b9b6013f82fd8f506bf572cdb1d5c3a"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-01-remainder.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-01-remainder.json",
+          "sha256": "fb989a1990c4f87e76d6cfe741eeb5ee306cf73c4ccd7d11bc1599a70235ba24"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/manifest.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/manifest.json",
+          "sha256": "6d30b32549d2b69fcf0f43df3199425a8b147f137f54577e1bb8863f72c45c93"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/spans-00.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/spans-00.json",
+          "sha256": "76564402608398e32190492af7ce6dffb493800f1d6135b1b83b59d899259ee7"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/readiness-horizontal-false.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/readiness-horizontal-false.json",
+          "sha256": "858a59592b17c9da7691fc9ad86333abb7e2f42fa1d6e70d7d27b2fd23ed3936"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-02.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-02.json",
+          "sha256": "0bb4b9b9868d5a4e0f7e723e965886d1972cad1680b2fd960065d7e62f161001"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/http-download.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/http-download.json",
+          "sha256": "47d41a917522c368792a448ff10b09e83b96f895c9eb04f202e0ce45855c149d"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-03.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-additional-browser/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-03.json",
+          "sha256": "650d974ae1a8c13e5564354fa90bf8c0cffd396400b6440c81834120af5fc153"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-021.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-021.json",
+          "sha256": "f26c89919ae923b0bf297dac786256a56bda2abd62e016b4f14aecb3b9bd4eb8"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-001.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-001.json",
+          "sha256": "76ccb13e31d60472546bd734ef493d608dddc2bf002b1f80f11e2cb0d8f4aaff"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-017.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-017.json",
+          "sha256": "da7b71da6d349a0af5064a3a6bcf70c5b6724de7d20dd0b7863cfe0021596d7c"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-016.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-016.json",
+          "sha256": "7e369dcea4e19f78345680755003995bea7620b4b20a449436729f8da31db495"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-000.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-000.json",
+          "sha256": "f498a82da9191613d9c94b37391171cf221c178a7cbbbf204af4b9577a5a49bf"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-020.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-020.json",
+          "sha256": "77917b7f76a1126f1661629fca4a3335157f9936ab23b9b2e7f7e004de0d47a4"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-007.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-007.json",
+          "sha256": "a360dec1d0a7eb6f2a5e7c3ba19496e748a1971dba73baf5b9a3c9228cb0765d"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-011.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-011.json",
+          "sha256": "a93127f72630a8864b956be0053bcfe6c8d8530cdf230b86c3c965c33509da92"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-031.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-031.json",
+          "sha256": "8e2c9aea5955170ff0a3751cfd8446e329011eacddf72fa71a84d8dd6f24798d"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-027.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-027.json",
+          "sha256": "1f27b9bbd342fca004c2aaaad8aec3245623281882d8e8a787cbf0fbd02cb667"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-026.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-026.json",
+          "sha256": "5282b85c6ccbc680171ee0bd4ffea05c23d6032799d69f67632bee70cd5b0194"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-030.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-030.json",
+          "sha256": "20f44906155b079e2a578db6f0613255eb497a5118d82a20d4fd68c7c17a681a"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-010.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-010.json",
+          "sha256": "e4589d525f9a1be9dd9c92422d4f08cbfd635507c8b6769bf451eb7bf42a0825"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-006.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-006.json",
+          "sha256": "7dba2dc4ef8da63cdb03ad293ffa8fbde3ac629fd0fb58990d26acea1924a539"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-013.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-013.json",
+          "sha256": "64fc656c41b10b531e1796c2ad60056df98e21a5cadb670564eedc7cad8e7082"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-005.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-005.json",
+          "sha256": "bc1f09d721e8fde1e74b6a5549838605ffb770870264164aa7f77739cd35d4c7"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-029.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-029.json",
+          "sha256": "91a1c4f8cf44f133c1c1f780a9d7fd0ec7e11a3a9f4ce4539e0973a423e08a6b"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-009.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-009.json",
+          "sha256": "a138004a4622c68739b00712a84ece837774b4a4bf3ca9c2c036cc632d1be0c6"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-025.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-025.json",
+          "sha256": "4d9c216bc142c3ba4a3ae23462e1d19144062135f7c6b6c00db295d13590937e"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-033.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-033.json",
+          "sha256": "85b4d557bc3a261de35745b3dd9ee67c8d9615c57b127e8978e70fa0518e7ea2"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-032.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-032.json",
+          "sha256": "d44c1693b0041c91579ff44c6deeffeff6312b66560cc10c3fd4d1187faea655"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-024.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-024.json",
+          "sha256": "2f7378f1acfd4a1695c6525c21dbe0c76b2856b1b8fbb45dcd82a3bc21c5dfcf"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-008.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-008.json",
+          "sha256": "e9ffddabad56507c4415a2a8d307074473278fc8df883ce05fd0fd6efaec9a26"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/manifest.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/manifest.json",
+          "sha256": "cc5bc622f24608090deb3de2fc0b7e4d5d945fd803a2d7c98f4547b49caae539"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-028.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-028.json",
+          "sha256": "6a196a7959fa74f523c549b5dfbadd16e27e0a58df3f5d9e9790d091067ef46b"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-004.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-004.json",
+          "sha256": "aa516077fb34e6827d7aeb9e68c5a1ffb851dd4185d9f12d5deedc26ec6796fc"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-012.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-012.json",
+          "sha256": "990e66289fc9d71f71a432eda7a8ebb122de3dad215b66747efa43e0c0a3d59d"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-019.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-019.json",
+          "sha256": "f970be6fc98691d29cc7b13219e99cce13bbc5325014bffdd54bf2d232cebc29"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-023.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-023.json",
+          "sha256": "6290f76503695485caa6ea66379ef774575bcb5b9d40b330ecbd645d6a6257b1"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-015.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-015.json",
+          "sha256": "4b08d83f365c3a499819df1ac975e32342b433cb3634f1fa4e9a86733c91466b"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-003.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-003.json",
+          "sha256": "9d71350038c4ead45bda362ec81c2d944d566dc2d5ed03ea322e0eed4877e149"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-002.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-002.json",
+          "sha256": "ae3631f738fd25306990a4e76f987399b7d778910c6bba5e97241ea1a24815e3"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-014.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-014.json",
+          "sha256": "1fda34eda79d3b3b2b5831cae0bb2e2a0f56f96dbaa14b07ecc556465d39557e"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-022.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-022.json",
+          "sha256": "c4a55c4448270e5885b40f84ea679f280c05aa072085571054b2a5b35a7e3d5d"
+        },
+        {
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-018.json",
+          "archive": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-editor-provenance-history/02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a/final-browser-batches/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/live-018.json",
+          "sha256": "ec93c55c6904f43143a8453240bdd2d0e2f8696f031db6464cb5a9115ed39eee"
+        }
+      ],
+      "purpose": "Preserve exact old editor supplemental manifest and authored/browser request settings before a separately reviewed gallery-only fix; no source or media acceptance."
+    }
+  },
+  "N1NativeRetry": {
+    "record": "implementation-n1-editor-retry-498c717d.json",
+    "head": "498c717d53240d15a29396830759a571a938f492",
+    "configurationHash": "3ce94f9c299d6d61ed84efde4342c4a85ff3db743d946e0b79793fb6317d8bbf",
+    "scope": "Exact copied LF/TAB fixture and two actual image views, no new sampled findings. No MP4 verdict."
+  },
+  "mp4Acceptance": null,
+  "actualHttpDownloadAcceptance": null,
+  "documentationWorkerBoundary": "Read retained reports/data only. No source mutation, new tests, browser, render or PDF. No earlier browser observation is relabeled to this editor head.",
+  "publicationPolicy": "R69 compact durable record. Raw session/clock/callback traces and full original report envelopes remain ignored and in exact Downloads mirrors. This record preserves outcomes, all findings/dispositions/narratives, identities and limits.",
+  "preservedIgnoredOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-finalization-raw-drafts/motion-atlas/implementation-editor-whitespace-498c717d.json",
+    "sha256": "6061c683b3b281feee0615e69f886c1cf2e8b833006af62872685ea93c093733",
+    "bytes": 75490
+  }
+}

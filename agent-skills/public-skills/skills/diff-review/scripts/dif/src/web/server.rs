@@ -8,46 +8,14 @@
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64};
 
 use tiny_http::{Header, Request, Response, Server, StatusCode};
 
 use super::router::{self, DiffFilter, Route};
-use super::{filter, groups, inject, meta, proxy};
-
-/// The embedded shell frontend + in-difit script (no build step; `include_str!`).
-pub const SHELL_HTML: &str = include_str!("frontend/shell.html");
-pub const SHELL_CSS: &str = include_str!("frontend/shell.css");
-pub const INJECT_JS: &str = include_str!("frontend/inject.js");
-
-/// The shell script, assembled from the ordered fragments under `frontend/shell/`.
-///
-/// They share ONE IIFE + closure scope: `shell.js` opens it and declares shared
-/// state, the feature files add behavior, and `boot.js` runs startup + closes
-/// the IIFE — so the order here is load-bearing (`shell.js` first, `boot.js`
-/// last; see `frontend/shell/shell.js`). The parts are concatenated at compile
-/// time and served as one `/__wrap/shell.js`.
-pub const SHELL_JS: &str = concat!(
-    include_str!("frontend/shell/shell.js"),
-    "\n",
-    include_str!("frontend/shell/tooltip.js"),
-    "\n",
-    include_str!("frontend/shell/helpers.js"),
-    "\n",
-    include_str!("frontend/shell/iframe.js"),
-    "\n",
-    include_str!("frontend/shell/render.js"),
-    "\n",
-    include_str!("frontend/shell/data.js"),
-    "\n",
-    include_str!("frontend/shell/spotlight.js"),
-    "\n",
-    include_str!("frontend/shell/hotkeys.js"),
-    "\n",
-    include_str!("frontend/shell/chrome.js"),
-    "\n",
-    include_str!("frontend/shell/boot.js"),
-);
+use super::{filter, github_routes, groups, inject, proxy, review_routes, shell_routes};
+use crate::github::registry::SharedRegistry;
+use crate::inject::mode::DispatchControl;
 
 /// Per-request context shared across handler threads.
 pub struct Ctx {
@@ -66,9 +34,16 @@ pub struct Ctx {
     /// Set to `true` when the browser POSTs `/__wrap/regenerate`; the TUI event
     /// loop swaps it back to `false` and triggers a diff-guide regeneration.
     pub regen: Arc<AtomicBool>,
+    /// How many times the TUI restarted difit, served in `meta.json` so an open
+    /// shell tab reloads itself instead of the restart opening another.
+    pub difit_restarts: Arc<AtomicU64>,
     /// Cache-busting tag appended to `shell.js` / `shell.css` in the served page,
     /// so a browser never runs a stale frontend after a rebuild.
     pub asset_version: String,
+    /// Bulk vs eager comment delivery, shared with the TUI event loop.
+    pub dispatch: Arc<DispatchControl>,
+    /// Which comments are bound for the GitHub PR, shared with the poller.
+    pub github: SharedRegistry,
 }
 
 /// Accept loop. Runs until the [`Server`] is unblocked.
@@ -85,7 +60,8 @@ fn header(name: &str, value: &str) -> Option<Header> {
     Header::from_bytes(name.as_bytes(), value.as_bytes()).ok()
 }
 
-fn send_bytes(
+/// Respond with `body` as `content_type` at `status`; the browser may cache it.
+pub(super) fn send_bytes(
     request: Request,
     status: u16,
     content_type: &str,
@@ -103,7 +79,7 @@ fn send_bytes(
 /// injected difit doc, the filtered `/api/diff`) so a browser never runs a stale
 /// copy after `dif` relaunches with a rebuilt frontend. difit's own hashed
 /// static assets still go through plain [`send_bytes`] and stay cacheable.
-fn send_bytes_nostore(
+pub(super) fn send_bytes_nostore(
     request: Request,
     status: u16,
     content_type: &str,
@@ -119,7 +95,8 @@ fn send_bytes_nostore(
     request.respond(resp)
 }
 
-fn send_status(request: Request, status: u16) -> std::io::Result<()> {
+/// Respond with an empty body at `status`.
+pub(super) fn send_status(request: Request, status: u16) -> std::io::Result<()> {
     request.respond(Response::empty(StatusCode(status)))
 }
 
@@ -164,7 +141,8 @@ fn is_sse(path: &str) -> bool {
     path == "/api/watch" || path == "/api/heartbeat"
 }
 
-fn with_query(path: &str, query: &str) -> String {
+/// `path` with `?query` appended when `query` is non-empty.
+pub(super) fn with_query(path: &str, query: &str) -> String {
     if query.is_empty() {
         path.to_owned()
     } else {
@@ -172,15 +150,8 @@ fn with_query(path: &str, query: &str) -> String {
     }
 }
 
-fn asset(name: &str) -> Option<(&'static str, &'static str)> {
-    match name {
-        "shell.css" => Some(("text/css; charset=utf-8", SHELL_CSS)),
-        "shell.js" => Some(("application/javascript; charset=utf-8", SHELL_JS)),
-        _ => None,
-    }
-}
-
-fn request_content_type(request: &Request) -> String {
+/// The request's `Content-Type`, defaulting to `application/json`.
+pub(super) fn request_content_type(request: &Request) -> String {
     request
         .headers()
         .iter()
@@ -191,8 +162,7 @@ fn request_content_type(request: &Request) -> String {
         )
 }
 
-#[allow(clippy::too_many_lines)]
-fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
+fn handle(request: Request, ctx: &Ctx) -> std::io::Result<()> {
     let method = request.method().to_string();
     let url = request.url().to_owned();
     let (path, query) = url.split_once('?').unwrap_or((url.as_str(), ""));
@@ -203,60 +173,24 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
         .map(|h| h.value.as_str().to_owned());
 
     match router::route(&method, path, query, referer.as_deref()) {
-        Route::ShellPage => {
-            // Append the build tag to the asset URLs so the browser fetches the
-            // current frontend after a relaunch (belt-and-suspenders with no-store).
-            let html = SHELL_HTML
-                .replace(
-                    "/__wrap/shell.css",
-                    &format!("/__wrap/shell.css?v={}", ctx.asset_version),
-                )
-                .replace(
-                    "/__wrap/shell.js",
-                    &format!("/__wrap/shell.js?v={}", ctx.asset_version),
-                );
-            send_bytes_nostore(request, 200, "text/html; charset=utf-8", html.into_bytes())
-        }
-        Route::InjectJs => send_bytes_nostore(
-            request,
-            200,
-            "application/javascript; charset=utf-8",
-            INJECT_JS.as_bytes().to_vec(),
-        ),
-        Route::ShellAsset(name) => match asset(&name) {
-            Some((ct, body)) => send_bytes_nostore(request, 200, ct, body.as_bytes().to_vec()),
-            None => send_status(request, 404),
-        },
-        Route::Groups => send_bytes_nostore(
-            request,
-            200,
-            "application/json",
-            groups::read_raw(&ctx.guide_json_path),
-        ),
-        Route::DiffSummary => send_bytes_nostore(
-            request,
-            200,
-            "text/markdown; charset=utf-8",
-            std::fs::read(&ctx.diff_summary_path).unwrap_or_default(),
-        ),
-        Route::TestPlan => send_bytes_nostore(
-            request,
-            200,
-            "text/markdown; charset=utf-8",
-            std::fs::read(&ctx.test_plan_path).unwrap_or_default(),
-        ),
-        Route::Meta => send_bytes_nostore(
-            request,
-            200,
-            "application/json",
-            meta::meta_json(&ctx.branch, &ctx.worktree),
-        ),
-        Route::Regenerate => {
-            // Signal the TUI event loop to regenerate the diff guide (it swaps
-            // the flag back and types the request into the LLM pane).
-            ctx.regen.store(true, Ordering::Relaxed);
-            send_status(request, 202)
-        }
+        route @ (Route::ShellPage
+        | Route::InjectJs
+        | Route::ShellAsset(_)
+        | Route::Groups
+        | Route::DiffSummary
+        | Route::TestPlan
+        | Route::Meta
+        | Route::Regenerate) => shell_routes::handle(route, request, ctx),
+        route @ (Route::DispatchState
+        | Route::SetDispatchMode
+        | Route::SendAll
+        | Route::SaveComments) => review_routes::handle(&route, request, ctx, query),
+        route @ (Route::GithubState
+        | Route::GithubPull
+        | Route::GithubSubmit
+        | Route::GithubViewed
+        | Route::GithubConflicts
+        | Route::GithubConnection) => github_routes::handle(&route, request, ctx),
         Route::DifitDoc => match proxy::get(ctx.difit_port, "/") {
             Ok(up) => send_bytes_nostore(
                 request,
@@ -266,112 +200,87 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
             ),
             Err(_) => send_status(request, 502),
         },
-        Route::ApiDiff { filter } => {
-            match proxy::get(ctx.difit_port, &with_query("/api/diff", query)) {
-                Ok(up) => {
-                    let proxy::Upstream {
-                        status,
-                        content_type,
-                        body,
-                    } = up;
-                    let body = match filter {
-                        DiffFilter::None => body,
-                        DiffFilter::Group(n) => {
-                            let allowed = groups::Groups::load(&ctx.guide_json_path).allowed(n);
-                            filter::filter_diff(&body, &allowed)
-                        }
-                        DiffFilter::Ungrouped => {
-                            let guide = groups::Groups::load(&ctx.guide_json_path).all_files();
-                            filter::filter_ungrouped(&body, &guide)
-                        }
-                    };
-                    send_bytes_nostore(request, status, &content_type, body)
-                }
-                Err(_) => send_status(request, 502),
-            }
-        }
-        Route::Proxy => {
-            let pq = with_query(path, query);
-            if is_sse(path) {
-                match proxy::open_stream(ctx.difit_port, &pq) {
-                    Ok((ct, reader)) => send_stream(request, &ct, reader),
-                    Err(_) => send_status(request, 502),
-                }
-            } else if method == "POST" {
-                let ct = request_content_type(&request);
-                let mut body = Vec::new();
-                request.as_reader().read_to_end(&mut body)?;
-                match proxy::post(ctx.difit_port, &pq, &ct, &body) {
-                    Ok(up) => send_bytes(request, up.status, &up.content_type, up.body),
-                    Err(_) => send_status(request, 502),
-                }
-            } else {
-                match proxy::get(ctx.difit_port, &pq) {
-                    Ok(up) => send_bytes(request, up.status, &up.content_type, up.body),
-                    Err(_) => send_status(request, 502),
-                }
-            }
-        }
+        Route::ApiDiff {
+            filter,
+            commented_only,
+        } => serve_api_diff(request, ctx, query, &filter, commented_only),
+        Route::Proxy => proxy_to_difit(request, ctx, &method, path, query),
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::SHELL_JS;
-
-    /// `SHELL_JS` is assembled by concatenating ordered fragments that together
-    /// form ONE IIFE. The ordering is load-bearing — `shell.js` must open the
-    /// IIFE first and `boot.js` must close it last — but no per-file syntax
-    /// check catches a mis-ordered concat. Guard the assembled shape here.
-    #[test]
-    fn shell_js_is_one_well_formed_iife() {
-        // shell.js opens the IIFE + strict mode exactly once (a second wrapper
-        // would mean a fragment was duplicated or the entry file was reordered).
-        assert!(
-            SHELL_JS.contains("(function () {\n  \"use strict\";"),
-            "shell.js (the entry fragment) must open the IIFE first"
-        );
-        assert_eq!(
-            SHELL_JS.matches("\"use strict\";").count(),
-            1,
-            "exactly one strict-mode wrapper across the whole bundle"
-        );
-        // boot.js closes the IIFE and must be last.
-        assert!(
-            SHELL_JS.trim_end().ends_with("})();"),
-            "boot.js (the closing fragment) must come last"
-        );
-        // Ordering: the IIFE open precedes a feature fragment, which precedes
-        // boot — i.e. shell.js → features → boot.
-        let open = SHELL_JS.find("(function () {").expect("IIFE open present");
-        let feature = SHELL_JS
-            .find("hover tooltip")
-            .expect("a feature fragment present");
-        let boot = SHELL_JS
-            .find("===== boot =====")
-            .expect("boot fragment present");
-        assert!(
-            open < feature && feature < boot,
-            "entry → features → boot order"
-        );
-        // A couple of key symbols from different fragments actually made it in.
-        for sym in [
-            "selectView",
-            "renderSidebar",
-            "buildActions",
-            "showNewChanges",
-            "renderGuideTabPanel",
-            "renderTestPlanTabPanel",
-            "diff-summary.md",
-            "test-plan.md",
-            "Alt+Shift+",
-        ] {
-            assert!(SHELL_JS.contains(sym), "assembled bundle is missing {sym}");
+/// Proxy difit's `/api/diff`, narrowed to the files `filter` selects and, when
+/// `commented_only`, to the files with comments.
+fn serve_api_diff(
+    request: Request,
+    ctx: &Ctx,
+    query: &str,
+    filter: &DiffFilter,
+    commented_only: bool,
+) -> std::io::Result<()> {
+    let Ok(upstream) = proxy::get(ctx.difit_port, &with_query("/api/diff", query)) else {
+        return send_status(request, 502);
+    };
+    let proxy::Upstream {
+        status,
+        content_type,
+        body,
+    } = upstream;
+    let body = match filter {
+        DiffFilter::None => body,
+        DiffFilter::Group(n) => {
+            let allowed = groups::Groups::load(&ctx.guide_json_path).allowed(*n);
+            filter::filter_diff(&body, &allowed)
         }
-        // The console diagnostic hook was removed and stays removed.
-        assert!(
-            !SHELL_JS.contains("__difShell"),
-            "the __difShell hook must not return"
-        );
+        DiffFilter::Ungrouped => {
+            let guide = groups::Groups::load(&ctx.guide_json_path).all_files();
+            filter::filter_ungrouped(&body, &guide)
+        }
+    };
+    let body = if commented_only {
+        narrow_to_commented(ctx, body)
+    } else {
+        body
+    };
+    send_bytes_nostore(request, status, &content_type, body)
+}
+
+/// Keep only the files difit holds comments on. Fails open: if the comments
+/// can't be read, the diff passes through unnarrowed.
+fn narrow_to_commented(ctx: &Ctx, body: Vec<u8>) -> Vec<u8> {
+    let commented = proxy::get(ctx.difit_port, "/api/comments-json")
+        .ok()
+        .and_then(|up| filter::commented_files(&up.body));
+    match commented {
+        Some(files) => filter::filter_diff(&body, &files),
+        None => body,
+    }
+}
+
+/// Relay any other request to difit unchanged, streaming its SSE endpoints.
+fn proxy_to_difit(
+    mut request: Request,
+    ctx: &Ctx,
+    method: &str,
+    path: &str,
+    query: &str,
+) -> std::io::Result<()> {
+    let pq = with_query(path, query);
+    if is_sse(path) {
+        return match proxy::open_stream(ctx.difit_port, &pq) {
+            Ok((ct, reader)) => send_stream(request, &ct, reader),
+            Err(_) => send_status(request, 502),
+        };
+    }
+    let upstream = if method == "POST" {
+        let ct = request_content_type(&request);
+        let mut body = Vec::new();
+        request.as_reader().read_to_end(&mut body)?;
+        proxy::post(ctx.difit_port, &pq, &ct, &body)
+    } else {
+        proxy::get(ctx.difit_port, &pq)
+    };
+    match upstream {
+        Ok(up) => send_bytes(request, up.status, &up.content_type, up.body),
+        Err(_) => send_status(request, 502),
     }
 }

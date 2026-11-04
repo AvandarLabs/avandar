@@ -1,0 +1,207 @@
+{
+  "version": 1,
+  "id": "model-to-workspace",
+  "title": "Model to workspace",
+  "description": "An entity model resolves into an inspectable product configuration. Retain the conceptual thread through the reveal.",
+  "sourceNotes": [
+    "Extracted from ontology-to-product; uses the same continuity renderer and typed content contracts.",
+    "Reusable geometry, timing and editorial relationships. Product state remains scripted demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 810,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "Model to workspace",
+        "category": "motion-product",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#f0ba83",
+        "beats": [
+          {
+            "id": "example-0",
+            "title": "Assemble fields around stable identities.",
+            "subtitle": "A fictional entity spine keeps one record per entity.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "entity-spine-assembly",
+                "schemaVersion": 1,
+                "input": {
+                  "entities": [
+                    {
+                      "id": "a",
+                      "label": "Site A"
+                    },
+                    {
+                      "id": "b",
+                      "label": "Site B"
+                    },
+                    {
+                      "id": "c",
+                      "label": "Site C"
+                    }
+                  ],
+                  "observations": [
+                    {
+                      "id": "o1",
+                      "entityId": "a",
+                      "value": 2
+                    },
+                    {
+                      "id": "o2",
+                      "entityId": "a",
+                      "value": 3
+                    },
+                    {
+                      "id": "o3",
+                      "entityId": "b",
+                      "value": 4
+                    }
+                  ],
+                  "field": {
+                    "label": "Recorded items",
+                    "unit": "items",
+                    "missingLabel": "No observation"
+                  },
+                  "showSourceRows": true,
+                  "copy": {
+                    "context": "Fictional example",
+                    "before": "Before",
+                    "after": "After"
+                  }
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 57,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 81,
+                  "x": 480,
+                  "y": 350,
+                  "zoom": 1.8,
+                  "ease": "push"
+                },
+                {
+                  "at": 136,
+                  "x": 480,
+                  "y": 350,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 150,
+                  "x": 480,
+                  "y": 255,
+                  "zoom": 2.0,
+                  "ease": "whip"
+                },
+                {
+                  "at": 198,
+                  "x": 480,
+                  "y": 255,
+                  "zoom": 2.0,
+                  "ease": "glide"
+                },
+                {
+                  "at": 226,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 240,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            },
+            "token": {
+              "label": "Record model",
+              "anchor": {
+                "x": 1130,
+                "y": 690,
+                "width": 340,
+                "height": 64
+              },
+              "appearance": "label"
+            }
+          },
+          {
+            "id": "example-1",
+            "title": "Inspect the model in Avandar.",
+            "subtitle": "Actual concept navigation and attribute components.",
+            "content": {
+              "kind": "product",
+              "segment": {
+                "feature": "ontology",
+                "mode": "full",
+                "fromFrame": 0,
+                "toFrame": 540,
+                "leadIn": 30
+              }
+            },
+            "duration": 600,
+            "transition": {
+              "kind": "morph",
+              "frames": 30
+            },
+            "token": {
+              "label": "Record model",
+              "anchor": {
+                "x": 473,
+                "y": 49,
+                "width": 1120,
+                "height": 758
+              },
+              "appearance": "outline"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "cue-0",
+      "shotId": "explanation",
+      "startFrame": 15,
+      "endFrame": 205,
+      "text": "Keep a meaningful object or relationship in view.",
+      "beatId": "example-0"
+    },
+    {
+      "id": "cue-1",
+      "shotId": "explanation",
+      "startFrame": 45,
+      "endFrame": 565,
+      "text": "Let the next scene continue the explanation.",
+      "beatId": "example-1"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

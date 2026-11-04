@@ -1,0 +1,65 @@
+WEBVTT
+
+import-choose-csv
+00:00:03.000 --> 00:00:06.000
+Choose the fictional Harborfield CSV.
+
+import-name-dataset
+00:00:06.400 --> 00:00:09.400
+Give the dataset a clear name.
+
+import-review-preview
+00:00:09.800 --> 00:00:13.800
+Review 200 rows and 13 detected columns.
+
+import-save-dataset
+00:00:15.200 --> 00:00:18.200
+Save the dataset for later exploration.
+
+import-saved-row-count
+00:00:19.200 --> 00:00:23.200
+The saved source contains 240 cases.
+
+explorer-open-query
+00:00:24.200 --> 00:00:27.200
+Open the query controls.
+
+explorer-filter-eastbank
+00:00:27.533 --> 00:00:31.533
+Filter the records to Eastbank.
+
+explorer-eastbank-count
+00:00:31.867 --> 00:00:34.867
+Eastbank has 56 recorded cases.
+
+explorer-write-query
+00:00:35.667 --> 00:00:40.333
+Write a query to compare all six districts.
+
+explorer-run-query
+00:00:41.200 --> 00:00:45.200
+Run the grouped count for every district.
+
+explorer-make-chart
+00:00:45.867 --> 00:00:50.200
+Show the comparison as a bar chart.
+
+dashboards-save-chart
+00:00:51.667 --> 00:00:54.667
+Save the district chart to a dashboard.
+
+dashboards-name-dashboard
+00:00:55.267 --> 00:01:00.267
+Name the briefing view.
+
+dashboards-review-editor
+00:01:00.867 --> 00:01:04.867
+Review the saved chart in the editor.
+
+dashboards-open-preview
+00:01:05.467 --> 00:01:09.467
+Open the dashboard preview.
+
+dashboards-unpublished-draft
+00:01:10.267 --> 00:01:14.267
+This draft has not been published.

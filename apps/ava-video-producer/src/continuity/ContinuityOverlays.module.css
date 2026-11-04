@@ -1,0 +1,58 @@
+.floating {
+  filter: drop-shadow(0 16px 22px #06101455);
+  pointer-events: none;
+  position: absolute;
+  z-index: 20;
+}
+
+.label {
+  border: 1px solid currentcolor;
+  border-radius: 10px;
+  bottom: calc(100% + 12px);
+  display: inline-block;
+  font-size: 23px;
+  line-height: 1.25;
+  margin: 0;
+  max-width: 90%;
+  padding: 12px 18px;
+  position: absolute;
+}
+
+.spotlight {
+  border-radius: 12px;
+  box-shadow: 0 0 0 1800px #061019a8;
+  pointer-events: none;
+  position: absolute;
+  z-index: 10;
+}
+
+.connector {
+  height: 840px;
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 1600px;
+  z-index: 18;
+}
+
+.annotation {
+  pointer-events: none;
+  position: absolute;
+  z-index: 24;
+}
+
+.boxOutline {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.boxOutlineSize {
+  height: 100%;
+  width: 100%;
+}
+
+.boxOutline > span {
+  height: 100%;
+  width: 100%;
+}

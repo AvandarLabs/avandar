@@ -1,0 +1,45 @@
+{
+  "ontology": {
+    "durationInFrames": 600,
+    "sourceComponents": [
+      "src/views/OntologyDesignerApp/ConceptNavbar.tsx",
+      "src/views/OntologyDesignerApp/ConceptMetaView/index.tsx",
+      "src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx"
+    ],
+    "fixtureProvenance": "Authored concept metadata over existing fictional demo-data/cases.csv and demo-data/facilities.csv columns. Source filenames remain visible. Synthetic IDs are presentation identities, not backend IDs.",
+    "adapterBoundaries": [
+      "The actual ConceptMetaView is mounted unchanged. Only its hydration hook is replaced by a local context lookup.",
+      "The service-backed CaseTypeActions group is excluded. No record navigation, synchronization, deletion or persistence is demonstrated.",
+      "The actual ConceptNavbar is mounted. Its active status, active class and Mantine data-active attribute are driven by the frame because the existing fixture router does not distinguish concept route params.",
+      "Concept metadata uses source-typed Pick projections for the exact fields consumed by these presentation leaves. Fixed IDs are validated by the product UUID helper. One documented assertion at the unchanged ConceptNavbar/ConceptMetaView prop seam accounts for absent ownership, timestamps, allowManualCreation and model branding. Fixture hydration remains explicitly projection-typed.",
+      "Response-case inspection occupies frames 0-337. Facility inspection occupies frames 338-599. No case record detail is reused."
+    ]
+  },
+  "attribute-mapping": {
+    "durationInFrames": 660,
+    "sourceComponents": [
+      "src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx",
+      "src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx",
+      "src/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/ConceptCreatorStore.tsx"
+    ],
+    "fixtureProvenance": "supply_kits_delivered is an original demo-data/visits.csv column at visit grain. follow_up_note is an explicitly authored fictional manual-field configuration, not an existing CSV column or a historical value.",
+    "adapterBoundaries": [
+      "The original mapping and manual-field components receive a source-checked projection of their form values, input fields and inert write methods. One documented assertion at MappingFields accounts for unrelated full-form APIs and model metadata. Form writes are inert and frame state is authoritative.",
+      "The actual ConceptCreatorStore supplies localized singular/plural concept names. The live parent form, dataset-column picker, identifier configuration and submission controller are not mounted.",
+      "Only-allow-one becomes checked at frame 98. The original rule menu opens at 158 and sum is selected at 218. The menu's incidental transition duration is zero for deterministic seeking.",
+      "At frame 338, Add field preserves the actual localized New field name and allowManualEdit=false/isArray=false defaults. The name is selected at frames 350-357, cleared at 358 and replaced through 442. The manual-edit checkbox remains unchecked. No old data is backfilled.",
+      "The live parent can suppress the manual leaf through FeatureFlag.DisableManualData. Mounting the existing source leaf does not establish availability in a deployed environment or successful creation."
+    ]
+  },
+  "verification": {
+    "date": "2026-10-18",
+    "bridge": "component:build passed with the existing shared license guard, importing 673 product source files. Generated JavaScript and CSS were built, not edited.",
+    "focusedTests": "Seven frame-state tests and the three existing fixture provenance tests passed after review corrections. The new defaults/name-selection tests were observed failing against the incorrect prior behavior before the correction.",
+    "scopedLint": "Scoped ESLint, Stylelint, app TypeScript (tsconfig.app.json), and diff whitespace checks passed after review corrections.",
+    "browser": "Initial adapter states were inspected with Playwright MCP before review correction. The source-correct defaults and selected-name states at 338-442 require controller visual verification. No browser was used during this follow-up because the controller owns the active session.",
+    "console": "Zero runtime errors. The existing Remotion Player license reminder remains.",
+    "evidence": ".temp/feat-motion-catalog/ontology-final-{0,599}.png and attribute-mapping-final-{98,180,400,659}.png are initial-version evidence. The mapping screenshots do not establish the corrected Add field defaults or text-selection behavior.",
+    "limits": "Component states and screenshots are verified. Full film choreography, captions, narration, visual transitions and final renders are controller-owned and are not established by this record. The pre-existing shared Puck stylesheet imports remote Inter font CSS. These adapters make no backend/data requests, but the whole bridge is not strictly network-free until that shared font dependency is localized.",
+    "reviewFollowup": "All four concrete findings in task-2-review.md were addressed. Stage modules/tests have matching directories and frame-source conversion names, hydration is named useHydratedConcept, MappingFields owns its own file, screen Props are named, CSS classes are component-prefixed, constants are uppercase and the field-binding helper uses named object inputs/outputs above its caller."
+  }
+}

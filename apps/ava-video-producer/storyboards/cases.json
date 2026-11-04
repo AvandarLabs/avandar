@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "id": "avandar-cases",
+  "title": "Avandar: case records preview",
+  "description": "Inspect the local dataset-backed case-type preview, browse its fictional records, and read one record with case and visit fields.",
+  "sourceNotes": [
+    "Programmatic React rendering of actual components and styles from the enclosing Avandar worktree. Each build records the current source revision and SHA-256 hashes in ignored src/avandar/generated/build.json. Tracked sample MP4s retain their original export provenance.",
+    "These shots use the avandar scene and frame-controlled adapters in avandar-adapter/. They contain no screenshots, screen recordings, screenshot callouts, or prerecorded UI. The original generic demo and showcase remain separate.",
+    "All Harborfield records and locations come from the deterministic fictional bundle in demo-data/manifest.json, bound through avandar-adapter/fixtures.json. Fictional demonstration data remains visible. No real person, organization, or reporting area is represented.",
+    "Typing, selection, query results, save responses, and navigation are deterministic fixture states. Rendering invokes no product backend, authentication, persistence mutation, or publication operation. Source reuse establishes UI provenance, not a new end-to-end product test.",
+    "Historical browser evidence remains separate: accepted local rehearsal pilot-2026-10-14T22-11-57-800Z-Z53br8 passed import, explorer, dashboards, cases, and point-map checks with 14 checkpoints and zero blocked requests. Earlier capture results do not prove that this component film executed those operations.",
+    "Narration cues are authored against adapter frames. This source plan contains text cues and captions only; any generated voice is scratch narration and requires separate listening and timing review. Final render and frame-gate evidence are recorded after completed runs.",
+    "Release boundary: this is the local dataset-backed Case Manager preview, not proof of general availability or an operational case workflow. Do not infer working comments, status changes, assignment or preserved history.",
+    "The actual CaseTypeHome, ConceptNavbar, CaseTypeAttributesList, RecordAttributesList, IndividualSelectionEmptyState and ActivityBlock components render fixture-bound state. No notes are entered or saved. No record synchronization is invoked.",
+    "The fixture list contains 240 distinct case records. Response case 001 is HF-0001 in North Quay with referral_status contacted and supply_kits_delivered 1 from its related visit data. The two source-key fields remain visible. These values also matched the earlier browser rehearsal.",
+    "The original synchronization path can replace record IDs and reset status or assignment. The accepted browser run reused populated records without synchronization; the component film does not claim to repair or verify that behavior."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "opening",
+      "scene": "title",
+      "durationInFrames": 66,
+      "transitionInFrames": 0,
+      "props": {
+        "name": "Connect case records",
+        "kicker": "Local product preview \u00b7 fictional data"
+      }
+    },
+    {
+      "id": "flow",
+      "scene": "avandar",
+      "durationInFrames": 660,
+      "transitionInFrames": 18,
+      "props": {
+        "feature": "cases",
+        "fromFrame": 0,
+        "mode": "full"
+      },
+      "note": "One continuous adapter timeline. All interaction, typing, chart and camera timing is body-local in the feature adapter."
+    }
+  ],
+  "narration": [
+    {
+      "id": "open-case-type",
+      "shotId": "flow",
+      "startFrame": 12,
+      "endFrame": 102,
+      "text": "Open the fictional case type."
+    },
+    {
+      "id": "review-mappings",
+      "shotId": "flow",
+      "startFrame": 114,
+      "endFrame": 234,
+      "text": "Review its dataset-backed attributes."
+    },
+    {
+      "id": "browse-records",
+      "shotId": "flow",
+      "startFrame": 248,
+      "endFrame": 348,
+      "text": "Browse the 240 fictional case records."
+    },
+    {
+      "id": "inspect-record",
+      "shotId": "flow",
+      "startFrame": 360,
+      "endFrame": 456,
+      "text": "Inspect Response case 001."
+    },
+    {
+      "id": "linked-fields",
+      "shotId": "flow",
+      "startFrame": 468,
+      "endFrame": 558,
+      "text": "See case and visit fields together."
+    },
+    {
+      "id": "activity-boundary",
+      "shotId": "flow",
+      "startFrame": 564,
+      "endFrame": 654,
+      "text": "Local preview; activity saving is unavailable."
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

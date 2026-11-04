@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 1,
+  "status": "actual-N1-native-roundtrip-and-sampled-pixels-recorded-no-MP4-acceptance",
+  "head": "498c717d53240d15a29396830759a571a938f492",
+  "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+  "configurationHash": "3ce94f9c299d6d61ed84efde4342c4a85ff3db743d946e0b79793fb6317d8bbf",
+  "evidence": {
+    "originalPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-configured-live-2ad04707-n1-editor-498c717d-evidence.json",
+    "sha256": "d253e37e202da23bd0aa126f5125312c47d79e63f87bfdfe5216da626e6a1b07",
+    "bytes": 22274,
+    "document": {
+      "records": [
+        {
+          "id": "tradeoff-pivot",
+          "captureKey": "configured-n1-editor-498c717d",
+          "title": "A choice has two sides",
+          "head": "498c717d53240d15a29396830759a571a938f492",
+          "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+          "configurationHash": "3ce94f9c299d6d61ed84efde4342c4a85ff3db743d946e0b79793fb6317d8bbf",
+          "status": "clock-observed-awaiting-visual-inspection",
+          "paletteVerification": {
+            "accent": "#d5e681",
+            "background": "#111318"
+          },
+          "editorVerification": {
+            "method": "Actual gallery fields and native clipboard copy after success notification",
+            "copied": {
+              "preset": "tradeoff-pivot",
+              "schemaVersion": 1,
+              "input": {
+                "approach": "A\nB\tC\nD\nE",
+                "gains": [
+                  {
+                    "id": "gain-0",
+                    "label": "Joined 👩🏽‍💻 example"
+                  },
+                  {
+                    "id": "gain-1",
+                    "label": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+                  },
+                  {
+                    "id": "gain-2",
+                    "label": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+                  }
+                ],
+                "concessions": [
+                  {
+                    "id": "cost-0",
+                    "label": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+                  },
+                  {
+                    "id": "cost-1",
+                    "label": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+                  },
+                  {
+                    "id": "cost-2",
+                    "label": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+                  }
+                ],
+                "sideLabels": {
+                  "gain": "界界界界界界界界界界界界界界界界界界界界界界",
+                  "concession": "界界界界界界界界界界界界界界界界界界界界界界"
+                },
+                "priorityStatement": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界",
+                "revealOrder": "gain-first"
+              },
+              "accent": "#d5e681",
+              "background": "#111318"
+            }
+          },
+          "screenshots": [
+            {
+              "phase": "entrance",
+              "requestedWindow": [18, 40],
+              "observedBefore": 18,
+              "observedAfter": 20,
+              "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/entrance.png"
+            },
+            {
+              "phase": "action-early",
+              "requestedWindow": [85, 103],
+              "observedBefore": 85,
+              "observedAfter": 88,
+              "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/action-early.png"
+            },
+            {
+              "phase": "action-late",
+              "requestedWindow": [120, 137],
+              "observedBefore": 120,
+              "observedAfter": 122,
+              "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/action-late.png"
+            },
+            {
+              "phase": "hold",
+              "requestedWindow": [145, 165],
+              "observedBefore": 145,
+              "observedAfter": 147,
+              "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/hold.png"
+            },
+            {
+              "phase": "seam",
+              "requestedWindow": [174, 179],
+              "observedBefore": 174,
+              "observedAfter": 177,
+              "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/seam.png"
+            }
+          ],
+          "observation": {
+            "started": 6345.300000011921,
+            "samplesSummary": {
+              "count": 182,
+              "rawTracePreservedInIgnoredOriginal": true
+            }
+          },
+          "uniqueFrames": 180,
+          "wraps": 1,
+          "errors": [],
+          "decisiveStill": {
+            "frame": 150,
+            "event": "Configured authored-state hold; compare complete copied request to exact input file.",
+            "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/decisive.png",
+            "method": "Actual keyboard slider input after natural clock observation completed"
+          },
+          "visualInspection": null,
+          "limits": "Controller must verify frozen source externally before and after batch and inspect images. Playback screenshots before/after frame values bound capture timing, not exact captured frame. Natural-clock observation uses no scrubbing or synthetic advancement. Optional decisive still is separately captured using actual keyboard slider controls after playback.",
+          "outputDirectory": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d"
+        }
+      ],
+      "visualAcceptance": "not asserted"
+    }
+  },
+  "inspection": {
+    "originalPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-configured-live-2ad04707-n1-editor-498c717d-inspection.json",
+    "sha256": "79a56ee088688c6f557d257d4a9238c11e726b41b576e946d8f8ddaefd88cbba",
+    "bytes": 10419,
+    "document": {
+      "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+      "records": [
+        {
+          "id": "tradeoff-pivot",
+          "captureKey": "configured-n1-editor-498c717d",
+          "head": "498c717d53240d15a29396830759a571a938f492",
+          "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+          "configurationHash": "3ce94f9c299d6d61ed84efde4342c4a85ff3db743d946e0b79793fb6317d8bbf",
+          "paletteVerification": {
+            "accent": "#d5e681",
+            "background": "#111318"
+          },
+          "editorVerification": {
+            "method": "Actual gallery fields and native clipboard copy after success notification",
+            "copied": {
+              "preset": "tradeoff-pivot",
+              "schemaVersion": 1,
+              "input": {
+                "approach": "A\nB\tC\nD\nE",
+                "gains": [
+                  {
+                    "id": "gain-0",
+                    "label": "Joined 👩🏽‍💻 example"
+                  },
+                  {
+                    "id": "gain-1",
+                    "label": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+                  },
+                  {
+                    "id": "gain-2",
+                    "label": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+                  }
+                ],
+                "concessions": [
+                  {
+                    "id": "cost-0",
+                    "label": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+                  },
+                  {
+                    "id": "cost-1",
+                    "label": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+                  },
+                  {
+                    "id": "cost-2",
+                    "label": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+                  }
+                ],
+                "sideLabels": {
+                  "gain": "界界界界界界界界界界界界界界界界界界界界界界",
+                  "concession": "界界界界界界界界界界界界界界界界界界界界界界"
+                },
+                "priorityStatement": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界",
+                "revealOrder": "gain-first"
+              },
+              "accent": "#d5e681",
+              "background": "#111318"
+            }
+          },
+          "screenshots": [
+            {
+              "phase": "entrance",
+              "requestedWindow": [18, 40],
+              "observedBefore": 18,
+              "observedAfter": 20,
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/entrance.png"
+            },
+            {
+              "phase": "action-early",
+              "requestedWindow": [85, 103],
+              "observedBefore": 85,
+              "observedAfter": 88,
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/action-early.png"
+            },
+            {
+              "phase": "action-late",
+              "requestedWindow": [120, 137],
+              "observedBefore": 120,
+              "observedAfter": 122,
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/action-late.png"
+            },
+            {
+              "phase": "hold",
+              "requestedWindow": [145, 165],
+              "observedBefore": 145,
+              "observedAfter": 147,
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/hold.png"
+            },
+            {
+              "phase": "seam",
+              "requestedWindow": [174, 179],
+              "observedBefore": 174,
+              "observedAfter": 177,
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/seam.png"
+            }
+          ],
+          "decisiveStill": {
+            "frame": 150,
+            "event": "Configured authored-state hold; compare complete copied request to exact input file.",
+            "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/decisive.png",
+            "method": "Actual keyboard slider input after natural clock observation completed"
+          },
+          "uniqueFrames": 180,
+          "wraps": 1,
+          "errors": [],
+          "contactSheet": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/review-contact-sheet.png",
+          "contactSheetSha256": "836e34cdd574b9fa55f092f1a9603c95078efae7162d9f5fced10804b2edacda",
+          "originalFiles": [
+            {
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/entrance.png",
+              "sha256": "7861b8b5b82fc6f25e7c6178b625af13f3e97d7b5811fa0626b2dacc309c0ccc"
+            },
+            {
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/action-early.png",
+              "sha256": "e302355273b04396f72335fbf12ac647cd97cfd9e48dc20d65b60e71ee0eff98"
+            },
+            {
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/action-late.png",
+              "sha256": "9ec5ef3702812ad34d833442ad89ca94dad15e646cc448da550352f0a342975c"
+            },
+            {
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/hold.png",
+              "sha256": "9ec5ef3702812ad34d833442ad89ca94dad15e646cc448da550352f0a342975c"
+            },
+            {
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/seam.png",
+              "sha256": "028d1b22623e71ef79cae7a92504bd4c3521babf040e11de6ee30fed867e4ea2"
+            },
+            {
+              "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/decisive.png",
+              "sha256": "9ec5ef3702812ad34d833442ad89ca94dad15e646cc448da550352f0a342975c"
+            }
+          ],
+          "limits": "Two actual image views, naturalclock telemetry and exact copied request. No continuous pixel or MP4 acceptance. Original failed N1 evidence remains historical.",
+          "status": "inspected",
+          "reviewer": "root controller",
+          "viewedFiles": [
+            {
+              "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/review-contact-sheet.png",
+              "sha256": "836e34cdd574b9fa55f092f1a9603c95078efae7162d9f5fced10804b2edacda"
+            },
+            {
+              "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/decisive.png",
+              "sha256": "9ec5ef3702812ad34d833442ad89ca94dad15e646cc448da550352f0a342975c"
+            }
+          ],
+          "observations": [
+            "Actual native copied approach retains A LF B TAB C LF D LF E exactly. Other full fixture/palette equality passed.",
+            "Natural180distinctframes/onewrap and no pageerrors.",
+            "Native150 shows both panels with all three list items, joined emoji and wrapped CJK rows. Long priority text remains inside canvas at bottom. No concrete sampled collision or clipping.",
+            "Approach is painted as A B C D E by existing display layout; raw copied JSON preserves authored whitespace.",
+            "Natural85..88 shows the second card mid-turn; this is a transition state, not a resolved hold."
+          ],
+          "findings": []
+        }
+      ]
+    }
+  },
+  "originalFailedN1PreservedIn": "implementation-additional-live-evidence-2ad04707.json",
+  "resolutionBoundary": "The new actual native copied request retains LF/TAB and all other fixture/palette fields. Actual sampled images are inspected. This resolves the earlier failed exact fixture witness through new evidence, without rewriting that original run.",
+  "nativeLineEndingLimit": "The accepted editor source regression separately records native CR/CRLF clipboard paste becoming LF. This retry proves the supplied LF/TAB fixture, not arbitrary line-ending bytes.",
+  "configuredCoverageAfterRetry": {
+    "exactNativeConfigurations": 17,
+    "headPolicy": "16 earlier inspected configurations retain02d6; this N1 retry retains498c717d. Not a claim that all17 were rerun at the new editor head.",
+    "remainingFinding": "N6 connector/tick low concern retained."
+  },
+  "mp4Acceptance": null,
+  "continuousPixelAcceptance": null,
+  "publicationPolicy": "R69 compact durable record. Raw session/clock/callback traces and full original report envelopes remain ignored and in exact Downloads mirrors. This record preserves outcomes, all findings/dispositions/narratives, identities and limits.",
+  "preservedIgnoredOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-finalization-raw-drafts/motion-atlas/implementation-n1-editor-retry-498c717d.json",
+    "sha256": "20000ac5ae3853b438224548e6dea48be35ec389cea4392419b582306a35f6a8",
+    "bytes": 37973
+  }
+}

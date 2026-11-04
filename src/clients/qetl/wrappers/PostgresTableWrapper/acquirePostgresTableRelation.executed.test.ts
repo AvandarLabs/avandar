@@ -2,7 +2,7 @@ import { writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { withDuckDb } from "../../../../../tests/integration/queries/executedDuckDb";
 import type {
   PostgresRelationCsvReader,
   PostgresRowsFetch,

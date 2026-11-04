@@ -76,6 +76,30 @@ pub fn inbound_entries<S: BuildHasher>(
         .collect()
 }
 
+/// The transcript entries to import when `snapshot` is a comment session difit
+/// has just switched to, or nothing when it is the session `dif` has been
+/// mirroring.
+///
+/// difit keys comments by the comparison's resolved commits, so once HEAD or
+/// the base moves, the browser's next diff request opens a new session. Its
+/// version starts again at 0, below `last_version`, the last version the
+/// poller mirrored. Mirroring that session would wipe the transcript, so the
+/// poller imports every transcript entry the new session lacks instead. A
+/// session the reviewer emptied keeps counting up and is left alone.
+#[must_use]
+pub fn reseed_entries(
+    snapshot: &Snapshot,
+    file_text: &str,
+    last_version: Option<i64>,
+) -> Vec<ImportEntry> {
+    let is_fresh = snapshot.version == 0 && snapshot.threads.is_empty();
+    let is_switched = last_version.is_some_and(|last| snapshot.version < last);
+    if !is_fresh && !is_switched {
+        return Vec::new();
+    }
+    inbound_entries(file_text, None, &snapshot_ids(snapshot))
+}
+
 /// POST `entries` to difit's import endpoint. Returns whether difit accepted
 /// them; a failure is non-fatal, the next tick retries.
 #[must_use]
@@ -179,6 +203,47 @@ mod tests {
         assert!(inbound_entries(r#"[{"type":"thread","id":"m1","#, None, &seen).is_empty());
         assert!(inbound_entries("", None, &seen).is_empty());
         assert!(inbound_entries("[]", None, &seen).is_empty());
+    }
+
+    const FRESH_SESSION: &str = r#"{"version":0,"threads":[]}"#;
+
+    #[test]
+    fn a_fresh_difit_session_gets_the_whole_transcript_back() {
+        // difit keys comments by the comparison's resolved commits, so a new
+        // HEAD or base serves an empty version-0 session. The transcript still
+        // holds the conversation and must be re-imported, not overwritten.
+        let reseed = reseed_entries(&snapshot(FRESH_SESSION), SKILL_WRITE, None);
+
+        assert_eq!(ids(&reseed), ["m1", "claude-r1-a-7"]);
+    }
+
+    #[test]
+    fn a_first_launch_with_no_comments_reseeds_nothing() {
+        assert!(reseed_entries(&snapshot(FRESH_SESSION), "[]\n", None).is_empty());
+    }
+
+    #[test]
+    fn a_session_the_reviewer_emptied_is_never_reseeded() {
+        // Deleting the last comment bumps difit's version, so an empty session
+        // past version 0 is a real deletion the mirror must keep.
+        let emptied = snapshot(r#"{"version":4,"threads":[]}"#);
+
+        assert!(reseed_entries(&emptied, SKILL_WRITE, Some(3)).is_empty());
+    }
+
+    #[test]
+    fn a_new_session_that_already_has_a_comment_gets_the_rest_back() {
+        // The browser wrote to the new session before the poller saw it empty:
+        // its version is lower than the last one mirrored, so it is still a
+        // different session, and only the entries it lacks are imported.
+        let reseed = reseed_entries(&snapshot(REVIEWER_THREAD), SKILL_WRITE, Some(37));
+
+        assert_eq!(ids(&reseed), ["claude-r1-a-7"]);
+    }
+
+    #[test]
+    fn a_session_holding_comments_is_never_reseeded() {
+        assert!(reseed_entries(&snapshot(REVIEWER_THREAD), SKILL_WRITE, Some(2)).is_empty());
     }
 
     #[test]

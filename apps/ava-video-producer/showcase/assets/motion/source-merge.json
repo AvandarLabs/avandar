@@ -1,0 +1,14 @@
+{
+  "preset": "source-merge",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "90b1add7a7500c8890e04cb0beaea238b85f0bfd882b7704afb7563b4653b3f5",
+  "posterSha256": "0083826b84fceee7da0ef82361bf61551ea782750490145bc2aa4a8900f79d72",
+  "generatedAt": "2026-10-14T23:54:33.688Z"
+}

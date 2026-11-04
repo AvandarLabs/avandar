@@ -3,13 +3,14 @@ import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/Anal
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type {
-  VizConfig,
-  VizConfigRegistry,
-} from "$/models/vizs/VizConfig/VizConfig.types";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 
 /**
  * Identifies the currently open saved dataset in the Data Explorer, if any.
@@ -29,8 +30,35 @@ export type OpenDatasetInfo = {
   virtualDatasetId?: VirtualDatasetId;
 };
 
+/**
+ * Every column of one data source, whether or not a query selects it, and
+ * whether those columns have finished loading. Lets a query control, such as
+ * a column picker or a filter builder, offer the source's columns and wait
+ * for them to load before judging which columns the source has.
+ */
+export type SourceColumnCatalog = {
+  sourceKey: QueryDataSource.TypedId | undefined;
+  status: "loading" | "ready";
+  columns: readonly QueryColumn.T[];
+};
+
 export type DataExplorerAppState = {
   query: PartialStructuredQuery;
+  /**
+   * The column bindings of the latest bound query result, which keep each
+   * `QueryResult` column on the same column ID across runs. Written by
+   * `setColumnBindings`. Read by `DataExplorerApp` to bind the next result
+   * and by `DataExplorerSaveAsMenuItems` to save the chart to a dashboard.
+   */
+  columnBindings?: QueryResultColumnBindingRegistry;
+
+  /**
+   * Every column of the selected data source, whether or not the query
+   * selects it. Read by `DataExplorerManualQueryForm`, which offers these
+   * columns to pick and filter on. Written by `setDataSource`,
+   * `setSourceColumns`, and `applySqlMapping`.
+   */
+  sourceCatalog?: SourceColumnCatalog;
 
   /**
    * If raw SQL was generated, we should use that for our query instead of
@@ -46,7 +74,16 @@ export type DataExplorerAppState = {
    */
   nlPrompt: string | undefined;
 
-  vizConfig: VizConfig;
+  vizConfig: AvaVizConfig.T;
+
+  /**
+   * A chart config restored from the URL, keyed by `QueryResult` column names
+   * because a URL carries no column IDs. The first query result binds those
+   * names to the result's column IDs and clears this field. Until then, URL
+   * sync keeps writing it back unchanged, so a slow or failed query does not
+   * drop it.
+   */
+  pendingUrlVizConfig?: UiVizConfig;
 
   /**
    * The last config the user actually saw for each viz type, so switching
@@ -62,13 +99,13 @@ export type DataExplorerAppState = {
    * stale when the query changes; they are reconciled against the current
    * result columns on restore rather than being invalidated up front.
    *
-   * `Partial<VizConfigRegistry>` correlates each entry with the viz type it
+   * `Partial<AvaVizConfigRegistry>` correlates each entry with the viz type it
    * is filed under, so a bar config cannot be stored under `"pie"`.
    *
    * In-memory only: this state manager is never persisted, so a reload
    * starts empty.
    */
-  vizConfigMemory: Partial<VizConfigRegistry>;
+  vizConfigMemory: Partial<AvaVizConfig.Registry>;
 
   /** The currently open saved dataset, or `undefined` if none is open. */
   openDataset: OpenDatasetInfo | undefined;
@@ -103,7 +140,7 @@ export type DataExplorerAppState = {
    * current result schema without holding a reference to the React Query
    * cache. `undefined` while no query has succeeded.
    */
-  lastResultColumns: readonly QueryResultColumn[] | undefined;
+  lastResultColumns: readonly QueryResult.ColumnWithId[] | undefined;
 
   /**
    * What caused the query that is about to run, recorded on `query.ran` and
