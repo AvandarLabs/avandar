@@ -114,9 +114,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
         return command === "stop";
       }),
     ).toHaveLength(0);
-    expect(fake.operations.filter(valEq(`write:${CONFIG_PATH}`))).toHaveLength(
-      1,
-    );
+    expect(fake.operations.filter(valEq(`write:${CONFIG_PATH}`))).toEqual([]);
   });
 
   it("skips a Docker-published port set when choosing an automatic base", async () => {
@@ -132,8 +130,8 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
       projectId: "analytics-p2-temp",
       seed: { state: "seeded" },
     });
-    expect(fake.files.get(CONFIG_PATH)).toContain("port = 55341");
-    expect(fake.files.get(CONFIG_PATH)).toContain("port = 55342");
+    expect(fake.files.get(ENV_PATH)).toContain("SUPABASE_API_PORT=55341");
+    expect(fake.files.get(ENV_PATH)).toContain("SUPABASE_DB_PORT=55342");
   });
 
   it("ignores a backup belonging to another branch", async () => {
@@ -176,16 +174,16 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
     });
   });
 
-  it("backs up every development file before rewriting configuration", async () => {
+  it("backs up every development env file before writing any of them", async () => {
     const fake = createFakeIo();
     await SupabaseLocalEnvironment.switch({
       io: fake.io,
       temporaryProjectId: "analytics-p2-temp",
     });
     expect(fake.copyOperations.map(prop("0")).sort()).toEqual(
-      [CONFIG_PATH, EDGE_ENV_PATH, ENV_PATH].sort(),
+      [EDGE_ENV_PATH, ENV_PATH].sort(),
     );
-    const configWriteIndex = fake.operations.indexOf(`write:${CONFIG_PATH}`);
+    const firstEnvWriteIndex = fake.operations.indexOf(`write:${ENV_PATH}`);
     const lastCopyIndex = Math.max(
       ...fake.operations
         .map((operation, index) => {
@@ -198,7 +196,65 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
         )
         .map(prop("index")),
     );
-    expect(lastCopyIndex).toBeLessThan(configWriteIndex);
+    expect(lastCopyIndex).toBeLessThan(firstEnvWriteIndex);
+  });
+
+  it("points the Supabase CLI at the new project from .env.development", async () => {
+    const fake = createFakeIo();
+    await SupabaseLocalEnvironment.switch({
+      io: fake.io,
+      temporaryProjectId: "analytics-p2-temp",
+    });
+    expect(fake.files.get(ENV_PATH)).toContain(
+      [
+        "SUPABASE_PROJECT_ID=analytics-p2-temp",
+        "SUPABASE_API_PORT=55321",
+        "SUPABASE_DB_PORT=55322",
+      ].join("\n"),
+    );
+  });
+
+  it("writes the project overrides before supabase start reads them", async () => {
+    const fake = createFakeIo();
+    await SupabaseLocalEnvironment.switch({
+      io: fake.io,
+      temporaryProjectId: "analytics-p2-temp",
+    });
+    expect(fake.operations.indexOf(`write:${ENV_PATH}`)).toBeLessThan(
+      fake.operations.indexOf("command:start"),
+    );
+  });
+
+  it("never writes supabase/config.toml", async () => {
+    const fake = createFakeIo();
+    await SupabaseLocalEnvironment.switch({
+      io: fake.io,
+      temporaryProjectId: "analytics-p2-temp",
+    });
+    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.operations).not.toContain(`write:${CONFIG_PATH}`);
+  });
+
+  it("keeps the project overrides out of the edge-function env file", async () => {
+    const fake = createFakeIo();
+    await SupabaseLocalEnvironment.switch({
+      io: fake.io,
+      temporaryProjectId: "analytics-p2-temp",
+    });
+    expect(fake.files.get(EDGE_ENV_PATH)).not.toContain("SUPABASE_PROJECT_ID");
+  });
+
+  it("refuses to switch a worktree that has no .env.development", async () => {
+    const fake = createFakeIo();
+    fake.files.delete(ENV_PATH);
+    await expect(
+      SupabaseLocalEnvironment.switch({
+        io: fake.io,
+        temporaryProjectId: "analytics-p2-temp",
+      }),
+    ).rejects.toThrow("needs a .env.development");
+    expect(fake.copyOperations).toEqual([]);
+    expect(fake.commands).toEqual([]);
   });
 
   it("refuses an externally retargeted backup hierarchy parent", async () => {
@@ -243,21 +299,6 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
     expect(fake.operations).toEqual([]);
   });
 
-  it("refuses a config symlink that escapes the canonical worktree", async () => {
-    const fake = createFakeIo({
-      canonicalPaths: { [CONFIG_PATH]: "/outside/config.toml" },
-    });
-
-    await expect(
-      SupabaseLocalEnvironment.switch({
-        io: fake.io,
-        temporaryProjectId: "analytics-p2-temp",
-      }),
-    ).rejects.toThrow("deterministic regular file");
-    expect(fake.commands).toEqual([]);
-    expect(fake.copyOperations).toEqual([]);
-    expect(fake.operations).toEqual([]);
-  });
 
   it("refuses an environment symlink retargeted inside the worktree", async () => {
     const fake = createFakeIo({
@@ -291,21 +332,6 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
     expect(fake.operations).toEqual([]);
   });
 
-  it("refuses a config directory before reserving or writing", async () => {
-    const fake = createFakeIo();
-    fake.files.delete(CONFIG_PATH);
-    fake.directories.add(CONFIG_PATH);
-
-    await expect(
-      SupabaseLocalEnvironment.switch({
-        io: fake.io,
-        temporaryProjectId: "analytics-p2-temp",
-      }),
-    ).rejects.toThrow("deterministic regular file");
-    expect(fake.commands).toEqual([]);
-    expect(fake.copyOperations).toEqual([]);
-    expect(fake.operations).toEqual([]);
-  });
 
   it("refuses an environment directory before reserving or writing", async () => {
     const fake = createFakeIo({ developmentEnvFiles: [ENV_PATH] });
@@ -331,7 +357,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
         temporaryProjectId: "analytics-p2-temp",
       }),
     ).rejects.toThrow(`Cannot copy to ${makeBackupPath(ENV_PATH)}`);
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
     await expect(fake.io.pathExists(makeBackupDirectory())).resolves.toBe(
       false,
     );

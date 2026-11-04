@@ -124,63 +124,6 @@ port = 54322
   });
 });
 
-describe("makeSupabaseConfigFromBasePort", () => {
-  it("replaces the project id and shifts every port by the API delta", () => {
-    const rewritten = SupabaseConfig.makeConfigContentsFromBasePort({
-      configContents: CONFIG,
-      projectId: "analytics-p2-temp",
-      basePort: 55321,
-    });
-
-    expect(rewritten).toContain('project_id = "analytics-p2-temp"');
-    expect(rewritten).toContain('project_id = "remote-project-ref"');
-    expect(rewritten).toContain("[remotes.production.api]\nport = 64321");
-    expect(SupabaseConfig.makeStateFromContents(rewritten).ports).toEqual({
-      "api.port": 55321,
-      "db.port": 55322,
-      "db.shadow_port": 55320,
-      "studio.port": 55323,
-      "inbucket.port": 52634,
-      "edge_runtime.inspector_port": 9083,
-      "analytics.port": 55327,
-    });
-  });
-
-  it("preserves inline comments while shifting every active local port", () => {
-    const rewritten = SupabaseConfig.makeConfigContentsFromBasePort({
-      configContents: CONFIG_WITH_COMMENTS_AND_MAIL_PORTS,
-      projectId: "analytics-p2-temp",
-      basePort: 55321,
-    });
-
-    expect(rewritten).toContain(
-      'project_id = "analytics-p2-temp" # local project',
-    );
-    expect(rewritten).toContain("port = 55321 # gateway");
-    expect(rewritten).toContain("port = 52634 # web interface");
-    expect(rewritten).toContain("smtp_port = 52635 # SMTP");
-    expect(rewritten).toContain("pop3_port = 52636 # POP3");
-    expect(rewritten).toContain(
-      'project_id = "remote-project-ref" # remote project',
-    );
-    expect(rewritten).toContain("smtp_port = 61635 # remote SMTP");
-  });
-
-  it("shifts commented local sections without rewriting commented remotes", () => {
-    const rewritten = SupabaseConfig.makeConfigContentsFromBasePort({
-      configContents: CONFIG_WITH_COMMENTED_SECTION_HEADERS,
-      projectId: "analytics-p2-temp",
-      basePort: 55321,
-    });
-
-    expect(rewritten).toContain("[api] # API gateway\nport = 55321");
-    expect(rewritten).toContain("[db] # database\nport = 55322");
-    expect(rewritten).toContain(
-      "[remotes.production.api] # deployed API\nport = 64321",
-    );
-  });
-});
-
 describe("makeSupabaseLocalStatusFromJson", () => {
   it("reads the local credentials needed by development environments", () => {
     expect(

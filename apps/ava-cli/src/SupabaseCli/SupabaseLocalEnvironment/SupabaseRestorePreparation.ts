@@ -3,6 +3,7 @@ import { SupabaseBackupHierarchy } from "@ava-cli/SupabaseCli/SupabaseLocalEnvir
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupPaths";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
 import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
+import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
 import {
   MANIFEST_FILE,
   PROJECT_ID_PATTERN,
@@ -119,12 +120,6 @@ async function _requireCurrentSourcesInManifest(
 ): Promise<void> {
   const { io, manifest } = options;
   const manifestSources = makeSet(manifest.files, { key: "sourcePath" });
-  const configPath = path.join(io.projectRoot, "supabase", "config.toml");
-  if (!manifestSources.has(configPath)) {
-    throw new Error(
-      "Supabase backup complete deterministic file set must include the config backup.",
-    );
-  }
   const currentEnvFiles = await io.findDevelopmentEnvFiles();
   if (
     currentEnvFiles.some((sourcePath) => {
@@ -193,6 +188,24 @@ async function _validateRestoreManifest(
   });
 }
 
+/**
+ * The project id the Supabase CLI uses in this worktree: the
+ * `.env.development` override when there is one, `config.toml` otherwise.
+ */
+async function _readActiveProjectId(
+  io: Readonly<SupabaseLocalEnvironmentIo>,
+): Promise<string> {
+  const envPath = path.join(io.projectRoot, ".env.development");
+  const [configContents, envContents] = await Promise.all([
+    io.readTextFile(path.join(io.projectRoot, "supabase", "config.toml")),
+    (await io.pathExists(envPath)) ? io.readTextFile(envPath) : "",
+  ]);
+  return SupabaseConfigOverrides.makeEffectiveState({
+    config: SupabaseConfig.makeStateFromContents(configContents),
+    envContents,
+  }).projectId;
+}
+
 async function _hasProvenRestoreOwnership(
   options: Readonly<{
     io: SupabaseLocalEnvironmentIo;
@@ -202,9 +215,7 @@ async function _hasProvenRestoreOwnership(
   const { io, manifest } = options;
   const activeProjectId = await (async (): Promise<string | undefined> => {
     try {
-      const configPath = path.join(io.projectRoot, "supabase", "config.toml");
-      const configContents = await io.readTextFile(configPath);
-      return SupabaseConfig.makeStateFromContents(configContents).projectId;
+      return await _readActiveProjectId(io);
     } catch {
       if (manifest.state === "active") {
         throw new Error("Cannot validate the active Supabase config.");
@@ -217,7 +228,7 @@ async function _hasProvenRestoreOwnership(
   }
   if (manifest.state === "active") {
     throw new Error(
-      "Supabase backup project id does not match the active Supabase config.",
+      "Supabase backup project id does not match the active Supabase project.",
     );
   }
   return false;

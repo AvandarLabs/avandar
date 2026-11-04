@@ -42,6 +42,7 @@ const STATUS_JSON = JSON.stringify({
 });
 
 const MANIFEST: SupabaseBackupManifest = {
+  kind: "local",
   branch: "feat/analytics-p2",
   worktreePath: "/repo",
   temporaryProjectId: "analytics-p2-temp",
@@ -62,7 +63,54 @@ function _getValueFromEntries(
   return options.entries.find(propEq("label", options.label))?.value;
 }
 
+/** `.env.development` as a switch to `analytics-p2-temp` leaves it. */
+const SWITCHED_ENV_FILE = {
+  filePath: "/repo/.env.development",
+  contents: "SUPABASE_PROJECT_ID=analytics-p2-temp\nSUPABASE_API_PORT=55321\n",
+};
+
 describe("makeStatusReport", () => {
+  it("reports the project and ports .env.development overrides", () => {
+    const report = SupabaseStatus.makeStatusReport({
+      branch: "feat/analytics-p2",
+      configContents: STANDARD_CONFIG,
+      manifest: MANIFEST,
+      statusJson: undefined,
+      envFiles: [SWITCHED_ENV_FILE],
+    });
+
+    expect(report.isSwitched).toBe(true);
+    expect(report.projectId).toBe("analytics-p2-temp");
+    expect(
+      _getValueFromEntries({ entries: report.ports, label: "API" }),
+    ).toBe("55321");
+  });
+
+  it("flags an override that no switch on this branch wrote", () => {
+    const report = SupabaseStatus.makeStatusReport({
+      branch: "feat/analytics-p2",
+      configContents: STANDARD_CONFIG,
+      manifest: undefined,
+      statusJson: undefined,
+      envFiles: [SWITCHED_ENV_FILE],
+    });
+
+    expect(report.isSwitched).toBe(false);
+    expect(report.hasStrayOverride).toBe(true);
+  });
+
+  it("raises no stray-override flag for a worktree on the shared stack", () => {
+    expect(
+      SupabaseStatus.makeStatusReport({
+        branch: "develop",
+        configContents: STANDARD_CONFIG,
+        manifest: undefined,
+        statusJson: undefined,
+        envFiles: [],
+      }).hasStrayOverride,
+    ).toBe(false);
+  });
+
   it("reports the shared stack when no backup owns the config", () => {
     const report = SupabaseStatus.makeStatusReport({
       branch: "develop",

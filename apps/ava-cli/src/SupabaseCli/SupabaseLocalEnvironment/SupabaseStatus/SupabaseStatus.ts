@@ -4,6 +4,7 @@ import { EnvFileLine } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/EnvFi
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupPaths";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
 import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
+import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
 import { SHARED_STACK_BRANCH } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import { promiseMap, prop } from "@avandar/utils";
 import type {
@@ -123,11 +124,20 @@ function _makeStatusReport(
   options: Readonly<MakeStatusReportOptions>,
 ): SupabaseStatusReport {
   const { branch, configContents, manifest, statusJson, envFiles } = options;
-  const config = SupabaseConfig.makeStateFromContents(configContents);
+  const sharedConfig = SupabaseConfig.makeStateFromContents(configContents);
+  const config = SupabaseConfigOverrides.makeEffectiveState({
+    config: sharedConfig,
+    envContents:
+      envFiles.find(({ filePath }) => {
+        return path.basename(filePath) === ".env.development";
+      })?.contents ?? "",
+  });
   const status = _readLocalStatus(statusJson);
   const isSwitched = manifest?.temporaryProjectId === config.projectId;
   return {
     isSwitched,
+    hasStrayOverride:
+      !isSwitched && config.projectId !== sharedConfig.projectId,
     isExpectedForBranch: isSwitched !== (branch === SHARED_STACK_BRANCH),
     isRunning: status !== undefined,
     branch,

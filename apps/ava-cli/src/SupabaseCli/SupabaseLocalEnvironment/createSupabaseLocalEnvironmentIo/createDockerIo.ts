@@ -1,6 +1,7 @@
 import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/RunLocalCommand/RunLocalCommand";
 import { DockerPublishedPorts } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/DockerPublishedPorts/DockerPublishedPorts";
 import { SupabaseCommandOutput } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseCommandOutput/SupabaseCommandOutput";
+import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
 import { SUPABASE_DOCKER_CLEANUP_RESOURCE_ORDER } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import {
   constant,
@@ -207,6 +208,10 @@ export function createDockerIo(
         command: "pnpm",
         args: ["exec", "supabase", ...commandArguments],
         cwd: projectRoot,
+        // `ava` loaded the invoking worktree's .env.development into its own
+        // environment, and the CLI ranks real variables above the env file it
+        // reads. Dropping them lets `projectRoot`'s .env.development decide.
+        shouldOmitEnvKey: SupabaseConfigOverrides.isOverrideKey,
         outputMode: options?.outputMode,
         transformStreamLine: SupabaseCommandOutput.redactSecretsFromLine,
       });

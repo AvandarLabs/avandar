@@ -26,8 +26,13 @@ export type SupabaseBackupFile = {
   backupPath: string;
 };
 
-/** Durable state required to restore one branch's local configuration. */
+/**
+ * Durable state required to restore one branch's local configuration.
+ *
+ * `kind` is `"local"` for a switch onto a branch-scoped Docker project.
+ */
 export type SupabaseBackupManifest = {
+  kind: "local";
   branch: string;
   worktreePath: string;
   temporaryProjectId: string;
@@ -153,8 +158,8 @@ export type SupabaseSwitchResult = {
 /** Everything a switch needs before it starts mutating local files. */
 export type SwitchPreparation = {
   backupDirectory: string;
-  configContents: string;
-  configPath: string;
+  /** The env file the Supabase CLI reads its project overrides from. */
+  developmentEnvPath: string;
   devServerPort: number;
   envFiles: string[];
   manifest: SupabaseBackupManifest;
@@ -181,6 +186,12 @@ export type SupabaseEnvironmentDrift = {
 /** Identity, ports, and endpoints of the local Supabase this worktree uses. */
 export type SupabaseStatusReport = {
   isSwitched: boolean;
+  /**
+   * Whether `.env.development` points the Supabase CLI at a project that no
+   * switch on this branch created, for example one copied from another
+   * worktree's env file.
+   */
+  hasStrayOverride: boolean;
   /** Whether the switch state is the healthy one for this branch. */
   isExpectedForBranch: boolean;
   isRunning: boolean;

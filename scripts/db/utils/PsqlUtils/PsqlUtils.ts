@@ -56,7 +56,46 @@ function _run(
   });
 }
 
-/** Returns the local project id and host database port from Supabase config. */
+/**
+ * Reads one variable the way the Supabase CLI does: a real environment
+ * variable first, then the last assignment in `.env.development`.
+ */
+function _getSupabaseOverrideFromEnv(
+  options: Readonly<{ repoRoot: string; envKey: string }>,
+): string | undefined {
+  const { repoRoot, envKey } = options;
+  const processValue = process.env[envKey];
+  if (processValue) {
+    return processValue;
+  }
+  const envContents = (() => {
+    try {
+      return readFileSync(path.join(repoRoot, ".env.development"), "utf8");
+    } catch {
+      return "";
+    }
+  })();
+  const assignedValue = envContents
+    .split("\n")
+    .map((line) => {
+      return new RegExp(`^\\s*${envKey}\\s*=(.*)$`, "u").exec(line)?.[1];
+    })
+    .filter((value): value is string => {
+      return value !== undefined;
+    })
+    .at(-1)
+    ?.trim()
+    .replace(/^(["'])(.*)\1$/u, "$2");
+  return assignedValue || undefined;
+}
+
+/**
+ * Returns the local project id and host database port the Supabase CLI uses.
+ *
+ * `ava supabase switch` moves a worktree onto its own project through
+ * `SUPABASE_PROJECT_ID` and `SUPABASE_DB_PORT` in `.env.development`, so those
+ * win over `supabase/config.toml`, which always holds the shared defaults.
+ */
 export function getLocalDatabaseConfigFromRepoRoot(repoRoot: string): {
   projectId: string;
   hostPort: string;
@@ -65,7 +104,9 @@ export function getLocalDatabaseConfigFromRepoRoot(repoRoot: string): {
     path.join(repoRoot, "supabase", "config.toml"),
     "utf8",
   );
-  const projectId = /^project_id\s*=\s*"([^"]+)"/mu.exec(configContents)?.[1];
+  const projectId =
+    _getSupabaseOverrideFromEnv({ repoRoot, envKey: "SUPABASE_PROJECT_ID" }) ??
+    /^project_id\s*=\s*"([^"]+)"/mu.exec(configContents)?.[1];
   if (projectId === undefined) {
     throw new Error("Cannot read local Supabase project id from config.toml.");
   }
@@ -74,7 +115,9 @@ export function getLocalDatabaseConfigFromRepoRoot(repoRoot: string): {
     .find((section) => {
       return /^\s*\[db\]\s*(?:#.*)?$/mu.test(section);
     });
-  const hostPort = /^\s*port\s*=\s*(\d+)/mu.exec(databaseSection ?? "")?.[1];
+  const hostPort =
+    _getSupabaseOverrideFromEnv({ repoRoot, envKey: "SUPABASE_DB_PORT" }) ??
+    /^\s*port\s*=\s*(\d+)/mu.exec(databaseSection ?? "")?.[1];
   if (hostPort === undefined) {
     throw new Error(
       "Cannot read local Supabase database port from config.toml.",

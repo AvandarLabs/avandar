@@ -142,13 +142,32 @@ describe("createSupabaseLocalEnvironmentIo (commands, Docker, Git, ports)", () =
     expect(commandMocks.execFile).toHaveBeenCalledWith(
       "pnpm",
       ["exec", "supabase", ...suppliedArgs],
-      {
+      expect.objectContaining({
         cwd: projectRoot,
         encoding: "utf8",
         maxBuffer: 10 * 1024 * 1024,
-      },
+      }),
       expect.any(Function),
     );
+  });
+
+  it("keeps inherited project overrides away from the Supabase CLI", async () => {
+    _setCommandSuccess([{ stderr: "", stdout: "" }]);
+    // What `ava` loaded from the invoking worktree's .env.development, which
+    // must not outrank the env file of the worktree the command runs in.
+    vi.stubEnv("SUPABASE_PROJECT_ID", "invoking-worktree");
+    vi.stubEnv("SUPABASE_API_PORT", "55321");
+    vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54321");
+    const io = createSupabaseLocalEnvironmentIo(path.resolve(process.cwd()));
+
+    await io.runSupabase(["start"]);
+
+    const childEnv = (
+      commandMocks.execFile.mock.calls[0]?.[2] as { env?: NodeJS.ProcessEnv }
+    ).env;
+    expect(childEnv).not.toHaveProperty("SUPABASE_PROJECT_ID");
+    expect(childEnv).not.toHaveProperty("SUPABASE_API_PORT");
+    expect(childEnv).toHaveProperty("SUPABASE_URL", "http://127.0.0.1:54321");
   });
 
   it("overrides the inherited connection when seeding", async () => {

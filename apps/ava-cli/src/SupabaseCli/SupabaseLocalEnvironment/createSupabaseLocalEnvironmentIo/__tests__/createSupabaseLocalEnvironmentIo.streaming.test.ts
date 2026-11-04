@@ -65,11 +65,10 @@ describe("createSupabaseLocalEnvironmentIo streaming", () => {
     expect(commandMocks.spawn).toHaveBeenCalledWith(
       "pnpm",
       ["exec", "supabase", "start"],
-      {
+      expect.objectContaining({
         cwd: projectRoot,
-        env: undefined,
         stdio: ["ignore", "pipe", "pipe"],
-      },
+      }),
     );
   });
 });

@@ -38,6 +38,8 @@ type CreateBackupOptions = {
 };
 
 const SupabaseBackupManifestSchema = z.object({
+  // A manifest written before remote switches existed has no `kind`.
+  kind: z.literal("local").default("local"),
   branch: z.string(),
   worktreePath: z.string(),
   temporaryProjectId: z.string(),
@@ -122,6 +124,7 @@ async function _createBackup(
       filesDirectory,
     });
     const manifest: SupabaseBackupManifest = {
+      kind: "local",
       branch: options.branch,
       worktreePath: options.worktreePath,
       temporaryProjectId: options.temporaryProjectId,

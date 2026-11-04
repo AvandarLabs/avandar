@@ -1,6 +1,7 @@
 import { DevServerPort } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
 import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
+import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
 import { SupabaseDockerCleanup } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseDockerCleanup";
 import { SupabaseRestorePreparation } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseRestorePreparation";
 import { SupabaseSwitchPreparation } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchPreparation";
@@ -142,11 +143,13 @@ async function _activateSwitch(
 }> {
   const { io, preparation, temporaryProjectId } = options;
   await io.writeTextFile({
-    filePath: preparation.configPath,
-    contents: SupabaseConfig.makeConfigContentsFromBasePort({
-      configContents: preparation.configContents,
-      projectId: temporaryProjectId,
-      basePort: preparation.manifest.basePort,
+    filePath: preparation.developmentEnvPath,
+    contents: SupabaseConfigOverrides.makeEnvContentsWithOverrides({
+      envContents: await io.readTextFile(preparation.developmentEnvPath),
+      overrides: SupabaseConfigOverrides.makeLocalOverrides({
+        projectId: temporaryProjectId,
+        ports: preparation.manifest.derivedPorts,
+      }),
     }),
   });
   _requireCommandSuccess({

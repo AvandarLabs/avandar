@@ -1,9 +1,7 @@
 import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
 import {
   BRANCH,
-  CONFIG_PATH,
   ENV_PATH,
-  ORIGINAL_CONFIG,
   ORIGINAL_ENV,
   SupabaseLocalEnvironmentFakeIo,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
@@ -25,7 +23,7 @@ describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
       fake.operations.indexOf("command:status -o json"),
     );
     expect(fake.operations.indexOf("command:status -o json")).toBeLessThan(
-      fake.operations.indexOf(`write:${ENV_PATH}`),
+      fake.operations.lastIndexOf(`write:${ENV_PATH}`),
     );
     expect(fake.commandOutputModes).toEqual(["stream", undefined]);
   });
@@ -42,7 +40,6 @@ describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
         temporaryProjectId: "analytics-p2-temp",
       }),
     ).rejects.toThrow("Supabase start failed");
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
     expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
     expect(fake.commands).not.toContainEqual([
       "stop",
@@ -71,7 +68,7 @@ describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
     });
     await expect(switchPromise).rejects.toThrow("Supabase status failed");
     await expect(switchPromise).rejects.not.toThrow("must-not-leak");
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
   });
 
   it("preserves cleanup and restoration errors during switch rollback", async () => {
