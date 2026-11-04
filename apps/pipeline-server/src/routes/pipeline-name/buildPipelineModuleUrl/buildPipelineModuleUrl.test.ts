@@ -20,7 +20,9 @@ describe("buildPipelineModuleUrl", () => {
     });
 
     expect(pathnames).toEqual([
-      expect.stringMatching(/\/apps\/pipeline-server\/pipelines\/hdx\/run\.ts$/),
+      expect.stringMatching(
+        /\/apps\/pipeline-server\/pipelines\/hdx\/run\.ts$/,
+      ),
       expect.stringMatching(
         /\/apps\/pipeline-server\/pipelines\/socrata\/run\.ts$/,
       ),

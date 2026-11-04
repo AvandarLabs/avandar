@@ -9,13 +9,13 @@ import {
   CkanPackageSearchSortKeySchema,
 } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.schemas.ts";
 import { parseCkanTimestamp } from "$/connectors/open-data/parseCkanTimestamp/parseCkanTimestamp.ts";
-import type { z } from "zod";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type {
   CkanDatasetSearchCursor,
   CkanDatasetSearchPage,
   CkanDiscoveryClient,
 } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.types.ts";
+import type { z } from "zod";
 
 /**
  * Builds `package_search`'s `fq`. Without a cursor it is a plain range. With
@@ -34,14 +34,14 @@ function _buildModifiedFilter(params: {
   // optional there: the filter would match every dataset and a crawl would
   // read its first page forever.
   const upperBound =
-    params.modifiedBefore === undefined ?
-      "*]"
-    : `${params.modifiedBefore.toISOString()}}`;
+    params.modifiedBefore === undefined
+      ? "*]"
+      : `${params.modifiedBefore.toISOString()}}`;
   if (params.after === undefined) {
     const lowerBound =
-      params.modifiedSince === undefined ?
-        "[*"
-      : `[${params.modifiedSince.toISOString()}`;
+      params.modifiedSince === undefined
+        ? "[*"
+        : `[${params.modifiedSince.toISOString()}`;
     return `+metadata_modified:${lowerBound} TO ${upperBound}`;
   }
   // Solr reads a range bound up to the next space, `]` or `}`, so the
@@ -144,20 +144,20 @@ function _buildSearchPage(
       return parsed.success ? [createCkanPackageFromWire(parsed.data)] : [];
     }),
     skippedDatasets: rows.flatMap(({ sortKey, parsed }) => {
-      return parsed.success ? [] : (
-          [
+      return parsed.success
+        ? []
+        : [
             {
               name: sortKey.name,
               metadataModified: sortKey.metadataModified,
               reason: _buildIssueSummary(parsed.error),
             },
-          ]
-        );
+          ];
     }),
     nextCursor:
-      lastSortKey === undefined ? undefined : (
-        { modifiedAt: lastSortKey.modifiedAt, name: lastSortKey.name }
-      ),
+      lastSortKey === undefined
+        ? undefined
+        : { modifiedAt: lastSortKey.modifiedAt, name: lastSortKey.name },
     resultCount: rawResults.length,
   };
 }

@@ -1,5 +1,5 @@
-import { formatDuration } from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
 import { PipelineRunProgressSchema } from "@ava-cli/PipelineCli/PipelineRunProgress/PipelineRunProgress.schemas";
+import { formatDuration } from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
 import { printInfo, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
 import type { PipelineRunProgress } from "@ava-cli/PipelineCli/PipelineRunProgress/PipelineRunProgress.schemas";
 

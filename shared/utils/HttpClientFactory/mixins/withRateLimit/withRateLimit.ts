@@ -1,9 +1,9 @@
 import Bottleneck from "bottleneck";
-import type { Mixin } from "@avandar/modules";
 import type {
   HttpClientState,
   HttpMiddleware,
 } from "$/utils/HttpClientFactory/HttpClientFactory.types.ts";
+import type { Mixin } from "@avandar/modules";
 
 type _RateLimitBase = {
   getMiddlewares(): HttpClientState["middlewares"];

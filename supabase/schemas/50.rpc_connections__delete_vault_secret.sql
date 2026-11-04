@@ -27,12 +27,10 @@
  *   workspace; an orphaned secret with no owning row at all is always
  *   deletable.
  */
-create or replace function public.rpc_connections__delete_vault_secret (
-  p_secret_id uuid,
-  p_workspace_id uuid
-) returns void language plpgsql security definer
+create or replace function public.rpc_connections__delete_vault_secret (p_secret_id uuid, p_workspace_id uuid) returns void language plpgsql security definer
 set
-  search_path = public, vault as $$
+  search_path = public,
+  vault as $$
 begin
   if exists (
     select 1

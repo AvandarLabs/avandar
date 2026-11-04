@@ -16,9 +16,7 @@ describe("getRelationCallCapValue", () => {
   });
 
   it("passes 'unbounded' through unchanged", () => {
-    expect(getRelationCallCapValue("unbounded", DESCRIPTOR)).toBe(
-      "unbounded",
-    );
+    expect(getRelationCallCapValue("unbounded", DESCRIPTOR)).toBe("unbounded");
   });
 
   it("returns the function cap's computed value for the descriptor", () => {

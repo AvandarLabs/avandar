@@ -32,7 +32,11 @@ export function createSocrataHttpClient(params: {
       auth:
         appToken === undefined
           ? undefined
-          : { type: "apiKeyHeader", headerName: "X-App-Token", apiKey: appToken },
+          : {
+              type: "apiKeyHeader",
+              headerName: "X-App-Token",
+              apiKey: appToken,
+            },
       maxResponseBytes: MAX_METADATA_BYTES,
       fetchImpl,
     },

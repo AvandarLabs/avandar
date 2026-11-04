@@ -192,26 +192,27 @@ function _configureCoordinatedQuery(
       _name: QueryMediatorCreateParameters[0],
       { state: options }: QueryMediatorCreateParameters[1],
     ) => {
-    return {
-      runQuery: async ({ rawSql }: { rawSql: string }) => {
-        const datasetIds = await options.getQueryDependencies(rawSql);
-        const { DatasetDuckDbCoordinator } =
-          await import("@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator");
-        const { runCoordinatedDatasetDuckDbOperation } =
-          DatasetDuckDbCoordinator;
-        return await runCoordinatedDatasetDuckDbOperation({
-          datasetIds,
-          operation: async (datasetDuckDbLease) => {
-            await options.prepareDuckDbDatasets?.({
-              datasetIds,
-              datasetDuckDbLease,
-            });
-            return await executeQuery();
-          },
-        });
-      },
-    };
-  });
+      return {
+        runQuery: async ({ rawSql }: { rawSql: string }) => {
+          const datasetIds = await options.getQueryDependencies(rawSql);
+          const { DatasetDuckDbCoordinator } =
+            await import("@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator");
+          const { runCoordinatedDatasetDuckDbOperation } =
+            DatasetDuckDbCoordinator;
+          return await runCoordinatedDatasetDuckDbOperation({
+            datasetIds,
+            operation: async (datasetDuckDbLease) => {
+              await options.prepareDuckDbDatasets?.({
+                datasetIds,
+                datasetDuckDbLease,
+              });
+              return await executeQuery();
+            },
+          });
+        },
+      };
+    },
+  );
 }
 
 async function _getPublicSnapshotClients() {

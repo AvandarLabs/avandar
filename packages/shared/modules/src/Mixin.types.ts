@@ -1,5 +1,5 @@
-import type { Merge, Module } from "@modules/Module.types.ts";
 import type { EmptyObject, UnknownObject } from "@avandar/utils";
+import type { Merge, Module } from "@modules/Module.types.ts";
 
 /**
  * What a mixin returns. `state` is merged into the module once, when the

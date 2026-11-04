@@ -1,6 +1,6 @@
 import { createByteRangeReader } from "@sbfn/open-data/readByteRangeOverHttp/readByteRangeOverHttp.ts";
-import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
 import { describe, expect, it, vi } from "vitest";
+import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
 
 describe("createByteRangeReader", () => {
   it("asks for the first maxBytes", async () => {

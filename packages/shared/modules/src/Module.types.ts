@@ -1,16 +1,16 @@
 import type {
+  EmptyObject,
+  ObjectPaths,
+  PathValue,
+  UnknownObject,
+} from "@avandar/utils";
+import type {
   LambdaMixin,
   MixinMembers,
   MixinResult,
   MixinState,
   MixinTypeLambda,
 } from "@modules/Mixin.types.ts";
-import type {
-  EmptyObject,
-  ObjectPaths,
-  PathValue,
-  UnknownObject,
-} from "@avandar/utils";
 import type { IsEmptyObject, Simplify } from "type-fest";
 
 /** Member names every module defines itself. Builders and mixins may not. */
@@ -47,8 +47,9 @@ type _StatePathValue<
 type _StateGetters<State extends UnknownObject> = string extends keyof State
   ? EmptyObject
   : {
-      [Key in keyof State &
-        string as `get${Capitalize<Key>}`]: () => State[Key];
+      [
+        Key in keyof State & string as `get${Capitalize<Key>}`
+      ]: () => State[Key];
     };
 
 type _StateSetters<

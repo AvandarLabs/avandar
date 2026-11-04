@@ -55,7 +55,10 @@ describe("readRawPipelineRunOptionsFromArgv", () => {
 
   it("reads --scope as one raw string", () => {
     expect(
-      readRawPipelineRunOptionsFromArgv(["--scope", "format:csv,format:parquet"]),
+      readRawPipelineRunOptionsFromArgv([
+        "--scope",
+        "format:csv,format:parquet",
+      ]),
     ).toEqual({ scopes: "format:csv,format:parquet" });
   });
 

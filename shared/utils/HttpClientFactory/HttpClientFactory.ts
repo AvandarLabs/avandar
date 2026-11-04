@@ -1,13 +1,13 @@
 import { createModuleFactory } from "@avandar/modules";
 import { readBoundedBody } from "$/utils/HttpClientFactory/readBoundedBody.ts";
 import { sendHttpRequest } from "$/utils/HttpClientFactory/sendHttpRequest.ts";
-import type { BuilderModule } from "@avandar/modules";
 import type {
   HttpClientMembers,
   HttpClientState,
   HttpMethod,
   HttpRequestWithBodyOptions,
 } from "$/utils/HttpClientFactory/HttpClientFactory.types.ts";
+import type { BuilderModule } from "@avandar/modules";
 
 function _parseJsonBody(bytes: Uint8Array): unknown {
   return bytes.byteLength === 0

@@ -24,7 +24,10 @@ describe("respondWithSampleFailure", () => {
     ]).toEqual([
       409,
       {
-        error: { code: "resource-empty", invalidDatasetReason: "empty_dataset" },
+        error: {
+          code: "resource-empty",
+          invalidDatasetReason: "empty_dataset",
+        },
       },
       [[{ catalogListingId: LISTING_ID, reason: "empty_dataset" }]],
     ]);

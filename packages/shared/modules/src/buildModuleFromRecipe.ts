@@ -1,10 +1,10 @@
 import { getValue, isFunction, setValue } from "@avandar/utils";
+import type { UnknownObject } from "@avandar/utils";
 import type { MixinResult } from "@modules/Mixin.types.ts";
 import type {
   ReservedMemberName,
   ReservedStateKey,
 } from "@modules/Module.types.ts";
-import type { UnknownObject } from "@avandar/utils";
 
 /** An untyped mixin, as the runtime stores it. */
 export type RuntimeMixin = (base: UnknownObject) => MixinResult;

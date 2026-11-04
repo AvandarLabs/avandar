@@ -63,9 +63,10 @@ describe("CkanDiscoveryClient.searchDatasets", () => {
       rows: 1000,
     });
 
-    expect([_sentQuery(http).get("sort"), _sentQuery(http).get("rows")]).toEqual(
-      ["metadata_modified asc,name asc", "1000"],
-    );
+    expect([
+      _sentQuery(http).get("sort"),
+      _sentQuery(http).get("rows"),
+    ]).toEqual(["metadata_modified asc,name asc", "1000"]);
   });
 
   it("matches every dataset and asks for no facets", async () => {
@@ -76,9 +77,10 @@ describe("CkanDiscoveryClient.searchDatasets", () => {
       rows: 1000,
     });
 
-    expect([_sentQuery(http).get("q"), _sentQuery(http).get("facet")]).toEqual(
-      ["*:*", "false"],
-    );
+    expect([_sentQuery(http).get("q"), _sentQuery(http).get("facet")]).toEqual([
+      "*:*",
+      "false",
+    ]);
   });
 
   it("requires a window, with * for a missing bound", async () => {
@@ -123,7 +125,7 @@ describe("CkanDiscoveryClient.searchDatasets", () => {
     });
 
     expect(_sentQuery(http).get("fq")).toBe(
-      '+(metadata_modified:{2026-10-20T13:47:48.858Z TO *] OR ' +
+      "+(metadata_modified:{2026-10-20T13:47:48.858Z TO *] OR " +
         '(metadata_modified:"2026-10-20T13:47:48.858Z" AND name:{"movement-range-maps" TO *]))',
     );
   });
@@ -142,7 +144,7 @@ describe("CkanDiscoveryClient.searchDatasets", () => {
     });
 
     expect(_sentQuery(http).get("fq")).toBe(
-      '+(metadata_modified:{2026-10-20T13:47:48.858Z TO 2026-10-21T00:00:00.000Z} OR ' +
+      "+(metadata_modified:{2026-10-20T13:47:48.858Z TO 2026-10-21T00:00:00.000Z} OR " +
         '(metadata_modified:"2026-10-20T13:47:48.858Z" AND name:{"movement-range-maps" TO *]))',
     );
   });
@@ -281,9 +283,10 @@ describe("CkanDiscoveryClient.searchDatasets", () => {
   });
 
   it("has no cursor on an empty page", async () => {
-    const page = await createCkanDiscoveryClient(_searchHttp()).searchDatasets(
-      { baseUrl: BASE_URL, rows: 1000 },
-    );
+    const page = await createCkanDiscoveryClient(_searchHttp()).searchDatasets({
+      baseUrl: BASE_URL,
+      rows: 1000,
+    });
 
     expect([page.nextCursor, page.resultCount]).toEqual([undefined, 0]);
   });

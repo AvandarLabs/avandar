@@ -52,7 +52,9 @@ export async function promptForInUseListingsChoice(
     responseOptions: { required: true, type: "string", defaultValue: "1" },
   });
   const choice =
-    CHOICE_FROM_ANSWER[(answer ?? "").trim() as keyof typeof CHOICE_FROM_ANSWER];
+    CHOICE_FROM_ANSWER[
+      (answer ?? "").trim() as keyof typeof CHOICE_FROM_ANSWER
+    ];
   if (choice !== undefined) {
     return choice;
   }

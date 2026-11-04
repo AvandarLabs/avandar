@@ -18,7 +18,6 @@ export function resolveRunWindow(args: {
 }): EtlRunWindow {
   const { options, checkpoint } = args;
   const since =
-    options.since ??
-    (options.mode === "incremental" ? checkpoint : undefined);
+    options.since ?? (options.mode === "incremental" ? checkpoint : undefined);
   return { since, until: options.until };
 }

@@ -3,9 +3,9 @@ import { parseCkanTimestamp } from "$/connectors/open-data/parseCkanTimestamp/pa
 
 describe("parseCkanTimestamp", () => {
   it("reads a naive microsecond timestamp as UTC", () => {
-    expect(
-      parseCkanTimestamp("2026-10-20T13:47:48.858245").toISOString(),
-    ).toBe("2026-10-20T13:47:48.858Z");
+    expect(parseCkanTimestamp("2026-10-20T13:47:48.858245").toISOString()).toBe(
+      "2026-10-20T13:47:48.858Z",
+    );
   });
 
   it("keeps an explicit Z", () => {
@@ -21,9 +21,9 @@ describe("parseCkanTimestamp", () => {
   });
 
   it("truncates microseconds instead of rounding them", () => {
-    expect(
-      parseCkanTimestamp("2021-07-23T08:57:33.999838").toISOString(),
-    ).toBe("2021-07-23T08:57:33.999Z");
+    expect(parseCkanTimestamp("2021-07-23T08:57:33.999838").toISOString()).toBe(
+      "2021-07-23T08:57:33.999Z",
+    );
   });
 
   it("applies an explicit offset", () => {

@@ -10,8 +10,8 @@ import { z } from "zod";
 import { acquireOpenDataColumnTypeSample } from "$/connectors/open-data/acquireOpenDataColumnTypeSample/acquireOpenDataColumnTypeSample.ts";
 import { Constants } from "$/types/database.types.ts";
 import { HttpClientFactory } from "$/utils/HttpClientFactory/HttpClientFactory.ts";
-import type { MarkListingInvalid } from "@sbfn/open-data/respondWithSampleFailure/respondWithSampleFailure.ts";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
+import type { MarkListingInvalid } from "@sbfn/open-data/respondWithSampleFailure/respondWithSampleFailure.ts";
 
 /** The largest response a sample's metadata or Socrata rows may be. */
 const MAX_SAMPLE_RESPONSE_BYTES = 25 * 1024 * 1024;

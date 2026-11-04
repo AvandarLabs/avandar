@@ -13,7 +13,10 @@ describe("getHdxDatasetTimestamp", () => {
 
   it("throws for a dataset with no metadata_modified, which cannot be ordered", () => {
     expect(() => {
-      return getHdxDatasetTimestamp({ name: "a", metadata_modified: undefined });
+      return getHdxDatasetTimestamp({
+        name: "a",
+        metadata_modified: undefined,
+      });
     }).toThrow("HDX dataset a has no metadata_modified");
   });
 });

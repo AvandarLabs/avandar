@@ -18,8 +18,8 @@ export function buildListingKeyFromRow(
     | "parquet_file_name"
   >,
 ): string {
-  return row.access_kind === "api_resource" ?
-      JSON.stringify([
+  return row.access_kind === "api_resource"
+    ? JSON.stringify([
         row.access_kind,
         row.api_service,
         row.api_base_url,

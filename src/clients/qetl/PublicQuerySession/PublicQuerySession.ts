@@ -77,34 +77,39 @@ function _createQetlClient(
   const { bucket, dashboardId, publishedDatasetIds, snapshotRevision } =
     options;
   const owner = { bucket, dashboardId, snapshotRevision } as const;
-  return QueryMediatorFactory.create("QueryMediator", { state: {
-    duckDbReadMode: "public",
-    publicSnapshotDuckDbOwner: owner,
-    getQueryDependencies: async (rawSql) => {
-      return _getReferencedPublishedDatasetIds({ publishedDatasetIds, rawSql });
+  return QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      duckDbReadMode: "public",
+      publicSnapshotDuckDbOwner: owner,
+      getQueryDependencies: async (rawSql) => {
+        return _getReferencedPublishedDatasetIds({
+          publishedDatasetIds,
+          rawSql,
+        });
+      },
+      getDuckDbLeaseDatasetIds: async () => {
+        return [...publishedDatasetIds];
+      },
+      // The public tier, scoped to this exact published snapshot. This is what
+      // closes the cross-visibility gap: the read path used to go to
+      // `LocalDataset` for every session, so a public query probed the workspace
+      // store while writing its own bytes somewhere that was never read back.
+      // `LocalPublicDatasetRelationCache` decodes the principal and refuses a
+      // workspace-form one, so it cannot serve one even by mistake.
+      relationCache: LocalPublicDatasetRelationCache,
+      principalKey: makePrincipalKeyFromPublicSession({
+        bucket,
+        dashboardId,
+        snapshotRevision,
+      }),
+      prepareDuckDbDatasets: async ({ datasetIds }) => {
+        DatasetDuckDbCoordinator.assertPublicSnapshotDatasetOwners({
+          datasetIds,
+          owner,
+        });
+      },
     },
-    getDuckDbLeaseDatasetIds: async () => {
-      return [...publishedDatasetIds];
-    },
-    // The public tier, scoped to this exact published snapshot. This is what
-    // closes the cross-visibility gap: the read path used to go to
-    // `LocalDataset` for every session, so a public query probed the workspace
-    // store while writing its own bytes somewhere that was never read back.
-    // `LocalPublicDatasetRelationCache` decodes the principal and refuses a
-    // workspace-form one, so it cannot serve one even by mistake.
-    relationCache: LocalPublicDatasetRelationCache,
-    principalKey: makePrincipalKeyFromPublicSession({
-      bucket,
-      dashboardId,
-      snapshotRevision,
-    }),
-    prepareDuckDbDatasets: async ({ datasetIds }) => {
-      DatasetDuckDbCoordinator.assertPublicSnapshotDatasetOwners({
-        datasetIds,
-        owner,
-      });
-    },
-  } });
+  });
 }
 
 async function _getClient(

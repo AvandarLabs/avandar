@@ -14,12 +14,12 @@ import { useState } from "react";
 import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId";
 import { ConnectorRow } from "@/views/DataManagerApp/DataImportView/ConnectorRow/ConnectorRow";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
-import { PostgresConnectionForm } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm";
 import { formatSavedConnectionLabel } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/formatSavedConnectionLabel";
+import { PostgresConnectionForm } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm";
 import { useLoadPostgresTable } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
-import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
 
 type Props = BoxProps & {
   /**
@@ -124,8 +124,8 @@ export function PostgresConnectorImportView({
   const relationsBySchema = makeBucketMap(load.relations ?? [], {
     keyFn: (relation) => {
       return (
-        PostgresRelationId.splitRelationId(relation.relationId)
-          ?.schemaName ?? ""
+        PostgresRelationId.splitRelationId(relation.relationId)?.schemaName ??
+        ""
       );
     },
     valueFn: (relation) => {

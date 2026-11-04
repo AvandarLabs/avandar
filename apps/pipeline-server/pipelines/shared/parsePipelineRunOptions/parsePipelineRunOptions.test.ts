@@ -113,9 +113,9 @@ describe("parsePipelineRunOptions", () => {
   });
 
   it("reads a list of scopes from a request body", () => {
-    expect(parsePipelineRunOptions({ scopes: ["format:csv"] }).scopes).toEqual(
-      ["format:csv"],
-    );
+    expect(parsePipelineRunOptions({ scopes: ["format:csv"] }).scopes).toEqual([
+      "format:csv",
+    ]);
   });
 
   it.each([

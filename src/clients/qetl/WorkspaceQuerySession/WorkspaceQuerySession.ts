@@ -117,40 +117,42 @@ function _createWorkspaceQetlClient(
   const getAllDatasetIds = async (): Promise<Dataset.Id[]> => {
     return await _getAllWorkspaceDatasetIds(options.workspaceId);
   };
-  return QueryMediatorFactory.create("QueryMediator", { state: {
-    // The per-relation half of authorization. Membership is checked once per
-    // `runQuery` above; this checks what the statement actually named, and
-    // refuses rather than silently dropping a reference the workspace does not
-    // own.
-    getQueryDependencies: async (rawSql) => {
-      return await assertWorkspaceRelations({
-        workspaceId: options.workspaceId,
-        referencedDatasetIds:
-          DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(rawSql),
-      });
-    },
-    planConceptRelations: async (rawSql) => {
-      return await getConceptRelationPlansFromSql({
-        rawSql,
-        allowlist: {
-          getAllowedConceptIds: async () => {
-            return await _getAllWorkspaceConceptIds(options.workspaceId);
+  return QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      // The per-relation half of authorization. Membership is checked once per
+      // `runQuery` above; this checks what the statement actually named, and
+      // refuses rather than silently dropping a reference the workspace does not
+      // own.
+      getQueryDependencies: async (rawSql) => {
+        return await assertWorkspaceRelations({
+          workspaceId: options.workspaceId,
+          referencedDatasetIds:
+            DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(rawSql),
+        });
+      },
+      planConceptRelations: async (rawSql) => {
+        return await getConceptRelationPlansFromSql({
+          rawSql,
+          allowlist: {
+            getAllowedConceptIds: async () => {
+              return await _getAllWorkspaceConceptIds(options.workspaceId);
+            },
+            getAllowedDatasetIds: getAllDatasetIds,
           },
-          getAllowedDatasetIds: getAllDatasetIds,
-        },
-      });
+        });
+      },
+      getDuckDbLeaseDatasetIds: getAllDatasetIds,
+      // The workspace tier, scoped to this workspace and this user. A public
+      // session holds `LocalPublicDatasetRelationCache` instead, so neither can
+      // reach the other's entries by construction rather than by a predicate.
+      relationCache: DexieRelationCache,
+      principalKey: makePrincipalKeyFromWorkspaceSession({
+        workspaceId: options.workspaceId,
+        userId: options.userId,
+      }),
+      prepareDuckDbDatasets: _prepareWorkspaceDatasets,
     },
-    getDuckDbLeaseDatasetIds: getAllDatasetIds,
-    // The workspace tier, scoped to this workspace and this user. A public
-    // session holds `LocalPublicDatasetRelationCache` instead, so neither can
-    // reach the other's entries by construction rather than by a predicate.
-    relationCache: DexieRelationCache,
-    principalKey: makePrincipalKeyFromWorkspaceSession({
-      workspaceId: options.workspaceId,
-      userId: options.userId,
-    }),
-    prepareDuckDbDatasets: _prepareWorkspaceDatasets,
-  } });
+  });
 }
 
 function _createGetWorkspaceQetlClient(): (
