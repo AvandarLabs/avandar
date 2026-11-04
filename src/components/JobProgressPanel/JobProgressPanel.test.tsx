@@ -24,9 +24,9 @@ describe("JobProgressPanel", () => {
     });
   });
 
-  it("re-renders on its own as a live job progresses and finishes", () => {
+  it("shows a job started after mount, its progress, and hides it once finished", () => {
     _renderPanel();
-    let jobId = "" as ReturnType<typeof JobProgressStore.startJob>;
+    let jobId: ReturnType<typeof JobProgressStore.startJob>;
 
     act(() => {
       jobId = JobProgressStore.startJob("Syncing dataset online");

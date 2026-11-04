@@ -101,29 +101,29 @@ function useMissingFilterNotification(
   );
 }
 
-type HydrationInputs = {
-  previousInput: AvaMapConfig.T;
-  previousConfig: AvaMapConfig.T;
-  readyColumns: readonly DatasetColumn.T[] | undefined;
-  readyAttributes: readonly ConceptAttribute.T[] | undefined;
-};
-
 /**
  * Returns an `updateConfig` that hydrates the current config before applying
  * an update. Its identity only changes with the editor's own `updateConfig`:
  * map tool gestures re-attach whenever it changes, so a new function on every
- * render would drop an area or polygon mid-draw. The latest hydration inputs
- * are read from a ref instead.
+ * render would drop an area or polygon mid-draw. Called by
+ * `useHydratedMapSources`.
  */
 function useHydratedUpdateConfig({
   updateEditorConfig,
   latestHydration,
 }: Readonly<{
   updateEditorConfig: ReturnType<typeof useAvaMapEditor>["updateConfig"];
-  latestHydration: HydrationInputs;
+  latestHydration: {
+    previousInput: AvaMapConfig.T;
+    previousConfig: AvaMapConfig.T;
+    readyColumns: readonly DatasetColumn.T[] | undefined;
+    readyAttributes: readonly ConceptAttribute.T[] | undefined;
+  };
 }>): ReturnType<typeof useAvaMapEditor>["updateConfig"] {
   const { previousInput, previousConfig, readyColumns, readyAttributes } =
     latestHydration;
+  // The callback reads the latest hydration inputs from this ref, so it does
+  // not need them as dependencies.
   const hydrationRef = useRef(latestHydration);
   useEffect(
     function syncLatestHydration() {
@@ -139,13 +139,13 @@ function useHydratedUpdateConfig({
   return useCallback(
     (update: (current: AvaMapConfig.T) => AvaMapConfig.T) => {
       return updateEditorConfig((config) => {
-        const latest = hydrationRef.current;
+        const hydrationInputs = hydrationRef.current;
         const hydrated = MapSourceHydration.fromMetadata({
           config,
-          previousInput: latest.previousInput,
-          previousConfig: latest.previousConfig,
-          datasetColumns: latest.readyColumns,
-          conceptAttributes: latest.readyAttributes,
+          previousInput: hydrationInputs.previousInput,
+          previousConfig: hydrationInputs.previousConfig,
+          datasetColumns: hydrationInputs.readyColumns,
+          conceptAttributes: hydrationInputs.readyAttributes,
         }).config;
         const updated = update(hydrated);
         return updated === hydrated ? config : updated;
