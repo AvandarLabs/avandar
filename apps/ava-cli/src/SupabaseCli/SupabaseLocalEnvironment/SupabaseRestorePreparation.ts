@@ -47,7 +47,11 @@ function _requireRestoreIdentity(
       `Supabase backup belongs to worktree ${options.manifest.worktreePath}, not ${options.worktreePath}.`,
     );
   }
-  if (!PROJECT_ID_PATTERN.test(options.manifest.temporaryProjectId)) {
+  const projectId =
+    options.manifest.kind === "local"
+      ? options.manifest.temporaryProjectId
+      : options.manifest.remoteProjectId;
+  if (!PROJECT_ID_PATTERN.test(projectId)) {
     throw new Error("Supabase backup has an unsafe temporary project id.");
   }
 }
@@ -206,6 +210,18 @@ async function _readActiveProjectId(
   }).projectId;
 }
 
+/** The hosted project `.env.development` says this worktree points at. */
+async function _readRemoteProjectId(
+  io: Readonly<SupabaseLocalEnvironmentIo>,
+): Promise<string | undefined> {
+  const envPath = path.join(io.projectRoot, ".env.development");
+  return (await io.pathExists(envPath))
+    ? SupabaseConfigOverrides.getRemoteProjectIdFromEnvContents(
+        await io.readTextFile(envPath),
+      )
+    : undefined;
+}
+
 async function _hasProvenRestoreOwnership(
   options: Readonly<{
     io: SupabaseLocalEnvironmentIo;
@@ -215,7 +231,9 @@ async function _hasProvenRestoreOwnership(
   const { io, manifest } = options;
   const activeProjectId = await (async (): Promise<string | undefined> => {
     try {
-      return await _readActiveProjectId(io);
+      return manifest.kind === "local"
+        ? await _readActiveProjectId(io)
+        : await _readRemoteProjectId(io);
     } catch {
       if (manifest.state === "active") {
         throw new Error("Cannot validate the active Supabase config.");
@@ -223,7 +241,12 @@ async function _hasProvenRestoreOwnership(
       return undefined;
     }
   })();
-  if (activeProjectId === manifest.temporaryProjectId) {
+  if (
+    activeProjectId ===
+    (manifest.kind === "local"
+      ? manifest.temporaryProjectId
+      : manifest.remoteProjectId)
+  ) {
     return true;
   }
   if (manifest.state === "active") {

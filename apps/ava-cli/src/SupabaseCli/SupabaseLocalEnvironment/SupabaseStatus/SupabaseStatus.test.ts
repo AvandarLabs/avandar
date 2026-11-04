@@ -63,6 +63,27 @@ function _getValueFromEntries(
   return options.entries.find(propEq("label", options.label))?.value;
 }
 
+const REMOTE_MANIFEST: SupabaseBackupManifest = {
+  kind: "remote",
+  branch: "feat/analytics-p2",
+  worktreePath: "/repo",
+  remoteProjectId: "abcdefghijklmnopqrst",
+  remoteApiUrl: "https://abcdefghijklmnopqrst.supabase.co",
+  files: [{ sourcePath: "/repo/.env.development", backupPath: "/backup/a" }],
+  state: "active",
+};
+
+/** `.env.development` as a remote switch leaves it. */
+const REMOTE_ENV_FILE = {
+  filePath: "/repo/.env.development",
+  contents: [
+    "VITE_SUPABASE_API_URL=https://abcdefghijklmnopqrst.supabase.co",
+    "SUPABASE_SERVICE_ROLE_KEY=sb_secret_remote_0123456789",
+    "AVA_SUPABASE_REMOTE_PROJECT_ID=abcdefghijklmnopqrst",
+    "",
+  ].join("\n"),
+};
+
 /** `.env.development` as a switch to `analytics-p2-temp` leaves it. */
 const SWITCHED_ENV_FILE = {
   filePath: "/repo/.env.development",
@@ -81,9 +102,9 @@ describe("makeStatusReport", () => {
 
     expect(report.isSwitched).toBe(true);
     expect(report.projectId).toBe("analytics-p2-temp");
-    expect(
-      _getValueFromEntries({ entries: report.ports, label: "API" }),
-    ).toBe("55321");
+    expect(_getValueFromEntries({ entries: report.ports, label: "API" })).toBe(
+      "55321",
+    );
   });
 
   it("flags an override that no switch on this branch wrote", () => {
@@ -97,6 +118,45 @@ describe("makeStatusReport", () => {
 
     expect(report.isSwitched).toBe(false);
     expect(report.hasStrayOverride).toBe(true);
+  });
+
+  it("reports a remote switch with the hosted project and its URL", () => {
+    const report = SupabaseStatus.makeStatusReport({
+      branch: "feat/analytics-p2",
+      configContents: STANDARD_CONFIG,
+      manifest: REMOTE_MANIFEST,
+      statusJson: STATUS_JSON,
+      envFiles: [REMOTE_ENV_FILE],
+    });
+
+    expect(report).toEqual(
+      expect.objectContaining({
+        switchKind: "remote",
+        isSwitched: true,
+        projectId: "abcdefghijklmnopqrst",
+        remoteApiUrl: "https://abcdefghijklmnopqrst.supabase.co",
+        ports: [],
+        endpoints: [],
+        environmentDrift: [],
+      }),
+    );
+  });
+
+  it("shows only the start of a remote secret key", () => {
+    const report = SupabaseStatus.makeStatusReport({
+      branch: "feat/analytics-p2",
+      configContents: STANDARD_CONFIG,
+      manifest: REMOTE_MANIFEST,
+      statusJson: undefined,
+      envFiles: [REMOTE_ENV_FILE],
+    });
+
+    expect(
+      _getValueFromEntries({
+        entries: report.environmentValues,
+        label: "SUPABASE_SERVICE_ROLE_KEY",
+      }),
+    ).toBe("sb_secret_re…");
   });
 
   it("raises no stray-override flag for a worktree on the shared stack", () => {

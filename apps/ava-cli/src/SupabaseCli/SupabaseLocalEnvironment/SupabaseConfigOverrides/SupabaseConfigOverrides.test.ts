@@ -38,9 +38,9 @@ describe("SupabaseConfigOverrides.getEnvKeyFromConfigKey", () => {
   });
 
   it("names the inbucket port after the local_smtp section it aliases", () => {
-    expect(SupabaseConfigOverrides.getEnvKeyFromConfigKey("inbucket.port")).toBe(
-      "SUPABASE_LOCAL_SMTP_PORT",
-    );
+    expect(
+      SupabaseConfigOverrides.getEnvKeyFromConfigKey("inbucket.port"),
+    ).toBe("SUPABASE_LOCAL_SMTP_PORT");
   });
 });
 

@@ -9,7 +9,9 @@ import { z } from "zod";
 import type {
   SupabaseBackupFile,
   SupabaseBackupManifest,
+  SupabaseBackupRecord,
   SupabaseLocalEnvironmentIo,
+  SupabaseSwitchTarget,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type CopyFileToBackupOptions = {
@@ -26,30 +28,45 @@ type CopyFilesToBackupOptions = {
   filesDirectory: string;
 };
 
-type CreateBackupOptions = {
+type CreateBackupOptions<Target extends SupabaseSwitchTarget> = {
   io: SupabaseLocalEnvironmentIo;
   branch: string;
   worktreePath: string;
   backupDirectory: string;
-  temporaryProjectId: string;
-  basePort: number;
-  derivedPorts: Record<string, number>;
+  target: Target;
   sourcePaths: readonly string[];
 };
 
-const SupabaseBackupManifestSchema = z.object({
-  // A manifest written before remote switches existed has no `kind`.
-  kind: z.literal("local").default("local"),
+const ManifestBaseSchema = z.object({
   branch: z.string(),
   worktreePath: z.string(),
-  temporaryProjectId: z.string(),
-  basePort: z.number().int(),
-  derivedPorts: z.record(z.string(), z.number().int()),
   files: z
     .array(z.object({ sourcePath: z.string(), backupPath: z.string() }))
     .min(1),
   state: z.enum(SUPABASE_BACKUP_STATES),
 });
+
+const SupabaseBackupManifestSchema = z.preprocess(
+  (value) => {
+    // A manifest written before remote switches existed has no `kind`.
+    return typeof value === "object" && value !== null && !("kind" in value)
+      ? { ...value, kind: "local" }
+      : value;
+  },
+  z.discriminatedUnion("kind", [
+    ManifestBaseSchema.extend({
+      kind: z.literal("local"),
+      temporaryProjectId: z.string(),
+      basePort: z.number().int(),
+      derivedPorts: z.record(z.string(), z.number().int()),
+    }),
+    ManifestBaseSchema.extend({
+      kind: z.literal("remote"),
+      remoteProjectId: z.string(),
+      remoteApiUrl: z.string(),
+    }),
+  ]),
+);
 
 async function _writeManifest(
   options: Readonly<{
@@ -110,9 +127,9 @@ async function _failBackupCreation(
   throw options.error;
 }
 
-async function _createBackup(
-  options: Readonly<CreateBackupOptions>,
-): Promise<SupabaseBackupManifest> {
+async function _createBackup<Target extends SupabaseSwitchTarget>(
+  options: Readonly<CreateBackupOptions<Target>>,
+): Promise<Target & SupabaseBackupRecord> {
   const { io, backupDirectory } = options;
   const filesDirectory = path.join(backupDirectory, "files");
   try {
@@ -123,15 +140,12 @@ async function _createBackup(
       worktreePath: options.worktreePath,
       filesDirectory,
     });
-    const manifest: SupabaseBackupManifest = {
-      kind: "local",
+    const manifest = {
+      ...options.target,
       branch: options.branch,
       worktreePath: options.worktreePath,
-      temporaryProjectId: options.temporaryProjectId,
-      basePort: options.basePort,
-      derivedPorts: options.derivedPorts,
       files,
-      state: "switching",
+      state: "switching" as const,
     };
     await _writeManifest({ io, backupDirectory, manifest });
     return manifest;

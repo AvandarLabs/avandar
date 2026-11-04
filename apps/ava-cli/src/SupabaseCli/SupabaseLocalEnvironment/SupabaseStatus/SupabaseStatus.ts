@@ -1,28 +1,20 @@
-import path from "node:path";
 import { DevServerPort } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
 import { EnvFileLine } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/EnvFileLine/EnvFileLine";
-import { SupabaseBackupPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupPaths";
-import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
 import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
-import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
-import { SHARED_STACK_BRANCH } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
-import { promiseMap, prop } from "@avandar/utils";
+import { SupabaseSwitchState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState/SupabaseSwitchState";
+import { prop, propEq } from "@avandar/utils";
 import type {
   DevelopmentEnvFile,
-  SupabaseBackupManifest,
   SupabaseEnvironmentDrift,
   SupabaseLocalEnvironmentIo,
   SupabaseLocalStatus,
   SupabaseStatusEntry,
   SupabaseStatusReport,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import type { SupabaseSwitchSources } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState/SupabaseSwitchState";
 
-type MakeStatusReportOptions = {
-  branch: string;
-  configContents: string;
-  manifest: SupabaseBackupManifest | undefined;
+type MakeStatusReportOptions = SupabaseSwitchSources & {
   statusJson: string | undefined;
-  envFiles: readonly DevelopmentEnvFile[];
 };
 
 /** Config port keys worth reporting, in the order they are printed. */
@@ -120,28 +112,83 @@ function _readLocalStatus(
   }
 }
 
+/** Development env keys a remote report shows, with secrets cut short. */
+const REMOTE_REPORTED_ENV_KEYS = [
+  "VITE_SUPABASE_API_URL",
+  "SUPABASE_URL",
+  "SUPABASE_POSTGRES_URL",
+  "VITE_SUPABASE_ANON_KEY",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "SB_PUBLISHABLE_KEY",
+  "SB_SECRET_KEY",
+  "SB_JWT_ISSUER",
+] as const;
+
+const SECRET_ENV_KEYS = new Set(["SUPABASE_SERVICE_ROLE_KEY", "SB_SECRET_KEY"]);
+
+/** Visible prefix length of a masked remote secret. */
+const MASKED_SECRET_PREFIX_LENGTH = 12;
+
+/**
+ * A hosted project's keys are real credentials, unlike the fixed local
+ * defaults, so a remote report shows only enough to tell them apart.
+ */
+function _maskRemoteValue(
+  options: Readonly<{ envKey: string; value: string }>,
+): string {
+  const { envKey, value } = options;
+  if (SECRET_ENV_KEYS.has(envKey)) {
+    return `${value.slice(0, MASKED_SECRET_PREFIX_LENGTH)}…`;
+  }
+  return value.replace(/^(postgres(?:ql)?:\/\/[^:/@]+):[^@]*@/, "$1:****@");
+}
+
+function _makeRemoteEnvironmentValues(
+  envFiles: readonly DevelopmentEnvFile[],
+): SupabaseStatusEntry[] {
+  const assignments = envFiles.flatMap(({ contents }) => {
+    return contents.split("\n").flatMap((line) => {
+      const assignment = EnvFileLine.getAssignment(line);
+      return assignment === undefined ? [] : [assignment];
+    });
+  });
+  return REMOTE_REPORTED_ENV_KEYS.flatMap((envKey) => {
+    const assignment = assignments.find(propEq("key", envKey));
+    return assignment === undefined
+      ? []
+      : [
+          {
+            label: envKey,
+            value: _maskRemoteValue({
+              envKey,
+              value: EnvFileLine.getUnquotedValue(assignment.value),
+            }),
+          },
+        ];
+  });
+}
+
 function _makeStatusReport(
   options: Readonly<MakeStatusReportOptions>,
 ): SupabaseStatusReport {
-  const { branch, configContents, manifest, statusJson, envFiles } = options;
-  const sharedConfig = SupabaseConfig.makeStateFromContents(configContents);
-  const config = SupabaseConfigOverrides.makeEffectiveState({
-    config: sharedConfig,
-    envContents:
-      envFiles.find(({ filePath }) => {
-        return path.basename(filePath) === ".env.development";
-      })?.contents ?? "",
-  });
+  const { statusJson, envFiles } = options;
+  const { config, ...summary } = SupabaseSwitchState.makeFromSources(options);
+  if (summary.switchKind === "remote") {
+    return {
+      ...summary,
+      isSwitched: true,
+      isRunning: false,
+      ports: [],
+      environmentValues: _makeRemoteEnvironmentValues(envFiles),
+      endpoints: [],
+      environmentDrift: [],
+    };
+  }
   const status = _readLocalStatus(statusJson);
-  const isSwitched = manifest?.temporaryProjectId === config.projectId;
   return {
-    isSwitched,
-    hasStrayOverride:
-      !isSwitched && config.projectId !== sharedConfig.projectId,
-    isExpectedForBranch: isSwitched !== (branch === SHARED_STACK_BRANCH),
+    ...summary,
+    isSwitched: summary.switchKind === "local",
     isRunning: status !== undefined,
-    branch,
-    projectId: config.projectId,
     ports: _makePorts({
       ports: config.ports,
       devServerPort: DevServerPort.fromEnvFiles(envFiles.map(prop("contents"))),
@@ -157,29 +204,6 @@ function _makeStatusReport(
   };
 }
 
-/** Reads this branch's backup manifest, if a switch left one behind. */
-async function _readManifest(
-  options: Readonly<{
-    io: SupabaseLocalEnvironmentIo;
-    branch: string;
-    worktreePath: string;
-  }>,
-): Promise<SupabaseBackupManifest | undefined> {
-  const backupDirectory = SupabaseBackupPaths.backupDirectory({
-    projectRoot: options.io.projectRoot,
-    branch: options.branch,
-    worktreePath: options.worktreePath,
-  });
-  try {
-    return await SupabaseBackupStore.readManifest({
-      io: options.io,
-      backupDirectory,
-    });
-  } catch {
-    return undefined;
-  }
-}
-
 async function _readStatusJson(
   io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<string | undefined> {
@@ -190,27 +214,11 @@ async function _readStatusJson(
 async function _readStatusReport(
   io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<SupabaseStatusReport> {
-  const [branch, worktreePath, configContents, envFilePaths, statusJson] =
-    await Promise.all([
-      io.readBranch(),
-      io.readWorktreePath(),
-      io.readTextFile(path.join(io.projectRoot, "supabase", "config.toml")),
-      io.findDevelopmentEnvFiles(),
-      _readStatusJson(io),
-    ]);
-  const [manifest, envFiles] = await Promise.all([
-    _readManifest({ io, branch, worktreePath }),
-    promiseMap(envFilePaths, async (filePath) => {
-      return { filePath, contents: await io.readTextFile(filePath) };
-    }),
+  const [sources, statusJson] = await Promise.all([
+    SupabaseSwitchState.readSources(io),
+    _readStatusJson(io),
   ]);
-  return _makeStatusReport({
-    branch,
-    configContents,
-    manifest,
-    statusJson,
-    envFiles,
-  });
+  return _makeStatusReport({ ...sources, statusJson });
 }
 
 /** Summarizes which local Supabase a worktree is pointed at. */

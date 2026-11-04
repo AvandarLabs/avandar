@@ -26,20 +26,58 @@ export type SupabaseBackupFile = {
   backupPath: string;
 };
 
-/**
- * Durable state required to restore one branch's local configuration.
- *
- * `kind` is `"local"` for a switch onto a branch-scoped Docker project.
- */
-export type SupabaseBackupManifest = {
+/** What a switch moved the worktree onto: a Docker project of its own. */
+export type SupabaseLocalSwitchTarget = {
   kind: "local";
-  branch: string;
-  worktreePath: string;
   temporaryProjectId: string;
   basePort: number;
   derivedPorts: Record<string, number>;
+};
+
+/** What a switch moved the worktree onto: a hosted Supabase project. */
+export type SupabaseRemoteSwitchTarget = {
+  kind: "remote";
+  remoteProjectId: string;
+  remoteApiUrl: string;
+};
+
+/** Either place a switch can move a worktree to. */
+export type SupabaseSwitchTarget =
+  | SupabaseLocalSwitchTarget
+  | SupabaseRemoteSwitchTarget;
+
+/** The manifest fields every switch records, whatever its target. */
+export type SupabaseBackupRecord = {
+  branch: string;
+  worktreePath: string;
   files: SupabaseBackupFile[];
   state: (typeof SUPABASE_BACKUP_STATES)[number];
+};
+
+/** Durable state required to restore one branch's local configuration. */
+export type SupabaseBackupManifest = SupabaseSwitchTarget &
+  SupabaseBackupRecord;
+
+/** A local-project manifest, the only kind that owns Docker resources. */
+export type SupabaseLocalBackupManifest = SupabaseBackupManifest &
+  SupabaseLocalSwitchTarget;
+
+/** The hosted project `ava supabase switch remote` points a worktree at. */
+export type SupabaseRemoteConnection = {
+  /** The hosted project's reference id, e.g. `abcdefghijklmnopqrst`. */
+  projectId: string;
+  /** The project URL, e.g. `https://abcdefghijklmnopqrst.supabase.co`. */
+  apiUrl: string;
+  /** A `postgresql://` connection string for the hosted database. */
+  databaseUrl: string;
+  publishableKey: string;
+  secretKey: string;
+};
+
+/** What a completed remote switch points the worktree at. */
+export type SupabaseRemoteSwitchResult = {
+  remoteProjectId: string;
+  apiUrl: string;
 };
 
 /** Captured output from one local process invocation. */
@@ -157,12 +195,12 @@ export type SupabaseSwitchResult = {
 
 /** Everything a switch needs before it starts mutating local files. */
 export type SwitchPreparation = {
+  manifest: SupabaseLocalBackupManifest;
   backupDirectory: string;
   /** The env file the Supabase CLI reads its project overrides from. */
   developmentEnvPath: string;
   devServerPort: number;
   envFiles: string[];
-  manifest: SupabaseBackupManifest;
 };
 
 /** One development environment file as it exists on disk. */
@@ -183,20 +221,37 @@ export type SupabaseEnvironmentDrift = {
   staleKeys: string[];
 };
 
-/** Identity, ports, and endpoints of the local Supabase this worktree uses. */
-export type SupabaseStatusReport = {
-  isSwitched: boolean;
+/**
+ * Which Supabase a worktree is on: the shared develop stack, its own local
+ * project, or a hosted project.
+ */
+export type SupabaseSwitchKind = "shared" | "local" | "remote";
+
+/** Which Supabase a worktree is on, and whether that is right for it. */
+export type SupabaseSwitchSummary = {
+  branch: string;
+  switchKind: SupabaseSwitchKind;
+  /** The local project id the CLI uses, or the hosted project's id. */
+  projectId: string;
+  /** The project id `supabase/config.toml` names for the shared stack. */
+  sharedProjectId: string;
+  /** The hosted project's URL, for a remote switch only. */
+  remoteApiUrl: string | undefined;
   /**
-   * Whether `.env.development` points the Supabase CLI at a project that no
-   * switch on this branch created, for example one copied from another
-   * worktree's env file.
+   * Whether `.env.development` points somewhere that no switch on this branch
+   * created, for example override lines copied from another worktree.
    */
   hasStrayOverride: boolean;
   /** Whether the switch state is the healthy one for this branch. */
   isExpectedForBranch: boolean;
+  /** The project id and ports the Supabase CLI uses in this worktree. */
+  config: SupabaseConfigState;
+};
+
+/** Identity, ports, and endpoints of the local Supabase this worktree uses. */
+export type SupabaseStatusReport = Omit<SupabaseSwitchSummary, "config"> & {
+  isSwitched: boolean;
   isRunning: boolean;
-  branch: string;
-  projectId: string;
   ports: SupabaseStatusEntry[];
   environmentValues: SupabaseStatusEntry[];
   endpoints: SupabaseStatusEntry[];

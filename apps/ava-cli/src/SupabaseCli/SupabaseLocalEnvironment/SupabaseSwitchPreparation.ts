@@ -221,9 +221,12 @@ async function _prepareSwitch(
   const manifest = await SupabaseBackupStore.createBackup({
     io,
     ...identity,
-    temporaryProjectId,
-    basePort,
-    derivedPorts,
+    target: {
+      kind: "local" as const,
+      temporaryProjectId,
+      basePort,
+      derivedPorts,
+    },
     sourcePaths: envFiles,
   });
   return {
@@ -238,4 +241,10 @@ async function _prepareSwitch(
 /** Gathers and validates everything a switch needs before it mutates files. */
 export const SupabaseSwitchPreparation = {
   prepareSwitch: _prepareSwitch,
+
+  /** Reads the branch, worktree, and backup directory a switch belongs to. */
+  readSwitchIdentity: _readSwitchIdentity,
+
+  /** Refuses env files that are not regular files at their own paths. */
+  requireSwitchSourceFiles: _requireSwitchSourceFiles,
 };

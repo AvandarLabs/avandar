@@ -9,7 +9,10 @@ import {
   ORIGINAL_ENV,
   PROJECT_ROOT,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
-import type { SupabaseBackupManifest } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import type {
+  SupabaseBackupManifest,
+  SupabaseLocalBackupManifest,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 import type { FakeHarness } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 
 function _makeBackupDirectory(
@@ -55,7 +58,7 @@ function _seedBackupFiles(
   options: Readonly<{ fake: FakeHarness; sourcePaths: readonly string[] }>,
 ): void {
   const { fake, sourcePaths } = options;
-  const manifest: SupabaseBackupManifest = {
+  const manifest: SupabaseLocalBackupManifest = {
     kind: "local",
     branch: BRANCH,
     worktreePath: PROJECT_ROOT,
@@ -108,12 +111,13 @@ function _seedLegacyActiveBackup(fake: FakeHarness): void {
   fake.files.set(ENV_PATH, "VITE_SUPABASE_API_URL=temp\n");
 }
 
+/** Reads the seeded manifest, which the fixtures always write as local. */
 function _readFakeManifest(
   fake: Readonly<FakeHarness>,
-): SupabaseBackupManifest {
+): SupabaseLocalBackupManifest {
   return JSON.parse(
     fake.files.get(`${_makeBackupDirectory()}/manifest.json`) ?? "{}",
-  ) as SupabaseBackupManifest;
+  ) as SupabaseLocalBackupManifest;
 }
 
 function _writeFakeManifest(

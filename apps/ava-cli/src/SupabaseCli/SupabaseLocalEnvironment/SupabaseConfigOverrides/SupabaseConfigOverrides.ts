@@ -118,9 +118,7 @@ function _makeEnvContentsWithOverrides(
     }),
     BLOCK_END,
   ].join("\n");
-  return keptContents === ""
-    ? `${block}\n`
-    : `${keptContents}\n\n${block}\n`;
+  return keptContents === "" ? `${block}\n` : `${keptContents}\n\n${block}\n`;
 }
 
 function _makeLocalOverrides(

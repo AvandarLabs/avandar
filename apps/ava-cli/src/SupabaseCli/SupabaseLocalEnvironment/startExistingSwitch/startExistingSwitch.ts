@@ -55,6 +55,11 @@ export async function startExistingSwitch(
     const branch = await io.readBranch();
     throw new Error(`Branch ${branch} has no active Supabase switch.`);
   }
+  if (existing.manifest.kind === "remote") {
+    throw new Error(
+      `Branch ${existing.branch} is switched to the hosted project ${existing.manifest.remoteProjectId}, so there is no local project to start. Run \`ava supabase restore\` first.`,
+    );
+  }
   _requireCommandSuccess({
     result: await io.runSupabase(["start"]),
     stage: "Supabase start",
@@ -74,12 +79,17 @@ export async function startExistingSwitch(
 }
 
 /**
- * Returns this branch's existing temporary project id, if a switch left a
- * backup behind.
+ * Returns the project this branch's existing switch points at, local or
+ * hosted, if a switch left a backup behind.
  */
-export async function readExistingSwitchProjectId(
+export async function readExistingSwitchProject(
   io: Readonly<SupabaseLocalEnvironmentIo>,
-): Promise<string | undefined> {
+): Promise<{ kind: "local" | "remote"; projectId: string } | undefined> {
   const existing = await _readExistingManifest(io);
-  return existing?.manifest.temporaryProjectId;
+  if (existing === undefined) {
+    return undefined;
+  }
+  return existing.manifest.kind === "local"
+    ? { kind: "local", projectId: existing.manifest.temporaryProjectId }
+    : { kind: "remote", projectId: existing.manifest.remoteProjectId };
 }

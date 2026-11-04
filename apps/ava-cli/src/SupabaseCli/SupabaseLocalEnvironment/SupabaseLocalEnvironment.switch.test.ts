@@ -299,7 +299,6 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
     expect(fake.operations).toEqual([]);
   });
 
-
   it("refuses an environment symlink retargeted inside the worktree", async () => {
     const fake = createFakeIo({
       canonicalPaths: { [ENV_PATH]: `${PROJECT_ROOT}/nested/environment` },
@@ -331,7 +330,6 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
     expect(fake.copyOperations).toEqual([]);
     expect(fake.operations).toEqual([]);
   });
-
 
   it("refuses an environment directory before reserving or writing", async () => {
     const fake = createFakeIo({ developmentEnvFiles: [ENV_PATH] });
