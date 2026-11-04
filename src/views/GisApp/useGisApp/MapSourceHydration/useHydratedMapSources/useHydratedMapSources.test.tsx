@@ -109,3 +109,36 @@ it("keeps filters through metadata errors and hydrates without saving", () => {
   result.current.updateConfig(identity);
   expect(editor.updateConfig.mock.calls.at(-1)?.[0](config)).toBe(config);
 });
+
+it("keeps updateConfig stable across renders so map gestures stay attached", () => {
+  const config = AvaMapConfig.makeEmpty();
+  const editor = {
+    name: "map",
+    mapConfig: config,
+    saveState: "saved" as const,
+    updateName: vi.fn(),
+    updateConfig:
+      vi.fn<(update: (config: AvaMapConfig.T) => AvaMapConfig.T) => void>(),
+    saveNow: vi.fn(),
+  };
+  metadata.isSuccess = true;
+  metadata.columns = [];
+  const { result, rerender } = renderHook(
+    (props: { mapConfig: AvaMapConfig.T }) => {
+      return useHydratedMapSources({
+        editor: { ...editor, mapConfig: props.mapConfig },
+        workspaceId: "workspace" as Workspace.Id,
+      });
+    },
+    { wrapper: TestProviders, initialProps: { mapConfig: config } },
+  );
+  const firstUpdateConfig = result.current.updateConfig;
+  const nextConfig = { ...config, annotations: config.annotations };
+  rerender({ mapConfig: nextConfig });
+  expect(result.current.updateConfig).toBe(firstUpdateConfig);
+
+  result.current.updateConfig(identity);
+  expect(editor.updateConfig.mock.calls.at(-1)?.[0](nextConfig)).toBe(
+    nextConfig,
+  );
+});
