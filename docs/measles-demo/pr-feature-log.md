@@ -62,6 +62,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F10 | Pipeline run options: `ava pipeline run --limit` and `.env.pipelines.local` | not started | F4 | |
 | F11 | Live progress output for `ava pipeline run` | not started | F10, the ETL engine's per-scope crawl (`crawlScope`), which this log does not map yet | |
 | F12 | Invalid catalog listings, and DuckDB-parsed column type samples | not started | F4, F7, and the column type verification feature (`verifyOpenDataColumnTypes`, `rpc_data_catalog_listings__write_verified_column_types`), which this log does not map yet | [AVA-396](https://linear.app/avandar/issue/AVA-396) (follow-up) |
+| F13 | Demo deployment: `demo/*` branches deploy to `demo.avandarlabs.com` | not started | none | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -81,6 +82,7 @@ API. It's new work, not something this branch built.
 | 8 | F8 | Adds columns to the F4 table, and its freshness check reads Socrata metadata through F6's `SocrataClient`. |
 | 9 | F11 | Needs F10's local runner and `--limit`, and the ETL engine's scope crawl it hooks into. Can merge any time after those, before F9. |
 | 10 | F12 | Extends the column type verification route and the F4 listings table. Merge after the verification feature it rewrites. |
+| any | F13 | Self-contained CI and scripts. Merge before the next demo branch is cut from `develop`, so it inherits the workflow. |
 | 11 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -648,6 +650,34 @@ branch only. `pr-feature-log.md` itself stays off `develop`.
 `a325df511` docs(open-data): document what every drive index pipeline must
 write. All of it: section 6.7 of `open-data-catalog-architecture.md`, the
 drive index invariant (AVA-381).
+
+---
+
+## F13: Demo deployment for `demo/*` branches
+
+**Purpose:** Every push to a `demo/*` branch creates or updates that demo's
+Supabase branch on staging (migrations, edge function secrets, functions,
+Auth URLs), then builds the app against it and deploys it to the Vercel
+`demo` environment at `demo.avandarlabs.com`. **Value:** A new demo is a new
+`demo/*` branch cut from `develop`, with no CI, Vercel or Supabase changes.
+
+**PR title:** `feat(ci): deploy demo/* branches to demo.avandarlabs.com`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `69cbdad98` | feat(ci): deploy demo/* branches to demo.avandarlabs.com | All of it |
+
+**Files:** `.github/workflows/demo.yaml`,
+`scripts/demo/ensureSupabaseBranch.sh`,
+`scripts/demo/loadLocalDataIntoDemoBranch.sh`. Vercel settings stay in the
+dashboard, not `vercel.json`, since the repo is public. The runbook,
+`docs/measles-demo/demo-deployment-runbook.md`, moves into `docs/` with this
+PR.
+
+**Verification:** `shellcheck -x scripts/demo/*.sh`. Then push a throwaway
+`demo/*` branch and confirm the **CI/CD for Demos** run deploys it.
 
 ---
 
