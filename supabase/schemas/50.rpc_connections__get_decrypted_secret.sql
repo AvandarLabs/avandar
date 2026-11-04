@@ -38,7 +38,8 @@ create or replace function public.rpc_connections__get_decrypted_secret (
   p_workspace_id uuid
 ) returns text language plpgsql security definer
 set
-  search_path = public, vault as $$
+  search_path = public,
+  vault as $$
 declare
   v_secret text;
 begin

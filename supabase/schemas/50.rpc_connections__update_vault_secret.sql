@@ -30,7 +30,8 @@ create or replace function public.rpc_connections__update_vault_secret (
   p_workspace_id uuid
 ) returns void language plpgsql security definer
 set
-  search_path = public, vault as $$
+  search_path = public,
+  vault as $$
 begin
   if not exists (
     select 1

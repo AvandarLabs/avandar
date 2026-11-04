@@ -106,9 +106,7 @@ function createDatabaseConnectionClient(): WithLogger<
           return [
             {
               connection:
-                DatabaseConnectionParsers.fromDBReadToModelRead(
-                  connectionRow,
-                ),
+                DatabaseConnectionParsers.fromDBReadToModelRead(connectionRow),
               postgres:
                 PostgresDatabaseConnectionParsers.fromDBReadToModelRead(
                   postgres,

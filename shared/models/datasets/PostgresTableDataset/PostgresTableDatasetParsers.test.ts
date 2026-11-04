@@ -53,9 +53,8 @@ describe("PostgresTableDatasetParsers", () => {
     expect(() => {
       return PostgresTableDatasetParsers.fromDBReadToModelRead(
         _dbRow({
-          relation_kind: "materialized_view" as PostgresTableDataset.T<
-            "DBRead"
-          >["relation_kind"],
+          relation_kind:
+            "materialized_view" as PostgresTableDataset.T<"DBRead">["relation_kind"],
         }),
       );
     }).toThrow();

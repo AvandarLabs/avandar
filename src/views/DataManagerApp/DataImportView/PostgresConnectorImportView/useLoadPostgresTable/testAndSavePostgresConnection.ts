@@ -1,9 +1,9 @@
 import { msg } from "@lingui/core/macro";
 import { APIClient } from "@/clients/APIClient";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
+import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
 import type { I18n } from "@lingui/core";
 import type { ConnectorRelation } from "@sbfn/connectors/Connector";
-import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
 
 /**
  * Tests the submitted credentials by opening a live connection, and saves

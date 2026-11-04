@@ -59,7 +59,8 @@ describe("createPostgresConnector - SSRF re-check on an already-saved connection
     const connector = createPostgresConnector({ connectToPostgres: vi.fn() });
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseClient:
+        undefined as unknown as ConnectorContext["supabaseClient"],
       supabaseAdminClient:
         _makeSavedLoopbackConnectionAdminClient() as unknown as ConnectorContext["supabaseAdminClient"],
     };
