@@ -506,6 +506,49 @@
 - Use string literal unions instead of enums.
 - Encapsulate data in composite types when a type, or parts of a type, need to
   be re-used.
+
+### Widening a string literal union: let the compiler build the checklist
+
+- This is the payoff of the string-literal-union rule above, not a separate
+  habit: branch on the union exhaustively, with an exhaustive
+  `Record<TUnion, X>` or `ts-pattern`'s `match(value).exhaustive()`, never a
+  plain `switch`/`if` chain with no exhaustiveness check and never TypeScript's
+  own `enum`. Only the exhaustive forms turn adding a variant into something
+  the compiler verifies, rather than something a human has to audit by eye.
+- When a new variant needs to reach every one of those call sites, **widen the
+  union first, before writing a single new arm by hand.** The moment the union
+  changes, every exhaustive `Record` and `match(...).exhaustive()` over it
+  fails to compile. Run the type-checker and treat that list of errors as the
+  complete, authoritative checklist of every place needing a new arm - not a
+  hand-assembled one.
+- Never substitute a grep across the repo for this. A search can miss a file
+  that branches on the union through a re-exported alias, and it cannot tell
+  you when you are *done* - only the type-checker reporting zero errors means
+  every arm actually exists. Work through the compiler's error list one file
+  at a time until it is clean; that is the whole verification, with no
+  separate step to double-check you found everything.
+
+  ```ts
+  // Step 1: widen the union. Do this before touching any call site.
+  type DatasetSourceType = "csv_file" | "google_sheets" | "postgres_table";
+
+  // Step 2: run the type-checker, not a grep. It now reports every one of
+  // these as a compile error, because each was exhaustive over the old union:
+  const SOURCE_TYPE_ICONS: Record<DatasetSourceType, Icon> = {
+    csv_file: IconFileSpreadsheet,
+    google_sheets: IconTable,
+    // missing `postgres_table` - a compiler error, not a silent gap
+  };
+
+  match(sourceType)
+    .with("csv_file", () => {})
+    .with("google_sheets", () => {})
+    // missing `.with("postgres_table", ...)` - `.exhaustive()` fails to compile
+    .exhaustive();
+
+  // Step 3: work the compiler's error list file by file. Zero errors means
+  // zero missing arms - that fact is proven, not merely believed.
+  ```
 - Do not create a new type if the type is never re-used. Reduce indirection.
   Example:
 

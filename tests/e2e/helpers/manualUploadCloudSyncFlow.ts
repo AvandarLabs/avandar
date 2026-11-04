@@ -23,6 +23,20 @@ export function parseDatasetIdFromDataManagerUrl(options: {
 }
 
 /**
+ * Matches the URL of any dataset page in the workspace, which is where a
+ * completed dataset save lands.
+ */
+export function makeDatasetPageUrlPatternFromWorkspaceSlug(
+  workspaceSlug: string,
+): RegExp {
+  const escapedWorkspaceSlug = workspaceSlug.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&",
+  );
+  return new RegExp(`/${escapedWorkspaceSlug}/data-manager/[0-9a-f-]{36}`, "i");
+}
+
+/**
  * After save, waits until the cloud-sync toggle is idle (upload finished) and
  * shows the online / synced affordance (`aria-label` "Make offline-only").
  *
@@ -71,8 +85,7 @@ export async function ensureCloudStorageCheckedAndSaveDataset(options: {
     await cloudCheckbox.check();
   }
 
-  const escaped = workspaceSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const metaUrl = new RegExp(`/${escaped}/data-manager/[0-9a-f-]{36}`, "i");
+  const metaUrl = makeDatasetPageUrlPatternFromWorkspaceSlug(workspaceSlug);
 
   await page.getByRole("button", { name: "Save Dataset" }).click();
   await expect

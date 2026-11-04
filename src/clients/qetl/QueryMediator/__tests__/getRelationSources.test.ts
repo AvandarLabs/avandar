@@ -9,7 +9,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { clearQueryableRelationColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const CSV_ID = "11111111-1111-4111-8111-111111111111" as Dataset.Id;
@@ -86,7 +86,7 @@ vi.mock("@/clients/datasets/source-datasets/PostgresTableDatasetClient", () => {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  clearQueryableRelationColumns();
+  QueryableRelationColumns.clear();
   datasetGetAllMock.mockResolvedValue([]);
   csvGetAllMock.mockResolvedValue([]);
   xlsxGetAllMock.mockResolvedValue([]);

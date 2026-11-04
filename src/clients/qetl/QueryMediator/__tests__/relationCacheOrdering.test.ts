@@ -23,6 +23,7 @@ async function _seedCache(datasetId: Dataset.Id): Promise<void> {
     },
     columns: "all",
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
 }
 

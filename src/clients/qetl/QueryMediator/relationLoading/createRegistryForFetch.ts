@@ -1,9 +1,9 @@
 import { makeIdLookupRecord, makeObject, prop } from "@avandar/utils";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { readRelationCsv } from "@/clients/qetl/QueryMediator/relationLoading/readRelationCsv/readRelationCsv";
 import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
-import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
+import type { RelationCsvReader } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
   QetlRunQuery,
@@ -22,88 +22,23 @@ function _isVirtualRelationSource(
   return relationSource.sourceType === "virtual";
 }
 
-function _isGoogleSheetsRelationSource(
-  relationSource: Readonly<RelationSource>,
-): relationSource is Extract<RelationSource, { sourceType: "google_sheets" }> {
-  return relationSource.sourceType === "google_sheets";
-}
-
-function _isPostgresTableRelationSource(
-  relationSource: Readonly<RelationSource>,
-): relationSource is Extract<RelationSource, { sourceType: "postgres_table" }> {
-  return relationSource.sourceType === "postgres_table";
-}
-
-function _googleSheetsSourceByDatasetId(
-  relationSources: readonly RelationSource[],
-): Record<string, GoogleSheetsDataset.T> {
-  return Object.fromEntries(
-    relationSources.filter(_isGoogleSheetsRelationSource).map((source) => {
-      return [source.dataset.id, source.sourceDataset];
-    }),
-  );
-}
-
-function _postgresTableSourceByDatasetId(
-  relationSources: readonly RelationSource[],
-): Record<string, PostgresTableDataset.T> {
-  return makeObject(relationSources.filter(_isPostgresTableRelationSource), {
-    keyFn: (source) => {
-      return source.dataset.id;
-    },
-    valueFn: (source) => {
-      return source.sourceDataset;
-    },
-  });
-}
-
 function _lookupsForFetch(relationSources: readonly RelationSource[]) {
   return {
     datasetsById: makeIdLookupRecord(relationSources.map(prop("dataset"))),
-    rawSqlByDatasetId: Object.fromEntries(
-      relationSources.filter(_isVirtualRelationSource).map((relationSource) => {
-        return [relationSource.dataset.id, relationSource.sourceDataset.rawSql];
-      }),
+    rawSqlByDatasetId: makeObject(
+      relationSources.filter(_isVirtualRelationSource),
+      {
+        keyFn: prop("dataset.id"),
+        valueFn: prop("sourceDataset.rawSql"),
+      },
     ),
-    googleSheetsByDatasetId: _googleSheetsSourceByDatasetId(relationSources),
-    postgresTableByDatasetId: _postgresTableSourceByDatasetId(relationSources),
   };
 }
 
 function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
   return {
-    readGoogleSheetTabCsv: async ({
-      datasetId,
-      csvText,
-    }: {
-      datasetId: Dataset.Id;
-      csvText: string;
-    }) => {
-      // The same reader the import path uses, so a dataset's columns are typed
-      // the same whether the rows arrived at import or at query time.
-      const loaded = await DuckDbClient.loadCsv({
-        tableName: datasetId,
-        fileText: csvText,
-        datasetDuckDbLease,
-      });
-      return { parquetBlob: loaded.parquetData };
-    },
-    readPostgresTableCsv: async ({
-      datasetId,
-      csvText,
-    }: {
-      datasetId: Dataset.Id;
-      csvText: string;
-    }) => {
-      // Same reasoning as `readGoogleSheetTabCsv`: query-time acquisition
-      // reads through the same CSV->Parquet loader the import path used, so
-      // a dataset's columns are typed identically either way.
-      const loaded = await DuckDbClient.loadCsv({
-        tableName: datasetId,
-        fileText: csvText,
-        datasetDuckDbLease,
-      });
-      return { parquetBlob: loaded.parquetData };
+    readRelationCsv: async (params: Parameters<RelationCsvReader>[0]) => {
+      return await readRelationCsv({ ...params, datasetDuckDbLease });
     },
     transcodeCsvToParquet: async ({
       datasetId,
@@ -130,6 +65,14 @@ function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
  * one place that wiring is assembled, so a new source type is added here and
  * nowhere else in the fetch path.
  */
+/** Throws `message` when `value` is missing, instead of returning it. */
+function _getOrThrow<T>(value: T | undefined, message: string): T {
+  if (value === undefined) {
+    throw new Error(message);
+  }
+  return value;
+}
+
 export function createRegistryForFetch(
   options: Readonly<{
     relationSources: readonly RelationSource[];
@@ -141,38 +84,16 @@ export function createRegistryForFetch(
   return createDefaultRegistry({
     ..._leaseBoundTranscoders(options.datasetDuckDbLease),
     getRawSql: async (ref) => {
-      const rawSql = lookups.rawSqlByDatasetId[ref.id];
-      if (rawSql === undefined) {
-        throw new Error(
-          `Virtual dataset '${ref.id}' is not among the relations to fetch`,
-        );
-      }
-      return rawSql;
+      return _getOrThrow(
+        lookups.rawSqlByDatasetId[ref.id],
+        `Virtual dataset '${ref.id}' is not among the relations to fetch`,
+      );
     },
     getDataset: async (id) => {
-      const dataset = lookups.datasetsById[id];
-      if (!dataset) {
-        throw new Error(`Dataset '${id}' is not among the relations to fetch`);
-      }
-      return dataset;
-    },
-    getGoogleSheetsSource: async (id) => {
-      const source = lookups.googleSheetsByDatasetId[id];
-      if (!source) {
-        throw new Error(
-          `Google Sheets dataset '${id}' is not among the relations to fetch`,
-        );
-      }
-      return source;
-    },
-    getPostgresTableSource: async (id) => {
-      const source = lookups.postgresTableByDatasetId[id];
-      if (!source) {
-        throw new Error(
-          `Postgres table dataset '${id}' is not among the relations to fetch`,
-        );
-      }
-      return source;
+      return _getOrThrow(
+        lookups.datasetsById[id],
+        `Dataset '${id}' is not among the relations to fetch`,
+      );
     },
     runParquetQuery: ({ rawSql }) => {
       return options.runQuery({

@@ -2,7 +2,7 @@ import { Tabs } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
 import { DataCatalogView } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView";
-import { ConnectorsAdvisory } from "@/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory";
+import { ConnectorsAdvisory } from "@/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory/ConnectorsAdvisory";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 import { PostgresConnectorImportView } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView";

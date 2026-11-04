@@ -1,4 +1,4 @@
-import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection.ts";
+import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";

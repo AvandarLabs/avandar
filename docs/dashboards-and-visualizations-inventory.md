@@ -608,8 +608,11 @@ ids known to belong to the workspace.
    - **open_data** / workspace datasets → materialize via SQL when the mode
      is `queried`/`custom` or any row filters exist
    - **`all_columns` + no row filters** → fast path, direct parquet copy
-     (open_data prefers the locally-cached parquet, falling back to the
-     open-dataset bucket)
+     for uploaded files (CSV, XLSX, PDF) and open data (open_data prefers the
+     locally-cached parquet, falling back to the open-dataset bucket).
+     Google Sheets and Postgres tables keep no parquet in Storage, so they
+     materialize via SQL in every mode. The match on source type is
+     exhaustive, so a new source type must pick a path
    - Failures surface a "Some datasets are not synced online yet or failed to
      publish" error toast and abort
 4. Persists the slice config back into the dashboard `config` JSON so

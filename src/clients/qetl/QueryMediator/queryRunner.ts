@@ -11,11 +11,7 @@ import {
   getRelationSources,
   probeRelationCache,
 } from "@/clients/qetl/QueryMediator/getRelationSources";
-import {
-  fetchRelationBytes,
-  loadRelationBytes,
-  probeStorageRelationCache,
-} from "@/clients/qetl/QueryMediator/relationLoading/relationLoading";
+import { RelationLoading } from "@/clients/qetl/QueryMediator/relationLoading/RelationLoading";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -113,7 +109,7 @@ async function _loadQueryRelations(
     neededByDatasetId,
   );
   const { cachedRelations, growFromColumnsByDatasetId, uncachedDatasetIds } =
-    await probeStorageRelationCache({
+    await RelationLoading.probeStorageRelationCache({
       datasetIds: notInQueryableTier,
       neededByDatasetId,
       principalKey: runnerOptions.principalKey,
@@ -123,14 +119,14 @@ async function _loadQueryRelations(
     uncachedDatasetIds.length > 0
       ? await getRelationSources(uncachedDatasetIds)
       : [];
-  const fetchedRelationBytes = await fetchRelationBytes({
+  const fetchedRelationBytes = await RelationLoading.fetchRelationBytes({
     datasetDuckDbLease: queryOptions.datasetDuckDbLease,
     growFromColumnsByDatasetId,
     neededByDatasetId,
     relationSources,
     runQuery: options.runQuery,
   });
-  await loadRelationBytes({
+  await RelationLoading.loadRelationBytes({
     datasetDuckDbLease: queryOptions.datasetDuckDbLease,
     principalKey: runnerOptions.principalKey,
     relationCache: runnerOptions.relationCache,

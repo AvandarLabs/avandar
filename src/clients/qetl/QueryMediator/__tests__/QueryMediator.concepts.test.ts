@@ -155,6 +155,7 @@ async function _createQetlClient(
     },
     columns: "all",
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
   return QueryMediatorFactory.create("QueryMediator", {
     state: {

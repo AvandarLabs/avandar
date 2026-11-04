@@ -265,7 +265,7 @@ authorized merge to `develop`.
   genuinely differ. Low-tech does not mean non-tech: the audience includes
   people who are comfortable using software day to day but have no reason to
   know this codebase's entity names.
-- Concretely: a Postgres `db_connections` row is the right name for
+- Concretely: a Postgres `connections` row is the right name for
   that backend entity, because a "connection" is genuinely what
   `MySQL`/`MSSQL`/`Snowflake` connectors will all persist as too - but a user
   never sees that word. They are "adding a database," not "creating a

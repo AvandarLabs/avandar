@@ -1,0 +1,79 @@
+import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
+import type {
+  ConnectorErrorCode,
+  ConnectorPreviewColumn,
+  ConnectorRelation,
+} from "@sbfn/connectors/Connector.ts";
+
+/** The shared error shape every `connectors` route returns on failure. */
+export type ConnectorErrorResponse = {
+  error: { code: ConnectorErrorCode; message: string };
+};
+
+/** HTTP contract for the `connectors` edge function's routes. */
+export type ConnectorsApi = APITypeDef<
+  "connectors",
+  [
+    "/:connectorType/connections/test-and-save",
+    "/:connectorType/connections/:connectionId/relations",
+    "/:connectorType/connections/:connectionId/relations/:relationId/preview",
+    "/:connectorType/datasets/:datasetId/rows",
+  ],
+  {
+    "/:connectorType/connections/test-and-save": {
+      POST: {
+        pathParams: { connectorType: string };
+        body: { workspaceId: string; connectionId?: string } & Record<
+          string,
+          unknown
+        >;
+        returnType:
+          | { connectionId: string; relations: ConnectorRelation[] }
+          | ConnectorErrorResponse;
+      };
+    };
+    "/:connectorType/connections/:connectionId/relations": {
+      GET: {
+        pathParams: { connectorType: string; connectionId: string };
+        returnType: { relations: ConnectorRelation[] } | ConnectorErrorResponse;
+      };
+    };
+    "/:connectorType/connections/:connectionId/relations/:relationId/preview": {
+      GET: {
+        pathParams: {
+          connectorType: string;
+          connectionId: string;
+          relationId: string;
+        };
+        returnType:
+          | {
+              columns: ConnectorPreviewColumn[];
+              previewRows: Array<Record<string, unknown>>;
+            }
+          | ConnectorErrorResponse;
+      };
+    };
+    "/:connectorType/datasets/:datasetId/rows": {
+      GET: {
+        pathParams: { connectorType: string; datasetId: string };
+        // The handler returns a raw `Response` with `Content-Type: text/csv`
+        // - `ValidReturnType` (`MiniServer/api.types.ts`) only allows
+        // `Record<string, unknown> | void | Response` here, so this must
+        // stay `Response`, matching the one other route in this codebase
+        // that also returns raw bytes (`open-data`'s
+        // `/data-catalog-listings/:catalogListingId/resource`, same
+        // `returnType: Response`). That precedent is never called through
+        // `APIClient`/`supabase.functions.invoke` for exactly this reason:
+        // `functions.invoke`'s own content-type-based parsing resolves
+        // `text/csv` to a plain string, not a `Response` object, so a caller
+        // going through it could never get a real `Response` back no matter
+        // what this type says. `acquirePostgresTableRelation.ts` instead
+        // does its own authenticated `fetch`, mirroring
+        // `fetchOpenDataCatalogResource.ts`, and reads the body itself. An
+        // error response is still JSON (MiniServer's default wrapping), so
+        // it comes back as the usual `ConnectorErrorResponse` shape.
+        returnType: Response | ConnectorErrorResponse;
+      };
+    };
+  }
+>;

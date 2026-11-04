@@ -30,10 +30,11 @@ with public_tables as (
     public_tables
   where
     table_name not in (
+      'connections',
+      'connections__postgres',
       'data_catalog_listings__relation_columns',
       'data_catalog_listings',
-      'db_connections',
-      'db_connections__postgres',
+      'datasets__postgres_table',
       -- Service role only: no `authenticated` grant at all.
       'pipeline_execution_scopes',
       'pipeline_executions',
@@ -82,10 +83,10 @@ with public_tables as (
     public_tables
   where
     table_name in (
+      'connections',
+      'connections__postgres',
       'data_catalog_listings__relation_columns',
       'data_catalog_listings',
-      'db_connections',
-      'db_connections__postgres',
       'subscriptions',
       'usage_analytics_events'
     )
@@ -105,6 +106,16 @@ with public_tables as (
     false
   from
     unnest(array['INSERT', 'SELECT', 'UPDATE']) as privileges (privilege_type)
+  union all
+  -- No `update`: a Postgres satellite row names the table everyone who can
+  -- see its dataset reads, and no signed-in user may change it.
+  select
+    'datasets__postgres_table',
+    'authenticated',
+    privilege_type,
+    false
+  from
+    unnest(array['DELETE', 'INSERT', 'SELECT']) as privileges (privilege_type)
   union all
   select
     'dashboards',

@@ -105,6 +105,17 @@ type Schemas = {
       RelationCachePayloadModel,
     ];
   };
+  v11: {
+    version: 11;
+    models: [
+      LocalDatasetModel,
+      LocalPublicDatasetModel,
+      ConsentAuditEntry.Model,
+      ClarificationAuditEntry.Model,
+      RelationCacheEntryModel,
+      RelationCachePayloadModel,
+    ];
+  };
 };
 
 export const AvaDexieVersionManager = DexieDBVersionManager.make<Schemas>();
@@ -375,9 +386,57 @@ const DBDefinitions = [
       },
     },
   }),
+
+  // Same tables as v10. Clears the relation cache once: rows written before
+  // cached relations carried a stale-at time never expire, so a Google Sheet
+  // or Postgres table cached under v10 would keep serving its first rows.
+  // Everything in the cache can be acquired again; nothing else is touched.
+  AvaDexieVersionManager.defineVersion<11>({
+    db,
+    version: 11,
+    models: {
+      LocalDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["userId", "workspaceId"],
+      },
+      LocalPublicDataset: {
+        primaryKey: ["dashboardId", "datasetId"],
+        columnsToIndex: ["dashboardId"],
+      },
+      ConsentAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: [
+          "workspaceId",
+          "userId",
+          "timestamp",
+          "context",
+          "decision",
+        ],
+      },
+      ClarificationAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: ["workspaceId", "timestamp", "outcome", "turnNumber"],
+      },
+      RelationCacheEntry: {
+        primaryKey: "identityKey",
+        // `columnsToIndex` cannot express Dexie's `[a+b]` compound-index
+        // syntax (it is typed `Array<keyof DBRead>`), so the lookup filters
+        // the handful of `tableName` candidates in JS instead of indexing a
+        // compound (principalKey, tableName) key.
+        columnsToIndex: ["tableName", "principalKey", "lastQueriedAt"],
+      },
+      RelationCachePayload: {
+        primaryKey: "identityKey",
+      },
+    },
+    upgrader: async (tx) => {
+      await tx.table("RelationCacheEntry").clear();
+      await tx.table("RelationCachePayload").clear();
+    },
+  }),
 ] as const;
 
 AvaDexieVersionManager.registerVersions(DBDefinitions);
 
 /** Registry key for the current AvaDexie schema version. */
-export const CURRENT_AVA_DEXIE_VERSION = "v10" as const satisfies keyof Schemas;
+export const CURRENT_AVA_DEXIE_VERSION = "v11" as const satisfies keyof Schemas;

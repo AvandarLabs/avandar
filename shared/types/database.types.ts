@@ -225,6 +225,101 @@ export type Database = {
           },
         ]
       }
+      connections: {
+        Row: {
+          connection_type: Database["public"]["Enums"]["connections__connection_type"]
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          connection_type: Database["public"]["Enums"]["connections__connection_type"]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          connection_type?: Database["public"]["Enums"]["connections__connection_type"]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connections_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connections__postgres: {
+        Row: {
+          connection_id: string
+          created_at: string
+          database_name: string
+          host: string
+          last_verified_at: string | null
+          port: number
+          ssl_mode: Database["public"]["Enums"]["connections__postgres_ssl_mode"]
+          updated_at: string
+          username: string
+          vault_secret_id: string
+          workspace_id: string
+        }
+        Insert: {
+          connection_id: string
+          created_at?: string
+          database_name: string
+          host: string
+          last_verified_at?: string | null
+          port: number
+          ssl_mode?: Database["public"]["Enums"]["connections__postgres_ssl_mode"]
+          updated_at?: string
+          username: string
+          vault_secret_id: string
+          workspace_id: string
+        }
+        Update: {
+          connection_id?: string
+          created_at?: string
+          database_name?: string
+          host?: string
+          last_verified_at?: string | null
+          port?: number
+          ssl_mode?: Database["public"]["Enums"]["connections__postgres_ssl_mode"]
+          updated_at?: string
+          username?: string
+          vault_secret_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connections__postgres_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: true
+            referencedRelation: "connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connections__postgres_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dashboards: {
         Row: {
           config: Json
@@ -883,18 +978,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "datasets__postgres_table_connection_id_fkey"
-            columns: ["connection_id"]
+            foreignKeyName: "datasets__postgres_table__connection_in_workspace_fkey"
+            columns: ["connection_id", "workspace_id"]
             isOneToOne: false
-            referencedRelation: "db_connections"
-            referencedColumns: ["id"]
+            referencedRelation: "connections"
+            referencedColumns: ["id", "workspace_id"]
           },
           {
-            foreignKeyName: "datasets__postgres_table_dataset_id_fkey"
-            columns: ["dataset_id"]
-            isOneToOne: true
+            foreignKeyName: "datasets__postgres_table__dataset_in_workspace_fkey"
+            columns: ["dataset_id", "workspace_id"]
+            isOneToOne: false
             referencedRelation: "datasets"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "workspace_id"]
           },
           {
             foreignKeyName: "datasets__postgres_table_workspace_id_fkey"
@@ -1000,101 +1095,6 @@ export type Database = {
           },
           {
             foreignKeyName: "datasets__xlsx_file_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      db_connections: {
-        Row: {
-          connection_type: Database["public"]["Enums"]["db_connections__connection_type"]
-          created_at: string
-          created_by: string | null
-          id: string
-          name: string
-          updated_at: string
-          workspace_id: string
-        }
-        Insert: {
-          connection_type: Database["public"]["Enums"]["db_connections__connection_type"]
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          name: string
-          updated_at?: string
-          workspace_id: string
-        }
-        Update: {
-          connection_type?: Database["public"]["Enums"]["db_connections__connection_type"]
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          name?: string
-          updated_at?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "db_connections_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      db_connections__postgres: {
-        Row: {
-          connection_id: string
-          created_at: string
-          database_name: string
-          host: string
-          last_verified_at: string | null
-          port: number
-          ssl_mode: Database["public"]["Enums"]["db_connections__postgres_ssl_mode"]
-          updated_at: string
-          username: string
-          vault_secret_id: string
-          workspace_id: string
-        }
-        Insert: {
-          connection_id: string
-          created_at?: string
-          database_name: string
-          host: string
-          last_verified_at?: string | null
-          port: number
-          ssl_mode?: Database["public"]["Enums"]["db_connections__postgres_ssl_mode"]
-          updated_at?: string
-          username: string
-          vault_secret_id: string
-          workspace_id: string
-        }
-        Update: {
-          connection_id?: string
-          created_at?: string
-          database_name?: string
-          host?: string
-          last_verified_at?: string | null
-          port?: number
-          ssl_mode?: Database["public"]["Enums"]["db_connections__postgres_ssl_mode"]
-          updated_at?: string
-          username?: string
-          vault_secret_id?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "db_connections__postgres_connection_id_fkey"
-            columns: ["connection_id"]
-            isOneToOne: true
-            referencedRelation: "db_connections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "db_connections__postgres_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -2173,6 +2173,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      datasets__auth_user_may_add_column: {
+        Args: { p_dataset_id: string }
+        Returns: boolean
+      }
+      datasets__is_postgres_table: {
+        Args: { p_dataset_id: string }
+        Returns: boolean
+      }
       maps__auth_user_may_select: {
         Args: { p_map_id: string }
         Returns: boolean
@@ -2189,6 +2197,26 @@ export type Database = {
       maps__owner_id_matches_stored: {
         Args: { p_map_id: string; p_owner_id: string }
         Returns: boolean
+      }
+      rpc_connections__create_vault_secret: {
+        Args: { p_description: string; p_name: string; p_secret: string }
+        Returns: string
+      }
+      rpc_connections__delete_vault_secret: {
+        Args: { p_secret_id: string; p_workspace_id: string }
+        Returns: undefined
+      }
+      rpc_connections__get_decrypted_secret: {
+        Args: { p_vault_secret_id: string; p_workspace_id: string }
+        Returns: string
+      }
+      rpc_connections__update_vault_secret: {
+        Args: {
+          p_new_secret: string
+          p_secret_id: string
+          p_workspace_id: string
+        }
+        Returns: undefined
       }
       rpc_data_catalog_listings__list_pipeline_scopes: {
         Args: { p_pipeline_name: string }
@@ -2618,22 +2646,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      rpc_db_connections__create_vault_secret: {
-        Args: { p_description: string; p_name: string; p_secret: string }
-        Returns: string
-      }
-      rpc_db_connections__delete_vault_secret: {
-        Args: { p_secret_id: string }
-        Returns: undefined
-      }
-      rpc_db_connections__get_decrypted_secret: {
-        Args: { p_vault_secret_id: string }
-        Returns: string
-      }
-      rpc_db_connections__update_vault_secret: {
-        Args: { p_new_secret: string; p_secret_id: string }
-        Returns: undefined
-      }
       rpc_pipeline_executions__finish: {
         Args: { p_execution_id: string; p_outcome: Json }
         Returns: undefined
@@ -2899,6 +2911,8 @@ export type Database = {
         | "max"
         | "min"
       concept_attributes__mapping_type: "dataset_column" | "manual_entry"
+      connections__connection_type: "postgres"
+      connections__postgres_ssl_mode: "disable" | "require"
       dashboard_snapshot_transition_kind:
         | "publish"
         | "abort_publish"
@@ -2970,8 +2984,6 @@ export type Database = {
         | "xlsx_file"
         | "pdf_file"
         | "postgres_table"
-      db_connections__connection_type: "postgres"
-      db_connections__postgres_ssl_mode: "disable" | "require"
       nux_status: "not_started" | "in_progress" | "completed" | "dismissed"
       pipeline_execution_scopes__status: "succeeded" | "failed" | "skipped"
       pipeline_executions__command: "run" | "reset" | "prune_retired_scopes"
@@ -3169,6 +3181,8 @@ export const Constants = {
         "min",
       ],
       concept_attributes__mapping_type: ["dataset_column", "manual_entry"],
+      connections__connection_type: ["postgres"],
+      connections__postgres_ssl_mode: ["disable", "require"],
       dashboard_snapshot_transition_kind: [
         "publish",
         "abort_publish",
@@ -3246,8 +3260,6 @@ export const Constants = {
         "pdf_file",
         "postgres_table",
       ],
-      db_connections__connection_type: ["postgres"],
-      db_connections__postgres_ssl_mode: ["disable", "require"],
       nux_status: ["not_started", "in_progress", "completed", "dismissed"],
       pipeline_execution_scopes__status: ["succeeded", "failed", "skipped"],
       pipeline_executions__command: ["run", "reset", "prune_retired_scopes"],

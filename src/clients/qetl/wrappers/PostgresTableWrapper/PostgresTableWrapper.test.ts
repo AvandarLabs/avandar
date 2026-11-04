@@ -4,11 +4,12 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { createPostgresTableWrapper } from "@/clients/qetl/wrappers/PostgresTableWrapper/PostgresTableWrapper";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { PostgresRowsFetch } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 import type { ILogger } from "@avandar/logger";
 
 const DATASET_REF = {
@@ -61,7 +62,7 @@ vi.mock("$/db/supabase/AvaSupabase", () => {
 });
 
 /** A fetch stub returning CSV text with the real route's content type. */
-function _csvFetch(csvText: string): PostgresRowsFetch {
+function _csvFetch(csvText: string): EdgeFunctionFetch {
   return async () => {
     return new Response(csvText, {
       status: 200,
@@ -71,7 +72,7 @@ function _csvFetch(csvText: string): PostgresRowsFetch {
 }
 
 /** A fetch stub returning the edge function's `{error}` JSON shape. */
-function _errorFetch(code: string, message: string): PostgresRowsFetch {
+function _errorFetch(code: string, message: string): EdgeFunctionFetch {
   return async () => {
     return new Response(JSON.stringify({ error: { code, message } }), {
       status: 200,
@@ -81,16 +82,10 @@ function _errorFetch(code: string, message: string): PostgresRowsFetch {
 }
 
 describe("PostgresTableWrapper", () => {
-  it("acquires the named relation as parquet", async () => {
+  it("acquires the named relation as parquet, fresh for the live-source max age", async () => {
     const parquetBlob = new Blob(["postgres-parquet"]);
     const readCsv = vi.fn().mockResolvedValue({ parquetBlob });
-    const getPostgresTableSource = vi.fn().mockResolvedValue({
-      connectionId: "connection-1",
-      schemaName: "public",
-      tableName: "customers",
-    });
     const wrapper = createPostgresTableWrapper({
-      getPostgresTableSource,
       readCsv,
       rowsFetch: _csvFetch("city\r\nNairobi\r\n"),
     });
@@ -103,22 +98,52 @@ describe("PostgresTableWrapper", () => {
     expect(readCsv).toHaveBeenCalledWith({
       datasetId: DATASET_REF.id,
       csvText: "city\r\nNairobi\r\n",
+      // A table declares its column types, so they come from its schema.
+      columnTypes: "source-schema",
     });
     expect(acquired).toEqual({
       ref: DATASET_REF,
       parquetBlob,
       sourceVersion: undefined,
+      maxAgeMs: GlobalAppConfig.timing.liveRelationMaxAgeMs,
     });
   });
 
-  it("throws when the edge function returns an error response", async () => {
-    const getPostgresTableSource = vi.fn().mockResolvedValue({
-      connectionId: "connection-1",
-      schemaName: "public",
-      tableName: "customers",
-    });
+  it("reads the rows by dataset, so the server picks the connection and table, not the caller", async () => {
+    const requestedUrls: string[] = [];
     const wrapper = createPostgresTableWrapper({
-      getPostgresTableSource,
+      readCsv: vi.fn().mockResolvedValue({ parquetBlob: new Blob([]) }),
+      rowsFetch: async (url) => {
+        requestedUrls.push(url);
+        return await _csvFetch("city\r\n")(url);
+      },
+    });
+
+    await wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT);
+
+    expect(requestedUrls).toEqual([
+      `https://project.supabase.co/functions/v1/connectors/postgres/datasets/${DATASET_REF.id}/rows`,
+    ]);
+  });
+
+  it("reports a refused dataset as forbidden rather than too large", async () => {
+    const wrapper = createPostgresTableWrapper({
+      readCsv: vi.fn(),
+      rowsFetch: async () => {
+        return new Response(JSON.stringify({ error: "No dataset found" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
+      },
+    });
+
+    await expect(
+      wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT),
+    ).rejects.toHaveProperty("code", "forbidden");
+  });
+
+  it("throws when the edge function returns an error response", async () => {
+    const wrapper = createPostgresTableWrapper({
       readCsv: vi.fn(),
       rowsFetch: _errorFetch("unreachable", "could not connect to server"),
     });
@@ -151,6 +176,29 @@ describe("PostgresTableWrapper", () => {
     expect(wrapper.pushDown).toBeUndefined();
     expect(wrapper.capabilities.wholeRelationAcquirable).toBe("yes");
     expect(wrapper.acquire).toBeDefined();
+  });
+
+  it("derives maxRowsPerCall from the shared byte budget and the relation's row width", () => {
+    const wrapper = createPostgresTableWrapper();
+    const maxRowsPerCall = wrapper.capabilities.maxRowsPerCall;
+    if (typeof maxRowsPerCall !== "function") {
+      expect.unreachable("maxRowsPerCall should be a function, not a flat cap");
+    }
+
+    // 150MB budget / 100 bytes-per-row = 1,572,864 rows.
+    expect(maxRowsPerCall({ columnCount: 3, estimatedRowBytes: 100 })).toBe(
+      1_572_864,
+    );
+  });
+
+  it("defers maxRowsPerCall to the byte cap when no row-width estimate is available", () => {
+    const wrapper = createPostgresTableWrapper();
+    const maxRowsPerCall = wrapper.capabilities.maxRowsPerCall;
+    if (typeof maxRowsPerCall !== "function") {
+      expect.unreachable("maxRowsPerCall should be a function, not a flat cap");
+    }
+
+    expect(maxRowsPerCall({ columnCount: 3 })).toBe("unbounded");
   });
 
   it("has no readFreshness, matching the 'none' freshness signal", () => {

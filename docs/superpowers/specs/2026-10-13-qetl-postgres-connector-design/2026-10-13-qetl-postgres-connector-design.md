@@ -434,22 +434,22 @@ implementations - the same registry shape `createDefaultRegistry.ts` already
 uses for `SourceWrapper`s (section 6, row 24), applied one layer down:
 
 ```ts
-// supabase/functions/external-datasets/connectors/ExternalDatasetConnector.ts
-export type ExternalDatasetConnectorType = "postgres"; // widens per future connector
+// supabase/functions/external-datasets/connectors/Connector.ts
+export type ConnectorType = "postgres"; // widens per future connector
 
 /** One pickable child object under a connection - a table/view, a sheet tab. */
-export type ExternalDatasetRelation = {
+export type ConnectorRelation = {
   relationId: string; // opaque to callers; postgres encodes "schema.table"
   label: string;       // what the picker shows, e.g. "public.customers"
   kind: string;         // connector-specific, e.g. "table" | "view"
 };
 
-export type ExternalDatasetConnector = {
+export type Connector = {
   testAndSaveConnection: (input: UnknownObject) => Promise<{
     connectionId: string;
-    relations: ExternalDatasetRelation[];
+    relations: ConnectorRelation[];
   }>;
-  listRelations: (connectionId: string) => Promise<ExternalDatasetRelation[]>;
+  listRelations: (connectionId: string) => Promise<ConnectorRelation[]>;
   previewRelation: (
     connectionId: string,
     relationId: string,
@@ -458,7 +458,7 @@ export type ExternalDatasetConnector = {
 };
 
 // connectorRegistry.ts
-const CONNECTORS: Record<ExternalDatasetConnectorType, ExternalDatasetConnector> = {
+const CONNECTORS: Record<ConnectorType, Connector> = {
   postgres: createPostgresConnector(/* ... */),
 };
 ```
@@ -480,8 +480,8 @@ never `.../tables` and never a bespoke "layer2."
 
 | Route | In | Out (success) | Out (failure) |
 | --- | --- | --- | --- |
-| `POST /external-datasets/:connectorType/connections/test-and-save` | `{ workspaceId, connectionId?, ...connectorFields }` - for `postgres`: `{ name, host, port, databaseName, username, password, sslMode }`. `connectionId` present means "rotate this connection's credential," absent means "create a new one." | `{ connectionId, relations: ExternalDatasetRelation[] }` | `{ error: { code: "auth_failed" \| "unreachable" \| "ssl_required" \| "timeout" \| "unknown", message } }` |
-| `GET /external-datasets/:connectorType/connections/:connectionId/relations` | - | `{ relations: ExternalDatasetRelation[] }` | same error shape |
+| `POST /external-datasets/:connectorType/connections/test-and-save` | `{ workspaceId, connectionId?, ...connectorFields }` - for `postgres`: `{ name, host, port, databaseName, username, password, sslMode }`. `connectionId` present means "rotate this connection's credential," absent means "create a new one." | `{ connectionId, relations: ConnectorRelation[] }` | `{ error: { code: "auth_failed" \| "unreachable" \| "ssl_required" \| "timeout" \| "unknown", message } }` |
+| `GET /external-datasets/:connectorType/connections/:connectionId/relations` | - | `{ relations: ConnectorRelation[] }` | same error shape |
 | `GET /external-datasets/:connectorType/connections/:connectionId/relations/:relationId/preview` | - | `{ columns: DuckDbColumnSchema[], previewRows: UnknownObject[] }`, row count bounded by the existing `GlobalAppConfig.dataManagerApp.maxPreviewRows` | same error shape |
 | `GET /external-datasets/:connectorType/connections/:connectionId/relations/:relationId/rows` | - | the full relation as CSV text, capped per section 5.3's `maxRowsPerCall`/`maxBytesPerCall` - **exceeding the cap fails the request with a distinct `too_large` error rather than silently truncating rows** (a silently truncated analytics table is a correctness bug wearing a success response), read the same way `GoogleSheetsRoutes.ts` returns sheet rows today, so the wrapper transcodes it client-side exactly like Sheets does - **not** a second transcoding path | same error shape, plus `too_large` |
 
@@ -521,7 +521,7 @@ the *user's own* Google OAuth grant, fetched directly, where a Postgres
 connection is a *shared workspace secret* a server must broker on the
 caller's behalf. `external-datasets` is built connector-agnostic from day one
 specifically so a reworked Sheets implementation can register into it
-without a second redesign - `ExternalDatasetConnector`'s methods are already
+without a second redesign - `Connector`'s methods are already
 generic enough (`testAndSaveConnection` takes an arbitrary
 `connectorFields` object; nothing assumes a password-shaped secret), so
 migrating Sheets is expected to mean writing a `createGoogleSheetsConnector`
@@ -632,7 +632,7 @@ this spec adds (marked **new**).
 | 24 | `src/clients/qetl/wrappers/createDefaultRegistry.ts` | options field, delegate, `match` arm |
 | 25 | `src/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper.ts` | add `postgres_table` to the refusing arm |
 | 26 | `src/clients/qetl/QueryMediator/relationLoading.ts` | type guard, lookup, lease-bound CSV transcoder (the wrapper returns CSV per section 5.4's `rows` route, same as Sheets) |
-| 27 | `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts` | branch in `_getSnapshotDatasetBlob` - **note this is the exact spot Google Sheets' own known gap lives** (architecture doc section 13: "Snapshot publishing of an `all_columns` slice fails over Google Sheets, no Storage object exists"). Postgres will have the same gap unless this is addressed; at minimum, do not regress it silently - either fix both or document both as a known limitation in the same place |
+| 27 | `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts` | arm in `_getSnapshotDatasetBlob`'s exhaustive `match` on source type. `google_sheets` and `postgres_table` keep no parquet in Storage, so every slice of theirs, `all_columns` included, is read through the workspace query. `DashboardClient.publishSnapshotSources.test.ts` pins the path for every source type |
 | 28 | `getRelationSources.characterization.test.ts` | reader-per-source-type pin, add the `postgres_table` arm |
 | 29 | an executed-DuckDb test for the CSV-to-Parquet transcode, mirroring `acquireGoogleSheetRelation.executed.test.ts` | |
 
@@ -927,7 +927,7 @@ so each got a linking comment instead of a duplicate.
    (section 5.4), retiring `supabase/functions/google-sheets/` as a separate
    edge function. Not done as part of this spec because Sheets' access model
    (the user's own Google OAuth grant, fetched directly) differs in kind from
-   Postgres's shared workspace secret, but `ExternalDatasetConnector` is
+   Postgres's shared workspace secret, but `Connector` is
    already generic enough that this is expected to mean writing a
    `createGoogleSheetsConnector` implementation, not redesigning the
    interface. Leaving two parallel proxy endpoints indefinitely defeats the
