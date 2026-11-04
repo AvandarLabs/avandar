@@ -2609,7 +2609,7 @@ msgstr "{keyboardShortcut} to save"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
@@ -2901,7 +2901,7 @@ msgstr "Geometry support is still downloading. This can take a moment on a slow 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
@@ -3067,7 +3067,7 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 msgstr "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem.tsx
 msgid "Refresh from the database"
 msgstr "Refresh from the database"
 
@@ -3395,7 +3395,7 @@ msgstr "Table or view to import"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "e.g. cholera-outbreak-2024"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem.tsx
 msgid "Refresh from Google Sheets"
 msgstr "Refresh from Google Sheets"
 
@@ -3845,7 +3845,7 @@ msgid "Rose"
 msgstr "Rose"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "Are you sure you want to delete {0}?"
 
@@ -3888,7 +3888,7 @@ msgstr "Bar"
 msgid "No {conceptName} records yet"
 msgstr "No {conceptName} records yet"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "More dataset actions"
 msgstr "More dataset actions"
 
@@ -4841,7 +4841,7 @@ msgstr "Remove failed"
 #. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
 #: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} deleted successfully"
@@ -5695,7 +5695,7 @@ msgstr "Make internal"
 msgid "Detected"
 msgstr "Detected"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete Dataset"
 msgstr "Delete Dataset"
@@ -6702,7 +6702,7 @@ msgstr "Could not reach the assistant. Kept the rule-based results."
 msgid "{0} missing"
 msgstr "{0} missing"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "Dataset deleted"
 msgstr "Dataset deleted"
 
@@ -6925,7 +6925,7 @@ msgstr "Latitude and longitude must both be numbers."
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "Delete dataset"
@@ -7499,12 +7499,6 @@ msgstr "Original kept"
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} km"
 msgstr "{lengthValue} km"
-
-#. placeholder {0}: load.savedConnections?.length
-#. placeholder {1}: load.savedConnections?.length === 1 ? "database" : "databases"
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
-#~ msgid "{0} saved {1} available"
-#~ msgstr "{0} saved {1} available"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
