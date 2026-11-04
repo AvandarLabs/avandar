@@ -97,7 +97,7 @@ push that changes them.
 | `ava supabase status [--branch <name>]` | Reports which Supabase a branch uses, with its ports, keys, and endpoints.        |
 | `ava supabase start [--branch <name>]`  | Runs `supabase start` for that branch's Supabase.                                 |
 | `ava supabase stop [--branch <name>]`   | Runs `supabase stop` for that branch's Supabase.                                  |
-| `ava supabase prune`                    | Deletes local projects whose branch or worktree is gone. All start selected.      |
+| `ava supabase prune`                    | Deletes local projects whose branch or worktree is gone. Unselect any to keep.    |
 
 A local switch writes `SUPABASE_PROJECT_ID` and `SUPABASE_<SECTION>_PORT`
 variables into one managed block in `.env.development`, which the Supabase CLI
