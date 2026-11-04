@@ -2,6 +2,7 @@
 import type {
   SqlTableAliasConcept,
   SqlTableAliasConceptAttribute,
+  SqlTableAliasConceptStatus,
   SqlTableAliasDataset,
   SqlTableAliasT,
 } from "$/models/chat/SqlTableAlias/SqlTableAlias.types.ts";
@@ -13,4 +14,5 @@ export namespace SqlTableAlias {
   export type Dataset = SqlTableAliasDataset;
   export type Concept = SqlTableAliasConcept;
   export type ConceptAttribute = SqlTableAliasConceptAttribute;
+  export type ConceptStatus = SqlTableAliasConceptStatus;
 }

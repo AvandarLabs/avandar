@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 
 type Props = {
@@ -24,8 +25,14 @@ export function CaseTypeDraftManualEntrySection({
 }: Readonly<Props>): React.ReactNode {
   const { t } = useLingui();
   const [newAttributeName, setNewAttributeName] = useState("");
+  const isNewNameReserved =
+    ConceptStatus.isReservedAttributeName(newAttributeName);
 
   const addAttribute = (): void => {
+    // Keep a reserved name in the input so its error stays in view.
+    if (isNewNameReserved) {
+      return;
+    }
     editor.addManualEntryAttribute(newAttributeName);
     setNewAttributeName("");
   };
@@ -55,6 +62,11 @@ export function CaseTypeDraftManualEntrySection({
           value={newAttributeName}
           placeholder={t`Add a field, e.g. Review notes`}
           aria-label={t`Add a field filled in by hand`}
+          error={
+            isNewNameReserved
+              ? t`Every case type already has a status. Choose another name.`
+              : undefined
+          }
           onChange={(event) => {
             setNewAttributeName(event.currentTarget.value);
           }}
@@ -69,7 +81,7 @@ export function CaseTypeDraftManualEntrySection({
           size="sm"
           variant="subtle"
           aria-label={t`Add field`}
-          disabled={newAttributeName.trim().length === 0}
+          disabled={newAttributeName.trim().length === 0 || isNewNameReserved}
           onClick={addAttribute}
         >
           <IconPlus size={14} />

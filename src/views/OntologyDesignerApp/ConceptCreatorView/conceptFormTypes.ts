@@ -3,6 +3,8 @@ import { uuid } from "$/lib/uuid";
 import { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import { ManualEntryMapping } from "$/models/ontology/AttributeMapping/ManualEntryMapping/ManualEntryMapping.types";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
+import { makeDefaultStatusDrafts } from "@/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type {
@@ -66,6 +68,12 @@ export type ConceptFormValues = SetOptional<
   }>;
   datasetColumnAttributes: readonly AttributeFormValues[];
   manualEntryAttributes: readonly AttributeFormValues[];
+
+  /**
+   * The case type's statuses, in display order. `defaultStatusId`, from the
+   * concept insert type, names the one new records start in.
+   */
+  statuses: readonly ConceptStatus.Draft[];
 };
 
 export type ConceptFormSubmitValues = ConceptFormValues & {
@@ -79,6 +87,7 @@ export type ConceptFormType = FormType<
 
 export function getDefaultConceptFormValues(): ConceptFormValues {
   const conceptId: ConceptId = uuid();
+  const { statuses, defaultStatusId } = makeDefaultStatusDrafts();
 
   return Model.make("Concept", {
     id: conceptId,
@@ -89,6 +98,8 @@ export function getDefaultConceptFormValues(): ConceptFormValues {
     allowManualCreation: false,
     datasetColumnAttributes: [],
     manualEntryAttributes: [],
+    statuses,
+    defaultStatusId,
   });
 }
 
@@ -109,7 +120,9 @@ export function makeDefaultDatasetColumnAttribute({
   return Model.make("ConceptAttribute", {
     id: conceptAttributeId,
     conceptId,
-    name,
+    // A field takes its column's name, and the form has no input to rename
+    // it, so a column called "status" is renamed here rather than rejected.
+    name: ConceptStatus.toNonReservedAttributeName(name),
     description: undefined,
     dataType: datasetColumn.dataType,
     mappingType: "dataset_column",

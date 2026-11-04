@@ -1,0 +1,9 @@
+/* The virtualized rows are absolutely placed inside this box. */
+.individualNavbarList {
+  min-height: 0;
+  position: relative;
+}
+
+.individualNavbarEmptyIcon {
+  color: var(--mantine-color-neutral-5);
+}

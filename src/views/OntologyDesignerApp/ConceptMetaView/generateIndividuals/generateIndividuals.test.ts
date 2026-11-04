@@ -28,6 +28,7 @@ import type {
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
+import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { IndividualId } from "$/models/ontology/Individual/Individual.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -158,6 +159,7 @@ function _makeConcept(): BuildableConcept {
       createdAt: "2026-08-19T00:00:00.000Z",
       updatedAt: "2026-08-19T00:00:00.000Z",
       allowManualCreation: false,
+      defaultStatusId: uuid<ConceptStatus.Id>(),
     }),
     datasets: [],
     attributes: [
@@ -301,7 +303,7 @@ describe("generateIndividuals", () => {
     ]);
   });
 
-  it("never includes id, status, assigned_to, created_at, or updated_at in an upsert payload", async () => {
+  it("never includes id, status_id, assigned_to, created_at, or updated_at in an upsert payload", async () => {
     _mockSinglePage([{ external_id: "ext-1", name: "Jane Doe" }]);
 
     await generateIndividuals(_makeConcept());
@@ -310,7 +312,7 @@ describe("generateIndividuals", () => {
     const [{ data }] = bulkInsertMock.mock.calls[0]!;
     (data as Array<Record<string, unknown>>).forEach((row) => {
       expect(row).not.toHaveProperty("id");
-      expect(row).not.toHaveProperty("status");
+      expect(row).not.toHaveProperty("status_id");
       expect(row).not.toHaveProperty("assigned_to");
       expect(row).not.toHaveProperty("created_at");
       expect(row).not.toHaveProperty("updated_at");
@@ -325,7 +327,7 @@ describe("generateIndividuals", () => {
         conceptId: CONCEPT_ID,
         externalId: "ext-1",
         name: "Jane Doe",
-        status: "active",
+        statusId: uuid<ConceptStatus.Id>(),
         assignedTo: undefined,
         missingFromSourceAt: undefined,
         createdAt: "2026-08-19T00:00:00.000Z",
@@ -347,7 +349,7 @@ describe("generateIndividuals", () => {
         conceptId: CONCEPT_ID,
         externalId: "ext-gone",
         name: "Ghost Record",
-        status: "active",
+        statusId: uuid<ConceptStatus.Id>(),
         assignedTo: undefined,
         missingFromSourceAt: undefined,
         createdAt: "2026-08-19T00:00:00.000Z",

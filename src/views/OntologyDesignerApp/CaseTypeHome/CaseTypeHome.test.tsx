@@ -103,4 +103,17 @@ describe("CaseTypeHome", () => {
       screen.getByRole("button", { name: /new case type/i }),
     ).toBeInTheDocument();
   });
+
+  it("offers no new-case-type card when the caller handles no creation", () => {
+    render(
+      <CaseTypeHome
+        caseTypes={[{ id: "c1", name: "County", description: undefined }]}
+        onOpenCaseType={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: /new case type/i }),
+    ).not.toBeInTheDocument();
+  });
 });

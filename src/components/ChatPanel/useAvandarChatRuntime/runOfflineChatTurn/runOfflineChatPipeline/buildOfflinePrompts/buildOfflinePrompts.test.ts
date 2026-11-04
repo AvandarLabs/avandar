@@ -30,6 +30,16 @@ const SCHEMA_WITH_CONCEPT = {
   conceptAttributes: [{ concept_id: CONCEPT_ID, name: "status" }],
 } as const;
 
+const SCHEMA_WITH_STATUSES = {
+  ...SCHEMA,
+  concepts: [{ id: CONCEPT_ID, name: "Case" }],
+  conceptAttributes: [{ concept_id: CONCEPT_ID, name: "district" }],
+  conceptStatuses: [
+    { concept_id: CONCEPT_ID, name: "Confirmed", position: 1 },
+    { concept_id: CONCEPT_ID, name: "Suspected", position: 0 },
+  ],
+} as const;
+
 describe("buildOfflineSqlPrompt", () => {
   it("requires resolved dataset FROM by alias and SQL-only output", () => {
     const prompt = buildOfflineSqlPrompt({
@@ -62,6 +72,19 @@ describe("buildOfflineSqlPrompt", () => {
 
     expect(prompt).toContain("- c0: Case (status)");
     expect(prompt).not.toContain(CONCEPT_ID);
+  });
+
+  it("lists a case type's statuses in position order offline", () => {
+    const prompt = buildOfflineSqlPrompt({
+      schema: SCHEMA_WITH_STATUSES,
+      pageContext: ChatPageContext.createDataExplorerViewContext(),
+      analysisSummary: "Count confirmed cases",
+      lastUserPrompt: "how many confirmed cases",
+    });
+
+    expect(prompt).toContain(
+      "- c0: Case (district, status: Suspected | Confirmed)",
+    );
   });
 });
 

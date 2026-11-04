@@ -1,12 +1,14 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { toCsvColumn } from "@/clients/qetl/QueryMediator/conceptRelation/toCsvColumn/toCsvColumn";
+import { toCsvRows } from "@/clients/qetl/QueryMediator/conceptRelation/toCsvRows/toCsvRows";
 import type { ConceptRelationRef } from "$/models/relations/RelationRef/RelationRef.types";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { ConceptSpineRow } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 
 /**
- * The spine table's name suffix, and the one column it carries.
+ * The spine table's name suffix, and the two columns it carries.
  *
  * `concept_<id>__individuals` deliberately keeps the `concept_` prefix:
  * `RelationRef.fromTableName` strips that prefix and then tests
@@ -14,9 +16,13 @@ import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoo
  * `undefined` rather than to the concept it belongs to. A name that resolved to
  * a relation would make the SQL analyzer treat the spine as a queryable
  * relation and try to load it.
+ *
+ * The status column takes the Data Explorer column's name, so the spine, the
+ * view, and the column a user picks all say `status`.
  */
 const SPINE_TABLE_SUFFIX = "__individuals";
 const SPINE_KEY_COLUMN = "external_id";
+const SPINE_STATUS_COLUMN = ConceptStatusColumn.COLUMN_NAME;
 
 /** Names the spine table that holds one concept's authoritative rows. */
 export function getConceptSpineTableNameFromRef(
@@ -43,12 +49,12 @@ export function getConceptSpineTableNameFromRef(
  */
 function _assertExternalIdsLoadable(
   options: Readonly<{
-    externalIds: readonly string[];
+    spineRows: readonly ConceptSpineRow[];
     ref: ConceptRelationRef;
   }>,
 ): void {
-  const emptyIdCount = options.externalIds.filter((externalId) => {
-    return externalId === "";
+  const emptyIdCount = options.spineRows.filter((row) => {
+    return row.externalId === "";
   }).length;
   if (emptyIdCount > 0) {
     throw new Error(
@@ -84,7 +90,8 @@ async function _createEmptyConceptSpine(
   });
   await DuckDbClient.runRawQuery(
     `CREATE TABLE ${quoteSqlIdentifier(options.spineTableName)} ` +
-      `(${quoteSqlIdentifier(SPINE_KEY_COLUMN)} VARCHAR)`,
+      `(${quoteSqlIdentifier(SPINE_KEY_COLUMN)} VARCHAR, ` +
+      `${quoteSqlIdentifier(SPINE_STATUS_COLUMN)} VARCHAR)`,
     { datasetDuckDbLease: options.datasetDuckDbLease },
   );
 }
@@ -104,12 +111,13 @@ async function _createEmptyConceptSpine(
  * SQL, duplicating the one injection surface the codebase already has
  * (`AttributeAssertionClient`'s `WHERE "<pk>" = '<externalId>'`).
  *
- * The key column is pinned to `VARCHAR` rather than sniffed, because
+ * Both columns are pinned to `VARCHAR` rather than sniffed. The key because
  * `individuals.external_id` is `text` in Postgres and a sniffed type would vary
  * with the data: all-numeric ids would arrive as `BIGINT` on one concept and as
  * `VARCHAR` on the next. Every comparison against a dataset's key column casts
  * both sides to text (`getEntityKeyComparisonSql`), so a pinned `VARCHAR` is
- * the type that makes those comparisons mean what Postgres means.
+ * the type that makes those comparisons mean what Postgres means. The status
+ * because it is a name, whatever it looks like.
  *
  * **The caller must hold a lease covering the spine table's name**, not just
  * the contributing datasets': `loadCsv` coordinates on the table name it is
@@ -126,14 +134,14 @@ async function _createEmptyConceptSpine(
 export async function loadConceptSpine(
   options: Readonly<{
     ref: ConceptRelationRef;
-    externalIds: readonly string[];
+    spineRows: readonly ConceptSpineRow[];
     datasetDuckDbLease: DatasetDuckDbLease;
   }>,
 ): Promise<string> {
   _assertExternalIdsLoadable(options);
   const spineTableName = getConceptSpineTableNameFromRef(options.ref);
 
-  if (options.externalIds.length === 0) {
+  if (options.spineRows.length === 0) {
     await _createEmptyConceptSpine({
       spineTableName,
       datasetDuckDbLease: options.datasetDuckDbLease,
@@ -143,8 +151,16 @@ export async function loadConceptSpine(
 
   await DuckDbClient.loadCsv({
     tableName: spineTableName,
-    fileText: toCsvColumn(SPINE_KEY_COLUMN, options.externalIds),
-    columns: [[SPINE_KEY_COLUMN, "VARCHAR"]],
+    fileText: toCsvRows({
+      columnNames: [SPINE_KEY_COLUMN, SPINE_STATUS_COLUMN],
+      rows: options.spineRows.map((row) => {
+        return [row.externalId, row.statusName];
+      }),
+    }),
+    columns: [
+      [SPINE_KEY_COLUMN, "VARCHAR"],
+      [SPINE_STATUS_COLUMN, "VARCHAR"],
+    ],
     datasetDuckDbLease: options.datasetDuckDbLease,
   });
   return spineTableName;

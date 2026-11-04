@@ -37,6 +37,25 @@ describe("truncateSchemaForOffline", () => {
       /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
     );
   });
+
+  it("keeps the statuses of the case types it keeps and drops the rest", () => {
+    const concepts = Array.from({ length: 13 }, (_, index) => {
+      return { id: `c-${index}`, name: `Case type ${index}` };
+    });
+    const truncated = truncateSchemaForOffline({
+      datasets: [],
+      columns: [],
+      concepts,
+      conceptStatuses: [
+        { concept_id: "c-0", name: "Active", position: 0 },
+        { concept_id: "c-12", name: "Active", position: 0 },
+      ],
+    });
+
+    expect(truncated.conceptStatuses).toEqual([
+      { concept_id: "c-0", name: "Active", position: 0 },
+    ]);
+  });
 });
 
 function formatUuidSchemaBlock(schema: {

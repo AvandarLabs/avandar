@@ -1,195 +1,78 @@
-import { Paper } from "@avandar/ui";
-import {
-  isNonNullish,
-  makeIdLookupMap,
-  makeMap,
-  prop,
-  propEq,
-  unknownToString,
-  where,
-} from "@avandar/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Container, Loader, Stack, Title } from "@mantine/core";
+import { where } from "@avandar/utils";
+import { Trans } from "@lingui/react/macro";
+import { Stack } from "@mantine/core";
 import { useMemo } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
-import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
+import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
+import { AppView } from "@/components/layouts/AppView/AppView";
+import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
+import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
+import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { ActivityBlock } from "@/views/IndividualManagerApp/SingleIndividualView/ActivityBlock";
-import { RecordAttributesList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
+import { RecordDetailsSection } from "@/views/IndividualManagerApp/SingleIndividualView/RecordDetailsSection";
+import { RecordRail } from "@/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail";
+import { RecordStatusControl } from "@/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusControl";
+import { useHydratedIndividual } from "@/views/IndividualManagerApp/SingleIndividualView/useHydratedIndividual";
+import { useRecordStatusChange } from "@/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange";
 import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Individual } from "$/models/ontology/Individual/Individual";
-import type { RecordAttributeRow } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
-
-type HydratedIndividual = Individual.T & {
-  identifierAttribute?: ConceptAttribute.T;
-  labelAttribute?: ConceptAttribute.T;
-  attributes?: ConceptAttribute.T[];
-  assertions?: Array<
-    AttributeAssertion.T & {
-      attributeName?: string;
-      sourceType?: DatasetSource.SourceType;
-      sourceName?: string;
-    }
-  >;
-  labelValue?: AttributeAssertion.T;
-};
-
-/**
- * Hydrates an individual with its concept attributes and their assertions.
- */
-function useHydratedIndividual({
-  concept,
-  individual,
-}: {
-  concept: Concept.T;
-  individual: Individual.T;
-}): [HydratedIndividual, boolean] {
-  // TODO(jpsyx): move this to a generalized implementation of useHydration
-  const [conceptAttributes, isLoadingConceptAttributes] =
-    ConceptAttributeClient.useGetAll({
-      where: { concept_id: { eq: concept.id } },
-    });
-  const [attributeAssertions, isLoadingAttributeAssertions] =
-    AttributeAssertionClient.withLogger().useGetAttributeAssertions({
-      workspaceId: individual.workspaceId,
-      individualId: individual.id,
-      conceptAttributes: conceptAttributes ?? [],
-    });
-
-  const datasetIds = useMemo(() => {
-    return [
-      ...new Set(
-        (attributeAssertions ?? []).map(prop("datasetId")).filter(isNonNullish),
-      ),
-    ];
-  }, [attributeAssertions]);
-
-  const [datasets] = DatasetClient.useGetAll(where("id", "in", datasetIds));
-
-  const datasetsMap = useMemo(() => {
-    return datasets ? makeMap(datasets, { keyFn: prop("id") }) : undefined;
-  }, [datasets]);
-
-  // TODO(jpsyx): move this to a module that can also use cacheing.
-  const hydratedIndividual = useMemo(() => {
-    let configInfo = undefined;
-    let assertionsInfo = undefined;
-    let attributesById:
-      | Map<ConceptAttribute.Id, ConceptAttribute.T>
-      | undefined = undefined;
-
-    if (conceptAttributes) {
-      const identifierAttribute = conceptAttributes.find(
-        propEq("isIdentifier", true),
-      );
-      const labelAttribute = conceptAttributes.find(propEq("isLabel", true));
-      attributesById = makeIdLookupMap(conceptAttributes);
-      configInfo = {
-        identifierAttribute,
-        labelAttribute,
-        attributes: conceptAttributes,
-      };
-    }
-
-    if (attributeAssertions) {
-      const assertionsByAttributeId = makeMap(attributeAssertions, {
-        keyFn: prop("conceptAttributeId"),
-        valueFn: (assertion) => {
-          const config = attributesById?.get(assertion.conceptAttributeId);
-          const dataset = assertion.datasetId
-            ? datasetsMap?.get(assertion.datasetId)
-            : undefined;
-          return {
-            ...assertion,
-            attributeName: config?.name,
-            sourceType: dataset?.sourceType ?? dataset?.sourceType,
-            sourceName: dataset?.name,
-          };
-        },
-      });
-
-      const labelAttributeId = configInfo?.labelAttribute?.id;
-
-      assertionsInfo = {
-        assertions: [...assertionsByAttributeId.values()],
-        labelValue: labelAttributeId
-          ? assertionsByAttributeId.get(labelAttributeId)
-          : undefined,
-      };
-    }
-
-    return {
-      ...individual,
-      ...configInfo,
-      ...assertionsInfo,
-    };
-  }, [individual, conceptAttributes, attributeAssertions, datasetsMap]);
-
-  return [
-    hydratedIndividual,
-    isLoadingConceptAttributes || isLoadingAttributeAssertions,
-  ];
-}
+import type { ReactNode } from "react";
 
 type Props = {
   concept: Concept.T;
   individual: Individual.T;
 };
 
+/**
+ * One record: its name with its status beside it, its attribute values, and
+ * its activity, with where it came from in the rail.
+ *
+ * The status control is a menu for a Case Records editor and a badge for
+ * everyone else. A change saves at once and refreshes every view that shows
+ * the record's status, this page's loader included.
+ */
 export function SingleIndividualView({
   concept,
   individual,
-}: Props): JSX.Element {
-  const { t } = useLingui();
-  const [hydratedIndividual, isLoadingHydratedIndividual] =
-    useHydratedIndividual({
-      concept,
-      individual,
-    });
-
-  const attributeRows: RecordAttributeRow[] | undefined = useMemo(() => {
-    if (!hydratedIndividual.assertions) {
-      return undefined;
-    }
-    return hydratedIndividual.assertions.map((assertion) => {
-      return {
-        name: assertion.attributeName ?? t`Loading...`,
-        value: assertion.value,
-        sourceType: assertion.sourceType,
-        sourceName: assertion.sourceName,
-      };
-    });
-  }, [hydratedIndividual.assertions, t]);
+}: Readonly<Props>): ReactNode {
+  const [hydratedIndividual] = useHydratedIndividual({ concept, individual });
+  const [statuses] = ConceptStatusClient.useGetAll(
+    where("concept_id", "eq", concept.id),
+  );
+  const canChangeStatus = useHasPermission("case_records__can_edit_record");
+  const { displayedStatusId, isSaving, changeStatus } =
+    useRecordStatusChange(individual);
+  const sortedStatuses = useMemo(() => {
+    return statuses ? ConceptStatus.sortByPosition(statuses) : undefined;
+  }, [statuses]);
 
   return (
-    <Container py="md">
-      <Stack gap="lg" maw={720}>
-        <Title order={2} fw={650}>
-          {isLoadingHydratedIndividual ? (
-            <Loader size="sm" />
-          ) : (
-            unknownToString(hydratedIndividual.name)
-          )}
-        </Title>
-        <Paper p="lg">
-          <Stack gap="lg">
-            <Title order={4}>
-              <Trans>Details</Trans>
-            </Title>
-            {attributeRows === undefined ? (
-              <Loader />
-            ) : (
-              <RecordAttributesList attributes={attributeRows} />
-            )}
-          </Stack>
-        </Paper>
-        <Paper p="lg">
-          <ActivityBlock />
-        </Paper>
-      </Stack>
-    </Container>
+    <AppView>
+      <AppViewHeader
+        title={individual.name}
+        titleAccessory={
+          sortedStatuses ? (
+            <RecordStatusControl
+              statuses={sortedStatuses}
+              currentStatusId={displayedStatusId}
+              canEdit={canChangeStatus}
+              isSaving={isSaving}
+              onChange={changeStatus}
+            />
+          ) : null
+        }
+      />
+      <AppViewBody
+        rail={<RecordRail concept={concept} individual={individual} />}
+      >
+        <Stack gap="xl">
+          <RecordDetailsSection hydratedIndividual={hydratedIndividual} />
+          <AppViewSection title={<Trans>Activity</Trans>}>
+            <ActivityBlock />
+          </AppViewSection>
+        </Stack>
+      </AppViewBody>
+    </AppView>
   );
 }

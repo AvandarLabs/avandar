@@ -29,3 +29,10 @@ export type SqlTableAliasConceptAttribute = {
   concept_id: string;
   name: string;
 };
+
+/** One status of a concept, listed after its attributes in the schema block. */
+export type SqlTableAliasConceptStatus = {
+  concept_id: string;
+  name: string;
+  position: number;
+};

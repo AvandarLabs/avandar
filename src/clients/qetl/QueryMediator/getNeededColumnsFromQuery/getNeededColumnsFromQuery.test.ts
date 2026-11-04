@@ -12,7 +12,7 @@ const CONCEPT_ID = "cccccccc-3333-4333-8333-cccccccccccc" as Concept.Id;
 const CONCEPT_PLAN: ConceptRelationPlan = {
   ref: { kind: "concept", id: CONCEPT_ID },
   contributingDatasetIds: [DATASET_ID],
-  externalIds: ["p1"],
+  spineRows: [{ externalId: "p1", statusName: "Active" }],
   attributeColumns: [
     {
       kind: "dataset_column",

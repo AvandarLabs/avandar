@@ -55,7 +55,7 @@ function _covidCase(
     identities: [{ datasetId: DATASET_ID, primaryKeyColumnId: PK_COLUMN_ID }],
     attributes: [
       {
-        name: "Status",
+        name: "Case status",
         kind: "dataset_column",
         datasetId: DATASET_ID,
         columnId: STATUS_COLUMN_ID,
@@ -98,7 +98,7 @@ describe("createdCaseTypeToFormValues", () => {
     const label = formValues.attributes.find((attribute) => {
       return attribute.isLabel;
     });
-    expect(label?.name).toBe("Status");
+    expect(label?.name).toBe("Case status");
     expect(label?.mappings.datasetColumn.datasetColumnId).toBe(
       STATUS_COLUMN_ID,
     );
@@ -115,7 +115,7 @@ describe("createdCaseTypeToFormValues", () => {
       caseType: _covidCase({
         attributes: [
           {
-            name: "Status",
+            name: "Case status",
             kind: "dataset_column",
             datasetId: DATASET_ID,
             columnId: STATUS_COLUMN_ID,
@@ -129,7 +129,7 @@ describe("createdCaseTypeToFormValues", () => {
     });
 
     const status = formValues.attributes.find((attribute) => {
-      return attribute.name === "Status";
+      return attribute.name === "Case status";
     });
     expect(status?.mappings.datasetColumn.valuePickerRuleType).toBe("max");
   });
@@ -142,7 +142,7 @@ describe("createdCaseTypeToFormValues", () => {
     });
 
     const status = formValues.attributes.find((attribute) => {
-      return attribute.name === "Status";
+      return attribute.name === "Case status";
     });
     expect(status?.mappings.datasetColumn.valuePickerRuleType).toBe(
       "most_frequent",
@@ -161,7 +161,7 @@ describe("createdCaseTypeToFormValues", () => {
         ],
         attributes: [
           {
-            name: "Status",
+            name: "Case status",
             kind: "dataset_column",
             datasetId: DATASET_ID,
             columnId: STATUS_COLUMN_ID,
@@ -257,5 +257,70 @@ describe("createdCaseTypeToFormValues", () => {
     expect(keyAttributes).toHaveLength(1);
     expect(keyAttributes[0]?.name).toBe("County code");
     expect(keyAttributes[0]?.isIdentifier).toBe(true);
+  });
+
+  it("starts a chat-created case type with the default status set", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: _covidCase(),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(
+      formValues.statuses.map((status) => {
+        return status.name;
+      }),
+    ).toEqual(["Active", "Inactive"]);
+    expect(formValues.defaultStatusId).toBe(formValues.statuses[0]?.id);
+  });
+
+  it("renames a field called status so it does not collide with the built-in status", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: _covidCase({
+        attributes: [
+          {
+            name: "Status",
+            kind: "dataset_column",
+            datasetId: DATASET_ID,
+            columnId: STATUS_COLUMN_ID,
+            isLabel: true,
+          },
+          { name: "status", kind: "manual_entry" },
+        ],
+      }),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(
+      formValues.attributes
+        .map((attribute) => {
+          return attribute.name;
+        })
+        .filter((name) => {
+          return name.toLowerCase().startsWith("status");
+        }),
+    ).toEqual(["Status (attribute)", "status (attribute)"]);
+  });
+
+  it("starts a chat-created case type with the statuses chat proposed", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: _covidCase({
+        statuses: [
+          { name: "Suspected", description: "", color: "#fab005" },
+          { name: "Confirmed", description: "", color: "#fa5252" },
+        ],
+        defaultStatusName: "Confirmed",
+      }),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(
+      formValues.statuses.map((status) => {
+        return status.name;
+      }),
+    ).toEqual(["Suspected", "Confirmed"]);
+    expect(formValues.defaultStatusId).toBe(formValues.statuses[1]?.id);
   });
 });

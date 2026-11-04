@@ -68,4 +68,36 @@ describe("buildCaseManagerSystemPrompt", () => {
     expect(prompt).toContain("long-us-deaths.csv id=dataset-1");
     expect(prompt).toContain("state (varchar id=column-1)");
   });
+
+  it("asks for a described status set when the domain implies a workflow", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain("fill `statuses`");
+    expect(prompt).toContain("`defaultStatusName`");
+    expect(prompt).toContain("one-sentence description");
+  });
+
+  it("tells the model every case type already has a built-in status", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain('never propose an attribute named "status"');
+  });
+
+  it("no longer suggests a manual-entry triage status", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).not.toContain("triage status");
+  });
 });

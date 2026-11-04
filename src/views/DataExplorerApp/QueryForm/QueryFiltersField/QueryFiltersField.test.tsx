@@ -82,7 +82,10 @@ describe("QueryFiltersField", () => {
     const originalColumn = COLUMNS[0]!;
     const renamedColumn = {
       ...originalColumn,
-      baseColumn: { ...originalColumn.baseColumn, name: "County" },
+      baseColumn: {
+        ...(originalColumn.baseColumn as DatasetColumn.T),
+        name: "County",
+      },
     };
 
     rerender(

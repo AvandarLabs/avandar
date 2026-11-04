@@ -1,6 +1,7 @@
 import { Model } from "@avandar/models";
 import { propEq } from "@avandar/utils";
 import { expect, it } from "vitest";
+import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { makeFilterColumnFromStructuredQuery } from "$/models/queries/StructuredQuery/structuredQueryToSql/makeFilterColumnFromStructuredQuery";
@@ -93,11 +94,11 @@ const _FIXTURE_SQL = `
   ) AS t(pop_key, population);
 
   CREATE TABLE "${_CONCEPT_TABLE_NAME}" AS SELECT * FROM (VALUES
-    ('p1', 'North', 5),
-    ('p2', 'North', 2),
-    ('p3', 'South', 3),
-    ('p4', 'East', 1)
-  ) AS t(external_id, region, headcount);
+    ('p1', 'North', 5, 'Confirmed'),
+    ('p2', 'North', 2, 'Suspected'),
+    ('p3', 'South', 3, 'Confirmed'),
+    ('p4', 'East', 1, 'Ruled out')
+  ) AS t(external_id, region, headcount, status);
 `;
 
 /** A dataset whose `id` is used verbatim as the FROM table name. */
@@ -154,6 +155,22 @@ function _makeConceptAttributeColumn(
     }),
     aggregation: args.aggregation,
   }) as unknown as QueryColumnRead;
+}
+
+/**
+ * A query column over the fixture concept's built-in `status` column, built
+ * with the same `ConceptStatusColumn.fromConceptId` the Data Explorer uses, so
+ * its name is the one the concept view emits.
+ */
+function _makeConceptStatusColumn(args: {
+  id: string;
+  aggregation?: QueryAggregationTypeT;
+}): QueryColumnRead {
+  return Model.make("QueryColumn", {
+    id: args.id as QueryColumnId,
+    baseColumn: ConceptStatusColumn.fromConceptId(_CONCEPT_ID as Concept.Id),
+    aggregation: args.aggregation,
+  });
 }
 
 /**
@@ -255,6 +272,7 @@ export const StructuredQueryTestFixtures = {
   _makeColumn,
   _makeConcept,
   _makeConceptAttributeColumn,
+  _makeConceptStatusColumn,
   _makeQuery,
   _normalizeRow,
   _runQuery,

@@ -61,7 +61,7 @@ describe("fetchWorkspaceSchema", () => {
     ]);
   });
 
-  it("does not query concept attributes when the workspace has no concepts", async () => {
+  it("does not query concept attributes or statuses when the workspace has no concepts", async () => {
     const fake = createFakeClient({
       datasets: [
         { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", name: "Cholera" },
@@ -79,5 +79,30 @@ describe("fetchWorkspaceSchema", () => {
     expect(schema.concepts).toEqual([]);
     expect(schema.conceptAttributes).toEqual([]);
     expect(fake.queriedTables).not.toContain("concept_attributes");
+    expect(schema.conceptStatuses).toEqual([]);
+    expect(fake.queriedTables).not.toContain("concept_statuses");
+  });
+
+  it("returns each case type's status names and positions", async () => {
+    const fake = createFakeClient({
+      datasets: [],
+      dataset_columns: [],
+      concepts: [{ id: CONCEPT_ID, name: "Case" }],
+      concept_attributes: [],
+      concept_statuses: [
+        { concept_id: CONCEPT_ID, name: "Suspected", position: 0 },
+        { concept_id: CONCEPT_ID, name: "Confirmed", position: 1 },
+      ],
+    });
+
+    const schema = await fetchWorkspaceSchema({
+      supabaseClient: fake.supabaseClient,
+      workspaceId: WORKSPACE_ID,
+    });
+
+    expect(schema.conceptStatuses).toEqual([
+      { concept_id: CONCEPT_ID, name: "Suspected", position: 0 },
+      { concept_id: CONCEPT_ID, name: "Confirmed", position: 1 },
+    ]);
   });
 });

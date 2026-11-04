@@ -123,7 +123,7 @@ type DatasetIdFilter = { where?: { id?: { in?: readonly Dataset.Id[] } } };
 const CONCEPT_PLAN: ConceptRelationPlan = {
   ref: { kind: "concept", id: CONCEPT_ID },
   contributingDatasetIds: [DATASET_ID],
-  externalIds: ["p1"],
+  spineRows: [{ externalId: "p1", statusName: "Active" }],
   attributeColumns: [
     {
       kind: "dataset_column",

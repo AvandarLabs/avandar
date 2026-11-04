@@ -17,8 +17,8 @@
  *
  * Today's split (every entry is a judgment call, review in the PR):
  *   - ACTIVE: dataset definitions and their per-format detail rows,
- *     catalog listings, dashboards, concepts + their attributes + attribute
- *     mappings, individuals, user profile, plus `workspaces` and
+ *     catalog listings, dashboards, concepts + their statuses, attributes,
+ *     and attribute mappings, individuals, user profile, plus `workspaces` and
  *     `workspace_memberships` so the workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
  *     billing, sensitive OAuth tokens, admin-only signups, legacy role
@@ -43,6 +43,7 @@ const ACTIVE_TABLES = [
   "data_catalog_listings__relation_columns",
   "dashboards",
   "concepts",
+  "concept_statuses",
   "concept_attributes",
   "attribute_mappings__dataset_column",
   "attribute_mappings__manual_entry",

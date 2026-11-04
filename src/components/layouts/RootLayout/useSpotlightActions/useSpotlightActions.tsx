@@ -1,4 +1,5 @@
 import { clearOpfs } from "@avandar/browser-utils";
+import { isDefined } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
@@ -12,6 +13,7 @@ import { useMemo } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { Logger } from "@/utils/Logger";
 import { notifySuccess } from "@/utils/notifications/notify";
 
@@ -22,6 +24,10 @@ export function useSpotlightActions(
   const router = useRouter();
   const { t } = useLingui();
   const appVersion = import.meta.env.VITE_APP_VERSION;
+  const canViewCaseTypes = useHasPermission("case_types__can_view_case_type");
+  const canCreateCaseType = useHasPermission(
+    "case_types__can_create_case_type",
+  );
 
   const navigationActions = useMemo(() => {
     const spotlightLinks = [
@@ -30,9 +36,13 @@ export function useSpotlightActions(
       SpotlightLinks.dataManagerHome(workspaceSlug),
       SpotlightLinks.dataImport(workspaceSlug),
       SpotlightLinks.dataExplorer(workspaceSlug),
-      SpotlightLinks.ontologyDesignerHome(workspaceSlug),
-      SpotlightLinks.ontologyDesignerCreatorView(workspaceSlug),
-    ];
+      canViewCaseTypes
+        ? SpotlightLinks.ontologyDesignerHome(workspaceSlug)
+        : undefined,
+      canCreateCaseType
+        ? SpotlightLinks.ontologyDesignerCreatorView(workspaceSlug)
+        : undefined,
+    ].filter(isDefined);
 
     return spotlightLinks.map(
       ({
@@ -51,7 +61,7 @@ export function useSpotlightActions(
         };
       },
     );
-  }, [router, workspaceSlug]);
+  }, [router, workspaceSlug, canViewCaseTypes, canCreateCaseType]);
 
   const devActions = useMemo(() => {
     if (import.meta.env.DEV) {

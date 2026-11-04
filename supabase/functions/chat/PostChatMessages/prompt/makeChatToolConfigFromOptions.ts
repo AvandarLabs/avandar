@@ -1,5 +1,7 @@
-import { propEq } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { buildDataExplorerToolDefinitions } from "@sbfn/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts";
+import { MAX_PROPOSED_STATUSES } from "@sbfn/chat/PostChatMessages/parsing/parseProposedCaseStatuses.ts";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 
 const DASHBOARD_TOOL_DEFINITIONS = [
@@ -221,7 +223,7 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
           manualEntryAttributes: {
             type: "array",
             description:
-              "Fields users fill in by hand that no dataset column supplies, such as review notes or a triage status.",
+              "Fields users fill in by hand that no dataset column supplies, such as review notes. Never a field for where a case stands: every case type already has statuses.",
             items: {
               type: "object",
               properties: {
@@ -235,6 +237,41 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
               required: ["name", "isIncluded"],
               additionalProperties: false,
             },
+          },
+          statuses: {
+            type: "array",
+            minItems: 1,
+            maxItems: MAX_PROPOSED_STATUSES,
+            description:
+              "The stages one case moves through, in workflow order, when the case type implies a workflow (an investigation, an application, an enrollment). Leave it out when cases have no workflow; the case type then starts with Active and Inactive.",
+            items: {
+              type: "object",
+              properties: {
+                name: {
+                  type: "string",
+                  description:
+                    "Short status name the people working the cases already use, unique within the case type. For example Suspected.",
+                },
+                description: {
+                  type: "string",
+                  description:
+                    "One sentence, written for the people working the cases, saying when a case belongs in this status. For example: A lab test came back positive.",
+                },
+                color: {
+                  type: "string",
+                  enum: ConceptStatus.PALETTE.map(prop("hex")),
+                  description:
+                    "Optional badge color. Leave it out to have a free color assigned.",
+                },
+              },
+              required: ["name", "description"],
+              additionalProperties: false,
+            },
+          },
+          defaultStatusName: {
+            type: "string",
+            description:
+              "The status a new case starts in. Must be one of `statuses`. Defaults to the first.",
           },
         },
         required: [

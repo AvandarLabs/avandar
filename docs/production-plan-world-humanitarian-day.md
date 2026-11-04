@@ -244,22 +244,26 @@ re-writes all rows (no incremental sync).
 - `[Depends on: touches P2/P0 for materialization; BLOCKS: P5b, P5c case-mgmt]`
 
 ### P5b. Configurable TBox (workspace-configurable schema)
-**Current state:** `Individual.status` is a free `string` defaulted to `active`;
-status options are hard-coded in a stub UI. Nothing configurable.
+**Current state:** Status sets ship (P5b.1): each case type has its own
+statuses in `concept_statuses`, and every record points at one through
+`individuals.status_id`. Enumerations and relations are not configurable yet.
 
-- P5b.1 `[NEW]` Configurable **status sets** per TBox (e.g. Suspected →
+- P5b.1 `[DONE]` Configurable **status sets** per TBox (e.g. Suspected →
   Probable → Confirmed → Recovered/Deceased for a case; org can define their
-  own).
+  own). Each status has a name, a description, a palette color, an order, and
+  one default per case type, edited in the create form, the chat draft card,
+  and the case type page. Spec:
+  `docs/superpowers/specs/2026-10-25-case-statuses-design.md`.
 - P5b.2 `[NEW]` Configurable enumerations / controlled vocabularies for fields.
 - P5b.3 `[NEW]` Configurable relations (from P5.2) exposed in the designer.
 - P5b.4 `[NEW]` LLM-assisted TBox authoring (see P5c.1).
 - `[Depends on: P5]`
 
 ### P5c. Case Management product (evolve legacy ontology → configurable cases)
-**Current state:** Case-management UI is **stubs with no backend**:
-`ActivityBlock` (comments) calls `notifyNotImplemented`; `StatusPill` is a
-hard-coded combobox with no persistence; `Individual.assignedTo` column exists with
-no writer/UI. Greenfield.
+**Current state:** Status workflow and the records list's status filter ship
+(P5c.4, and P5c.6 except the assignee filter). Comments and assignment are still **stubs with no backend**:
+`ActivityBlock` (comments) calls `notifyNotImplemented`, and
+`Individual.assignedTo` exists with no writer or UI.
 
 - P5c.1 `[NEW]` **LLM-configurable case types**: describe a domain in natural
   language ("cholera outbreak investigation") → generate a TBox (fields,
@@ -268,14 +272,22 @@ no writer/UI. Greenfield.
   wire the existing Tiptap editor). Includes @mentions.
 - P5c.3 `[NEW]` **Assignment**: assign a case (ABox) to a user/user-group;
   persist `assignedTo`; "assigned to me" views.
-- P5c.4 `[NEW]` **Status workflow**: set/track status from the configurable set
-  (P5b.1); status change history.
+- P5c.4 `[DONE, except history]` **Status workflow**: set/track status from the
+  configurable set (P5b.1). A record's status changes from the record page,
+  with each status's description on hover; status is a column in the Data
+  Explorer and in chat's schema, and chat proposes a status set when it drafts a
+  case type. Status change history moved to P5c.9.
 - P5c.5 `[NEW]` **Activity/audit log** (status changes, assignments, edits).
-- P5c.6 `[NEW]` ABox **list/grid view** with filtering by status/assignee
-  (today there's only a virtualized navbar + single-individual detail).
+- P5c.6 `[PARTIAL]` ABox **list/grid view** with filtering by status/assignee.
+  Done: the records list filters by status and counts the matching records.
+  Not done: filtering by assignee, which waits on assignment (P5c.3).
 - P5c.7 `[NEW]` Manual case creation + edit (uses P5.4 manual_entry).
 - P5c.8 `[NEW]` Notifications for assignment/mention/status change (reuse email
   client / in-app).
+- P5c.9 `[NEW]` **Case change history**: record who changed what on a case and
+  when, across status, assignment, and edits, and show it on the record page.
+  Covers the status change history left out of P5c.4 and feeds P5c.5. Kept out
+  of the status sets work on purpose (case statuses spec, follow-up 1).
 - `[Depends on: P5, P5b, P3 (assignee = permission principal)]`
 
 ---

@@ -64,6 +64,17 @@ export function truncateSchemaForOffline(
       return keptConceptIds.has(attribute.concept_id);
     },
   );
+  // Statuses are kept whole for every kept case type: they are what tells the
+  // model which values `status` can hold.
+  const conceptStatuses = (schema.conceptStatuses ?? []).filter((status) => {
+    return keptConceptIds.has(status.concept_id);
+  });
 
-  return { datasets: trimmedDatasets, columns, concepts, conceptAttributes };
+  return {
+    datasets: trimmedDatasets,
+    columns,
+    concepts,
+    conceptAttributes,
+    conceptStatuses,
+  };
 }

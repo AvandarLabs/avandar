@@ -88,6 +88,7 @@ export const QueriesRoutes = defineRoutes<QueriesAPI>("queries", {
             columns: schema.columns,
             concepts: schema.concepts,
             conceptAttributes: schema.conceptAttributes,
+            conceptStatuses: schema.conceptStatuses,
           }),
         });
         return { sql: _sqlWithRelationIds(rawSql, schema) };

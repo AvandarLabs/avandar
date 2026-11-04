@@ -54,6 +54,47 @@ describe("makeChatToolConfigFromOptions", () => {
       "labelColumnId",
       "attributes",
       "manualEntryAttributes",
+      "statuses",
+      "defaultStatusName",
+    ]);
+  });
+
+  it("limits proposed statuses to 12 with palette colors", () => {
+    const config = makeChatToolConfigFromOptions({
+      clarificationCapReached: false,
+      app: "case-manager",
+    });
+    const tools = config.tools as Array<{
+      function: {
+        name: string;
+        parameters: {
+          properties: {
+            statuses?: {
+              maxItems: number;
+              items: {
+                required: string[];
+                properties: { color: { enum: string[] } };
+              };
+            };
+          };
+        };
+      };
+    }>;
+    const statuses = tools.find((tool) => {
+      return tool.function.name === "proposeCaseType";
+    })?.function.parameters.properties.statuses;
+
+    expect(statuses?.maxItems).toBe(12);
+    expect(statuses?.items.required).toEqual(["name", "description"]);
+    expect(statuses?.items.properties.color.enum).toEqual([
+      "#637c95",
+      "#40c057",
+      "#228be6",
+      "#12b886",
+      "#fab005",
+      "#fd7e14",
+      "#fa5252",
+      "#be4bdb",
     ]);
   });
 

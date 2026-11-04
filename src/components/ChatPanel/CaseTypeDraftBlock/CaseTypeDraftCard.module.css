@@ -33,3 +33,26 @@
   border-left: 2px solid var(--mantine-color-blue-2);
   padding-left: var(--mantine-spacing-xs);
 }
+
+.statusList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.statusRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.statusRowName {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  min-width: 0;
+}

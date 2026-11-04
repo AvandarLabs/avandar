@@ -57,21 +57,27 @@ describe("getConceptSpineTableNameFromRef", () => {
 });
 
 describe("loadConceptSpine", () => {
-  it("loads the ids as CSV text with the key column pinned to VARCHAR", async () => {
+  it("loads each record's id and status as CSV text, both pinned to VARCHAR", async () => {
     const { loadConceptSpine } =
       await import("@/clients/qetl/QueryMediator/conceptRelation/loadConceptSpine/loadConceptSpine");
 
     const spineTableName = await loadConceptSpine({
       ref: CONCEPT_REF,
-      externalIds: ["p1", "Brien, O"],
+      spineRows: [
+        { externalId: "p1", statusName: "Active" },
+        { externalId: "Brien, O", statusName: "Closed, no action" },
+      ],
       datasetDuckDbLease: LEASE,
     });
 
     expect(spineTableName).toBe(SPINE_TABLE);
     expect(loadCsvMock).toHaveBeenCalledWith({
       tableName: SPINE_TABLE,
-      fileText: 'external_id\np1\n"Brien, O"',
-      columns: [["external_id", "VARCHAR"]],
+      fileText: 'external_id,status\np1,Active\n"Brien, O","Closed, no action"',
+      columns: [
+        ["external_id", "VARCHAR"],
+        ["status", "VARCHAR"],
+      ],
       datasetDuckDbLease: LEASE,
     });
   });
@@ -87,7 +93,11 @@ describe("loadConceptSpine", () => {
     await expect(
       loadConceptSpine({
         ref: CONCEPT_REF,
-        externalIds: ["p1", "", "p3"],
+        spineRows: [
+          { externalId: "p1", statusName: "Active" },
+          { externalId: "", statusName: "Active" },
+          { externalId: "p3", statusName: "Active" },
+        ],
         datasetDuckDbLease: LEASE,
       }),
     ).rejects.toThrow(/1 individual\(s\) with an empty external_id/);
@@ -97,13 +107,13 @@ describe("loadConceptSpine", () => {
   // A concept with no individuals is an ordinary state, not an error: nobody
   // has generated them yet. `loadCsv` throws on a zero-row file by design, so
   // the empty case takes its own path and answers with an empty relation.
-  it("creates an empty typed spine for a concept with no individuals", async () => {
+  it("creates an empty spine with both typed columns for a concept with no individuals", async () => {
     const { loadConceptSpine } =
       await import("@/clients/qetl/QueryMediator/conceptRelation/loadConceptSpine/loadConceptSpine");
 
     await loadConceptSpine({
       ref: CONCEPT_REF,
-      externalIds: [],
+      spineRows: [],
       datasetDuckDbLease: LEASE,
     });
 
@@ -116,7 +126,7 @@ describe("loadConceptSpine", () => {
       datasetDuckDbLease: LEASE,
     });
     expect(runRawQueryMock).toHaveBeenCalledWith(
-      `CREATE TABLE "${SPINE_TABLE}" ("external_id" VARCHAR)`,
+      `CREATE TABLE "${SPINE_TABLE}" ("external_id" VARCHAR, "status" VARCHAR)`,
       { datasetDuckDbLease: LEASE },
     );
   });
@@ -132,7 +142,7 @@ describe("loadConceptSpine", () => {
 
     await loadConceptSpine({
       ref: CONCEPT_REF,
-      externalIds: [],
+      spineRows: [],
       datasetDuckDbLease: LEASE,
     });
     const emittedSql = runRawQueryMock.mock.calls[0]?.[0] as string;

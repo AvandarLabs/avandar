@@ -32,9 +32,11 @@ Google Drive-style sharing layered on top of workspace membership.
 ## 2. Vocabulary
 
 **App (`app_type`)** - A product surface within a workspace whose access is
-granted independently. v1 values: `data_sources`, `data_explorer`,
-`dashboards`, `settings`. Example: a user can be `editor` in `dashboards` and
-`viewer` in `data_sources`.
+granted independently. Values: `data_sources`, `data_explorer`, `dashboards`,
+`gis` (Maps), `case_types` (the Case Manager, where case types are designed),
+`case_records` (the Records pages, where a case type's records are worked),
+and `settings`. Example: a user can be `editor` in `dashboards` and `viewer`
+in `data_sources`.
 
 **Role level (`role_level`)** - One of `viewer` < `editor` < `admin`. Ordered
 low→high in Postgres so enum comparison matches intent. Example: `editor` can
@@ -332,7 +334,8 @@ flowchart LR
 
 **Enums (planned)**
 
-- `app_type`: `data_sources`, `data_explorer`, `dashboards`, `settings`
+- `app_type`: `data_sources`, `data_explorer`, `dashboards`, `settings`,
+  `gis`, `case_types`, `case_records` (enum order; new values are appended)
 - `role_level`: `viewer`, `editor`, `admin` (ordered low→high)
 - `resource_type`: `dashboard`, `dataset`
 - `share_principal_type`: `user`, `user_group`, `workspace`
@@ -534,6 +537,32 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 
 - Add a **workspace** principal share at `viewer`; combine with stronger per-user
   or group shares via `max` as needed.
+
+**Someone designs case types but does not work their records**
+
+- Give them a role group with `case_types` at `editor` and no `case_records`
+  row. They can create case types, edit them, and refresh their records, but
+  cannot open a Records page. Refreshing writes records, which is why the
+  `individuals` INSERT and UPDATE policies accept a `case_types` editor as
+  well as a `case_records` editor. Deleting a case type needs `case_types` at
+  `admin`.
+
+**Someone works the records but cannot change case types**
+
+- Give them `case_records` at `editor` and `case_types` at `viewer`. They open
+  Records and can refresh a case type's records from its Case Manager page,
+  but cannot create, edit, or delete a case type. Without the `case_types`
+  row they lose the Case Manager entirely and reach Records from the
+  navigation only. Deleting a record needs `case_records` at `admin`.
+
+**Querying case types without a case role**
+
+- Nothing to set up. Every workspace member reads case types, their
+  attributes and mappings, and their records whatever their case roles,
+  because the Data Explorer and chat query them. The route guards and the
+  navigation, not RLS, keep the Case Manager and Records pages from members
+  without the matching role. Workspace owners pass every case-role check
+  through `util__auth_user_meets_min_app_role`.
 
 ---
 

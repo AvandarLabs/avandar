@@ -39,7 +39,13 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { concept, individual } = Route.useLoaderData();
-  return <SingleIndividualView concept={concept} individual={individual} />;
+  return (
+    <SingleIndividualView
+      key={individual.id}
+      concept={concept}
+      individual={individual}
+    />
+  );
 }
 
 function ErrorView({ error }: ErrorComponentProps) {

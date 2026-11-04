@@ -188,6 +188,9 @@ async function _runConceptQuery({
 }): Promise<QueryResult.T<UnknownRow>> {
   // TODO(jpsyx): optimize this by using a progressive
   // table-materialization approach
+  // Attributes only. A case type's built-in `status` column has no attribute
+  // id to read a value by, so this path leaves it out. SQL-backed queries,
+  // which read the concept relation, are the ones that return it.
   const attributes = sortedQueryColumns
     .map(prop("baseColumn"))
     .filter(Model.valIsOfModelType("ConceptAttribute"));

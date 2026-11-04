@@ -1,7 +1,7 @@
 import { Text } from "@mantine/core";
 import clsx from "clsx";
 import css from "@/components/layouts/AppListPane/AppListPane.module.css";
-import type { ReactNode } from "react";
+import type { ReactNode, Ref } from "react";
 
 type Props = {
   /** What the list holds, plural. */
@@ -23,6 +23,12 @@ type Props = {
    */
   filter?: ReactNode;
 
+  /**
+   * The scrolling body, for a virtualized list that has to measure the
+   * element it scrolls inside.
+   */
+  bodyRef?: Ref<HTMLDivElement>;
+
   /** The rows. This is the only part of the pane that scrolls. */
   children: ReactNode;
 
@@ -41,6 +47,7 @@ export function AppListPane({
   count,
   action,
   filter,
+  bodyRef,
   children,
   className,
 }: Readonly<Props>): ReactNode {
@@ -60,7 +67,9 @@ export function AppListPane({
         </div>
         {filter ? <div className={css.appListPaneFilter}>{filter}</div> : null}
       </div>
-      <div className={css.appListPaneBody}>{children}</div>
+      <div ref={bodyRef} className={css.appListPaneBody}>
+        {children}
+      </div>
     </div>
   );
 }

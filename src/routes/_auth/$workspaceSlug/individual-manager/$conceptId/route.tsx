@@ -7,15 +7,23 @@ import {
   notFound,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { appLabel } from "$/copy/appLabel";
 import { uuid } from "$/lib/uuid";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { Logger } from "@/utils/Logger";
+import { RouteMiddleware } from "@/utils/RouteMiddleware";
 import { IndividualManagerApp } from "@/views/IndividualManagerApp";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/individual-manager/$conceptId",
 )({
+  beforeLoad: RouteMiddleware.BeforeLoad.checkUserPermissions({
+    permissionKey: "case_records__can_view_record",
+    appLabel: () => {
+      return appLabel("case_records");
+    },
+  }),
   component: RouteComponent,
   loader: async ({ params: { conceptId } }): Promise<Concept.T> => {
     const concept = await ConceptClient.getById({
