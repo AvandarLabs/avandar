@@ -1,5 +1,6 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
+import { act } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
@@ -21,6 +22,34 @@ describe("JobProgressPanel", () => {
     JobProgressStore.getAllJobs().forEach(({ id }) => {
       JobProgressStore.finishJob(id);
     });
+  });
+
+  it("re-renders on its own as a live job progresses and finishes", () => {
+    _renderPanel();
+    let jobId = "" as ReturnType<typeof JobProgressStore.startJob>;
+
+    act(() => {
+      jobId = JobProgressStore.startJob("Syncing dataset online");
+    });
+    expect(screen.getByText("Syncing dataset online")).toBeInTheDocument();
+
+    act(() => {
+      JobProgressStore.updateJob(jobId, {
+        status: "determinate",
+        label: "Syncing dataset online",
+        current: 4,
+        total: 4,
+      });
+    });
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "100",
+    );
+
+    act(() => {
+      JobProgressStore.finishJob(jobId);
+    });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
   it("renders nothing when no job is live", () => {

@@ -26,8 +26,20 @@ export type JobEntry =
 export const JobProgressStore = createExternalStore({
   initialState: new Map<JobId, JobEntry>(),
   builder: (jobs: Map<JobId, JobEntry>) => {
+    // `jobs` is mutated in place, so it cannot serve as the snapshot React's
+    // `useSyncExternalStore` compares: an unchanged identity means no
+    // re-render. Every updater bumps this version instead.
+    let version = 0;
     return {
       getters: {
+        /**
+         * A number that changes on every update. Use it as the
+         * `useSyncExternalStore` snapshot, then read jobs with the getters.
+         */
+        getVersion: (): number => {
+          return version;
+        },
+
         /** The current entry for one job, or undefined if it isn't live. */
         getJob: (jobId: JobId): JobEntry | undefined => {
           return jobs.get(jobId);
@@ -47,6 +59,7 @@ export const JobProgressStore = createExternalStore({
          */
         startJob: (label: string, options?: { detail?: string }): JobId => {
           const jobId = uuid<"Job">();
+          version += 1;
           jobs.set(jobId, {
             status: "indeterminate",
             label,
@@ -63,6 +76,7 @@ export const JobProgressStore = createExternalStore({
           if (!jobs.has(jobId)) {
             return;
           }
+          version += 1;
           jobs.set(jobId, entry);
         },
 
@@ -71,6 +85,7 @@ export const JobProgressStore = createExternalStore({
          * error.
          */
         finishJob: (jobId: JobId): void => {
+          version += 1;
           jobs.delete(jobId);
         },
 
@@ -83,6 +98,7 @@ export const JobProgressStore = createExternalStore({
           if (!existingEntry) {
             return;
           }
+          version += 1;
           jobs.set(jobId, {
             status: "error",
             label: existingEntry.label,
