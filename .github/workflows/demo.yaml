@@ -120,23 +120,40 @@ jobs:
 
       - name: Pull the Vercel demo environment
         run: |
+          # `vercel deploy` looks the team up by this ID and only accepts a
+          # Team ID. `vercel pull` skips that lookup, so check it here rather
+          # than after a full build.
+          if [[ ! "$VERCEL_ORG_ID" =~ ^team_[A-Za-z0-9]+$ ]]; then
+            echo "VERCEL_ORG_ID must be the avandar team's Team ID (team_...), with no spaces or quotes." >&2
+            exit 1
+          fi
           npx --yes "vercel@$VERCEL_CLI_VERSION" pull --yes \
             --environment="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
+          env_file=".vercel/.env.$VERCEL_ENVIRONMENT.local"
           # These three come from the demo's Supabase branch below. A value
           # set in Vercel would point the build at the wrong database.
-          if grep -qE '^(VITE_SUPABASE_API_URL|VITE_SUPABASE_ANON_KEY|VITE_APP_URL)=' \
-            ".vercel/.env.$VERCEL_ENVIRONMENT.local"; then
+          if grep -qE '^(VITE_SUPABASE_API_URL|VITE_SUPABASE_ANON_KEY|VITE_APP_URL)=' "$env_file"; then
             echo "Remove VITE_SUPABASE_API_URL, VITE_SUPABASE_ANON_KEY and VITE_APP_URL from the Vercel '$VERCEL_ENVIRONMENT' environment." >&2
             exit 1
           fi
+          # Vercel never sends Sensitive values to `vercel pull`, only a
+          # "[SENSITIVE]" placeholder, which the build would bake into the
+          # app. Drop them. The Google Picker values come from GitHub instead.
+          sensitive_pattern='^[A-Z0-9_]+="?\[SENSITIVE\]"?$'
+          sensitive_names="$(grep -E "$sensitive_pattern" "$env_file" | cut -d= -f1 || true)"
+          echo "Sensitive Vercel variables left out of the build:"
+          echo "${sensitive_names:-(none)}"
+          sed -i -E "/$sensitive_pattern/d; /^VITE_GOOGLE_PICKER_(API_KEY|APP_ID)=/d" "$env_file"
 
       - name: Build and deploy to Vercel
         env:
           VITE_SUPABASE_API_URL: ${{ env.DEMO_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ env.DEMO_PUBLISHABLE_KEY }}
           VITE_APP_URL: ${{ env.DEMO_APP_URL }}
+          VITE_GOOGLE_PICKER_API_KEY: ${{ secrets.VITE_GOOGLE_PICKER_API_KEY }}
+          VITE_GOOGLE_PICKER_APP_ID: ${{ vars.VITE_GOOGLE_PICKER_APP_ID }}
         run: |
           npx --yes "vercel@$VERCEL_CLI_VERSION" build \
-            --target="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
+            --environment="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
           npx --yes "vercel@$VERCEL_CLI_VERSION" deploy --prebuilt \
-            --target="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
+            --environment="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
