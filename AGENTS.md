@@ -150,11 +150,12 @@ before running `pnpm db:new-migration`, `pnpm db:reset`, `pnpm test:db`,
 `supabase start`, `supabase stop`, or `supabase db diff`:
 
 1. Run `ava supabase status`.
-2. Confirm it reports this worktree on its own switched project, not on the
-   shared `avandar` stack. The first line reads yellow when the switch state is
-   wrong for the branch.
+2. Confirm its first line says this branch is on a switched local Supabase
+   database, naming the branch's own project. If it instead says
+   `This is the develop local Supabase`, the worktree is on the shared
+   `avandar` stack.
 3. If it is not switched, run `ava supabase switch` and re-check. Do not run the
-   command you were about to run until status reads green.
+   command you were about to run until status names the branch's own project.
 
 **Never run any of those commands from a worktree while it points at the shared
 `avandar` stack.** They stop, rebuild, or reset the one stack that every
@@ -171,14 +172,9 @@ therefore already cost a working stack, not just a bad migration.
 `ava` is built from this repo, not installed separately. If it is not on
 `PATH`, run `pnpm build:ava-cli`, which builds `apps/ava-cli` and symlinks it
 next to `pnpm`. Do not fall back to the shared stack because the binary is
-missing, and do not hand-edit `supabase/config.toml` to fake a switch: git
-hooks reject a branch-scoped config, and a half-switched worktree points some
-tools at one project and some at another.
-
-A switch rewrites `supabase/config.toml` with a branch project id and its own
-ports. That file must never be staged. Commit the files your change touched by
-path rather than with `git add -A`, and run `ava supabase restore` before any
-authorized merge to `develop`.
+missing, and do not fake a switch by hand: never change the project id or
+ports in `supabase/config.toml` (git hooks reject it), and never edit the
+`ava supabase switch` block in `.env.development`.
 
 ### Migrations
 
@@ -214,18 +210,9 @@ authorized merge to `develop`.
 - Run `ava supabase status` to see whether the current worktree is on the
   shared `avandar` stack or on a switched project, along with its ports, keys,
   endpoints, and whether the development environment files still match the
-  running stack. Its first line reads green when the switch state is the right
-  one for the branch (`develop` on the shared stack, every other branch
-  switched) and yellow when it is not.
-- Keep the switched local instance active unless the user explicitly asks to
-  merge into `develop`. When an authorized merge to `develop` is requested, run
-  `ava supabase restore` before staging, committing, or merging, then verify
-  `supabase/config.toml` uses the standard local `avandar` project id and ports.
-  If no merge is requested, tell the user they are responsible for running
-  `ava supabase restore` when they finish validating their branch.
-- Never commit a branch-scoped Supabase `config.toml` or switch-generated
-  environment changes. Git hooks enforce the standard configuration, but do not
-  bypass those hooks.
+  running stack. Pass `--branch <name>` to ask about another worktree's branch.
+- Leave the switch in place when you finish. It changes no tracked file, so
+  nothing needs restoring before a commit or merge.
 
 ### Production database prohibition
 
