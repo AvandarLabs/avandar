@@ -668,15 +668,14 @@ Auth URLs), then builds the app against it and deploys it to the Vercel
 | SHA | Subject | Take |
 |---|---|---|
 | `69cbdad98` | feat(ci): deploy demo/* branches to demo.avandarlabs.com | All of it |
-| `14888b6f0` | fix(ci): stop recording demo deploys as staging deployments | All of it |
-| `e36dcb1c9` | fix(ci): catch a bad Vercel team ID early and keep Sensitive placeholders out of the demo build | All of it |
+| `a8ebe196c` | fix(ci): stop recording demo deploys as staging deployments | All of it |
+| `815e2f8e5` | fix(ci): catch a bad Vercel team ID early and keep Sensitive placeholders out of the demo build | All of it |
 
 **Files:** `.github/workflows/demo.yaml`,
 `scripts/demo/ensureSupabaseBranch.sh`,
 `scripts/demo/loadLocalDataIntoDemoBranch.sh`. Vercel settings stay in the
-dashboard, not `vercel.json`, since the repo is public. The runbook,
-`docs/measles-demo/demo-deployment-runbook.md`, moves into `docs/` with this
-PR.
+dashboard, not `vercel.json`, since the repo is public. The setup runbook
+is kept out of the repo for the same reason.
 
 **Verification:** `shellcheck -x scripts/demo/*.sh`. Then push a throwaway
 `demo/*` branch and confirm the **CI/CD for Demos** run deploys it.
