@@ -3612,10 +3612,6 @@ msgstr "Confirm Action"
 msgid "No dashboards to show"
 msgstr "No dashboards to show"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-#~ msgid "A type of record you manage"
-#~ msgstr "A type of record you manage"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
 msgstr "Rows from these {regionCount} regions"
@@ -4839,10 +4835,6 @@ msgstr "Delete this workspace"
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
 msgstr "Edit {name}"
-
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
-#~ msgid "Column name (must match SQL)"
-#~ msgstr "Column name (must match SQL)"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
@@ -7096,10 +7088,6 @@ msgstr "does not end with"
 msgid "Add layer"
 msgstr "Add layer"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
-#~ msgid "This catalog entry has no column metadata. It cannot be imported yet."
-#~ msgstr "This catalog entry has no column metadata. It cannot be imported yet."
-
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
 msgstr "Offline chat model ready"
@@ -7849,19 +7837,9 @@ msgstr "Original kept"
 msgid "{lengthValue} km"
 msgstr "{lengthValue} km"
 
-#. placeholder {0}: load.savedConnections?.length
-#. placeholder {1}: load.savedConnections?.length === 1 ? "database" : "databases"
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
-#~ msgid "{0} saved {1} available"
-#~ msgstr "{0} saved {1} available"
-
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "Source line"
-
-#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
-#~ msgid "Nothing more to load"
-#~ msgstr "Nothing more to load"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
@@ -8741,12 +8719,6 @@ msgstr "Edit role group"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
 msgstr "Profiles"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-#~ msgid "They referenced columns this data source does not have: "
-#~ "{removedColumnNames}"
-#~ msgstr "They referenced columns this data source does not have: "
-#~ "{removedColumnNames}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"

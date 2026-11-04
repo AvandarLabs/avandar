@@ -19,7 +19,7 @@ msgstr "您可以在您的支付方式中进行更改"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftStatusSection.tsx
 msgid "Proposed statuses"
-msgstr ""
+msgstr "建议的状态"
 
 #. placeholder {0}: datasetMeta.rows.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -134,7 +134,7 @@ msgstr "值列"
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Could not refresh this dataset"
-msgstr ""
+msgstr "无法刷新此数据集"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not on"
@@ -158,7 +158,7 @@ msgstr "区分大小写"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 msgid "Updated"
-msgstr ""
+msgstr "已更新"
 
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
@@ -301,11 +301,11 @@ msgstr "在此上下文中无法使用发现功能。"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "You need Case Types editor access to change these statuses."
-msgstr ""
+msgstr "您需要“案例类型”编辑权限才能更改这些状态。"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusDragHandle.tsx
 msgid "Reorder {statusName}"
-msgstr ""
+msgstr "重新排序 {statusName}"
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
@@ -485,7 +485,7 @@ msgstr "侧边栏布局"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Add status"
-msgstr ""
+msgstr "添加状态"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -507,7 +507,7 @@ msgstr "PDF 文件"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "These statuses changed somewhere else. Close this window and try again."
-msgstr ""
+msgstr "这些状态已在其他位置发生更改。关闭此窗口，然后重试。"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
@@ -571,7 +571,7 @@ msgstr "已保存为 \"{0}\"。"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
-msgstr ""
+msgstr "此服务器要求使用 SSL。将 SSL 模式设置为“Require”，然后重试。"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Could not save. Your last change is still on screen."
@@ -645,7 +645,7 @@ msgstr "离线聊天模型"
 
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "{statusName} color: {colorName}"
-msgstr ""
+msgstr "{statusName} 颜色：{colorName}"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointInputControls.tsx
 msgid "Select a point geometry column"
@@ -800,7 +800,7 @@ msgstr "Google Picker 错误"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Choose a default status from this list."
-msgstr ""
+msgstr "从此列表中选择默认状态。"
 
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
@@ -942,7 +942,7 @@ msgstr "您可以选择让工作区中的所有人查看您的仪表板，也可
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Add at least one status."
-msgstr ""
+msgstr "至少添加一个状态。"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Unpublish"
@@ -954,7 +954,7 @@ msgstr "在聊天中设计案例类型"
 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Choose a default status."
-msgstr ""
+msgstr "选择默认状态。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -1080,7 +1080,7 @@ msgstr "选择要发布的每个数据集的数量。默认选项：\"仅查询�
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset.tsx
 msgid "The stages a record moves through. New records start in the default "
 "status."
-msgstr ""
+msgstr "记录经历的各个阶段。新记录从默认状态开始。"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
@@ -1116,7 +1116,7 @@ msgstr "无法加载"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source file is empty."
-msgstr ""
+msgstr "源文件为空。"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
@@ -1172,7 +1172,7 @@ msgstr "但是，我们目前不允许新的注册。"
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Open and being worked on."
-msgstr ""
+msgstr "已打开，正在处理。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Derived dataset"
@@ -1322,7 +1322,7 @@ msgstr "预设"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "Reading a sample of this dataset to confirm its columns and their types. "
 "The list below may change."
-msgstr ""
+msgstr "正在读取此数据集的示例，以确认其列及列类型。下面的列表可能会发生变化。"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
@@ -1334,7 +1334,7 @@ msgstr "如果您的设备有 16 GB 内存，并且会同时运行 Avandar 和�
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/EditStatusesForm.tsx
 msgid "Save statuses"
-msgstr ""
+msgstr "保存状态"
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
@@ -1407,7 +1407,7 @@ msgstr "无法连接云端助手。要使用已下载的设备端模型处理此
 #. placeholder {0}: currentStatus.name
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Status: {0}"
-msgstr ""
+msgstr "状态：{0}"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
@@ -1517,7 +1517,7 @@ msgstr "隐藏教程"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Username"
-msgstr ""
+msgstr "用户名"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
@@ -1653,7 +1653,7 @@ msgstr "漏斗图"
 
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "Show every status"
-msgstr ""
+msgstr "显示所有状态"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Symbol"
@@ -1661,7 +1661,7 @@ msgstr "符号"
 
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 msgid "{recordCount, plural, one {Move # record to} other {Move # records to}}"
-msgstr ""
+msgstr "{recordCount, plural, one {将 # 条记录移至} other {将 # 条记录移至}}"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
@@ -1688,7 +1688,7 @@ msgstr "Y 轴刻度间隔"
 
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbarRows.tsx
 msgid "No records have these statuses"
-msgstr ""
+msgstr "没有记录处于这些状态"
 
 #. placeholder {0}: _columnList(namedColumns)
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
@@ -1749,7 +1749,7 @@ msgstr "(年度计费)"
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Every case type already has a status. Choose another name."
-msgstr ""
+msgstr "每种案例类型都已有状态。请选择其他名称。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
@@ -1811,7 +1811,7 @@ msgstr "检测到："
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "The record keeps its previous status. Try again in a moment."
-msgstr ""
+msgstr "记录保留其之前的状态。请稍后重试。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
@@ -1841,7 +1841,7 @@ msgstr "发布每一列，所有行。为查看者提供最大灵活性，最大
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActionsMenu.tsx
 msgid "More case type actions"
-msgstr ""
+msgstr "更多案例类型操作"
 
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Query failed."
@@ -1962,7 +1962,7 @@ msgstr "选择要创建缓冲区的数据图层。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Cannot add dataset yet"
-msgstr ""
+msgstr "暂时无法添加数据集"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Paper size"
@@ -1987,7 +1987,7 @@ msgstr "中"
 
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "Colors for {statusName}"
-msgstr ""
+msgstr "{statusName} 的颜色"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
@@ -2007,7 +2007,7 @@ msgstr "聊天"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Host"
-msgstr ""
+msgstr "主机"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the z, x and y placeholders where the server expects the tile "
@@ -2181,7 +2181,7 @@ msgstr "所示边界和名称不代表官方认可或接受。"
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Try again. If it keeps failing, reload the page."
-msgstr ""
+msgstr "请重试。如果仍然失败，请重新加载页面。"
 
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
@@ -2297,13 +2297,13 @@ msgstr "您已与工作区共享第一个仪表板。工作区中的任何人都
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "This dataset now reflects the current contents of the table."
-msgstr ""
+msgstr "此数据集现已反映表的当前内容。"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftStatusSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusesSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesModal.tsx
 msgid "Edit statuses"
-msgstr ""
+msgstr "编辑状态"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
@@ -2357,7 +2357,7 @@ msgstr "未命名数据集"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorRow.tsx
 msgid "Remove {displayName}"
-msgstr ""
+msgstr "移除 {displayName}"
 
 #. placeholder {0}: entry.turnNumber
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
@@ -2386,7 +2386,7 @@ msgstr "1 个点"
 #. placeholder {0}: recordCounts[status.id] ?? 0
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
 msgid "{0, plural, one {# record} other {# records}}"
-msgstr ""
+msgstr "{0, plural, one {# 条记录} other {# 条记录}}"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
@@ -2403,7 +2403,7 @@ msgstr "Cluster 和 Heat 需要完整的点生成绑定。"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Choose where the records of each removed status go."
-msgstr ""
+msgstr "选择每个已移除状态的记录应转移到的位置。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
@@ -2424,7 +2424,7 @@ msgstr "发布"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Prod reporting replica"
-msgstr ""
+msgstr "生产环境报表副本"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
@@ -2449,7 +2449,7 @@ msgstr "使用的建议"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Fix the statuses above before you create this case type."
-msgstr ""
+msgstr "请先修正上面的状态，然后再创建此案例类型。"
 
 #. placeholder {0}: diagnostics.duplicateBoundaryKeyCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
@@ -2516,7 +2516,7 @@ msgstr "放弃"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Two statuses have the same name. Give each one its own name."
-msgstr ""
+msgstr "两个状态名称相同。请分别为它们命名。"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -2695,7 +2695,7 @@ msgstr "您的工作区使用的是免费套餐，该套餐允许您分享或发
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Disable"
-msgstr ""
+msgstr "停用"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -2819,7 +2819,7 @@ msgstr "移除系列"
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Created"
-msgstr ""
+msgstr "已创建"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Collapse the layers panel"
@@ -2889,7 +2889,7 @@ msgstr "{usedSeats} / {maxSeats} 个座位已使用 · {remainingSeats} 个剩�
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusesSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
 msgid "Statuses"
-msgstr ""
+msgstr "状态"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Largest catalog option. Maximum offline capability when RAM and download "
@@ -2992,7 +2992,7 @@ msgstr "未配置属性或数据集。"
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "No longer being worked on."
-msgstr ""
+msgstr "已不再处理。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
@@ -3009,7 +3009,7 @@ msgstr "在表格、图表、地图或文本块周围框选，以提取其中的
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/testAndSavePostgresConnection.ts
 msgid "Listing tables..."
-msgstr ""
+msgstr "正在列出表格…"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
@@ -3022,7 +3022,7 @@ msgstr "数据预览"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This address isn't allowed"
-msgstr ""
+msgstr "不允许使用此地址"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Your Google connection expired"
@@ -3078,7 +3078,7 @@ msgstr "完成"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From a database"
-msgstr ""
+msgstr "来自数据库"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
@@ -3136,7 +3136,7 @@ msgstr "升级到“您想支付多少”计划只能通过账单门户进行。
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem.tsx
 msgid "Refresh from the database"
-msgstr ""
+msgstr "从数据库刷新"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
@@ -3196,7 +3196,7 @@ msgstr "不超过"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Use a database"
-msgstr ""
+msgstr "使用数据库"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is"
@@ -3253,7 +3253,7 @@ msgstr "无"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "This dataset is indexed in {serviceName}, but it can't be loaded."
-msgstr ""
+msgstr "此数据集已在 {serviceName} 中建立索引，但无法加载。"
 
 #: src/views/ProfileView/PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
@@ -3271,7 +3271,7 @@ msgstr "网格形状"
 #. placeholder {0}: error instanceof Error ? error.message : String(error)
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Failed to save dashboard: {0}"
-msgstr ""
+msgstr "保存仪表板失败：{0}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish"
@@ -3451,7 +3451,7 @@ msgstr "以……结尾"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Table or view to import"
-msgstr ""
+msgstr "要导入的表或视图"
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
@@ -3501,7 +3501,7 @@ msgstr "拆分（+/-）"
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Active"
-msgstr ""
+msgstr "活跃"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default values, comma-separated or JSON array"
@@ -3514,10 +3514,6 @@ msgstr "确认操作"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "没有可显示的仪表板"
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-#~ msgid "A type of record you manage"
-#~ msgstr "您管理的一类记录"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -3559,7 +3555,7 @@ msgstr "请让我为此仪表板添加图表。我将选择可视化类型，编
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "Reading a sample of this dataset to find its columns."
-msgstr ""
+msgstr "正在读取此数据集的示例以查找其列。"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Dashboard saved successfully!"
@@ -3696,7 +3692,7 @@ msgstr "保留原始测量值"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
-msgstr ""
+msgstr "需要安全连接"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
@@ -3744,7 +3740,7 @@ msgstr "{0} 的名称"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table is too large to import"
-msgstr ""
+msgstr "此表过大，无法导入"
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Please <0>email us</0> if you would like access."
@@ -3939,7 +3935,7 @@ msgstr "PDF 第 {0} 页"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{attributeCount, plural, one {# attribute} other {# attributes}}"
-msgstr ""
+msgstr "{attributeCount, plural, one {# 个属性} other {# 个属性}}"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Get an answer out of the data you just added."
@@ -4110,7 +4106,7 @@ msgstr "只有你可以访问此 {resource}。其他所有人都将失去访问�
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 msgid "Can't be loaded"
-msgstr ""
+msgstr "无法加载"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -4139,7 +4135,7 @@ msgstr "达到上限"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Your statuses were not saved. Try again in a moment."
-msgstr ""
+msgstr "未保存你的状态。请稍后重试。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Go to billing portal"
@@ -4196,7 +4192,7 @@ msgstr "上传 CSV"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source file isn't in a format Avandar can read as a table."
-msgstr ""
+msgstr "源文件的格式不是 Avandar 可读取为表格的格式。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
@@ -4311,7 +4307,7 @@ msgstr "{description} {recommendedIf}（约 {approxSizeMb} MB 下载）。"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
-msgstr ""
+msgstr "身份验证失败"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Hex"
@@ -4378,7 +4374,7 @@ msgstr "来自数据集的字段"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Port"
-msgstr ""
+msgstr "端口"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
@@ -4459,7 +4455,7 @@ msgstr "GROUP BY 使用了非列表达式。"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Checking this dataset's columns first. It will be added to your "
 "workspace as soon as that finishes."
-msgstr ""
+msgstr "正在先检查此数据集的列。检查完成后，它会立即添加到你的工作区。"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make private"
@@ -4658,7 +4654,7 @@ msgstr "正在生成 SQL…"
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/RenameWarning.tsx
 msgid "Saved filters and dashboards find records by status name. Filters that "
 "use {renamedList} will stop finding records once you save."
-msgstr ""
+msgstr "已保存的筛选器和仪表板会按状态名称查找记录。保存后，使用 {renamedList} 的筛选器将无法再找到记录。"
 
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
@@ -4667,7 +4663,7 @@ msgstr "再次从头开始，了解如何创建和共享仪表板。"
 #. placeholder {0}: columns.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "{0}"
-msgstr ""
+msgstr "{0}"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -4675,7 +4671,7 @@ msgstr "X 轴标签旋转角度"
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Refreshed from the database"
-msgstr ""
+msgstr "已从数据库刷新"
 
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
@@ -4701,7 +4697,7 @@ msgstr "标签，例如：区域"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Records can only move to a status in this list."
-msgstr ""
+msgstr "记录只能移动到此列表中的状态。"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} m"
@@ -4720,10 +4716,6 @@ msgstr "删除此工作区"
 msgid "Edit {name}"
 msgstr "编辑 {name}"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
-#~ msgid "Column name (must match SQL)"
-#~ msgstr "列名（必须与 SQL 匹配）"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
 msgstr "{usedSeats} / {maxSeats} 个座位已使用 · {remainingSeats} 个剩余"
@@ -4738,7 +4730,7 @@ msgstr "没有可用的频率数据。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "We couldn't check this dataset's columns. Try adding it again."
-msgstr ""
+msgstr "无法检查此数据集的列。请尝试再次添加。"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "We'll add this visualization to your new dashboard."
@@ -4746,7 +4738,7 @@ msgstr "我们将把此可视化添加到您的新仪表板。"
 
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "All statuses"
-msgstr ""
+msgstr "所有状态"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Repairing query…"
@@ -4793,7 +4785,7 @@ msgstr "任何拥有链接的人都可以查看此{resource}。下方的人员�
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "The person who added this sheet needs to reconnect their Google account. "
 "Ask them to reconnect it, then try again."
-msgstr ""
+msgstr "添加此工作表的人员需要重新连接其 Google 账号。请让对方重新连接，然后重试。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
@@ -4870,7 +4862,7 @@ msgstr "带标签的图形（地图、图表、图块）"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Allowed"
-msgstr ""
+msgstr "允许"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
@@ -4917,7 +4909,7 @@ msgstr "JOIN ON 子句使用了非列引用；表单将通过原始 SQL 保留�
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/useSaveCaseTypeStatuses.ts
 msgid "Statuses saved"
-msgstr ""
+msgstr "状态已保存"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
@@ -4972,7 +4964,7 @@ msgstr "此 SQL 的部分内容无法在手动表单中表示。表单显示的�
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Database"
-msgstr ""
+msgstr "数据库"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
@@ -5022,7 +5014,7 @@ msgstr "跳过的行"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Databases"
-msgstr ""
+msgstr "数据库"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Not yet published. Viewers will not see this."
@@ -5154,7 +5146,7 @@ msgstr "下载 PDF"
 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Enter a name."
-msgstr ""
+msgstr "请输入名称。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -5247,7 +5239,7 @@ msgstr "此仪表板仍在 Web 上公开。任何拥有链接的人都可以查�
 
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "Filter by status"
-msgstr ""
+msgstr "按状态筛选"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields.tsx
 msgid "Select columns"
@@ -5459,7 +5451,7 @@ msgstr "数据集加载成功"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Every status needs a name."
-msgstr ""
+msgstr "每个状态都需要名称。"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
@@ -5480,7 +5472,7 @@ msgstr "选项（逗号分隔，用于选择模式）"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Postgres"
-msgstr ""
+msgstr "Postgres"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
@@ -5564,7 +5556,7 @@ msgstr "未确定的值"
 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Another status has this name."
-msgstr ""
+msgstr "已有其他状态使用此名称。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
@@ -5594,7 +5586,7 @@ msgstr "正在加载 {layerName}"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "One of the colors is not in the palette. Pick another color."
-msgstr ""
+msgstr "其中一种颜色不在调色板中。请选择其他颜色。"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "This is the data explorer. Ask a question in your own words, like \"how "
@@ -5636,7 +5628,7 @@ msgstr "您当前的套餐仅允许您分享或发布 {maxAllowed, plural, one {
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The file was downloaded, but Avandar couldn't read it as a table."
-msgstr ""
+msgstr "文件已下载，但 Avandar 无法将其读取为表格。"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
@@ -5668,7 +5660,7 @@ msgstr "绘制箭头"
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Purple"
-msgstr ""
+msgstr "紫色"
 
 #: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
 msgid "This tool arrives in a later release."
@@ -5912,7 +5904,7 @@ msgstr "系列标签"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "We couldn't read a sample of this dataset, so its columns and their "
 "types are not confirmed. Adding it will try again."
-msgstr ""
+msgstr "无法读取此数据集的示例，因此其列及列类型尚未确认。添加时将重试。"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -5993,7 +5985,7 @@ msgstr "上限"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/testAndSavePostgresConnection.ts
 msgid "Connecting to database"
-msgstr ""
+msgstr "正在连接数据库"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -6035,7 +6027,7 @@ msgstr "已映射 {mapped}/{total} 行"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 msgid "Missing from source since"
-msgstr ""
+msgstr "自此日期起从源中缺失"
 
 #. placeholder {0}: guess.latitudeColumnName
 #. placeholder {1}: guess.longitudeColumnName
@@ -6071,11 +6063,11 @@ msgstr "早于或等于"
 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Choose a status for these records."
-msgstr ""
+msgstr "为这些记录选择状态。"
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Inactive"
-msgstr ""
+msgstr "未激活"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -6321,7 +6313,7 @@ msgstr "工作区名称已更新"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
 "the server allows connections from Avandar."
-msgstr ""
+msgstr "Avandar 无法连接到该主机和端口。请检查地址，并确认服务器允许来自 Avandar 的连接。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
@@ -6385,7 +6377,7 @@ msgstr "让其他人查看您的仪表板"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Records added by hand"
-msgstr ""
+msgstr "手动添加的记录"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -6408,11 +6400,11 @@ msgstr "甜甜圈样式"
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftStatusSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
 msgid "Default"
-msgstr ""
+msgstr "默认"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Not allowed"
-msgstr ""
+msgstr "不允许"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
@@ -6504,7 +6496,7 @@ msgstr "来源署名（始终包含）"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 msgid "Status name"
-msgstr ""
+msgstr "状态名称"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock.tsx
@@ -6679,7 +6671,7 @@ msgstr "请稍后重试；如果问题持续存在，请联系支持团队。"
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
-msgstr ""
+msgstr "数据库用户最好对您计划导入的表或视图拥有只读权限。"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
@@ -6756,13 +6748,14 @@ msgstr "生成日期（始终包含）"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{recordCount, plural, one {# record} other {# records}}"
-msgstr ""
+msgstr "{recordCount, plural, one {# 条记录} other {# 条记录}}"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusDragHandle.tsx
 msgid "Press Space or Enter to pick up this status, move it with the arrow "
 "keys, then press Space or Enter to drop it. Or hold Alt and press the up "
 "or down arrow to move it one place."
-msgstr ""
+msgstr "按空格键或 Enter 键拾取此状态，使用箭头键移动，然后按空格键或 Enter 键放下。或者按住 Alt "
+"并按向上或向下箭头键，将其移动一位。"
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "Update now"
@@ -6870,7 +6863,7 @@ msgstr "该查询失败。请修复 SQL 并重试。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Schema"
-msgstr ""
+msgstr "架构"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Repeating labelled blocks"
@@ -6927,10 +6920,6 @@ msgstr "不以……结尾"
 msgid "Add layer"
 msgstr "添加图层"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
-#~ msgid "This catalog entry has no column metadata. It cannot be imported yet."
-#~ msgstr "此目录条目没有列元数据。尚无法导入。"
-
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
 msgstr "离线聊天模型已准备好"
@@ -6962,7 +6951,7 @@ msgstr "按…加权"
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Gray"
-msgstr ""
+msgstr "灰色"
 
 #. placeholder {0}: err.message
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -7005,7 +6994,7 @@ msgstr "前 {0} 行"
 
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 msgid "Choose a status"
-msgstr ""
+msgstr "选择状态"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Data processing failed"
@@ -7025,7 +7014,7 @@ msgstr "时间范围"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "Status not changed"
-msgstr ""
+msgstr "状态未更改"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
@@ -7034,7 +7023,7 @@ msgstr "此数据集较大，因此我们应用了 100 行限制。您可以随�
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Yellow"
-msgstr ""
+msgstr "黄色"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
@@ -7101,12 +7090,12 @@ msgstr "下限"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "This sheet can't be read right now"
-msgstr ""
+msgstr "目前无法读取此工作表"
 
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorRow.tsx
 msgid "Untitled status"
-msgstr ""
+msgstr "未命名状态"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -7117,7 +7106,7 @@ msgstr "您当前的计划仅支持最多 {0} 个数据集。升级到我们的 
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "Checking column types"
-msgstr ""
+msgstr "正在检查列类型"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
 msgid "Mark done"
@@ -7189,7 +7178,7 @@ msgstr "复制共享链接"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The file is hosted on a different site from the one that lists it, so "
 "Avandar doesn't download it."
-msgstr ""
+msgstr "托管该文件的网站与列出该文件的网站不同，因此 Avandar 不会下载该文件。"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Leave empty when the geometry is already WGS 84."
@@ -7240,7 +7229,7 @@ msgstr "行数"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The site that hosts the file didn't respond. This may be temporary."
-msgstr ""
+msgstr "托管该文件的网站未响应。这可能是暂时性的。"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Form is an approximation"
@@ -7426,7 +7415,7 @@ msgstr "纬度或经度为空"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 msgid "Make {displayName} the default"
-msgstr ""
+msgstr "将 {displayName} 设为默认"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
@@ -7560,7 +7549,7 @@ msgstr "移除条件"
 
 #: shared/copy/appLabel.ts
 msgid "Case Types"
-msgstr ""
+msgstr "案件类型"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
 msgid "Open case type"
@@ -7614,7 +7603,7 @@ msgstr "建议重写："
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source no longer has this dataset."
-msgstr ""
+msgstr "源中已不再包含此数据集。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -7657,19 +7646,9 @@ msgstr "已保留原始内容"
 msgid "{lengthValue} km"
 msgstr "{lengthValue} 千米"
 
-#. placeholder {0}: load.savedConnections?.length
-#. placeholder {1}: load.savedConnections?.length === 1 ? "database" : "databases"
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
-#~ msgid "{0} saved {1} available"
-#~ msgstr ""
-
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "来源行"
-
-#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
-#~ msgid "Nothing more to load"
-#~ msgstr "没有更多内容可加载"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
@@ -7710,7 +7689,7 @@ msgstr "Google Sheets"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "+ New database"
-msgstr ""
+msgstr "+ 新建数据库"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "None of the selected regions produced any rows yet, so there are no "
@@ -7738,7 +7717,7 @@ msgstr "编辑权限"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Change status"
-msgstr ""
+msgstr "更改状态"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox.tsx
 msgid "queried"
@@ -7747,7 +7726,7 @@ msgstr "查询的"
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
 #: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
 msgid "They referenced columns this data source does not have."
-msgstr ""
+msgstr "它们引用了此数据源中不存在的列。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "{conceptName} fields"
@@ -7822,11 +7801,11 @@ msgstr "该图层只获取这些字段，因此添加字段后也可以用于筛
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Require"
-msgstr ""
+msgstr "必填"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Import a table or view from a database your organization runs"
-msgstr ""
+msgstr "从组织运营的数据库中导入表或视图"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
@@ -7890,7 +7869,7 @@ msgstr "选择规则（例如，最频繁）"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Database is unreachable"
-msgstr ""
+msgstr "无法访问数据库"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add tabular data to render a simple table."
@@ -8099,7 +8078,7 @@ msgstr "新共享的角色"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
-msgstr ""
+msgstr "此表的行数超过 Avandar 一次可导入的上限。请尝试使用较小的表或视图。"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
@@ -8111,7 +8090,7 @@ msgstr "发送给 AI 吗？"
 
 #: shared/copy/appLabel.ts
 msgid "Case Records"
-msgstr ""
+msgstr "案件记录"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
@@ -8120,7 +8099,7 @@ msgstr "购买 {seatsToAdd} 个座位"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
-msgstr ""
+msgstr "用户名或密码未被接受。请检查凭据后重试。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
@@ -8149,7 +8128,7 @@ msgstr "左对齐"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
-msgstr ""
+msgstr "您需要拥有案件记录编辑者权限才能更改记录状态。"
 
 #: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
@@ -8303,7 +8282,7 @@ msgstr "清除搜索"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "An unexpected error occurred while connecting."
-msgstr ""
+msgstr "连接时发生意外错误。"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
@@ -8356,7 +8335,7 @@ msgstr "仅显示数量。工作区管理员永远无法查看私有内容。您
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 msgid "What this status means"
-msgstr ""
+msgstr "此状态的含义"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupFieldSelect.tsx
 msgid "Fields"
@@ -8425,7 +8404,7 @@ msgstr "水平内边距"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source requires a login to download this dataset."
-msgstr ""
+msgstr "源要求登录才能下载此数据集。"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
@@ -8453,7 +8432,7 @@ msgstr "表单不支持 DISTINCT。"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Source data"
-msgstr ""
+msgstr "源数据"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -8461,7 +8440,7 @@ msgstr "无法将数据集设置为仅离线使用"
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Green"
-msgstr ""
+msgstr "绿色"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Hide details"
@@ -8469,7 +8448,7 @@ msgstr "隐藏详情"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Choose a case type from the sidebar to see its records."
-msgstr ""
+msgstr "从侧边栏选择案例类型以查看其记录。"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "See why"
@@ -8478,7 +8457,7 @@ msgstr "了解原因"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar can't connect to a loopback, link-local, or private address. Use "
 "a publicly reachable host and port."
-msgstr ""
+msgstr "Avandar 无法连接到回环地址、链路本地地址或专用地址。请使用可从公共网络访问的主机和端口。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
@@ -8516,7 +8495,7 @@ msgstr "线性"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 msgid "Source ID"
-msgstr ""
+msgstr "源 ID"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{droppedRowCount} rows unmapped"
@@ -8529,11 +8508,6 @@ msgstr "编辑角色组"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
 msgstr "配置文件"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-#~ msgid "They referenced columns this data source does not have: "
-#~ "{removedColumnNames}"
-#~ msgstr "它们引用了此数据源中不存在的列：{removedColumnNames}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
@@ -8668,7 +8642,7 @@ msgstr "仪表板"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 msgid "Record"
-msgstr ""
+msgstr "记录"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "integer"
@@ -8704,7 +8678,7 @@ msgstr "计数"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Default status"
-msgstr ""
+msgstr "默认状态"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
@@ -8726,7 +8700,7 @@ msgstr "感谢您的关注！"
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Case type"
-msgstr ""
+msgstr "案例类型"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
@@ -8738,7 +8712,7 @@ msgstr "来源"
 
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "Loading records"
-msgstr ""
+msgstr "正在加载记录"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
@@ -8758,7 +8732,7 @@ msgstr "推荐"
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Teal"
-msgstr ""
+msgstr "青绿色"
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
@@ -8835,7 +8809,7 @@ msgstr "平方根"
 #. placeholder {0}: status.name
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 msgid "Removed: {0}"
-msgstr ""
+msgstr "已移除：{0}"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
@@ -8849,7 +8823,7 @@ msgstr "条件"
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "{0, plural, one {# saved database available} other {# saved databases "
 "available}}"
-msgstr ""
+msgstr "{0, plural, one {# 个已保存的数据库可用} other {# 个已保存的数据库可用}}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
@@ -8861,7 +8835,7 @@ msgstr "请重试。您的仪表板仍处于已发布状态。"
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Red"
-msgstr ""
+msgstr "红色"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
@@ -9001,7 +8975,7 @@ msgstr "数据集已保存"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Connection timed out"
-msgstr ""
+msgstr "连接超时"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low to High"
@@ -9074,7 +9048,7 @@ msgstr "细微"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Activity"
-msgstr ""
+msgstr "活动"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
@@ -9296,7 +9270,7 @@ msgstr "HAVING 使用了表单不支持的运算符“{operator}”。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
-msgstr ""
+msgstr "此目录列表没有列元数据，暂时无法导入。"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
@@ -9388,7 +9362,7 @@ msgstr "上传 CSV、Excel 或 PDF 文件，连接 Google Sheet，或浏览开�
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
-msgstr ""
+msgstr "数据库未及时响应。请检查地址后重试。"
 
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
@@ -9509,7 +9483,7 @@ msgstr "选择读者应看到的字段"
 
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusList.tsx
 msgid "Removed statuses that records still use"
-msgstr ""
+msgstr "已移除记录仍在使用的状态"
 
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
@@ -9632,7 +9606,7 @@ msgstr "在 Y 轴上点击一个带标签的刻度。"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Could not connect to the database"
-msgstr ""
+msgstr "无法连接到数据库"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
@@ -9728,7 +9702,7 @@ msgstr "绘制注释区域"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "SSL mode"
-msgstr ""
+msgstr "SSL 模式"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"
@@ -9785,7 +9759,7 @@ msgstr "此图层的弹出窗口未显示任何字段。请在图层的“弹出
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Pick a case type"
-msgstr ""
+msgstr "选择案例类型"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx

@@ -19,7 +19,7 @@ msgstr "As alterações no seu método de pagamento podem ser feitas em seu"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftStatusSection.tsx
 msgid "Proposed statuses"
-msgstr ""
+msgstr "Status propostos"
 
 #. placeholder {0}: datasetMeta.rows.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -143,7 +143,7 @@ msgstr "Coluna de valor"
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Could not refresh this dataset"
-msgstr ""
+msgstr "Não foi possível atualizar este conjunto de dados"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not on"
@@ -167,7 +167,7 @@ msgstr "Diferenciar maiúsculas e minúsculas"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 msgid "Updated"
-msgstr ""
+msgstr "Atualizado"
 
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
@@ -314,11 +314,12 @@ msgstr "A descoberta não está disponível neste contexto."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "You need Case Types editor access to change these statuses."
-msgstr ""
+msgstr "Você precisa de acesso ao editor de Tipos de caso para alterar estes "
+"status."
 
 #: src/components/caseStatuses/StatusSetEditor/StatusDragHandle.tsx
 msgid "Reorder {statusName}"
-msgstr ""
+msgstr "Reordenar {statusName}"
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
@@ -503,7 +504,7 @@ msgstr "Layout da barra lateral"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Add status"
-msgstr ""
+msgstr "Adicionar status"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -527,7 +528,8 @@ msgstr "Arquivo PDF"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "These statuses changed somewhere else. Close this window and try again."
-msgstr ""
+msgstr "Estes status foram alterados em outro local. Feche esta janela e tente "
+"novamente."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
@@ -593,7 +595,8 @@ msgstr "Salvo como \"{0}\"."
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
-msgstr ""
+msgstr "Este servidor exige SSL. Defina o modo SSL como \"Require\" e tente "
+"novamente."
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Could not save. Your last change is still on screen."
@@ -668,7 +671,7 @@ msgstr "Modelo de chat offline"
 
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "{statusName} color: {colorName}"
-msgstr ""
+msgstr "Cor de {statusName}: {colorName}"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointInputControls.tsx
 msgid "Select a point geometry column"
@@ -830,7 +833,7 @@ msgstr "Erro do Google Picker"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Choose a default status from this list."
-msgstr ""
+msgstr "Escolha um status padrão desta lista."
 
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
@@ -982,7 +985,7 @@ msgstr "Você pode escolher permitir que todos no seu espaço de trabalho vejam 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Add at least one status."
-msgstr ""
+msgstr "Adicione pelo menos um status."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Unpublish"
@@ -994,7 +997,7 @@ msgstr "Crie tipos de caso no chat"
 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Choose a default status."
-msgstr ""
+msgstr "Escolha um status padrão."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -1129,7 +1132,8 @@ msgstr "Escolha quanto de cada conjunto de dados publicar. O padrão: \"Apenas o
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset.tsx
 msgid "The stages a record moves through. New records start in the default "
 "status."
-msgstr ""
+msgstr "As etapas pelas quais um registro passa. Novos registros começam no "
+"status padrão."
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
@@ -1167,7 +1171,7 @@ msgstr "Não foi possível carregar"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source file is empty."
-msgstr ""
+msgstr "O arquivo de origem está vazio."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
@@ -1226,7 +1230,7 @@ msgstr "No entanto, não estamos permitindo novas inscrições no momento."
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Open and being worked on."
-msgstr ""
+msgstr "Aberto e em andamento."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Derived dataset"
@@ -1380,7 +1384,8 @@ msgstr "Predefinição"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "Reading a sample of this dataset to confirm its columns and their types. "
 "The list below may change."
-msgstr ""
+msgstr "Lendo uma amostra deste conjunto de dados para confirmar suas colunas e "
+"tipos. A lista abaixo pode mudar."
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
@@ -1394,7 +1399,7 @@ msgstr "Recomendado se você tiver 16 GB de RAM e executar o Avandar junto com "
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/EditStatusesForm.tsx
 msgid "Save statuses"
-msgstr ""
+msgstr "Salvar status"
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
@@ -1470,7 +1475,7 @@ msgstr "Não foi possível acessar o assistente na nuvem. Usar o modelo baixado 
 #. placeholder {0}: currentStatus.name
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Status: {0}"
-msgstr ""
+msgstr "Status: {0}"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
@@ -1583,7 +1588,7 @@ msgstr "Ocultar tutorial"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Username"
-msgstr ""
+msgstr "Nome de usuário"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
@@ -1723,7 +1728,7 @@ msgstr "Gráfico de funil"
 
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "Show every status"
-msgstr ""
+msgstr "Mostrar todos os status"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Symbol"
@@ -1731,7 +1736,8 @@ msgstr "Símbolo"
 
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 msgid "{recordCount, plural, one {Move # record to} other {Move # records to}}"
-msgstr ""
+msgstr "{recordCount, plural, one {Mover # registro para} other {Mover # "
+"registros para}}"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
@@ -1758,7 +1764,7 @@ msgstr "Intervalo das marcações do eixo Y"
 
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbarRows.tsx
 msgid "No records have these statuses"
-msgstr ""
+msgstr "Nenhum registro tem estes status"
 
 #. placeholder {0}: _columnList(namedColumns)
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
@@ -1822,7 +1828,7 @@ msgstr "(Cobrança anual)"
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Every case type already has a status. Choose another name."
-msgstr ""
+msgstr "Todos os tipos de caso já têm um status. Escolha outro nome."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
@@ -1885,7 +1891,7 @@ msgstr "Detectado:"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "The record keeps its previous status. Try again in a moment."
-msgstr ""
+msgstr "O registro mantém seu status anterior. Tente novamente em instantes."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
@@ -1916,7 +1922,7 @@ msgstr "Publique todas as colunas, todas as linhas. Máxima flexibilidade para "
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActionsMenu.tsx
 msgid "More case type actions"
-msgstr ""
+msgstr "Mais ações do tipo de caso"
 
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Query failed."
@@ -2040,7 +2046,7 @@ msgstr "Selecione uma camada de dados para criar um buffer."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Cannot add dataset yet"
-msgstr ""
+msgstr "Ainda não é possível adicionar o conjunto de dados"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Paper size"
@@ -2066,7 +2072,7 @@ msgstr "Médio"
 
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "Colors for {statusName}"
-msgstr ""
+msgstr "Cores de {statusName}"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
@@ -2086,7 +2092,7 @@ msgstr "Chat"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Host"
-msgstr ""
+msgstr "Host"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the z, x and y placeholders where the server expects the tile "
@@ -2263,7 +2269,7 @@ msgstr "Os limites e nomes exibidos não implicam endosso ou aceitação oficial
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Try again. If it keeps failing, reload the page."
-msgstr ""
+msgstr "Tente novamente. Se o problema persistir, recarregue a página."
 
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
@@ -2385,13 +2391,13 @@ msgstr "Você compartilhou seu primeiro painel com seu espaço de trabalho. "
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "This dataset now reflects the current contents of the table."
-msgstr ""
+msgstr "Este conjunto de dados agora reflete o conteúdo atual da tabela."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftStatusSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusesSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesModal.tsx
 msgid "Edit statuses"
-msgstr ""
+msgstr "Editar status"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
@@ -2449,7 +2455,7 @@ msgstr "Conjunto de dados sem título"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorRow.tsx
 msgid "Remove {displayName}"
-msgstr ""
+msgstr "Remover {displayName}"
 
 #. placeholder {0}: entry.turnNumber
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
@@ -2480,7 +2486,7 @@ msgstr "1 ponto"
 #. placeholder {0}: recordCounts[status.id] ?? 0
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
 msgid "{0, plural, one {# record} other {# records}}"
-msgstr ""
+msgstr "{0, plural, one {# registro} other {# registros}}"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
@@ -2498,7 +2504,7 @@ msgstr "Cluster e Heat exigem uma vinculação completa que produza pontos."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Choose where the records of each removed status go."
-msgstr ""
+msgstr "Escolha para onde os registros de cada status removido devem ir."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
@@ -2519,7 +2525,7 @@ msgstr "Publicar"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Prod reporting replica"
-msgstr ""
+msgstr "Réplica de relatórios de produção"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
@@ -2545,7 +2551,7 @@ msgstr "Sugestão usada"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Fix the statuses above before you create this case type."
-msgstr ""
+msgstr "Corrija os status acima antes de criar este tipo de caso."
 
 #. placeholder {0}: diagnostics.duplicateBoundaryKeyCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
@@ -2612,7 +2618,7 @@ msgstr "Descartar"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Two statuses have the same name. Give each one its own name."
-msgstr ""
+msgstr "Dois status têm o mesmo nome. Dê a cada um seu próprio nome."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -2805,7 +2811,7 @@ msgstr "Seu workspace está no plano Free, que permite compartilhar ou publicar 
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Disable"
-msgstr ""
+msgstr "Desativar"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -2933,7 +2939,7 @@ msgstr "Remover séries"
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Created"
-msgstr ""
+msgstr "Criado"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Collapse the layers panel"
@@ -3008,7 +3014,7 @@ msgstr "{usedSeats} de {maxSeats} assentos utilizados · {remainingSeats} "
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusesSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
 msgid "Statuses"
-msgstr ""
+msgstr "Status"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Largest catalog option. Maximum offline capability when RAM and download "
@@ -3115,7 +3121,7 @@ msgstr "Nenhum atributo ou conjunto de dados está configurado."
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "No longer being worked on."
-msgstr ""
+msgstr "Não está mais em desenvolvimento."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
@@ -3134,7 +3140,7 @@ msgstr "Desenhe uma caixa ao redor de uma tabela, gráfico, mapa ou bloco de "
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/testAndSavePostgresConnection.ts
 msgid "Listing tables..."
-msgstr ""
+msgstr "Listando tabelas..."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
@@ -3147,7 +3153,7 @@ msgstr "Pré-visualização de dados"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This address isn't allowed"
-msgstr ""
+msgstr "Este endereço não é permitido"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Your Google connection expired"
@@ -3205,7 +3211,7 @@ msgstr "Concluído"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From a database"
-msgstr ""
+msgstr "De um banco de dados"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
@@ -3265,7 +3271,7 @@ msgstr "A atualização para um plano \"Pague o que quiser\" só pode ser feita 
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem.tsx
 msgid "Refresh from the database"
-msgstr ""
+msgstr "Atualizar do banco de dados"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
@@ -3328,7 +3334,7 @@ msgstr "é no máximo"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Use a database"
-msgstr ""
+msgstr "Usar um banco de dados"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is"
@@ -3390,7 +3396,8 @@ msgstr "Nenhum"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "This dataset is indexed in {serviceName}, but it can't be loaded."
-msgstr ""
+msgstr "Este conjunto de dados está indexado em {serviceName}, mas não pode ser "
+"carregado."
 
 #: src/views/ProfileView/PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
@@ -3410,7 +3417,7 @@ msgstr "Formato da grade"
 #. placeholder {0}: error instanceof Error ? error.message : String(error)
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Failed to save dashboard: {0}"
-msgstr ""
+msgstr "Falha ao salvar o painel: {0}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish"
@@ -3597,7 +3604,7 @@ msgstr "termina com"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Table or view to import"
-msgstr ""
+msgstr "Tabela ou visualização a importar"
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
@@ -3647,7 +3654,7 @@ msgstr "Dividir (+/-)"
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Active"
-msgstr ""
+msgstr "Ativo"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default values, comma-separated or JSON array"
@@ -3660,10 +3667,6 @@ msgstr "Confirmar Ação"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "Nenhum dashboard para exibir"
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-#~ msgid "A type of record you manage"
-#~ msgstr "Um tipo de registro que você gerencia"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -3707,7 +3710,7 @@ msgstr "Peça-me para adicionar um gráfico a este painel. Eu escolherei um tipo
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "Reading a sample of this dataset to find its columns."
-msgstr ""
+msgstr "Lendo uma amostra deste conjunto de dados para encontrar suas colunas."
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Dashboard saved successfully!"
@@ -3851,7 +3854,7 @@ msgstr "Manter as medições como encontradas"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
-msgstr ""
+msgstr "É necessária uma conexão segura"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
@@ -3900,7 +3903,7 @@ msgstr "Nome de {0}"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table is too large to import"
-msgstr ""
+msgstr "Esta tabela é grande demais para ser importada"
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Please <0>email us</0> if you would like access."
@@ -4100,7 +4103,7 @@ msgstr "Página {0} do PDF"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{attributeCount, plural, one {# attribute} other {# attributes}}"
-msgstr ""
+msgstr "{attributeCount, plural, one {# atributo} other {# atributos}}"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Get an answer out of the data you just added."
@@ -4279,7 +4282,7 @@ msgstr "Somente você pode acessar este {resource}. Todas as outras pessoas "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 msgid "Can't be loaded"
-msgstr ""
+msgstr "Não pode ser carregado"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -4308,7 +4311,7 @@ msgstr "Limite alcançado"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Your statuses were not saved. Try again in a moment."
-msgstr ""
+msgstr "Seus status não foram salvos. Tente novamente daqui a pouco."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Go to billing portal"
@@ -4367,7 +4370,8 @@ msgstr "Carregar CSV"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source file isn't in a format Avandar can read as a table."
-msgstr ""
+msgstr "O arquivo de origem não está em um formato que o Avandar consiga ler "
+"como tabela."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
@@ -4483,7 +4487,7 @@ msgstr "{description} {recommendedIf} (~{approxSizeMb} MB para download)."
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
-msgstr ""
+msgstr "Falha na autenticação"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Hex"
@@ -4551,7 +4555,7 @@ msgstr "Campos que vêm de conjuntos de dados"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Port"
-msgstr ""
+msgstr "Porta"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
@@ -4635,7 +4639,8 @@ msgstr "GROUP BY usa uma expressão que não é uma coluna."
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Checking this dataset's columns first. It will be added to your "
 "workspace as soon as that finishes."
-msgstr ""
+msgstr "Verificando primeiro as colunas deste conjunto de dados. Ele será "
+"adicionado ao seu espaço de trabalho assim que isso for concluído."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make private"
@@ -4836,7 +4841,9 @@ msgstr "Gerando SQL…"
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/RenameWarning.tsx
 msgid "Saved filters and dashboards find records by status name. Filters that "
 "use {renamedList} will stop finding records once you save."
-msgstr ""
+msgstr "Filtros e painéis salvos encontram registros pelo nome do status. Os "
+"filtros que usam {renamedList} deixarão de encontrar registros depois "
+"que você salvar."
 
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
@@ -4846,7 +4853,7 @@ msgstr "Revise novamente, desde o início, como criar e compartilhar um "
 #. placeholder {0}: columns.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "{0}"
-msgstr ""
+msgstr "{0}"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -4854,7 +4861,7 @@ msgstr "Rotação dos rótulos do eixo X"
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Refreshed from the database"
-msgstr ""
+msgstr "Atualizado do banco de dados"
 
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
@@ -4881,7 +4888,7 @@ msgstr "Rótulo, por exemplo, Região"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Records can only move to a status in this list."
-msgstr ""
+msgstr "Os registros só podem ser movidos para um status desta lista."
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} m"
@@ -4900,10 +4907,6 @@ msgstr "Excluir este workspace"
 msgid "Edit {name}"
 msgstr "Editar {name}"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
-#~ msgid "Column name (must match SQL)"
-#~ msgstr "Nome da coluna (deve corresponder ao SQL)"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
 msgstr "{usedSeats} de {maxSeats} assentos usados · {remainingSeats} restantes"
@@ -4918,7 +4921,8 @@ msgstr "Nenhum dado de frequência disponível."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "We couldn't check this dataset's columns. Try adding it again."
-msgstr ""
+msgstr "Não foi possível verificar as colunas deste conjunto de dados. Tente "
+"adicioná-lo novamente."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "We'll add this visualization to your new dashboard."
@@ -4926,7 +4930,7 @@ msgstr "Adicionaremos esta visualização ao seu novo painel."
 
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "All statuses"
-msgstr ""
+msgstr "Todos os status"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Repairing query…"
@@ -4975,7 +4979,8 @@ msgstr "Qualquer pessoa com o link pode visualizar este {resource}. As pessoas "
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "The person who added this sheet needs to reconnect their Google account. "
 "Ask them to reconnect it, then try again."
-msgstr ""
+msgstr "A pessoa que adicionou esta planilha precisa reconectar a conta do "
+"Google. Peça a ela para reconectá-la e tente novamente."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
@@ -5053,7 +5058,7 @@ msgstr "Gráfico identificado (mapa, gráfico, blocos)"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Allowed"
-msgstr ""
+msgstr "Permitido"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
@@ -5102,7 +5107,7 @@ msgstr "A cláusula JOIN ON usa uma referência que não é uma coluna; o "
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/useSaveCaseTypeStatuses.ts
 msgid "Statuses saved"
-msgstr ""
+msgstr "Status salvos"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
@@ -5158,7 +5163,7 @@ msgstr "Partes deste SQL não puderam ser representadas no formulário Manual. O
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Database"
-msgstr ""
+msgstr "Banco de dados"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
@@ -5208,7 +5213,7 @@ msgstr "Linhas ignoradas"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Databases"
-msgstr ""
+msgstr "Bancos de dados"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Not yet published. Viewers will not see this."
@@ -5343,7 +5348,7 @@ msgstr "Baixar PDF"
 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Enter a name."
-msgstr ""
+msgstr "Digite um nome."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -5443,7 +5448,7 @@ msgstr "Este dashboard ainda está público na web. Qualquer pessoa com o link "
 
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "Filter by status"
-msgstr ""
+msgstr "Filtrar por status"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields.tsx
 msgid "Select columns"
@@ -5658,7 +5663,7 @@ msgstr "Conjunto de dados carregado com sucesso"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Every status needs a name."
-msgstr ""
+msgstr "Todo status precisa ter um nome."
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
@@ -5682,7 +5687,7 @@ msgstr "Opções (separadas por vírgula, para modos de seleção)"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Postgres"
-msgstr ""
+msgstr "Postgres"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
@@ -5769,7 +5774,7 @@ msgstr "Valores indeterminados"
 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Another status has this name."
-msgstr ""
+msgstr "Outro status tem este nome."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
@@ -5799,7 +5804,7 @@ msgstr "Carregando {layerName}"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "One of the colors is not in the palette. Pick another color."
-msgstr ""
+msgstr "Uma das cores não está na paleta. Escolha outra cor."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "This is the data explorer. Ask a question in your own words, like \"how "
@@ -5845,7 +5850,7 @@ msgstr "Seu plano atual permite apenas compartilhar ou publicar {maxAllowed, "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The file was downloaded, but Avandar couldn't read it as a table."
-msgstr ""
+msgstr "O arquivo foi baixado, mas o Avandar não conseguiu lê-lo como tabela."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
@@ -5878,7 +5883,7 @@ msgstr "Desenhar uma seta"
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Purple"
-msgstr ""
+msgstr "Roxo"
 
 #: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
 msgid "This tool arrives in a later release."
@@ -6126,7 +6131,9 @@ msgstr "Rótulo da série"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "We couldn't read a sample of this dataset, so its columns and their "
 "types are not confirmed. Adding it will try again."
-msgstr ""
+msgstr "Não foi possível ler uma amostra deste conjunto de dados, portanto suas "
+"colunas e tipos não foram confirmados. Ao adicioná-lo, tentaremos "
+"novamente."
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -6209,7 +6216,7 @@ msgstr "Limite superior"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/testAndSavePostgresConnection.ts
 msgid "Connecting to database"
-msgstr ""
+msgstr "Conectando ao banco de dados"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -6251,7 +6258,7 @@ msgstr "{mapped} de {total} linhas mapeadas"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 msgid "Missing from source since"
-msgstr ""
+msgstr "Ausente na fonte desde"
 
 #. placeholder {0}: guess.latitudeColumnName
 #. placeholder {1}: guess.longitudeColumnName
@@ -6288,11 +6295,11 @@ msgstr "é anterior ou igual a"
 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Choose a status for these records."
-msgstr ""
+msgstr "Escolha um status para estes registros."
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Inactive"
-msgstr ""
+msgstr "Inativo"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -6544,7 +6551,8 @@ msgstr "Nome do espaço de trabalho atualizado"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
 "the server allows connections from Avandar."
-msgstr ""
+msgstr "O Avandar não conseguiu acessar esse host e essa porta. Verifique o "
+"endereço e se o servidor permite conexões do Avandar."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
@@ -6612,7 +6620,7 @@ msgstr "Vamos permitir que outras pessoas vejam seu painel"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Records added by hand"
-msgstr ""
+msgstr "Registros adicionados manualmente"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -6635,11 +6643,11 @@ msgstr "Estilo de donut"
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftStatusSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
 msgid "Default"
-msgstr ""
+msgstr "Padrão"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Not allowed"
-msgstr ""
+msgstr "Não permitido"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
@@ -6732,7 +6740,7 @@ msgstr "Atribuição da fonte (Sempre incluída)"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 msgid "Status name"
-msgstr ""
+msgstr "Nome do status"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock.tsx
@@ -6913,7 +6921,8 @@ msgstr "Tente novamente em instantes ou entre em contato com o suporte se o "
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
-msgstr ""
+msgstr "O usuário do banco de dados deve ter, idealmente, acesso somente "
+"leitura à tabela ou à visualização que você planeja importar."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
@@ -6993,13 +7002,16 @@ msgstr "Data de produção (Sempre incluída)"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{recordCount, plural, one {# record} other {# records}}"
-msgstr ""
+msgstr "{recordCount, plural, one {# registro} other {# registros}}"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusDragHandle.tsx
 msgid "Press Space or Enter to pick up this status, move it with the arrow "
 "keys, then press Space or Enter to drop it. Or hold Alt and press the up "
 "or down arrow to move it one place."
-msgstr ""
+msgstr "Pressione Espaço ou Enter para selecionar este status, mova-o com as "
+"teclas de seta e pressione Espaço ou Enter para soltá-lo. Ou mantenha "
+"Alt pressionada e pressione a seta para cima ou para baixo para movê-lo "
+"uma posição."
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "Update now"
@@ -7110,7 +7122,7 @@ msgstr "Essa consulta falhou. Por favor, corrija o SQL e tente novamente."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Schema"
-msgstr ""
+msgstr "Esquema"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Repeating labelled blocks"
@@ -7169,11 +7181,6 @@ msgstr "não termina com"
 msgid "Add layer"
 msgstr "Adicionar camada"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
-#~ msgid "This catalog entry has no column metadata. It cannot be imported yet."
-#~ msgstr "Esta entrada de catálogo não possui metadados de coluna. Não pode ser "
-#~ "importada ainda."
-
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
 msgstr "Modelo de chat offline pronto"
@@ -7206,7 +7213,7 @@ msgstr "Ponderar por"
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Gray"
-msgstr ""
+msgstr "Cinza"
 
 #. placeholder {0}: err.message
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -7250,7 +7257,7 @@ msgstr "Primeiras {0} linhas"
 
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 msgid "Choose a status"
-msgstr ""
+msgstr "Escolha um status"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Data processing failed"
@@ -7270,7 +7277,7 @@ msgstr "Intervalo de tempo"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "Status not changed"
-msgstr ""
+msgstr "Status não alterado"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
@@ -7280,7 +7287,7 @@ msgstr "Este conjunto de dados é grande, então aplicamos um limite de 100 "
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Yellow"
-msgstr ""
+msgstr "Amarelo"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
@@ -7352,12 +7359,12 @@ msgstr "Limite inferior"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "This sheet can't be read right now"
-msgstr ""
+msgstr "Esta planilha não pode ser lida no momento"
 
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorRow.tsx
 msgid "Untitled status"
-msgstr ""
+msgstr "Status sem título"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -7370,7 +7377,7 @@ msgstr "Seu plano atual suporta apenas até {0} conjuntos de dados. Faça upgrad
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "Checking column types"
-msgstr ""
+msgstr "Verificando os tipos de coluna"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
 msgid "Mark done"
@@ -7445,7 +7452,8 @@ msgstr "Copiar link de compartilhamento"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The file is hosted on a different site from the one that lists it, so "
 "Avandar doesn't download it."
-msgstr ""
+msgstr "O arquivo está hospedado em um site diferente daquele que o lista, por "
+"isso o Avandar não faz o download."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Leave empty when the geometry is already WGS 84."
@@ -7497,7 +7505,7 @@ msgstr "Número de linhas"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The site that hosts the file didn't respond. This may be temporary."
-msgstr ""
+msgstr "O site que hospeda o arquivo não respondeu. Isso pode ser temporário."
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Form is an approximation"
@@ -7692,7 +7700,7 @@ msgstr "A latitude ou a longitude está vazia"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 msgid "Make {displayName} the default"
-msgstr ""
+msgstr "Tornar {displayName} o padrão"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
@@ -7829,7 +7837,7 @@ msgstr "Remover condição"
 
 #: shared/copy/appLabel.ts
 msgid "Case Types"
-msgstr ""
+msgstr "Tipos de caso"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
 msgid "Open case type"
@@ -7883,7 +7891,7 @@ msgstr "Reescrita sugerida:"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source no longer has this dataset."
-msgstr ""
+msgstr "A fonte não tem mais este conjunto de dados."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -7928,19 +7936,9 @@ msgstr "Original mantido"
 msgid "{lengthValue} km"
 msgstr "{lengthValue} km"
 
-#. placeholder {0}: load.savedConnections?.length
-#. placeholder {1}: load.savedConnections?.length === 1 ? "database" : "databases"
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
-#~ msgid "{0} saved {1} available"
-#~ msgstr ""
-
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "Linha de origem"
-
-#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
-#~ msgid "Nothing more to load"
-#~ msgstr "Nada mais para carregar"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
@@ -7981,7 +7979,7 @@ msgstr "Google Sheets"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "+ New database"
-msgstr ""
+msgstr "+ Novo banco de dados"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "None of the selected regions produced any rows yet, so there are no "
@@ -8013,7 +8011,7 @@ msgstr "Editar permissões"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Change status"
-msgstr ""
+msgstr "Alterar status"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox.tsx
 msgid "queried"
@@ -8022,7 +8020,7 @@ msgstr "consultado"
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
 #: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
 msgid "They referenced columns this data source does not have."
-msgstr ""
+msgstr "Foram referenciadas colunas que esta fonte de dados não possui."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "{conceptName} fields"
@@ -8099,11 +8097,12 @@ msgstr "A camada busca exatamente estes campos, portanto adicionar um campo "
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Require"
-msgstr ""
+msgstr "Obrigatório"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Import a table or view from a database your organization runs"
-msgstr ""
+msgstr "Importe uma tabela ou visualização de um banco de dados administrado "
+"pela sua organização"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
@@ -8171,7 +8170,7 @@ msgstr "Selecionar regra (por exemplo, mais frequente)"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Database is unreachable"
-msgstr ""
+msgstr "Não foi possível acessar o banco de dados"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add tabular data to render a simple table."
@@ -8386,7 +8385,8 @@ msgstr "Função para novo compartilhamento"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
-msgstr ""
+msgstr "Esta tabela tem mais linhas do que o Avandar consegue importar de uma "
+"só vez. Tente usar uma tabela ou visualização menor."
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
@@ -8398,7 +8398,7 @@ msgstr "Enviar para IA?"
 
 #: shared/copy/appLabel.ts
 msgid "Case Records"
-msgstr ""
+msgstr "Registros de caso"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
@@ -8407,7 +8407,8 @@ msgstr "Comprar {seatsToAdd} assentos"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
-msgstr ""
+msgstr "O nome de usuário ou a senha não foram aceitos. Verifique as "
+"credenciais e tente novamente."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
@@ -8436,7 +8437,8 @@ msgstr "Esquerda"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
-msgstr ""
+msgstr "Você precisa ter acesso de editor aos registros de caso para alterar o "
+"status de um registro."
 
 #: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
@@ -8592,7 +8594,7 @@ msgstr "Limpar pesquisa"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "An unexpected error occurred while connecting."
-msgstr ""
+msgstr "Ocorreu um erro inesperado ao conectar."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
@@ -8648,7 +8650,7 @@ msgstr "Apenas contagens. O conteúdo privado nunca é visível para "
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 msgid "What this status means"
-msgstr ""
+msgstr "O que este status significa"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupFieldSelect.tsx
 msgid "Fields"
@@ -8723,7 +8725,7 @@ msgstr "Preenchimento horizontal"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source requires a login to download this dataset."
-msgstr ""
+msgstr "A fonte exige um login para baixar este conjunto de dados."
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
@@ -8751,7 +8753,7 @@ msgstr "DISTINCT não é compatível com o formulário."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Source data"
-msgstr ""
+msgstr "Dados de origem"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -8759,7 +8761,7 @@ msgstr "Não foi possível tornar o conjunto de dados apenas offline."
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Green"
-msgstr ""
+msgstr "Verde"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Hide details"
@@ -8767,7 +8769,7 @@ msgstr "Ocultar detalhes"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Choose a case type from the sidebar to see its records."
-msgstr ""
+msgstr "Escolha um tipo de caso na barra lateral para ver seus registros."
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "See why"
@@ -8776,7 +8778,8 @@ msgstr "Saiba por quê"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar can't connect to a loopback, link-local, or private address. Use "
 "a publicly reachable host and port."
-msgstr ""
+msgstr "O Avandar não consegue se conectar a um endereço de loopback, de link "
+"local ou privado. Use um host e uma porta acessíveis publicamente."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
@@ -8817,7 +8820,7 @@ msgstr "linear"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 msgid "Source ID"
-msgstr ""
+msgstr "ID da fonte"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{droppedRowCount} rows unmapped"
@@ -8830,12 +8833,6 @@ msgstr "Editar grupo de funções"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
 msgstr "Perfis"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-#~ msgid "They referenced columns this data source does not have: "
-#~ "{removedColumnNames}"
-#~ msgstr "Foram referenciadas colunas que esta fonte de dados não possui: "
-#~ "{removedColumnNames}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
@@ -8971,7 +8968,7 @@ msgstr "Painéis"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 msgid "Record"
-msgstr ""
+msgstr "Registro"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "integer"
@@ -9009,7 +9006,7 @@ msgstr "Contagem"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Default status"
-msgstr ""
+msgstr "Status padrão"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
@@ -9034,7 +9031,7 @@ msgstr "Obrigado pelo seu interesse!"
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Case type"
-msgstr ""
+msgstr "Tipo de caso"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
@@ -9046,7 +9043,7 @@ msgstr "Origem"
 
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "Loading records"
-msgstr ""
+msgstr "Carregando registros"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
@@ -9066,7 +9063,7 @@ msgstr "Recomendado"
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Teal"
-msgstr ""
+msgstr "Verde-azulado"
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
@@ -9144,7 +9141,7 @@ msgstr "Raiz quadrada"
 #. placeholder {0}: status.name
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 msgid "Removed: {0}"
-msgstr ""
+msgstr "Removido: {0}"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
@@ -9158,7 +9155,8 @@ msgstr "Condição"
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "{0, plural, one {# saved database available} other {# saved databases "
 "available}}"
-msgstr ""
+msgstr "{0, plural, one {# banco de dados salvo disponível} other {# bancos de "
+"dados salvos disponíveis}}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
@@ -9170,7 +9168,7 @@ msgstr "Tente novamente. Seu dashboard ainda está publicado."
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Red"
-msgstr ""
+msgstr "Vermelho"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
@@ -9316,7 +9314,7 @@ msgstr "Conjunto de dados salvo"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Connection timed out"
-msgstr ""
+msgstr "A conexão expirou"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low to High"
@@ -9390,7 +9388,7 @@ msgstr "Sutil"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Activity"
-msgstr ""
+msgstr "Atividade"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
@@ -9619,7 +9617,8 @@ msgstr "HAVING usa o operador \"{operator}\", que não é compatível com o "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
-msgstr ""
+msgstr "Esta listagem de catálogo não tem metadados de coluna. Ela ainda não "
+"pode ser importada."
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
@@ -9719,7 +9718,8 @@ msgstr "Envie um arquivo CSV, Excel ou PDF, conecte uma Google Sheet ou navegue 
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
-msgstr ""
+msgstr "O banco de dados não respondeu a tempo. Verifique o endereço e tente "
+"novamente."
 
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
@@ -9844,7 +9844,7 @@ msgstr "Selecione os campos que o leitor deve visualizar"
 
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusList.tsx
 msgid "Removed statuses that records still use"
-msgstr ""
+msgstr "Status removidos que ainda são usados pelos registros"
 
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
@@ -9967,7 +9967,7 @@ msgstr "Clique em uma marca rotulada no eixo Y."
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Could not connect to the database"
-msgstr ""
+msgstr "Não foi possível conectar ao banco de dados"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
@@ -10070,7 +10070,7 @@ msgstr "Desenhar uma área de anotação"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "SSL mode"
-msgstr ""
+msgstr "Modo SSL"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"
@@ -10128,7 +10128,7 @@ msgstr "O pop-up desta camada não exibe nenhum campo. Escolha alguns na seção
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Pick a case type"
-msgstr ""
+msgstr "Escolha um tipo de caso"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
