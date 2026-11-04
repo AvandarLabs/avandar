@@ -78,6 +78,21 @@ describe("SupabasePrunePlan.make", () => {
     ]);
   });
 
+  it("keeps a project whose worktree is gone but whose branch still exists", () => {
+    const project = _makeProject("custom-id", [`${ROOT}/feat/nux-old`]);
+    const plan = SupabasePrunePlan.make({
+      ...BASE_INPUT,
+      localBranches: [...BASE_INPUT.localBranches, "feat/nux-old"],
+      dockerProjects: [project],
+    });
+
+    expect(plan.candidates).toEqual([]);
+    expect(plan.kept[0]?.reason).toEqual({
+      kind: "branchExists",
+      branch: "feat/nux-old",
+    });
+  });
+
   it("offers a volume-only project named like a branch that no longer exists", () => {
     const project = _makeProject("fix-gone");
 

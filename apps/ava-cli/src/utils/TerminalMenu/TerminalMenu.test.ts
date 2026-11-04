@@ -129,6 +129,18 @@ describe("TerminalMenu.makeLines", () => {
     ).toEqual(["  [x] feat-a", "› [ ] feat-b"]);
   });
 
+  it("cuts a line to the terminal width so a redraw never wraps", () => {
+    expect(
+      TerminalMenu.makeLines({
+        state: { cursorIndex: 0, selectedIndexes: [0] },
+        labels: ["feat-a  (worktree ~/src/worktrees/avandar/feat/a is gone)"],
+        isMultiSelect: true,
+        isColorEnabled: false,
+        maxWidth: 20,
+      }),
+    ).toEqual(["› [x] feat-a  (work…"]);
+  });
+
   it("drops the boxes in a single-choice menu", () => {
     expect(
       TerminalMenu.makeLines({

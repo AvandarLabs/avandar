@@ -118,15 +118,26 @@ function _reduceKey(
   }
 }
 
+function _truncate(
+  options: Readonly<{ text: string; maxWidth: number | undefined }>,
+): string {
+  const { text, maxWidth } = options;
+  return maxWidth === undefined || [...text].length <= maxWidth
+    ? text
+    : `${[...text].slice(0, Math.max(maxWidth - 1, 0)).join("")}…`;
+}
+
 function _makeLines(
   options: Readonly<{
     state: MenuState;
     labels: readonly string[];
     isMultiSelect: boolean;
     isColorEnabled: boolean;
+    /** Widest a line may be, so a redraw never wraps onto an extra row. */
+    maxWidth?: number;
   }>,
 ): string[] {
-  const { state, labels, isMultiSelect, isColorEnabled } = options;
+  const { state, labels, isMultiSelect, isColorEnabled, maxWidth } = options;
   return labels.map((label, index) => {
     const isCurrent = index === state.cursorIndex;
     const checkbox = isMultiSelect
@@ -134,7 +145,10 @@ function _makeLines(
         ? "[x] "
         : "[ ] "
       : "";
-    const line = `${isCurrent ? "›" : " "} ${checkbox}${label}`;
+    const line = _truncate({
+      text: `${isCurrent ? "›" : " "} ${checkbox}${label}`,
+      maxWidth,
+    });
     return isCurrent
       ? CliTheme.paint({ style: "selection", text: line, isColorEnabled })
       : line;
@@ -160,10 +174,20 @@ function _prompt(
   let drawnLineCount = 0;
 
   const draw = () => {
+    // One column spare, since some terminals wrap a line that fills the row.
+    const maxWidth = Math.max((stderr.columns || 80) - 1, 20);
     const lines = [
-      CliTheme.paint({ style: "prompt", text: options.title, isColorEnabled }),
-      CliTheme.paint({ style: "muted", text: options.hint, isColorEnabled }),
-      ..._makeLines({ ...options, state, isColorEnabled }),
+      CliTheme.paint({
+        style: "prompt",
+        text: _truncate({ text: options.title, maxWidth }),
+        isColorEnabled,
+      }),
+      CliTheme.paint({
+        style: "muted",
+        text: _truncate({ text: options.hint, maxWidth }),
+        isColorEnabled,
+      }),
+      ..._makeLines({ ...options, state, isColorEnabled, maxWidth }),
     ];
     const rewind =
       drawnLineCount > 0 ? `\u001B[${drawnLineCount}A\u001B[J` : "";

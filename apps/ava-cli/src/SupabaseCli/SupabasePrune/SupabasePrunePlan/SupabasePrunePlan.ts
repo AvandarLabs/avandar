@@ -76,21 +76,50 @@ function _getWorktreeRoots(worktrees: readonly BranchWorktree[]): string[] {
   ];
 }
 
+/**
+ * The branch a workdir under a worktree root was named after, e.g.
+ * `feat/nux` for `<root>/feat/nux`.
+ */
+function _getBranchesFromWorkdirs(
+  options: Readonly<{
+    workdirs: readonly string[];
+    worktreeRoots: readonly string[];
+  }>,
+): string[] {
+  return options.workdirs.flatMap((workdir) => {
+    return options.worktreeRoots.flatMap((root) => {
+      return workdir.startsWith(`${root}${path.sep}`)
+        ? [workdir.slice(root.length + 1)]
+        : [];
+    });
+  });
+}
+
 function _getKeepReason(
   options: Readonly<{
     project: DockerSupabaseProject;
     input: MakePrunePlanOptions;
+    worktreeRoots: readonly string[];
   }>,
 ): KeepReason | undefined {
-  const { project, input } = options;
+  const { project, input, worktreeRoots } = options;
   const user = input.worktreeProjectIds.find(({ projectId }) => {
     return projectId === project.projectId;
   });
   if (user !== undefined) {
     return { kind: "usedByWorktree", worktreePath: user.worktreePath };
   }
+  // A project belongs to a live branch either by its default id or by the
+  // worktree it was started in, which custom ids still record.
+  const workdirBranches = _getBranchesFromWorkdirs({
+    workdirs: project.workdirs,
+    worktreeRoots,
+  });
   const branch = input.localBranches.find((localBranch) => {
-    return _getProjectIdFromBranch(localBranch) === project.projectId;
+    return (
+      _getProjectIdFromBranch(localBranch) === project.projectId ||
+      workdirBranches.includes(localBranch)
+    );
   });
   if (branch !== undefined) {
     return { kind: "branchExists", branch };
@@ -151,7 +180,11 @@ function _make(
       return projectId !== options.sharedProjectId;
     })
     .reduce((plan, project) => {
-      const keepReason = _getKeepReason({ project, input: options });
+      const keepReason = _getKeepReason({
+        project,
+        input: options,
+        worktreeRoots,
+      });
       if (keepReason !== undefined) {
         return {
           ...plan,
