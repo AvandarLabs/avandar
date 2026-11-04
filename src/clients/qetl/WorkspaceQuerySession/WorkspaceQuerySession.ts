@@ -121,8 +121,8 @@ function _createWorkspaceQetlClient(
     state: {
       // The per-relation half of authorization. Membership is checked once per
       // `runQuery` above; this checks what the statement actually named, and
-      // refuses rather than silently dropping a reference the workspace does not
-      // own.
+      // refuses rather than silently dropping a reference the workspace does
+      // not own.
       getQueryDependencies: async (rawSql) => {
         return await assertWorkspaceRelations({
           workspaceId: options.workspaceId,
