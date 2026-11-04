@@ -1,0 +1,138 @@
+name: CI/CD for Demos
+
+# Deploys any `demo/*` branch to https://demo.avandarlabs.com. Each demo gets
+# its own Supabase branch on the staging project (`demo/measles` becomes
+# `demo-measles`), created on the first push. Only one demo is live at a time:
+# the demo domain serves whichever `demo/*` branch deployed last.
+#
+# Secrets are read from the `staging` GitHub environment so demos reuse the
+# staging edge function keys instead of keeping a second copy.
+
+on:
+  push:
+    branches:
+      - "demo/**"
+  workflow_dispatch:
+
+# Never cancel a deploy halfway through a migration. Pushes queue instead.
+concurrency:
+  group: demo-deploy
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: 24.15.0
+  SUPABASE_CLI_VERSION: 2.98.2
+  VERCEL_CLI_VERSION: 64.7.0
+  DEMO_APP_URL: https://demo.avandarlabs.com
+  VERCEL_ENVIRONMENT: demo
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: staging
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      STAGING_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v5
+      - run: corepack enable
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          package-manager-cache: true
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - name: Ensure the demo's Supabase branch exists
+        run: |
+          DEMO_ENV_FILE="$GITHUB_ENV" \
+            bash scripts/demo/ensureSupabaseBranch.sh "$GITHUB_REF_NAME"
+
+      - name: Apply migrations
+        env:
+          SUPABASE_DB_PASSWORD: ${{ env.DEMO_DB_PASSWORD }}
+        run: |
+          supabase link --project-ref "$DEMO_SUPABASE_REF"
+          supabase db push --include-all
+
+      - name: Set edge function secrets
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          POLAR_ACCESS_TOKEN: ${{ secrets.POLAR_ACCESS_TOKEN }}
+          UPSTASH_REDIS_API_URL: ${{ secrets.UPSTASH_REDIS_API_URL }}
+          UPSTASH_REDIS_REST_API_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_API_TOKEN }}
+          RESEND_SENDING_API_KEY: ${{ secrets.RESEND_SENDING_API_KEY }}
+          RESEND_FULL_ACCESS_API_KEY: ${{ secrets.RESEND_FULL_ACCESS_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
+          FEATUREBASE_JWT_SECRET: ${{ secrets.FEATUREBASE_JWT_SECRET }}
+          AVA_PIPELINE_SERVER_SECRET: ${{ secrets.AVA_PIPELINE_SERVER_SECRET }}
+        run: |
+          secrets_file="$RUNNER_TEMP/demo-functions.env"
+          {
+            echo "SB_SECRET_KEY=$DEMO_SECRET_KEY"
+            echo "SB_PUBLISHABLE_KEY=$DEMO_PUBLISHABLE_KEY"
+            echo "MODE=staging"
+            echo "VITE_APP_URL=$DEMO_APP_URL"
+            echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID"
+            echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET"
+            echo "GOOGLE_REDIRECT_URI=$DEMO_SUPABASE_URL/functions/v1/google-auth-callback"
+            echo "POLAR_ACCESS_TOKEN=$POLAR_ACCESS_TOKEN"
+            echo "POLAR_SERVER_TYPE=sandbox"
+            echo "UPSTASH_REDIS_API_URL=$UPSTASH_REDIS_API_URL"
+            echo "UPSTASH_REDIS_REST_API_TOKEN=$UPSTASH_REDIS_REST_API_TOKEN"
+            echo "RESEND_SENDING_API_KEY=$RESEND_SENDING_API_KEY"
+            echo "RESEND_FULL_ACCESS_API_KEY=$RESEND_FULL_ACCESS_API_KEY"
+            echo "RESEND_SITE_IMG_URL=https://avandarlabs.com"
+            echo "OPENAI_API_KEY=$OPENAI_API_KEY"
+            echo "OPEN_ROUTER_API_KEY=$OPEN_ROUTER_API_KEY"
+            echo "FEATUREBASE_JWT_SECRET=$FEATUREBASE_JWT_SECRET"
+            echo "AVA_PIPELINE_SERVER_SECRET=$AVA_PIPELINE_SERVER_SECRET"
+          } > "$secrets_file"
+          supabase secrets set --project-ref "$DEMO_SUPABASE_REF" \
+            --env-file "$secrets_file"
+          rm "$secrets_file"
+
+      - name: Deploy edge functions
+        run: supabase functions deploy --project-ref "$DEMO_SUPABASE_REF"
+
+      - name: Point Supabase Auth at the demo domain
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --request PATCH \
+            "https://api.supabase.com/v1/projects/$DEMO_SUPABASE_REF/config/auth" \
+            --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data "{\"site_url\": \"$DEMO_APP_URL\", \"uri_allow_list\": \"$DEMO_APP_URL/**\"}" \
+            > /dev/null
+
+      - name: Pull the Vercel demo environment
+        run: |
+          npx --yes "vercel@$VERCEL_CLI_VERSION" pull --yes \
+            --environment="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
+          # These three come from the demo's Supabase branch below. A value
+          # set in Vercel would point the build at the wrong database.
+          if grep -qE '^(VITE_SUPABASE_API_URL|VITE_SUPABASE_ANON_KEY|VITE_APP_URL)=' \
+            ".vercel/.env.$VERCEL_ENVIRONMENT.local"; then
+            echo "Remove VITE_SUPABASE_API_URL, VITE_SUPABASE_ANON_KEY and VITE_APP_URL from the Vercel '$VERCEL_ENVIRONMENT' environment." >&2
+            exit 1
+          fi
+
+      - name: Build and deploy to Vercel
+        env:
+          VITE_SUPABASE_API_URL: ${{ env.DEMO_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ env.DEMO_PUBLISHABLE_KEY }}
+          VITE_APP_URL: ${{ env.DEMO_APP_URL }}
+        run: |
+          npx --yes "vercel@$VERCEL_CLI_VERSION" build \
+            --target="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
+          npx --yes "vercel@$VERCEL_CLI_VERSION" deploy --prebuilt \
+            --target="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
