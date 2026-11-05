@@ -29,6 +29,32 @@ describe("isEmpty", () => {
     ]);
   });
 
+  it("treats sets and maps with no entries as empty", () => {
+    expect([
+      isEmpty(new Set()),
+      isEmpty(new Map()),
+      isEmpty(new Set([1])),
+      isEmpty(new Map([["a", 1]])),
+    ]).toEqual([true, true, false, false]);
+  });
+
+  it("keeps a set and a map usable in both branches", () => {
+    const ids = new Set<number>();
+    if (isEmpty(ids)) {
+      expectTypeOf(ids).not.toBeNever();
+      expectTypeOf(ids).toExtend<Set<number>>();
+    } else {
+      expectTypeOf(ids).toEqualTypeOf<Set<number>>();
+    }
+    const totals = new Map<string, number>();
+    if (isEmpty(totals)) {
+      expectTypeOf(totals).not.toBeNever();
+      expectTypeOf(totals).toExtend<Map<string, number>>();
+    } else {
+      expectTypeOf(totals).toEqualTypeOf<Map<string, number>>();
+    }
+  });
+
   it("narrows a wide string to the empty string and leaves the else branch a string", () => {
     const name = "" as string;
     if (isEmpty(name)) {

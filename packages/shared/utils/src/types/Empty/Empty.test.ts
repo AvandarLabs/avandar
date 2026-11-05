@@ -45,6 +45,13 @@ describe("Type: Empty", () => {
     expectTypeOf<Empty<Record<string, number>>>().toExtend<EmptyObject>();
   });
 
+  it("narrows a set and a map without collapsing to never", () => {
+    expectTypeOf<Empty<Set<number>>>().not.toBeNever();
+    expectTypeOf<Empty<Set<number>>>().toExtend<Set<number>>();
+    expectTypeOf<Empty<Map<string, number>>>().not.toBeNever();
+    expectTypeOf<Empty<Map<string, number>>>().toExtend<Map<string, number>>();
+  });
+
   it("maps numbers and booleans to never", () => {
     expectTypeOf<Empty<number>>().toBeNever();
     expectTypeOf<Empty<boolean>>().toBeNever();
