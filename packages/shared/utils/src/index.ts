@@ -71,6 +71,8 @@ export { isValidDateValue } from "@utils/guards/isValidDateValue/isValidDateValu
 export { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps.ts";
 export { valIsNotEmpty } from "@utils/guards/valIsNotEmpty/valIsNotEmpty.ts";
 export type { NonEmpty } from "@utils/guards/valIsNotEmpty/valIsNotEmpty.ts";
+export { valIsEmpty } from "@utils/guards/valIsEmpty/valIsEmpty.ts";
+export type { Empty } from "@utils/guards/valIsEmpty/valIsEmpty.ts";
 
 // guards - higher order functions
 export { valEq } from "@utils/guards/hofs/valEq.ts";
