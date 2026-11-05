@@ -79,6 +79,24 @@ export const SubscriptionModule = {
   },
 
   /**
+   * Whether to prompt the user to upgrade because the workspace cannot add
+   * another dataset. A workspace that still needs billing setup already gets
+   * the blocking plan-selection prompt, so this only applies to a workspace
+   * whose active plan is at its dataset cap.
+   */
+  shouldPromptForDatasetLimitUpgrade: (
+    options: Readonly<{
+      subscription: SubscriptionRead | undefined;
+      isAddAllowed: boolean;
+    }>,
+  ): boolean => {
+    return (
+      !options.isAddAllowed &&
+      !SubscriptionModule.shouldPromptForBillingSetup(options.subscription)
+    );
+  },
+
+  /**
    * Resolves the workspace's effective feature plan. Returns
    * `no_subscription` when the row is missing (UI should redirect), and
    * collapses inactive/canceled paid rows to `free` so feature gates stay
