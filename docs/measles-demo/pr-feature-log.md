@@ -667,13 +667,13 @@ Auth URLs), then builds the app against it and deploys it to the Vercel
 
 | SHA | Subject | Take |
 |---|---|---|
-| `69cbdad98` | feat(ci): deploy demo/* branches to demo.avandarlabs.com | All of it |
+| `69cbdad98` | feat(ci): deploy demo/* branches to demo.avandarlabs.com | All of it except `scripts/demo/loadLocalDataIntoDemoBranch.sh`, which was later deleted |
 | `a8ebe196c` | fix(ci): stop recording demo deploys as staging deployments | All of it |
 | `815e2f8e5` | fix(ci): catch a bad Vercel team ID early and keep Sensitive placeholders out of the demo build | All of it |
 
 **Files:** `.github/workflows/demo.yaml`,
-`scripts/demo/ensureSupabaseBranch.sh`,
-`scripts/demo/loadLocalDataIntoDemoBranch.sh`. Vercel settings stay in the
+`scripts/demo/ensureSupabaseBranch.sh`. Demo data is created by hand in the
+hosted demo, not copied from a local database. Vercel settings stay in the
 dashboard, not `vercel.json`, since the repo is public. The setup runbook
 is kept out of the repo for the same reason.
 
