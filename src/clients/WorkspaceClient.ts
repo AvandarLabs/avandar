@@ -154,20 +154,22 @@ export const WorkspaceClient = createUsableServiceClient(
 
     mutations: ({ clientLogger, dbClient, parsers }) => {
       return {
-        validateWorkspaceSlug: async (options: {
+        /**
+         * Checks whether a slug is well formed and unused by any workspace.
+         * This calls a database RPC rather than an edge function so the
+         * check never waits on an edge worker to boot.
+         */
+        isWorkspaceSlugAvailable: async (options: {
           workspaceSlug: string;
-        }): Promise<{ isValid: true } | { isValid: false; reason: string }> => {
-          const logger = clientLogger.appendName("validateWorkspaceSlug");
-          logger.log("Checking if workspace slug exists", {
+        }): Promise<boolean> => {
+          const logger = clientLogger.appendName("isWorkspaceSlugAvailable");
+          logger.log("Checking if workspace slug is available", {
             workspaceSlug: options.workspaceSlug,
           });
-          const validationResult = await APIClient.post({
-            route: "workspaces/validate-slug",
-            body: {
-              slug: options.workspaceSlug,
-            },
-          });
-          return validationResult;
+          return await serverApi.rpc<boolean>(
+            "rpc_workspaces__is_slug_available",
+            { p_workspace_slug: options.workspaceSlug },
+          );
         },
 
         createWorkspaceWithOwner: async (params: {
@@ -240,7 +242,7 @@ export const WorkspaceClient = createUsableServiceClient(
   {
     queryFns: ["getWorkspacesOfCurrentUser", "getUsersForWorkspace"],
     mutationFns: [
-      "validateWorkspaceSlug",
+      "isWorkspaceSlugAvailable",
       "createWorkspaceWithOwner",
       "removeMember",
       "deleteWorkspace",

@@ -9,29 +9,29 @@ import { renderHook, TestProviders } from "@/test-utils";
 
 vi.mock("@/clients/WorkspaceClient", () => {
   return {
-    WorkspaceClient: { useValidateWorkspaceSlug: vi.fn() },
+    WorkspaceClient: { useIsWorkspaceSlugAvailable: vi.fn() },
   };
 });
 
 type MutationOptions = {
   onSuccess: (
-    result: { isValid: true } | { isValid: false; reason: string },
+    isAvailable: boolean,
     variables: { workspaceSlug: string },
   ) => void;
   onError: (error: Error, variables: { workspaceSlug: string }) => void;
 };
 
-const validateSlug = vi.fn();
+const isSlugAvailable = vi.fn();
 let mutationOptions: MutationOptions;
 
 beforeEach(() => {
-  validateSlug.mockReset();
-  vi.mocked(WorkspaceClient.useValidateWorkspaceSlug).mockImplementation(((
+  isSlugAvailable.mockReset();
+  vi.mocked(WorkspaceClient.useIsWorkspaceSlugAvailable).mockImplementation(((
     options: MutationOptions,
   ) => {
     mutationOptions = options;
-    return [validateSlug, false];
-  }) as unknown as typeof WorkspaceClient.useValidateWorkspaceSlug);
+    return [isSlugAvailable, false];
+  }) as unknown as typeof WorkspaceClient.useIsWorkspaceSlugAvailable);
 });
 
 function _renderSlugCheck() {
@@ -67,7 +67,7 @@ describe("useWorkspaceSlugCheck", () => {
       result.current[1]("ab");
     });
 
-    expect(validateSlug).not.toHaveBeenCalled();
+    expect(isSlugAvailable).not.toHaveBeenCalled();
     expect(result.current[0]).toEqual({
       status: "invalid",
       slug: "ab",
@@ -81,17 +81,16 @@ describe("useWorkspaceSlugCheck", () => {
     act(() => {
       result.current[1]("nyc-measles");
     });
-    expect(validateSlug).toHaveBeenCalledWith({ workspaceSlug: "nyc-measles" });
+    expect(isSlugAvailable).toHaveBeenCalledWith({
+      workspaceSlug: "nyc-measles",
+    });
     expect(result.current[0]).toEqual({
       status: "checking",
       slug: "nyc-measles",
     });
 
     act(() => {
-      mutationOptions.onSuccess(
-        { isValid: false, reason: "taken" },
-        { workspaceSlug: "nyc-measles" },
-      );
+      mutationOptions.onSuccess(false, { workspaceSlug: "nyc-measles" });
     });
     expect(result.current[0]).toEqual({ status: "taken", slug: "nyc-measles" });
   });
@@ -106,10 +105,7 @@ describe("useWorkspaceSlugCheck", () => {
       result.current[1]("nyc-measles");
     });
     act(() => {
-      mutationOptions.onSuccess(
-        { isValid: true },
-        { workspaceSlug: "nyc-measle" },
-      );
+      mutationOptions.onSuccess(true, { workspaceSlug: "nyc-measle" });
     });
     expect(result.current[0]).toEqual({
       status: "checking",
@@ -117,10 +113,7 @@ describe("useWorkspaceSlugCheck", () => {
     });
 
     act(() => {
-      mutationOptions.onSuccess(
-        { isValid: true },
-        { workspaceSlug: "nyc-measles" },
-      );
+      mutationOptions.onSuccess(true, { workspaceSlug: "nyc-measles" });
     });
     expect(result.current[0]).toEqual({
       status: "available",

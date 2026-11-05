@@ -7,8 +7,9 @@ import { deleteUserOwnedWorkspaceTreeBySlug } from "./setup/e2eTestWorkspaceLife
 import type { Response } from "@playwright/test";
 
 /**
- * Throws with HTTP status and body when `workspaces/validate-slug` does not
- * succeed, so timeouts vs 4xx/5xx are distinguishable in CI logs.
+ * Throws with HTTP status and body when the
+ * `rpc_workspaces__is_slug_available` request does not succeed, so timeouts
+ * vs 4xx/5xx are distinguishable in CI logs.
  */
 async function _assertSlugResponseOk(response: Response): Promise<void> {
   if (response.ok()) {
@@ -24,7 +25,7 @@ async function _assertSlugResponseOk(response: Response): Promise<void> {
   }
 
   throw new Error(
-    `workspaces/validate-slug request failed: HTTP ${response.status()} ${response.statusText()}. Response body: ${bodySnippet}`,
+    `rpc_workspaces__is_slug_available request failed: HTTP ${response.status()} ${response.statusText()}. Response body: ${bodySnippet}`,
   );
 }
 
@@ -61,7 +62,7 @@ test.describe("workspace creation", () => {
         (response) => {
           return (
             response.request().method() === "POST" &&
-            response.url().includes("validate-slug")
+            response.url().includes("rpc/rpc_workspaces__is_slug_available")
           );
         },
         { timeout: LONG_WAIT },
@@ -79,13 +80,17 @@ test.describe("workspace creation", () => {
       } catch (error) {
         const detail = error instanceof Error ? error.message : String(error);
         throw new Error(
-          `Timed out after ${LONG_WAIT}ms waiting for POST workspaces/validate-slug.
+          `Timed out after ${LONG_WAIT}ms waiting for POST rpc/rpc_workspaces__is_slug_available.
 The debounced request may not have fired, the URL may differ, or the server hung.
 ${detail}`,
         );
       }
 
       await _assertSlugResponseOk(slugValidationResponse);
+      await expect(dialog.getByRole("status")).toHaveText(
+        `${workspaceSlug} is available`,
+        { timeout: SHORT_WAIT },
+      );
 
       await dialog.getByLabel("Full Name").fill("E2E Tester");
       await dialog.getByLabel("Display Name").fill("E2E Tester");

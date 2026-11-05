@@ -61,11 +61,11 @@ export function useWorkspaceSlugCheck(): [
     status: "idle",
   });
   const latestSlugRef = useRef<string | undefined>(undefined);
-  const [validateSlug] = WorkspaceClient.useValidateWorkspaceSlug({
-    onSuccess: (result, { workspaceSlug }) => {
+  const [isSlugAvailable] = WorkspaceClient.useIsWorkspaceSlugAvailable({
+    onSuccess: (isAvailable, { workspaceSlug }) => {
       if (workspaceSlug === latestSlugRef.current) {
         setSlugCheck({
-          status: result.isValid ? "available" : "taken",
+          status: isAvailable ? "available" : "taken",
           slug: workspaceSlug,
         });
       }
@@ -85,7 +85,7 @@ export function useWorkspaceSlugCheck(): [
       return;
     }
     setSlugCheck({ status: "checking", slug });
-    validateSlug({ workspaceSlug: slug });
+    isSlugAvailable({ workspaceSlug: slug });
   };
 
   return [slugCheck, checkSlug];
