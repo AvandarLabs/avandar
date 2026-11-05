@@ -126,22 +126,30 @@ fn draw_main_diff(f: &mut Frame, area: Rect, app: &mut App) {
     if inner.height == 0 || inner.width == 0 {
         return;
     }
-    let rows = Layout::vertical([Constraint::Length(1), Constraint::Min(0)]).split(inner);
+    let rows = Layout::vertical([
+        Constraint::Length(1),
+        Constraint::Length(1),
+        Constraint::Min(0),
+    ])
+    .split(inner);
     f.render_widget(Paragraph::new(tab_strip(app.active_diff_view)), rows[0]);
-    app.pane_areas.main = rows[1];
+    if let Some(url) = app.open_url.as_deref() {
+        f.render_widget(Paragraph::new(review_url_line(url)), rows[1]);
+    }
+    app.pane_areas.main = rows[2];
 
     match app.active_diff_view {
-        MainDiffView::Log => draw_log_view(f, rows[1], &mut app.difit, focused),
+        MainDiffView::Log => draw_log_view(f, rows[2], &mut app.difit, focused),
         MainDiffView::TestPlan => draw_markdown_view(
             f,
-            rows[1],
+            rows[2],
             &mut app.test_plan,
             "No test plan yet.",
             "Press Ctrl+G to ask the LLM to generate one.",
         ),
         MainDiffView::Guide => draw_markdown_view(
             f,
-            rows[1],
+            rows[2],
             &mut app.guide,
             "No diff guide yet.",
             "Press Ctrl+G to ask the LLM to generate one.",
@@ -168,6 +176,23 @@ fn tab_strip(active: MainDiffView) -> Line<'static> {
     }
     spans.push(Span::styled("   (tab)", dim));
     Line::from(spans)
+}
+
+/// The `review · <url>` row under the tab strip. difit's log only prints its
+/// own server URL, so this keeps the review shell's URL in view and clickable.
+fn review_url_line(url: &str) -> Line<'static> {
+    let dim = Style::new().fg(Color::Rgb(122, 134, 173));
+    Line::from(vec![
+        Span::raw(" "),
+        Span::styled("review · ", dim),
+        Span::styled(
+            url.to_owned(),
+            Style::new()
+                .fg(Color::Rgb(130, 170, 255))
+                .add_modifier(Modifier::UNDERLINED),
+        ),
+        Span::styled("   (^O open)", dim),
+    ])
 }
 
 /// The log view: difit's `vt100` screen, resized to its area.
@@ -286,7 +311,7 @@ fn bordered(title: &str, focused: bool) -> Block<'_> {
 mod tests {
     use crate::session::AgentKind;
 
-    use super::{llm_session_ended_title, llm_title};
+    use super::{llm_session_ended_title, llm_title, review_url_line};
 
     #[test]
     fn llm_title_uses_agent_label_without_internal_nomenclature() {
@@ -312,5 +337,15 @@ mod tests {
             " Codex session ended "
         );
         assert!(!llm_session_ended_title(AgentKind::Codex).contains("LLM panel"));
+    }
+
+    #[test]
+    fn review_url_line_shows_the_shell_url_in_full() {
+        let text: String = review_url_line("http://127.0.0.1:4675/")
+            .spans
+            .iter()
+            .map(|span| span.content.as_ref())
+            .collect();
+        assert_eq!(text, " review · http://127.0.0.1:4675/   (^O open)");
     }
 }

@@ -1,4 +1,4 @@
-import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
+import type { VizType } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 
 /**
  * Per-visualization caps on how many rows can be passed to the underlying

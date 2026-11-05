@@ -2,6 +2,7 @@ import { isArray } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
 
 /**
@@ -75,7 +76,7 @@ export function makeLibraryFilterGroupFromQueryFilterGroup(
       }
       return {
         id: child.id ?? StructuredQuery.makeFilterNodeId(),
-        field: child.columnName,
+        field: child.columnId,
         operator: child.operator,
         value: child.value,
       };
@@ -108,12 +109,12 @@ export function makeQueryFilterGroupFromLibraryGroup(
         });
       }
       const id = child.id ?? StructuredQuery.makeFilterNodeId();
-      const columnDataType = options.columnTypes[child.field];
+      const columnDataType = options.columnTypes[child.field as QueryColumn.Id];
       const matchCase = options.matchCaseById[id];
       const rule: StructuredQuery.FilterRule = {
         type: "rule",
         id,
-        columnName: child.field,
+        columnId: child.field as QueryColumn.Id,
         operator: QueryFilterOperator.isOperator(child.operator)
           ? child.operator
           : "=",
@@ -169,7 +170,7 @@ export function normalizeLibraryTree(
           columnTypes: options.columnTypes,
         });
       }
-      const dataType = options.columnTypes[child.field];
+      const dataType = options.columnTypes[child.field as QueryColumn.Id];
       return dataType === undefined ||
         QueryFilterOperator.isOfferedForDataType(child.operator, dataType)
         ? child

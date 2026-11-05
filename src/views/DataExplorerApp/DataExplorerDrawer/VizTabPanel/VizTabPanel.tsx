@@ -3,15 +3,15 @@ import { Stack, Text } from "@mantine/core";
 import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody/VizSettingsFormBody";
 import css from "@/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.module.css";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactNode } from "react";
 
 type Props = {
-  columns: readonly QueryResult.Column[];
+  columns: readonly QueryResult.ColumnWithId[];
   data: UnknownDataFrame;
-  vizConfig: VizConfig.T;
-  onVizConfigChange: (vizConfig: VizConfig.T) => void;
+  vizConfig: AvaVizConfig.T;
+  onVizConfigChange: (vizConfig: AvaVizConfig.T) => void;
 };
 
 /**

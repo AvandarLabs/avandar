@@ -168,6 +168,12 @@ function renderModal(props: Partial<ModalProps> = {}): {
       <QueryClientProvider client={queryClient}>
         <AvandarAppProvider>
           <SaveToDashboardModal
+            columnBindings={{
+              version: 1,
+              scopeKey: "explorer",
+              sqlKey: "SELECT 1",
+              columns: [],
+            }}
             rawSql="SELECT 1"
             prompt="Show one"
             vizType="table"

@@ -1,60 +1,44 @@
-import { objectValues } from "@avandar/utils";
-import { useMemo } from "react";
-import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
-import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-import type {
-  DataVizFilterProps,
-  LocalFilter,
-} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import { applyDashboardFiltersToSql } from "./applyDashboardFiltersToSql/applyDashboardFiltersToSql";
+import { makeLocalFilterColumnBindingsFromLocalFilters } from "./makeLocalFilterColumnBindingsFromLocalFilters/makeLocalFilterColumnBindingsFromLocalFilters";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { DashboardFilterRecord } from "./DashboardFilterStateManager";
+import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { LocalFilterStateApi } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
-import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 
-type Options = {
+type UseApplyDashboardFiltersToSqlOptions = {
   rawSql: string;
-  filterProps?: DataVizFilterProps;
-  localFilters?: readonly LocalFilter[];
-  localFilterState?: LocalFilterStateApi;
+  columns: readonly QueryResult.ColumnWithId[] | undefined;
+  globalFilters: readonly DashboardFilterRecord[];
+  localFilters: readonly LocalFilter[];
+  localFilterState: LocalFilterStateApi;
 };
 
-function _buildLocalFilterRecords(
-  options: Readonly<Options>,
-): DashboardFilterRecord[] {
-  if (!options.localFilterState) {
-    return [];
-  }
-  return (options.localFilters ?? []).map((localFilter) => {
-    return DataVizFilters.localFilterToRecord({
-      filter: localFilter,
-      value: options.localFilterState?.valuesById[localFilter.id],
-    });
-  });
-}
-
-/** Returns SQL amended with active global and visualization-local filters. */
+/**
+ * Returns a chart's SQL wrapped with its bound dashboard filters and its local
+ * filters, each local filter applied by the current `QueryResult` column name
+ * of its column ID. Undefined until the chart's columns are known, so no
+ * filtered query runs before the filters can bind. Use it to get the SQL a
+ * chart runs, for example to fetch a dashboard chart's rows.
+ */
 export function useApplyDashboardFiltersToSql(
-  options: Readonly<Options>,
-): string {
-  const { filtersById } = DashboardFilterStateManager.useState();
-  return useMemo(() => {
-    const globalFilters = objectValues(filtersById);
-    const subscribedFilterIds = options.filterProps
-      ? DataVizFilters.resolveSubscribedFilterIds({
-          subscription: options.filterProps.globalFilterSubscription,
-          registeredFilters: globalFilters,
-        })
-      : undefined;
-    const globallyFilteredSql = applyDashboardFiltersToSql({
-      sql: options.rawSql,
-      filters: globalFilters,
-      ...(subscribedFilterIds !== undefined ? { subscribedFilterIds } : {}),
-    });
-    const localFilterRecords = _buildLocalFilterRecords(options);
-    return localFilterRecords.length > 0
-      ? applyDashboardFiltersToSql({
-          sql: globallyFilteredSql,
-          filters: localFilterRecords,
-        })
-      : globallyFilteredSql;
-  }, [filtersById, options]);
+  options: Readonly<UseApplyDashboardFiltersToSqlOptions>,
+): string | undefined {
+  if (!options.columns) {
+    return undefined;
+  }
+  const globalSql = applyDashboardFiltersToSql({
+    sql: options.rawSql,
+    filters: options.globalFilters,
+  });
+  const local = makeLocalFilterColumnBindingsFromLocalFilters({
+    filters: options.localFilters,
+    columns: options.columns,
+    valuesById: options.localFilterState.valuesById,
+  });
+  return local.resolvedFilters.length
+    ? applyDashboardFiltersToSql({
+        sql: globalSql,
+        filters: local.resolvedFilters,
+      })
+    : globalSql;
 }

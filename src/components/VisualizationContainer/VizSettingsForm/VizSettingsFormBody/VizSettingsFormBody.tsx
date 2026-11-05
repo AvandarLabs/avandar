@@ -1,23 +1,23 @@
 import { match } from "ts-pattern";
-import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm";
-import { FunnelChartForm } from "@/components/VisualizationContainer/VizSettingsForm/FunnelChartForm";
-import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsForm/PieChartForm";
-import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
+import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm/BubbleChartForm";
+import { FunnelChartForm } from "@/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm";
+import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm";
+import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm/ScatterChartForm";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
-  columns: readonly QueryResultColumn[];
+  columns: readonly QueryResult.ColumnWithId[];
   data: UnknownDataFrame;
 
   /** Current visualization config. */
-  vizConfig: VizConfig;
+  vizConfig: AvaVizConfig;
 
   /** Called when the user edits any control inside a per-type subform. */
-  onVizConfigChange: (vizConfig: VizConfig) => void;
+  onVizConfigChange: (vizConfig: AvaVizConfig) => void;
 
   /**
    * How each subform arranges its setting groups. Defaults to a vertical
@@ -27,15 +27,13 @@ type Props = {
 };
 
 /**
- * Renders the per-viz-type subform for a given `VizConfig`, **without** the
- * top-level viz type selector. Pure and prop-driven so it can be reused
- * anywhere a viz config needs to be edited (DataExplorer sidebar, Puck custom
- * field in the dashboard editor, etc.) by composing it with whatever viz-type
- * picker is appropriate for that context.
+ * Renders the settings subform for an `AvaVizConfig`'s viz type, without the
+ * viz type selector, so any place that edits a chart's settings can pair it
+ * with its own viz type picker, for example the Data Explorer drawer's
+ * visualization tab or the dashboard editor's chart settings field.
  *
- * Bar / line / area / radar share a descriptor-driven form
- * (`SeriesAwareVizForm`). The remaining single-series vizs (pie,
- * funnel, scatter, bubble) keep their hand-coded forms for now.
+ * Bar, line, area, and radar share the descriptor-driven
+ * `SeriesAwareVizForm`. Pie, funnel, scatter, and bubble have their own forms.
  */
 export function VizSettingsFormBody({
   columns,

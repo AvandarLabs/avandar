@@ -162,7 +162,8 @@ Apply **only**:
 - From `docs/code-reviews/typescript-checklist.md`, only the comment and
   docstring bullets: JSDoc for public classes and methods; comment and
   docstring lines at 80 characters or fewer; if a docstring fits on one
-  line within 80 characters, keep it single-line; all exported classes,
+  line within 80 characters, keep it single-line, without ever cutting
+  content to make it fit; all exported classes,
   objects, and functions need docstrings; if an exported object defines
   top-level methods inline, those methods need docstrings too; function
   docstrings should explain purpose and output, not interior
@@ -250,8 +251,10 @@ Apply **only**:
   assertion-free tests, observable-behavior assertions, placeholder
   tests, runtime assertions that restate the type system, e2e specs
   that write the behavior under test through the database instead of
-  the UI, `__tests__/` layout once a module has two or more test
-  files, and integration-test placement.
+  the UI, test files named after no module beside them, aspect labels on
+  a module's only test file, `__tests__/` layout once a module has two or
+  more test files, integration-test placement in a `__tests__/`
+  directory, and the `.integration` label on integration tests.
 
 This pack does not pull extra bullets from Most Common Mistakes,
 General Checks, or the TypeScript checklist. Running the tests
@@ -636,6 +639,9 @@ finding from Stage 1, spawn an adversarial verifier whose job is to
   exception)?
 - Is the recommended alternative (a helper, a library util) actually
   present in this repo?
+- For an unneeded-cast finding, did the verifier delete the cast and run
+  the type checker? Settle it by the compiler's output, never by reading
+  the code: a clean type check confirms the finding.
 
 Default to refuted when uncertain. A finding survives only if the verifier
 cannot refute it. For high-severity findings, use three verifiers with
@@ -958,8 +964,9 @@ SKILL file.
 - **Reference:**
   [`docs/code-reviews/types-checklist.md`](docs/code-reviews/types-checklist.md)
 - **Covers:** type declarations, assertions and escape hatches (`any`,
-  `as unknown as T`), absence (`undefined` vs. `null`), literal unions, and
-  readonly/variance contracts.
+  `as unknown as T`, and any `as T` cast the type checker does not need),
+  absence (`undefined` vs. `null`), literal unions, and readonly/variance
+  contracts.
 
 ### Phase: functional style
 
@@ -1056,7 +1063,8 @@ SKILL file.
   guarantees, and — for **e2e tests only** — direct database writes that
   perform the behavior under test instead of driving it through the UI (direct
   writes are for seeding preconditions before page load, teardown, bypassing
-  slow/external systems, or read-only oracles).
+  slow/external systems, or read-only oracles), and test file names and
+  `__tests__/` placement.
 
 ## Library-Gated Phases
 
