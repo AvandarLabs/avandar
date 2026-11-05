@@ -12,7 +12,7 @@
 # Usage:
 #   STAGING_PROJECT_ID=<ref> bash scripts/demo/ensureSupabaseBranch.sh <git-branch>
 #
-# Requires `SUPABASE_ACCESS_TOKEN` (or a logged-in Supabase CLI) and `jq`.
+# Requires `SUPABASE_ACCESS_TOKEN`, `curl`, and `jq`.
 #
 # Output, one per line:
 #   DEMO_SUPABASE_BRANCH, DEMO_SUPABASE_REF, DEMO_SUPABASE_URL,
@@ -25,6 +25,7 @@ set -euo pipefail
 
 GIT_BRANCH="${1:?Usage: ensureSupabaseBranch.sh <git-branch>}"
 : "${STAGING_PROJECT_ID:?STAGING_PROJECT_ID must be set}"
+: "${SUPABASE_ACCESS_TOKEN:?SUPABASE_ACCESS_TOKEN must be set}"
 
 # How long to wait for a new branch to become healthy, in seconds.
 WAIT_TIMEOUT_SECONDS=900
@@ -113,7 +114,15 @@ DB_PASSWORD="$(
     "$POSTGRES_URL_NON_POOLING"
 )"
 
-API_KEYS_JSON="$(supabase projects api-keys --project-ref "$BRANCH_REF" -o json)"
+# `supabase projects api-keys` masks secret keys (`sb_secret_` followed by
+# placeholder characters), and a masked key fails every admin-client request
+# the edge functions make. The Management API returns the real key only when
+# asked with `reveal=true`.
+API_KEYS_JSON="$(
+  curl --fail --silent --show-error \
+    --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+    "https://api.supabase.com/v1/projects/$BRANCH_REF/api-keys?reveal=true"
+)"
 PUBLISHABLE_KEY="$(jq -r '[.[] | select(.type == "publishable")][0].api_key // ""' <<<"$API_KEYS_JSON")"
 SECRET_KEY="$(jq -r '[.[] | select(.type == "secret")][0].api_key // ""' <<<"$API_KEYS_JSON")"
 
