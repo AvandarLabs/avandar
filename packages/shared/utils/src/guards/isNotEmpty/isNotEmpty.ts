@@ -64,7 +64,7 @@ export type NonEmpty<T> = unknown extends T
  * @param value - The value to check.
  * @returns `true` if `value` is not empty, narrowing it to `NonEmpty<T>`.
  */
-export function valIsNotEmpty<T>(value: T): value is NonEmpty<T> {
+export function isNotEmpty<T>(value: T): value is NonEmpty<T> {
   if (isString(value)) {
     return value !== "";
   }
