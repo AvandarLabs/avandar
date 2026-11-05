@@ -149,6 +149,8 @@ narrows the value in the matching branch.
 | `isUndefined`      | `undefined`                                                      |
 | `isValidDateValue` | Anything `parseDate` would accept                                |
 | `hasDefinedProps`  | A record where the listed keys are non-`undefined`               |
+| `valIsNotEmpty`    | `NonEmpty<T>`: not `null`, `undefined`, `""`, `[]`, or `{}`         |
+| `valIsEmpty`       | `Empty<T>`: `null`, `undefined`, `""`, `[]`, or `{}`                |
 
 ### Higher-order guards
 
@@ -306,6 +308,8 @@ and `pipe`.
 | `ReplaceTypes<T, From, To>`| Replaces every property of type `From` with `To`                     |
 | `Registry<K, V>`           | A `Record<K, V>` registry                                            |
 | `RegistryOfArrays<K, V>`   | A `Record<K, V[]>` registry                                          |
+| `NonEmpty<T>`              | `T` proven not empty, as narrowed by `valIsNotEmpty`                 |
+| `Empty<T>`                 | `T` proven missing or empty, as narrowed by `valIsEmpty`             |
 | `ObjectRegistry<...>`      | A registry of objects keyed by a discriminator                       |
 | `MergeObjects<A, B>`       | Recursively merges two object types                                  |
 
