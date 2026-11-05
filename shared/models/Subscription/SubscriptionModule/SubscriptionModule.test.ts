@@ -184,6 +184,44 @@ describe("SubscriptionModule billing lifecycle", () => {
   });
 });
 
+describe("SubscriptionModule.shouldPromptForDatasetLimitUpgrade", () => {
+  it("defers to the billing setup prompt when the subscription is missing", () => {
+    expect(
+      SubscriptionModule.shouldPromptForDatasetLimitUpgrade({
+        subscription: undefined,
+        isAddAllowed: false,
+      }),
+    ).toBe(false);
+  });
+
+  it("defers to the billing setup prompt when the subscription is inactive", () => {
+    expect(
+      SubscriptionModule.shouldPromptForDatasetLimitUpgrade({
+        subscription: _subscription({ subscriptionStatus: "canceled" }),
+        isAddAllowed: false,
+      }),
+    ).toBe(false);
+  });
+
+  it("prompts when an active subscription is at its dataset cap", () => {
+    expect(
+      SubscriptionModule.shouldPromptForDatasetLimitUpgrade({
+        subscription: _subscription({ subscriptionStatus: "active" }),
+        isAddAllowed: false,
+      }),
+    ).toBe(true);
+  });
+
+  it("does not prompt when an active subscription can add datasets", () => {
+    expect(
+      SubscriptionModule.shouldPromptForDatasetLimitUpgrade({
+        subscription: _subscription({ subscriptionStatus: "active" }),
+        isAddAllowed: true,
+      }),
+    ).toBe(false);
+  });
+});
+
 describe("SubscriptionModule.resolveFeaturePlanTypeForWorkspace", () => {
   it("returns no_subscription when row is missing", () => {
     expect(
