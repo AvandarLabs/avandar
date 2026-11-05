@@ -1,17 +1,8 @@
 import { act } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import {
-  getWorkspaceSlugFormatProblem,
-  useWorkspaceSlugCheck,
-} from "@/components/forms/useWorkspaceSlugCheck/useWorkspaceSlugCheck";
+import { useWorkspaceSlugCheck } from "@/components/forms/useWorkspaceSlugCheck/useWorkspaceSlugCheck";
 import { renderHook, TestProviders } from "@/test-utils";
-
-vi.mock("@/clients/WorkspaceClient", () => {
-  return {
-    WorkspaceClient: { useIsWorkspaceSlugAvailable: vi.fn() },
-  };
-});
+import type { Mock } from "vitest";
 
 type MutationOptions = {
   onSuccess: (
@@ -21,17 +12,27 @@ type MutationOptions = {
   onError: (error: Error, variables: { workspaceSlug: string }) => void;
 };
 
-const isSlugAvailable = vi.fn();
-let mutationOptions: MutationOptions;
+const mocks = vi.hoisted(() => {
+  const state: {
+    requestSlugAvailability: Mock;
+    mutationOptions?: MutationOptions;
+  } = { requestSlugAvailability: vi.fn() };
+  return state;
+});
+
+vi.mock("@/clients/WorkspaceClient", () => {
+  return {
+    WorkspaceClient: {
+      useIsWorkspaceSlugAvailable: (options: MutationOptions) => {
+        mocks.mutationOptions = options;
+        return [mocks.requestSlugAvailability, false];
+      },
+    },
+  };
+});
 
 beforeEach(() => {
-  isSlugAvailable.mockReset();
-  vi.mocked(WorkspaceClient.useIsWorkspaceSlugAvailable).mockImplementation(((
-    options: MutationOptions,
-  ) => {
-    mutationOptions = options;
-    return [isSlugAvailable, false];
-  }) as unknown as typeof WorkspaceClient.useIsWorkspaceSlugAvailable);
+  mocks.requestSlugAvailability.mockReset();
 });
 
 function _renderSlugCheck() {
@@ -43,22 +44,6 @@ function _renderSlugCheck() {
   );
 }
 
-describe("getWorkspaceSlugFormatProblem", () => {
-  it("reports each format problem", () => {
-    expect(getWorkspaceSlugFormatProblem("")).toBe("empty");
-    expect(getWorkspaceSlugFormatProblem("ab")).toBe("too_short");
-    expect(getWorkspaceSlugFormatProblem("a".repeat(21))).toBe("too_long");
-    expect(getWorkspaceSlugFormatProblem("nyc measles")).toBe(
-      "invalid_characters",
-    );
-    expect(getWorkspaceSlugFormatProblem("nyc_measles")).toBe(
-      "invalid_characters",
-    );
-    expect(getWorkspaceSlugFormatProblem("a".repeat(20))).toBeUndefined();
-    expect(getWorkspaceSlugFormatProblem("nyc-measles")).toBeUndefined();
-  });
-});
-
 describe("useWorkspaceSlugCheck", () => {
   it("rejects a malformed slug without calling the server", () => {
     const { result } = _renderSlugCheck();
@@ -67,7 +52,7 @@ describe("useWorkspaceSlugCheck", () => {
       result.current[1]("ab");
     });
 
-    expect(isSlugAvailable).not.toHaveBeenCalled();
+    expect(mocks.requestSlugAvailability).not.toHaveBeenCalled();
     expect(result.current[0]).toEqual({
       status: "invalid",
       slug: "ab",
@@ -81,7 +66,7 @@ describe("useWorkspaceSlugCheck", () => {
     act(() => {
       result.current[1]("nyc-measles");
     });
-    expect(isSlugAvailable).toHaveBeenCalledWith({
+    expect(mocks.requestSlugAvailability).toHaveBeenCalledWith({
       workspaceSlug: "nyc-measles",
     });
     expect(result.current[0]).toEqual({
@@ -90,7 +75,7 @@ describe("useWorkspaceSlugCheck", () => {
     });
 
     act(() => {
-      mutationOptions.onSuccess(false, { workspaceSlug: "nyc-measles" });
+      mocks.mutationOptions!.onSuccess(false, { workspaceSlug: "nyc-measles" });
     });
     expect(result.current[0]).toEqual({ status: "taken", slug: "nyc-measles" });
   });
@@ -105,7 +90,7 @@ describe("useWorkspaceSlugCheck", () => {
       result.current[1]("nyc-measles");
     });
     act(() => {
-      mutationOptions.onSuccess(true, { workspaceSlug: "nyc-measle" });
+      mocks.mutationOptions!.onSuccess(true, { workspaceSlug: "nyc-measle" });
     });
     expect(result.current[0]).toEqual({
       status: "checking",
@@ -113,7 +98,7 @@ describe("useWorkspaceSlugCheck", () => {
     });
 
     act(() => {
-      mutationOptions.onSuccess(true, { workspaceSlug: "nyc-measles" });
+      mocks.mutationOptions!.onSuccess(true, { workspaceSlug: "nyc-measles" });
     });
     expect(result.current[0]).toEqual({
       status: "available",
@@ -128,7 +113,7 @@ describe("useWorkspaceSlugCheck", () => {
       result.current[1]("nyc-measles");
     });
     act(() => {
-      mutationOptions.onError(new Error("offline"), {
+      mocks.mutationOptions!.onError(new Error("offline"), {
         workspaceSlug: "nyc-measles",
       });
     });

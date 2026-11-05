@@ -74,17 +74,22 @@ type Props<
 };
 
 /**
- * The hydrated field schemas are computed once, on mount. These text field
- * props describe live status instead, so they are always read from the
- * latest `fields` record.
+ * Returns `hydratedField` with `rightSection`, `error`, and `inputContainer`
+ * taken from `latestField` when both are text fields, or `hydratedField`
+ * unchanged otherwise. Used by `AvaForm` when rendering each field, because
+ * hydrated schemas are computed once on mount but these props show live
+ * status.
  */
 function _withLiveTextFieldProps<
   FieldKey extends string,
   FormValues extends ValuesOfFieldRecord<GenericFormSchemaRecord>,
->(
-  hydratedField: FormFieldSchema<FieldKey, FormValues>,
-  latestField: FormFieldSchema<FieldKey, FormValues>,
-): FormFieldSchema<FieldKey, FormValues> {
+>({
+  hydratedField,
+  latestField,
+}: {
+  hydratedField: FormFieldSchema<FieldKey, FormValues>;
+  latestField: FormFieldSchema<FieldKey, FormValues>;
+}): FormFieldSchema<FieldKey, FormValues> {
   if (hydratedField.type !== "text" || latestField.type !== "text") {
     return hydratedField;
   }
@@ -251,13 +256,10 @@ export function AvaForm<
         if (typeof formElement === "string") {
           if (formElement in improvedFields) {
             const fieldKey = formElement as FieldKey;
-            const field = _withLiveTextFieldProps(
-              improvedFields[fieldKey]! as FormFieldSchema<
-                FieldKey,
-                FormValues
-              >,
-              fields[fieldKey]! as FormFieldSchema<FieldKey, FormValues>,
-            );
+            const field = _withLiveTextFieldProps<FieldKey, FormValues>({
+              hydratedField: improvedFields[fieldKey]!,
+              latestField: fields[fieldKey]!,
+            });
             return (
               <UnknownAvaInput
                 key={field.key}

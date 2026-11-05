@@ -638,7 +638,7 @@ msgstr "تحميل ملف"
 msgid "Privacy log cleared."
 msgstr "تم مسح سجل الخصوصية."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "{slug} is already taken. Try another ID."
 msgstr "‏{slug} مستخدم بالفعل. جرّب معرّفًا آخر."
 
@@ -693,7 +693,7 @@ msgstr "مجاني"
 msgid "The table visualization has no extra settings."
 msgstr "لا تحتوي تصور الجدول على إعدادات إضافية."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "حولك"
 
@@ -1974,7 +1974,7 @@ msgstr "فجوة"
 msgid "Select a data source"
 msgstr "اختر مصدر البيانات"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "{slug} is available"
 msgstr "‏{slug} متاح"
 
@@ -2093,7 +2093,7 @@ msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "هل أنت متأكد أنك تريد المتابعة مع هذا الإجراء؟ لا يمكن التراجع عن ذلك."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
 msgstr "هذا هو المعرف الفريد لمؤسستك المستخدم في عناوين URL."
 
@@ -2125,7 +2125,7 @@ msgstr "تعذّر رسم {droppedRowCount} من أصل {totalRowCount} صفًا
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "هل أنت متأكد أنك تريد إزالة هذا المستخدم من مساحة العمل؟"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Enter an ID for your workspace."
 msgstr "أدخل معرّفًا لمساحة العمل الخاصة بك."
 
@@ -2187,7 +2187,7 @@ msgstr "تم الكشف عن تحيز:"
 msgid "Body"
 msgstr "المتن"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "We couldn't check this ID. Check your connection, then edit the ID to "
 "try again."
 msgstr "تعذّر علينا التحقق من هذا المعرّف. تحقّق من اتصالك، ثم عدّل المعرّف "
@@ -2446,7 +2446,7 @@ msgstr "الأدوار والأذونات"
 msgid "100% stacked"
 msgstr "تكديس بنسبة 100%"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
 msgstr "استخدم {WORKSPACE_SLUG_MAX_LENGTH} حرفًا أو أقل."
 
@@ -2621,7 +2621,7 @@ msgstr "تستخدم عبارة WHERE تعبيرًا في الجانب الأي�
 msgid "PDF downloaded."
 msgstr "تم تنزيل PDF."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "معرّف مساحة العمل"
 
@@ -2831,7 +2831,7 @@ msgstr "E"
 msgid "Column 5"
 msgstr "العمود 5"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use only letters, numbers, and hyphens."
 msgstr "استخدم الأحرف والأرقام والواصلات فقط."
 
@@ -3568,7 +3568,7 @@ msgstr "لم يتمكن من التقاط اللوحة"
 msgid "Processing dataset…"
 msgstr "جارٍ معالجة مجموعة البيانات…"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
 msgstr "استخدم {WORKSPACE_SLUG_MIN_LENGTH} أحرف على الأقل."
 
@@ -3645,7 +3645,7 @@ msgstr "يُرجى <0>مراسلتنا عبر البريد الإلكتروني<
 msgid "Private maps"
 msgstr "الخرائط الخاصة"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "حول مساحة العمل الخاصة بك"
 
@@ -5043,7 +5043,7 @@ msgstr "دع الذكاء الاصطناعي يقرر (الإصدار القدي
 msgid "New field"
 msgstr "حقل جديد"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "تم إنشاء مساحة العمل بنجاح!"
 
@@ -5462,7 +5462,7 @@ msgstr "الاتجاه"
 msgid "Dashboard deleted successfully!"
 msgstr "تم حذف لوحة التحكم بنجاح!"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "الاسم الذي تريد أن يراه أعضاء الفريق الآخرون."
 
@@ -6675,7 +6675,7 @@ msgstr "لا ينتهي بـ"
 msgid "Add layer"
 msgstr "إضافة طبقة"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "Checking if {slug} is available…"
 msgstr "جارٍ التحقق من توفّر {slug}…"
 

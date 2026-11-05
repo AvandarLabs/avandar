@@ -225,7 +225,7 @@ describe("AvaForm", () => {
   });
 
   it("updates a text field's status props when the field schema changes", () => {
-    function renderWithStatus(status: "checking" | "taken") {
+    const renderWithStatus = (status: "checking" | "taken") => {
       return (
         <AvaForm
           fields={{
@@ -246,7 +246,7 @@ describe("AvaForm", () => {
           formElements={["username"]}
         />
       );
-    }
+    };
 
     const { rerender } = render(renderWithStatus("checking"));
     expect(screen.getByText("Checking")).toBeInTheDocument();

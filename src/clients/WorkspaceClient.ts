@@ -155,9 +155,11 @@ export const WorkspaceClient = createUsableServiceClient(
     mutations: ({ clientLogger, dbClient, parsers }) => {
       return {
         /**
-         * Checks whether a slug is well formed and unused by any workspace.
-         * This calls a database RPC rather than an edge function so the
-         * check never waits on an edge worker to boot.
+         * Checks whether a slug is well formed and unused by any workspace,
+         * for example to validate a slug live while someone names a new
+         * workspace.
+         *
+         * @returns True if a new workspace can use the slug.
          */
         isWorkspaceSlugAvailable: async (options: {
           workspaceSlug: string;
@@ -166,6 +168,8 @@ export const WorkspaceClient = createUsableServiceClient(
           logger.log("Checking if workspace slug is available", {
             workspaceSlug: options.workspaceSlug,
           });
+          // Keep this a database RPC, not an edge function: the check runs
+          // as the user types and must not wait on an edge worker to boot.
           return await serverApi.rpc<boolean>(
             "rpc_workspaces__is_slug_available",
             { p_workspace_slug: options.workspaceSlug },

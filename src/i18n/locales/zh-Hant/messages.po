@@ -624,7 +624,7 @@ msgstr "上傳檔案"
 msgid "Privacy log cleared."
 msgstr "隱私日誌已清除。"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "{slug} is already taken. Try another ID."
 msgstr "{slug} 已被使用。請嘗試其他 ID。"
 
@@ -678,7 +678,7 @@ msgstr "免費"
 msgid "The table visualization has no extra settings."
 msgstr "表格視覺化沒有額外的設置。"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "關於您"
 
@@ -1922,7 +1922,7 @@ msgstr "間距"
 msgid "Select a data source"
 msgstr "選擇數據來源"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "{slug} is available"
 msgstr "{slug} 可使用"
 
@@ -2041,7 +2041,7 @@ msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "您確定要繼續此操作嗎？此操作無法撤銷。"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
 msgstr "這是您組織在網址中使用的唯一 ID。"
 
@@ -2073,7 +2073,7 @@ msgstr "{totalRowCount} 筆資料列中有 {droppedRowCount} 筆無法繪製"
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "您確定要將此用戶從工作區中移除嗎？"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Enter an ID for your workspace."
 msgstr "輸入工作區的 ID。"
 
@@ -2132,7 +2132,7 @@ msgstr "檢測到偏見："
 msgid "Body"
 msgstr "內文"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "We couldn't check this ID. Check your connection, then edit the ID to "
 "try again."
 msgstr "我們無法檢查此 ID。請檢查您的連線，然後編輯 ID 再試一次。"
@@ -2383,7 +2383,7 @@ msgstr "角色與權限"
 msgid "100% stacked"
 msgstr "100% 堆疊"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
 msgstr "請使用不超過 {WORKSPACE_SLUG_MAX_LENGTH} 個字元。"
 
@@ -2550,7 +2550,7 @@ msgstr "WHERE 子句左側使用了非欄位參照的運算式。"
 msgid "PDF downloaded."
 msgstr "PDF 已下載。"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "工作區 ID"
 
@@ -2753,7 +2753,7 @@ msgstr "東"
 msgid "Column 5"
 msgstr "第 5 欄"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use only letters, numbers, and hyphens."
 msgstr "僅限使用字母、數字和連字號。"
 
@@ -3467,7 +3467,7 @@ msgstr "無法捕捉儀表板"
 msgid "Processing dataset…"
 msgstr "處理數據集中…"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
 msgstr "請至少使用 {WORKSPACE_SLUG_MIN_LENGTH} 個字元。"
 
@@ -3544,7 +3544,7 @@ msgstr "如果您想取得存取權，請<0>寄送電子郵件給我們</0>。"
 msgid "Private maps"
 msgstr "私人地圖"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "關於您的工作區"
 
@@ -4918,7 +4918,7 @@ msgstr "讓 AI 決定 (舊版)"
 msgid "New field"
 msgstr "新增欄位"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "工作區成功建立！"
 
@@ -5329,7 +5329,7 @@ msgstr "方向"
 msgid "Dashboard deleted successfully!"
 msgstr "儀表板已成功刪除！"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "您希望其他團隊成員看到的名稱。"
 
@@ -6527,7 +6527,7 @@ msgstr "不以…結尾"
 msgid "Add layer"
 msgstr "新增圖層"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "Checking if {slug} is available…"
 msgstr "正在檢查 {slug} 是否可使用…"
 

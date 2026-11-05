@@ -643,7 +643,7 @@ msgstr "Pakia faili"
 msgid "Privacy log cleared."
 msgstr "Kumbukumbu ya faragha imeondolewa."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "{slug} is already taken. Try another ID."
 msgstr "{slug} tayari imetumika. Jaribu Kitambulisho kingine."
 
@@ -699,7 +699,7 @@ msgstr "Bure"
 msgid "The table visualization has no extra settings."
 msgstr "Mwangaza wa meza haina mipangilio ya ziada."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "Kuhusu wewe"
 
@@ -1995,7 +1995,7 @@ msgstr "Pengo"
 msgid "Select a data source"
 msgstr "Chagua chanzo cha data"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "{slug} is available"
 msgstr "{slug} inapatikana"
 
@@ -2114,7 +2114,7 @@ msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "Je, uko tayari kuendelea na hatua hii? Hii haiwezi kubadilishwa."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
 msgstr "Hii ni ID ya kipekee ya shirika lako inayotumika katika URL."
 
@@ -2148,7 +2148,7 @@ msgstr "Safu {droppedRowCount} kati ya {totalRowCount} hazikuweza kuwekwa "
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "Je, uko tayari kumuondoa mtumiaji huyu katika eneo la kazi?"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Enter an ID for your workspace."
 msgstr "Weka Kitambulisho cha nafasi yako ya kazi."
 
@@ -2211,7 +2211,7 @@ msgstr "Upendeleo umegunduliwa:"
 msgid "Body"
 msgstr "Mwili"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "We couldn't check this ID. Check your connection, then edit the ID to "
 "try again."
 msgstr "Hatukuweza kuangalia Kitambulisho hiki. Angalia muunganisho wako, kisha "
@@ -2475,7 +2475,7 @@ msgstr "Majukumu & Ruhusa"
 msgid "100% stacked"
 msgstr "100% iliyopangwa kwa safu"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
 msgstr "Tumia vibambo {WORKSPACE_SLUG_MAX_LENGTH} au pungufu."
 
@@ -2656,7 +2656,7 @@ msgstr "Kifungu cha WHERE kinatumia usemi upande wa kushoto ambao si rejeleo la 
 msgid "PDF downloaded."
 msgstr "PDF imeshukuliwa."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "Kitambulisho cha eneo la kazi"
 
@@ -2868,7 +2868,7 @@ msgstr "E"
 msgid "Column 5"
 msgstr "Safu wima ya 5"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use only letters, numbers, and hyphens."
 msgstr "Tumia herufi, nambari na vistari pekee."
 
@@ -3613,7 +3613,7 @@ msgstr "Haiwezi kunasa dashibodi"
 msgid "Processing dataset…"
 msgstr "Inashughulikia seti ya data…"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
 msgstr "Tumia angalau vibambo {WORKSPACE_SLUG_MIN_LENGTH}."
 
@@ -3693,7 +3693,7 @@ msgstr "Tafadhali <0>tutumie barua pepe</0> ikiwa ungependa kupata ufikiaji."
 msgid "Private maps"
 msgstr "Ramani za faragha"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "Kuhusu eneo lako la kazi"
 
@@ -5106,7 +5106,7 @@ msgstr "Acha AI iamue (urithi)"
 msgid "New field"
 msgstr "Uwanja mpya"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "Ofisi imeundwa kwa mafanikio!"
 
@@ -5531,7 +5531,7 @@ msgstr "Mwelekeo"
 msgid "Dashboard deleted successfully!"
 msgstr "Dashibodi imefutwa kwa mafanikio!"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "Jina unalotaka wanachama wengine wa timu waone."
 
@@ -6759,7 +6759,7 @@ msgstr "haiishii na"
 msgid "Add layer"
 msgstr "Ongeza safu"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "Checking if {slug} is available…"
 msgstr "Inaangalia kama {slug} inapatikana…"
 

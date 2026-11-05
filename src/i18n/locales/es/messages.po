@@ -646,7 +646,7 @@ msgstr "Subir archivo"
 msgid "Privacy log cleared."
 msgstr "Registro de privacidad borrado."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "{slug} is already taken. Try another ID."
 msgstr "{slug} ya está ocupado. Prueba con otro ID."
 
@@ -701,7 +701,7 @@ msgstr "Gratis"
 msgid "The table visualization has no extra settings."
 msgstr "La visualización de la tabla no tiene configuraciones adicionales."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "Acerca de ti"
 
@@ -2003,7 +2003,7 @@ msgstr "Espacio"
 msgid "Select a data source"
 msgstr "Seleccionar una fuente de datos"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "{slug} is available"
 msgstr "{slug} está disponible"
 
@@ -2124,7 +2124,7 @@ msgid "Are you sure you want to proceed with this action? This cannot be "
 msgstr "¿Estás seguro de que deseas continuar con esta acción? Esto no se puede "
 "deshacer."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
 msgstr "Este es el ID único de tu organización utilizado en las URL."
 
@@ -2158,7 +2158,7 @@ msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "¿Estás seguro de que deseas eliminar a este usuario del espacio de "
 "trabajo?"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Enter an ID for your workspace."
 msgstr "Ingresa un ID para tu espacio de trabajo."
 
@@ -2220,7 +2220,7 @@ msgstr "Sesgo detectado:"
 msgid "Body"
 msgstr "Cuerpo"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "We couldn't check this ID. Check your connection, then edit the ID to "
 "try again."
 msgstr "No pudimos comprobar este ID. Comprueba tu conexión y luego edita el ID "
@@ -2482,7 +2482,7 @@ msgstr "Roles y permisos"
 msgid "100% stacked"
 msgstr "Apilado al 100%"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
 msgstr "Usa {WORKSPACE_SLUG_MAX_LENGTH} caracteres o menos."
 
@@ -2663,7 +2663,7 @@ msgstr "La cláusula WHERE usa una expresión en el lado izquierdo que no es una
 msgid "PDF downloaded."
 msgstr "PDF descargado."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "ID del espacio de trabajo"
 
@@ -2876,7 +2876,7 @@ msgstr "E"
 msgid "Column 5"
 msgstr "Columna 5"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use only letters, numbers, and hyphens."
 msgstr "Usa solo letras, números y guiones."
 
@@ -3623,7 +3623,7 @@ msgstr "No se pudo capturar el panel"
 msgid "Processing dataset…"
 msgstr "Procesando conjunto de datos…"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
 msgid "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
 msgstr "Usa al menos {WORKSPACE_SLUG_MIN_LENGTH} caracteres."
 
@@ -3704,7 +3704,7 @@ msgstr "Por favor, <0>envíenos un correo electrónico</0> si desea obtener "
 msgid "Private maps"
 msgstr "Mapas privados"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "Acerca de tu espacio de trabajo"
 
@@ -5122,7 +5122,7 @@ msgstr "Dejar que la IA decida (heredado)"
 msgid "New field"
 msgstr "Nuevo campo"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "¡Espacio de trabajo creado exitosamente!"
 
@@ -5547,7 +5547,7 @@ msgstr "Orientación"
 msgid "Dashboard deleted successfully!"
 msgstr "¡Panel eliminado con éxito!"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "El nombre que deseas que otros miembros del equipo vean."
 
@@ -6779,7 +6779,7 @@ msgstr "no termina en"
 msgid "Add layer"
 msgstr "Agregar capa"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
 msgid "Checking if {slug} is available…"
 msgstr "Comprobando si {slug} está disponible…"
 

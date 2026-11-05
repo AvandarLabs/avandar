@@ -1,31 +1,19 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Divider,
-  Group,
-  Loader,
-  Text,
-  Title,
-  VisuallyHidden,
-} from "@mantine/core";
-import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react";
+import { Divider, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { match } from "ts-pattern";
 import { slugify } from "$/lib/strings/transformations";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
-import {
-  getWorkspaceSlugFormatProblem,
-  useWorkspaceSlugCheck,
-  WORKSPACE_SLUG_MAX_LENGTH,
-  WORKSPACE_SLUG_MIN_LENGTH,
-} from "@/components/forms/useWorkspaceSlugCheck/useWorkspaceSlugCheck";
+import { SlugCheckMessage } from "@/components/forms/CreateWorkspaceForm/SlugCheckMessage";
+import { SlugFieldStatusLine } from "@/components/forms/CreateWorkspaceForm/SlugFieldStatusLine";
+import { SlugFormatMessage } from "@/components/forms/CreateWorkspaceForm/SlugFormatMessage";
+import { SlugStatusIcon } from "@/components/forms/CreateWorkspaceForm/SlugStatusIcon";
+import { getWorkspaceSlugFormatProblem } from "@/components/forms/getWorkspaceSlugFormatProblem/getWorkspaceSlugFormatProblem";
+import { useWorkspaceSlugCheck } from "@/components/forms/useWorkspaceSlugCheck/useWorkspaceSlugCheck";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { notifySuccess } from "@/utils/notifications/notify";
-import type {
-  WorkspaceSlugCheck,
-  WorkspaceSlugFormatProblem,
-} from "@/components/forms/useWorkspaceSlugCheck/useWorkspaceSlugCheck";
+import type { WorkspaceSlugCheck } from "@/components/forms/useWorkspaceSlugCheck/useWorkspaceSlugCheck";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -45,72 +33,10 @@ type Props = {
 const SLUG_CHECK_DEBOUNCE_MS = 300;
 
 /**
- * Translates a slug format problem into a short fix the user can act on.
- */
-function SlugFormatMessage({
-  problem,
-}: {
-  problem: WorkspaceSlugFormatProblem;
-}): ReactNode {
-  return match(problem)
-    .with("empty", () => {
-      return <Trans>Enter an ID for your workspace.</Trans>;
-    })
-    .with("too_short", () => {
-      return (
-        <Trans>Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters.</Trans>
-      );
-    })
-    .with("too_long", () => {
-      return (
-        <Trans>Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer.</Trans>
-      );
-    })
-    .with("invalid_characters", () => {
-      return <Trans>Use only letters, numbers, and hyphens.</Trans>;
-    })
-    .exhaustive();
-}
-
-/**
- * The message for a slug check, or `undefined` while there is nothing to say.
- */
-function SlugCheckMessage({
-  slugCheck,
-}: {
-  slugCheck: WorkspaceSlugCheck;
-}): ReactNode {
-  return match(slugCheck)
-    .with({ status: "idle" }, () => {
-      return undefined;
-    })
-    .with({ status: "invalid" }, ({ problem }) => {
-      return <SlugFormatMessage problem={problem} />;
-    })
-    .with({ status: "checking" }, ({ slug }) => {
-      return <Trans>Checking if {slug} is available…</Trans>;
-    })
-    .with({ status: "available" }, ({ slug }) => {
-      return <Trans>{slug} is available</Trans>;
-    })
-    .with({ status: "taken" }, ({ slug }) => {
-      return <Trans>{slug} is already taken. Try another ID.</Trans>;
-    })
-    .with({ status: "failed" }, () => {
-      return (
-        <Trans>
-          We couldn't check this ID. Check your connection, then edit the ID to
-          try again.
-        </Trans>
-      );
-    })
-    .exhaustive();
-}
-
-/**
  * The live props for the slug input: a status icon at its trailing edge,
  * the error under it, and a success line in the same place when the slug
- * is free. Every state is also announced to screen readers.
+ * is free. Every state is also announced to screen readers. Spread into the
+ * `workspaceSlug` field schema of `CreateWorkspaceForm`.
  */
 function _getSlugFieldStatusProps(slugCheck: WorkspaceSlugCheck): {
   rightSection: ReactNode;
@@ -120,50 +46,14 @@ function _getSlugFieldStatusProps(slugCheck: WorkspaceSlugCheck): {
   const { status } = slugCheck;
   const isError =
     status === "invalid" || status === "taken" || status === "failed";
-  const message = <SlugCheckMessage slugCheck={slugCheck} />;
   return {
-    rightSection: match(status)
-      .with("checking", () => {
-        return <Loader size={14} color="neutral.6" />;
-      })
-      .with("available", () => {
-        return (
-          <IconCircleCheck
-            aria-hidden
-            size={18}
-            color="var(--mantine-color-success-9)"
-          />
-        );
-      })
-      .with("invalid", "taken", "failed", () => {
-        return <IconAlertCircle aria-hidden size={18} />;
-      })
-      .with("idle", () => {
-        return null;
-      })
-      .exhaustive(),
-    error: isError ? message : undefined,
+    rightSection: <SlugStatusIcon status={status} />,
+    error: isError ? <SlugCheckMessage slugCheck={slugCheck} /> : undefined,
     inputContainer: (children) => {
       return (
         <>
           {children}
-          {/* errors render in the input's own error slot instead */}
-          {status === "available" || status === "checking" ? (
-            <Group gap={6} mt={6} wrap="nowrap" aria-hidden>
-              {status === "available" ? (
-                <IconCircleCheck
-                  size={14}
-                  color="var(--mantine-color-success-9)"
-                />
-              ) : null}
-              <Text size="xs" c="neutral.8">
-                {message}
-              </Text>
-            </Group>
-          ) : null}
-          <VisuallyHidden role="status">
-            {status === "idle" ? null : message}
-          </VisuallyHidden>
+          <SlugFieldStatusLine slugCheck={slugCheck} />
         </>
       );
     },
