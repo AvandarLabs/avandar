@@ -33,7 +33,7 @@ describe("findLastReleaseCommitSha", () => {
   it("does not match the prefix in the middle of a subject", () => {
     expect(
       findLastReleaseCommitSha([
-        { sha: "c1", subject: "Revert \"Release: @avandar packages (#266)\"" },
+        { sha: "c1", subject: 'Revert "Release: @avandar packages (#266)"' },
       ]),
     ).toBeUndefined();
   });
