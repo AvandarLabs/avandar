@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from "vitest";
-import type { Empty } from "@utils/types/Empty/Empty.ts";
 import type { EmptyObject } from "@utils/types/common.types.ts";
+import type { Empty } from "@utils/types/Empty/Empty.ts";
 
 describe("Type: Empty", () => {
   it("keeps null and undefined", () => {
