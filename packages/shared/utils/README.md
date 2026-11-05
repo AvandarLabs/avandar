@@ -310,8 +310,8 @@ and `pipe`.
 | `ReplaceTypes<T, From, To>`| Replaces every property of type `From` with `To`                     |
 | `Registry<K, V>`           | A `Record<K, V>` registry                                            |
 | `RegistryOfArrays<K, V>`   | A `Record<K, V[]>` registry                                          |
-| `NonEmpty<T>`              | `T` proven not empty, as narrowed by `isNotEmpty`                 |
-| `Empty<T>`                 | `T` proven missing or empty, as narrowed by `isEmpty`             |
+| `NonEmpty<T>`              | `T` with its empty members removed, or branded when it can't be     |
+| `Empty<T>`                 | `T` narrowed to its empty members: `""`, `[]`, `{}`, `null`, `undefined` |
 | `ObjectRegistry<...>`      | A registry of objects keyed by a discriminator                       |
 | `MergeObjects<A, B>`       | Recursively merges two object types                                  |
 

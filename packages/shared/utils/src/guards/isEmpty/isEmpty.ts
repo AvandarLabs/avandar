@@ -1,38 +1,5 @@
 import { isNotEmpty } from "@utils/guards/isNotEmpty/isNotEmpty.ts";
-import type { EmptyObject } from "@utils/types/common.types.ts";
-
-/**
- * What `Empty` narrows an object type to. An object with a required key can
- * never be empty, so it becomes `never`.
- */
-type EmptyFromObject<T> = T extends EmptyObject
-  ? T & EmptyObject
-  : Partial<T> extends T
-    ? T & EmptyObject
-    : never;
-
-/**
- * A value of type `T` proven missing or empty: `""` for strings, a
- * zero-length array for arrays, `EmptyObject` for objects, and `null` or
- * `undefined`. Other primitives, such as numbers and booleans, are never
- * empty.
- *
- * Use it to type the empty case of a value, for example the input of a
- * function that renders a placeholder.
- */
-export type Empty<T> = unknown extends T
-  ? T
-  : T extends null | undefined
-    ? T
-    : T extends string
-      ? string extends T
-        ? T & ""
-        : Extract<T, "">
-      : T extends readonly unknown[]
-        ? T & readonly []
-        : T extends object
-          ? EmptyFromObject<T>
-          : never;
+import type { Empty } from "@utils/types/Empty/Empty.ts";
 
 /**
  * Checks that a value is missing or empty: `null`, `undefined`, `""`, `[]`,

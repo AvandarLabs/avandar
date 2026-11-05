@@ -1,5 +1,5 @@
 import { isEmpty } from "@utils/guards/isEmpty/isEmpty.ts";
-import type { Empty } from "@utils/guards/isEmpty/isEmpty.ts";
+import type { Empty } from "@utils/types/Empty/Empty.ts";
 
 /**
  * Returns a type guard that checks if a value is empty: `null`, `undefined`,
