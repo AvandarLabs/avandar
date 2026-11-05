@@ -264,7 +264,7 @@ describe("SupabaseLocalEnvironment.restore (switches made by an older ava)", () 
     expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
   });
 
-  it("still restores a legacy switch whose config.toml was reverted by hand", async () => {
+  it("restores the env files and asks for manual cleanup when a legacy config.toml was reverted by hand", async () => {
     const fake = createFakeIo();
     seedLegacyActiveBackup(fake);
     fake.files.set(CONFIG_PATH, ORIGINAL_CONFIG);

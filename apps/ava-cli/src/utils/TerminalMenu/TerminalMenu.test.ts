@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type {
   MenuKey,
   MenuState,
+  MenuStep,
 } from "@ava-cli/utils/TerminalMenu/TerminalMenu";
 
 const ALL_SELECTED: MenuState = {
@@ -16,14 +17,14 @@ function _press(
     keys: readonly MenuKey[];
     isMultiSelect?: boolean;
   }>,
-): ReturnType<typeof TerminalMenu.reduceKey> {
+): MenuStep {
   const { state, keys, isMultiSelect = true } = options;
-  return keys.reduce<ReturnType<typeof TerminalMenu.reduceKey>>(
+  return keys.reduce<MenuStep>(
     (result, key) => {
       return TerminalMenu.reduceKey({
         state: result.state,
         key,
-        itemCount: 3,
+        numItems: 3,
         isMultiSelect,
       });
     },
@@ -32,18 +33,21 @@ function _press(
 }
 
 describe("TerminalMenu.getKeyFromInput", () => {
-  it("reads arrows, vim keys, and Enter as the same movements", () => {
+  it("maps arrow keys and their vim equivalents to up and down", () => {
     expect(
-      ["\u001B[A", "k", "\u001B[B", "j", "\r", "\n", "g", "G", " ", "a"].map(
-        TerminalMenu.getKeyFromInput,
-      ),
-    ).toEqual([
-      "up",
-      "up",
-      "down",
-      "down",
+      ["\u001B[A", "k", "\u001B[B", "j"].map(TerminalMenu.getKeyFromInput),
+    ).toEqual(["up", "up", "down", "down"]);
+  });
+
+  it("maps both Enter characters to confirm", () => {
+    expect(["\r", "\n"].map(TerminalMenu.getKeyFromInput)).toEqual([
       "confirm",
       "confirm",
+    ]);
+  });
+
+  it("maps g, G, space, and a to first, last, toggle, and toggle all", () => {
+    expect(["g", "G", " ", "a"].map(TerminalMenu.getKeyFromInput)).toEqual([
       "first",
       "last",
       "toggle",
@@ -51,7 +55,7 @@ describe("TerminalMenu.getKeyFromInput", () => {
     ]);
   });
 
-  it("reads Ctrl-C, Escape, and q as cancel", () => {
+  it("maps Ctrl-C, Escape, and q to cancel", () => {
     expect(["\u0003", "\u001B", "q"].map(TerminalMenu.getKeyFromInput)).toEqual(
       ["cancel", "cancel", "cancel"],
     );
@@ -94,9 +98,10 @@ describe("TerminalMenu.reduceKey", () => {
   });
 
   it("confirms with the current selection", () => {
-    expect(_press({ state: ALL_SELECTED, keys: ["confirm"] }).outcome).toBe(
-      "confirm",
-    );
+    expect(_press({ state: ALL_SELECTED, keys: ["confirm"] })).toEqual({
+      state: ALL_SELECTED,
+      outcome: "confirm",
+    });
   });
 
   it("cancels without changing the selection", () => {
@@ -114,6 +119,33 @@ describe("TerminalMenu.reduceKey", () => {
         isMultiSelect: false,
       }).state.selectedIndexes,
     ).toEqual([]);
+  });
+});
+
+describe("TerminalMenu.applyInput", () => {
+  it("applies each key in a batched chunk until one ends the menu", () => {
+    expect(
+      TerminalMenu.applyInput({
+        input: "j \rj",
+        state: ALL_SELECTED,
+        numItems: 3,
+        isMultiSelect: true,
+      }),
+    ).toEqual({
+      state: { cursorIndex: 1, selectedIndexes: [0, 2] },
+      outcome: "confirm",
+    });
+  });
+
+  it("ignores characters the menu does not use", () => {
+    expect(
+      TerminalMenu.applyInput({
+        input: "xyz",
+        state: ALL_SELECTED,
+        numItems: 3,
+        isMultiSelect: true,
+      }),
+    ).toEqual({ state: ALL_SELECTED, outcome: undefined });
   });
 });
 

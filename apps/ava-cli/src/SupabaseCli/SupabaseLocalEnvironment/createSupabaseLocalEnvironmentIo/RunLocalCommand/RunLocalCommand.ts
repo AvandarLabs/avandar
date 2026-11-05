@@ -224,4 +224,28 @@ export const RunLocalCommand = {
   isPortAvailable: _isPortAvailable,
 
   run: _runCommand,
+
+  /**
+   * Runs a command whose output is the result, and throws naming the command
+   * and its stderr when it fails. Use it for a lookup such as listing Git
+   * branches or Docker volumes, where a failure leaves nothing to work with.
+   */
+  runOrThrow: async (
+    options: Readonly<Omit<RunCommandOptions, "outputMode">>,
+  ): Promise<string> => {
+    const result = await _runCommand(options);
+    if (!result.ok) {
+      throw new Error(
+        `${options.command} ${options.args.slice(0, 2).join(" ")} failed: ${result.stderr || "unknown error"}`,
+      );
+    }
+    return result.stdout;
+  },
+
+  /** The non-blank lines of a command's output. */
+  getLinesFromOutput: (output: string): string[] => {
+    return output.split("\n").filter((line) => {
+      return line.trim() !== "";
+    });
+  },
 };

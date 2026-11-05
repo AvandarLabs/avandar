@@ -13,27 +13,25 @@ const SHARED_SUMMARY: SupabaseSwitchSummary = {
   config: { projectId: "avandar", apiPort: 54321, ports: {} },
 };
 
-describe("SupabaseTargetHeadline.makeLines", () => {
+describe("SupabaseTargetHeadline.makeLinesFromSummary", () => {
   it("names the develop local Supabase in green for an unswitched branch", () => {
-    expect(
-      SupabaseTargetHeadline.makeLines({ summary: SHARED_SUMMARY }),
-    ).toEqual([
-      {
-        style: "success",
-        text: "✅ This is the develop local Supabase (avandar). Branch develop uses it.",
-      },
-    ]);
+    expect(SupabaseTargetHeadline.makeLinesFromSummary(SHARED_SUMMARY)).toEqual(
+      [
+        {
+          style: "success",
+          text: "✅ This is the develop local Supabase (avandar). Branch develop uses it.",
+        },
+      ],
+    );
   });
 
   it("warns in yellow that a branch is on a switched local Supabase", () => {
     expect(
-      SupabaseTargetHeadline.makeLines({
-        summary: {
-          ...SHARED_SUMMARY,
-          branch: "feat/x",
-          switchKind: "local",
-          projectId: "feat-x",
-        },
+      SupabaseTargetHeadline.makeLinesFromSummary({
+        ...SHARED_SUMMARY,
+        branch: "feat/x",
+        switchKind: "local",
+        projectId: "feat-x",
       }),
     ).toEqual([
       {
@@ -45,14 +43,12 @@ describe("SupabaseTargetHeadline.makeLines", () => {
 
   it("warns in yellow that a branch is switched to a hosted project", () => {
     expect(
-      SupabaseTargetHeadline.makeLines({
-        summary: {
-          ...SHARED_SUMMARY,
-          branch: "feat/x",
-          switchKind: "remote",
-          projectId: "abcdefghijklmnopqrst",
-          remoteApiUrl: "https://abcdefghijklmnopqrst.supabase.co",
-        },
+      SupabaseTargetHeadline.makeLinesFromSummary({
+        ...SHARED_SUMMARY,
+        branch: "feat/x",
+        switchKind: "remote",
+        projectId: "abcdefghijklmnopqrst",
+        remoteApiUrl: "https://abcdefghijklmnopqrst.supabase.co",
       }),
     ).toEqual([
       {
@@ -63,13 +59,11 @@ describe("SupabaseTargetHeadline.makeLines", () => {
   });
 
   it("adds a warning when .env.development holds overrides no switch wrote", () => {
-    const lines = SupabaseTargetHeadline.makeLines({
-      summary: {
-        ...SHARED_SUMMARY,
-        branch: "feat/x",
-        projectId: "feat-other",
-        hasStrayOverride: true,
-      },
+    const lines = SupabaseTargetHeadline.makeLinesFromSummary({
+      ...SHARED_SUMMARY,
+      branch: "feat/x",
+      projectId: "feat-other",
+      hasStrayOverride: true,
     });
 
     expect(lines).toHaveLength(2);

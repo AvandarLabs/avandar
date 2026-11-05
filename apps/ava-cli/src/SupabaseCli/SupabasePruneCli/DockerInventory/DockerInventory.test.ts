@@ -1,4 +1,4 @@
-import { DockerInventory } from "@ava-cli/SupabaseCli/SupabasePrune/DockerInventory/DockerInventory";
+import { DockerInventory } from "@ava-cli/SupabaseCli/SupabasePruneCli/DockerInventory/DockerInventory";
 import { describe, expect, it } from "vitest";
 
 describe("DockerInventory.makeProjectsFromListings", () => {
@@ -17,18 +17,18 @@ describe("DockerInventory.makeProjectsFromListings", () => {
       {
         projectId: "avandar",
         workdirs: ["/src/avandar"],
-        containerCount: 1,
-        volumeCount: 0,
-        networkCount: 0,
+        numContainers: 1,
+        numVolumes: 0,
+        numNetworks: 0,
         isRunning: true,
         images: ["public.ecr.aws/supabase/kong:2"],
       },
       {
         projectId: "feat-old",
         workdirs: ["/wt/feat/old"],
-        containerCount: 2,
-        volumeCount: 2,
-        networkCount: 1,
+        numContainers: 2,
+        numVolumes: 2,
+        numNetworks: 1,
         isRunning: true,
         images: [
           "public.ecr.aws/supabase/postgres:17",
@@ -38,9 +38,9 @@ describe("DockerInventory.makeProjectsFromListings", () => {
       {
         projectId: "fix-gone",
         workdirs: [],
-        containerCount: 0,
-        volumeCount: 1,
-        networkCount: 0,
+        numContainers: 0,
+        numVolumes: 1,
+        numNetworks: 0,
         isRunning: false,
         images: [],
       },

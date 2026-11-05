@@ -115,9 +115,13 @@ function _seedLegacyActiveBackup(fake: FakeHarness): void {
 function _readFakeManifest(
   fake: Readonly<FakeHarness>,
 ): SupabaseLocalBackupManifest {
-  return JSON.parse(
-    fake.files.get(`${_makeBackupDirectory()}/manifest.json`) ?? "{}",
-  ) as SupabaseLocalBackupManifest;
+  const manifestContents = fake.files.get(
+    `${_makeBackupDirectory()}/manifest.json`,
+  );
+  if (manifestContents === undefined) {
+    throw new Error("The fake harness has no seeded manifest.");
+  }
+  return JSON.parse(manifestContents);
 }
 
 function _writeFakeManifest(

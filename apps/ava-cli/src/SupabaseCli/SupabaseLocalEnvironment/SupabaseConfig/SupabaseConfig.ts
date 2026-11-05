@@ -185,6 +185,20 @@ function _makeDevelopmentEnvFromStatus(
 
 /** Transforms Supabase configuration and local status values. */
 export const SupabaseConfig = {
+  /**
+   * Every development env key a switch points at a Supabase project, in the
+   * order a status report lists them.
+   */
+  getManagedEnvKeys: (): string[] => {
+    return [...Object.keys(ENV_VALUE_FROM_KEY), "SB_JWT_ISSUER"];
+  },
+
+  /** Whether a development env key holds the project's secret key. */
+  isSecretEnvKey: (envKey: string): boolean => {
+    const statusKey = _getStatusKeyFromEnvKey(envKey);
+    return statusKey === "secretKey" || statusKey === "serviceRoleKey";
+  },
+
   /** Reads the project identity and active ports from Supabase TOML. */
   makeStateFromContents: _makeStateFromContents,
   /** Parses the credentials emitted by `supabase status -o json`. */

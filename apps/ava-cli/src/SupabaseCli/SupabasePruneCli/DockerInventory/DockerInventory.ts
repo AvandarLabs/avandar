@@ -1,5 +1,17 @@
 import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/RunLocalCommand/RunLocalCommand";
-import type { DockerSupabaseProject } from "@ava-cli/SupabaseCli/SupabasePrune/SupabasePrunePlan/SupabasePrunePlan";
+
+/** One local Supabase project as Docker labels describe it. */
+export type DockerSupabaseProject = {
+  projectId: string;
+  /** Distinct `com.supabase.cli.workdir` labels of its containers. */
+  workdirs: string[];
+  numContainers: number;
+  numVolumes: number;
+  numNetworks: number;
+  isRunning: boolean;
+  /** Images its containers run, which other projects may share. */
+  images: string[];
+};
 
 /** The container runtime behind the `docker` CLI, as a person would name it. */
 export type DockerRuntime = {
@@ -8,22 +20,22 @@ export type DockerRuntime = {
   startHint: string;
 };
 
+/** One listing row's effect on the project it belongs to. */
+type ProjectChange = readonly [
+  projectId: string,
+  applyChange: (project: DockerSupabaseProject) => DockerSupabaseProject,
+];
+
 const PROJECT_LABEL = "com.supabase.cli.project";
 const WORKDIR_LABEL = "com.supabase.cli.workdir";
-
-function _getLines(listing: string): string[] {
-  return listing.split("\n").filter((line) => {
-    return line.trim() !== "";
-  });
-}
 
 function _makeEmptyProject(projectId: string): DockerSupabaseProject {
   return {
     projectId,
     workdirs: [],
-    containerCount: 0,
-    volumeCount: 0,
-    networkCount: 0,
+    numContainers: 0,
+    numVolumes: 0,
+    numNetworks: 0,
     isRunning: false,
     images: [],
   };
@@ -35,6 +47,23 @@ function _addUnique(values: readonly string[], value: string): string[] {
     : [...values, value];
 }
 
+function _makeContainerChange(line: string): ProjectChange {
+  const [projectId = "", workdir = "", state = "", image = ""] =
+    line.split("\t");
+  return [
+    projectId,
+    (project) => {
+      return {
+        ...project,
+        workdirs: _addUnique(project.workdirs, workdir),
+        numContainers: project.numContainers + 1,
+        isRunning: project.isRunning || state === "running",
+        images: _addUnique(project.images, image),
+      };
+    },
+  ];
+}
+
 function _makeProjectsFromListings(
   options: Readonly<{
     containerListing: string;
@@ -42,39 +71,35 @@ function _makeProjectsFromListings(
     networkListing: string;
   }>,
 ): DockerSupabaseProject[] {
-  const projects = new Map<string, DockerSupabaseProject>();
-  const update = (
-    projectId: string,
-    change: (project: DockerSupabaseProject) => DockerSupabaseProject,
-  ) => {
-    projects.set(
-      projectId,
-      change(projects.get(projectId) ?? _makeEmptyProject(projectId)),
-    );
-  };
-  _getLines(options.containerListing).forEach((line) => {
-    const [projectId = "", workdir = "", state = "", image = ""] =
-      line.split("\t");
-    update(projectId, (project) => {
-      return {
-        ...project,
-        workdirs: _addUnique(project.workdirs, workdir),
-        containerCount: project.containerCount + 1,
-        isRunning: project.isRunning || state === "running",
-        images: _addUnique(project.images, image),
-      };
-    });
-  });
-  _getLines(options.volumeListing).forEach((projectId) => {
-    update(projectId, (project) => {
-      return { ...project, volumeCount: project.volumeCount + 1 };
-    });
-  });
-  _getLines(options.networkListing).forEach((projectId) => {
-    update(projectId, (project) => {
-      return { ...project, networkCount: project.networkCount + 1 };
-    });
-  });
+  const changes: ProjectChange[] = [
+    ...RunLocalCommand.getLinesFromOutput(options.containerListing).map(
+      _makeContainerChange,
+    ),
+    ...RunLocalCommand.getLinesFromOutput(options.volumeListing).map(
+      (projectId): ProjectChange => {
+        return [
+          projectId,
+          (project) => {
+            return { ...project, numVolumes: project.numVolumes + 1 };
+          },
+        ];
+      },
+    ),
+    ...RunLocalCommand.getLinesFromOutput(options.networkListing).map(
+      (projectId): ProjectChange => {
+        return [
+          projectId,
+          (project) => {
+            return { ...project, numNetworks: project.numNetworks + 1 };
+          },
+        ];
+      },
+    ),
+  ];
+  const projects = changes.reduce((projectsById, [projectId, applyChange]) => {
+    const project = projectsById.get(projectId) ?? _makeEmptyProject(projectId);
+    return new Map([...projectsById, [projectId, applyChange(project)]]);
+  }, new Map<string, DockerSupabaseProject>());
   return [...projects.values()].sort((left, right) => {
     return left.projectId.localeCompare(right.projectId);
   });
@@ -105,17 +130,50 @@ function _getRuntimeFromContext(contextName: string): DockerRuntime {
 async function _runDocker(
   options: Readonly<{ projectRoot: string; args: readonly string[] }>,
 ): Promise<string> {
-  const result = await RunLocalCommand.run({
+  return await RunLocalCommand.runOrThrow({
     command: "docker",
     args: options.args,
     cwd: options.projectRoot,
   });
-  if (!result.ok) {
-    throw new Error(
-      `docker ${options.args.slice(0, 2).join(" ")} failed: ${result.stderr || "unknown error"}`,
-    );
-  }
-  return result.stdout;
+}
+
+/** Arguments that list one resource type's project labels. */
+function _makeLabelListArgs(
+  resourceType: "volume" | "network",
+): readonly string[] {
+  return [
+    resourceType,
+    "ls",
+    "--filter",
+    `label=${PROJECT_LABEL}`,
+    "--format",
+    `{{.Label "${PROJECT_LABEL}"}}`,
+  ];
+}
+
+async function _readProjects(
+  projectRoot: string,
+): Promise<DockerSupabaseProject[]> {
+  const [containerListing, volumeListing, networkListing] = await Promise.all([
+    _runDocker({
+      projectRoot,
+      args: [
+        "ps",
+        "-a",
+        "--filter",
+        `label=${PROJECT_LABEL}`,
+        "--format",
+        `{{.Label "${PROJECT_LABEL}"}}\t{{.Label "${WORKDIR_LABEL}"}}\t{{.State}}\t{{.Image}}`,
+      ],
+    }),
+    _runDocker({ projectRoot, args: _makeLabelListArgs("volume") }),
+    _runDocker({ projectRoot, args: _makeLabelListArgs("network") }),
+  ]);
+  return _makeProjectsFromListings({
+    containerListing,
+    volumeListing,
+    networkListing,
+  });
 }
 
 /**
@@ -159,57 +217,11 @@ export const DockerInventory = {
   },
 
   /** Lists every local Supabase project Docker holds resources for. */
-  readProjects: async (
-    projectRoot: string,
-  ): Promise<DockerSupabaseProject[]> => {
-    const projectFormat = `{{.Label "${PROJECT_LABEL}"}}`;
-    const [containerListing, volumeListing, networkListing] = await Promise.all(
-      [
-        _runDocker({
-          projectRoot,
-          args: [
-            "ps",
-            "-a",
-            "--filter",
-            `label=${PROJECT_LABEL}`,
-            "--format",
-            `${projectFormat}\t{{.Label "${WORKDIR_LABEL}"}}\t{{.State}}\t{{.Image}}`,
-          ],
-        }),
-        _runDocker({
-          projectRoot,
-          args: [
-            "volume",
-            "ls",
-            "--filter",
-            `label=${PROJECT_LABEL}`,
-            "--format",
-            projectFormat,
-          ],
-        }),
-        _runDocker({
-          projectRoot,
-          args: [
-            "network",
-            "ls",
-            "--filter",
-            `label=${PROJECT_LABEL}`,
-            "--format",
-            projectFormat,
-          ],
-        }),
-      ],
-    );
-    return _makeProjectsFromListings({
-      containerListing,
-      volumeListing,
-      networkListing,
-    });
-  },
+  readProjects: _readProjects,
 
   /** Images any container on this machine still uses, pruned or not. */
   readImagesInUse: async (projectRoot: string): Promise<string[]> => {
-    return _getLines(
+    return RunLocalCommand.getLinesFromOutput(
       await _runDocker({
         projectRoot,
         args: ["ps", "-a", "--format", "{{.Image}}"],

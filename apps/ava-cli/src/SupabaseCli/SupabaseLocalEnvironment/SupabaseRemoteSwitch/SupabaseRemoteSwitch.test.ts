@@ -7,6 +7,7 @@ import {
   SupabaseLocalEnvironmentFakeIo,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
+import { SupabaseRemoteSwitch } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseRemoteSwitch/SupabaseRemoteSwitch";
 import { describe, expect, it } from "vitest";
 import type { SupabaseRemoteConnection } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
@@ -23,11 +24,11 @@ const CONNECTION: SupabaseRemoteConnection = {
   secretKey: "sb_secret_remote",
 };
 
-describe("SupabaseLocalEnvironment.switchRemote", () => {
+describe("SupabaseRemoteSwitch.switchRemote", () => {
   it("points the app's Supabase variables at the hosted project", async () => {
     const fake = createFakeIo();
 
-    await SupabaseLocalEnvironment.switchRemote({
+    await SupabaseRemoteSwitch.switchRemote({
       io: fake.io,
       connection: CONNECTION,
     });
@@ -46,7 +47,7 @@ describe("SupabaseLocalEnvironment.switchRemote", () => {
   it("points the edge-function variables at the hosted project", async () => {
     const fake = createFakeIo();
 
-    await SupabaseLocalEnvironment.switchRemote({
+    await SupabaseRemoteSwitch.switchRemote({
       io: fake.io,
       connection: CONNECTION,
     });
@@ -62,7 +63,7 @@ describe("SupabaseLocalEnvironment.switchRemote", () => {
   it("records the hosted project id in .env.development", async () => {
     const fake = createFakeIo();
 
-    await SupabaseLocalEnvironment.switchRemote({
+    await SupabaseRemoteSwitch.switchRemote({
       io: fake.io,
       connection: CONNECTION,
     });
@@ -70,6 +71,16 @@ describe("SupabaseLocalEnvironment.switchRemote", () => {
     expect(fake.files.get(ENV_PATH)).toContain(
       "AVA_SUPABASE_REMOTE_PROJECT_ID=abcdefghijklmnopqrst",
     );
+  });
+
+  it("leaves an active remote backup manifest naming the hosted project", async () => {
+    const fake = createFakeIo();
+
+    await SupabaseRemoteSwitch.switchRemote({
+      io: fake.io,
+      connection: CONNECTION,
+    });
+
     expect(readFakeManifest(fake)).toEqual(
       expect.objectContaining({
         kind: "remote",
@@ -82,7 +93,7 @@ describe("SupabaseLocalEnvironment.switchRemote", () => {
   it("runs no Supabase CLI or Docker command", async () => {
     const fake = createFakeIo();
 
-    await SupabaseLocalEnvironment.switchRemote({
+    await SupabaseRemoteSwitch.switchRemote({
       io: fake.io,
       connection: CONNECTION,
     });
@@ -94,7 +105,7 @@ describe("SupabaseLocalEnvironment.switchRemote", () => {
   it("leaves the dev-server port where it was", async () => {
     const fake = createFakeIo();
 
-    await SupabaseLocalEnvironment.switchRemote({
+    await SupabaseRemoteSwitch.switchRemote({
       io: fake.io,
       connection: CONNECTION,
     });
@@ -110,7 +121,7 @@ describe("SupabaseLocalEnvironment.switchRemote", () => {
     seedActiveBackup(fake);
 
     await expect(
-      SupabaseLocalEnvironment.switchRemote({
+      SupabaseRemoteSwitch.switchRemote({
         io: fake.io,
         connection: CONNECTION,
       }),
@@ -121,7 +132,7 @@ describe("SupabaseLocalEnvironment.switchRemote", () => {
     const fake = createFakeIo();
 
     await expect(
-      SupabaseLocalEnvironment.switchRemote({
+      SupabaseRemoteSwitch.switchRemote({
         io: fake.io,
         connection: { ...CONNECTION, databaseUrl: "https://example.com" },
       }),
@@ -133,7 +144,7 @@ describe("SupabaseLocalEnvironment.switchRemote", () => {
     const fake = createFakeIo({ writeFailureTarget: EDGE_ENV_PATH });
 
     await expect(
-      SupabaseLocalEnvironment.switchRemote({
+      SupabaseRemoteSwitch.switchRemote({
         io: fake.io,
         connection: CONNECTION,
       }),
@@ -148,7 +159,7 @@ describe("SupabaseLocalEnvironment.switchRemote", () => {
 describe("SupabaseLocalEnvironment.restore (after a remote switch)", () => {
   it("restores every development env file", async () => {
     const fake = createFakeIo();
-    await SupabaseLocalEnvironment.switchRemote({
+    await SupabaseRemoteSwitch.switchRemote({
       io: fake.io,
       connection: CONNECTION,
     });
@@ -168,7 +179,7 @@ describe("SupabaseLocalEnvironment.restore (after a remote switch)", () => {
     const fake = createFakeIo({
       supabaseResources: [{ type: "container", id: "a".repeat(64) }],
     });
-    await SupabaseLocalEnvironment.switchRemote({
+    await SupabaseRemoteSwitch.switchRemote({
       io: fake.io,
       connection: CONNECTION,
     });

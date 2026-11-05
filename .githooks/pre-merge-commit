@@ -16,5 +16,5 @@ if [ "$current_branch" != "develop" ]; then
   exit 0
 fi
 
-exec "$REPO_ROOT/scripts/supabase/validate-standard-local-config.sh" \
+exec "$REPO_ROOT/scripts/supabase/validate-standard-local-config/validate-standard-local-config.sh" \
   < "$REPO_ROOT/supabase/config.toml"

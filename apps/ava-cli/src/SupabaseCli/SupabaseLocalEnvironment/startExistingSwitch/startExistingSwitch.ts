@@ -86,11 +86,12 @@ export async function readExistingSwitchProject(
   io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<{ kind: "local" | "remote"; projectId: string } | undefined> {
   const existing = await _readExistingManifest(io);
-  if (existing === undefined) {
-    return undefined;
-  }
-  return {
-    kind: existing.manifest.kind,
-    projectId: SupabaseBackupStore.getProjectIdFromManifest(existing.manifest),
-  };
+  return existing === undefined
+    ? undefined
+    : {
+        kind: existing.manifest.kind,
+        projectId: SupabaseBackupStore.getProjectIdFromManifest(
+          existing.manifest,
+        ),
+      };
 }

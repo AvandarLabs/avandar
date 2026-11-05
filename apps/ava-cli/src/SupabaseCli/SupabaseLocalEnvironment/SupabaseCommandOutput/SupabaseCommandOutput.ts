@@ -1,3 +1,5 @@
+import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
+
 const SENSITIVE_FIELD_NAMES = new Set([
   "PUBLISHABLE_KEY",
   "SECRET_KEY",
@@ -45,8 +47,28 @@ function _redactSecretsFromLine(line: string): string {
   return line.replace(HUMAN_READABLE_SECRET_PATTERN, "$1[redacted]");
 }
 
-/** Removes generated credentials while preserving Supabase startup output. */
+/** Visible prefix length of a masked secret key. */
+const MASKED_SECRET_PREFIX_LENGTH = 12;
+
+/**
+ * Removes credentials from what `ava` prints, keeping Supabase's own output
+ * and a hosted project's settings readable.
+ */
 export const SupabaseCommandOutput = {
   /** Redacts credential values from one complete output line. */
   redactSecretsFromLine: _redactSecretsFromLine,
+
+  /**
+   * Shortens a development env value enough to tell secrets apart without
+   * printing them: a secret key keeps only its start, and a Postgres URL
+   * loses its password.
+   */
+  maskEnvValue: (
+    options: Readonly<{ envKey: string; value: string }>,
+  ): string => {
+    const { envKey, value } = options;
+    return SupabaseConfig.isSecretEnvKey(envKey)
+      ? `${value.slice(0, MASKED_SECRET_PREFIX_LENGTH)}…`
+      : value.replace(/^(postgres(?:ql)?:\/\/[^:/@]+):[^@]*@/, "$1:****@");
+  },
 };

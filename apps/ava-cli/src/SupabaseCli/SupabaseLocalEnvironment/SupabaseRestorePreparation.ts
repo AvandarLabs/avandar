@@ -8,7 +8,8 @@ import {
   PROJECT_ID_PATTERN,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import { SupabaseManifestPathChecks } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseManifestPathChecks";
-import { SupabaseSwitchState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState/SupabaseSwitchState";
+import { SupabaseProjectPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseProjectPaths";
+import { SupabaseSwitchState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState";
 import { makeMap, makeSet, promiseMap, propEq } from "@avandar/utils";
 import type {
   RestorePaths,
@@ -191,18 +192,13 @@ async function _validateRestoreManifest(
   });
 }
 
-/** The project id the Supabase CLI uses in this worktree. */
-async function _readActiveProjectId(
-  io: Readonly<SupabaseLocalEnvironmentIo>,
-): Promise<string> {
-  return (await SupabaseSwitchState.readEffectiveConfig(io)).projectId;
-}
-
 /** The hosted project `.env.development` says this worktree points at. */
 async function _readRemoteProjectId(
   io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<string | undefined> {
-  const envPath = path.join(io.projectRoot, ".env.development");
+  const envPath = SupabaseProjectPaths.getDevelopmentEnvPathFromProjectRoot(
+    io.projectRoot,
+  );
   return (await io.pathExists(envPath))
     ? SupabaseConfigOverrides.getRemoteProjectIdFromEnvContents(
         await io.readTextFile(envPath),
@@ -220,7 +216,7 @@ async function _hasProvenRestoreOwnership(
   const activeProjectId = await (async (): Promise<string | undefined> => {
     try {
       return manifest.kind === "local"
-        ? await _readActiveProjectId(io)
+        ? (await SupabaseSwitchState.readEffectiveConfig(io)).projectId
         : await _readRemoteProjectId(io);
     } catch {
       if (manifest.state === "active") {
@@ -234,13 +230,17 @@ async function _hasProvenRestoreOwnership(
   ) {
     return true;
   }
-  // A switch made by an older `ava` rewrote config.toml, and the git hooks
-  // tell anyone blocked by that to put the file back by hand. Its backup still
-  // restores everything, so only cleanup of the project waits on proof.
-  const isLegacySwitch = manifest.files.some(({ sourcePath }) => {
-    return sourcePath === path.join(io.projectRoot, "supabase", "config.toml");
-  });
-  if (manifest.state === "active" && !isLegacySwitch) {
+  // A manifest that backs up supabase/config.toml comes from a switch that
+  // rewrote that file, and the git hooks tell anyone blocked by it to put the
+  // file back by hand. Its backup still restores everything, so only cleanup
+  // of the project waits on proof.
+  const hasConfigBackup = manifest.files.some(
+    propEq(
+      "sourcePath",
+      SupabaseProjectPaths.getConfigPathFromProjectRoot(io.projectRoot),
+    ),
+  );
+  if (manifest.state === "active" && !hasConfigBackup) {
     throw new Error(
       "Supabase backup project id does not match the active Supabase project.",
     );

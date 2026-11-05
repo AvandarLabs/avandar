@@ -1,6 +1,6 @@
-import { SupabasePrunePlan } from "@ava-cli/SupabaseCli/SupabasePrune/SupabasePrunePlan/SupabasePrunePlan";
+import { SupabasePrunePlan } from "@ava-cli/SupabaseCli/SupabasePruneCli/SupabasePrunePlan/SupabasePrunePlan";
 import { describe, expect, it } from "vitest";
-import type { DockerSupabaseProject } from "@ava-cli/SupabaseCli/SupabasePrune/SupabasePrunePlan/SupabasePrunePlan";
+import type { DockerSupabaseProject } from "@ava-cli/SupabaseCli/SupabasePruneCli/DockerInventory/DockerInventory";
 
 const ROOT = "/src/worktrees/avandar";
 
@@ -11,9 +11,9 @@ function _makeProject(
   return {
     projectId,
     workdirs: [...workdirs],
-    containerCount: workdirs.length > 0 ? 12 : 0,
-    volumeCount: 3,
-    networkCount: workdirs.length > 0 ? 1 : 0,
+    numContainers: workdirs.length > 0 ? 12 : 0,
+    numVolumes: 3,
+    numNetworks: workdirs.length > 0 ? 1 : 0,
     isRunning: false,
     images: [],
   };
@@ -38,14 +38,14 @@ function _makePlan(
   dockerProjects: readonly DockerSupabaseProject[],
   existingWorkdirs: readonly string[] = [],
 ) {
-  return SupabasePrunePlan.make({
+  return SupabasePrunePlan.fromDockerProjects({
     ...BASE_INPUT,
     dockerProjects,
     existingWorkdirs,
   });
 }
 
-describe("SupabasePrunePlan.make", () => {
+describe("SupabasePrunePlan.fromDockerProjects", () => {
   it("never offers the shared develop project", () => {
     expect(
       _makePlan([_makeProject("avandar", ["/src/avandar"])]).candidates,
@@ -96,7 +96,7 @@ describe("SupabasePrunePlan.make", () => {
   });
 
   it("leaves alone a sibling repository under a short branch's parent", () => {
-    const plan = SupabasePrunePlan.make({
+    const plan = SupabasePrunePlan.fromDockerProjects({
       ...BASE_INPUT,
       localBranches: [...BASE_INPUT.localBranches, "nux"],
       worktrees: [
@@ -112,7 +112,7 @@ describe("SupabasePrunePlan.make", () => {
 
   it("keeps a project whose worktree is gone but whose branch still exists", () => {
     const project = _makeProject("custom-id", [`${ROOT}/feat/nux-old`]);
-    const plan = SupabasePrunePlan.make({
+    const plan = SupabasePrunePlan.fromDockerProjects({
       ...BASE_INPUT,
       localBranches: [...BASE_INPUT.localBranches, "feat/nux-old"],
       dockerProjects: [project],

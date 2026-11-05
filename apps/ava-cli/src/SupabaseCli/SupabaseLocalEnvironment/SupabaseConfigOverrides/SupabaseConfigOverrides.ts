@@ -3,11 +3,11 @@ import {
   MAX_TCP_PORT,
   MIN_TCP_PORT,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
-import { isDefined, objectEntries } from "@avandar/utils";
+import { isDefined, objectEntries, objectValuesMap } from "@avandar/utils";
 import type { SupabaseConfigState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 /** One `KEY=value` line the managed block writes, as a key and its value. */
-export type SupabaseConfigOverride = readonly [key: string, value: string];
+export type SupabaseConfigOverride = [key: string, value: string];
 
 /** Environment variable that overrides `project_id` in `config.toml`. */
 const PROJECT_ID_ENV_KEY = "SUPABASE_PROJECT_ID";
@@ -20,8 +20,6 @@ const REMOTE_PROJECT_ID_ENV_KEY = "AVA_SUPABASE_REMOTE_PROJECT_ID";
 
 const BLOCK_START = "# >>> ava supabase switch >>>";
 const BLOCK_END = "# <<< ava supabase switch <<<";
-const BLOCK_NOTE =
-  "# Managed by `ava supabase switch`. Run `ava supabase restore` to remove it.";
 
 /**
  * Config sections whose environment variables use another section's name.
@@ -30,7 +28,7 @@ const BLOCK_NOTE =
  * port only moves through `SUPABASE_LOCAL_SMTP_PORT`. `SUPABASE_INBUCKET_PORT`
  * is accepted without error and silently ignored.
  */
-const ENV_SECTION_FROM_CONFIG_SECTION: Readonly<Record<string, string>> = {
+const ENV_SECTION_FROM_CONFIG_SECTION: Record<string, string> = {
   inbucket: "local_smtp",
 };
 
@@ -68,18 +66,16 @@ function _makeEffectiveState(
 ): SupabaseConfigState {
   const { config } = options;
   const envValues = _getEnvValuesFromContents(options.envContents);
-  const ports = Object.fromEntries(
-    objectEntries(config.ports).map(([configKey, port]) => {
-      const overrideText = envValues.get(_getEnvKeyFromConfigKey(configKey));
-      const override = Number(overrideText);
-      const isValidPort =
-        overrideText !== undefined &&
-        /^\d+$/.test(overrideText) &&
-        override >= MIN_TCP_PORT &&
-        override <= MAX_TCP_PORT;
-      return [configKey, isValidPort ? override : port];
-    }),
-  );
+  const ports = objectValuesMap(config.ports, (port, configKey) => {
+    const overrideText = envValues.get(_getEnvKeyFromConfigKey(configKey));
+    const overridePort = Number(overrideText);
+    const isValidPort =
+      overrideText !== undefined &&
+      /^\d+$/.test(overrideText) &&
+      overridePort >= MIN_TCP_PORT &&
+      overridePort <= MAX_TCP_PORT;
+    return isValidPort ? overridePort : port;
+  });
   return {
     projectId: envValues.get(PROJECT_ID_ENV_KEY) || config.projectId,
     apiPort: ports["api.port"] ?? config.apiPort,
@@ -104,7 +100,7 @@ function _removeOverrideLines(envContents: string): string[] {
 function _makeEnvContentsWithOverrides(
   options: Readonly<{
     envContents: string;
-    overrides: readonly SupabaseConfigOverride[];
+    overrides: ReadonlyArray<Readonly<SupabaseConfigOverride>>;
   }>,
 ): string {
   const keptContents = _removeOverrideLines(options.envContents)
@@ -112,7 +108,7 @@ function _makeEnvContentsWithOverrides(
     .replace(/\n+$/, "");
   const block = [
     BLOCK_START,
-    BLOCK_NOTE,
+    "# Managed by `ava supabase switch`. Run `ava supabase restore` to remove it.",
     ...options.overrides.map(([key, value]) => {
       return `${key}=${value}`;
     }),
@@ -121,13 +117,16 @@ function _makeEnvContentsWithOverrides(
   return keptContents === "" ? `${block}\n` : `${keptContents}\n\n${block}\n`;
 }
 
-function _makeLocalOverrides(
+function _fromLocalProject(
   options: Readonly<{ projectId: string; ports: Record<string, number> }>,
 ): SupabaseConfigOverride[] {
   return [
     [PROJECT_ID_ENV_KEY, options.projectId],
     ...objectEntries(options.ports).map(([configKey, port]) => {
-      return [_getEnvKeyFromConfigKey(configKey), String(port)] as const;
+      return [
+        _getEnvKeyFromConfigKey(configKey),
+        String(port),
+      ] satisfies SupabaseConfigOverride;
     }),
   ];
 }
@@ -138,9 +137,10 @@ function _makeLocalOverrides(
  *
  * The CLI loads `.env.development` from the project root and lets
  * `SUPABASE_PROJECT_ID` and `SUPABASE_<SECTION>_<KEY>` variables override the
- * TOML. `ava supabase switch` writes those variables into one managed block,
- * and `ava supabase status`, `start`, `stop`, and `prune` read them back to
- * learn which project a worktree is really on.
+ * TOML. `ava supabase switch` writes those variables into one managed block.
+ * Other `ava supabase` steps read them back, for example status and restore
+ * to learn which project a worktree is really on, or the Supabase CLI runner
+ * to keep inherited overrides out of a child process.
  */
 export const SupabaseConfigOverrides = {
   /** The environment variable the Supabase CLI reads for a config key. */
@@ -154,8 +154,11 @@ export const SupabaseConfigOverrides = {
    */
   isOverrideKey: _isOverrideKey,
 
-  /** The project id and ports the Supabase CLI will actually use. */
-  makeEffectiveState: _makeEffectiveState,
+  /**
+   * The project id and ports the Supabase CLI will actually use, given the
+   * config's defaults and a `.env.development`'s contents.
+   */
+  makeEffectiveStateFromEnvContents: _makeEffectiveState,
 
   /**
    * Writes the managed block, replacing any earlier one.
@@ -166,10 +169,10 @@ export const SupabaseConfigOverrides = {
   makeEnvContentsWithOverrides: _makeEnvContentsWithOverrides,
 
   /** The block entries that move a worktree onto a local project. */
-  makeLocalOverrides: _makeLocalOverrides,
+  fromLocalProject: _fromLocalProject,
 
   /** The block entries that mark a worktree as pointed at a hosted project. */
-  makeRemoteOverrides: (remoteProjectId: string): SupabaseConfigOverride[] => {
+  fromRemoteProjectId: (remoteProjectId: string): SupabaseConfigOverride[] => {
     return [[REMOTE_PROJECT_ID_ENV_KEY, remoteProjectId]];
   },
 

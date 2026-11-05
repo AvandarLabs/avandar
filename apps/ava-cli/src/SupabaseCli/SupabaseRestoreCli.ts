@@ -5,24 +5,11 @@ import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import { Acclimate } from "@avandar/acclimate";
 import type { CommandHelpSpec } from "@ava-cli/utils/CommandHelp/CommandHelp";
 
-/** What `ava supabase restore --help` prints. */
-export const SupabaseRestoreHelp: CommandHelpSpec = {
-  commandPath: ["supabase", "restore"],
-  summary:
-    "Undo this branch's `ava supabase switch`: put every development env file back as it was, and delete the branch's own local project and its data if it had one.",
-  usage: ["ava supabase restore"],
-  options: [],
-  examples: [
-    {
-      label: "ava supabase restore",
-      description: "Put the current branch back on the develop local Supabase.",
-    },
-  ],
-};
-
 /** CLI for undoing this branch's local or remote Supabase switch. */
 export const SupabaseRestoreCli = Acclimate.createCLI("restore")
-  .description(SupabaseRestoreHelp.summary)
+  .description(
+    "Undo this branch's `ava supabase switch`: put every development env file back as it was, and delete the branch's own local project and its data if it had one.",
+  )
   .action(() => {
     const io = createSupabaseLocalEnvironmentIo(
       findRepoRoot() ?? process.cwd(),
@@ -43,3 +30,16 @@ export const SupabaseRestoreCli = Acclimate.createCLI("restore")
         process.exitCode = 1;
       });
   });
+
+/** What `ava supabase restore --help` prints. */
+export const SupabaseRestoreHelp: CommandHelpSpec = {
+  commandPath: ["supabase", "restore"],
+  cli: SupabaseRestoreCli,
+  usage: ["ava supabase restore"],
+  examples: [
+    {
+      label: "ava supabase restore",
+      description: "Put the current branch back on the develop local Supabase.",
+    },
+  ],
+};

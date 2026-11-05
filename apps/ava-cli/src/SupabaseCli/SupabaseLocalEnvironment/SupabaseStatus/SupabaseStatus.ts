@@ -1,8 +1,9 @@
 import { DevServerPort } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
 import { EnvFileLine } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/EnvFileLine/EnvFileLine";
+import { SupabaseCommandOutput } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseCommandOutput/SupabaseCommandOutput";
 import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
-import { SupabaseSwitchState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState/SupabaseSwitchState";
-import { prop, propEq } from "@avandar/utils";
+import { SupabaseSwitchState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState";
+import { isDefined, prop, propEq } from "@avandar/utils";
 import type {
   DevelopmentEnvFile,
   SupabaseEnvironmentDrift,
@@ -11,7 +12,7 @@ import type {
   SupabaseStatusEntry,
   SupabaseStatusReport,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-import type { SupabaseSwitchSources } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState/SupabaseSwitchState";
+import type { SupabaseSwitchSources } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState";
 
 type MakeStatusReportOptions = SupabaseSwitchSources & {
   statusJson: string | undefined;
@@ -112,54 +113,25 @@ function _readLocalStatus(
   }
 }
 
-/** Development env keys a remote report shows, with secrets cut short. */
-const REMOTE_REPORTED_ENV_KEYS = [
-  "VITE_SUPABASE_API_URL",
-  "SUPABASE_URL",
-  "SUPABASE_POSTGRES_URL",
-  "VITE_SUPABASE_ANON_KEY",
-  "SUPABASE_SERVICE_ROLE_KEY",
-  "SB_PUBLISHABLE_KEY",
-  "SB_SECRET_KEY",
-  "SB_JWT_ISSUER",
-] as const;
-
-const SECRET_ENV_KEYS = new Set(["SUPABASE_SERVICE_ROLE_KEY", "SB_SECRET_KEY"]);
-
-/** Visible prefix length of a masked remote secret. */
-const MASKED_SECRET_PREFIX_LENGTH = 12;
-
-/**
- * A hosted project's keys are real credentials, unlike the fixed local
- * defaults, so a remote report shows only enough to tell them apart.
- */
-function _maskRemoteValue(
-  options: Readonly<{ envKey: string; value: string }>,
-): string {
-  const { envKey, value } = options;
-  if (SECRET_ENV_KEYS.has(envKey)) {
-    return `${value.slice(0, MASKED_SECRET_PREFIX_LENGTH)}…`;
-  }
-  return value.replace(/^(postgres(?:ql)?:\/\/[^:/@]+):[^@]*@/, "$1:****@");
-}
-
 function _makeRemoteEnvironmentValues(
   envFiles: readonly DevelopmentEnvFile[],
 ): SupabaseStatusEntry[] {
   const assignments = envFiles.flatMap(({ contents }) => {
-    return contents.split("\n").flatMap((line) => {
-      const assignment = EnvFileLine.getAssignment(line);
-      return assignment === undefined ? [] : [assignment];
-    });
+    return contents
+      .split("\n")
+      .map(EnvFileLine.getAssignment)
+      .filter(isDefined);
   });
-  return REMOTE_REPORTED_ENV_KEYS.flatMap((envKey) => {
+  // A hosted project's keys are real credentials, unlike the fixed local
+  // defaults, so the report shows only enough to tell them apart.
+  return SupabaseConfig.getManagedEnvKeys().flatMap((envKey) => {
     const assignment = assignments.find(propEq("key", envKey));
     return assignment === undefined
       ? []
       : [
           {
             label: envKey,
-            value: _maskRemoteValue({
+            value: SupabaseCommandOutput.maskEnvValue({
               envKey,
               value: EnvFileLine.getUnquotedValue(assignment.value),
             }),
@@ -172,7 +144,7 @@ function _makeStatusReport(
   options: Readonly<MakeStatusReportOptions>,
 ): SupabaseStatusReport {
   const { statusJson, envFiles } = options;
-  const { config, ...summary } = SupabaseSwitchState.makeFromSources(options);
+  const { config, ...summary } = SupabaseSwitchState.fromSources(options);
   if (summary.switchKind === "remote") {
     return {
       ...summary,
@@ -218,7 +190,7 @@ async function _readStatusReport(
   // A hosted project has no local stack to ask, and the shared stack's
   // status would describe a database this worktree does not use.
   const statusJson =
-    SupabaseSwitchState.makeFromSources(sources).switchKind === "remote"
+    SupabaseSwitchState.fromSources(sources).switchKind === "remote"
       ? undefined
       : await _readStatusJson(io);
   return _makeStatusReport({ ...sources, statusJson });

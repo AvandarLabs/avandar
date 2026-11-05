@@ -67,7 +67,6 @@ function _makeErrorLines(
   ];
 }
 
-/** Writes one styled line to a stream, colored only when it is a terminal. */
 function _writeLine(
   options: Readonly<{
     stream: NodeJS.WriteStream;
@@ -118,6 +117,7 @@ export const CliTheme = {
   /** The two lines of a failure: what went wrong, then how to fix it. */
   makeErrorLines: _makeErrorLines,
 
+  /** Writes one styled line to a stream, colored only when it is a terminal. */
   writeLine: _writeLine,
 
   /** Announces work on stderr before it starts. */

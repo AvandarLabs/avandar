@@ -5,7 +5,8 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import type { SpawnSyncReturns } from "node:child_process";
 
-const GUARD_PATH = "scripts/supabase/require-local-supabase.sh";
+const GUARD_PATH =
+  "scripts/supabase/require-local-supabase/require-local-supabase.sh";
 
 let temporaryRoots: string[] = [];
 

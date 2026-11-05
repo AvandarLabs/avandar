@@ -1,6 +1,6 @@
 import { createSupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/createSupabaseLocalEnvironmentIo";
 import { runSupabaseSwitch } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/runSupabaseSwitch/runSupabaseSwitch";
-import { SupabaseSwitchRemoteCli } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/SupabaseSwitchRemoteCli/SupabaseSwitchRemoteCli";
+import { SupabaseSwitchRemoteCli } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/SupabaseSwitchRemoteCli";
 import { CliTheme } from "@ava-cli/utils/CliTheme/CliTheme";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import { TerminalMenu } from "@ava-cli/utils/TerminalMenu/TerminalMenu";
@@ -12,56 +12,11 @@ import type {
 import type { RunSupabaseSwitchOutcome } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/runSupabaseSwitch/runSupabaseSwitch";
 import type { CommandHelpSpec } from "@ava-cli/utils/CommandHelp/CommandHelp";
 
-const COMMAND_NAME = "ava supabase switch";
-
 /** How to seed by hand once a switch has already finished. */
 const MANUAL_SEED_COMMAND = "pnpm db:seed";
 
 const RESTORE_THEN_SWITCH_MESSAGE =
   "Run `ava supabase restore` first, then you can switch to a new id.";
-
-/** What `ava supabase switch --help` prints. */
-export const SupabaseSwitchHelp: CommandHelpSpec = {
-  commandPath: ["supabase", "switch"],
-  summary:
-    "Start a local Supabase project of this branch's own, so its database is isolated from every other worktree. `ava supabase switch remote` points the worktree at a hosted project instead.",
-  usage: [
-    "ava supabase switch [project-id] [base-port] [--no-seed]",
-    "ava supabase switch remote [options]",
-  ],
-  arguments: [
-    {
-      label: "[project-id]",
-      description:
-        "Local project id. Defaults to the branch name in kebab case, e.g. feat/nux becomes feat-nux.",
-    },
-    {
-      label: "[base-port]",
-      description:
-        "API port to start the project's port set at. Defaults to the first free set from 55321.",
-    },
-  ],
-  options: [
-    {
-      label: "--no-seed",
-      description: "Leave the new project empty instead of seeding it.",
-    },
-  ],
-  examples: [
-    {
-      label: "ava supabase switch",
-      description: "Give the current branch its own seeded local Supabase.",
-    },
-    {
-      label: "ava supabase switch feat-nux-empty 56321 --no-seed",
-      description: "Use a chosen id and port set, and skip the seed.",
-    },
-    {
-      label: "ava supabase switch remote --help",
-      description: "See how to point the worktree at a hosted project.",
-    },
-  ],
-};
 
 function _printSeedOutcome(seed: Readonly<SupabaseSeedOutcome>): void {
   switch (seed.state) {
@@ -118,14 +73,15 @@ async function _confirmReuse(existingProjectId: string): Promise<boolean> {
 
 /** CLI for starting a branch-isolated local Supabase project. */
 export const SupabaseSwitchCli = Acclimate.createCLI("switch")
-  .description(SupabaseSwitchHelp.summary)
+  .description(
+    "Start a local Supabase project of this branch's own, so its database is isolated from every other worktree. `ava supabase switch remote` points the worktree at a hosted project instead.",
+  )
   .addCommand("remote", SupabaseSwitchRemoteCli)
   .addPositionalArg({
     name: "temporaryProjectId",
     required: false,
     description:
-      "Temporary local Supabase project id. Defaults to a kebab-case " +
-      "form of the current Git branch.",
+      "Local project id. Defaults to the branch name in kebab case, e.g. feat/nux becomes feat-nux.",
     type: "string",
     validator: (value: string) => {
       return (
@@ -137,7 +93,8 @@ export const SupabaseSwitchCli = Acclimate.createCLI("switch")
   .addPositionalArg({
     name: "requestedBasePort",
     required: false,
-    description: "Optional API base port. Omit to select a free port set.",
+    description:
+      "API port to start the project's port set at. Defaults to the first free set from 55321.",
     type: "number",
     parser: (value: string) => {
       return Number(value);
@@ -151,8 +108,7 @@ export const SupabaseSwitchCli = Acclimate.createCLI("switch")
   })
   .addOption({
     name: "--no-seed",
-    description:
-      "Leave the new project empty instead of running the database seed.",
+    description: "Leave the new project empty instead of seeding it.",
     required: false,
     default: false,
     type: "boolean",
@@ -178,7 +134,7 @@ export const SupabaseSwitchCli = Acclimate.createCLI("switch")
         .then(_printOutcome)
         .catch((error: unknown) => {
           CliTheme.error({
-            command: COMMAND_NAME,
+            command: "ava supabase switch",
             message: error instanceof Error ? error.message : String(error),
             hint: "Fix what the message names and retry. A failed switch puts the env files back.",
           });
@@ -186,3 +142,31 @@ export const SupabaseSwitchCli = Acclimate.createCLI("switch")
         });
     },
   );
+
+/** What `ava supabase switch --help` prints. */
+export const SupabaseSwitchHelp: CommandHelpSpec = {
+  commandPath: ["supabase", "switch"],
+  cli: SupabaseSwitchCli,
+  usage: [
+    "ava supabase switch [project-id] [base-port] [--no-seed]",
+    "ava supabase switch remote [options]",
+  ],
+  labels: {
+    temporaryProjectId: "[project-id]",
+    requestedBasePort: "[base-port]",
+  },
+  examples: [
+    {
+      label: "ava supabase switch",
+      description: "Give the current branch its own seeded local Supabase.",
+    },
+    {
+      label: "ava supabase switch feat-nux-empty 56321 --no-seed",
+      description: "Use a chosen id and port set, and skip the seed.",
+    },
+    {
+      label: "ava supabase switch remote --help",
+      description: "See how to point the worktree at a hosted project.",
+    },
+  ],
+};

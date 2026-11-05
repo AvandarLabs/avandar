@@ -52,7 +52,7 @@ while read -r _local_ref local_sha _remote_ref remote_sha; do
     fi
 
     if ! git show "$local_sha:supabase/config.toml" \
-      | "$REPO_ROOT/scripts/supabase/validate-standard-local-config.sh"; then
+      | "$REPO_ROOT/scripts/supabase/validate-standard-local-config/validate-standard-local-config.sh"; then
       exit 1
     fi
   fi

@@ -1,7 +1,9 @@
 import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
 import {
+  CONFIG_PATH,
   EDGE_ENV_PATH,
   ENV_PATH,
+  ORIGINAL_CONFIG,
   SupabaseLocalEnvironmentFakeIo,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { describe, expect, it } from "vitest";
@@ -95,5 +97,52 @@ describe("SupabaseLocalEnvironment.switch (environment rewriting)", () => {
     expect(fake.files.get(EDGE_ENV_PATH)).toContain(
       'GOOGLE_REDIRECT_URI="http://127.0.0.1:55321/functions/v1/google-auth-callback"',
     );
+  });
+});
+
+describe("SupabaseLocalEnvironment.switch (project overrides)", () => {
+  it("points the Supabase CLI at the new project from .env.development", async () => {
+    const fake = createFakeIo();
+    await SupabaseLocalEnvironment.switch({
+      io: fake.io,
+      temporaryProjectId: "analytics-p2-temp",
+    });
+    expect(fake.files.get(ENV_PATH)).toContain(
+      [
+        "SUPABASE_PROJECT_ID=analytics-p2-temp",
+        "SUPABASE_API_PORT=55321",
+        "SUPABASE_DB_PORT=55322",
+      ].join("\n"),
+    );
+  });
+
+  it("writes the project overrides before supabase start reads them", async () => {
+    const fake = createFakeIo();
+    await SupabaseLocalEnvironment.switch({
+      io: fake.io,
+      temporaryProjectId: "analytics-p2-temp",
+    });
+    expect(fake.operations.indexOf(`write:${ENV_PATH}`)).toBeLessThan(
+      fake.operations.indexOf("command:start"),
+    );
+  });
+
+  it("never writes supabase/config.toml", async () => {
+    const fake = createFakeIo();
+    await SupabaseLocalEnvironment.switch({
+      io: fake.io,
+      temporaryProjectId: "analytics-p2-temp",
+    });
+    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.operations).not.toContain(`write:${CONFIG_PATH}`);
+  });
+
+  it("keeps the project overrides out of the edge-function env file", async () => {
+    const fake = createFakeIo();
+    await SupabaseLocalEnvironment.switch({
+      io: fake.io,
+      temporaryProjectId: "analytics-p2-temp",
+    });
+    expect(fake.files.get(EDGE_ENV_PATH)).not.toContain("SUPABASE_PROJECT_ID");
   });
 });

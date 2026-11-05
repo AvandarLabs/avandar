@@ -58,10 +58,10 @@ describe("SupabaseConfigOverrides.isOverrideKey", () => {
   });
 });
 
-describe("SupabaseConfigOverrides.makeEffectiveState", () => {
+describe("SupabaseConfigOverrides.makeEffectiveStateFromEnvContents", () => {
   it("returns the config unchanged when the environment overrides nothing", () => {
     expect(
-      SupabaseConfigOverrides.makeEffectiveState({
+      SupabaseConfigOverrides.makeEffectiveStateFromEnvContents({
         config: STANDARD_STATE,
         envContents: "VITE_APP_URL=http://localhost:5173/\n",
       }),
@@ -70,7 +70,7 @@ describe("SupabaseConfigOverrides.makeEffectiveState", () => {
 
   it("applies the project id and every overridden port", () => {
     expect(
-      SupabaseConfigOverrides.makeEffectiveState({
+      SupabaseConfigOverrides.makeEffectiveStateFromEnvContents({
         config: STANDARD_STATE,
         envContents: ENV_WITH_BLOCK,
       }),
@@ -83,7 +83,7 @@ describe("SupabaseConfigOverrides.makeEffectiveState", () => {
 
   it("keeps the config port when an override is blank", () => {
     expect(
-      SupabaseConfigOverrides.makeEffectiveState({
+      SupabaseConfigOverrides.makeEffectiveStateFromEnvContents({
         config: STANDARD_STATE,
         envContents: "SUPABASE_API_PORT=\n",
       }).apiPort,
@@ -92,7 +92,7 @@ describe("SupabaseConfigOverrides.makeEffectiveState", () => {
 
   it("reads an override written outside the managed block", () => {
     expect(
-      SupabaseConfigOverrides.makeEffectiveState({
+      SupabaseConfigOverrides.makeEffectiveStateFromEnvContents({
         config: STANDARD_STATE,
         envContents: 'SUPABASE_LOCAL_SMTP_PORT="52634"\n',
       }).ports["inbucket.port"],
@@ -135,10 +135,10 @@ describe("SupabaseConfigOverrides.makeEnvContentsWithOverrides", () => {
   });
 });
 
-describe("SupabaseConfigOverrides.makeLocalOverrides", () => {
+describe("SupabaseConfigOverrides.fromLocalProject", () => {
   it("lists the project id first and then one entry per port", () => {
     expect(
-      SupabaseConfigOverrides.makeLocalOverrides({
+      SupabaseConfigOverrides.fromLocalProject({
         projectId: "feat-x",
         ports: { "api.port": 55321, "inbucket.port": 52634 },
       }),

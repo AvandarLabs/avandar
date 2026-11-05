@@ -48,3 +48,32 @@ describe("SupabaseCommandOutput.redactSecretsFromLine", () => {
     ).toBe("Applying migration 20260818182843_normalize_grants.sql...");
   });
 });
+
+describe("SupabaseCommandOutput.maskEnvValue", () => {
+  it("shows only the start of a secret key", () => {
+    expect(
+      SupabaseCommandOutput.maskEnvValue({
+        envKey: "SB_SECRET_KEY",
+        value: "sb_secret_remote_0123456789",
+      }),
+    ).toBe("sb_secret_re…");
+  });
+
+  it("hides the password in a Postgres connection string", () => {
+    expect(
+      SupabaseCommandOutput.maskEnvValue({
+        envKey: "SUPABASE_POSTGRES_URL",
+        value: "postgresql://postgres.abc:hunter2@db.example.com:5432/postgres",
+      }),
+    ).toBe("postgresql://postgres.abc:****@db.example.com:5432/postgres");
+  });
+
+  it("leaves a value that is not a credential as it is", () => {
+    expect(
+      SupabaseCommandOutput.maskEnvValue({
+        envKey: "VITE_SUPABASE_API_URL",
+        value: "https://abc.supabase.co",
+      }),
+    ).toBe("https://abc.supabase.co");
+  });
+});

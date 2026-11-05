@@ -4,7 +4,6 @@ import {
   CONFIG_PATH,
   EDGE_ENV_PATH,
   ENV_PATH,
-  ORIGINAL_CONFIG,
   ORIGINAL_ENV,
   PROJECT_ROOT,
   SupabaseLocalEnvironmentFakeIo,
@@ -197,51 +196,6 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
         .map(prop("index")),
     );
     expect(lastCopyIndex).toBeLessThan(firstEnvWriteIndex);
-  });
-
-  it("points the Supabase CLI at the new project from .env.development", async () => {
-    const fake = createFakeIo();
-    await SupabaseLocalEnvironment.switch({
-      io: fake.io,
-      temporaryProjectId: "analytics-p2-temp",
-    });
-    expect(fake.files.get(ENV_PATH)).toContain(
-      [
-        "SUPABASE_PROJECT_ID=analytics-p2-temp",
-        "SUPABASE_API_PORT=55321",
-        "SUPABASE_DB_PORT=55322",
-      ].join("\n"),
-    );
-  });
-
-  it("writes the project overrides before supabase start reads them", async () => {
-    const fake = createFakeIo();
-    await SupabaseLocalEnvironment.switch({
-      io: fake.io,
-      temporaryProjectId: "analytics-p2-temp",
-    });
-    expect(fake.operations.indexOf(`write:${ENV_PATH}`)).toBeLessThan(
-      fake.operations.indexOf("command:start"),
-    );
-  });
-
-  it("never writes supabase/config.toml", async () => {
-    const fake = createFakeIo();
-    await SupabaseLocalEnvironment.switch({
-      io: fake.io,
-      temporaryProjectId: "analytics-p2-temp",
-    });
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
-    expect(fake.operations).not.toContain(`write:${CONFIG_PATH}`);
-  });
-
-  it("keeps the project overrides out of the edge-function env file", async () => {
-    const fake = createFakeIo();
-    await SupabaseLocalEnvironment.switch({
-      io: fake.io,
-      temporaryProjectId: "analytics-p2-temp",
-    });
-    expect(fake.files.get(EDGE_ENV_PATH)).not.toContain("SUPABASE_PROJECT_ID");
   });
 
   it("refuses to switch a worktree that has no .env.development", async () => {

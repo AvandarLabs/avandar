@@ -162,9 +162,9 @@ describe("createSupabaseLocalEnvironmentIo (commands, Docker, Git, ports)", () =
 
     await io.runSupabase(["start"]);
 
-    const childEnv = (
-      commandMocks.execFile.mock.calls[0]?.[2] as { env?: NodeJS.ProcessEnv }
-    ).env;
+    const execOptions: { env?: NodeJS.ProcessEnv } | undefined =
+      commandMocks.execFile.mock.calls[0]?.[2];
+    const childEnv = execOptions?.env;
     expect(childEnv).not.toHaveProperty("SUPABASE_PROJECT_ID");
     expect(childEnv).not.toHaveProperty("SUPABASE_API_PORT");
     expect(childEnv).toHaveProperty("SUPABASE_URL", "http://127.0.0.1:54321");

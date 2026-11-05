@@ -130,6 +130,27 @@ async function _rollbackSwitch(
   throw options.switchError;
 }
 
+/** Points the Supabase CLI at the new project before it starts. */
+async function _writeProjectOverrides(
+  options: Readonly<{
+    io: SupabaseLocalEnvironmentIo;
+    preparation: SwitchPreparation;
+    temporaryProjectId: string;
+  }>,
+): Promise<void> {
+  const { io, preparation } = options;
+  await io.writeTextFile({
+    filePath: preparation.developmentEnvPath,
+    contents: SupabaseConfigOverrides.makeEnvContentsWithOverrides({
+      envContents: await io.readTextFile(preparation.developmentEnvPath),
+      overrides: SupabaseConfigOverrides.fromLocalProject({
+        projectId: options.temporaryProjectId,
+        ports: preparation.manifest.derivedPorts,
+      }),
+    }),
+  });
+}
+
 async function _activateSwitch(
   options: Readonly<{
     io: SupabaseLocalEnvironmentIo;
@@ -143,16 +164,7 @@ async function _activateSwitch(
   status: SupabaseLocalStatus;
 }> {
   const { io, preparation, temporaryProjectId } = options;
-  await io.writeTextFile({
-    filePath: preparation.developmentEnvPath,
-    contents: SupabaseConfigOverrides.makeEnvContentsWithOverrides({
-      envContents: await io.readTextFile(preparation.developmentEnvPath),
-      overrides: SupabaseConfigOverrides.makeLocalOverrides({
-        projectId: temporaryProjectId,
-        ports: preparation.manifest.derivedPorts,
-      }),
-    }),
-  });
+  await _writeProjectOverrides(options);
   _requireCommandSuccess({
     result: await io.runSupabase(["start"], { outputMode: "stream" }),
     stage: "Supabase start",

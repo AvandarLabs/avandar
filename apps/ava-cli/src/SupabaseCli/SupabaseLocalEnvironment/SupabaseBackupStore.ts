@@ -5,6 +5,7 @@ import {
   SUPABASE_BACKUP_STATES,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import { promiseMap } from "@avandar/utils";
+import { match } from "ts-pattern";
 import { z } from "zod";
 import type {
   SupabaseBackupFile,
@@ -48,7 +49,7 @@ const ManifestBaseSchema = z.object({
 
 const SupabaseBackupManifestSchema = z.preprocess(
   (value) => {
-    // A manifest written before remote switches existed has no `kind`.
+    // A manifest with no `kind` is from a local switch, so read it as one.
     return typeof value === "object" && value !== null && !("kind" in value)
       ? { ...value, kind: "local" }
       : value;
@@ -66,7 +67,7 @@ const SupabaseBackupManifestSchema = z.preprocess(
       remoteApiUrl: z.string(),
     }),
   ]),
-);
+) satisfies z.ZodType<SupabaseBackupManifest>;
 
 async function _writeManifest(
   options: Readonly<{
@@ -193,9 +194,14 @@ export const SupabaseBackupStore = {
   getProjectIdFromManifest: (
     manifest: Readonly<SupabaseBackupManifest>,
   ): string => {
-    return manifest.kind === "local"
-      ? manifest.temporaryProjectId
-      : manifest.remoteProjectId;
+    return match<Readonly<SupabaseBackupManifest>, string>(manifest)
+      .with({ kind: "local" }, ({ temporaryProjectId }) => {
+        return temporaryProjectId;
+      })
+      .with({ kind: "remote" }, ({ remoteProjectId }) => {
+        return remoteProjectId;
+      })
+      .exhaustive();
   },
 
   createBackup: _createBackup,

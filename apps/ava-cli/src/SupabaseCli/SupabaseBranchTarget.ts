@@ -1,6 +1,7 @@
 import { BranchWorktrees } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/BranchWorktrees/BranchWorktrees";
 import { createSupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/createSupabaseLocalEnvironmentIo";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
+import { match } from "ts-pattern";
 import type { SupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 /** The worktree a command acts in, or why it cannot act. */
@@ -8,14 +9,7 @@ export type SupabaseBranchTargetResult =
   | { kind: "found"; io: SupabaseLocalEnvironmentIo }
   | { kind: "failed"; message: string; hint: string };
 
-/**
- * Finds the worktree whose Supabase settings a command should use: the
- * current one, or the one that has `branch` checked out.
- *
- * Used by `ava supabase start`, `stop`, and `status`, whose `--branch`
- * option acts on another branch's database without changing directory.
- */
-export async function readSupabaseBranchTarget(
+async function _read(
   branch: string | undefined,
 ): Promise<SupabaseBranchTargetResult> {
   const repoRoot = findRepoRoot() ?? process.cwd();
@@ -31,23 +25,37 @@ export async function readSupabaseBranchTarget(
     localBranches,
     worktrees,
   });
-  switch (lookup.kind) {
-    case "found":
+  return match(lookup)
+    .with({ kind: "found" }, ({ worktreePath }) => {
       return {
-        kind: "found",
-        io: createSupabaseLocalEnvironmentIo(lookup.worktreePath),
+        kind: "found" as const,
+        io: createSupabaseLocalEnvironmentIo(worktreePath),
       };
-    case "missingBranch":
+    })
+    .with({ kind: "missingBranch" }, () => {
       return {
-        kind: "failed",
+        kind: "failed" as const,
         message: `Branch ${branch} does not exist locally.`,
         hint: "Run `git branch --list` to see the local branches, then retry with one of them.",
       };
-    case "notCheckedOut":
+    })
+    .with({ kind: "notCheckedOut" }, () => {
       return {
-        kind: "failed",
+        kind: "failed" as const,
         message: `Branch ${branch} exists, but no worktree has it checked out, so it has no Supabase settings of its own.`,
         hint: "Check the branch out in a worktree first, or drop --branch to use the current one.",
       };
-  }
+    })
+    .exhaustive();
 }
+
+/**
+ * Finds the worktree whose Supabase settings a command should use: the
+ * current one, or the one that has a given branch checked out.
+ *
+ * Used by `SupabaseLifecycleCli` and `SupabaseStatusCli`, whose `--branch`
+ * option acts on another branch's database without changing directory.
+ */
+export const SupabaseBranchTarget = {
+  read: _read,
+};

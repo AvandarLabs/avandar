@@ -1,19 +1,8 @@
 import path from "node:path";
 import { makeTemporaryProjectIdFromBranch } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/makeTemporaryProjectIdFromBranch/makeTemporaryProjectIdFromBranch";
+import { propEq, propNotEq } from "@avandar/utils";
 import type { BranchWorktree } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/BranchWorktrees/BranchWorktrees";
-
-/** One local Supabase project as Docker labels describe it. */
-export type DockerSupabaseProject = {
-  projectId: string;
-  /** Distinct `com.supabase.cli.workdir` labels of its containers. */
-  workdirs: string[];
-  containerCount: number;
-  volumeCount: number;
-  networkCount: number;
-  isRunning: boolean;
-  /** Images its containers run, which other projects may share. */
-  images: string[];
-};
+import type { DockerSupabaseProject } from "@ava-cli/SupabaseCli/SupabasePruneCli/DockerInventory/DockerInventory";
 
 /** The project id a worktree's Supabase CLI resolves to today. */
 export type WorktreeProjectId = {
@@ -32,24 +21,27 @@ export type KeepReason =
   | { kind: "branchExists"; branch: string }
   | { kind: "worktreeExists"; worktreePath: string };
 
+/** One project `ava supabase prune` may delete. */
+export type PruneCandidate = {
+  project: DockerSupabaseProject;
+  reason: PruneReason;
+  /**
+   * Whether a container recorded which removed worktree started it. A project
+   * known only by its name could come from another repository, so it is never
+   * deleted without being picked by hand.
+   */
+  isVerified: boolean;
+};
+
 /** Which Docker projects `ava supabase prune` may delete, and why. */
 export type SupabasePrunePlanResult = {
-  candidates: Array<{
-    project: DockerSupabaseProject;
-    reason: PruneReason;
-    /**
-     * Whether a container recorded which removed worktree started it. A
-     * project known only by its name could come from another repository, so
-     * it is never deleted without being picked by hand.
-     */
-    isVerified: boolean;
-  }>;
+  candidates: PruneCandidate[];
   kept: Array<{ project: DockerSupabaseProject; reason: KeepReason }>;
   /** Projects that do not come from this repository's worktrees. */
   ignoredProjectIds: string[];
 };
 
-type MakePrunePlanOptions = {
+type PrunePlanSources = {
   dockerProjects: readonly DockerSupabaseProject[];
   sharedProjectId: string;
   localBranches: readonly string[];
@@ -58,6 +50,19 @@ type MakePrunePlanOptions = {
   /** Container workdirs that still exist on disk. */
   existingWorkdirs: readonly string[];
 };
+
+/** What the plan derives from its sources once, before classifying. */
+type PrunePlanContext = {
+  sources: PrunePlanSources;
+  worktreeRoots: readonly string[];
+  branchPrefixes: ReadonlySet<string>;
+};
+
+/** Where one project lands in the plan. */
+type ProjectClassification =
+  | { kind: "kept"; reason: KeepReason }
+  | { kind: "candidate"; reason: PruneReason }
+  | { kind: "ignored" };
 
 /** Branch prefixes a branch-derived project id starts with. */
 const GITFLOW_PREFIXES = ["feat", "fix", "refactor", "chore", "docs", "test"];
@@ -87,6 +92,16 @@ function _getWorktreeRoots(worktrees: readonly BranchWorktree[]): string[] {
   ];
 }
 
+function _getBranchPrefixes(localBranches: readonly string[]): Set<string> {
+  return new Set([
+    ...GITFLOW_PREFIXES,
+    ...localBranches.flatMap((branch) => {
+      const [prefix] = branch.split("/");
+      return branch.includes("/") && prefix ? [prefix] : [];
+    }),
+  ]);
+}
+
 /**
  * The branch a workdir under a worktree root was named after, e.g.
  * `feat/nux` for `<root>/feat/nux`.
@@ -109,24 +124,27 @@ function _getBranchesFromWorkdirs(
 function _getKeepReason(
   options: Readonly<{
     project: DockerSupabaseProject;
-    input: MakePrunePlanOptions;
-    worktreeRoots: readonly string[];
+    context: PrunePlanContext;
   }>,
 ): KeepReason | undefined {
-  const { project, input, worktreeRoots } = options;
-  const user = input.worktreeProjectIds.find(({ projectId }) => {
-    return projectId === project.projectId;
-  });
-  if (user !== undefined) {
-    return { kind: "usedByWorktree", worktreePath: user.worktreePath };
+  const { project, context } = options;
+  const { sources } = context;
+  const worktreeUsingProject = sources.worktreeProjectIds.find(
+    propEq("projectId", project.projectId),
+  );
+  if (worktreeUsingProject !== undefined) {
+    return {
+      kind: "usedByWorktree",
+      worktreePath: worktreeUsingProject.worktreePath,
+    };
   }
   // A project belongs to a live branch either by its default id or by the
   // worktree it was started in, which custom ids still record.
   const workdirBranches = _getBranchesFromWorkdirs({
     workdirs: project.workdirs,
-    worktreeRoots,
+    worktreeRoots: context.worktreeRoots,
   });
-  const branch = input.localBranches.find((localBranch) => {
+  const branch = sources.localBranches.find((localBranch) => {
     return (
       _getProjectIdFromBranch(localBranch) === project.projectId ||
       workdirBranches.includes(localBranch)
@@ -136,9 +154,7 @@ function _getKeepReason(
     return { kind: "branchExists", branch };
   }
   const liveWorkdir = project.workdirs.find((workdir) => {
-    return input.worktrees.some(({ worktreePath }) => {
-      return worktreePath === workdir;
-    });
+    return sources.worktrees.some(propEq("worktreePath", workdir));
   });
   return liveWorkdir === undefined
     ? undefined
@@ -148,26 +164,24 @@ function _getKeepReason(
 function _getPruneReason(
   options: Readonly<{
     project: DockerSupabaseProject;
-    worktreeRoots: readonly string[];
-    branchPrefixes: ReadonlySet<string>;
-    existingWorkdirs: readonly string[];
+    context: PrunePlanContext;
   }>,
 ): PruneReason | undefined {
-  const { project, worktreeRoots, branchPrefixes } = options;
+  const { project, context } = options;
   // A removed worktree's path is gone from disk and reads as a prefixed
   // branch under the worktree root, e.g. `<root>/feat/old`. Requiring both
   // keeps a sibling repository out when a short branch's parent is `~/src`.
   const removedWorkdir = project.workdirs.find((workdir) => {
     return (
-      !options.existingWorkdirs.includes(workdir) &&
-      worktreeRoots.some((root) => {
-        const [prefix = "", ...rest] = workdir
+      !context.sources.existingWorkdirs.includes(workdir) &&
+      context.worktreeRoots.some((root) => {
+        const [prefix = "", ...branchPathSegments] = workdir
           .slice(root.length + 1)
           .split(path.sep);
         return (
           workdir.startsWith(`${root}${path.sep}`) &&
-          branchPrefixes.has(prefix) &&
-          rest.length > 0
+          context.branchPrefixes.has(prefix) &&
+          branchPathSegments.length > 0
         );
       })
     );
@@ -179,66 +193,64 @@ function _getPruneReason(
   // another repository. Only a project with no containers left falls back to
   // whether its name looks like one of this repository's branches.
   const [namePrefix = ""] = project.projectId.split("-");
-  return project.workdirs.length === 0 && branchPrefixes.has(namePrefix)
+  return project.workdirs.length === 0 && context.branchPrefixes.has(namePrefix)
     ? { kind: "branchGone" }
     : undefined;
 }
 
-function _make(
-  options: Readonly<MakePrunePlanOptions>,
+function _classifyProject(
+  options: Readonly<{
+    project: DockerSupabaseProject;
+    context: PrunePlanContext;
+  }>,
+): ProjectClassification {
+  const keepReason = _getKeepReason(options);
+  if (keepReason !== undefined) {
+    return { kind: "kept", reason: keepReason };
+  }
+  const pruneReason = _getPruneReason(options);
+  return pruneReason === undefined
+    ? { kind: "ignored" }
+    : { kind: "candidate", reason: pruneReason };
+}
+
+function _fromDockerProjects(
+  sources: Readonly<PrunePlanSources>,
 ): SupabasePrunePlanResult {
-  const worktreeRoots = _getWorktreeRoots(options.worktrees);
-  const branchPrefixes = new Set([
-    ...GITFLOW_PREFIXES,
-    ...options.localBranches.flatMap((branch) => {
-      const [prefix] = branch.split("/");
-      return branch.includes("/") && prefix ? [prefix] : [];
-    }),
-  ]);
-  const initialPlan: SupabasePrunePlanResult = {
-    candidates: [],
-    kept: [],
-    ignoredProjectIds: [],
+  const context: PrunePlanContext = {
+    sources,
+    worktreeRoots: _getWorktreeRoots(sources.worktrees),
+    branchPrefixes: _getBranchPrefixes(sources.localBranches),
   };
-  return options.dockerProjects
-    .filter(({ projectId }) => {
-      return projectId !== options.sharedProjectId;
-    })
-    .reduce((plan, project) => {
-      const keepReason = _getKeepReason({
+  const classified = sources.dockerProjects
+    .filter(propNotEq("projectId", sources.sharedProjectId))
+    .map((project) => {
+      return {
         project,
-        input: options,
-        worktreeRoots,
-      });
-      if (keepReason !== undefined) {
-        return {
-          ...plan,
-          kept: [...plan.kept, { project, reason: keepReason }],
-        };
-      }
-      const pruneReason = _getPruneReason({
-        project,
-        worktreeRoots,
-        branchPrefixes,
-        existingWorkdirs: options.existingWorkdirs,
-      });
-      return pruneReason === undefined
-        ? {
-            ...plan,
-            ignoredProjectIds: [...plan.ignoredProjectIds, project.projectId],
-          }
-        : {
-            ...plan,
-            candidates: [
-              ...plan.candidates,
-              {
-                project,
-                reason: pruneReason,
-                isVerified: pruneReason.kind === "worktreeRemoved",
-              },
-            ],
-          };
-    }, initialPlan);
+        classification: _classifyProject({ project, context }),
+      };
+    });
+  return {
+    candidates: classified.flatMap(({ project, classification }) => {
+      return classification.kind === "candidate"
+        ? [
+            {
+              project,
+              reason: classification.reason,
+              isVerified: classification.reason.kind === "worktreeRemoved",
+            },
+          ]
+        : [];
+    }),
+    kept: classified.flatMap(({ project, classification }) => {
+      return classification.kind === "kept"
+        ? [{ project, reason: classification.reason }]
+        : [];
+    }),
+    ignoredProjectIds: classified.flatMap(({ project, classification }) => {
+      return classification.kind === "ignored" ? [project.projectId] : [];
+    }),
+  };
 }
 
 /**
@@ -250,5 +262,6 @@ function _make(
  * named after a branch that still exists are never offered.
  */
 export const SupabasePrunePlan = {
-  make: _make,
+  /** The plan for the Docker projects and worktrees in `sources`. */
+  fromDockerProjects: _fromDockerProjects,
 };

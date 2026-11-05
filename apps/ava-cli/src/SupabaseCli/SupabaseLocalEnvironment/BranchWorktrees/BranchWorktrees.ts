@@ -1,4 +1,5 @@
 import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/RunLocalCommand/RunLocalCommand";
+import { propEq } from "@avandar/utils";
 
 /** One checkout of the repository and the branch it has checked out. */
 export type BranchWorktree = {
@@ -13,15 +14,11 @@ export type BranchWorktreeLookup =
   | { kind: "missingBranch" }
   | { kind: "notCheckedOut" };
 
-function _isNonEmptyLine(line: string): boolean {
-  return line !== "";
-}
-
 function _fromPorcelain(porcelain: string): BranchWorktree[] {
   return porcelain
     .split(/\n\s*\n/)
     .map((block) => {
-      return block.split("\n").filter(_isNonEmptyLine);
+      return RunLocalCommand.getLinesFromOutput(block);
     })
     .filter((lines) => {
       return lines[0]?.startsWith("worktree ") === true;
@@ -48,28 +45,10 @@ function _findWorktreeFromBranch(
   if (!localBranches.includes(branch)) {
     return { kind: "missingBranch" };
   }
-  const worktree = worktrees.find((candidate) => {
-    return candidate.branch === branch;
-  });
+  const worktree = worktrees.find(propEq("branch", branch));
   return worktree === undefined
     ? { kind: "notCheckedOut" }
     : { kind: "found", worktreePath: worktree.worktreePath };
-}
-
-async function _runGit(
-  options: Readonly<{ projectRoot: string; args: readonly string[] }>,
-): Promise<string> {
-  const result = await RunLocalCommand.run({
-    command: "git",
-    args: options.args,
-    cwd: options.projectRoot,
-  });
-  if (!result.ok) {
-    throw new Error(
-      `git ${options.args.join(" ")} failed: ${result.stderr || "unknown error"}`,
-    );
-  }
-  return result.stdout;
 }
 
 /**
@@ -89,17 +68,23 @@ export const BranchWorktrees = {
 
   /** Lists every local branch name. */
   readLocalBranches: async (projectRoot: string): Promise<string[]> => {
-    const output = await _runGit({
-      projectRoot,
-      args: ["for-each-ref", "--format=%(refname:short)", "refs/heads"],
-    });
-    return output.split("\n").filter(_isNonEmptyLine);
+    return RunLocalCommand.getLinesFromOutput(
+      await RunLocalCommand.runOrThrow({
+        command: "git",
+        args: ["for-each-ref", "--format=%(refname:short)", "refs/heads"],
+        cwd: projectRoot,
+      }),
+    );
   },
 
   /** Lists every worktree of the repository `projectRoot` belongs to. */
   readWorktrees: async (projectRoot: string): Promise<BranchWorktree[]> => {
     return _fromPorcelain(
-      await _runGit({ projectRoot, args: ["worktree", "list", "--porcelain"] }),
+      await RunLocalCommand.runOrThrow({
+        command: "git",
+        args: ["worktree", "list", "--porcelain"],
+        cwd: projectRoot,
+      }),
     );
   },
 };

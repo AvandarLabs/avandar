@@ -33,6 +33,7 @@ afterEach(() => {
   commandMocks.execFile.mockReset();
   commandMocks.spawn.mockReset();
   vi.restoreAllMocks();
+  vi.unstubAllEnvs();
 });
 
 describe("createSupabaseLocalEnvironmentIo streaming", () => {
@@ -69,6 +70,31 @@ describe("createSupabaseLocalEnvironmentIo streaming", () => {
         cwd: projectRoot,
         stdio: ["ignore", "pipe", "pipe"],
       }),
+    );
+  });
+
+  it("keeps inherited project overrides away from a streamed Supabase CLI", async () => {
+    _setStreamingCommandSuccess();
+    vi.spyOn(process.stdout, "write").mockImplementation(() => {
+      return true;
+    });
+    vi.spyOn(process.stderr, "write").mockImplementation(() => {
+      return true;
+    });
+    vi.stubEnv("SUPABASE_PROJECT_ID", "invoking-worktree");
+    vi.stubEnv("SUPABASE_API_PORT", "55321");
+    vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54321");
+    const io = createSupabaseLocalEnvironmentIo(path.resolve(process.cwd()));
+
+    await io.runSupabase(["start"], { outputMode: "stream" });
+
+    const spawnOptions: { env?: NodeJS.ProcessEnv } | undefined =
+      commandMocks.spawn.mock.calls[0]?.[2];
+    expect(spawnOptions?.env).not.toHaveProperty("SUPABASE_PROJECT_ID");
+    expect(spawnOptions?.env).not.toHaveProperty("SUPABASE_API_PORT");
+    expect(spawnOptions?.env).toHaveProperty(
+      "SUPABASE_URL",
+      "http://127.0.0.1:54321",
     );
   });
 });

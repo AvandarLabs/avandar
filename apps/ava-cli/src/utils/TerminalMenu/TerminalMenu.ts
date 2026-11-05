@@ -1,4 +1,5 @@
 import { CliTheme } from "@ava-cli/utils/CliTheme/CliTheme";
+import { isDefined, makeArrayWithLength, matchLiteral } from "@avandar/utils";
 
 /** A key press the menu reacts to. */
 export type MenuKey =
@@ -14,7 +15,13 @@ export type MenuKey =
 /** Where the cursor is and which items are checked. */
 export type MenuState = {
   cursorIndex: number;
-  selectedIndexes: readonly number[];
+  selectedIndexes: number[];
+};
+
+/** A menu state after some input, and whether that input ended the menu. */
+export type MenuStep = {
+  state: MenuState;
+  outcome: "confirm" | "cancel" | undefined;
 };
 
 /** How a menu session ended. */
@@ -22,7 +29,15 @@ export type MenuResult =
   | { kind: "confirm"; state: MenuState }
   | { kind: "cancel" };
 
-const KEY_FROM_INPUT: Readonly<Record<string, MenuKey>> = {
+/** What a menu shows: its question, key hint, and one label per item. */
+type MenuContent = {
+  title: string;
+  hint: string;
+  labels: readonly string[];
+  isMultiSelect: boolean;
+};
+
+const KEY_FROM_INPUT: Record<string, MenuKey> = {
   "\u001B[A": "up",
   k: "up",
   "\u001B[B": "down",
@@ -43,79 +58,107 @@ function _getKeyFromInput(input: string): MenuKey | undefined {
   return KEY_FROM_INPUT[input];
 }
 
-function _getToggledIndexes(
-  options: Readonly<{ selectedIndexes: readonly number[]; index: number }>,
+/** The checked items after a toggle key, or unchanged for any other key. */
+function _getSelectionAfterKey(
+  options: Readonly<{
+    key: "toggle" | "toggleAll";
+    state: Readonly<MenuState>;
+    numItems: number;
+  }>,
 ): number[] {
-  const { selectedIndexes, index } = options;
-  return selectedIndexes.includes(index)
-    ? selectedIndexes.filter((selectedIndex) => {
-        return selectedIndex !== index;
+  const { state, numItems } = options;
+  if (options.key === "toggleAll") {
+    return state.selectedIndexes.length === numItems
+      ? []
+      : makeArrayWithLength(numItems);
+  }
+  return state.selectedIndexes.includes(state.cursorIndex)
+    ? state.selectedIndexes.filter((selectedIndex) => {
+        return selectedIndex !== state.cursorIndex;
       })
-    : [...selectedIndexes, index].sort((left, right) => {
+    : [...state.selectedIndexes, state.cursorIndex].sort((left, right) => {
         return left - right;
       });
 }
 
+/** Where the cursor lands after a movement key, wrapping at both ends. */
+function _getCursorIndexAfterKey(
+  options: Readonly<{
+    key: "up" | "down" | "first" | "last";
+    cursorIndex: number;
+    numItems: number;
+  }>,
+): number {
+  const { cursorIndex } = options;
+  const lastIndex = options.numItems - 1;
+  return matchLiteral(options.key, {
+    up: cursorIndex === 0 ? lastIndex : cursorIndex - 1,
+    down: cursorIndex === lastIndex ? 0 : cursorIndex + 1,
+    first: 0,
+    last: lastIndex,
+  });
+}
+
 function _reduceKey(
   options: Readonly<{
-    state: MenuState;
+    state: Readonly<MenuState>;
     key: MenuKey;
-    itemCount: number;
+    numItems: number;
     isMultiSelect: boolean;
   }>,
-): { state: MenuState; outcome: "confirm" | "cancel" | undefined } {
-  const { state, key, itemCount, isMultiSelect } = options;
-  const lastIndex = itemCount - 1;
-  const moveTo = (cursorIndex: number) => {
+): MenuStep {
+  const { state, numItems, isMultiSelect } = options;
+  const move = (key: "up" | "down" | "first" | "last"): MenuStep => {
+    const cursorIndex = _getCursorIndexAfterKey({
+      key,
+      cursorIndex: state.cursorIndex,
+      numItems,
+    });
     return { state: { ...state, cursorIndex }, outcome: undefined };
   };
-  switch (key) {
-    case "up":
-      return moveTo(
-        state.cursorIndex === 0 ? lastIndex : state.cursorIndex - 1,
-      );
-    case "down":
-      return moveTo(
-        state.cursorIndex === lastIndex ? 0 : state.cursorIndex + 1,
-      );
-    case "first":
-      return moveTo(0);
-    case "last":
-      return moveTo(lastIndex);
-    case "toggle":
-      return {
-        state: isMultiSelect
-          ? {
-              ...state,
-              selectedIndexes: _getToggledIndexes({
-                selectedIndexes: state.selectedIndexes,
-                index: state.cursorIndex,
-              }),
-            }
-          : state,
-        outcome: undefined,
-      };
-    case "toggleAll": {
-      const isAllSelected = state.selectedIndexes.length === itemCount;
-      return {
-        state: isMultiSelect
-          ? {
-              ...state,
-              selectedIndexes: isAllSelected
-                ? []
-                : Array.from({ length: itemCount }, (_unused, index) => {
-                    return index;
-                  }),
-            }
-          : state,
-        outcome: undefined,
-      };
-    }
-    case "confirm":
-      return { state, outcome: "confirm" };
-    case "cancel":
-      return { state, outcome: "cancel" };
-  }
+  const toggle = (key: "toggle" | "toggleAll"): MenuStep => {
+    const selectedIndexes = isMultiSelect
+      ? _getSelectionAfterKey({ key, state, numItems })
+      : state.selectedIndexes;
+    return { state: { ...state, selectedIndexes }, outcome: undefined };
+  };
+  const end = (outcome: "confirm" | "cancel"): MenuStep => {
+    return { state: { ...state }, outcome };
+  };
+  return matchLiteral(options.key, {
+    up: move,
+    down: move,
+    first: move,
+    last: move,
+    toggle,
+    toggleAll: toggle,
+    confirm: end,
+    cancel: end,
+  });
+}
+
+function _applyInput(
+  options: Readonly<{
+    input: string;
+    state: Readonly<MenuState>;
+    numItems: number;
+    isMultiSelect: boolean;
+  }>,
+): MenuStep {
+  const { input, numItems, isMultiSelect } = options;
+  // An escape sequence arrives as one chunk, but fast typing can batch plain
+  // keys together, so a chunk that is not itself a key is read per character.
+  const keys = (_getKeyFromInput(input) === undefined ? [...input] : [input])
+    .map(_getKeyFromInput)
+    .filter(isDefined);
+  return keys.reduce<MenuStep>(
+    (stepResult, key) => {
+      return stepResult.outcome === undefined
+        ? _reduceKey({ state: stepResult.state, key, numItems, isMultiSelect })
+        : stepResult;
+    },
+    { state: { ...options.state }, outcome: undefined },
+  );
 }
 
 function _truncate(
@@ -129,7 +172,7 @@ function _truncate(
 
 function _makeLines(
   options: Readonly<{
-    state: MenuState;
+    state: Readonly<MenuState>;
     labels: readonly string[];
     isMultiSelect: boolean;
     isColorEnabled: boolean;
@@ -155,46 +198,62 @@ function _makeLines(
   });
 }
 
-/** Draws the menu on stderr and resolves once the user confirms or cancels. */
-function _prompt(
-  options: Readonly<{
-    title: string;
-    hint: string;
-    labels: readonly string[];
-    isMultiSelect: boolean;
-    initialState: MenuState;
-  }>,
-): Promise<MenuResult> {
-  const { stdin, stderr } = process;
+function _makeFrameLines(
+  options: Readonly<
+    MenuContent & {
+      state: Readonly<MenuState>;
+      isColorEnabled: boolean;
+      maxWidth: number;
+    }
+  >,
+): string[] {
+  const { isColorEnabled, maxWidth } = options;
+  return [
+    CliTheme.paint({
+      style: "prompt",
+      text: _truncate({ text: options.title, maxWidth }),
+      isColorEnabled,
+    }),
+    CliTheme.paint({
+      style: "muted",
+      text: _truncate({ text: options.hint, maxWidth }),
+      isColorEnabled,
+    }),
+    ..._makeLines(options),
+  ];
+}
+
+/** Draws a frame on stderr, first rewinding over the one drawn before. */
+function _createFrameDrawer(
+  content: Readonly<MenuContent>,
+): (state: Readonly<MenuState>) => void {
+  const { stderr } = process;
   const isColorEnabled = CliTheme.isColorEnabled({
     stream: stderr,
     env: process.env,
   });
-  let state = options.initialState;
-  let drawnLineCount = 0;
-
-  const draw = () => {
+  let numDrawnLines = 0;
+  return (state) => {
     // One column spare, since some terminals wrap a line that fills the row.
     const maxWidth = Math.max((stderr.columns || 80) - 1, 20);
-    const lines = [
-      CliTheme.paint({
-        style: "prompt",
-        text: _truncate({ text: options.title, maxWidth }),
-        isColorEnabled,
-      }),
-      CliTheme.paint({
-        style: "muted",
-        text: _truncate({ text: options.hint, maxWidth }),
-        isColorEnabled,
-      }),
-      ..._makeLines({ ...options, state, isColorEnabled, maxWidth }),
-    ];
-    const rewind =
-      drawnLineCount > 0 ? `\u001B[${drawnLineCount}A\u001B[J` : "";
+    const lines = _makeFrameLines({
+      ...content,
+      state,
+      isColorEnabled,
+      maxWidth,
+    });
+    const rewind = numDrawnLines > 0 ? `\u001B[${numDrawnLines}A\u001B[J` : "";
     stderr.write(`${rewind}${lines.join("\n")}\n`);
-    drawnLineCount = lines.length;
+    numDrawnLines = lines.length;
   };
+}
 
+function _prompt(
+  options: Readonly<MenuContent & { initialState: MenuState }>,
+): Promise<MenuResult> {
+  const { stdin, stderr } = process;
+  const draw = _createFrameDrawer(options);
+  let state = options.initialState;
   return new Promise((resolve) => {
     const finish = (result: MenuResult) => {
       stdin.off("data", onData);
@@ -208,39 +267,25 @@ function _prompt(
       finish({ kind: "cancel" });
     };
     const onData = (chunk: Buffer) => {
-      const input = chunk.toString("utf8");
-      const keys = (
-        _getKeyFromInput(input) === undefined ? [...input] : [input]
-      ).flatMap((keyInput) => {
-        const key = _getKeyFromInput(keyInput);
-        return key === undefined ? [] : [key];
+      const step = _applyInput({
+        input: chunk.toString("utf8"),
+        state,
+        numItems: options.labels.length,
+        isMultiSelect: options.isMultiSelect,
       });
-      const result = keys.reduce<ReturnType<typeof _reduceKey>>(
-        (previous, key) => {
-          return previous.outcome === undefined
-            ? _reduceKey({
-                state: previous.state,
-                key,
-                itemCount: options.labels.length,
-                isMultiSelect: options.isMultiSelect,
-              })
-            : previous;
-        },
-        { state, outcome: undefined },
+      state = step.state;
+      if (step.outcome === undefined) {
+        draw(state);
+        return;
+      }
+      finish(
+        step.outcome === "cancel"
+          ? { kind: "cancel" }
+          : { kind: "confirm", state },
       );
-      state = result.state;
-      if (result.outcome === "cancel") {
-        finish({ kind: "cancel" });
-        return;
-      }
-      if (result.outcome === "confirm") {
-        finish({ kind: "confirm", state });
-        return;
-      }
-      draw();
     };
     stderr.write("\u001B[?25l");
-    draw();
+    draw(state);
     stdin.setRawMode(true);
     stdin.resume();
     stdin.on("data", onData);
@@ -264,9 +309,16 @@ export const TerminalMenu = {
   /** Applies one key press to the menu state. */
   reduceKey: _reduceKey,
 
+  /** Applies a raw stdin chunk, which may hold several keys. */
+  applyInput: _applyInput,
+
   /** Renders the item lines for a menu state. */
   makeLines: _makeLines,
 
+  /**
+   * Draws the menu on stderr and resolves once the user confirms or
+   * cancels.
+   */
   prompt: _prompt,
 
   /** Whether an interactive menu can run in this process. */

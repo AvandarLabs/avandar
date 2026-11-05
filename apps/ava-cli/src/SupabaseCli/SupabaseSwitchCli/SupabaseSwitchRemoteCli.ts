@@ -3,6 +3,7 @@ import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCli/SupabaseLocalEnvi
 import { CliTheme } from "@ava-cli/utils/CliTheme/CliTheme";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import { Acclimate } from "@avandar/acclimate";
+import { objectEntries } from "@avandar/utils";
 import type { SupabaseRemoteConnection } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 import type { CommandHelpSpec } from "@ava-cli/utils/CommandHelp/CommandHelp";
 
@@ -15,6 +16,9 @@ const COMMAND_NAME = "ava supabase switch remote";
  */
 const IS_INTERACTIVE = process.stdin.isTTY === true;
 
+const USAGE =
+  "ava supabase switch remote [--project-id <ref>] [--api-url <url>] [--database-url <url>] [--publishable-key <key>] [--secret-key <key>]";
+
 type RemoteOptions = {
   projectId?: string;
   apiUrl?: string;
@@ -23,59 +27,12 @@ type RemoteOptions = {
   secretKey?: string;
 };
 
-const REQUIRED_OPTION_FROM_KEY = {
-  projectId: "--project-id",
-  databaseUrl: "--database-url",
-  publishableKey: "--publishable-key",
-  secretKey: "--secret-key",
-} as const satisfies Partial<Record<keyof RemoteOptions, string>>;
+/** Prompts with a short question in a terminal, and never without one. */
+function _makeAskIfEmpty(message: string): false | { message: string } {
+  return IS_INTERACTIVE ? { message } : false;
+}
 
-/** What `ava supabase switch remote --help` prints. */
-export const SupabaseSwitchRemoteHelp: CommandHelpSpec = {
-  commandPath: ["supabase", "switch", "remote"],
-  summary:
-    "Point this worktree's development env files at a hosted Supabase project, so `pnpm dev` uses that database. `ava supabase restore` puts them back.",
-  usage: [
-    "ava supabase switch remote [--project-id <ref>] [--api-url <url>] [--database-url <url>] [--publishable-key <key>] [--secret-key <key>]",
-  ],
-  options: [
-    {
-      label: "--project-id <ref>",
-      description: "The hosted project's reference id. Required.",
-    },
-    {
-      label: "--api-url <url>",
-      description:
-        "The project URL. Defaults to https://<project-id>.supabase.co.",
-    },
-    {
-      label: "--database-url <url>",
-      description:
-        "A postgresql:// connection string for the hosted database. Required.",
-    },
-    {
-      label: "--publishable-key <key>",
-      description: "The project's publishable (anon) key. Required.",
-    },
-    {
-      label: "--secret-key <key>",
-      description: "The project's secret (service role) key. Required.",
-    },
-  ],
-  examples: [
-    {
-      label: "ava supabase switch remote",
-      description: "Ask for every value in the terminal.",
-    },
-    {
-      label:
-        "ava supabase switch remote --project-id abcdefghijklmnopqrst --database-url postgresql://… --publishable-key sb_publishable_… --secret-key sb_secret_…",
-      description: "Switch without prompts, for example from a script.",
-    },
-  ],
-};
-
-function _makeConnection(
+function _makeConnectionFromOptions(
   options: Readonly<RemoteOptions>,
 ): SupabaseRemoteConnection | undefined {
   const { projectId, databaseUrl, publishableKey, secretKey } = options;
@@ -87,9 +44,10 @@ function _makeConnection(
   ) {
     return undefined;
   }
+  const trimmedProjectId = projectId.trim();
   return {
-    projectId: projectId.trim(),
-    apiUrl: options.apiUrl?.trim() || `https://${projectId.trim()}.supabase.co`,
+    projectId: trimmedProjectId,
+    apiUrl: options.apiUrl?.trim() || `https://${trimmedProjectId}.supabase.co`,
     databaseUrl: databaseUrl.trim(),
     publishableKey: publishableKey.trim(),
     secretKey: secretKey.trim(),
@@ -97,22 +55,25 @@ function _makeConnection(
 }
 
 function _reportMissingOptions(options: Readonly<RemoteOptions>): void {
-  const missingFlags = Object.entries(REQUIRED_OPTION_FROM_KEY).flatMap(
-    ([key, flag]) => {
-      return options[key as keyof RemoteOptions] === undefined ? [flag] : [];
-    },
-  );
+  const missingFlags = objectEntries({
+    projectId: "--project-id",
+    databaseUrl: "--database-url",
+    publishableKey: "--publishable-key",
+    secretKey: "--secret-key",
+  }).flatMap(([key, flag]) => {
+    return options[key] === undefined ? [flag] : [];
+  });
   CliTheme.error({
     command: COMMAND_NAME,
     message: IS_INTERACTIVE
       ? `${missingFlags.join(", ")} was left empty.`
       : `Missing ${missingFlags.join(", ")}, and there is no terminal to ask on.`,
-    hint: `Run it as: ${SupabaseSwitchRemoteHelp.usage[0]}`,
+    hint: `Run it as: ${USAGE}`,
   });
 }
 
 async function _run(options: Readonly<RemoteOptions>): Promise<void> {
-  const connection = _makeConnection(options);
+  const connection = _makeConnectionFromOptions(options);
   if (connection === undefined) {
     _reportMissingOptions(options);
     process.exitCode = 1;
@@ -137,42 +98,47 @@ async function _run(options: Readonly<RemoteOptions>): Promise<void> {
 
 /** CLI for pointing a worktree at a hosted Supabase project. */
 export const SupabaseSwitchRemoteCli = Acclimate.createCLI("remote")
-  .description(SupabaseSwitchRemoteHelp.summary)
+  .description(
+    "Point this worktree's development env files at a hosted Supabase project, so `pnpm dev` uses that database. `ava supabase restore` puts them back.",
+  )
   .addOption({
     name: "--project-id",
-    description: "Hosted project reference id",
+    description: "The hosted project's reference id. Required.",
     required: false,
     type: "string",
-    askIfEmpty: IS_INTERACTIVE,
+    askIfEmpty: _makeAskIfEmpty("Hosted project reference id:"),
   })
   .addOption({
     name: "--api-url",
     description:
-      "Project URL; leave empty for https://<project-id>.supabase.co",
+      "The project URL. Defaults to https://<project-id>.supabase.co.",
     required: false,
     type: "string",
-    askIfEmpty: IS_INTERACTIVE,
+    askIfEmpty: _makeAskIfEmpty(
+      "Project URL (leave empty for https://<project-id>.supabase.co):",
+    ),
   })
   .addOption({
     name: "--database-url",
-    description: "postgresql:// connection string",
+    description:
+      "A postgresql:// connection string for the hosted database. Required.",
     required: false,
     type: "string",
-    askIfEmpty: IS_INTERACTIVE,
+    askIfEmpty: _makeAskIfEmpty("postgresql:// connection string:"),
   })
   .addOption({
     name: "--publishable-key",
-    description: "Publishable (anon) key",
+    description: "The project's publishable (anon) key. Required.",
     required: false,
     type: "string",
-    askIfEmpty: IS_INTERACTIVE,
+    askIfEmpty: _makeAskIfEmpty("Publishable (anon) key:"),
   })
   .addOption({
     name: "--secret-key",
-    description: "Secret (service role) key",
+    description: "The project's secret (service role) key. Required.",
     required: false,
     type: "string",
-    askIfEmpty: IS_INTERACTIVE,
+    askIfEmpty: _makeAskIfEmpty("Secret (service role) key:"),
   })
   .action((commandArguments: Readonly<RemoteOptions>) => {
     return _run(commandArguments).catch((error: unknown) => {
@@ -184,3 +150,28 @@ export const SupabaseSwitchRemoteCli = Acclimate.createCLI("remote")
       process.exitCode = 1;
     });
   });
+
+/** What `ava supabase switch remote --help` prints. */
+export const SupabaseSwitchRemoteHelp: CommandHelpSpec = {
+  commandPath: ["supabase", "switch", "remote"],
+  cli: SupabaseSwitchRemoteCli,
+  usage: [USAGE],
+  labels: {
+    "--project-id": "<ref>",
+    "--api-url": "<url>",
+    "--database-url": "<url>",
+    "--publishable-key": "<key>",
+    "--secret-key": "<key>",
+  },
+  examples: [
+    {
+      label: "ava supabase switch remote",
+      description: "Ask for every value in the terminal.",
+    },
+    {
+      label:
+        "ava supabase switch remote --project-id abcdefghijklmnopqrst --database-url postgresql://… --publishable-key sb_publishable_… --secret-key sb_secret_…",
+      description: "Switch without prompts, for example from a script.",
+    },
+  ],
+};

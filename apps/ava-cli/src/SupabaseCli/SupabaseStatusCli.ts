@@ -1,5 +1,5 @@
 import path from "node:path";
-import { readSupabaseBranchTarget } from "@ava-cli/SupabaseCli/SupabaseBranchTarget/SupabaseBranchTarget";
+import { SupabaseBranchTarget } from "@ava-cli/SupabaseCli/SupabaseBranchTarget";
 import { SHARED_STACK_BRANCH } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import { SupabaseStatus } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseStatus/SupabaseStatus";
 import { SupabaseTargetHeadline } from "@ava-cli/SupabaseCli/SupabaseTargetHeadline/SupabaseTargetHeadline";
@@ -22,12 +22,14 @@ function _print(options: Readonly<{ style?: CliStyle; text: string }>): void {
 function _makeAdvice(
   report: Readonly<SupabaseStatusReport>,
 ): string | undefined {
-  if (report.isExpectedForBranch) {
-    return undefined;
-  }
-  return report.branch === SHARED_STACK_BRANCH
-    ? `   ${SHARED_STACK_BRANCH} belongs on the shared stack. Run \`ava supabase restore\` to put it back.`
-    : "   Every worktree that is not switched writes to this database. Run `ava supabase switch` to give this branch its own.";
+  const restoreAdvice = `   ${SHARED_STACK_BRANCH} belongs on the shared stack. Run \`ava supabase restore\` to put it back.`;
+  const switchAdvice =
+    "   Every worktree that is not switched writes to this database. Run `ava supabase switch` to give this branch its own.";
+  return report.isExpectedForBranch
+    ? undefined
+    : report.branch === SHARED_STACK_BRANCH
+      ? restoreAdvice
+      : switchAdvice;
 }
 
 function _printSection(
@@ -118,7 +120,7 @@ function _printReport(report: Readonly<SupabaseStatusReport>): void {
 }
 
 async function _run(branch: string | undefined): Promise<void> {
-  const target = await readSupabaseBranchTarget(branch);
+  const target = await SupabaseBranchTarget.read(branch);
   if (target.kind === "failed") {
     CliTheme.error({ command: COMMAND_NAME, ...target });
     process.exitCode = 1;
@@ -128,39 +130,16 @@ async function _run(branch: string | undefined): Promise<void> {
   _printReport(await SupabaseStatus.readStatusReport(target.io));
 }
 
-/** What `ava supabase status --help` prints. */
-export const SupabaseStatusHelp: CommandHelpSpec = {
-  commandPath: ["supabase", "status"],
-  summary:
-    "Report which Supabase a branch uses (the shared develop stack, its own switched project, or a remote one) and its ports, keys, and endpoints.",
-  usage: ["ava supabase status [--branch <name>]"],
-  options: [
-    {
-      label: "-b, --branch <name>",
-      description:
-        "Report on this local branch's worktree instead of the current one. The branch must exist locally and be checked out in a worktree.",
-    },
-  ],
-  examples: [
-    {
-      label: "ava supabase status",
-      description: "Report on the current branch.",
-    },
-    {
-      label: "ava supabase status --branch feat/nux",
-      description: "Report on the worktree that has feat/nux checked out.",
-    },
-  ],
-};
-
 /** CLI for reporting which Supabase a worktree is pointed at. */
 export const SupabaseStatusCli = Acclimate.createCLI("status")
-  .description(SupabaseStatusHelp.summary)
+  .description(
+    "Report which Supabase a branch uses (the shared develop stack, its own switched project, or a remote one) and its ports, keys, and endpoints.",
+  )
   .addOption({
     name: "--branch",
     aliases: ["-b"],
     description:
-      "Local branch whose worktree to report on. Defaults to the current branch.",
+      "Report on this local branch's worktree instead of the current one. The branch must exist locally and be checked out in a worktree.",
     required: false,
     type: "string",
   })
@@ -174,3 +153,21 @@ export const SupabaseStatusCli = Acclimate.createCLI("status")
       process.exitCode = 1;
     });
   });
+
+/** What `ava supabase status --help` prints. */
+export const SupabaseStatusHelp: CommandHelpSpec = {
+  commandPath: ["supabase", "status"],
+  cli: SupabaseStatusCli,
+  usage: ["ava supabase status [--branch <name>]"],
+  labels: { "--branch": "<name>" },
+  examples: [
+    {
+      label: "ava supabase status",
+      description: "Report on the current branch.",
+    },
+    {
+      label: "ava supabase status --branch feat/nux",
+      description: "Report on the worktree that has feat/nux checked out.",
+    },
+  ],
+};

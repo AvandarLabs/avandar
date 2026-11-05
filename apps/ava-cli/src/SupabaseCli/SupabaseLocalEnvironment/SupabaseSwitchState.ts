@@ -3,8 +3,13 @@ import { SupabaseBackupPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironme
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
 import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
 import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
-import { SHARED_STACK_BRANCH } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
+import {
+  DEVELOPMENT_ENV_FILE,
+  SHARED_STACK_BRANCH,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
+import { SupabaseProjectPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseProjectPaths";
 import { promiseMap } from "@avandar/utils";
+import { match } from "ts-pattern";
 import type {
   DevelopmentEnvFile,
   SupabaseBackupManifest,
@@ -22,16 +27,6 @@ export type SupabaseSwitchSources = {
   envFiles: DevelopmentEnvFile[];
 };
 
-function _getDevelopmentEnvContents(
-  envFiles: readonly DevelopmentEnvFile[],
-): string {
-  return (
-    envFiles.find(({ filePath }) => {
-      return path.basename(filePath) === ".env.development";
-    })?.contents ?? ""
-  );
-}
-
 function _getSwitchKind(
   options: Readonly<{
     manifest: SupabaseBackupManifest | undefined;
@@ -39,25 +34,34 @@ function _getSwitchKind(
     remoteProjectId: string | undefined;
   }>,
 ): SupabaseSwitchKind {
-  const { manifest, localProjectId, remoteProjectId } = options;
-  if (manifest?.kind === "local") {
-    return manifest.temporaryProjectId === localProjectId ? "local" : "shared";
-  }
-  if (manifest?.kind === "remote") {
-    return manifest.remoteProjectId === remoteProjectId ? "remote" : "shared";
-  }
-  return "shared";
+  const { localProjectId, remoteProjectId } = options;
+  return match<SupabaseBackupManifest | undefined, SupabaseSwitchKind>(
+    options.manifest,
+  )
+    .with({ kind: "local" }, ({ temporaryProjectId }) => {
+      return temporaryProjectId === localProjectId ? "local" : "shared";
+    })
+    .with({ kind: "remote" }, (manifest) => {
+      return manifest.remoteProjectId === remoteProjectId ? "remote" : "shared";
+    })
+    .with(undefined, () => {
+      return "shared";
+    })
+    .exhaustive();
 }
 
-function _makeFromSources(
+function _fromSources(
   sources: Readonly<SupabaseSwitchSources>,
 ): SupabaseSwitchSummary {
   const { branch, manifest } = sources;
-  const envContents = _getDevelopmentEnvContents(sources.envFiles);
+  const envContents =
+    sources.envFiles.find(({ filePath }) => {
+      return path.basename(filePath) === DEVELOPMENT_ENV_FILE;
+    })?.contents ?? "";
   const sharedConfig = SupabaseConfig.makeStateFromContents(
     sources.configContents,
   );
-  const config = SupabaseConfigOverrides.makeEffectiveState({
+  const config = SupabaseConfigOverrides.makeEffectiveStateFromEnvContents({
     config: sharedConfig,
     envContents,
   });
@@ -119,7 +123,9 @@ async function _readSources(
     await Promise.all([
       io.readBranch(),
       io.readWorktreePath(),
-      io.readTextFile(path.join(io.projectRoot, "supabase", "config.toml")),
+      io.readTextFile(
+        SupabaseProjectPaths.getConfigPathFromProjectRoot(io.projectRoot),
+      ),
       io.findDevelopmentEnvFiles(),
     ]);
   const [manifest, envFiles] = await Promise.all([
@@ -135,12 +141,15 @@ async function _readSources(
  * Decides which Supabase a worktree is really on: the shared develop stack,
  * a branch's own local project, or a hosted project.
  *
- * `ava supabase status`, `start`, and `stop` read it to print which database
- * a command is about to touch, and `status` builds its report on top of it.
+ * `SupabaseLifecycleCli` and `SupabaseStatus` read it to print which database
+ * a command is about to touch, and `SupabaseStatus` builds its report on top
+ * of it. `SupabaseRestorePreparation`, `SupabaseSwitchPreparation`, and
+ * `PrunePlanReader` use `readEffectiveConfig` to learn the project a worktree
+ * is on before restoring, switching, or pruning.
  */
 export const SupabaseSwitchState = {
   /** The switch state the files on disk describe. */
-  makeFromSources: _makeFromSources,
+  fromSources: _fromSources,
 
   /** Reads the files that decide a worktree's switch state. */
   readSources: _readSources,
@@ -152,12 +161,16 @@ export const SupabaseSwitchState = {
   readEffectiveConfig: async (
     io: Readonly<SupabaseLocalEnvironmentIo>,
   ): Promise<SupabaseConfigState> => {
-    const envPath = path.join(io.projectRoot, ".env.development");
+    const envPath = SupabaseProjectPaths.getDevelopmentEnvPathFromProjectRoot(
+      io.projectRoot,
+    );
     const [configContents, envContents] = await Promise.all([
-      io.readTextFile(path.join(io.projectRoot, "supabase", "config.toml")),
+      io.readTextFile(
+        SupabaseProjectPaths.getConfigPathFromProjectRoot(io.projectRoot),
+      ),
       (await io.pathExists(envPath)) ? io.readTextFile(envPath) : "",
     ]);
-    return SupabaseConfigOverrides.makeEffectiveState({
+    return SupabaseConfigOverrides.makeEffectiveStateFromEnvContents({
       config: SupabaseConfig.makeStateFromContents(configContents),
       envContents,
     });
@@ -167,6 +180,6 @@ export const SupabaseSwitchState = {
   read: async (
     io: Readonly<SupabaseLocalEnvironmentIo>,
   ): Promise<SupabaseSwitchSummary> => {
-    return _makeFromSources(await _readSources(io));
+    return _fromSources(await _readSources(io));
   },
 };

@@ -18,7 +18,7 @@ if [ -z "$REPO_ROOT" ]; then
 fi
 cd "$REPO_ROOT" || exit 0
 
-VALIDATOR="$REPO_ROOT/scripts/supabase/validate-standard-local-config.sh"
+VALIDATOR="$REPO_ROOT/scripts/supabase/validate-standard-local-config/validate-standard-local-config.sh"
 
 validate_working_config() {
   "$VALIDATOR" < "$REPO_ROOT/supabase/config.toml"

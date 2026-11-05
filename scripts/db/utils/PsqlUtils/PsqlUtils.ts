@@ -18,6 +18,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { isDefined } from "@avandar/utils";
 
 const PSQL_OUTPUT_ARGS = [
   "--no-psqlrc",
@@ -80,9 +81,7 @@ function _getSupabaseOverrideFromEnv(
     .map((line) => {
       return new RegExp(`^\\s*${envKey}\\s*=(.*)$`, "u").exec(line)?.[1];
     })
-    .filter((value): value is string => {
-      return value !== undefined;
-    })
+    .filter(isDefined)
     .at(-1)
     ?.trim()
     .replace(/^(["'])(.*)\1$/u, "$2");

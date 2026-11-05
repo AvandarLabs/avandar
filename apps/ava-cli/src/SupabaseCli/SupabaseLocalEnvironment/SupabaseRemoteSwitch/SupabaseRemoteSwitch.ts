@@ -1,9 +1,8 @@
-import path from "node:path";
-import { SupabaseBackupHierarchy } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupHierarchy";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
 import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
 import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
 import { PROJECT_ID_PATTERN } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
+import { SupabaseProjectPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseProjectPaths";
 import { SupabaseSwitchPreparation } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchPreparation";
 import { promiseMapSequential } from "@avandar/utils";
 import type {
@@ -61,7 +60,8 @@ async function _rewriteEnvFiles(
   }>,
 ): Promise<void> {
   const { io, connection } = options;
-  const developmentEnvPath = path.join(io.projectRoot, ".env.development");
+  const developmentEnvPath =
+    SupabaseProjectPaths.getDevelopmentEnvPathFromProjectRoot(io.projectRoot);
   await promiseMapSequential(options.envFiles, async (envPath) => {
     const rewrittenContents = SupabaseConfig.makeDevelopmentEnvFromStatus({
       envContents: await io.readTextFile(envPath),
@@ -73,7 +73,7 @@ async function _rewriteEnvFiles(
         envPath === developmentEnvPath
           ? SupabaseConfigOverrides.makeEnvContentsWithOverrides({
               envContents: rewrittenContents,
-              overrides: SupabaseConfigOverrides.makeRemoteOverrides(
+              overrides: SupabaseConfigOverrides.fromRemoteProjectId(
                 connection.projectId,
               ),
             })
@@ -111,28 +111,16 @@ async function _switchRemote(
 ): Promise<SupabaseRemoteSwitchResult> {
   const { io, connection } = options;
   _requireValidConnection(connection);
-  const identity = await SupabaseSwitchPreparation.readSwitchIdentity(io);
-  const envFiles = await io.findDevelopmentEnvFiles();
-  if (!envFiles.includes(path.join(io.projectRoot, ".env.development"))) {
-    throw new Error(
-      `Supabase switch needs a .env.development in ${io.projectRoot}, because that is the file the app reads its Supabase connection from.`,
-    );
-  }
-  await SupabaseSwitchPreparation.requireSwitchSourceFiles({
+  const files = await SupabaseSwitchPreparation.readSwitchFiles(io);
+  const { envFiles, identity } = files;
+  const manifest = await SupabaseSwitchPreparation.createSwitchBackup({
     io,
-    sourcePaths: envFiles,
-    worktreePath: identity.worktreePath,
-  });
-  await SupabaseBackupHierarchy.prepareBackupHierarchy({ io, ...identity });
-  const manifest = await SupabaseBackupStore.createBackup({
-    io,
-    ...identity,
+    files,
     target: {
       kind: "remote" as const,
       remoteProjectId: connection.projectId,
       remoteApiUrl: connection.apiUrl,
     },
-    sourcePaths: envFiles,
   });
   try {
     await _rewriteEnvFiles({ io, envFiles, connection });
@@ -161,5 +149,6 @@ async function _switchRemote(
  * way, and a branch holds at most one switch of either kind.
  */
 export const SupabaseRemoteSwitch = {
+  /** Rewrites every development env file for `connection`, with a backup. */
   switchRemote: _switchRemote,
 };

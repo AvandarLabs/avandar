@@ -8,7 +8,7 @@
 # that state would reset the shared stack every other worktree uses, then seed
 # the hosted project. Database scripts call this first so neither can happen.
 #
-# Usage: scripts/supabase/require-local-supabase.sh [project-root]
+# Usage: scripts/supabase/require-local-supabase/require-local-supabase.sh [project-root]
 
 set -uo pipefail
 
