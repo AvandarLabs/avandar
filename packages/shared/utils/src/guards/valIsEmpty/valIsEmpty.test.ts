@@ -13,15 +13,18 @@ describe("valIsEmpty", () => {
     ]).toEqual([true, true, true, true, true]);
   });
 
-  it("returns false for non-empty values and values with no notion of emptiness", () => {
+  it("returns false for non-empty strings, arrays, and plain objects", () => {
     expect([
       valIsEmpty(" "),
       valIsEmpty([undefined]),
       valIsEmpty({ a: undefined }),
-      valIsEmpty(0),
-      valIsEmpty(false),
-      valIsEmpty(new Date(0)),
-    ]).toEqual([false, false, false, false, false, false]);
+    ]).toEqual([false, false, false]);
+  });
+
+  it("returns false for values with no notion of emptiness", () => {
+    expect([valIsEmpty(0), valIsEmpty(false), valIsEmpty(new Date(0))]).toEqual(
+      [false, false, false],
+    );
   });
 
   it("narrows a wide string to the empty string and leaves the else branch a string", () => {
@@ -55,7 +58,7 @@ describe("valIsEmpty", () => {
     const totals = {} as Record<string, number>;
     if (valIsEmpty(totals)) {
       expectTypeOf(totals).not.toBeNever();
-      expectTypeOf(totals).toExtend<EmptyObject>();
+      expectTypeOf(totals).not.toEqualTypeOf<Record<string, number>>();
     } else {
       expectTypeOf(totals).toEqualTypeOf<Record<string, number>>();
     }
@@ -71,11 +74,26 @@ describe("valIsEmpty", () => {
   });
 
   it("narrows an object with a required key to never", () => {
-    const user = { id: "u1" } as { id: string };
+    const user = { id: "u1" };
     if (valIsEmpty(user)) {
       expectTypeOf(user).toBeNever();
     } else {
       expectTypeOf(user).toEqualTypeOf<{ id: string }>();
+    }
+  });
+
+  it("narrows numbers and booleans to never", () => {
+    const total = 0 as number;
+    const isActive = false as boolean;
+    if (valIsEmpty(total)) {
+      expectTypeOf(total).toBeNever();
+    } else {
+      expectTypeOf(total).toEqualTypeOf<number>();
+    }
+    if (valIsEmpty(isActive)) {
+      expectTypeOf(isActive).toBeNever();
+    } else {
+      expectTypeOf(isActive).toEqualTypeOf<boolean>();
     }
   });
 

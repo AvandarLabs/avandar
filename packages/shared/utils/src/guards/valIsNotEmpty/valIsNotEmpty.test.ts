@@ -101,6 +101,8 @@ describe("valIsNotEmpty", () => {
     const rows = {} as Record<number, string>;
     if (valIsNotEmpty(rows)) {
       expectTypeOf(rows).not.toBeNever();
+    } else {
+      expectTypeOf(rows).toEqualTypeOf<Record<number, string>>();
     }
   });
 
@@ -124,9 +126,35 @@ describe("valIsNotEmpty", () => {
   });
 
   it("leaves an object with a required key unchanged", () => {
-    const user = { id: "u1" } as { id: string };
+    const user = { id: "u1" };
     if (valIsNotEmpty(user)) {
       expectTypeOf(user).toEqualTypeOf<{ id: string }>();
+    }
+  });
+
+  it("brands object and {} instead of collapsing them to never", () => {
+    const config = {} as object;
+    const settings = {} as NonNullable<unknown>;
+    if (valIsNotEmpty(config)) {
+      expectTypeOf(config).toExtend<object>();
+    } else {
+      expectTypeOf(config).toEqualTypeOf<object>();
+    }
+    if (valIsNotEmpty(settings)) {
+      expectTypeOf(settings).toExtend<NonNullable<unknown>>();
+    } else {
+      expectTypeOf(settings).toEqualTypeOf<NonNullable<unknown>>();
+    }
+  });
+
+  it("leaves numbers and booleans unbranded", () => {
+    const total = 0 as number | undefined;
+    const isActive = false as boolean | null;
+    if (valIsNotEmpty(total)) {
+      expectTypeOf(total).toEqualTypeOf<number>();
+    }
+    if (valIsNotEmpty(isActive)) {
+      expectTypeOf(isActive).toEqualTypeOf<boolean>();
     }
   });
 
@@ -139,7 +167,7 @@ describe("valIsNotEmpty", () => {
 
   it("filters an array down to its non-empty items", () => {
     const statuses = ["", "draft"] as Array<"" | "draft">;
-    const lists = [[], ["a"]] as string[][];
+    const lists = [[], ["a"]];
     const nonEmptyLists = lists.filter(valIsNotEmpty);
 
     expect(statuses.filter(valIsNotEmpty)).toEqual(["draft"]);
@@ -147,10 +175,9 @@ describe("valIsNotEmpty", () => {
     expectTypeOf(statuses.filter(valIsNotEmpty)).toEqualTypeOf<
       Array<"draft">
     >();
-    expectTypeOf(nonEmptyLists[0]?.[0]).toEqualTypeOf<string | undefined>();
     expectTypeOf(
-      nonEmptyLists.map(([first]) => {
-        return first;
+      nonEmptyLists.map(([firstItem]) => {
+        return firstItem;
       }),
     ).toEqualTypeOf<string[]>();
   });

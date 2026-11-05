@@ -12,8 +12,13 @@ type EmptyFromObject<T> = T extends EmptyObject
     : never;
 
 /**
- * The type `valIsEmpty` narrows `T` to: `""` for strings, a zero-length
- * array for arrays, `EmptyObject` for objects, and `null` or `undefined`.
+ * A value of type `T` proven missing or empty: `""` for strings, a
+ * zero-length array for arrays, `EmptyObject` for objects, and `null` or
+ * `undefined`. Other primitives, such as numbers and booleans, are never
+ * empty.
+ *
+ * Use it to type the empty case of a value, for example the input of a
+ * function that renders a placeholder.
  */
 export type Empty<T> = unknown extends T
   ? T
@@ -25,11 +30,16 @@ export type Empty<T> = unknown extends T
         : Extract<T, "">
       : T extends readonly unknown[]
         ? T & readonly []
-        : EmptyFromObject<T>;
+        : T extends object
+          ? EmptyFromObject<T>
+          : never;
 
 /**
  * Checks that a value is missing or empty: `null`, `undefined`, `""`, `[]`,
  * or `{}`. It is the exact opposite of `valIsNotEmpty`.
+ *
+ * Use it to handle the blank case first, for example to show a placeholder
+ * when a value is missing or to filter a list down to its empty entries.
  *
  * The else branch only loses the union members that are always empty, since
  * TypeScript cannot express "a non-empty string". To narrow a value to its

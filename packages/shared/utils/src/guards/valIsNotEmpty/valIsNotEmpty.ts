@@ -17,21 +17,27 @@ type NonEmptyBrand = { readonly [nonEmptyBrand]: true };
 
 /**
  * What `NonEmpty` narrows an object type to. `EmptyObject` becomes `never`.
- * A record also matches `EmptyObject` through its index signature, so it is
- * branded instead, like any object whose keys are all optional.
+ * A record, `object`, and `{}` also match `EmptyObject`, so they are branded
+ * instead, like any object whose keys are all optional.
  */
-type NonEmptyObject<T> = T extends EmptyObject
-  ? [Extract<keyof T, string | number>] extends [never]
-    ? never
-    : T & NonEmptyBrand
+type NonEmptyFromObject<T> = T extends EmptyObject
+  ? [keyof T] extends [never]
+    ? T & NonEmptyBrand
+    : [Extract<keyof T, string | number>] extends [never]
+      ? never
+      : T & NonEmptyBrand
   : Partial<T> extends T
     ? T & NonEmptyBrand
     : T;
 
 /**
- * The type `valIsNotEmpty` narrows `T` to. Literal unions lose `""`, arrays
+ * A value of type `T` proven not empty. Literal unions lose `""`, arrays
  * gain a first element, `null` and `undefined` are removed, and a wide
- * `string` or an object that could be empty is branded.
+ * `string` or an object that could be empty is branded. Other primitives,
+ * such as numbers and booleans, are left unchanged.
+ *
+ * Use it to type a parameter that callers must check first, for example a
+ * helper that only accepts a list with at least one item.
  */
 export type NonEmpty<T> = unknown extends T
   ? NonNullable<T>
@@ -43,12 +49,17 @@ export type NonEmpty<T> = unknown extends T
         : Exclude<T, "">
       : T extends readonly unknown[]
         ? T & readonly [T[number], ...Array<T[number]>]
-        : NonEmptyObject<T>;
+        : T extends object
+          ? NonEmptyFromObject<T>
+          : T;
 
 /**
  * Checks that a value is present and not empty: not `null`, `undefined`,
  * `""`, `[]`, or `{}`. Any other value, such as `0`, `false`, or a `Date`,
  * counts as not empty.
+ *
+ * Use it to skip blank optional input, for example as an early-return guard
+ * on a form field or as an `Array.filter` predicate that drops empty items.
  *
  * @param value - The value to check.
  * @returns `true` if `value` is not empty, narrowing it to `NonEmpty<T>`.
