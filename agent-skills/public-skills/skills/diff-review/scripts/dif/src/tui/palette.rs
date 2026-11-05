@@ -10,8 +10,8 @@
 /// `App::execute_palette_action`.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum PaletteAction {
-    /// Kill the difit server and relaunch it with the same comparison, port,
-    /// and seeded comments, keeping the left pane's log continuous (the new
+    /// "Refresh diff": kill the difit server and relaunch it with the same
+    /// comparison, port, and seeded comments, keeping the left pane's log continuous (the new
     /// server output appends below a `[dif]` status line rather than clearing
     /// the pane). Does not touch the LLM pane or quit the shell.
     RestartDifit,
@@ -28,6 +28,10 @@ pub enum PaletteAction {
     /// the pane's first launch does. Unlike typing `/new`, this takes effect
     /// immediately even when the LLM is mid-thought.
     NewLlmSession,
+    /// Pull the branch's GitHub PR now (new comments, replies, and commits),
+    /// exactly as the browser's Sync button does. The pull runs on the
+    /// poller thread; this only asks for it.
+    ResyncGithub,
 }
 
 /// One row in the global command palette.
@@ -43,7 +47,7 @@ pub struct PaletteCommand {
 /// points at the same command.
 pub const PALETTE_COMMANDS: &[PaletteCommand] = &[
     PaletteCommand {
-        label: "Restart diff server",
+        label: "Refresh diff",
         action: PaletteAction::RestartDifit,
     },
     PaletteCommand {
@@ -58,6 +62,10 @@ pub const PALETTE_COMMANDS: &[PaletteCommand] = &[
         label: "New LLM session",
         action: PaletteAction::NewLlmSession,
     },
+    PaletteCommand {
+        label: "Resync with GitHub",
+        action: PaletteAction::ResyncGithub,
+    },
 ];
 
 /// The direct keystroke that runs `action` without opening the palette,
@@ -70,6 +78,7 @@ pub const fn shortcut_for(action: PaletteAction) -> Option<&'static str> {
         PaletteAction::RegenerateGuide => Some("^G"),
         PaletteAction::OpenInBrowser => Some("^O"),
         PaletteAction::NewLlmSession => Some("^N"),
+        PaletteAction::ResyncGithub => Some("^S"),
     }
 }
 
@@ -197,9 +206,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn registry_starts_with_restart_diff_server() {
+    fn registry_starts_with_refresh_diff() {
         let first = &PALETTE_COMMANDS[0];
-        assert_eq!(first.label, "Restart diff server");
+        assert_eq!(first.label, "Refresh diff");
         assert_eq!(first.action, PaletteAction::RestartDifit);
     }
 
@@ -210,10 +219,11 @@ mod tests {
         assert_eq!(
             p.numbered_entries(),
             vec![
-                ("1. Restart diff server".to_owned(), Some("^R")),
+                ("1. Refresh diff".to_owned(), Some("^R")),
                 ("2. Regenerate diff guide".to_owned(), Some("^G")),
                 ("3. Open diff in browser".to_owned(), Some("^O")),
                 ("4. New LLM session".to_owned(), Some("^N")),
+                ("5. Resync with GitHub".to_owned(), Some("^S")),
             ]
         );
     }
@@ -229,8 +239,13 @@ mod tests {
     }
 
     #[test]
-    fn restart_command_advertises_its_ctrl_r_shortcut() {
+    fn refresh_command_advertises_its_ctrl_r_shortcut() {
         assert_eq!(shortcut_for(PaletteAction::RestartDifit), Some("^R"));
+    }
+
+    #[test]
+    fn resync_with_github_advertises_its_ctrl_s_shortcut() {
+        assert_eq!(shortcut_for(PaletteAction::ResyncGithub), Some("^S"));
     }
 
     #[test]
@@ -241,7 +256,7 @@ mod tests {
     #[test]
     fn filter_matches_label_case_insensitively() {
         let mut p = PaletteState::new();
-        for c in "RESTART".chars() {
+        for c in "REFRESH".chars() {
             p.append(c);
         }
         assert_eq!(p.visible().len(), 1);

@@ -61,7 +61,7 @@ fn difit_program(repo_root: &Path) -> String {
 /// `exec` replaces the wrapping shell with difit so the pane's tracked PID is
 /// difit itself. That makes [`PtyPane::kill_child`](crate::pty_pane::PtyPane)
 /// land a signal directly on difit (rather than leaving an orphaned server
-/// holding the port) when the "Restart diff server" palette command tears it down.
+/// holding the port) when the "Refresh diff" palette command tears it down.
 #[must_use]
 pub fn build_command(
     repo_root: &Path,
@@ -121,7 +121,7 @@ pub fn spawn(
 
 /// Block until `port` is bindable again (up to ~`tries` × 40ms).
 ///
-/// Used by "Restart diff server" between killing the old server and spawning the new
+/// Used by "Refresh diff" between killing the old server and spawning the new
 /// one, so the relaunched difit binds the same port (keeping the poller valid)
 /// instead of silently auto-reassigning. Returns `true` once the port is free,
 /// `false` if it stayed occupied for the whole window.
@@ -143,7 +143,9 @@ pub fn wait_until_ready(port: u16, tries: u32) -> bool {
     let url = format!("http://localhost:{port}/api/comments-json");
     for _ in 0..tries {
         if ureq::get(&url)
-            .timeout(Duration::from_millis(500))
+            .config()
+            .timeout_global(Some(Duration::from_millis(500)))
+            .build()
             .call()
             .is_ok()
         {

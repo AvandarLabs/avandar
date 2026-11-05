@@ -12,6 +12,7 @@
 //! on top in later modules.
 
 pub mod cli;
+pub mod clipboard;
 pub mod comparison;
 pub mod config;
 pub mod difit;

@@ -114,6 +114,24 @@ fn coming_back_online_pulls_at_once() {
 }
 
 #[test]
+fn a_reviewer_resync_asks_for_a_pull_that_may_stash() {
+    let mut session = Session::new();
+    session.pr = PrState::Available(pr("jpsyx"));
+    assert!(session.request_reviewer_pull());
+    assert!(session.pull_requested);
+    assert!(session.reviewer_pull);
+}
+
+#[test]
+fn a_reviewer_resync_asks_nothing_when_the_branch_has_no_pr() {
+    let mut session = Session::new();
+    session.pr = PrState::Unavailable("no PR".to_owned());
+    assert!(!session.request_reviewer_pull());
+    assert!(!session.pull_requested);
+    assert!(!session.reviewer_pull);
+}
+
+#[test]
 fn viewed_events_are_numbered_and_capped() {
     let mut viewed = ViewedSync::default();
     viewed.push_events((0..MAX_VIEWED_EVENTS + 5).map(|i| (format!("f{i}"), true)));

@@ -108,16 +108,32 @@ suite with `cargo test` (it finishes in a couple of seconds).
   frontend-specific delayed submit keys (`Enter` for Claude, `Tab` for Codex).
 - `tui::control`: local control endpoint accepts one comparison update while
   offline, rejects invalid payloads, and returns `409` once updates are disabled.
-- `tui::palette`: command registry (Restart diff server, Regenerate diff guide,
-  Open diff in browser, New LLM session), filter (by label and row number),
-  selection/navigation, empty-match handling, and the `^R` / `^G` / `^O` / `^N`
-  shortcut hints.
+- `tui::palette`: command registry (Refresh diff, Regenerate diff guide,
+  Open diff in browser, New LLM session, Resync with GitHub), filter (by label
+  and row number), selection/navigation, empty-match handling, and the `^R` /
+  `^G` / `^O` / `^N` / `^S` shortcut hints.
 - `tui::vim`: count and `gg` prefix accumulation, the bare-letter motions
   (`jkhl`, `w`/`b`, `d`/`u`, `G`, `o`), and unknown-key count reset.
 - `tui::open_target`: token extraction under a column (with punctuation
   trimming that keeps `:`), URL vs path classification, line-ref parsing
   (`:L1-L6`, `:7`, none → 1), plain-word rejection, and the iTerm tab script.
 - `tui::main_diff_view`: `Tab` / `Shift+Tab` cycle wrapping and the view labels.
+- `tui::selection`: selection ordering and containment in content coordinates,
+  the highlight painting exactly the selected cells, and copying out of a real
+  `vt100` screen: partial rows, newlines between rows, soft-wrapped rows joined,
+  trailing blanks trimmed, a wide character kept whole, and lines scrolled out
+  of view read back with the scroll offset restored. Markdown views copy by
+  character from their rendered lines.
+- `tui::mouse`: mapping a cell onto the pane under it (borders, the tab strip,
+  and the statusline map to none), clamping a drag into a pane and detecting it
+  overshooting the top or bottom, and the exact mouse modes enabled (never 1003,
+  never a reset).
+- `tui::multi_click`: press counting (1, 2, 3, then restart; a slow press or a
+  new cell starts over), the word-character set, the word under a cell in a real
+  `vt100` screen (brackets and blanks excluded, wide characters whole), soft-wrap
+  line spans, and the word under a markdown column.
+- `clipboard`: base64 against the RFC 4648 vectors and the OSC 52 escape,
+  plain and for tmux. `pbcopy` itself is not unit-tested.
 - `tui::guide`: `refresh` detecting content changes (and file removal) on a
   real temp file; cursor motions moving + clamping within the content; word
   motions stepping between words across lines; `target_under_cursor` reading the

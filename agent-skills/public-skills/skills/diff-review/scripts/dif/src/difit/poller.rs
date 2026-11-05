@@ -208,10 +208,13 @@ fn publish(latest: &Arc<Mutex<Option<Snapshot>>>, snapshot: Snapshot) {
 
 fn fetch(url: &str) -> Option<Snapshot> {
     ureq::get(url)
-        .timeout(Duration::from_millis(800))
+        .config()
+        .timeout_global(Some(Duration::from_millis(800)))
+        .build()
         .call()
         .ok()?
-        .into_json::<Snapshot>()
+        .body_mut()
+        .read_json::<Snapshot>()
         .ok()
 }
 

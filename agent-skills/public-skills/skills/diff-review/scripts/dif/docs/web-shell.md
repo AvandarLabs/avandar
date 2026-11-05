@@ -380,7 +380,7 @@ palette action).
 Clicking it (or the palette entry) is **instant** — it is not a process (no
 Claude, no server restart). It posts `reload-difit` back; `inject.js` clicks
 difit's own reload button so difit reloads the diff **in place** (no iframe
-reload, so an in-progress comment survives, and no `Ctrl+R`-style server restart
+reload, so an in-progress comment survives, and no `Ctrl+R` Refresh diff
 or new browser tab). The shell also re-fetches `groups.json` + `/api/diff` so its
 guide and counts match. The affordance clears immediately on click and only
 returns when difit reports changes again.
@@ -448,11 +448,12 @@ comments payload leaves the diff unnarrowed (fail-open). The count polls
 `/api/comments-json` every 3s and counts commented files in the current diff;
 with none, the toggle is disabled while off.
 
-### Reloading after a Sync or a difit restart
+### Reloading after a Sync or a Refresh diff
 
 The shell reloads the whole page (`reloadShell`) when a reviewer-requested
-**Sync** finishes (`sync.reviewerPulls` grows in `/__wrap/github.json`) and when
-the TUI restarts difit (`difitRestarts` grows in `/__wrap/meta.json`, now polled
+**Sync** or a TUI **Resync with GitHub** finishes (`sync.reviewerPulls` grows
+in `/__wrap/github.json`) and when a TUI **Refresh diff** relaunches difit
+(`difitRestarts` grows in `/__wrap/meta.json`, now polled
 every 2s). Neither ever opens a new tab. The tab's place survives any reload,
 ours or the browser's: `pagehide` saves the view, the sidebar tab, and the
 commented-only toggle to `sessionStorage` (`dif-shell-view`), and boot restores
@@ -501,9 +502,9 @@ centered view title.
 
 ### Iframe auto-retry (no manual "Retry")
 
-difit is briefly down right after a `Ctrl+R` restart (which reloads the open
+difit is briefly down right after a `Ctrl+R` Refresh diff (which reloads the open
 tab rather than opening a new one), so the iframe's first load can `502`. `shell.js` retries the load silently (up to `RETRY_MAX`, 500ms apart)
-before surfacing the manual "difit didn't load" box — so a restart reopens the
+before surfacing the manual "difit didn't load" box — so a refresh reopens the
 shell and difit fills in on its own. `difit-ready` (from `inject.js`) cancels the
 retry loop.
 
