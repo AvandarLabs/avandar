@@ -52,8 +52,8 @@
   // ---- data: header identity (branch + worktree pill), difit restarts ----
   function applyMeta(meta) {
     if (!meta || typeof meta !== "object") return;
-    // A TUI Ctrl+R restarted difit. The restart no longer opens a new tab, so
-    // this one reloads itself to show the fresh server.
+    // A TUI Ctrl+R Refresh diff relaunched difit. A refresh never opens a new
+    // tab, so this one reloads itself to show the fresh server.
     if (typeof meta.difitRestarts === "number") {
       if (seenDifitRestarts !== null && meta.difitRestarts > seenDifitRestarts) {
         reloadShell();

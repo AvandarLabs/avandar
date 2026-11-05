@@ -20,14 +20,18 @@ use crate::web;
 use super::control::ReviewControl;
 use super::guide::Guide;
 use super::main_diff_view::MainDiffView;
+use super::mouse::PaneAreas;
+use super::multi_click::ClickTracker;
 use super::open_target;
 use super::palette::{PaletteAction, PaletteState};
+use super::selection::Selection;
 use super::start_review::StartReviewModal;
 use super::vim::VimState;
 
 mod llm;
 mod review_surface;
 mod scroll;
+mod select;
 
 /// How long the git diff signature must hold steady after diverging from what
 /// difit is showing before `dif` declares the code change "settled" and warns
@@ -72,7 +76,7 @@ pub struct App {
     /// A label for the difit comparison, e.g. `@ develop` or `.`.
     pub comparison_label: String,
     /// The repo root difit + LLM run in (needed to relaunch difit on a
-    /// "Restart diff server" with the original `cd` target).
+    /// "Refresh diff" with the original `cd` target).
     pub repo_root: PathBuf,
     /// The comparison difit was launched with, replayed verbatim on restart so
     /// the relaunched server shows the same diff.
@@ -126,6 +130,16 @@ pub struct App {
     pub palette: Option<PaletteState>,
     /// Whether the `Alt+S` keyboard-shortcuts help modal is open.
     pub help_open: bool,
+    /// Where each pane's content was drawn last frame, for mouse hit-testing.
+    pub pane_areas: PaneAreas,
+    /// The mouse text selection, highlighted until the next click or key.
+    pub selection: Option<Selection>,
+    /// Counts rapid presses so a double-click selects a word and a
+    /// triple-click a line.
+    pub clicks: ClickTracker,
+    /// A short status message (e.g. "Copied 42 characters") and when it was
+    /// raised; the statusline shows it briefly in place of the shortcut chips.
+    pub notice: Option<(String, Instant)>,
     /// The browser web shell wrapping difit (guide sidebar + per-group views).
     /// Owned here so it lives for the session and shuts down on exit; `None`
     /// before difit starts or if it failed to start.
@@ -227,6 +241,7 @@ impl App {
             PaletteAction::RegenerateGuide => self.regenerate_guide(),
             PaletteAction::OpenInBrowser => self.open_in_browser(),
             PaletteAction::NewLlmSession => self.new_llm_session(),
+            PaletteAction::ResyncGithub => self.resync_with_github(),
         }
         self.close_palette();
     }
