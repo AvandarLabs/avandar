@@ -22,9 +22,11 @@ describe("isEmpty", () => {
   });
 
   it("returns false for values with no notion of emptiness", () => {
-    expect([isEmpty(0), isEmpty(false), isEmpty(new Date(0))]).toEqual(
-      [false, false, false],
-    );
+    expect([isEmpty(0), isEmpty(false), isEmpty(new Date(0))]).toEqual([
+      false,
+      false,
+      false,
+    ]);
   });
 
   it("narrows a wide string to the empty string and leaves the else branch a string", () => {

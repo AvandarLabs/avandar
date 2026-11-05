@@ -12,10 +12,7 @@ describe("isNotEmpty", () => {
   });
 
   it("returns false for null and undefined", () => {
-    expect([isNotEmpty(null), isNotEmpty(undefined)]).toEqual([
-      false,
-      false,
-    ]);
+    expect([isNotEmpty(null), isNotEmpty(undefined)]).toEqual([false, false]);
   });
 
   it("returns true for non-empty strings, arrays, and plain objects", () => {
@@ -27,11 +24,9 @@ describe("isNotEmpty", () => {
   });
 
   it("returns true for values with no notion of emptiness", () => {
-    expect([
-      isNotEmpty(0),
-      isNotEmpty(false),
-      isNotEmpty(new Date(0)),
-    ]).toEqual([true, true, true]);
+    expect([isNotEmpty(0), isNotEmpty(false), isNotEmpty(new Date(0))]).toEqual(
+      [true, true, true],
+    );
   });
 
   it("removes only the empty string from a literal union", () => {
@@ -172,9 +167,7 @@ describe("isNotEmpty", () => {
 
     expect(statuses.filter(isNotEmpty)).toEqual(["draft"]);
     expect(nonEmptyLists).toEqual([["a"]]);
-    expectTypeOf(statuses.filter(isNotEmpty)).toEqualTypeOf<
-      Array<"draft">
-    >();
+    expectTypeOf(statuses.filter(isNotEmpty)).toEqualTypeOf<Array<"draft">>();
     expectTypeOf(
       nonEmptyLists.map(([firstItem]) => {
         return firstItem;
