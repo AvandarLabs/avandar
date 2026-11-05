@@ -650,6 +650,10 @@ msgstr "Télécharger le fichier"
 msgid "Privacy log cleared."
 msgstr "Journal de confidentialité effacé."
 
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "{slug} is already taken. Try another ID."
+msgstr "{slug} est déjà utilisé. Essayez un autre identifiant."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Export CSV"
 msgstr "Exporter CSV"
@@ -1712,11 +1716,6 @@ msgstr "Afficher les 20 premières lignes de {datasetName}"
 msgid "Map of {0}"
 msgstr "Carte de {0}"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
-msgstr "L’identifiant de l’espace de travail doit comporter moins de "
-"{SLUG_MAX_LENGTH} caractères"
-
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "Refreshed from Google Sheets"
 msgstr "Actualisé depuis Google Sheets"
@@ -1933,11 +1932,6 @@ msgstr "La vue en tableau ne propose aucun paramètre de graphique."
 msgid "You save {discount}% compared to monthly billing"
 msgstr "Vous économisez {discount}% par rapport à la facturation mensuelle"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be at least {SLUG_MIN_LENGTH} characters long"
-msgstr "L’identifiant de l’espace de travail doit comporter au moins "
-"{SLUG_MIN_LENGTH} caractères"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Built-in presets"
 msgstr "Préréglages intégrés"
@@ -2023,6 +2017,10 @@ msgstr "Espacement"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "Sélectionnez une source de données"
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "{slug} is available"
+msgstr "{slug} est disponible"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Opacity"
@@ -2176,6 +2174,10 @@ msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "Êtes-vous sûr de vouloir retirer cet utilisateur de l'espace de travail "
 "?"
 
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "Enter an ID for your workspace."
+msgstr "Saisissez un identifiant pour votre espace de travail."
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Configure this filter: set its id, label, and column name in the side "
 "panel."
@@ -2234,6 +2236,12 @@ msgstr "Biais détecté :"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
 msgstr "Corps"
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "We couldn't check this ID. Check your connection, then edit the ID to "
+"try again."
+msgstr "Nous n’avons pas pu vérifier cet identifiant. Vérifiez votre connexion, "
+"puis modifiez l’identifiant pour réessayer."
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
@@ -2435,10 +2443,6 @@ msgstr "Manuel"
 msgid "Understanding your question…"
 msgstr "Compréhension de votre question…"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot be empty"
-msgstr "L’identifiant de l’espace de travail ne peut pas être vide"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "Par défaut, nous utilisons un lien direct basé sur un UUID."
@@ -2498,6 +2502,10 @@ msgstr "Rôles et autorisations"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
 msgstr "Empilé à 100 %"
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
+msgstr "Utilisez {WORKSPACE_SLUG_MAX_LENGTH} caractères ou moins."
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Write a field name in braces to fill it from the clicked feature, for "
@@ -2892,6 +2900,10 @@ msgstr "E"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 5"
 msgstr "Colonne 5"
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "Use only letters, numbers, and hyphens."
+msgstr "Utilisez uniquement des lettres, des chiffres et des tirets."
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline"
@@ -3642,6 +3654,10 @@ msgstr "Impossible de capturer le tableau de bord"
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
 msgstr "Traitement du jeu de données…"
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
+msgstr "Utilisez au moins {WORKSPACE_SLUG_MIN_LENGTH} caractères."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
@@ -5094,11 +5110,6 @@ msgstr "Compter les lignes dans {datasetName} par {groupByColumn}"
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "SQL n’a pas été appliqué. Connectez-vous pour approuver les valeurs des "
 "filtres."
-
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID can only contain letters, numbers, and hyphens"
-msgstr "L’identifiant de l’espace de travail peut uniquement contenir des "
-"lettres, des chiffres et des traits d’union"
 
 #. placeholder {0}: workspace.name
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
@@ -6818,6 +6829,10 @@ msgstr "ne se termine pas par"
 msgid "Add layer"
 msgstr "Ajouter une couche"
 
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "Checking if {slug} is available…"
+msgstr "Vérification de la disponibilité de {slug}…"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
 msgstr "Cette entrée de catalogue n'a pas de métadonnées de colonne. Elle ne "
@@ -8122,10 +8137,6 @@ msgstr "n’est pas vide"
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "No boundary layer on this map to look up a P-code."
 msgstr "Aucune couche de limites sur cette carte pour rechercher un code P."
-
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot contain spaces"
-msgstr "L’identifiant de l’espace de travail ne peut pas contenir d’espaces"
 
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
