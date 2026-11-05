@@ -63,6 +63,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F11 | Live progress output for `ava pipeline run` | not started | F10, the ETL engine's per-scope crawl (`crawlScope`), which this log does not map yet | |
 | F12 | Invalid catalog listings, and DuckDB-parsed column type samples | not started | F4, F7, and the column type verification feature (`verifyOpenDataColumnTypes`, `rpc_data_catalog_listings__write_verified_column_types`), which this log does not map yet | [AVA-396](https://linear.app/avandar/issue/AVA-396) (follow-up) |
 | F13 | Demo deployment: `demo/*` branches deploy to `demo.avandarlabs.com` | not started | none | |
+| F14 | Show only the plan picker when a workspace has no active plan | not started | none | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -83,6 +84,7 @@ API. It's new work, not something this branch built.
 | 9 | F11 | Needs F10's local runner and `--limit`, and the ETL engine's scope crawl it hooks into. Can merge any time after those, before F9. |
 | 10 | F12 | Extends the column type verification route and the F4 listings table. Merge after the verification feature it rewrites. |
 | any | F13 | Self-contained CI and scripts. Merge before the next demo branch is cut from `develop`, so it inherits the workflow. |
+| any | F14 | Self-contained billing UI fix. The bug is already on `develop`, so it can merge first. |
 | 11 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -670,6 +672,7 @@ Auth URLs), then builds the app against it and deploys it to the Vercel
 | `69cbdad98` | feat(ci): deploy demo/* branches to demo.avandarlabs.com | All of it except `scripts/demo/loadLocalDataIntoDemoBranch.sh`, which was later deleted |
 | `a8ebe196c` | fix(ci): stop recording demo deploys as staging deployments | All of it |
 | `815e2f8e5` | fix(ci): catch a bad Vercel team ID early and keep Sensitive placeholders out of the demo build | All of it |
+| `b9780a05e` | fix(ci): give demo edge functions the real Supabase secret key | All of it |
 
 **Files:** `.github/workflows/demo.yaml`,
 `scripts/demo/ensureSupabaseBranch.sh`. Demo data is created by hand in the
@@ -679,6 +682,35 @@ is kept out of the repo for the same reason.
 
 **Verification:** `shellcheck -x scripts/demo/*.sh`. Then push a throwaway
 `demo/*` branch and confirm the **CI/CD for Demos** run deploys it.
+
+---
+
+## F14: Show only the plan picker when a workspace has no active plan
+
+**Purpose:** A workspace with no subscription row, or an inactive one, gets
+the blocking "Select your plan" modal from the root layout. The import view
+also opened "Dataset limit reached" on top of it, since the optimistic
+`canAddDatasets` fallback reports `false` for a missing subscription.
+`SubscriptionModule.shouldPromptForDatasetLimitUpgrade` now opens the dataset
+limit modal only for an active plan at its dataset cap. **Value:** A new
+workspace sees one modal, not two, and is never told it hit a limit it has
+not reached.
+
+**PR title:** `fix(billing): show only the plan picker when a workspace has no active plan`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `30c62fefb` | fix(billing): show only the plan picker when a workspace has no active plan | All of it |
+
+**Files:**
+`shared/models/Subscription/SubscriptionModule/SubscriptionModule.ts`,
+`shared/models/Subscription/SubscriptionModule/SubscriptionModule.test.ts`,
+`src/views/DataManagerApp/DataImportView/DataImportView.tsx`.
+
+**Verification:**
+`npx vitest run shared/models/Subscription/SubscriptionModule/SubscriptionModule.test.ts`.
 
 ---
 
