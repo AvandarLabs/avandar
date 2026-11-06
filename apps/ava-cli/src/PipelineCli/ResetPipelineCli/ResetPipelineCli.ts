@@ -355,7 +355,7 @@ export const ResetPipelineCli = Acclimate.createCLI("reset")
   .description(
     "Delete the data catalog listings a pipeline wrote, so it can be run " +
       "again from scratch. Asks before deleting anything. Uses the database " +
-      "in .env.development, or the --staging/--prod one. Selects a " +
+      "in .env.development, or the --env one. Selects a " +
       "pipeline's listings by pipeline_name only, so listings written " +
       "before the pipeline_name backfill migration are not selected until " +
       "that migration has run. Also deletes the pipeline's checkpoints, " +

@@ -131,7 +131,7 @@ describe("pruneRetiredScopesCommand", () => {
     process.env.VITE_SUPABASE_API_URL = API_URL;
     process.env.SUPABASE_SERVICE_ROLE_KEY = "sb_secret_test";
     vi.spyOn(Acclimate, "log").mockImplementation(() => {});
-    vi.spyOn(AvaEnv, "getLoadedEnvTarget").mockReturnValue("local");
+    vi.spyOn(AvaEnv, "getLoadedEnvName").mockReturnValue("development");
   });
 
   afterEach(() => {
@@ -211,18 +211,21 @@ describe("pruneRetiredScopesCommand", () => {
     ]);
   });
 
-  it("refuses --local against a deployed database before reading anything", async () => {
-    vi.mocked(AvaEnv.getLoadedEnvTarget).mockReturnValue("production");
-    const posts = _mockScopeRpcs([RETIRED]);
+  it.each(["production", "demo"])(
+    "refuses --local against --env %s before reading anything",
+    async (envName) => {
+      vi.mocked(AvaEnv.getLoadedEnvName).mockReturnValue(envName);
+      const posts = _mockScopeRpcs([RETIRED]);
 
-    await expect(
-      pruneRetiredScopesCommand({ name: "hdx", isDryRun: true, local: true }),
-    ).rejects.toThrow("--local");
-    expect([posts, vi.mocked(fetchLivePipelineScopes).mock.calls]).toEqual([
-      [],
-      [],
-    ]);
-  });
+      await expect(
+        pruneRetiredScopesCommand({ name: "hdx", isDryRun: true, local: true }),
+      ).rejects.toThrow("--local");
+      expect([posts, vi.mocked(fetchLivePipelineScopes).mock.calls]).toEqual([
+        [],
+        [],
+      ]);
+    },
+  );
 
   it("prunes nothing and rethrows when the live scopes cannot be read", async () => {
     vi.mocked(fetchLivePipelineScopes).mockRejectedValueOnce(

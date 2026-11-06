@@ -101,9 +101,10 @@ export const SupabaseRunCli = Acclimate.createCLI("run")
       scriptName: scriptToRun,
     });
 
-    const dbLocation = AvaEnv.getLoadedEnvTarget();
+    // The runner only connects without SSL to a database typed `local`.
+    const dbLocation = AvaEnv.isLocal() ? "local" : AvaEnv.getLoadedEnvName();
 
-    // Validated here, in the parent, so a target whose env file has no
+    // Validated here, in the parent, so an env whose file has no
     // connection string fails by name instead of the child silently using
     // whatever `SUPABASE_POSTGRES_URL` happened to be in the shell.
     AvaEnv.requireVar("SUPABASE_POSTGRES_URL");
