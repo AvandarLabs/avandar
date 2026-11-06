@@ -3240,7 +3240,10 @@ describe("RichTextView", () => {
               {
                 type: "paragraph",
                 content: [
-                  { type: "userMention", attrs: { id: "1" } },
+                  {
+                    type: "userMention",
+                    attrs: { id: "11111111-1111-4111-8111-111111111111" },
+                  },
                   { type: "text", text: " rash onset " },
                   { type: "text", text: "Oct 24", marks: [{ type: "bold" }] },
                 ],
@@ -5126,7 +5129,10 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { ActivityEventClient } from "@/clients/activity/ActivityEventClient";
 import { ACTIVITY_FEED_VISIBLE_KINDS } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/activityFeedItemRenderers";
-import type { ActivityFeedEntry } from "@/clients/activity/ActivityEventClient";
+import type {
+  ActivityFeedCursor,
+  ActivityFeedEntry,
+} from "@/clients/activity/ActivityEventClient";
 import type { Individual } from "$/models/ontology/Individual/Individual";
 
 const PAGE_SIZE = 50;
@@ -5157,13 +5163,21 @@ export function useCaseActivityFeed(
       return ActivityEventClient.getCaseActivityPage({
         individualId,
         kinds: ACTIVITY_FEED_VISIBLE_KINDS,
-        beforeOccurredAt: context.pageParam,
+        before: context.pageParam,
         limit: PAGE_SIZE,
       });
     },
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => {
-      return lastPage.hasMore ? lastPage.entries[0]?.occurredAt : undefined;
+    initialPageParam: undefined as ActivityFeedCursor | undefined,
+    getNextPageParam: (lastPage): ActivityFeedCursor | undefined => {
+      const oldestEntry = lastPage.entries[0];
+      if (!lastPage.hasMore || !oldestEntry) {
+        return undefined;
+      }
+      return {
+        occurredAt: oldestEntry.occurredAt,
+        recordedAt: oldestEntry.recordedAt,
+        id: oldestEntry.id,
+      };
     },
     refetchOnWindowFocus: true,
   });
@@ -6107,3 +6121,5 @@ Do not run `ava supabase restore` unless a merge to `develop` was requested. Tel
 - The `@` dropdown uses the house pattern from `PillEditPopover` (fixed anchor plus a code-driven `Combobox`) instead of the suggestion plugin's `props.mount`.
 - `CommentParsers` does not validate the document, so one comment with an unknown node cannot break the whole feed. `RichTextView` falls back to plain text, and Edit refuses with a notification.
 - A linked comment stays highlighted while the `comment` search param is present, rather than for a fixed few seconds.
+- The feed pages on a full `(occurred_at, recorded_at, id)` keyset through the security-invoker RPC `rpc_activity_events__get_case_page`, replacing Task 9's `lt("occurred_at")` cursor, which skipped events that shared a timestamp at a page boundary. `getCaseActivityPage` takes `before: ActivityFeedCursor`.
+- The rich text parser requires `userMention` ids to be uuids, `text` on text nodes, and `http`, `https`, or `mailto` link hrefs.
