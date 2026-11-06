@@ -148,7 +148,10 @@ create table public.data_catalog_listings (
       api_service is not null and
       api_base_url is not null and
       api_resource_id is not null and
-      (api_resource_format is not null or not is_workspace_loadable) and
+      (
+        api_resource_format is not null or
+        not is_workspace_loadable
+      ) and
       external_dataset_id is not null and
       parquet_file_name is null
     )

@@ -173,7 +173,11 @@ describe("buildListingRowFromRelation", () => {
 
     it("lets the format rule win over a pipeline that calls it loadable", () => {
       const row = _build(
-        { ...API_RELATION, apiResourceFormat: "XLSX", isWorkspaceLoadable: true },
+        {
+          ...API_RELATION,
+          apiResourceFormat: "XLSX",
+          isWorkspaceLoadable: true,
+        },
         { unloadableFormats: ["xlsx"] },
       );
 

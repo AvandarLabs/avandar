@@ -1,4 +1,3 @@
-import type { EtlWorkspaceLoadabilityRules } from "@etl/EtlConfig/EtlConfig.types";
 import { createHash } from "node:crypto";
 import { promiseMapSequential } from "@avandar/utils";
 import { buildListingRowFromRelation } from "@etl/EtlEngine/buildListingRowFromRelation/buildListingRowFromRelation";
@@ -6,6 +5,7 @@ import { isListingRowUnchanged } from "@etl/EtlEngine/isListingRowUnchanged/isLi
 import { prepareParquetRelation } from "@etl/EtlEngine/prepareParquetRelation/prepareParquetRelation";
 import { buildListingKeyFromRow } from "@etl/stores/buildListingKeyFromRow/buildListingKeyFromRow";
 import { splitIntoChunks } from "@etl/utils/splitIntoChunks/splitIntoChunks";
+import type { EtlWorkspaceLoadabilityRules } from "@etl/EtlConfig/EtlConfig.types";
 import type { CrawlMetricsRecorder } from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 import type {
   EtlPipelineRunId,

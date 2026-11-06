@@ -1,8 +1,5 @@
 import { fileURLToPath } from "node:url";
-import {
-  getWorkspaceLoadabilityRules,
-  readEtlConfigFile,
-} from "@avandar/etl";
+import { getWorkspaceLoadabilityRules, readEtlConfigFile } from "@avandar/etl";
 import type { EtlWorkspaceLoadabilityRules } from "@avandar/etl";
 
 /** The ETL config every pipeline in this server shares. */
