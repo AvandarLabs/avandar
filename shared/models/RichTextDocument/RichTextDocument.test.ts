@@ -131,7 +131,9 @@ const MALFORMED_DOCUMENTS: ReadonlyArray<[string, unknown]> = [
     "a node missing its type",
     {
       type: "doc",
-      content: [{ content: [{ type: "text", text: "Serum" }, _mention(MEMBER_ID)] }],
+      content: [
+        { content: [{ type: "text", text: "Serum" }, _mention(MEMBER_ID)] },
+      ],
     },
   ],
 ];

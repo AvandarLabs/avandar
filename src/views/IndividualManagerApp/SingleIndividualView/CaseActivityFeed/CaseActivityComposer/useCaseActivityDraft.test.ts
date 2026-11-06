@@ -52,7 +52,9 @@ describe("useCaseActivityDraft", () => {
     act(() => {
       vi.advanceTimersByTime(300);
     });
-    expect(loadCaseActivityDraft(_scope("i1"))).toEqual(_document("first words"));
+    expect(loadCaseActivityDraft(_scope("i1"))).toEqual(
+      _document("first words"),
+    );
   });
 
   it("saves a pending draft when the composer goes away", () => {
@@ -98,7 +100,11 @@ describe("useCaseActivityDraft", () => {
     act(() => {
       vi.advanceTimersByTime(300);
     });
-    expect(loadCaseActivityDraft(_scope("i1"))).toEqual(_document("first case"));
-    expect(loadCaseActivityDraft(_scope("i2"))).toEqual(_document("second case"));
+    expect(loadCaseActivityDraft(_scope("i1"))).toEqual(
+      _document("first case"),
+    );
+    expect(loadCaseActivityDraft(_scope("i2"))).toEqual(
+      _document("second case"),
+    );
   });
 });

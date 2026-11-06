@@ -167,12 +167,10 @@ export function SingleIndividualView({
       concept,
       individual,
     });
-  const [members, isLoadingMembers] = WorkspaceClient.useGetUsersForWorkspace(
-    {
-      workspaceId: individual.workspaceId,
-      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
-    },
-  );
+  const [members, isLoadingMembers] = WorkspaceClient.useGetUsersForWorkspace({
+    workspaceId: individual.workspaceId,
+    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+  });
 
   const attributeRows: CaseDetailsRow[] | undefined = useMemo(() => {
     if (!hydratedIndividual.assertions) {

@@ -4,7 +4,11 @@ import { useFeedMembers } from "@/views/IndividualManagerApp/SingleIndividualVie
 import type { UserProfile } from "$/models/User/UserProfile";
 
 function _member(
-  overrides: Pick<UserProfile.WithRole, "userId" | "displayName" | "fullName">,
+  overrides: Readonly<{
+    userId: string;
+    displayName: string;
+    fullName: string;
+  }>,
 ): UserProfile.WithRole {
   return {
     email: `${overrides.userId}@example.org`,

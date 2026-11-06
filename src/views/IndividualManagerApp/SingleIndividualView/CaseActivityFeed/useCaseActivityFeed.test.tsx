@@ -238,12 +238,10 @@ describe("useCaseActivityFeed", () => {
       );
       const { queryClient } = _renderFeedOnRestoredCache();
       await waitFor(() => {
-        const feedQuery = queryClient
-          .getQueryCache()
-          .find({
-            queryKey: buildCaseActivityFeedQueryKey(INDIVIDUAL_ID),
-            exact: false,
-          });
+        const feedQuery = queryClient.getQueryCache().find({
+          queryKey: buildCaseActivityFeedQueryKey(INDIVIDUAL_ID),
+          exact: false,
+        });
         expect(feedQuery?.meta?.persist).toBe(false);
       });
     });

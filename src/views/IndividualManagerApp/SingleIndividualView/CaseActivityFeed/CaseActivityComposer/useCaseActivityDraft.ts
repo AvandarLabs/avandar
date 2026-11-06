@@ -5,10 +5,10 @@ import {
   loadCaseActivityDraft,
   saveCaseActivityDraft,
 } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/caseActivityDraftStorage";
-import type { CaseActivityDraftScope } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/caseActivityDraftStorage";
 import type { Individual } from "$/models/ontology/Individual/Individual";
 import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { CaseActivityDraftScope } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/caseActivityDraftStorage";
 
 /** How long typing must pause before the draft is written. */
 const SAVE_DELAY_MS = 300;
