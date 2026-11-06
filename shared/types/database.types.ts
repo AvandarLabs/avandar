@@ -361,6 +361,7 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
           source_url: string | null
@@ -403,6 +404,7 @@ export type Database = {
           pipeline_name?: string | null
           pipeline_run_id?: string | null
           pipeline_scope_keys?: string[]
+          search_vector?: unknown
           source_asset_type?: string | null
           source_download_url?: string | null
           source_url?: string | null
@@ -445,6 +447,7 @@ export type Database = {
           pipeline_name?: string | null
           pipeline_run_id?: string | null
           pipeline_scope_keys?: string[]
+          search_vector?: unknown
           source_asset_type?: string | null
           source_download_url?: string | null
           source_url?: string | null
@@ -2247,6 +2250,7 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
           source_url: string | null
@@ -2272,6 +2276,18 @@ export type Database = {
           listings_deleted: number
           listings_detached: number
           listings_kept_in_use: number
+        }[]
+      }
+      rpc_data_catalog_listings__search: {
+        Args: { p_limit?: number; p_offset?: number; p_query: string }
+        Returns: {
+          display_name: string
+          external_organization_name: string
+          id: string
+          is_invalid: boolean
+          is_workspace_loadable: boolean
+          pipeline_name: string
+          total_count: number
         }[]
       }
       rpc_data_catalog_listings__upsert_with_relation_columns: {
@@ -2312,6 +2328,7 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
           source_url: string | null
@@ -2363,6 +2380,7 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
           source_url: string | null

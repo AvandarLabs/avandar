@@ -82,8 +82,10 @@ Otherwise a listing matches when either holds:
 
 - `search_vector @@ websearch_to_tsquery('english', p_query)`, so users get
   quoted phrases, `or`, and `-word` exclusion for free.
-- `p_query <% display_name`: trigram word similarity at or above
-  `pg_trgm.word_similarity_threshold` (0.6 by default).
+- `p_query <% display_name`: trigram word similarity of at least 0.5. The
+  function sets `pg_trgm.word_similarity_threshold` to 0.5, below the 0.6
+  default, so a swapped pair of letters in a short word still matches:
+  "measels" scores 0.5 against "Measles", and 0.6 would miss it.
 
 ### 4.2 Order
 

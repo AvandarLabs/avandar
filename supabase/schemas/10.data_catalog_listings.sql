@@ -119,6 +119,31 @@ create table public.data_catalog_listings (
   -- Where the asset's bytes can be downloaded, when the source exposes one.
   -- `source_url` is the page a person opens instead.
   source_download_url text,
+  -- What catalog search matches words against, weighted by how strongly a
+  -- match in each field says this is the listing the user wants: the name
+  -- (A), who publishes it (B), then what it says about itself (C).
+  search_vector tsvector generated always as (
+    setweight(
+      to_tsvector('english'::regconfig, coalesce(display_name, '')),
+      'A'
+    ) ||
+    setweight(
+      to_tsvector(
+        'english'::regconfig,
+        coalesce(external_organization_name, '') || ' ' ||
+        coalesce(external_service_name, '') || ' ' ||
+        coalesce(pipeline_name, '')
+      ),
+      'B'
+    ) ||
+    setweight(
+      to_tsvector(
+        'english'::regconfig,
+        coalesce(description, '') || ' ' || coalesce(notes, '')
+      ),
+      'C'
+    )
+  ) stored,
   constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name),
   -- A pipeline listing carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning
@@ -211,6 +236,13 @@ create index data_catalog_listings__pipeline_drive_last_update on public.data_ca
   api_base_url,
   date_of_last_update
 );
+
+-- Serves catalog search's whole-word matching on `search_vector`.
+create index data_catalog_listings__search_vector on public.data_catalog_listings using gin (search_vector);
+
+-- Serves catalog search's partial and misspelled word matching on a
+-- listing's name.
+create index data_catalog_listings__display_name_trgm on public.data_catalog_listings using gin (display_name extensions.gin_trgm_ops);
 
 -- Enable row level security
 alter table public.data_catalog_listings enable row level security;
