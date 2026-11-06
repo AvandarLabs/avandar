@@ -12,6 +12,25 @@ describe("classifyStatement", () => {
     expect(classifyStatement('drop table "public"."x";')).toBe("schema-shape");
   });
 
+  it("drops a tsvector column, which only Postgres full-text search reads", () => {
+    expect(
+      classifyStatement(
+        `alter table "public"."x" add column "search_vector" tsvector generated always as (to_tsvector('english'::regconfig, name)) stored;`,
+      ),
+    ).toBe("drop");
+  });
+
+  it("drops a GIN or GiST index, which SQLite cannot build", () => {
+    expect(
+      classifyStatement(
+        "CREATE INDEX x__name_trgm ON public.x USING gin (name extensions.gin_trgm_ops);",
+      ),
+    ).toBe("drop");
+    expect(
+      classifyStatement("CREATE INDEX x__area ON public.x USING gist (area);"),
+    ).toBe("drop");
+  });
+
   it("classifies CREATE [UNIQUE] INDEX and DROP INDEX as schema-shape", () => {
     expect(
       classifyStatement("create index idx on public.x using btree (id);"),
