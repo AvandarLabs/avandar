@@ -1,31 +1,84 @@
-.shell {
-  /*
-   * Always opaque so the dark app shell behind us never bleeds through.
-   * The previous disabled state used `rgb(0 0 0 / 6%)`, which against a
-   * dark navbar background reads as fully transparent on iPad and on
-   * darker themed deployments (caught on the Vercel preview). Opaque
-   * background plus the existing composer text-tint communicates the
-   * disabled state without leaking the navbar through.
-   */
-  background-color: var(--mantine-color-white);
-  border-left: 1px solid var(--ava-border-default);
+/*
+ * The chat aside's half of the fused slate. The block and inline-end sides
+ * keep the slate's gutter so the shell still frames the pair; the
+ * inline-start side has none, because the slate drops its own gutter there
+ * and the two surfaces meet edge to edge (see `.root[data-chat-fused]` in
+ * AppShell.module.css).
+ */
+.dock {
+  height: 100%;
+  padding-block: var(--mantine-spacing-xs);
+  padding-inline-end: var(--mantine-spacing-xs);
 }
 
-.chatPanelShellDisabled {
-  /*
-   * Subtle, opaque off-white. Distinguishable from the active state
-   * but never transparent.
-   */
-  background-color: var(--mantine-color-neutral-0);
+/*
+ * Matches the slate's edge, corner, and shadow so the pair reads as one
+ * object. The inline-start side carries no border: the slate's own border
+ * there is the hairline between the view and the chat. The clip-path keeps
+ * this surface's shadow off the slate beside it while letting it spill into
+ * the gutter above and below, where it blends with the slate's shadow
+ * instead of leaving a notch at the seam.
+ *
+ * Always opaque so the dark shell behind never bleeds through.
+ */
+.shell {
+  background-color: var(--ava-surface-body);
+  border: 1px solid var(--mantine-color-neutral-7);
+  border-end-end-radius: 12px;
+  border-inline-start: none;
+  border-start-end-radius: 8px;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 20%),
+    0 8px 24px rgb(0 0 0 / 25%);
+  clip-path: polygon(
+    -40px -40px,
+    calc(100% + 40px) -40px,
+    calc(100% + 40px) calc(100% + 40px),
+    -40px calc(100% + 40px),
+    -40px 100%,
+    0 100%,
+    0 0,
+    -40px 0
+  );
+  height: 100%;
+  overflow: hidden;
+}
+
+:global([dir="rtl"]) .shell {
+  clip-path: polygon(
+    -40px -40px,
+    calc(100% + 40px) -40px,
+    calc(100% + 40px) 0,
+    100% 0,
+    100% 100%,
+    calc(100% + 40px) 100%,
+    calc(100% + 40px) calc(100% + 40px),
+    -40px calc(100% + 40px)
+  );
+}
+
+/*
+ * Case Manager's expanded composer floats over a dimmed slate instead of
+ * sitting beside it, so it gets the full gutter, every corner, and the
+ * overlay panel's lift.
+ */
+.dockComposer {
+  padding-inline-start: var(--mantine-spacing-xs);
 }
 
 .shellComposer {
-  border-left: none;
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-xl);
   box-shadow:
     var(--ava-overlay-panel-shadow),
     -24px 0 32px rgb(16 42 67 / 22%);
+  clip-path: none;
   transition: box-shadow var(--ava-animation-duration-normal)
     var(--ava-animation-easing-out);
+}
+
+:global([dir="rtl"]) .shellComposer {
+  clip-path: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

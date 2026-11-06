@@ -1,12 +1,82 @@
+/*
+ * Pushed to the foot of the thread viewport so the greeting and the starter
+ * prompts sit just above the composer, where the user is about to type.
+ */
+.chatEmptyState {
+  animation: chat-empty-state-in var(--ava-animation-duration-normal)
+    var(--ava-animation-easing-out);
+  margin-top: auto;
+  text-wrap: pretty;
+}
+
+/*
+ * One raised list with hairline rows rather than a stack of separate
+ * buttons: the prompts read as a set of options, not as competing actions.
+ */
+.suggestionList {
+  background: var(--ava-surface-raised);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-xs);
+  list-style: none;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.suggestionList li + li {
+  border-top: 1px solid var(--mantine-color-neutral-1);
+}
+
 .suggestionButton {
-  font-weight: 400;
+  align-items: flex-start;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  justify-content: space-between;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  text-align: start;
+  transition: var(--ava-transition-interactive);
+  width: 100%;
 }
 
-.suggestionButtonInner {
-  justify-content: flex-start;
+.suggestionButton:hover {
+  background: var(--mantine-color-primary-0);
 }
 
-.suggestionButtonLabel {
-  line-height: 1.4;
-  text-align: left;
+.suggestionButton:focus-visible {
+  outline: 2px solid var(--mantine-color-primary-6);
+  outline-offset: -2px;
+}
+
+.suggestionButtonIcon {
+  color: var(--mantine-color-neutral-4);
+  flex-shrink: 0;
+  margin-top: 3px;
+  transition: var(--ava-transition-interactive);
+}
+
+:global([dir="rtl"]) .suggestionButtonIcon {
+  transform: scaleX(-1);
+}
+
+.suggestionButton:hover .suggestionButtonIcon {
+  color: var(--mantine-color-primary-6);
+}
+
+@keyframes chat-empty-state-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chatEmptyState {
+    animation: none;
+  }
 }

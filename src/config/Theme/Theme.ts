@@ -58,6 +58,15 @@ import type {
 export const APP_SLATE_Z_INDEX = 150;
 
 /**
+ * Docked chat aside z-index. While docked, Ask Avandar is fused to the
+ * slate's inline-end edge and reads as the slate's right-hand pane, so it
+ * paints just over the slate: that is what keeps the slate's drop shadow from
+ * falling across the chat. It stays below `getDefaultZIndex("modal")` (200)
+ * and `APP_CHROME_Z_INDEX` for the same reasons the slate does.
+ */
+export const APP_CHAT_ASIDE_Z_INDEX = APP_SLATE_Z_INDEX + 1;
+
+/**
  * App chrome z-index. Floating toolbars, the mobile navbar, and the chat
  * composer overlay live here: above the slate but always below modals,
  * drawers, and any overlay layer. Anchoring chrome to this token (instead of

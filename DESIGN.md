@@ -208,7 +208,7 @@ The app is a fixed full-height shell, not a scrolling page. `AppSlate` occupies 
 
 **The Tablet Downshift Rule.** Avandar's UI is designed for desktop. Rather than reflowing at tablet widths, the whole system shrinks: `--mantine-scale` drops to `0.8` between 48em and 75em and `0.9` between 75em and 88em, which rescales every spacing, font size, radius, shadow, and shell width in one place. Never hand-tune a component for tablet. If it is 25% oversized on an iPad, the scale is doing its job and your override will fight it.
 
-**The Gutter Rule.** The slate keeps its 8px frame of shell background on all four sides. Taking the gutter off, or letting a parent clip it, collapses the central metaphor.
+**The Gutter Rule.** The slate keeps its 8px frame of shell background on all four sides. Taking the gutter off, or letting a parent clip it, collapses the central metaphor. The one exception is the open chat aside, which fuses to the slate's inline-end edge and carries the gutter on its own outer edges, so the pair is still framed as one object.
 
 ## Elevation & Depth
 
@@ -231,7 +231,7 @@ Every step is a stacked pair: one tight low-offset layer plus one softer, larger
 - **md** (`0 2px 3px /.10, 0 4px 10px /.07`): menus, popovers, combobox dropdowns, notifications.
 - **lg** (`0 3px 4px /.11, 0 8px 20px /.08`) and **xl** (`0 4px 6px /.12, 0 14px 32px /.10`): reserved; rare in current UI.
 
-**The slate's own shadow is not from this scale.** It uses a stronger neutral.7 edge and `0 1px 2px rgb(0 0 0 / 20%), 0 8px 24px rgb(0 0 0 / 25%)` because it has to read as floating on a dark field rather than lifting off a light one. That shadow deliberately spills past the gutter onto the sidebar and the chat aside, which is why the slate is raised to `APP_SLATE_Z_INDEX` (150). Clipping it back to the gutter is a bug, not a tidy-up.
+**The slate's own shadow is not from this scale.** It uses a stronger neutral.7 edge and `0 1px 2px rgb(0 0 0 / 20%), 0 8px 24px rgb(0 0 0 / 25%)` because it has to read as floating on a dark field rather than lifting off a light one. That shadow deliberately spills past the gutter onto the sidebar, which is why the slate is raised to `APP_SLATE_Z_INDEX` (150). The open chat aside is fused to the slate rather than shadowed by it: it carries the same edge, corner, and shadow, sits one tier higher (`APP_CHAT_ASIDE_Z_INDEX`), and the slate's own border becomes the hairline between them. Clipping it back to the gutter is a bug, not a tidy-up.
 
 **Overlays.** Full-screen dim is `rgb(15 23 42 / 38%)` with `blur(6px) saturate(140%)`. The elevated panel on top uses a deep lift plus a 1px inset white highlight (`0 25px 50px -12px rgb(15 23 42 / 35%), 0 0 0 1px rgb(255 255 255 / 50%) inset`) at radius `xl`. This is the one place the system goes dramatic, and it is reserved for modals and the import drop overlay.
 

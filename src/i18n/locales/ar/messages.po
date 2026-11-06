@@ -3530,6 +3530,10 @@ msgid "Microsoft's compact instruct model. Solid structure and instruction "
 msgstr "نموذج Microsoft المدمج للتعليمات. يتميز ببنية متينة واتباع جيد "
 "للتعليمات الخاصة بلوحات المعلومات."
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Try asking"
+msgstr "جرّب أن تسأل"
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit"
 msgstr "تعديل"
@@ -9264,8 +9268,8 @@ msgid "Read as"
 msgstr "يُقرأ كـ"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Try one of these"
-msgstr "جرّب أحد هذه"
+#~ msgid "Try one of these"
+#~ msgstr "جرّب أحد هذه"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"

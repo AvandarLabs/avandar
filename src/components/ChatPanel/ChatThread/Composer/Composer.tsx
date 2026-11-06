@@ -1,6 +1,6 @@
 import { ComposerPrimitive } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
-import { ActionIcon, Group } from "@mantine/core";
+import { ActionIcon } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useRef } from "react";
@@ -59,7 +59,7 @@ export function Composer(): React.ReactNode {
           unstable_focusOnScrollToBottom={false}
           unstable_focusOnThreadSwitched={false}
         />
-        <Group gap="xs">
+        <div className={css.composerActions}>
           <ChatModelPicker disabled={chatDisabled} />
           <ComposerPrimitive.Send asChild>
             <ActionIcon
@@ -70,10 +70,10 @@ export function Composer(): React.ReactNode {
               disabled={chatDisabled}
               className={css.composerSend}
             >
-              <IconArrowUp size={16} />
+              <IconArrowUp size={16} stroke={2.25} />
             </ActionIcon>
           </ComposerPrimitive.Send>
-        </Group>
+        </div>
       </ComposerPrimitive.Root>
     </div>
   );

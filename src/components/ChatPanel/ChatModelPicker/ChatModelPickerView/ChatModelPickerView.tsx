@@ -1,6 +1,6 @@
 import { Tooltip } from "@avandar/ui";
 import { Button, Combobox, Group, Text } from "@mantine/core";
-import { IconCheck } from "@tabler/icons-react";
+import { IconCheck, IconChevronDown } from "@tabler/icons-react";
 import css from "./ChatModelPickerView.module.css";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import type { ComboboxStore } from "@mantine/core";
@@ -71,10 +71,11 @@ function _renderTrigger(
       <Combobox.Target targetType="button" withExpandedAttribute>
         <Button
           type="button"
-          variant="light"
+          variant="subtle"
           color="neutral"
           size="compact-sm"
           className={css.chatModelPickerViewTrigger}
+          rightSection={<IconChevronDown size={14} aria-hidden />}
           disabled={options.disabled}
           aria-label={options.triggerAriaLabel}
           onClick={() => {

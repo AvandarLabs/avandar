@@ -3581,6 +3581,10 @@ msgid "Microsoft's compact instruct model. Solid structure and instruction "
 msgstr "Modeli ya Microsoft yenye maagizo mafupi. Muundo thabiti na ufuataji "
 "mzuri wa maagizo kwa dashibodi."
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Try asking"
+msgstr "Jaribu kuuliza"
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit"
 msgstr "Hariri"
@@ -9379,8 +9383,8 @@ msgid "Read as"
 msgstr "Soma kama"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Try one of these"
-msgstr "Jaribu moja ya haya"
+#~ msgid "Try one of these"
+#~ msgstr "Jaribu moja ya haya"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
