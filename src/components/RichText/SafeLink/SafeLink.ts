@@ -33,10 +33,24 @@ export function getSafeLinkHrefFromInput(input: string): string | undefined {
 /**
  * Links limited to web and email addresses. TipTap checks the raw typed text
  * (such as `example.com`) before autolinking, so scheme-less addresses pass
- * the check, and the link commands store them with a scheme so every saved
- * href is one the stored document schema accepts.
+ * the check, and the link commands and HTML parsing store them with a
+ * scheme so every saved href is one the stored document schema accepts.
  */
 export const SafeLink = Link.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      href: {
+        default: null,
+        parseHTML: (element) => {
+          return (
+            getSafeLinkHrefFromInput(element.getAttribute("href") ?? "") ?? null
+          );
+        },
+      },
+    };
+  },
+
   addCommands() {
     const parentCommands = this.parent?.();
     return {
@@ -75,5 +89,14 @@ export const SafeLink = Link.extend({
   defaultProtocol: "https",
   isAllowedUri: (url) => {
     return getSafeLinkHrefFromInput(url) !== undefined;
+  },
+  // Pasting an address over selected text consults only this check, not
+  // `isAllowedUri`, and stores the address as given, so it must refuse
+  // other schemes too. Autolinking runs both checks.
+  shouldAutoLink: (url) => {
+    return (
+      getSafeLinkHrefFromInput(url) !== undefined &&
+      Link.options.shouldAutoLink(url)
+    );
   },
 });

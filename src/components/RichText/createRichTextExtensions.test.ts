@@ -103,3 +103,59 @@ describe("createRichTextExtensions link box", () => {
     expect(_getLinkHrefs(editor)).toEqual([]);
   });
 });
+
+/**
+ * A paste event without clipboard data. jsdom has no `ClipboardEvent`,
+ * which ProseMirror would otherwise construct for a programmatic paste.
+ */
+function _createPasteEvent(): ClipboardEvent {
+  return new Event("paste") as ClipboardEvent;
+}
+
+describe("createRichTextExtensions pasted links", () => {
+  it("never links selected text to a pasted address with another scheme", () => {
+    editor = _createEditorWithSelectedText();
+    editor.view.pasteText("ftp://x.com", _createPasteEvent());
+    expect(_getLinkHrefs(editor)).toEqual([]);
+  });
+
+  it("never links selected text to a pasted file address", () => {
+    editor = _createEditorWithSelectedText();
+    editor.view.pasteText("file:///etc/passwd", _createPasteEvent());
+    expect(_getLinkHrefs(editor)).toEqual([]);
+  });
+
+  it("links selected text to a pasted bare domain with https", () => {
+    editor = _createEditorWithSelectedText();
+    editor.view.pasteText("example.com", _createPasteEvent());
+    expect(_getLinkHrefs(editor)).toEqual(["https://example.com"]);
+  });
+
+  it("adds https to a pasted HTML link whose href has no scheme", () => {
+    editor = new Editor({ extensions: createRichTextExtensions() });
+    editor.view.pasteHTML(
+      '<p><a href="example.com">the lab</a></p>',
+      _createPasteEvent(),
+    );
+    expect(_getLinkHrefs(editor)).toEqual(["https://example.com"]);
+  });
+
+  it("adds mailto to a pasted HTML link whose href is a bare email", () => {
+    editor = new Editor({ extensions: createRichTextExtensions() });
+    editor.view.pasteHTML(
+      '<p><a href="dana@x.org">Dana</a></p>',
+      _createPasteEvent(),
+    );
+    expect(_getLinkHrefs(editor)).toEqual(["mailto:dana@x.org"]);
+  });
+
+  it("drops a pasted HTML link with a disallowed href, keeping its text", () => {
+    editor = new Editor({ extensions: createRichTextExtensions() });
+    editor.view.pasteHTML(
+      '<p><a href="ftp://x.com/a">files</a></p>',
+      _createPasteEvent(),
+    );
+    expect(_getLinkHrefs(editor)).toEqual([]);
+    expect(editor.getText()).toBe("files");
+  });
+});
