@@ -29,8 +29,15 @@ values
   ('e2200003-0000-4000-8000-000000000003'::uuid, 'e2100002-0000-4000-8000-000000000002'::uuid, 'e2000003-0000-4000-8000-000000000003'::uuid)
 on conflict (id) do nothing;
 
-insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation)
-values ('e2300001-0000-4000-8000-000000000001'::uuid, 'e2000001-0000-4000-8000-000000000001'::uuid, 'e2100001-0000-4000-8000-000000000001'::uuid, 'rls concept', true)
+-- A case type and its default status reference each other; the
+-- foreign key is deferred, so both rows go in before the commit.
+insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
+values ('e2300001-0000-4000-8000-000000000001'::uuid, 'e2000001-0000-4000-8000-000000000001'::uuid, 'e2100001-0000-4000-8000-000000000001'::uuid, 'rls concept', true, 'e23f0001-0000-4000-8000-000000000001'::uuid)
+on conflict (id) do nothing;
+
+insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
+values
+  ('e23f0001-0000-4000-8000-000000000001'::uuid, 'e2100001-0000-4000-8000-000000000001'::uuid, 'e2300001-0000-4000-8000-000000000001'::uuid, 'Open', '#40c057', 0)
 on conflict (id) do nothing;
 
 insert into public.individuals (id, workspace_id, name, concept_id, external_id)
@@ -427,8 +434,15 @@ select throws_ok (
 -- table owner after test 2, which expects the outsider to see no comments.
 reset role;
 
-insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation)
-values ('e2300002-0000-4000-8000-000000000002'::uuid, 'e2000003-0000-4000-8000-000000000003'::uuid, 'e2100002-0000-4000-8000-000000000002'::uuid, 'rls other concept', true)
+-- A case type and its default status reference each other; the
+-- foreign key is deferred, so both rows go in before the commit.
+insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
+values ('e2300002-0000-4000-8000-000000000002'::uuid, 'e2000003-0000-4000-8000-000000000003'::uuid, 'e2100002-0000-4000-8000-000000000002'::uuid, 'rls other concept', true, 'e23f0002-0000-4000-8000-000000000002'::uuid)
+on conflict (id) do nothing;
+
+insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
+values
+  ('e23f0002-0000-4000-8000-000000000002'::uuid, 'e2100002-0000-4000-8000-000000000002'::uuid, 'e2300002-0000-4000-8000-000000000002'::uuid, 'Open', '#40c057', 0)
 on conflict (id) do nothing;
 
 insert into public.individuals (id, workspace_id, name, concept_id, external_id)

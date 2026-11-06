@@ -29,10 +29,18 @@ values
   ('e1200003-0000-4000-8000-000000000003'::uuid, 'e1100002-0000-4000-8000-000000000002'::uuid, 'e1000003-0000-4000-8000-000000000003'::uuid)
 on conflict (id) do nothing;
 
-insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation)
+-- A case type and its default status reference each other; the
+-- foreign key is deferred, so both rows go in before the commit.
+insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
 values
-  ('e1300001-0000-4000-8000-000000000001'::uuid, 'e1000001-0000-4000-8000-000000000001'::uuid, 'e1100001-0000-4000-8000-000000000001'::uuid, 'activity concept', true),
-  ('e1300002-0000-4000-8000-000000000002'::uuid, 'e1000003-0000-4000-8000-000000000003'::uuid, 'e1100002-0000-4000-8000-000000000002'::uuid, 'other concept', true)
+  ('e1300001-0000-4000-8000-000000000001'::uuid, 'e1000001-0000-4000-8000-000000000001'::uuid, 'e1100001-0000-4000-8000-000000000001'::uuid, 'activity concept', true, 'e13f0001-0000-4000-8000-000000000001'::uuid),
+  ('e1300002-0000-4000-8000-000000000002'::uuid, 'e1000003-0000-4000-8000-000000000003'::uuid, 'e1100002-0000-4000-8000-000000000002'::uuid, 'other concept', true, 'e13f0002-0000-4000-8000-000000000002'::uuid)
+on conflict (id) do nothing;
+
+insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
+values
+  ('e13f0001-0000-4000-8000-000000000001'::uuid, 'e1100001-0000-4000-8000-000000000001'::uuid, 'e1300001-0000-4000-8000-000000000001'::uuid, 'Open', '#40c057', 0),
+  ('e13f0002-0000-4000-8000-000000000002'::uuid, 'e1100002-0000-4000-8000-000000000002'::uuid, 'e1300002-0000-4000-8000-000000000002'::uuid, 'Open', '#40c057', 0)
 on conflict (id) do nothing;
 
 insert into public.individuals (id, workspace_id, name, concept_id, external_id)
