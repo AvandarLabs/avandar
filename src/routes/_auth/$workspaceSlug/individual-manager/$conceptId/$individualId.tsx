@@ -7,6 +7,7 @@ import {
   notFound,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { z } from "zod";
 import { uuid } from "$/lib/uuid";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
@@ -15,10 +16,19 @@ import { SingleIndividualView } from "@/views/IndividualManagerApp/SingleIndivid
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { Individual } from "$/models/ontology/Individual/Individual";
 
+/**
+ * `comment` names a comment to scroll to and highlight, set by a copied
+ * comment link. A malformed id is dropped rather than failing the page.
+ */
+const RecordSearchSchema = z.object({
+  comment: z.uuid().optional().catch(undefined),
+});
+
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId",
 )({
   component: RouteComponent,
+  validateSearch: RecordSearchSchema,
   loader: async ({
     params: { individualId, conceptId },
   }): Promise<{ concept: Concept.T; individual: Individual.T }> => {
@@ -39,7 +49,18 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { concept, individual } = Route.useLoaderData();
-  return <SingleIndividualView concept={concept} individual={individual} />;
+  const { comment } = Route.useSearch();
+
+  // Keyed by record so picking another record resets the feed's scroll
+  // memory and the composer.
+  return (
+    <SingleIndividualView
+      key={individual.id}
+      concept={concept}
+      individual={individual}
+      highlightedCommentId={comment}
+    />
+  );
 }
 
 function ErrorView({ error }: ErrorComponentProps) {

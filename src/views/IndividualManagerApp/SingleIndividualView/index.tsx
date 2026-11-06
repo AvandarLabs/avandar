@@ -1,4 +1,3 @@
-import { Paper } from "@avandar/ui";
 import {
   isNonNullish,
   makeIdLookupMap,
@@ -8,20 +7,25 @@ import {
   unknownToString,
   where,
 } from "@avandar/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Container, Loader, Stack, Title } from "@mantine/core";
+import { useLingui } from "@lingui/react/macro";
+import { Skeleton } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
-import { ActivityBlock } from "@/views/IndividualManagerApp/SingleIndividualView/ActivityBlock";
-import { RecordAttributesList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { AppView } from "@/components/layouts/AppView/AppView";
+import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
+import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
+import { CaseActivityFeed } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed";
+import { CaseDetailsRail } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Individual } from "$/models/ontology/Individual/Individual";
-import type { RecordAttributeRow } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
+import type { CaseDetailsRow } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
 
 type HydratedIndividual = Individual.T & {
   identifierAttribute?: ConceptAttribute.T;
@@ -137,11 +141,20 @@ function useHydratedIndividual({
 type Props = {
   concept: Concept.T;
   individual: Individual.T;
+
+  /** A comment to scroll to and highlight, from a copied comment link. */
+  highlightedCommentId: string | undefined;
 };
 
+/**
+ * A case's record page: its name and case type in the header band, its
+ * activity feed and composer in the content column, and its fields in the
+ * properties rail.
+ */
 export function SingleIndividualView({
   concept,
   individual,
+  highlightedCommentId,
 }: Props): JSX.Element {
   const { t } = useLingui();
   const [hydratedIndividual, isLoadingHydratedIndividual] =
@@ -149,8 +162,12 @@ export function SingleIndividualView({
       concept,
       individual,
     });
+  const [members] = WorkspaceClient.useGetUsersForWorkspace({
+    workspaceId: individual.workspaceId,
+    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+  });
 
-  const attributeRows: RecordAttributeRow[] | undefined = useMemo(() => {
+  const attributeRows: CaseDetailsRow[] | undefined = useMemo(() => {
     if (!hydratedIndividual.assertions) {
       return undefined;
     }
@@ -158,38 +175,31 @@ export function SingleIndividualView({
       return {
         name: assertion.attributeName ?? t`Loading...`,
         value: assertion.value,
-        sourceType: assertion.sourceType,
         sourceName: assertion.sourceName,
       };
     });
   }, [hydratedIndividual.assertions, t]);
 
   return (
-    <Container py="md">
-      <Stack gap="lg" maw={720}>
-        <Title order={2} fw={650}>
-          {isLoadingHydratedIndividual ? (
-            <Loader size="sm" />
+    <AppView>
+      <AppViewHeader
+        title={
+          isLoadingHydratedIndividual ? (
+            <Skeleton component="span" height={24} width={200} />
           ) : (
             unknownToString(hydratedIndividual.name)
-          )}
-        </Title>
-        <Paper p="lg">
-          <Stack gap="lg">
-            <Title order={4}>
-              <Trans>Details</Trans>
-            </Title>
-            {attributeRows === undefined ? (
-              <Loader />
-            ) : (
-              <RecordAttributesList attributes={attributeRows} />
-            )}
-          </Stack>
-        </Paper>
-        <Paper p="lg">
-          <ActivityBlock />
-        </Paper>
-      </Stack>
-    </Container>
+          )
+        }
+        facts={[concept.name]}
+      />
+      <AppViewBody rail={<CaseDetailsRail attributes={attributeRows} />}>
+        <CaseActivityFeed
+          workspaceId={individual.workspaceId}
+          individualId={individual.id}
+          members={members ?? []}
+          highlightedCommentId={highlightedCommentId}
+        />
+      </AppViewBody>
+    </AppView>
   );
 }
