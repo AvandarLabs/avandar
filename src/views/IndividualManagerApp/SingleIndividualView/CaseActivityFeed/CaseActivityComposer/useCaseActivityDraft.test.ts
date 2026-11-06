@@ -6,6 +6,19 @@ import type { Individual } from "$/models/ontology/Individual/Individual";
 import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
+vi.mock("@/hooks/users/useCurrentUser", () => {
+  return {
+    useCurrentUser: () => {
+      return { id: "u1" };
+    },
+  };
+});
+
+/** Where the hook stores a case's draft for the signed-in member, u1. */
+function _scope(individualId: string) {
+  return { userId: "u1", workspaceId: "w1", individualId };
+}
+
 function _document(text: string): RichTextDocument.T {
   return {
     type: "doc",
@@ -35,11 +48,11 @@ describe("useCaseActivityDraft", () => {
       result.current.saveDraft(_document("first"));
       result.current.saveDraft(_document("first words"));
     });
-    expect(loadCaseActivityDraft("w1", "i1")).toBeUndefined();
+    expect(loadCaseActivityDraft(_scope("i1"))).toBeUndefined();
     act(() => {
       vi.advanceTimersByTime(300);
     });
-    expect(loadCaseActivityDraft("w1", "i1")).toEqual(_document("first words"));
+    expect(loadCaseActivityDraft(_scope("i1"))).toEqual(_document("first words"));
   });
 
   it("saves a pending draft when the composer goes away", () => {
@@ -48,7 +61,7 @@ describe("useCaseActivityDraft", () => {
       result.current.saveDraft(_document("half a thought"));
     });
     unmount();
-    expect(loadCaseActivityDraft("w1", "i1")).toEqual(
+    expect(loadCaseActivityDraft(_scope("i1"))).toEqual(
       _document("half a thought"),
     );
   });
@@ -62,7 +75,7 @@ describe("useCaseActivityDraft", () => {
     act(() => {
       vi.advanceTimersByTime(300);
     });
-    expect(loadCaseActivityDraft("w1", "i1")).toBeUndefined();
+    expect(loadCaseActivityDraft(_scope("i1"))).toBeUndefined();
   });
 
   it("never writes one case's text into another after a switch", () => {
@@ -85,7 +98,7 @@ describe("useCaseActivityDraft", () => {
     act(() => {
       vi.advanceTimersByTime(300);
     });
-    expect(loadCaseActivityDraft("w1", "i1")).toEqual(_document("first case"));
-    expect(loadCaseActivityDraft("w1", "i2")).toEqual(_document("second case"));
+    expect(loadCaseActivityDraft(_scope("i1"))).toEqual(_document("first case"));
+    expect(loadCaseActivityDraft(_scope("i2"))).toEqual(_document("second case"));
   });
 });

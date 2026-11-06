@@ -4,19 +4,26 @@ import {
 } from "$/models/RichTextDocument/RichTextDocument";
 import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
 
-function _buildDraftKey(workspaceId: string, individualId: string): string {
-  return `ava:case-activity-draft:${workspaceId}:${individualId}`;
+/**
+ * Whose draft, for which case. Drafts are kept per member so two people
+ * sharing a device never see each other's unsent updates.
+ */
+export type CaseActivityDraftScope = Readonly<{
+  userId: string;
+  workspaceId: string;
+  individualId: string;
+}>;
+
+function _buildDraftKey(scope: CaseActivityDraftScope): string {
+  return `ava:case-activity-draft:${scope.userId}:${scope.workspaceId}:${scope.individualId}`;
 }
 
-/** The unsent update for a case on this device, if any. */
+/** The member's unsent update for a case on this device, if any. */
 export function loadCaseActivityDraft(
-  workspaceId: string,
-  individualId: string,
+  scope: CaseActivityDraftScope,
 ): RichTextDocument.T | undefined {
   try {
-    const storedValue = window.localStorage.getItem(
-      _buildDraftKey(workspaceId, individualId),
-    );
+    const storedValue = window.localStorage.getItem(_buildDraftKey(scope));
     if (storedValue === null) {
       return undefined;
     }
@@ -28,21 +35,20 @@ export function loadCaseActivityDraft(
 }
 
 /**
- * Keeps the unsent update for a case on this device, or forgets it once the
- * document has no text left.
+ * Keeps the member's unsent update for a case on this device, or forgets it
+ * once the document has no text left.
  */
 export function saveCaseActivityDraft(
-  workspaceId: string,
-  individualId: string,
+  scope: CaseActivityDraftScope,
   document: RichTextDocument.T,
 ): void {
   if (richTextToPlainText(document) === "") {
-    clearCaseActivityDraft(workspaceId, individualId);
+    clearCaseActivityDraft(scope);
     return;
   }
   try {
     window.localStorage.setItem(
-      _buildDraftKey(workspaceId, individualId),
+      _buildDraftKey(scope),
       JSON.stringify(document),
     );
   } catch {
@@ -50,13 +56,10 @@ export function saveCaseActivityDraft(
   }
 }
 
-/** Forgets the unsent update for a case after it is posted. */
-export function clearCaseActivityDraft(
-  workspaceId: string,
-  individualId: string,
-): void {
+/** Forgets the member's unsent update for a case after it is posted. */
+export function clearCaseActivityDraft(scope: CaseActivityDraftScope): void {
   try {
-    window.localStorage.removeItem(_buildDraftKey(workspaceId, individualId));
+    window.localStorage.removeItem(_buildDraftKey(scope));
   } catch {
     // Storage can be blocked; see saveCaseActivityDraft.
   }
@@ -67,16 +70,15 @@ export function clearCaseActivityDraft(
  * newer draft written after the post started survives.
  */
 export function clearCaseActivityDraftIfUnchanged(
-  workspaceId: string,
-  individualId: string,
+  scope: CaseActivityDraftScope,
   postedDocument: RichTextDocument.T,
 ): void {
-  const storedDraft = loadCaseActivityDraft(workspaceId, individualId);
+  const storedDraft = loadCaseActivityDraft(scope);
   if (
     storedDraft !== undefined &&
     JSON.stringify(storedDraft) !== JSON.stringify(postedDocument)
   ) {
     return;
   }
-  clearCaseActivityDraft(workspaceId, individualId);
+  clearCaseActivityDraft(scope);
 }

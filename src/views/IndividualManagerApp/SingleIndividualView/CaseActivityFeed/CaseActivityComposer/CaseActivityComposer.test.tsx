@@ -18,6 +18,14 @@ vi.mock("@/lib/hooks/browser/useIsOnline/useIsOnline", () => {
   };
 });
 
+vi.mock("@/hooks/users/useCurrentUser", () => {
+  return {
+    useCurrentUser: () => {
+      return { id: "u1" };
+    },
+  };
+});
+
 function _wrapper({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={new QueryClient()}>
@@ -56,7 +64,7 @@ describe("CaseActivityComposer", () => {
 
   it("restores the draft saved for this case", () => {
     window.localStorage.setItem(
-      "ava:case-activity-draft:w1:i1",
+      "ava:case-activity-draft:u1:w1:i1",
       JSON.stringify({
         type: "doc",
         content: [
@@ -81,7 +89,7 @@ describe("CaseActivityComposer", () => {
   it("explains that the draft is kept and blocks posting while offline", () => {
     isOnline.value = false;
     window.localStorage.setItem(
-      "ava:case-activity-draft:w1:i1",
+      "ava:case-activity-draft:u1:w1:i1",
       JSON.stringify({
         type: "doc",
         content: [

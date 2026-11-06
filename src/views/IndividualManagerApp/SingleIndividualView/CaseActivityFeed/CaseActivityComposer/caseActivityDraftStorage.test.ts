@@ -6,6 +6,9 @@ import {
   saveCaseActivityDraft,
 } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/caseActivityDraftStorage";
 
+const CASE_ONE = { userId: "u1", workspaceId: "w1", individualId: "i1" };
+const CASE_TWO = { ...CASE_ONE, individualId: "i2" };
+
 const DRAFT = {
   type: "doc" as const,
   content: [{ type: "paragraph", content: [{ type: "text", text: "draft" }] }],
@@ -18,21 +21,31 @@ afterEach(() => {
 
 describe("caseActivityDraftStorage", () => {
   it("saves, loads, and clears a draft per case", () => {
-    saveCaseActivityDraft("w1", "i1", DRAFT);
-    expect(loadCaseActivityDraft("w1", "i1")).toEqual(DRAFT);
-    expect(loadCaseActivityDraft("w1", "i2")).toBeUndefined();
-    clearCaseActivityDraft("w1", "i1");
-    expect(loadCaseActivityDraft("w1", "i1")).toBeUndefined();
+    saveCaseActivityDraft(CASE_ONE, DRAFT);
+    expect(loadCaseActivityDraft(CASE_ONE)).toEqual(DRAFT);
+    expect(loadCaseActivityDraft(CASE_TWO)).toBeUndefined();
+    clearCaseActivityDraft(CASE_ONE);
+    expect(loadCaseActivityDraft(CASE_ONE)).toBeUndefined();
+  });
+
+  it("keeps each member's draft for the same case apart", () => {
+    saveCaseActivityDraft(CASE_ONE, DRAFT);
+    expect(
+      window.localStorage.getItem("ava:case-activity-draft:u1:w1:i1"),
+    ).not.toBeNull();
+    expect(
+      loadCaseActivityDraft({ ...CASE_ONE, userId: "u2" }),
+    ).toBeUndefined();
   });
 
   it("forgets the draft when the saved document has no text", () => {
-    saveCaseActivityDraft("w1", "i1", DRAFT);
-    saveCaseActivityDraft("w1", "i1", {
+    saveCaseActivityDraft(CASE_ONE, DRAFT);
+    saveCaseActivityDraft(CASE_ONE, {
       type: "doc",
       content: [{ type: "paragraph" }],
     });
     expect(
-      window.localStorage.getItem("ava:case-activity-draft:w1:i1"),
+      window.localStorage.getItem("ava:case-activity-draft:u1:w1:i1"),
     ).toBeNull();
   });
 
@@ -43,25 +56,25 @@ describe("caseActivityDraftStorage", () => {
         { type: "paragraph", content: [{ type: "text", text: "newer" }] },
       ],
     };
-    saveCaseActivityDraft("w1", "i1", newerDraft);
-    clearCaseActivityDraftIfUnchanged("w1", "i1", DRAFT);
-    expect(loadCaseActivityDraft("w1", "i1")).toEqual(newerDraft);
-    clearCaseActivityDraftIfUnchanged("w1", "i1", newerDraft);
-    expect(loadCaseActivityDraft("w1", "i1")).toBeUndefined();
+    saveCaseActivityDraft(CASE_ONE, newerDraft);
+    clearCaseActivityDraftIfUnchanged(CASE_ONE, DRAFT);
+    expect(loadCaseActivityDraft(CASE_ONE)).toEqual(newerDraft);
+    clearCaseActivityDraftIfUnchanged(CASE_ONE, newerDraft);
+    expect(loadCaseActivityDraft(CASE_ONE)).toBeUndefined();
   });
 
   it("returns nothing instead of throwing when storage is unavailable", () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new Error("blocked");
     });
-    expect(loadCaseActivityDraft("w1", "i1")).toBeUndefined();
+    expect(loadCaseActivityDraft(CASE_ONE)).toBeUndefined();
   });
 
   it("ignores a stored value that is not a document", () => {
     window.localStorage.setItem(
-      "ava:case-activity-draft:w1:i1",
+      "ava:case-activity-draft:u1:w1:i1",
       '{"type":"nope"}',
     );
-    expect(loadCaseActivityDraft("w1", "i1")).toBeUndefined();
+    expect(loadCaseActivityDraft(CASE_ONE)).toBeUndefined();
   });
 });

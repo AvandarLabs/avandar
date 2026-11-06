@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef } from "react";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import {
   clearCaseActivityDraftIfUnchanged,
   loadCaseActivityDraft,
   saveCaseActivityDraft,
 } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/caseActivityDraftStorage";
+import type { CaseActivityDraftScope } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/caseActivityDraftStorage";
 import type { Individual } from "$/models/ontology/Individual/Individual";
 import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -12,8 +14,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 const SAVE_DELAY_MS = 300;
 
 type PendingDraft = {
-  workspaceId: Workspace.Id;
-  individualId: Individual.Id;
+  scope: CaseActivityDraftScope;
   document: RichTextDocument.T;
 };
 
@@ -25,15 +26,24 @@ type CaseActivityDraft = {
   clearPostedDraft: (postedDocument: RichTextDocument.T) => void;
 };
 
-/** The case's unsent update on this device, saved as the member types. */
+/**
+ * The signed-in member's unsent update for a case on this device, saved as
+ * they type. Without a signed-in member nothing is loaded or saved.
+ */
 export function useCaseActivityDraft(
   workspaceId: Workspace.Id,
   individualId: Individual.Id,
 ): CaseActivityDraft {
+  const userId = useCurrentUser()?.id;
+  const scope = useMemo((): CaseActivityDraftScope | undefined => {
+    return userId === undefined
+      ? undefined
+      : { userId, workspaceId, individualId };
+  }, [userId, workspaceId, individualId]);
   const initialDraft = useMemo(() => {
-    return loadCaseActivityDraft(workspaceId, individualId);
-  }, [workspaceId, individualId]);
-  // The pending draft carries its own case, so a flush that runs after a
+    return scope === undefined ? undefined : loadCaseActivityDraft(scope);
+  }, [scope]);
+  // The pending draft carries its own scope, so a flush that runs after a
   // case switch still writes it to the case it was typed in.
   const pendingDraftRef = useRef<PendingDraft | undefined>(undefined);
   const timerRef = useRef<number | undefined>(undefined);
@@ -44,33 +54,30 @@ export function useCaseActivityDraft(
       const pendingDraft = pendingDraftRef.current;
       pendingDraftRef.current = undefined;
       if (pendingDraft) {
-        saveCaseActivityDraft(
-          pendingDraft.workspaceId,
-          pendingDraft.individualId,
-          pendingDraft.document,
-        );
+        saveCaseActivityDraft(pendingDraft.scope, pendingDraft.document);
       }
     };
   }, []);
 
   useEffect(() => {
     return flushDraft;
-  }, [flushDraft, workspaceId, individualId]);
+  }, [flushDraft, scope]);
 
   return {
     initialDraft,
     saveDraft: (document) => {
-      pendingDraftRef.current = { workspaceId, individualId, document };
+      if (scope === undefined) {
+        return;
+      }
+      pendingDraftRef.current = { scope, document };
       window.clearTimeout(timerRef.current);
       timerRef.current = window.setTimeout(flushDraft, SAVE_DELAY_MS);
     },
     clearPostedDraft: (postedDocument) => {
       flushDraft();
-      clearCaseActivityDraftIfUnchanged(
-        workspaceId,
-        individualId,
-        postedDocument,
-      );
+      if (scope !== undefined) {
+        clearCaseActivityDraftIfUnchanged(scope, postedDocument);
+      }
     },
   };
 }
