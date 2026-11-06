@@ -125,7 +125,6 @@ organizationLabels:
   2: Agency
 
 fields:
-  display_name: { from: resource.name }
   description: { from: resource.description }
   organization2_name: { from: resource.attribution }
   domains: { script: ./mappers/socrataDomains.ts }
@@ -147,7 +146,7 @@ drives:
     fields:
       organization1_name: { value: State of New York }
       organization2_name: { value: Department of Health }
-      organization3_name: { from: resource.attribution }
+      organization3_name: { script: ./mappers/socrataOfficeDivision/socrataOfficeDivision.ts }
 ```
 
 Top-level keys:
@@ -197,13 +196,18 @@ null and the run logs a warning naming the script and the dataset.
 The keys `fields` accepts are a fixed list. Any other key fails the config
 when it loads:
 
-`display_name`, `description`, `notes`, `license`, `update_frequency`,
-`canonical_urls`, `coverage_start_date`, `coverage_end_date`,
-`organization1_name`, `organization2_name`, `organization3_name`,
-`organization4_name`, `domains`, `tags`.
+`description`, `notes`, `license`, `update_frequency`, `canonical_urls`,
+`coverage_start_date`, `coverage_end_date`, `organization1_name`,
+`organization2_name`, `organization3_name`, `organization4_name`,
+`domains`, `tags`.
 
-`display_name` and `organization1_name` are required: every drive must map
-them, through its own `fields` or the pipeline's.
+`display_name` is not mappable. Both pipelines keep it in code: HDX names
+a listing after its resource, not its dataset, and Socrata's `resource.name`
+is already validated by the Discovery client's schema.
+
+`organization1_name` is required: every drive must map it, through its own
+`fields` or the pipeline's. A drive that does not fails the config when it
+loads.
 
 ### 4.4 Coercion
 
@@ -213,8 +217,8 @@ them, through its own `fields` or the pipeline's.
 | Text array (`domains`, `tags`, `canonical_urls`) | A string (wrapped into a one-item array) or an array of strings. Blanks and duplicates are dropped. An empty result is null. | Null, with a warning. |
 | Date (`coverage_*`) | An ISO 8601 string. | Null, with a warning. |
 
-When `display_name` or `organization1_name` comes out null for a record,
-the pipeline skips that dataset with a `console.warn`, the way Socrata
+When `organization1_name` comes out null for a record, the pipeline skips
+that dataset with a `console.warn`, the way Socrata
 results that fail validation are skipped today. It does not fail the drive.
 
 ## 5. Loading the config, once per run
@@ -264,30 +268,34 @@ mappings from drifting apart.
    it does now, and spreads in `mapper.mapFields(raw, driveKey)` plus
    `sourceMetadata: raw`.
 5. `buildListingRowFromRelation` writes the new columns and the drive id.
-   `isListingRowUnchanged` and `listingContractColumns` include the new
-   columns, so a mapping change rewrites the affected rows on the next full
-   run.
+   `listingContractColumns` includes the new columns, so
+   `isListingRowUnchanged` compares them and a mapping change rewrites the
+   affected rows on the next full run. `source_metadata` is the one new
+   column the change check ignores: Socrata's record carries `page_views`
+   and `download_count`, which change daily, so counting them would rewrite
+   every listing on every full run. A listing's `source_metadata` is
+   therefore as of the last write that changed anything else.
 
 ## 7. Initial mappings
 
 | Field | Socrata | HDX (CKAN) |
 |---|---|---|
 | Labels | NYC: City, Agency. NY State: State, Agency. NYS Health: State, Department, Office. | Organization |
-| `display_name` | `resource.name` | Kept in code: the resource name, as today |
 | `organization1_name` | `value` per drive | `organization.title`, such as "World Health Organization" |
 | `organization2_name` | `resource.attribution` (NYC, NY State); `value` "Department of Health" (NYS Health) | None |
-| `organization3_name` | `resource.attribution` (NYS Health only) | None |
+| `organization3_name` | Script: the `Dataset-Summary_Office/Division` entry in `classification.domain_metadata` (NYS Health only, where `resource.attribution` is the department itself) | None |
 | `description` | `resource.description` | `notes` |
 | `domains` | Script: `classification.domain_category` plus `classification.categories` (the latter is empty on NYC today) | Script: `groups[].title` (countries on HDX) |
 | `tags` | `classification.domain_tags` | Script: `tags[].name` |
-| `update_frequency` | Script: the `Update-Frequency` entry in `classification.domain_metadata` | Script: `data_update_frequency` is a code (`"1"` is every day), translated to words |
+| `update_frequency` | Script: the first of `Update_Update-Frequency` (NYC) or `Dataset-Summary_Posting-Frequency` (NY State portals) in `classification.domain_metadata` | Script: `data_update_frequency` is a code (`"1"` is every day), translated to words |
 | `license` | `metadata.license`, when present (rare on NYC) | `license_title` |
 
-HDX lists one listing per resource, so its record is the CKAN package with
-the resource attached. Its `from` paths therefore read package fields, and
-HDX's `display_name` stays in code because it comes from the resource. The
-CKAN package schema widens to keep `organization`, `groups`, `tags`,
-`notes`, `license_title` and `data_update_frequency`.
+HDX lists one listing per resource, but every mapped field describes the
+dataset, so its record is the raw CKAN package (`package_search`'s result),
+and each of a package's resource listings stores that same package as its
+`source_metadata`. HDX's `display_name` stays in code because it comes from
+the resource. The CKAN package schema does not need to widen: the mapper
+reads the raw package, not the narrowed `CkanPackage`.
 
 These rows are the starting config. Verify each path against a recorded
 response while building, and fix the YAML rather than this table when they
