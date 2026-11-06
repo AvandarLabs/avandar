@@ -18,9 +18,9 @@ use super::palette::PaletteState;
 /// Render the command palette centered over `area`.
 pub fn draw_palette(f: &mut Frame, state: &PaletteState, area: Rect) {
     let entries = state.numbered_entries();
-    // Inner height: filter + separator + list (≥1) + footer = 4 + list rows.
+    // Outer height: two borders + filter + separator + footer = 5 + list rows.
     let list_h = u16::try_from(entries.len()).unwrap_or(u16::MAX);
-    let height = list_h.saturating_add(4).max(7).min(area.height);
+    let height = list_h.saturating_add(5).max(7).min(area.height);
     let modal = centered_rect(60.min(area.width), height, area);
     f.render_widget(Clear, modal);
 
@@ -147,4 +147,40 @@ fn render_list(
         })
         .collect();
     f.render_widget(Paragraph::new(lines), area);
+}
+
+#[cfg(test)]
+mod tests {
+    use ratatui::Terminal;
+    use ratatui::backend::TestBackend;
+
+    use super::*;
+    use crate::tui::palette::PALETTE_COMMANDS;
+
+    fn rendered_text(state: &PaletteState) -> String {
+        let mut terminal = Terminal::new(TestBackend::new(100, 40)).expect("test terminal");
+        terminal
+            .draw(|f| draw_palette(f, state, f.area()))
+            .expect("draw palette");
+        let buffer = terminal.backend().buffer();
+        buffer
+            .content()
+            .chunks(usize::from(buffer.area.width))
+            .map(|row| {
+                row.iter()
+                    .map(ratatui::buffer::Cell::symbol)
+                    .collect::<String>()
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
+
+    #[test]
+    fn every_command_row_fits_in_the_modal() {
+        let text = rendered_text(&PaletteState::new());
+        for (number, command) in PALETTE_COMMANDS.iter().enumerate() {
+            let row = format!("{}. {}", number + 1, command.label);
+            assert!(text.contains(&row), "missing palette row {row:?}:\n{text}");
+        }
+    }
 }

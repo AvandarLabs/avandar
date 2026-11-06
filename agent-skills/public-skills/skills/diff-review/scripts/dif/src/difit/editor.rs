@@ -50,15 +50,20 @@ impl DifitEditor for DifitHttp {
         }
         let base = format!("http://localhost:{}", self.port);
         let current: Value = ureq::get(&format!("{base}/api/comments-json"))
-            .timeout(Duration::from_secs(2))
+            .config()
+            .timeout_global(Some(Duration::from_secs(2)))
+            .build()
             .call()
             .context("reading difit's comments")?
-            .into_json()?;
+            .body_mut()
+            .read_json()?;
         let version = current["version"].clone();
         let mut threads = current["threads"].as_array().cloned().unwrap_or_default();
         apply_edits(&mut threads, edits);
         let response = ureq::post(&format!("{base}/api/comments"))
-            .timeout(Duration::from_secs(2))
+            .config()
+            .timeout_global(Some(Duration::from_secs(2)))
+            .build()
             .send_json(json!({ "threads": threads, "baseVersion": version }));
         if let Err(e) = response {
             bail!("saving difit's comments: {e}");

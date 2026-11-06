@@ -49,7 +49,7 @@
   var diffPaths = [];   // array of repo-relative paths
   var diffLoaded = false;
 
-  // Silent auto-retry of the difit iframe: after a Ctrl+R restart difit is
+  // Silent auto-retry of the difit iframe: after a Ctrl+R Refresh diff, difit is
   // briefly down, so the first load can 502. Retry a few times before showing
   // the manual "difit didn't load" box.
   var RETRY_MAX = 12;

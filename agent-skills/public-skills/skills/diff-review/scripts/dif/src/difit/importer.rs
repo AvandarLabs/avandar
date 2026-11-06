@@ -108,7 +108,9 @@ pub fn post(port: u16, entries: &[ImportEntry]) -> bool {
         return true;
     }
     ureq::post(&format!("http://localhost:{port}/api/comment-imports"))
-        .timeout(Duration::from_secs(5))
+        .config()
+        .timeout_global(Some(Duration::from_secs(5)))
+        .build()
         .send_json(serde_json::to_value(entries).unwrap_or_default())
         .is_ok()
 }

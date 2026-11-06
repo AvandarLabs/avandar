@@ -142,30 +142,30 @@ Once a guide exists the control endpoint returns `409`, and a retarget that
 arrives after the reviewer has started commenting is logged and ignored: a
 review that is underway is never switched out from under the browser.
 
-### Restarting difit in place ("Restart diff server")
+### Relaunching difit in place ("Refresh diff")
 
-"Restart diff server" — the command palette entry or its `Ctrl+R` shortcut (see
-[features.md](features.md#restart-diff-server)) — restarts only the difit server,
-keeping the same comparison, port, and pane log. `dif` prompts a restart by
+"Refresh diff" — the command palette entry or its `Ctrl+R` shortcut (see
+[features.md](features.md#refresh-diff)) — relaunches only the difit server,
+keeping the same comparison, port, and pane log. `dif` prompts a refresh by
 logging an orange warning in the left pane once it detects (via the git-watcher)
-that the code changed since launch; it never restarts on its own, so a comment
+that the code changed since launch; it never refreshes on its own, so a comment
 you're mid-typing in the browser is never dropped. The flow:
 
 1. `App::restart_difit` re-reads the `.difit` transcript and rebuilds the same
    difit command (same comparison + port, `--comment` reseeded). difit is spawned
    with `--no-open` — exactly as at launch — because the **web shell owns the
-   browser surface**; a restart must not pop difit's own frontend.
-2. It writes a `[dif] Stopping…` status line into the pane, calls
+   browser surface**; a refresh must not pop difit's own frontend.
+2. It writes a `[dif] Refreshing diff: stopping difit…` status line into the pane, calls
    `PtyPane::kill_child` (SIGKILL lands on difit thanks to `exec`), then
    `server::wait_until_port_free` so the port is released before rebinding.
-3. It writes `[dif] Restarting…` and calls
+3. It writes `[dif] Refreshing diff: starting difit…` and calls
    `PtyPane::respawn_shell_command_with_env`, which spawns the new difit into a
    fresh PTY **reusing the same `vt100` parser** — so the log is continuous, not
    cleared.
 4. It bumps the running `WebShell`'s restart counter
    (`WebShell::note_difit_restart`). The shell serves it as `difitRestarts` in
    `/__wrap/meta.json`, which the open tab polls every 2s and reloads itself on.
-   A restart never calls `open`, so it never stacks up another browser tab; the
+   A refresh never calls `open`, so it never stacks up another browser tab; the
    shell still proxies the same port, and `Ctrl+O` opens a tab when none is
    open.
 
@@ -173,7 +173,7 @@ The poller (still pointed at the unchanged port) and the LLM pane are not
 touched; the poller just reconnects once difit answers again. The dispatcher's
 once-each baseline means reseeded comments are not re-injected.
 
-The restart warning that prompts this is **attributed**: `dif` tracks when it
+The refresh warning that prompts this is **attributed**: `dif` tracks when it
 last injected a prompt into the LLM (`last_inject_at`, set on comment injection
 and on `Ctrl+G`) and words the alert "Claude made code changes..." when the change
 settles soon after an injection, or "New manual changes detected…" otherwise. It
@@ -384,7 +384,9 @@ then calls `submitPullRequestReview` and marks every draft `published`.
 ### Pulling from GitHub
 
 The poller pulls every 60 seconds, and at once when the reviewer clicks
-**Sync** (`POST /__wrap/github/pull`) or after a submit. A pull reads every
+**Sync** (`POST /__wrap/github/pull`), when the TUI runs **Resync with
+GitHub** (`Ctrl+S`, the same `Session::request_reviewer_pull`), or after a
+submit. A pull reads every
 review thread and the viewer's per-file viewed state (paged), then:
 
 - **Comments** (`github::pull`, pure): threads and replies the reviewer has not
@@ -407,7 +409,8 @@ review thread and the viewer's per-file viewed state (paged), then:
   fetches `pull/<n>/head` and fast-forwards only if the branch is strictly
   behind. The background pull also requires that no tracked file has
   uncommitted changes, and the shell then reloads difit in place. A pull the
-  reviewer asked for (**Sync** sets `reviewer_pull` beside `pull_requested`)
+  reviewer asked for (**Sync** and **Resync with GitHub** set `reviewer_pull`
+beside `pull_requested`)
   instead stashes the tracked changes (`git stash push`, only when there is
   something to stash, so an older stash entry is never popped), fast-forwards,
   and restores them (`git stash pop`). A failed fast-forward still restores them.
