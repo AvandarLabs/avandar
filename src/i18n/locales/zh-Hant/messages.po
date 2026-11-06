@@ -3810,7 +3810,7 @@ msgstr "預覽："
 msgid "Background"
 msgstr "背景"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
+#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
 msgstr "選擇您的計劃"
 

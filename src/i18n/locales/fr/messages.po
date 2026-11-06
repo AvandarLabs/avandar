@@ -4012,7 +4012,7 @@ msgstr "Aperçu :"
 msgid "Background"
 msgstr "Arrière-plan"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
+#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
 msgstr "Sélectionnez votre plan"
 

@@ -3966,7 +3966,7 @@ msgstr "Muonekano:"
 msgid "Background"
 msgstr "Mandharinyuma"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
+#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
 msgstr "Chagua mpango wako"
 
