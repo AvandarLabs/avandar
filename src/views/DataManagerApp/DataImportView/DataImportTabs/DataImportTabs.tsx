@@ -74,7 +74,7 @@ export function DataImportTabs({
             <DataCatalogView
               isAddAllowed={isAddAllowed}
               onSaveSuccess={onSaveSuccess}
-              pt="lg"
+              pt="md"
             />
           );
         },

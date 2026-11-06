@@ -1,13 +1,19 @@
 /*
- * The catalog fills the height its host gives it. The minimum keeps it
- * usable in a host that does not size it, rather than collapsing to the
- * height of its header.
+ * The catalog fills the height its host gives it and paints to the host's
+ * edges, bleeding out over the content gutter on both sides and the bottom.
+ * A frame around it would spend a gutter and a border on each side to say
+ * "this is the catalog", which the tabs above already say. The minimum keeps
+ * it usable in a host that does not size it.
  */
 .dataCatalogView {
+  --data-catalog-bleed: var(--ava-content-gutter, 0px);
+
   container: data-catalog / inline-size;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100% + var(--data-catalog-bleed));
+  margin-inline: calc(var(--data-catalog-bleed) * -1);
+  margin-bottom: calc(var(--data-catalog-bleed) * -1);
   min-height: 32rem;
 }
 
@@ -19,8 +25,7 @@
  * dataset stay the lit, working regions.
  */
 .dataCatalogViewBrowser {
-  border: 1px solid var(--ava-border-default);
-  border-radius: var(--mantine-radius-sm);
+  border-top: 1px solid var(--ava-border-default);
   display: grid;
   flex: 1;
   grid-template-areas: "rail results detail";

@@ -120,6 +120,12 @@
   min-height: 0;
 }
 
+/*
+ * The catalog paints to the modal's edges by bleeding out over the body's
+ * padding, the same way it does over a view's gutter.
+ */
 .importPanelFill {
+  --ava-content-gutter: var(--mb-padding, var(--mantine-spacing-md));
+
   height: 100%;
 }
