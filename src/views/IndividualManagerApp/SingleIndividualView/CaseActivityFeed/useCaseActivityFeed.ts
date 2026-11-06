@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityEventClient } from "@/clients/activity/ActivityEventClient";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import type { ActivityEvent } from "$/models/activity/ActivityEvent/ActivityEvent";
 import type { Individual } from "$/models/ontology/Individual/Individual";
 import type {
@@ -174,6 +175,12 @@ export function useCaseActivityFeed(options: {
     initialPageParam: undefined as ActivityFeedCursor | undefined,
     getNextPageParam: _buildCursorFromPage,
     refetchOnWindowFocus: true,
+    // The feed is posted to, edited, and reacted to on the same screen, so a
+    // restored or cached copy may predate those changes. Always refetch on
+    // mount, and never write the feed to the IndexedDB persister, whose
+    // throttled writes could restore a pre-mutation snapshot as fresh.
+    ...ALWAYS_REFETCH_ON_MOUNT,
+    meta: { persist: false },
   });
   const { fetchNextPage, isFetchingNextPage, isFetchNextPageError } = query;
   const entries = useMemo(() => {
