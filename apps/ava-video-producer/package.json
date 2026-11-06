@@ -1,6 +1,6 @@
 {
   "name": "@avandar/ava-video-producer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Avandar workspace video producer, component previews, Motion Atlas, and sample films",
   "license": "MIT",
