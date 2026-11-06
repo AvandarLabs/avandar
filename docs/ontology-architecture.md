@@ -90,6 +90,7 @@ names. Do not put DL terms in UI strings.
 - **Concepts as QETL relations**: `src/clients/qetl/QueryMediator/conceptRelation/`, `src/clients/qetl/wrappers/ConceptWrapper/`
 - **Case Manager (TBox authoring, Sync)**: `src/views/OntologyDesignerApp/`
 - **Records screens (ABox browsing)**: `src/views/IndividualManagerApp/`
+- **Case activity (comments, reactions, audit log)**: see [case-activity-architecture.md](case-activity-architecture.md)
 - **Chat draft card and session kickoff**: `src/components/ChatPanel/CaseTypeDraftBlock/`, `src/components/ChatPanel/CaseDesignKickoff/`
 - **Chat edge function pieces**: `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts`, `parseCreateCaseTypes.ts`, `prompt/buildCaseManagerSystemPrompt.ts`
 - **Chat contract types**: `shared/types/chat.types.ts` (`ChatProposedCaseType`, `ChatCreatedCaseType`)
@@ -533,7 +534,7 @@ extension.
 | `individual-manager/index.tsx` | Redirect to Case Manager home | |
 | `individual-manager/$conceptId/route.tsx` | Records slate: list pane plus outlet | `src/views/IndividualManagerApp/index.tsx`, `IndividualNavbar.tsx`, `useConceptIndividuals.ts`, `useVirtualIndividualLinks.ts`, `EditCaseTypeButton.tsx` |
 | `individual-manager/$conceptId/index.tsx` | Select-a-record or sync-first empty state | `src/views/IndividualManagerApp/IndividualSelectionEmptyState/` |
-| `individual-manager/$conceptId/$individualId.tsx` | Record page: Details and Notes | `src/views/IndividualManagerApp/SingleIndividualView/` (`RecordAttributesList.tsx`, `ActivityBlock.tsx`) |
+| `individual-manager/$conceptId/$individualId.tsx` | Record page: activity feed and composer, fields in the rail | `src/views/IndividualManagerApp/SingleIndividualView/` (`CaseDetailsRail.tsx`, `CaseActivityFeed/`) |
 
 Outside the routes:
 
@@ -691,13 +692,11 @@ flowchart TD
   Q --> C --> C1
 ```
 
-_Under the merge of 2026-10-09 only the natural-key placement keeps its data
-without side effects: a column on `individuals` is reset, and an `id`-keyed
-child table either blocks the sync (`no action`) or has every row rewritten on
-every sync (`cascade`). Verified on 2026-10-09 by replaying the sync upsert
-against all three placements in a rolled-back transaction on the local stack.
-Once Sync stops sending `id`, `status` and `assigned_to`, all three placements
-work._
+_Incremental sync (October 2026) upserts only `external_id`, `name`, and
+`missing_from_source_at`, so it no longer rewrites `id`, `status`, or
+`assigned_to`. All three placements now keep their data. Comments use an
+`id`-keyed child table (`comments.individual_id`), covered by a Sync replay
+in `supabase/tests/database/case_activity/comment_audit_triggers.test.sql`._
 
 Layers a per-case capability touches:
 
@@ -706,8 +705,9 @@ Layers a per-case capability touches:
 2. **Schema**: the new table(s) with membership policies (with a `using` on
    `UPDATE`), pgTAP tests, and `syncable-tables.ts`.
 3. **Models and clients** for the new tables.
-4. **Record page**: controls in `SingleIndividualView`; `ActivityBlock` is the
-   existing (unwired) notes editor.
+4. **Record page**: controls in `SingleIndividualView`; new kinds of activity
+   go through `activityFeedItemRenderers` (see
+   [case-activity-architecture.md](case-activity-architecture.md)).
 5. **A list or grid view** to filter by the new state; the records list pane has
    no ordering, filtering or search.
 6. **QETL**, if SQL and dashboards should see the state: the spine carries only
@@ -758,7 +758,6 @@ means established from the code.
 
 | Limitation | Effect | Status |
 | --- | --- | --- |
-| Sync upserts every staged column, including a fresh `id`, `status` and `assigned_to` | Record URLs break and case state is erased on every sync | Verified (`pg_stat_statements` and a rolled-back replay) |
 | Sync takes keys from every dataset but the name from one | A multi-dataset case type with an uncovered key fails to sync, after partial writes | Read |
 | Record page throws on any manual-entry mapping; chat offers manual fields regardless of `DisableManualData` | The Details panel never loads for such case types | Verified (app) |
 | `max`/`min` cast to `DOUBLE`, which fails for non-numeric columns | Date or text attributes with those rules fail their record pages and any concept query that reads the column; numeric columns are unaffected | Verified (DuckDB CLI 1.3.2; the app's DuckDB-wasm build not tested) |
@@ -775,7 +774,7 @@ means established from the code.
 | The form allows a manual-entry label | Sync then fails with a TypeError | Read |
 | Value-picker SQL quotes names without escaping | A name containing `"` breaks the concept view | Read |
 
-Not built: roles between concepts, subsumption, status sets, comments,
+Not built: roles between concepts, subsumption, status sets,
 assignment, activity log, manual entry storage, editing a case type, manual
 creation of individuals, a records grid with filters, incremental sync,
 concepts on public dashboards (`PublicQuerySession` has no concept planner),

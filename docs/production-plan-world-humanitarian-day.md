@@ -257,25 +257,29 @@ status options are hard-coded in a stub UI. Nothing configurable.
 
 ### P5c. Case Management product (evolve legacy ontology → configurable cases)
 **Current state:** Case-management UI is **stubs with no backend**:
-`ActivityBlock` (comments) calls `notifyNotImplemented`; `StatusPill` is a
+Comments shipped in P5c.2; `StatusPill` is a
 hard-coded combobox with no persistence; `Individual.assignedTo` column exists with
 no writer/UI. Greenfield.
 
 - P5c.1 `[NEW]` **LLM-configurable case types**: describe a domain in natural
   language ("cholera outbreak investigation") → generate a TBox (fields,
   statuses, relations) the org can edit. Domain-agnostic.
-- P5c.2 `[NEW]` **Comments / activity feed** on an ABox (model, table, client,
-  wire the existing Tiptap editor). Includes @mentions.
+- P5c.2 **Comments / activity feed** on an ABox: built. Rich text, markdown,
+  @mentions, reactions, edit and delete, on an append-only activity log. See
+  [case-activity-architecture.md](case-activity-architecture.md).
 - P5c.3 `[NEW]` **Assignment**: assign a case (ABox) to a user/user-group;
   persist `assignedTo`; "assigned to me" views.
 - P5c.4 `[NEW]` **Status workflow**: set/track status from the configurable set
   (P5b.1); status change history.
-- P5c.5 `[NEW]` **Activity/audit log** (status changes, assignments, edits).
+- P5c.5 `[NEW]` **Activity/audit log** for every change to a case: status
+  changes, assignment, manual field values, and case creation, plus history
+  pulled from a connected third-party service. Each is a new `activity_events`
+  kind written by a trigger; the feed and table already exist (P5c.2).
 - P5c.6 `[NEW]` ABox **list/grid view** with filtering by status/assignee
   (today there's only a virtualized navbar + single-individual detail).
 - P5c.7 `[NEW]` Manual case creation + edit (uses P5.4 manual_entry).
 - P5c.8 `[NEW]` Notifications for assignment/mention/status change (reuse email
-  client / in-app).
+  client / in-app). Mention notifications read `comment_mentions`.
 - `[Depends on: P5, P5b, P3 (assignee = permission principal)]`
 
 ---

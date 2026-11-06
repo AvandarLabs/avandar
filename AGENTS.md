@@ -5,6 +5,8 @@
 - Use `docs/` for architectural notes, design decisions, and checklists
   (for example `docs/<topic>.md`).
 - Granular workspace permissions: `docs/permissions-architecture.md`.
+- Case comments, reactions, and the case activity log:
+  `docs/case-activity-architecture.md`.
 - App shell, slate, and z-index nomenclature: `docs/app-shell-nomenclature.md`.
 - How a view inside the slate is laid out (header band, content column,
   properties rail, section rhythm): `docs/design/app-view-layout.md`. Read it
