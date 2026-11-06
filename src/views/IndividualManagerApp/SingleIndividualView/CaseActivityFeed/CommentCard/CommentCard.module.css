@@ -1,0 +1,62 @@
+.card {
+  border-radius: var(--mantine-radius-sm);
+  column-gap: var(--mantine-spacing-sm);
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  padding-block: var(--mantine-spacing-sm);
+  transition: var(--ava-transition-colors);
+}
+
+.card + .card {
+  border-block-start: 1px solid var(--ava-border-default);
+}
+
+.highlighted {
+  background-color: var(--mantine-color-primary-0);
+}
+
+.avatar {
+  background-color: var(--mantine-color-neutral-1);
+  border: 1px solid var(--ava-border-default);
+  border-radius: 50%;
+  display: grid;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  height: 32px;
+  place-items: center;
+  width: 32px;
+}
+
+.header {
+  align-items: baseline;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+}
+
+.actions {
+  margin-inline-start: auto;
+  opacity: 0;
+  transition: var(--ava-transition-opacity);
+}
+
+.card:hover .actions,
+.card:focus-within .actions {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .actions {
+    opacity: 1;
+  }
+}
+
+.deleted {
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .actions {
+    transition: none;
+  }
+}
