@@ -3961,7 +3961,7 @@ msgstr "Vista previa:"
 msgid "Background"
 msgstr "Fondo"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
+#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
 msgstr "Selecciona tu plan"
 
