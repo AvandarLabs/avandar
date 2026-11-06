@@ -3897,7 +3897,7 @@ msgstr "معاينة:"
 msgid "Background"
 msgstr "الخلفية"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
+#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
 msgstr "اختر خطتك"
 

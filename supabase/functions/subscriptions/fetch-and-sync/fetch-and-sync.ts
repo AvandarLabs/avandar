@@ -1,4 +1,4 @@
-import { promiseMap } from "@avandar/utils";
+import { promiseMap, propEq } from "@avandar/utils";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
@@ -13,16 +13,18 @@ import type { Tables } from "$/types/database.types.ts";
 
 /**
  * Search for subscriptions by a user's Avandar ID and update them in our
- * Supabase database in case anything has changed in Polar.
+ * Supabase database in case anything has changed in Polar. When a
+ * `workspaceId` is given, only that workspace's subscriptions are synced.
  *
  * TODO(jpsyx): this should be a POST request.
  */
 export const FetchAndSyncUserSubscriptions = GET("/fetch-and-sync")
   .querySchema({
     userId: z.uuid(),
+    workspaceId: z.uuid().optional(),
   })
   .action(async ({ queryParams, supabaseAdminClient, user }) => {
-    const { userId } = queryParams;
+    const { userId, workspaceId } = queryParams;
 
     if (userId !== user.id) {
       throw new AvaHTTPError(
@@ -31,9 +33,15 @@ export const FetchAndSyncUserSubscriptions = GET("/fetch-and-sync")
       );
     }
 
-    const subscriptions = await PolarClient.getSubscriptionsByUserId({
+    const userSubscriptions = await PolarClient.getSubscriptionsByUserId({
       avandarUserId: userId,
     });
+
+    // A workspace-scoped sync must leave the user's other workspaces alone.
+    const subscriptions =
+      workspaceId === undefined
+        ? userSubscriptions
+        : userSubscriptions.filter(propEq("metadata.workspaceId", workspaceId));
 
     // Each Polar subscription has a distinct id, so the upsert calls don't
     // race with each other and we can run them in parallel.
