@@ -64,7 +64,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F12 | Invalid catalog listings, and DuckDB-parsed column type samples | not started | F4, F7, and the column type verification feature (`verifyOpenDataColumnTypes`, `rpc_data_catalog_listings__write_verified_column_types`), which this log does not map yet | [AVA-396](https://linear.app/avandar/issue/AVA-396) (follow-up) |
 | F13 | Demo deployment: `demo/*` branches deploy to `demo.avandarlabs.com` | not started | none | |
 | F14 | Show only the plan picker when a workspace has no active plan | PR open: [#314](https://github.com/AvandarLabs/avandar/pull/314) | none | |
-| F15 | `ava --env <name>` loads any `.env.<name>`, replacing `--staging` and `--prod` | not started | none, but see its section for hunks in files `develop` lacks | |
+| F15 | `ava --env <name>` loads any `.env.<name>`, replacing `--staging` and `--prod` | PR open: [#319](https://github.com/AvandarLabs/avandar/pull/319) | none, but see its section for hunks in files `develop` lacks | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -728,6 +728,11 @@ deployment, such as a demo's Supabase branch, only takes a new env file:
 `ava pipeline run socrata --local --env demo`.
 
 **PR title:** `feat(ava-cli)!: replace --staging and --prod with a global --env <name>`
+
+**PR:** [#319](https://github.com/AvandarLabs/avandar/pull/319), branch
+`feat/ava-env-flag`, built from `develop` as `77f0ee7a5`. It carries every
+hunk below in files `develop` has, and none of the hunks in files it lacks.
+Its README example runs `world-bank__wdi --env staging` instead of `socrata`.
 
 **Commits to read:**
 
