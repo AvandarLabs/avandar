@@ -14,6 +14,20 @@ export type CliStyle =
 /** The part of a Node stream that decides whether it is a terminal. */
 type StreamLike = { isTTY?: boolean };
 
+/** One line of a titled section: a label and the text beside it. */
+export type CliSectionEntry = {
+  label: string;
+  text: string;
+};
+
+/** A titled section of labelled lines, and how to paint it. */
+type MakeSectionLinesOptions = {
+  title: string;
+  entries: readonly CliSectionEntry[];
+  labelStyle: CliStyle;
+  isColorEnabled: boolean;
+};
+
 /** Escape codes per style, chosen to stay readable on a dark terminal. */
 const ESCAPE_CODE_FROM_STYLE: Record<CliStyle, string> = {
   heading: "\u001B[1;96m",
@@ -48,14 +62,15 @@ function _paint(
     : text;
 }
 
-function _makeErrorLines(
-  options: Readonly<{
-    command: string;
-    message: string;
-    hint: string;
-    isColorEnabled: boolean;
-  }>,
-): string[] {
+/** A failed command, what went wrong, and how to fix it. */
+type MakeErrorLinesOptions = {
+  command: string;
+  message: string;
+  hint: string;
+  isColorEnabled: boolean;
+};
+
+function _makeErrorLines(options: Readonly<MakeErrorLinesOptions>): string[] {
   const { isColorEnabled } = options;
   return [
     _paint({
@@ -65,6 +80,31 @@ function _makeErrorLines(
     }),
     _paint({ style: "warning", text: `  ⚠️ ${options.hint}`, isColorEnabled }),
   ];
+}
+
+function _makeSectionLines(
+  options: Readonly<MakeSectionLinesOptions>,
+): string[] {
+  const { title, entries, labelStyle, isColorEnabled } = options;
+  const labelWidth = Math.max(
+    ...entries.map(({ label }) => {
+      return label.length;
+    }),
+  );
+  return entries.length === 0
+    ? []
+    : [
+        "",
+        _paint({ style: "heading", text: title, isColorEnabled }),
+        ...entries.map(({ label, text }) => {
+          const paddedLabel = _paint({
+            style: labelStyle,
+            text: label.padEnd(labelWidth),
+            isColorEnabled,
+          });
+          return `  ${paddedLabel}  ${text}`;
+        }),
+      ];
 }
 
 function _writeLine(
@@ -116,6 +156,12 @@ export const CliTheme = {
 
   /** The two lines of a failure: what went wrong, then how to fix it. */
   makeErrorLines: _makeErrorLines,
+
+  /**
+   * A blank line, a heading, then one indented line per entry with the labels
+   * padded into a column. No lines at all when there are no entries.
+   */
+  makeSectionLines: _makeSectionLines,
 
   /** Writes one styled line to a stream, colored only when it is a terminal. */
   writeLine: _writeLine,

@@ -1,4 +1,5 @@
 import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/RunLocalCommand/RunLocalCommand";
+import { prop, sortObjList } from "@avandar/utils";
 
 /** One local Supabase project as Docker labels describe it. */
 export type DockerSupabaseProject = {
@@ -21,7 +22,7 @@ export type DockerRuntime = {
 };
 
 /** One listing row's effect on the project it belongs to. */
-type ProjectChange = readonly [
+type ProjectChange = [
   projectId: string,
   applyChange: (project: DockerSupabaseProject) => DockerSupabaseProject,
 ];
@@ -100,9 +101,7 @@ function _makeProjectsFromListings(
     const project = projectsById.get(projectId) ?? _makeEmptyProject(projectId);
     return new Map([...projectsById, [projectId, applyChange(project)]]);
   }, new Map<string, DockerSupabaseProject>());
-  return [...projects.values()].sort((left, right) => {
-    return left.projectId.localeCompare(right.projectId);
-  });
+  return sortObjList([...projects.values()], { sortBy: prop("projectId") });
 }
 
 function _getRuntimeFromContext(contextName: string): DockerRuntime {
@@ -138,9 +137,7 @@ async function _runDocker(
 }
 
 /** Arguments that list one resource type's project labels. */
-function _makeLabelListArgs(
-  resourceType: "volume" | "network",
-): readonly string[] {
+function _makeLabelListArgs(resourceType: "volume" | "network"): string[] {
   return [
     resourceType,
     "ls",
@@ -184,6 +181,8 @@ async function _readProjects(
  * to name Colima, Docker Desktop, or OrbStack when Docker is unreachable.
  * Colima needs no special handling beyond that: it serves the same `docker`
  * CLI through its own context.
+ *
+ * Used by `SupabasePruneCli`, `PrunePlanReader`, and `PruneDeletion`.
  */
 export const DockerInventory = {
   /** Groups `docker ... ls` label listings into one entry per project. */

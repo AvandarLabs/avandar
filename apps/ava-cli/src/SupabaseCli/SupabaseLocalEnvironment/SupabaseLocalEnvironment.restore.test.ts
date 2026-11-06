@@ -264,7 +264,7 @@ describe("SupabaseLocalEnvironment.restore (switches made by an older ava)", () 
     expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
   });
 
-  it("restores the env files and asks for manual cleanup when a legacy config.toml was reverted by hand", async () => {
+  it("restores every env file but leaves Docker cleanup to the user when a legacy config.toml was reverted by hand", async () => {
     const fake = createFakeIo();
     seedLegacyActiveBackup(fake);
     fake.files.set(CONFIG_PATH, ORIGINAL_CONFIG);
@@ -273,6 +273,7 @@ describe("SupabaseLocalEnvironment.restore (switches made by an older ava)", () 
       "supabase stop --project-id analytics-p2-temp --no-backup",
     );
     expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
+    expect(fake.files.get(EDGE_ENV_PATH)).toBe(ORIGINAL_EDGE_ENV);
     expect(fake.removedResources).toEqual([]);
     await expect(fake.io.pathExists(makeBackupDirectory())).resolves.toBe(
       false,

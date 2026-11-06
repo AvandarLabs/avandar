@@ -57,5 +57,9 @@ async function _read(
  * option acts on another branch's database without changing directory.
  */
 export const SupabaseBranchTarget = {
+  /**
+   * The current worktree when `branch` is undefined, otherwise the one that
+   * has `branch` checked out, or why there is none.
+   */
   read: _read,
 };

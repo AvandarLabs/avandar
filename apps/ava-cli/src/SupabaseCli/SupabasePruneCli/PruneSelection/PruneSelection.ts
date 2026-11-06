@@ -1,6 +1,6 @@
 import { PruneCandidateText } from "@ava-cli/SupabaseCli/SupabasePruneCli/PruneCandidateText/PruneCandidateText";
 import { TerminalMenu } from "@ava-cli/utils/TerminalMenu/TerminalMenu";
-import { propEq } from "@avandar/utils";
+import { propEq, valNotEq } from "@avandar/utils";
 import type { PruneCandidate } from "@ava-cli/SupabaseCli/SupabasePruneCli/SupabasePrunePlan/SupabasePrunePlan";
 
 /** The `ava supabase prune` flags that decide what gets deleted. */
@@ -25,9 +25,7 @@ function _selectFromKeepIds(
     keepText: string;
   }>,
 ): PruneSelectionResult {
-  const keepIds = options.keepText.split(/[\s,]+/).filter((keepId) => {
-    return keepId !== "";
-  });
+  const keepIds = options.keepText.split(/[\s,]+/).filter(valNotEq(""));
   const unknownIds = keepIds.filter((keepId) => {
     return !options.candidates.some(propEq("project.projectId", keepId));
   });
@@ -105,6 +103,8 @@ async function _select(
  * `--all`, all but the named ones for `--keep`, or what the user leaves
  * selected in the terminal menu. A candidate known only by its name is never
  * chosen without `--include-unverified` or a pick by hand.
+ *
+ * Used by `SupabasePruneCli`.
  */
 export const PruneSelection = {
   /** The candidates to delete, or why there are none. */

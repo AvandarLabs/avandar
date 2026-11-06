@@ -65,7 +65,14 @@ type ProjectClassification =
   | { kind: "ignored" };
 
 /** Branch prefixes a branch-derived project id starts with. */
-const GITFLOW_PREFIXES = ["feat", "fix", "refactor", "chore", "docs", "test"];
+const GITFLOW_PREFIXES = [
+  "feat",
+  "fix",
+  "refactor",
+  "chore",
+  "docs",
+  "test",
+] as const;
 
 function _getProjectIdFromBranch(branch: string): string | undefined {
   try {
@@ -260,6 +267,8 @@ function _fromDockerProjects(
  * `ava supabase prune` offers only `candidates` for deletion. The shared
  * develop project, any project a current worktree points at, and any project
  * named after a branch that still exists are never offered.
+ *
+ * Used by `PrunePlanReader`.
  */
 export const SupabasePrunePlan = {
   /** The plan for the Docker projects and worktrees in `sources`. */

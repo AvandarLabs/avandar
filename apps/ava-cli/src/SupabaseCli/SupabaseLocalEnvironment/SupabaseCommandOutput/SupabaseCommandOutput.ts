@@ -63,7 +63,7 @@ export const SupabaseCommandOutput = {
    * printing them: a secret key keeps only its start, and a Postgres URL
    * loses its password.
    */
-  maskEnvValue: (
+  makeMaskedValueFromEnvValue: (
     options: Readonly<{ envKey: string; value: string }>,
   ): string => {
     const { envKey, value } = options;

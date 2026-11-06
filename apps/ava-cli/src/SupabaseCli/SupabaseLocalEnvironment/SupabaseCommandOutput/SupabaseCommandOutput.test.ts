@@ -49,10 +49,10 @@ describe("SupabaseCommandOutput.redactSecretsFromLine", () => {
   });
 });
 
-describe("SupabaseCommandOutput.maskEnvValue", () => {
+describe("SupabaseCommandOutput.makeMaskedValueFromEnvValue", () => {
   it("shows only the start of a secret key", () => {
     expect(
-      SupabaseCommandOutput.maskEnvValue({
+      SupabaseCommandOutput.makeMaskedValueFromEnvValue({
         envKey: "SB_SECRET_KEY",
         value: "sb_secret_remote_0123456789",
       }),
@@ -61,7 +61,7 @@ describe("SupabaseCommandOutput.maskEnvValue", () => {
 
   it("hides the password in a Postgres connection string", () => {
     expect(
-      SupabaseCommandOutput.maskEnvValue({
+      SupabaseCommandOutput.makeMaskedValueFromEnvValue({
         envKey: "SUPABASE_POSTGRES_URL",
         value: "postgresql://postgres.abc:hunter2@db.example.com:5432/postgres",
       }),
@@ -70,7 +70,7 @@ describe("SupabaseCommandOutput.maskEnvValue", () => {
 
   it("leaves a value that is not a credential as it is", () => {
     expect(
-      SupabaseCommandOutput.maskEnvValue({
+      SupabaseCommandOutput.makeMaskedValueFromEnvValue({
         envKey: "VITE_SUPABASE_API_URL",
         value: "https://abc.supabase.co",
       }),

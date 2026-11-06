@@ -248,7 +248,10 @@ export type SupabaseSwitchSummary = {
   config: SupabaseConfigState;
 };
 
-/** Identity, ports, and endpoints of the local Supabase this worktree uses. */
+/**
+ * Identity, ports, and endpoints of the Supabase this worktree uses: the
+ * shared stack, its own local project, or a hosted project.
+ */
 export type SupabaseStatusReport = Omit<SupabaseSwitchSummary, "config"> & {
   isSwitched: boolean;
   isRunning: boolean;

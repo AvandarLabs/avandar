@@ -94,6 +94,9 @@ function _getSupabaseOverrideFromEnv(
  * `ava supabase switch` moves a worktree onto its own project through
  * `SUPABASE_PROJECT_ID` and `SUPABASE_DB_PORT` in `.env.development`, so those
  * win over `supabase/config.toml`, which always holds the shared defaults.
+ *
+ * Use it to reach the database this worktree targets, for example to run
+ * `psql` inside its container from a db script.
  */
 export function getLocalDatabaseConfigFromRepoRoot(repoRoot: string): {
   projectId: string;

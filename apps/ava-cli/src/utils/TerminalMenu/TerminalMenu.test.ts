@@ -149,10 +149,10 @@ describe("TerminalMenu.applyInput", () => {
   });
 });
 
-describe("TerminalMenu.makeLines", () => {
+describe("TerminalMenu.makeLinesFromState", () => {
   it("marks the cursor with a pointer and checked items with a box", () => {
     expect(
-      TerminalMenu.makeLines({
+      TerminalMenu.makeLinesFromState({
         state: { cursorIndex: 1, selectedIndexes: [0] },
         labels: ["feat-a", "feat-b"],
         isMultiSelect: true,
@@ -163,7 +163,7 @@ describe("TerminalMenu.makeLines", () => {
 
   it("cuts a line to the terminal width so a redraw never wraps", () => {
     expect(
-      TerminalMenu.makeLines({
+      TerminalMenu.makeLinesFromState({
         state: { cursorIndex: 0, selectedIndexes: [0] },
         labels: ["feat-a  (worktree ~/src/worktrees/avandar/feat/a is gone)"],
         isMultiSelect: true,
@@ -175,7 +175,7 @@ describe("TerminalMenu.makeLines", () => {
 
   it("drops the boxes in a single-choice menu", () => {
     expect(
-      TerminalMenu.makeLines({
+      TerminalMenu.makeLinesFromState({
         state: { cursorIndex: 0, selectedIndexes: [] },
         labels: ["Yes", "No"],
         isMultiSelect: false,

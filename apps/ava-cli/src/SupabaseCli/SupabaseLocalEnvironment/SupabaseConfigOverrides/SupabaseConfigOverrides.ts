@@ -3,7 +3,12 @@ import {
   MAX_TCP_PORT,
   MIN_TCP_PORT,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
-import { isDefined, objectEntries, objectValuesMap } from "@avandar/utils";
+import {
+  isDefined,
+  makeMap,
+  objectEntries,
+  objectValuesMap,
+} from "@avandar/utils";
 import type { SupabaseConfigState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 /** One `KEY=value` line the managed block writes, as a key and its value. */
@@ -50,14 +55,16 @@ function _isOverrideKey(envKey: string): boolean {
 
 /** Reads every `KEY=value` assignment, unquoted, the last one winning. */
 function _getEnvValuesFromContents(envContents: string): Map<string, string> {
-  return new Map(
-    envContents
-      .split("\n")
-      .map(EnvFileLine.getAssignment)
-      .filter(isDefined)
-      .map(({ key, value }) => {
-        return [key.trim(), EnvFileLine.getUnquotedValue(value)] as const;
-      }),
+  return makeMap(
+    envContents.split("\n").map(EnvFileLine.getAssignment).filter(isDefined),
+    {
+      keyFn: (assignment) => {
+        return assignment.key.trim();
+      },
+      valueFn: (assignment) => {
+        return EnvFileLine.getUnquotedValue(assignment.value);
+      },
+    },
   );
 }
 

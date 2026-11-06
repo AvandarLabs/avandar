@@ -1,4 +1,5 @@
 import { CliTheme } from "@ava-cli/utils/CliTheme/CliTheme";
+import { objectValues } from "@avandar/utils";
 import type {
   AnyCLI,
   CLIOptionParam,
@@ -34,14 +35,7 @@ export type CommandHelpSpec = {
 /** What `CommandHelp.handleArgv` did, which decides the exit status. */
 export type CommandHelpOutcome = "printedHelp" | "refusedFlag" | "continue";
 
-const HELP_FLAGS = ["--help", "-h"];
-
-function _getLeadingWords(argv: readonly string[]): string[] {
-  const firstFlagIndex = argv.findIndex((token) => {
-    return token.startsWith("-");
-  });
-  return firstFlagIndex === -1 ? [...argv] : argv.slice(0, firstFlagIndex);
-}
+const HELP_FLAGS = ["--help", "-h"] as const;
 
 function _findSpecFromArgv(
   options: Readonly<{
@@ -49,7 +43,13 @@ function _findSpecFromArgv(
     specs: readonly CommandHelpSpec[];
   }>,
 ): CommandHelpSpec | undefined {
-  const leadingWords = _getLeadingWords(options.argv);
+  const firstFlagIndex = options.argv.findIndex((token) => {
+    return token.startsWith("-");
+  });
+  const leadingWords =
+    firstFlagIndex === -1
+      ? [...options.argv]
+      : options.argv.slice(0, firstFlagIndex);
   return options.specs
     .filter(({ commandPath }) => {
       return commandPath.every((word, index) => {
@@ -61,14 +61,10 @@ function _findSpecFromArgv(
     })[0];
 }
 
-function _getOptionParams(
-  optionArgs: Readonly<Record<string, CLIOptionParam>>,
-): CLIOptionParam[] {
-  return Object.values(optionArgs);
-}
-
-function _getFlagsFromOptions(options: readonly CLIOptionParam[]): string[] {
-  return options.flatMap(({ name, aliases }) => {
+function _getFlagsFromOptions(
+  optionParams: readonly CLIOptionParam[],
+): string[] {
+  return optionParams.flatMap(({ name, aliases }) => {
     return [name, ...(aliases ?? [])];
   });
 }
@@ -81,11 +77,9 @@ function _findUnknownFlags(
   }>,
 ): string[] {
   const knownFlags = new Set([
+    ..._getFlagsFromOptions(objectValues(options.spec.cli.state.optionArgs)),
     ..._getFlagsFromOptions(
-      _getOptionParams(options.spec.cli.state.optionArgs),
-    ),
-    ..._getFlagsFromOptions(
-      _getOptionParams(options.rootCli.state.globalOptionArgs),
+      objectValues(options.rootCli.state.globalOptionArgs),
     ),
     ...HELP_FLAGS,
   ]);
@@ -122,35 +116,6 @@ function _makeArgumentEntries(
   });
 }
 
-function _makeSectionLines(
-  options: Readonly<{
-    title: string;
-    entries: readonly CommandHelpEntry[];
-    isColorEnabled: boolean;
-  }>,
-): string[] {
-  const { title, entries, isColorEnabled } = options;
-  const labelWidth = Math.max(
-    ...entries.map(({ label }) => {
-      return label.length;
-    }),
-  );
-  return entries.length === 0
-    ? []
-    : [
-        "",
-        CliTheme.paint({ style: "heading", text: title, isColorEnabled }),
-        ...entries.map(({ label, description }) => {
-          const paddedLabel = CliTheme.paint({
-            style: "value",
-            text: label.padEnd(labelWidth),
-            isColorEnabled,
-          });
-          return `  ${paddedLabel}  ${description}`;
-        }),
-      ];
-}
-
 /** Every titled section of a help screen, in the order they print. */
 function _makeHelpSections(
   options: Readonly<{ spec: Readonly<CommandHelpSpec>; rootCli: AnyCLI }>,
@@ -158,7 +123,7 @@ function _makeHelpSections(
   const { spec } = options;
   const labels = spec.labels ?? {};
   const commandOptions = _makeOptionEntries({
-    params: _getOptionParams(spec.cli.state.optionArgs),
+    params: objectValues(spec.cli.state.optionArgs),
     labels,
   });
   return [
@@ -182,7 +147,7 @@ function _makeHelpSections(
     {
       title: "Global options",
       entries: _makeOptionEntries({
-        params: _getOptionParams(options.rootCli.state.globalOptionArgs),
+        params: objectValues(options.rootCli.state.globalOptionArgs),
         labels,
       }),
     },
@@ -210,8 +175,15 @@ function _makeHelpLines(
     ...spec.usage.map((line) => {
       return `  ${line}`;
     }),
-    ..._makeHelpSections(options).flatMap((section) => {
-      return _makeSectionLines({ ...section, isColorEnabled });
+    ..._makeHelpSections(options).flatMap(({ title, entries }) => {
+      return CliTheme.makeSectionLines({
+        title,
+        entries: entries.map(({ label, description }) => {
+          return { label, text: description };
+        }),
+        labelStyle: "value",
+        isColorEnabled,
+      });
     }),
   ];
 }

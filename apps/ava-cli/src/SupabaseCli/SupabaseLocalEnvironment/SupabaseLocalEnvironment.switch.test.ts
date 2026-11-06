@@ -182,7 +182,12 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
     expect(fake.copyOperations.map(prop("0")).sort()).toEqual(
       [EDGE_ENV_PATH, ENV_PATH].sort(),
     );
-    const firstEnvWriteIndex = fake.operations.indexOf(`write:${ENV_PATH}`);
+    const envWriteOperations = [ENV_PATH, EDGE_ENV_PATH].map((envPath) => {
+      return `write:${envPath}`;
+    });
+    const firstEnvWriteIndex = fake.operations.findIndex((operation) => {
+      return envWriteOperations.includes(operation);
+    });
     const lastCopyIndex = Math.max(
       ...fake.operations
         .map((operation, index) => {

@@ -6,6 +6,7 @@ import type {
 
 /** Config, status, manifest, and env inputs shared by the status suites. */
 
+/** `supabase/config.toml` with the shared `avandar` project id and ports. */
 export const STANDARD_CONFIG = `project_id = "avandar"
 
 [api]
@@ -21,11 +22,13 @@ port = 54323
 port = 51634
 `;
 
+/** The same config after a switch to `analytics-p2-temp` on port 55321. */
 export const SWITCHED_CONFIG = STANDARD_CONFIG.replace(
   '"avandar"',
   '"analytics-p2-temp"',
 ).replace("port = 54321", "port = 55321");
 
+/** `supabase status -o json` output for the switched project. */
 export const STATUS_JSON = JSON.stringify({
   API_URL: "http://127.0.0.1:55321",
   DB_URL: "postgresql://postgres:postgres@127.0.0.1:55322/postgres",
@@ -41,6 +44,7 @@ export const STATUS_JSON = JSON.stringify({
   JWT_SECRET: "super-secret",
 });
 
+/** An active local-switch manifest for `feat/analytics-p2`. */
 export const MANIFEST: SupabaseBackupManifest = {
   kind: "local",
   branch: "feat/analytics-p2",
@@ -54,6 +58,10 @@ export const MANIFEST: SupabaseBackupManifest = {
   state: "active",
 };
 
+/**
+ * The value of the entry with this label in a status report section, so a
+ * suite can assert one port, key, or endpoint at a time.
+ */
 export function getValueFromEntries(
   options: Readonly<{
     entries: readonly SupabaseStatusEntry[];
@@ -63,6 +71,7 @@ export function getValueFromEntries(
   return options.entries.find(propEq("label", options.label))?.value;
 }
 
+/** An active remote-switch manifest for `feat/analytics-p2`. */
 export const REMOTE_MANIFEST: SupabaseBackupManifest = {
   kind: "remote",
   branch: "feat/analytics-p2",

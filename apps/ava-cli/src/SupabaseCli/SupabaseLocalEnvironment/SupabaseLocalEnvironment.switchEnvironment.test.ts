@@ -101,7 +101,7 @@ describe("SupabaseLocalEnvironment.switch (environment rewriting)", () => {
 });
 
 describe("SupabaseLocalEnvironment.switch (project overrides)", () => {
-  it("points the Supabase CLI at the new project from .env.development", async () => {
+  it("writes the new project id and ports into .env.development", async () => {
     const fake = createFakeIo();
     await SupabaseLocalEnvironment.switch({
       io: fake.io,

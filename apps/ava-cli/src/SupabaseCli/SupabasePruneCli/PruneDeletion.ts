@@ -76,6 +76,8 @@ async function _deleteUnusedImages(
 /**
  * Deletes what `ava supabase prune` selected: each project's containers,
  * networks, and volumes, and optionally the images no container still needs.
+ *
+ * Used by `SupabasePruneCli`.
  */
 export const PruneDeletion = {
   /**

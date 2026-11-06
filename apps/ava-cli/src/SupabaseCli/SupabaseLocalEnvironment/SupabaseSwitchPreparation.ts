@@ -161,13 +161,16 @@ async function _createSwitchBackup<Target extends SupabaseSwitchTarget>(
   });
 }
 
+/** The config to move and the ports a new switch must avoid. */
+type SelectSwitchPortsOptions = {
+  io: SupabaseLocalEnvironmentIo;
+  source: SupabaseConfigState;
+  requestedBasePort?: number;
+  occupiedHostPorts: readonly number[];
+};
+
 async function _selectSwitchPorts(
-  options: Readonly<{
-    io: SupabaseLocalEnvironmentIo;
-    source: SupabaseConfigState;
-    requestedBasePort?: number;
-    occupiedHostPorts: readonly number[];
-  }>,
+  options: Readonly<SelectSwitchPortsOptions>,
 ): Promise<{ basePort: number; derivedPorts: Record<string, number> }> {
   const basePort = await SupabasePorts.getAvailableBasePortFromPorts({
     currentApiPort: options.source.apiPort,

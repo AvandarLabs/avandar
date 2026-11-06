@@ -150,6 +150,7 @@ describe("SupabaseRemoteSwitch.switchRemote", () => {
       }),
     ).rejects.toThrow(`Cannot write ${EDGE_ENV_PATH}`);
     expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
+    expect(fake.files.get(EDGE_ENV_PATH)).toBe(ORIGINAL_EDGE_ENV);
     await expect(fake.io.pathExists(makeBackupDirectory())).resolves.toBe(
       false,
     );

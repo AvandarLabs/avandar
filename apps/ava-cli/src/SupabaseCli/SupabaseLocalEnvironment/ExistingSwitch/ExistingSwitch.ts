@@ -7,6 +7,7 @@ import type {
   SupabaseBackupManifest,
   SupabaseLocalEnvironmentIo,
   SupabaseSwitchResult,
+  SupabaseSwitchTarget,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 function _requireCommandSuccess(
@@ -43,11 +44,7 @@ async function _readExistingManifest(
   }
 }
 
-/**
- * Starts this branch's existing isolated Supabase project without creating a
- * second switch.
- */
-export async function startExistingSwitch(
+async function _start(
   io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<SupabaseSwitchResult> {
   const existing = await _readExistingManifest(io);
@@ -78,13 +75,11 @@ export async function startExistingSwitch(
   };
 }
 
-/**
- * Returns the project this branch's existing switch points at, local or
- * hosted, if a switch left a backup behind.
- */
-export async function readExistingSwitchProject(
+async function _readProject(
   io: Readonly<SupabaseLocalEnvironmentIo>,
-): Promise<{ kind: "local" | "remote"; projectId: string } | undefined> {
+): Promise<
+  { kind: SupabaseSwitchTarget["kind"]; projectId: string } | undefined
+> {
   const existing = await _readExistingManifest(io);
   return existing === undefined
     ? undefined
@@ -95,3 +90,23 @@ export async function readExistingSwitchProject(
         ),
       };
 }
+
+/**
+ * Reads and restarts the switch a branch already has, so a second
+ * `ava supabase switch` reuses it instead of creating another one.
+ *
+ * Used by `runSupabaseSwitch`.
+ */
+export const ExistingSwitch = {
+  /**
+   * Starts this branch's existing isolated Supabase project without creating
+   * a second switch.
+   */
+  start: _start,
+
+  /**
+   * Returns the project this branch's existing switch points at, local or
+   * hosted, if a switch left a backup behind.
+   */
+  readProject: _readProject,
+};

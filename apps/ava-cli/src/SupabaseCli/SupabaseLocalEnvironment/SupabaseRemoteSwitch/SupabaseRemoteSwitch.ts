@@ -82,13 +82,16 @@ async function _rewriteEnvFiles(
   });
 }
 
+/** A remote switch that failed part way, and the backup to undo it from. */
+type RollBackRemoteSwitchOptions = {
+  io: SupabaseLocalEnvironmentIo;
+  backupDirectory: string;
+  manifest: SupabaseBackupManifest;
+  switchError: unknown;
+};
+
 async function _rollBackRemoteSwitch(
-  options: Readonly<{
-    io: SupabaseLocalEnvironmentIo;
-    backupDirectory: string;
-    manifest: SupabaseBackupManifest;
-    switchError: unknown;
-  }>,
+  options: Readonly<RollBackRemoteSwitchOptions>,
 ): Promise<never> {
   const { io, backupDirectory, manifest, switchError } = options;
   try {

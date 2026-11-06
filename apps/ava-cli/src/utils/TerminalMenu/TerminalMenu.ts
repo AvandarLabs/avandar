@@ -12,6 +12,15 @@ export type MenuKey =
   | "confirm"
   | "cancel";
 
+/** A key that moves the cursor. */
+type MoveKey = Extract<MenuKey, "up" | "down" | "first" | "last">;
+
+/** A key that checks or unchecks items. */
+type ToggleKey = Extract<MenuKey, "toggle" | "toggleAll">;
+
+/** A key that ends the menu. */
+type EndKey = Extract<MenuKey, "confirm" | "cancel">;
+
 /** Where the cursor is and which items are checked. */
 export type MenuState = {
   cursorIndex: number;
@@ -21,7 +30,7 @@ export type MenuState = {
 /** A menu state after some input, and whether that input ended the menu. */
 export type MenuStep = {
   state: MenuState;
-  outcome: "confirm" | "cancel" | undefined;
+  outcome: EndKey | undefined;
 };
 
 /** How a menu session ended. */
@@ -35,6 +44,32 @@ type MenuContent = {
   hint: string;
   labels: readonly string[];
   isMultiSelect: boolean;
+};
+
+/** The inputs `_reduceKey` needs to apply one key press. */
+type ReduceKeyOptions = {
+  state: Readonly<MenuState>;
+  key: MenuKey;
+  numItems: number;
+  isMultiSelect: boolean;
+};
+
+/** The inputs `_applyInput` needs to apply one raw stdin chunk. */
+type ApplyInputOptions = {
+  input: string;
+  state: Readonly<MenuState>;
+  numItems: number;
+  isMultiSelect: boolean;
+};
+
+/** The inputs `_makeLines` needs to render the item lines. */
+type MakeLinesOptions = {
+  state: Readonly<MenuState>;
+  labels: readonly string[];
+  isMultiSelect: boolean;
+  isColorEnabled: boolean;
+  /** Widest a line may be, so a redraw never wraps onto an extra row. */
+  maxWidth?: number;
 };
 
 const KEY_FROM_INPUT: Record<string, MenuKey> = {
@@ -61,30 +96,34 @@ function _getKeyFromInput(input: string): MenuKey | undefined {
 /** The checked items after a toggle key, or unchanged for any other key. */
 function _getSelectionAfterKey(
   options: Readonly<{
-    key: "toggle" | "toggleAll";
+    key: ToggleKey;
     state: Readonly<MenuState>;
     numItems: number;
   }>,
 ): number[] {
   const { state, numItems } = options;
-  if (options.key === "toggleAll") {
-    return state.selectedIndexes.length === numItems
-      ? []
-      : makeArrayWithLength(numItems);
-  }
-  return state.selectedIndexes.includes(state.cursorIndex)
-    ? state.selectedIndexes.filter((selectedIndex) => {
-        return selectedIndex !== state.cursorIndex;
-      })
-    : [...state.selectedIndexes, state.cursorIndex].sort((left, right) => {
-        return left - right;
-      });
+  return matchLiteral(options.key, {
+    toggleAll: () => {
+      return state.selectedIndexes.length === numItems
+        ? []
+        : makeArrayWithLength(numItems);
+    },
+    toggle: () => {
+      return state.selectedIndexes.includes(state.cursorIndex)
+        ? state.selectedIndexes.filter((selectedIndex) => {
+            return selectedIndex !== state.cursorIndex;
+          })
+        : [...state.selectedIndexes, state.cursorIndex].sort((left, right) => {
+            return left - right;
+          });
+    },
+  });
 }
 
 /** Where the cursor lands after a movement key, wrapping at both ends. */
 function _getCursorIndexAfterKey(
   options: Readonly<{
-    key: "up" | "down" | "first" | "last";
+    key: MoveKey;
     cursorIndex: number;
     numItems: number;
   }>,
@@ -99,16 +138,9 @@ function _getCursorIndexAfterKey(
   });
 }
 
-function _reduceKey(
-  options: Readonly<{
-    state: Readonly<MenuState>;
-    key: MenuKey;
-    numItems: number;
-    isMultiSelect: boolean;
-  }>,
-): MenuStep {
+function _reduceKey(options: Readonly<ReduceKeyOptions>): MenuStep {
   const { state, numItems, isMultiSelect } = options;
-  const move = (key: "up" | "down" | "first" | "last"): MenuStep => {
+  const move = (key: MoveKey): MenuStep => {
     const cursorIndex = _getCursorIndexAfterKey({
       key,
       cursorIndex: state.cursorIndex,
@@ -116,13 +148,13 @@ function _reduceKey(
     });
     return { state: { ...state, cursorIndex }, outcome: undefined };
   };
-  const toggle = (key: "toggle" | "toggleAll"): MenuStep => {
+  const toggle = (key: ToggleKey): MenuStep => {
     const selectedIndexes = isMultiSelect
       ? _getSelectionAfterKey({ key, state, numItems })
       : state.selectedIndexes;
     return { state: { ...state, selectedIndexes }, outcome: undefined };
   };
-  const end = (outcome: "confirm" | "cancel"): MenuStep => {
+  const end = (outcome: EndKey): MenuStep => {
     return { state: { ...state }, outcome };
   };
   return matchLiteral(options.key, {
@@ -137,14 +169,7 @@ function _reduceKey(
   });
 }
 
-function _applyInput(
-  options: Readonly<{
-    input: string;
-    state: Readonly<MenuState>;
-    numItems: number;
-    isMultiSelect: boolean;
-  }>,
-): MenuStep {
+function _applyInput(options: Readonly<ApplyInputOptions>): MenuStep {
   const { input, numItems, isMultiSelect } = options;
   // An escape sequence arrives as one chunk, but fast typing can batch plain
   // keys together, so a chunk that is not itself a key is read per character.
@@ -170,16 +195,7 @@ function _truncate(
     : `${[...text].slice(0, Math.max(maxWidth - 1, 0)).join("")}…`;
 }
 
-function _makeLines(
-  options: Readonly<{
-    state: Readonly<MenuState>;
-    labels: readonly string[];
-    isMultiSelect: boolean;
-    isColorEnabled: boolean;
-    /** Widest a line may be, so a redraw never wraps onto an extra row. */
-    maxWidth?: number;
-  }>,
-): string[] {
+function _makeLines(options: Readonly<MakeLinesOptions>): string[] {
   const { state, labels, isMultiSelect, isColorEnabled, maxWidth } = options;
   return labels.map((label, index) => {
     const isCurrent = index === state.cursorIndex;
@@ -313,7 +329,7 @@ export const TerminalMenu = {
   applyInput: _applyInput,
 
   /** Renders the item lines for a menu state. */
-  makeLines: _makeLines,
+  makeLinesFromState: _makeLines,
 
   /**
    * Draws the menu on stderr and resolves once the user confirms or

@@ -51,6 +51,8 @@ function _fromCandidate(candidate: Readonly<PruneCandidate>): string {
  * The plain-text descriptions `ava supabase prune` prints for its candidates:
  * one line per project in the menu and in `--dry-run`, plus the resource
  * counts in each deletion's progress line.
+ *
+ * Used by `SupabasePruneCli`, `PruneSelection`, and `PruneDeletion`.
  */
 export const PruneCandidateText = {
   /** A count with its noun, pluralised unless there is exactly one. */

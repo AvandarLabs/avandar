@@ -35,24 +35,18 @@ function _makeAdvice(
 function _printSection(
   options: Readonly<{ title: string; entries: readonly SupabaseStatusEntry[] }>,
 ): void {
-  const { title, entries } = options;
-  if (entries.length === 0) {
-    return;
-  }
-  const labelWidth = Math.max(
-    ...entries.map(({ label }) => {
-      return label.length;
+  CliTheme.makeSectionLines({
+    title: options.title,
+    entries: options.entries.map(({ label, value }) => {
+      return { label, text: value };
     }),
-  );
-  _print({ text: "" });
-  _print({ style: "heading", text: title });
-  entries.forEach(({ label, value }) => {
-    const paddedLabel = CliTheme.paintFor({
+    labelStyle: "accent",
+    isColorEnabled: CliTheme.isColorEnabled({
       stream: process.stdout,
-      style: "accent",
-      text: `  ${label.padEnd(labelWidth)}`,
-    });
-    _print({ text: `${paddedLabel}  ${value}` });
+      env: process.env,
+    }),
+  }).forEach((line) => {
+    _print({ text: line });
   });
 }
 

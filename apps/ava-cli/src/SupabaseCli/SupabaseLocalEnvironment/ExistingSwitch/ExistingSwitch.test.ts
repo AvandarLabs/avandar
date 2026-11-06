@@ -1,7 +1,7 @@
 /**
  * Starts this branch's existing switch without creating a second project.
  */
-import { startExistingSwitch } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/startExistingSwitch/startExistingSwitch";
+import { ExistingSwitch } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/ExistingSwitch/ExistingSwitch";
 import { SupabaseLocalEnvironmentFakeIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { describe, expect, it } from "vitest";
@@ -9,13 +9,13 @@ import { describe, expect, it } from "vitest";
 const { create: createFakeIo } = SupabaseLocalEnvironmentFakeIo;
 const { seedActiveBackup } = SupabaseLocalEnvironmentFixtures;
 
-describe("startExistingSwitch", () => {
+describe("ExistingSwitch.start", () => {
   it("starts the existing project without creating a new backup", async () => {
     const fake = createFakeIo();
     seedActiveBackup(fake);
     const copyCountBefore = fake.copyOperations.length;
 
-    await expect(startExistingSwitch(fake.io)).resolves.toEqual({
+    await expect(ExistingSwitch.start(fake.io)).resolves.toEqual({
       basePort: 55321,
       devServerPort: 5173,
       projectId: "analytics-p2-temp",
@@ -29,7 +29,7 @@ describe("startExistingSwitch", () => {
 
   it("refuses when this branch has no switch", async () => {
     const fake = createFakeIo();
-    await expect(startExistingSwitch(fake.io)).rejects.toThrow(
+    await expect(ExistingSwitch.start(fake.io)).rejects.toThrow(
       "has no active Supabase switch",
     );
     expect(fake.commands).toEqual([]);

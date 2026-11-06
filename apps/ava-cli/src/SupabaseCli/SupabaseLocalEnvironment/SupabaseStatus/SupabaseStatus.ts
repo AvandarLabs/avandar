@@ -131,7 +131,7 @@ function _makeRemoteEnvironmentValues(
       : [
           {
             label: envKey,
-            value: SupabaseCommandOutput.maskEnvValue({
+            value: SupabaseCommandOutput.makeMaskedValueFromEnvValue({
               envKey,
               value: EnvFileLine.getUnquotedValue(assignment.value),
             }),
