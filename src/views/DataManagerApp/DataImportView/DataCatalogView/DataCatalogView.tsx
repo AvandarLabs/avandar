@@ -36,11 +36,11 @@ import { DataCatalogListingList } from "@/views/DataManagerApp/DataImportView/Da
 import { DataCatalogResultsHeader } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
 import { readCatalogColumnsForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/readCatalogColumnsForAdding/readCatalogColumnsForAdding";
+import { useDisplayedCatalogListings } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDisplayedCatalogListings";
 import {
   useColumnTypeVerificationStatus,
   useVerifyColumnTypesOnDwell,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useVerifyColumnTypesOnDwell/useVerifyColumnTypesOnDwell";
-import { useDisplayedCatalogListings } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDisplayedCatalogListings";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";

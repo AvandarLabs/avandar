@@ -358,7 +358,7 @@ msgstr "Swali"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Hide datasets that can't be loaded"
-msgstr ""
+msgstr "Ficha seti za data ambazo haziwezi kupakiwa"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Join key"
@@ -630,7 +630,7 @@ msgstr "Orodha"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Sort datasets by"
-msgstr ""
+msgstr "Panga seti za data kwa"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
@@ -844,7 +844,7 @@ msgstr "Jina la safu"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
-msgstr ""
+msgstr "Inayolingana zaidi"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick a sheet"
@@ -899,7 +899,7 @@ msgstr "Ficha tarehe ya kuchapishwa"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Updated over a year ago"
-msgstr ""
+msgstr "Ilisasishwa zaidi ya mwaka mmoja uliopita"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
 msgid "Pick both a latitude and a longitude column. One on its own plots every "
@@ -959,12 +959,6 @@ msgstr " rekodi"
 #: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
 msgstr "Kitu kingine…"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "The catalog is still in <0/> and grows as people tell us what they need. "
-#~ "Missing a dataset? <1>tell us</1>."
-#~ msgstr "Katalogi bado iko katika <0/> na hukua kadiri watu wanavyotuambia "
-#~ "wanachohitaji. Hukupati seti ya data? <1>tuambie</1>."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
@@ -1029,7 +1023,7 @@ msgstr "Thamani ya tiki ya kwanza"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Covers"
-msgstr ""
+msgstr "Inahusu"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
@@ -1332,10 +1326,6 @@ msgstr "Endesha swali kwanza."
 msgid "Seat limit reached"
 msgstr "Kikomo cha viti kimefikiwa"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Pipeline"
-#~ msgstr "Pipeline"
-
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
 msgstr "Imeshindikana kuacha kuchapisha dashibodi"
@@ -1359,7 +1349,7 @@ msgstr "Seti hizi za data zimeorodheshwa kwenye eneo lako la kazi, lakini data "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
 msgid "Show fewer"
-msgstr ""
+msgstr "Onyesha chache"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
@@ -1381,7 +1371,7 @@ msgstr "Andika swali, nami nitaunda SQL na kuiendesha kwa ajili yako."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Search datasets"
-msgstr ""
+msgstr "Tafuta seti za data"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
@@ -1436,7 +1426,7 @@ msgstr "Pikseli za maelezo za kuondoa katika ukuzaji wa sasa. Weka sifuri ili "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Any time"
-msgstr ""
+msgstr "Wakati wowote"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Regular expression"
@@ -1469,7 +1459,8 @@ msgstr "Dashibodi yako imechapishwa kwenye:"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "The catalog is in <0/> and grows from what people ask for. Missing a "
 "dataset? <1>Request one</1>"
-msgstr ""
+msgstr "Katalogi iko katika <0/> na hukua kutokana na mahitaji ya watu. "
+"Hukupata seti ya data? <1>Omba moja</1>"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
@@ -1493,7 +1484,7 @@ msgstr "Pengo la wima"
 #. placeholder {0}: activeFilters.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Filters ({0})"
-msgstr ""
+msgstr "Vichujio ({0})"
 
 #. placeholder {0}: aggregateLayer.name
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
@@ -2663,7 +2654,7 @@ msgstr "Hali mbili zina jina sawa. Zipe kila moja jina lake."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Last updated"
-msgstr ""
+msgstr "Ilisasishwa mara ya mwisho"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -2749,10 +2740,6 @@ msgstr "Ruhusu {pluralConceptName} mpya kuundwa kwa mikono"
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Welcome to Avandar"
 msgstr "Karibu Avandar"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Tell us which open dataset you want via feedback"
-#~ msgstr "Tuambie ni dataset gani ya wazi unayotaka kupitia maoni"
 
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
@@ -2915,7 +2902,7 @@ msgstr "Kawaida"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Filters"
-msgstr ""
+msgstr "Vichujio"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Annotate, then export"
@@ -2931,12 +2918,6 @@ msgstr "{0}, {1}, na {2} zimewekwa kwa kila eneo la kazi."
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Synced to the cloud"
 msgstr "Imesawazishwa kwenye wingu"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
-#~ "how often it updates."
-#~ msgstr "Chagua seti ya data upande wa kushoto ili kusoma inahusu nini, nani "
-#~ "anachapisha, na inasasishwa mara ngapi."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
@@ -3306,10 +3287,6 @@ msgstr "Kwa sasa uko kwenye mpango wa <0>{currentFeaturePlanName}</0>."
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Result size"
 msgstr "Ukubwa wa matokeo"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Search open data catalog"
-#~ msgstr "Tafuta katalogi ya data wazi"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
@@ -3716,10 +3693,6 @@ msgstr "Thibitisha Kitendo"
 msgid "No dashboards to show"
 msgstr "Hakuna dashibodi za kuonyesha"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-#~ msgid "A type of record you manage"
-#~ msgstr "Aina ya rekodi unayodhibiti"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
 msgstr "Mistari kutoka kwenye maeneo haya {regionCount}"
@@ -4115,7 +4088,7 @@ msgstr "Makundi ya jukumu la kawaida"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Updated in the past month"
-msgstr ""
+msgstr "Ilisasishwa katika mwezi uliopita"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterListInput.tsx
 msgid "Add a value"
@@ -4445,10 +4418,6 @@ msgstr "Maeneo kamili"
 msgid "New chat"
 msgstr "Mazungumzo mapya"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Search by name, organization, pipeline…"
-#~ msgstr "Tafuta kwa jina, shirika, bomba…"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Data"
@@ -4479,7 +4448,7 @@ msgstr "Maelezo ya seti ya data"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Updated in the past year"
-msgstr ""
+msgstr "Ilisasishwa katika mwaka uliopita"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
 msgid "1 filter"
@@ -4607,7 +4576,7 @@ msgstr "Nakala ya {0}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Original"
-msgstr ""
+msgstr "Asili"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "One row per number"
@@ -4696,7 +4665,8 @@ msgstr "Kuza hadi kwenye kundi"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "No datasets match your search and filters. Try fewer filters or "
 "different words."
-msgstr ""
+msgstr "Hakuna seti za data zinazolingana na utafutaji na vichujio vyako. "
+"Jaribu kutumia vichujio vichache au maneno tofauti."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is true"
@@ -4897,7 +4867,7 @@ msgstr "Safu ya Y"
 #. placeholder {0}: facets.numUnloadable
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "{0} hidden"
-msgstr ""
+msgstr "{0} zimefichwa"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Go home"
@@ -5107,11 +5077,6 @@ msgstr "Viti vimenunuliwa kwa mafanikio"
 msgid "Open chat (⌘/)"
 msgstr "Fungua mazungumzo (⌘/)"
 
-#. placeholder {0}: displayedListings.length
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Catalog ({0})"
-#~ msgstr "Katalogi ({0})"
-
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "Tuma"
@@ -5148,7 +5113,7 @@ msgstr "Modeli ya instruct ya 7B yenye ubora wa juu. Inafaa zaidi kwa miundo ya 
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{numResults, plural, one {# dataset} other {# datasets}}"
-msgstr ""
+msgstr "{numResults, plural, one {# seti ya data} other {# seti za data}}"
 
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "This query could not run"
@@ -5402,7 +5367,7 @@ msgstr "Ruhusu kuhariri kwa mkono"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Format"
-msgstr ""
+msgstr "Umbizo"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not"
@@ -5541,7 +5506,7 @@ msgstr "Chuja kwa hali"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Results"
-msgstr ""
+msgstr "Matokeo"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields.tsx
 msgid "Select columns"
@@ -5614,11 +5579,6 @@ msgstr "Idhini"
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "Tuambie kuhusu mahali ambapo data ya {singularConceptName} inapaswa "
 "kutokea..."
-
-#. placeholder {0}: debouncedSearch.trim()
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "No catalog dataset matches “{0}”."
-#~ msgstr "Hakuna seti ya data kwenye katalogi inayolingana na “{0}”."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -5878,7 +5838,7 @@ msgstr "Hakuna maeneo yaliyoongezwa"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "All results"
-msgstr ""
+msgstr "Matokeo yote"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -6557,12 +6517,6 @@ msgstr "Barua pepe"
 msgid "Y axis tick color"
 msgstr "Rangi ya alama za mhimili wa Y"
 
-#. placeholder {0}: listing.pipelineName
-#. placeholder {1}: listing.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "{0} · run {1}"
-#~ msgstr "{0} · endesha {1}"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
 msgstr "Process data again"
@@ -6647,7 +6601,7 @@ msgstr "Jina la eneo la kazi limeboreshwa"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Search open data"
-msgstr ""
+msgstr "Tafuta data iliyo wazi"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
@@ -7662,7 +7616,7 @@ msgstr "Imeshirikiwa nami"
 #. placeholder {0}: activeFilter.label
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Remove filter: {0}"
-msgstr ""
+msgstr "Ondoa kichujio: {0}"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -7753,7 +7707,7 @@ msgstr "Imetengenezwa \"{dashboardName}\""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Past month"
-msgstr ""
+msgstr "Mwezi uliopita"
 
 #. placeholder {0}: diagnostics.unmatchedBoundaryCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
@@ -7909,7 +7863,7 @@ msgstr "Kosa"
 #. placeholder {0}: options.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
 msgid "Show all {0}"
-msgstr ""
+msgstr "Onyesha zote {0}"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
@@ -8019,7 +7973,8 @@ msgstr "Kwanza"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
-msgstr ""
+msgstr "Seti za data {formattedNumResults} kati ya "
+"{formattedNumCatalogListings}"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -8056,10 +8011,6 @@ msgstr "{lengthValue} km"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "Mstari wa chanzo"
-
-#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
-#~ msgid "Nothing more to load"
-#~ msgstr "Hakuna kitu kingine cha kupakia"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
@@ -8430,7 +8381,7 @@ msgstr "Avandar bado haiwezi kuongeza aina hii ya seti ya data."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear filters"
-msgstr ""
+msgstr "Futa vichujio"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
@@ -8482,10 +8433,6 @@ msgstr "Mhariri"
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Entered manually"
 msgstr "Imeingizwa mwenyewe"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Organization"
-#~ msgstr "Shirika"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
@@ -8932,7 +8879,8 @@ msgstr "Jina la dataset"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Select a dataset to see its columns, where it comes from, and how "
 "recently it changed."
-msgstr ""
+msgstr "Chagua seti ya data ili kuona safu zake, inakotoka, na ilivyobadilika "
+"hivi karibuni."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Source column"
@@ -8991,7 +8939,7 @@ msgstr "Mseto wa rangi"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Over a year ago"
-msgstr ""
+msgstr "Zaidi ya mwaka mmoja uliopita"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
@@ -9054,7 +9002,7 @@ msgstr "Ongeza muktadha, mbinu, au jambo kuu la kukumbuka."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 msgid "Open datasets"
-msgstr ""
+msgstr "Seti za data zilizo wazi"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a table of the top 10 rows of {datasetName}"
@@ -9413,7 +9361,7 @@ msgstr "Chini kulia"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Recently updated"
-msgstr ""
+msgstr "Zilizosasishwa hivi karibuni"
 
 #. placeholder {0}: scale.meters
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -10194,7 +10142,7 @@ msgstr "Bluu"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Including datasets that can't be loaded"
-msgstr ""
+msgstr "Pamoja na seti za data ambazo haziwezi kupakiwa"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Select a numeric column"
@@ -10254,7 +10202,7 @@ msgstr "Onyesha QR code"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Past year"
-msgstr ""
+msgstr "Mwaka uliopita"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"

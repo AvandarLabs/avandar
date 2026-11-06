@@ -1,26 +1,19 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Anchor,
-  Button,
-  Collapse,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Anchor, Button, Collapse, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconArrowLeft, IconChevronDown, IconPlus } from "@tabler/icons-react";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
-import { DataCatalogInvalidNotice } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice";
-import { DataCatalogListingColumns } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
 import {
   getCatalogListingFormat,
   getCatalogListingUpdatedDate,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
+import { DataCatalogInvalidNotice } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice";
+import { DataCatalogListingColumns } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.module.css";
-import { formatCatalogListingDate } from "@/views/DataManagerApp/DataImportView/DataCatalogView/formatCatalogListingDate";
 import { DataCatalogUnsupportedNotice } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice";
+import { formatCatalogListingDate } from "@/views/DataManagerApp/DataImportView/DataCatalogView/formatCatalogListingDate";
 import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";
 import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
@@ -234,7 +227,9 @@ export function DataCatalogListingDetail({
             </AppViewRail.Fact>
           ) : null}
           {listing.notes ? (
-            <AppViewRail.Fact label={t`Notes`}>{listing.notes}</AppViewRail.Fact>
+            <AppViewRail.Fact label={t`Notes`}>
+              {listing.notes}
+            </AppViewRail.Fact>
           ) : null}
         </AppViewRail.Group>
 

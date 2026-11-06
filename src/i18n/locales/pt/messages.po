@@ -360,7 +360,7 @@ msgstr "Consulta"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Hide datasets that can't be loaded"
-msgstr ""
+msgstr "Ocultar conjuntos de dados que não podem ser carregados"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Join key"
@@ -634,7 +634,7 @@ msgstr "Lista"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Sort datasets by"
-msgstr ""
+msgstr "Classificar conjuntos de dados por"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
@@ -849,7 +849,7 @@ msgstr "Nome da camada"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
-msgstr ""
+msgstr "Melhor correspondência"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick a sheet"
@@ -905,7 +905,7 @@ msgstr "Ocultar data de publicação"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Updated over a year ago"
-msgstr ""
+msgstr "Atualizado há mais de um ano"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
 msgid "Pick both a latitude and a longitude column. One on its own plots every "
@@ -965,13 +965,6 @@ msgstr " registros"
 #: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
 msgstr "Algo mais…"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "The catalog is still in <0/> and grows as people tell us what they need. "
-#~ "Missing a dataset? <1>tell us</1>."
-#~ msgstr "O catálogo ainda está em <0/> e cresce à medida que as pessoas nos "
-#~ "informam do que precisam. Está faltando algum conjunto de dados? "
-#~ "<1>Conte para nós</1>."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
@@ -1036,7 +1029,7 @@ msgstr "Valor da primeira marca"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Covers"
-msgstr ""
+msgstr "Cobertura"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
@@ -1339,10 +1332,6 @@ msgstr "Execute uma consulta primeiro."
 msgid "Seat limit reached"
 msgstr "Limite de assentos alcançado"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Pipeline"
-#~ msgstr "Pipeline"
-
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
 msgstr "Não foi possível cancelar a publicação do dashboard"
@@ -1366,7 +1355,7 @@ msgstr "Estes conjuntos de dados estão listados no seu espaço de trabalho, mas
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
 msgid "Show fewer"
-msgstr ""
+msgstr "Mostrar menos"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
@@ -1388,7 +1377,7 @@ msgstr "Digite uma pergunta e eu gerarei o SQL e o executarei para você."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Search datasets"
-msgstr ""
+msgstr "Pesquisar conjuntos de dados"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
@@ -1444,7 +1433,7 @@ msgstr "Pixels de detalhe a remover no zoom atual. Defina como zero para "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Any time"
-msgstr ""
+msgstr "Qualquer período"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Regular expression"
@@ -1477,7 +1466,8 @@ msgstr "Seu painel está publicado em:"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "The catalog is in <0/> and grows from what people ask for. Missing a "
 "dataset? <1>Request one</1>"
-msgstr ""
+msgstr "O catálogo está em <0/> e cresce a partir do que as pessoas solicitam. "
+"Não encontrou um conjunto de dados? <1>Solicite um</1>"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
@@ -1501,7 +1491,7 @@ msgstr "Preenchimento vertical"
 #. placeholder {0}: activeFilters.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Filters ({0})"
-msgstr ""
+msgstr "Filtros ({0})"
 
 #. placeholder {0}: aggregateLayer.name
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
@@ -2668,7 +2658,7 @@ msgstr "Dois status têm o mesmo nome. Dê a cada um seu próprio nome."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Last updated"
-msgstr ""
+msgstr "Última atualização"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -2753,10 +2743,6 @@ msgstr "Permitir que novos {pluralConceptName} sejam criados manualmente"
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Welcome to Avandar"
 msgstr "Boas-vindas ao Avandar"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Tell us which open dataset you want via feedback"
-#~ msgstr "Nos diga qual conjunto de dados aberto você deseja através do feedback"
 
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
@@ -2919,7 +2905,7 @@ msgstr "Normal"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Filters"
-msgstr ""
+msgstr "Filtros"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Annotate, then export"
@@ -2935,12 +2921,6 @@ msgstr "{0}, {1} e {2} são fixos para cada espaço de trabalho."
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Synced to the cloud"
 msgstr "Sincronizado com a nuvem"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
-#~ "how often it updates."
-#~ msgstr "Escolha um conjunto de dados à esquerda para saber o que ele contém, "
-#~ "quem o publica e com que frequência é atualizado."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
@@ -3313,10 +3293,6 @@ msgstr "Você está atualmente no plano <0>{currentFeaturePlanName}</0>."
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Result size"
 msgstr "Tamanho do resultado"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Search open data catalog"
-#~ msgstr "Pesquisar catálogo de dados abertos"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
@@ -3723,10 +3699,6 @@ msgstr "Confirmar Ação"
 msgid "No dashboards to show"
 msgstr "Nenhum dashboard para exibir"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-#~ msgid "A type of record you manage"
-#~ msgstr "Um tipo de registro que você gerencia"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
 msgstr "Linhas destas {regionCount} regiões"
@@ -4122,7 +4094,7 @@ msgstr "Grupos de função personalizados"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Updated in the past month"
-msgstr ""
+msgstr "Atualizado no último mês"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterListInput.tsx
 msgid "Add a value"
@@ -4452,10 +4424,6 @@ msgstr "Localizações exatas"
 msgid "New chat"
 msgstr "Novo chat"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Search by name, organization, pipeline…"
-#~ msgstr "Pesquisar por nome, organização, pipeline…"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Data"
@@ -4486,7 +4454,7 @@ msgstr "Detalhes do conjunto de dados"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Updated in the past year"
-msgstr ""
+msgstr "Atualizado no último ano"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
 msgid "1 filter"
@@ -4614,7 +4582,7 @@ msgstr "Cópia de {0}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "One row per number"
@@ -4703,7 +4671,8 @@ msgstr "Ampliar para o agrupamento"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "No datasets match your search and filters. Try fewer filters or "
 "different words."
-msgstr ""
+msgstr "Nenhum conjunto de dados corresponde à sua pesquisa e aos filtros. "
+"Tente usar menos filtros ou palavras diferentes."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is true"
@@ -4905,7 +4874,7 @@ msgstr "Coluna Y"
 #. placeholder {0}: facets.numUnloadable
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "{0} hidden"
-msgstr ""
+msgstr "{0} ocultos"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Go home"
@@ -5113,11 +5082,6 @@ msgstr "Assentos comprados com sucesso"
 msgid "Open chat (⌘/)"
 msgstr "Abrir chat (⌘/)"
 
-#. placeholder {0}: displayedListings.length
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Catalog ({0})"
-#~ msgstr "Catálogo ({0})"
-
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "Enviar"
@@ -5154,7 +5118,8 @@ msgstr "Modelo instruct 7B de alta qualidade. Ideal para esquemas difíceis e "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{numResults, plural, one {# dataset} other {# datasets}}"
-msgstr ""
+msgstr "{numResults, plural, one {# conjunto de dados} other {# conjuntos de "
+"dados}}"
 
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "This query could not run"
@@ -5409,7 +5374,7 @@ msgstr "Permitir edição manual"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Format"
-msgstr ""
+msgstr "Formato"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not"
@@ -5546,7 +5511,7 @@ msgstr "Filtrar por status"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Results"
-msgstr ""
+msgstr "Resultados"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields.tsx
 msgid "Select columns"
@@ -5618,11 +5583,6 @@ msgstr "Consentimento"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "Conte-nos de onde os dados do {singularConceptName} devem vir..."
-
-#. placeholder {0}: debouncedSearch.trim()
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "No catalog dataset matches “{0}”."
-#~ msgstr "Nenhum conjunto de dados do catálogo corresponde a “{0}”."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -5884,7 +5844,7 @@ msgstr "Nenhum campo foi adicionado"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "All results"
-msgstr ""
+msgstr "Todos os resultados"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -6566,12 +6526,6 @@ msgstr "E-mail"
 msgid "Y axis tick color"
 msgstr "Cor das marcas do eixo Y"
 
-#. placeholder {0}: listing.pipelineName
-#. placeholder {1}: listing.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "{0} · run {1}"
-#~ msgstr "{0} · executar {1}"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
 msgstr "Processar os dados novamente"
@@ -6656,7 +6610,7 @@ msgstr "Nome do espaço de trabalho atualizado"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Search open data"
-msgstr ""
+msgstr "Pesquisar dados abertos"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
@@ -7675,7 +7629,7 @@ msgstr "Compartilhados comigo"
 #. placeholder {0}: activeFilter.label
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Remove filter: {0}"
-msgstr ""
+msgstr "Remover filtro: {0}"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -7766,7 +7720,7 @@ msgstr "Criado \"{dashboardName}\""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Past month"
-msgstr ""
+msgstr "Último mês"
 
 #. placeholder {0}: diagnostics.unmatchedBoundaryCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
@@ -7920,7 +7874,7 @@ msgstr "Erro"
 #. placeholder {0}: options.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
 msgid "Show all {0}"
-msgstr ""
+msgstr "Mostrar todos os {0}"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
@@ -8030,7 +7984,8 @@ msgstr "Primeiro"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
-msgstr ""
+msgstr "{formattedNumResults} de {formattedNumCatalogListings} conjuntos de "
+"dados"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -8067,10 +8022,6 @@ msgstr "{lengthValue} km"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "Linha de origem"
-
-#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
-#~ msgid "Nothing more to load"
-#~ msgstr "Nada mais para carregar"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
@@ -8444,7 +8395,7 @@ msgstr "O Avandar ainda não pode adicionar esse tipo de conjunto de dados."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear filters"
-msgstr ""
+msgstr "Limpar filtros"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
@@ -8497,10 +8448,6 @@ msgstr "Editor"
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Entered manually"
 msgstr "Inserido manualmente"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Organization"
-#~ msgstr "Organização"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
@@ -8949,7 +8896,8 @@ msgstr "Nome do conjunto de dados"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Select a dataset to see its columns, where it comes from, and how "
 "recently it changed."
-msgstr ""
+msgstr "Selecione um conjunto de dados para ver suas colunas, sua origem e "
+"quando foi atualizado pela última vez."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Source column"
@@ -9008,7 +8956,7 @@ msgstr "Escala de cores"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Over a year ago"
-msgstr ""
+msgstr "Há mais de um ano"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
@@ -9071,7 +9019,7 @@ msgstr "Adicione contexto, metodologia ou uma conclusão importante."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 msgid "Open datasets"
-msgstr ""
+msgstr "Conjuntos de dados abertos"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a table of the top 10 rows of {datasetName}"
@@ -9430,7 +9378,7 @@ msgstr "Inferior direito"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Recently updated"
-msgstr ""
+msgstr "Atualizados recentemente"
 
 #. placeholder {0}: scale.meters
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -10216,7 +10164,7 @@ msgstr "Azul"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Including datasets that can't be loaded"
-msgstr ""
+msgstr "Incluindo conjuntos de dados que não podem ser carregados"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Select a numeric column"
@@ -10277,7 +10225,7 @@ msgstr "Mostrar código QR"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Past year"
-msgstr ""
+msgstr "Último ano"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"

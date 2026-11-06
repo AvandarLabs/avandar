@@ -26,9 +26,7 @@ export function DataManagerApp(): JSX.Element {
   const navigate = useNavigate();
   const { t } = useLingui();
   const matchRoute = useMatchRoute();
-  const isOnHome = Boolean(
-    matchRoute({ to: "/$workspaceSlug/data-manager" }),
-  );
+  const isOnHome = Boolean(matchRoute({ to: "/$workspaceSlug/data-manager" }));
   const phonePane =
     isOnHome && (isLoadingDatasets || (allDatasets ?? []).length > 0)
       ? "list"

@@ -4,7 +4,11 @@ import type { DataCatalogListingRead } from "$/models/data-catalog-listings/Data
  * How recently a listing must have been updated. The windows are cumulative:
  * a listing updated last week is also within the past year.
  */
-export type CatalogUpdatedWithin = "any" | "pastMonth" | "pastYear" | "overAYear";
+export type CatalogUpdatedWithin =
+  | "any"
+  | "pastMonth"
+  | "pastYear"
+  | "overAYear";
 
 /** The order the catalog's results are listed in. */
 export type CatalogSortBy = "relevance" | "updated" | "name";
@@ -112,7 +116,11 @@ function _matchesFilters(options: {
   skip?: FacetKey;
 }): boolean {
   const { listing, filters, now, skip } = options;
-  if (skip !== "isLoadableOnly" && filters.isLoadableOnly && listing.isInvalid) {
+  if (
+    skip !== "isLoadableOnly" &&
+    filters.isLoadableOnly &&
+    listing.isInvalid
+  ) {
     return false;
   }
   if (

@@ -73,11 +73,7 @@ export function DataCatalogResultsHeader({
               {formattedNumResults} of {formattedNumCatalogListings} datasets
             </Trans>
           ) : (
-            <Plural
-              value={numResults}
-              one="# dataset"
-              other="# datasets"
-            />
+            <Plural value={numResults} one="# dataset" other="# datasets" />
           )}
         </Text>
         <Group gap="xs" wrap="nowrap">

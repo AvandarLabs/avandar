@@ -6,12 +6,12 @@ import {
   filterCatalogListings,
   sortCatalogListings,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
+import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 import type {
   CatalogFacets,
   CatalogListingFilters,
   CatalogSortBy,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
-import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 
 /**
  * The catalog as the user has narrowed it: searched, then filtered, then
