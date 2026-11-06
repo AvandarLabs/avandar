@@ -8,7 +8,7 @@ import {
   where,
 } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { Skeleton } from "@mantine/core";
+import { Skeleton, VisuallyHidden } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
@@ -17,15 +17,19 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
-import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { CaseActivityFeed } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed";
 import { CaseDetailsRail } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
+import css from "@/views/IndividualManagerApp/SingleIndividualView/SingleIndividualView.module.css";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Individual } from "$/models/ontology/Individual/Individual";
+import type { UserProfile } from "$/models/User/UserProfile";
 import type { CaseDetailsRow } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
+
+/** Stands in for the members until they load, one array for every render. */
+const EMPTY_MEMBERS: readonly UserProfile.WithRole[] = [];
 
 type HydratedIndividual = Individual.T & {
   identifierAttribute?: ConceptAttribute.T;
@@ -164,7 +168,6 @@ export function SingleIndividualView({
     });
   const [members] = WorkspaceClient.useGetUsersForWorkspace({
     workspaceId: individual.workspaceId,
-    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
   });
 
   const attributeRows: CaseDetailsRow[] | undefined = useMemo(() => {
@@ -173,6 +176,7 @@ export function SingleIndividualView({
     }
     return hydratedIndividual.assertions.map((assertion) => {
       return {
+        id: assertion.conceptAttributeId,
         name: assertion.attributeName ?? t`Loading...`,
         value: assertion.value,
         sourceName: assertion.sourceName,
@@ -185,20 +189,39 @@ export function SingleIndividualView({
       <AppViewHeader
         title={
           isLoadingHydratedIndividual ? (
-            <Skeleton component="span" height={24} width={200} />
+            <>
+              <Skeleton
+                component="span"
+                height={24}
+                width={200}
+                display="inline-block"
+                aria-hidden
+              />
+              <VisuallyHidden>{t`Loading case`}</VisuallyHidden>
+            </>
           ) : (
             unknownToString(hydratedIndividual.name)
           )
         }
         facts={[concept.name]}
       />
-      <AppViewBody rail={<CaseDetailsRail attributes={attributeRows} />}>
-        <CaseActivityFeed
-          workspaceId={individual.workspaceId}
-          individualId={individual.id}
-          members={members ?? []}
-          highlightedCommentId={highlightedCommentId}
-        />
+      {
+        // The body's own padding would leave a gap under the composer, which
+        // docks to the bottom of the scroller. This view pays the same gutter
+        // itself, minus the bottom.
+      }
+      <AppViewBody
+        noPadding
+        rail={<CaseDetailsRail attributes={attributeRows} />}
+      >
+        <div className={css.content}>
+          <CaseActivityFeed
+            workspaceId={individual.workspaceId}
+            individualId={individual.id}
+            members={members ?? EMPTY_MEMBERS}
+            highlightedCommentId={highlightedCommentId}
+          />
+        </div>
       </AppViewBody>
     </AppView>
   );
