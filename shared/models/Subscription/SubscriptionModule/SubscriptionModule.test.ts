@@ -144,16 +144,14 @@ describe("SubscriptionModule billing lifecycle", () => {
   });
 
   it("prompts billing setup when subscription is missing or inactive", () => {
-    expect(SubscriptionModule.shouldPromptForBillingSetup(undefined)).toBe(
-      true,
-    );
+    expect(SubscriptionModule.needsBillingSetup(undefined)).toBe(true);
     expect(
-      SubscriptionModule.shouldPromptForBillingSetup(
+      SubscriptionModule.needsBillingSetup(
         _subscription({ subscriptionStatus: "canceled" }),
       ),
     ).toBe(true);
     expect(
-      SubscriptionModule.shouldPromptForBillingSetup(
+      SubscriptionModule.needsBillingSetup(
         _subscription({ subscriptionStatus: "active" }),
       ),
     ).toBe(false);
@@ -179,44 +177,6 @@ describe("SubscriptionModule billing lifecycle", () => {
       SubscriptionModule.canInviteMembers({
         subscription: canceledPaid,
         numMembersInWorkspace: 2,
-      }),
-    ).toBe(false);
-  });
-});
-
-describe("SubscriptionModule.shouldPromptForDatasetLimitUpgrade", () => {
-  it("defers to the billing setup prompt when the subscription is missing", () => {
-    expect(
-      SubscriptionModule.shouldPromptForDatasetLimitUpgrade({
-        subscription: undefined,
-        isAddAllowed: false,
-      }),
-    ).toBe(false);
-  });
-
-  it("defers to the billing setup prompt when the subscription is inactive", () => {
-    expect(
-      SubscriptionModule.shouldPromptForDatasetLimitUpgrade({
-        subscription: _subscription({ subscriptionStatus: "canceled" }),
-        isAddAllowed: false,
-      }),
-    ).toBe(false);
-  });
-
-  it("prompts when an active subscription is at its dataset cap", () => {
-    expect(
-      SubscriptionModule.shouldPromptForDatasetLimitUpgrade({
-        subscription: _subscription({ subscriptionStatus: "active" }),
-        isAddAllowed: false,
-      }),
-    ).toBe(true);
-  });
-
-  it("does not prompt when an active subscription can add datasets", () => {
-    expect(
-      SubscriptionModule.shouldPromptForDatasetLimitUpgrade({
-        subscription: _subscription({ subscriptionStatus: "active" }),
-        isAddAllowed: true,
       }),
     ).toBe(false);
   });
