@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ActivityEventClient } from "@/clients/activity/ActivityEventClient";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { CaseActivityFeed } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed";
 import type { Individual } from "$/models/ontology/Individual/Individual";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -102,6 +102,31 @@ describe("CaseActivityFeed", () => {
     expect(pageSpy).toHaveBeenCalledTimes(3);
   });
 
+  it("scrolls a linked comment into view", async () => {
+    vi.spyOn(ActivityEventClient, "getCaseActivityPage").mockResolvedValue({
+      hasMore: false,
+      entries: [
+        _commentEntry("e1", "Specimens sent", "2026-10-27T13:40:00"),
+        _commentEntry("e2", "Results back", "2026-10-28T09:00:00"),
+      ],
+    });
+    const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+    render(
+      <CaseActivityFeed
+        workspaceId={"w1" as Workspace.Id}
+        individualId={"i1" as Individual.Id}
+        members={[]}
+        highlightedCommentId="c-e1"
+      />,
+      { wrapper: _wrapper },
+    );
+    await screen.findByText("Specimens sent");
+    await waitFor(() => {
+      expect(scrollSpy).toHaveBeenCalledTimes(1);
+    });
+    expect(scrollSpy.mock.contexts[0]).toHaveProperty("id", "comment-c-e1");
+  });
+
   it("explains a failed first load", async () => {
     vi.spyOn(ActivityEventClient, "getCaseActivityPage").mockRejectedValue(
       new Error("offline"),
@@ -191,5 +216,6 @@ describe("CaseActivityFeed", () => {
     );
     expect(await screen.findByText("Specimens sent")).toBeInTheDocument();
     expect(screen.getByText(/October 27/)).toBeInTheDocument();
+    expect(screen.getByRole("feed", { name: "Activity" })).toBeInTheDocument();
   });
 });

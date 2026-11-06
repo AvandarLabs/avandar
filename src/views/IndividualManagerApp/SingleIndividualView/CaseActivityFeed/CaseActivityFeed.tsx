@@ -1,24 +1,18 @@
-import { Callout } from "@avandar/ui";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Center, Loader, Stack, Text, ThemeIcon, Title } from "@mantine/core";
-import { IconMessages } from "@tabler/icons-react";
-import { useEffect, useMemo, useRef } from "react";
+import { Trans } from "@lingui/react/macro";
+import { useRef } from "react";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import { RichTextMembersContext } from "@/components/RichText/RichTextMembersContext";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import {
-  ACTIVITY_FEED_VISIBLE_KINDS,
-  activityFeedItemRenderers,
-} from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/activityFeedItemRenderers";
+import { ACTIVITY_FEED_VISIBLE_KINDS } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/activityFeedItemRenderers";
 import { CaseActivityComposer } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer";
 import classes from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.module.css";
-import { EarlierActivityControl } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl";
-import { groupActivityByDay } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/groupActivityByDay";
+import { CaseActivityFeedContent } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent";
 import { useCaseActivityFeed } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/useCaseActivityFeed";
+import { useFeedMembers } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/useFeedMembers";
+import { useInitialFeedScroll } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/useInitialFeedScroll";
 import type { Individual } from "$/models/ontology/Individual/Individual";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { MentionCandidate } from "@/components/RichText/UserMention/filterMentionCandidates";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -31,7 +25,6 @@ type Props = {
 /**
  * A case's activity: every entry oldest first under day separators, with
  * the composer docked at the bottom. Comments are the only kind drawn today.
- * On first load it scrolls to the linked comment, or to the newest entry.
  */
 export function CaseActivityFeed({
   workspaceId,
@@ -39,66 +32,20 @@ export function CaseActivityFeed({
   members,
   highlightedCommentId,
 }: Props): ReactNode {
-  const { t, i18n } = useLingui();
   const currentUser = useCurrentUser();
   const feed = useCaseActivityFeed({
     individualId,
     kinds: ACTIVITY_FEED_VISIBLE_KINDS,
     linkedCommentId: highlightedCommentId,
   });
+  const { mentionCandidates, membersLookup } = useFeedMembers(members);
   const endRef = useRef<HTMLDivElement>(null);
-  // The case whose feed was already scrolled into place, so a refetch or a
-  // new post never yanks the reader back.
-  const scrolledCaseIdRef = useRef<Individual.Id | undefined>(undefined);
-
-  const mentionCandidates: MentionCandidate[] = useMemo(() => {
-    return members.map((member) => {
-      return {
-        userId: member.userId,
-        displayName: member.displayName || member.fullName,
-        email: member.email,
-      };
-    });
-  }, [members]);
-
-  const membersLookup = useMemo(() => {
-    const namesById = new Map(
-      mentionCandidates.map((candidate) => {
-        return [candidate.userId, candidate.displayName];
-      }),
-    );
-    return {
-      getMemberName: (userId: string) => {
-        return namesById.get(userId);
-      },
-    };
-  }, [mentionCandidates]);
-
-  useEffect(() => {
-    if (
-      feed.isLoading ||
-      feed.isSeekingLinkedComment ||
-      scrolledCaseIdRef.current === individualId
-    ) {
-      return;
-    }
-    scrolledCaseIdRef.current = individualId;
-    const linkedComment = highlightedCommentId
-      ? document.getElementById(`comment-${highlightedCommentId}`)
-      : undefined;
-    if (linkedComment) {
-      linkedComment.scrollIntoView({ block: "center" });
-    } else {
-      endRef.current?.scrollIntoView({ block: "end" });
-    }
-  }, [
-    feed.isLoading,
-    feed.isSeekingLinkedComment,
-    highlightedCommentId,
+  useInitialFeedScroll({
     individualId,
-  ]);
-
-  const dayGroups = groupActivityByDay(feed.entries);
+    highlightedCommentId,
+    isReady: !feed.isLoading && !feed.isSeekingLinkedComment,
+    endRef,
+  });
 
   return (
     <RichTextMembersContext.Provider value={membersLookup}>
@@ -110,72 +57,15 @@ export function CaseActivityFeed({
             : undefined
         }
       >
-        {feed.isLoading ? (
-          <Center py="xl">
-            <Loader size="sm" />
-          </Center>
-        ) : feed.isLoadError ? (
-          <Callout
-            title={t`The activity for this case failed to load`}
-            message={t`Try again in a moment, or reach out to support if it keeps happening.`}
-          />
-        ) : feed.entries.length === 0 ? (
-          <Stack className={classes.empty} align="center" gap="xs">
-            <ThemeIcon size={64} radius="xl" variant="light">
-              <IconMessages size={28} />
-            </ThemeIcon>
-            <Title order={4} fw={650} className={classes.emptyTitle}>
-              <Trans>No activity on this case yet</Trans>
-            </Title>
-            <Text c="dimmed" size="sm">
-              <Trans>
-                Post the first update below. Mention a teammate with @ to bring
-                them in.
-              </Trans>
-            </Text>
-          </Stack>
-        ) : (
-          <div
-            className={classes.feed}
-            role="feed"
-            aria-busy={feed.isLoadingEarlier}
-          >
-            {feed.hasEarlier ? (
-              <EarlierActivityControl
-                hasError={feed.hasEarlierError}
-                isLoading={feed.isLoadingEarlier}
-                onLoadEarlier={feed.loadEarlier}
-              />
-            ) : null}
-            {dayGroups.map((group) => {
-              return (
-                <div key={group.dayKey}>
-                  <Text size="xs" c="dimmed" fw={500} className={classes.day}>
-                    {i18n.date(group.date, {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </Text>
-                  {group.entries.map((entry) => {
-                    const Renderer = activityFeedItemRenderers[entry.kind];
-                    return Renderer ? (
-                      <Renderer
-                        key={entry.id}
-                        entry={entry}
-                        currentUserId={currentUser?.id}
-                        getMemberName={membersLookup.getMemberName}
-                        mentionCandidates={mentionCandidates}
-                        highlightedCommentId={highlightedCommentId}
-                      />
-                    ) : null;
-                  })}
-                </div>
-              );
-            })}
-          </div>
-        )}
-        <div ref={endRef} />
+        <CaseActivityFeedContent
+          feed={feed}
+          itemProps={{
+            currentUserId: currentUser?.id,
+            getMemberName: membersLookup.getMemberName,
+            mentionCandidates,
+            highlightedCommentId,
+          }}
+        />
         <div className={classes.dock} data-sticky-action-bar>
           <CaseActivityComposer
             workspaceId={workspaceId}
@@ -183,6 +73,7 @@ export function CaseActivityFeed({
             mentionCandidates={mentionCandidates}
           />
         </div>
+        <div ref={endRef} />
       </AppViewSection>
     </RichTextMembersContext.Provider>
   );

@@ -21,7 +21,8 @@ export type CaseActivityFeedData = InfiniteData<
   ActivityFeedCursor | undefined
 >;
 
-type CaseActivityFeed = {
+/** A case's loaded feed and the controls to load more of it. */
+export type CaseActivityFeedState = {
   /** Every loaded entry, oldest first. */
   entries: ActivityFeedEntry[];
   isLoading: boolean;
@@ -70,6 +71,28 @@ function _buildCursorFromPage(
     recordedAt: oldestEntry.recordedAt,
     id: oldestEntry.id,
   };
+}
+
+/** Every loaded entry, oldest first; pages are cached newest first. */
+function _getEntriesFromData(
+  data: { pages: readonly ActivityFeedPage[] } | undefined,
+): ActivityFeedEntry[] {
+  return [...(data?.pages ?? [])].reverse().flatMap((page) => {
+    return page.entries;
+  });
+}
+
+/** Whether the linked comment, if there is one, is among the entries. */
+function _hasLinkedComment(
+  entries: readonly ActivityFeedEntry[],
+  linkedCommentId: string | undefined,
+): boolean {
+  return (
+    linkedCommentId === undefined ||
+    entries.some((entry) => {
+      return entry.commentId === linkedCommentId;
+    })
+  );
 }
 
 /**
@@ -133,7 +156,7 @@ export function useCaseActivityFeed(options: {
   individualId: Individual.Id;
   kinds: readonly ActivityEvent.Kind[];
   linkedCommentId: string | undefined;
-}): CaseActivityFeed {
+}): CaseActivityFeedState {
   const { individualId, kinds, linkedCommentId } = options;
   const query = useInfiniteQuery({
     queryKey: [...buildCaseActivityFeedQueryKey(individualId), kinds],
@@ -150,23 +173,14 @@ export function useCaseActivityFeed(options: {
     refetchOnWindowFocus: true,
   });
   const { fetchNextPage, isFetchingNextPage, isFetchNextPageError } = query;
-
   const entries = useMemo(() => {
-    return [...(query.data?.pages ?? [])].reverse().flatMap((page) => {
-      return page.entries;
-    });
+    return _getEntriesFromData(query.data);
   }, [query.data]);
-
-  const isLinkedCommentLoaded =
-    linkedCommentId === undefined ||
-    entries.some((entry) => {
-      return entry.commentId === linkedCommentId;
-    });
   const isSeekingLinkedComment = useSeekLinkedComment({
     seekKey: `${individualId}:${linkedCommentId}`,
     canSeek:
       query.isSuccess &&
-      !isLinkedCommentLoaded &&
+      !_hasLinkedComment(entries, linkedCommentId) &&
       query.hasNextPage &&
       !isFetchNextPageError,
     isFetchingNextPage,

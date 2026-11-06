@@ -1,6 +1,12 @@
 .feed {
   display: flex;
   flex-direction: column;
+
+  /*
+   * Older pages are added above the reader; the feed restores the scroll
+   * position itself, so the browser's own anchoring must not also move it.
+   */
+  overflow-anchor: none;
 }
 
 .earlier {
