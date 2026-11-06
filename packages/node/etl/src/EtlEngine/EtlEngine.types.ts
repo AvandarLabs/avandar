@@ -116,6 +116,27 @@ export type EtlScope = Readonly<{
   key: string;
 }>;
 
+/**
+ * An organization level, broadest first, the way admin1, admin2, and admin3
+ * nest administrative boundaries. Level 1 might be a city and level 2 one of
+ * its agencies.
+ */
+export type EtlOrganizationLevel = 1 | 2 | 3 | 4;
+
+/**
+ * What each organization level is called on one drive, such as `City` for
+ * level 1 and `Agency` for level 2. A level with no label is one the drive
+ * does not use.
+ */
+export type EtlOrganizationLabels = Readonly<
+  Partial<Record<EtlOrganizationLevel, string>>
+>;
+
+/** What the engine records about one drive in the drives table. */
+export type EtlDriveDescription = Readonly<{
+  organizationLabels: EtlOrganizationLabels;
+}>;
+
 /** The descriptive listing fields every relation carries or may carry. */
 export type RelationDescription = Readonly<{
   /** The connection's id in the source, written to `external_dataset_id`. */

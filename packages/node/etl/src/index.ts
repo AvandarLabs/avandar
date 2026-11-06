@@ -10,6 +10,16 @@ export type {
   EtlPipelineWorkspaceLoadability,
   EtlWorkspaceLoadabilityRules,
 } from "@etl/EtlConfig/EtlConfig.types";
+export { CATALOG_MAPPABLE_FIELDS } from "@etl/EtlConfig/PipelineConfig.types";
+export type {
+  CatalogFieldMappings,
+  CatalogFieldSource,
+  CatalogMappableField,
+  PipelineConfig,
+  PipelineDriveConfig,
+} from "@etl/EtlConfig/PipelineConfig.types";
+export { parsePipelineConfig } from "@etl/EtlConfig/parsePipelineConfig/parsePipelineConfig";
+export { readPipelineConfigFile } from "@etl/EtlConfig/readPipelineConfigFile/readPipelineConfigFile";
 export {
   ETL_RUN_FAILED_ERROR_NAME,
   EtlRunFailedError,
@@ -42,10 +52,13 @@ export type {
   EtlCrawlReport,
   EtlCrawlStatus,
   EtlDestination,
+  EtlDriveDescription,
   EtlDriveScopes,
   EtlEngineConfig,
   EtlEngineInstance,
   EtlIncrementalConfig,
+  EtlOrganizationLabels,
+  EtlOrganizationLevel,
   EtlOutput,
   EtlPipelineMetrics,
   EtlPipelineRunId,
