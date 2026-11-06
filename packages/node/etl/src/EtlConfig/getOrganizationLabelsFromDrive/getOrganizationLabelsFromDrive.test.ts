@@ -1,4 +1,4 @@
-import { resolveDriveOrganizationLabels } from "@etl/EtlConfig/resolveDriveOrganizationLabels/resolveDriveOrganizationLabels";
+import { getOrganizationLabelsFromDrive } from "@etl/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive";
 import { describe, expect, it } from "vitest";
 
 const CONFIG = {
@@ -6,10 +6,10 @@ const CONFIG = {
   drives: [],
 };
 
-describe("resolveDriveOrganizationLabels", () => {
+describe("getOrganizationLabelsFromDrive", () => {
   it("gives a drive with no labels the pipeline's", () => {
     expect(
-      resolveDriveOrganizationLabels({
+      getOrganizationLabelsFromDrive({
         config: CONFIG,
         drive: { baseUrl: "https://a.example.gov" },
       }),
@@ -18,7 +18,7 @@ describe("resolveDriveOrganizationLabels", () => {
 
   it("replaces the pipeline's labels whole, not level by level", () => {
     expect(
-      resolveDriveOrganizationLabels({
+      getOrganizationLabelsFromDrive({
         config: CONFIG,
         drive: { baseUrl: "https://a.example.gov", organizationLabels: { 1: "State" } },
       }),
@@ -27,7 +27,7 @@ describe("resolveDriveOrganizationLabels", () => {
 
   it("gives no labels when neither sets any", () => {
     expect(
-      resolveDriveOrganizationLabels({
+      getOrganizationLabelsFromDrive({
         config: { drives: [] },
         drive: { baseUrl: "https://a.example.gov" },
       }),

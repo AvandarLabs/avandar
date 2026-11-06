@@ -17,7 +17,10 @@ export type CatalogFieldScriptContext = Readonly<{
   field: CatalogMappableField;
 }>;
 
-/** A mapper script's default export. */
+/**
+ * A mapper script's default export. It must be synchronous: a returned
+ * Promise is coerced as an object and dropped with a problem.
+ */
 export type CatalogFieldScript = (
   record: unknown,
   context: CatalogFieldScriptContext,
@@ -113,6 +116,21 @@ function _listScriptPaths(config: PipelineConfig): readonly string[] {
   });
 }
 
+/** Imports one script, rethrowing any failure with the script's path. */
+async function _importOrExplain(
+  importScript: CatalogFieldScriptImporter,
+  absolutePath: string,
+): Promise<unknown> {
+  try {
+    return await importScript(pathToFileURL(absolutePath).href);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${absolutePath} could not be loaded: ${message}`, {
+      cause: error,
+    });
+  }
+}
+
 /**
  * Imports every distinct script the config names, once each, keyed by its
  * absolute path.
@@ -131,8 +149,9 @@ async function _importScripts(args: {
   ];
   const entries = await Promise.all(
     absolutePaths.map(async (absolutePath) => {
-      const module = (await args.importScript(
-        pathToFileURL(absolutePath).href,
+      const module = (await _importOrExplain(
+        args.importScript,
+        absolutePath,
       )) as { default?: unknown };
       if (typeof module.default !== "function") {
         throw new Error(
@@ -255,7 +274,10 @@ export async function loadCatalogFieldMapper(args: {
   });
   const compiledByDrive = new Map(
     config.drives.map((drive) => {
-      const merged: CatalogFieldMappings = { ...config.fields, ...drive.fields };
+      const merged: CatalogFieldMappings = {
+        ...config.fields,
+        ...drive.fields,
+      };
       const compiledFields = Object.entries(merged).flatMap(
         ([field, source]) => {
           return source === undefined

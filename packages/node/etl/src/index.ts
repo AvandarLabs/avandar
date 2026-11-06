@@ -170,7 +170,7 @@ export {
   type ExecutionFunctions,
   type SupabaseExecutionStoreOptions,
 } from "@etl/stores/SupabaseExecutionStore/createSupabaseExecutionStore";
-export { resolveDriveOrganizationLabels } from "@etl/EtlConfig/resolveDriveOrganizationLabels/resolveDriveOrganizationLabels";
+export { getOrganizationLabelsFromDrive } from "@etl/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive";
 export {
   loadCatalogFieldMapper,
   type CatalogFieldMapper,

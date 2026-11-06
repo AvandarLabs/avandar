@@ -76,9 +76,13 @@ describe("loadCatalogFieldMapper", () => {
       importScript,
     });
 
-    Array.from({ length: 1000 }, (_, index) => {
+    const results = Array.from({ length: 1000 }, (_, index) => {
       return mapper.mapFields({ name: `record ${index}` }, DRIVE);
     });
+
+    expect(results[999]?.fields.organization2Name).toBe(
+      `RECORD 999 (organization2_name on ${DRIVE})`,
+    );
 
     expect(importScript).toHaveBeenCalledTimes(1);
     expect(importScript.mock.calls[0]?.[0]).toMatch(
@@ -148,6 +152,8 @@ describe("loadCatalogFieldMapper", () => {
 
     expect(() => {
       return mapper.mapFields({}, "https://unknown.example.gov");
-    }).toThrow("https://unknown.example.gov is not a drive in this pipeline's config");
+    }).toThrow(
+      "https://unknown.example.gov is not a drive in this pipeline's config",
+    );
   });
 });
