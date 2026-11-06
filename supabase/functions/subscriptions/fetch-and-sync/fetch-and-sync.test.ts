@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@sbfn/_shared/MiniServer/MiniServer.ts", () => {
@@ -31,9 +31,9 @@ const WORKSPACE_A_ID = "22222222-2222-4222-8222-222222222222";
 const WORKSPACE_B_ID = "33333333-3333-4333-8333-333333333333";
 
 function _makePolarSubscription(
-  workspaceId: string,
-  status: string = "active",
+  options: Readonly<{ workspaceId: string; status?: string }>,
 ): Record<string, unknown> {
+  const { workspaceId, status = "active" } = options;
   return {
     id: _toPolarSubscriptionId(workspaceId),
     product: {
@@ -63,21 +63,30 @@ type SubscriptionRow = Readonly<{
   subscription_status: string;
 }>;
 
-/** The fields a sync wrote to one `subscriptions` row. */
-type WrittenRow = Readonly<{
+/** The `subscriptions` fields these tests check on a written row. */
+type RowFields = {
   workspace_id: string;
   subscription_status: string;
-}>;
+};
+
+/**
+ * The fields a sync wrote to one `subscriptions` row, and the id of the row
+ * it updated (`undefined` for an insert).
+ */
+type WrittenRow = Readonly<RowFields & { updatedRowId: string | undefined }>;
 
 /**
  * Creates an admin client over a `subscriptions` table holding
  * `existingRows` that records the fields of every row it inserts or updates.
  */
 function _createFakeAdminClient(
-  existingRows: readonly SubscriptionRow[],
-  writtenRows: WrittenRow[],
+  options: Readonly<{
+    existingRows: readonly SubscriptionRow[];
+    writtenRows: WrittenRow[];
+  }>,
 ): unknown {
-  const toWriteResult = (row: WrittenRow) => {
+  const { existingRows, writtenRows } = options;
+  const toWriteResult = (row: RowFields) => {
     return {
       select: () => {
         return {
@@ -100,9 +109,7 @@ function _createFakeAdminClient(
             maybeSingle: () => {
               return {
                 throwOnError: async () => {
-                  const matchingRow = existingRows.find((row) => {
-                    return row[column] === value;
-                  });
+                  const matchingRow = existingRows.find(propEq(column, value));
                   return { data: matchingRow ?? null };
                 },
               };
@@ -111,14 +118,14 @@ function _createFakeAdminClient(
         },
       };
     },
-    insert: (row: WrittenRow) => {
-      writtenRows.push(row);
+    insert: (row: RowFields) => {
+      writtenRows.push({ ...row, updatedRowId: undefined });
       return toWriteResult(row);
     },
-    update: (row: WrittenRow) => {
+    update: (row: RowFields) => {
       return {
-        eq: () => {
-          writtenRows.push(row);
+        eq: (_column: "id", rowId: string) => {
+          writtenRows.push({ ...row, updatedRowId: rowId });
           return toWriteResult(row);
         },
       };
@@ -142,10 +149,10 @@ async function _runFetchAndSync(
   // calls, and the user carries only its id.
   await FetchAndSyncUserSubscriptions.state.action({
     queryParams: options.queryParams,
-    supabaseAdminClient: _createFakeAdminClient(
-      options.existingRows ?? [],
+    supabaseAdminClient: _createFakeAdminClient({
+      existingRows: options.existingRows ?? [],
       writtenRows,
-    ),
+    }),
     user: { id: USER_ID },
   } as Parameters<typeof FetchAndSyncUserSubscriptions.state.action>[0]);
   return writtenRows;
@@ -154,8 +161,8 @@ async function _runFetchAndSync(
 describe("FetchAndSyncUserSubscriptions", () => {
   it("writes only the given workspace's subscription", async () => {
     vi.mocked(PolarClient.getSubscriptionsByUserId).mockResolvedValue([
-      _makePolarSubscription(WORKSPACE_A_ID),
-      _makePolarSubscription(WORKSPACE_B_ID),
+      _makePolarSubscription({ workspaceId: WORKSPACE_A_ID }),
+      _makePolarSubscription({ workspaceId: WORKSPACE_B_ID }),
     ] as never);
 
     const writtenRows = await _runFetchAndSync({
@@ -167,8 +174,8 @@ describe("FetchAndSyncUserSubscriptions", () => {
 
   it("writes every workspace's subscription when no workspace is given", async () => {
     vi.mocked(PolarClient.getSubscriptionsByUserId).mockResolvedValue([
-      _makePolarSubscription(WORKSPACE_A_ID),
-      _makePolarSubscription(WORKSPACE_B_ID),
+      _makePolarSubscription({ workspaceId: WORKSPACE_A_ID }),
+      _makePolarSubscription({ workspaceId: WORKSPACE_B_ID }),
     ] as never);
 
     const writtenRows = await _runFetchAndSync({
@@ -183,7 +190,10 @@ describe("FetchAndSyncUserSubscriptions", () => {
 
   it("keeps a workspace's Free plan when the Polar plan it replaced syncs as canceled", async () => {
     vi.mocked(PolarClient.getSubscriptionsByUserId).mockResolvedValue([
-      _makePolarSubscription(WORKSPACE_A_ID, "canceled"),
+      _makePolarSubscription({
+        workspaceId: WORKSPACE_A_ID,
+        status: "canceled",
+      }),
     ] as never);
 
     const writtenRows = await _runFetchAndSync({
@@ -203,7 +213,10 @@ describe("FetchAndSyncUserSubscriptions", () => {
 
   it("does not record a canceled Polar plan for a workspace with no plan", async () => {
     vi.mocked(PolarClient.getSubscriptionsByUserId).mockResolvedValue([
-      _makePolarSubscription(WORKSPACE_A_ID, "canceled"),
+      _makePolarSubscription({
+        workspaceId: WORKSPACE_A_ID,
+        status: "canceled",
+      }),
     ] as never);
 
     const writtenRows = await _runFetchAndSync({
@@ -215,7 +228,10 @@ describe("FetchAndSyncUserSubscriptions", () => {
 
   it("records a cancellation on the row that still tracks the Polar plan", async () => {
     vi.mocked(PolarClient.getSubscriptionsByUserId).mockResolvedValue([
-      _makePolarSubscription(WORKSPACE_A_ID, "canceled"),
+      _makePolarSubscription({
+        workspaceId: WORKSPACE_A_ID,
+        status: "canceled",
+      }),
     ] as never);
 
     const writtenRows = await _runFetchAndSync({
@@ -230,6 +246,11 @@ describe("FetchAndSyncUserSubscriptions", () => {
       ],
     });
 
-    expect(writtenRows.map(prop("subscription_status"))).toEqual(["canceled"]);
+    expect(writtenRows).toEqual([
+      expect.objectContaining({
+        updatedRowId: "premium-row",
+        subscription_status: "canceled",
+      }),
+    ]);
   });
 });
