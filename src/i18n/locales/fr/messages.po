@@ -2025,6 +2025,10 @@ msgstr "Cette zone ne contient aucun texte à envoyer. Les résultats basés sur
 msgid "Medium"
 msgstr "Moyen"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
+msgid "Loading case"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
 msgstr "Toutes les personnes dans {app} n’y auront plus accès."
@@ -5219,6 +5223,7 @@ msgstr "Créer un espace de travail"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
 msgid "Try again"
 msgstr "Réessayer"

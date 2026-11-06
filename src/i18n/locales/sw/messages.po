@@ -2002,6 +2002,10 @@ msgstr "Hakuna maandishi katika eneo hili ya kutuma. Matokeo yanayotegemea "
 msgid "Medium"
 msgstr "Wastani"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
+msgid "Loading case"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
 msgstr "Kila mtu katika {app} hatapata tena idhini ya kufikia."
@@ -5166,6 +5170,7 @@ msgstr "Unda Mahali pa Kazi"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
 msgid "Try again"
 msgstr "Jaribu tena"
