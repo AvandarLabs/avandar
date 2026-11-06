@@ -20,9 +20,9 @@ type EmptyFromObject<T> = T extends EmptyObject
 
 /**
  * The part of `T` that is missing or empty: `""` for strings, a zero-length
- * array for arrays, `EmptyObject` for objects, a branded `Set` or `Map`, and `null` or `undefined`.
- * Other primitives, such as numbers and booleans, can never be empty, so
- * they become `never`.
+ * array for arrays, `EmptyObject` for objects, a branded `Set` or `Map`,
+ * and `null` or `undefined`. Other primitives, such as numbers and booleans,
+ * can never be empty, so they become `never`.
  */
 export type Empty<T> = unknown extends T
   ? T

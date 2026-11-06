@@ -8,8 +8,8 @@ import type { NonEmpty } from "@utils/types/NonEmpty/NonEmpty.ts";
 
 /**
  * Checks that a value is present and not empty: not `null`, `undefined`,
- * `""`, `[]`, `{}`, or a `Set` or `Map` with no entries. Any other value, such as `0`, `false`, or a `Date`,
- * counts as not empty.
+ * `""`, `[]`, `{}`, or a `Set` or `Map` with no entries. Any other value,
+ * such as `0`, `false`, or a `Date`, counts as not empty.
  *
  * Use it to skip blank optional input, for example as an early-return guard
  * on a form field or as an `Array.filter` predicate that drops empty items.
