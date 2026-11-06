@@ -66,9 +66,7 @@ export function DataImportView(): JSX.Element {
         subscription={workspace.subscription}
         isOpened={
           !isAddAllowed &&
-          !SubscriptionModule.shouldPromptForBillingSetup(
-            workspace.subscription,
-          ) &&
+          !SubscriptionModule.needsBillingSetup(workspace.subscription) &&
           !isLimitModalDismissed
         }
         onClose={() => {

@@ -14,7 +14,7 @@ function _shouldOpenBillingSetupModal(options: {
 }): boolean {
   return options.isInCheckoutRoute
     ? false
-    : SubscriptionModule.shouldPromptForBillingSetup(options.subscription);
+    : SubscriptionModule.needsBillingSetup(options.subscription);
 }
 
 /**
