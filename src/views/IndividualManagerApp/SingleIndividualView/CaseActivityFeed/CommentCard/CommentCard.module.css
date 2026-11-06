@@ -4,7 +4,19 @@
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr);
   padding-block: var(--mantine-spacing-sm);
+
+  /* Keeps a card scrolled into view clear of the docked composer. */
+  scroll-margin-block-end: var(--ava-sticky-action-bar-inset, 160px);
   transition: var(--ava-transition-colors);
+}
+
+.card:focus {
+  outline: none;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 2px;
 }
 
 .card + .card {
@@ -12,7 +24,20 @@
 }
 
 .highlighted {
+  animation: highlight-fade 2.4s ease-in forwards;
   background-color: var(--mantine-color-primary-0);
+}
+
+/* Holds the linked-comment tint, then fades it before the class is dropped. */
+@keyframes highlight-fade {
+  0%,
+  60% {
+    background-color: var(--mantine-color-primary-0);
+  }
+
+  100% {
+    background-color: transparent;
+  }
 }
 
 .avatar {
@@ -58,5 +83,9 @@
   .card,
   .actions {
     transition: none;
+  }
+
+  .highlighted {
+    animation: none;
   }
 }

@@ -12,6 +12,29 @@ type Props = {
   onDelete: () => void;
 };
 
+/** This page's URL pointing at one comment, without other query params. */
+function _buildCommentUrl(commentId: Comment.Id): string {
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.searchParams.set("comment", commentId);
+  return url.toString();
+}
+
+/** Copies a link to the comment and reports whether it worked. */
+function _copyCommentLink(
+  commentId: Comment.Id,
+  messages: { copied: string; failed: string },
+): void {
+  navigator.clipboard.writeText(_buildCommentUrl(commentId)).then(
+    () => {
+      notifySuccess(messages.copied);
+    },
+    () => {
+      notifyError(messages.failed);
+    },
+  );
+}
+
 /** Edit, copy a link to, or delete your own comment. */
 export function CommentActionsMenu({
   comment,
@@ -38,17 +61,10 @@ export function CommentActionsMenu({
         <Menu.Item
           leftSection={<IconLink size={14} />}
           onClick={() => {
-            const url = new URL(window.location.href);
-            url.search = "";
-            url.searchParams.set("comment", comment.id);
-            navigator.clipboard.writeText(url.toString()).then(
-              () => {
-                notifySuccess(t`Link copied`);
-              },
-              () => {
-                notifyError(t`The link could not be copied.`);
-              },
-            );
+            _copyCommentLink(comment.id, {
+              copied: t`Link copied`,
+              failed: t`The link could not be copied.`,
+            });
           }}
         >
           {t`Copy link to comment`}
