@@ -4,7 +4,7 @@ import { RichTextEditor } from "@mantine/tiptap";
 import { IconAt } from "@tabler/icons-react";
 import { Extension } from "@tiptap/core";
 import { useEditor, useEditorState } from "@tiptap/react";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   isRichTextDocument,
   RICH_TEXT_MAX_TEXT_LENGTH,
@@ -172,14 +172,20 @@ export function RichTextComposer({
     },
   });
 
-  const { isEmpty, plainTextLength } = useEditorState({
-    editor,
-    selector: ({ editor: currentEditor }) => {
+  // Stable so the selector, and the document walk inside it, only runs on
+  // editor transactions or a change of members, not on every render.
+  const selectEditorSummary = useCallback(
+    ({ editor: currentEditor }: { editor: Editor }) => {
       return {
         isEmpty: currentEditor.isEmpty,
         plainTextLength: _getPlainTextLength(currentEditor, membersLookup),
       };
     },
+    [membersLookup],
+  );
+  const { isEmpty, plainTextLength } = useEditorState({
+    editor,
+    selector: selectEditorSummary,
   });
 
   const isOverLimit = plainTextLength > RICH_TEXT_MAX_TEXT_LENGTH;
@@ -240,16 +246,17 @@ export function RichTextComposer({
         <div className={classes.footer}>
           <RichTextEditor.Toolbar className={classes.toolbar}>
             <RichTextEditor.ControlsGroup>
-              <RichTextEditor.Bold />
-              <RichTextEditor.Italic />
-              <RichTextEditor.BulletList />
-              <RichTextEditor.OrderedList />
-              <RichTextEditor.Link />
-              <RichTextEditor.Code />
-              <RichTextEditor.Blockquote />
+              <RichTextEditor.Bold disabled={isSaving} />
+              <RichTextEditor.Italic disabled={isSaving} />
+              <RichTextEditor.BulletList disabled={isSaving} />
+              <RichTextEditor.OrderedList disabled={isSaving} />
+              <RichTextEditor.Link disabled={isSaving} />
+              <RichTextEditor.Code disabled={isSaving} />
+              <RichTextEditor.Blockquote disabled={isSaving} />
             </RichTextEditor.ControlsGroup>
             <RichTextEditor.ControlsGroup>
               <RichTextEditor.Control
+                disabled={isSaving}
                 aria-label={t`Mention a teammate`}
                 title={t`Mention a teammate`}
                 onClick={() => {

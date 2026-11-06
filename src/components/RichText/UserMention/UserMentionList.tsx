@@ -21,18 +21,65 @@ export type UserMentionListProps = {
   clientRect: (() => DOMRect | null) | null | undefined;
   command: (attributes: { id: string }) => void;
   /**
-   * Called with the listbox id and the highlighted option's id whenever the
-   * highlight moves, so the editor can point `aria-activedescendant` at it.
+   * The editor's editing area. While the list is mounted it becomes an ARIA
+   * combobox that controls the list and points at the highlighted member.
    */
-  onHighlightChange?: (ids: {
-    listboxId: string;
-    activeOptionId: string | undefined;
-  }) => void;
+  editingArea?: HTMLElement;
 };
+
+/** ARIA attributes the list adds to the editing area while it is open. */
+const COMBOBOX_ARIA_ATTRIBUTES = [
+  "aria-activedescendant",
+  "aria-autocomplete",
+  "aria-controls",
+  "aria-expanded",
+] as const;
 
 /** The DOM id of one member's option inside the listbox. */
 function _buildOptionId(listboxId: string, userId: string): string {
   return `${listboxId}-${userId}`;
+}
+
+/**
+ * Turns the editing area into a combobox for as long as the list is
+ * mounted, then gives it back its own role and drops the attributes.
+ */
+function useEditingAreaComboboxAria(
+  editingArea: HTMLElement | undefined,
+  listboxId: string,
+  activeOptionId: string | undefined,
+): void {
+  useEffect(() => {
+    if (!editingArea) {
+      return undefined;
+    }
+    const originalRole = editingArea.getAttribute("role");
+    editingArea.setAttribute("role", "combobox");
+    editingArea.setAttribute("aria-expanded", "true");
+    editingArea.setAttribute("aria-autocomplete", "list");
+    editingArea.setAttribute("aria-controls", listboxId);
+    return () => {
+      COMBOBOX_ARIA_ATTRIBUTES.forEach((attribute) => {
+        editingArea.removeAttribute(attribute);
+      });
+      if (originalRole === null) {
+        editingArea.removeAttribute("role");
+      } else {
+        editingArea.setAttribute("role", originalRole);
+      }
+    };
+  }, [editingArea, listboxId]);
+
+  useEffect(() => {
+    if (!editingArea) {
+      return;
+    }
+    if (activeOptionId) {
+      editingArea.setAttribute("aria-activedescendant", activeOptionId);
+    } else {
+      editingArea.removeAttribute("aria-activedescendant");
+    }
+  }, [editingArea, activeOptionId]);
 }
 
 /** Two-letter initials for a member's avatar. */
@@ -54,13 +101,8 @@ function _initials(name: string): string {
 export const UserMentionList = forwardRef<
   UserMentionListHandle,
   UserMentionListProps
->(function UserMentionList(
-  { items, clientRect, command, onHighlightChange },
-  ref,
-) {
+>(function UserMentionList({ items, clientRect, command, editingArea }, ref) {
   const listboxId = useId();
-  const onHighlightChangeRef = useRef(onHighlightChange);
-  onHighlightChangeRef.current = onHighlightChange;
   // Always open while mounted: the suggestion plugin mounts and unmounts
   // the list as the `@` query starts and ends.
   const combobox = useCombobox({ opened: true });
@@ -81,15 +123,14 @@ export const UserMentionList = forwardRef<
     setHighlightedIndex(0);
   }, [items]);
 
-  useEffect(() => {
-    const highlightedItem = items[highlightedIndex];
-    onHighlightChangeRef.current?.({
-      listboxId,
-      activeOptionId: highlightedItem
-        ? _buildOptionId(listboxId, highlightedItem.userId)
-        : undefined,
-    });
-  }, [highlightedIndex, items, listboxId]);
+  const highlightedItem = items[highlightedIndex];
+  useEditingAreaComboboxAria(
+    editingArea,
+    listboxId,
+    highlightedItem
+      ? _buildOptionId(listboxId, highlightedItem.userId)
+      : undefined,
+  );
 
   useImperativeHandle(ref, () => {
     return {
@@ -108,10 +149,12 @@ export const UserMentionList = forwardRef<
           highlightIndex((items.length + currentIndex - 1) % items.length);
           return true;
         }
-        if (event.key === "Enter" || event.key === "Tab") {
-          const highlightedItem = items[currentIndex];
-          if (highlightedItem) {
-            command({ id: highlightedItem.userId });
+        const hasModifier =
+          event.ctrlKey || event.metaKey || event.altKey || event.shiftKey;
+        if ((event.key === "Enter" || event.key === "Tab") && !hasModifier) {
+          const chosenItem = items[currentIndex];
+          if (chosenItem) {
+            command({ id: chosenItem.userId });
           }
           return true;
         }

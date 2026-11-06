@@ -132,7 +132,9 @@ function _renderComposer(
 }
 
 function _getEditingArea(): HTMLElement {
-  return screen.getByRole("textbox", { name: "Write an update" });
+  // Found by name alone: its role is `textbox`, or `combobox` while the
+  // mention list is open.
+  return screen.getByLabelText("Write an update");
 }
 
 function _getEditor(): Editor {
@@ -363,6 +365,7 @@ describe("RichTextComposer mentions", () => {
         firstOption?.id,
       );
     });
+    expect(editingArea).toHaveAttribute("role", "combobox");
     expect(editingArea).toHaveAttribute("aria-expanded", "true");
     expect(editingArea).toHaveAttribute("aria-controls", listboxId);
     expect(editingArea).toHaveAttribute("aria-autocomplete", "list");
@@ -382,6 +385,46 @@ describe("RichTextComposer mentions", () => {
     expect(editingArea).not.toHaveAttribute("aria-expanded");
     expect(editingArea).not.toHaveAttribute("aria-activedescendant");
     expect(editingArea).not.toHaveAttribute("aria-autocomplete");
+    expect(editingArea).toHaveAttribute("role", "textbox");
+  });
+
+  it("submits instead of picking a member on Mod-Enter while the list is open", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(true);
+    _renderComposer({ onSubmit, initialContent: undefined });
+    act(() => {
+      _getEditor().commands.insertContent("Ask @pri");
+    });
+    await screen.findByText("Priya Natarajan");
+    _pressModEnter();
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+    expect(JSON.stringify(onSubmit.mock.calls[0]?.[0])).not.toContain(
+      "userMention",
+    );
+  });
+});
+
+describe("RichTextComposer toolbar", () => {
+  it("disables every toolbar control while saving", async () => {
+    const onSubmit = vi.fn().mockReturnValue(new Promise<boolean>(() => {}));
+    _renderComposer({ onSubmit });
+    _pressModEnter();
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalled();
+    });
+    [
+      "Bold",
+      "Italic",
+      "Bullet list",
+      "Numbered list",
+      "Link",
+      "Code",
+      "Quote",
+      "Mention a teammate",
+    ].forEach((name) => {
+      expect(screen.getByRole("button", { name })).toBeDisabled();
+    });
   });
 });
 

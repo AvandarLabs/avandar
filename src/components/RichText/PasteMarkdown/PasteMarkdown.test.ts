@@ -73,6 +73,14 @@ describe("PasteMarkdown", () => {
     );
   });
 
+  it("adds https to a pasted link written without a scheme", () => {
+    editor = new Editor({ extensions: createRichTextExtensions() });
+    _paste(editor, "See [the lab](example.org/lab)");
+    expect(JSON.stringify(editor.getJSON())).toContain(
+      '"href":"https://example.org/lab"',
+    );
+  });
+
   it("pastes markdown as typed text inside a code block", () => {
     editor = new Editor({
       extensions: createRichTextExtensions(),

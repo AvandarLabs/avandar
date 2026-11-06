@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
-import { isSafeLinkHref } from "$/models/RichTextDocument/RichTextDocument";
+import { getSafeLinkHrefFromInput } from "@/components/RichText/SafeLink/SafeLink";
 import type { JSONContent } from "@tiptap/core";
 
 const MARKDOWN_PATTERN =
@@ -11,22 +11,32 @@ export function looksLikeMarkdown(text: string): boolean {
   return MARKDOWN_PATTERN.test(text);
 }
 
+/** A mark with a link's href made safe, or `undefined` to drop the link. */
+function _buildSafeMark(
+  mark: NonNullable<JSONContent["marks"]>[number],
+): NonNullable<JSONContent["marks"]>[number] | undefined {
+  if (mark.type !== "link") {
+    return mark;
+  }
+  const href = getSafeLinkHrefFromInput(String(mark.attrs?.href ?? ""));
+  return href ? { ...mark, attrs: { ...mark.attrs, href } } : undefined;
+}
+
 /**
- * Content with every link mark whose href is not a web or email link
- * removed. Markdown parsing builds marks directly, so it skips the link
- * extension's own href check.
+ * Content whose links all point at web or email addresses: scheme-less
+ * addresses gain a scheme and any other link is removed, keeping its text.
+ * Markdown parsing builds marks directly, so it skips the link extension's
+ * own href check.
  */
-function _removeUnsafeLinks(content: JSONContent): JSONContent {
-  const marks = content.marks?.filter((mark) => {
-    return (
-      mark.type !== "link" || isSafeLinkHref(String(mark.attrs?.href ?? ""))
-    );
+function _makeLinksSafe(content: JSONContent): JSONContent {
+  const marks = content.marks?.flatMap((mark) => {
+    return _buildSafeMark(mark) ?? [];
   });
   return {
     ...content,
     ...(marks ? { marks } : {}),
     ...(content.content
-      ? { content: content.content.map(_removeUnsafeLinks) }
+      ? { content: content.content.map(_makeLinksSafe) }
       : {}),
   };
 }
@@ -58,9 +68,7 @@ export const PasteMarkdown = Extension.create({
             if (!looksLikeMarkdown(text) || !editor.markdown) {
               return false;
             }
-            const parsedDocument = _removeUnsafeLinks(
-              editor.markdown.parse(text),
-            );
+            const parsedDocument = _makeLinksSafe(editor.markdown.parse(text));
             return editor.commands.insertContent(parsedDocument.content ?? []);
           },
         },

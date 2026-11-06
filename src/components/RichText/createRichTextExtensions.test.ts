@@ -37,3 +37,69 @@ describe("createRichTextExtensions", () => {
     expect(editor.commands.setLink({ href: "https://example.org" })).toBe(true);
   });
 });
+
+function _getLinkHrefs(target: Editor): string[] {
+  const hrefs: string[] = [];
+  target.state.doc.descendants((node) => {
+    node.marks.forEach((mark) => {
+      if (mark.type.name === "link") {
+        hrefs.push(String(mark.attrs.href));
+      }
+    });
+  });
+  return hrefs;
+}
+
+function _type(target: Editor, text: string): void {
+  // Insert one character per transaction, the way typing does, so the
+  // autolink plugin sees the space that ends a word.
+  text.split("").forEach((character) => {
+    target.commands.insertContent(character);
+  });
+}
+
+describe("createRichTextExtensions autolinks", () => {
+  it("links a typed bare domain to its https address", () => {
+    editor = new Editor({ extensions: createRichTextExtensions() });
+    _type(editor, "see example.com ");
+    expect(_getLinkHrefs(editor)).toEqual(["https://example.com"]);
+  });
+
+  it("links a typed www address to its https address", () => {
+    editor = new Editor({ extensions: createRichTextExtensions() });
+    _type(editor, "www.example.org ");
+    expect(_getLinkHrefs(editor)).toEqual(["https://www.example.org"]);
+  });
+
+  it("links a typed email address as a mailto link", () => {
+    editor = new Editor({ extensions: createRichTextExtensions() });
+    _type(editor, "dana@example.org ");
+    expect(_getLinkHrefs(editor)).toEqual(["mailto:dana@example.org"]);
+  });
+
+  it("never links typed script", () => {
+    editor = new Editor({ extensions: createRichTextExtensions() });
+    _type(editor, "javascript:alert(1) ");
+    expect(_getLinkHrefs(editor)).toEqual([]);
+  });
+});
+
+describe("createRichTextExtensions link box", () => {
+  it("adds https to an address entered without a scheme", () => {
+    editor = _createEditorWithSelectedText();
+    expect(editor.commands.setLink({ href: "example.com/lab" })).toBe(true);
+    expect(_getLinkHrefs(editor)).toEqual(["https://example.com/lab"]);
+  });
+
+  it("adds mailto to an email address entered without a scheme", () => {
+    editor = _createEditorWithSelectedText();
+    expect(editor.commands.setLink({ href: "dana@example.org" })).toBe(true);
+    expect(_getLinkHrefs(editor)).toEqual(["mailto:dana@example.org"]);
+  });
+
+  it("refuses an entry that is not an address", () => {
+    editor = _createEditorWithSelectedText();
+    expect(editor.commands.setLink({ href: "not a link" })).toBe(false);
+    expect(_getLinkHrefs(editor)).toEqual([]);
+  });
+});

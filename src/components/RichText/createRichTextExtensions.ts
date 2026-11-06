@@ -1,8 +1,8 @@
 import Placeholder from "@tiptap/extension-placeholder";
 import { Markdown } from "@tiptap/markdown";
 import StarterKit from "@tiptap/starter-kit";
-import { isSafeLinkHref } from "$/models/RichTextDocument/RichTextDocument";
 import { PasteMarkdown } from "@/components/RichText/PasteMarkdown/PasteMarkdown";
+import { SafeLink } from "@/components/RichText/SafeLink/SafeLink";
 import { UserMention } from "@/components/RichText/UserMention/UserMention";
 import type { Extensions } from "@tiptap/core";
 import type { MentionOptions } from "@tiptap/extension-mention";
@@ -22,15 +22,9 @@ export function createRichTextExtensions(
   return [
     StarterKit.configure({
       heading: { levels: [2, 3] },
-      link: {
-        openOnClick: false,
-        autolink: true,
-        defaultProtocol: "https",
-        isAllowedUri: (url) => {
-          return isSafeLinkHref(url);
-        },
-      },
+      link: false,
     }),
+    SafeLink,
     Placeholder.configure({ placeholder: options.placeholder ?? "" }),
     UserMention.configure(
       options.mentionSuggestion

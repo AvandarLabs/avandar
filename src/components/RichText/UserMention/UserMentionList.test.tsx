@@ -74,8 +74,31 @@ describe("UserMentionList", () => {
     expect(_pressKey(ref, "Enter")).toBe(false);
   });
 
-  it("reports the highlighted option's id as the active descendant", async () => {
-    const onHighlightChange = vi.fn();
+  it("lets Enter with a modifier fall through to the editor", async () => {
+    const command = vi.fn();
+    const ref = createRef<UserMentionListHandle>();
+    render(
+      <UserMentionList
+        ref={ref}
+        items={ITEMS}
+        clientRect={_rect}
+        command={command}
+      />,
+    );
+    await screen.findByText("Priya Natarajan");
+    let isHandled = true;
+    act(() => {
+      isHandled =
+        ref.current?.onKeyDown(
+          new KeyboardEvent("keydown", { key: "Enter", ctrlKey: true }),
+        ) ?? true;
+    });
+    expect(isHandled).toBe(false);
+    expect(command).not.toHaveBeenCalled();
+  });
+
+  it("makes the editing area a combobox pointing at the highlighted option", async () => {
+    const editingArea = _createEditingArea();
     const ref = createRef<UserMentionListHandle>();
     render(
       <UserMentionList
@@ -83,24 +106,57 @@ describe("UserMentionList", () => {
         items={ITEMS}
         clientRect={_rect}
         command={vi.fn()}
-        onHighlightChange={onHighlightChange}
+        editingArea={editingArea}
       />,
     );
     await screen.findByText("Priya Natarajan");
     const listboxId = screen.getByRole("listbox").id;
     const [firstOption, secondOption] = screen.getAllByRole("option");
     expect(listboxId).not.toBe("");
-    expect(onHighlightChange).toHaveBeenLastCalledWith({
-      listboxId,
-      activeOptionId: firstOption?.id,
-    });
+    expect(editingArea).toHaveAttribute("role", "combobox");
+    expect(editingArea).toHaveAttribute("aria-expanded", "true");
+    expect(editingArea).toHaveAttribute("aria-autocomplete", "list");
+    expect(editingArea).toHaveAttribute("aria-controls", listboxId);
+    expect(editingArea).toHaveAttribute(
+      "aria-activedescendant",
+      firstOption?.id,
+    );
     expect(firstOption).toHaveAttribute("aria-selected", "true");
 
     _pressKey(ref, "ArrowDown");
-    expect(onHighlightChange).toHaveBeenLastCalledWith({
-      listboxId,
-      activeOptionId: secondOption?.id,
-    });
+    expect(editingArea).toHaveAttribute(
+      "aria-activedescendant",
+      secondOption?.id,
+    );
     expect(secondOption).toHaveAttribute("aria-selected", "true");
   });
+
+  it("restores the editing area's role and drops the combobox attributes on unmount", async () => {
+    const editingArea = _createEditingArea();
+    const { unmount } = render(
+      <UserMentionList
+        items={ITEMS}
+        clientRect={_rect}
+        command={vi.fn()}
+        editingArea={editingArea}
+      />,
+    );
+    await screen.findByText("Priya Natarajan");
+    unmount();
+    expect(editingArea).toHaveAttribute("role", "textbox");
+    [
+      "aria-activedescendant",
+      "aria-autocomplete",
+      "aria-controls",
+      "aria-expanded",
+    ].forEach((attribute) => {
+      expect(editingArea).not.toHaveAttribute(attribute);
+    });
+  });
 });
+
+function _createEditingArea(): HTMLElement {
+  const editingArea = document.createElement("div");
+  editingArea.setAttribute("role", "textbox");
+  return editingArea;
+}
