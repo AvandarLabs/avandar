@@ -44,3 +44,7 @@
 .emptyTitle {
   text-wrap: balance;
 }
+
+.retry {
+  align-self: flex-start;
+}

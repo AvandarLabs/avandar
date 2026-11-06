@@ -40,7 +40,11 @@ describe("useKeepScrollOnPrepend", () => {
     const anchorRef = { current: content };
     const { result, rerender } = renderHook(
       ({ pageCount }) => {
-        return useKeepScrollOnPrepend(anchorRef, pageCount);
+        return useKeepScrollOnPrepend(anchorRef, {
+          pageCount,
+          hasError: false,
+          resetKey: "i1",
+        });
       },
       { initialProps: { pageCount: 1 } },
     );
@@ -57,12 +61,59 @@ describe("useKeepScrollOnPrepend", () => {
     const anchorRef = { current: content };
     const { rerender } = renderHook(
       ({ pageCount }) => {
-        return useKeepScrollOnPrepend(anchorRef, pageCount);
+        return useKeepScrollOnPrepend(anchorRef, {
+          pageCount,
+          hasError: false,
+          resetKey: "i1",
+        });
       },
       { initialProps: { pageCount: 1 } },
     );
     setScrollHeight(1600);
     rerender({ pageCount: 2 });
+    expect(scroller.scrollTop).toBe(700);
+  });
+
+  it("forgets the saved place when the earlier page fails", () => {
+    const { scroller, content, setScrollHeight } = _createScroller();
+    setScrollHeight(1000);
+    scroller.scrollTop = 700;
+    const anchorRef = { current: content };
+    const { result, rerender } = renderHook(
+      ({ pageCount, hasError }) => {
+        return useKeepScrollOnPrepend(anchorRef, {
+          pageCount,
+          hasError,
+          resetKey: "i1",
+        });
+      },
+      { initialProps: { pageCount: 1, hasError: false } },
+    );
+    result.current();
+    rerender({ pageCount: 1, hasError: true });
+    setScrollHeight(1600);
+    rerender({ pageCount: 2, hasError: false });
+    expect(scroller.scrollTop).toBe(700);
+  });
+
+  it("forgets the saved place when the case changes", () => {
+    const { scroller, content, setScrollHeight } = _createScroller();
+    setScrollHeight(1000);
+    scroller.scrollTop = 700;
+    const anchorRef = { current: content };
+    const { result, rerender } = renderHook(
+      ({ pageCount, resetKey }) => {
+        return useKeepScrollOnPrepend(anchorRef, {
+          pageCount,
+          hasError: false,
+          resetKey,
+        });
+      },
+      { initialProps: { pageCount: 1, resetKey: "i1" } },
+    );
+    result.current();
+    setScrollHeight(1600);
+    rerender({ pageCount: 0, resetKey: "i2" });
     expect(scroller.scrollTop).toBe(700);
   });
 });

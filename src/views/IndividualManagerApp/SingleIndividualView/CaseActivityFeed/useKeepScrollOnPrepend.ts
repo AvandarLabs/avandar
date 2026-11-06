@@ -19,13 +19,27 @@ function _findScrollContainer(
  * Keeps the reader's place when older entries are added above the feed.
  * Call the returned function just before requesting an earlier page; when
  * `pageCount` next changes, the scroll container is moved by however much
- * the content grew above.
+ * the content grew above. A failed request or a new `resetKey` (another
+ * case) forgets the saved place.
  */
 export function useKeepScrollOnPrepend(
   anchorRef: RefObject<HTMLElement | null>,
-  pageCount: number,
+  options: { pageCount: number; hasError: boolean; resetKey: string },
 ): () => void {
+  const { pageCount, hasError, resetKey } = options;
   const distanceFromBottomRef = useRef<number | undefined>(undefined);
+
+  useLayoutEffect(() => {
+    if (hasError) {
+      distanceFromBottomRef.current = undefined;
+    }
+  }, [hasError]);
+
+  useLayoutEffect(() => {
+    return () => {
+      distanceFromBottomRef.current = undefined;
+    };
+  }, [resetKey]);
 
   useLayoutEffect(() => {
     const distanceFromBottom = distanceFromBottomRef.current;

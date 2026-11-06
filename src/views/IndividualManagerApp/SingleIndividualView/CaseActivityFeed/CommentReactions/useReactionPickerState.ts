@@ -22,7 +22,8 @@ type ReactionPickerState = {
 /**
  * Open state of the reaction picker. Resting the pointer on the button
  * opens it after a delay and leaving closes it after another, unless the
- * pointer moves into the picker; the down arrow opens it at once.
+ * pointer moves into the picker; the down arrow opens it at once, and then
+ * the pointer leaving does not close it.
  */
 export function useReactionPickerState(
   onPick: (kind: CommentReaction.Kind) => void,
@@ -69,7 +70,10 @@ export function useReactionPickerState(
       window.clearTimeout(timerRef.current);
     },
     onPointerLeave: () => {
-      schedule(false, CLOSE_DELAY_MS);
+      // A picker opened from the keyboard stays until a pick or Escape.
+      if (!isOpenedByKeyboard) {
+        schedule(false, CLOSE_DELAY_MS);
+      }
     },
   };
 }

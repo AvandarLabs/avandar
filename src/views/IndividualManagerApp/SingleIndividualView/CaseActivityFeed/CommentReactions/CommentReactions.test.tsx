@@ -110,14 +110,82 @@ describe("CommentReactions", () => {
   });
 
   it("removes your reaction when you click it again", async () => {
-    const deleteSpy = vi
-      .spyOn(CommentReactionClient, "delete")
+    vi.spyOn(CommentReactionClient, "getAll").mockResolvedValue([MY_LIKE]);
+    const bulkDeleteSpy = vi
+      .spyOn(CommentReactionClient, "bulkDelete")
       .mockResolvedValue(undefined);
     _renderReactions([MY_LIKE]);
     fireEvent.click(screen.getByRole("button", { name: "Like" }));
     await waitFor(() => {
-      expect(deleteSpy).toHaveBeenCalledWith({ id: "r1" });
+      expect(bulkDeleteSpy).toHaveBeenCalledWith({ ids: ["r1"] });
     });
+  });
+
+  it("leaves no reaction when you un-react right after reacting", async () => {
+    let serverReactions: CommentReaction.T[] = [];
+    vi.spyOn(CommentReactionClient, "insert").mockImplementation(
+      async ({ data }) => {
+        const savedReaction = { ...data, id: "server-id" } as CommentReaction.T;
+        serverReactions = [savedReaction];
+        return savedReaction;
+      },
+    );
+    vi.spyOn(CommentReactionClient, "getAll").mockImplementation(async () => {
+      return serverReactions;
+    });
+    vi.spyOn(CommentReactionClient, "bulkDelete").mockImplementation(
+      async ({ ids }) => {
+        serverReactions = serverReactions.filter((reaction) => {
+          return !ids.includes(reaction.id);
+        });
+      },
+    );
+    const deleteSpy = vi.spyOn(CommentReactionClient, "delete");
+    const { rerender } = _renderReactions([]);
+    fireEvent.click(screen.getByRole("button", { name: "Like" }));
+    await waitFor(() => {
+      expect(serverReactions).toHaveLength(1);
+    });
+    // The feed still shows the optimistic reaction, which has no server id.
+    rerender(
+      <CommentReactions
+        comment={COMMENT}
+        reactions={[{ ...MY_LIKE, id: "optimistic-id" as CommentReaction.Id }]}
+        currentUserId={"u1" as CommentReaction.T["userId"]}
+        getMemberName={() => {
+          return "Dana";
+        }}
+      />,
+    );
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Like" })).not.toHaveAttribute(
+        "aria-busy",
+        "true",
+      );
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Like" }));
+    await waitFor(() => {
+      expect(serverReactions).toEqual([]);
+    });
+    expect(deleteSpy).not.toHaveBeenCalled();
+  });
+
+  it("returns focus to the reaction button after picking from the keyboard", async () => {
+    vi.spyOn(CommentReactionClient, "insert").mockImplementation(() => {
+      return new Promise(() => {});
+    });
+    _renderReactions([]);
+    const reactionButton = screen.getByRole("button", { name: "Like" });
+    reactionButton.focus();
+    fireEvent.keyDown(reactionButton, { key: "ArrowDown" });
+    const picker = await _findPicker();
+    fireEvent.click(
+      within(picker).getByRole("button", { name: "Celebrate", hidden: true }),
+    );
+    await waitFor(() => {
+      expect(reactionButton).toHaveFocus();
+    });
+    expect(reactionButton).toHaveAttribute("aria-busy", "true");
   });
 
   it("focuses your current reaction when the picker opens from the keyboard", async () => {

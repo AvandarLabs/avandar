@@ -36,6 +36,9 @@ export type CaseActivityFeedState = {
   isSeekingLinkedComment: boolean;
   pageCount: number;
   loadEarlier: () => void;
+  /** Loads the first page again after it failed. */
+  retry: () => void;
+  isRetrying: boolean;
 };
 
 type SeekState = {
@@ -199,5 +202,9 @@ export function useCaseActivityFeed(options: {
     loadEarlier: () => {
       void fetchNextPage();
     },
+    retry: () => {
+      void query.refetch();
+    },
+    isRetrying: query.isLoadingError && query.isFetching,
   };
 }

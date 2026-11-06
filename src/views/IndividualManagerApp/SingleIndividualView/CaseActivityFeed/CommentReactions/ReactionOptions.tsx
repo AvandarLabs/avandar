@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Tooltip } from "@mantine/core";
+import clsx from "clsx";
 import {
   buildReactionColorVar,
   COMMENT_REACTION_DISPLAY,
@@ -10,6 +11,8 @@ import type { CommentReaction } from "$/models/comments/CommentReaction/CommentR
 import type { ReactNode } from "react";
 
 type Props = {
+  /** Picks are ignored while saving; the options say so but stay focusable. */
+  isSaving: boolean;
   currentKind: CommentReaction.Kind | undefined;
   /** The option that takes focus when the picker opens. */
   autoFocusKind: CommentReaction.Kind;
@@ -18,13 +21,19 @@ type Props = {
 
 /** The six reactions as a row of toggle buttons named by their labels. */
 export function ReactionOptions({
+  isSaving,
   currentKind,
   autoFocusKind,
   onPick,
 }: Props): ReactNode {
   const { t, i18n } = useLingui();
   return (
-    <div className={classes.picker} role="group" aria-label={t`Reactions`}>
+    <div
+      className={clsx(classes.picker, isSaving && classes.saving)}
+      role="group"
+      aria-label={t`Reactions`}
+      aria-busy={isSaving}
+    >
       {COMMENT_REACTION_KINDS.map((kind) => {
         const { Icon, color, label } = COMMENT_REACTION_DISPLAY[kind];
         return (

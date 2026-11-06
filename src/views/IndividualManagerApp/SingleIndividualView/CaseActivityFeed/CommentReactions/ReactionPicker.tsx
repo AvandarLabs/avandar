@@ -1,7 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { Button, Popover } from "@mantine/core";
 import { IconThumbUp } from "@tabler/icons-react";
+import clsx from "clsx";
 import { COMMENT_REACTION_DISPLAY } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds";
+import classes from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/CommentReactions.module.css";
 import { ReactionOptions } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionOptions";
 import { useReactionPickerState } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/useReactionPickerState";
 import type { CommentReaction } from "$/models/comments/CommentReaction/CommentReaction";
@@ -16,7 +18,8 @@ type Props = {
 /**
  * The reaction button and its picker. A click toggles your current
  * reaction (Like by default); resting the pointer on the button, or
- * pressing the down arrow on it, opens all six.
+ * pressing the down arrow on it, opens all six. While a reaction saves,
+ * the controls stay focusable and further picks are ignored.
  */
 export function ReactionPicker({
   currentKind,
@@ -45,7 +48,10 @@ export function ReactionPicker({
           color={currentKind ? "primary" : "neutral"}
           size="compact-xs"
           aria-pressed={currentKind !== undefined}
-          loading={isSaving}
+          // Not `loading`: that disables the button, which drops focus to
+          // the page when the picker returns it or Enter toggles it.
+          aria-busy={isSaving}
+          className={clsx(isSaving && classes.saving)}
           leftSection={<ButtonIcon size={13} />}
           onClick={() => {
             picker.pick(buttonKind);
@@ -63,6 +69,7 @@ export function ReactionPicker({
         onMouseLeave={picker.onPointerLeave}
       >
         <ReactionOptions
+          isSaving={isSaving}
           currentKind={currentKind}
           autoFocusKind={buttonKind}
           onPick={picker.pick}

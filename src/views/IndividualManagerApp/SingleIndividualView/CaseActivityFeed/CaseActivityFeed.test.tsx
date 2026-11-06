@@ -127,6 +127,26 @@ describe("CaseActivityFeed", () => {
     expect(scrollSpy.mock.contexts[0]).toHaveProperty("id", "comment-c-e1");
   });
 
+  it("loads the feed again when you retry a failed first load", async () => {
+    vi.spyOn(ActivityEventClient, "getCaseActivityPage")
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValue({
+        hasMore: false,
+        entries: [_commentEntry("e1", "Specimens sent", "2026-10-27T13:40:00")],
+      });
+    render(
+      <CaseActivityFeed
+        workspaceId={"w1" as Workspace.Id}
+        individualId={"i1" as Individual.Id}
+        members={[]}
+        highlightedCommentId={undefined}
+      />,
+      { wrapper: _wrapper },
+    );
+    fireEvent.click(await screen.findByRole("button", { name: "Try again" }));
+    expect(await screen.findByText("Specimens sent")).toBeInTheDocument();
+  });
+
   it("explains a failed first load", async () => {
     vi.spyOn(ActivityEventClient, "getCaseActivityPage").mockRejectedValue(
       new Error("offline"),

@@ -42,3 +42,9 @@
   outline: 2px solid var(--ava-border-focus);
   outline-offset: 2px;
 }
+
+/* A save is in flight: still focusable, visibly waiting. */
+.saving {
+  cursor: progress;
+  opacity: 0.6;
+}

@@ -11,6 +11,12 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 /** How long typing must pause before the draft is written. */
 const SAVE_DELAY_MS = 300;
 
+type PendingDraft = {
+  workspaceId: Workspace.Id;
+  individualId: Individual.Id;
+  document: RichTextDocument.T;
+};
+
 type CaseActivityDraft = {
   initialDraft: RichTextDocument.T | undefined;
   /** Writes the draft once typing pauses, or when the composer goes away. */
@@ -27,7 +33,9 @@ export function useCaseActivityDraft(
   const initialDraft = useMemo(() => {
     return loadCaseActivityDraft(workspaceId, individualId);
   }, [workspaceId, individualId]);
-  const pendingDraftRef = useRef<RichTextDocument.T | undefined>(undefined);
+  // The pending draft carries its own case, so a flush that runs after a
+  // case switch still writes it to the case it was typed in.
+  const pendingDraftRef = useRef<PendingDraft | undefined>(undefined);
   const timerRef = useRef<number | undefined>(undefined);
 
   const flushDraft = useMemo(() => {
@@ -36,19 +44,23 @@ export function useCaseActivityDraft(
       const pendingDraft = pendingDraftRef.current;
       pendingDraftRef.current = undefined;
       if (pendingDraft) {
-        saveCaseActivityDraft(workspaceId, individualId, pendingDraft);
+        saveCaseActivityDraft(
+          pendingDraft.workspaceId,
+          pendingDraft.individualId,
+          pendingDraft.document,
+        );
       }
     };
-  }, [workspaceId, individualId]);
+  }, []);
 
   useEffect(() => {
     return flushDraft;
-  }, [flushDraft]);
+  }, [flushDraft, workspaceId, individualId]);
 
   return {
     initialDraft,
     saveDraft: (document) => {
-      pendingDraftRef.current = document;
+      pendingDraftRef.current = { workspaceId, individualId, document };
       window.clearTimeout(timerRef.current);
       timerRef.current = window.setTimeout(flushDraft, SAVE_DELAY_MS);
     },

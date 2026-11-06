@@ -58,6 +58,7 @@ export function CaseActivityFeed({
         }
       >
         <CaseActivityFeedContent
+          caseKey={individualId}
           feed={feed}
           itemProps={{
             currentUserId: currentUser?.id,

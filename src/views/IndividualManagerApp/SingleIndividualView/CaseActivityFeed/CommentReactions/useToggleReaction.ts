@@ -81,39 +81,45 @@ function _buildOptimisticReaction(
   };
 }
 
-/**
- * Shows the change in every cached copy of the case's feed and returns the
- * copies as they were, for a rollback.
- */
-async function _applyOptimisticChange(
+/** Sets one member's reaction on one comment in every cached feed copy. */
+function _setCachedReaction(
   queryClient: QueryClient,
   queryKey: QueryKey,
   change: ReactionChange,
-): Promise<Array<[QueryKey, CaseActivityFeedData | undefined]>> {
-  await queryClient.cancelQueries({ queryKey });
-  const previousFeeds = queryClient.getQueriesData<CaseActivityFeedData>({
-    queryKey,
-  });
+  reaction: CommentReaction.T | undefined,
+): void {
   queryClient.setQueriesData<CaseActivityFeedData>({ queryKey }, (data) => {
     return _buildFeedDataWithReaction(data, {
       commentId: change.comment.id,
       userId: change.userId,
-      reaction: _buildOptimisticReaction(change),
+      reaction,
     });
   });
-  return previousFeeds;
 }
 
-/** Writes the member's next reaction: an upsert, or a delete to clear it. */
-async function _saveReaction(change: ReactionChange): Promise<void> {
-  const { comment, userId, myReaction, nextKind } = change;
+/**
+ * Writes the member's next reaction and returns the saved row. Clearing
+ * deletes by comment and member, never by the cached id: a reaction shown
+ * before its insert returned carries an id the server never saw.
+ */
+async function _saveReaction(
+  change: ReactionChange,
+): Promise<CommentReaction.T | undefined> {
+  const { comment, userId, nextKind } = change;
   if (nextKind === undefined) {
-    if (myReaction) {
-      await CommentReactionClient.delete({ id: myReaction.id });
+    const savedReactions = await CommentReactionClient.getAll({
+      where: { comment_id: { eq: comment.id }, user_id: { eq: userId } },
+    });
+    if (savedReactions.length > 0) {
+      await CommentReactionClient.bulkDelete({
+        ids: savedReactions.map((reaction) => {
+          return reaction.id;
+        }),
+      });
     }
-    return;
+    return undefined;
   }
-  await CommentReactionClient.insert({
+  return CommentReactionClient.insert({
     data: {
       commentId: comment.id,
       kind: nextKind,
@@ -130,7 +136,8 @@ async function _saveReaction(change: ReactionChange): Promise<void> {
 
 /**
  * Sets, swaps, or clears the current member's reaction on a comment. The
- * case feed shows the change at once and rolls it back if saving fails.
+ * case feed shows the change at once; if saving fails only that comment's
+ * reaction is put back.
  */
 export function useToggleReaction(options: {
   comment: Comment.T;
@@ -154,22 +161,27 @@ export function useToggleReaction(options: {
     };
     const queryKey = buildCaseActivityFeedQueryKey(comment.individualId);
     setIsSaving(true);
-    const previousFeeds = await _applyOptimisticChange(
+    await queryClient.cancelQueries({ queryKey });
+    _setCachedReaction(
       queryClient,
       queryKey,
       change,
+      _buildOptimisticReaction(change),
     );
     try {
-      await _saveReaction(change);
+      _setCachedReaction(
+        queryClient,
+        queryKey,
+        change,
+        await _saveReaction(change),
+      );
     } catch {
-      previousFeeds.forEach(([previousQueryKey, previousData]) => {
-        queryClient.setQueryData(previousQueryKey, previousData);
-      });
+      _setCachedReaction(queryClient, queryKey, change, myReaction);
       notifyError(t`Your reaction could not be saved. Try again.`);
-    } finally {
-      setIsSaving(false);
-      void queryClient.invalidateQueries({ queryKey });
     }
+    // Settle on the server's state before another toggle is allowed.
+    await queryClient.invalidateQueries({ queryKey });
+    setIsSaving(false);
   };
 
   return {

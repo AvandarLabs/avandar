@@ -1,6 +1,6 @@
 import { Callout } from "@avandar/ui";
-import { useLingui } from "@lingui/react/macro";
-import { Center, Loader } from "@mantine/core";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Button, Center, Loader } from "@mantine/core";
 import { useMemo, useRef } from "react";
 import { CaseActivityDayGroup } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityDayGroup";
 import classes from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.module.css";
@@ -13,6 +13,8 @@ import type { CaseActivityFeedState } from "@/views/IndividualManagerApp/SingleI
 import type { ReactNode } from "react";
 
 type Props = {
+  /** Identifies the case, so state kept for one case never leaks to another. */
+  caseKey: string;
   feed: CaseActivityFeedState;
   itemProps: Omit<ActivityFeedItemProps, "entry">;
 };
@@ -22,13 +24,18 @@ type Props = {
  * or the entries by day with the control that loads older ones. Loading
  * older entries keeps the reader's place.
  */
-export function CaseActivityFeedContent({ feed, itemProps }: Props): ReactNode {
+export function CaseActivityFeedContent({
+  caseKey,
+  feed,
+  itemProps,
+}: Props): ReactNode {
   const { t } = useLingui();
   const feedRef = useRef<HTMLDivElement>(null);
-  const rememberScrollPosition = useKeepScrollOnPrepend(
-    feedRef,
-    feed.pageCount,
-  );
+  const rememberScrollPosition = useKeepScrollOnPrepend(feedRef, {
+    pageCount: feed.pageCount,
+    hasError: feed.hasEarlierError,
+    resetKey: caseKey,
+  });
   const dayGroups = useMemo(() => {
     return groupActivityByDay(feed.entries);
   }, [feed.entries]);
@@ -45,7 +52,17 @@ export function CaseActivityFeedContent({ feed, itemProps }: Props): ReactNode {
       <Callout
         title={t`The activity for this case failed to load`}
         message={t`Try again in a moment, or reach out to support if it keeps happening.`}
-      />
+      >
+        <Button
+          variant="default"
+          size="compact-sm"
+          className={classes.retry}
+          loading={feed.isRetrying}
+          onClick={feed.retry}
+        >
+          <Trans>Try again</Trans>
+        </Button>
+      </Callout>
     );
   }
   if (feed.entries.length === 0) {

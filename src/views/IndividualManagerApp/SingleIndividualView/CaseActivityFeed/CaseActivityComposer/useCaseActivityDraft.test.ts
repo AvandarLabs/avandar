@@ -64,4 +64,28 @@ describe("useCaseActivityDraft", () => {
     });
     expect(loadCaseActivityDraft("w1", "i1")).toBeUndefined();
   });
+
+  it("never writes one case's text into another after a switch", () => {
+    const { result, rerender } = renderHook(
+      ({ individualId }) => {
+        return useCaseActivityDraft("w1" as Workspace.Id, individualId);
+      },
+      { initialProps: { individualId: "i1" as Individual.Id } },
+    );
+    const firstCaseDraft = result.current;
+    act(() => {
+      firstCaseDraft.saveDraft(_document("first case"));
+    });
+    rerender({ individualId: "i2" as Individual.Id });
+    act(() => {
+      result.current.saveDraft(_document("second case"));
+      // A post on the first case finishes after the switch.
+      firstCaseDraft.clearPostedDraft(_document("posted earlier"));
+    });
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    expect(loadCaseActivityDraft("w1", "i1")).toEqual(_document("first case"));
+    expect(loadCaseActivityDraft("w1", "i2")).toEqual(_document("second case"));
+  });
 });
