@@ -1,0 +1,25 @@
+.anchor {
+  height: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: 9999;
+}
+
+.option {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+}
+
+.initials {
+  background-color: var(--mantine-color-neutral-1);
+  border: 1px solid var(--ava-border-default);
+  border-radius: 50%;
+  display: grid;
+  flex: none;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  height: 24px;
+  place-items: center;
+  width: 24px;
+}
