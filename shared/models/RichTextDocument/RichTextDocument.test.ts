@@ -120,6 +120,48 @@ describe("getMentionedUserIds", () => {
   });
 });
 
+/**
+ * Bodies the stored-document schema would reject. A stored body is read
+ * without parsing, so these must never throw while the page renders.
+ */
+const MALFORMED_DOCUMENTS: ReadonlyArray<[string, unknown]> = [
+  ["a null child", { type: "doc", content: [null] }],
+  ["content that is not an array", { type: "doc", content: {} }],
+  [
+    "a node missing its type",
+    {
+      type: "doc",
+      content: [{ content: [{ type: "text", text: "Serum" }, _mention(MEMBER_ID)] }],
+    },
+  ],
+];
+
+describe("malformed documents", () => {
+  it.each(MALFORMED_DOCUMENTS)(
+    "reads plain text from a document with %s without throwing",
+    (_label, document) => {
+      expect(() => {
+        return richTextToPlainText(document as RichTextDocument.T);
+      }).not.toThrow();
+    },
+  );
+
+  it.each(MALFORMED_DOCUMENTS)(
+    "reads mentions from a document with %s without throwing",
+    (_label, document) => {
+      expect(() => {
+        return getMentionedUserIds(document as RichTextDocument.T);
+      }).not.toThrow();
+    },
+  );
+
+  it("keeps the readable text and mentions of a node missing its type", () => {
+    const document = MALFORMED_DOCUMENTS[2]![1] as RichTextDocument.T;
+    expect(richTextToPlainText(document)).toBe("Serum@member");
+    expect(getMentionedUserIds(document)).toEqual([MEMBER_ID]);
+  });
+});
+
 describe("isSafeLinkHref", () => {
   it("allows web and email links in any case", () => {
     expect(isSafeLinkHref("https://example.org")).toBe(true);

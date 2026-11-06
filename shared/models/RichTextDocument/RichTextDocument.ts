@@ -150,23 +150,28 @@ export function richTextToPlainText(
 }
 
 function _nodeToPlainText(
-  node: RichTextNode,
+  node: unknown,
   options: Readonly<{
     getMentionLabel?: (userId: string) => string | undefined;
   }>,
 ): string {
-  if (node.type === "text") {
-    return node.text ?? "";
+  if (!_isObject(node)) {
+    return "";
   }
-  if (node.type === "hardBreak") {
+  const nodeType = _readNodeType(node);
+  if (nodeType === "text") {
+    return typeof node.text === "string" ? node.text : "";
+  }
+  if (nodeType === "hardBreak") {
     return "\n";
   }
-  if (node.type === "userMention") {
-    const userId = String(node.attrs?.id ?? "");
+  if (nodeType === "userMention") {
+    const userId = _readMentionUserId(node) ?? "";
     return `@${options.getMentionLabel?.(userId) ?? "member"}`;
   }
-  const separator = BLOCK_CONTAINER_TYPES.has(node.type) ? "\n" : "";
-  return (node.content ?? [])
+  const separator =
+    nodeType !== undefined && BLOCK_CONTAINER_TYPES.has(nodeType) ? "\n" : "";
+  return _readChildren(node)
     .map((child) => {
       return _nodeToPlainText(child, options);
     })
@@ -182,16 +187,41 @@ export function getMentionedUserIds(
   return [...userIds];
 }
 
-function _collectMentions(node: RichTextNode, userIds: Set<string>): void {
-  if (node.type === "userMention") {
-    const userId = node.attrs?.id;
-    if (typeof userId === "string" && userId.length > 0) {
+function _collectMentions(node: unknown, userIds: Set<string>): void {
+  if (!_isObject(node)) {
+    return;
+  }
+  if (_readNodeType(node) === "userMention") {
+    const userId = _readMentionUserId(node);
+    if (userId !== undefined && userId.length > 0) {
       userIds.add(userId);
     }
   }
-  (node.content ?? []).forEach((child) => {
+  _readChildren(node).forEach((child) => {
     _collectMentions(child, userIds);
   });
+}
+
+/*
+ * Defensive readers. A stored body is read without parsing it first, so the
+ * walkers above must survive any JSON shape rather than trust the type.
+ */
+
+function _isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function _readNodeType(node: Record<string, unknown>): string | undefined {
+  return typeof node.type === "string" ? node.type : undefined;
+}
+
+function _readChildren(node: Record<string, unknown>): readonly unknown[] {
+  return Array.isArray(node.content) ? node.content : [];
+}
+
+function _readMentionUserId(node: Record<string, unknown>): string | undefined {
+  const userId = _isObject(node.attrs) ? node.attrs.id : undefined;
+  return typeof userId === "string" ? userId : undefined;
 }
 
 /** Rich text documents stored by comments and rendered in the case feed. */

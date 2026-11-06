@@ -38,7 +38,14 @@ create table public.comments (
     )
   ),
   constraint comments__body_text_length check (char_length(body_text) <= 10000),
-  constraint comments__body_size check (pg_column_size(body) <= 262144)
+  constraint comments__body_size check (pg_column_size(body) <= 262144),
+  constraint comments__body_is_doc check (
+    body is null or
+    (
+      jsonb_typeof(body) = 'object' and
+      body ->> 'type' = 'doc'
+    )
+  )
 );
 
 create index idx_comments__individual_created on public.comments (individual_id, created_at);

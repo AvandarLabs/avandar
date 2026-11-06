@@ -55,7 +55,7 @@ values (
   'first'
 );
 
-select plan (22);
+select plan (24);
 
 -- 1. Insert writes one comment_created event.
 select is (
@@ -367,6 +367,38 @@ select is (
   ),
   '{"is_created_now": true, "is_updated_now": true, "edited_at": null, "deleted_at": null, "has_body": true}'::jsonb,
   'an insert cannot backdate a comment or create it edited or deleted'
+);
+
+-- 23. The body must be a document object, not any other JSON value.
+select throws_ok (
+  $$
+  insert into public.comments (workspace_id, individual_id, author_user_id, body, body_text)
+  values (
+    'e1100001-0000-4000-8000-000000000001'::uuid,
+    'e1400001-0000-4000-8000-000000000001'::uuid,
+    'e1000001-0000-4000-8000-000000000001'::uuid,
+    '[{"type":"doc"}]'::jsonb,
+    'not a document'
+  )
+  $$,
+  '23514',
+  'new row for relation "comments" violates check constraint "comments__body_is_doc"',
+  'a body that is not a JSON object is rejected'
+);
+select throws_ok (
+  $$
+  insert into public.comments (workspace_id, individual_id, author_user_id, body, body_text)
+  values (
+    'e1100001-0000-4000-8000-000000000001'::uuid,
+    'e1400001-0000-4000-8000-000000000001'::uuid,
+    'e1000001-0000-4000-8000-000000000001'::uuid,
+    '{"type":"paragraph","content":[]}'::jsonb,
+    'not a document'
+  )
+  $$,
+  '23514',
+  'new row for relation "comments" violates check constraint "comments__body_is_doc"',
+  'a body whose root is not a doc node is rejected'
 );
 
 select * from finish ();

@@ -190,6 +190,10 @@ alter table "public"."comment_revisions" add constraint "comment_revisions_works
 
 alter table "public"."comment_revisions" validate constraint "comment_revisions_workspace_id_fkey";
 
+alter table "public"."comments" add constraint "comments__body_is_doc" CHECK (((body IS NULL) OR ((jsonb_typeof(body) = 'object'::text) AND ((body ->> 'type'::text) = 'doc'::text)))) not valid;
+
+alter table "public"."comments" validate constraint "comments__body_is_doc";
+
 alter table "public"."comments" add constraint "comments__body_present_unless_deleted" CHECK (((deleted_at IS NULL) = ((body IS NOT NULL) AND (body_text IS NOT NULL)))) not valid;
 
 alter table "public"."comments" validate constraint "comments__body_present_unless_deleted";
