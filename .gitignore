@@ -25,10 +25,10 @@ dist-ssr
 
 # Environment
 .env
-.env.local*
-.env.development*
-.env.staging*
-.env.production*
+# Every `.env.<name>` that `ava --env <name>` can load, except the examples.
+.env.*
+!.env.example
+!.env.example.edge
 *client_secret*
 
 # Ignorable development files 
