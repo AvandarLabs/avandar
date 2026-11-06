@@ -35,12 +35,14 @@ function _listing(
   | "dateColumnTypeLastVerified"
   | "dateOfLastUpdate"
   | "isInvalid"
+  | "isWorkspaceLoadable"
 > {
   return {
     accessKind: "api_resource",
     apiResourceFormat: "CSV",
     dateColumnTypeLastVerified: undefined,
     isInvalid: false,
+    isWorkspaceLoadable: true,
     dateOfLastUpdate: "2026-10-20T00:00:00+00:00",
     ...overrides,
   };
@@ -69,6 +71,7 @@ describe("isColumnTypeVerificationDue", () => {
     ],
     ["a Parquet resource", { apiResourceFormat: "PARQUET" }, false],
     ["marked invalid", { isInvalid: true }, false],
+    ["not supported in a workspace", { isWorkspaceLoadable: false }, false],
     [
       "a pipeline Parquet listing",
       { accessKind: "pipeline_parquet", apiResourceFormat: undefined },

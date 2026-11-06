@@ -128,6 +128,22 @@ export type DataCatalogListingRead = {
 
   /** Why the dataset cannot be loaded. Set exactly when `isInvalid` is. */
   invalidDatasetReason: InvalidDatasetReason | undefined;
+
+  /**
+   * Whether a workspace can add this entry. False for an asset Avandar
+   * cannot read yet, such as a map or a PDF, which is still listed so it
+   * can be found and opened at `sourceUrl`.
+   */
+  isWorkspaceLoadable: boolean;
+
+  /**
+   * The source's own name for the kind of asset this is, such as Socrata's
+   * `map` or `file`.
+   */
+  sourceAssetType: string | undefined;
+
+  /** Where the asset's bytes can be downloaded, when the source says. */
+  sourceDownloadUrl: string | undefined;
 };
 
 /**
@@ -187,7 +203,12 @@ export type DataCatalogListingModel = SupabaseCrudModelSpec<
       Read: DataCatalogListingRead;
       Insert: SetOptional<
         DataCatalogListingRead,
-        "id" | "createdAt" | "updatedAt" | "isInvalid" | "invalidDatasetReason"
+        | "id"
+        | "createdAt"
+        | "updatedAt"
+        | "isInvalid"
+        | "invalidDatasetReason"
+        | "isWorkspaceLoadable"
       >;
       Update: Partial<DataCatalogListingRead>;
     };

@@ -589,7 +589,7 @@ msgstr "تم الحفظ كـ \"{0}\"."
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
-msgstr "يتطلب هذا الخادم SSL. عيّن وضع SSL إلى \"Require\" وحاول مرة أخرى."
+msgstr "يتطلب هذا الخادم SSL. اضبط وضع SSL على \"Require\" وحاول مرة أخرى."
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Could not save. Your last change is still on screen."
@@ -2531,7 +2531,7 @@ msgstr "انشره"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Prod reporting replica"
-msgstr "نسخة طبق الأصل لإعداد تقارير الإنتاج"
+msgstr "نسخة متماثلة لإعداد تقارير الإنتاج"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
@@ -3601,7 +3601,7 @@ msgstr "ينتهي بـ"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Table or view to import"
-msgstr "الجدول أو العرض المراد استيراده"
+msgstr "الجدول أو العرض المطلوب استيراده"
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
@@ -3641,10 +3641,6 @@ msgstr "مشتق"
 msgid "text"
 msgstr "نص"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-#~ msgid "{numResults} of {numCatalogListings} datasets"
-#~ msgstr ""
-
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "Review filter"
 msgstr "مراجعة عامل التصفية"
@@ -3668,6 +3664,10 @@ msgstr "تأكيد الإجراء"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "لا توجد لوحات معلومات لعرضها"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#~ msgid "A type of record you manage"
+#~ msgstr "نوع من السجلات التي تديرها"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -4466,6 +4466,10 @@ msgstr "إرسال"
 msgid "dashboard"
 msgstr "لوحة التحكم"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "You can still open the original, where it is published."
+msgstr "لا يزال بإمكانك فتح النسخة الأصلية حيث نُشرت."
+
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
 msgstr "يتوفر إصدار جديد. حدّث الآن، أو أغلق هذه النافذة وحدّث لاحقًا."
@@ -5175,7 +5179,7 @@ msgstr "تعذّر تمثيل أجزاء من SQL في النموذج اليدو
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Database"
-msgstr "قاعدة بيانات"
+msgstr "قاعدة البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
@@ -5225,7 +5229,7 @@ msgstr "الصفوف التي تم تخطيها"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Databases"
-msgstr "قواعد بيانات"
+msgstr "قواعد البيانات"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Not yet published. Viewers will not see this."
@@ -5761,6 +5765,10 @@ msgstr "البحث في مصادر البيانات"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Tool"
 msgstr "أداة"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Not supported yet"
+msgstr "غير مدعوم حتى الآن"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -6560,8 +6568,8 @@ msgstr ""
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
 "the server allows connections from Avandar."
-msgstr "تعذّر على Avandar الوصول إلى ذلك المضيف والمنفذ. تحقّق من العنوان ومن "
-"أن الخادم يسمح بالاتصالات من Avandar."
+msgstr "تعذر على Avandar الوصول إلى ذلك المضيف والمنفذ. تحقق من العنوان ومن أن "
+"الخادم يسمح بالاتصالات من Avandar."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
@@ -6923,8 +6931,8 @@ msgstr "حاول مرة أخرى بعد قليل، أو تواصل مع الدع
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
-msgstr "يُفضّل أن يكون لدى مستخدم قاعدة البيانات وصول للقراءة فقط إلى الجدول أو "
-"العرض الذي تخطط لاستيراده."
+msgstr "يُفضّل أن يملك مستخدم قاعدة البيانات صلاحية القراءة فقط للجدول أو العرض "
+"الذي تخطط لاستيراده."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
@@ -7945,6 +7953,10 @@ msgstr "{lengthValue} كم"
 msgid "Source line"
 msgstr "سطر المصدر"
 
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
+#~ msgid "Nothing more to load"
+#~ msgstr "لا يوجد المزيد لتحميله"
+
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "تعذّر جعله خاصًا"
@@ -8288,6 +8300,10 @@ msgstr "عمود مفتاح الحدود"
 msgid "Time window: {0}"
 msgstr "الفترة الزمنية: {0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Open it on {serviceName}"
+msgstr "افتحه على {serviceName}"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
 msgstr "الإحداثي خارج النطاق الصالح"
@@ -8301,6 +8317,10 @@ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers 
 "offline."
 msgstr "يُنصح بهذا الخيار إذا كانت ذاكرة RAM لديك بسعة 12 GB وتريد إجابات SQL "
 "أفضل بشكل ملحوظ دون اتصال."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Avandar can't add this kind of dataset yet."
+msgstr "لا يستطيع Avandar إضافة هذا النوع من مجموعات البيانات حتى الآن."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear filters"
@@ -8387,8 +8407,8 @@ msgstr "الدور للمشاركة الجديدة"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
-msgstr "يحتوي هذا الجدول على عدد صفوف أكبر مما يستطيع Avandar استيراده دفعة "
-"واحدة. جرّب جدولًا أو عرضًا أصغر."
+msgstr "يحتوي هذا الجدول على صفوف أكثر مما يمكن لـ Avandar استيراده دفعةً "
+"واحدة. جرّب جدولًا أو طريقة عرض أصغر."
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"

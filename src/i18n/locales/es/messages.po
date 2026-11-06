@@ -3703,10 +3703,6 @@ msgstr "Derivado"
 msgid "text"
 msgstr "texto"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-#~ msgid "{numResults} of {numCatalogListings} datasets"
-#~ msgstr ""
-
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "Review filter"
 msgstr "Revisar filtro"
@@ -3730,6 +3726,10 @@ msgstr "Confirmar acción"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "No hay dashboards para mostrar"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#~ msgid "A type of record you manage"
+#~ msgstr "Un tipo de registro que administra"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -4541,6 +4541,10 @@ msgstr "Enviar"
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "tablero"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "You can still open the original, where it is published."
+msgstr "Aún puede abrir el original, donde está publicado."
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
@@ -5858,6 +5862,10 @@ msgstr "Buscar fuentes de datos"
 msgid "Tool"
 msgstr "Herramienta"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Not supported yet"
+msgstr "Aún no es compatible"
+
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
 msgstr "Pide a un administrador de configuraciones del espacio de trabajo que "
@@ -6665,8 +6673,8 @@ msgstr ""
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
 "the server allows connections from Avandar."
-msgstr "Avandar no pudo comunicarse con ese host y puerto. Verifique la "
-"dirección y que el servidor permita conexiones desde Avandar."
+msgstr "Avandar no pudo conectarse a ese host y puerto. Verifique la dirección "
+"y que el servidor permita conexiones desde Avandar."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
@@ -8077,6 +8085,10 @@ msgstr "{lengthValue} km"
 msgid "Source line"
 msgstr "Línea de origen"
 
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
+#~ msgid "Nothing more to load"
+#~ msgstr "No hay nada más que cargar"
+
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "No se pudo hacer privado"
@@ -8427,6 +8439,10 @@ msgstr "Columna de clave del límite"
 msgid "Time window: {0}"
 msgstr "Periodo: {0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Open it on {serviceName}"
+msgstr "Abrir en {serviceName}"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
 msgstr "La coordenada está fuera del rango válido"
@@ -8440,6 +8456,10 @@ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers 
 "offline."
 msgstr "Recomendado si tiene 12 GB de RAM y desea respuestas de SQL sin "
 "conexión notablemente mejores."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Avandar can't add this kind of dataset yet."
+msgstr "Avandar aún no puede agregar este tipo de conjunto de datos."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear filters"
@@ -8551,7 +8571,7 @@ msgstr "Comprar {seatsToAdd} asientos"
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
 msgstr "No se aceptó el nombre de usuario o la contraseña. Verifique las "
-"credenciales e inténtelo de nuevo."
+"credenciales y vuelva a intentarlo."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
@@ -9884,8 +9904,8 @@ msgstr "Cargue un archivo CSV, Excel o PDF, conecte una hoja de cálculo de "
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
-msgstr "La base de datos no respondió a tiempo. Verifique la dirección e "
-"inténtelo de nuevo."
+msgstr "La base de datos no respondió a tiempo. Verifique la dirección y vuelva "
+"a intentarlo."
 
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx

@@ -18,6 +18,7 @@ function _listing(
     apiResourceFormat: "CSV",
     dateColumnTypeLastVerified: undefined,
     isInvalid: false,
+    isWorkspaceLoadable: true,
     invalidDatasetReason: undefined,
     dateOfLastUpdate: "2026-10-20T00:00:00+00:00",
     ...overrides,

@@ -2571,7 +2571,7 @@ msgstr "Publicar"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Prod reporting replica"
-msgstr "Réplica de relatórios de produção"
+msgstr "Réplica de produção para relatórios"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
@@ -3699,10 +3699,6 @@ msgstr "Derivado"
 msgid "text"
 msgstr "texto"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-#~ msgid "{numResults} of {numCatalogListings} datasets"
-#~ msgstr ""
-
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "Review filter"
 msgstr "Revisar filtro"
@@ -3726,6 +3722,10 @@ msgstr "Confirmar Ação"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "Nenhum dashboard para exibir"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#~ msgid "A type of record you manage"
+#~ msgstr "Um tipo de registro que você gerencia"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -4534,6 +4534,10 @@ msgstr "Enviar"
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "painel"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "You can still open the original, where it is published."
+msgstr "Você ainda pode abrir o original, onde ele está publicado."
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
@@ -5846,6 +5850,10 @@ msgstr "Pesquisar fontes de dados"
 msgid "Tool"
 msgstr "Ferramenta"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Not supported yet"
+msgstr "Ainda não compatível"
+
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
 msgstr "Peça a um administrador de configurações do espaço de trabalho para "
@@ -7023,7 +7031,7 @@ msgstr "Tente novamente em instantes ou entre em contato com o suporte se o "
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
-msgstr "O usuário do banco de dados deve ter, idealmente, acesso somente "
+msgstr "O usuário do banco de dados deve, idealmente, ter acesso somente "
 "leitura à tabela ou visualização que você planeja importar."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
@@ -8060,6 +8068,10 @@ msgstr "{lengthValue} km"
 msgid "Source line"
 msgstr "Linha de origem"
 
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
+#~ msgid "Nothing more to load"
+#~ msgstr "Nada mais para carregar"
+
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "Não foi possível tornar privado"
@@ -8217,11 +8229,11 @@ msgstr "A camada busca exatamente estes campos, portanto adicionar um campo "
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Require"
-msgstr "Require"
+msgstr "Exigir"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Import a table or view from a database your organization runs"
-msgstr "Importe uma tabela ou visualização de um banco de dados operado pela "
+msgstr "Importar uma tabela ou visualização de um banco de dados operado pela "
 "sua organização"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
@@ -8408,6 +8420,10 @@ msgstr "Coluna-chave do limite"
 msgid "Time window: {0}"
 msgstr "Período: {0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Open it on {serviceName}"
+msgstr "Abrir no {serviceName}"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
 msgstr "A coordenada está fora do intervalo válido"
@@ -8421,6 +8437,10 @@ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers 
 "offline."
 msgstr "Recomendado se você tiver 12 GB de RAM e quiser respostas de SQL "
 "offline significativamente melhores."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Avandar can't add this kind of dataset yet."
+msgstr "O Avandar ainda não pode adicionar esse tipo de conjunto de dados."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear filters"
@@ -8509,8 +8529,8 @@ msgstr "Função para novo compartilhamento"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
-msgstr "Esta tabela tem mais linhas do que o Avandar consegue importar de uma "
-"só vez. Tente usar uma tabela ou visualização menor."
+msgstr "Esta tabela tem mais linhas do que o Avandar pode importar de uma só "
+"vez. Tente usar uma tabela ou visualização menor."
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"

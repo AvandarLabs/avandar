@@ -156,7 +156,11 @@ export function DataCatalogListingList({
                   .filter(Boolean)
                   .join(" · ")}
               </Text>
-              {listing.isInvalid ? (
+              {!listing.isWorkspaceLoadable ? (
+                <Text c="dimmed" size="xs">
+                  <Trans>Not supported yet</Trans>
+                </Text>
+              ) : listing.isInvalid ? (
                 <Text c="danger.8" size="xs">
                   <Trans>Can't be loaded</Trans>
                 </Text>

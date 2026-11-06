@@ -449,6 +449,10 @@ lists several resources side by side.
   into an exported, reusable predicate so the pipeline and the acquisition
   path can never drift out of sync on what counts as readable.
 
+Neither filter decides whether a row exists any more. A resource that
+fails it is still listed, with `is_workspace_loadable` false: see section
+7, item 7.
+
 ### 6.5 Upsert semantics
 
 The `hdx` and `socrata` pipelines do not write rows themselves. Their
@@ -592,6 +596,41 @@ relation's object before writing the row that points at it.
    exponential backoff, and both drive-index pipelines resume an interrupted
    drive with `--incremental`, so a rate-limited run loses nothing it already
    saved. Other transient failures still fail the drive for that run.
+7. Index every asset a drive lists, and flag which ones a user can add to a
+   workspace. **Done.** A pipeline used to decide what Avandar supports by
+   leaving rows out: the Socrata pipeline dropped every asset with no
+   exportable column, so NYC Open Data's maps, files, external links,
+   stories and charts never became listings (601 of its 3,032 assets on
+   2026-11-06), and the HDX pipeline kept only the resources that passed the
+   readable-resource filter in section 6.4. Now:
+   - **Pipelines are full extractions.** Every Socrata asset becomes a
+     listing, whatever its type. HDX's `format:csv` and `format:parquet`
+     scopes list every resource in their format, and a `format:other` scope
+     lists every other format.
+   - **Support is `data_catalog_listings.is_workspace_loadable`**, not the
+     presence of the row. The catalog shows every listing in search, labels
+     an unloadable one "Not supported yet", explains it in the detail view
+     with a link to the original, and refuses to add it. A database trigger
+     on `datasets__open_data` refuses it too.
+   - **A listing links to the original asset** through `source_url`: the
+     Socrata permalink (`/d/<id>`) or the HDX resource page.
+   - **Pipelines store what the flag is derived from**: the asset type
+     (`source_asset_type`: Socrata's `resource.type`, or a CKAN resource's
+     `url_type`), the format (`api_resource_format`, now nullable on an
+     unloadable listing, and taken from a Socrata file's MIME type), and the
+     download URL (`source_download_url`). Supporting a type later is a data
+     migration that flips the flag on the matching rows, never a re-crawl.
+   - **The pipeline writes the flag, from two sources.** A pipeline marks an
+     asset it cannot read whatever its format (a Socrata map, a dataset
+     with no exported columns, an HDX file whose columns could not be read).
+     `@avandar/etl` then applies a shared YAML file,
+     `apps/pipeline-server/pipelines/etl.config.yaml`, of formats no
+     workspace can load (PDF, XLSX, and others), with per-pipeline
+     overrides. A generated column was rejected because the rules need facts
+     only the pipeline has, such as whether any columns were readable.
+   - **It stays separate from `is_invalid`.** `is_invalid` means a dataset
+     was sampled and turned out broken, and a pipeline rewrite clears it.
+     An unloadable listing is never sampled.
 
 ## 8. Testing references to add
 

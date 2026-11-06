@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type { EtlPipelineMetrics, RelationColumn } from "@avandar/etl";
 import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
+import type { HdxScope } from "@pipelines/hdx/hdxScopes";
 
 const CKAN_DRIVE: HdxDrive = {
   baseUrl: "https://data.humdata.org",
@@ -33,6 +34,17 @@ function _packageWithOneCsv(
     ],
   };
 }
+
+const CSV_SCOPE: HdxScope = { key: "format:csv", resourceFormat: "CSV" };
+const PARQUET_SCOPE: HdxScope = {
+  key: "format:parquet",
+  resourceFormat: "Parquet",
+};
+const OTHER_SCOPE: HdxScope = {
+  key: "format:other",
+  resourceFormat: undefined,
+  excludedFormats: ["CSV", "Parquet"],
+};
 
 const SNIFFED_COLUMNS: RelationColumn[] = [
   { name: "value", originalDataType: "DOUBLE", castDataType: "DOUBLE" },
@@ -105,7 +117,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
       ckanPackage,
-      resourceFormat: "CSV",
+      scope: CSV_SCOPE,
       readFileColumns: _readSniffedColumns,
       metrics: _metrics().metrics,
     });
@@ -119,6 +131,11 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         displayName: "data.csv",
         externalOrganizationName: "Humanitarian Data Exchange",
         sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
+        sourceAssetType: "upload",
+        sourceUrl:
+          "https://data.humdata.org/dataset/movement-range-maps/resource/csv-1",
+        sourceDownloadUrl:
+          "https://data.humdata.org/dataset/x/resource/csv-1/download/data.csv",
         columns: [],
         sourceSizeBytes: 200,
       },
@@ -131,7 +148,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
       ckanPackage: _packageWithOneCsv({ fileHeaders: ["adm1", "year"] }),
-      resourceFormat: "CSV",
+      scope: CSV_SCOPE,
       readFileColumns,
       metrics: _metrics().metrics,
     });
@@ -144,23 +161,90 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     expect(readFileColumns).not.toHaveBeenCalled();
   });
 
-  it("leaves out a Parquet resource whose columns cannot be read", async () => {
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-
+  it("lists a Parquet resource whose columns cannot be read as unloadable", async () => {
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
       ckanPackage: _packageWithOneCsv({ format: "Parquet" }),
-      resourceFormat: "Parquet",
+      scope: PARQUET_SCOPE,
       readFileColumns: async () => {
         return undefined;
       },
       metrics: _metrics().metrics,
     });
 
-    expect(relations).toEqual([]);
+    expect(
+      relations.map((relation) => {
+        return [relation.isWorkspaceLoadable, relation.columns];
+      }),
+    ).toEqual([[false, []]]);
   });
 
-  it("returns no relations when the dataset has no readable resource", async () => {
+  it("lists a CSV that HDX does not host as unloadable, without reading it", async () => {
+    const readFileColumns = vi.fn(_readSniffedColumns);
+
+    const relations = await makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      ckanPackage: _packageWithOneCsv({
+        url: "http://example.invalid/data.csv",
+        url_type: "",
+        fileHeaders: ["adm1"],
+      }),
+      scope: CSV_SCOPE,
+      readFileColumns,
+      metrics: _metrics().metrics,
+    });
+
+    expect(
+      relations.map((relation) => {
+        return [
+          relation.isWorkspaceLoadable,
+          relation.columns,
+          relation.sourceAssetType,
+          relation.sourceDownloadUrl,
+        ];
+      }),
+    ).toEqual([[false, [], undefined, "http://example.invalid/data.csv"]]);
+    expect(readFileColumns).not.toHaveBeenCalled();
+  });
+
+  it("lists every other format in the other scope as unloadable, without reading it", async () => {
+    const readFileColumns = vi.fn(_readSniffedColumns);
+    const [csvResource] = _packageWithOneCsv({}).resources;
+    const ckanPackage: CkanPackage = {
+      ..._packageWithOneCsv({}),
+      resources: [
+        csvResource!,
+        { ...csvResource!, id: "pdf-1", format: "PDF" },
+        { ...csvResource!, id: "parquet-1", format: "parquet" },
+        { ...csvResource!, id: "blank-1", format: "" },
+      ],
+    };
+
+    const relations = await makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      ckanPackage,
+      scope: OTHER_SCOPE,
+      readFileColumns,
+      metrics: _metrics().metrics,
+    });
+
+    expect(
+      relations.map((relation) => {
+        return [
+          relation.apiResourceId,
+          relation.apiResourceFormat,
+          relation.isWorkspaceLoadable,
+          relation.columns,
+        ];
+      }),
+    ).toEqual([
+      ["pdf-1", "PDF", false, []],
+      ["blank-1", undefined, false, []],
+    ]);
+    expect(readFileColumns).not.toHaveBeenCalled();
+  });
+
+  it("returns no relations when the dataset has no resource in the scope's format", async () => {
     const ckanPackage: CkanPackage = {
       id: "c3429f0e",
       name: "docs-only-dataset",
@@ -185,7 +269,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
       await makeApiResourceRelationsFromCkanPackage({
         drive: CKAN_DRIVE,
         ckanPackage,
-        resourceFormat: "CSV",
+        scope: CSV_SCOPE,
         readFileColumns: _readSniffedColumns,
         metrics: _metrics().metrics,
       }),
@@ -228,7 +312,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
       ckanPackage,
-      resourceFormat: "Parquet",
+      scope: PARQUET_SCOPE,
       readFileColumns: _readSniffedColumns,
       metrics: _metrics().metrics,
     });
@@ -247,7 +331,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         fileHeaders: ["adm1"],
         size: 4096,
       }),
-      resourceFormat: "CSV",
+      scope: CSV_SCOPE,
       readFileColumns: _readSniffedColumns,
       metrics: _metrics().metrics,
     });

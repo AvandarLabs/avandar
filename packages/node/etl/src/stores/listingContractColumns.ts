@@ -33,4 +33,7 @@ export const LISTING_CONTRACT_COLUMNS = [
   "parquet_file_name",
   "pipeline_scope_keys",
   "date_column_type_last_verified",
+  "is_workspace_loadable",
+  "source_asset_type",
+  "source_download_url",
 ] as const satisfies ReadonlyArray<keyof ListingRowValues>;

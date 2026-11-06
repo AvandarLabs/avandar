@@ -6,82 +6,144 @@ import type {
   CkanPackage,
   CkanResource,
 } from "$/connectors/open-data/CkanClient/CkanClient.types";
-import type { ApiResourceRelation, EtlPipelineMetrics } from "@avandar/etl";
+import type {
+  ApiResourceRelation,
+  EtlPipelineMetrics,
+  RelationColumn,
+} from "@avandar/etl";
 import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
+import type { HdxScope } from "@pipelines/hdx/hdxScopes";
 import type { HdxFileColumnReader } from "@pipelines/hdx/readHdxResourceColumns/readHdxResourceColumns";
 
+/** A resource's columns, and whether a workspace can load it. */
+type _ResourceReadability = Readonly<{
+  isWorkspaceLoadable: boolean;
+  columns: readonly RelationColumn[];
+  columnTypesVerifiedAt: Date | undefined;
+}>;
+
+const UNLOADABLE: _ResourceReadability = {
+  isWorkspaceLoadable: false,
+  columns: [],
+  columnTypesVerifiedAt: undefined,
+};
+
 /**
- * Builds one relation per CKAN resource worth reading, using the same
- * readability rule the acquisition path enforces at query time. A dataset
- * with no readable resource yields none. Each relation is dated by the same
- * `metadata_modified` the crawl orders datasets by, and carries the columns
+ * Whether a resource belongs to a scope: it has the scope's format, or, in
+ * the scope with no format, none of the formats the other scopes take.
+ * Formats compare case-insensitively.
+ */
+function _isInScope(
+  resource: Readonly<CkanResource>,
+  scope: HdxScope,
+): boolean {
+  const format = resource.format.toLowerCase();
+  if (scope.resourceFormat !== undefined) {
+    return format === scope.resourceFormat.toLowerCase();
+  }
+  return !(scope.excludedFormats ?? []).some((excludedFormat) => {
+    return excludedFormat.toLowerCase() === format;
+  });
+}
+
+/**
+ * Reads a readable resource's columns. A resource Avandar cannot read, or
+ * whose columns cannot be read, is unloadable, with no columns.
+ */
+async function _readResource(params: {
+  resource: Readonly<CkanResource>;
+  readFileColumns: HdxFileColumnReader;
+  metrics: EtlPipelineMetrics;
+}): Promise<_ResourceReadability> {
+  if (!isReadableCkanResource(params.resource)) {
+    return UNLOADABLE;
+  }
+  const resourceColumns = await readHdxResourceColumns(params);
+  if (resourceColumns === undefined) {
+    return UNLOADABLE;
+  }
+  return { isWorkspaceLoadable: true, ...resourceColumns };
+}
+
+function _toRelation(params: {
+  drive: Readonly<HdxDrive>;
+  ckanPackage: Readonly<CkanPackage>;
+  resource: Readonly<CkanResource>;
+  sourceUpdatedAt: Date;
+  readability: _ResourceReadability;
+}): ApiResourceRelation {
+  const { drive, ckanPackage, resource, readability } = params;
+  return {
+    kind: "api_resource",
+    externalDatasetId: ckanPackage.name,
+    apiResourceId: resource.id,
+    apiResourceFormat:
+      resource.format === "" ? undefined : resource.format.toUpperCase(),
+    displayName: resource.name,
+    externalOrganizationName: drive.organizationName,
+    sourceUpdatedAt: params.sourceUpdatedAt,
+    ...(resource.url_type === "" ? {} : { sourceAssetType: resource.url_type }),
+    sourceUrl: `${drive.baseUrl}/dataset/${ckanPackage.name}/resource/${resource.id}`,
+    ...(resource.url === "" ? {} : { sourceDownloadUrl: resource.url }),
+    ...(readability.isWorkspaceLoadable ? {} : { isWorkspaceLoadable: false }),
+    columns: readability.columns,
+    ...(readability.columnTypesVerifiedAt === undefined
+      ? {}
+      : { columnTypesVerifiedAt: readability.columnTypesVerifiedAt }),
+    ...(resource.size === undefined ? {} : { sourceSizeBytes: resource.size }),
+  };
+}
+
+/**
+ * Builds one relation per CKAN resource in the scope, each dated by the
+ * same `metadata_modified` the crawl orders datasets by and linked to its
+ * page on HDX. A resource is workspace-loadable only when it passes the
+ * readability rule the acquisition path enforces at query time and its
+ * columns can be found. Otherwise it is listed unloadable, with no columns,
+ * so it still shows up in the catalog. Each relation carries the columns
  * `readHdxResourceColumns` finds, verified only when they were read from the
- * file. Each relation reports the resource's `size` as `sourceSizeBytes`
- * when CKAN records one. A resource with no columns is left out and
- * logged with `console.warn`, since a listing is never stored without its
- * columns.
+ * file, and reports the resource's `size` as `sourceSizeBytes` when CKAN
+ * records one.
  *
- * @param params.resourceFormat - The scope's format. Only readable resources
- *   in it, compared case-insensitively, become relations.
+ * @param params.scope - The scope being crawled. Only its resources become
+ *   relations.
  * @param params.readFileColumns - Reads a resource's columns from its file
  *   when HDX recorded no usable headers.
  * @param params.metrics - Receives the footer reads that finding columns
  *   takes.
- * @throws When a dataset with a readable resource has no
+ * @throws When a dataset with a resource in the scope has no
  * `metadata_modified`.
  */
 export async function makeApiResourceRelationsFromCkanPackage(params: {
   drive: Readonly<HdxDrive>;
   ckanPackage: Readonly<CkanPackage>;
-  resourceFormat: string;
+  scope: HdxScope;
   readFileColumns: HdxFileColumnReader;
   metrics: EtlPipelineMetrics;
 }): Promise<ApiResourceRelation[]> {
   const { drive, ckanPackage } = params;
-  const wantedFormat = params.resourceFormat.toLowerCase();
-  const readableResources = ckanPackage.resources.filter((resource) => {
-    return (
-      isReadableCkanResource(resource) &&
-      resource.format.toLowerCase() === wantedFormat
-    );
+  const scopedResources = ckanPackage.resources.filter((resource) => {
+    return _isInScope(resource, params.scope);
   });
-  if (readableResources.length === 0) {
+  if (scopedResources.length === 0) {
     return [];
   }
   const sourceUpdatedAt = getHdxDatasetTimestamp(ckanPackage);
-  const relations = await promiseMapSequential(
-    readableResources,
+  return await promiseMapSequential(
+    scopedResources,
     async (resource: CkanResource) => {
-      const resourceColumns = await readHdxResourceColumns({
+      const readability = await _readResource({
         resource,
         readFileColumns: params.readFileColumns,
         metrics: params.metrics,
       });
-      if (resourceColumns === undefined) {
-        console.warn(
-          `[hdx] drive ${drive.baseUrl}: skipped resource ${resource.id} of dataset ${ckanPackage.name}: no columns could be read`,
-        );
-        return undefined;
-      }
-      return {
-        kind: "api_resource" as const,
-        externalDatasetId: ckanPackage.name,
-        apiResourceId: resource.id,
-        apiResourceFormat: resource.format.toUpperCase(),
-        displayName: resource.name,
-        externalOrganizationName: drive.organizationName,
+      return _toRelation({
+        drive,
+        ckanPackage,
+        resource,
         sourceUpdatedAt,
-        columns: resourceColumns.columns,
-        ...(resourceColumns.columnTypesVerifiedAt === undefined
-          ? {}
-          : { columnTypesVerifiedAt: resourceColumns.columnTypesVerifiedAt }),
-        ...(resource.size === undefined
-          ? {}
-          : { sourceSizeBytes: resource.size }),
-      };
+        readability,
+      });
     },
   );
-  return relations.filter((relation) => {
-    return relation !== undefined;
-  });
 }

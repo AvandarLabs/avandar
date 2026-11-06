@@ -575,7 +575,7 @@ msgstr "已保存为 \"{0}\"。"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
-msgstr "此服务器需要 SSL。将 SSL 模式设置为“Require”，然后重试。"
+msgstr "此服务器需要 SSL。请将 SSL 模式设置为“Require”，然后重试。"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Could not save. Your last change is still on screen."
@@ -3546,10 +3546,6 @@ msgstr "派生的"
 msgid "text"
 msgstr "文本"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-#~ msgid "{numResults} of {numCatalogListings} datasets"
-#~ msgstr ""
-
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "Review filter"
 msgstr "审核筛选条件"
@@ -3573,6 +3569,10 @@ msgstr "确认操作"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "没有可显示的仪表板"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#~ msgid "A type of record you manage"
+#~ msgstr "您管理的一类记录"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -4355,6 +4355,10 @@ msgstr "提交"
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "仪表板"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "You can still open the original, where it is published."
+msgstr "您仍可以打开其发布所在的原始页面。"
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
@@ -5629,6 +5633,10 @@ msgstr "搜索数据源"
 msgid "Tool"
 msgstr "工具"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Not supported yet"
+msgstr "暂不支持"
+
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
 msgstr "请向工作区设置管理员请求更新您的角色。"
@@ -6083,7 +6091,7 @@ msgstr "上限"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/testAndSavePostgresConnection.ts
 msgid "Connecting to database"
-msgstr "正在连接数据库"
+msgstr "正在连接到数据库"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -6773,7 +6781,7 @@ msgstr "请稍后重试；如果问题持续存在，请联系支持团队。"
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
-msgstr "数据库用户最好对计划导入的表或视图拥有只读权限。"
+msgstr "数据库用户最好对您计划导入的表或视图拥有只读权限。"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
@@ -7770,6 +7778,10 @@ msgstr "{lengthValue} 千米"
 msgid "Source line"
 msgstr "来源行"
 
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
+#~ msgid "Nothing more to load"
+#~ msgstr "没有更多内容可加载"
+
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "无法设为私密"
@@ -7921,11 +7933,11 @@ msgstr "该图层只获取这些字段，因此添加字段后也可以用于筛
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Require"
-msgstr "Require"
+msgstr "要求"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Import a table or view from a database your organization runs"
-msgstr "从组织运行的数据库中导入表或视图"
+msgstr "从您所在组织运行的数据库中导入表或视图"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
@@ -8106,6 +8118,10 @@ msgstr "边界键列"
 msgid "Time window: {0}"
 msgstr "时间范围：{0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Open it on {serviceName}"
+msgstr "在 {serviceName} 上打开"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
 msgstr "坐标超出有效范围"
@@ -8118,6 +8134,10 @@ msgstr "过滤器（位置）"
 msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
 "offline."
 msgstr "如果您有 12 GB 内存，并希望在离线状态下获得明显更好的 SQL 答案，建议使用此模型。"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Avandar can't add this kind of dataset yet."
+msgstr "Avandar 暂时无法添加此类数据集。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear filters"
@@ -8202,7 +8222,7 @@ msgstr "新共享的角色"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
-msgstr "此表的行数超过 Avandar 单次可导入的上限。请尝试使用较小的表或视图。"
+msgstr "此表的行数超过 Avandar 一次可导入的上限。请尝试使用更小的表或视图。"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
@@ -8223,7 +8243,7 @@ msgstr "购买 {seatsToAdd} 个座位"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
-msgstr "用户名或密码未被接受。请检查凭据，然后重试。"
+msgstr "用户名或密码未被接受。请检查凭据后重试。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
@@ -9504,7 +9524,7 @@ msgstr "上传 CSV、Excel 或 PDF 文件，连接 Google Sheet，或浏览开�
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
-msgstr "数据库未及时响应。请检查地址，然后重试。"
+msgstr "数据库未及时响应。请检查地址后重试。"
 
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx

@@ -1,5 +1,6 @@
 import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
 import { getPipelineEtlDestination } from "@pipelines/shared/getPipelineEtlDestination/getPipelineEtlDestination";
+import { getPipelineWorkspaceLoadability } from "@pipelines/shared/getPipelineWorkspaceLoadability/getPipelineWorkspaceLoadability";
 import { createSocrataEtlEngine } from "@pipelines/socrata/createSocrataEtlEngine/createSocrataEtlEngine";
 import { createSocrataHttpClient } from "@pipelines/socrata/createSocrataHttpClient/createSocrataHttpClient";
 import { createSocrataDiscoveryClient } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient";
@@ -16,7 +17,11 @@ function _createEngine(): EtlEngineInstance {
       appToken: getOptionalEnvVar("SOCRATA_APP_TOKEN"),
     }),
   );
-  return createSocrataEtlEngine({ ...getPipelineEtlDestination(), discovery });
+  return createSocrataEtlEngine({
+    ...getPipelineEtlDestination(),
+    discovery,
+    workspaceLoadability: getPipelineWorkspaceLoadability("socrata"),
+  });
 }
 
 /**

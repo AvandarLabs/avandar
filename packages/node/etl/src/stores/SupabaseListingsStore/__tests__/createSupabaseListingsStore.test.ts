@@ -41,6 +41,9 @@ const ROW: ListingRowValues = {
   parquet_file_name: null,
   pipeline_scope_keys: ["all"],
   date_column_type_last_verified: null,
+  is_workspace_loadable: true,
+  source_asset_type: null,
+  source_download_url: null,
 };
 
 /** A client whose every read returns `rowCount` rows that match nothing. */

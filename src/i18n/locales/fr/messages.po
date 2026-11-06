@@ -601,7 +601,7 @@ msgstr "Enregistré sous \"{0}\"."
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
-msgstr "Ce serveur requiert SSL. Définissez le mode SSL sur « Require », puis "
+msgstr "Ce serveur nécessite SSL. Définissez le mode SSL sur « Require », puis "
 "réessayez."
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
@@ -2593,7 +2593,7 @@ msgstr "Publier"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Prod reporting replica"
-msgstr "Réplique de reporting de production"
+msgstr "Réplique de production pour les rapports"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
@@ -3731,10 +3731,6 @@ msgstr "Dérivé"
 msgid "text"
 msgstr "texte"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-#~ msgid "{numResults} of {numCatalogListings} datasets"
-#~ msgstr ""
-
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "Review filter"
 msgstr "Examiner le filtre"
@@ -3758,6 +3754,10 @@ msgstr "Confirmer l'action"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "Aucun tableau de bord à afficher"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#~ msgid "A type of record you manage"
+#~ msgstr "Un type d’enregistrement que vous gérez"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -4576,6 +4576,10 @@ msgstr "Soumettre"
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "tableau de bord"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "You can still open the original, where it is published."
+msgstr "Vous pouvez toujours ouvrir l’original, là où il est publié."
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
@@ -5903,6 +5907,10 @@ msgstr "Rechercher des sources de données"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Tool"
 msgstr "Outil"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Not supported yet"
+msgstr "Pas encore pris en charge"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -8139,6 +8147,10 @@ msgstr "{lengthValue} km"
 msgid "Source line"
 msgstr "Ligne source"
 
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
+#~ msgid "Nothing more to load"
+#~ msgstr "Rien de plus à charger"
+
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "Impossible de rendre privé"
@@ -8303,7 +8315,7 @@ msgstr "Require"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Import a table or view from a database your organization runs"
-msgstr "Importez une table ou une vue depuis une base de données gérée par "
+msgstr "Importer une table ou une vue depuis une base de données gérée par "
 "votre organisation"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
@@ -8372,7 +8384,7 @@ msgstr "Sélectionner la règle (par exemple, la plus fréquente)"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Database is unreachable"
-msgstr "La base de données est inaccessible"
+msgstr "Base de données inaccessible"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add tabular data to render a simple table."
@@ -8490,6 +8502,10 @@ msgstr "Colonne de clé de limite"
 msgid "Time window: {0}"
 msgstr "Période : {0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Open it on {serviceName}"
+msgstr "Ouvrir sur {serviceName}"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
 msgstr "La coordonnée est en dehors de la plage valide"
@@ -8503,6 +8519,10 @@ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers 
 "offline."
 msgstr "Recommandé si vous disposez de 12 Go de RAM et souhaitez obtenir des "
 "réponses SQL hors ligne sensiblement meilleures."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Avandar can't add this kind of dataset yet."
+msgstr "Avandar ne peut pas encore ajouter ce type de jeu de données."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear filters"
@@ -8591,8 +8611,8 @@ msgstr "Rôle pour le nouveau partage"
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
-msgstr "Cette table contient plus de lignes qu’Avandar ne peut en importer en "
-"une seule fois. Essayez avec une table ou une vue plus petite."
+msgstr "Cette table contient plus de lignes qu’Avandar ne peut en importer à la "
+"fois. Essayez une table ou une vue plus petite."
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
@@ -8614,7 +8634,7 @@ msgstr "Acheter {seatsToAdd} sièges"
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
 msgstr "Le nom d’utilisateur ou le mot de passe n’a pas été accepté. Vérifiez "
-"les identifiants, puis réessayez."
+"les identifiants et réessayez."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
@@ -9959,7 +9979,7 @@ msgstr "Importez un fichier CSV, Excel ou PDF, connectez une feuille Google "
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
-msgstr "La base de données n’a pas répondu à temps. Vérifiez l’adresse, puis "
+msgstr "La base de données n’a pas répondu à temps. Vérifiez l’adresse et "
 "réessayez."
 
 #. placeholder {0}: column.name

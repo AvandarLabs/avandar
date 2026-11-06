@@ -335,6 +335,7 @@ function _buildLoadContext<TDrive, TConnection, TScope extends EtlScope>(
     stores: args.stores,
     bucket: args.config.output.bucket,
     metrics: args.metrics,
+    workspaceLoadability: args.config.workspaceLoadability,
   };
 }
 

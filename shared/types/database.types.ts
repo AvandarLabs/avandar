@@ -509,6 +509,7 @@ export type Database = {
             | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
             | null
           is_invalid: boolean
+          is_workspace_loadable: boolean
           license: string | null
           metadata: Json | null
           notes: string | null
@@ -516,6 +517,8 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          source_asset_type: string | null
+          source_download_url: string | null
           source_url: string | null
           update_frequency: string | null
           updated_at: string
@@ -548,6 +551,7 @@ export type Database = {
             | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
             | null
           is_invalid?: boolean
+          is_workspace_loadable?: boolean
           license?: string | null
           metadata?: Json | null
           notes?: string | null
@@ -555,6 +559,8 @@ export type Database = {
           pipeline_name?: string | null
           pipeline_run_id?: string | null
           pipeline_scope_keys?: string[]
+          source_asset_type?: string | null
+          source_download_url?: string | null
           source_url?: string | null
           update_frequency?: string | null
           updated_at?: string
@@ -587,6 +593,7 @@ export type Database = {
             | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
             | null
           is_invalid?: boolean
+          is_workspace_loadable?: boolean
           license?: string | null
           metadata?: Json | null
           notes?: string | null
@@ -594,6 +601,8 @@ export type Database = {
           pipeline_name?: string | null
           pipeline_run_id?: string | null
           pipeline_scope_keys?: string[]
+          source_asset_type?: string | null
+          source_download_url?: string | null
           source_url?: string | null
           update_frequency?: string | null
           updated_at?: string
@@ -2345,6 +2354,7 @@ export type Database = {
             | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
             | null
           is_invalid: boolean
+          is_workspace_loadable: boolean
           license: string | null
           metadata: Json | null
           notes: string | null
@@ -2352,6 +2362,8 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          source_asset_type: string | null
+          source_download_url: string | null
           source_url: string | null
           update_frequency: string | null
           updated_at: string
@@ -2407,6 +2419,7 @@ export type Database = {
             | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
             | null
           is_invalid: boolean
+          is_workspace_loadable: boolean
           license: string | null
           metadata: Json | null
           notes: string | null
@@ -2414,6 +2427,8 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          source_asset_type: string | null
+          source_download_url: string | null
           source_url: string | null
           update_frequency: string | null
           updated_at: string
@@ -2455,6 +2470,7 @@ export type Database = {
             | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
             | null
           is_invalid: boolean
+          is_workspace_loadable: boolean
           license: string | null
           metadata: Json | null
           notes: string | null
@@ -2462,6 +2478,8 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          source_asset_type: string | null
+          source_download_url: string | null
           source_url: string | null
           update_frequency: string | null
           updated_at: string

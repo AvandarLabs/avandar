@@ -60,6 +60,9 @@ const DBReadSchema = z.object({
       "unreachable_dataset",
     ])
     .nullable(),
+  is_workspace_loadable: z.boolean(),
+  source_asset_type: z.string().nullable(),
+  source_download_url: z.string().nullable(),
 });
 
 export const DataCatalogListingParsers =
