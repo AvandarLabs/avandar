@@ -58,6 +58,20 @@ describe("coerceCatalogFieldValue", () => {
     });
   });
 
+  describe("text array fields with nullish items", () => {
+    it.each([
+      ["undefined", undefined],
+      ["null", null],
+    ])("reports a list holding %s", (name, item) => {
+      expect(
+        coerceCatalogFieldValue({ field: "tags", value: ["a", item] }),
+      ).toEqual({
+        value: undefined,
+        problem: `expected text or a list of text, got a list holding ${name}`,
+      });
+    });
+  });
+
   describe("date fields", () => {
     it("parses an ISO 8601 string", () => {
       expect(
@@ -77,6 +91,52 @@ describe("coerceCatalogFieldValue", () => {
       ).toEqual({
         value: undefined,
         problem: 'expected an ISO 8601 date, got "last spring"',
+      });
+    });
+
+    it("accepts a date with no time", () => {
+      expect(
+        coerceCatalogFieldValue({
+          field: "coverage_start_date",
+          value: "2026-01-02",
+        }),
+      ).toEqual({ value: new Date("2026-01-02") });
+    });
+
+    it("accepts a time with an offset", () => {
+      expect(
+        coerceCatalogFieldValue({
+          field: "coverage_start_date",
+          value: "2026-01-02T03:00:00+02:00",
+        }),
+      ).toEqual({ value: new Date("2026-01-02T01:00:00Z") });
+    });
+
+    it.each([
+      ["a bare number string", "12"],
+      ["a natural language date", "March 5 2024"],
+      ["a time with no timezone", "2024-01-02T00:00"],
+    ])("rejects %s", (_name, value) => {
+      expect(
+        coerceCatalogFieldValue({ field: "coverage_start_date", value }),
+      ).toEqual({
+        value: undefined,
+        problem: `expected an ISO 8601 date, got ${JSON.stringify(value)}`,
+      });
+    });
+
+    it("treats a blank string as no value, without a problem", () => {
+      expect(
+        coerceCatalogFieldValue({ field: "coverage_end_date", value: "  " }),
+      ).toEqual({ value: undefined });
+    });
+
+    it("describes a non-string by its type", () => {
+      expect(
+        coerceCatalogFieldValue({ field: "coverage_end_date", value: 5 }),
+      ).toEqual({
+        value: undefined,
+        problem: "expected an ISO 8601 date, got number",
       });
     });
   });
