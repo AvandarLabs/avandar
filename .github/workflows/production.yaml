@@ -90,9 +90,12 @@ jobs:
   # End-to-end tests. Intentionally NOT a dependency of `migrate`.
   # See `staging.yaml` for the explanation on the timeout threshold.
   test-e2e:
-    runs-on: ubuntu-latest
+    # Pinned rather than `ubuntu-latest`: some runners now resolve that to
+    # Ubuntu 26.04, where Playwright 1.59.1 cannot install Chromium and the
+    # job fails before any test runs. Move this with the Playwright version.
+    runs-on: ubuntu-24.04
     needs: lint-typecheck
-    timeout-minutes: 30
+    timeout-minutes: 70
     # Even though this is a production CI, we still use the staging env vars
     # to run tests.
     environment: staging

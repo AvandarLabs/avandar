@@ -111,7 +111,10 @@ jobs:
   # End-to-end tests, on a budget sized for the whole suite at one worker.
   # See `staging.yaml` for the explanation on the timeout threshold.
   pr-test-e2e:
-    runs-on: ubuntu-latest
+    # Pinned rather than `ubuntu-latest`: some runners now resolve that to
+    # Ubuntu 26.04, where Playwright 1.59.1 cannot install Chromium and the
+    # job fails before any test runs. Move this with the Playwright version.
+    runs-on: ubuntu-24.04
     needs: lint-typecheck
     timeout-minutes: 70
     environment: staging
