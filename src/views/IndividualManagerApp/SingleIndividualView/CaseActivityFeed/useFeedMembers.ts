@@ -21,7 +21,8 @@ export function useFeedMembers(
     const mentionCandidates = (members ?? []).map((member): MentionCandidate => {
       return {
         userId: member.userId,
-        displayName: member.displayName || member.fullName,
+        // Fall back to the email so a name and its initials are never blank.
+        displayName: member.displayName || member.fullName || member.email,
         email: member.email,
       };
     });
