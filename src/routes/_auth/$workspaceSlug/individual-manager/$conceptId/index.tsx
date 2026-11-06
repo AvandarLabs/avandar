@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { Button, Center } from "@mantine/core";
+import { Button } from "@mantine/core";
 import {
   createFileRoute,
   getRouteApi,
@@ -8,6 +8,7 @@ import {
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { DetailPaneMessage } from "@/views/IndividualManagerApp/DetailPaneMessage/DetailPaneMessage";
 import { IndividualSelectionEmptyState } from "@/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState";
 import { useConceptIndividuals } from "@/views/IndividualManagerApp/useConceptIndividuals";
 import type { ReactNode } from "react";
@@ -40,7 +41,7 @@ function IndividualManagerWithNoIndividualSelected(): ReactNode {
   }
 
   return (
-    <Center h="100%" px="md">
+    <DetailPaneMessage>
       <IndividualSelectionEmptyState
         conceptName={concept.name}
         hasRecords={hasRecords}
@@ -64,6 +65,6 @@ function IndividualManagerWithNoIndividualSelected(): ReactNode {
           )
         }
       />
-    </Center>
+    </DetailPaneMessage>
   );
 }

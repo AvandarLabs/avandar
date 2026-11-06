@@ -1,0 +1,13 @@
+.chip {
+  background-color: var(--mantine-color-primary-0);
+  border-radius: var(--mantine-radius-xs);
+  color: var(--mantine-color-primary-8);
+  font-weight: 500;
+  padding: 0 3px;
+  white-space: nowrap;
+}
+
+.former {
+  background-color: var(--mantine-color-neutral-1);
+  color: var(--mantine-color-neutral-7);
+}

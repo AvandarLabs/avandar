@@ -51,6 +51,10 @@ msgid "Return online to view or make the page available offline."
 msgstr "Retour en ligne pour visualiser ou rendre la page disponible hors "
 "ligne."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "The link could not be copied."
+msgstr "Le lien n’a pas pu être copié."
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -111,6 +115,10 @@ msgstr "Cette feuille de calcul ne contient qu’un seul onglet."
 msgid "starts with"
 msgstr "commence par"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Open link in the same tab"
+msgstr "Ouvrir le lien dans le même onglet"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
 msgstr "Exécutez une requête pour voir les résultats."
@@ -130,6 +138,10 @@ msgstr "Taille de cellule (mètres)"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "Ouvrir l'ensemble de données"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "Delete comment?"
+msgstr "Supprimer le commentairef"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
@@ -167,7 +179,7 @@ msgstr "Supprimer l'accès pour {name}."
 msgid "Match case"
 msgstr "Respecter la casse"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 msgid "Updated"
 msgstr "Mis à jour"
 
@@ -499,6 +511,10 @@ msgstr "La latitude et la longitude semblent inversées"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Cannot add dataset"
 msgstr "Impossible d'ajouter l'ensemble de données"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
+msgid "No activity on this case yet"
+msgstr "Aucune activité sur ce dossier pour le moment"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Members still assigned to this group must be moved first."
@@ -843,6 +859,10 @@ msgstr "Masquer le tutoriel ?"
 msgid "Google Picker error"
 msgstr "Erreur Google Picker"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
+msgid "Show earlier activity"
+msgstr "Afficher l’activité précédente"
+
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Choose a default status from this list."
 msgstr "Choisissez un statut par défaut dans cette liste."
@@ -971,6 +991,13 @@ msgstr " enregistrements"
 #: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
 msgstr "Autre chose…"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "The catalog is still in <0/> and grows as people tell us what they need. "
+#~ "Missing a dataset? <1>tell us</1>."
+#~ msgstr "Le catalogue est toujours en <0/> et s’enrichit à mesure que les "
+#~ "utilisateurs nous indiquent leurs besoins. Un jeu de données manque ? "
+#~ "<1>Faites-le-nous savoir</1>."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
@@ -1269,14 +1296,15 @@ msgstr "Ce champ ne peut pas être vide"
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "« {value} » n'est pas une date. Utilisez le format AAAA-MM-JJ."
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-msgid "Add a note"
-msgstr "Ajouter une note"
-
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
 msgstr "Ouvrir la carte {0}"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Some links in this update are not allowed. Use web or email links."
+msgstr "Certains liens de cette mise à jour ne sont pas autorisés. Utilisez des "
+"liens web ou des liens e-mail."
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "Oops!"
@@ -1340,6 +1368,10 @@ msgstr "Exécutez d’abord une requête."
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
 msgstr "Limite de sièges atteinte"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#~ msgid "Pipeline"
+#~ msgstr "Pipeline"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
@@ -1456,6 +1488,10 @@ msgstr "Passer"
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
 msgstr "Copié"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "Copy link to comment"
+msgstr "Copier le lien vers le commentaire"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureMapTool.tsx
 msgid "Measure distance and area"
@@ -1778,6 +1814,10 @@ msgstr "Graphique en entonnoir"
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "Show every status"
 msgstr "Afficher tous les statuts"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Link address"
+msgstr "Adresse du lien"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Symbol"
@@ -2124,6 +2164,10 @@ msgstr "Cette zone ne contient aucun texte à envoyer. Les résultats basés sur
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Medium"
 msgstr "Moyen"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
+msgid "Loading case"
+msgstr "Chargement du dossier"
 
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "Colors for {statusName}"
@@ -2569,6 +2613,10 @@ msgstr "Choisissez la destination des dossiers associés à chaque statut "
 msgid "Private datasets"
 msgstr "Jeux de données privés"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
+msgid "Earlier activity failed to load."
+msgstr "L’activité précédente n’a pas pu être chargée."
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Create case type"
@@ -2771,6 +2819,10 @@ msgstr "Autoriser la création manuelle de nouveaux {pluralConceptName}"
 msgid "Welcome to Avandar"
 msgstr "Bienvenue sur Avandar"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "Tell us which open dataset you want via feedback"
+#~ msgstr "Dites-nous quel jeu de données ouvert vous souhaitez via vos retours"
+
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
@@ -2802,6 +2854,12 @@ msgstr "J’ai exécuté la requête, mais elle a échoué."
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
 msgstr "Étape"
+
+#: src/components/RichText/RichTextView/RichTextView.tsx
+#: src/components/RichText/UserMention/UserMentionChip.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCard.tsx
+msgid "Former member"
+msgstr "Ancien membre"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
@@ -2854,6 +2912,7 @@ msgstr "{keyboardShortcut} pour enregistrer"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActionsMenu.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -2883,6 +2942,12 @@ msgid "WHERE clause uses an expression on the left-hand side that is not a "
 "column reference."
 msgstr "La clause WHERE utilise une expression à gauche qui n’est pas une "
 "référence de colonne."
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/usePostCaseComment.ts
+msgid "Your update was not posted. It is still in the box, so you can try "
+"again."
+msgstr "Votre mise à jour n’a pas été publiée. Elle se trouve toujours dans la "
+"zone de saisie, vous pouvez donc réessayer."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "PDF downloaded."
@@ -2951,6 +3016,12 @@ msgstr "{0}, {1} et {2} sont fixes pour chaque espace de travail."
 msgid "Synced to the cloud"
 msgstr "Synchronisé avec le cloud"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#~ msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
+#~ "how often it updates."
+#~ msgstr "Sélectionnez un jeu de données à gauche pour découvrir ce qu’il couvre, "
+#~ "qui le publie et à quelle fréquence il est mis à jour."
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
 msgstr "Aucune couleur de données"
@@ -3000,7 +3071,7 @@ msgstr "Votre tableau de bord existe, mais personne d’autre ne peut encore "
 msgid "Remove series"
 msgstr "Supprimer la série"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Created"
 msgstr "Créé"
@@ -3038,6 +3109,10 @@ msgstr "La clause HAVING utilise un côté gauche que le formulaire ne peut pas 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "has no value"
 msgstr "n’a aucune valeur"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#~ msgid "Catalog datasets"
+#~ msgstr "Cataloguer les jeux de données"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -3146,6 +3221,7 @@ msgstr "La prise en charge de la géométrie est en cours de téléchargement. C
 #: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
@@ -3165,6 +3241,7 @@ msgstr "La prise en charge de la géométrie est en cours de téléchargement. C
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/EditStatusesForm.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
@@ -3324,6 +3401,10 @@ msgstr "Vous êtes actuellement sur le plan <0>{currentFeaturePlanName}</0>."
 msgid "Result size"
 msgstr "Taille du résultat"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "Search open data catalog"
+#~ msgstr "Rechercher dans le catalogue de données ouvertes"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
@@ -3434,6 +3515,10 @@ msgstr "Aller à l'Explorateur de données"
 msgid "Radar Chart"
 msgstr "Graphique radar"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "Comment actions"
+msgstr "Actions sur le commentaire"
+
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistDockButton.tsx
 msgid "Get started {completedCount}/{totalMilestoneCount}"
 msgstr "Commencer {completedCount}/{totalMilestoneCount}"
@@ -3455,6 +3540,10 @@ msgstr "Lien vers l’enregistrement source"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "None"
 msgstr "Aucun"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "Link copied"
+msgstr "Lien copié"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "This dataset is indexed in {serviceName}, but it can't be loaded."
@@ -3602,6 +3691,7 @@ msgid "Try asking"
 msgstr "Essayez de demander"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Edit"
 msgstr "Modifier"
 
@@ -3650,6 +3740,15 @@ msgstr "Dupliquer"
 msgid "Outcome"
 msgstr "Résultat"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "Searching the catalog"
+#~ msgstr "Recherche dans le catalogue"
+
+#: src/components/RichText/UserMention/UserMentionList.tsx
+msgid "No teammates match"
+msgstr "Aucun coéquipier correspondant"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Code"
 msgstr "Code"
@@ -3736,6 +3835,10 @@ msgstr "Confirmer l'action"
 msgid "No dashboards to show"
 msgstr "Aucun tableau de bord à afficher"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#~ msgid "A type of record you manage"
+#~ msgstr "Un type d’enregistrement que vous gérez"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
 msgstr "Lignes de ces {regionCount} régions"
@@ -3761,6 +3864,10 @@ msgid "The layer configuration is saved. Try again once your connection is "
 "back, or reload the page."
 msgstr "La configuration du calque est enregistrée. Réessayez une fois la "
 "connexion rétablie, ou rechargez la page."
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "{plainTextLength} of {RICH_TEXT_MAX_TEXT_LENGTH} characters"
+msgstr "{plainTextLength} sur {RICH_TEXT_MAX_TEXT_LENGTH} caractères"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
@@ -4047,6 +4154,10 @@ msgstr "Commencez votre parcours avec nous"
 msgid "Qwen 2.5 7B (offline)"
 msgstr "Qwen 2.5 7B (hors ligne)"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Funny"
+msgstr "Drôle"
+
 #. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "{0} distinct"
@@ -4204,6 +4315,10 @@ msgstr "Plus d’actions sur le jeu de données"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
 msgstr "Supprimer le tableau de bord ?"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Love"
+msgstr "J’adore"
 
 #: src/views/ProfileView/PasswordSection.tsx
 msgid "Change password"
@@ -4470,6 +4585,10 @@ msgstr "Emplacements exacts"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
 msgstr "Nouvelle conversation"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "Search by name, organization, pipeline…"
+#~ msgstr "Rechercher par nom, organisation, pipeline…"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -4809,6 +4928,10 @@ msgstr "a une valeur"
 msgid "The custom URL cannot contain spaces"
 msgstr "L’URL personnalisée ne peut pas contenir d’espaces"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Bullet list"
+msgstr "Liste à puces"
+
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Annotate the map"
@@ -5085,6 +5208,11 @@ msgstr "Toute personne disposant du lien peut consulter ce {resource}. Les "
 "personnes et les groupes ci-dessous contrôlent toujours les accès en "
 "modification."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
+msgid "Post the first update below. Mention a teammate with @ to bring them in."
+msgstr "Publiez la première mise à jour ci-dessous. Mentionnez un coéquipier "
+"avec @ pour l’ajouter à la conversation."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "The person who added this sheet needs to reconnect their Google account. "
 "Ask them to reconnect it, then try again."
@@ -5135,6 +5263,11 @@ msgstr "Sièges achetés avec succès"
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Open chat (⌘/)"
 msgstr "Ouvrir le chat (⌘/)"
+
+#. placeholder {0}: catalogSearch.totalCount
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "Catalog ({0})"
+#~ msgstr "Catalogue ({0})"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
@@ -5212,6 +5345,10 @@ msgid "JOIN ON clause uses a non-column reference; the form will keep it via "
 "raw SQL."
 msgstr "La clause JOIN ON utilise une référence qui n’est pas une colonne ; le "
 "formulaire la conserve via le SQL brut."
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Insightful"
+msgstr "Instructif"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/useSaveCaseTypeStatuses.ts
 msgid "Statuses saved"
@@ -5300,6 +5437,10 @@ msgstr "Modifier l’URL personnalisée ?"
 msgid "Color"
 msgstr "Couleur"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Celebrate"
+msgstr "Féliciter"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label"
 msgstr "Libellé de l’axe Y"
@@ -5315,6 +5456,10 @@ msgstr "Sélectionner une colonne"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "1"
 msgstr "1"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
+msgid "edited"
+msgstr "modifié"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Rows skipped"
@@ -5387,6 +5532,8 @@ msgstr "Créer un espace de travail"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
 msgid "Try again"
 msgstr "Réessayer"
 
@@ -5463,6 +5610,10 @@ msgstr "Télécharger le PDF"
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Enter a name."
 msgstr "Saisissez un nom."
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Bold"
+msgstr "Gras"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -5636,6 +5787,11 @@ msgstr "Oui"
 msgid "Clear privacy log"
 msgstr "Effacer le journal de confidentialité"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/useCommentEditing.ts
+msgid "This comment has content this version of Avandar cannot edit."
+msgstr "Ce commentaire contient du contenu que cette version d’Avandar ne peut "
+"pas modifier."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Consent"
 msgstr "Consentement"
@@ -5643,6 +5799,11 @@ msgstr "Consentement"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "Parlez-nous de l'origine des données de {singularConceptName}..."
+
+#. placeholder {0}: debouncedSearch.trim()
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "No catalog dataset matches “{0}”."
+#~ msgstr "Aucun jeu de données du catalogue ne correspond à « {0} »."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -5922,6 +6083,10 @@ msgstr "Qu'est-ce qu'une série ?"
 msgid "Latitude or longitude is not a number"
 msgstr "La latitude ou la longitude n’est pas un nombre"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Numbered list"
+msgstr "Liste numérotée"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster"
 msgstr "Groupe"
@@ -6020,6 +6185,11 @@ msgstr "Violet"
 msgid "This tool arrives in a later release."
 msgstr "Cet outil sera disponible dans une version ultérieure."
 
+#. placeholder {0}: summary.total
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionSummaryChip.tsx
+msgid "{0, plural, one {# reaction} other {# reactions}}"
+msgstr "{0, plural, one {# réaction} other {# réactions}}"
+
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
 msgstr "Demandez à propos de vos données..."
@@ -6089,6 +6259,10 @@ msgstr "Afficher la couche {layerName}"
 #: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "Créer un nouveau compte"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/useToggleReaction.ts
+msgid "Your reaction could not be saved. Try again."
+msgstr "Votre réaction n’a pas pu être enregistrée. Réessayez."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Reconnect your Google account and try again."
@@ -6331,10 +6505,6 @@ msgstr "Qwen 2.5 3B"
 msgid "Collapse drawer"
 msgstr "Réduire le panneau"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-msgid "Add note"
-msgstr "Ajouter une note"
-
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
 msgstr "Le partage a échoué"
@@ -6389,7 +6559,7 @@ msgstr "Colonne 1"
 msgid "{mapped} of {total} rows mapped"
 msgstr "{mapped} lignes sur {total} mises en correspondance"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 msgid "Missing from source since"
 msgstr "Absent de la source depuis"
 
@@ -6460,6 +6630,10 @@ msgstr "Certaines données doivent être saisies manuellement"
 msgid "Field name"
 msgstr "Nom du champ"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/useCommentMutations.ts
+msgid "Your changes could not be saved. Try again."
+msgstr "Vos modifications n’ont pas pu être enregistrées. Réessayez."
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Most frequent"
 msgstr "Le plus fréquent"
@@ -6517,6 +6691,10 @@ msgstr "Certains jeux de données ne sont pas encore synchronisés en ligne ou "
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this chart"
 msgstr "Lignes de ce graphique"
+
+#: src/components/RichText/UserMention/UserMentionChip.tsx
+msgid "member"
+msgstr "membre"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
@@ -6592,6 +6770,12 @@ msgstr "E-mail"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick color"
 msgstr "Couleur des graduations de l’axe Y"
+
+#. placeholder {0}: listing.pipelineName
+#. placeholder {1}: listing.pipelineRunId
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#~ msgid "{0} · run {1}"
+#~ msgstr "{0} · exécuter {1}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
@@ -6866,6 +7050,10 @@ msgstr "Types de colonnes mis à jour"
 msgid "Partially offline"
 msgstr "Partiellement hors ligne"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "The comment is removed from the case for everyone."
+msgstr "Le commentaire est supprimé du dossier pour tout le monde."
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Source attribution (Always included)"
 msgstr "Attribution de la source (Toujours incluse)"
@@ -7047,6 +7235,7 @@ msgstr "Créer un nouvel espace de travail. Vous pouvez toujours le modifier "
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "Réessayez dans un instant ou contactez l’assistance si le problème "
 "persiste."
@@ -7065,6 +7254,10 @@ msgstr "Qwen 2.5 7B"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Neutral"
 msgstr "Neutre"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/useCommentMutations.ts
+msgid "The comment could not be deleted. Try again."
+msgstr "Le commentaire n’a pas pu être supprimé. Réessayez."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
@@ -7135,6 +7328,10 @@ msgstr "Veuillez vous reconnecter pour continuer."
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
 msgstr "Date de production (Toujours incluse)"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Italic"
+msgstr "Italique"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{recordCount, plural, one {# record} other {# records}}"
@@ -7565,6 +7762,10 @@ msgid "Public queries are not supported for structured queries. Use raw SQL "
 msgstr "Les requêtes publiques ne sont pas prises en charge pour les requêtes "
 "structurées. Utilisez plutôt SQL brut."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
+msgid "Edit comment"
+msgstr "Modifier le commentaire"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "CSV file"
 msgstr "Fichier CSV"
@@ -7838,6 +8039,12 @@ msgstr "Disposition en barres"
 msgid "Limit to app access"
 msgstr "Limiter l'accès à l'application"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/OfflineNotice.tsx
+msgid "You're offline. Your draft is saved on this device and you can post when "
+"you reconnect."
+msgstr "Vous êtes hors ligne. Votre brouillon est enregistré sur cet appareil "
+"et vous pourrez le publier lorsque la connexion sera rétablie."
+
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Enter dataset name"
 msgstr "Entrez le nom de l'ensemble de données"
@@ -8086,6 +8293,10 @@ msgstr "Aucune colonne numérique"
 msgid "Service"
 msgstr "Service"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
+msgid "Loading author"
+msgstr "Chargement de l’auteur"
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too large for the on-device model. Try a shorter "
 "question, or reconnect to use cloud chat."
@@ -8104,6 +8315,14 @@ msgstr "{lengthValue} km"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "Ligne source"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#~ msgid "Loading more datasets"
+#~ msgstr "Chargement d’autres jeux de données"
+
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
+#~ msgid "Nothing more to load"
+#~ msgstr "Rien de plus à charger"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
@@ -8214,10 +8433,12 @@ msgid "Error saving dataset"
 msgstr "Erreur lors de l'enregistrement de l'ensemble de données"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
 #: src/views/ProfileView/DisplayNameSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -8534,6 +8755,10 @@ msgstr "Éditeur"
 msgid "Entered manually"
 msgstr "Saisi manuellement"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#~ msgid "Organization"
+#~ msgstr "Organisation"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
 msgstr "portail de facturation."
@@ -8663,7 +8888,7 @@ msgstr "Excel"
 msgid "Dataset columns"
 msgstr "Colonnes de l'ensemble de données"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordDetailsSection.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Details"
 msgstr "Détails"
 
@@ -9004,7 +9229,7 @@ msgstr "Colonnes de latitude et de longitude"
 msgid "linear"
 msgstr "linéaire"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 msgid "Source ID"
 msgstr "ID de la source"
 
@@ -9162,7 +9387,7 @@ msgstr "est compris entre"
 msgid "Dashboards"
 msgstr "Tableaux de bord"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 msgid "Record"
 msgstr "Enregistrement"
 
@@ -9173,6 +9398,10 @@ msgstr "entier"
 #: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Custom clarification answer"
 msgstr "Réponse de clarification personnalisée"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Like"
+msgstr "J’aime"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -9227,7 +9456,6 @@ msgstr "Avandar est encore en version bêta. Certaines fonctionnalités peuvent 
 msgid "Thank you for your interest!"
 msgstr "Merci de votre intérêt !"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Case type"
 msgstr "Type de dossier"
@@ -9295,6 +9523,10 @@ msgstr "Aucune valeur"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Shape"
 msgstr "Forme"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
+msgid "This comment was deleted."
+msgstr "Ce commentaire a été supprimé."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on"
@@ -9438,6 +9670,10 @@ msgstr "Supprimer la carte {0}"
 msgid "Read as"
 msgstr "Interprété comme"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#~ msgid "Try one of these"
+#~ msgstr "Essayez l'une de ces options"
+
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
 msgstr "Colonne de valeur sélectionnée invalide"
@@ -9445,6 +9681,11 @@ msgstr "Colonne de valeur sélectionnée invalide"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "Ligne {rowNum} / Colonne {colNum}"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
+msgid "Write an update. Type @ to mention a teammate."
+msgstr "Écrivez une mise à jour. Saisissez @ pour mentionner un membre de "
+"l’équipe."
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList.tsx
 msgid "You can't go to this step until you create a new dashboard."
@@ -9588,7 +9829,8 @@ msgstr "Document sélectionné : {0}"
 msgid "Subtle"
 msgstr "Discret"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 msgid "Activity"
 msgstr "Activité"
 
@@ -9633,6 +9875,10 @@ msgstr "Chaque membre de l’espace de travail qui peut ouvrir l’application "
 msgid "{formattedPriceToDisplay}/seat"
 msgstr "{formattedPriceToDisplay}/siège"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+msgid "The activity for this case failed to load"
+msgstr "Le chargement de l’activité de ce dossier a échoué"
+
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed"
 msgstr "Cette requête a échoué"
@@ -9647,6 +9893,10 @@ msgstr "Ajoutez une couche pour tracer un jeu de données, un jeu de données "
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Explore your data"
 msgstr "Explorez vos données"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Mention a teammate"
+msgstr "Mentionner un membre de l’équipe"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email address"
@@ -9684,7 +9934,7 @@ msgstr "Synchroniser en ligne ?"
 msgid "Neutral failure"
 msgstr "Échec neutre"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "No fields yet"
 msgstr "Aucun champ pour le moment"
 
@@ -9703,6 +9953,10 @@ msgstr "Accès général"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Media"
 msgstr "Média"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Support"
+msgstr "Assistance"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "+ Condition"
@@ -9724,6 +9978,10 @@ msgstr "Copier le lien"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "100,000"
 msgstr "100 000"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
+msgid "Post"
+msgstr "Publier"
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: dataset.name
@@ -9771,6 +10029,11 @@ msgstr "Modifier l’URL"
 msgid "Ochre"
 msgstr "Ocre"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
+msgid "Write an update"
+msgstr "Écrivez une mise à jour"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
 msgid "Could not create that case type"
 msgstr "Impossible de créer ce type de dossier"
@@ -9790,6 +10053,10 @@ msgstr "Échec de la mise à jour de l'e-mail"
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Published to your workspace."
 msgstr "Publié dans votre espace de travail."
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Open link in a new tab"
+msgstr "Ouvrir le lien dans un nouvel onglet"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
@@ -10042,6 +10309,10 @@ msgstr "est supérieur à"
 msgid "Close"
 msgstr "Fermer"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Link"
+msgstr "Lien"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "Votre espace de travail a utilisé {currentSeatUsage} de ses "
@@ -10089,7 +10360,7 @@ msgstr "Pas hors ligne"
 msgid "This dashboard is published publicly."
 msgstr "Ce tableau de bord est publié publiquement."
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordDetailsSection.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading..."
 msgstr "Chargement..."
 
@@ -10186,6 +10457,7 @@ msgstr "Valeurs, séparées par des virgules"
 msgid "Heading"
 msgstr "Titre"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Quote"
 msgstr "Citation"
@@ -10290,6 +10562,10 @@ msgstr "Mode SSL"
 msgid "S"
 msgstr "S"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "https://example.org"
+msgstr "https://example.org"
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
 msgstr "Étapes suivantes recommandées"
@@ -10305,6 +10581,10 @@ msgstr "Bas"
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"
 msgstr "Prêt hors ligne"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionOptions.tsx
+msgid "Reactions"
+msgstr "Réactions"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Swap latitude and longitude"

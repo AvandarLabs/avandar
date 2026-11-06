@@ -1,0 +1,46 @@
+.root {
+  font-size: var(--mantine-font-size-md);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.root p {
+  margin: var(--mantine-spacing-xxs) 0 0;
+}
+
+.root ul,
+.root ol {
+  margin: var(--mantine-spacing-xxs) 0 0;
+  padding-inline-start: var(--mantine-spacing-lg);
+}
+
+.root blockquote {
+  border-inline-start: 1px solid var(--ava-border-strong);
+  color: var(--mantine-color-neutral-8);
+  margin: var(--mantine-spacing-xs) 0 0;
+  padding-inline-start: var(--mantine-spacing-sm);
+}
+
+.root code {
+  background-color: var(--mantine-color-neutral-1);
+  border-radius: var(--mantine-radius-xs);
+  font-size: var(--mantine-font-size-sm);
+  padding: 1px 4px;
+}
+
+.root pre {
+  background-color: var(--mantine-color-neutral-1);
+  border-radius: var(--mantine-radius-sm);
+  margin: var(--mantine-spacing-xs) 0 0;
+  overflow-x: auto;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+}
+
+.root a {
+  color: var(--mantine-color-primary-7);
+  text-underline-offset: 2px;
+}
+
+.plainText {
+  white-space: pre-line;
+}

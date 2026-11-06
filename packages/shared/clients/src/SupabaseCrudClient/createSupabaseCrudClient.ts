@@ -1,10 +1,14 @@
-import { assertIsDefined, objectEntries, objectKeys } from "@avandar/utils";
+import { assertIsDefined, objectEntries } from "@avandar/utils";
 import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
 import type { ILogger } from "@avandar/logger";
-import type { FilterOperator, FiltersByColumn } from "@avandar/utils";
+import type {
+  FilterOperator,
+  FilterOperatorRecord,
+  FiltersByColumn,
+} from "@avandar/utils";
 import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type {
   ClientReturningOnlyPromises,
@@ -104,8 +108,15 @@ export function createSupabaseCrudClient<
     Query extends AnySupabaseFilterableQuery,
   >(query: Query, filters: FiltersByColumn<M["DBRead"]>): Query {
     let newQuery = query;
-    objectKeys(filters).forEach((column) => {
-      const filter = filters[column as keyof M["DBRead"]];
+    // Widen to a plain column-keyed record before iterating. Inside this
+    // generic, `M["DBRead"]` resolves to the union of every registered
+    // table's Row, so `keyof M["DBRead"]` is only the columns that every table
+    // shares. That is `never` once any table lacks a common column, which
+    // breaks any cast to or indexed access by that key.
+    const filtersByColumnName: Partial<
+      Record<string, FilterOperatorRecord<unknown>>
+    > = filters;
+    objectEntries(filtersByColumnName).forEach(([column, filter]) => {
       if (filter) {
         objectEntries(filter).forEach(([operator, value]) => {
           // currently we only support `eq` filters

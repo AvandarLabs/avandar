@@ -34,6 +34,70 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_events: {
+        Row: {
+          actor_user_id: string | null
+          comment_id: string | null
+          id: string
+          individual_id: string | null
+          kind: Database["public"]["Enums"]["activity_events__kind"]
+          occurred_at: string
+          payload: Json
+          payload_version: number
+          recorded_at: string
+          source: Database["public"]["Enums"]["activity_events__source"]
+          workspace_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          comment_id?: string | null
+          id?: string
+          individual_id?: string | null
+          kind: Database["public"]["Enums"]["activity_events__kind"]
+          occurred_at?: string
+          payload?: Json
+          payload_version?: number
+          recorded_at?: string
+          source?: Database["public"]["Enums"]["activity_events__source"]
+          workspace_id: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          comment_id?: string | null
+          id?: string
+          individual_id?: string | null
+          kind?: Database["public"]["Enums"]["activity_events__kind"]
+          occurred_at?: string
+          payload?: Json
+          payload_version?: number
+          recorded_at?: string
+          source?: Database["public"]["Enums"]["activity_events__source"]
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_events_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_events_individual_id_fkey"
+            columns: ["individual_id"]
+            isOneToOne: false
+            referencedRelation: "individuals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_events_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attribute_mappings__dataset_column: {
         Row: {
           concept_attribute_id: string
@@ -114,6 +178,195 @@ export type Database = {
           },
           {
             foreignKeyName: "attribute_mappings__manual_entry_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comment_mentions: {
+        Row: {
+          comment_id: string
+          created_at: string
+          mentioned_user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          mentioned_user_id: string
+          workspace_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          mentioned_user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_mentions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comment_mentions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comment_reactions: {
+        Row: {
+          comment_id: string
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["comment_reactions__kind"]
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          id?: string
+          kind: Database["public"]["Enums"]["comment_reactions__kind"]
+          updated_at?: string
+          user_id?: string
+          workspace_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["comment_reactions__kind"]
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_reactions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comment_reactions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comment_revisions: {
+        Row: {
+          body: Json
+          body_schema_version: number
+          body_text: string
+          comment_id: string
+          created_at: string
+          id: string
+          reason: Database["public"]["Enums"]["comment_revisions__reason"]
+          revised_by_user_id: string | null
+          workspace_id: string
+        }
+        Insert: {
+          body: Json
+          body_schema_version: number
+          body_text: string
+          comment_id: string
+          created_at?: string
+          id?: string
+          reason: Database["public"]["Enums"]["comment_revisions__reason"]
+          revised_by_user_id?: string | null
+          workspace_id: string
+        }
+        Update: {
+          body?: Json
+          body_schema_version?: number
+          body_text?: string
+          comment_id?: string
+          created_at?: string
+          id?: string
+          reason?: Database["public"]["Enums"]["comment_revisions__reason"]
+          revised_by_user_id?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_revisions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comment_revisions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          author_user_id: string | null
+          body: Json | null
+          body_schema_version: number
+          body_text: string | null
+          created_at: string
+          deleted_at: string | null
+          edited_at: string | null
+          id: string
+          individual_id: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          author_user_id?: string | null
+          body?: Json | null
+          body_schema_version?: number
+          body_text?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          edited_at?: string | null
+          id?: string
+          individual_id?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          author_user_id?: string | null
+          body?: Json | null
+          body_schema_version?: number
+          body_text?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          edited_at?: string | null
+          id?: string
+          individual_id?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_individual_id_fkey"
+            columns: ["individual_id"]
+            isOneToOne: false
+            referencedRelation: "individuals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -517,6 +770,7 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
           source_url: string | null
@@ -559,6 +813,7 @@ export type Database = {
           pipeline_name?: string | null
           pipeline_run_id?: string | null
           pipeline_scope_keys?: string[]
+          search_vector?: unknown
           source_asset_type?: string | null
           source_download_url?: string | null
           source_url?: string | null
@@ -601,6 +856,7 @@ export type Database = {
           pipeline_name?: string | null
           pipeline_run_id?: string | null
           pipeline_scope_keys?: string[]
+          search_vector?: unknown
           source_asset_type?: string | null
           source_download_url?: string | null
           source_url?: string | null
@@ -2275,6 +2531,35 @@ export type Database = {
         Args: { p_map_id: string; p_owner_id: string }
         Returns: boolean
       }
+      rpc_activity_events__get_case_page: {
+        Args: {
+          p_before_id?: string
+          p_before_occurred_at?: string
+          p_before_recorded_at?: string
+          p_individual_id: string
+          p_kinds: Database["public"]["Enums"]["activity_events__kind"][]
+          p_limit: number
+        }
+        Returns: {
+          actor_user_id: string | null
+          comment_id: string | null
+          id: string
+          individual_id: string | null
+          kind: Database["public"]["Enums"]["activity_events__kind"]
+          occurred_at: string
+          payload: Json
+          payload_version: number
+          recorded_at: string
+          source: Database["public"]["Enums"]["activity_events__source"]
+          workspace_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "activity_events"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       rpc_concept_statuses__save: {
         Args: {
           p_concept_id: string
@@ -2362,6 +2647,7 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
           source_url: string | null
@@ -2387,6 +2673,18 @@ export type Database = {
           listings_deleted: number
           listings_detached: number
           listings_kept_in_use: number
+        }[]
+      }
+      rpc_data_catalog_listings__search: {
+        Args: { p_limit?: number; p_offset?: number; p_query: string }
+        Returns: {
+          display_name: string
+          external_organization_name: string
+          id: string
+          is_invalid: boolean
+          is_workspace_loadable: boolean
+          pipeline_name: string
+          total_count: number
         }[]
       }
       rpc_data_catalog_listings__upsert_with_relation_columns: {
@@ -2427,6 +2725,7 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
           source_url: string | null
@@ -2478,6 +2777,7 @@ export type Database = {
           pipeline_name: string | null
           pipeline_run_id: string | null
           pipeline_scope_keys: string[]
+          search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
           source_url: string | null
@@ -3001,6 +3301,11 @@ export type Database = {
       }
     }
     Enums: {
+      activity_events__kind:
+        | "comment_created"
+        | "comment_edited"
+        | "comment_deleted"
+      activity_events__source: "avandar" | "external"
       app_type:
         | "data_sources"
         | "data_explorer"
@@ -3017,6 +3322,14 @@ export type Database = {
         | "count"
         | "max"
         | "min"
+      comment_reactions__kind:
+        | "like"
+        | "celebrate"
+        | "support"
+        | "love"
+        | "insightful"
+        | "funny"
+      comment_revisions__reason: "edit" | "delete"
       concept_attributes__mapping_type: "dataset_column" | "manual_entry"
       connections__connection_type: "postgres"
       connections__postgres_ssl_mode: "disable" | "require"
@@ -3271,6 +3584,12 @@ export const Constants = {
   },
   public: {
     Enums: {
+      activity_events__kind: [
+        "comment_created",
+        "comment_edited",
+        "comment_deleted",
+      ],
+      activity_events__source: ["avandar", "external"],
       app_type: [
         "data_sources",
         "data_explorer",
@@ -3289,6 +3608,15 @@ export const Constants = {
         "max",
         "min",
       ],
+      comment_reactions__kind: [
+        "like",
+        "celebrate",
+        "support",
+        "love",
+        "insightful",
+        "funny",
+      ],
+      comment_revisions__reason: ["edit", "delete"],
       concept_attributes__mapping_type: ["dataset_column", "manual_entry"],
       connections__connection_type: ["postgres"],
       connections__postgres_ssl_mode: ["disable", "require"],

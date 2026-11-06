@@ -47,6 +47,10 @@ msgstr "尚無記錄"
 msgid "Return online to view or make the page available offline."
 msgstr "返回線上以查看或使頁面可離線使用。"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "The link could not be copied."
+msgstr "無法複製連結。"
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -102,6 +106,10 @@ msgstr "此試算表中只有一個分頁。"
 msgid "starts with"
 msgstr "開頭為"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Open link in the same tab"
+msgstr "在相同分頁中開啟連結"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
 msgstr "執行查詢以查看結果。"
@@ -121,6 +129,10 @@ msgstr "儲存格大小（公尺）"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "打開資料集"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "Delete comment?"
+msgstr "要刪除留言嗎？"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
@@ -156,7 +168,7 @@ msgstr "移除 {name} 的訪問權限。"
 msgid "Match case"
 msgstr "區分大小寫"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 msgid "Updated"
 msgstr "已更新"
 
@@ -478,6 +490,10 @@ msgstr "緯度和經度似乎對調了"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Cannot add dataset"
 msgstr "無法添加資料集"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
+msgid "No activity on this case yet"
+msgstr "此案件尚無活動"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Members still assigned to this group must be moved first."
@@ -806,6 +822,10 @@ msgstr "要隱藏教學嗎？"
 msgid "Google Picker error"
 msgstr "Google Picker 錯誤"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
+msgid "Show earlier activity"
+msgstr "顯示較早的活動"
+
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Choose a default status from this list."
 msgstr "從此清單選擇預設狀態。"
@@ -926,6 +946,11 @@ msgstr " 筆資料"
 #: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
 msgstr "其他…"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "The catalog is still in <0/> and grows as people tell us what they need. "
+#~ "Missing a dataset? <1>tell us</1>."
+#~ msgstr "目錄仍在 <0/>，並會隨著大家告訴我們需求而擴充。找不到需要的資料集？<1>告訴我們</1>。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
@@ -1204,14 +1229,14 @@ msgstr "此欄位不能為空"
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "「{value}」不是日期。請使用 YYYY-MM-DD。"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-msgid "Add a note"
-msgstr "新增備註"
-
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
 msgstr "開啟地圖 {0}"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Some links in this update are not allowed. Use web or email links."
+msgstr "此更新中的部分連結不受允許。請使用網頁或電子郵件連結。"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "Oops!"
@@ -1275,6 +1300,10 @@ msgstr "請先執行查詢。"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
 msgstr "已達到座位限制"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#~ msgid "Pipeline"
+#~ msgstr "管道"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
@@ -1382,6 +1411,10 @@ msgstr "略過"
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
 msgstr "已複製"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "Copy link to comment"
+msgstr "複製留言連結"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureMapTool.tsx
 msgid "Measure distance and area"
@@ -1691,6 +1724,10 @@ msgstr "漏斗圖"
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "Show every status"
 msgstr "顯示所有狀態"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Link address"
+msgstr "連結地址"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Symbol"
@@ -2021,6 +2058,10 @@ msgstr "此區域沒有可傳送的文字。已保留規則式結果。"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Medium"
 msgstr "中"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
+msgid "Loading case"
+msgstr "正在載入案件"
 
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "Colors for {statusName}"
@@ -2446,6 +2487,10 @@ msgstr "選擇要將已移除狀態的記錄移至何處。"
 msgid "Private datasets"
 msgstr "私人資料集"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
+msgid "Earlier activity failed to load."
+msgstr "較早的活動載入失敗。"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Create case type"
@@ -2636,6 +2681,10 @@ msgstr "允許手動創建新的 {pluralConceptName}"
 msgid "Welcome to Avandar"
 msgstr "歡迎使用 Avandar"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "Tell us which open dataset you want via feedback"
+#~ msgstr "通過反饋告訴我們您想要的開放資料集"
+
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
@@ -2663,6 +2712,12 @@ msgstr "我已執行查詢，但查詢失敗。"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
 msgstr "步階"
+
+#: src/components/RichText/RichTextView/RichTextView.tsx
+#: src/components/RichText/UserMention/UserMentionChip.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCard.tsx
+msgid "Former member"
+msgstr "前成員"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
@@ -2713,6 +2768,7 @@ msgstr "{keyboardShortcut} 以保存"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActionsMenu.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -2738,6 +2794,11 @@ msgstr "停用"
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
 "column reference."
 msgstr "WHERE 子句左側使用了非欄位參照的運算式。"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/usePostCaseComment.ts
+msgid "Your update was not posted. It is still in the box, so you can try "
+"again."
+msgstr "您的更新尚未發布。內容仍保留在輸入框中，您可以再試一次。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "PDF downloaded."
@@ -2806,6 +2867,11 @@ msgstr "{0}、{1} 和 {2} 對每個工作區都是固定的。"
 msgid "Synced to the cloud"
 msgstr "已同步至雲端"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#~ msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
+#~ "how often it updates."
+#~ msgstr "選取左側的資料集，以查看其涵蓋內容、發佈者及更新頻率。"
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
 msgstr "無資料顏色"
@@ -2853,7 +2919,7 @@ msgstr "您的儀表板已建立，但其他人目前還無法開啟。請選擇
 msgid "Remove series"
 msgstr "移除系列"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Created"
 msgstr "已建立"
@@ -2890,6 +2956,10 @@ msgstr "HAVING 子句使用了表單無法表示的左側運算式。"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "has no value"
 msgstr "沒有值"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#~ msgid "Catalog datasets"
+#~ msgstr "編目資料集"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -2990,6 +3060,7 @@ msgstr "幾何功能正在下載。在網路較慢時可能需要稍等。"
 #: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
@@ -3009,6 +3080,7 @@ msgstr "幾何功能正在下載。在網路較慢時可能需要稍等。"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/EditStatusesForm.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
@@ -3162,6 +3234,10 @@ msgstr "您目前在<0>{currentFeaturePlanName}</0>計劃中。"
 msgid "Result size"
 msgstr "結果大小"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "Search open data catalog"
+#~ msgstr "搜索開放數據目錄"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
@@ -3264,6 +3340,10 @@ msgstr "前往數據探索器"
 msgid "Radar Chart"
 msgstr "雷達圖"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "Comment actions"
+msgstr "留言操作"
+
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistDockButton.tsx
 msgid "Get started {completedCount}/{totalMilestoneCount}"
 msgstr "開始使用 {completedCount}/{totalMilestoneCount}"
@@ -3283,6 +3363,10 @@ msgstr "連結至來源紀錄"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "None"
 msgstr "無"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "Link copied"
+msgstr "連結已複製"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "This dataset is indexed in {serviceName}, but it can't be loaded."
@@ -3419,6 +3503,7 @@ msgid "Try asking"
 msgstr "試著問問"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Edit"
 msgstr "編輯"
 
@@ -3466,6 +3551,15 @@ msgstr "複製"
 msgid "Outcome"
 msgstr "結果"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "Searching the catalog"
+#~ msgstr "正在搜尋目錄"
+
+#: src/components/RichText/UserMention/UserMentionList.tsx
+msgid "No teammates match"
+msgstr "沒有符合條件的隊友"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Code"
 msgstr "程式碼"
@@ -3552,6 +3646,10 @@ msgstr "確認操作"
 msgid "No dashboards to show"
 msgstr "沒有可顯示的儀表板"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#~ msgid "A type of record you manage"
+#~ msgstr "您管理的一種記錄"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
 msgstr "來自這 {regionCount} 個區域的列"
@@ -3576,6 +3674,10 @@ msgstr "內距"
 msgid "The layer configuration is saved. Try again once your connection is "
 "back, or reload the page."
 msgstr "圖層設定已儲存。恢復網路連線後重試，或重新載入頁面。"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "{plainTextLength} of {RICH_TEXT_MAX_TEXT_LENGTH} characters"
+msgstr "{plainTextLength} / {RICH_TEXT_MAX_TEXT_LENGTH} 個字元"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
@@ -3845,6 +3947,10 @@ msgstr "與我們一起開始您的旅程"
 msgid "Qwen 2.5 7B (offline)"
 msgstr "Qwen 2.5 7B（離線）"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Funny"
+msgstr "好笑"
+
 #. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "{0} distinct"
@@ -3996,6 +4102,10 @@ msgstr "更多資料集動作"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
 msgstr "刪除儀表板？"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Love"
+msgstr "喜愛"
 
 #: src/views/ProfileView/PasswordSection.tsx
 msgid "Change password"
@@ -4249,6 +4359,10 @@ msgstr "精確位置"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
 msgstr "新聊天"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "Search by name, organization, pipeline…"
+#~ msgstr "按名稱、組織、管道等搜索…"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -4577,6 +4691,10 @@ msgstr "有值"
 msgid "The custom URL cannot contain spaces"
 msgstr "自訂 URL 不得包含空格"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Bullet list"
+msgstr "項目符號清單"
+
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Annotate the map"
@@ -4841,6 +4959,10 @@ msgid "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
 msgstr "任何取得連結的人都能查看此{resource}。下方的人員和群組仍可控制誰能編輯。"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
+msgid "Post the first update below. Mention a teammate with @ to bring them in."
+msgstr "在下方發布第一則更新。使用 @ 提及隊友，讓他們加入。"
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "The person who added this sheet needs to reconnect their Google account. "
 "Ask them to reconnect it, then try again."
@@ -4889,6 +5011,11 @@ msgstr "座位購買成功"
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Open chat (⌘/)"
 msgstr "打開聊天 (⌘/)"
+
+#. placeholder {0}: catalogSearch.totalCount
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "Catalog ({0})"
+#~ msgstr "目錄 ({0})"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
@@ -4964,6 +5091,10 @@ msgstr "不可用"
 msgid "JOIN ON clause uses a non-column reference; the form will keep it via "
 "raw SQL."
 msgstr "JOIN ON 子句使用非欄位參照；表單將透過原始 SQL 保留該內容。"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Insightful"
+msgstr "富有洞察力"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/useSaveCaseTypeStatuses.ts
 msgid "Statuses saved"
@@ -5050,6 +5181,10 @@ msgstr "要變更自訂 URL 嗎？"
 msgid "Color"
 msgstr "顏色"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Celebrate"
+msgstr "慶祝"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label"
 msgstr "Y 軸標籤"
@@ -5065,6 +5200,10 @@ msgstr "選擇列"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "1"
 msgstr "1"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
+msgid "edited"
+msgstr "已編輯"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Rows skipped"
@@ -5135,6 +5274,8 @@ msgstr "創建工作區"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
 msgid "Try again"
 msgstr "再試一次"
 
@@ -5209,6 +5350,10 @@ msgstr "下載 PDF"
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Enter a name."
 msgstr "輸入名稱。"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Bold"
+msgstr "粗體"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -5369,6 +5514,10 @@ msgstr "是"
 msgid "Clear privacy log"
 msgstr "清除隱私日誌"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/useCommentEditing.ts
+msgid "This comment has content this version of Avandar cannot edit."
+msgstr "此留言包含目前版本的 Avandar 無法編輯的內容。"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Consent"
 msgstr "同意"
@@ -5376,6 +5525,11 @@ msgstr "同意"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "告訴我們 {singularConceptName} 數據應該來自哪裡..."
+
+#. placeholder {0}: debouncedSearch.trim()
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#~ msgid "No catalog dataset matches “{0}”."
+#~ msgstr "目錄中沒有符合「{0}」的資料集。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -5645,6 +5799,10 @@ msgstr "什麼是系列？"
 msgid "Latitude or longitude is not a number"
 msgstr "緯度或經度不是數字"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Numbered list"
+msgstr "編號清單"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster"
 msgstr "叢集"
@@ -5735,6 +5893,11 @@ msgstr "紫色"
 msgid "This tool arrives in a later release."
 msgstr "此工具將於後續版本推出。"
 
+#. placeholder {0}: summary.total
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionSummaryChip.tsx
+msgid "{0, plural, one {# reaction} other {# reactions}}"
+msgstr "{0, plural, one {# 個回應} other {# 個回應}}"
+
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
 msgstr "詢問您的數據..."
@@ -5803,6 +5966,10 @@ msgstr "顯示圖層 {layerName}"
 #: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "創建新帳戶"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/useToggleReaction.ts
+msgid "Your reaction could not be saved. Try again."
+msgstr "無法儲存您的回應。請再試一次。"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Reconnect your Google account and try again."
@@ -6036,10 +6203,6 @@ msgstr "Qwen 2.5 3B"
 msgid "Collapse drawer"
 msgstr "收合抽屜"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-msgid "Add note"
-msgstr "新增備註"
-
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
 msgstr "分享失敗"
@@ -6094,7 +6257,7 @@ msgstr "第 1 欄"
 msgid "{mapped} of {total} rows mapped"
 msgstr "已對應 {mapped} / {total} 筆資料列"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 msgid "Missing from source since"
 msgstr "自此日期起從來源中遺失"
 
@@ -6164,6 +6327,10 @@ msgstr "某些數據應手動輸入"
 msgid "Field name"
 msgstr "欄位名稱"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/useCommentMutations.ts
+msgid "Your changes could not be saved. Try again."
+msgstr "無法儲存您的變更。請再試一次。"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Most frequent"
 msgstr "最常見"
@@ -6217,6 +6384,10 @@ msgstr "部分資料集尚未同步至線上，或發布失敗。{errorMessage}"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this chart"
 msgstr "來自這張圖表的列"
+
+#: src/components/RichText/UserMention/UserMentionChip.tsx
+msgid "member"
+msgstr "成員"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
@@ -6290,6 +6461,12 @@ msgstr "電子郵件"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick color"
 msgstr "Y 軸刻度顏色"
+
+#. placeholder {0}: listing.pipelineName
+#. placeholder {1}: listing.pipelineRunId
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#~ msgid "{0} · run {1}"
+#~ msgstr "{0} · 執行 {1}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
@@ -6557,6 +6734,10 @@ msgstr "列類型已更新"
 msgid "Partially offline"
 msgstr "部分離線"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
+msgid "The comment is removed from the case for everyone."
+msgstr "所有人都看不到此留言了。"
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Source attribution (Always included)"
 msgstr "來源標註（一定包含）"
@@ -6732,6 +6913,7 @@ msgstr "創建一個新的工作區。您可以隨時稍後編輯它。"
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "請稍後再試；如果問題持續發生，請聯絡支援人員。"
 
@@ -6747,6 +6929,10 @@ msgstr "Qwen 2.5 7B"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Neutral"
 msgstr "中性"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/useCommentMutations.ts
+msgid "The comment could not be deleted. Try again."
+msgstr "無法刪除留言。請再試一次。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
@@ -6812,6 +6998,10 @@ msgstr "請重新登錄以繼續。"
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
 msgstr "產製日期（一定包含）"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Italic"
+msgstr "斜體"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{recordCount, plural, one {# record} other {# records}}"
@@ -7219,6 +7409,10 @@ msgid "Public queries are not supported for structured queries. Use raw SQL "
 "instead."
 msgstr "結構化查詢不支援公共查詢。請改用原始 SQL。"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
+msgid "Edit comment"
+msgstr "編輯留言"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "CSV file"
 msgstr "CSV 檔案"
@@ -7478,6 +7672,11 @@ msgstr "長條圖配置"
 msgid "Limit to app access"
 msgstr "限制應用訪問"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/OfflineNotice.tsx
+msgid "You're offline. Your draft is saved on this device and you can post when "
+"you reconnect."
+msgstr "您目前離線。草稿已儲存至此裝置，重新連線後即可發布。"
+
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Enter dataset name"
 msgstr "輸入數據集名稱"
@@ -7719,6 +7918,10 @@ msgstr "沒有數值欄"
 msgid "Service"
 msgstr "服務"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
+msgid "Loading author"
+msgstr "正在載入作者"
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too large for the on-device model. Try a shorter "
 "question, or reconnect to use cloud chat."
@@ -7735,6 +7938,14 @@ msgstr "{lengthValue} km"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "來源行"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#~ msgid "Loading more datasets"
+#~ msgstr "正在載入更多資料集"
+
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
+#~ msgid "Nothing more to load"
+#~ msgstr "沒有更多內容可加載"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
@@ -7839,10 +8050,12 @@ msgid "Error saving dataset"
 msgstr "保存數據集時出錯"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
 #: src/views/ProfileView/DisplayNameSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -8145,6 +8358,10 @@ msgstr "編輯者"
 msgid "Entered manually"
 msgstr "手動輸入"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#~ msgid "Organization"
+#~ msgstr "組織"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
 msgstr "計費入口網站。"
@@ -8270,7 +8487,7 @@ msgstr "Excel"
 msgid "Dataset columns"
 msgstr "數據集欄位"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordDetailsSection.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Details"
 msgstr "詳細資料"
 
@@ -8593,7 +8810,7 @@ msgstr "緯度與經度欄"
 msgid "linear"
 msgstr "線性"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 msgid "Source ID"
 msgstr "來源 ID"
 
@@ -8748,7 +8965,7 @@ msgstr "介於"
 msgid "Dashboards"
 msgstr "儀表板"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 msgid "Record"
 msgstr "紀錄"
 
@@ -8759,6 +8976,10 @@ msgstr "整數"
 #: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Custom clarification answer"
 msgstr "自定義澄清答案"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Like"
+msgstr "讚"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -8805,7 +9026,6 @@ msgstr "Avandar 仍在測試階段。某些功能可能無法按預期工作，�
 msgid "Thank you for your interest!"
 msgstr "感謝您的關注！"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordRail/RecordRail.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Case type"
 msgstr "案件類型"
@@ -8871,6 +9091,10 @@ msgstr "無值"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Shape"
 msgstr "形狀"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
+msgid "This comment was deleted."
+msgstr "這則留言已刪除。"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on"
@@ -9010,6 +9234,10 @@ msgstr "刪除地圖 {0}"
 msgid "Read as"
 msgstr "讀取為"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#~ msgid "Try one of these"
+#~ msgstr "嘗試這些"
+
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
 msgstr "選擇的值欄位無效"
@@ -9017,6 +9245,10 @@ msgstr "選擇的值欄位無效"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "第 {rowNum} 列 / 第 {colNum} 欄"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
+msgid "Write an update. Type @ to mention a teammate."
+msgstr "撰寫更新內容。輸入 @ 來提及團隊成員。"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList.tsx
 msgid "You can't go to this step until you create a new dashboard."
@@ -9154,7 +9386,8 @@ msgstr "選定的文件：{0}"
 msgid "Subtle"
 msgstr "細微"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 msgid "Activity"
 msgstr "活動"
 
@@ -9196,6 +9429,10 @@ msgstr "每位可以開啟 {app} 應用程式的工作區成員，都會在此 {
 msgid "{formattedPriceToDisplay}/seat"
 msgstr "{formattedPriceToDisplay}/座位"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+msgid "The activity for this case failed to load"
+msgstr "無法載入此案件的活動"
+
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed"
 msgstr "該查詢失敗"
@@ -9208,6 +9445,10 @@ msgstr "新增圖層以繪製資料集、衍生資料集或設定檔。您可以
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Explore your data"
 msgstr "探索您的數據"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Mention a teammate"
+msgstr "提及團隊成員"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email address"
@@ -9242,7 +9483,7 @@ msgstr "同步到線上？"
 msgid "Neutral failure"
 msgstr "中立失敗"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "No fields yet"
 msgstr "尚無欄位"
 
@@ -9261,6 +9502,10 @@ msgstr "一般訪問"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Media"
 msgstr "媒體"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
+msgid "Support"
+msgstr "支援"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "+ Condition"
@@ -9281,6 +9526,10 @@ msgstr "複製連結"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "100,000"
 msgstr "100,000"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
+msgid "Post"
+msgstr "發佈"
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: dataset.name
@@ -9327,6 +9576,11 @@ msgstr "變更網址"
 msgid "Ochre"
 msgstr "赭色"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
+msgid "Write an update"
+msgstr "撰寫更新內容"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
 msgid "Could not create that case type"
 msgstr "無法建立該案件類型"
@@ -9346,6 +9600,10 @@ msgstr "更新電子郵件失敗"
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Published to your workspace."
 msgstr "已發布至您的工作區。"
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Open link in a new tab"
+msgstr "在新分頁中開啟連結"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
@@ -9582,6 +9840,10 @@ msgstr "大於"
 msgid "Close"
 msgstr "關閉"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Link"
+msgstr "連結"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "您的工作區已使用所有 {currentSeatUsage} 個座位中的 {totalSeats} 個。"
@@ -9628,7 +9890,7 @@ msgstr "不離線"
 msgid "This dashboard is published publicly."
 msgstr "此儀表板已公開發佈。"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/RecordDetailsSection.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading..."
 msgstr "載入中..."
 
@@ -9725,6 +9987,7 @@ msgstr "值，以逗號分隔"
 msgid "Heading"
 msgstr "標題"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Quote"
 msgstr "引用"
@@ -9821,6 +10084,10 @@ msgstr "SSL 模式"
 msgid "S"
 msgstr "S"
 
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "https://example.org"
+msgstr "https://example.org"
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
 msgstr "推薦的下一步"
@@ -9836,6 +10103,10 @@ msgstr "底端"
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"
 msgstr "已準備離線"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionOptions.tsx
+msgid "Reactions"
+msgstr "回應"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Swap latitude and longitude"

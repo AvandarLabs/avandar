@@ -66,8 +66,10 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F14 | Show only the plan picker when a workspace has no active plan | PR open: [#314](https://github.com/AvandarLabs/avandar/pull/314) | none | |
 | F15 | `ava --env <name>` loads any `.env.<name>`, replacing `--staging` and `--prod` | PR open: [#319](https://github.com/AvandarLabs/avandar/pull/319) | none, but see its section for hunks in files `develop` lacks | |
 | F16 | Index every catalog asset behind `is_workspace_loadable`, and add the NY State Socrata portals | not started | F4, F6, F7, F12 | |
-| F17 | Open data catalog browser: full-height three-pane layout with search, filters, and sort | not started | F12, F16 | |
-| F18 | Phone widths: Data Sources shows one pane at a time, and the slate stays on screen | not started | none | |
+| F17 | Search the catalog in Postgres and load listings as the user scrolls | not started | F4, F12, F16 | |
+| F18 | Case comments and the case activity feed | not started | none | |
+| F19 | Open data catalog browser: full-height three-pane layout with search, filters, and sort | not started | F12, F16, F17 | |
+| F20 | Phone widths: Data Sources shows one pane at a time, and the slate stays on screen | not started | none | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -91,9 +93,11 @@ API. It's new work, not something this branch built.
 | any | F14 | Self-contained billing UI fix. The bug is already on `develop`, so it can merge first. |
 | any | F15 | Self-contained CLI change. Its hunks in `ava supabase sql`, `ava pipeline reset`, and `ava pipeline prune-retired-scopes` go with whichever of F15 and those commands lands on `develop` second. |
 | 11 | F16 | Extends the F4 listings table and upsert, both F6 and F7 pipelines, and F12's invalid-listing UI. Merge after all four. |
-| 12 | F17 | Rewrites the catalog list and detail that F12 and F16 extend, and keeps their invalid and unsupported states. Merge after both. |
-| any | F18 | Self-contained layout fix. The slate overflowing the bottom of a phone screen is already on `develop`, so it can merge first. |
-| 13 | F9 | Last, because the docs describe the merged features. |
+| 12 | F17 | Adds a column and indexes to the F4 listings table, and rewrites the catalog list that F12 and F16 extended. Merge after both. |
+| 13 | F19 | Moves the catalog browser onto F17's server search: its filters, facets, and sort become search parameters, and its list keeps F17's infinite scroll. Merge after F17. |
+| any | F18 | Self-contained: new tables, the record page feed, and one shared client typing fix. It touches no other feature's files, and nothing depends on it. |
+| any | F20 | Self-contained layout fix. The slate overflowing the bottom of a phone screen is already on `develop`, so it can merge first. |
+| 14 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -111,15 +115,14 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/functions/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts` | F3, F6 | F6: Socrata failure codes (`d9f488ff1`). |
 | `shared/connectors/open-data/openDataErrors.ts` | F3, F6 | F6: Socrata failure codes. |
 | `shared/connectors/open-data/CkanClient/CkanClient.ts` | F3, F2, F7 | F2: `get`. F7: `ckanActionApiHelpers` refactor. |
-| `shared/models/data-catalog-listings/DataCatalogListing/*` | F3, F4, F6, F8 | F3: `OpenDataAccess` field rename (`65b4cc8ad`). F4: the rename itself. F6: the `socrata` `api_service` arm. F8: cache fields. |
+| `shared/models/data-catalog-listings/DataCatalogListing/*` | F3, F4, F6, F8, F17 | F3: `OpenDataAccess` field rename (`65b4cc8ad`). F4: the rename itself. F6: the `socrata` `api_service` arm. F8: cache fields. F17: `search_vector` in `DBReadSchema` and dropped by `fromDBReadToModelRead`, and the `SearchResult` type. |
+| `src/views/DataManagerApp/DataImportView/DataCatalogView/{DataCatalogView,DataCatalogListingList/DataCatalogListingList}.tsx` and their CSS modules | F12, F16, F17, F19 | F12 and F16: see their sections. F17: server search through `useDataCatalogSearch`, the infinite-scroll list, and the by-id detail fetch. F19: the full-height three-pane layout, filters, facets, sort, and the filter drawer, all on F17's search. |
 | `supabase/schemas/00.enum.data_catalog_listings__api_service.sql` | F4, F6 | F4: rename. F6: the `socrata` value. |
-| `supabase/schemas/10.data_catalog_listings.sql` | F4, F8 | F4: rename and the non-partial `api_resource` unique index. F8: cache columns and their CHECK clauses. |
+| `supabase/schemas/10.data_catalog_listings.sql` | F4, F8, F17 | F4: rename and the non-partial `api_resource` unique index. F8: cache columns and their CHECK clauses. F17: the `search_vector` column and its two GIN indexes. |
 | `supabase/tests/database/data_catalog_listings_access.test.sql` | F4, F8 | F4: rename and the index test. F8: cache-column and `pipeline_access_complete` tests. |
 | `apps/pipeline-server/pipelines/world-bank__wdi/run.ts` | F1, F4, F10 | F1: `EtlEngine.create(name, { state })`. F4: `createSupabaseAdminClient` import from `pipelines/shared`. F10: `run(options)` rejecting `--limit`. |
-| `shared/types/database.types.ts` | F4, F6, F8 | Generated: regenerate in each. |
-| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx` | F12, F16, F17 | F12: the "Can't be loaded" line. F16: the "Not supported yet" line ahead of it. F17: the virtualized listbox around both. |
-| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx` | F12, F16, F17 | F12: `DataCatalogInvalidNotice`. F16: `DataCatalogUnsupportedNotice`, the `isWorkspaceLoadable` guard on the invalid notice, and `!listing.isWorkspaceLoadable` in `isAddBlocked`. F17: the scrolling body, pinned foot, back button, and fact list. |
-| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx` | F12, F16, F17 | F12: column type state. F16: the `isWorkspaceLoadable` guard in `onAddToWorkspace`. F17: filters, facets, sort, layout, and the filter drawer. |
+| `shared/types/database.types.ts` | F4, F6, F8, F17 | Generated: regenerate in each. |
+| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx` | F12, F16, F19 | F12: `DataCatalogInvalidNotice`. F16: `DataCatalogUnsupportedNotice`, the `isWorkspaceLoadable` guard on the invalid notice, and `!listing.isWorkspaceLoadable` in `isAddBlocked`. F19: the scrolling body, pinned foot, back button, and fact list. |
 
 ---
 
@@ -658,6 +661,7 @@ branch only. `pr-feature-log.md` itself stays off `develop`.
 | `9ae975a73` | prebuilt metacatalog plan | `docs/measles-demo/open-data-prebuilt-metacatalog-plan.md` |
 | `6053f4772`, `8297adad6` | modules and HttpClient design and plan | `docs/measles-demo/modules-factory-and-http-client-design.md`, `modules-factory-and-http-client-plan.md` |
 | `045066166` | docs(open-data): handoff brief for the next data-catalog rename pass | nothing: `03cf621ed` deleted the file |
+| `e1976a576`, `465b72ddb` | catalog search design | `docs/measles-demo/catalog-search-design.md` (final). `465b72ddb` is **MIXED**: only that file. |
 
 **Also take:**
 `a325df511` docs(open-data): document what every drive index pipeline must
@@ -832,7 +836,172 @@ ava pipeline run socrata --local --limit 400   # maps, files, and links land wit
 
 ---
 
-## F17: Open data catalog browser
+## F17: Search the catalog in Postgres and load listings as the user scrolls
+
+**Purpose:** The catalog view stops loading every listing (5,000+) and
+fuzzy-searching them in the browser with Fuse. Postgres matches whole words
+through a weighted `search_vector` column (name, then publisher, then
+description), and partial or misspelled words in a listing's name through
+`pg_trgm` at a 0.5 word-similarity threshold. One RPC,
+`rpc_data_catalog_listings__search`, returns ranked pages of slim rows with
+a total count. The view loads 50 at a time with `useInfiniteQuery` as the
+user scrolls, renders only the rows in view with `@tanstack/react-virtual`,
+and reads the selected listing in full by id. **Value:** Browser memory goes
+to DuckDB instead of three copies of the catalog (rows, Fuse index, DOM).
+Design: `docs/measles-demo/catalog-search-design.md` (goes with F9).
+
+**PR title:** `feat(catalog): search the catalog in Postgres and load listings as the user scrolls`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `e1976a576` | docs(measles-demo): design backend catalog search with infinite scroll | Nothing: goes with F9. |
+| `465b72ddb` | feat(catalog): search catalog listings in Postgres with full-text and trigram matching | All of it. Regenerate the migration and types. The design doc hunk goes with F9. |
+| `e36e0ae9b` | feat(catalog): search the catalog on the server and load listings as the user scrolls | All of it. Regenerate the `.po` catalogs. |
+| `7e24c81fb` | fix(desktop): skip tsvector columns and GIN indexes when mirroring migrations to SQLite | All of it. Regenerate the desktop migration. Without this, the generator mirrors the Postgres-only column into SQLite. |
+
+**Files:** `supabase/schemas/00.extension.pg_trgm.sql`,
+`10.data_catalog_listings.sql`, `50.rpc_data_catalog_listings__search.sql`,
+the pgTAP test `rpc_data_catalog_listings__search.test.sql`, the
+`DataCatalogListing` model, types, and parsers,
+`src/clients/data-catalog-listings/DataCatalogListingClient.ts` and
+`createDataCatalogSearchPage/`, `src/lib/openData/ColumnTypeVerifications.ts`
+(invalidates every listing query, not just `getAll`), the `DataCatalogView`
+view, list, CSS modules, and new `useDataCatalogSearch/`, and
+`apps/desktop/scripts/gen-sqlite-migrations/parse.ts` with its test.
+
+**Schema:** `20261106223031_add_catalog_listing_search.sql` (installs
+`pg_trgm` in `extensions`, adds the generated `search_vector` column and two
+GIN indexes, and adds the RPC with `execute` for `authenticated` only).
+
+**Verification:**
+```sh
+pnpm vitest run src/clients/data-catalog-listings src/views/DataManagerApp/DataImportView/DataCatalogView src/lib/openData shared/models/data-catalog-listings
+pnpm --filter @avandar/desktop test
+supabase test db supabase/tests/database/rpc_data_catalog_listings__search.test.sql
+pnpm test:db
+```
+
+---
+
+## F18: Case comments and the case activity feed
+
+**Purpose:** Members comment on a case record in a TipTap 3 editor with
+markdown shortcuts and paste, `@` mentions of workspace members, and six
+LinkedIn-style reactions; authors edit and delete their own comments. Each
+case has an activity feed built on an append-only `activity_events` log that
+only database triggers write, with every earlier comment body kept in
+`comment_revisions`. The record page moves onto `AppView`: the feed and a
+docked composer in the content column, the case's fields in the rail.
+**Value:** Teams work a case in one place, every change is auditable, and
+status changes, field edits, and third-party history become new event kinds
+instead of a rewrite.
+
+**PR title:** `feat(comments): add case comments and the case activity feed`
+
+**Built on:** `feat/comments`, merged into this branch at `e331cbdcc`. Its
+own commits are `2bf68f2d8..3b1f51e55` (the merge's first parent), plus
+`72484297d` here, which repoints the video producer's cases adapter at the
+new record page components. That commit only matters if F17 lands after the
+video producer app; otherwise drop it.
+
+**Commits to read:** all of these, oldest first. They contain no other
+feature's work.
+
+| SHA | Subject |
+|---|---|
+| `bdb358aa5` | docs(comments): add the case comments and activity feed design |
+| `0b9dc72ac` | docs(comments): add the Phase 1 implementation plan |
+| `29b92190b` | chore(comments): add TipTap mention, markdown, and static renderer packages |
+| `8febd4749` | feat(comments): add comments, reactions, mentions, and the activity event log |
+| `3bb232d67` | test(comments): cover mention quotes, moves, size limits, and reaction ownership |
+| `f0a927dd4` | fix(comments): close audit gaps and harden case activity schema |
+| `27732d21e` | feat(comments): add the RichTextDocument model |
+| `28a3b1537` | feat(comments): add Comment, CommentReaction, and ActivityEvent models |
+| `572b0e076` | feat(comments): add comment, reaction, and activity clients |
+| `b62108262` | fix(clients): stop filter iteration from depending on shared columns |
+| `a1d7b5226` | docs(comments): record the keyset feed cursor and stricter parsing in the plan |
+| `3453b9e43` | fix(comments): page the case feed on a full keyset and harden rich text parsing |
+| `a4cca25a8` | feat(comments): add the userMention node and its chip |
+| `d7fe28ee0` | feat(comments): add the @ mention typeahead |
+| `5c66c6616` | feat(comments): add the shared rich text extension list and markdown paste |
+| `afdf6928e` | feat(comments): render stored rich text without an editor |
+| `cbe8aa972` | feat(comments): add the rich text composer |
+| `fd7b95dcc` | fix(comments): harden the rich text composer, links, and typeahead a11y |
+| `d83c45c69` | feat(comments): add LinkedIn-style comment reactions |
+| `e41dd5f9a` | feat(comments): add the comment card with edit and delete |
+| `1672a9003` | fix(comments): restore bare-domain autolinks and fix typeahead ARIA |
+| `4634a4cfb` | fix(comments): validate links pasted over a selection or from HTML |
+| `f186419ad` | feat(comments): add the case activity feed and docked composer |
+| `adfeef536` | chore(comments): exclude case activity tables from desktop sync |
+| `433ad3bf2` | docs(comments): document the case activity architecture and update the roadmap |
+| `cefe28df1` | fix(comments): keep the feed on fetch errors and stop endless linked-comment seeking |
+| `49a10f5b3` | fix(comments): make reactions optimistic and keyboard accessible |
+| `bad6eed59` | fix(comments): keep focus on comment cards and fade the link highlight |
+| `6338644a6` | fix(comments): debounce case drafts and keep the offline notice announced |
+| `6bf6bcd30` | fix(comments): keep scroll in the case feed and split its components |
+| `56e27bfb4` | feat(comments): move the record page onto AppView with the activity feed |
+| `61060fe1b` | chore(comments): extract case activity messages |
+| `03b48ed92` | docs(comments): document the comment link param and drop stale ActivityBlock references |
+| `13637421a` | fix(comments): make reaction toggles and feed recovery robust |
+| `363b050c0` | test(comments): cover posting, reacting, editing, and deleting a case update |
+| `b1ab68a92` | fix(comments): polish the record page loading and rail |
+| `075842ef4` | docs(comments): tidy the comment link and measles snapshot notes |
+| `5593c7d71` | chore(comments): extract case activity messages |
+| `66e4ef03e` | fix(comments): use a pale wash for the highlighted mention option |
+| `7dbf30fde` | fix(comments): tolerate malformed comment bodies |
+| `85630644f` | fix(comments): always load a fresh case feed |
+| `0ed68d1c8` | fix(comments): keep authors pending while members load |
+| `cd8ee49aa` | chore(clients): add a changeset for the CRUD client filter typing fix |
+| `f84397fc1` | chore(deps): use caret ranges for the new TipTap packages |
+| `06a782e78` | fix(comments): keep case drafts per member |
+| `77e7fc591` | fix(comments): name a member by email when they have no name |
+| `c048ed081` | docs(comments): match the highlight, cursor, and draft key notes to the code |
+| `f8e28eda0` | fix(comments): let detail pane messages scroll when the pane is short |
+| `bf85931e0` | chore(comments): format the review fixes and fix their lint |
+| `3b1f51e55` | chore(i18n): extract the comment loading and member messages |
+| `72484297d` | fix(video): render the cases record detail with the new record page components |
+
+**Files:** `supabase/schemas/00.enum.{activity_events__kind,activity_events__source,comment_reactions__kind,comment_revisions__reason}.sql`,
+`21.comments.sql`, `22.{comment_revisions,comment_reactions,comment_mentions,activity_events}.sql`,
+`23.comments__audit_triggers.sql`, `50.rpc_activity_events__get_case_page.sql`,
+pgTAP tests under `supabase/tests/database/case_activity/` and
+`permissions/rls_case_activity.test.sql` (plus the `exact_data_api_grants`
+edits), `shared/models/{RichTextDocument,comments,activity}/**`,
+`src/clients/{comments,activity}/**`, `src/components/RichText/**`,
+`src/views/IndividualManagerApp/**` (record page, feed, details rail,
+outlet layout, `DetailPaneMessage`), the `$individualId` route search param,
+`apps/desktop/sync/syncable-tables.ts`, `tests/e2e/case-activity.spec.ts`
+and `tests/e2e/helpers/seedCaseRecord.ts`, the four new `@tiptap/*`
+dependencies, and `packages/shared/clients/src/SupabaseCrudClient/createSupabaseCrudClient.ts`
+with its `@avandar/clients` patch changeset.
+
+**Docs:** `docs/measles-demo/case-activity-architecture.md`,
+`docs/measles-demo/case-comments-design.md`, and
+`docs/measles-demo/case-comments-plan.md` are new on this branch, so port
+them to `docs/` (and the spec and plan to `docs/superpowers/`) in the PR,
+fixing the links in `AGENTS.md`, `docs/ontology-architecture.md`,
+`docs/production-plan-world-humanitarian-day.md`, and the two schema
+comments that point at the architecture doc. The one-line note in
+`docs/measles-demo/measles-outbreak-response.md` is branch-only: don't port it.
+
+**Schema:** one migration, `20261106223652_case_comments.sql`. Regenerate it
+on the PR branch after `ava supabase switch`, rather than copying it, so it
+sorts after whatever `develop` has then.
+
+**Verification:**
+```sh
+pnpm test:db
+pnpm vitest run shared/models/RichTextDocument shared/models/comments shared/models/activity src/components/RichText src/views/IndividualManagerApp
+pnpm test:desktop
+pnpm i18n:check
+pnpm test:e2e case-activity.spec.ts
+```
+
+---
+
+## F19: Open data catalog browser
 
 **Purpose:** The Open data tab was a fixed 22 to 30rem bordered box holding
 one unfiltered list of every listing. It becomes a three-pane browser that
@@ -855,9 +1024,9 @@ visible at a glance.
 |---|---|---|
 | `da3f88cf5` | feat(data-catalog): full-height catalog browser with filters and sort | All of it. Regenerate the `.po` catalogs. |
 | `7c3b22068` | fix(data-catalog): paint the catalog to the view's edges instead of framing it | All of it |
-| `61499d842` | fix(data-catalog): show one pane at a time on phones | MIXED: only the three `DataCatalogView` stylesheets. The rest is F18. |
-| `76c3de1ab` | Merge branch 'demo/measles' of https://github.com/AvandarLabs/avandar into demo/measles | The F16 hunks it carried into `DataCatalogListingList.tsx` and `DataCatalogListingDetail.tsx`, which go with F16 or F17, whichever lands second. |
-| `c2055f851` | chore(data-catalog): translate the catalog browser copy and apply the pre-push formatter | MIXED: everything except the `DataManagerApp.tsx` reformat, which is F18. Regenerate the `.po` catalogs, then keep its hand-corrected `sw`, `zh-Hans`, `es`, `fr`, and `pt` strings. |
+| `61499d842` | fix(data-catalog): show one pane at a time on phones | MIXED: only the three `DataCatalogView` stylesheets. The rest is F20. |
+| `76c3de1ab` | Merge branch 'demo/measles' of https://github.com/AvandarLabs/avandar into demo/measles | The F16 hunks it carried into `DataCatalogListingList.tsx` and `DataCatalogListingDetail.tsx`, which go with F16 or F19, whichever lands second. |
+| `c2055f851` | chore(data-catalog): translate the catalog browser copy and apply the pre-push formatter | MIXED: everything except the `DataManagerApp.tsx` reformat, which is F20. Regenerate the `.po` catalogs, then keep its hand-corrected `sw`, `zh-Hans`, `es`, `fr`, and `pt` strings. |
 
 **Files:** everything under
 `src/views/DataManagerApp/DataImportView/DataCatalogView/` except
@@ -882,7 +1051,7 @@ modal.
 
 ---
 
-## F18: Phone widths show one Data Sources pane at a time
+## F20: Phone widths show one Data Sources pane at a time
 
 **Purpose:** Below 48em, Data Sources showed its dataset list beside the open
 page, leaving the page about 150px wide. The list now shows alone on the app's
@@ -900,7 +1069,7 @@ app is on screen.
 
 | SHA | Subject | Take |
 |---|---|---|
-| `61499d842` | fix(data-catalog): show one pane at a time on phones | MIXED: `AppShell.tsx`, `AppSlate.tsx`, `DataManagerApp.tsx`, `DataManagerApp.module.css`, and `DatasetNavbar.tsx`. The `DataCatalogView` stylesheets are F17. |
+| `61499d842` | fix(data-catalog): show one pane at a time on phones | MIXED: `AppShell.tsx`, `AppSlate.tsx`, `DataManagerApp.tsx`, `DataManagerApp.module.css`, and `DatasetNavbar.tsx`. The `DataCatalogView` stylesheets are F19. |
 | `c2055f851` | chore(data-catalog): translate the catalog browser copy and apply the pre-push formatter | MIXED: only the `DataManagerApp.tsx` reformat. |
 
 **Files:** `src/components/AppShell/AppShell.tsx`,
@@ -1016,6 +1185,9 @@ port the final files, not the commit.
 | 87 | `eba708217` | F10 |
 | 88 | `b7cbe395a` | F6 |
 | 89 | `f78be622b` | F7 |
+
+F18's commits came in through the `e331cbdcc` merge and are listed in full
+under F18 above rather than numbered here.
 
 Commits that only update this log are branch-only and are not listed.
 

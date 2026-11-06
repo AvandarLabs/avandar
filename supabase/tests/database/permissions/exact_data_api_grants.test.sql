@@ -30,6 +30,10 @@ with public_tables as (
     public_tables
   where
     table_name not in (
+      'activity_events',
+      'comment_mentions',
+      'comment_revisions',
+      'comments',
       'connections',
       'connections__postgres',
       'data_catalog_listings__relation_columns',
@@ -83,6 +87,8 @@ with public_tables as (
     public_tables
   where
     table_name in (
+      'activity_events',
+      'comment_mentions',
       'connections',
       'connections__postgres',
       'data_catalog_listings__relation_columns',
@@ -90,6 +96,14 @@ with public_tables as (
       'subscriptions',
       'usage_analytics_events'
     )
+  union all
+  select
+    'comments',
+    'authenticated',
+    privilege_type,
+    false
+  from
+    unnest(array['INSERT', 'SELECT']) as privileges (privilege_type)
   union all
   select
     'user_group_memberships',
@@ -173,6 +187,22 @@ with expected_column_privileges as (
         'payload',
         'user_id',
         'workspace_id'
+      ]
+    ) as columns (column_name)
+  union all
+  select
+    'comments'::text as table_name,
+    column_name,
+    'authenticated'::text as grantee,
+    'UPDATE'::text as privilege_type,
+    false as is_grantable
+  from
+    unnest(
+      array[
+        'body',
+        'body_schema_version',
+        'body_text',
+        'deleted_at'
       ]
     ) as columns (column_name)
 ), actual_column_privileges as (

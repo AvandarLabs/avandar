@@ -6,6 +6,7 @@ import type {
   InvalidDatasetReason as InvalidDatasetReasonType,
   DataCatalogListingId,
   DataCatalogListingModel,
+  DataCatalogListingSearchResult,
 } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 
 export { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts";
@@ -27,4 +28,7 @@ export namespace DataCatalogListing {
 
   /** Why an entry's dataset cannot be loaded. */
   export type InvalidDatasetReason = InvalidDatasetReasonType;
+
+  /** One listing as catalog search returns it, with only the list's columns. */
+  export type SearchResult = DataCatalogListingSearchResult;
 }

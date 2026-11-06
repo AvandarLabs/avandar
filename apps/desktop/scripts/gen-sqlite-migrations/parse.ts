@@ -63,6 +63,11 @@ export function classifyStatement(sql: string): StatementKind {
     if (/\b(enable|disable)\s+row\s+level\s+security\b/.test(t)) {
       return "drop";
     }
+    // A `tsvector` column only serves Postgres full-text search, and its
+    // generated expression calls Postgres functions SQLite does not have.
+    if (/\badd\s+column\s+("?\w+"?)\s+tsvector\b/.test(t)) {
+      return "drop";
+    }
     if (/\bvalidate\s+constraint\b/.test(t)) {
       return "drop";
     }
@@ -90,6 +95,12 @@ export function classifyStatement(sql: string): StatementKind {
     return "schema-shape";
   }
   if (/^create\s+(unique\s+)?index\b/.test(t)) {
+    // SQLite only builds B-tree indexes. A GIN or GiST index serves a
+    // Postgres operator (full-text, trigram, array, geometry) that SQLite
+    // cannot run, so it has nothing to mirror.
+    if (/\busing\s+(gin|gist|spgist|brin)\b/.test(t)) {
+      return "drop";
+    }
     return "schema-shape";
   }
   if (/^drop\s+index\b/.test(t)) {

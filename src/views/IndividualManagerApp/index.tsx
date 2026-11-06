@@ -20,11 +20,11 @@ export function IndividualManagerApp({ concept }: Props): JSX.Element {
       toolbarButtonSection={<EditCaseTypeButton concept={concept} />}
     >
       {
-        // The record view owns its own scrolling so its header band stays
-        // put while the content moves under it. The list pane is keyed by
-        // case type so its status filter starts empty for each one: the
-        // route keeps this component mounted when only the case type in the
-        // URL changes.
+        // Not a scroll container: the record page's AppViewBody scrolls, so
+        // its header band stays put while the content moves under it. The
+        // list pane is keyed by case type so its status filter starts empty
+        // for each one: the route keeps this component mounted when only the
+        // case type in the URL changes.
       }
       <Flex align="stretch" h="100%" mih={0}>
         <IndividualNavbar key={concept.id} concept={concept} />

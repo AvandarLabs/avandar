@@ -5,6 +5,12 @@ import { createColumnTypeVerificationCoordinator } from "@/lib/openData/createCo
 import { verifyOpenDataColumnTypes } from "@/lib/openData/verifyOpenDataColumnTypes/verifyOpenDataColumnTypes";
 
 /**
+ * Every cached query of catalog listings: searches, single listings, and
+ * the full list. Query keys start with the client's name.
+ */
+const ALL_CATALOG_LISTING_QUERIES = [DataCatalogListingClient.getClientName()];
+
+/**
  * The app's one column type verification coordinator. After a listing's
  * types are written it refetches the catalog's listings and columns, so the
  * catalog shows, and adds, the verified columns. After a failure it
@@ -14,7 +20,7 @@ export const ColumnTypeVerifications = createColumnTypeVerificationCoordinator({
   verify: verifyOpenDataColumnTypes,
   onVerified: () => {
     void AvaQueryClient.invalidateQueries({
-      queryKey: DataCatalogListingClient.QueryKeys.getAll(),
+      queryKey: ALL_CATALOG_LISTING_QUERIES,
     });
     void AvaQueryClient.invalidateQueries({
       queryKey: DataCatalogRelationColumnClient.QueryKeys.getAll(),
@@ -22,7 +28,7 @@ export const ColumnTypeVerifications = createColumnTypeVerificationCoordinator({
   },
   onFailed: () => {
     void AvaQueryClient.invalidateQueries({
-      queryKey: DataCatalogListingClient.QueryKeys.getAll(),
+      queryKey: ALL_CATALOG_LISTING_QUERIES,
     });
   },
 });

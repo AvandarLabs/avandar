@@ -1,0 +1,8 @@
+/*
+ * AppViewBody's gutter on every side but the bottom. The feed's composer
+ * docks to the bottom of the scroller, so bottom padding would leave a band
+ * of empty space under it.
+ */
+.content {
+  padding: var(--mantine-spacing-lg) var(--mantine-spacing-lg) 0;
+}
