@@ -2,7 +2,7 @@
 
 How a case records everything that happens to it, and how the activity feed
 on the record page reads that record. Spec:
-[2026-11-06-case-comments-design.md](superpowers/specs/2026-11-06-case-comments-design.md).
+[case-comments-design.md](case-comments-design.md).
 
 ## The model
 

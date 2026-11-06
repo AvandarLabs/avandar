@@ -427,7 +427,7 @@ Celebrate and swaps to Like, edits the comment, and deletes it. Cleanup in
 
 ## 10. Documentation and roadmap updates
 
-- New `docs/case-activity-architecture.md`: the event model, every built and
+- New `docs/measles-demo/case-activity-architecture.md`: the event model, every built and
   planned event kind, why only triggers write the log, how external history
   will arrive (`source = 'external'`, `occurred_at` from the third party,
   idempotency via an external id in the payload), and the Phase 2 extension

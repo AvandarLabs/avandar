@@ -1,7 +1,7 @@
 /**
  * Append-only log of every change to a case, and the source of the case
  * activity feed. Only database triggers write it, so no client or write path
- * can skip it. See docs/case-activity-architecture.md for every kind and its
+ * can skip it. See docs/measles-demo/case-activity-architecture.md for every kind and its
  * payload.
  */
 create table public.activity_events (

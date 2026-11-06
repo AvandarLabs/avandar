@@ -9,7 +9,7 @@
  * `comment_deleted` - The author deleted a comment. The payload names the
  *   revision that holds the deleted body.
  *
- * Planned kinds, documented in docs/case-activity-architecture.md:
+ * Planned kinds, documented in docs/measles-demo/case-activity-architecture.md:
  * `case_created`, `case_status_changed`, `case_assigned`,
  * `case_field_value_changed`, `case_external_record`.
  */

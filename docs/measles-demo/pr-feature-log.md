@@ -66,6 +66,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F14 | Show only the plan picker when a workspace has no active plan | PR open: [#314](https://github.com/AvandarLabs/avandar/pull/314) | none | |
 | F15 | `ava --env <name>` loads any `.env.<name>`, replacing `--staging` and `--prod` | PR open: [#319](https://github.com/AvandarLabs/avandar/pull/319) | none, but see its section for hunks in files `develop` lacks | |
 | F16 | Index every catalog asset behind `is_workspace_loadable`, and add the NY State Socrata portals | not started | F4, F6, F7, F12 | |
+| F17 | Case comments and the case activity feed | not started | none | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -89,6 +90,7 @@ API. It's new work, not something this branch built.
 | any | F14 | Self-contained billing UI fix. The bug is already on `develop`, so it can merge first. |
 | any | F15 | Self-contained CLI change. Its hunks in `ava supabase sql`, `ava pipeline reset`, and `ava pipeline prune-retired-scopes` go with whichever of F15 and those commands lands on `develop` second. |
 | 11 | F16 | Extends the F4 listings table and upsert, both F6 and F7 pipelines, and F12's invalid-listing UI. Merge after all four. |
+| any | F17 | Self-contained: new tables, the record page feed, and one shared client typing fix. It touches no other feature's files, and nothing depends on it. |
 | 12 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -825,6 +827,122 @@ ava pipeline run socrata --local --limit 400   # maps, files, and links land wit
 
 ---
 
+## F17: Case comments and the case activity feed
+
+**Purpose:** Members comment on a case record in a TipTap 3 editor with
+markdown shortcuts and paste, `@` mentions of workspace members, and six
+LinkedIn-style reactions; authors edit and delete their own comments. Each
+case has an activity feed built on an append-only `activity_events` log that
+only database triggers write, with every earlier comment body kept in
+`comment_revisions`. The record page moves onto `AppView`: the feed and a
+docked composer in the content column, the case's fields in the rail.
+**Value:** Teams work a case in one place, every change is auditable, and
+status changes, field edits, and third-party history become new event kinds
+instead of a rewrite.
+
+**PR title:** `feat(comments): add case comments and the case activity feed`
+
+**Built on:** `feat/comments`, merged into this branch at `e331cbdcc`. Its
+own commits are `2bf68f2d8..3b1f51e55` (the merge's first parent), plus
+`72484297d` here, which repoints the video producer's cases adapter at the
+new record page components. That commit only matters if F17 lands after the
+video producer app; otherwise drop it.
+
+**Commits to read:** all of these, oldest first. They contain no other
+feature's work.
+
+| SHA | Subject |
+|---|---|
+| `bdb358aa5` | docs(comments): add the case comments and activity feed design |
+| `0b9dc72ac` | docs(comments): add the Phase 1 implementation plan |
+| `29b92190b` | chore(comments): add TipTap mention, markdown, and static renderer packages |
+| `8febd4749` | feat(comments): add comments, reactions, mentions, and the activity event log |
+| `3bb232d67` | test(comments): cover mention quotes, moves, size limits, and reaction ownership |
+| `f0a927dd4` | fix(comments): close audit gaps and harden case activity schema |
+| `27732d21e` | feat(comments): add the RichTextDocument model |
+| `28a3b1537` | feat(comments): add Comment, CommentReaction, and ActivityEvent models |
+| `572b0e076` | feat(comments): add comment, reaction, and activity clients |
+| `b62108262` | fix(clients): stop filter iteration from depending on shared columns |
+| `a1d7b5226` | docs(comments): record the keyset feed cursor and stricter parsing in the plan |
+| `3453b9e43` | fix(comments): page the case feed on a full keyset and harden rich text parsing |
+| `a4cca25a8` | feat(comments): add the userMention node and its chip |
+| `d7fe28ee0` | feat(comments): add the @ mention typeahead |
+| `5c66c6616` | feat(comments): add the shared rich text extension list and markdown paste |
+| `afdf6928e` | feat(comments): render stored rich text without an editor |
+| `cbe8aa972` | feat(comments): add the rich text composer |
+| `fd7b95dcc` | fix(comments): harden the rich text composer, links, and typeahead a11y |
+| `d83c45c69` | feat(comments): add LinkedIn-style comment reactions |
+| `e41dd5f9a` | feat(comments): add the comment card with edit and delete |
+| `1672a9003` | fix(comments): restore bare-domain autolinks and fix typeahead ARIA |
+| `4634a4cfb` | fix(comments): validate links pasted over a selection or from HTML |
+| `f186419ad` | feat(comments): add the case activity feed and docked composer |
+| `adfeef536` | chore(comments): exclude case activity tables from desktop sync |
+| `433ad3bf2` | docs(comments): document the case activity architecture and update the roadmap |
+| `cefe28df1` | fix(comments): keep the feed on fetch errors and stop endless linked-comment seeking |
+| `49a10f5b3` | fix(comments): make reactions optimistic and keyboard accessible |
+| `bad6eed59` | fix(comments): keep focus on comment cards and fade the link highlight |
+| `6338644a6` | fix(comments): debounce case drafts and keep the offline notice announced |
+| `6bf6bcd30` | fix(comments): keep scroll in the case feed and split its components |
+| `56e27bfb4` | feat(comments): move the record page onto AppView with the activity feed |
+| `61060fe1b` | chore(comments): extract case activity messages |
+| `03b48ed92` | docs(comments): document the comment link param and drop stale ActivityBlock references |
+| `13637421a` | fix(comments): make reaction toggles and feed recovery robust |
+| `363b050c0` | test(comments): cover posting, reacting, editing, and deleting a case update |
+| `b1ab68a92` | fix(comments): polish the record page loading and rail |
+| `075842ef4` | docs(comments): tidy the comment link and measles snapshot notes |
+| `5593c7d71` | chore(comments): extract case activity messages |
+| `66e4ef03e` | fix(comments): use a pale wash for the highlighted mention option |
+| `7dbf30fde` | fix(comments): tolerate malformed comment bodies |
+| `85630644f` | fix(comments): always load a fresh case feed |
+| `0ed68d1c8` | fix(comments): keep authors pending while members load |
+| `cd8ee49aa` | chore(clients): add a changeset for the CRUD client filter typing fix |
+| `f84397fc1` | chore(deps): use caret ranges for the new TipTap packages |
+| `06a782e78` | fix(comments): keep case drafts per member |
+| `77e7fc591` | fix(comments): name a member by email when they have no name |
+| `c048ed081` | docs(comments): match the highlight, cursor, and draft key notes to the code |
+| `f8e28eda0` | fix(comments): let detail pane messages scroll when the pane is short |
+| `bf85931e0` | chore(comments): format the review fixes and fix their lint |
+| `3b1f51e55` | chore(i18n): extract the comment loading and member messages |
+| `72484297d` | fix(video): render the cases record detail with the new record page components |
+
+**Files:** `supabase/schemas/00.enum.{activity_events__kind,activity_events__source,comment_reactions__kind,comment_revisions__reason}.sql`,
+`21.comments.sql`, `22.{comment_revisions,comment_reactions,comment_mentions,activity_events}.sql`,
+`23.comments__audit_triggers.sql`, `50.rpc_activity_events__get_case_page.sql`,
+pgTAP tests under `supabase/tests/database/case_activity/` and
+`permissions/rls_case_activity.test.sql` (plus the `exact_data_api_grants`
+edits), `shared/models/{RichTextDocument,comments,activity}/**`,
+`src/clients/{comments,activity}/**`, `src/components/RichText/**`,
+`src/views/IndividualManagerApp/**` (record page, feed, details rail,
+outlet layout, `DetailPaneMessage`), the `$individualId` route search param,
+`apps/desktop/sync/syncable-tables.ts`, `tests/e2e/case-activity.spec.ts`
+and `tests/e2e/helpers/seedCaseRecord.ts`, the four new `@tiptap/*`
+dependencies, and `packages/shared/clients/src/SupabaseCrudClient/createSupabaseCrudClient.ts`
+with its `@avandar/clients` patch changeset.
+
+**Docs:** `docs/measles-demo/case-activity-architecture.md`,
+`docs/measles-demo/case-comments-design.md`, and
+`docs/measles-demo/case-comments-plan.md` are new on this branch, so port
+them to `docs/` (and the spec and plan to `docs/superpowers/`) in the PR,
+fixing the links in `AGENTS.md`, `docs/ontology-architecture.md`,
+`docs/production-plan-world-humanitarian-day.md`, and the two schema
+comments that point at the architecture doc. The one-line note in
+`docs/measles-demo/measles-outbreak-response.md` is branch-only: don't port it.
+
+**Schema:** one migration, `20261106223652_case_comments.sql`. Regenerate it
+on the PR branch after `ava supabase switch`, rather than copying it, so it
+sorts after whatever `develop` has then.
+
+**Verification:**
+```sh
+pnpm test:db
+pnpm vitest run shared/models/RichTextDocument shared/models/comments shared/models/activity src/components/RichText src/views/IndividualManagerApp
+pnpm test:desktop
+pnpm i18n:check
+pnpm test:e2e case-activity.spec.ts
+```
+
+---
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -922,6 +1040,9 @@ port the final files, not the commit.
 | 87 | `eba708217` | F10 |
 | 88 | `b7cbe395a` | F6 |
 | 89 | `f78be622b` | F7 |
+
+F17's commits came in through the `e331cbdcc` merge and are listed in full
+under F17 above rather than numbered here.
 
 Commits that only update this log are branch-only and are not listed.
 

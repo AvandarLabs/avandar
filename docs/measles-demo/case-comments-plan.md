@@ -8,7 +8,7 @@
 
 **Tech Stack:** Supabase Postgres (declarative schemas, RLS, plpgsql triggers, pgTAP), TypeScript, React 19, Mantine 9, TipTap 3.23.4 (`@mantine/tiptap`, `@tiptap/extension-mention`, `@tiptap/markdown`, `@tiptap/static-renderer`), TanStack Query and Router, zod 4, Lingui, Vitest, Playwright.
 
-**Spec:** [`docs/superpowers/specs/2026-11-06-case-comments-design.md`](../specs/2026-11-06-case-comments-design.md). Read it before Task 1.
+**Spec:** [`docs/measles-demo/case-comments-design.md`](case-comments-design.md). Read it before Task 1.
 
 ---
 
@@ -114,7 +114,7 @@ House conventions this plan relies on:
 | `apps/desktop/sync/syncable-tables.ts` | Modify: exclude the five tables |
 | `tests/e2e/helpers/seedCaseRecord.ts` | E2E setup helper |
 | `tests/e2e/case-activity.spec.ts` | E2E spec |
-| `docs/case-activity-architecture.md` | New architecture doc |
+| `docs/measles-demo/case-activity-architecture.md` | New architecture doc |
 | `docs/ontology-architecture.md`, `docs/production-plan-world-humanitarian-day.md` | Modify |
 
 ---
@@ -774,7 +774,7 @@ Expected: FAIL (`relation "public.comments" does not exist` and a grants mismatc
  * `comment_deleted` - The author deleted a comment. The payload names the
  *   revision that holds the deleted body.
  *
- * Planned kinds, documented in docs/case-activity-architecture.md:
+ * Planned kinds, documented in docs/measles-demo/case-activity-architecture.md:
  * `case_created`, `case_status_changed`, `case_assigned`,
  * `case_field_value_changed`, `case_external_record`.
  */
@@ -1221,7 +1221,7 @@ select
 /**
  * Append-only log of every change to a case, and the source of the case
  * activity feed. Only database triggers write it, so no client or write path
- * can skip it. See docs/case-activity-architecture.md for every kind and its
+ * can skip it. See docs/measles-demo/case-activity-architecture.md for every kind and its
  * payload.
  */
 create table public.activity_events (
@@ -5940,19 +5940,19 @@ git commit -m "test(comments): cover posting, reacting, editing, and deleting a 
 ### Task 21: Documentation and roadmap
 
 **Files:**
-- Create: `docs/case-activity-architecture.md`
+- Create: `docs/measles-demo/case-activity-architecture.md`
 - Modify: `docs/ontology-architecture.md`
 - Modify: `docs/production-plan-world-humanitarian-day.md`
 - Modify: `CLAUDE.md` (Documentation list)
 
-- [ ] **Step 1: Write `docs/case-activity-architecture.md`**
+- [ ] **Step 1: Write `docs/measles-demo/case-activity-architecture.md`**
 
 ```markdown
 # Case activity architecture
 
 How a case records everything that happens to it, and how the activity feed
 on the record page reads that record. Spec:
-[2026-11-06-case-comments-design.md](superpowers/specs/2026-11-06-case-comments-design.md).
+[case-comments-design.md](case-comments-design.md).
 
 ## The model
 
@@ -6067,12 +6067,12 @@ in `supabase/tests/database/case_activity/comment_audit_triggers.test.sql`._
 - [ ] **Step 4: Point CLAUDE.md at the new doc**
 
 In `CLAUDE.md`'s Documentation list, after the permissions line, add:
-`- Case comments, reactions, and the case activity log: \`docs/case-activity-architecture.md\`.`
+`- Case comments, reactions, and the case activity log: \`docs/measles-demo/case-activity-architecture.md\`.`
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add docs/case-activity-architecture.md docs/ontology-architecture.md docs/production-plan-world-humanitarian-day.md CLAUDE.md
+git add docs/measles-demo/case-activity-architecture.md docs/ontology-architecture.md docs/production-plan-world-humanitarian-day.md CLAUDE.md
 git commit -m "docs(comments): document the case activity architecture and update the roadmap"
 ```
 

@@ -90,7 +90,7 @@ names. Do not put DL terms in UI strings.
 - **Concepts as QETL relations**: `src/clients/qetl/QueryMediator/conceptRelation/`, `src/clients/qetl/wrappers/ConceptWrapper/`
 - **Case Manager (TBox authoring, Sync)**: `src/views/OntologyDesignerApp/`
 - **Records screens (ABox browsing)**: `src/views/IndividualManagerApp/`
-- **Case activity (comments, reactions, audit log)**: see [case-activity-architecture.md](case-activity-architecture.md)
+- **Case activity (comments, reactions, audit log)**: see [case-activity-architecture.md](measles-demo/case-activity-architecture.md)
 - **Chat draft card and session kickoff**: `src/components/ChatPanel/CaseTypeDraftBlock/`, `src/components/ChatPanel/CaseDesignKickoff/`
 - **Chat edge function pieces**: `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts`, `parseCreateCaseTypes.ts`, `prompt/buildCaseManagerSystemPrompt.ts`
 - **Chat contract types**: `shared/types/chat.types.ts` (`ChatProposedCaseType`, `ChatCreatedCaseType`)
@@ -707,7 +707,7 @@ Layers a per-case capability touches:
 3. **Models and clients** for the new tables.
 4. **Record page**: controls in `SingleIndividualView`; new kinds of activity
    go through `activityFeedItemRenderers` (see
-   [case-activity-architecture.md](case-activity-architecture.md)).
+   [case-activity-architecture.md](measles-demo/case-activity-architecture.md)).
 5. **A list or grid view** to filter by the new state; the records list pane has
    no ordering, filtering or search.
 6. **QETL**, if SQL and dashboards should see the state: the spine carries only

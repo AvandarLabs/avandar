@@ -266,7 +266,7 @@ no writer/UI. Greenfield.
   statuses, relations) the org can edit. Domain-agnostic.
 - P5c.2 **Comments / activity feed** on an ABox: built. Rich text, markdown,
   @mentions, reactions, edit and delete, on an append-only activity log. See
-  [case-activity-architecture.md](case-activity-architecture.md).
+  [case-activity-architecture.md](measles-demo/case-activity-architecture.md).
 - P5c.3 `[NEW]` **Assignment**: assign a case (ABox) to a user/user-group;
   persist `assignedTo`; "assigned to me" views.
 - P5c.4 `[NEW]` **Status workflow**: set/track status from the configurable set
