@@ -6191,6 +6191,10 @@ msgstr "Some datasets are not synced online yet or failed to publish. "
 msgid "Rows from this chart"
 msgstr "Rows from this chart"
 
+#: src/components/RichText/UserMention/UserMentionChip.tsx
+msgid "member"
+msgstr "member"
+
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
 msgstr "\"{sourceFileName}\" could not be parsed: {message}"
@@ -7672,6 +7676,10 @@ msgstr "No numeric columns"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Service"
 msgstr "Service"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
+msgid "Loading author"
+msgstr "Loading author"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too large for the on-device model. Try a shorter "

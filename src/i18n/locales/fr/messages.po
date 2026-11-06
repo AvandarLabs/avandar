@@ -6328,6 +6328,10 @@ msgstr "Certains jeux de données ne sont pas encore synchronisés en ligne ou "
 msgid "Rows from this chart"
 msgstr "Lignes de ce graphique"
 
+#: src/components/RichText/UserMention/UserMentionChip.tsx
+msgid "member"
+msgstr ""
+
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
 msgstr "\"{sourceFileName}\" n'a pas pu être analysé : {message}"
@@ -7837,6 +7841,10 @@ msgstr "Aucune colonne numérique"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Service"
 msgstr "Service"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
+msgid "Loading author"
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too large for the on-device model. Try a shorter "

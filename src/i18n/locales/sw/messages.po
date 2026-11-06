@@ -6261,6 +6261,10 @@ msgstr "Baadhi ya seti za data bado hazijasawazishwa mtandaoni au zimeshindwa "
 msgid "Rows from this chart"
 msgstr "Mistari kutoka kwenye chati hii"
 
+#: src/components/RichText/UserMention/UserMentionChip.tsx
+msgid "member"
+msgstr ""
+
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
 msgstr "\"{sourceFileName}\" haiwezi kuchambuliwa: {message}"
@@ -7753,6 +7757,10 @@ msgstr "Hakuna safu za nambari"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Service"
 msgstr "Huduma"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
+msgid "Loading author"
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too large for the on-device model. Try a shorter "

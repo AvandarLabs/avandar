@@ -6039,6 +6039,10 @@ msgstr "部分資料集尚未同步至線上，或發布失敗。{errorMessage}"
 msgid "Rows from this chart"
 msgstr "來自這張圖表的列"
 
+#: src/components/RichText/UserMention/UserMentionChip.tsx
+msgid "member"
+msgstr ""
+
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
 msgstr "\"{sourceFileName}\" 無法解析：{message}"
@@ -7483,6 +7487,10 @@ msgstr "沒有數值欄"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Service"
 msgstr "服務"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
+msgid "Loading author"
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too large for the on-device model. Try a shorter "

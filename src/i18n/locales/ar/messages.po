@@ -6181,6 +6181,10 @@ msgstr "لم تتم مزامنة بعض مجموعات البيانات عبر �
 msgid "Rows from this chart"
 msgstr "الصفوف من هذا المخطط"
 
+#: src/components/RichText/UserMention/UserMentionChip.tsx
+msgid "member"
+msgstr ""
+
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
 msgstr "\"{sourceFileName}\" لم يتمكن من التحليل: {message}"
@@ -7653,6 +7657,10 @@ msgstr "لا توجد أعمدة رقمية"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Service"
 msgstr "الخدمة"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
+msgid "Loading author"
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too large for the on-device model. Try a shorter "
