@@ -9347,10 +9347,6 @@ msgstr "Excluir o mapa {0}"
 msgid "Read as"
 msgstr "Ler como"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Try one of these"
-#~ msgstr "Experimente um destes"
-
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
 msgstr "Coluna de valor inválido selecionada"

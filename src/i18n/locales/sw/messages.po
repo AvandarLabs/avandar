@@ -9330,10 +9330,6 @@ msgstr "Futa ramani {0}"
 msgid "Read as"
 msgstr "Soma kama"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Try one of these"
-#~ msgstr "Jaribu moja ya haya"
-
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
 msgstr "Thamani isiyo sahihi ya safu imechaguliwa"

@@ -9010,10 +9010,6 @@ msgstr "刪除地圖 {0}"
 msgid "Read as"
 msgstr "讀取為"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Try one of these"
-#~ msgstr "嘗試這些"
-
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
 msgstr "選擇的值欄位無效"

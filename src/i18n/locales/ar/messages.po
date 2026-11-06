@@ -9215,10 +9215,6 @@ msgstr "حذف الخريطة {0}"
 msgid "Read as"
 msgstr "يُقرأ كـ"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Try one of these"
-#~ msgstr "جرّب أحد هذه"
-
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
 msgstr "تم اختيار عمود قيمة غير صالح"

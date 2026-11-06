@@ -9438,10 +9438,6 @@ msgstr "Supprimer la carte {0}"
 msgid "Read as"
 msgstr "Interprété comme"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Try one of these"
-#~ msgstr "Essayez l'une de ces options"
-
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
 msgstr "Colonne de valeur sélectionnée invalide"

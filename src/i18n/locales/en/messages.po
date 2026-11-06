@@ -9230,10 +9230,6 @@ msgstr "Delete the map {0}"
 msgid "Read as"
 msgstr "Read as"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Try one of these"
-#~ msgstr "Try one of these"
-
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
 msgstr "Invalid value column selected"
