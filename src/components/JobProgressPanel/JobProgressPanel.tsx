@@ -10,8 +10,8 @@ import css from "./JobProgressPanel.module.css";
 export function JobProgressPanel(): JSX.Element | null {
   useSyncExternalStore(
     JobProgressStore.subscribe,
-    JobProgressStore.getSnapshot,
-    JobProgressStore.getSnapshot,
+    JobProgressStore.getVersion,
+    JobProgressStore.getVersion,
   );
   const jobs = JobProgressStore.getAllJobs();
 
