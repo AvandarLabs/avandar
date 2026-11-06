@@ -97,13 +97,35 @@ ava supabase google-token get --env staging me@example.com   # the email is read
 The wrong order fails with a missing-positional error rather than doing
 something unintended.
 
+## Local Supabase per branch
+
+Every worktree starts on the shared develop stack that `supabase/config.toml`
+describes. Its project id and ports never change: git hooks reject a commit or
+push that changes them.
+
+| Command                                 | What it does                                                                      |
+| --------------------------------------- | --------------------------------------------------------------------------------- |
+| `ava supabase switch`                   | Starts a project of the branch's own on free ports, and seeds it.                 |
+| `ava supabase switch remote`            | Points the development env files at a hosted project. Prompts for missing values. |
+| `ava supabase restore`                  | Undoes either switch, and deletes the branch's own local project.                 |
+| `ava supabase status [--branch <name>]` | Reports which Supabase a branch uses, with its ports, keys, and endpoints.        |
+| `ava supabase start [--branch <name>]`  | Runs `supabase start` for that branch's Supabase.                                 |
+| `ava supabase stop [--branch <name>]`   | Runs `supabase stop` for that branch's Supabase.                                  |
+| `ava supabase prune`                    | Deletes local projects whose branch or worktree is gone. Unselect any to keep.    |
+
+A local switch writes `SUPABASE_PROJECT_ID` and `SUPABASE_<SECTION>_PORT`
+variables into one managed block in `.env.development`, which the Supabase CLI
+reads as overrides of `config.toml`. No tracked file changes, so nothing needs
+restoring before a commit. Each of these commands has `--help`.
+
 ### Known gap
 
 The local-environment commands (`supabase switch`, `supabase restore`,
-`supabase status`) operate on `.env.development` files by name and are only
-meaningful locally. They currently accept `--env` and ignore it, because the
-option is global by design rather than declared per command. They should
-refuse it instead: AVA-350.
+`supabase status`, `supabase start`, `supabase stop`, `supabase prune`)
+operate on `.env.development` files by name and are only meaningful
+locally. They currently accept `--env` and ignore it, because the option is
+global by design rather than declared per command. They should refuse it
+instead: AVA-350.
 
 `ava pipeline run --local` runs the pipeline under `vite-node`, which loads
 `.env.development` and fills in every variable the chosen env file left unset.

@@ -7,6 +7,7 @@ import type {
   SupabaseBackupManifest,
   SupabaseLocalEnvironmentIo,
   SupabaseSwitchResult,
+  SupabaseSwitchTarget,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 function _requireCommandSuccess(
@@ -43,17 +44,18 @@ async function _readExistingManifest(
   }
 }
 
-/**
- * Starts this branch's existing isolated Supabase project without creating a
- * second switch.
- */
-export async function startExistingSwitch(
+async function _start(
   io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<SupabaseSwitchResult> {
   const existing = await _readExistingManifest(io);
   if (existing === undefined) {
     const branch = await io.readBranch();
     throw new Error(`Branch ${branch} has no active Supabase switch.`);
+  }
+  if (existing.manifest.kind === "remote") {
+    throw new Error(
+      `Branch ${existing.branch} is switched to the hosted project ${existing.manifest.remoteProjectId}, so there is no local project to start. Run \`ava supabase restore\` first.`,
+    );
   }
   _requireCommandSuccess({
     result: await io.runSupabase(["start"]),
@@ -73,13 +75,38 @@ export async function startExistingSwitch(
   };
 }
 
-/**
- * Returns this branch's existing temporary project id, if a switch left a
- * backup behind.
- */
-export async function readExistingSwitchProjectId(
+async function _readProject(
   io: Readonly<SupabaseLocalEnvironmentIo>,
-): Promise<string | undefined> {
+): Promise<
+  { kind: SupabaseSwitchTarget["kind"]; projectId: string } | undefined
+> {
   const existing = await _readExistingManifest(io);
-  return existing?.manifest.temporaryProjectId;
+  return existing === undefined
+    ? undefined
+    : {
+        kind: existing.manifest.kind,
+        projectId: SupabaseBackupStore.getProjectIdFromManifest(
+          existing.manifest,
+        ),
+      };
 }
+
+/**
+ * Reads and restarts the switch a branch already has, so a second
+ * `ava supabase switch` reuses it instead of creating another one.
+ *
+ * Used by `runSupabaseSwitch`.
+ */
+export const ExistingSwitch = {
+  /**
+   * Starts this branch's existing isolated Supabase project without creating
+   * a second switch.
+   */
+  start: _start,
+
+  /**
+   * Returns the project this branch's existing switch points at, local or
+   * hosted, if a switch left a backup behind.
+   */
+  readProject: _readProject,
+};

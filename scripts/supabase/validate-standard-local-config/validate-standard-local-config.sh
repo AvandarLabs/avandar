@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# Validates the canonical local Supabase identity and ports from TOML on stdin.
+# Validates that supabase/config.toml, read from stdin, keeps the standard
+# project_id and ports. Nobody changes them: every developer runs the same
+# local setup by default.
 
 set -uo pipefail
 
@@ -87,7 +89,8 @@ if [ "$validation_status" -eq 0 ]; then
   exit 0
 fi
 
-echo "Supabase local configuration must use the standard avandar identity and ports:" >&2
-printf '%s\n' "$validation_output" >&2
-echo "${YELLOW}Run 'ava supabase restore', stage the restored files, and retry.${RESET}" >&2
+echo "❌ Changing the project_id or port numbers in supabase/config.toml is not allowed:" >&2
+printf '%s\n' "$validation_output" | sed 's/^/  /' >&2
+echo "  Every developer runs the same local Supabase setup by default, so these values never change." >&2
+echo "${YELLOW}  ⚠️ Put those values back in supabase/config.toml, stage it, and retry.${RESET}" >&2
 exit 1

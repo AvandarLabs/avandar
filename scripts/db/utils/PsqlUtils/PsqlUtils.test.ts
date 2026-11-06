@@ -48,6 +48,33 @@ port = 55382
     });
   });
 
+  it("prefers the project and port a switch wrote to .env.development", () => {
+    processMocks.readFileSync.mockImplementation((filePath: string) => {
+      return filePath === "/repo/.env.development"
+        ? 'SUPABASE_PROJECT_ID=feat-x\nSUPABASE_DB_PORT="55322"\n'
+        : `project_id = "avandar"\n\n[db]\nport = 54322\n`;
+    });
+
+    expect(getLocalDatabaseConfigFromRepoRoot("/repo")).toEqual({
+      projectId: "feat-x",
+      hostPort: "55322",
+    });
+  });
+
+  it("reads config.toml alone when the worktree has no .env.development", () => {
+    processMocks.readFileSync.mockImplementation((filePath: string) => {
+      if (filePath === "/repo/.env.development") {
+        throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
+      }
+      return `project_id = "avandar"\n\n[db]\nport = 54322\n`;
+    });
+
+    expect(getLocalDatabaseConfigFromRepoRoot("/repo")).toEqual({
+      projectId: "avandar",
+      hostPort: "54322",
+    });
+  });
+
   it("runs host psql on the configured switched port", () => {
     processMocks.execFileSync
       .mockReturnValueOnce("1\n")

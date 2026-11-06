@@ -2,7 +2,8 @@ import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import type { SpawnSyncReturns } from "node:child_process";
 
-const VALIDATOR_PATH = "scripts/supabase/validate-standard-local-config.sh";
+const VALIDATOR_PATH =
+  "scripts/supabase/validate-standard-local-config/validate-standard-local-config.sh";
 
 const STANDARD_CONFIG = `project_id = "avandar"
 
@@ -45,14 +46,15 @@ describe("validate-standard-local-config", () => {
     expect(result.stderr).toBe("");
   });
 
-  it("rejects a changed root project id with restoration guidance", () => {
+  it("rejects a changed root project id as not allowed", () => {
     const result = _runValidator(
       STANDARD_CONFIG.replace('project_id = "avandar"', 'project_id = "temp"'),
     );
 
     expect(result.status).toBe(1);
     expect(result.stderr).toContain("project_id must be avandar");
-    expect(result.stderr).toContain("ava supabase restore");
+    expect(result.stderr).toContain("is not allowed");
+    expect(result.stderr).not.toContain("ava supabase restore");
   });
 
   it.each([
@@ -75,7 +77,7 @@ describe("validate-standard-local-config", () => {
 
     expect(result.status).toBe(1);
     expect(result.stderr).toContain(`${key} must be`);
-    expect(result.stderr).toContain("ava supabase restore");
+    expect(result.stderr).toContain("is not allowed");
   });
 
   it("ignores comments and remote configuration values", () => {

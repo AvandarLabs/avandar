@@ -1,68 +1,57 @@
+import {
+  MANIFEST,
+  STANDARD_CONFIG,
+  STATUS_JSON,
+  SWITCHED_CONFIG,
+  SWITCHED_ENV_FILE,
+  getValueFromEntries,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseStatus/__tests__/SupabaseStatus.fixtures";
 import { SupabaseStatus } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseStatus/SupabaseStatus";
-import { prop, propEq } from "@avandar/utils";
+import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-import type {
-  SupabaseBackupManifest,
-  SupabaseStatusEntry,
-} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
-const STANDARD_CONFIG = `project_id = "avandar"
-
-[api]
-port = 54321
-
-[db]
-port = 54322
-
-[studio]
-port = 54323
-
-[inbucket]
-port = 51634
-`;
-
-const SWITCHED_CONFIG = STANDARD_CONFIG.replace(
-  '"avandar"',
-  '"analytics-p2-temp"',
-).replace("port = 54321", "port = 55321");
-
-const STATUS_JSON = JSON.stringify({
-  API_URL: "http://127.0.0.1:55321",
-  DB_URL: "postgresql://postgres:postgres@127.0.0.1:55322/postgres",
-  ANON_KEY: "anon",
-  SERVICE_ROLE_KEY: "service",
-  PUBLISHABLE_KEY: "publishable",
-  SECRET_KEY: "secret",
-  STUDIO_URL: "http://127.0.0.1:55323",
-  MAILPIT_URL: "http://127.0.0.1:52634",
-  FUNCTIONS_URL: "http://127.0.0.1:55321/functions/v1",
-  STORAGE_S3_URL: "http://127.0.0.1:55321/storage/v1/s3",
-  GRAPHQL_URL: "http://127.0.0.1:55321/graphql/v1",
-  JWT_SECRET: "super-secret",
-});
-
-const MANIFEST: SupabaseBackupManifest = {
-  branch: "feat/analytics-p2",
-  worktreePath: "/repo",
-  temporaryProjectId: "analytics-p2-temp",
-  basePort: 55321,
-  derivedPorts: { "api.port": 55321 },
-  files: [
-    { sourcePath: "/repo/supabase/config.toml", backupPath: "/backup/a" },
-  ],
-  state: "active",
-};
-
-function _getValueFromEntries(
-  options: Readonly<{
-    entries: readonly SupabaseStatusEntry[];
-    label: string;
-  }>,
-): string | undefined {
-  return options.entries.find(propEq("label", options.label))?.value;
-}
 
 describe("makeStatusReport", () => {
+  it("reports the project and ports .env.development overrides", () => {
+    const report = SupabaseStatus.makeStatusReport({
+      branch: "feat/analytics-p2",
+      configContents: STANDARD_CONFIG,
+      manifest: MANIFEST,
+      statusJson: undefined,
+      envFiles: [SWITCHED_ENV_FILE],
+    });
+
+    expect(report.isSwitched).toBe(true);
+    expect(report.projectId).toBe("analytics-p2-temp");
+    expect(getValueFromEntries({ entries: report.ports, label: "API" })).toBe(
+      "55321",
+    );
+  });
+
+  it("flags an override that no switch on this branch wrote", () => {
+    const report = SupabaseStatus.makeStatusReport({
+      branch: "feat/analytics-p2",
+      configContents: STANDARD_CONFIG,
+      manifest: undefined,
+      statusJson: undefined,
+      envFiles: [SWITCHED_ENV_FILE],
+    });
+
+    expect(report.isSwitched).toBe(false);
+    expect(report.hasStrayOverride).toBe(true);
+  });
+
+  it("raises no stray-override flag for a worktree on the shared stack", () => {
+    expect(
+      SupabaseStatus.makeStatusReport({
+        branch: "develop",
+        configContents: STANDARD_CONFIG,
+        manifest: undefined,
+        statusJson: undefined,
+        envFiles: [],
+      }).hasStrayOverride,
+    ).toBe(false);
+  });
+
   it("reports the shared stack when no backup owns the config", () => {
     const report = SupabaseStatus.makeStatusReport({
       branch: "develop",
@@ -156,14 +145,14 @@ describe("makeStatusReport", () => {
       ],
     });
 
-    expect(_getValueFromEntries({ entries: report.ports, label: "API" })).toBe(
+    expect(getValueFromEntries({ entries: report.ports, label: "API" })).toBe(
       "55321",
     );
     expect(
-      _getValueFromEntries({ entries: report.ports, label: "Database" }),
+      getValueFromEntries({ entries: report.ports, label: "Database" }),
     ).toBe("54322");
     expect(
-      _getValueFromEntries({
+      getValueFromEntries({
         entries: report.ports,
         label: "Dev server (pnpm dev)",
       }),
@@ -195,31 +184,31 @@ describe("makeStatusReport", () => {
 
     expect(report.isRunning).toBe(true);
     expect(
-      _getValueFromEntries({
+      getValueFromEntries({
         entries: report.environmentValues,
         label: "SB_PUBLISHABLE_KEY",
       }),
     ).toBe("publishable");
     expect(
-      _getValueFromEntries({
+      getValueFromEntries({
         entries: report.environmentValues,
         label: "SB_SECRET_KEY",
       }),
     ).toBe("secret");
     expect(
-      _getValueFromEntries({
+      getValueFromEntries({
         entries: report.environmentValues,
         label: "SUPABASE_SERVICE_ROLE_KEY",
       }),
     ).toBe("secret");
     expect(
-      _getValueFromEntries({
+      getValueFromEntries({
         entries: report.environmentValues,
         label: "VITE_SUPABASE_ANON_KEY",
       }),
     ).toBe("publishable");
     expect(
-      _getValueFromEntries({
+      getValueFromEntries({
         entries: report.environmentValues,
         label: "SB_JWT_ISSUER",
       }),
@@ -242,7 +231,7 @@ describe("makeStatusReport", () => {
       "Storage (S3)",
     ]);
     expect(
-      _getValueFromEntries({
+      getValueFromEntries({
         entries: report.endpoints,
         label: "Storage (S3)",
       }),

@@ -48,3 +48,9 @@ export const LOOPBACK_HOST_NAMES = new Set([
   "0.0.0.0",
   "[::1]",
 ]);
+
+/**
+ * The env file the Supabase CLI reads its project overrides from, and the
+ * one a switch writes them to.
+ */
+export const DEVELOPMENT_ENV_FILE = ".env.development";

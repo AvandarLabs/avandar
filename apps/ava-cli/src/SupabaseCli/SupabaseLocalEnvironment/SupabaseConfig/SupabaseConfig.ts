@@ -103,45 +103,6 @@ function _makeStateFromContents(configContents: string): SupabaseConfigState {
   };
 }
 
-/** Rewrites Supabase TOML with a project id and shifted port assignments. */
-function _makeConfigContentsFromBasePort(
-  options: Readonly<{
-    configContents: string;
-    projectId: string;
-    basePort: number;
-  }>,
-): string {
-  const { configContents, projectId, basePort } = options;
-  const original = _makeStateFromContents(configContents);
-  const portDelta = basePort - original.apiPort;
-  let section = "";
-
-  return configContents
-    .split("\n")
-    .map((line) => {
-      const sectionMatch = line.match(SECTION_PATTERN);
-      if (sectionMatch) {
-        const sectionName = sectionMatch[1];
-        if (sectionName) {
-          section = sectionName;
-        }
-        return line;
-      }
-      const projectMatch = line.match(PROJECT_ID_PATTERN);
-      if (projectMatch && section === "") {
-        return `${projectMatch[1]}"${projectId}"${projectMatch[3]}`;
-      }
-      const portMatch = line.match(PORT_PATTERN);
-      const portKey = portMatch ? `${section}.${portMatch[2]}` : undefined;
-      if (!portMatch || !portKey || original.ports[portKey] === undefined) {
-        return line;
-      }
-      const shiftedPort = original.ports[portKey] + portDelta;
-      return `${portMatch[1]}${portMatch[2]}${portMatch[3]}${shiftedPort}${portMatch[5]}`;
-    })
-    .join("\n");
-}
-
 /** Parses the credentials emitted by `supabase status -o json`. */
 function _makeLocalStatusFromJson(statusJson: string): SupabaseLocalStatus {
   const value = JSON.parse(statusJson) as Record<string, unknown>;
@@ -224,10 +185,22 @@ function _makeDevelopmentEnvFromStatus(
 
 /** Transforms Supabase configuration and local status values. */
 export const SupabaseConfig = {
+  /**
+   * Every development env key a switch points at a Supabase project, in the
+   * order a status report lists them.
+   */
+  getManagedEnvKeys: (): string[] => {
+    return [...Object.keys(ENV_VALUE_FROM_KEY), "SB_JWT_ISSUER"];
+  },
+
+  /** Whether a development env key holds the project's secret key. */
+  isSecretEnvKey: (envKey: string): boolean => {
+    const statusKey = _getStatusKeyFromEnvKey(envKey);
+    return statusKey === "secretKey" || statusKey === "serviceRoleKey";
+  },
+
   /** Reads the project identity and active ports from Supabase TOML. */
   makeStateFromContents: _makeStateFromContents,
-  /** Rewrites Supabase TOML with a project id and shifted port assignments. */
-  makeConfigContentsFromBasePort: _makeConfigContentsFromBasePort,
   /** Parses the credentials emitted by `supabase status -o json`. */
   makeLocalStatusFromJson: _makeLocalStatusFromJson,
   /** Rewrites known development variables from local Supabase status. */
