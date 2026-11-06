@@ -5,7 +5,7 @@
   "version": "0.14.1-dev",
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "./scripts/startAvandar.sh",
