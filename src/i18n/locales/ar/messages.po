@@ -2794,6 +2794,10 @@ msgstr "تستخدم عبارة HAVING جانبًا أيسر لا يمكن لل�
 msgid "has no value"
 msgstr "ليس له قيمة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Catalog datasets"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -3369,6 +3373,10 @@ msgstr "تكرار"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
 msgstr "النتيجة"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Searching the catalog"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Code"
@@ -4770,7 +4778,7 @@ msgstr "تم شراء المقاعد بنجاح"
 msgid "Open chat (⌘/)"
 msgstr "فتح الدردشة (⌘/)"
 
-#. placeholder {0}: displayedListings.length
+#. placeholder {0}: catalogSearch.totalCount
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "الفهرس ({0})"
@@ -7533,6 +7541,10 @@ msgstr "{lengthValue} كم"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "سطر المصدر"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Loading more datasets"
+msgstr ""
 
 #: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"

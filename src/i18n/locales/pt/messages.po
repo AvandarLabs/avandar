@@ -2837,6 +2837,10 @@ msgstr "A cláusula HAVING usa um lado esquerdo que o formulário não pode "
 msgid "has no value"
 msgstr "não tem valor"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Catalog datasets"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -3423,6 +3427,10 @@ msgstr "Duplicar"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
 msgstr "Resultado"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Searching the catalog"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Code"
@@ -4840,7 +4848,7 @@ msgstr "Assentos comprados com sucesso"
 msgid "Open chat (⌘/)"
 msgstr "Abrir chat (⌘/)"
 
-#. placeholder {0}: displayedListings.length
+#. placeholder {0}: catalogSearch.totalCount
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "Catálogo ({0})"
@@ -7643,6 +7651,10 @@ msgstr "{lengthValue} km"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "Linha de origem"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Loading more datasets"
+msgstr ""
 
 #: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"

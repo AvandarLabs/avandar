@@ -2720,6 +2720,10 @@ msgstr "HAVING 子句使用了表單無法表示的左側運算式。"
 msgid "has no value"
 msgstr "沒有值"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Catalog datasets"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -3274,6 +3278,10 @@ msgstr "複製"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
 msgstr "結果"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Searching the catalog"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Code"
@@ -4650,7 +4658,7 @@ msgstr "座位購買成功"
 msgid "Open chat (⌘/)"
 msgstr "打開聊天 (⌘/)"
 
-#. placeholder {0}: displayedListings.length
+#. placeholder {0}: catalogSearch.totalCount
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "目錄 ({0})"
@@ -7362,6 +7370,10 @@ msgstr "{lengthValue} km"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "來源行"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Loading more datasets"
+msgstr ""
 
 #: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"
