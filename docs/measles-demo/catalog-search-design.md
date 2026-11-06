@@ -181,7 +181,9 @@ matches".
 ## 7. Out of scope
 
 - Filtering by organization, domain or tag, and the indexes on `domains` and
-  `tags`. They depend on the field mapping design's columns.
+  `tags`. They depend on the field mapping design's columns, and are designed
+  in [catalog-field-mapping-design.md](catalog-field-mapping-design.md)
+  sections 3.3, 6, and 7.
 - Accent-insensitive matching. `unaccent` is not immutable, so a generated
   column cannot call it without an immutable wrapper. Add it if non-English
   listings need it.
