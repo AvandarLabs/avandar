@@ -1,20 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
-import { Group, Text } from "@mantine/core";
-import { IconWifiOff } from "@tabler/icons-react";
-import { useMemo } from "react";
-import { RICH_TEXT_SCHEMA_VERSION } from "$/models/RichTextDocument/RichTextDocument";
-import { ActivityEventClient } from "@/clients/activity/ActivityEventClient";
-import { CommentClient } from "@/clients/comments/CommentClient";
 import { RichTextComposer } from "@/components/RichText/RichTextComposer/RichTextComposer";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
-import { notifyError } from "@/utils/notifications/notify";
-import {
-  clearCaseActivityDraft,
-  loadCaseActivityDraft,
-  saveCaseActivityDraft,
-} from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/caseActivityDraftStorage";
+import { OfflineNotice } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/OfflineNotice";
+import { useCaseActivityDraft } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/useCaseActivityDraft";
+import { usePostCaseComment } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/usePostCaseComment";
 import type { Individual } from "$/models/ontology/Individual/Individual";
-import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { MentionCandidate } from "@/components/RichText/UserMention/filterMentionCandidates";
 import type { ReactNode } from "react";
@@ -36,68 +26,31 @@ export function CaseActivityComposer({
 }: Props): ReactNode {
   const { t } = useLingui();
   const isOnline = useIsOnline();
-  const initialDraft = useMemo(() => {
-    return loadCaseActivityDraft(workspaceId, individualId);
-  }, [workspaceId, individualId]);
-  const [insertComment, isPosting] = CommentClient.useInsert({
-    queriesToInvalidate: [[ActivityEventClient.getClientName()]],
+  const draft = useCaseActivityDraft(workspaceId, individualId);
+  const { postComment, isPosting } = usePostCaseComment({
+    workspaceId,
+    individualId,
   });
-
-  const postComment = (
-    document: RichTextDocument.T,
-    plainText: string,
-  ): Promise<boolean> => {
-    return new Promise((resolve) => {
-      insertComment(
-        {
-          data: {
-            body: document,
-            bodySchemaVersion: RICH_TEXT_SCHEMA_VERSION,
-            bodyText: plainText,
-            individualId,
-            workspaceId,
-          },
-        },
-        {
-          onSuccess: () => {
-            clearCaseActivityDraft(workspaceId, individualId);
-            resolve(true);
-          },
-          onError: () => {
-            notifyError(
-              t`Your update was not posted. It is still in the box, so you can try again.`,
-            );
-            resolve(false);
-          },
-        },
-      );
-    });
-  };
 
   return (
     <RichTextComposer
       key={`${workspaceId}:${individualId}`}
       label={t`Write an update`}
       placeholder={t`Write an update. Type @ to mention a teammate.`}
-      initialContent={initialDraft}
+      initialContent={draft.initialDraft}
       mentionCandidates={mentionCandidates}
       submitLabel={t`Post`}
       isSubmitting={isPosting}
       isSubmitBlocked={!isOnline}
-      notice={
-        isOnline ? null : (
-          <Group gap="xs" px="sm" py={6} bg="neutral.1" wrap="nowrap">
-            <IconWifiOff size={14} aria-hidden />
-            <Text size="xs" role="status">
-              {t`You're offline. Your draft is saved on this device and you can post when you reconnect.`}
-            </Text>
-          </Group>
-        )
-      }
-      onChange={(document) => {
-        saveCaseActivityDraft(workspaceId, individualId, document);
+      notice={<OfflineNotice isOnline={isOnline} />}
+      onChange={draft.saveDraft}
+      onSubmit={async (document, plainText) => {
+        const didPost = await postComment(document, plainText);
+        if (didPost) {
+          draft.clearPostedDraft(document);
+        }
+        return didPost;
       }}
-      onSubmit={postComment}
     />
   );
 }

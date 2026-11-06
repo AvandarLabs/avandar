@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   clearCaseActivityDraft,
+  clearCaseActivityDraftIfUnchanged,
   loadCaseActivityDraft,
   saveCaseActivityDraft,
 } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/caseActivityDraftStorage";
@@ -33,6 +34,20 @@ describe("caseActivityDraftStorage", () => {
     expect(
       window.localStorage.getItem("ava:case-activity-draft:w1:i1"),
     ).toBeNull();
+  });
+
+  it("clears the draft only while it still holds the posted update", () => {
+    const newerDraft = {
+      type: "doc" as const,
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "newer" }] },
+      ],
+    };
+    saveCaseActivityDraft("w1", "i1", newerDraft);
+    clearCaseActivityDraftIfUnchanged("w1", "i1", DRAFT);
+    expect(loadCaseActivityDraft("w1", "i1")).toEqual(newerDraft);
+    clearCaseActivityDraftIfUnchanged("w1", "i1", newerDraft);
+    expect(loadCaseActivityDraft("w1", "i1")).toBeUndefined();
   });
 
   it("returns nothing instead of throwing when storage is unavailable", () => {

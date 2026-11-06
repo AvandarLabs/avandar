@@ -32,6 +32,28 @@ afterEach(() => {
 });
 
 describe("CaseActivityComposer", () => {
+  it("announces going offline in a status region that stays mounted", () => {
+    const { rerender } = render(
+      <CaseActivityComposer
+        workspaceId={"w1" as Workspace.Id}
+        individualId={"i1" as Individual.Id}
+        mentionCandidates={[]}
+      />,
+      { wrapper: _wrapper },
+    );
+    const statusRegion = screen.getByRole("status");
+    expect(statusRegion).toBeEmptyDOMElement();
+    isOnline.value = false;
+    rerender(
+      <CaseActivityComposer
+        workspaceId={"w1" as Workspace.Id}
+        individualId={"i1" as Individual.Id}
+        mentionCandidates={[]}
+      />,
+    );
+    expect(statusRegion).toHaveTextContent(/You're offline/);
+  });
+
   it("restores the draft saved for this case", () => {
     window.localStorage.setItem(
       "ava:case-activity-draft:w1:i1",

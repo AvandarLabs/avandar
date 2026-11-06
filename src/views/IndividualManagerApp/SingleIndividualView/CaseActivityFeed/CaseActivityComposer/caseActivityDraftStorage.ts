@@ -61,3 +61,22 @@ export function clearCaseActivityDraft(
     // Storage can be blocked; see saveCaseActivityDraft.
   }
 }
+
+/**
+ * Forgets the case's draft only if it still holds `postedDocument`, so a
+ * newer draft written after the post started survives.
+ */
+export function clearCaseActivityDraftIfUnchanged(
+  workspaceId: string,
+  individualId: string,
+  postedDocument: RichTextDocument.T,
+): void {
+  const storedDraft = loadCaseActivityDraft(workspaceId, individualId);
+  if (
+    storedDraft !== undefined &&
+    JSON.stringify(storedDraft) !== JSON.stringify(postedDocument)
+  ) {
+    return;
+  }
+  clearCaseActivityDraft(workspaceId, individualId);
+}
