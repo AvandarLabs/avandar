@@ -50,8 +50,8 @@ pipeline pages through HDX, not a description of a drive.
 
 | Column | Change | Meaning |
 |---|---|---|
-| `organization_1_name` | Renamed from `external_organization_name` | The top organization level, such as "City of New York". Still `not null`. |
-| `organization_2_name` … `organization_4_name` | New, `text` | Deeper organization levels, such as an agency, then an office. Null when the source has no such level. |
+| `organization1_name` | Renamed from `external_organization_name` | The top organization level, such as "City of New York". Still `not null`. |
+| `organization2_name` … `organization4_name` | New, `text` | Deeper organization levels, such as an agency, then an office. Null when the source has no such level. |
 | `domains` | New, `text[]` | Subject areas the source files the dataset under, such as "Transportation". |
 | `tags` | New, `text[]` | The source's free-form keywords. |
 | `source_metadata` | New, `jsonb` | The full, untouched source record the listing was built from. |
@@ -70,6 +70,15 @@ source. Four levels covers the deepest hierarchy seen so far: data.gov's CKAN
 publisher hierarchy ("U.S. Government" > "Department of Commerce" > "NOAA" >
 "NESDIS").
 
+The level number is attached to the word (`organization1_name`), never
+separated by its own underscore (`organization_1_name`). The app converts
+column names to camelCase on read and back to snake_case on write, through
+`toCamelCase` / `toSnakeCase` in `@avandar/utils` and type-fest's
+`CamelCase` / `SnakeCase` types. `organization1_name` round-trips through
+`organization1Name` at runtime and in the types. `organization_1_name` reads
+as `organization1Name` but writes back as `organization1_name`, a column that
+does not exist.
+
 `source_metadata` is a new column rather than a use of the existing
 `metadata` column, because the engine already writes its own bookkeeping
 into `metadata` (`relation_columns_sha256`). Mixing the two would let a
@@ -85,7 +94,7 @@ One row per drive a pipeline crawls.
 | `created_at`, `updated_at` | `timestamptz` | |
 | `pipeline_name` | `text not null` | Such as `socrata`. |
 | `drive_key` | `text not null` | The drive's key, which is its base URL, such as `https://data.cityofnewyork.us`. |
-| `organization_1_label` … `organization_4_label` | `text` | What each organization level is called on this drive, such as "City" and "Agency". Null for a level the drive does not use. |
+| `organization1_label` … `organization4_label` | `text` | What each organization level is called on this drive, such as "City" and "Agency". Null for a level the drive does not use. |
 
 Unique on `(pipeline_name, drive_key)`. The catalog is public metadata, so
 the table gets the same read policy `data_catalog_listings` has, and only the
@@ -118,7 +127,7 @@ organizationLabels:
 fields:
   display_name: { from: resource.name }
   description: { from: resource.description }
-  organization_2_name: { from: resource.attribution }
+  organization2_name: { from: resource.attribution }
   domains: { script: ./mappers/socrataDomains.ts }
   tags: { from: classification.domain_tags }
   update_frequency: { script: ./mappers/socrataUpdateFrequency.ts }
@@ -126,19 +135,19 @@ fields:
 drives:
   - baseUrl: https://data.cityofnewyork.us
     fields:
-      organization_1_name: { value: City of New York }
+      organization1_name: { value: City of New York }
 
   - baseUrl: https://data.ny.gov
     organizationLabels: { 1: State, 2: Agency }
     fields:
-      organization_1_name: { value: State of New York }
+      organization1_name: { value: State of New York }
 
   - baseUrl: https://health.data.ny.gov
     organizationLabels: { 1: State, 2: Department, 3: Office }
     fields:
-      organization_1_name: { value: State of New York }
-      organization_2_name: { value: Department of Health }
-      organization_3_name: { from: resource.attribution }
+      organization1_name: { value: State of New York }
+      organization2_name: { value: Department of Health }
+      organization3_name: { from: resource.attribution }
 ```
 
 Top-level keys:
@@ -190,10 +199,10 @@ when it loads:
 
 `display_name`, `description`, `notes`, `license`, `update_frequency`,
 `canonical_urls`, `coverage_start_date`, `coverage_end_date`,
-`organization_1_name`, `organization_2_name`, `organization_3_name`,
-`organization_4_name`, `domains`, `tags`.
+`organization1_name`, `organization2_name`, `organization3_name`,
+`organization4_name`, `domains`, `tags`.
 
-`display_name` and `organization_1_name` are required: every drive must map
+`display_name` and `organization1_name` are required: every drive must map
 them, through its own `fields` or the pipeline's.
 
 ### 4.4 Coercion
@@ -204,7 +213,7 @@ them, through its own `fields` or the pipeline's.
 | Text array (`domains`, `tags`, `canonical_urls`) | A string (wrapped into a one-item array) or an array of strings. Blanks and duplicates are dropped. An empty result is null. | Null, with a warning. |
 | Date (`coverage_*`) | An ISO 8601 string. | Null, with a warning. |
 
-When `display_name` or `organization_1_name` comes out null for a record,
+When `display_name` or `organization1_name` comes out null for a record,
 the pipeline skips that dataset with a `console.warn`, the way Socrata
 results that fail validation are skipped today. It does not fail the drive.
 
@@ -265,9 +274,9 @@ mappings from drifting apart.
 |---|---|---|
 | Labels | NYC: City, Agency. NY State: State, Agency. NYS Health: State, Department, Office. | Organization |
 | `display_name` | `resource.name` | Kept in code: the resource name, as today |
-| `organization_1_name` | `value` per drive | `organization.title`, such as "World Health Organization" |
-| `organization_2_name` | `resource.attribution` (NYC, NY State); `value` "Department of Health" (NYS Health) | None |
-| `organization_3_name` | `resource.attribution` (NYS Health only) | None |
+| `organization1_name` | `value` per drive | `organization.title`, such as "World Health Organization" |
+| `organization2_name` | `resource.attribution` (NYC, NY State); `value` "Department of Health" (NYS Health) | None |
+| `organization3_name` | `resource.attribution` (NYS Health only) | None |
 | `description` | `resource.description` | `notes` |
 | `domains` | Script: `classification.domain_category` plus `classification.categories` (the latter is empty on NYC today) | Script: `groups[].title` (countries on HDX) |
 | `tags` | `classification.domain_tags` | Script: `tags[].name` |
@@ -294,7 +303,7 @@ differ.
 - `rpc_data_catalog_listings__upsert_with_relation_columns` writes the new
   columns.
 - Every reader of `external_organization_name` moves to
-  `organization_1_name`: the app model and parsers, the catalog view, the
+  `organization1_name`: the app model and parsers, the catalog view, the
   ETL stores, the desktop SQLite migration generator, and the tests.
 - The demo instance is backfilled by one full (non-incremental) run of each
   pipeline. Incremental runs only touch datasets that changed, so they would
