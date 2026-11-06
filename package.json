@@ -2,10 +2,10 @@
   "name": "avandar",
   "license": "CPAL-1.0",
   "private": true,
-  "version": "0.14.0",
+  "version": "0.14.1",
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "./scripts/startAvandar.sh",
