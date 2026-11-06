@@ -1,4 +1,5 @@
 import type { UUID } from "@avandar/utils";
+import type { EtlWorkspaceLoadabilityRules } from "@etl/EtlConfig/EtlConfig.types";
 import type { TransformedColumnDescription } from "@etl/EtlEngine/transformedCsvsToParquetBlobs";
 import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 import type {
@@ -127,7 +128,15 @@ export type RelationDescription = Readonly<{
    */
   sourceUpdatedAt: Date | undefined;
   externalServiceName?: string;
+  /** The page a person opens to see the asset at its source. */
   sourceUrl?: string;
+  /** Where the asset's bytes can be downloaded, when the source says. */
+  sourceDownloadUrl?: string;
+  /**
+   * The source's own name for the kind of asset this is, such as Socrata's
+   * `map` or `file`. Written to `source_asset_type`.
+   */
+  sourceAssetType?: string;
   canonicalUrls?: readonly string[];
   license?: string;
   updateFrequency?: string;
@@ -156,7 +165,19 @@ export type ApiResourceRelation = RelationDescription &
   Readonly<{
     kind: "api_resource";
     apiResourceId: string;
-    apiResourceFormat: string;
+    /**
+     * The format the resource is read as, such as `CSV`, or `undefined` for
+     * an asset with none, such as a map. A relation with no format is not
+     * workspace-loadable.
+     */
+    apiResourceFormat: string | undefined;
+    /**
+     * `false` when this pipeline cannot load this asset whatever its format,
+     * such as a map, or a file whose columns could not be read. Omit it to
+     * let the format decide, through the engine's `workspaceLoadability`
+     * rules. `true` never overrides an unloadable format.
+     */
+    isWorkspaceLoadable?: boolean;
     /**
      * Written together with the relation's row. Empty when the pipeline
      * cannot learn the columns: they are filled in when the listing's types
@@ -289,6 +310,12 @@ export type EtlEngineConfig<
     }) => PromisedOrValue<readonly Relation[]>;
     /** Omit for a pipeline that only supports full runs. */
     incremental?: EtlIncrementalConfig<TDrive, TConnection>;
+    /**
+     * The formats this pipeline's listings cannot be loaded in a workspace,
+     * usually from the shared ETL config file through
+     * `getWorkspaceLoadabilityRules`. Omit to rule out no format.
+     */
+    workspaceLoadability?: EtlWorkspaceLoadabilityRules;
   }>;
 
 /** How one crawl ended. `skipped` means the limit was reached first. */

@@ -924,6 +924,12 @@ importers:
       '@avandar/utils':
         specifier: workspace:*
         version: link:../../shared/utils
+      yaml:
+        specifier: 2.9.0
+        version: 2.9.0
+      zod:
+        specifier: 'catalog:'
+        version: 4.4.3
     devDependencies:
       '@supabase/supabase-js':
         specifier: 'catalog:'

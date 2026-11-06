@@ -1,3 +1,4 @@
+import type { EtlWorkspaceLoadabilityRules } from "@etl/EtlConfig/EtlConfig.types";
 import { createHash } from "node:crypto";
 import { promiseMapSequential } from "@avandar/utils";
 import { buildListingRowFromRelation } from "@etl/EtlEngine/buildListingRowFromRelation/buildListingRowFromRelation";
@@ -46,6 +47,8 @@ export type LoadRelationsPageContext = Readonly<{
   bucket: string | undefined;
   /** The crawl's metrics, which this page's reads and writes add to. */
   metrics: CrawlMetricsRecorder;
+  /** The formats a workspace cannot load. Omit to rule out none. */
+  workspaceLoadability?: EtlWorkspaceLoadabilityRules;
 }>;
 
 /** How many of a page's relations were written and how many were skipped. */
@@ -146,6 +149,7 @@ function _buildRelationsWithRows(args: {
       driveKey: context.driveKey,
       syncedAt: context.syncedAt,
       scopeKey: context.scopeKey,
+      workspaceLoadability: context.workspaceLoadability,
     });
     return { relation, row, key: buildListingKeyFromRow(row) };
   });

@@ -28,7 +28,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@avandar/utils": "workspace:*"
+    "@avandar/utils": "workspace:*",
+    "yaml": "2.9.0",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@supabase/supabase-js": "catalog:",
