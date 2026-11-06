@@ -65,10 +65,11 @@ export function DataImportView(): JSX.Element {
       <DatasetLimitReachedModal
         subscription={workspace.subscription}
         isOpened={
-          SubscriptionModule.shouldPromptForDatasetLimitUpgrade({
-            subscription: workspace.subscription,
-            isAddAllowed,
-          }) && !isLimitModalDismissed
+          !isAddAllowed &&
+          !SubscriptionModule.shouldPromptForBillingSetup(
+            workspace.subscription,
+          ) &&
+          !isLimitModalDismissed
         }
         onClose={() => {
           setIsLimitModalDismissed(true);
