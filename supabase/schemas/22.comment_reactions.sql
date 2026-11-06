@@ -21,9 +21,15 @@ create table public.comment_reactions (
   constraint comment_reactions__one_per_user unique (comment_id, user_id)
 );
 
+create index idx_comment_reactions__workspace_id on public.comment_reactions (workspace_id);
+
+create index idx_comment_reactions__user_id on public.comment_reactions (user_id);
+
 alter table public.comment_reactions enable row level security;
 
--- Data API privileges.
+-- Data API privileges. `UPDATE` stays table-wide rather than column-scoped
+-- because a PostgREST upsert updates every column in its payload, and the
+-- policies already pin `user_id` and the comment.
 grant
 select
 ,

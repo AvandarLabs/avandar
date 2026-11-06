@@ -94,15 +94,33 @@ CREATE UNIQUE INDEX comment_revisions_pkey ON public.comment_revisions USING btr
 
 CREATE UNIQUE INDEX comments_pkey ON public.comments USING btree (id);
 
+CREATE INDEX idx_activity_events__actor_user_id ON public.activity_events USING btree (actor_user_id);
+
 CREATE INDEX idx_activity_events__comment ON public.activity_events USING btree (comment_id);
 
-CREATE INDEX idx_activity_events__individual_occurred ON public.activity_events USING btree (individual_id, occurred_at DESC);
+CREATE INDEX idx_activity_events__individual_occurred ON public.activity_events USING btree (individual_id, occurred_at DESC, recorded_at DESC, id DESC);
+
+CREATE INDEX idx_activity_events__workspace_id ON public.activity_events USING btree (workspace_id);
 
 CREATE INDEX idx_comment_mentions__mentioned_user ON public.comment_mentions USING btree (mentioned_user_id);
 
+CREATE INDEX idx_comment_mentions__workspace_id ON public.comment_mentions USING btree (workspace_id);
+
+CREATE INDEX idx_comment_reactions__user_id ON public.comment_reactions USING btree (user_id);
+
+CREATE INDEX idx_comment_reactions__workspace_id ON public.comment_reactions USING btree (workspace_id);
+
 CREATE INDEX idx_comment_revisions__comment_created ON public.comment_revisions USING btree (comment_id, created_at);
 
+CREATE INDEX idx_comment_revisions__revised_by_user_id ON public.comment_revisions USING btree (revised_by_user_id);
+
+CREATE INDEX idx_comment_revisions__workspace_id ON public.comment_revisions USING btree (workspace_id);
+
+CREATE INDEX idx_comments__author_user_id ON public.comments USING btree (author_user_id);
+
 CREATE INDEX idx_comments__individual_created ON public.comments USING btree (individual_id, created_at);
+
+CREATE INDEX idx_comments__workspace_id ON public.comments USING btree (workspace_id);
 
 alter table "public"."activity_events" add constraint "activity_events_pkey" PRIMARY KEY using index "activity_events_pkey";
 
@@ -192,11 +210,11 @@ alter table "public"."comments" add constraint "comments_author_user_id_fkey" FO
 
 alter table "public"."comments" validate constraint "comments_author_user_id_fkey";
 
-alter table "public"."comments" add constraint "comments_individual_id_fkey" FOREIGN KEY (individual_id) REFERENCES public.individuals(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
+alter table "public"."comments" add constraint "comments_individual_id_fkey" FOREIGN KEY (individual_id) REFERENCES public.individuals(id) ON DELETE CASCADE not valid;
 
 alter table "public"."comments" validate constraint "comments_individual_id_fkey";
 
-alter table "public"."comments" add constraint "comments_workspace_id_fkey" FOREIGN KEY (workspace_id) REFERENCES public.workspaces(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
+alter table "public"."comments" add constraint "comments_workspace_id_fkey" FOREIGN KEY (workspace_id) REFERENCES public.workspaces(id) ON DELETE CASCADE not valid;
 
 alter table "public"."comments" validate constraint "comments_workspace_id_fkey";
 
@@ -216,7 +234,9 @@ begin
     v_kind := 'comment_created';
   elsif old.deleted_at is null and new.deleted_at is not null then
     v_kind := 'comment_deleted';
-  elsif new.body is distinct from old.body then
+  elsif (new.body, new.body_text, new.body_schema_version)
+    is distinct from (old.body, old.body_text, old.body_schema_version)
+  then
     v_kind := 'comment_edited';
   else
     return null;
@@ -227,7 +247,7 @@ begin
     into v_revision_id
     from public.comment_revisions r
     where r.comment_id = new.id
-    order by r.created_at desc
+    order by r.created_at desc, r.id desc
     limit 1;
   end if;
 
@@ -267,7 +287,9 @@ begin
     );
     new.body := null;
     new.body_text := null;
-  elsif new.body is distinct from old.body then
+  elsif (new.body, new.body_text, new.body_schema_version)
+    is distinct from (old.body, old.body_text, old.body_schema_version)
+  then
     insert into public.comment_revisions (
       workspace_id, comment_id, reason, body, body_schema_version, body_text, revised_by_user_id
     )
@@ -331,6 +353,13 @@ CREATE OR REPLACE FUNCTION public.comments__validate_subject()
  SET search_path TO ''
 AS $function$
 begin
+  if tg_op = 'INSERT' then
+    new.created_at := now();
+    new.updated_at := now();
+    new.edited_at := null;
+    new.deleted_at := null;
+  end if;
+
   if tg_op = 'UPDATE' then
     if new.individual_id is distinct from old.individual_id
       or new.workspace_id is distinct from old.workspace_id

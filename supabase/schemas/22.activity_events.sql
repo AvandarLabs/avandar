@@ -32,7 +32,16 @@ create table public.activity_events (
   constraint activity_events__exactly_one_subject check (num_nonnulls (individual_id) = 1)
 );
 
-create index idx_activity_events__individual_occurred on public.activity_events (individual_id, occurred_at desc);
+create index idx_activity_events__individual_occurred on public.activity_events (
+  individual_id,
+  occurred_at desc,
+  recorded_at desc,
+  id desc
+);
+
+create index idx_activity_events__workspace_id on public.activity_events (workspace_id);
+
+create index idx_activity_events__actor_user_id on public.activity_events (actor_user_id);
 
 create index idx_activity_events__comment on public.activity_events (comment_id);
 

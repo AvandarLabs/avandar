@@ -27,6 +27,10 @@ create table public.comment_revisions (
 
 create index idx_comment_revisions__comment_created on public.comment_revisions (comment_id, created_at);
 
+create index idx_comment_revisions__workspace_id on public.comment_revisions (workspace_id);
+
+create index idx_comment_revisions__revised_by_user_id on public.comment_revisions (revised_by_user_id);
+
 alter table public.comment_revisions enable row level security;
 
 -- Data API privileges. Service role only: this is an audit store.

@@ -1,7 +1,8 @@
 /**
- * Keeps the body a comment is about to lose. On an edit it stores the old
- * body as an `edit` revision and stamps `edited_at`. On a delete it stores
- * the body as a `delete` revision and clears `body` and `body_text`.
+ * Keeps the body a comment is about to lose. On an edit, a change to `body`,
+ * `body_text`, or `body_schema_version`, it stores the old body as an `edit`
+ * revision and stamps `edited_at`. On a delete it stores the body as a
+ * `delete` revision and clears `body` and `body_text`.
  */
 create or replace function public.comments__record_revision () returns trigger language plpgsql security definer
 set
@@ -16,7 +17,9 @@ begin
     );
     new.body := null;
     new.body_text := null;
-  elsif new.body is distinct from old.body then
+  elsif (new.body, new.body_text, new.body_schema_version)
+    is distinct from (old.body, old.body_text, old.body_schema_version)
+  then
     insert into public.comment_revisions (
       workspace_id, comment_id, reason, body, body_schema_version, body_text, revised_by_user_id
     )
@@ -59,7 +62,9 @@ begin
     v_kind := 'comment_created';
   elsif old.deleted_at is null and new.deleted_at is not null then
     v_kind := 'comment_deleted';
-  elsif new.body is distinct from old.body then
+  elsif (new.body, new.body_text, new.body_schema_version)
+    is distinct from (old.body, old.body_text, old.body_schema_version)
+  then
     v_kind := 'comment_edited';
   else
     return null;
@@ -70,7 +75,7 @@ begin
     into v_revision_id
     from public.comment_revisions r
     where r.comment_id = new.id
-    order by r.created_at desc
+    order by r.created_at desc, r.id desc
     limit 1;
   end if;
 

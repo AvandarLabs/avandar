@@ -9,10 +9,10 @@ create table public.comments (
   -- Primary key
   id uuid primary key default gen_random_uuid(),
   -- Workspace this comment belongs to
-  workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
+  workspace_id uuid not null references public.workspaces (id) on update no action on delete cascade,
   -- The case this comment is on. A later subject (a dashboard, a dataset)
   -- adds its own nullable column and joins `comments__exactly_one_subject`.
-  individual_id uuid references public.individuals (id) on update cascade on delete cascade,
+  individual_id uuid references public.individuals (id) on update no action on delete cascade,
   -- Author. Cleared if the auth user is deleted, so the comment outlives them.
   author_user_id uuid default auth.uid () references auth.users (id) on update cascade on delete set null,
   -- The rich text document as ProseMirror JSON. Null only once deleted.
@@ -42,6 +42,10 @@ create table public.comments (
 );
 
 create index idx_comments__individual_created on public.comments (individual_id, created_at);
+
+create index idx_comments__workspace_id on public.comments (workspace_id);
+
+create index idx_comments__author_user_id on public.comments (author_user_id);
 
 alter table public.comments enable row level security;
 
@@ -127,12 +131,20 @@ with
  * Keeps a comment on its case: the case must be in the comment's workspace,
  * the subject, workspace, and author never change after posting (except the
  * author becoming null when their account is deleted), and a deleted comment
- * is never restored.
+ * is never restored. On insert it also owns the server-managed columns, so a
+ * client cannot backdate a comment or post one already edited or deleted.
  */
 create or replace function public.comments__validate_subject () returns trigger language plpgsql security definer
 set
   search_path = '' as $$
 begin
+  if tg_op = 'INSERT' then
+    new.created_at := now();
+    new.updated_at := now();
+    new.edited_at := null;
+    new.deleted_at := null;
+  end if;
+
   if tg_op = 'UPDATE' then
     if new.individual_id is distinct from old.individual_id
       or new.workspace_id is distinct from old.workspace_id

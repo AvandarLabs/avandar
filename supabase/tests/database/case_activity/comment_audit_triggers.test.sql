@@ -55,7 +55,7 @@ values (
   'first'
 );
 
-select plan (20);
+select plan (22);
 
 -- 1. Insert writes one comment_created event.
 select is (
@@ -192,7 +192,7 @@ select throws_ok (
   )
   $$,
   '23514',
-  null,
+  'The case belongs to a different workspace',
   'a comment cannot be attached to a case in another workspace'
 );
 
@@ -209,7 +209,7 @@ select throws_ok (
   )
   $$,
   '23514',
-  null,
+  'new row for relation "comments" violates check constraint "comments__body_text_length"',
   'body_text is capped at 10,000 characters'
 );
 
@@ -310,6 +310,63 @@ select throws_ok (
   '23514',
   'new row for relation "comments" violates check constraint "comments__body_size"',
   'body is capped at 256 KB'
+);
+
+-- 21. Changing only the plain text still counts as an edit.
+update public.comments
+set body_text = '@member quoted'
+where id = 'e1500003-0000-4000-8000-000000000003'::uuid;
+select is (
+  (
+    select jsonb_build_object(
+      'revisions', (
+        select count(*)::int from public.comment_revisions r
+        where r.comment_id = 'e1500003-0000-4000-8000-000000000003'::uuid and r.reason = 'edit'
+      ),
+      'events', (
+        select count(*)::int from public.activity_events e
+        where e.comment_id = 'e1500003-0000-4000-8000-000000000003'::uuid and e.kind = 'comment_edited'
+      ),
+      'is_edited', (
+        select c.edited_at is not null from public.comments c
+        where c.id = 'e1500003-0000-4000-8000-000000000003'::uuid
+      )
+    )
+  ),
+  '{"revisions": 1, "events": 1, "is_edited": true}'::jsonb,
+  'an update of only body_text writes an edit revision and a comment_edited event'
+);
+
+-- 22. The server owns the timestamps and deletion state of a new comment.
+insert into public.comments (
+  id, workspace_id, individual_id, author_user_id, body, body_text, created_at, updated_at, edited_at, deleted_at
+)
+values (
+  'e1500004-0000-4000-8000-000000000004'::uuid,
+  'e1100001-0000-4000-8000-000000000001'::uuid,
+  'e1400001-0000-4000-8000-000000000001'::uuid,
+  'e1000001-0000-4000-8000-000000000001'::uuid,
+  '{"type":"doc"}'::jsonb,
+  'backdated',
+  '2000-01-01T00:00:00Z',
+  '2000-01-01T00:00:00Z',
+  '2000-01-02T00:00:00Z',
+  '2000-01-03T00:00:00Z'
+);
+select is (
+  (
+    select jsonb_build_object(
+      'is_created_now', c.created_at = now(),
+      'is_updated_now', c.updated_at = now(),
+      'edited_at', c.edited_at,
+      'deleted_at', c.deleted_at,
+      'has_body', c.body is not null
+    )
+    from public.comments c
+    where c.id = 'e1500004-0000-4000-8000-000000000004'::uuid
+  ),
+  '{"is_created_now": true, "is_updated_now": true, "edited_at": null, "deleted_at": null, "has_body": true}'::jsonb,
+  'an insert cannot backdate a comment or create it edited or deleted'
 );
 
 select * from finish ();

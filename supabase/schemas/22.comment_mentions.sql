@@ -17,6 +17,8 @@ create table public.comment_mentions (
 
 create index idx_comment_mentions__mentioned_user on public.comment_mentions (mentioned_user_id);
 
+create index idx_comment_mentions__workspace_id on public.comment_mentions (workspace_id);
+
 alter table public.comment_mentions enable row level security;
 
 -- Data API privileges. Members read; only the trigger writes.

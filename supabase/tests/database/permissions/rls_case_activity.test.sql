@@ -48,7 +48,7 @@ update public.comments set deleted_at = now() where id = 'e2500002-0000-4000-800
 insert into public.comment_reactions (id, comment_id, user_id, workspace_id, kind)
 values ('e2600001-0000-4000-8000-000000000001'::uuid, 'e2500001-0000-4000-8000-000000000001'::uuid, 'e2000001-0000-4000-8000-000000000001'::uuid, 'e2100001-0000-4000-8000-000000000001'::uuid, 'like');
 
-select plan (16);
+select plan (24);
 
 -- 1. A member reads a teammate's comment and the case activity.
 select lives_ok (
@@ -298,6 +298,209 @@ select lives_ok (
   end $chk$;
   $t$,
   'only the author can delete a comment'
+);
+
+-- 17. The author posts as themselves through the default author and the
+-- triggers log it and extract the mention.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  insert into public.comments (id, workspace_id, individual_id, body, body_text)
+  values (
+    'e2500003-0000-4000-8000-000000000003'::uuid,
+    'e2100001-0000-4000-8000-000000000001'::uuid,
+    'e2400001-0000-4000-8000-000000000001'::uuid,
+    '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"userMention","attrs":{"id":"e2000002-0000-4000-8000-000000000002"}}]}]}'::jsonb,
+    '@member'
+  );
+  reset role;
+  do $chk$
+  begin
+    if (select author_user_id from public.comments where id = 'e2500003-0000-4000-8000-000000000003'::uuid) <> 'e2000001-0000-4000-8000-000000000001'::uuid then
+      raise exception 'the author was not defaulted to the caller';
+    end if;
+    if (
+      select count(*)::int from public.activity_events
+      where comment_id = 'e2500003-0000-4000-8000-000000000003'::uuid
+        and kind = 'comment_created'
+        and actor_user_id = 'e2000001-0000-4000-8000-000000000001'::uuid
+    ) <> 1 then
+      raise exception 'posting did not log one comment_created event';
+    end if;
+    if (
+      select count(*)::int from public.comment_mentions
+      where comment_id = 'e2500003-0000-4000-8000-000000000003'::uuid
+        and mentioned_user_id = 'e2000002-0000-4000-8000-000000000002'::uuid
+    ) <> 1 then
+      raise exception 'posting did not extract the mention';
+    end if;
+  end $chk$;
+  $t$,
+  'the author posts a comment and the triggers log it and extract its mention'
+);
+
+-- 18. The author cannot move their comment to another workspace.
+select throws_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  update public.comments
+  set workspace_id = 'e2100002-0000-4000-8000-000000000002'::uuid
+  where id = 'e2500003-0000-4000-8000-000000000003'::uuid;
+  $t$,
+  '42501',
+  null,
+  'the author cannot move a comment to another workspace'
+);
+
+-- 19. An outsider cannot post into another workspace.
+select throws_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000003-0000-4000-8000-000000000003","role":"authenticated"}', true);
+  insert into public.comments (workspace_id, individual_id, author_user_id, body, body_text)
+  values ('e2100001-0000-4000-8000-000000000001'::uuid, 'e2400001-0000-4000-8000-000000000001'::uuid, 'e2000003-0000-4000-8000-000000000003'::uuid, '{"type":"doc"}'::jsonb, 'intruder');
+  $t$,
+  '42501',
+  null,
+  'an outsider cannot insert a comment into another workspace'
+);
+
+-- 20. An outsider reads no reactions or mentions from another workspace.
+select lives_ok (
+  $t$
+  reset role;
+  do $chk$
+  begin
+    if (select count(*)::int from public.comment_reactions) = 0
+      or (select count(*)::int from public.comment_mentions) = 0
+    then
+      raise exception 'the fixture has no reactions or mentions to hide';
+    end if;
+  end $chk$;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000003-0000-4000-8000-000000000003","role":"authenticated"}', true);
+  do $chk$
+  begin
+    if (select count(*)::int from public.comment_reactions) + (select count(*)::int from public.comment_mentions) <> 0 then
+      raise exception 'an outsider can read another workspace''s reactions or mentions';
+    end if;
+  end $chk$;
+  reset role;
+  $t$,
+  'an outsider reads no reactions or mentions'
+);
+
+-- 21. An outsider cannot react to another workspace's comment.
+select throws_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000003-0000-4000-8000-000000000003","role":"authenticated"}', true);
+  insert into public.comment_reactions (comment_id, user_id, workspace_id, kind)
+  values ('e2500001-0000-4000-8000-000000000001'::uuid, 'e2000003-0000-4000-8000-000000000003'::uuid, 'e2100001-0000-4000-8000-000000000001'::uuid, 'like');
+  $t$,
+  '42501',
+  null,
+  'an outsider cannot react to a comment in another workspace'
+);
+
+-- 22. Claiming their own workspace on the reaction does not help.
+select throws_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000003-0000-4000-8000-000000000003","role":"authenticated"}', true);
+  insert into public.comment_reactions (comment_id, user_id, workspace_id, kind)
+  values ('e2500001-0000-4000-8000-000000000001'::uuid, 'e2000003-0000-4000-8000-000000000003'::uuid, 'e2100002-0000-4000-8000-000000000002'::uuid, 'like');
+  $t$,
+  '42501',
+  null,
+  'an outsider cannot react by claiming their own workspace'
+);
+
+-- A comment in the outsider's workspace, for the next test. Inserted as the
+-- table owner after test 2, which expects the outsider to see no comments.
+reset role;
+
+insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation)
+values ('e2300002-0000-4000-8000-000000000002'::uuid, 'e2000003-0000-4000-8000-000000000003'::uuid, 'e2100002-0000-4000-8000-000000000002'::uuid, 'rls other concept', true)
+on conflict (id) do nothing;
+
+insert into public.individuals (id, workspace_id, name, concept_id, external_id)
+values ('e2400002-0000-4000-8000-000000000002'::uuid, 'e2100002-0000-4000-8000-000000000002'::uuid, 'Other case', 'e2300002-0000-4000-8000-000000000002'::uuid, 'ext-9')
+on conflict (id) do nothing;
+
+insert into public.comments (id, workspace_id, individual_id, author_user_id, body, body_text)
+values ('e2500004-0000-4000-8000-000000000004'::uuid, 'e2100002-0000-4000-8000-000000000002'::uuid, 'e2400002-0000-4000-8000-000000000002'::uuid, 'e2000003-0000-4000-8000-000000000003'::uuid, '{"type":"doc"}'::jsonb, 'elsewhere');
+
+-- 23. A member cannot move their reaction onto another workspace's comment.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  do $chk$
+  begin
+    update public.comment_reactions
+    set comment_id = 'e2500004-0000-4000-8000-000000000004'::uuid
+    where comment_id = 'e2500001-0000-4000-8000-000000000001'::uuid
+      and user_id = 'e2000002-0000-4000-8000-000000000002'::uuid;
+  exception
+    when insufficient_privilege then
+      -- Rejected by the policy's WITH CHECK, which is a pass.
+      null;
+  end $chk$;
+  reset role;
+  do $chk$
+  begin
+    if exists (
+      select 1 from public.comment_reactions
+      where comment_id = 'e2500004-0000-4000-8000-000000000004'::uuid
+    ) or not exists (
+      select 1 from public.comment_reactions
+      where comment_id = 'e2500001-0000-4000-8000-000000000001'::uuid
+        and user_id = 'e2000002-0000-4000-8000-000000000002'::uuid
+    ) then
+      raise exception 'a member moved their reaction to another workspace''s comment';
+    end if;
+  end $chk$;
+  $t$,
+  'a member cannot move a reaction to a comment in another workspace'
+);
+
+-- 24. The author soft-deletes their own comment.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  update public.comments set deleted_at = now() where id = 'e2500003-0000-4000-8000-000000000003'::uuid;
+  reset role;
+  do $chk$
+  begin
+    if (select body from public.comments where id = 'e2500003-0000-4000-8000-000000000003'::uuid) is not null then
+      raise exception 'deleting did not clear the body';
+    end if;
+    if (
+      select count(*)::int from public.comment_revisions
+      where comment_id = 'e2500003-0000-4000-8000-000000000003'::uuid and reason = 'delete'
+    ) <> 1 then
+      raise exception 'deleting did not keep a delete revision';
+    end if;
+    if (
+      select count(*)::int from public.activity_events
+      where comment_id = 'e2500003-0000-4000-8000-000000000003'::uuid and kind = 'comment_deleted'
+    ) <> 1 then
+      raise exception 'deleting did not log comment_deleted';
+    end if;
+  end $chk$;
+  $t$,
+  'the author soft-deletes their own comment'
 );
 
 select * from finish ();
