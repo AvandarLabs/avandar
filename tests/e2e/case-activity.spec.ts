@@ -78,9 +78,13 @@ test("a member's case update keeps its formatting, mention, reaction, and edit u
     await page.keyboard.type("- Serum for IgM");
     await page.getByRole("button", { name: "Post", exact: true }).click();
 
-    const comment = page.getByRole("article").filter({ hasText: "Lab results" });
+    const comment = page
+      .getByRole("article")
+      .filter({ hasText: "Lab results" });
     await expect(comment).toBeVisible({ timeout: MEDIUM_WAIT });
-    await expect(comment.locator("strong", { hasText: "pending" })).toBeVisible();
+    await expect(
+      comment.locator("strong", { hasText: "pending" }),
+    ).toBeVisible();
     await expect(comment.locator('[data-type="userMention"]')).toBeVisible();
     await expect(comment.getByRole("listitem")).toHaveText("Serum for IgM");
     await expect(editor).toHaveText("");

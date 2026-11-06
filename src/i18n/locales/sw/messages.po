@@ -46,7 +46,7 @@ msgstr "Rudi mtandaoni ili kuona au kufanya ukurasa upatikane bila mtandao."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The link could not be copied."
-msgstr ""
+msgstr "Kiungo hakikuweza kunakiliwa."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -109,7 +109,7 @@ msgstr "huanza na"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Open link in the same tab"
-msgstr ""
+msgstr "Fungua kiungo kwenye kichupo hicho hicho"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
@@ -133,7 +133,7 @@ msgstr "Fungua dataset"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Delete comment?"
-msgstr ""
+msgstr "Ufute maoni?"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
@@ -485,7 +485,7 @@ msgstr "Haiwezekani kuongeza dataset"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
 msgid "No activity on this case yet"
-msgstr ""
+msgstr "Bado hakuna shughuli kwenye kesi hii"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Members still assigned to this group must be moved first."
@@ -810,7 +810,7 @@ msgstr "Hitilafu ya Google Picker"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
 msgid "Show earlier activity"
-msgstr ""
+msgstr "Onyesha shughuli za awali"
 
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
@@ -1205,7 +1205,8 @@ msgstr "Fungua ramani ya {0}"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Some links in this update are not allowed. Use web or email links."
-msgstr ""
+msgstr "Baadhi ya viungo katika sasisho hili haviruhusiwi. Tumia viungo vya "
+"wavuti au barua pepe."
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "Oops!"
@@ -1375,7 +1376,7 @@ msgstr "Imeandikwa"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Copy link to comment"
-msgstr ""
+msgstr "Nakili kiungo cha maoni"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureMapTool.tsx
 msgid "Measure distance and area"
@@ -1676,7 +1677,7 @@ msgstr "Chati ya Funnel"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Link address"
-msgstr ""
+msgstr "Anwani ya kiungo"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Symbol"
@@ -2000,7 +2001,7 @@ msgstr "Wastani"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
-msgstr ""
+msgstr "Inapakia kesi"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
@@ -2412,7 +2413,7 @@ msgstr "Seti za data za faragha"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
 msgid "Earlier activity failed to load."
-msgstr ""
+msgstr "Shughuli za awali hazikuweza kupakiwa."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -2642,7 +2643,7 @@ msgstr "Hatua"
 #: src/components/RichText/UserMention/UserMentionChip.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCard.tsx
 msgid "Former member"
-msgstr ""
+msgstr "Mwanachama wa zamani"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
@@ -2727,7 +2728,8 @@ msgstr "Kifungu cha WHERE kinatumia usemi upande wa kushoto ambao si rejeleo la 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/usePostCaseComment.ts
 msgid "Your update was not posted. It is still in the box, so you can try "
 "again."
-msgstr ""
+msgstr "Sasisho lako halikuchapishwa. Bado liko kwenye kisanduku, kwa hivyo "
+"unaweza kujaribu tena."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "PDF downloaded."
@@ -2882,7 +2884,7 @@ msgstr "haina thamani"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 msgid "Catalog datasets"
-msgstr ""
+msgstr "Katalogi seti za data"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -3262,7 +3264,7 @@ msgstr "Chati ya Rada"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Comment actions"
-msgstr ""
+msgstr "Vitendo vya maoni"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistDockButton.tsx
 msgid "Get started {completedCount}/{totalMilestoneCount}"
@@ -3288,7 +3290,7 @@ msgstr "Hakuna"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Link copied"
-msgstr ""
+msgstr "Kiungo kimenakiliwa"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "This dataset is indexed in {serviceName}, but it can't be loaded."
@@ -3481,11 +3483,11 @@ msgstr "Matokeo"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Searching the catalog"
-msgstr ""
+msgstr "Inatafuta kwenye katalogi"
 
 #: src/components/RichText/UserMention/UserMentionList.tsx
 msgid "No teammates match"
-msgstr ""
+msgstr "Hakuna mwenzako wa timu anayelingana"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -3602,7 +3604,7 @@ msgstr "Mipangilio ya safu imehifadhiwa. Jaribu tena muunganisho utakaporejea, "
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "{plainTextLength} of {RICH_TEXT_MAX_TEXT_LENGTH} characters"
-msgstr ""
+msgstr "{plainTextLength} kati ya herufi {RICH_TEXT_MAX_TEXT_LENGTH}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
@@ -3886,7 +3888,7 @@ msgstr "Qwen 2.5 7B (offline)"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
-msgstr ""
+msgstr "Inachekesha"
 
 #. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
@@ -4037,7 +4039,7 @@ msgstr "Futa dashibodi?"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
-msgstr ""
+msgstr "Napenda"
 
 #: src/views/ProfileView/PasswordSection.tsx
 msgid "Change password"
@@ -4625,7 +4627,7 @@ msgstr "URL maalum haiwezi kuwa na nafasi"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bullet list"
-msgstr ""
+msgstr "Orodha yenye vitone"
 
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
@@ -4878,7 +4880,8 @@ msgstr "Mtu yeyote aliye na kiungo anaweza kutazama {resource} hii. Watu na "
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
 msgid "Post the first update below. Mention a teammate with @ to bring them in."
-msgstr ""
+msgstr "Chapisha sasisho la kwanza hapa chini. Mtaje mwenzako wa timu kwa @ ili "
+"kumhusisha."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
@@ -5001,7 +5004,7 @@ msgstr "Kifungu cha JOIN ON kinatumia rejeleo lisilo la safu; fomu italihifadhi 
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Insightful"
-msgstr ""
+msgstr "Yenye maarifa"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
@@ -5088,7 +5091,7 @@ msgstr "Rangi"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Celebrate"
-msgstr ""
+msgstr "Sherehekea"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label"
@@ -5108,7 +5111,7 @@ msgstr "1"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
 msgid "edited"
-msgstr ""
+msgstr "imehaririwa"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Rows skipped"
@@ -5251,7 +5254,7 @@ msgstr "Pakua PDF"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bold"
-msgstr ""
+msgstr "Nene"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -5416,7 +5419,7 @@ msgstr "Futa kumbukumbu za faragha"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/useCommentEditing.ts
 msgid "This comment has content this version of Avandar cannot edit."
-msgstr ""
+msgstr "Maoni haya yana maudhui ambayo toleo hili la Avandar haliwezi kuhariri."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Consent"
@@ -5695,7 +5698,7 @@ msgstr "Latitudo au longitudo si nambari"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
-msgstr ""
+msgstr "Orodha yenye nambari"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster"
@@ -5786,7 +5789,7 @@ msgstr "Zana hii itapatikana katika toleo lijalo."
 #. placeholder {0}: summary.total
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionSummaryChip.tsx
 msgid "{0, plural, one {# reaction} other {# reactions}}"
-msgstr ""
+msgstr "{0, plural, one {# mwitikio} other {# miitikio}}"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
@@ -5859,7 +5862,7 @@ msgstr "Unda akaunti mpya"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/useToggleReaction.ts
 msgid "Your reaction could not be saved. Try again."
-msgstr ""
+msgstr "Mwitikio wako haukuweza kuhifadhiwa. Jaribu tena."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Reconnect your Google account and try again."
@@ -6213,7 +6216,7 @@ msgstr "Jina la sehemu"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/useCommentMutations.ts
 msgid "Your changes could not be saved. Try again."
-msgstr ""
+msgstr "Mabadiliko yako hayakuweza kuhifadhiwa. Jaribu tena."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Most frequent"
@@ -6273,7 +6276,7 @@ msgstr "Mistari kutoka kwenye chati hii"
 
 #: src/components/RichText/UserMention/UserMentionChip.tsx
 msgid "member"
-msgstr ""
+msgstr "mwanachama"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
@@ -6611,7 +6614,7 @@ msgstr "Sehemu ya mtandaoni"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The comment is removed from the case for everyone."
-msgstr ""
+msgstr "Maoni haya yameondolewa kwenye kesi kwa kila mtu."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Source attribution (Always included)"
@@ -6809,7 +6812,7 @@ msgstr "Yasiyoegemea upande wowote"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/useCommentMutations.ts
 msgid "The comment could not be deleted. Try again."
-msgstr ""
+msgstr "Maoni hayakuweza kufutwa. Jaribu tena."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
@@ -6881,7 +6884,7 @@ msgstr "Tarehe ya utayarishaji (Hujumuishwa kila wakati)"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Italic"
-msgstr ""
+msgstr "Italiki"
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "Update now"
@@ -7271,7 +7274,7 @@ msgstr "Maswali ya umma hayakubaliwi kwa maswali yaliyo na muundo. Tumia SQL ya 
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
 msgid "Edit comment"
-msgstr ""
+msgstr "Hariri maoni"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "CSV file"
@@ -7536,7 +7539,8 @@ msgstr "Punguza ufikiaji wa programu"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/OfflineNotice.tsx
 msgid "You're offline. Your draft is saved on this device and you can post when "
 "you reconnect."
-msgstr ""
+msgstr "Huna muunganisho wa intaneti. Rasimu yako imehifadhiwa kwenye kifaa "
+"hiki na unaweza kuichapisha utakapojiunga tena."
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Enter dataset name"
@@ -7770,7 +7774,7 @@ msgstr "Huduma"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
 msgid "Loading author"
-msgstr ""
+msgstr "Inapakia mwandishi"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too large for the on-device model. Try a shorter "
@@ -7792,7 +7796,7 @@ msgstr "Mstari wa chanzo"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 msgid "Loading more datasets"
-msgstr ""
+msgstr "Inapakia seti zaidi za data"
 
 #: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"
@@ -8798,7 +8802,7 @@ msgstr "Jibu la ufafanuzi maalum"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Like"
-msgstr ""
+msgstr "Penda"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -8903,7 +8907,7 @@ msgstr "Umbo"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
 msgid "This comment was deleted."
-msgstr ""
+msgstr "Maoni haya yalifutwa."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on"
@@ -9051,7 +9055,7 @@ msgstr "Safu {rowNum} / Safu wima {colNum}"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
 msgid "Write an update. Type @ to mention a teammate."
-msgstr ""
+msgstr "Andika taarifa. Andika @ ili kumtaja mshiriki wa timu."
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList.tsx
 msgid "You can't go to this step until you create a new dashboard."
@@ -9193,7 +9197,7 @@ msgstr "Isiyoonekana sana"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 msgid "Activity"
-msgstr ""
+msgstr "Shughuli"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
@@ -9238,7 +9242,7 @@ msgstr "{formattedPriceToDisplay}/kiti"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 msgid "The activity for this case failed to load"
-msgstr ""
+msgstr "Imeshindikana kupakia shughuli ya kesi hii"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed"
@@ -9256,7 +9260,7 @@ msgstr "Chunguza data yako"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Mention a teammate"
-msgstr ""
+msgstr "Mtaje mshiriki wa timu"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email address"
@@ -9315,7 +9319,7 @@ msgstr "Midia"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Support"
-msgstr ""
+msgstr "Usaidizi"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "+ Condition"
@@ -9339,7 +9343,7 @@ msgstr "100,000"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
 msgid "Post"
-msgstr ""
+msgstr "Chapisha"
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: dataset.name
@@ -9390,7 +9394,7 @@ msgstr "Ocheri"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
 msgid "Write an update"
-msgstr ""
+msgstr "Andika taarifa"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
 msgid "Could not create that case type"
@@ -9414,7 +9418,7 @@ msgstr "Imechapishwa kwenye nafasi yako ya kazi."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Open link in a new tab"
-msgstr ""
+msgstr "Fungua kiungo katika kichupo kipya"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
@@ -9662,7 +9666,7 @@ msgstr "Funga"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Link"
-msgstr ""
+msgstr "Kiungo"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
@@ -9902,7 +9906,7 @@ msgstr "S"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "https://example.org"
-msgstr ""
+msgstr "https://example.org"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
@@ -9922,7 +9926,7 @@ msgstr "Iko tayari mtandaoni"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionOptions.tsx
 msgid "Reactions"
-msgstr ""
+msgstr "Miitikio"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Swap latitude and longitude"

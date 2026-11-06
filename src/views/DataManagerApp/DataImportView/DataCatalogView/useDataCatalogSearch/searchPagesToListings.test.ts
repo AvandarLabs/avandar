@@ -20,7 +20,11 @@ describe("searchPagesToListings", () => {
       { rows: [_listing("c")] },
     ]);
 
-    expect(listings.map((listing) => {return listing.id})).toEqual(["a", "b", "c"]);
+    expect(
+      listings.map((listing) => {
+        return listing.id;
+      }),
+    ).toEqual(["a", "b", "c"]);
   });
 
   it("keeps only the first copy of a listing a later page repeats", () => {
@@ -29,6 +33,10 @@ describe("searchPagesToListings", () => {
       { rows: [_listing("b"), _listing("c")] },
     ]);
 
-    expect(listings.map((listing) => {return listing.id})).toEqual(["a", "b", "c"]);
+    expect(
+      listings.map((listing) => {
+        return listing.id;
+      }),
+    ).toEqual(["a", "b", "c"]);
   });
 });

@@ -124,19 +124,18 @@ create table public.data_catalog_listings (
   -- (A), who publishes it (B), then what it says about itself (C).
   search_vector tsvector generated always as (
     setweight(
-      to_tsvector('english'::regconfig, coalesce(display_name, '')),
-      'A'
-    ) ||
-    setweight(
       to_tsvector(
         'english'::regconfig,
-        coalesce(external_organization_name, '') || ' ' ||
-        coalesce(external_service_name, '') || ' ' ||
-        coalesce(pipeline_name, '')
+        coalesce(display_name, '')
+      ),
+      'A'
+    ) || setweight(
+      to_tsvector(
+        'english'::regconfig,
+        coalesce(external_organization_name, '') || ' ' || coalesce(external_service_name, '') || ' ' || coalesce(pipeline_name, '')
       ),
       'B'
-    ) ||
-    setweight(
+    ) || setweight(
       to_tsvector(
         'english'::regconfig,
         coalesce(description, '') || ' ' || coalesce(notes, '')
