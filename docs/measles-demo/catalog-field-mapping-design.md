@@ -594,7 +594,7 @@ Red/green TDD, in this order:
 | A script used by two fields across 1,000 records is imported once | Same, with a spy on the import |
 | A script that throws nulls only its field and warns | Same |
 | Coercion for text, arrays and dates | `coerceCatalogFieldValue` unit tests |
-| Labels: drive override replaces the default, omitted levels are null | `resolveDriveOrganizationLabels` unit tests |
+| Labels: drive override replaces the default, omitted levels are null | `getOrganizationLabelsFromDrive` unit tests |
 | Socrata and HDX transforms produce the section 9 fields, and descriptions lose their markup | Each pipeline's transform and mapper tests, against recorded raw records |
 | Row building writes the new columns and `drive_id` | `buildListingRowFromRelation` tests |
 | The drive row upsert and listing link | Engine and Supabase store tests |

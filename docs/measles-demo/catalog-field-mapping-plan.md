@@ -68,7 +68,7 @@ Read it first. Section numbers below (for example "spec §4.4") point into it.
 | `packages/node/etl/src/EtlConfig/readPipelineConfigFile/readPipelineConfigFile.ts` | Create. Reads and parses one config file |
 | `packages/node/etl/src/EtlConfig/buildCatalogFieldPathReader/buildCatalogFieldPathReader.ts` | Create. A `from` path to a lookup function |
 | `packages/node/etl/src/EtlConfig/coerceCatalogFieldValue/coerceCatalogFieldValue.ts` | Create. Coerces a raw value to a field's type (spec §4.4) |
-| `packages/node/etl/src/EtlConfig/resolveDriveOrganizationLabels/resolveDriveOrganizationLabels.ts` | Create. A drive's labels: its own, or the pipeline's |
+| `packages/node/etl/src/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive.ts` | Create. A drive's labels: its own, or the pipeline's |
 | `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/loadCatalogFieldMapper.ts` | Create. Compiles a config into a `CatalogFieldMapper`, importing each script once |
 | `packages/node/etl/src/EtlConfig/EtlConfig.types.ts`, `parseEtlConfig.ts`, `getWorkspaceLoadabilityRules.ts` | Modify. Per-pipeline loadability overrides move into the pipeline config |
 | `packages/node/etl/src/EtlEngine/EtlEngine.types.ts` | Modify. Organization labels, drive description, new relation fields, `drivesTable` |
@@ -904,17 +904,17 @@ git commit -m "feat(etl): read catalog field paths and coerce mapped values"
 ### Task 3: The field mapper, with scripts imported once
 
 **Files:**
-- Create: `packages/node/etl/src/EtlConfig/resolveDriveOrganizationLabels/resolveDriveOrganizationLabels.ts` and its test
+- Create: `packages/node/etl/src/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive.ts` and its test
 - Create: `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/loadCatalogFieldMapper.ts`
 - Create: `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/__fixtures__/upperCaseName.ts`
 - Create: `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/__fixtures__/throwsOnRecord.ts`
 - Create: `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/__fixtures__/noDefaultFunction.ts`
 - Test: `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/loadCatalogFieldMapper.test.ts`
 
-- [ ] **Step 1: Write the failing test** `resolveDriveOrganizationLabels.test.ts`:
+- [ ] **Step 1: Write the failing test** `getOrganizationLabelsFromDrive.test.ts`:
 
 ```ts
-import { resolveDriveOrganizationLabels } from "@etl/EtlConfig/resolveDriveOrganizationLabels/resolveDriveOrganizationLabels";
+import { getOrganizationLabelsFromDrive } from "@etl/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive";
 import { describe, expect, it } from "vitest";
 
 const CONFIG = {
@@ -922,10 +922,10 @@ const CONFIG = {
   drives: [],
 };
 
-describe("resolveDriveOrganizationLabels", () => {
+describe("getOrganizationLabelsFromDrive", () => {
   it("gives a drive with no labels the pipeline's", () => {
     expect(
-      resolveDriveOrganizationLabels({
+      getOrganizationLabelsFromDrive({
         config: CONFIG,
         drive: { baseUrl: "https://a.example.gov" },
       }),
@@ -934,7 +934,7 @@ describe("resolveDriveOrganizationLabels", () => {
 
   it("replaces the pipeline's labels whole, not level by level", () => {
     expect(
-      resolveDriveOrganizationLabels({
+      getOrganizationLabelsFromDrive({
         config: CONFIG,
         drive: { baseUrl: "https://a.example.gov", organizationLabels: { 1: "State" } },
       }),
@@ -943,7 +943,7 @@ describe("resolveDriveOrganizationLabels", () => {
 
   it("gives no labels when neither sets any", () => {
     expect(
-      resolveDriveOrganizationLabels({
+      getOrganizationLabelsFromDrive({
         config: { drives: [] },
         drive: { baseUrl: "https://a.example.gov" },
       }),
@@ -953,7 +953,7 @@ describe("resolveDriveOrganizationLabels", () => {
 ```
 
 - [ ] **Step 2: Run it, watch it fail, then implement
-  `resolveDriveOrganizationLabels.ts`:**
+  `getOrganizationLabelsFromDrive.ts`:**
 
 ```ts
 import type {
@@ -971,7 +971,7 @@ import type { EtlOrganizationLabels } from "@etl/EtlEngine/EtlEngine.types";
  * @param args.drive - One of its drives.
  * @returns The labels, possibly empty.
  */
-export function resolveDriveOrganizationLabels(args: {
+export function getOrganizationLabelsFromDrive(args: {
   config: PipelineConfig;
   drive: PipelineDriveConfig;
 }): EtlOrganizationLabels {
@@ -979,7 +979,7 @@ export function resolveDriveOrganizationLabels(args: {
 }
 ```
 
-Run: `pnpm --filter @avandar/etl test resolveDriveOrganizationLabels`
+Run: `pnpm --filter @avandar/etl test getOrganizationLabelsFromDrive`
 Expected: FAIL first (module not found), then PASS, 3 tests.
 
 - [ ] **Step 3: Create the fixture scripts.**
@@ -1512,7 +1512,7 @@ If Bun cannot resolve the `@etl/` alias inside the loader, run it from
 - [ ] **Step 9: Export them** from `packages/node/etl/src/index.ts`:
 
 ```ts
-export { resolveDriveOrganizationLabels } from "@etl/EtlConfig/resolveDriveOrganizationLabels/resolveDriveOrganizationLabels";
+export { getOrganizationLabelsFromDrive } from "@etl/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive";
 export {
   loadCatalogFieldMapper,
   type CatalogFieldMapper,
@@ -1529,7 +1529,7 @@ export {
 ```bash
 pnpm --filter @avandar/etl type-check
 pnpm format
-git add packages/node/etl/src/EtlConfig/resolveDriveOrganizationLabels \
+git add packages/node/etl/src/EtlConfig/getOrganizationLabelsFromDrive \
   packages/node/etl/src/EtlConfig/loadCatalogFieldMapper \
   packages/node/etl/src/index.ts
 git commit -m "feat(etl): compile pipeline field mappings, importing each script once"
@@ -3619,7 +3619,7 @@ README after Step 2.
     mapping kinds, the mappable fields, coercion, that scripts load once
     per run, and a table of the new exports (`parsePipelineConfig`,
     `readPipelineConfigFile`, `loadCatalogFieldMapper`,
-    `resolveDriveOrganizationLabels`, `CATALOG_MAPPABLE_FIELDS`, the types),
+    `getOrganizationLabelsFromDrive`, `CATALOG_MAPPABLE_FIELDS`, the types),
     following the format of the README's existing tables.
   - The stores table or section: add `createInMemoryDrivesStore` and
     `createSupabaseDrivesStore`, `EtlOutput.drivesTable`, and
@@ -4169,14 +4169,14 @@ export function listConfiguredDrives(
         : SocrataScopesSchema.parse(drive.scopes);
     return {
       baseUrl: drive.baseUrl,
-      organizationLabels: resolveDriveOrganizationLabels({ config, drive }),
+      organizationLabels: getOrganizationLabelsFromDrive({ config, drive }),
       ...(scopes === undefined ? {} : { scopes }),
     };
   });
 }
 ```
 
-with imports `import { resolveDriveOrganizationLabels } from "@avandar/etl";`,
+with imports `import { getOrganizationLabelsFromDrive } from "@avandar/etl";`,
 `import { z } from "zod";`, and
 `import type { EtlOrganizationLabels, EtlScope, PipelineConfig } from "@avandar/etl";`.
 If `apps/pipeline-server/package.json` does not list `zod`, add
@@ -4598,7 +4598,7 @@ export function listHdxDrives(config: PipelineConfig): readonly HdxDrive[] {
     }
     return {
       baseUrl: drive.baseUrl,
-      organizationLabels: resolveDriveOrganizationLabels({ config, drive }),
+      organizationLabels: getOrganizationLabelsFromDrive({ config, drive }),
     };
   });
 }
