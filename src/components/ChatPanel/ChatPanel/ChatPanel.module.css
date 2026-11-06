@@ -12,27 +12,20 @@
 }
 
 /*
- * Matches the slate's edge, corner, and shadow so the pair reads as one
- * object. The inline-start side carries no border: the slate's own border
- * there is the hairline between the view and the chat. The clip-path keeps
- * this surface's shadow off the slate beside it while letting it spill into
- * the gutter above and below, where it blends with the slate's shadow
- * instead of leaving a notch at the seam.
- *
- * The edge and fill are the pair the slate actually renders: the theme's
- * Paper styles paint every Paper border `--ava-border-default`, over the
- * slate's `--ava-surface-body` ground. That border is translucent and
- * composites over the element's own fill, so both have to match, or the
- * top and bottom edges land on different grays and the chat reads a pixel
- * shorter than the slate.
+ * Matches the slate's neutral.7 edge, corner, and shadow so the pair reads
+ * as one object. The slate drops its inline-end border while fused, so the
+ * inline-start border here is the light hairline between the view and the
+ * chat. The clip-path keeps this surface's shadow off the slate beside it
+ * while letting it spill into the gutter above and below, where it blends
+ * with the slate's shadow instead of leaving a notch at the seam.
  *
  * Always opaque so the dark shell behind never bleeds through.
  */
 .shell {
   background-color: var(--ava-surface-body);
-  border: 1px solid var(--ava-border-default);
+  border: 1px solid var(--mantine-color-neutral-7);
   border-end-end-radius: 12px;
-  border-inline-start: none;
+  border-inline-start-color: var(--ava-border-default);
   border-start-end-radius: 8px;
   box-shadow:
     0 1px 2px rgb(0 0 0 / 20%),

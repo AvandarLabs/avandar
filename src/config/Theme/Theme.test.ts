@@ -100,6 +100,19 @@ describe("Theme design tokens", () => {
     ).toBe(ANIMATION_PRESET.popIn.durationMs);
   });
 
+  it("lets a Paper's own CSS override the themed border color", () => {
+    // Theme `styles` land as an inline style, which no CSS module class can
+    // beat. Routing the color through a custom property is what lets the
+    // slate paint its neutral.7 edge while every other Paper keeps the
+    // default token.
+    const paperStyles = Theme.components?.Paper?.styles as
+      | { root?: { borderColor?: string } }
+      | undefined;
+    expect(paperStyles?.root?.borderColor).toBe(
+      "var(--ava-paper-border-color, var(--ava-border-default))",
+    );
+  });
+
   it("exposes overlay pop-in motion as CSS variables", () => {
     const resolved = cssVariablesResolver(Theme);
     expect(resolved.variables["--ava-animation-duration-pop-in"]).toBe(

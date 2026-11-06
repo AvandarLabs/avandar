@@ -29,10 +29,20 @@
     var(--app-shell-transition-timing-function, ease);
 }
 
+/*
+ * The neutral.7 edge reaches the screen through `--ava-paper-border-color`:
+ * the theme paints every Paper's border color inline, which a plain
+ * `border-color` here cannot beat. Widths are not inline, so the
+ * inline-end side can still drop out when the chat aside fuses on and draws
+ * the divider itself.
+ */
 .slate {
+  --ava-paper-border-color: var(--mantine-color-neutral-7);
+
   border: 1px solid var(--mantine-color-neutral-7);
   border-end-end-radius: var(--ava-slate-inline-end-radius, 12px);
   border-end-start-radius: 8px;
+  border-inline-end-width: var(--ava-slate-inline-end-border-width, 1px);
   border-start-end-radius: var(--ava-slate-inline-end-radius, 8px);
   border-start-start-radius: 8px;
   box-shadow:
@@ -49,6 +59,15 @@
   transition: border-radius var(--app-shell-transition-duration, 200ms)
     var(--app-shell-transition-timing-function, ease);
   z-index: var(--mantine-z-index-app-slate);
+}
+
+/*
+ * Custom properties inherit, so without this the slate's edge would reach
+ * every Paper inside the view. Resetting it hands nested Papers back the
+ * theme's default edge.
+ */
+.slate :global(.mantine-Paper-root) {
+  --ava-paper-border-color: initial;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -20,13 +20,14 @@
 
 /*
  * Chat open beside the slate: the slate and the chat aside become one
- * surface. The slate drops its inline-end gutter, squares off that edge, and
- * turns its border there into the hairline between the view and the chat.
+ * surface. The slate drops its inline-end gutter, border, and corners there,
+ * and the chat aside draws the hairline between the view and the chat.
  * AppSlate.module.css reads these; ChatPanel.module.css draws the other half.
  */
 .root[data-chat-fused] {
   --ava-slate-gutter-inline-end: 0px;
   --ava-slate-inline-end-radius: 0px;
+  --ava-slate-inline-end-border-width: 0px;
 }
 
 /*
