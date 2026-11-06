@@ -1,9 +1,9 @@
-import { parse } from "yaml";
-import { z } from "zod";
 import {
   CATALOG_MAPPABLE_FIELDS,
   REQUIRED_CATALOG_FIELD,
 } from "@etl/EtlConfig/PipelineConfig.types";
+import { parse } from "yaml";
+import { z } from "zod";
 import type { PipelineConfig } from "@etl/EtlConfig/PipelineConfig.types";
 
 /** Dotted segments of letters, digits, `_`, and `-`, such as `a.b.0`. */
@@ -13,10 +13,7 @@ const FieldSourceSchema = z.union(
   [
     z.strictObject({ from: z.string().regex(FIELD_PATH_PATTERN) }),
     z.strictObject({
-      value: z.union([
-        z.string().min(1),
-        z.array(z.string().min(1)).min(1),
-      ]),
+      value: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]),
     }),
     z.strictObject({ script: z.string().min(1) }),
   ],
@@ -74,9 +71,7 @@ function _assertValidDrives(config: PipelineConfig, sourceName: string): void {
   const seenBaseUrls = new Set<string>();
   config.drives.forEach((drive) => {
     if (seenBaseUrls.has(drive.baseUrl)) {
-      throw new Error(
-        `${sourceName}: Drive ${drive.baseUrl} is listed twice.`,
-      );
+      throw new Error(`${sourceName}: Drive ${drive.baseUrl} is listed twice.`);
     }
     seenBaseUrls.add(drive.baseUrl);
     const mergedFields = { ...config.fields, ...drive.fields };
