@@ -1,22 +1,18 @@
 import { Callout } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Button,
-  Center,
-  Loader,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title,
-} from "@mantine/core";
+import { Center, Loader, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { IconMessages } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef } from "react";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import { RichTextMembersContext } from "@/components/RichText/RichTextMembersContext";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { activityFeedItemRenderers } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/activityFeedItemRenderers";
+import {
+  ACTIVITY_FEED_VISIBLE_KINDS,
+  activityFeedItemRenderers,
+} from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/activityFeedItemRenderers";
 import { CaseActivityComposer } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer";
 import classes from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.module.css";
+import { EarlierActivityControl } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl";
 import { groupActivityByDay } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/groupActivityByDay";
 import { useCaseActivityFeed } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/useCaseActivityFeed";
 import type { Individual } from "$/models/ontology/Individual/Individual";
@@ -45,7 +41,11 @@ export function CaseActivityFeed({
 }: Props): ReactNode {
   const { t, i18n } = useLingui();
   const currentUser = useCurrentUser();
-  const feed = useCaseActivityFeed(individualId, highlightedCommentId);
+  const feed = useCaseActivityFeed({
+    individualId,
+    kinds: ACTIVITY_FEED_VISIBLE_KINDS,
+    linkedCommentId: highlightedCommentId,
+  });
   const endRef = useRef<HTMLDivElement>(null);
   // The case whose feed was already scrolled into place, so a refetch or a
   // new post never yanks the reader back.
@@ -114,7 +114,7 @@ export function CaseActivityFeed({
           <Center py="xl">
             <Loader size="sm" />
           </Center>
-        ) : feed.isError ? (
+        ) : feed.isLoadError ? (
           <Callout
             title={t`The activity for this case failed to load`}
             message={t`Try again in a moment, or reach out to support if it keeps happening.`}
@@ -141,16 +141,11 @@ export function CaseActivityFeed({
             aria-busy={feed.isLoadingEarlier}
           >
             {feed.hasEarlier ? (
-              <Button
-                variant="subtle"
-                color="neutral"
-                size="compact-sm"
-                className={classes.earlier}
-                loading={feed.isLoadingEarlier}
-                onClick={feed.loadEarlier}
-              >
-                <Trans>Show earlier activity</Trans>
-              </Button>
+              <EarlierActivityControl
+                hasError={feed.hasEarlierError}
+                isLoading={feed.isLoadingEarlier}
+                onLoadEarlier={feed.loadEarlier}
+              />
             ) : null}
             {dayGroups.map((group) => {
               return (

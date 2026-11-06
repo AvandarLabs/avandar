@@ -1,4 +1,4 @@
-import { CommentCard } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCard";
+import { CommentCreatedItem } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCreatedItem";
 import type { ActivityEvent } from "$/models/activity/ActivityEvent/ActivityEvent";
 import type { User } from "$/models/User/User";
 import type { ActivityFeedEntry } from "@/clients/activity/ActivityEventClient";
@@ -13,28 +13,6 @@ export type ActivityFeedItemProps = {
   mentionCandidates: readonly MentionCandidate[];
   highlightedCommentId: string | undefined;
 };
-
-function CommentCreatedItem({
-  entry,
-  currentUserId,
-  getMemberName,
-  mentionCandidates,
-  highlightedCommentId,
-}: ActivityFeedItemProps): ReactNode {
-  if (!entry.comment) {
-    return null;
-  }
-  return (
-    <CommentCard
-      comment={entry.comment}
-      reactions={entry.reactions}
-      currentUserId={currentUserId}
-      getMemberName={getMemberName}
-      mentionCandidates={mentionCandidates}
-      isHighlighted={highlightedCommentId === entry.comment.id}
-    />
-  );
-}
 
 /**
  * The row component for each activity kind, or `null` for kinds that change
@@ -52,7 +30,7 @@ export const activityFeedItemRenderers: Readonly<
   comment_deleted: null,
 };
 
-/** Kinds that get their own row. The feed query asks only for these. */
+/** Kinds that get their own row. The feed asks only for these. */
 export const ACTIVITY_FEED_VISIBLE_KINDS: readonly ActivityEvent.Kind[] = (
   Object.keys(activityFeedItemRenderers) as ActivityEvent.Kind[]
 ).filter((kind) => {

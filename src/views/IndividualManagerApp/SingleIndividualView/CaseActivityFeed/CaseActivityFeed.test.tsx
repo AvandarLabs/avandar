@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ActivityEventClient } from "@/clients/activity/ActivityEventClient";
-import { render, screen } from "@/test-utils";
+import { fireEvent, render, screen } from "@/test-utils";
 import { CaseActivityFeed } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed";
 import type { Individual } from "$/models/ontology/Individual/Individual";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -27,7 +27,99 @@ function _wrapper({ children }: { children: ReactNode }) {
   );
 }
 
+function _commentEntry(id: string, text: string, occurredAt: string) {
+  return {
+    actorUserId: "u1",
+    commentId: `c-${id}`,
+    id,
+    individualId: "i1",
+    kind: "comment_created",
+    occurredAt,
+    payload: {},
+    payloadVersion: 1,
+    recordedAt: occurredAt,
+    source: "avandar",
+    workspaceId: "w1",
+    reactions: [],
+    comment: {
+      authorUserId: "u1",
+      body: {
+        type: "doc",
+        content: [{ type: "paragraph", content: [{ type: "text", text }] }],
+      },
+      bodySchemaVersion: 1,
+      bodyText: text,
+      createdAt: occurredAt,
+      deletedAt: undefined,
+      editedAt: undefined,
+      id: `c-${id}`,
+      individualId: "i1",
+      updatedAt: occurredAt,
+      workspaceId: "w1",
+    },
+  } as never;
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe("CaseActivityFeed", () => {
+  it("keeps the loaded comments and offers a retry when earlier activity fails", async () => {
+    const pageSpy = vi
+      .spyOn(ActivityEventClient, "getCaseActivityPage")
+      .mockImplementation(async ({ before }) => {
+        if (before !== undefined) {
+          throw new Error("offline");
+        }
+        return {
+          hasMore: true,
+          entries: [
+            _commentEntry("e1", "Specimens sent", "2026-10-27T13:40:00"),
+          ],
+        };
+      });
+    render(
+      <CaseActivityFeed
+        workspaceId={"w1" as Workspace.Id}
+        individualId={"i1" as Individual.Id}
+        members={[]}
+        highlightedCommentId={undefined}
+      />,
+      { wrapper: _wrapper },
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Show earlier activity" }),
+    );
+    fireEvent.click(await screen.findByRole("button", { name: "Try again" }));
+    expect(screen.getByText("Specimens sent")).toBeInTheDocument();
+    expect(
+      screen.getByText("Earlier activity failed to load."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("The activity for this case failed to load"),
+    ).not.toBeInTheDocument();
+    expect(pageSpy).toHaveBeenCalledTimes(3);
+  });
+
+  it("explains a failed first load", async () => {
+    vi.spyOn(ActivityEventClient, "getCaseActivityPage").mockRejectedValue(
+      new Error("offline"),
+    );
+    render(
+      <CaseActivityFeed
+        workspaceId={"w1" as Workspace.Id}
+        individualId={"i1" as Individual.Id}
+        members={[]}
+        highlightedCommentId={undefined}
+      />,
+      { wrapper: _wrapper },
+    );
+    expect(
+      await screen.findByText("The activity for this case failed to load"),
+    ).toBeInTheDocument();
+  });
+
   it("teaches the next move when the case has no activity", async () => {
     vi.spyOn(ActivityEventClient, "getCaseActivityPage").mockResolvedValue({
       entries: [],
