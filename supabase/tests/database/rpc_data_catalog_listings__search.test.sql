@@ -101,7 +101,7 @@ select results_eq(
 select ok(
   has_function_privilege(
     'authenticated',
-    'public.rpc_data_catalog_listings__search(text, integer, integer)',
+    'public.rpc_data_catalog_listings__search(text, integer, integer, text[], text[], text, boolean, text)',
     'execute'
   ),
   'a signed-in user may search the catalog'
@@ -110,7 +110,7 @@ select ok(
 select ok(
   not has_function_privilege(
     'anon',
-    'public.rpc_data_catalog_listings__search(text, integer, integer)',
+    'public.rpc_data_catalog_listings__search(text, integer, integer, text[], text[], text, boolean, text)',
     'execute'
   ),
   'a signed-out visitor may not search the catalog'
