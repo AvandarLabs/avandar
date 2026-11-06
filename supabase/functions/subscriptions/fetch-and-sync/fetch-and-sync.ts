@@ -1,4 +1,4 @@
-import { promiseMap, propEq } from "@avandar/utils";
+import { isDefined, promiseMap, propEq } from "@avandar/utils";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
@@ -9,7 +9,120 @@ import {
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
 import { z } from "zod";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { Tables } from "$/types/database.types.ts";
+
+type PolarSubscription = Awaited<
+  ReturnType<typeof PolarClient.getSubscriptionsByUserId>
+>[number];
+
+/**
+ * Writes one Polar subscription onto its workspace's `subscriptions` row for
+ * `FetchAndSyncUserSubscriptions`. Returns the written row, or `undefined`
+ * when the subscription has nothing to sync.
+ */
+async function _syncPolarSubscription(
+  options: Readonly<{
+    subscription: PolarSubscription;
+    supabaseAdminClient: AvaSupabaseClient;
+  }>,
+): Promise<Tables<"subscriptions"> | undefined> {
+  const { subscription, supabaseAdminClient } = options;
+  const { product, metadata, status, customer } = subscription;
+  const subscriptionMetadata = PolarSubscriptionMetadataSchema.parse(metadata);
+  const productMetadata = PolarProductMetadataSchema.parse(product.metadata);
+  const featurePlan = productMetadata.featurePlanType;
+  if (
+    featurePlan !== "free" &&
+    featurePlan !== "basic" &&
+    featurePlan !== "premium"
+  ) {
+    throw new Error(
+      `Invalid feature plan type: ${featurePlan}. Expected one of: free, basic, premium.`,
+    );
+  }
+
+  const polarFields = {
+    polar_subscription_id: subscription.id,
+    polar_product_id: product.id,
+    subscription_owner_id: subscriptionMetadata.userId,
+    workspace_id: subscriptionMetadata.workspaceId,
+    subscription_status: status,
+    feature_plan_type: featurePlan,
+    started_at: subscription.startedAt?.toISOString(),
+    ends_at: subscription.endsAt?.toISOString(),
+    ended_at: subscription.endedAt?.toISOString(),
+    polar_customer_email: customer.email,
+    polar_customer_id: customer.id,
+    ...Subscription.computeSubscriptionLimitsForDB({
+      featurePlan,
+      numSeats: subscription.seats ?? 1,
+    }),
+    current_period_start: subscription.currentPeriodStart.toISOString(),
+    current_period_end: subscription.currentPeriodEnd?.toISOString(),
+  };
+
+  const { data: existingByPolarId } = await supabaseAdminClient
+    .from("subscriptions")
+    .select("id")
+    .eq("polar_subscription_id", subscription.id)
+    .maybeSingle()
+    .throwOnError();
+
+  if (existingByPolarId?.id !== undefined) {
+    const { data: updatedRow } = await supabaseAdminClient
+      .from("subscriptions")
+      .update(polarFields)
+      .eq("id", existingByPolarId.id)
+      .select()
+      .single()
+      .throwOnError();
+    return updatedRow;
+  }
+
+  // No row tracks this subscription anymore. One that grants nothing, such
+  // as a plan revoked when the workspace switched to Free, must not take
+  // over the workspace's current row.
+  if (!Subscription.doesSubscriptionGrantEntitlements(status)) {
+    return undefined;
+  }
+
+  const { data: existingByWorkspace } = await supabaseAdminClient
+    .from("subscriptions")
+    .select("id, polar_subscription_id, subscription_status")
+    .eq("workspace_id", subscriptionMetadata.workspaceId)
+    .maybeSingle()
+    .throwOnError();
+
+  if (
+    existingByWorkspace !== null &&
+    Subscription.canPolarCheckoutMergeOntoExistingRow(existingByWorkspace)
+  ) {
+    const { data: updatedRow } = await supabaseAdminClient
+      .from("subscriptions")
+      .update(polarFields)
+      .eq("id", existingByWorkspace.id)
+      .select()
+      .single()
+      .throwOnError();
+    return updatedRow;
+  }
+
+  if (existingByWorkspace !== null) {
+    throw new Error(
+      `Workspace '${subscriptionMetadata.workspaceId}' already has a ` +
+        `Polar subscription.`,
+    );
+  }
+
+  const { data: insertedRow } = await supabaseAdminClient
+    .from("subscriptions")
+    .insert(polarFields)
+    .select()
+    .single()
+    .throwOnError();
+  return insertedRow;
+}
 
 /**
  * Search for subscriptions by a user's Avandar ID and update them in our
@@ -45,99 +158,15 @@ export const FetchAndSyncUserSubscriptions = GET("/fetch-and-sync")
 
     // Each Polar subscription has a distinct id, so the upsert calls don't
     // race with each other and we can run them in parallel.
-    const upsertedSubscriptions: Array<Tables<"subscriptions">> =
-      await promiseMap(subscriptions, async (subscription) => {
-        const { product, metadata, status, customer } = subscription;
-        const subscriptionMetadata =
-          PolarSubscriptionMetadataSchema.parse(metadata);
-        const productMetadata = PolarProductMetadataSchema.parse(
-          product.metadata,
-        );
-        const featurePlan = productMetadata.featurePlanType;
-        if (
-          featurePlan !== "free" &&
-          featurePlan !== "basic" &&
-          featurePlan !== "premium"
-        ) {
-          throw new Error(
-            `Invalid feature plan type: ${featurePlan}. Expected one of: free, basic, premium.`,
-          );
-        }
+    const syncedSubscriptions = await promiseMap(
+      subscriptions,
+      async (subscription) => {
+        return await _syncPolarSubscription({
+          subscription,
+          supabaseAdminClient,
+        });
+      },
+    );
 
-        const polarFields = {
-          polar_subscription_id: subscription.id,
-          polar_product_id: product.id,
-          subscription_owner_id: subscriptionMetadata.userId,
-          workspace_id: subscriptionMetadata.workspaceId,
-          subscription_status: status,
-          feature_plan_type: featurePlan,
-          started_at: subscription.startedAt?.toISOString(),
-          ends_at: subscription.endsAt?.toISOString(),
-          ended_at: subscription.endedAt?.toISOString(),
-          polar_customer_email: customer.email,
-          polar_customer_id: customer.id,
-          ...Subscription.computeSubscriptionLimitsForDB({
-            featurePlan,
-            numSeats: subscription.seats ?? 1,
-          }),
-          current_period_start: subscription.currentPeriodStart.toISOString(),
-          current_period_end: subscription.currentPeriodEnd?.toISOString(),
-        };
-
-        const { data: existingByPolarId } = await supabaseAdminClient
-          .from("subscriptions")
-          .select("id")
-          .eq("polar_subscription_id", subscription.id)
-          .maybeSingle()
-          .throwOnError();
-
-        if (existingByPolarId?.id !== undefined) {
-          const { data: updatedRow } = await supabaseAdminClient
-            .from("subscriptions")
-            .update(polarFields)
-            .eq("id", existingByPolarId.id)
-            .select()
-            .single()
-            .throwOnError();
-          return updatedRow;
-        }
-
-        const { data: existingByWorkspace } = await supabaseAdminClient
-          .from("subscriptions")
-          .select("id, polar_subscription_id, subscription_status")
-          .eq("workspace_id", subscriptionMetadata.workspaceId)
-          .maybeSingle()
-          .throwOnError();
-
-        if (
-          existingByWorkspace !== null &&
-          Subscription.canPolarCheckoutMergeOntoExistingRow(existingByWorkspace)
-        ) {
-          const { data: updatedRow } = await supabaseAdminClient
-            .from("subscriptions")
-            .update(polarFields)
-            .eq("id", existingByWorkspace.id)
-            .select()
-            .single()
-            .throwOnError();
-          return updatedRow;
-        }
-
-        if (existingByWorkspace !== null) {
-          throw new Error(
-            `Workspace '${subscriptionMetadata.workspaceId}' already has a ` +
-              `Polar subscription.`,
-          );
-        }
-
-        const { data: insertedRow } = await supabaseAdminClient
-          .from("subscriptions")
-          .insert(polarFields)
-          .select()
-          .single()
-          .throwOnError();
-        return insertedRow;
-      });
-
-    return { subscriptions: upsertedSubscriptions };
+    return { subscriptions: syncedSubscriptions.filter(isDefined) };
   });
