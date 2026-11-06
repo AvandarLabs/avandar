@@ -84,10 +84,12 @@ export const SubscriptionModule = {
    * the blocking plan-selection prompt, so this only applies to a workspace
    * whose active plan is at its dataset cap.
    */
-  shouldPromptForDatasetLimitUpgrade: (options: {
-    subscription: SubscriptionRead | undefined;
-    isAddAllowed: boolean;
-  }): boolean => {
+  shouldPromptForDatasetLimitUpgrade: (
+    options: Readonly<{
+      subscription: SubscriptionRead | undefined;
+      isAddAllowed: boolean;
+    }>,
+  ): boolean => {
     return (
       !options.isAddAllowed &&
       !SubscriptionModule.shouldPromptForBillingSetup(options.subscription)
