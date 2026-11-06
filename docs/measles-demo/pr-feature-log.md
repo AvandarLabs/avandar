@@ -66,6 +66,8 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F14 | Show only the plan picker when a workspace has no active plan | PR open: [#314](https://github.com/AvandarLabs/avandar/pull/314) | none | |
 | F15 | `ava --env <name>` loads any `.env.<name>`, replacing `--staging` and `--prod` | PR open: [#319](https://github.com/AvandarLabs/avandar/pull/319) | none, but see its section for hunks in files `develop` lacks | |
 | F16 | Index every catalog asset behind `is_workspace_loadable`, and add the NY State Socrata portals | not started | F4, F6, F7, F12 | |
+| F17 | Open data catalog browser: full-height three-pane layout with search, filters, and sort | not started | F12, F16 | |
+| F18 | Phone widths: Data Sources shows one pane at a time, and the slate stays on screen | not started | none | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -89,7 +91,9 @@ API. It's new work, not something this branch built.
 | any | F14 | Self-contained billing UI fix. The bug is already on `develop`, so it can merge first. |
 | any | F15 | Self-contained CLI change. Its hunks in `ava supabase sql`, `ava pipeline reset`, and `ava pipeline prune-retired-scopes` go with whichever of F15 and those commands lands on `develop` second. |
 | 11 | F16 | Extends the F4 listings table and upsert, both F6 and F7 pipelines, and F12's invalid-listing UI. Merge after all four. |
-| 12 | F9 | Last, because the docs describe the merged features. |
+| 12 | F17 | Rewrites the catalog list and detail that F12 and F16 extend, and keeps their invalid and unsupported states. Merge after both. |
+| any | F18 | Self-contained layout fix. The slate overflowing the bottom of a phone screen is already on `develop`, so it can merge first. |
+| 13 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -113,6 +117,9 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/tests/database/data_catalog_listings_access.test.sql` | F4, F8 | F4: rename and the index test. F8: cache-column and `pipeline_access_complete` tests. |
 | `apps/pipeline-server/pipelines/world-bank__wdi/run.ts` | F1, F4, F10 | F1: `EtlEngine.create(name, { state })`. F4: `createSupabaseAdminClient` import from `pipelines/shared`. F10: `run(options)` rejecting `--limit`. |
 | `shared/types/database.types.ts` | F4, F6, F8 | Generated: regenerate in each. |
+| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx` | F12, F16, F17 | F12: the "Can't be loaded" line. F16: the "Not supported yet" line ahead of it. F17: the virtualized listbox around both. |
+| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx` | F12, F16, F17 | F12: `DataCatalogInvalidNotice`. F16: `DataCatalogUnsupportedNotice`, the `isWorkspaceLoadable` guard on the invalid notice, and `!listing.isWorkspaceLoadable` in `isAddBlocked`. F17: the scrolling body, pinned foot, back button, and fact list. |
+| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx` | F12, F16, F17 | F12: column type state. F16: the `isWorkspaceLoadable` guard in `onAddToWorkspace`. F17: filters, facets, sort, layout, and the filter drawer. |
 
 ---
 
@@ -822,6 +829,93 @@ pnpm vitest run src/lib/openData src/views/DataManagerApp/DataImportView shared/
 pnpm test:db
 ava pipeline run socrata --local --limit 400   # maps, files, and links land with is_workspace_loadable false
 ```
+
+---
+
+## F17: Open data catalog browser
+
+**Purpose:** The Open data tab was a fixed 22 to 30rem bordered box holding
+one unfiltered list of every listing. It becomes a three-pane browser that
+fills the height and width of its host: a filter rail (search, source,
+format, last updated, hide unloadable), a virtualized results list with a
+live count, removable filter chips, and sort, and a detail pane whose "Add to
+workspace" is pinned at its foot. Facet counts are computed against every
+other active filter. Container queries fold the rail into a drawer, and then
+stack results and detail, so the same component fits the Import page and the
+Data Explorer's Open dataset modal, which grows to nearly full screen while
+the catalog shows. **Value:** A catalog of thousands is searchable and
+narrowable instead of a scroll, and its size and every filter's effect are
+visible at a glance.
+
+**PR title:** `feat(data-catalog): full-height catalog browser with filters and sort`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `da3f88cf5` | feat(data-catalog): full-height catalog browser with filters and sort | All of it. Regenerate the `.po` catalogs. |
+| `7c3b22068` | fix(data-catalog): paint the catalog to the view's edges instead of framing it | All of it |
+| `61499d842` | fix(data-catalog): show one pane at a time on phones | MIXED: only the three `DataCatalogView` stylesheets. The rest is F18. |
+| `76c3de1ab` | Merge branch 'demo/measles' of https://github.com/AvandarLabs/avandar into demo/measles | The F16 hunks it carried into `DataCatalogListingList.tsx` and `DataCatalogListingDetail.tsx`, which go with F16 or F17, whichever lands second. |
+| `c2055f851` | chore(data-catalog): translate the catalog browser copy and apply the pre-push formatter | MIXED: everything except the `DataManagerApp.tsx` reformat, which is F18. Regenerate the `.po` catalogs, then keep its hand-corrected `sw`, `zh-Hans`, `es`, `fr`, and `pt` strings. |
+
+**Files:** everything under
+`src/views/DataManagerApp/DataImportView/DataCatalogView/` except
+`DataCatalogInvalidNotice/`, `DataCatalogUnsupportedNotice/`,
+`useVerifyColumnTypesOnDwell/`, `readCatalogColumnsForAdding/`, and
+`buildOpenDataDatasetColumnInputs.ts`; `DataImportTabs/`,
+`DataImportView.tsx`; `AppViewBody.tsx` and its stylesheet (the
+`isFillHeight` prop and the `--ava-content-gutter` property);
+`OpenDatasetDrawer/OpenDatasetModal.tsx`, its stylesheet, and
+`ImportDatasetView.tsx`.
+
+**Verification:**
+```sh
+pnpm vitest run src/views/DataManagerApp src/views/DataExplorerApp src/components/layouts
+pnpm test:e2e csv-import.spec.ts
+pnpm test:e2e data-explorer-query-drawer.spec.ts
+pnpm test:e2e nux-first-milestone.spec.ts
+```
+Then open the Open data tab with a catalog of a few thousand listings at
+1440px, 1100px, and 390px wide, and in the Data Explorer's Open dataset
+modal.
+
+---
+
+## F18: Phone widths show one Data Sources pane at a time
+
+**Purpose:** Below 48em, Data Sources showed its dataset list beside the open
+page, leaving the page about 150px wide. The list now shows alone on the app's
+home while there are datasets, and any page under it (a dataset, the import
+flow) takes the full width. Separately, the slate was sized to a full viewport
+while `AppShell.Main` sits 30px down under the mobile header, so every phone
+view ran off the bottom edge. Main now publishes that offset as
+`--ava-shell-main-offset-top`, and the slate and Main's minimum height
+subtract it. **Value:** Phone layouts are readable, and the bottom of every
+app is on screen.
+
+**PR title:** `fix(layout): stack Data Sources panes on phones and keep the slate on screen`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `61499d842` | fix(data-catalog): show one pane at a time on phones | MIXED: `AppShell.tsx`, `AppSlate.tsx`, `DataManagerApp.tsx`, `DataManagerApp.module.css`, and `DatasetNavbar.tsx`. The `DataCatalogView` stylesheets are F17. |
+| `c2055f851` | chore(data-catalog): translate the catalog browser copy and apply the pre-push formatter | MIXED: only the `DataManagerApp.tsx` reformat. |
+
+**Files:** `src/components/AppShell/AppShell.tsx`,
+`src/components/layouts/AppSlate/AppSlate.tsx`,
+`src/views/DataManagerApp/DataManagerApp.tsx`,
+`DataManagerApp.module.css`, `DatasetNavbar/DatasetNavbar.tsx`.
+
+**Verification:**
+```sh
+pnpm vitest run src/components src/views/DataManagerApp
+pnpm test:e2e nux-first-milestone.spec.ts
+pnpm test:e2e gis-map-layers.spec.ts   # its narrow-screen case runs the mobile shell
+```
+Then open Data Sources at 390px wide: the home shows only the list, a dataset
+or Import data shows only the page, and the slate's bottom gutter is visible.
 
 ---
 
