@@ -4344,7 +4344,7 @@ msgstr "tableau de bord"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "You can still open the original, where it is published."
-msgstr ""
+msgstr "Vous pouvez toujours ouvrir l’original, là où il est publié."
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
@@ -5601,7 +5601,7 @@ msgstr "Outil"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 msgid "Not supported yet"
-msgstr ""
+msgstr "Pas encore pris en charge"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -8072,7 +8072,7 @@ msgstr "Période : {0}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Open it on {serviceName}"
-msgstr ""
+msgstr "Ouvrir sur {serviceName}"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -8090,7 +8090,7 @@ msgstr "Recommandé si vous disposez de 12 Go de RAM et souhaitez obtenir des "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Avandar can't add this kind of dataset yet."
-msgstr ""
+msgstr "Avandar ne peut pas encore ajouter ce type de jeu de données."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"

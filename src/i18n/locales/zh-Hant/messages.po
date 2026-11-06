@@ -4127,7 +4127,7 @@ msgstr "儀表板"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "You can still open the original, where it is published."
-msgstr ""
+msgstr "您仍可開啟其發布所在的原始內容。"
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
@@ -5335,7 +5335,7 @@ msgstr "工具"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 msgid "Not supported yet"
-msgstr ""
+msgstr "尚未支援"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -7701,7 +7701,7 @@ msgstr "時間範圍：{0}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Open it on {serviceName}"
-msgstr ""
+msgstr "在 {serviceName} 上開啟"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -7718,7 +7718,7 @@ msgstr "如果您有 12 GB RAM，且希望在離線狀態下獲得明顯更好�
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Avandar can't add this kind of dataset yet."
-msgstr ""
+msgstr "Avandar 目前尚無法新增此類資料集。"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"

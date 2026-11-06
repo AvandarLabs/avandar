@@ -4303,7 +4303,7 @@ msgstr "painel"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "You can still open the original, where it is published."
-msgstr ""
+msgstr "Você ainda pode abrir o original, onde ele está publicado."
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
@@ -5546,7 +5546,7 @@ msgstr "Ferramenta"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 msgid "Not supported yet"
-msgstr ""
+msgstr "Ainda não compatível"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -7994,7 +7994,7 @@ msgstr "Período: {0}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Open it on {serviceName}"
-msgstr ""
+msgstr "Abrir no {serviceName}"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -8012,7 +8012,7 @@ msgstr "Recomendado se você tiver 12 GB de RAM e quiser respostas de SQL "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Avandar can't add this kind of dataset yet."
-msgstr ""
+msgstr "O Avandar ainda não pode adicionar esse tipo de conjunto de dados."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
