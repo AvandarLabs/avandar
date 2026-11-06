@@ -1,0 +1,80 @@
+.avandarFilm {
+  background: var(--mantine-navbar-background);
+  box-sizing: border-box;
+  color: var(--mantine-color-text);
+  display: flex;
+  font-family: "Figtree Variable", Figtree, sans-serif;
+  gap: 0;
+  overflow: hidden;
+  padding: 8px 8px 34px;
+  position: relative;
+}
+
+.avandarFilm * {
+  box-sizing: border-box;
+}
+
+.avandarFilm *,
+.avandarFilm *::before,
+.avandarFilm *::after {
+  animation: none !important;
+  caret-color: transparent;
+  transition: none !important;
+}
+
+.videoNavbar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 4px;
+  padding-right: 8px;
+  width: 224px;
+}
+
+.videoNavbar a {
+  display: block;
+  text-decoration: none;
+}
+
+.videoSlate {
+  background: var(--ava-surface-body);
+  flex: 1;
+  min-width: 0;
+}
+
+.videoToolbar {
+  background: white;
+  border-bottom: 1px solid var(--mantine-color-neutral-2);
+  flex-shrink: 0;
+  height: 40px;
+}
+
+.videoAppContent {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.videoProvenance {
+  bottom: 9px;
+  color: white;
+  font-size: 12px;
+  left: 240px;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  position: absolute;
+}
+
+/* stylelint-disable-next-line selector-class-pattern -- .recharts-wrapper is Recharts' own class, not ours to rename */
+.avandarFilm .recharts-wrapper {
+  outline: none;
+}
+
+.avandarFilm .ag-row {
+  transition: none !important;
+}
+
+.avandarFilm .cm-cursor {
+  display: none !important;
+}

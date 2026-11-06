@@ -1,10 +1,10 @@
 ---
 name: avandar-code-review
-description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions. Also use for focused Auto reviews when the user says avandar-code-review followed by comments, files, naming, and/or tests (any subset, concatenatable).
+description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions. Reviews and fixes every violation autonomously. Also use for focused reviews when the user says avandar-code-review followed by comments, files, naming, and/or tests (any subset, concatenatable).
 metadata:
   author: jpsyx
-  version: "2.4.0"
-  tags: avandar, code-review, typescript, react, sql, conventions, style, comments, files, naming, tests
+  version: "3.0.0"
+  tags: avandar, code-review, typescript, react, sql, conventions, style, comments, files, naming, tests, architecture, code-smells
 ---
 
 # Avandar Code Review
@@ -16,6 +16,8 @@ general-checks sections, then only apply the language-specific and
 library-gated phases when the diff matches their gate. On a **focused
 review** (`comments`, `files`, `naming`, and/or `tests`), skip every
 phase and bullet outside the selected packs; see **Focused Reviews**.
+Every review fixes what it finds without stopping to ask; see **How The
+Review Runs**.
 
 ## Public Core And Repo-Local Rules
 
@@ -74,18 +76,6 @@ The actual repo-local checklist used during reviews lives at
 - When creating the repo-local file for the first time, use the packaged
   template from this skill as the starting structure.
 
-## Asking The User
-
-When this skill says "prompt with options", use the host agent's interactive
-menu tool if one is available, otherwise fall back to a plain-text question.
-Never error out because a menu tool is missing; just ask in chat.
-
-- Claude Code: call `AskUserQuestion` with the listed options.
-- Codex CLI or any other host without an interactive menu tool: write the
-  options as a numbered list in chat and wait for the user's reply.
-- If you are unsure whether a menu tool exists in the current host, default to
-  the plain-text fallback rather than guessing.
-
 ## Focused Reviews
 
 A focused review is a concatenatable subset of this skill. It still
@@ -119,27 +109,23 @@ Examples:
 
 If at least one pack token is present, this is a focused review:
 
-1. **Mode is Auto.** Do not prompt for Report / Auto / Pair Review, even
-   when the mode was otherwise unspecified. A conflicting mode word in
-   the same invocation is ignored; Auto wins.
-2. **Base branch follows Auto Mode's non-interactive default**
-   (`develop`, else `main`, else the repo's obvious trunk). Do not
-   prompt. If the user named a base branch explicitly, use that.
-3. **Skip every phase and every bullet that is not in the selected
+1. **Skip every phase and every bullet that is not in the selected
    packs.** That includes Most Common Mistakes and General Checks except
    the bullets listed below, every other language-specific phase, every
    library-gated phase, and the repo-local `extra-checklist.md` phases.
    Exclusive means exclusive.
-4. Still apply **Files To Skip**, **Review Scope** (`+` lines only), and
-   Auto Mode's **Finish protocol**. Re-verify only the selected packs.
-   Do not run `react-doctor` or any other phase that was not selected.
+2. Still apply **Base Branch Detection**, **Files To Skip**, **Review
+   Scope** (`+` lines only), and the **Finish protocol**. Re-verify only
+   the selected packs. Do not run `react-doctor` or any other phase that
+   was not selected.
 
-If no pack token is present, this is a full review. Follow **Review
-Modes** and **Review Order** as written.
+If no pack token is present, this is a full review. Follow **How The
+Review Runs** and **Review Order** as written.
 
-Unknown extra words that are not pack tokens, mode names, or an explicit
-base branch do not start a focused review on their own. Ignore them when
-at least one pack token is present.
+Unknown extra words that are not pack tokens or an explicit base branch
+do not start a focused review on their own. Ignore them, including the
+retired mode words `auto`, `report`, and `pair review`: the skill has
+only one way of running.
 
 ### Pack: `comments`
 
@@ -162,7 +148,8 @@ Apply **only**:
 - From `docs/code-reviews/typescript-checklist.md`, only the comment and
   docstring bullets: JSDoc for public classes and methods; comment and
   docstring lines at 80 characters or fewer; if a docstring fits on one
-  line within 80 characters, keep it single-line; all exported classes,
+  line within 80 characters, keep it single-line, without ever cutting
+  content to make it fit; all exported classes,
   objects, and functions need docstrings; if an exported object defines
   top-level methods inline, those methods need docstrings too; function
   docstrings should explain purpose and output, not interior
@@ -250,12 +237,14 @@ Apply **only**:
   assertion-free tests, observable-behavior assertions, placeholder
   tests, runtime assertions that restate the type system, e2e specs
   that write the behavior under test through the database instead of
-  the UI, `__tests__/` layout once a module has two or more test
-  files, and integration-test placement.
+  the UI, test files named after no module beside them, aspect labels on
+  a module's only test file, `__tests__/` layout once a module has two or
+  more test files, integration-test placement in a `__tests__/`
+  directory, and the `.integration` label on integration tests.
 
 This pack does not pull extra bullets from Most Common Mistakes,
 General Checks, or the TypeScript checklist. Running the tests
-themselves stays in Auto Mode's **Finish protocol**
+themselves stays in the **Finish protocol**
 ("Testing At The End Of Review"); this pack reviews test *code*.
 
 Do not apply comment rules, directory-module rules, identifier naming,
@@ -278,49 +267,22 @@ Fan-out uses the same threshold: fewer than 3 selected packs run
 inline; 3 or more selected packs fan out. Repo-local extra-checklist
 phases do **not** count (they do not run).
 
-## Review Modes
+## How The Review Runs
 
-If this is a focused review (see **Focused Reviews**), the mode is Auto.
-Do not prompt.
-
-If the mode is not specified in the prompt and this is not a focused
-review, prompt with options before any review work:
-
-- Question: "Which review mode?"
-- Header (Claude Code only): "Review mode"
-- Options:
-  - `Report`: write a paste-ready review, no edits
-  - `Auto`: fix violations as you find them
-  - `Pair Review`: discuss each finding before editing
-
-Do not default silently on a full review.
-
-### Report Mode
-
-Goal: a copy-pasteable review for GitHub, Slack, or another discussion surface.
-
-- Do not modify code.
-- Collect findings; report them ordered by severity with file and line refs.
-- Keep output concise, concrete, and ready to paste externally.
-
-### Auto Mode
-
-Goal: agent acts as reviewer and fixer, fully autonomously. `Auto` means
-**do everything**: fix every violation you find, and never stop to ask.
+Every review, full or focused, runs the same way. The agent acts as
+reviewer and fixer, fully autonomously: fix every violation you find, and
+never stop to ask.
 
 - **Fix every rule violation you find, without exception.** Apply a fix for
   every finding that survives verification, including the low-value,
   cosmetic, and high-churn ones (comment cleanups, naming, file moves,
   component splits, helper reuse, functional-style rewrites, etc.). "Low
-  value," "high churn," or "large refactor" is never a reason to skip a fix
-  in auto mode.
-- **Never ask the user anything in auto mode.** Do not ask whether to apply a
-  fix, do not ask the user to confirm your approach or how aggressive to be,
-  and do not defer anything as an optional "follow-up" for the user to
-  approve. There are no follow-ups in auto mode: if it breaks a rule, you fix
-  it now. The only thing you may resolve non-interactively is the base branch
-  (default to `develop`, else `main`, else the repo's obvious trunk), pick
-  it and proceed rather than prompting.
+  value," "high churn," or "large refactor" is never a reason to skip a fix.
+- **Never ask the user anything.** Do not ask whether to apply a fix, do not
+  ask the user to confirm your approach or how aggressive to be, and do not
+  defer anything as an optional "follow-up" for the user to approve. There
+  are no follow-ups: if it breaks a rule, you fix it now. Resolve the base
+  branch without prompting too (see **Base Branch Detection**).
 - Correctness is the top priority: when a fix is behavior-sensitive, make the
   change and prove it with the finish protocol below. Never trade correctness
   for coverage, but never skip a fix merely because it is risky: do it and
@@ -337,14 +299,14 @@ Goal: agent acts as reviewer and fixer, fully autonomously. `Auto` means
   not actually apply once checked. These are not "skipped" work; record each
   with a one-line reason. Everything else gets fixed.
 
-**Finish protocol (auto mode always runs this, in order, without asking):**
+**Finish protocol (every review runs this, in order, without asking):**
 
 1. Apply every fix.
 2. **Format.** If the repo defines a format script (e.g. a `format` entry in
    `package.json` such as `pnpm format`, or a documented formatter), run it
    once over the changed files.
 3. **Run completion validation.** Follow **Lint And Typecheck After Review**.
-   In auto mode, fix every lint and typecheck error in the repository,
+   Fix every lint and typecheck error in the repository,
    including errors outside the reviewed diff, then rerun both commands until
    they report zero errors.
 4. **Run the relevant tests** (see "Testing At The End Of Review") and get
@@ -356,38 +318,13 @@ Goal: agent acts as reviewer and fixer, fully autonomously. `Auto` means
    any other phase that was not selected. Loop back to step 1 if anything
    remains.
 
-**Exit bar for auto mode:** by the time you report, the repository must have
+**Exit bar:** by the time you report, the repository must have
 zero lint errors and zero typecheck errors, and no code-review rule may still
 be broken on the reviewed lines. End with a summary of what you fixed plus a
 short list of any verified false positives (with the reason each is not a real
 violation). The summary must NOT contain a
 "recommended follow-up" section that punts real rule violations back to the
-user; in auto mode there are none.
-
-### Pair Review Mode
-
-Goal: interactive review, user approves direction before edits.
-
-- Announce the current review phase before presenting its findings.
-- Review iteratively, one finding at a time.
-- For each finding: explain the issue, recommend a fix, then prompt with
-  options (see "Asking The User"):
-  - Question: "Apply the recommended fix?"
-  - Header (Claude Code only): "Apply fix?"
-  - Options:
-    - `Yes`: apply the recommended fix
-    - `No`: skip this finding and move on
-    - `Let's chat about this`: wait for the user's next message before
-      proceeding. Omit this option when the host provides an interactive
-      menu tool with a built-in free-text input (for example, Claude Code's
-      `AskUserQuestion`, which already exposes a "Type something" field).
-- Do not edit code for a finding until the user picks `Yes`.
-- If the user types a free-text reply instead of picking an option (either
-  via the host's built-in text input or via `Let's chat about this` when
-  that option is offered), stop and wait for input. Do not move on to the
-  next finding until the discussion resolves.
-- Stay inside the requested review scope.
-- After resolving one finding, continue to the next until the review is done.
+user; there are none.
 
 ## Base Branch Detection
 
@@ -395,27 +332,14 @@ Before computing any diff, determine the base branch:
 
 1. Run `git branch --show-current` to get the current (head) branch.
 2. If the user specified a base branch in their prompt, use it directly.
-3. If no base branch was specified, run `git branch` to list local branches,
-   then prompt with options (see "Asking The User"):
-   - Question: "Which branch should I diff against?"
-   - Header (Claude Code only): "Base branch"
-   - Options: up to 4 branches from `git branch` output (prioritise
-     `main`, `master`, `develop`, and the most recently checked-out
-     branches); always include an "Other" fallback so the user can type a
-     custom name.
+3. If no base branch was specified, pick `develop` if it exists, else
+   `main`, else the repo's obvious trunk, and proceed without prompting.
 4. Compute the diff with:
    ```
    git diff <base>...<head>
    ```
    The three-dot form diffs from the common ancestor, which is the correct
    scope for a feature or fix branch review.
-
-Never assume a default base branch on a full review that is not Auto.
-Always confirm with the user when it is not explicitly stated, except:
-
-- **Auto mode** (including every focused review) picks `develop` if it
-  exists, else `main`, else the repo's obvious trunk, and proceeds
-  without prompting.
 
 ## Files To Skip
 
@@ -452,16 +376,12 @@ modified by the author under review). Do not flag issues on context lines
 
 ## Review Order
 
-1. If this is a focused review, set mode to Auto and skip the mode prompt
-   (see **Focused Reviews**). Otherwise, if the mode was not specified,
-   prompt for it at the very start (see "Review Modes" for the interactive
-   menu spec).
-2. Determine the base branch and compute the diff (see **Base Branch
+1. Determine the base branch and compute the diff (see **Base Branch
    Detection** above). Extract the exact `+` line ranges per file; these
    are the only lines eligible for findings in every subsequent phase.
-3. Apply the **Files To Skip** filter above and narrow the diff to only
+2. Apply the **Files To Skip** filter above and narrow the diff to only
    reviewable files before doing anything else.
-4. Determine which phases fire for this diff, then execute the review
+3. Determine which phases fire for this diff, then execute the review
    using the **Execution Model With Sub-Agents** section below. Fan out
    to read-only find sub-agents when 3 or more phases fire; otherwise run
    the phases inline in this agent.
@@ -484,18 +404,11 @@ modified by the author under review). Do not flag issues on context lines
       point: run every phase it declares and every further ruleset it
       references (for example under `docs/code-reviews/references/`) as its
       own phase, in the order the file lists them.
-5. Follow the active review mode for how each finding is applied or
-   reported (see the Execution Model's Apply stage for how the three modes
-   differ).
-6. After all review findings have been reported or resolved, follow **Lint
-   And Typecheck After Review**, then run only the exact tests that are
-   relevant to the code changes.
-7. Report only concrete findings that are visible in the code under review.
-
-In pair review mode, announce the phase explicitly as you move through the
-review, for example: "Phase: comments", "Phase: TypeScript",
-"Phase: functional style", "Phase: `@avandar/utils`",
-"Phase: repo-local extra checklist".
+4. Fix every surviving finding (see the Execution Model's Apply stage).
+5. After all review findings have been fixed, follow **Lint And Typecheck
+   After Review**, then run only the exact tests that are relevant to the
+   code changes.
+6. Flag only concrete findings that are visible in the code under review.
 
 **Skipping phases is the rule, not the exception.** A diff that only
 touches SQL should not load the TypeScript, React, hooks, CSS, or any
@@ -584,6 +497,7 @@ below for a focused review.
 |------|--------------|------|
 | `common-and-general` | Most Common Mistakes + General Checks (this file) | full review (always) |
 | `comments-and-module` | comments + module hierarchy | full review; diff has `.ts`/`.tsx` |
+| `code-smells` | code-smells-checklist | full review; diff has `.ts`/`.tsx` |
 | `typescript` | typescript-checklist | full review; diff has `.ts`/`.tsx` |
 | `types` | types-checklist | full review; diff has `.ts`/`.tsx` |
 | `functional-style` | functional-style-checklist | full review; diff has `.ts`/`.tsx` |
@@ -635,6 +549,9 @@ finding from Stage 1, spawn an adversarial verifier whose job is to
   exception)?
 - Is the recommended alternative (a helper, a library util) actually
   present in this repo?
+- For an unneeded-cast finding, did the verifier delete the cast and run
+  the type checker? Settle it by the compiler's output, never by reading
+  the code: a clean type check confirms the finding.
 
 Default to refuted when uncertain. A finding survives only if the verifier
 cannot refute it. For high-severity findings, use three verifiers with
@@ -648,27 +565,21 @@ Collect the surviving findings in this orchestrator. Deduplicate overlaps
 by both `common-and-general` and `typescript`). Order by severity. This is
 a plain reasoning step; do not spawn a sub-agent for it.
 
-#### Stage 4: Apply (serial, orchestrator, mode-dependent)
+#### Stage 4: Apply (serial, orchestrator)
 
 Only the orchestrator edits, only here, one file at a time. Sub-agents
 edited nothing, so there is no write contention.
 
-- **Report mode:** do not apply. Output the merged findings ordered by
-  severity, per **Review Output**.
-- **Auto mode:** apply **every** surviving fix (never defer one as a
-  follow-up), grouped by file, then run the auto-mode **Finish protocol**
-  defined under "Auto Mode" (format → lint and typecheck with zero errors →
-  targeted tests → re-verify no reviewed line still breaks a rule). Do not ask
-  the user anything.
-- **Pair Review mode:** present the merged findings one at a time for
-  approval (per **Pair Review Mode**), and apply each approved fix serially
-  before moving to the next.
+Apply **every** surviving fix (never defer one as a follow-up), grouped by
+file, then run the **Finish protocol** defined under "How The Review Runs"
+(format → lint and typecheck with zero errors → targeted tests → re-verify
+no reviewed line still breaks a rule). Do not ask the user anything.
 
 ### Inline Fallback
 
 When fewer than 3 phases fire, skip the sub-agents entirely. Run the firing
-phases in this agent, in the order given in **Review Order**, and handle
-each finding per the active mode. Everything else in this skill (gates,
+phases in this agent, in the order given in **Review Order**, and fix
+each finding as in Stage 4. Everything else in this skill (gates,
 scope, Files To Skip, testing, output) applies unchanged.
 
 ## Testing At The End Of Review
@@ -715,27 +626,13 @@ the targeted tests. Inspect the repo's `package.json` `scripts` object first:
    denotes type checking (for example `type-check` or `check-types`). Run it
    as `pnpm <script-name>`. Do not invent a typecheck command or run a
    compiler directly when no typecheck script exists.
-3. Address the results according to the active review mode, then rerun every
-   command that was run so the final result is current.
+3. Fix **all** lint and typecheck errors reported, whether or not they are
+   in the reviewed changeset, then rerun every command that was run so the
+   final result is current. Continue until every command run reports zero
+   errors. There are no pre-existing-error exceptions.
 
-Mode-specific scope:
-
-- **Report mode:** do not edit code. Report only lint and typecheck errors
-  attributable to the reviewed changes; unrelated pre-existing errors are out
-  of scope for the report.
-- **Pair Review mode (collaborate mode):** present only errors attributable to
-  the reviewed changes for the user's approval, then fix approved errors.
-  Unrelated pre-existing errors remain out of scope.
-- **Auto mode:** fix **all** lint and typecheck errors reported, whether or
-  not they are in the reviewed changeset. Continue until every command run
-  reports zero errors. There are no pre-existing-error exceptions in auto
-  mode.
-
-In auto mode, if `pnpm lint` runs, its final result must contain zero lint
-errors. If a typecheck script runs, its final result must contain zero
-typecheck errors. Report and Pair Review modes must resolve or report every
-validation error attributable to the reviewed changes, without taking
-unrelated errors into scope.
+If `pnpm lint` runs, its final result must contain zero lint errors. If a
+typecheck script runs, its final result must contain zero typecheck errors.
 
 ## Most Common Mistakes
 
@@ -957,8 +854,9 @@ SKILL file.
 - **Reference:**
   [`docs/code-reviews/types-checklist.md`](docs/code-reviews/types-checklist.md)
 - **Covers:** type declarations, assertions and escape hatches (`any`,
-  `as unknown as T`), absence (`undefined` vs. `null`), literal unions, and
-  readonly/variance contracts.
+  `as unknown as T`, and any `as T` cast the type checker does not need),
+  absence (`undefined` vs. `null`), literal unions, and readonly/variance
+  contracts.
 
 ### Phase: functional style
 
@@ -979,6 +877,18 @@ SKILL file.
 - **Focused review:** this phase is the core of the `files` pack. See
   **Focused Reviews** for the extra file-layout bullets pulled from
   General Checks and the TypeScript checklist.
+
+### Phase: code smells
+
+- **Gate:** the diff includes at least one `.ts` or `.tsx` file.
+- **Reference:**
+  [`docs/code-reviews/code-smells-checklist.md`](docs/code-reviews/code-smells-checklist.md)
+- **Covers:** logical and architectural antipatterns, such as a one-off
+  integration between two modules routed through a bridge/adapter
+  mounted on a shared, global, or app-root component instead of a
+  direct dependency between the two modules that actually need each
+  other. This phase judges *where logic lives and why*, never naming,
+  file layout, or syntax shape.
 
 ### Phase: React components
 
@@ -1043,7 +953,8 @@ SKILL file.
   guarantees, and — for **e2e tests only** — direct database writes that
   perform the behavior under test instead of driving it through the UI (direct
   writes are for seeding preconditions before page load, teardown, bypassing
-  slow/external systems, or read-only oracles).
+  slow/external systems, or read-only oracles), and test file names and
+  `__tests__/` placement.
 
 ## Library-Gated Phases
 
@@ -1143,15 +1054,11 @@ sub-checklist file.
 
 ## Review Output
 
-- In report mode, report findings first, ordered by severity, with file and
-  line references, in a format that can be pasted into GitHub or Slack.
-- In auto mode, summarize the fixes you applied and confirm the exit bar was
-  met (zero lint and typecheck errors; no reviewed line still breaks a rule).
-  The only list you may include is **verified false positives**, each with a
-  one-line reason. Do NOT list "remaining findings" or "recommended
-  follow-ups" that are real rule violations or validation errors left unfixed:
-  auto mode fixes them all.
-- In pair review mode, present one finding at a time with the recommended fix
-  and wait for user approval before changing code.
+- Summarize the fixes you applied and confirm the exit bar was met (zero
+  lint and typecheck errors; no reviewed line still breaks a rule). The only
+  list you may include is **verified false positives**, each with a one-line
+  reason. Do NOT list "remaining findings" or "recommended follow-ups" that
+  are real rule violations or validation errors left unfixed: every review
+  fixes them all.
 - Skip sections that are not relevant to the diff.
 - If there are no findings, say that explicitly.

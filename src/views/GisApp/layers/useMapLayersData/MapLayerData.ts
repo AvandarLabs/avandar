@@ -1,6 +1,8 @@
 import { propEq } from "@avandar/utils";
+import { match } from "ts-pattern";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 
@@ -42,8 +44,60 @@ function _getBufferSourceQueryKey(
   };
 }
 
+function _hasColumnIdFilterTargets(
+  filters: StructuredQuery.FilterGroup,
+): boolean {
+  return filters.rules.every((node) => {
+    return match(node)
+      .with({ type: "group" }, _hasColumnIdFilterTargets)
+      .with({ type: "rule" }, (rule) => {
+        return typeof rule.columnId === "string";
+      })
+      .exhaustive();
+  });
+}
+
+function _hasReadySourceFilters(layer: MapLayer.T): boolean {
+  const { filters, having, sourceColumns } = layer.source;
+  return (
+    (filters.rules.length === 0 && having.rules.length === 0) ||
+    (sourceColumns !== undefined &&
+      _hasColumnIdFilterTargets(filters) &&
+      _hasColumnIdFilterTargets(having))
+  );
+}
+
 /** Queryability and cache-key helpers for map-layer data. */
 export const MapLayerData = {
+  /**
+   * True when the filters and having clauses of this layer, and of each layer
+   * it buffers, are hydrated, with every rule targeting a column ID. Check it
+   * before running a layer's SQL, for example to hold a layer's data query or
+   * the time slider's extent until saved filters can apply. Missing sources
+   * and cycles return true, so the compiler can report them.
+   */
+  hasReadySourceFilters: ({
+    layer,
+    stack,
+  }: Readonly<{
+    layer: MapLayer.T;
+    stack: readonly MapLayer.T[];
+  }>): boolean => {
+    const visited = new Set<MapLayer.Id>();
+    let current: MapLayer.T | undefined = layer;
+    while (current && !visited.has(current.id)) {
+      if (!_hasReadySourceFilters(current)) {
+        return false;
+      }
+      visited.add(current.id);
+      current =
+        current.geoBinding?.type === "bufferOfLayer"
+          ? stack.find(propEq("id", current.geoBinding.layerId))
+          : undefined;
+    }
+    return true;
+  },
+
   /**
    * True when the layer can compile: a resolvable binding, or a buffer whose
    * source is on the stack.

@@ -1,8 +1,11 @@
+import { t } from "@lingui/core/macro";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { createOfflineChatEngine } from "@/stores/OfflineChatEngineStore/createOfflineChatEngine/createOfflineChatEngine";
 import { deleteLocalChatModelCache } from "@/stores/OfflineChatEngineStore/deleteLocalChatModelCache/deleteLocalChatModelCache";
 import type { OfflineChatEngine } from "$/types/offlineChat.types";
+import type { JobId } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 
 export type OfflineChatManagerStatus =
   | { kind: "idle" }
@@ -33,6 +36,8 @@ class OfflineChatEngineStoreImpl {
   private listeners = new Set<Listener>();
   private engine: OfflineChatEngine | undefined;
   private loadedModelId: LocalChatModel.Id | undefined;
+  /** Tracks the in-flight download's entry in {@link JobProgressStore}. */
+  private downloadJobId: JobId | undefined;
 
   /** Subscribes to status changes and immediately emits the current status. */
   subscribe(listener: Listener): () => void {
@@ -66,6 +71,11 @@ class OfflineChatEngineStoreImpl {
       modelId,
       progress: 0,
     });
+
+    const label = t`Downloading offline chat model`;
+    const detail = t`Do not refresh or close this tab or else the download will be canceled.`;
+    this.downloadJobId = JobProgressStore.startJob(label, { detail });
+
     const engine = createOfflineChatEngine({
       modelId,
       onDownloadProgress: (report) => {
@@ -74,6 +84,18 @@ class OfflineChatEngineStoreImpl {
           modelId,
           progress: report.progress,
         });
+        if (this.downloadJobId !== undefined) {
+          const percent = Math.round(
+            Math.min(1, Math.max(0, report.progress)) * 100,
+          );
+          JobProgressStore.updateJob(this.downloadJobId, {
+            status: "determinate",
+            label,
+            current: percent,
+            total: 100,
+            detail,
+          });
+        }
       },
     });
     try {
@@ -82,6 +104,7 @@ class OfflineChatEngineStoreImpl {
       this.loadedModelId = modelId;
       LocalChatModelStore.markDownloaded(modelId);
       this.setStatus({ kind: "ready", modelId });
+      this._finishDownloadJob();
       return engine;
     } catch (error) {
       this.engine = undefined;
@@ -89,7 +112,24 @@ class OfflineChatEngineStoreImpl {
       const message =
         error instanceof Error ? error.message : "Failed to load offline model";
       this.setStatus({ kind: "error", modelId, message });
+      this._failDownloadJob(message);
       throw error;
+    }
+  }
+
+  /** Finishes the tracked download job. No-op if none is live. */
+  private _finishDownloadJob(): void {
+    if (this.downloadJobId !== undefined) {
+      JobProgressStore.finishJob(this.downloadJobId);
+      this.downloadJobId = undefined;
+    }
+  }
+
+  /** Fails the tracked download job, if one is still live. No-op otherwise. */
+  private _failDownloadJob(message: string): void {
+    if (this.downloadJobId !== undefined) {
+      JobProgressStore.failJob(this.downloadJobId, message);
+      this.downloadJobId = undefined;
     }
   }
 
@@ -108,6 +148,10 @@ class OfflineChatEngineStoreImpl {
       "modelId" in this.status &&
       this.status.modelId === modelId
     ) {
+      // The model being deleted was still mid-download (not yet resident, so
+      // the `unload()` above was skipped): close out its job so it doesn't
+      // linger in the floating panel.
+      this._finishDownloadJob();
       this.setStatus({ kind: "idle" });
     }
   }
@@ -119,6 +163,10 @@ class OfflineChatEngineStoreImpl {
     }
     this.engine = undefined;
     this.loadedModelId = undefined;
+    // A download can be interrupted mid-flight (switching models, deleting
+    // the one downloading, tearing down in a test); close out its job so it
+    // doesn't linger in the floating panel after the engine stops tracking it.
+    this._finishDownloadJob();
     if (this.status.kind !== "idle") {
       this.setStatus({ kind: "idle" });
     }

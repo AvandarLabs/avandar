@@ -62,7 +62,7 @@ msgstr "1 group"
 msgid "Numbers in prose"
 msgstr "Numbers in prose"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort by"
 msgstr "Sort by"
 
@@ -128,8 +128,8 @@ msgid "Name this case type and say where its fields come from. Map columns from 
 msgstr "Name this case type and say where its fields come from. Map columns "
 "from existing datasets, or add fields to fill in by hand."
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Value column"
 msgstr "Value column"
 
@@ -285,7 +285,7 @@ msgstr "HAVING compares \"{columnName}\" against a non-literal expression."
 msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "UNION/INTERSECT/EXCEPT is not supported in the form."
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "Chart settings"
@@ -506,7 +506,7 @@ msgid "Individual locations will be drawn on the map, and suppressed areas will 
 msgstr "Individual locations will be drawn on the map, and suppressed areas "
 "will show their real counts. Continue?"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Aggregations"
 msgstr "Aggregations"
 
@@ -1174,8 +1174,8 @@ msgstr "Oops!"
 msgid "Dataset saved."
 msgstr "Dataset saved."
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "There are no numeric columns"
 msgstr "There are no numeric columns"
 
@@ -1572,8 +1572,8 @@ msgstr "Liberty"
 msgid "SQL is empty."
 msgstr "SQL is empty."
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Name column"
 msgstr "Name column"
 
@@ -1987,7 +1987,7 @@ msgstr "Open Data"
 msgid "Radius"
 msgstr "Radius"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Sort & limit"
 
@@ -2263,8 +2263,8 @@ msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 msgstr "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 "<2>{avg}</2>{0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "No columns are available"
 msgstr "No columns are available"
 
@@ -2633,9 +2633,9 @@ msgstr "Generate a query to configure this visualization."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
@@ -2689,7 +2689,8 @@ msgstr "Each series is a numeric column plotted on the Y axis. Values are "
 msgid "Filled in by hand"
 msgstr "Filled in by hand"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
 msgid "Some filters were removed"
 msgstr "Some filters were removed"
 
@@ -3006,7 +3007,7 @@ msgstr "You can't save to a dashboard until you've run a query."
 msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
 msgstr "You are currently on the <0>{currentFeaturePlanName}</0> plan."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Result size"
 msgstr "Result size"
 
@@ -3149,6 +3150,11 @@ msgstr "Press Space or Enter to start dragging. Use the arrow keys to move the "
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Grid shape"
 msgstr "Grid shape"
+
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+msgid "Failed to save dashboard: {0}"
+msgstr "Failed to save dashboard: {0}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish"
@@ -3841,6 +3847,11 @@ msgstr "Checkout Successful!"
 msgid "Answered"
 msgstr "Answered"
 
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {0} records…"
+msgstr "Refreshing {0} records…"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
 msgstr "Straight"
@@ -3888,7 +3899,7 @@ msgstr "Preview:"
 msgid "Background"
 msgstr "Background"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
+#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
 msgstr "Select your plan"
 
@@ -3902,10 +3913,6 @@ msgstr "Dataset name must be under {maxDatasetNameLength} characters (current: "
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "4258 - ETRS89"
 msgstr "4258 - ETRS89"
-
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Preparing model files…"
-msgstr "Preparing model files…"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
@@ -4129,7 +4136,7 @@ msgstr "Save to dashboard"
 msgid "Added"
 msgstr "Added"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Label type"
 msgstr "Label type"
 
@@ -4555,10 +4562,6 @@ msgstr "Delete this workspace"
 msgid "Edit {name}"
 msgstr "Edit {name}"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
-msgid "Column name (must match SQL)"
-msgstr "Column name (must match SQL)"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
 msgstr "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
@@ -4588,10 +4591,6 @@ msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from 
 "the 8 GB tier."
 msgstr "Stronger reasoning than 1.5B with a moderate download. Good step up "
 "from the 8 GB tier."
-
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Starting…"
-msgstr "Starting…"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
@@ -4908,7 +4907,7 @@ msgstr "Add a field filled in by hand"
 msgid "Upgrade plan"
 msgstr "Upgrade plan"
 
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Do not refresh or close this tab or else the download will be canceled."
 msgstr "Do not refresh or close this tab or else the download will be canceled."
 
@@ -4953,9 +4952,9 @@ msgid "Llama 3.2 1B (offline)"
 msgstr "Llama 3.2 1B (offline)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "Series"
@@ -5188,6 +5187,11 @@ msgstr "Share summary"
 msgid "Time"
 msgstr "Time"
 
+#. placeholder {0}: entry.label
+#: src/components/JobProgressPanel/JobProgressIndicator.tsx
+msgid "Dismiss {0}"
+msgstr "Dismiss {0}"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is false"
 msgstr "is false"
@@ -5215,6 +5219,10 @@ msgstr "Dataset added"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
 msgstr "Optional"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Syncing dataset online"
+msgstr "Syncing dataset online"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
@@ -5255,10 +5263,6 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
-msgid "Sync records"
-msgstr "Sync records"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -5679,6 +5683,10 @@ msgstr "Empty"
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
 msgstr "All"
+
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Downloading offline chat model"
+msgstr "Downloading offline chat model"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -6163,7 +6171,7 @@ msgstr "about {0} minutes"
 msgid "Select columns to query"
 msgstr "Select columns to query"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Donut style"
 msgstr "Donut style"
 
@@ -6556,11 +6564,6 @@ msgstr "The layer's query failed. This usually means the dataset has changed or 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
 msgstr "Your name"
-
-#. placeholder {0}: modelCopy.displayName
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Downloading {0} for offline chat"
-msgstr "Downloading {0} for offline chat"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Disputed status column"
@@ -7060,6 +7063,10 @@ msgstr "The owner always has admin access. To change owner, use the {resource} "
 msgid "Loading datasets…"
 msgstr "Loading datasets…"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {conceptName} records…"
+msgstr "Refreshing {conceptName} records…"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
 msgid "Loading private resources"
 msgstr "Loading private resources"
@@ -7080,6 +7087,11 @@ msgstr "Smallest radius"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "Access denied"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Refresh {0} records"
+msgstr "Refresh {0} records"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "join key"
@@ -7180,7 +7192,7 @@ msgstr "Dataset"
 msgid "All decisions"
 msgstr "All decisions"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Show labels"
 msgstr "Show labels"
 
@@ -7275,7 +7287,7 @@ msgstr "Remove condition"
 msgid "Open case type"
 msgstr "Open case type"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Percent"
 msgstr "Percent"
 
@@ -7440,6 +7452,11 @@ msgstr "Edit permissions"
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox.tsx
 msgid "queried"
 msgstr "queried"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
+msgid "They referenced columns this data source does not have."
+msgstr "They referenced columns this data source does not have."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "{conceptName} fields"
@@ -7695,7 +7712,7 @@ msgstr "Time window: {0}"
 msgid "Coordinate is outside the valid range"
 msgstr "Coordinate is outside the valid range"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Filters (Where)"
 msgstr "Filters (Where)"
 
@@ -8172,12 +8189,6 @@ msgstr "Edit role group"
 msgid "Profiles"
 msgstr "Profiles"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-msgid "They referenced columns this data source does not have: "
-"{removedColumnNames}"
-msgstr "They referenced columns this data source does not have: "
-"{removedColumnNames}"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
 msgstr "Update & republish"
@@ -8363,7 +8374,7 @@ msgstr "Avandar is still in beta. Some features may not work as expected and "
 msgid "Thank you for your interest!"
 msgstr "Thank you for your interest!"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
@@ -8439,7 +8450,7 @@ msgstr "Point geometry"
 msgid "Let's move these results to a dashboard"
 msgstr "Let's move these results to a dashboard"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Value"
 msgstr "Value"
@@ -8476,10 +8487,6 @@ msgstr "Graduated"
 msgid "Please try again. Your dashboard is still published."
 msgstr "Please try again. Your dashboard is still published."
 
-#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "Syncing dataset online..."
-msgstr "Syncing dataset online..."
-
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "Add a series to choose which numeric column drives the chart."
@@ -8490,6 +8497,7 @@ msgid "Geometry column"
 msgstr "Geometry column"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterFieldSelector/FilterFieldSelector.tsx
 msgid "Column"
@@ -8824,8 +8832,8 @@ msgstr "100,000"
 msgid "Delete {0}"
 msgstr "Delete {0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Slice colors"
 msgstr "Slice colors"
 

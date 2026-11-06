@@ -1,29 +1,22 @@
-import { makeObject, prop, setValue } from "@avandar/utils";
-import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
+import { Model } from "@avandar/models";
+import { setValue } from "@avandar/utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import {
-  applyVizConfigFromQueryResult,
-  isVizConfigEqualForQueryResultSync,
-} from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import {
   applyQueryChange,
   isSameColumnSchema,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
-import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
+import { DataExplorerSourceActions } from "./DataExplorerSourceActions";
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
-import type {
-  VizConfig,
-  VizConfigRegistry,
-  VizType,
-} from "$/models/vizs/VizConfig/VizConfig.types";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
@@ -45,50 +38,7 @@ export const DataExplorerStateManager = createAppStateManager({
   name: "DataExplorer",
   initialState: initialDataExplorerState,
   actions: {
-    /** Set the data source for the query. */
-    setDataSource: (
-      state: DataExplorerAppState,
-      payload: {
-        dataSource: QueryDataSource | undefined;
-        options?: { limit?: number };
-      },
-    ) => {
-      const { dataSource, options } = payload;
-      const newQuery = applyDefaultManualQueryLimit({
-        ...state.query,
-        dataSource,
-        ...(options?.limit !== undefined ? { limit: options.limit } : {}),
-      } as StructuredQuery.Partial);
-      return applyQueryChange({ state, newQuery });
-    },
-
-    /** Set the columns for the query. */
-    setColumns: (
-      state: DataExplorerAppState,
-      columns: readonly QueryColumn.T[],
-    ) => {
-      const {
-        query: { aggregations },
-      } = state;
-      const newColumnIds = columns.map(prop("id"));
-      const newAggregations = makeObject(newColumnIds, {
-        valueFn: (colId) => {
-          // if this column already had an aggregation we keep it
-          return aggregations[colId] ?? "none";
-        },
-      });
-      const newQuery = {
-        ...state.query,
-        queryColumns: columns,
-        aggregations: newAggregations,
-      } as StructuredQuery.Partial;
-      const newVizConfig = VizConfigs.hydrateFromQuery(
-        state.vizConfig,
-        newQuery,
-      );
-      const next = applyQueryChange({ state, newQuery });
-      return { ...next, vizConfig: newVizConfig };
-    },
+    ...DataExplorerSourceActions,
 
     /** Set the aggregation for a specific column */
     setColumnAggregation: (
@@ -116,7 +66,7 @@ export const DataExplorerStateManager = createAppStateManager({
         queryColumns: newQueryColumns,
         aggregations: newAggregations,
       } as StructuredQuery.Partial;
-      const newVizConfig = VizConfigs.hydrateFromQuery(vizConfig, newQuery);
+      const newVizConfig = AvaVizConfigs.hydrateFromQuery(vizConfig, newQuery);
       const next = applyQueryChange({ state, newQuery });
       return { ...next, vizConfig: newVizConfig };
     },
@@ -124,7 +74,7 @@ export const DataExplorerStateManager = createAppStateManager({
     /** Set the column that we are ordering by. */
     setOrderByColumn: (
       state: DataExplorerAppState,
-      columnId: QueryColumnId | undefined,
+      columnId: QueryColumn.Id | undefined,
     ) => {
       const newQuery = {
         ...state.query,
@@ -185,6 +135,15 @@ export const DataExplorerStateManager = createAppStateManager({
       return {
         ...state,
         query: payload.query,
+        sourceCatalog: payload.query.sourceColumns
+          ? {
+              sourceKey: payload.query.dataSource
+                ? Model.getTypedId(payload.query.dataSource)
+                : undefined,
+              status: "ready",
+              columns: payload.query.sourceColumns,
+            }
+          : state.sourceCatalog,
         isStructuredQueryInSync: payload.isFullyMapped,
         sqlSyncWarnings: payload.unmappedReasons,
       };
@@ -203,32 +162,29 @@ export const DataExplorerStateManager = createAppStateManager({
      * Activates a visualization type while preserving its most recent config.
      * Returns state with a restored or hydrated config for the selected type.
      */
-    setActiveVizType: (state: DataExplorerAppState, newVizType: VizType) => {
-      const { vizConfig, query, rawSql, vizConfigMemory, lastResultColumns } =
-        state;
+    setActiveVizType: (
+      state: DataExplorerAppState,
+      newVizType: AvaVizConfig.Type,
+    ) => {
+      const { vizConfig, query, vizConfigMemory, lastResultColumns } = state;
 
       if (vizConfig.vizType === newVizType) {
         return state;
       }
 
       const rememberedVizConfig = vizConfigMemory[newVizType];
+      const initialVizConfig =
+        rememberedVizConfig ??
+        AvaVizConfigs.convertVizConfig(vizConfig, newVizType);
       const nextVizConfig =
-        rememberedVizConfig === undefined
-          ? VizConfigs.hydrateFromQuery(
-              VizConfigs.convertVizConfig(vizConfig, newVizType),
-              query,
+        lastResultColumns !== undefined
+          ? AvaVizConfigs.hydrateFromQueryResult(
+              initialVizConfig,
+              lastResultColumns,
             )
-          : // Without results there is nothing to reconcile against, so the
-            // remembered config stands as-is until `syncVizFromQueryResult`
-            // runs.
-            lastResultColumns === undefined
-            ? rememberedVizConfig
-            : applyVizConfigFromQueryResult({
-                vizConfig: rememberedVizConfig,
-                rawSql,
-                query,
-                columns: lastResultColumns,
-              });
+          : rememberedVizConfig === undefined && state.isStructuredQueryInSync
+            ? AvaVizConfigs.hydrateFromQuery(initialVizConfig, query)
+            : initialVizConfig;
 
       // TypeScript widens the computed union key to `string` and so cannot see
       // that `vizConfig` lands under its own `vizType`. The key is taken from
@@ -236,40 +192,60 @@ export const DataExplorerStateManager = createAppStateManager({
       const nextVizConfigMemory = {
         ...vizConfigMemory,
         [vizConfig.vizType]: vizConfig,
-      } as Partial<VizConfigRegistry>;
+      } as Partial<AvaVizConfig.Registry>;
 
       return {
         ...state,
         vizConfig: nextVizConfig,
         vizConfigMemory: nextVizConfigMemory,
+        pendingUrlVizConfig: undefined,
       };
     },
 
     /**
-     * Clears axis keys missing from the latest result columns and applies
-     * `hydrateFromQueryResult` when `shouldHydrateVizFromQueryResult` is true.
+     * Holds a chart config restored from the URL until a query result can bind
+     * its `QueryResult` column names to column IDs. Shows an empty chart of the
+     * restored type meanwhile.
+     */
+    restoreVizConfigFromUrl: (
+      state: DataExplorerAppState,
+      urlVizConfig: UiVizConfig,
+    ): DataExplorerAppState => {
+      return {
+        ...state,
+        vizConfig: AvaVizConfigs.makeEmptyConfig(urlVizConfig.vizType),
+        pendingUrlVizConfig: urlVizConfig,
+      };
+    },
+
+    /**
+     * Seeds unconfigured slots from the result's columns and preserves owned
+     * selections while their `QueryResult` column is unavailable. A chart
+     * config restored from the URL is first bound to these columns by
+     * `QueryResult` column name.
      */
     syncVizFromQueryResult: (
       state: DataExplorerAppState,
-      columns: readonly QueryResultColumn[],
+      columns: readonly QueryResult.ColumnWithId[],
     ) => {
-      const next = applyVizConfigFromQueryResult({
-        vizConfig: state.vizConfig,
-        rawSql: state.rawSql,
-        query: state.query,
+      const { pendingUrlVizConfig } = state;
+      const next = AvaVizConfigs.hydrateFromQueryResult(
+        pendingUrlVizConfig
+          ? AvaVizConfigs.makeFromUiVizConfig({
+              config: pendingUrlVizConfig,
+              columns: columns,
+            }).config
+          : state.vizConfig,
         columns,
-      });
+      );
 
       const columnsChanged = !isSameColumnSchema({
         previousColumns: state.lastResultColumns,
         currentColumns: columns,
       });
-      const vizConfigChanged = !isVizConfigEqualForQueryResultSync(
-        next,
-        state.vizConfig,
-      );
+      const vizConfigChanged = !AvaVizConfigs.isEqual(next, state.vizConfig);
 
-      if (!columnsChanged && !vizConfigChanged) {
+      if (!columnsChanged && !vizConfigChanged && !pendingUrlVizConfig) {
         return state;
       }
 
@@ -277,12 +253,51 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state,
         ...(vizConfigChanged ? { vizConfig: next } : {}),
         ...(columnsChanged ? { lastResultColumns: columns } : {}),
+        pendingUrlVizConfig: undefined,
       };
     },
 
-    setVizConfig: (state: DataExplorerAppState, vizConfig: VizConfig) => {
+    /**
+     * Stores the column bindings of the latest bound query result, which the
+     * next result is bound from and "Save to dashboard" saves with the chart.
+     * Chart configs on provisional SQL column IDs move to the IDs these
+     * bindings give the same expressions.
+     */
+    setColumnBindings: (
+      state: DataExplorerAppState,
+      columnBindings: QueryResultColumnBindingRegistry,
+    ) => {
+      const previous = state.columnBindings;
+      if (!previous) {
+        return { ...state, columnBindings };
+      }
+      const vizConfig = AvaVizConfigs.remapProvisionalColumnIds({
+        config: state.vizConfig,
+        previous: previous,
+        current: columnBindings,
+      });
+      const vizConfigMemory = Object.fromEntries(
+        Object.entries(state.vizConfigMemory).map(([type, config]) => {
+          return [
+            type,
+            AvaVizConfigs.remapProvisionalColumnIds({
+              config: config,
+              previous: previous,
+              current: columnBindings,
+            }),
+          ];
+        }),
+      ) as Partial<AvaVizConfig.Registry>;
+      return { ...state, columnBindings, vizConfig, vizConfigMemory };
+    },
+
+    /** Applies an explicit chart edit, replacing any URL-restored chart. */
+    setVizConfig: (state: DataExplorerAppState, vizConfig: AvaVizConfig.T) => {
       // fill in the defaults
-      return setValue(state, "vizConfig", vizConfig);
+      return {
+        ...setValue(state, "vizConfig", vizConfig),
+        pendingUrlVizConfig: undefined,
+      };
     },
 
     setRawSql: (state: DataExplorerAppState, rawSql: string | undefined) => {
@@ -301,6 +316,7 @@ export const DataExplorerStateManager = createAppStateManager({
       return {
         ...state,
         rawSql: rawSql,
+        lastResultColumns: undefined,
         isStructuredQueryInSync: false,
         sqlSyncWarnings: state.sqlSyncWarnings,
       };

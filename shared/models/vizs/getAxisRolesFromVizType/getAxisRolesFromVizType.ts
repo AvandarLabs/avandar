@@ -1,4 +1,4 @@
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.ts";
 
 /**
  * Which kind of scale an axis uses. Minimum, maximum, and tick interval
@@ -37,9 +37,9 @@ const AXIS_ROLES_BY_VIZ_TYPE = {
   pie: NEITHER,
   funnel: NEITHER,
   table: NEITHER,
-} as const satisfies Record<VizConfig.Type, AxisRoles>;
+} as const satisfies Record<AvaVizConfig.Type, AxisRoles>;
 
 /** Returns the X and Y axis roles for a visualization type. */
-export function getAxisRolesFromVizType(vizType: VizConfig.Type): AxisRoles {
+export function getAxisRolesFromVizType(vizType: AvaVizConfig.Type): AxisRoles {
   return { ...AXIS_ROLES_BY_VIZ_TYPE[vizType] };
 }

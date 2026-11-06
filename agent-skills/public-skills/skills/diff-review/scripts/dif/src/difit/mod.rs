@@ -1,6 +1,7 @@
 //! The difit integration: comment shapes + conversion, the transcript file,
 //! spawning the server, and the background poller.
 
+pub mod editor;
 pub mod importer;
 pub mod imports;
 pub mod poller;

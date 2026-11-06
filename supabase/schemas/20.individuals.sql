@@ -19,7 +19,11 @@ create table public.individuals (
   -- individuals.
   assigned_to uuid references auth.users (id) on update cascade on delete no action,
   -- Status of the individual
-  status text not null,
+  status text not null default 'active',
+  -- Set when this individual's external_id stops appearing in any source
+  -- dataset on a sync. Clear the timestamp if it reappears. NULL means it
+  -- is present.
+  missing_from_source_at timestamptz,
   -- Unique constraint to ensure one external_id per concept
   constraint individuals__concept_external_id_unique unique (concept_id, external_id)
 );

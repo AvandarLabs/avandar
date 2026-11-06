@@ -23,6 +23,7 @@ const DBReadSchema = z.object({
   concept_id: z.uuid(),
   external_id: z.string(),
   id: z.uuid(),
+  missing_from_source_at: z.iso.datetime({ offset: true }).nullable(),
   name: z.string(),
   status: z.string(),
   updated_at: z.iso.datetime({ offset: true }),
@@ -47,12 +48,12 @@ export const IndividualParsers = makeParserRegistry<IndividualModel>().build({
   fromModelInsertToDBInsert: pipe(
     snakeCaseKeysDeep,
     undefinedsToNullsDeep,
-    excludeNullsExceptInProps("assigned_to"),
+    excludeNullsExceptInProps(["assigned_to", "missing_from_source_at"]),
   ),
   fromModelUpdateToDBUpdate: pipe(
     snakeCaseKeysDeep,
     undefinedsToNullsDeep,
-    excludeNullsExceptInProps("assigned_to"),
+    excludeNullsExceptInProps(["assigned_to", "missing_from_source_at"]),
   ),
 });
 

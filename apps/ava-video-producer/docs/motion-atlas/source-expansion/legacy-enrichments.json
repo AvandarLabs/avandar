@@ -1,0 +1,27 @@
+[
+  {
+    "targetId": "schema-mapping",
+    "proposalSource": "architecture:12:schema-mapping",
+    "status": "planned legacy metadata enrichment",
+    "concept": "Map dataset columns into domain-specific case fields",
+    "sourceRefs": [
+      {
+        "sourceId": "ontology",
+        "locator": "Sections 1, 2, 5 and 8",
+        "rationale": "Case fields are authored mappings over contributing dataset columns."
+      }
+    ],
+    "suggestedChanges": {
+      "goodFor": [
+        "Explain configurable case fields backed by datasets",
+        "Show source identifiers and label fields explicitly"
+      ],
+      "tags": ["case schema", "dataset-backed fields", "identifier mapping"],
+      "limits": [
+        "Mapping is not entity resolution, a reasoning engine or manual-field persistence."
+      ],
+      "verificationFocus": "Keep each source column mapped to its authored destination field and never manufacture an identifier mapping for an unmapped source."
+    },
+    "reason": "Field correspondence is already schema-mapping; entity-grain assembly is separately new."
+  }
+]

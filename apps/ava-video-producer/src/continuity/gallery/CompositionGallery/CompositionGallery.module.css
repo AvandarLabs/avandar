@@ -1,0 +1,32 @@
+.compositionGallery {
+  margin: 0 auto;
+  max-width: 1600px;
+  padding: 24px 32px 60px;
+}
+
+.compositionGallery h1 {
+  font-size: 32px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+
+.description {
+  color: var(--muted);
+  margin: 0 0 28px;
+}
+
+.compositionGalleryWorkspace {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: 270px minmax(0, 1fr);
+}
+
+@media (width <= 900px) {
+  .compositionGallery {
+    padding: 18px;
+  }
+
+  .compositionGalleryWorkspace {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,116 @@
+name:
+  id: motionAtlas.public-works-measurement-check.name
+  message: Measure the work against the promise
+description:
+  id: motionAtlas.public-works-measurement-check.description
+  message:
+    A community representative checks one supplied physical dimension of a
+    public-work example against its published specification. A ruler exposes the
+    authored difference without treating a visual inspection as a safety certification.
+category:
+  id: motionAtlas.public-works-measurement-check.category
+  message: On-site measurement illustration
+useWhen:
+  id: motionAtlas.public-works-measurement-check.useWhen
+  message: Make a public-work claim inspectable through one concrete measurement.
+prompt:
+  id: motionAtlas.public-works-measurement-check.prompt
+  message:
+    Show a published specification beside a simple built wall or handrail. Two
+    community observers extend a measuring tape along the actual structure, keeping its
+    endpoints attached. A lighter promised-length outline remains behind the measured
+    object; the tape's end stops at the supplied observed value. Hold the signed
+    difference, the measurement source label and the two lengths on one scale.
+creativeDirection:
+  id: motionAtlas.public-works-measurement-check.creativeDirection
+  message:
+    Show a published specification beside a simple built wall or handrail. Two
+    community observers extend a measuring tape along the actual structure, keeping its
+    endpoints attached. A lighter promised-length outline remains behind the measured
+    object; the tape's end stops at the supplied observed value. Hold the signed
+    difference, the measurement source label and the two lengths on one scale.
+intent:
+  id: motionAtlas.public-works-measurement-check.intent
+  message: Make a public-work claim inspectable through one concrete measurement.
+distinction:
+  id: motionAtlas.public-works-measurement-check.distinction
+  message:
+    Observers physically stretch a tape along a built object while the promised
+    outline remains on the same spatial scale. Unlike capability-matrix or
+    paired-contrast, the evidence is a concrete dimension checked through a measuring
+    action; unlike chart-focus-edit, a measurement is introduced rather than a chart
+    restyled.
+tags:
+  - id: motionAtlas.public-works-measurement-check.tags.0
+    message: public accountability
+  - id: motionAtlas.public-works-measurement-check.tags.1
+    message: social audit
+  - id: motionAtlas.public-works-measurement-check.tags.2
+    message: community monitoring
+  - id: motionAtlas.public-works-measurement-check.tags.3
+    message: public works
+  - id: motionAtlas.public-works-measurement-check.tags.4
+    message: measurement
+  - id: motionAtlas.public-works-measurement-check.tags.5
+    message: contract specification
+  - id: motionAtlas.public-works-measurement-check.tags.6
+    message: delivery verification
+  - id: motionAtlas.public-works-measurement-check.tags.7
+    message: citizen oversight
+goodFor:
+  - id: motionAtlas.public-works-measurement-check.goodFor.0
+    message: Explaining a community monitoring visit
+  - id: motionAtlas.public-works-measurement-check.goodFor.1
+    message: Showing a public commitment checked against a supplied observation
+  - id: motionAtlas.public-works-measurement-check.goodFor.2
+    message: Introducing a specific discrepancy for public accountability
+notFor:
+  - id: motionAtlas.public-works-measurement-check.notFor.0
+    message:
+      The authored measurement is an illustration, not evidence from a real project
+      or an engineering assessment.
+  - id: motionAtlas.public-works-measurement-check.notFor.1
+    message:
+      One length does not establish overall compliance, workmanship, accessibility or
+      safety.
+  - id: motionAtlas.public-works-measurement-check.notFor.2
+    message:
+      The layout is schematic and contains no real geography; scale applies only to
+      the displayed measured dimension.
+domains:
+  - id: motionAtlas.public-works-measurement-check.domains.0
+    message: On-site measurement illustration
+aliases:
+  - id: motionAtlas.public-works-measurement-check.aliases.0
+    message: public accountability
+  - id: motionAtlas.public-works-measurement-check.aliases.1
+    message: social audit
+  - id: motionAtlas.public-works-measurement-check.aliases.2
+    message: community monitoring
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.public-works-measurement-check.beat.0
+      message: Establish the authored people, objects and supplied starting state.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.public-works-measurement-check.beat.1
+      message:
+        Show a published specification beside a simple built wall or handrail. Two
+        community observers extend a measuring tape along the actual structure, keeping
+        its endpoints attached. A lighter promised-length outline remains behind the
+        measured object; the tape's end stops at the supplied observed value. Hold the
+        signed difference, the measurement source label and the two lengths on one
+        scale.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.public-works-measurement-check.beat.2
+      message: Hold the supplied result, identities and limits.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.public-works-measurement-check.beat.3
+      message: The shared opaque envelope fades the illustration for its loop seam.

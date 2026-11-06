@@ -1,0 +1,58 @@
+name:
+  id: motionAtlas.code-focus.name
+  message: Code spotlight
+description:
+  id: motionAtlas.code-focus.description
+  message: An active line brings a code block into focus.
+category:
+  id: motionAtlas.code-focus.category
+  message: Code
+tags:
+  - id: motionAtlas.code-focus.tags.0
+    message: code
+  - id: motionAtlas.code-focus.tags.1
+    message: highlight
+  - id: motionAtlas.code-focus.tags.2
+    message: blink
+  - id: motionAtlas.code-focus.tags.3
+    message: execution
+useWhen:
+  id: motionAtlas.code-focus.useWhen
+  message: Direct attention to one line in an illustrative query or code excerpt.
+prompt:
+  id: motionAtlas.code-focus.prompt
+  message:
+    Use Motion Atlas "Code spotlight" (code-focus) as a conceptual graphic. Direct
+    attention to one line in an illustrative query or code excerpt. Keep the restrained
+    motion and readable labels; replace sample content with approved facts before making
+    product claims.
+creativeDirection:
+  id: motionAtlas.code-focus.creativeDirection
+  message: An active line brings a code block into focus.
+goodFor:
+  - id: motionAtlas.code-focus.goodFor.0
+    message: Direct attention to one line in an illustrative query or code excerpt.
+intent:
+  id: motionAtlas.code-focus.intent
+  message: Direct attention to one line in an illustrative query or code excerpt.
+domains:
+  - id: motionAtlas.code-focus.domains.0
+    message: Code
+aliases:
+  - id: motionAtlas.code-focus.aliases.0
+    message: code
+  - id: motionAtlas.code-focus.aliases.1
+    message: highlight
+  - id: motionAtlas.code-focus.aliases.2
+    message: blink
+  - id: motionAtlas.code-focus.aliases.3
+    message: execution
+notFor:
+  - id: motionAtlas.code-focus.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.code-focus.distinction
+  message: An active line brings a code block into focus.

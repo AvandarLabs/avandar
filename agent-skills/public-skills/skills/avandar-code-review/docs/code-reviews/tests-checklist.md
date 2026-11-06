@@ -131,29 +131,103 @@ reach a precondition, move it into setup before the page loads; if a distinct
 label is only needed to disambiguate, make the entity the only one of its kind
 and select it by position/id instead of renaming it mid-test.
 
-- Always move a module's test files into a `__tests__/` directory once two or
-  more of them share a module name in the same directory. A module keeps its
-  test beside it while there is one file; a split suite scattered across the
-  module directory buries the production files among its own tests. The module
-  name is the filename up to the first dot, so `DuckDbClient.test.ts` and
-  `DuckDbClient.leasing.test.ts` are two files for `DuckDbClient`.
+- Always name a test file outside a `__tests__/` directory after a module file
+  in the same directory: `Foo.test.ts` sits beside `Foo.ts` or `Foo.tsx`. The module name is the filename up to the first dot.
+  A reader finds the code under test by that name, so a test named after no
+  file beside it leaves them guessing which modules it covers. Recommend one
+  of: 1) rename the test after the one module it exercises; 2) when it
+  exercises several modules together, it is an integration test, so move it
+  into a `__tests__/` directory per the integration-test bullet below.
+  Exception: `tests/e2e/` and `tests/integration/` are dedicated test trees
+  and exempt.
+
+  This is bad:
+
+  ```txt
+  checkout/
+    formatOrderTotal.ts
+    useCartItems/useCartItems.ts
+    checkoutTotals.test.tsx
+  ```
+
+  This is good:
+
+  ```txt
+  checkout/
+    formatOrderTotal.ts
+    useCartItems/useCartItems.ts
+    __tests__/
+      checkoutTotals.integration.test.tsx
+  ```
+
+- Never put an aspect label between the module name and `.test` when the
+  file is the module's only test file. Name it `{ModuleName}.test.ts(x)`, not
+  `{ModuleName}.{aspect}.test.ts(x)`. An aspect label such as `.filters` or
+  `.props` exists to tell one test file of a module from another, so on a
+  lone test file it distinguishes nothing and makes the reader look for the
+  sibling test files it implies. Count every test file for the module,
+  beside it and in its `__tests__/`; test-only helpers such as fixtures do
+  not count. Exceptions: 1) the segment is part of the module's own filename
+  (`Foo.worker.test.ts` tests `Foo.worker.ts`); 2) a test runner or test
+  config selects files by that segment (check the `include` and `exclude`
+  globs of every test config), since renaming the file would move it to
+  another runner or out of every runner; 3) the `.integration` label on an
+  integration test, per the integration-test naming bullet below.
+
+  This is bad:
+
+  ```txt
+  ManualQueryForm/
+    ManualQueryForm.tsx
+    ManualQueryForm.filters.test.tsx
+  ```
+
+  This is good:
+
+  ```txt
+  ManualQueryForm/
+    ManualQueryForm.tsx
+    ManualQueryForm.test.tsx
+  ```
+
+- Always move a module's test-related files into a `__tests__/` directory once
+  two or more of them share a module name in the same directory. Count test
+  files **and** test-only helpers (`*Fixtures.ts(x)`, `*.fixtures.ts`, stubs,
+  scenario builders, test wrappers) together. A module keeps its test beside it
+  only when the test is the lone test-related file; a split suite scattered
+  across the module directory buries the production files among its own tests.
+  The module name is the filename up to the first dot, so `DuckDbClient.test.ts`
+  and `DuckDbClient.leasing.test.ts` are two files for `DuckDbClient`, and so
+  are `BarChart.test.tsx` and `BarChartTestFixtures.tsx`. A test plus a
+  fixtures file is already a split suite: flag it.
 
   Anything used **exclusively** by those tests moves in with them: fixtures,
   stubs, scenario builders, custom assertions. Exceptions: 1) a helper with
-  even one non-test importer stays outside, because it is production code; 2) a single test file stays colocated with its module.
+  even one non-test importer stays outside, because it is production code;
+  2) a lone test file with no test-only helpers stays colocated with its
+  module.
 
-  **Find candidates** (a directory with 2+ split tests for one module):
+  **Find candidates** (a directory with 2+ test files outside `__tests__/`):
 
   ```bash
   find . -type f \( -name '*.test.ts' -o -name '*.test.tsx' \) \
     -not -path '*/node_modules/*' -not -path '*/__tests__/*' \
-  | awk -F/ '{ dir=""; for(i=1;i<NF;i++) dir=dir $i "/";
-               split($NF, p, "."); print dir "\t" p[1] }' \
-  | sort | uniq -c | awk '$1 > 1'
+    -printf '%h\n' | sort | uniq -c | awk '$1 > 1'
   ```
 
-  Every row this prints is a violation. A directory holding one test file each
-  for two different modules is not a match, since the module names differ.
+  Every row this prints is a violation.
+
+- Allow at most one `*.test.ts(x)` file per directory outside a `__tests__/`
+  directory, **whatever the module names are**. Two tests for different modules
+  in one directory (`PairChartForms.test.tsx` next to
+  `PieFunnelChartForm.test.tsx`) are not a loophole around this. Flag the
+  directory and recommend one of: 1) a `__tests__/` beside the module for one
+  module's split suite; 2) a subdirectory per module with the module and its
+  test colocated (the default for tests of different modules); 3) a
+  `__tests__/` at the lowest common directory, only for a test that genuinely
+  spans several sibling modules at once. `tests/e2e/` and `tests/integration/`
+  are exempt. Check every directory touched by the diff, including test files
+  the diff did not add but now sits beside.
 
 - Never put test files for two different modules in one `__tests__/`
   directory. `__tests__/` groups the split suite of a single module; two module
@@ -176,9 +250,45 @@ and select it by position/id instead of renaming it mid-test.
   clients/QetlClient/QetlClient.test.ts
   ```
 
-- Place an integration test at the lowest directory containing every module it
-  exercises. It covers several modules by definition, so it cannot belong to
-  any one module's `__tests__/`, and putting it under one of them implies an
-  ownership that is not real. If that lowest common directory is the
-  application root, the test is too broad to be an integration test: recommend
-  an e2e test instead.
+- Place an integration test in a `__tests__/` directory inside the lowest
+  directory containing every module it exercises, and name it after the
+  behavior it covers. It covers several modules by definition, so it cannot
+  sit beside any one of them or belong to any one module's `__tests__/`:
+  either placement implies an ownership that is not real. If that lowest
+  common directory is the application root, the test is too broad to be an
+  integration test: recommend an e2e test instead. Exception: a test whose
+  module lives where the test cannot run (for example a module that must stay
+  loadable by another runtime, tested with a harness only Node can load) may
+  sit in a `__tests__/` elsewhere and keeps the module's name.
+
+- Always name an integration test `{behavior}.integration.test.ts(x)`: the
+  behavior it covers, then `.integration`, then `.test`. Its name matches no
+  module, so without the label a reader cannot tell it from a unit test whose
+  module was renamed or deleted. Flag any test file in a `__tests__/`
+  directory whose name up to the first dot matches no module in the
+  directory that holds that `__tests__/`, and that lacks `.integration`.
+  Recommend `.integration` when the test exercises several modules together;
+  otherwise recommend renaming it after the one module it covers.
+  Exceptions: 1) when a test runner selects the file by a suffix, such as
+  `.executed.test.ts`, `.integration` goes before that suffix
+  (`{behavior}.integration.executed.test.ts`) so the runner still matches it;
+  2) a test that keeps a module's name because the module lives where the
+  test cannot run (the integration-placement exception above) takes no
+  `.integration`; 3) `tests/e2e/` and `tests/integration/` are dedicated test
+  trees and exempt.
+
+  This is bad:
+
+  ```txt
+  checkout/
+    __tests__/
+      checkoutTotals.test.tsx
+  ```
+
+  This is good:
+
+  ```txt
+  checkout/
+    __tests__/
+      checkoutTotals.integration.test.tsx
+  ```

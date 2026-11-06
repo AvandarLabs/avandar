@@ -5,6 +5,7 @@ import {
   normalizeLibraryTree,
 } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 
 const COLUMN_TYPES: Record<string, AvaDataType.T> = {
@@ -20,7 +21,7 @@ const INTERNAL: StructuredQuery.FilterGroup = {
     {
       type: "rule",
       id: "r1",
-      columnName: "Admin2",
+      columnId: "Admin2" as QueryColumn.Id,
       columnDataType: "varchar",
       operator: "contains",
       value: "san",
@@ -33,7 +34,7 @@ const INTERNAL: StructuredQuery.FilterGroup = {
         {
           type: "rule",
           id: "r2",
-          columnName: "cases",
+          columnId: "cases" as QueryColumn.Id,
           columnDataType: "bigint",
           operator: "between",
           value: [1, 2],
@@ -69,7 +70,7 @@ describe("makeLibraryFilterGroupFromQueryFilterGroup", () => {
       rules: [
         {
           type: "rule" as const,
-          columnName: "Admin2",
+          columnId: "Admin2" as QueryColumn.Id,
           operator: "=" as const,
           value: "a",
         },
@@ -164,7 +165,10 @@ describe("normalizeLibraryTree", () => {
           { id: "r1", field: "Admin2", operator: "contains", value: "s" },
         ],
       },
-      columnTypes: { Admin2: "varchar", other: "varchar" },
+      columnTypes: {
+        ["Admin2" as QueryColumn.Id]: "varchar",
+        ["other" as QueryColumn.Id]: "varchar",
+      },
     });
     expect(nextLibraryGroup.rules[0]).toEqual({
       id: "r1",
@@ -181,7 +185,7 @@ describe("normalizeLibraryTree", () => {
         combinator: "AND",
         rules: [{ id: "r1", field: "cases", operator: "contains", value: "s" }],
       },
-      columnTypes: { cases: "bigint" },
+      columnTypes: { ["cases" as QueryColumn.Id]: "bigint" },
     });
     expect(nextLibraryGroup.rules[0]).toEqual({
       id: "r1",
@@ -206,7 +210,7 @@ describe("normalizeLibraryTree", () => {
           },
         ],
       },
-      columnTypes: { cases: "bigint" },
+      columnTypes: { ["cases" as QueryColumn.Id]: "bigint" },
     });
     const nested = nextLibraryGroup.rules[0];
     expect(nested && "rules" in nested && nested.rules[0]).toEqual({
@@ -226,7 +230,7 @@ describe("normalizeLibraryTree", () => {
     };
     const nextLibraryGroup = normalizeLibraryTree({
       group: { id: "g1", combinator: "AND", rules: [rule] },
-      columnTypes: { Admin2: "varchar" },
+      columnTypes: { ["Admin2" as QueryColumn.Id]: "varchar" },
     });
     expect(nextLibraryGroup.rules[0]).toEqual(rule);
   });

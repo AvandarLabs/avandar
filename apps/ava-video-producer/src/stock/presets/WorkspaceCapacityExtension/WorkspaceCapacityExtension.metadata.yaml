@@ -1,0 +1,140 @@
+name:
+  id: motionAtlas.workspace-capacity-extension.name
+  message: Make room without replacing the work
+description:
+  id: motionAtlas.workspace-capacity-extension.description
+  message:
+    A bounded workspace retains its existing resources while additional requests
+    wait outside its current allowance. An authored plan choice expands the available
+    slots or leaves the requests pending, preserving both user agency and resource
+    identity.
+category:
+  id: motionAtlas.workspace-capacity-extension.category
+  message: Bounded workspace growth
+useWhen:
+  id: motionAtlas.workspace-capacity-extension.useWhen
+  message:
+    Show that an authorized capacity change creates room while the current work
+    stays intact.
+creativeDirection:
+  id: motionAtlas.workspace-capacity-extension.creativeDirection
+  message:
+    Frames 0-11 reveal the current workspace as a shallow tray with its exact slot
+    allowance on the 960x600 canvas. Frames 12-50 bring requested resource tabs
+    alongside the filled tray while the existing tabs stay fixed. Frames 51-80 show the
+    supplied choice. For expand, frames 81-125 extend the same tray along a hinged side,
+    reveal the additional slots, and seat all requested tabs. For keep, retain the
+    original boundary and pending tabs. Frames 126-167 hold the selected allowance,
+    existing identities, and any pending requests. Fade to the common opaque ground at
+    frames 168-179. Use deterministic frame-driven React/SVG at 30fps.
+intent:
+  id: motionAtlas.workspace-capacity-extension.intent
+  message:
+    Show that an authorized capacity change creates room while the current work
+    stays intact.
+distinction:
+  id: motionAtlas.workspace-capacity-extension.distinction
+  message:
+    Unlike stagger-cards, the explanatory action changes a finite containing
+    boundary after an explicit choice. Unlike queue-relief, resources occupy persistent
+    workspace slots rather than leaving after service. Unlike dashboard-slot-assembly,
+    no layout rearrangement or content reshaping makes the new capacity.
+prompt:
+  id: motionAtlas.workspace-capacity-extension.prompt
+  message: Use Motion Atlas "Make room without replacing the work"
+    (workspace-capacity-extension) as a conceptual graphic. Show that an authorized
+    capacity change creates room while the current work stays intact. Replace fictional
+    examples with approved authored content before making product claims.
+tags:
+  - id: motionAtlas.workspace-capacity-extension.tags.0
+    message: freemium
+  - id: motionAtlas.workspace-capacity-extension.tags.1
+    message: plan capacity
+  - id: motionAtlas.workspace-capacity-extension.tags.2
+    message: voluntary upgrade
+  - id: motionAtlas.workspace-capacity-extension.tags.3
+    message: retained work
+  - id: motionAtlas.workspace-capacity-extension.tags.4
+    message: resource allowance
+  - id: motionAtlas.workspace-capacity-extension.tags.5
+    message: pending requests
+  - id: motionAtlas.workspace-capacity-extension.tags.6
+    message: land and expand
+goodFor:
+  - id: motionAtlas.workspace-capacity-extension.goodFor.0
+    message: Explain voluntary movement between capacity-limited software plans
+  - id: motionAtlas.workspace-capacity-extension.goodFor.1
+    message: Show a team retaining prior work while adding resources
+  - id: motionAtlas.workspace-capacity-extension.goodFor.2
+    message: Distinguish a pending need from an authorized plan change
+domains:
+  - id: motionAtlas.workspace-capacity-extension.domains.0
+    message: Bounded workspace growth
+aliases:
+  - id: motionAtlas.workspace-capacity-extension.aliases.0
+    message: freemium
+  - id: motionAtlas.workspace-capacity-extension.aliases.1
+    message: plan capacity
+  - id: motionAtlas.workspace-capacity-extension.aliases.2
+    message: voluntary upgrade
+  - id: motionAtlas.workspace-capacity-extension.aliases.3
+    message: retained work
+notFor:
+  - id: motionAtlas.workspace-capacity-extension.notFor.0
+    message:
+      One workspace, two allowance choices, and at most nine total resources. No
+      actual billing, subscription entitlement, import, connection, or checkout is
+      performed.
+  - id: motionAtlas.workspace-capacity-extension.notFor.1
+    message:
+      The combined collection lengths determine resource count. Capacity is supplied
+      separately and must contain the final count when expansion is selected. Invalid
+      combinations are rejected, not silently truncated.
+  - id: motionAtlas.workspace-capacity-extension.notFor.2
+    message:
+      Existing resource identity and content remain unchanged. Pending resources are
+      not shown as already imported or connected.
+  - id: motionAtlas.workspace-capacity-extension.notFor.3
+    message:
+      No real plan names, prices, conversion rate, automatic charge, or guaranteed
+      growth is illustrated.
+  - id: motionAtlas.workspace-capacity-extension.notFor.4
+    message:
+      A kept allowance is a valid outcome with visible pending demand. No celebratory
+      failure mark or forced-upgrade message punishes that choice.
+  - id: motionAtlas.workspace-capacity-extension.notFor.5
+    message:
+      Supplied prose meaning, fictional status and agreement with structured choices
+      are authoring responsibilities. Runtime validation enforces structure, numeric
+      bounds, identities and references.
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.workspace-capacity-extension.motionBeats.0
+      message: Reveal exact current allowance and retained resources.
+  - startFrame: 12
+    endFrame: 50
+    description:
+      id: motionAtlas.workspace-capacity-extension.motionBeats.1
+      message: Bring requests beside the tray.
+  - startFrame: 51
+    endFrame: 80
+    description:
+      id: motionAtlas.workspace-capacity-extension.motionBeats.2
+      message: Show the authored capacity choice.
+  - startFrame: 81
+    endFrame: 125
+    description:
+      id: motionAtlas.workspace-capacity-extension.motionBeats.3
+      message: Expand the same tray and seat requests only when authorized.
+  - startFrame: 126
+    endFrame: 167
+    description:
+      id: motionAtlas.workspace-capacity-extension.motionBeats.4
+      message: Hold allowance and pending or seated requests.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.workspace-capacity-extension.motionBeats.5
+      message: Shared opaque exit.

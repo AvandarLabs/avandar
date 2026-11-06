@@ -6,16 +6,19 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
 /**
- * Zod schema for the Data Explorer URL search params.
+ * Validates the Data Explorer route's URL search params, which
+ * `serializeStateToUrl` writes and `parseUrlSearch` reads so a reload or a
+ * shared link reopens the same query and chart.
  *
  * We persist a minimal set of identifiers rather than serialising full
  * model objects, keeping URLs short and human-readable:
@@ -25,7 +28,12 @@ import type {
  *   &agg=<colName>:<aggregationType>,...
  *   &orderBy=<colName>&orderDir=asc|desc
  *   &sql=<rawSql>
- *   &vc=<JSON-stringified VizConfig> (omitted when viz is the default table)
+ *   &vc=<JSON-stringified UiVizConfig> (omitted when viz is the default table)
+ *
+ * `vc` references columns by `QueryResult` column name, never by column ID.
+ * A URL has no column binding registry, so the IDs of one session mean
+ * nothing to the tab that reopens the URL, which assigns fresh IDs to the same
+ * columns.
  *
  * When `sql` is present it is the authoritative query: `ds`, `cols`, `agg`,
  * and `orderBy`/`orderDir` are not written (and are ignored on hydrate) so a
@@ -56,7 +64,7 @@ export type ParsedUrlState = {
   orderByColName?: string;
   orderDir?: OrderByDirection;
   rawSql?: string;
-  vizConfig?: VizConfig;
+  vizConfig?: UiVizConfig;
   openDataset?: OpenDatasetInfo;
 };
 
@@ -110,7 +118,7 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
 
   if (search.vc) {
     try {
-      result.vizConfig = JSON.parse(search.vc) as VizConfig;
+      result.vizConfig = JSON.parse(search.vc) as UiVizConfig;
     } catch {
       // Ignore malformed JSON — the viz will fall back to defaults.
     }
@@ -143,6 +151,23 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
   }
 
   return result;
+}
+
+/**
+ * Returns the chart config keyed by `QueryResult` column names, for
+ * `serializeStateToUrl` to write as `vc`. A config restored from the URL and
+ * not yet bound to a result is returned unchanged.
+ * Otherwise each column ID maps to its name in the latest result, and a slot
+ * whose column is absent from that result is left out.
+ */
+function _getUiVizConfig(state: DataExplorerAppState): UiVizConfig {
+  return (
+    state.pendingUrlVizConfig ??
+    AvaVizConfigs.toUiVizConfig({
+      config: state.vizConfig,
+      columns: state.lastResultColumns ?? [],
+    }).config
+  );
 }
 
 /**
@@ -203,7 +228,7 @@ export function serializeStateToUrl(
   // query string could never clear in one action.
   try {
     if (vizConfig.vizType !== "table") {
-      params.vc = JSON.stringify(vizConfig);
+      params.vc = JSON.stringify(_getUiVizConfig(state));
     }
   } catch {
     // Ignore — viz config will fall back to defaults on next load.

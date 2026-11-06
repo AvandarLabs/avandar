@@ -63,7 +63,7 @@ msgstr "مجموعة واحدة"
 msgid "Numbers in prose"
 msgstr "الأرقام في النصوص"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort by"
 msgstr "ترتيب حسب"
 
@@ -129,8 +129,8 @@ msgid "Name this case type and say where its fields come from. Map columns from 
 msgstr "سمِّ نوع الحالة هذا، واذكر مصدر حقوله. طابِق الأعمدة من مجموعات "
 "البيانات الحالية، أو أضف حقولًا لتعبئتها يدويًا."
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Value column"
 msgstr "عمود القيمة"
 
@@ -287,7 +287,7 @@ msgstr "تقارن HAVING العمود \"{columnName}\" بتعبير غير حر
 msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "لا يتم دعم UNION/INTERSECT/EXCEPT بهذا الشكل في النموذج."
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "إعدادات الرسم البياني"
@@ -506,7 +506,7 @@ msgid "Individual locations will be drawn on the map, and suppressed areas will 
 msgstr "سيتم رسم المواقع الفردية على الخريطة، وستعرض المناطق المحجوبة أعدادها "
 "الفعلية. هل تريد المتابعة؟"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Aggregations"
 msgstr "التجميعات"
 
@@ -1173,8 +1173,8 @@ msgstr "عذرًا!"
 msgid "Dataset saved."
 msgstr "تم حفظ مجموعة البيانات."
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "There are no numeric columns"
 msgstr "لا توجد أعمدة عددية"
 
@@ -1574,8 +1574,8 @@ msgstr "Liberty"
 msgid "SQL is empty."
 msgstr "عبارة SQL فارغة."
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Name column"
 msgstr "عمود الاسم"
 
@@ -1990,7 +1990,7 @@ msgstr "البيانات المفتوحة"
 msgid "Radius"
 msgstr "نصف القطر"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "الفرز والحد"
 
@@ -2265,8 +2265,8 @@ msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 msgstr "يتراوح من <0>{numericLow}</0> إلى <1>{numericHigh}</1>، بمتوسط "
 "<2>{avg}</2>{0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "No columns are available"
 msgstr "لا توجد أعمدة متاحة"
 
@@ -2633,9 +2633,9 @@ msgstr "قم بإنشاء استعلام لتكوين هذه التصور."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
@@ -2689,7 +2689,8 @@ msgstr "كل سلسلة هي عمود رقمي يتم رسمه على المحو
 msgid "Filled in by hand"
 msgstr "تعبئة يدويًا"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
 msgid "Some filters were removed"
 msgstr "تمت إزالة بعض عوامل التصفية"
 
@@ -3006,7 +3007,7 @@ msgstr "لا يمكنك الحفظ في لوحة المعلومات حتى تُ�
 msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
 msgstr "أنت حاليًا على خطة <0>{currentFeaturePlanName}</0>."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Result size"
 msgstr "حجم النتيجة"
 
@@ -3148,6 +3149,11 @@ msgstr "اضغط على مفتاح المسافة أو Enter لبدء السحب
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Grid shape"
 msgstr "شكل الشبكة"
+
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+msgid "Failed to save dashboard: {0}"
+msgstr "تعذّر حفظ لوحة المعلومات: {0}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish"
@@ -3839,6 +3845,11 @@ msgstr "تمت عملية الدفع بنجاح!"
 msgid "Answered"
 msgstr "تم الرد"
 
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {0} records…"
+msgstr "جارٍ تحديث {0} من السجلات…"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
 msgstr "مستقيم"
@@ -3886,7 +3897,7 @@ msgstr "معاينة:"
 msgid "Background"
 msgstr "الخلفية"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
+#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
 msgstr "اختر خطتك"
 
@@ -3900,10 +3911,6 @@ msgstr "يجب أن يكون اسم مجموعة البيانات أقل من {m
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "4258 - ETRS89"
 msgstr "4258 - ETRS89"
-
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Preparing model files…"
-msgstr "جارٍ إعداد ملفات النموذج…"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
@@ -4127,7 +4134,7 @@ msgstr "حفظ إلى اللوحة"
 msgid "Added"
 msgstr "أُضيفت"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Label type"
 msgstr "نوع التسمية"
 
@@ -4554,10 +4561,6 @@ msgstr "حذف مساحة العمل هذه"
 msgid "Edit {name}"
 msgstr "تعديل {name}"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
-msgid "Column name (must match SQL)"
-msgstr "اسم العمود (يجب أن يتطابق مع SQL)"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
 msgstr "{usedSeats} من {maxSeats} مقاعد مستخدمة · {remainingSeats} متبقية"
@@ -4587,10 +4590,6 @@ msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from 
 "the 8 GB tier."
 msgstr "استدلال أقوى من 1.5B مع تنزيل متوسط الحجم. ترقية جيدة مقارنةً بفئة 8 "
 "GB."
-
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Starting…"
-msgstr "جارٍ البدء…"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
@@ -4905,7 +4904,7 @@ msgstr "إضافة حقل مُعبّأ يدويًا"
 msgid "Upgrade plan"
 msgstr "ترقية الخطة"
 
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Do not refresh or close this tab or else the download will be canceled."
 msgstr "لا تقم بتحديث أو إغلاق هذه التبويب وإلا سيتم إلغاء التحميل."
 
@@ -4950,9 +4949,9 @@ msgid "Llama 3.2 1B (offline)"
 msgstr "Llama 3.2 1B (دون اتصال بالإنترنت)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "سلسلة"
@@ -5184,6 +5183,11 @@ msgstr "مشاركة الملخص"
 msgid "Time"
 msgstr "الوقت"
 
+#. placeholder {0}: entry.label
+#: src/components/JobProgressPanel/JobProgressIndicator.tsx
+msgid "Dismiss {0}"
+msgstr "تجاهل {0}"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is false"
 msgstr "خطأ"
@@ -5211,6 +5215,10 @@ msgstr "تمت إضافة مجموعة البيانات"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
 msgstr "اختياري"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Syncing dataset online"
+msgstr "جارٍ مزامنة مجموعة البيانات عبر الإنترنت"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
@@ -5251,10 +5259,6 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. يتم تجميع القيم حسب "
 "محور الفئة (\"{axisKeyValue}\")."
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
-msgid "Sync records"
-msgstr "مزامنة السجلات"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -5673,6 +5677,10 @@ msgstr "فارغ"
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
 msgstr "الكل"
+
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Downloading offline chat model"
+msgstr "جارٍ تنزيل نموذج الدردشة للعمل دون اتصال"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -6154,7 +6162,7 @@ msgstr "حوالي {0} دقائق"
 msgid "Select columns to query"
 msgstr "اختر الأعمدة للاستعلام"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Donut style"
 msgstr "أسلوب الدونات"
 
@@ -6544,11 +6552,6 @@ msgstr "فشل استعلام الطبقة. يعني هذا عادةً أن مج
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
 msgstr "اسمك"
-
-#. placeholder {0}: modelCopy.displayName
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Downloading {0} for offline chat"
-msgstr "تحميل {0} للدردشة غير المتصلة"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Disputed status column"
@@ -7046,6 +7049,10 @@ msgstr "المالك لديه دائمًا وصول إداري. لتغيير ا�
 msgid "Loading datasets…"
 msgstr "جارٍ تحميل مجموعات البيانات…"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {conceptName} records…"
+msgstr "جارٍ تحديث سجلات {conceptName}…"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
 msgid "Loading private resources"
 msgstr "جارٍ تحميل الموارد الخاصة"
@@ -7066,6 +7073,11 @@ msgstr "أصغر نصف قطر"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "تم رفض الوصول"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Refresh {0} records"
+msgstr "تحديث {0} من السجلات"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "join key"
@@ -7166,7 +7178,7 @@ msgstr "مجموعة البيانات"
 msgid "All decisions"
 msgstr "جميع القرارات"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Show labels"
 msgstr "عرض التسميات"
 
@@ -7261,7 +7273,7 @@ msgstr "إزالة الشرط"
 msgid "Open case type"
 msgstr "فتح نوع الحالة"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Percent"
 msgstr "نسبة مئوية"
 
@@ -7424,6 +7436,11 @@ msgstr "تحرير الأذونات"
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox.tsx
 msgid "queried"
 msgstr "تم الاستعلام"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
+msgid "They referenced columns this data source does not have."
+msgstr "لقد أشاروا إلى أعمدة غير موجودة في مصدر البيانات هذا."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "{conceptName} fields"
@@ -7679,7 +7696,7 @@ msgstr "الفترة الزمنية: {0}"
 msgid "Coordinate is outside the valid range"
 msgstr "الإحداثي خارج النطاق الصالح"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Filters (Where)"
 msgstr "الفلاتر (أين)"
 
@@ -8157,12 +8174,6 @@ msgstr "تحرير مجموعة الأدوار"
 msgid "Profiles"
 msgstr "الملفات الشخصية"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-msgid "They referenced columns this data source does not have: "
-"{removedColumnNames}"
-msgstr "تمت الإشارة إلى أعمدة غير موجودة في مصدر البيانات هذا: "
-"{removedColumnNames}"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
 msgstr "تحديث وإعادة نشر"
@@ -8348,7 +8359,7 @@ msgstr "Avandar لا يزال في مرحلة البيتا. قد لا تعمل �
 msgid "Thank you for your interest!"
 msgstr "شكرًا لاهتمامك!"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
@@ -8424,7 +8435,7 @@ msgstr "هندسة النقطة"
 msgid "Let's move these results to a dashboard"
 msgstr "لننقل هذه النتائج إلى لوحة معلومات"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Value"
 msgstr "قيمة"
@@ -8461,10 +8472,6 @@ msgstr "متدرج"
 msgid "Please try again. Your dashboard is still published."
 msgstr "يرجى المحاولة مرة أخرى. لا تزال لوحة المعلومات منشورة."
 
-#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "Syncing dataset online..."
-msgstr "جارٍ مزامنة مجموعة البيانات عبر الإنترنت..."
-
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "أضف سلسلة لاختيار العمود الرقمي الذي يقود الرسم البياني."
@@ -8475,6 +8482,7 @@ msgid "Geometry column"
 msgstr "عمود الهندسة"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterFieldSelector/FilterFieldSelector.tsx
 msgid "Column"
@@ -8808,8 +8816,8 @@ msgstr "100,000"
 msgid "Delete {0}"
 msgstr "حذف {0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Slice colors"
 msgstr "قطع الألوان"
 

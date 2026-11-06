@@ -63,7 +63,7 @@ msgstr "Kikundi 1"
 msgid "Numbers in prose"
 msgstr "Nambari katika maandishi"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort by"
 msgstr "Panga kwa"
 
@@ -129,8 +129,8 @@ msgid "Name this case type and say where its fields come from. Map columns from 
 msgstr "Ipe aina hii ya kesi jina na eleza sehemu zinakotoka. Panga safu kutoka "
 "kwenye seti za data zilizopo, au ongeza sehemu za kujaza kwa mkono."
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Value column"
 msgstr "Safu ya thamani"
 
@@ -289,7 +289,7 @@ msgstr "HAVING inalinganisha \"{columnName}\" na usemi usio wa literal."
 msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "UNION/INTERSECT/EXCEPT haitumiki katika fomu hii."
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "Mipangilio ya chati"
@@ -510,7 +510,7 @@ msgid "Individual locations will be drawn on the map, and suppressed areas will 
 msgstr "Maeneo mahususi yatachorwa kwenye ramani, na maeneo yaliyofichwa "
 "yataonyesha idadi yake halisi. Endelea?"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Aggregations"
 msgstr "Mkusanyiko"
 
@@ -1186,8 +1186,8 @@ msgstr "Samahani!"
 msgid "Dataset saved."
 msgstr "Seti ya data imehifadhiwa."
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "There are no numeric columns"
 msgstr "Hakuna safu za nambari"
 
@@ -1590,8 +1590,8 @@ msgstr "Liberty"
 msgid "SQL is empty."
 msgstr "SQL iko tupu."
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Name column"
 msgstr "Safu ya jina"
 
@@ -2013,7 +2013,7 @@ msgstr "Data za Wazi"
 msgid "Radius"
 msgstr "Radius"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Panga na punguza"
 
@@ -2293,8 +2293,8 @@ msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 msgstr "Inatofautiana kutoka <0>{numericLow}</0> hadi <1>{numericHigh}</1>, "
 "ikiwemo wastani wa <2>{avg}</2>{0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "No columns are available"
 msgstr "Hakuna safu zinazopatikana"
 
@@ -2670,9 +2670,9 @@ msgstr "Buni query ili kuunda picha hii."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
@@ -2726,7 +2726,8 @@ msgstr "Kila mfululizo ni safu ya nambari iliyopangwa kwenye mhimili wa Y. "
 msgid "Filled in by hand"
 msgstr "Imejazwa kwa mkono"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
 msgid "Some filters were removed"
 msgstr "Baadhi ya vichujio vimeondolewa"
 
@@ -3047,7 +3048,7 @@ msgstr "Huwezi kuhifadhi kwenye dashibodi hadi utekeleze swali."
 msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
 msgstr "Kwa sasa uko kwenye mpango wa <0>{currentFeaturePlanName}</0>."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Result size"
 msgstr "Ukubwa wa matokeo"
 
@@ -3192,6 +3193,11 @@ msgstr "Bonyeza Space au Enter ili kuanza kuburuta. Tumia vitufe vya mishale "
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Grid shape"
 msgstr "Umbo la gridi"
+
+#. placeholder {0}: error instanceof Error ? error.message : String(error)
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+msgid "Failed to save dashboard: {0}"
+msgstr "Imeshindikana kuhifadhi dashibodi: {0}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish"
@@ -3891,6 +3897,11 @@ msgstr "Malipo Yamefanikiwa!"
 msgid "Answered"
 msgstr "Jibu"
 
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {0} records…"
+msgstr "Inasasisha rekodi {0}…"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
 msgstr "Nyooka"
@@ -3939,7 +3950,7 @@ msgstr "Muonekano:"
 msgid "Background"
 msgstr "Mandharinyuma"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
+#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
 msgstr "Chagua mpango wako"
 
@@ -3953,10 +3964,6 @@ msgstr "Jina la seti ya data lazima liwe chini ya {maxDatasetNameLength} herufi 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "4258 - ETRS89"
 msgstr "4258 - ETRS89"
-
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Preparing model files…"
-msgstr "Inatayarisha faili za modeli…"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
@@ -4182,7 +4189,7 @@ msgstr "Hifadhi kwenye dashibodi"
 msgid "Added"
 msgstr "Imeongezwa"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Label type"
 msgstr "Aina ya lebo"
 
@@ -4611,10 +4618,6 @@ msgstr "Futa workspace hii"
 msgid "Edit {name}"
 msgstr "Hariri {name}"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
-msgid "Column name (must match SQL)"
-msgstr "Jina la safu (lazima liendane na SQL)"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
 msgstr "{usedSeats} kati ya {maxSeats} viti vilitumika · {remainingSeats} "
@@ -4645,10 +4648,6 @@ msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from 
 "the 8 GB tier."
 msgstr "Uwezo wa kufikiri ni bora kuliko 1.5B kwa upakuaji wa wastani. Hatua "
 "nzuri kutoka daraja la GB 8."
-
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Starting…"
-msgstr "Kuanza…"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
@@ -4967,7 +4966,7 @@ msgstr "Ongeza sehemu inayojazwa kwa mkono"
 msgid "Upgrade plan"
 msgstr "Boresha mpango"
 
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Do not refresh or close this tab or else the download will be canceled."
 msgstr "Usi-refresh au kufunga tab hii vinginevyo upakuaji utafutwa."
 
@@ -5012,9 +5011,9 @@ msgid "Llama 3.2 1B (offline)"
 msgstr "Llama 3.2 1B (nje ya mtandao)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "Mfululizo"
@@ -5252,6 +5251,11 @@ msgstr "Shiriki muhtasari"
 msgid "Time"
 msgstr "Wakati"
 
+#. placeholder {0}: entry.label
+#: src/components/JobProgressPanel/JobProgressIndicator.tsx
+msgid "Dismiss {0}"
+msgstr "Ondoa {0}"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is false"
 msgstr "si kweli"
@@ -5279,6 +5283,10 @@ msgstr "Dataset imeongezwa"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
 msgstr "Hiari"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Syncing dataset online"
+msgstr "Inasawazisha seti ya data mtandaoni"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
@@ -5319,10 +5327,6 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye thamani ya radial. "
 "Thamani zimepangwa kwa axis ya kategoria (\"{axisKeyValue}\")."
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
-msgid "Sync records"
-msgstr "Sawazisha rekodi"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -5746,6 +5750,10 @@ msgstr "Tupu"
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
 msgstr "Yote"
+
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Downloading offline chat model"
+msgstr "Inapakua modeli ya mazungumzo ya nje ya mtandao"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -6232,7 +6240,7 @@ msgstr "takriban {0} dakika"
 msgid "Select columns to query"
 msgstr "Chagua safu za kuuliza"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Donut style"
 msgstr "Mtindo wa donut"
 
@@ -6628,11 +6636,6 @@ msgstr "Hoja ya safu imeshindikana. Kwa kawaida hii inamaanisha kuwa seti ya "
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
 msgstr "Jina lako"
-
-#. placeholder {0}: modelCopy.displayName
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Downloading {0} for offline chat"
-msgstr "Inapakua {0} kwa mazungumzo ya mtandaoni"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Disputed status column"
@@ -7138,6 +7141,10 @@ msgstr "Mmiliki daima ana ufikiaji wa admin. Ili kubadilisha mmiliki, tumia "
 msgid "Loading datasets…"
 msgstr "Inapakia seti za data…"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {conceptName} records…"
+msgstr "Inasasisha rekodi za {conceptName}…"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
 msgid "Loading private resources"
 msgstr "Inapakia rasilimali za faragha"
@@ -7158,6 +7165,11 @@ msgstr "Radius ndogo zaidi"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "Upatikanaji umekataliwa"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Refresh {0} records"
+msgstr "Sasisha rekodi {0}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "join key"
@@ -7260,7 +7272,7 @@ msgstr "Seti ya data"
 msgid "All decisions"
 msgstr "Maamuzi yote"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Show labels"
 msgstr "Onyesha lebo"
 
@@ -7355,7 +7367,7 @@ msgstr "Ondoa sharti"
 msgid "Open case type"
 msgstr "Fungua aina ya kesi"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Percent"
 msgstr "Asilimia"
 
@@ -7519,6 +7531,11 @@ msgstr "Hariri ruhusa"
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox.tsx
 msgid "queried"
 msgstr "iliyoulizwa"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
+msgid "They referenced columns this data source does not have."
+msgstr "Wametaja safu ambazo chanzo hiki cha data hakina."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "{conceptName} fields"
@@ -7775,7 +7792,7 @@ msgstr "Kipindi cha muda: {0}"
 msgid "Coordinate is outside the valid range"
 msgstr "Kiratibu kiko nje ya masafa halali"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Filters (Where)"
 msgstr "Filita (Wapi)"
 
@@ -8258,12 +8275,6 @@ msgstr "Hariri kundi la jukumu"
 msgid "Profiles"
 msgstr "Profaili"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-msgid "They referenced columns this data source does not have: "
-"{removedColumnNames}"
-msgstr "Zilirejelea safu wima ambazo chanzo hiki cha data hakina: "
-"{removedColumnNames}"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
 msgstr "Sasisha & chapisha tena"
@@ -8450,7 +8461,7 @@ msgstr "Avandar bado iko kwenye beta. Vipengele vingine vinaweza kutofanya kazi 
 msgid "Thank you for your interest!"
 msgstr "Asante kwa nia yako!"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
@@ -8526,7 +8537,7 @@ msgstr "Jiometri ya nukta"
 msgid "Let's move these results to a dashboard"
 msgstr "Hebu tuhamishe matokeo haya kwenye dashibodi"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Value"
 msgstr "Thamani"
@@ -8563,10 +8574,6 @@ msgstr "Iliyopangwa kwa viwango"
 msgid "Please try again. Your dashboard is still published."
 msgstr "Tafadhali jaribu tena. Dashibodi yako bado imechapishwa."
 
-#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "Syncing dataset online..."
-msgstr "Inasawazisha dataset mtandaoni..."
-
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "Ongeza mfululizo kuchagua ni safu ipi ya nambari inayoendesha chati."
@@ -8577,6 +8584,7 @@ msgid "Geometry column"
 msgstr "Safu wima ya jiometri"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterFieldSelector/FilterFieldSelector.tsx
 msgid "Column"
@@ -8915,8 +8923,8 @@ msgstr "100,000"
 msgid "Delete {0}"
 msgstr "Futa {0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Slice colors"
 msgstr "Slice rangi"
 

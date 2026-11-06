@@ -5,10 +5,10 @@
 set -uo pipefail
 
 if [[ -t 2 ]]; then
-  BOLD_YELLOW=$'\033[1;33m'
+  YELLOW=$'\033[33m'
   RESET=$'\033[0m'
 else
-  BOLD_YELLOW=''
+  YELLOW=''
   RESET=''
 fi
 
@@ -89,5 +89,5 @@ fi
 
 echo "Supabase local configuration must use the standard avandar identity and ports:" >&2
 printf '%s\n' "$validation_output" >&2
-echo "  ${BOLD_YELLOW}⚠️ Run 'ava supabase restore', stage the restored files, and retry.${RESET}" >&2
+echo "${YELLOW}Run 'ava supabase restore', stage the restored files, and retry.${RESET}" >&2
 exit 1

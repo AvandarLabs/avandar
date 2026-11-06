@@ -202,11 +202,11 @@ with a 4-app role matrix. No lightweight external-guest concept exists.
 
 ### P5. Ontology Designer refactor (rename + DL model)
 **Current state:** Clean TBox/ABox split already exists
-(`OntologyDesignerApp` = TBox, `IndividualManagerApp` = ABox), and P5.1 and P5.6
-below have shipped. Individual sync is incremental and preserves case-workflow
-state. Gaps vs a real DL/ontology model: **no roles (object properties)
+(`OntologyDesignerApp` = TBox, `IndividualManagerApp` = ABox), and P5.1 below
+has shipped. Gaps vs a real DL/ontology model: **no roles (object properties)
 between concepts**, no class hierarchy/subsumption, `manual_entry` mapping
-unimplemented, concept delete doesn't cascade.
+unimplemented, concept delete doesn't cascade, generation is in-browser and
+re-writes all rows (no incremental sync).
 
 - P5.1 `[DONE]` Renamed internal domain to DL nomenclature across models,
   clients, views, routes and the database. **Internal
@@ -223,14 +223,8 @@ unimplemented, concept delete doesn't cascade.
   just merged from datasets.
 - P5.5 `[FIX]` Cascade delete of a concept to its individuals + their
   attribute assertions.
-- P5.6 `[DONE]` Incremental, state-preserving individual generation. Merged
-  `feat/incremental-gen` in [PR #301](https://github.com/AvandarLabs/avandar/pull/301)
-  on 2026-10-15 ([AVA-242](https://linear.app/avandar/issue/AVA-242)). Sync skips
-  unchanged rows, preserves existing IDs, statuses, and assignments, and flags
-  individuals missing from source data without deleting them. New case types
-  refresh automatically, with shared progress reporting for refreshes, dataset
-  uploads, and offline-model downloads. Heavy query work already runs through
-  QETL with DuckDB in a Web Worker. P5.8-P5.10 remain separate follow-ups.
+- P5.6 `[REFACTOR]` Incremental individual generation (stop full re-upsert every
+  sync) and move heavy generation off the main browser thread / onto QETL.
 - P5.7 `[NEW]` Configurable **TBox** (see P5b below) - statuses, allowed
   values, relations are workspace-configurable.
 - P5.8 `[FIX]` Sync crashes a whole run when a case type's label resolves to

@@ -16,7 +16,8 @@ Global (work from either pane):
 | `Alt+U` / `Alt+D` | scroll the focused view a half-page up / down (guide view moves its cursor; a PTY pane scrolls half its visible rows) |
 | `Alt+K` / `Alt+J` | scroll the focused view one line up / down |
 | `Ctrl+P` | open the **command palette** (works from either pane) |
-| `Ctrl+R` | restart the difit server (the palette's "Restart diff server") |
+| `Ctrl+R` | refresh the diff by relaunching the difit server (the palette's "Refresh diff"). The open browser tab reloads itself; no new tab opens |
+| `Ctrl+S` | resync with GitHub now: pull new PR comments and commits, the same as the browser's **Sync** (the palette's "Resync with GitHub") |
 | `Ctrl+G` | regenerate the diff guide (the palette's "Regenerate diff guide") |
 | `Ctrl+O` | open the difit server URL in the default browser (the palette's "Open diff in browser") |
 | `Ctrl+N` | start a fresh LLM session (interrupts: kills the running LLM and respawns it on a new session that auto-submits the review-orientation prompt; the palette's "New LLM session") |
@@ -26,7 +27,7 @@ Global (work from either pane):
 `Alt+H` / `Alt+L` switch focus; `Alt+U` / `Alt+D` scroll the focused view a
 half-page, while `Alt+K` / `Alt+J` scroll it one line at a time. These are
 keyboard-only alternatives to the wheel that never depend on terminal mouse
-reporting. `Ctrl+P` / `Ctrl+R` / `Ctrl+G` / `Ctrl+O` /
+reporting. `Ctrl+P` / `Ctrl+R` / `Ctrl+S` / `Ctrl+G` / `Ctrl+O` /
 `Ctrl+N` / `Ctrl+Q` are the command keys. The `Alt` and `Ctrl` commands are intercepted
 globally **before** keys are forwarded to the LLM, so they never reach the
 LLM session. That is what lets `Alt+U`/`Alt+D` and `Alt+K`/`Alt+J` scroll while
@@ -77,7 +78,7 @@ When the **main** (diff) view is focused (read-only). Keys common to both views:
 | `Tab` / `Shift+Tab` | cycle the main view forward / backward (Logs ↔ Test plan ↔ Diff guide) |
 | `Up` / `Down` | scroll the active view 3 rows |
 | `PageUp` / `PageDown` | scroll the active view 20 rows |
-| mouse wheel | scroll the focused pane |
+| mouse wheel | scroll the pane under the pointer |
 
 There are **no bare-letter shortcuts to switch views** — use `Tab` /
 `Shift+Tab`. In the **Test plan** and **Diff guide** views, the bare letters
@@ -104,34 +105,37 @@ forwards every key, including `Tab` and bare letters, straight to the frontend, 
 focus it with `Alt+H` first. These follow the sibling `tasks`/`brain` focus
 convention: `Alt+H` for the left pane, `Alt+L` for the right LLM pane.
 
-## Mouse, and native ⌘-click links
+## Mouse
 
-`dif` (like the sibling `tasks` / `brain` shells) captures the mouse only for
-**button + wheel** events — it deliberately turns off mouse *motion* reporting
-(DECSET 1002/1003) that crossterm's `EnableMouseCapture` would also enable. With
-motion reporting off, holding **⌘** lets iTerm2 bypass mouse reporting and use
-its native link / Semantic-History handling: ⌘-hover underlines a URL or file
-path and ⌘-click opens it (the same handler `o` uses from the keyboard).
+| Action | Effect |
+| --- | --- |
+| wheel | scroll the pane under the pointer, focused or not (a markdown view moves its cursor) |
+| click | focus the pane under the pointer |
+| drag | select text in that pane, highlighted. Dragging past its top or bottom edge scrolls a terminal pane to reach more |
+| release | copy the selection to the clipboard. The statusline shows `Copied N characters`, and the highlight stays until the next click or key |
+| double-click | select and copy the word under the pointer. A word is letters, digits, and `_-./~:@+%#?&=`, so a path, URL, or `file.rs:12` comes whole, without surrounding brackets or quotes |
+| triple-click | select and copy the line under the pointer, clipped to its pane: a terminal pane's row plus the soft-wrapped rows joined to it that are in view, or the visible columns of a markdown line. It never reaches into the other pane |
+| ⌘-click (iTerm2) | open a URL or file path, unchanged: iTerm2 handles it before mouse reporting |
+| Option-drag (iTerm2) / Fn-drag (Terminal) | the terminal's own selection, bypassing `dif` |
 
-**The scroll wheel is best-effort, not guaranteed.** Keeping ⌘-click working
-(motion reporting off) is in tension with wheel delivery: on the user's iTerm2
-the wheel emits **no** mouse events while motion reporting is off, so the panes
-don't scroll with it. We deliberately do **not** re-enable motion reporting to
-recover the wheel — it risks silently breaking ⌘-click (unconfirmed on that
-iTerm2 version) and is fragile, terminal-specific behavior these shells
-shouldn't depend on. Use **`Alt+U` / `Alt+D`** for half-page scrolls or
-**`Alt+K` / `Alt+J`** for single-line scrolls (see the focus/command table
-above): they are plain key events, intercepted before forwarding to the LLM, so
-they scroll the focused view in any terminal and even while the LLM pane is
-focused, with no dependency on mouse reporting. The
-`brain` sibling records the full analysis in its `docs/decisions.md`; `dif`
-keeps no decisions log, so the reasoning lives here.
+Presses count as a double or triple click when they land on the same cell
+within 500ms; a fourth starts over. Dragging after a double or triple click
+leaves the word or line selection as it is. A selection never spans panes and
+copies as plain text, with soft-wrapped lines
+joined and trailing blanks trimmed. Over SSH the copy also reaches your local
+clipboard through OSC 52; in iTerm2 that needs **Settings > General >
+Selection > Applications in terminal may access clipboard**, and inside tmux
+it needs `set -g set-clipboard on` (or `allow-passthrough on`). The keyboard
+scrolls (`Alt+U` / `Alt+D`, `Alt+K` / `Alt+J`) still work without the mouse.
+See [architecture.md](architecture.md#mouse-wheel-click-drag-to-copy) for how it
+works.
 
 ## Shortcut-label rule (for agents)
 
 When a shortcut is **also** a command-palette action (today: `Ctrl+R` →
-"Restart diff server", `Ctrl+G` → "Regenerate diff guide", `Ctrl+O` → "Open
-diff in browser", `Ctrl+N` → "New LLM session"), its dimmed `[…]` hint on the
+"Refresh diff", `Ctrl+G` → "Regenerate diff guide", `Ctrl+O` → "Open
+diff in browser", `Ctrl+N` → "New LLM session", `Ctrl+S` → "Resync with
+GitHub"), its dimmed `[…]` hint on the
 palette row is derived from
 `palette::shortcut_for`. If you add or change such a
 shortcut, update `shortcut_for` so the hint matches — the rule is enforced in

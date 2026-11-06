@@ -1,0 +1,127 @@
+name:
+  id: motionAtlas.practice-to-work-sample.name
+  message: Try the learned action in a new setting
+description:
+  id: motionAtlas.practice-to-work-sample.description
+  message:
+    A learner repeats an authored measuring-and-marking action first on a practice
+    sheet and then on a workshop material. Both artifacts remain visible so the
+    connection is concrete without implying a job outcome.
+category:
+  id: motionAtlas.practice-to-work-sample.category
+  message: Repeated action across learning environments
+useWhen:
+  id: motionAtlas.practice-to-work-sample.useWhen
+  message:
+    Connect a specific practiced action to an application in a different physical
+    setting.
+prompt:
+  id: motionAtlas.practice-to-work-sample.prompt
+  message:
+    Show one learner using a ruler to place a labeled measurement on a practice
+    sheet at a classroom desk. Slide the surrounding furniture into a simple workshop
+    arrangement while retaining the learner and the first marked sheet at the side.
+    Repeat the same ruler placement and marking gesture on the chosen work material,
+    then hold the two measured artifacts together. Fade to the shared background.
+creativeDirection:
+  id: motionAtlas.practice-to-work-sample.creativeDirection
+  message:
+    Show one learner using a ruler to place a labeled measurement on a practice
+    sheet at a classroom desk. Slide the surrounding furniture into a simple workshop
+    arrangement while retaining the learner and the first marked sheet at the side.
+    Repeat the same ruler placement and marking gesture on the chosen work material,
+    then hold the two measured artifacts together. Fade to the shared background.
+intent:
+  id: motionAtlas.practice-to-work-sample.intent
+  message:
+    Connect a specific practiced action to an application in a different physical
+    setting.
+distinction:
+  id: motionAtlas.practice-to-work-sample.distinction
+  message: The same physical gesture is performed on different materials as the
+    surrounding learning environment changes. Unlike field mapping or a sequence of
+    workflow stages, the connection is demonstrated through tool use and preserved
+    artifacts.
+tags:
+  - id: motionAtlas.practice-to-work-sample.tags.0
+    message: skills transition
+  - id: motionAtlas.practice-to-work-sample.tags.1
+    message: school to work
+  - id: motionAtlas.practice-to-work-sample.tags.2
+    message: vocational learning
+  - id: motionAtlas.practice-to-work-sample.tags.3
+    message: applied learning
+  - id: motionAtlas.practice-to-work-sample.tags.4
+    message: work sample
+  - id: motionAtlas.practice-to-work-sample.tags.5
+    message: measurement
+  - id: motionAtlas.practice-to-work-sample.tags.6
+    message: practice
+  - id: motionAtlas.practice-to-work-sample.tags.7
+    message: transfer of learning
+goodFor:
+  - id: motionAtlas.practice-to-work-sample.goodFor.0
+    message: Explain a school-to-practice skills transition
+  - id: motionAtlas.practice-to-work-sample.goodFor.1
+    message: Show how one classroom action is tried on a work sample
+  - id: motionAtlas.practice-to-work-sample.goodFor.2
+    message: Introduce hands-on vocational learning without promising employment
+domains:
+  - id: motionAtlas.practice-to-work-sample.domains.0
+    message: Repeated action across learning environments
+aliases:
+  - id: motionAtlas.practice-to-work-sample.aliases.0
+    message: skills transition
+  - id: motionAtlas.practice-to-work-sample.aliases.1
+    message: school to work
+  - id: motionAtlas.practice-to-work-sample.aliases.2
+    message: vocational learning
+notFor:
+  - id: motionAtlas.practice-to-work-sample.notFor.0
+    message:
+      One learner performs two authored attempts. Two artifacts are not two
+      graduates, two skills certifications, or two employment outcomes.
+  - id: motionAtlas.practice-to-work-sample.notFor.1
+    message:
+      The numeric label is an illustrative target measurement. SVG length is a
+      normalized diagram representation, not a usable real-world measuring instrument.
+  - id: motionAtlas.practice-to-work-sample.notFor.2
+    message:
+      Repeating a gesture does not prove competence, retention, successful transfer,
+      workplace readiness, or a job placement.
+  - id: motionAtlas.practice-to-work-sample.notFor.3
+    message:
+      This bounded motif supports measuring and marking only. Participants,
+      materials, and setting names are fictional defaults.
+motionBeats:
+  - startFrame: 0
+    endFrame: 23
+    description:
+      id: motionAtlas.PracticeToWorkSample.beat.0
+      message: Reveal one learner, the practice sheet and the authored target measurement.
+  - startFrame: 24
+    endFrame: 53
+    description:
+      id: motionAtlas.PracticeToWorkSample.beat.1
+      message: Place a ruler and mark the same authored value on the practice sheet.
+  - startFrame: 56
+    endFrame: 81
+    description:
+      id: motionAtlas.PracticeToWorkSample.beat.2
+      message:
+        Slide classroom furniture and the first artifact aside as the learner enters
+        the workshop arrangement.
+  - startFrame: 82
+    endFrame: 111
+    description:
+      id: motionAtlas.PracticeToWorkSample.beat.3
+      message:
+        Repeat ruler placement and pencil marking on the selected material with the
+        identical value and unit.
+  - startFrame: 112
+    endFrame: 179
+    description:
+      id: motionAtlas.PracticeToWorkSample.beat.4
+      message:
+        Hold the measured work sample and optional first artifact through the shared
+        fade.

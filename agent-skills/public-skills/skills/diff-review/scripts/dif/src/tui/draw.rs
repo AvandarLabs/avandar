@@ -6,6 +6,8 @@
 //! or diff guide through [`super::markdown`]. The agent pane is its own PTY.
 //! The focused pane's border brightens and (for a PTY) its cursor is surfaced.
 
+use std::time::Duration;
+
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
@@ -18,7 +20,11 @@ use crate::session::AgentKind;
 
 use super::app::{App, Panel};
 use super::main_diff_view::MainDiffView;
+use super::selection;
 use super::shortcuts::{self, Group};
+
+/// How long a statusline notice (e.g. "Copied 42 characters") stays up.
+const NOTICE_TTL: Duration = Duration::from_secs(3);
 
 /// Draw the whole UI for one frame.
 pub fn draw(f: &mut Frame, app: &mut App) {
@@ -28,7 +34,15 @@ pub fn draw(f: &mut Frame, app: &mut App) {
         Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)]).split(root[0]);
     draw_main_diff(f, cols[0], app);
     draw_llm(f, cols[1], app);
-    draw_statusline(f, root[1]);
+    if let Some((sel, origin)) = app.selection_origin() {
+        selection::paint(f.buffer_mut(), app.pane_areas.of(sel.panel), origin, &sel);
+    }
+    let notice = app
+        .notice
+        .as_ref()
+        .filter(|(_, at)| at.elapsed() < NOTICE_TTL)
+        .map(|(text, _)| text.as_str());
+    draw_statusline(f, root[1], notice);
     // The command palette and help modal overlay both panes when open; drawn
     // last so their borders and cursor sit on top. Only one is ever open.
     if let Some(palette) = app.palette.as_ref() {
@@ -45,8 +59,9 @@ pub fn draw(f: &mut Frame, app: &mut App) {
 }
 
 /// The bottom keyboard-shortcut statusline: the curated command chips on the
-/// left, and the `Alt+S` help hint pinned to the far right so it always shows.
-fn draw_statusline(f: &mut Frame, area: Rect) {
+/// left (or a brief `notice` in their place), and the `Alt+S` help hint pinned
+/// to the far right so it always shows.
+fn draw_statusline(f: &mut Frame, area: Rect, notice: Option<&str>) {
     let key = Style::new()
         .fg(Color::Rgb(255, 199, 119))
         .add_modifier(Modifier::BOLD);
@@ -54,10 +69,13 @@ fn draw_statusline(f: &mut Frame, area: Rect) {
     let sep = Style::new().fg(Color::Rgb(78, 92, 122));
 
     let mut left = vec![Span::raw(" ")];
+    if let Some(text) = notice {
+        left.push(Span::styled(text.to_owned(), key));
+    }
     let mut first = true;
     for s in shortcuts::footer_subset()
         .into_iter()
-        .filter(|s| s.group != Group::Global)
+        .filter(|s| notice.is_none() && s.group != Group::Global)
     {
         if !first {
             left.push(Span::styled("  ·  ", sep));
@@ -104,24 +122,34 @@ fn draw_main_diff(f: &mut Frame, area: Rect, app: &mut App) {
     let block = bordered(&title, focused);
     let inner = block.inner(area);
     f.render_widget(block, area);
+    app.pane_areas.main = Rect::default();
     if inner.height == 0 || inner.width == 0 {
         return;
     }
-    let rows = Layout::vertical([Constraint::Length(1), Constraint::Min(0)]).split(inner);
+    let rows = Layout::vertical([
+        Constraint::Length(1),
+        Constraint::Length(1),
+        Constraint::Min(0),
+    ])
+    .split(inner);
     f.render_widget(Paragraph::new(tab_strip(app.active_diff_view)), rows[0]);
+    if let Some(url) = app.open_url.as_deref() {
+        f.render_widget(Paragraph::new(review_url_line(url)), rows[1]);
+    }
+    app.pane_areas.main = rows[2];
 
     match app.active_diff_view {
-        MainDiffView::Log => draw_log_view(f, rows[1], &mut app.difit, focused),
+        MainDiffView::Log => draw_log_view(f, rows[2], &mut app.difit, focused),
         MainDiffView::TestPlan => draw_markdown_view(
             f,
-            rows[1],
+            rows[2],
             &mut app.test_plan,
             "No test plan yet.",
             "Press Ctrl+G to ask the LLM to generate one.",
         ),
         MainDiffView::Guide => draw_markdown_view(
             f,
-            rows[1],
+            rows[2],
             &mut app.guide,
             "No diff guide yet.",
             "Press Ctrl+G to ask the LLM to generate one.",
@@ -148,6 +176,23 @@ fn tab_strip(active: MainDiffView) -> Line<'static> {
     }
     spans.push(Span::styled("   (tab)", dim));
     Line::from(spans)
+}
+
+/// The `review · <url>` row under the tab strip. difit's log only prints its
+/// own server URL, so this keeps the review shell's URL in view and clickable.
+fn review_url_line(url: &str) -> Line<'static> {
+    let dim = Style::new().fg(Color::Rgb(122, 134, 173));
+    Line::from(vec![
+        Span::raw(" "),
+        Span::styled("review · ", dim),
+        Span::styled(
+            url.to_owned(),
+            Style::new()
+                .fg(Color::Rgb(130, 170, 255))
+                .add_modifier(Modifier::UNDERLINED),
+        ),
+        Span::styled("   (^O open)", dim),
+    ])
 }
 
 /// The log view: difit's `vt100` screen, resized to its area.
@@ -215,9 +260,10 @@ fn draw_markdown_view(
 
 fn draw_llm(f: &mut Frame, area: Rect, app: &mut App) {
     let focused = app.focus == Panel::Llm;
+    app.pane_areas.llm = Rect::default();
     if let Some(llm) = app.llm.as_mut() {
         let title = llm_title(app.agent_kind);
-        render_pane(f, area, &title, llm, focused);
+        app.pane_areas.llm = render_pane(f, area, &title, llm, focused);
     } else {
         let title = llm_session_ended_title(app.agent_kind);
         let block = bordered(&title, focused);
@@ -239,11 +285,13 @@ fn llm_session_ended_title(agent_kind: AgentKind) -> String {
 }
 
 /// Render one PTY pane inside a bordered block, resizing the PTY to fit.
-fn render_pane(f: &mut Frame, area: Rect, title: &str, pane: &mut PtyPane, focused: bool) {
+/// Returns the terminal's area inside the border.
+fn render_pane(f: &mut Frame, area: Rect, title: &str, pane: &mut PtyPane, focused: bool) -> Rect {
     let block = bordered(title, focused);
     let inner = block.inner(area);
     f.render_widget(block, area);
     draw_log_view(f, inner, pane, focused);
+    inner
 }
 
 /// A bordered block whose border brightens when focused.
@@ -263,7 +311,7 @@ fn bordered(title: &str, focused: bool) -> Block<'_> {
 mod tests {
     use crate::session::AgentKind;
 
-    use super::{llm_session_ended_title, llm_title};
+    use super::{llm_session_ended_title, llm_title, review_url_line};
 
     #[test]
     fn llm_title_uses_agent_label_without_internal_nomenclature() {
@@ -289,5 +337,15 @@ mod tests {
             " Codex session ended "
         );
         assert!(!llm_session_ended_title(AgentKind::Codex).contains("LLM panel"));
+    }
+
+    #[test]
+    fn review_url_line_shows_the_shell_url_in_full() {
+        let text: String = review_url_line("http://127.0.0.1:4675/")
+            .spans
+            .iter()
+            .map(|span| span.content.as_ref())
+            .collect();
+        assert_eq!(text, " review · http://127.0.0.1:4675/   (^O open)");
     }
 }

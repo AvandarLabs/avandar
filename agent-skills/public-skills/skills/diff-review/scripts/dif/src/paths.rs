@@ -56,6 +56,27 @@ pub fn test_plan_path(repo_root: &Path, branch_slug: &str, scope_slug: &str) -> 
     difit_dir(repo_root).join(format!("{branch_slug}-difit-{scope_slug}-test-plan.md"))
 }
 
+/// The GitHub sync record for this review:
+/// `<repo>/.difit/<branch>-difit-<scope>-github.json`.
+///
+/// Lists which transcript comments were sent to the branch's GitHub PR instead
+/// of the LLM, and the GitHub comment each maps to. `dif` owns it; the
+/// `diff-review` skill reads it to leave those comments alone.
+#[must_use]
+pub fn github_sync_path(repo_root: &Path, branch_slug: &str, scope_slug: &str) -> PathBuf {
+    difit_dir(repo_root).join(format!("{branch_slug}-difit-{scope_slug}-github.json"))
+}
+
+/// The comments held for "Send all" in this review:
+/// `<repo>/.difit/<branch>-difit-<scope>-held.json`.
+///
+/// `dif` owns it, saving the held message ids as the queue changes so a
+/// relaunch holds them again instead of losing them to the launch baseline.
+#[must_use]
+pub fn held_comments_path(repo_root: &Path, branch_slug: &str, scope_slug: &str) -> PathBuf {
+    difit_dir(repo_root).join(format!("{branch_slug}-difit-{scope_slug}-held.json"))
+}
+
 /// The reviewed-state file for this review:
 /// `<repo>/.difit/<branch>-difit-<scope>-reviewed.json`.
 ///
@@ -126,6 +147,21 @@ mod tests {
             p,
             PathBuf::from("/r/.difit/feat-share-difit-dot-summary.md")
         );
+    }
+
+    #[test]
+    fn github_sync_shares_the_review_stem() {
+        let p = github_sync_path(Path::new("/r"), "feat-share", "dot");
+        assert_eq!(
+            p,
+            PathBuf::from("/r/.difit/feat-share-difit-dot-github.json")
+        );
+    }
+
+    #[test]
+    fn held_comments_share_the_review_stem() {
+        let p = held_comments_path(Path::new("/r"), "feat-share", "dot");
+        assert_eq!(p, PathBuf::from("/r/.difit/feat-share-difit-dot-held.json"));
     }
 
     #[test]

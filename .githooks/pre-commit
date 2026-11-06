@@ -4,6 +4,14 @@
 
 set -uo pipefail
 
+if [[ -t 2 ]]; then
+  YELLOW=$'\033[33m'
+  RESET=$'\033[0m'
+else
+  YELLOW=''
+  RESET=''
+fi
+
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 if [ -z "$REPO_ROOT" ]; then
   exit 0
@@ -19,7 +27,7 @@ validate_working_config() {
 validate_staged_config() {
   if ! git cat-file -e :supabase/config.toml 2>/dev/null; then
     echo "The staged tree does not contain supabase/config.toml." >&2
-    echo "Run 'ava supabase restore', stage the restored files, and retry." >&2
+    echo "${YELLOW}Run 'ava supabase restore', stage the restored files, and retry.${RESET}" >&2
     return 1
   fi
 

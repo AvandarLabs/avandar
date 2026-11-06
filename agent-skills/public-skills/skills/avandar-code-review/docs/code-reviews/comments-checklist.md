@@ -74,6 +74,67 @@ applies the comment bullets listed under **Focused Reviews** in
   export async function rehydratePlan(options: Options): Promise<void> {}
   ```
 
+- Every docstring says what the documented thing is for, not only what it
+  is: who calls or reads it, in what situation, and what they get from it. A
+  reader deciding whether and how to use it should not have to search for its
+  callers. This applies to functions, types, module objects, hooks,
+  components, and constants alike.
+  - **Tightly coupled code** exists for a fixed set of callers, so a new
+    caller would be a design change. An example is a module that shares
+    state between two specific parts of one feature. Name every caller by
+    identifier, never by file path, as a complete list.
+  - **Loosely coupled code** is meant for reuse: utilities, hooks, clients,
+    models, components. Give one or two use cases, marked as examples ("for
+    example", "such as"). Never name a file or a specific caller, so the
+    docstring does not suggest tight coupling.
+  - To decide, code that lives in a shared location or already has callers
+    in more than one feature is loosely coupled. When unsure, treat it as
+    loosely coupled: a use case stays true as callers change, and a caller
+    list does not.
+  - Aim for 2 to 6 lines of text. One line is enough only when it already
+    says what the thing is for. Past 8 lines, a docstring is usually
+    narrating the implementation, which belongs in `//` comments in the body.
+  - Exceptions, which need no use: 1) a type that restates its fields or
+    aliases another type; 2) a constant whose name and value already say
+    what it is for; 3) a member of a module object whose use the module's
+    own docstring already gives.
+
+  This is bad (says what it is, not what it is for):
+
+  ```ts
+  /** Session-only target ownership shared by rendering and explicit edits. */
+  export const DataVizRuntimeTargets = {
+  ```
+
+  This is good (tightly coupled, so it names its callers):
+
+  ```ts
+  /**
+   * Remembers, for this browser session, which column each dashboard filter
+   * applies to in each chart, so a filter that bound to a column ID keeps it
+   * when the chart's SQL is edited. Nothing here is saved to the dashboard.
+   *
+   * Read and written by `useDataVizRuntimeColumnBindings` on render and by
+   * `DashboardColumnBindingPreparation` at save, so a saved chart keeps the
+   * filter targets the editor was already seeing.
+   */
+  export const DataVizRuntimeTargets = {
+  ```
+
+  This is good (loosely coupled, so it gives a use case):
+
+  ```ts
+  /**
+   * Gets the query column ID of the one `QueryResult` column with this name,
+   * matching exactly first and then case-insensitively. Undefined when none
+   * or several match.
+   *
+   * Use it wherever something names a column but needs its ID, for example a
+   * chart setting or a filter that was written against a column name.
+   */
+  export function getQueryColumnIdFromQueryResultColumnName(
+  ```
+
 - Do not use file-level comments in a file that has a main export. A file-level
   comment is a detached block comment describing the file as a whole rather than
   a specific member; it counts whether it sits at the very top of the file or

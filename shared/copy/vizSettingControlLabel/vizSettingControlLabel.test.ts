@@ -6,11 +6,14 @@ import { describe, expect, it } from "vitest";
  * non-English locale.
  */
 import { knownVizSettingControlLabels } from "$/copy/vizSettingControlLabel/vizSettingControlLabel.ts";
-import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs.ts";
+import {
+  AvaVizConfigs,
+  VizTypes,
+} from "$/models/vizs/AvaVizConfig/AvaVizConfigs.ts";
 
 function collectRegistryLabels(): string[] {
   return VizTypes.flatMap((vizType) => {
-    const descriptors = VizConfigs.getDescriptors(vizType);
+    const descriptors = AvaVizConfigs.getDescriptors(vizType);
     return [...descriptors.chart, ...descriptors.series].flatMap(
       (descriptor) => {
         const control = descriptor.control;
