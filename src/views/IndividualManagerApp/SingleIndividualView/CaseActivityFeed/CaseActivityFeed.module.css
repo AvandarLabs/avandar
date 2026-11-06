@@ -1,0 +1,40 @@
+.feed {
+  display: flex;
+  flex-direction: column;
+}
+
+.earlier {
+  align-self: center;
+}
+
+.day {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  margin-block-start: var(--mantine-spacing-sm);
+}
+
+.day::after {
+  background-color: var(--ava-border-default);
+  content: "";
+  flex: 1;
+  height: 1px;
+}
+
+.dock {
+  background-color: var(--ava-surface-raised);
+  inset-block-end: 0;
+  padding-block: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  position: sticky;
+}
+
+.empty {
+  margin-inline: auto;
+  max-width: 720px;
+  padding: var(--mantine-spacing-xxl) var(--mantine-spacing-lg);
+  text-align: center;
+}
+
+.emptyTitle {
+  text-wrap: balance;
+}
