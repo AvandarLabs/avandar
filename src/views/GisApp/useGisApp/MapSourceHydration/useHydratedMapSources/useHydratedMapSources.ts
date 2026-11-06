@@ -101,6 +101,14 @@ function useMissingFilterNotification(
   );
 }
 
+/** The inputs `useHydratedUpdateConfig` hydrates each update against. */
+type HydrationInputs = {
+  previousInput: AvaMapConfig.T;
+  previousConfig: AvaMapConfig.T;
+  readyColumns: readonly DatasetColumn.T[] | undefined;
+  readyAttributes: readonly ConceptAttribute.T[] | undefined;
+};
+
 /**
  * Returns an `updateConfig` that hydrates the current config before applying
  * an update. Its identity only changes with the editor's own `updateConfig`:
@@ -113,12 +121,7 @@ function useHydratedUpdateConfig({
   latestHydration,
 }: Readonly<{
   updateEditorConfig: ReturnType<typeof useAvaMapEditor>["updateConfig"];
-  latestHydration: {
-    previousInput: AvaMapConfig.T;
-    previousConfig: AvaMapConfig.T;
-    readyColumns: readonly DatasetColumn.T[] | undefined;
-    readyAttributes: readonly ConceptAttribute.T[] | undefined;
-  };
+  latestHydration: HydrationInputs;
 }>): ReturnType<typeof useAvaMapEditor>["updateConfig"] {
   const { previousInput, previousConfig, readyColumns, readyAttributes } =
     latestHydration;
@@ -140,15 +143,15 @@ function useHydratedUpdateConfig({
     (update: (current: AvaMapConfig.T) => AvaMapConfig.T) => {
       return updateEditorConfig((config) => {
         const hydrationInputs = hydrationRef.current;
-        const hydrated = MapSourceHydration.fromMetadata({
+        const hydratedConfig = MapSourceHydration.fromMetadata({
           config,
           previousInput: hydrationInputs.previousInput,
           previousConfig: hydrationInputs.previousConfig,
           datasetColumns: hydrationInputs.readyColumns,
           conceptAttributes: hydrationInputs.readyAttributes,
         }).config;
-        const updated = update(hydrated);
-        return updated === hydrated ? config : updated;
+        const updatedConfig = update(hydratedConfig);
+        return updatedConfig === hydratedConfig ? config : updatedConfig;
       });
     },
     [updateEditorConfig],
