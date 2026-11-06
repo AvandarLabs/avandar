@@ -28,6 +28,8 @@ function _catalog(size: number): SocrataDiscoveryResult[] {
       domain: "data.cityofnewyork.us",
       createdAt: "2026-01-01T00:00:00.000Z",
       updatedAt: new Date(Date.UTC(2026, 9, 1, 0, index)).toISOString(),
+      assetType: "dataset",
+      blobMimeType: undefined,
       columns: [{ fieldName: "a", name: "A", dataType: "Text" }],
     };
   });
@@ -50,12 +52,14 @@ function _discoveryOver(
 function _engine(
   stores: EtlStores,
   catalog: readonly SocrataDiscoveryResult[],
+  unloadableFormats: readonly string[] = [],
 ) {
   return createSocrataEtlEngine({
     output: OUTPUT,
     discovery: _discoveryOver(catalog),
     drives: [DRIVE],
     stores,
+    workspaceLoadability: { unloadableFormats },
   });
 }
 
@@ -81,7 +85,7 @@ describe("createSocrataEtlEngine", () => {
     ]);
   });
 
-  it("writes each listing's columns with it, and skips a dataset with none the export has", async () => {
+  it("writes each listing's columns with it, and lists a dataset with none the export has as unloadable", async () => {
     const listings = createInMemoryListingsStore();
     const catalog = _catalog(2).map((result, index) => {
       return index === 0
@@ -107,14 +111,74 @@ describe("createSocrataEtlEngine", () => {
       catalog,
     ).run({ mode: "full" });
 
-    const [row] = listings.getRows();
+    const [row, columnlessRow] = listings.getRows();
     expect([
       report.crawls[0]?.relationsWritten,
-      listings.getRows().length,
       listings.getRelationColumns(row?.id ?? "")?.map((column) => {
         return [column.column_name, column.cast_data_type];
       }),
-    ]).toEqual([1, 1, [["a", "VARCHAR"]]]);
+      row?.is_workspace_loadable,
+      columnlessRow?.is_workspace_loadable,
+      listings.getRelationColumns(columnlessRow?.id ?? ""),
+    ]).toEqual([2, [["a", "VARCHAR"]], true, false, []]);
+  });
+
+  it("lists every asset type, and marks only datasets loadable", async () => {
+    const listings = createInMemoryListingsStore();
+    const catalog = _catalog(3).map((result, index) => {
+      if (index === 1) {
+        return { ...result, assetType: "map", columns: [] };
+      }
+      if (index === 2) {
+        return {
+          ...result,
+          assetType: "file",
+          blobMimeType: "application/pdf",
+          columns: [],
+        };
+      }
+      return result;
+    });
+
+    await _engine(
+      {
+        listings,
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+      },
+      catalog,
+    ).run({ mode: "full" });
+
+    expect(
+      listings.getRows().map((row) => {
+        return [
+          row.source_asset_type,
+          row.api_resource_format,
+          row.is_workspace_loadable,
+          row.source_url,
+        ];
+      }),
+    ).toEqual([
+      ["dataset", "CSV", true, `${DRIVE.baseUrl}/d/ds-0`],
+      ["map", null, false, `${DRIVE.baseUrl}/d/ds-1`],
+      ["file", "PDF", false, `${DRIVE.baseUrl}/d/ds-2`],
+    ]);
+  });
+
+  it("applies the workspace loadability rules it is given", async () => {
+    const listings = createInMemoryListingsStore();
+
+    await _engine(
+      {
+        listings,
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+      },
+      _catalog(1),
+      ["csv"],
+    ).run({ mode: "full" });
+
+    expect(listings.getRows()[0]?.is_workspace_loadable).toBe(false);
   });
 
   it("writes each dataset once across overlapping pages", async () => {

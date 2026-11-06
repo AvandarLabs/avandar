@@ -32,6 +32,8 @@ function _catalog(size: number): SocrataDiscoveryResult[] {
       domain: "data.cityofnewyork.us",
       createdAt: "2026-01-01T00:00:00.000Z",
       updatedAt: _at(index).toISOString(),
+      assetType: "dataset",
+      blobMimeType: undefined,
       columns: [{ fieldName: "a", name: "A", dataType: "Text" }],
     };
   });

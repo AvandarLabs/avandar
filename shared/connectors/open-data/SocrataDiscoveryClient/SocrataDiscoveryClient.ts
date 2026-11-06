@@ -50,6 +50,8 @@ function _splitValidResults(rawResults: readonly unknown[]): {
       domain: metadata.domain,
       createdAt: resource.createdAt,
       updatedAt: resource.updatedAt,
+      assetType: resource.type,
+      blobMimeType: resource.blob_mime_type ?? undefined,
       columns: resource.columns_field_name.map((fieldName, index) => {
         return {
           fieldName,
