@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getMentionedUserIds,
   isRichTextDocument,
+  isSafeLinkHref,
   parseRichTextDocument,
   richTextToPlainText,
 } from "$/models/RichTextDocument/RichTextDocument.ts";
@@ -116,5 +117,19 @@ describe("richTextToPlainText", () => {
 describe("getMentionedUserIds", () => {
   it("returns each mentioned user once, in document order, including nested ones", () => {
     expect(getMentionedUserIds(DOCUMENT)).toEqual([MEMBER_ID, OTHER_ID]);
+  });
+});
+
+describe("isSafeLinkHref", () => {
+  it("allows web and email links in any case", () => {
+    expect(isSafeLinkHref("https://example.org")).toBe(true);
+    expect(isSafeLinkHref("http://example.org")).toBe(true);
+    expect(isSafeLinkHref("MAILTO:lab@example.org")).toBe(true);
+  });
+
+  it("refuses script, data, and relative links", () => {
+    expect(isSafeLinkHref("javascript:alert(1)")).toBe(false);
+    expect(isSafeLinkHref("data:text/html,hi")).toBe(false);
+    expect(isSafeLinkHref("/cases/1")).toBe(false);
   });
 });

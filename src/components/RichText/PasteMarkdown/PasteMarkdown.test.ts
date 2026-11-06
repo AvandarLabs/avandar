@@ -1,6 +1,7 @@
 import { Editor } from "@tiptap/core";
 import { Slice } from "@tiptap/pm/model";
 import { afterEach, describe, expect, it } from "vitest";
+import { isRichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
 import { createRichTextExtensions } from "@/components/RichText/createRichTextExtensions";
 import { looksLikeMarkdown } from "@/components/RichText/PasteMarkdown/PasteMarkdown";
 
@@ -53,5 +54,36 @@ describe("PasteMarkdown", () => {
   it("lets the browser handle a paste that carries HTML", () => {
     editor = new Editor({ extensions: createRichTextExtensions() });
     expect(_paste(editor, "- one", ["text/plain", "text/html"])).toBe(false);
+  });
+
+  it("drops a pasted link that could run script, keeping its text", () => {
+    editor = new Editor({ extensions: createRichTextExtensions() });
+    expect(_paste(editor, "See [x](javascript:alert(1)) **now**")).toBe(true);
+    const document = editor.getJSON();
+    expect(JSON.stringify(document)).not.toContain("javascript:");
+    expect(editor.getText()).toContain("See x now");
+    expect(isRichTextDocument(document)).toBe(true);
+  });
+
+  it("keeps a pasted web link", () => {
+    editor = new Editor({ extensions: createRichTextExtensions() });
+    _paste(editor, "See [the lab](https://example.org/lab)");
+    expect(JSON.stringify(editor.getJSON())).toContain(
+      '"href":"https://example.org/lab"',
+    );
+  });
+
+  it("pastes markdown as typed text inside a code block", () => {
+    editor = new Editor({
+      extensions: createRichTextExtensions(),
+      content: {
+        type: "doc",
+        content: [
+          { type: "codeBlock", content: [{ type: "text", text: "x" }] },
+        ],
+      },
+    });
+    editor.commands.focus("end");
+    expect(_paste(editor, "- one\n- two")).toBe(false);
   });
 });

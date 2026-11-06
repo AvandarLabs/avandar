@@ -3,9 +3,10 @@ import { Button, Group, Text } from "@mantine/core";
 import { RichTextEditor } from "@mantine/tiptap";
 import { IconAt } from "@tabler/icons-react";
 import { Extension } from "@tiptap/core";
-import { useEditor } from "@tiptap/react";
+import { useEditor, useEditorState } from "@tiptap/react";
 import { useMemo, useRef, useState } from "react";
 import {
+  isRichTextDocument,
   RICH_TEXT_MAX_TEXT_LENGTH,
   richTextToPlainText,
 } from "$/models/RichTextDocument/RichTextDocument";
@@ -15,10 +16,16 @@ import { RichTextMembersContext } from "@/components/RichText/RichTextMembersCon
 import { createUserMentionSuggestion } from "@/components/RichText/UserMention/createUserMentionSuggestion";
 import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
 import type { MentionCandidate } from "@/components/RichText/UserMention/filterMentionCandidates";
+import type { RichTextEditorLabels } from "@mantine/tiptap";
+import type { Editor } from "@tiptap/core";
 import type { ReactNode } from "react";
 
 /** Show the character counter once the text is this close to the limit. */
 const COUNTER_THRESHOLD = RICH_TEXT_MAX_TEXT_LENGTH - 1000;
+
+type MembersLookup = {
+  getMemberName: (userId: string) => string | undefined;
+};
 
 type Props = {
   /** Accessible name of the editing area. */
@@ -32,7 +39,10 @@ type Props = {
   isSubmitBlocked?: boolean;
   /** Content above the editing area, such as an offline notice. */
   notice?: ReactNode;
-  /** Resolves `true` when the document was saved, which clears the editor. */
+  /**
+   * Resolves `true` when the document was saved, which clears the editor.
+   * Resolving `false` or rejecting keeps the text so it can be retried.
+   */
   onSubmit: (
     document: RichTextDocument.T,
     plainText: string,
@@ -41,10 +51,42 @@ type Props = {
   onCancel?: () => void;
 };
 
+/** Translated names for the toolbar controls and the link editor. */
+function useEditorLabels(): Partial<RichTextEditorLabels> {
+  const { t } = useLingui();
+  return useMemo(() => {
+    return {
+      boldControlLabel: t`Bold`,
+      italicControlLabel: t`Italic`,
+      bulletListControlLabel: t`Bullet list`,
+      orderedListControlLabel: t`Numbered list`,
+      linkControlLabel: t`Link`,
+      codeControlLabel: t`Code`,
+      blockquoteControlLabel: t`Quote`,
+      linkEditorInputLabel: t`Link address`,
+      linkEditorInputPlaceholder: t`https://example.org`,
+      linkEditorExternalLink: t`Open link in a new tab`,
+      linkEditorInternalLink: t`Open link in the same tab`,
+      linkEditorSave: t`Save`,
+    };
+  }, [t]);
+}
+
+/** The editor's plain text length, counted the way the stored text is. */
+function _getPlainTextLength(
+  editor: Editor,
+  membersLookup: MembersLookup,
+): number {
+  return richTextToPlainText(editor.getJSON() as RichTextDocument.T, {
+    getMentionLabel: membersLookup.getMemberName,
+  }).length;
+}
+
 /**
  * The rich text editor used to write and edit comments: markdown shortcuts,
  * markdown paste, `@` mentions of workspace members, and Mod-Enter to
- * submit.
+ * submit. While a submit is in flight the text is read-only, so nothing
+ * typed during the save is lost when it clears.
  */
 export function RichTextComposer({
   label,
@@ -60,13 +102,17 @@ export function RichTextComposer({
   onCancel,
 }: Props): ReactNode {
   const { t } = useLingui();
+  const labels = useEditorLabels();
   const candidatesRef = useRef(mentionCandidates);
   candidatesRef.current = mentionCandidates;
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
   const submitRef = useRef<() => void>(() => {});
-  const [plainTextLength, setPlainTextLength] = useState(0);
-  const [isEmpty, setIsEmpty] = useState(initialContent === undefined);
+  const isSavingRef = useRef(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasDisallowedLink, setHasDisallowedLink] = useState(false);
 
-  const membersLookup = useMemo(() => {
+  const membersLookup = useMemo((): MembersLookup => {
     const namesById = new Map(
       mentionCandidates.map((candidate) => {
         return [candidate.userId, candidate.displayName];
@@ -79,8 +125,11 @@ export function RichTextComposer({
     };
   }, [mentionCandidates]);
 
-  const editor = useEditor({
-    extensions: [
+  // Built once: `useEditor` calls `setOptions` whenever an option changes
+  // identity, so a fresh array or object per render would do it per
+  // keystroke.
+  const [extensions] = useState(() => {
+    return [
       ...createRichTextExtensions({
         placeholder,
         mentionSuggestion: createUserMentionSuggestion(() => {
@@ -98,50 +147,96 @@ export function RichTextComposer({
           };
         },
       }),
-    ],
-    content: initialContent ?? "",
-    editorProps: {
+    ];
+  });
+  const [content] = useState(() => {
+    return initialContent ?? "";
+  });
+  const editorProps = useMemo(() => {
+    return {
       attributes: {
         "aria-label": label,
         "aria-multiline": "true",
         role: "textbox",
       },
-    },
-    onCreate: ({ editor: createdEditor }) => {
-      setIsEmpty(createdEditor.isEmpty);
-      setPlainTextLength(createdEditor.getText().length);
-    },
+    };
+  }, [label]);
+
+  const editor = useEditor({
+    extensions,
+    content,
+    editorProps,
     onUpdate: ({ editor: updatedEditor }) => {
-      setIsEmpty(updatedEditor.isEmpty);
-      setPlainTextLength(updatedEditor.getText().length);
-      onChange?.(updatedEditor.getJSON() as RichTextDocument.T);
+      setHasDisallowedLink(false);
+      onChangeRef.current?.(updatedEditor.getJSON() as RichTextDocument.T);
+    },
+  });
+
+  const { isEmpty, plainTextLength } = useEditorState({
+    editor,
+    selector: ({ editor: currentEditor }) => {
+      return {
+        isEmpty: currentEditor.isEmpty,
+        plainTextLength: _getPlainTextLength(currentEditor, membersLookup),
+      };
     },
   });
 
   const isOverLimit = plainTextLength > RICH_TEXT_MAX_TEXT_LENGTH;
   const isSubmitDisabled =
-    isEmpty || isOverLimit || isSubmitBlocked || isSubmitting;
+    isEmpty || isOverLimit || isSubmitBlocked || isSubmitting || isSaving;
 
   submitRef.current = () => {
-    if (!editor || isSubmitDisabled) {
+    if (isSavingRef.current || isSubmitDisabled) {
       return;
     }
     const document = editor.getJSON() as RichTextDocument.T;
+    // The editor only makes documents the schema accepts, except for a
+    // link whose href slipped past the link extension's check.
+    if (!isRichTextDocument(document)) {
+      setHasDisallowedLink(true);
+      return;
+    }
     const plainText = richTextToPlainText(document, {
       getMentionLabel: membersLookup.getMemberName,
     });
-    void onSubmit(document, plainText).then((didSave) => {
-      if (didSave) {
-        editor.commands.clearContent(true);
-      }
-    });
+    isSavingRef.current = true;
+    setIsSaving(true);
+    editor.setEditable(false, false);
+    void Promise.resolve()
+      .then(() => {
+        return onSubmit(document, plainText);
+      })
+      .catch(() => {
+        return false;
+      })
+      .then((didSave) => {
+        isSavingRef.current = false;
+        setIsSaving(false);
+        if (editor.isDestroyed) {
+          return;
+        }
+        editor.setEditable(true, false);
+        if (didSave) {
+          editor.commands.clearContent(true);
+        }
+      });
   };
 
   return (
     <RichTextMembersContext.Provider value={membersLookup}>
-      <RichTextEditor editor={editor} className={classes.editor}>
+      <RichTextEditor
+        editor={editor}
+        className={classes.editor}
+        labels={labels}
+      >
         {notice}
         <RichTextEditor.Content className={classes.content} />
+        {hasDisallowedLink ? (
+          <Text size="xs" c="danger" role="alert" className={classes.error}>
+            {t`Some links in this update are not allowed. Use web or email links.`}
+          </Text>
+        ) : null}
         <div className={classes.footer}>
           <RichTextEditor.Toolbar className={classes.toolbar}>
             <RichTextEditor.ControlsGroup>
@@ -158,7 +253,7 @@ export function RichTextComposer({
                 aria-label={t`Mention a teammate`}
                 title={t`Mention a teammate`}
                 onClick={() => {
-                  editor?.chain().focus().insertContent("@").run();
+                  editor.chain().focus().insertContent("@").run();
                 }}
               >
                 <IconAt size={16} stroke={1.75} />
@@ -185,7 +280,7 @@ export function RichTextComposer({
             ) : null}
             <Button
               size="compact-sm"
-              loading={isSubmitting}
+              loading={isSubmitting || isSaving}
               disabled={isSubmitDisabled}
               onClick={() => {
                 submitRef.current();

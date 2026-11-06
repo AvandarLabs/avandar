@@ -70,13 +70,22 @@ const BLOCK_CONTAINER_TYPES: ReadonlySet<string> = new Set([
 /** Link targets a stored link may open: web pages and email addresses. */
 const SAFE_LINK_HREF_PATTERN = /^(https?:|mailto:)/i;
 
+/**
+ * Whether a link may be stored and opened: only web (`http`, `https`) and
+ * email (`mailto`) links. The editor and the stored document schema share
+ * this check so the editor never makes a link the save would reject.
+ */
+export function isSafeLinkHref(href: string): boolean {
+  return SAFE_LINK_HREF_PATTERN.test(href);
+}
+
 const AttrsSchema = z.record(z.string(), z.unknown());
 
 const MarkSchema = z.union([
   z.object({
     type: z.literal("link"),
     attrs: z
-      .object({ href: z.string().regex(SAFE_LINK_HREF_PATTERN) })
+      .object({ href: z.string().refine(isSafeLinkHref) })
       .catchall(z.unknown()),
   }),
   z.object({

@@ -3,6 +3,7 @@ import { Combobox, Stack, Text, useCombobox } from "@mantine/core";
 import {
   forwardRef,
   useEffect,
+  useId,
   useImperativeHandle,
   useRef,
   useState,
@@ -19,7 +20,20 @@ export type UserMentionListProps = {
   items: readonly MentionCandidate[];
   clientRect: (() => DOMRect | null) | null | undefined;
   command: (attributes: { id: string }) => void;
+  /**
+   * Called with the listbox id and the highlighted option's id whenever the
+   * highlight moves, so the editor can point `aria-activedescendant` at it.
+   */
+  onHighlightChange?: (ids: {
+    listboxId: string;
+    activeOptionId: string | undefined;
+  }) => void;
 };
+
+/** The DOM id of one member's option inside the listbox. */
+function _buildOptionId(listboxId: string, userId: string): string {
+  return `${listboxId}-${userId}`;
+}
 
 /** Two-letter initials for a member's avatar. */
 function _initials(name: string): string {
@@ -40,7 +54,13 @@ function _initials(name: string): string {
 export const UserMentionList = forwardRef<
   UserMentionListHandle,
   UserMentionListProps
->(function UserMentionList({ items, clientRect, command }, ref) {
+>(function UserMentionList(
+  { items, clientRect, command, onHighlightChange },
+  ref,
+) {
+  const listboxId = useId();
+  const onHighlightChangeRef = useRef(onHighlightChange);
+  onHighlightChangeRef.current = onHighlightChange;
   // Always open while mounted: the suggestion plugin mounts and unmounts
   // the list as the `@` query starts and ends.
   const combobox = useCombobox({ opened: true });
@@ -61,11 +81,23 @@ export const UserMentionList = forwardRef<
     setHighlightedIndex(0);
   }, [items]);
 
+  useEffect(() => {
+    const highlightedItem = items[highlightedIndex];
+    onHighlightChangeRef.current?.({
+      listboxId,
+      activeOptionId: highlightedItem
+        ? _buildOptionId(listboxId, highlightedItem.userId)
+        : undefined,
+    });
+  }, [highlightedIndex, items, listboxId]);
+
   useImperativeHandle(ref, () => {
     return {
       onKeyDown: (event) => {
+        const isArrowKey = event.key === "ArrowDown" || event.key === "ArrowUp";
         if (items.length === 0) {
-          return false;
+          // Nothing to move through, but the caret must not move either.
+          return isArrowKey;
         }
         const currentIndex = highlightedIndexRef.current;
         if (event.key === "ArrowDown") {
@@ -100,6 +132,9 @@ export const UserMentionList = forwardRef<
         position="bottom-start"
         width={300}
         withinPortal
+        // The anchor is a zero-size point at the caret, which floating-ui
+        // can report as detached. The list must show whenever it is mounted.
+        hideDetached={false}
         onOptionSubmit={(userId) => {
           command({ id: userId });
         }}
@@ -108,7 +143,7 @@ export const UserMentionList = forwardRef<
           <div />
         </Combobox.Target>
         <Combobox.Dropdown>
-          <Combobox.Options>
+          <Combobox.Options id={listboxId}>
             {items.length === 0 ? (
               <Combobox.Empty>
                 <Trans>No teammates match</Trans>
@@ -119,6 +154,7 @@ export const UserMentionList = forwardRef<
                 return (
                   <Combobox.Option
                     key={item.userId}
+                    id={_buildOptionId(listboxId, item.userId)}
                     value={item.userId}
                     selected={isHighlighted}
                     aria-selected={isHighlighted}

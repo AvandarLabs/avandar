@@ -29,3 +29,7 @@
 .counter {
   margin-inline-start: auto;
 }
+
+.error {
+  padding: 0 var(--mantine-spacing-xs);
+}

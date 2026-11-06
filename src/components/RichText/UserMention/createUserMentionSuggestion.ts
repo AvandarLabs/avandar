@@ -9,21 +9,40 @@ import type {
 import type { MentionOptions } from "@tiptap/extension-mention";
 import type { SuggestionProps } from "@tiptap/suggestion";
 
+/** Attributes that tie the editing area to the open list for screen readers. */
+const COMBOBOX_ARIA_ATTRIBUTES = [
+  "aria-activedescendant",
+  "aria-autocomplete",
+  "aria-controls",
+  "aria-expanded",
+] as const;
+
 function _toListProps(
   props: SuggestionProps<MentionCandidate>,
 ): UserMentionListProps {
+  const editingArea = props.editor.view.dom;
   return {
     items: props.items,
     clientRect: props.clientRect,
     command: (attributes) => {
       props.command(attributes);
     },
+    onHighlightChange: ({ listboxId, activeOptionId }) => {
+      editingArea.setAttribute("aria-controls", listboxId);
+      if (activeOptionId) {
+        editingArea.setAttribute("aria-activedescendant", activeOptionId);
+      } else {
+        editingArea.removeAttribute("aria-activedescendant");
+      }
+    },
   };
 }
 
 /**
  * Suggestion options for `@` mentions. `getCandidates` is read on every
- * keystroke, so the list follows the latest workspace members.
+ * keystroke, so the list follows the latest workspace members. While the
+ * list is open, the editing area carries the ARIA combobox attributes that
+ * point at it and at the highlighted member.
  */
 export function createUserMentionSuggestion(
   getCandidates: () => readonly MentionCandidate[],
@@ -38,14 +57,11 @@ export function createUserMentionSuggestion(
         | ReactRenderer<UserMentionListHandle, UserMentionListProps>
         | undefined;
 
-      const destroy = () => {
-        renderer?.element.remove();
-        renderer?.destroy();
-        renderer = undefined;
-      };
-
       return {
         onStart: (props: SuggestionProps<MentionCandidate>) => {
+          const editingArea = props.editor.view.dom;
+          editingArea.setAttribute("aria-expanded", "true");
+          editingArea.setAttribute("aria-autocomplete", "list");
           renderer = new ReactRenderer(UserMentionList, {
             props: _toListProps(props),
             editor: props.editor,
@@ -55,14 +71,19 @@ export function createUserMentionSuggestion(
         onUpdate: (props: SuggestionProps<MentionCandidate>) => {
           renderer?.updateProps(_toListProps(props));
         },
+        // The suggestion plugin closes the list on Escape itself, by
+        // calling `onExit`, so only list navigation is forwarded here.
         onKeyDown: ({ event }: { event: KeyboardEvent }) => {
-          if (event.key === "Escape") {
-            destroy();
-            return true;
-          }
           return renderer?.ref?.onKeyDown(event) ?? false;
         },
-        onExit: destroy,
+        onExit: (props: SuggestionProps<MentionCandidate>) => {
+          COMBOBOX_ARIA_ATTRIBUTES.forEach((attribute) => {
+            props.editor.view.dom.removeAttribute(attribute);
+          });
+          renderer?.element.remove();
+          renderer?.destroy();
+          renderer = undefined;
+        },
       };
     },
   };

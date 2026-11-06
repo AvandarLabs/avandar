@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { RichTextMembersContext } from "@/components/RichText/RichTextMembersContext";
 import { RichTextView } from "@/components/RichText/RichTextView/RichTextView";
 import { render, screen } from "@/test-utils";
+import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
 
 describe("RichTextView", () => {
   it("renders formatting and mentions without an editor", () => {
@@ -58,4 +59,42 @@ describe("RichTextView", () => {
     );
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
   });
+
+  it("names mentioned members in the plain text fallback", () => {
+    render(
+      <RichTextMembersContext.Provider
+        value={{
+          getMemberName: (userId) => {
+            return userId === MEMBER_ID ? "Dana Whitfield" : undefined;
+          },
+        }}
+      >
+        <RichTextView document={_documentWithEmbedAndMention(MEMBER_ID)} />
+      </RichTextMembersContext.Provider>,
+    );
+    expect(screen.getByText(/@Dana Whitfield/)).toBeInTheDocument();
+  });
+
+  it("calls a departed member a former member in the plain text fallback", () => {
+    render(<RichTextView document={_documentWithEmbedAndMention(MEMBER_ID)} />);
+    expect(screen.getByText(/@Former member/)).toBeInTheDocument();
+  });
 });
+
+const MEMBER_ID = "11111111-1111-4111-8111-111111111111";
+
+function _documentWithEmbedAndMention(userId: string): RichTextDocument.T {
+  return {
+    type: "doc",
+    content: [
+      { type: "objectEmbed" },
+      {
+        type: "paragraph",
+        content: [
+          { type: "text", text: "Ask " },
+          { type: "userMention", attrs: { id: userId } },
+        ],
+      },
+    ],
+  };
+}

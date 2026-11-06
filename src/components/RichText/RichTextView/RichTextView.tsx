@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { renderToReactElement } from "@tiptap/static-renderer/pm/react";
 import { useMemo } from "react";
 import {
@@ -5,6 +6,7 @@ import {
   richTextToPlainText,
 } from "$/models/RichTextDocument/RichTextDocument";
 import { createRichTextExtensions } from "@/components/RichText/createRichTextExtensions";
+import { useRichTextMembers } from "@/components/RichText/RichTextMembersContext";
 import classes from "@/components/RichText/RichTextView/RichTextView.module.css";
 import { UserMentionChip } from "@/components/RichText/UserMention/UserMentionChip";
 import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
@@ -22,9 +24,18 @@ export function RichTextView({
 }: {
   document: RichTextDocument.T;
 }): ReactNode {
+  const { t } = useLingui();
+  const { getMemberName } = useRichTextMembers();
+  const formerMemberName = t`Former member`;
+
   const content = useMemo(() => {
     if (!isRichTextDocument(document)) {
-      return <p>{richTextToPlainText(document)}</p>;
+      const plainText = richTextToPlainText(document, {
+        getMentionLabel: (userId) => {
+          return getMemberName(userId) ?? formerMemberName;
+        },
+      });
+      return <p className={classes.plainText}>{plainText}</p>;
     }
     return renderToReactElement({
       extensions: VIEW_EXTENSIONS,
@@ -37,7 +48,7 @@ export function RichTextView({
         },
       },
     });
-  }, [document]);
+  }, [document, formerMemberName, getMemberName]);
 
   return <div className={classes.root}>{content}</div>;
 }
