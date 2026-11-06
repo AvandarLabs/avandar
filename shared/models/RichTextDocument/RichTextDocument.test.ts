@@ -56,7 +56,51 @@ describe("parseRichTextDocument", () => {
     }).toThrow();
     expect(isRichTextDocument(withEmbed)).toBe(false);
   });
+
+  it("accepts web and email links", () => {
+    expect(
+      isRichTextDocument(_documentWithLink("https://example.org/case")),
+    ).toBe(true);
+    expect(
+      isRichTextDocument(_documentWithLink("MAILTO:lab@example.org")),
+    ).toBe(true);
+  });
+
+  it("rejects a link whose href could run script", () => {
+    expect(isRichTextDocument(_documentWithLink("javascript:alert(1)"))).toBe(
+      false,
+    );
+  });
+
+  it("rejects a mention whose id is not a user id", () => {
+    const withBadMention = {
+      type: "doc",
+      content: [_paragraph({ type: "userMention", attrs: { id: "priya" } })],
+    };
+    expect(isRichTextDocument(withBadMention)).toBe(false);
+  });
+
+  it("rejects a text node without text", () => {
+    const withEmptyText = {
+      type: "doc",
+      content: [_paragraph({ type: "text" })],
+    };
+    expect(isRichTextDocument(withEmptyText)).toBe(false);
+  });
 });
+
+function _documentWithLink(href: string): RichTextDocument.T {
+  return {
+    type: "doc",
+    content: [
+      _paragraph({
+        type: "text",
+        text: "results",
+        marks: [{ type: "link", attrs: { href, target: "_blank" } }],
+      }),
+    ],
+  };
+}
 
 describe("richTextToPlainText", () => {
   it("puts each block on its own line and labels mentions", () => {

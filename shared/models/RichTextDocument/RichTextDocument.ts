@@ -67,19 +67,42 @@ const BLOCK_CONTAINER_TYPES: ReadonlySet<string> = new Set([
   "orderedList",
 ]);
 
-const MarkSchema = z.object({
-  type: z.enum(RICH_TEXT_MARK_TYPES),
-  attrs: z.record(z.string(), z.unknown()).optional(),
-});
+/** Link targets a stored link may open: web pages and email addresses. */
+const SAFE_LINK_HREF_PATTERN = /^(https?:|mailto:)/i;
+
+const AttrsSchema = z.record(z.string(), z.unknown());
+
+const MarkSchema = z.union([
+  z.object({
+    type: z.literal("link"),
+    attrs: z
+      .object({ href: z.string().regex(SAFE_LINK_HREF_PATTERN) })
+      .catchall(z.unknown()),
+  }),
+  z.object({
+    type: z.enum(RICH_TEXT_MARK_TYPES).exclude(["link"]),
+    attrs: AttrsSchema.optional(),
+  }),
+]);
 
 const NodeSchema: z.ZodType<RichTextNode> = z.lazy(() => {
-  return z.object({
-    type: z.enum(RICH_TEXT_NODE_TYPES),
-    attrs: z.record(z.string(), z.unknown()).optional(),
-    content: z.array(NodeSchema).optional(),
-    marks: z.array(MarkSchema).optional(),
-    text: z.string().optional(),
-  });
+  return z.union([
+    z.object({
+      type: z.literal("text"),
+      text: z.string(),
+      marks: z.array(MarkSchema).optional(),
+    }),
+    z.object({
+      type: z.literal("userMention"),
+      attrs: z.object({ id: z.uuid() }).catchall(z.unknown()),
+    }),
+    z.object({
+      type: z.enum(RICH_TEXT_NODE_TYPES).exclude(["text", "userMention"]),
+      attrs: AttrsSchema.optional(),
+      content: z.array(NodeSchema).optional(),
+      marks: z.array(MarkSchema).optional(),
+    }),
+  ]);
 });
 
 const DocumentSchema = z.object({
@@ -104,6 +127,9 @@ export function isRichTextDocument(value: unknown): value is RichTextDocumentT {
  * Plain text of a document: one line per block, and `@name` for each
  * mention. `getMentionLabel` returns the member's current name, or
  * `undefined` to fall back to "member".
+ *
+ * The output is stored for search and as the fallback text, never displayed
+ * as is, so the "member" fallback is deliberately untranslated English.
  */
 export function richTextToPlainText(
   document: RichTextDocumentT | RichTextNode,
@@ -115,19 +141,19 @@ export function richTextToPlainText(
 }
 
 function _nodeToPlainText(
-  node: RichTextDocumentT | RichTextNode,
+  node: RichTextNode,
   options: Readonly<{
     getMentionLabel?: (userId: string) => string | undefined;
   }>,
 ): string {
   if (node.type === "text") {
-    return "text" in node ? (node.text ?? "") : "";
+    return node.text ?? "";
   }
   if (node.type === "hardBreak") {
     return "\n";
   }
   if (node.type === "userMention") {
-    const userId = "attrs" in node ? String(node.attrs?.id ?? "") : "";
+    const userId = String(node.attrs?.id ?? "");
     return `@${options.getMentionLabel?.(userId) ?? "member"}`;
   }
   const separator = BLOCK_CONTAINER_TYPES.has(node.type) ? "\n" : "";
@@ -147,11 +173,8 @@ export function getMentionedUserIds(
   return [...userIds];
 }
 
-function _collectMentions(
-  node: RichTextDocumentT | RichTextNode,
-  userIds: Set<string>,
-): void {
-  if (node.type === "userMention" && "attrs" in node) {
+function _collectMentions(node: RichTextNode, userIds: Set<string>): void {
+  if (node.type === "userMention") {
     const userId = node.attrs?.id;
     if (typeof userId === "string" && userId.length > 0) {
       userIds.add(userId);

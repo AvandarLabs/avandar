@@ -388,6 +388,33 @@ end;
 $function$
 ;
 
+CREATE OR REPLACE FUNCTION public.rpc_activity_events__get_case_page(p_individual_id uuid, p_kinds public.activity_events__kind[], p_limit integer, p_before_occurred_at timestamp with time zone DEFAULT NULL::timestamp with time zone, p_before_recorded_at timestamp with time zone DEFAULT NULL::timestamp with time zone, p_before_id uuid DEFAULT NULL::uuid)
+ RETURNS SETOF public.activity_events
+ LANGUAGE sql
+ STABLE
+ SET search_path TO ''
+AS $function$
+  select activity_event.*
+  from public.activity_events activity_event
+  where
+    activity_event.individual_id = p_individual_id and
+    activity_event.kind = any (p_kinds) and
+    (
+      p_before_id is null or
+      (
+        activity_event.occurred_at,
+        activity_event.recorded_at,
+        activity_event.id
+      ) < (p_before_occurred_at, p_before_recorded_at, p_before_id)
+    )
+  order by
+    activity_event.occurred_at desc,
+    activity_event.recorded_at desc,
+    activity_event.id desc
+  limit p_limit;
+$function$
+;
+
 grant select on table "public"."activity_events" to "authenticated";
 
 grant delete on table "public"."activity_events" to "service_role";
@@ -560,3 +587,5 @@ revoke all privileges on function public.comments__record_activity() from public
 revoke all privileges on function public.comments__record_revision() from public, anon, authenticated, service_role;
 revoke all privileges on function public.comments__sync_mentions() from public, anon, authenticated, service_role;
 revoke all privileges on function public.comments__validate_subject() from public, anon, authenticated, service_role;
+revoke all privileges on function public.rpc_activity_events__get_case_page(p_individual_id uuid, p_kinds activity_events__kind[], p_limit integer, p_before_occurred_at timestamp with time zone, p_before_recorded_at timestamp with time zone, p_before_id uuid) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.rpc_activity_events__get_case_page(p_individual_id uuid, p_kinds activity_events__kind[], p_limit integer, p_before_occurred_at timestamp with time zone, p_before_recorded_at timestamp with time zone, p_before_id uuid) to "authenticated";

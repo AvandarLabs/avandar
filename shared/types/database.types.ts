@@ -2443,6 +2443,35 @@ export type Database = {
         Args: { p_map_id: string; p_owner_id: string }
         Returns: boolean
       }
+      rpc_activity_events__get_case_page: {
+        Args: {
+          p_before_id?: string
+          p_before_occurred_at?: string
+          p_before_recorded_at?: string
+          p_individual_id: string
+          p_kinds: Database["public"]["Enums"]["activity_events__kind"][]
+          p_limit: number
+        }
+        Returns: {
+          actor_user_id: string | null
+          comment_id: string | null
+          id: string
+          individual_id: string | null
+          kind: Database["public"]["Enums"]["activity_events__kind"]
+          occurred_at: string
+          payload: Json
+          payload_version: number
+          recorded_at: string
+          source: Database["public"]["Enums"]["activity_events__source"]
+          workspace_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "activity_events"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       rpc_data_catalog_listings__list_pipeline_scopes: {
         Args: { p_pipeline_name: string }
         Returns: {

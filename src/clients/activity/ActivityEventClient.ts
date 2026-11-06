@@ -17,6 +17,17 @@ export type ActivityFeedEntry = ActivityEvent.T & {
   reactions: CommentReaction.T[];
 };
 
+/**
+ * Position in a case's feed: the last event already loaded. Values are kept
+ * exactly as the database returned them, since a timestamp round-tripped
+ * through `Date` loses microseconds and would skip or repeat events.
+ */
+export type ActivityFeedCursor = {
+  occurredAt: string;
+  recordedAt: string;
+  id: string;
+};
+
 /** One page of a case's feed, oldest entry first. */
 export type ActivityFeedPage = {
   entries: ActivityFeedEntry[];
@@ -33,29 +44,30 @@ export const ActivityEventClient = createUsableServiceClient(
     queries: ({ clientLogger, dbClient, parsers }) => {
       return {
         /**
-         * The newest `limit` events of the given kinds that occurred before
-         * `beforeOccurredAt`, returned oldest first.
+         * The newest `limit` events of the given kinds that come before the
+         * `before` cursor in `(occurredAt, recordedAt, id)` order, returned
+         * oldest first.
          */
         getCaseActivityPage: async (params: {
           individualId: Individual.Id;
           kinds: readonly ActivityEvent.Kind[];
-          beforeOccurredAt: string | undefined;
           limit: number;
+          before: ActivityFeedCursor | undefined;
         }): Promise<ActivityFeedPage> => {
           const logger = clientLogger.appendName("getCaseActivityPage");
           logger.log("Loading case activity", params);
-          let query = dbClient
-            .from("activity_events")
+          const { data } = await dbClient
+            .rpc("rpc_activity_events__get_case_page", {
+              p_individual_id: params.individualId,
+              p_kinds: [...params.kinds],
+              // One extra row tells whether an older page exists.
+              p_limit: params.limit + 1,
+              p_before_occurred_at: params.before?.occurredAt,
+              p_before_recorded_at: params.before?.recordedAt,
+              p_before_id: params.before?.id,
+            })
             .select("*, comment:comments(*, reactions:comment_reactions(*))")
-            .eq("individual_id", params.individualId)
-            .in("kind", [...params.kinds])
-            .order("occurred_at", { ascending: false })
-            .order("id", { ascending: false })
-            .limit(params.limit + 1);
-          if (params.beforeOccurredAt !== undefined) {
-            query = query.lt("occurred_at", params.beforeOccurredAt);
-          }
-          const { data } = await query.throwOnError();
+            .throwOnError();
           const rows = data.slice(0, params.limit).reverse();
           return {
             hasMore: data.length > params.limit,

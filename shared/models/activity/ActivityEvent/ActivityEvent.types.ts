@@ -24,6 +24,10 @@ type ActivityEventRead = {
   actorUserId: User.Id | undefined;
   commentId: Comment.Id | undefined;
   id: ActivityEventId;
+  /**
+   * The case. The database requires exactly one subject, and cases are the
+   * only one today.
+   */
   individualId: Individual.Id;
   kind: ActivityEventKind;
   occurredAt: string;
