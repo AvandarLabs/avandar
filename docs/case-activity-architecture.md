@@ -80,6 +80,13 @@ events that share a timestamp are never skipped or repeated across pages.
 On the client, `ActivityEventClient.getCaseActivityPage` takes
 `before: ActivityFeedCursor` (null for the first page).
 
+Comments are addressable by id. The record route
+(`src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx`)
+takes an optional `?comment=<id>` search param, and a malformed id is dropped
+rather than failing the page. "Copy link to comment" builds that URL. The
+record page passes the id to the feed as `highlightedCommentId`, and the feed
+pages back (up to 10 pages) until it finds that comment, then scrolls to it and highlights it.
+
 ## Rich text
 
 `src/components/RichText/` holds one extension list
@@ -105,8 +112,6 @@ This is planned in the roadmap and not built.
   `RichTextView`'s `nodeMapping`.
 - Extract references into a `comment_references` table with a trigger
   modeled on `comments__sync_mentions`.
-- Comments are addressable by id: the feed can take a linked comment id and
-  page until it finds that comment.
 
 ## Future work
 

@@ -256,8 +256,8 @@ status options are hard-coded in a stub UI. Nothing configurable.
 - `[Depends on: P5]`
 
 ### P5c. Case Management product (evolve legacy ontology → configurable cases)
-**Current state:** Case-management UI is **stubs with no backend**:
-Comments shipped in P5c.2; `StatusPill` is a
+**Current state:** Comments shipped in P5c.2. The rest of the
+case-management UI is **stubs with no backend**: `StatusPill` is a
 hard-coded combobox with no persistence; `Individual.assignedTo` column exists with
 no writer/UI. Greenfield.
 
