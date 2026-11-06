@@ -4126,6 +4126,10 @@ msgstr "提交"
 msgid "dashboard"
 msgstr "仪表板"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "You can still open the original, where it is published."
+msgstr ""
+
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
 msgstr "新版本已准备就绪。立即更新，或关闭此提示稍后更新。"
@@ -5329,6 +5333,10 @@ msgstr "搜索数据源"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Tool"
 msgstr "工具"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Not supported yet"
+msgstr ""
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -7691,6 +7699,10 @@ msgstr "边界键列"
 msgid "Time window: {0}"
 msgstr "时间范围：{0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Open it on {serviceName}"
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
 msgstr "坐标超出有效范围"
@@ -7703,6 +7715,10 @@ msgstr "过滤器（位置）"
 msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
 "offline."
 msgstr "如果您有 12 GB 内存，并希望在离线状态下获得明显更好的 SQL 答案，建议使用此模型。"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Avandar can't add this kind of dataset yet."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"

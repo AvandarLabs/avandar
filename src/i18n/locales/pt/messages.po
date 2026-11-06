@@ -4301,6 +4301,10 @@ msgstr "Enviar"
 msgid "dashboard"
 msgstr "painel"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "You can still open the original, where it is published."
+msgstr ""
+
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
 msgstr "Uma nova versão está pronta. Atualize agora ou feche esta mensagem para "
@@ -5539,6 +5543,10 @@ msgstr "Pesquisar fontes de dados"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Tool"
 msgstr "Ferramenta"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Not supported yet"
+msgstr ""
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -7984,6 +7992,10 @@ msgstr "Coluna-chave do limite"
 msgid "Time window: {0}"
 msgstr "Período: {0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Open it on {serviceName}"
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
 msgstr "A coordenada está fora do intervalo válido"
@@ -7997,6 +8009,10 @@ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers 
 "offline."
 msgstr "Recomendado se você tiver 12 GB de RAM e quiser respostas de SQL "
 "offline significativamente melhores."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Avandar can't add this kind of dataset yet."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"

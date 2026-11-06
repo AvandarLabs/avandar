@@ -49,7 +49,8 @@ async function _inferColumnTypesWithDuckDb(
  * API-backed CSV resource whose types were never verified, or were verified
  * before its source last changed. A Parquet resource's types come from its
  * file when a pipeline reads it. A listing marked invalid is not tried
- * again: a pipeline rewrite after its source changes clears the mark.
+ * again: a pipeline rewrite after its source changes clears the mark. A
+ * listing a workspace cannot load is never sampled.
  */
 export function isColumnTypeVerificationDue(
   listing: Pick<
@@ -59,10 +60,12 @@ export function isColumnTypeVerificationDue(
     | "dateColumnTypeLastVerified"
     | "dateOfLastUpdate"
     | "isInvalid"
+    | "isWorkspaceLoadable"
   >,
 ): boolean {
   if (
     listing.isInvalid ||
+    !listing.isWorkspaceLoadable ||
     listing.accessKind !== "api_resource" ||
     listing.apiResourceFormat?.toUpperCase() !== "CSV"
   ) {

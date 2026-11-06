@@ -4236,6 +4236,10 @@ msgstr "إرسال"
 msgid "dashboard"
 msgstr "لوحة التحكم"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "You can still open the original, where it is published."
+msgstr ""
+
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
 msgstr "يتوفر إصدار جديد. حدّث الآن، أو أغلق هذه النافذة وحدّث لاحقًا."
@@ -5459,6 +5463,10 @@ msgstr "البحث في مصادر البيانات"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Tool"
 msgstr "أداة"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Not supported yet"
+msgstr ""
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -7869,6 +7877,10 @@ msgstr "عمود مفتاح الحدود"
 msgid "Time window: {0}"
 msgstr "الفترة الزمنية: {0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Open it on {serviceName}"
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
 msgstr "الإحداثي خارج النطاق الصالح"
@@ -7882,6 +7894,10 @@ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers 
 "offline."
 msgstr "يُنصح بهذا الخيار إذا كانت ذاكرة RAM لديك بسعة 12 GB وتريد إجابات SQL "
 "أفضل بشكل ملحوظ دون اتصال."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Avandar can't add this kind of dataset yet."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
