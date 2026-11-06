@@ -156,7 +156,7 @@ fn a_transcript_the_skill_wrote_reaches_the_live_server() {
         ureq::get(&comments_url)
             .call()
             .ok()
-            .and_then(|r| r.into_string().ok())
+            .and_then(|r| r.into_body().read_to_string().ok())
             .unwrap_or_default()
     };
 
@@ -266,7 +266,7 @@ fn comments_survive_difit_switching_to_a_new_session_when_head_moves() {
         wait_for(10, || ureq::get(&comments_url)
             .call()
             .ok()
-            .and_then(|r| r.into_string().ok())
+            .and_then(|r| r.into_body().read_to_string().ok())
             .is_some_and(|live| live.contains("why line two?"))),
         "the conversation never reached difit's new comment session"
     );

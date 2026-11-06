@@ -63,6 +63,8 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F11 | Live progress output for `ava pipeline run` | not started | F10, the ETL engine's per-scope crawl (`crawlScope`), which this log does not map yet | |
 | F12 | Invalid catalog listings, and DuckDB-parsed column type samples | not started | F4, F7, and the column type verification feature (`verifyOpenDataColumnTypes`, `rpc_data_catalog_listings__write_verified_column_types`), which this log does not map yet | [AVA-396](https://linear.app/avandar/issue/AVA-396) (follow-up) |
 | F13 | Demo deployment: `demo/*` branches deploy to `demo.avandarlabs.com` | not started | none | |
+| F14 | Show only the plan picker when a workspace has no active plan | PR open: [#314](https://github.com/AvandarLabs/avandar/pull/314) | none | |
+| F15 | `ava --env <name>` loads any `.env.<name>`, replacing `--staging` and `--prod` | PR open: [#319](https://github.com/AvandarLabs/avandar/pull/319) | none, but see its section for hunks in files `develop` lacks | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -83,6 +85,8 @@ API. It's new work, not something this branch built.
 | 9 | F11 | Needs F10's local runner and `--limit`, and the ETL engine's scope crawl it hooks into. Can merge any time after those, before F9. |
 | 10 | F12 | Extends the column type verification route and the F4 listings table. Merge after the verification feature it rewrites. |
 | any | F13 | Self-contained CI and scripts. Merge before the next demo branch is cut from `develop`, so it inherits the workflow. |
+| any | F14 | Self-contained billing UI fix. The bug is already on `develop`, so it can merge first. |
+| any | F15 | Self-contained CLI change. Its hunks in `ava supabase sql`, `ava pipeline reset`, and `ava pipeline prune-retired-scopes` go with whichever of F15 and those commands lands on `develop` second. |
 | 11 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -667,18 +671,99 @@ Auth URLs), then builds the app against it and deploys it to the Vercel
 
 | SHA | Subject | Take |
 |---|---|---|
-| `69cbdad98` | feat(ci): deploy demo/* branches to demo.avandarlabs.com | All of it |
+| `69cbdad98` | feat(ci): deploy demo/* branches to demo.avandarlabs.com | All of it except `scripts/demo/loadLocalDataIntoDemoBranch.sh`, which was later deleted |
 | `a8ebe196c` | fix(ci): stop recording demo deploys as staging deployments | All of it |
 | `815e2f8e5` | fix(ci): catch a bad Vercel team ID early and keep Sensitive placeholders out of the demo build | All of it |
+| `b9780a05e` | fix(ci): give demo edge functions the real Supabase secret key | All of it |
 
 **Files:** `.github/workflows/demo.yaml`,
-`scripts/demo/ensureSupabaseBranch.sh`,
-`scripts/demo/loadLocalDataIntoDemoBranch.sh`. Vercel settings stay in the
+`scripts/demo/ensureSupabaseBranch.sh`. Demo data is created by hand in the
+hosted demo, not copied from a local database. Vercel settings stay in the
 dashboard, not `vercel.json`, since the repo is public. The setup runbook
 is kept out of the repo for the same reason.
 
 **Verification:** `shellcheck -x scripts/demo/*.sh`. Then push a throwaway
 `demo/*` branch and confirm the **CI/CD for Demos** run deploys it.
+
+---
+
+## F14: Show only the plan picker when a workspace has no active plan
+
+**Purpose:** A workspace with no subscription row, or an inactive one, gets
+the blocking "Select your plan" modal from the root layout. The import view
+also opened "Dataset limit reached" on top of it, since the optimistic
+`canAddDatasets` fallback reports `false` for a missing subscription.
+`SubscriptionModule.shouldPromptForDatasetLimitUpgrade` now opens the dataset
+limit modal only for an active plan at its dataset cap. **Value:** A new
+workspace sees one modal, not two, and is never told it hit a limit it has
+not reached.
+
+**PR title:** `fix(billing): show only the plan picker when a workspace has no active plan`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `30c62fefb` | fix(billing): show only the plan picker when a workspace has no active plan | All of it |
+| `b8cc02d97` | refactor(billing): take the dataset limit prompt options as Readonly | All of it |
+
+**Files:**
+`shared/models/Subscription/SubscriptionModule/SubscriptionModule.ts`,
+`shared/models/Subscription/SubscriptionModule/SubscriptionModule.test.ts`,
+`src/views/DataManagerApp/DataImportView/DataImportView.tsx`.
+
+**Verification:**
+`npx vitest run shared/models/Subscription/SubscriptionModule/SubscriptionModule.test.ts`.
+
+---
+
+## F15: `ava --env <name>` loads any `.env.<name>`
+
+**Purpose:** Replace the `--staging` and `--prod` global flags with one
+`--env <name>` option that loads `.env.<name>` from the repo root. With no
+`--env`, the CLI loads `.env.development`. `--staging` and `--prod` are
+refused with the `--env` that replaces them, and `.gitignore` covers every
+`.env.*` file except the examples. **Value:** Pointing `ava` at a new
+deployment, such as a demo's Supabase branch, only takes a new env file:
+`ava pipeline run socrata --local --env demo`.
+
+**PR title:** `feat(ava-cli)!: replace --staging and --prod with a global --env <name>`
+
+**PR:** [#319](https://github.com/AvandarLabs/avandar/pull/319), branch
+`feat/ava-env-flag`, built from `develop` as `77f0ee7a5`. It carries every
+hunk below in files `develop` has, and none of the hunks in files it lacks.
+Its README example runs `world-bank__wdi --env staging` instead of `socrata`.
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `78c8296ef` | feat(ava-cli)!: replace --staging and --prod with a global --env <name> | All of it, except the hunks in files `develop` lacks (below) |
+
+**Files:**
+- On `develop`: `.gitignore`, `docs/google-sheets-e2e.md`,
+  `apps/ava-cli/README.md`, `apps/ava-cli/src/main.ts`,
+  `apps/ava-cli/src/AvaEnv/AvaEnv.ts` and `AvaEnv.test.ts`,
+  `GoogleTokenGetCli.ts`, `SupabaseRunCli.ts`, and
+  `SupabaseRunCli/supabase-script-runner/main.ts`.
+- Not on `develop` yet: `SupabaseSqlCli.ts`, `ResetPipelineCli.ts`,
+  `PruneRetiredScopesCli.ts` (each with its test), and
+  `announcePostgrestTarget.ts`. They come from the `ava supabase sql` command
+  and the pipeline executions work, which this log does not map yet. Whichever
+  of F15 and those lands second carries these hunks:
+  `AvaEnv.getLoadedEnvTarget()` becomes `AvaEnv.getLoadedEnvName()`, and a
+  `!== "local"` check becomes `!AvaEnv.isLocal()`.
+- The README's pipeline example names `socrata`, which F6 adds. Use
+  `world-bank__wdi` instead if F6 has not merged.
+
+**Schema:** none.
+
+**Verification:**
+```sh
+pnpm test:ava-cli && pnpm exec tsc --noEmit -p tsconfig.node.json
+pnpm --filter @avandar/ava-cli build
+node apps/ava-cli/dist/main.cjs supabase sql "select 1" --staging   # refused, names --env staging
+```
 
 ---
 

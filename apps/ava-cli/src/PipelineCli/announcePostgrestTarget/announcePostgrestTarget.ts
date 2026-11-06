@@ -7,9 +7,9 @@ import type { PostgrestTarget } from "@ava-cli/PipelineCli/ResetPipelineCli/pipe
  * is production.
  */
 export function announcePostgrestTarget(target: PostgrestTarget): void {
-  const envTarget = AvaEnv.getLoadedEnvTarget();
-  printInfo(`Database: ${envTarget} (${target.apiUrl})`);
-  if (envTarget === "production") {
+  const envName = AvaEnv.getLoadedEnvName();
+  printInfo(`Database: ${envName} (${target.apiUrl})`);
+  if (envName === "production") {
     printWarn(
       "WARNING: this will delete rows from the PRODUCTION database. " +
         "Workspaces in production may be using these listings.",

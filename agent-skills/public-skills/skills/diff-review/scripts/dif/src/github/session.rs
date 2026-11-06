@@ -244,6 +244,19 @@ impl Session {
         }
     }
 
+    /// The reviewer asked to sync with GitHub now: the browser's Sync, or the
+    /// TUI's "Resync with GitHub". Unlike the background pull, this one may
+    /// stash local changes to bring in the PR's new commits. Returns `false`,
+    /// asking for nothing, when the branch is known to have no PR.
+    pub const fn request_reviewer_pull(&mut self) -> bool {
+        if matches!(self.pr, PrState::Unavailable(_)) {
+            return false;
+        }
+        self.pull_requested = true;
+        self.reviewer_pull = true;
+        true
+    }
+
     /// Record who resolves the open merge conflicts. A no-op when none are
     /// open, so a second browser tab answering late changes nothing.
     pub fn answer_conflicts(&mut self, resolution: ConflictResolution) {

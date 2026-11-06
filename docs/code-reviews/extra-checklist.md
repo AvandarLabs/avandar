@@ -20,8 +20,6 @@ library-gated phase should run.
 1. Inspect the diff and classify which **gates** below match.
 2. For every gate that matches, apply the rules in that phase.
 3. Skip any phase whose gate does not match.
-4. In Pair Review mode, announce each phase before presenting its
-   findings, for example: "Phase: repo-local Deno paths".
 
 ### This file is an entry point, not a single flat file
 

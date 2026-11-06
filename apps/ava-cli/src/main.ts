@@ -1,4 +1,4 @@
-import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
+import { AvaEnv, DEFAULT_ENV_NAME } from "@ava-cli/AvaEnv/AvaEnv";
 import { DevCli } from "@ava-cli/DevCli/DevCli";
 import { NewBoilerplateCli } from "@ava-cli/DevCli/NewBoilerplateCli/NewBoilerplateCli";
 import { PipelineCli } from "@ava-cli/PipelineCli/PipelineCli";
@@ -12,31 +12,24 @@ import { Acclimate } from "@avandar/acclimate";
 // Declared globally rather than per command: pointing the CLI at a deployment
 // is a property of the invocation, not of any one command. Acclimate propagates
 // a global option down to every subcommand, so declaring here is what puts
-// these in each help screen and hands their parsed value to any action that
-// wants it. The declaration is not what makes them accepted: Acclimate ignores
-// an option nobody declared, so an undeclared `--prod` would be
-// silently swallowed rather than refused.
+// `--env` in each help screen and hands its parsed value to any action that
+// wants it. The declaration is not what makes it accepted: Acclimate ignores an
+// option nobody declared, which is why `AvaEnv.getEnvNameFromArgv` refuses the
+// removed `--staging` and `--prod` itself.
 //
-// The entry point below reads them off argv rather than from a parsed action,
-// because the env file has to be chosen before any action runs.
+// The entry point below reads `--env` off argv rather than from a parsed
+// action, because the env file has to be chosen before any action runs.
 const cli = Acclimate.createCLI("ava")
   .addGlobalOption({
-    name: "--staging",
+    name: "--env",
     description:
-      "Use .env.staging for this invocation, instead of .env.development. " +
-      "Nothing is merged: a variable that file omits is absent.",
+      "Load .env.<name> for this invocation, such as --env staging for " +
+      ".env.staging or --env demo for .env.demo. Defaults to " +
+      `${DEFAULT_ENV_NAME}, which loads .env.${DEFAULT_ENV_NAME}. Nothing is ` +
+      "merged: a variable that file omits is absent.",
     required: false,
-    default: false,
-    type: "boolean",
-  })
-  .addGlobalOption({
-    name: "--prod",
-    description:
-      "Use .env.production for this invocation, instead of .env.development. " +
-      "Nothing is merged: a variable that file omits is absent.",
-    required: false,
-    default: false,
-    type: "boolean",
+    defaultValue: DEFAULT_ENV_NAME,
+    type: "string",
   })
   .addCommand("dev", DevCli)
   .addCommand("new", NewBoilerplateCli)
@@ -52,11 +45,11 @@ if (!assertCliIsUpToDate()) {
   process.exit(1);
 }
 
-// Exactly one env file is loaded, before any command action runs. A bad flag
-// combination is reported here rather than thrown from module scope, so it
-// reads as a CLI error instead of a Node stack trace.
+// Exactly one env file is loaded, before any command action runs. A bad
+// `--env` is reported here rather than thrown from module scope, so it reads
+// as a CLI error instead of a Node stack trace.
 try {
-  AvaEnv.load({ target: AvaEnv.getEnvTargetFromArgv(process.argv.slice(2)) });
+  AvaEnv.load({ envName: AvaEnv.getEnvNameFromArgv(process.argv.slice(2)) });
 } catch (error: unknown) {
   printError(error instanceof Error ? error.message : String(error));
   process.exit(1);

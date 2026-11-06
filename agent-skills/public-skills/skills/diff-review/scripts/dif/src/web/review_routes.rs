@@ -67,14 +67,14 @@ fn save_comments(mut request: Request, ctx: &Ctx, query: &str) -> std::io::Resul
     let content_type = request_content_type(&request);
     let mut body = Vec::new();
     request.as_reader().read_to_end(&mut body)?;
-    if is_github_bound || is_send_now {
-        if let Ok(current) = proxy::get(ctx.difit_port, &with_query("/api/comments-json", query)) {
-            let new_ids = new_message_ids(&current.body, &body);
-            if is_github_bound {
-                ctx.github.mark_pending(&new_ids);
-            } else {
-                ctx.dispatch.request_send_now(new_ids);
-            }
+    if (is_github_bound || is_send_now)
+        && let Ok(current) = proxy::get(ctx.difit_port, &with_query("/api/comments-json", query))
+    {
+        let new_ids = new_message_ids(&current.body, &body);
+        if is_github_bound {
+            ctx.github.mark_pending(&new_ids);
+        } else {
+            ctx.dispatch.request_send_now(new_ids);
         }
     }
     match proxy::post(

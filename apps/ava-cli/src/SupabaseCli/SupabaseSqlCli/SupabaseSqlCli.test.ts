@@ -44,7 +44,7 @@ describe("runSupabaseSql", () => {
     vi.clearAllMocks();
     process.env.SUPABASE_POSTGRES_URL = SWITCHED_DATABASE_URL;
     vi.spyOn(Acclimate, "log").mockImplementation(() => {});
-    vi.spyOn(AvaEnv, "getLoadedEnvTarget").mockReturnValue("local");
+    vi.spyOn(AvaEnv, "getLoadedEnvName").mockReturnValue("development");
   });
 
   afterEach(() => {
@@ -89,23 +89,17 @@ describe("runSupabaseSql", () => {
     expect(_getSpawnCall()[1]).toEqual([SWITCHED_DATABASE_URL]);
   });
 
-  it("refuses to connect on --prod", async () => {
-    vi.mocked(AvaEnv.getLoadedEnvTarget).mockReturnValue("production");
+  it.each(["production", "staging", "demo"])(
+    "refuses to connect on --env %s",
+    async (envName) => {
+      vi.mocked(AvaEnv.getLoadedEnvName).mockReturnValue(envName);
 
-    await expect(runSupabaseSql({ sql: "select 1" })).rejects.toThrow(
-      "only runs against the local database",
-    );
-    expect(vi.mocked(spawn)).not.toHaveBeenCalled();
-  });
-
-  it("refuses to connect on --staging", async () => {
-    vi.mocked(AvaEnv.getLoadedEnvTarget).mockReturnValue("staging");
-
-    await expect(runSupabaseSql({ sql: "select 1" })).rejects.toThrow(
-      "only runs against the local database",
-    );
-    expect(vi.mocked(spawn)).not.toHaveBeenCalled();
-  });
+      await expect(runSupabaseSql({ sql: "select 1" })).rejects.toThrow(
+        `only runs against the local database, not ${envName}`,
+      );
+      expect(vi.mocked(spawn)).not.toHaveBeenCalled();
+    },
+  );
 
   it("refuses a SUPABASE_POSTGRES_URL that is not on this machine", async () => {
     process.env.SUPABASE_POSTGRES_URL =
