@@ -33,10 +33,6 @@
   border: 1px solid var(--mantine-color-neutral-7);
   border-end-end-radius: var(--ava-slate-inline-end-radius, 12px);
   border-end-start-radius: 8px;
-  border-inline-end-color: var(
-    --ava-slate-inline-end-border-color,
-    var(--mantine-color-neutral-7)
-  );
   border-start-end-radius: var(--ava-slate-inline-end-radius, 8px);
   border-start-start-radius: 8px;
   box-shadow:
@@ -50,11 +46,8 @@
   overscroll-behavior: none;
   padding: 0;
   position: relative;
-  transition:
-    border-radius var(--app-shell-transition-duration, 200ms)
-      var(--app-shell-transition-timing-function, ease),
-    border-color var(--app-shell-transition-duration, 200ms)
-      var(--app-shell-transition-timing-function, ease);
+  transition: border-radius var(--app-shell-transition-duration, 200ms)
+    var(--app-shell-transition-timing-function, ease);
   z-index: var(--mantine-z-index-app-slate);
 }
 

@@ -27,7 +27,6 @@
 .root[data-chat-fused] {
   --ava-slate-gutter-inline-end: 0px;
   --ava-slate-inline-end-radius: 0px;
-  --ava-slate-inline-end-border-color: var(--mantine-color-neutral-2);
 }
 
 /*

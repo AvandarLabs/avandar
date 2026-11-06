@@ -19,11 +19,18 @@
  * the gutter above and below, where it blends with the slate's shadow
  * instead of leaving a notch at the seam.
  *
+ * The edge and fill are the pair the slate actually renders: the theme's
+ * Paper styles paint every Paper border `--ava-border-default`, over the
+ * slate's `--ava-surface-body` ground. That border is translucent and
+ * composites over the element's own fill, so both have to match, or the
+ * top and bottom edges land on different grays and the chat reads a pixel
+ * shorter than the slate.
+ *
  * Always opaque so the dark shell behind never bleeds through.
  */
 .shell {
   background-color: var(--ava-surface-body);
-  border: 1px solid var(--mantine-color-neutral-7);
+  border: 1px solid var(--ava-border-default);
   border-end-end-radius: 12px;
   border-inline-start: none;
   border-start-end-radius: 8px;
