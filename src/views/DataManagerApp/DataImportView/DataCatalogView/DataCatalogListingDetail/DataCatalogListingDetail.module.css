@@ -17,6 +17,14 @@
   scrollbar-width: thin;
 }
 
+/*
+ * The body is a height-bound flex column, so without this its children
+ * would shrink to fit instead of overflowing into the scroll.
+ */
+.dataCatalogListingDetailBody > * {
+  flex-shrink: 0;
+}
+
 .dataCatalogListingDetailIdle {
   align-items: center;
   display: flex;

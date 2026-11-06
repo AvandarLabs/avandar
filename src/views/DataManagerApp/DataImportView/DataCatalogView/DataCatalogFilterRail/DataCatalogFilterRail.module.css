@@ -17,6 +17,11 @@
   scrollbar-width: thin;
 }
 
+/* Facets overflow into the scroll rather than shrinking to fit. */
+.dataCatalogFilterRailBody > * {
+  flex-shrink: 0;
+}
+
 .dataCatalogFilterRailFacetLabel {
   color: var(--mantine-color-neutral-9);
   font-size: var(--mantine-font-size-xs);

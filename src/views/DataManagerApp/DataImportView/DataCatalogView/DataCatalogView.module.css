@@ -3,7 +3,8 @@
  * edges, bleeding out over the content gutter on both sides and the bottom.
  * A frame around it would spend a gutter and a border on each side to say
  * "this is the catalog", which the tabs above already say. The minimum keeps
- * it usable in a host that does not size it.
+ * it usable in a host that does not size it, and is low enough that a phone
+ * keeps the add action on screen.
  */
 .dataCatalogView {
   --data-catalog-bleed: var(--ava-content-gutter, 0px);
@@ -14,7 +15,7 @@
   height: calc(100% + var(--data-catalog-bleed));
   margin-inline: calc(var(--data-catalog-bleed) * -1);
   margin-bottom: calc(var(--data-catalog-bleed) * -1);
-  min-height: 32rem;
+  min-height: 20rem;
 }
 
 /*

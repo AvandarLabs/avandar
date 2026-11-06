@@ -42,6 +42,13 @@ const DRAG_REGION_FILL_STYLE: CSSProperties = {
 
 const HEADER_MOBILE_DEFAULT_HEIGHT = 42;
 
+/**
+ * How far Main is pushed down on mobile to clear the mobile header. Main
+ * publishes it as `--ava-shell-main-offset-top` so a full-height child (the
+ * slate) can subtract it rather than running off the bottom of the screen.
+ */
+const MAIN_MOBILE_OFFSET_TOP_PX = 30;
+
 const NAVBAR_DEFAULT_WIDTH = 220;
 
 const ASIDE_DEFAULT_WIDTH = 380;
@@ -207,7 +214,15 @@ function AppShellComponent({
           py="0"
           ml={-16}
           mr={-16}
-          mt={isMobileViewSize ? 30 : 0}
+          mt={isMobileViewSize ? MAIN_MOBILE_OFFSET_TOP_PX : 0}
+          style={{
+            "--ava-shell-main-offset-top": `${
+              isMobileViewSize ? MAIN_MOBILE_OFFSET_TOP_PX : 0
+            }px`,
+            // Mantine's own minimum is a full viewport, which the offset
+            // above would push past the bottom edge and make the page scroll.
+            minHeight: "calc(100dvh - var(--ava-shell-main-offset-top))",
+          }}
         >
           {isChatPanelOpen && chatPanelLayout === "composer" ? (
             <ChatComposerOverlay
