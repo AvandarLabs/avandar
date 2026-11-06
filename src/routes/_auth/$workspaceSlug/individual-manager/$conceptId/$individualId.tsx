@@ -1,6 +1,5 @@
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { Center } from "@mantine/core";
 import {
   createFileRoute,
   ErrorComponentProps,
@@ -12,6 +11,7 @@ import { uuid } from "$/lib/uuid";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { Logger } from "@/utils/Logger";
+import { DetailPaneMessage } from "@/views/IndividualManagerApp/DetailPaneMessage/DetailPaneMessage";
 import { SingleIndividualView } from "@/views/IndividualManagerApp/SingleIndividualView";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { Individual } from "$/models/ontology/Individual/Individual";
@@ -70,11 +70,11 @@ function ErrorView({ error }: ErrorComponentProps) {
   }, [error]);
 
   return (
-    <Center h="100%" px="md">
+    <DetailPaneMessage>
       <Callout
         title={t`This record failed to load`}
         message={t`Try again in a moment, or reach out to support if it keeps happening.`}
       />
-    </Center>
+    </DetailPaneMessage>
   );
 }
