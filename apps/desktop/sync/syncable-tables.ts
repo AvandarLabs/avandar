@@ -22,7 +22,9 @@
  *     `workspace_memberships` so the workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
  *     billing, sensitive OAuth tokens, admin-only signups, legacy role
- *     tables, the web-only `dexie_dbs` tracker, and web GIS `maps`.
+ *     tables, the web-only `dexie_dbs` tracker, web GIS `maps`, and case
+ *     activity (`comments`, `comment_reactions`, `comment_mentions`,
+ *     `comment_revisions`, `activity_events`).
  */
 
 /**
@@ -173,6 +175,13 @@ export const EXCLUDED_TABLES = [
   // Web-only first-run tutorial/onboarding progress; nothing the desktop
   // needs to render offline.
   "user_nux_progress",
+  // Case activity: collaborative, server-of-truth, and audit data. The
+  // desktop does not render case comments offline.
+  "activity_events",
+  "comment_mentions",
+  "comment_reactions",
+  "comment_revisions",
+  "comments",
   // A saved connection's secret pointer is meaningless offline, and the
   // desktop shell cannot proxy a live Postgres connection either.
   "db_connections",
