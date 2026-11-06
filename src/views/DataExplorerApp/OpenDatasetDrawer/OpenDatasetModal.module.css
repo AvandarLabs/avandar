@@ -90,3 +90,42 @@
 .importPanel {
   padding-top: var(--mantine-spacing-xs);
 }
+
+/*
+ * While the open data catalog is showing, every layer from the modal down
+ * hands its full height to the catalog, which scrolls inside its own panes.
+ */
+.contentFill {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--modal-y-offset) * 2);
+}
+
+.bodyFill {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tabsFill {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tabsFillPanel {
+  flex: 1;
+  min-height: 0;
+}
+
+/*
+ * The catalog paints to the modal's edges by bleeding out over the body's
+ * padding, the same way it does over a view's gutter.
+ */
+.importPanelFill {
+  --ava-content-gutter: var(--mb-padding, var(--mantine-spacing-md));
+
+  height: 100%;
+}

@@ -1,0 +1,16 @@
+/*
+ * Height passes through to the panels only when the host has a definite
+ * height to give. Otherwise `height: 100%` resolves to auto and the tabs
+ * flow like any other block.
+ */
+.dataImportTabs {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.dataImportTabsPanel {
+  flex: 1;
+  min-height: 0;
+}

@@ -1,0 +1,84 @@
+/*
+ * The rail scrolls its facets and pins the beta note to its foot, so the
+ * request link is always one glance away rather than below a long facet.
+ */
+.dataCatalogFilterRail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.dataCatalogFilterRailBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--mantine-spacing-md);
+  scrollbar-width: thin;
+}
+
+/* Facets overflow into the scroll rather than shrinking to fit. */
+.dataCatalogFilterRailBody > * {
+  flex-shrink: 0;
+}
+
+.dataCatalogFilterRailFacetLabel {
+  color: var(--mantine-color-neutral-9);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  margin-bottom: var(--mantine-spacing-xs);
+}
+
+/* Let the label run the full rail width so the count sits on the far edge. */
+.dataCatalogFilterRailOptionBody {
+  width: 100%;
+}
+
+.dataCatalogFilterRailOptionLabelWrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.dataCatalogFilterRailOption {
+  align-items: baseline;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  justify-content: space-between;
+}
+
+.dataCatalogFilterRailOptionName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * Tabular figures, so a column of counts reads as a column and does not
+ * jitter as a search changes them.
+ */
+.dataCatalogFilterRailOptionCount {
+  color: var(--mantine-color-neutral-6);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.dataCatalogFilterRailFoldToggle {
+  align-self: flex-start;
+  margin-inline-start: calc(var(--mantine-spacing-xs) * -1);
+}
+
+.dataCatalogFilterRailFoot {
+  border-top: 1px solid var(--ava-border-default);
+  flex-shrink: 0;
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+}
+
+.dataCatalogFilterRailRequestLink {
+  color: var(--mantine-color-primary-7);
+  display: inline;
+  font-size: inherit;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

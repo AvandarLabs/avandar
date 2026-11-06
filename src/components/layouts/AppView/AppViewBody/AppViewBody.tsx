@@ -31,6 +31,13 @@ type Props = {
   /** Drops the content gutter, for a view that paints edge to edge. */
   noPadding?: boolean;
 
+  /**
+   * Sizes the content column to exactly the visible height instead of its
+   * content's, for a view whose panes scroll on their own (a master-detail
+   * browser) and so must not grow the page.
+   */
+  isFillHeight?: boolean;
+
   className?: string;
 };
 
@@ -46,6 +53,7 @@ export function AppViewBody({
   rail,
   contentMaxWidth,
   noPadding = false,
+  isFillHeight = false,
   className,
 }: Readonly<Props>): ReactNode {
   const isRailAColumn = useMediaQuery(RAIL_AS_COLUMN_QUERY, true);
@@ -58,6 +66,7 @@ export function AppViewBody({
           className={clsx(
             css.appViewBodyContent,
             noPadding && css.appViewBodyContentNoPadding,
+            isFillHeight && css.appViewBodyContentFillHeight,
           )}
           style={
             contentMaxWidth === undefined

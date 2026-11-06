@@ -18,12 +18,27 @@
  * table in this column the same width as the header above it.
  */
 .appViewBodyContent {
-  padding: var(--mantine-spacing-lg) var(--mantine-spacing-lg)
+  --ava-content-gutter: var(--mantine-spacing-lg);
+
+  padding: var(--ava-content-gutter) var(--ava-content-gutter)
     var(--mantine-spacing-xxl);
 }
 
 .appViewBodyContentNoPadding {
   padding: 0;
+}
+
+/*
+ * A fill-height view scrolls inside its own panes, so the column is exactly
+ * as tall as the scroller and the trailing padding matches the gutter
+ * instead of leaving room to scroll past the end. A pane browser that should
+ * paint to the slate's edges bleeds out by `--ava-content-gutter`.
+ */
+.appViewBodyContentFillHeight {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: var(--ava-content-gutter);
 }
 
 /*
