@@ -199,6 +199,7 @@ export const UserMentionList = forwardRef<
                     key={item.userId}
                     id={_buildOptionId(listboxId, item.userId)}
                     value={item.userId}
+                    className={classes.optionRow}
                     selected={isHighlighted}
                     aria-selected={isHighlighted}
                   >

@@ -4,6 +4,13 @@
   position: fixed;
 }
 
+/* A pale wash, not Mantine's filled default, so the dimmed email stays
+   legible on the highlighted row. */
+.optionRow[data-combobox-selected] {
+  background-color: var(--mantine-color-primary-0);
+  color: var(--mantine-color-neutral-9);
+}
+
 .option {
   align-items: center;
   display: flex;
