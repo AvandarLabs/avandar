@@ -1,0 +1,14 @@
+{
+  "preset": "schema-mapping",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "1b57ff852b1784fbde7a86273b36374c1c8fd816761e5b9fabb8c133326e13f4",
+  "posterSha256": "66008f468c8aea219ff79e83a78e7ea781e258cdc8a8003f184e9153352a1efc",
+  "generatedAt": "2026-10-14T23:55:06.598Z"
+}

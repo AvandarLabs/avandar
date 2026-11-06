@@ -3,7 +3,7 @@ import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSe
 import type {
   AnyChartSettingDescriptor,
   VizSettingGroup,
-} from "$/models/vizs/SettingDescriptor";
+} from "$/models/vizs/VizSettingDescriptors.types";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { ReactNode } from "react";
 

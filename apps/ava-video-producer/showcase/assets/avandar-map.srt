@@ -1,0 +1,23 @@
+1
+00:00:02,600 --> 00:00:05,600
+Inspect 240 fictional case locations.
+
+2
+00:00:05,800 --> 00:00:09,800
+Select the 12 facility locations.
+
+3
+00:00:10,200 --> 00:00:13,800
+Hide the facility layer to compare.
+
+4
+00:00:14,200 --> 00:00:17,200
+Restore the separate facility layer.
+
+5
+00:00:17,400 --> 00:00:20,400
+Move closer to inspect one location.
+
+6
+00:00:21,000 --> 00:00:25,000
+Read the selected facility's details.

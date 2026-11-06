@@ -144,16 +144,14 @@ describe("SubscriptionModule billing lifecycle", () => {
   });
 
   it("prompts billing setup when subscription is missing or inactive", () => {
-    expect(SubscriptionModule.shouldPromptForBillingSetup(undefined)).toBe(
-      true,
-    );
+    expect(SubscriptionModule.needsBillingSetup(undefined)).toBe(true);
     expect(
-      SubscriptionModule.shouldPromptForBillingSetup(
+      SubscriptionModule.needsBillingSetup(
         _subscription({ subscriptionStatus: "canceled" }),
       ),
     ).toBe(true);
     expect(
-      SubscriptionModule.shouldPromptForBillingSetup(
+      SubscriptionModule.needsBillingSetup(
         _subscription({ subscriptionStatus: "active" }),
       ),
     ).toBe(false);

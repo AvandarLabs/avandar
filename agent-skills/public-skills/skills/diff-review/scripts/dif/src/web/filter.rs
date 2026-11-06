@@ -10,9 +10,30 @@
 //! **Fail-open:** if the body isn't the shape we expect (not a JSON object, or
 //! no `files` array), return it byte-for-byte unchanged. A difit response shape
 //! we don't recognize degrades to "no grouping", never to a broken view.
+//!
+//! The same filter narrows a view to the files with comments, the set
+//! [`commented_files`] reads out of difit's `/api/comments-json`.
 
 use std::collections::HashSet;
 use std::hash::BuildHasher;
+
+use crate::difit::imports::Snapshot;
+
+/// The files difit holds at least one comment on, from its
+/// `/api/comments-json` body. `None` when the body can't be read, so the caller
+/// leaves the diff unfiltered rather than showing nothing.
+#[must_use]
+pub fn commented_files(comments_json: &[u8]) -> Option<HashSet<String>> {
+    let snapshot: Snapshot = serde_json::from_slice(comments_json).ok()?;
+    Some(
+        snapshot
+            .threads
+            .into_iter()
+            .filter(|thread| !thread.messages.is_empty())
+            .filter_map(|thread| thread.file_path)
+            .collect(),
+    )
+}
 
 /// Narrow difit's `/api/diff` `body` to one group's files.
 ///
@@ -237,6 +258,18 @@ mod tests {
                 .len(),
             1
         );
+    }
+
+    #[test]
+    fn commented_files_are_the_threads_with_messages() {
+        let comments = br#"{"version":3,"threads":[
+            {"id":"t1","filePath":"src/a.rs","messages":[{"id":"m1","body":"why?"}]},
+            {"id":"t2","filePath":"src/a.rs","messages":[{"id":"m2","body":"and?"}]},
+            {"id":"t3","filePath":"src/b.rs","messages":[]},
+            {"id":"t4","messages":[{"id":"m4","body":"no file"}]}
+        ]}"#;
+        assert_eq!(commented_files(comments), Some(set(&["src/a.rs"])));
+        assert_eq!(commented_files(b"<html>"), None, "unreadable: don't filter");
     }
 
     #[test]

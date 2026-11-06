@@ -1,4 +1,4 @@
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
@@ -12,10 +12,14 @@ function createBlockId(type: string): string {
 function buildDataVizItem(
   block: Extract<ChatGeneratedDashboardBlock, { kind: "DataViz" }>,
 ): PuckContentItem {
+  const id = createBlockId("DataViz");
   return {
     type: "DataViz",
     props: {
-      id: createBlockId("DataViz"),
+      id,
+      columnBindingVersion: 1,
+      columnBindings: { version: 1, scopeKey: id, sqlKey: "", columns: [] },
+      globalFilterTargets: {},
       nlQuery: {
         prompt: block.prompt,
         rawSql: block.sql,
@@ -27,7 +31,7 @@ function buildDataVizItem(
         ],
       },
       vizType: block.vizType,
-      vizConfig: VizConfigs.makeEmptyConfig(block.vizType),
+      vizConfig: AvaVizConfigs.makeEmptyConfig(block.vizType),
       globalFilterSubscription: DataVizFilters.defaultGlobalFilterSubscription,
       localFilters: [],
     },

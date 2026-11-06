@@ -9,7 +9,7 @@ import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm
 import type {
   AnyChartSettingDescriptor,
   VizSettingGroup,
-} from "$/models/vizs/SettingDescriptor";
+} from "$/models/vizs/VizSettingDescriptors.types";
 import type { SettingsColumnGroup } from "@/components/SettingsColumns/SettingsColumns";
 
 type Options = {

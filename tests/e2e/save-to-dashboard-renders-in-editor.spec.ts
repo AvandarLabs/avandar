@@ -1,14 +1,8 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { openDataExplorerDrawerTab } from "./helpers/dataExplorerFlow";
-import {
-  deleteAllDashboardsForOwner,
-  deleteDashboardsByIds,
-} from "./helpers/seedDashboard";
-import {
-  createSupabaseAdminClient,
-  getWorkspaceIdBySlug,
-} from "./helpers/supabaseAdminClient";
+import { deleteDashboardsByIds } from "./helpers/seedDashboard";
+import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 /**
@@ -21,8 +15,9 @@ import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
  *   2. Create + save an empty dashboard.
  *   3. Run a constant SQL query in the Data Explorer and switch the viz to bar.
  *   4. Save to the existing dashboard.
- *   5. Navigate (client-side) back to the dashboard editor.
- *   6. Assert the bar chart is visible inside the Puck canvas iframe.
+ *   5. Reopen the persisted dashboard in the editor.
+ *   6. Assert the chart and styling inside the Puck canvas iframe.
+ *   7. Open View and verify tooltip values in the saved preview.
  */
 test.describe("Data Explorer: save viz to dashboard", () => {
   test("bar chart saved to an existing dashboard renders inside that dashboard's editor", async ({
@@ -31,19 +26,7 @@ test.describe("Data Explorer: save viz to dashboard", () => {
   }) => {
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
-    const workspaceId = await getWorkspaceIdBySlug({
-      supabaseAdminClient: admin,
-      slug: workspaceSlug,
-    });
-
-    // Earlier specs in the same worker leave dashboards behind (e.g.
-    // dataviz-pblock-visualizations seeds nine). Clear them so the save
-    // modal list only contains the dashboard this test creates.
-    await deleteAllDashboardsForOwner({
-      admin,
-      workspaceId,
-      ownerEmail: primaryUser.email,
-    });
+    const dashboardName = `Binding reopen ${crypto.randomUUID()}`;
 
     const createdDashboardIds: string[] = [];
 
@@ -78,7 +61,11 @@ test.describe("Data Explorer: save viz to dashboard", () => {
       }
       createdDashboardIds.push(dashboardId);
 
-      // Save the empty dashboard (header has a Save button in the editor).
+      await page
+        .getByRole("textbox", { name: "Page title", exact: true })
+        .fill(dashboardName);
+
+      // Save the uniquely named dashboard through the editor.
       await page.getByRole("button", { name: /^save$/i }).click();
       await expect(page.getByText(/dashboard saved successfully/i)).toBeVisible(
         { timeout: MEDIUM_WAIT },
@@ -139,15 +126,29 @@ test.describe("Data Explorer: save viz to dashboard", () => {
         timeout: MEDIUM_WAIT,
       });
 
-      // Step 5: Open Save -> Save to dashboard, pick the dashboard we made.
-      // `deleteAllDashboardsForOwner` ran first, so this is the only dashboard
-      // in the list; select it without depending on its (default) name.
+      await page
+        .getByRole("textbox", { name: "Series label", exact: true })
+        .fill("Revenue trend");
+      await page
+        .getByRole("textbox", { name: "Color", exact: true })
+        .fill("#123456");
+      await page
+        .getByRole("textbox", { name: "Color", exact: true })
+        .press("Tab");
+      await expect(
+        page.locator(".recharts-bar-rectangle path").first(),
+      ).toHaveAttribute("fill", "#123456");
+
+      // Select only the dashboard created by this test.
       await page.getByRole("button", { name: /^save$/i }).click();
       await page.getByRole("menuitem", { name: /save to dashboard/i }).click();
 
       const listbox = page.getByRole("listbox", { name: /dashboards/i });
       await expect(listbox).toBeVisible({ timeout: SHORT_WAIT });
-      await listbox.getByRole("option").first().click();
+      await listbox
+        .getByRole("option")
+        .filter({ hasText: dashboardName })
+        .click();
 
       await page.getByRole("button", { name: /^save to dashboard$/i }).click();
 
@@ -171,12 +172,42 @@ test.describe("Data Explorer: save viz to dashboard", () => {
       // Puck canvas iframe. If the block was saved without a usable
       // `nlQuery.prompt`, DataVizPBlock short-circuits to its "add a
       // prompt" placeholder and the bar chart never appears.
-      await expect(async () => {
-        const editorFrame = page.locator("iframe").first().contentFrame();
-        await expect(editorFrame.locator(".recharts-bar").first()).toBeVisible({
-          timeout: SHORT_WAIT,
-        });
-      }).toPass({ timeout: LONG_WAIT });
+      const editorFrame = page.locator("iframe").first().contentFrame();
+      const bars = editorFrame.locator(".recharts-bar-rectangle path");
+      await expect(bars).toHaveCount(4, { timeout: LONG_WAIT });
+      await expect(bars.first()).toHaveAttribute("fill", "#123456");
+      await expect(
+        editorFrame.getByText("Revenue trend", { exact: true }).first(),
+      ).toBeVisible();
+      await page.screenshot({
+        path: ".temp/refactor-query-column-id/save-reopen-bindings.png",
+        fullPage: true,
+      });
+
+      // The editor's selection overlay owns pointer interactions. View opens
+      // the persisted dashboard with interactive chart tooltips.
+      await page.getByRole("button", { name: "View", exact: true }).click();
+      await expect(page).toHaveURL(
+        new RegExp(`/${workspaceSlug}/dashboards/preview/${dashboardId}`),
+        { timeout: MEDIUM_WAIT },
+      );
+      const previewBars = page.locator(".recharts-bar-rectangle path");
+      await expect(previewBars).toHaveCount(4, { timeout: MEDIUM_WAIT });
+      await expect(previewBars.first()).toHaveAttribute("fill", "#123456");
+      await expect(
+        page.getByText("Revenue trend", { exact: true }).first(),
+      ).toBeVisible();
+      await previewBars.first().hover();
+      const tooltip = page.locator(".recharts-tooltip-wrapper");
+      await expect(tooltip).toContainText("Riverside");
+      await expect(tooltip).toContainText(/1,?800/);
+      await previewBars.last().hover();
+      await expect(tooltip).toContainText("Fresno");
+      await expect(tooltip).toContainText("700");
+      await page.screenshot({
+        path: ".temp/refactor-query-column-id/save-reopen-preview-bindings.png",
+        fullPage: true,
+      });
     } finally {
       await deleteDashboardsByIds({ admin, dashboardIds: createdDashboardIds });
     }

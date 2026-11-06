@@ -1,0 +1,883 @@
+{
+  "status": "169 unchanged preset full SVG records exactly equal after isolated renderer correction; historical media remains versioned",
+  "beforeHead": "498c717d53240d15a29396830759a571a938f492",
+  "beforeSourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+  "afterHead": "e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e",
+  "afterSourceHash": "38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9",
+  "changedFiles": [
+    "apps/ava-video-producer/src/stock/presets/StratifiedSpatialSample/SampleCopy.tsx",
+    "apps/ava-video-producer/src/stock/presets/StratifiedSpatialSample/StratifiedSpatialSample.test.ts",
+    "apps/ava-video-producer/src/stock/presets/StratifiedSpatialSample/StratifiedSpatialSample.tsx"
+  ],
+  "beforeValidation": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-svg/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/validation.json",
+    "sha256": "fc337b43e4b00e9de6331f1fbaa0d31e41bbf10558279e6cc6094d3a615353ec"
+  },
+  "afterValidation": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-svg/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/validation.json",
+    "sha256": "881d053b1fa230e8f3b87bc30995943bf09ec5e7a25f4975ffb6416092589bdd"
+  },
+  "unchangedPresets": [
+    {
+      "id": "network-graph",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "node-traversal",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "radial-network",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "plexus-field",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "orbital-system",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "source-merge",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "data-pipeline",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "schema-mapping",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "packet-stream",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "event-bus",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "code-focus",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "terminal-type",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "scan-lines",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "bar-race",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "line-trace",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "metric-counter",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "dot-matrix",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "stagger-cards",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "word-reveal",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "status-cycle",
+      "fixtures": 3,
+      "frameHashesCompared": 27
+    },
+    {
+      "id": "paired-contrast",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "capability-matrix",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "reject-and-replace",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "decision-fork",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "tradeoff-pivot",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "exception-detour",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "argument-bridge",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "scope-aperture",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "qualify-apparent-conflict",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "shared-foundation",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "offline-ledger",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "journal-receipts",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "pocket-inference",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "disclosure-aperture",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "sealed-handoff",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "custody-transfer",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "readiness-latch",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "contribution-weave",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "expiring-lease",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "dashboard-slot-assembly",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "report-page-bind",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "cell-normalization",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "chart-focus-edit",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "pipeline-step-splice",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "provenance-peelback",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "keyed-row-zipper",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "field-conflict-choice",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "nested-drilldown-window",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "duplicate-review-stack",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "queue-relief",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "retry-backoff",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "cache-reuse",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "revision-restore",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "schedule-buffer",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "batch-release",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "feedback-refinement",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "work-decomposition",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "priority-insertion",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "uncertainty-unfold",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "linked-parameter-rehearsal",
+      "fixtures": 6,
+      "frameHashesCompared": 54
+    },
+    {
+      "id": "cold-chain-custody",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "vaccination-session-balance",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "dose-cohort-return-paths",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "missed-visit-reconnect",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "contact-window-overlap",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "specimen-aliquot-balance",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "referral-return-acknowledgement",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "outreach-household-revisits",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "mobile-clinic-relocation",
+      "fixtures": 7,
+      "frameHashesCompared": 63
+    },
+    {
+      "id": "fictional-conflict-globe",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "convoy-route-detour",
+      "fixtures": 9,
+      "frameHashesCompared": 81
+    },
+    {
+      "id": "aid-cargo-mode-handoff",
+      "fixtures": 11,
+      "frameHashesCompared": 99
+    },
+    {
+      "id": "recipient-confirmed-handover",
+      "fixtures": 6,
+      "frameHashesCompared": 54
+    },
+    {
+      "id": "pooled-donor-allocation",
+      "fixtures": 9,
+      "frameHashesCompared": 81
+    },
+    {
+      "id": "household-market-choice",
+      "fixtures": 6,
+      "frameHashesCompared": 54
+    },
+    {
+      "id": "retail-shelf-replenishment",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "chosen-service-access",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "voluntary-family-reunion",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "community-coordination-table",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "carbon-storage-accounting",
+      "fixtures": 6,
+      "frameHashesCompared": 54
+    },
+    {
+      "id": "compute-capacity-consolidation",
+      "fixtures": 7,
+      "frameHashesCompared": 63
+    },
+    {
+      "id": "stormwater-storage-spill",
+      "fixtures": 9,
+      "frameHashesCompared": 81
+    },
+    {
+      "id": "street-shade-installation",
+      "fixtures": 6,
+      "frameHashesCompared": 54
+    },
+    {
+      "id": "contour-sediment-retention",
+      "fixtures": 12,
+      "frameHashesCompared": 108
+    },
+    {
+      "id": "component-material-return",
+      "fixtures": 12,
+      "frameHashesCompared": 108
+    },
+    {
+      "id": "battery-dispatch-balance",
+      "fixtures": 7,
+      "frameHashesCompared": 63
+    },
+    {
+      "id": "environmental-observation-gaps",
+      "fixtures": 6,
+      "frameHashesCompared": 54
+    },
+    {
+      "id": "aquifer-allocation-balance",
+      "fixtures": 7,
+      "frameHashesCompared": 63
+    },
+    {
+      "id": "habitat-corridor-reconnection",
+      "fixtures": 7,
+      "frameHashesCompared": 63
+    },
+    {
+      "id": "classroom-day-presence",
+      "fixtures": 6,
+      "frameHashesCompared": 54
+    },
+    {
+      "id": "school-cost-satchel",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "returning-learner-worktable",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "fraction-material-translation",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "teacher-learning-cover",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "shared-reading-circles",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "school-lunch-tray-composition",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "classroom-access-rearrangement",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "practice-to-work-sample",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "shared-experiment-predictions",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "gis-layer-intersection-tally",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "catchment-union-gaps",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "cluster-epicurve-link",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "parcel-setback-inset",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "population-normalized-map",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "boundary-regrouping-effect",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "surveillance-reporting-backfill",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "location-uncertainty-boundary",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "shelter-usable-area-capacity",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "person-led-support-calendar",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "referral-consent-withdrawal",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "private-case-conversation",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "benefit-shortfall-correction",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "grievance-remedy-retest",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "resident-budget-ballots",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "public-works-measurement-check",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "school-transition-rehearsal",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "shared-workshop-booking",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "interpreted-case-dialogue",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "saved-seed-season-return",
+      "fixtures": 8,
+      "frameHashesCompared": 72
+    },
+    {
+      "id": "schema-column-evolution",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "plugin-capability-install",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "charge-reference-alignment",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "workspace-capacity-extension",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "equal-count-unequal-volume",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "actor-attribution-split",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "term-limited-revenue-share",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "utterance-to-model-draft",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "expectation-overlay-check",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "protected-work-boundary",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "expertise-role-exchange",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "peer-contribution-recognition",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "support-request-response",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "recurring-leak-prevention",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "release-repair-obligations",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "shared-jig-preparation",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "portable-work-transfer",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "serviceable-panel-swap",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "schema-plan-local-execution",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "query-column-cache-growth",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "ordered-lock-acquisition",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "invalid-table-quarantine",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "entity-spine-assembly",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "grouped-value-picker",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "state-preserving-source-refresh",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "effective-permission-grants",
+      "fixtures": 6,
+      "frameHashesCompared": 54
+    },
+    {
+      "id": "atomic-outbox-commit",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "resumable-byte-transfer",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "pdf-grid-reconstruction",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "pdf-nearest-label-review",
+      "fixtures": 5,
+      "frameHashesCompared": 45
+    },
+    {
+      "id": "prose-measurement-ledger",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "repeating-blocks-to-table",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "wide-table-to-observations",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "document-region-drift-check",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "publication-snapshot-slice",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "filter-subscription-scope",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "predicate-pushdown-boundary",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "choropleth-class-breaks",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "proportional-symbol-area",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "map-cluster-unfold",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "spatial-grid-binning",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "minimum-count-map-suppression",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "coordinate-quality-triage",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "coordinate-frame-registration",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "geometry-detail-budget",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "travel-time-network-frontier",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "bounded-location-displacement",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "kernel-density-spread",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "distance-buffer-envelope",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    },
+    {
+      "id": "late-type-evidence",
+      "fixtures": 4,
+      "frameHashesCompared": 36
+    }
+  ],
+  "changedPreset": "stratified-spatial-sample",
+  "unchangedCount": 169,
+  "unchangedFixtures": 754,
+  "unchangedFrameHashes": 6786,
+  "limits": [
+    "Original previews/live/MP4s retain their actual old source and HEAD identities.",
+    "Exact sampled SVG equality is a regression comparison, not continuous pixel quality or fresh MP4 rendering.",
+    "Changed preset needs its own current-source previews, actual browser/MP4 and frame-gate evidence.",
+    "Shared schemas, controls, registry, metadata, palette and motion helpers must be unchanged."
+  ],
+  "preservedOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/sampling-correction-source-continuity.json",
+    "sha256": "2ece859572b104640d343211d14299f9834c77ba574c1f9f289116ca571536ce",
+    "bytes": 19464
+  },
+  "publicationPolicy": "Curated R69 outcome/identity/limitation record; no raw callback/session trace."
+}

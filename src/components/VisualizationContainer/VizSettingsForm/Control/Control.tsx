@@ -9,8 +9,8 @@ import {
 import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { ColumnPickerControl } from "@/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { ControlSpec } from "$/models/vizs/SettingDescriptor";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { ControlSpec } from "$/models/vizs/VizSettingDescriptors.types";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -26,7 +26,7 @@ type Props = {
    * Columns available for `columnPicker` controls. Required when
    * `spec.kind === "columnPicker"`; ignored otherwise.
    */
-  fields?: readonly QueryResultColumn[];
+  fields?: readonly QueryResult.ColumnWithId[];
 };
 
 /**

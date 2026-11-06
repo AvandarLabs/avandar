@@ -1,0 +1,58 @@
+name:
+  id: motionAtlas.word-reveal.name
+  message: Masked statement
+description:
+  id: motionAtlas.word-reveal.description
+  message: Words rise from clean masks into a bold statement.
+category:
+  id: motionAtlas.word-reveal.category
+  message: Interface
+tags:
+  - id: motionAtlas.word-reveal.tags.0
+    message: type
+  - id: motionAtlas.word-reveal.tags.1
+    message: words
+  - id: motionAtlas.word-reveal.tags.2
+    message: mask
+  - id: motionAtlas.word-reveal.tags.3
+    message: kinetic
+useWhen:
+  id: motionAtlas.word-reveal.useWhen
+  message: Open a chapter with a short approved statement, giving every word time to land.
+prompt:
+  id: motionAtlas.word-reveal.prompt
+  message:
+    Use Motion Atlas "Masked statement" (word-reveal) as a conceptual graphic. Open
+    a chapter with a short approved statement, giving every word time to land. Keep the
+    restrained motion and readable labels; replace sample content with approved facts
+    before making product claims.
+creativeDirection:
+  id: motionAtlas.word-reveal.creativeDirection
+  message: Words rise from clean masks into a bold statement.
+goodFor:
+  - id: motionAtlas.word-reveal.goodFor.0
+    message: Open a chapter with a short approved statement, giving every word time to land.
+intent:
+  id: motionAtlas.word-reveal.intent
+  message: Open a chapter with a short approved statement, giving every word time to land.
+domains:
+  - id: motionAtlas.word-reveal.domains.0
+    message: Interface
+aliases:
+  - id: motionAtlas.word-reveal.aliases.0
+    message: type
+  - id: motionAtlas.word-reveal.aliases.1
+    message: words
+  - id: motionAtlas.word-reveal.aliases.2
+    message: mask
+  - id: motionAtlas.word-reveal.aliases.3
+    message: kinetic
+notFor:
+  - id: motionAtlas.word-reveal.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.word-reveal.distinction
+  message: Words rise from clean masks into a bold statement.

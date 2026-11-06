@@ -1,0 +1,58 @@
+name:
+  id: motionAtlas.data-pipeline.name
+  message: Processing pipeline
+description:
+  id: motionAtlas.data-pipeline.description
+  message: Data moves through a sequence of named stages.
+category:
+  id: motionAtlas.data-pipeline.category
+  message: Data flow
+tags:
+  - id: motionAtlas.data-pipeline.tags.0
+    message: pipeline
+  - id: motionAtlas.data-pipeline.tags.1
+    message: ETL
+  - id: motionAtlas.data-pipeline.tags.2
+    message: transform
+  - id: motionAtlas.data-pipeline.tags.3
+    message: workflow
+useWhen:
+  id: motionAtlas.data-pipeline.useWhen
+  message: Explain the order of a process with only the stages verified for the product.
+prompt:
+  id: motionAtlas.data-pipeline.prompt
+  message:
+    Use Motion Atlas "Processing pipeline" (data-pipeline) as a conceptual graphic.
+    Explain the order of a process with only the stages verified for the product. Keep
+    the restrained motion and readable labels; replace sample content with approved
+    facts before making product claims.
+creativeDirection:
+  id: motionAtlas.data-pipeline.creativeDirection
+  message: Data moves through a sequence of named stages.
+goodFor:
+  - id: motionAtlas.data-pipeline.goodFor.0
+    message: Explain the order of a process with only the stages verified for the product.
+intent:
+  id: motionAtlas.data-pipeline.intent
+  message: Explain the order of a process with only the stages verified for the product.
+domains:
+  - id: motionAtlas.data-pipeline.domains.0
+    message: Data flow
+aliases:
+  - id: motionAtlas.data-pipeline.aliases.0
+    message: pipeline
+  - id: motionAtlas.data-pipeline.aliases.1
+    message: ETL
+  - id: motionAtlas.data-pipeline.aliases.2
+    message: transform
+  - id: motionAtlas.data-pipeline.aliases.3
+    message: workflow
+notFor:
+  - id: motionAtlas.data-pipeline.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.data-pipeline.distinction
+  message: Data moves through a sequence of named stages.

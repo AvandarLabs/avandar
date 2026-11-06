@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { acquireGoogleSheetRelation } from "@/clients/google/GoogleDriveClient/acquireGoogleSheetRelation";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
 import type { GoogleSheetTabCsvReader } from "@/clients/google/GoogleDriveClient/acquireGoogleSheetRelation";
 import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
 

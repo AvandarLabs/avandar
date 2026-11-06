@@ -36,6 +36,13 @@ export type RunStructuredQueryParams = StructuredQueryAuth & {
 
 /** A query result plus the execution relations analytics records about it. */
 export type RunStructuredQueryResult = {
+  /**
+   * The raw SQL that ran, including any automatic row limit, or undefined
+   * when the query ran against its source with no raw SQL. Compare it with
+   * the SQL a caller expects, for example to tell whether a result's columns
+   * belong to a chart's current SQL.
+   */
+  executedSql: string | undefined;
   result: QueryResult.T<UnknownRow>;
   /**
    * True when the large-dataset guard replaced the caller's query with a

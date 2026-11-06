@@ -22,6 +22,7 @@ use std::time::Duration;
 
 use super::imports::{Snapshot, snapshot_to_imports};
 use super::{importer, transcript};
+use crate::github::sync::GithubSync;
 
 /// Handle to the running poller thread + the latest snapshot it has seen.
 pub struct Poller {
@@ -35,12 +36,33 @@ impl Poller {
     /// until [`Poller::stop`] (or drop).
     #[must_use]
     pub fn start(port: u16, transcript_path: PathBuf, interval: Duration) -> Self {
+        Self::start_with_github(port, transcript_path, interval, None)
+    }
+
+    /// Like [`Poller::start`], also running `github` over every snapshot so
+    /// PR-bound comments are posted, edited, and deleted on the PR.
+    #[must_use]
+    pub fn start_with_github(
+        port: u16,
+        transcript_path: PathBuf,
+        interval: Duration,
+        mut github: Option<GithubSync>,
+    ) -> Self {
         let latest = Arc::new(Mutex::new(None));
         let stop = Arc::new(AtomicBool::new(false));
         let handle = {
             let latest = Arc::clone(&latest);
             let stop = Arc::clone(&stop);
-            thread::spawn(move || run(port, &transcript_path, interval, &latest, &stop))
+            thread::spawn(move || {
+                run(
+                    port,
+                    &transcript_path,
+                    interval,
+                    &latest,
+                    &stop,
+                    &mut github,
+                );
+            })
         };
         Self {
             latest,
@@ -76,6 +98,7 @@ fn run(
     interval: Duration,
     latest: &Arc<Mutex<Option<Snapshot>>>,
     stop: &Arc<AtomicBool>,
+    github: &mut Option<GithubSync>,
 ) {
     let url = format!("http://localhost:{port}/api/comments-json");
     // The exact text we last mirrored, so anything else on disk is an inbound
@@ -83,10 +106,23 @@ fn run(
     let mut last_written: Option<String> = None;
     // Every id difit has held this session, plus everything we imported.
     let mut seen: HashSet<String> = HashSet::new();
+    // The version of the last snapshot mirrored, to tell a new difit session
+    // (its version starts over) from the one being mirrored.
+    let mut last_version: Option<i64> = None;
 
     while !stop.load(Ordering::Relaxed) {
         if let Some(snapshot) = fetch(&url) {
+            // A fresh difit session is not a mass deletion: skip the GitHub
+            // pass and the mirror so neither treats every comment as removed.
+            if reseed_new_session(port, transcript_path, &snapshot, last_version) {
+                sleep_interruptible(interval, stop);
+                continue;
+            }
+            last_version = Some(snapshot.version);
             seen.extend(importer::snapshot_ids(&snapshot));
+            if let Some(github) = github.as_mut() {
+                github.tick(&snapshot);
+            }
             // An inbound write wins this tick: mirroring now would overwrite the
             // skill's round before difit has ingested it. The next poll sees the
             // imported entries in difit and mirrors the merged conversation.
@@ -102,6 +138,26 @@ fn run(
         }
         sleep_interruptible(interval, stop);
     }
+}
+
+/// Import the transcript entries a new difit comment session lacks. Returns
+/// whether it did, so the caller skips this tick. A failed POST is retried on
+/// the next tick, since the session still lacks them.
+fn reseed_new_session(
+    port: u16,
+    transcript_path: &Path,
+    snapshot: &Snapshot,
+    last_version: Option<i64>,
+) -> bool {
+    let Ok(text) = std::fs::read_to_string(transcript_path) else {
+        return false;
+    };
+    let entries = importer::reseed_entries(snapshot, &text, last_version);
+    if entries.is_empty() {
+        return false;
+    }
+    let _ = importer::post(port, &entries);
+    true
 }
 
 /// Push transcript entries difit has never held into the live server. Returns
@@ -152,10 +208,13 @@ fn publish(latest: &Arc<Mutex<Option<Snapshot>>>, snapshot: Snapshot) {
 
 fn fetch(url: &str) -> Option<Snapshot> {
     ureq::get(url)
-        .timeout(Duration::from_millis(800))
+        .config()
+        .timeout_global(Some(Duration::from_millis(800)))
+        .build()
         .call()
         .ok()?
-        .into_json::<Snapshot>()
+        .body_mut()
+        .read_json::<Snapshot>()
         .ok()
 }
 

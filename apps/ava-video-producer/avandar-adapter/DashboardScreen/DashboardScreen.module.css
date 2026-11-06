@@ -1,0 +1,16 @@
+.sourceChartRoot {
+  background: var(--ava-surface-raised);
+  height: 100%;
+  position: relative;
+}
+
+.sourceChartBody {
+  height: calc(100% - 52px);
+  padding: 20px;
+}
+
+.phaseLayerBase {
+  inset: 0;
+  position: absolute;
+  z-index: 0;
+}

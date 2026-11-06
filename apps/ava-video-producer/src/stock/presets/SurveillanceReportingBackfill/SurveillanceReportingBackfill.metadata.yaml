@@ -1,0 +1,109 @@
+name:
+  id: motionAtlas.surveillance-reporting-backfill.name
+  message: New reports can change earlier days
+description:
+  id: motionAtlas.surveillance-reporting-backfill.description
+  message:
+    A fictional surveillance histogram is updated between two reporting snapshots.
+    Newly received records land in their earlier event-date bins instead of being added
+    to the current day's event count.
+category:
+  id: motionAtlas.surveillance-reporting-backfill.category
+  message: temporal record reassignment
+useWhen:
+  id: motionAtlas.surveillance-reporting-backfill.useWhen
+  message:
+    Show that a later report can revise an earlier period without representing a
+    new event today.
+prompt:
+  id: motionAtlas.surveillance-reporting-backfill.prompt
+  message:
+    Begin with the histogram known at the first reporting snapshot. Advance the
+    reporting-date tab while later receipts open above the chart; their tokens drop into
+    the supplied earlier event bins. Hold the original bar outlines beneath the revised
+    heights and retain both snapshot totals.
+creativeDirection:
+  id: motionAtlas.surveillance-reporting-backfill.creativeDirection
+  message:
+    Begin with the histogram known at the first reporting snapshot. Advance the
+    reporting-date tab while later receipts open above the chart; their tokens drop into
+    the supplied earlier event bins. Hold the original bar outlines beneath the revised
+    heights and retain both snapshot totals.
+intent:
+  id: motionAtlas.surveillance-reporting-backfill.intent
+  message:
+    Show that a later report can revise an earlier period without representing a
+    new event today.
+distinction:
+  id: motionAtlas.surveillance-reporting-backfill.distinction
+  message:
+    New records alter historical bins while reporting time advances independently.
+    Unlike a trend trace or journal receipt, the hero action is retroactive event-date
+    placement, not drawing a trend or acknowledging already stored records.
+tags:
+  - id: motionAtlas.surveillance-reporting-backfill.tags.0
+    message: surveillance
+  - id: motionAtlas.surveillance-reporting-backfill.tags.1
+    message: reporting lag
+  - id: motionAtlas.surveillance-reporting-backfill.tags.2
+    message: backfill
+  - id: motionAtlas.surveillance-reporting-backfill.tags.3
+    message: event date
+  - id: motionAtlas.surveillance-reporting-backfill.tags.4
+    message: report date
+  - id: motionAtlas.surveillance-reporting-backfill.tags.5
+    message: epidemic curve
+  - id: motionAtlas.surveillance-reporting-backfill.tags.6
+    message: data revision
+  - id: motionAtlas.surveillance-reporting-backfill.tags.7
+    message: historical counts
+goodFor:
+  - id: motionAtlas.surveillance-reporting-backfill.goodFor.0
+    message: Explain reporting delay and backfill
+  - id: motionAtlas.surveillance-reporting-backfill.goodFor.1
+    message: Distinguish event date from report date
+  - id: motionAtlas.surveillance-reporting-backfill.goodFor.2
+    message: Show why a historical surveillance count was revised
+notFor:
+  - id: motionAtlas.surveillance-reporting-backfill.notFor.0
+    message:
+      Only supplied observations are shown. No nowcast, reporting completeness
+      estimate, or unseen-event total is inferred.
+  - id: motionAtlas.surveillance-reporting-backfill.notFor.1
+    message:
+      Each record contributes once per snapshot after its first appearance; revised
+      minus earlier total equals newly received records.
+  - id: motionAtlas.surveillance-reporting-backfill.notFor.2
+    message:
+      Histogram counts are record totals, not incidence rates. This does not assess
+      an outbreak or offer medical guidance.
+domains:
+  - id: motionAtlas.surveillance-reporting-backfill.domains.0
+    message: temporal record reassignment
+aliases:
+  - id: motionAtlas.surveillance-reporting-backfill.aliases.0
+    message: surveillance
+  - id: motionAtlas.surveillance-reporting-backfill.aliases.1
+    message: reporting lag
+  - id: motionAtlas.surveillance-reporting-backfill.aliases.2
+    message: backfill
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.surveillance-reporting-backfill.beat.0
+      message:
+        Show the first-snapshot histogram, both cutoff labels and the incoming receipt
+        keys.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.surveillance-reporting-backfill.beat.1
+      message:
+        Advance the reporting tab and drop each later receipt into its authored
+        event-date bin; all receipts land by frame 106.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.surveillance-reporting-backfill.beat.2
+      message: Hold revised bars, optional prior outlines, and both snapshot totals.

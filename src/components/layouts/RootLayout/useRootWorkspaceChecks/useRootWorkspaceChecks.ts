@@ -1,6 +1,6 @@
 import { useImportJobsBeforeUnloadGuard } from "@/clients/datasets/useBeforeUnloadGuard";
 import { useEnsureLocalStoragePersistence } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureLocalStoragePersistence";
-import { useEnsureWorkspaceBilling } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling";
+import { useEnsureWorkspaceBilling } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling/useEnsureWorkspaceBilling";
 import { useSyncLocalDatasets } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useSyncLocalDatasets";
 
 /**

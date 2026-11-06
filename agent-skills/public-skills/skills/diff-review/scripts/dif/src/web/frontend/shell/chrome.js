@@ -1,4 +1,4 @@
-  // ===== chrome: collapse, retry, regenerate, show-new-changes, theme =====
+  // ===== chrome: collapse, retry, regenerate, show-new-changes, reload, theme =====
   // Fragment concatenated into the IIFE opened in shell.js — see that file for
   // the module map. Not standalone-valid; parse the assembled shell.js.
   document.getElementById("toggleSide").addEventListener("click", function () { els.body.classList.toggle("collapsed"); });
@@ -65,6 +65,36 @@
     fetchDiff();
   }
   if (els.showChangesBtn) els.showChangesBtn.addEventListener("click", showNewChanges);
+
+  // Reload the whole page (after a GitHub sync, or difit restarting under a TUI
+  // Ctrl+R) without losing the reviewer's place: the view, the sidebar tab, and
+  // the commented-only toggle survive any reload of this tab, ours or the
+  // browser's, through sessionStorage (saved on `pagehide`, restored on boot).
+  function saveViewState() {
+    try {
+      window.sessionStorage.setItem(VIEW_STATE_KEY, JSON.stringify({
+        view: view,
+        sideMode: sideMode,
+        commentedOnly: commentedOnly,
+      }));
+    } catch (e) { /* storage unavailable: a reload starts at the full diff */ }
+  }
+  // Apply the saved sidebar tab + toggle and return the saved view to open.
+  function restoreViewState() {
+    try {
+      var saved = JSON.parse(window.sessionStorage.getItem(VIEW_STATE_KEY) || "null");
+      if (!saved || typeof saved !== "object") return "full";
+      if (saved.sideMode === "test-plan") sideMode = "test-plan";
+      commentedOnly = saved.commentedOnly === true;
+      var isKnownView = typeof saved.view === "string" && /^(full|new|g\d+)$/.test(saved.view);
+      return isKnownView ? saved.view : "full";
+    } catch (e) { return "full"; }
+  }
+  function reloadShell() {
+    saveViewState();
+    window.location.reload();
+  }
+  window.addEventListener("pagehide", saveViewState);
 
   function applyTheme(t) {
     if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);

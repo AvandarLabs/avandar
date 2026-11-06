@@ -1,0 +1,14 @@
+{
+  "preset": "scan-lines",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "956bb454489cc6bd1446e00c80e495a3d71fcd6560ee44a00e76edfadea7656e",
+  "posterSha256": "2c46ba0adf0a1e071275c083b79fe9b4411f7bac51f8803ae7a7bdd58ab0e1c3",
+  "generatedAt": "2026-10-14T23:55:40.309Z"
+}

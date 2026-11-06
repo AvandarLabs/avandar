@@ -1,0 +1,249 @@
+{
+  "version": 1,
+  "id": "field-grouping",
+  "title": "Bracket a field group",
+  "description": "Full-stage native product with timed, source-anchored explanatory overlays and measured annotations.",
+  "sourceNotes": [
+    "Extracted from ontology-composite; uses the same continuity renderer and typed content contracts.",
+    "Reusable geometry, timing and editorial relationships. Product state remains scripted demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 870,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "Bracket a field group",
+        "category": "composite",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#82c8f2",
+        "beats": [
+          {
+            "id": "example-0",
+            "title": "Configuration is a set of decisions.",
+            "subtitle": "Show both the control and the meaning of the choice.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Many visits. One response case.",
+                "A field needs a source and a rule."
+              ],
+              "emphasis": "Identity \u2192 observations \u2192 useful fields."
+            },
+            "duration": 180,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "example-1",
+            "title": "Configure how observations become fields.",
+            "subtitle": "Native product with anchored explanatory overlays.",
+            "content": {
+              "kind": "composite",
+              "segment": {
+                "feature": "attribute-mapping",
+                "mode": "full",
+                "fromFrame": 0,
+                "toFrame": 659,
+                "leadIn": 60
+              },
+              "diagrams": [
+                {
+                  "at": 0,
+                  "request": {
+                    "preset": "keyed-row-zipper",
+                    "schemaVersion": 1,
+                    "input": {
+                      "leftRows": [
+                        {
+                          "key": "C01",
+                          "value": "Case 01"
+                        },
+                        {
+                          "key": "C02",
+                          "value": "Case 02"
+                        },
+                        {
+                          "key": "C03",
+                          "value": "Case 03"
+                        }
+                      ],
+                      "rightRows": [
+                        {
+                          "key": "C01",
+                          "value": "Visit A"
+                        },
+                        {
+                          "key": "C03",
+                          "value": "Visit B"
+                        },
+                        {
+                          "key": "C04",
+                          "value": "Visit C"
+                        }
+                      ],
+                      "joinType": "left",
+                      "labels": {
+                        "title": "Illustrative case / visit keys",
+                        "left": "Case",
+                        "right": "Visit",
+                        "key": "Key",
+                        "result": "Joined records",
+                        "unmatched": "Unmatched input",
+                        "missing": "No match"
+                      },
+                      "showKeys": true,
+                      "showUnmatchedTray": true
+                    }
+                  },
+                  "label": "The case identifier links observations.",
+                  "detail": {
+                    "x": 40,
+                    "y": 110,
+                    "width": 530,
+                    "height": 332
+                  },
+                  "overlay": {
+                    "at": 180,
+                    "until": 258,
+                    "target": {
+                      "x": 510,
+                      "y": 535,
+                      "width": 900,
+                      "height": 235
+                    }
+                  }
+                },
+                {
+                  "at": 270,
+                  "request": {
+                    "preset": "grouped-value-picker",
+                    "schemaVersion": 1,
+                    "input": {
+                      "observations": [
+                        {
+                          "id": "a",
+                          "value": 2
+                        },
+                        {
+                          "id": "b",
+                          "value": 4
+                        },
+                        {
+                          "id": "c",
+                          "value": 4
+                        },
+                        {
+                          "id": "d",
+                          "value": null
+                        }
+                      ],
+                      "rule": "sum",
+                      "nullPolicy": "exclude-from-mode",
+                      "labels": {
+                        "entity": "Illustrative case",
+                        "field": "Supply kits delivered",
+                        "unit": "kits",
+                        "missing": "Missing",
+                        "result": "Total kits",
+                        "countUnit": "observations"
+                      },
+                      "showCalculation": true
+                    }
+                  },
+                  "label": "Sum adds the available kit counts.",
+                  "detail": {
+                    "x": 42,
+                    "y": 332,
+                    "width": 885,
+                    "height": 215
+                  },
+                  "overlay": {
+                    "at": 294,
+                    "until": 675,
+                    "target": {
+                      "x": 450,
+                      "y": 535,
+                      "width": 900,
+                      "height": 235
+                    }
+                  }
+                }
+              ],
+              "signalAt": 290,
+              "source": {
+                "x": 502,
+                "y": 294.875,
+                "width": 822,
+                "height": 36
+              },
+              "effect": "bracket",
+              "annotations": [
+                {
+                  "at": 156,
+                  "until": 675,
+                  "kind": "bracket",
+                  "target": {
+                    "x": 502,
+                    "y": 294.875,
+                    "width": 822,
+                    "height": 36
+                  },
+                  "seed": 17
+                },
+                {
+                  "at": 170,
+                  "until": 235,
+                  "kind": "circle",
+                  "target": {
+                    "x": 502,
+                    "y": 234.078,
+                    "width": 20,
+                    "height": 20
+                  },
+                  "seed": 29
+                }
+              ]
+            },
+            "duration": 720,
+            "transition": {
+              "kind": "wipe",
+              "frames": 30
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "cue-0",
+      "shotId": "explanation",
+      "startFrame": 15,
+      "endFrame": 145,
+      "text": "Keep a meaningful object or relationship in view.",
+      "beatId": "example-0"
+    },
+    {
+      "id": "cue-1",
+      "shotId": "explanation",
+      "startFrame": 45,
+      "endFrame": 685,
+      "text": "Let the next scene continue the explanation.",
+      "beatId": "example-1"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

@@ -1,0 +1,22 @@
+.collectionFieldCollection button {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  padding: 6px 9px;
+}
+
+.collectionFieldCollection > legend {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.collectionFieldCollection {
+  border: 0;
+  margin: 20px 0;
+  min-width: 0;
+  padding: 0;
+}

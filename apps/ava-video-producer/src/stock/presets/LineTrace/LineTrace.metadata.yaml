@@ -1,0 +1,58 @@
+name:
+  id: motionAtlas.line-trace.name
+  message: Trend trace
+description:
+  id: motionAtlas.line-trace.description
+  message: A line draws across its plot with a leading marker.
+category:
+  id: motionAtlas.line-trace.category
+  message: Charts
+tags:
+  - id: motionAtlas.line-trace.tags.0
+    message: line
+  - id: motionAtlas.line-trace.tags.1
+    message: chart
+  - id: motionAtlas.line-trace.tags.2
+    message: trend
+  - id: motionAtlas.line-trace.tags.3
+    message: draw-on
+useWhen:
+  id: motionAtlas.line-trace.useWhen
+  message: Introduce an observed trend using approved values, units, and time range.
+prompt:
+  id: motionAtlas.line-trace.prompt
+  message:
+    Use Motion Atlas "Trend trace" (line-trace) as a conceptual graphic. Introduce
+    an observed trend using approved values, units, and time range. Keep the restrained
+    motion and readable labels; replace sample content with approved facts before making
+    product claims.
+creativeDirection:
+  id: motionAtlas.line-trace.creativeDirection
+  message: A line draws across its plot with a leading marker.
+goodFor:
+  - id: motionAtlas.line-trace.goodFor.0
+    message: Introduce an observed trend using approved values, units, and time range.
+intent:
+  id: motionAtlas.line-trace.intent
+  message: Introduce an observed trend using approved values, units, and time range.
+domains:
+  - id: motionAtlas.line-trace.domains.0
+    message: Charts
+aliases:
+  - id: motionAtlas.line-trace.aliases.0
+    message: line
+  - id: motionAtlas.line-trace.aliases.1
+    message: chart
+  - id: motionAtlas.line-trace.aliases.2
+    message: trend
+  - id: motionAtlas.line-trace.aliases.3
+    message: draw-on
+notFor:
+  - id: motionAtlas.line-trace.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.line-trace.distinction
+  message: A line draws across its plot with a leading marker.

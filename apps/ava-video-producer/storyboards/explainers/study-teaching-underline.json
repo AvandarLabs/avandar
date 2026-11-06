@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "id": "teaching-underline",
+  "title": "A restrained teaching underline",
+  "description": "Underline one takeaway with a fixed seed and frame-driven progress. Keep the rest of the typography still.",
+  "sourceNotes": [
+    "Extracted from right-sized-data; uses the same continuity renderer and typed content contracts.",
+    "Reusable geometry, timing and editorial relationships. Product state remains scripted demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 402,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "A restrained teaching underline",
+        "category": "motion-motion",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#9fefca",
+        "beats": [
+          {
+            "id": "example-0",
+            "title": "Useful data does not have to be big data.",
+            "subtitle": "Design around the work a team actually needs.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "A mission-sized workload.",
+                "A different architectural opportunity."
+              ],
+              "emphasis": "Fit the infrastructure to the work."
+            },
+            "duration": 210,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "example-1",
+            "title": "Optimize for the teams doing the work.",
+            "subtitle": "Benefits depend on workload, device and source support.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Less unnecessary remote work.",
+                "More capability near the team."
+              ],
+              "emphasis": "A deliberate fit for the social sector."
+            },
+            "duration": 210,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "cue-0",
+      "shotId": "explanation",
+      "startFrame": 15,
+      "endFrame": 175,
+      "text": "Keep a meaningful object or relationship in view.",
+      "beatId": "example-0"
+    },
+    {
+      "id": "cue-1",
+      "shotId": "explanation",
+      "startFrame": 33,
+      "endFrame": 175,
+      "text": "Let the next scene continue the explanation.",
+      "beatId": "example-1"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

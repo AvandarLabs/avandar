@@ -1,0 +1,101 @@
+{
+  "screens": [
+    "Case type home",
+    "Case type attributes",
+    "Case records",
+    "Native point map"
+  ],
+  "productRevision": "3c164aa32b8a60b30885081e7bb0986135e99f70",
+  "layoutSources": [
+    "src/views/OntologyDesignerApp/ConceptMetaView/index.tsx",
+    "src/views/IndividualManagerApp/SingleIndividualView/index.tsx",
+    "src/views/IndividualManagerApp/IndividualNavbar.tsx",
+    "src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx",
+    "src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx",
+    "src/views/GisApp/shell/MapTopBar/MapTopBar.tsx"
+  ],
+  "originalLeaves": [
+    "src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx",
+    "src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx",
+    "src/views/OntologyDesignerApp/ConceptNavbar.tsx",
+    "src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx",
+    "src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx",
+    "src/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList.tsx",
+    "src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx",
+    "packages/web/ui/src/router-links/NavLinkList.tsx",
+    "src/views/GisApp/shell/MapShell/MapShell.tsx",
+    "src/views/GisApp/MapCanvas/MapCanvasSurface/MapCanvasSurface.tsx",
+    "src/views/GisApp/MapCanvas/useMapCanvas.ts",
+    "src/views/GisApp/MapCanvas/useMapViewSync/useMapViewSync.ts",
+    "src/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows.ts",
+    "src/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.ts",
+    "src/views/GisApp/panels/LayerPanel/LayerList/LayerList.tsx",
+    "src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx",
+    "src/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection.tsx",
+    "src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.tsx",
+    "src/views/GisApp/panels/LayerInspector/StyleSection/CircleRadiusControl.tsx",
+    "src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx",
+    "src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx",
+    "src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx",
+    "src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx",
+    "src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx",
+    "src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx"
+  ],
+  "adapterBoundaries": [
+    "The shared renderer owns product providers, workspace navigation and outer slate. These adapters use actual product leaves, source CSS and source-matched parent layout. The product checkout remains read-only.",
+    "Case type and record data clients are replaced by immutable fictional CSV fixtures. Navigation and selection are frame-owned. The 240 fixture records are rendered through NavLinkList without reproducing the product's backend pagination controller.",
+    "The case record is HF-0001. Its six attributes retain source order, both case_id fields, source dataset labels and the sum of its related supply_kits_delivered values. No search control, assignment, status edit, synchronization or note save is demonstrated.",
+    "ActivityBlock is unchanged. The notifyNotImplemented alias suppresses the unused placeholder toast only; the film never invokes Add note. The product's duplicate TipTap link-extension warning remains observable.",
+    "Map geometry is generated from the original cases and facilities latitude/longitude strings by the product's makeFeatureCollectionFromRows. The actual product layer builder and native MapLibre canvas render those features.",
+    "The map uses the actual built-in Avandar basemap, resolved through the unchanged BasemapStyle and MapStyles modules to OpenFreeMap Bright. The source applyMapStyles function supplies Avandar colors. Real tiles and labels provide context beneath fictional data; required OpenFreeMap, OpenMapTiles and OpenStreetMap attribution remains visible.",
+    "The Layer inspector retains original section, status, style, sensitivity and legend components. Its Data section uses the exact source Mantine control order with fixture-bound choices instead of network-loaded dataset metadata. Filter and Popup sections remain collapsed and are not operated.",
+    "Layer visibility, selected layer and feature inspection are controlled by the authored frame. The map camera is applied by the product's useMapViewSync jumpTo path. Circle paint transitions have zero duration so they cannot depend on wall time.",
+    "The feature drawer keeps the original FeatureInspector and uses a frame-calculated height wrapper. Native MapLibre NavigationControl is docked beside the measured inspector to avoid covering Export at the film's bounded viewport.",
+    "Cursor annotations identify actual rendered controls. The transparent facility marker receives only native map.project coordinates at idle and is explicitly tagged as a canvas projection for hit testing. It does not draw a replacement point.",
+    "Native map idle and shared font/layout readiness delay rendering. The camera, visibility and drawer remain seekable without backend queries or persistence mutations."
+  ],
+  "fixtureMetrics": {
+    "cases": 240,
+    "visits": 297,
+    "facilities": 12,
+    "selectedCase": {
+      "case_id": "HF-0001",
+      "case_label": "Response case 001",
+      "district_name": "North Quay",
+      "referral_status": "contacted",
+      "supply_kits_delivered": 1
+    },
+    "selectedFacility": {
+      "facility_id": "F03",
+      "facility_name": "Eastbank Hub",
+      "staff_count": "5",
+      "supply_kits_available": "7",
+      "stock_as_of": "2026-09-13"
+    }
+  },
+  "limitations": [
+    "Source reuse proves presentation provenance, not a new end-to-end product run. Earlier accepted local browser evidence remains separately recorded in docs/using-avandar.md.",
+    "Case Manager remains a local dataset-backed preview. Existing synchronization can replace record IDs and reset status or assignment; pagination has known boundary behavior. This film neither exercises nor claims to repair those paths.",
+    "The earlier district WKT layer failed with a DuckDB Binder Error for __avandar_geometry. No successful district polygons, choropleth, spatial join or geometry export is claimed.",
+    "The map renderer needs access to the public tile, sprite and glyph endpoints. Native idle, style readiness, loaded tiles and a nonempty rendered vector basemap are required before each capture; a missing basemap fails the render instead of producing a blank backdrop."
+  ],
+  "verification": {
+    "componentFrames": {
+      "cases": [40, 140, 290, 390, 500],
+      "map": [40, 120, 220, 330, 400, 510, 570, 660]
+    },
+    "componentEvidence": "out/component-review/cases-map-state-review.json",
+    "componentScreenshots": "out/component-review/cases-{frame}.png and out/component-review/map-{frame}.png",
+    "componentReview": "All 13 screenshots inspected at a 1600 by 1000 browser viewport containing the 1600 by 840 film stage. Case fields and Notes controls fit; Lingui values resolve; map visibility, camera and F03 feature fields render correctly. No console errors or runtime exceptions. Every recorded state had remotion_renderReady true and an empty delay-render handle list.",
+    "repeatSeekEvidence": [
+      "out/component-review/cases-map-measurement/review.json",
+      "out/component-review/measurement/review.json"
+    ],
+    "repeatSeekReview": "Direct seeks and the route 740, 17, target reproduced identical text at cases 180/390/600 and map 140/460/650. Some PNG hashes differ. Inspected differences in the combined review were confined to rounded slate and Save State pill antialiasing; exact pixel inequality is retained in the evidence. No threshold was loosened.",
+    "cursorCorrections": "Removed a visibility annotation fallback that also matched the draggable handle's aria-pressed attribute. The source Hide/Show button now owns the target. Final map point coordinates must be remeasured after the camera change, not copied from the earlier view.",
+    "finalCursorEvidence": "out/component-review/final-ready-measurement/review.json and src/avandar/cursor-targets.json",
+    "finalCursorReview": "The final readiness-aware measurement resolved all 30 targets across five adapters with zero errors. Case Manager has four targets and Maps six. Map visibility frames 300/380 target the source eye at (280, 176.61). The projected facility moves from (888.75, 504.25) at frame 440 to (876.81, 444.61) at frame 540, matching the native camera.",
+    "tests": "tests/avandar.test.ts: seven passing tests cover CSV parity including blanks, dataset grain and joins, 252 valid map coordinates, vendor/build hashes, authored scene constraints, all six React-only film plans and pointer click holds. Tools TypeScript check passed.",
+    "fullFilmReview": "Full-film previews, render gates and listening review are separate pipeline evidence; component inspection alone does not approve final films."
+  }
+}

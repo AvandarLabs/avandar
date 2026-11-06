@@ -1,0 +1,218 @@
+{
+  "stage": {
+    "width": 1600,
+    "height": 840
+  },
+  "cursorMeasurement": {
+    "settleMs": 700,
+    "errors": [],
+    "unresolved": []
+  },
+  "randomSeekChecks": [
+    {
+      "feature": "import",
+      "frame": 160,
+      "route": [740, 17, 160],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "6e9b8bafef1d7a6040a450b0d31d97c8aff4a1fae94263f6cbd6b67dad98d920",
+      "afterSeeksSha256": "6e9b8bafef1d7a6040a450b0d31d97c8aff4a1fae94263f6cbd6b67dad98d920",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "import",
+      "frame": 350,
+      "route": [740, 17, 350],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "4dec18f59f2a9224603eb24bc3700e0135e9de849cf36781ae30184f4e4502c0",
+      "afterSeeksSha256": "4dec18f59f2a9224603eb24bc3700e0135e9de849cf36781ae30184f4e4502c0",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "import",
+      "frame": 550,
+      "route": [740, 17, 550],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "26cdb69e02aae872862d8e7a7823fca3c32834fe3ee5dc6307c977b4f847cbc7",
+      "afterSeeksSha256": "26cdb69e02aae872862d8e7a7823fca3c32834fe3ee5dc6307c977b4f847cbc7",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "explorer",
+      "frame": 160,
+      "route": [740, 17, 160],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "a7fee729c771d23a39ef33440b295952a939a6600ad9599096c7ed9242d4a4f3",
+      "afterSeeksSha256": "a7fee729c771d23a39ef33440b295952a939a6600ad9599096c7ed9242d4a4f3",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "explorer",
+      "frame": 460,
+      "route": [740, 17, 460],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "e962ca230c2ecdac1b356a6573a257c66388d7d0957763e4158ec5be39be28d2",
+      "afterSeeksSha256": "e962ca230c2ecdac1b356a6573a257c66388d7d0957763e4158ec5be39be28d2",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "explorer",
+      "frame": 719,
+      "route": [740, 17, 719],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "a772bcb6da2777933221f66a3e7fc58afced6954cc12d799b2799f7dee2962e0",
+      "afterSeeksSha256": "a772bcb6da2777933221f66a3e7fc58afced6954cc12d799b2799f7dee2962e0",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "dashboards",
+      "frame": 190,
+      "route": [740, 17, 190],
+      "identicalPixels": false,
+      "identicalText": true,
+      "directSha256": "ec1b617e895c06a50d4367330af0500f4ec4c815b4d8d3d7dab2fc364feba649",
+      "afterSeeksSha256": "87899f8e6bf9753ccd5f452e358ddd11b685882b0482a607c0216a615fc4b290",
+      "changedPixels": 48,
+      "maxChannelDelta": 5,
+      "bounds": {
+        "x": 233,
+        "y": 789,
+        "width": 1358,
+        "height": 16
+      }
+    },
+    {
+      "feature": "dashboards",
+      "frame": 380,
+      "route": [740, 17, 380],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "4b175b81d48154562183a39e1498768d1bc6db4a08535344d5c76bde18c85501",
+      "afterSeeksSha256": "4b175b81d48154562183a39e1498768d1bc6db4a08535344d5c76bde18c85501",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "dashboards",
+      "frame": 600,
+      "route": [740, 17, 600],
+      "identicalPixels": false,
+      "identicalText": true,
+      "directSha256": "191a6b6a9f4d331d975c3564ace67031a367c6500bb8729ed8d2be74f0470ae3",
+      "afterSeeksSha256": "7d16d8ade147979d62517925129d6976abc8fa9a00e11e38427177ebf079fd95",
+      "changedPixels": 18,
+      "maxChannelDelta": 5,
+      "bounds": {
+        "x": 233,
+        "y": 797,
+        "width": 1358,
+        "height": 8
+      }
+    },
+    {
+      "feature": "cases",
+      "frame": 180,
+      "route": [740, 17, 180],
+      "identicalPixels": false,
+      "identicalText": true,
+      "directSha256": "a9968f87b21fee0ca2a907ebafdeda059d0caf36fc3409d86d6ac82e4514c380",
+      "afterSeeksSha256": "4787b3e8ad592f0be1c2d8cd7dfca677036125c5f7305009532c5d309e6c2a93",
+      "changedPixels": 7,
+      "maxChannelDelta": 5,
+      "bounds": {
+        "x": 233,
+        "y": 800,
+        "width": 4,
+        "height": 5
+      }
+    },
+    {
+      "feature": "cases",
+      "frame": 390,
+      "route": [740, 17, 390],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "f19d9a63fa6324bd10694e485b3118cfe381a4024ce8287f30913ca8c9b8c3cd",
+      "afterSeeksSha256": "f19d9a63fa6324bd10694e485b3118cfe381a4024ce8287f30913ca8c9b8c3cd",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "cases",
+      "frame": 600,
+      "route": [740, 17, 600],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "f19d9a63fa6324bd10694e485b3118cfe381a4024ce8287f30913ca8c9b8c3cd",
+      "afterSeeksSha256": "f19d9a63fa6324bd10694e485b3118cfe381a4024ce8287f30913ca8c9b8c3cd",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "map",
+      "frame": 140,
+      "route": [740, 17, 140],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "ca7d123af4e87ce83da7de6fcf54e3e9fecab9338aab98120ad4ddb0eb189121",
+      "afterSeeksSha256": "ca7d123af4e87ce83da7de6fcf54e3e9fecab9338aab98120ad4ddb0eb189121",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "map",
+      "frame": 460,
+      "route": [740, 17, 460],
+      "identicalPixels": true,
+      "identicalText": true,
+      "directSha256": "c397a512ed20a735729468bdfe1ecf2150b42a325923b85e6f9972254bdb591e",
+      "afterSeeksSha256": "c397a512ed20a735729468bdfe1ecf2150b42a325923b85e6f9972254bdb591e",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "bounds": null
+    },
+    {
+      "feature": "map",
+      "frame": 650,
+      "route": [740, 17, 650],
+      "identicalPixels": false,
+      "identicalText": true,
+      "directSha256": "252c56b85f3b494e3796c9d560e2443f8c10a7b908f37933ffb4f39809becb3b",
+      "afterSeeksSha256": "a170e8bc69d5998383d6fa25443a278414f595bf490885a2e7a153d7c8feb260",
+      "changedPixels": 63,
+      "maxChannelDelta": 22,
+      "bounds": {
+        "x": 233,
+        "y": 70,
+        "width": 1358,
+        "height": 735
+      }
+    }
+  ],
+  "visualReview": {
+    "reviewedBy": "Codex",
+    "notes": "All nonzero differences were inspected and localized to rounded slate edges and, for map650, four Save State pill corner pixels. No text or data state differences were observed. Exact pixel inequality remains recorded without changing thresholds."
+  },
+  "scope": "Component review before final film rendering; final MP4 records are separate."
+}
