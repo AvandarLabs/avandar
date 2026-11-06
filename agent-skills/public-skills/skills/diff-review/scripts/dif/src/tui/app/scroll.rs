@@ -13,7 +13,14 @@ impl App {
     /// Whether a markdown-backed main view is active.
     #[must_use]
     pub fn markdown_view_active(&self) -> bool {
-        self.focus == Panel::Difit
+        self.markdown_view_for(self.focus)
+    }
+
+    /// Whether `panel` is showing a markdown-backed view (the test plan or the
+    /// diff guide) rather than a terminal.
+    #[must_use]
+    pub fn markdown_view_for(&self, panel: Panel) -> bool {
+        panel == Panel::Difit
             && matches!(
                 self.active_diff_view,
                 MainDiffView::TestPlan | MainDiffView::Guide
@@ -27,34 +34,59 @@ impl App {
         }
     }
 
-    /// The pane currently focused, if it exists.
-    const fn focused_pane(&self) -> Option<&PtyPane> {
-        match self.focus {
+    /// The markdown view the main pane is showing (the diff guide unless the
+    /// test plan is active).
+    pub(super) const fn active_markdown_ref(&self) -> &Guide {
+        match self.active_diff_view {
+            MainDiffView::TestPlan => &self.test_plan,
+            _ => &self.guide,
+        }
+    }
+
+    /// The PTY behind `panel`, if it exists.
+    pub(super) const fn pane_for(&self, panel: Panel) -> Option<&PtyPane> {
+        match panel {
             Panel::Difit => Some(&self.difit),
             Panel::Llm => self.llm.as_ref(),
         }
     }
 
-    /// Scroll up by `num_rows` rows (mouse wheel / arrows / PageUp). In the diff guide
-    /// view this moves the cursor (the view follows it); otherwise the focused
-    /// PTY pane scrolls.
-    pub fn scroll_focused_up(&mut self, num_rows: usize) {
-        if self.markdown_view_active() {
+    /// The pane currently focused, if it exists.
+    const fn focused_pane(&self) -> Option<&PtyPane> {
+        self.pane_for(self.focus)
+    }
+
+    /// Scroll `panel` up by `num_rows` rows (mouse wheel over it). In the diff
+    /// guide view this moves the cursor (the view follows it); otherwise the
+    /// PTY pane scrolls into its history.
+    pub fn scroll_panel_up(&mut self, panel: Panel, num_rows: usize) {
+        if self.markdown_view_for(panel) {
             self.active_markdown()
                 .cursor_up(u16::try_from(num_rows).unwrap_or(u16::MAX));
-        } else if let Some(pane) = self.focused_pane() {
+        } else if let Some(pane) = self.pane_for(panel) {
             pane.scroll_up(num_rows);
         }
     }
 
-    /// Scroll down by `num_rows` rows (mouse wheel / arrows / PageDown).
-    pub fn scroll_focused_down(&mut self, num_rows: usize) {
-        if self.markdown_view_active() {
+    /// Scroll `panel` down by `num_rows` rows (mouse wheel over it).
+    pub fn scroll_panel_down(&mut self, panel: Panel, num_rows: usize) {
+        if self.markdown_view_for(panel) {
             self.active_markdown()
                 .cursor_down(u16::try_from(num_rows).unwrap_or(u16::MAX));
-        } else if let Some(pane) = self.focused_pane() {
+        } else if let Some(pane) = self.pane_for(panel) {
             pane.scroll_down(num_rows);
         }
+    }
+
+    /// Scroll the focused pane up by `num_rows` rows (arrows / PageUp / Alt+K).
+    pub fn scroll_focused_up(&mut self, num_rows: usize) {
+        self.scroll_panel_up(self.focus, num_rows);
+    }
+
+    /// Scroll the focused pane down by `num_rows` rows (arrows / PageDown /
+    /// Alt+J).
+    pub fn scroll_focused_down(&mut self, num_rows: usize) {
+        self.scroll_panel_down(self.focus, num_rows);
     }
 
     /// Scroll the focused view a half-page in `up`'s direction (Alt+U / Alt+D).

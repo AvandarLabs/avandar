@@ -1,6 +1,6 @@
 //! Retargeting and relaunching the review surface: the web shell's requests
 //! (regenerate the guide, resolve a pull's merge conflicts), a comparison
-//! change, a fresh LLM session, and a difit restart.
+//! change, a fresh LLM session, a diff refresh, and a GitHub resync.
 
 use std::time::Instant;
 
@@ -9,6 +9,7 @@ use crate::difit::poller::Poller;
 use crate::difit::{server, transcript};
 use crate::github::conflicts::{resolve_prompt, reviewer_resolves_notice};
 use crate::github::registry::SharedRegistry;
+use crate::github::session::Session;
 use crate::inject::held::HeldComments;
 use crate::paths;
 use crate::slug;
@@ -251,7 +252,7 @@ impl App {
         }
     }
 
-    /// Tear down the difit server and relaunch it with the same comparison,
+    /// "Refresh diff" (`Ctrl+R`): tear down the difit server and relaunch it with the same comparison,
     /// port, and (freshly re-read) seeded comments. The left pane's log is kept
     /// continuous: `dif` writes its own `[dif]` status lines into the pane and
     /// the new server output appends below them, rather than clearing the pane
@@ -271,19 +272,19 @@ impl App {
             false,
         );
         self.difit
-            .write_to_screen("\r\n\x1b[33m[dif] Stopping difit server…\x1b[0m\r\n");
+            .write_to_screen("\r\n\x1b[33m[dif] Refreshing diff: stopping difit…\x1b[0m\r\n");
         self.difit.kill_child();
         // Wait for difit to release the port so the relaunch binds the same one
         // (keeping the poller valid) instead of difit silently reassigning.
         let _ = server::wait_until_port_free(self.port, 50);
         self.difit
-            .write_to_screen("\x1b[33m[dif] Restarting difit server…\x1b[0m\r\n");
+            .write_to_screen("\x1b[33m[dif] Refreshing diff: starting difit…\x1b[0m\r\n");
         if let Err(e) = self
             .difit
             .respawn_shell_command_with_env(&command, &[], &self.repo_root)
         {
             self.difit.write_to_screen(&format!(
-                "\x1b[31m[dif] Failed to restart difit: {e}\x1b[0m\r\n"
+                "\x1b[31m[dif] Failed to refresh the diff: {e}\x1b[0m\r\n"
             ));
         }
         // The relaunched difit now shows the current diff: re-baseline so the
@@ -299,5 +300,21 @@ impl App {
         if let Some(shell) = self.web_shell.as_ref() {
             shell.note_difit_restart();
         }
+    }
+
+    /// "Resync with GitHub" (`Ctrl+S`): ask the poller's GitHub sync for a pull
+    /// now, the same request the browser's Sync button makes, and say so in the
+    /// log view. The open browser tab reloads itself once the pull finishes.
+    pub fn resync_with_github(&self) {
+        let line = if self
+            .comment_channels
+            .github
+            .session(Session::request_reviewer_pull)
+        {
+            "\r\n\x1b[36m↻ Resyncing with GitHub…\x1b[0m\r\n"
+        } else {
+            "\r\n\x1b[33m[dif] This branch has no open GitHub PR to resync with.\x1b[0m\r\n"
+        };
+        self.difit.write_to_screen(line);
     }
 }
