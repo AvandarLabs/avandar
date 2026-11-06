@@ -2,6 +2,7 @@ import { makeParserRegistry } from "@avandar/clients";
 import {
   camelCaseKeysDeep,
   nullsToUndefinedDeep,
+  omitProps,
   pipe,
   snakeCaseKeysDeep,
 } from "@avandar/utils";
@@ -60,6 +61,10 @@ const DBReadSchema = z.object({
       "unreachable_dataset",
     ])
     .nullable(),
+  is_workspace_loadable: z.boolean(),
+  source_asset_type: z.string().nullable(),
+  source_download_url: z.string().nullable(),
+  search_vector: z.unknown(),
 });
 
 export const DataCatalogListingParsers =
@@ -67,6 +72,9 @@ export const DataCatalogListingParsers =
     modelName: "DataCatalogListing",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
+      // The search document exists for catalog search in Postgres. Nothing
+      // in the app reads it.
+      omitProps("search_vector"),
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
       (obj): DataCatalogListingRead => {

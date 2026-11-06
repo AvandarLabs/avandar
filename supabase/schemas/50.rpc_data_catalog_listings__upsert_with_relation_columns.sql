@@ -133,7 +133,10 @@ begin
       pipeline_scope_keys,
       date_column_type_last_verified,
       is_invalid,
-      invalid_dataset_reason
+      invalid_dataset_reason,
+      is_workspace_loadable,
+      source_asset_type,
+      source_download_url
     ) values (
       coalesce(v_input.id, gen_random_uuid()),
       v_input.access_kind,
@@ -162,7 +165,10 @@ begin
       coalesce(v_input.pipeline_scope_keys, '{}'),
       v_input.date_column_type_last_verified,
       v_input.is_invalid,
-      v_input.invalid_dataset_reason
+      v_input.invalid_dataset_reason,
+      coalesce(v_input.is_workspace_loadable, true),
+      v_input.source_asset_type,
+      v_input.source_download_url
     )
     on conflict (id) do update set
       access_kind = excluded.access_kind,
@@ -191,7 +197,10 @@ begin
       pipeline_scope_keys = excluded.pipeline_scope_keys,
       date_column_type_last_verified = excluded.date_column_type_last_verified,
       is_invalid = excluded.is_invalid,
-      invalid_dataset_reason = excluded.invalid_dataset_reason
+      invalid_dataset_reason = excluded.invalid_dataset_reason,
+      is_workspace_loadable = excluded.is_workspace_loadable,
+      source_asset_type = excluded.source_asset_type,
+      source_download_url = excluded.source_download_url
     returning * into v_listing;
 
     v_written_ids := v_written_ids || v_listing.id;

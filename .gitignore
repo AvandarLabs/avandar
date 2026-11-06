@@ -25,15 +25,16 @@ dist-ssr
 
 # Environment
 .env
-.env.local*
-.env.development*
-.env.staging*
-.env.production*
-.env.pipelines.local
+# Every `.env.<name>` that `ava --env <name>` can load, except the examples.
+.env.*
+!.env.example
+!.env.example.edge
+!.env.pipelines.example
 *client_secret*
 
 # Ignorable development files 
 .eslintcache
+__pycache__/
 
 # Supabase
 supabase/.temp
@@ -115,4 +116,7 @@ public/test-data/pdf/gate/imc-sudan-cholera-sitrep-1.pdf
 .impeccable/build/
 .impeccable/mocks/
 .impeccable/review/
-.impeccable/hook.cache.json
+**/.impeccable/hook.cache.json
+
+# Company video projects, source media, and exports stay local.
+.videos/

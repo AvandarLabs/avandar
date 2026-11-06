@@ -1,0 +1,373 @@
+[
+  {
+    "preset": "network-graph",
+    "paths": ["nodes.*.label"],
+    "fontSize": 18,
+    "width": 150,
+    "mono": false
+  },
+  {
+    "preset": "network-graph",
+    "paths": ["nodes.*.detail"],
+    "fontSize": 12,
+    "width": 170,
+    "mono": false
+  },
+  {
+    "preset": "node-traversal",
+    "paths": ["nodes.*.label"],
+    "fontSize": 18,
+    "width": 150,
+    "mono": false
+  },
+  {
+    "preset": "node-traversal",
+    "paths": ["nodes.*.detail"],
+    "fontSize": 12,
+    "width": 170,
+    "mono": false
+  },
+  {
+    "preset": "radial-network",
+    "paths": ["hub.label"],
+    "fontSize": 25,
+    "width": 116,
+    "mono": false
+  },
+  {
+    "preset": "radial-network",
+    "paths": ["hub.detail"],
+    "fontSize": 12,
+    "width": 116,
+    "mono": false
+  },
+  {
+    "preset": "radial-network",
+    "paths": ["spokes.*"],
+    "fontSize": 18,
+    "width": 140,
+    "mono": false
+  },
+  {
+    "preset": "plexus-field",
+    "paths": ["heading"],
+    "fontSize": 22,
+    "width": 832,
+    "mono": false
+  },
+  {
+    "preset": "orbital-system",
+    "paths": ["bodies.*.label"],
+    "fontSize": 12,
+    "width": 100,
+    "mono": false
+  },
+  {
+    "preset": "source-merge",
+    "paths": ["sources.*.name"],
+    "fontSize": 21,
+    "width": 127,
+    "mono": false
+  },
+  {
+    "preset": "source-merge",
+    "paths": ["sources.*.kind"],
+    "fontSize": 13,
+    "width": 40,
+    "mono": true
+  },
+  {
+    "preset": "source-merge",
+    "paths": ["destination.label"],
+    "fontSize": 25,
+    "width": 194,
+    "mono": false
+  },
+  {
+    "preset": "source-merge",
+    "paths": ["destination.detail"],
+    "fontSize": 16,
+    "width": 194,
+    "mono": false
+  },
+  {
+    "preset": "data-pipeline",
+    "paths": ["stages.*.label"],
+    "fontSize": 22,
+    "width": 152,
+    "mono": false
+  },
+  {
+    "preset": "data-pipeline",
+    "paths": ["stages.*.detail"],
+    "fontSize": 15,
+    "width": 152,
+    "mono": false
+  },
+  {
+    "preset": "data-pipeline",
+    "paths": ["heading"],
+    "fontSize": 32,
+    "width": 832,
+    "mono": false
+  },
+  {
+    "preset": "schema-mapping",
+    "paths": ["mappings.*.source"],
+    "fontSize": 17,
+    "width": 240,
+    "mono": true
+  },
+  {
+    "preset": "schema-mapping",
+    "paths": ["mappings.*.target"],
+    "fontSize": 17,
+    "width": 152,
+    "mono": true
+  },
+  {
+    "preset": "schema-mapping",
+    "paths": ["mappings.*.type"],
+    "fontSize": 12,
+    "width": 60,
+    "mono": true
+  },
+  {
+    "preset": "schema-mapping",
+    "paths": ["sourceLabel"],
+    "fontSize": 23,
+    "width": 246,
+    "mono": false
+  },
+  {
+    "preset": "schema-mapping",
+    "paths": ["targetLabel"],
+    "fontSize": 23,
+    "width": 246,
+    "mono": false
+  },
+  {
+    "preset": "packet-stream",
+    "paths": ["lanes.*.label"],
+    "fontSize": 16,
+    "width": 150,
+    "mono": true
+  },
+  {
+    "preset": "packet-stream",
+    "paths": ["heading"],
+    "fontSize": 29,
+    "width": 832,
+    "mono": false
+  },
+  {
+    "preset": "event-bus",
+    "paths": ["producers.*"],
+    "fontSize": 21,
+    "width": 100,
+    "mono": false
+  },
+  {
+    "preset": "event-bus",
+    "paths": ["subscribers.*"],
+    "fontSize": 21,
+    "width": 100,
+    "mono": false
+  },
+  {
+    "preset": "event-bus",
+    "paths": ["heading"],
+    "fontSize": 14,
+    "width": 650,
+    "mono": false
+  },
+  {
+    "preset": "code-focus",
+    "paths": ["title"],
+    "fontSize": 14,
+    "width": 700,
+    "mono": true
+  },
+  {
+    "preset": "code-focus",
+    "paths": ["footer"],
+    "fontSize": 13,
+    "width": 738,
+    "mono": true
+  },
+  {
+    "preset": "code-focus",
+    "paths": ["lines.*.*.text"],
+    "fontSize": 21,
+    "width": 718,
+    "mono": true
+  },
+  {
+    "preset": "terminal-type",
+    "paths": ["command"],
+    "fontSize": 22,
+    "width": 730,
+    "mono": true
+  },
+  {
+    "preset": "terminal-type",
+    "paths": ["steps.*.text"],
+    "fontSize": 21,
+    "width": 621,
+    "mono": true
+  },
+  {
+    "preset": "terminal-type",
+    "paths": ["steps.*.detail"],
+    "fontSize": 16,
+    "width": 45,
+    "mono": true
+  },
+  {
+    "preset": "terminal-type",
+    "paths": ["response"],
+    "fontSize": 20,
+    "width": 732,
+    "mono": true
+  },
+  {
+    "preset": "terminal-type",
+    "paths": ["title"],
+    "fontSize": 14,
+    "width": 700,
+    "mono": true
+  },
+  {
+    "preset": "scan-lines",
+    "paths": ["fields.*"],
+    "fontSize": 18,
+    "width": 220,
+    "mono": true
+  },
+  {
+    "preset": "bar-race",
+    "paths": ["bars.*.label"],
+    "fontSize": 23,
+    "width": 113,
+    "mono": false
+  },
+  {
+    "preset": "bar-race",
+    "paths": ["heading"],
+    "fontSize": 29,
+    "width": 832,
+    "mono": false
+  },
+  {
+    "preset": "line-trace",
+    "paths": ["heading"],
+    "fontSize": 29,
+    "width": 832,
+    "mono": false
+  },
+  {
+    "preset": "line-trace",
+    "paths": ["seriesLabel"],
+    "fontSize": 15,
+    "width": 105,
+    "mono": false
+  },
+  {
+    "preset": "line-trace",
+    "paths": ["referenceLabel"],
+    "fontSize": 15,
+    "width": 170,
+    "mono": false
+  },
+  {
+    "preset": "metric-counter",
+    "paths": ["label"],
+    "fontSize": 20,
+    "width": 620,
+    "mono": false
+  },
+  {
+    "preset": "metric-counter",
+    "paths": ["value", "unit"],
+    "fontSize": 103,
+    "width": 624,
+    "mono": false
+  },
+  {
+    "preset": "dot-matrix",
+    "paths": ["groups.*.label"],
+    "fontSize": 17,
+    "width": 124,
+    "mono": false
+  },
+  {
+    "preset": "dot-matrix",
+    "paths": ["heading"],
+    "fontSize": 31,
+    "width": 620,
+    "mono": false
+  },
+  {
+    "preset": "dot-matrix",
+    "paths": ["cohortLabel"],
+    "fontSize": 15,
+    "width": 148,
+    "mono": false
+  },
+  {
+    "preset": "stagger-cards",
+    "paths": ["cards.*.label"],
+    "fontSize": 26,
+    "width": 214,
+    "mono": false
+  },
+  {
+    "preset": "stagger-cards",
+    "paths": ["cards.*.detail"],
+    "fontSize": 16,
+    "width": 190,
+    "mono": false
+  },
+  {
+    "preset": "stagger-cards",
+    "paths": ["heading"],
+    "fontSize": 31,
+    "width": 832,
+    "mono": false
+  },
+  {
+    "preset": "word-reveal",
+    "paths": ["words.0.word"],
+    "fontSize": 91,
+    "width": 232,
+    "mono": false
+  },
+  {
+    "preset": "word-reveal",
+    "paths": ["words.1.word"],
+    "fontSize": 91,
+    "width": 236,
+    "mono": false
+  },
+  {
+    "preset": "word-reveal",
+    "paths": ["words.2.word"],
+    "fontSize": 137,
+    "width": 414,
+    "mono": false
+  },
+  {
+    "preset": "status-cycle",
+    "paths": ["states.*.label"],
+    "fontSize": 37,
+    "width": 398,
+    "mono": false
+  },
+  {
+    "preset": "status-cycle",
+    "paths": ["states.*.detail"],
+    "fontSize": 18,
+    "width": 398,
+    "mono": false
+  }
+]

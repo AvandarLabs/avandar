@@ -78,14 +78,24 @@ update on public.datasets__open_data for each row
 execute function public.util__set_updated_at ();
 
 /**
- * Refuses to add a workspace dataset from a catalog listing whose relation
- * column types were never verified against the source's real data. Until
- * they are, the listing's columns are text at best, and possibly names the
- * source does not have, so the dataset would start with the wrong columns.
- * The app verifies a listing's types before it adds it.
+ * Refuses to add a workspace dataset from a catalog listing a workspace
+ * cannot load, such as a map or a PDF, or one whose relation column types
+ * were never verified against the source's real data. Until they are, the
+ * listing's columns are text at best, and possibly names the source does
+ * not have, so the dataset would start with the wrong columns. The app
+ * verifies a listing's types before it adds it.
  */
 create or replace function public.datasets__open_data__assert_listing_column_types_verified () returns trigger as $$
 begin
+  if exists (
+    select 1
+    from public.data_catalog_listings listing
+    where
+      listing.id = new.catalog_listing_id and
+      not listing.is_workspace_loadable
+  ) then
+    raise exception 'Catalog listing % is not supported in a workspace, so it cannot be added', new.catalog_listing_id;
+  end if;
   if exists (
     select 1
     from public.data_catalog_listings listing

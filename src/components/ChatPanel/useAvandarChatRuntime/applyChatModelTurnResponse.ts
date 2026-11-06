@@ -99,7 +99,7 @@ async function reviewAndApplySql(
   options.dataExplorerDispatch.setRawSql(options.sql);
   options.dataExplorerDispatch.setNlPrompt(prompt);
   try {
-    const mapping = options.parseSqlRef.current(options.sql);
+    const mapping = options.parseSqlRef.current({ sql: options.sql });
     options.dataExplorerDispatch.applySqlMapping({
       query: mapping.query,
       isFullyMapped: mapping.isFullyMapped,

@@ -31,6 +31,10 @@ const SHARED_DB_COLUMNS = {
   date_column_type_last_verified: null,
   is_invalid: false,
   invalid_dataset_reason: null,
+  is_workspace_loadable: true,
+  source_asset_type: null,
+  source_download_url: null,
+  search_vector: "'seri':1A 'world':2B 'bank':3B",
 } as const;
 
 function _pipelineDBRow(): DataCatalogListingModel["DBRead"] {
@@ -96,6 +100,14 @@ describe("DataCatalogListingParsers", () => {
     expect(entry.apiBaseUrl).toBeUndefined();
     expect(entry.apiResourceId).toBeUndefined();
     expect(entry.apiResourceFormat).toBeUndefined();
+  });
+
+  it("leaves the search document out of the model", () => {
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse(_pipelineDBRow()),
+    );
+
+    expect(entry).not.toHaveProperty("searchVector");
   });
 
   it("rejects an unknown access kind", () => {

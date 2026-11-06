@@ -2,6 +2,7 @@ import { createHdxEtlEngine } from "@pipelines/hdx/createHdxEtlEngine/createHdxE
 import { createHdxHttpClient } from "@pipelines/hdx/createHdxHttpClient/createHdxHttpClient";
 import { HDX_BASE_URL } from "@pipelines/hdx/hdxDrive";
 import { getPipelineEtlDestination } from "@pipelines/shared/getPipelineEtlDestination/getPipelineEtlDestination";
+import { getPipelineWorkspaceLoadability } from "@pipelines/shared/getPipelineWorkspaceLoadability/getPipelineWorkspaceLoadability";
 import { createCkanDiscoveryClient } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient";
 import type {
   EtlDriveScopes,
@@ -14,7 +15,11 @@ function _createEngine(): EtlEngineInstance {
   const discovery = createCkanDiscoveryClient(
     createHdxHttpClient({ baseUrl: HDX_BASE_URL }),
   );
-  return createHdxEtlEngine({ ...getPipelineEtlDestination(), discovery });
+  return createHdxEtlEngine({
+    ...getPipelineEtlDestination(),
+    discovery,
+    workspaceLoadability: getPipelineWorkspaceLoadability("hdx"),
+  });
 }
 
 /**

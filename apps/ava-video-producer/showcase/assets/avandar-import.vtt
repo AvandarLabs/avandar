@@ -1,0 +1,21 @@
+WEBVTT
+
+choose-csv
+00:00:03.000 --> 00:00:06.000
+Choose the fictional Harborfield CSV.
+
+name-dataset
+00:00:06.400 --> 00:00:09.400
+Give the dataset a clear name.
+
+review-preview
+00:00:09.800 --> 00:00:13.800
+Review 200 rows and 13 detected columns.
+
+save-dataset
+00:00:15.200 --> 00:00:18.200
+Save the dataset for later exploration.
+
+saved-row-count
+00:00:19.200 --> 00:00:23.200
+The saved source contains 240 cases.

@@ -16,6 +16,7 @@ import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGat
 import { DataCatalogInvalidNotice } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice";
 import { DataCatalogListingColumns } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.module.css";
+import { DataCatalogUnsupportedNotice } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice";
 import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";
 import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
@@ -54,7 +55,8 @@ type Props = {
  * bold-heading-plus-paragraph pairs, which turns a page of short values into
  * a page of headings. There is exactly one add button: a primary action
  * offered twice makes a user check whether the two do the same thing. A
- * listing whose dataset cannot be loaded says so and cannot be added.
+ * listing whose dataset cannot be loaded, or that is a kind of dataset a
+ * workspace cannot hold yet, says so and cannot be added.
  */
 export function DataCatalogListingDetail({
   listing,
@@ -89,6 +91,7 @@ export function DataCatalogListingDetail({
       : undefined;
   const isAddPending = isAdding || isWaitingForColumnTypes;
   const isAddBlocked =
+    !listing.isWorkspaceLoadable ||
     listing.isInvalid ||
     !isAddAllowed ||
     isAddPending ||
@@ -119,7 +122,16 @@ export function DataCatalogListingDetail({
         </OfflineGated>
       </Group>
 
-      {listing.isInvalid && listing.invalidDatasetReason ? (
+      {!listing.isWorkspaceLoadable ? (
+        <DataCatalogUnsupportedNotice
+          serviceName={listing.externalOrganizationName}
+          sourceUrl={listing.sourceUrl}
+        />
+      ) : null}
+
+      {listing.isWorkspaceLoadable &&
+      listing.isInvalid &&
+      listing.invalidDatasetReason ? (
         <DataCatalogInvalidNotice
           serviceName={
             listing.externalServiceName ?? listing.externalOrganizationName

@@ -11,14 +11,28 @@ describe("HDX_SCOPES", () => {
       HDX_SCOPES.map((scope) => {
         return scope.key;
       }),
-    ).toEqual(["format:csv", "format:parquet"]);
+    ).toEqual(["format:csv", "format:parquet", "format:other"]);
   });
 
   it("names only formats the open data reader can read", () => {
     expect(
       HDX_SCOPES.every((scope) => {
-        return READABLE_FORMATS.includes(scope.resourceFormat.toLowerCase());
+        return (
+          scope.resourceFormat === undefined ||
+          READABLE_FORMATS.includes(scope.resourceFormat.toLowerCase())
+        );
       }),
     ).toBe(true);
+  });
+
+  it("covers every other format in one scope, so no resource is left out", () => {
+    const formatScopeFormats = HDX_SCOPES.flatMap((scope) => {
+      return scope.resourceFormat === undefined ? [] : [scope.resourceFormat];
+    });
+    const otherScope = HDX_SCOPES.find((scope) => {
+      return scope.resourceFormat === undefined;
+    });
+
+    expect(otherScope?.excludedFormats).toEqual(formatScopeFormats);
   });
 });

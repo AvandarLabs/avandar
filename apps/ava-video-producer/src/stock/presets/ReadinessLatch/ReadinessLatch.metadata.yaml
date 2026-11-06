@@ -1,0 +1,140 @@
+name:
+  id: motionAtlas.readiness-latch.name
+  message: Wait for every required branch
+description:
+  id: motionAtlas.readiness-latch.description
+  message:
+    Independent work ribbons reach a shared readiness latch. Completed branches
+    release their own pins, but the common result can pass only after every required
+    branch is ready.
+category:
+  id: motionAtlas.readiness-latch.category
+  message: Coordination constraints
+useWhen:
+  id: motionAtlas.readiness-latch.useWhen
+  message: Explain a shared action that waits for every named participant's readiness.
+prompt:
+  id: motionAtlas.readiness-latch.prompt
+  message: Explain a shared action that waits for every named participant's readiness.
+creativeDirection:
+  id: motionAtlas.readiness-latch.creativeDirection
+  message:
+    Reveal two to five work ribbons ending at a shared latch. Their progress
+    advances with authored relative work units during frames 24..112; ready participants
+    withdraw their pins as they finish, while unready participants retain theirs. At
+    frame 122, the latch opens only if every pin is withdrawn, releasing the labeled
+    result by frame 146. Otherwise hold the blocked gate and identify the waiting
+    branch. Preserve completed ribbons during the final reading hold, then fade to the
+    common ground.
+intent:
+  id: motionAtlas.readiness-latch.intent
+  message: Explain a shared action that waits for every named participant's readiness.
+distinction:
+  id: motionAtlas.readiness-latch.distinction
+  message: Combines a parallel-completion barrier and a readiness gate. Unlike
+    status-cycle, the action depends on all independent branch states and may remain
+    blocked; an early completion cannot release it.
+tags:
+  - id: motionAtlas.readiness-latch.tags.0
+    message: coordination
+  - id: motionAtlas.readiness-latch.tags.1
+    message: readiness barrier
+  - id: motionAtlas.readiness-latch.tags.2
+    message: all ready
+  - id: motionAtlas.readiness-latch.tags.3
+    message: joint release
+  - id: motionAtlas.readiness-latch.tags.4
+    message: prerequisites
+  - id: motionAtlas.readiness-latch.tags.5
+    message: synchronization
+  - id: motionAtlas.readiness-latch.tags.6
+    message: latch
+  - id: motionAtlas.readiness-latch.tags.7
+    message: stage cue
+  - id: motionAtlas.readiness-latch.tags.8
+    message: parallel work
+  - id: motionAtlas.readiness-latch.tags.9
+    message: barrier
+  - id: motionAtlas.readiness-latch.tags.10
+    message: join
+  - id: motionAtlas.readiness-latch.tags.11
+    message: all dependencies
+  - id: motionAtlas.readiness-latch.tags.12
+    message: wait for all
+  - id: motionAtlas.readiness-latch.tags.13
+    message: completion
+  - id: motionAtlas.readiness-latch.tags.14
+    message: dependency readiness
+  - id: motionAtlas.readiness-latch.tags.15
+    message: offline cache coverage
+goodFor:
+  - id: motionAtlas.readiness-latch.goodFor.0
+    message: Explain an all-participants readiness condition
+  - id: motionAtlas.readiness-latch.goodFor.1
+    message: Illustrate coordinated publication or a stage crew's agreed cue
+  - id: motionAtlas.readiness-latch.goodFor.2
+    message: Show why one unresolved prerequisite keeps a shared action on hold
+  - id: motionAtlas.readiness-latch.goodFor.3
+    message: Explaining an all-of dependency before publication
+  - id: motionAtlas.readiness-latch.goodFor.4
+    message: Showing independent checks that must all finish
+  - id: motionAtlas.readiness-latch.goodFor.5
+    message: Introducing parallel work followed by one coordinated handoff
+  - id: motionAtlas.readiness-latch.goodFor.6
+    message: Explain full versus partial offline readiness
+  - id: motionAtlas.readiness-latch.goodFor.7
+    message: Show one missing dependency keeping an action unavailable
+domains:
+  - id: motionAtlas.readiness-latch.domains.0
+    message: Editorial explanation
+aliases:
+  - id: motionAtlas.readiness-latch.aliases.0
+    message: Coordination constraints
+notFor:
+  - id: motionAtlas.readiness-latch.notFor.0
+    message:
+      The condition is all supplied participants, not a majority, weighted vote, or
+      consensus algorithm.
+  - id: motionAtlas.readiness-latch.notFor.1
+    message:
+      Readiness and ordering are authored. The small latch test and reveal are
+      illustrative timing, not measured coordination latency.
+  - id: motionAtlas.readiness-latch.notFor.2
+    message:
+      A blocked final state is valid. Waiting must not be styled as a participant's
+      fault or as proof of a failure outside the example.
+  - id: motionAtlas.readiness-latch.notFor.3
+    message: The default branches and work quantities are fictional.
+  - id: motionAtlas.readiness-latch.notFor.4
+    message:
+      Work units establish relative authored timing only; the six-second playback is
+      not a duration forecast.
+  - id: motionAtlas.readiness-latch.notFor.5
+    message:
+      Every branch is required. An unready branch remains incomplete and keeps the
+      latch closed. Quorum and optional checks require another scene.
+  - id: motionAtlas.readiness-latch.notFor.6
+    message:
+      A cached dependency list does not establish that every other product capability
+      works offline.
+motionBeats:
+  - startFrame: 12
+    endFrame: 24
+    description:
+      id: motionAtlas.readiness-latch.motionBeats.0
+      message: Reveal stable ribbon order and the common latch.
+  - startFrame: 24
+    endFrame: 112
+    description:
+      id: motionAtlas.readiness-latch.motionBeats.1
+      message: Relative work completes ready ribbons while unready pins remain.
+  - startFrame: 122
+    endFrame: 146
+    description:
+      id: motionAtlas.readiness-latch.motionBeats.2
+      message: Open only when all pins have withdrawn and release the result.
+  - startFrame: 146
+    endFrame: 166
+    description:
+      id: motionAtlas.readiness-latch.motionBeats.3
+      message: Hold the completed ribbons and released or blocked gate.

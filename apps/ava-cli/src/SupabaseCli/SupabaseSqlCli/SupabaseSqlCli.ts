@@ -14,14 +14,14 @@ const LOCAL_HOSTS: ReadonlySet<string> = new Set([
  * Reads the local database URL from the loaded env file, refusing anything
  * that could reach a deployed database.
  *
- * Both checks are needed: `--staging` and `--prod` select a deployed env file,
- * and `.env.development` itself could name a remote host.
+ * Both checks are needed: `--env` can select a deployed env file, and
+ * `.env.development` itself could name a remote host.
  */
 function _getLocalDatabaseUrl(): string {
-  const target = AvaEnv.getLoadedEnvTarget();
-  if (target !== "local") {
+  if (!AvaEnv.isLocal()) {
     throw new Error(
-      `ava supabase sql only runs against the local database, not ${target}.`,
+      "ava supabase sql only runs against the local database, not " +
+        `${AvaEnv.getLoadedEnvName()}.`,
     );
   }
   const databaseUrl = AvaEnv.requireVar("SUPABASE_POSTGRES_URL");
@@ -87,7 +87,7 @@ export const SupabaseSqlCli = Acclimate.createCLI("sql")
   .description(
     "Run SQL against the local Supabase database with psql, or open a psql " +
       "shell when no SQL is given. Follows ava supabase switch. Refuses " +
-      "--staging and --prod.",
+      "every --env other than development.",
   )
   .addPositionalArg({
     name: "sql",

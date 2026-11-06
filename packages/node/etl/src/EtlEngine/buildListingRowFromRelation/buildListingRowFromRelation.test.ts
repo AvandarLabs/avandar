@@ -34,16 +34,22 @@ const PARQUET_RELATION: PipelineParquetRelation = {
 
 function _build(
   relation: Relation,
-  options: { service: string | undefined } = { service: "socrata" },
+  options: {
+    service?: string | undefined;
+    unloadableFormats?: readonly string[];
+  } = {},
 ) {
   return buildListingRowFromRelation({
     relation,
     pipelineName: "socrata",
     pipelineRunId: "run-7",
-    service: options.service,
+    service: "service" in options ? options.service : "socrata",
     driveKey: DRIVE_KEY,
     syncedAt: SYNCED_AT,
     scopeKey: "format:csv",
+    workspaceLoadability: {
+      unloadableFormats: options.unloadableFormats ?? [],
+    },
   });
 }
 
@@ -144,5 +150,75 @@ describe("buildListingRowFromRelation", () => {
     expect(() => {
       return _build({ ...API_RELATION, coverageEndDate: new Date("nope") });
     }).toThrow(/Rodent Inspections.*abcd-1234/);
+  });
+  describe("workspace loadability", () => {
+    it("marks an API relation loadable when nothing rules it out", () => {
+      expect(_build(API_RELATION).is_workspace_loadable).toBe(true);
+    });
+
+    it("marks an API relation unloadable when the pipeline says so", () => {
+      const row = _build({ ...API_RELATION, isWorkspaceLoadable: false });
+
+      expect(row.is_workspace_loadable).toBe(false);
+    });
+
+    it("marks an API relation unloadable when its format is unloadable", () => {
+      const row = _build(
+        { ...API_RELATION, apiResourceFormat: "PDF" },
+        { unloadableFormats: ["pdf"] },
+      );
+
+      expect(row.is_workspace_loadable).toBe(false);
+    });
+
+    it("lets the format rule win over a pipeline that calls it loadable", () => {
+      const row = _build(
+        {
+          ...API_RELATION,
+          apiResourceFormat: "XLSX",
+          isWorkspaceLoadable: true,
+        },
+        { unloadableFormats: ["xlsx"] },
+      );
+
+      expect(row.is_workspace_loadable).toBe(false);
+    });
+
+    it("marks an API relation with no format unloadable", () => {
+      const row = _build({ ...API_RELATION, apiResourceFormat: undefined });
+
+      expect([row.is_workspace_loadable, row.api_resource_format]).toEqual([
+        false,
+        null,
+      ]);
+    });
+
+    it("always marks a Parquet relation loadable", () => {
+      const row = _build(PARQUET_RELATION, { unloadableFormats: ["parquet"] });
+
+      expect(row.is_workspace_loadable).toBe(true);
+    });
+
+    it("writes the source's asset type and download URL", () => {
+      const row = _build({
+        ...API_RELATION,
+        sourceAssetType: "file",
+        sourceDownloadUrl: "https://example.invalid/download/abcd-1234",
+      });
+
+      expect([row.source_asset_type, row.source_download_url]).toEqual([
+        "file",
+        "https://example.invalid/download/abcd-1234",
+      ]);
+    });
+
+    it("writes null asset type and download URL when unset", () => {
+      const row = _build(API_RELATION);
+
+      expect([row.source_asset_type, row.source_download_url]).toEqual([
+        null,
+        null,
+      ]);
+    });
   });
 });

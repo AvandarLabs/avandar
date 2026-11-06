@@ -20,8 +20,6 @@ library-gated phase should run.
 1. Inspect the diff and classify which **gates** below match.
 2. For every gate that matches, apply the rules in that phase.
 3. Skip any phase whose gate does not match.
-4. In Pair Review mode, announce each phase before presenting its
-   findings, for example: "Phase: repo-local Deno paths".
 
 ### This file is an entry point, not a single flat file
 
@@ -271,7 +269,13 @@ when the gate matches.
 ### Phase: internationalization (Lingui)
 
 - **Gate:** the diff includes a frontend `.ts` or `.tsx` file under `src/`
-  (or `packages/web/`).
+  (or `packages/web/`), excluding internal-only tooling apps that are never
+  shown to a customer and are never localized. `apps/ava-video-producer` is
+  one such app: it renders demo videos and an internal showcase gallery for
+  the team, not a surface any workspace user ever opens, so its English-only
+  copy is not a finding. A future internal-only app can be added to this
+  exclusion the same way; a customer-facing app never qualifies, even if it
+  is new or small.
 - This repo renders user-facing copy through Lingui. All displayable,
   user-facing text must be translated. Flag any bare user-facing string
   literal:

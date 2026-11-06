@@ -7,15 +7,16 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
+import { findLastReleaseCommitSha } from "./findLastReleaseCommitSha/findLastReleaseCommitSha";
 import { getPackageNamesFromChangedFiles } from "./getPackageNamesFromChangedFiles/getPackageNamesFromChangedFiles";
 import { inferBumpType } from "./inferBumpType/inferBumpType";
 import { makeChangesetMarkdown } from "./makeChangesetMarkdown/makeChangesetMarkdown";
+import type { CommitSummary } from "./findLastReleaseCommitSha/findLastReleaseCommitSha";
 import type { SemverBump } from "./inferBumpType/inferBumpType";
 
 const REPO_ROOT = process.cwd();
 const CHANGESET_DIR = join(REPO_ROOT, ".changeset");
 const PACKAGE_TIERS = ["node", "shared", "web"] as const;
-const ZERO_SHA = "0000000000000000000000000000000000000000";
 
 type MergedPullRequest = {
   number: number;
@@ -40,24 +41,6 @@ function _runGh(args: string[]): string {
     cwd: REPO_ROOT,
     encoding: "utf8",
   }).trim();
-}
-
-/** Whether ancestorSha is an ancestor of descendantSha (fast-forward). */
-function _isAncestor(options: {
-  ancestorSha: string;
-  descendantSha: string;
-}): boolean {
-  const { ancestorSha, descendantSha } = options;
-  try {
-    execFileSync(
-      "git",
-      ["merge-base", "--is-ancestor", ancestorSha, descendantSha],
-      { cwd: REPO_ROOT },
-    );
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 /** Maps each `packages/<tier>/<name>` directory to its package.json name. */
@@ -268,31 +251,53 @@ function _processUnassociatedCommit(options: {
   return true;
 }
 
-function _main(): void {
-  const beforeSha = process.env.BEFORE_SHA;
-  const afterSha = process.env.AFTER_SHA;
+/** Lists every commit reachable from HEAD, newest first. */
+function _loadCommitSummaries(): CommitSummary[] {
+  return _runGit(["log", "--format=%H%x09%s", "HEAD"])
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => {
+      const [sha = "", ...subjectParts] = line.split("\t");
+      return { sha, subject: subjectParts.join("\t") };
+    });
+}
 
-  if (!beforeSha || !afterSha || beforeSha === ZERO_SHA) {
-    _warn(
-      "No usable push range (new branch or missing SHAs); skipping auto-changeset generation.",
-    );
-    return;
-  }
-
-  if (!_isAncestor({ ancestorSha: beforeSha, descendantSha: afterSha })) {
-    _warn(
-      "Push range is not a fast-forward (force-push); skipping auto-changeset generation.",
-    );
-    return;
-  }
-
-  const commitShas = _runGit([
-    "log",
-    "--format=%H",
-    `${beforeSha}..${afterSha}`,
+/**
+ * Lists the non-merge commits since the last release that touch
+ * `packages/**`. Merge commits are skipped because the commits they bring in
+ * are listed on their own, and diffing a merge against its first parent can
+ * sweep in another branch's changes.
+ */
+function _listUnreleasedPackageCommitShas(releaseSha: string): string[] {
+  return _runGit([
+    "rev-list",
+    "--no-merges",
+    "--full-history",
+    `${releaseSha}..HEAD`,
+    "--",
+    "packages/",
   ])
     .split("\n")
     .filter(Boolean);
+}
+
+/**
+ * Writes an untracked changeset for every change to `packages/**` since the
+ * last version PR merged. The files are rebuilt on every run rather than
+ * committed, because `develop` only accepts changes through a pull request.
+ * `changesets/action` keeps untracked files when it resets the version
+ * branch, so they still land in the version PR.
+ */
+function _main(): void {
+  const releaseSha = findLastReleaseCommitSha(_loadCommitSummaries());
+  if (releaseSha === undefined) {
+    _warn(
+      "No `Release: @avandar packages` commit found; skipping auto-changeset generation.",
+    );
+    return;
+  }
+
+  const commitShas = _listUnreleasedPackageCommitShas(releaseSha);
   if (commitShas.length === 0) {
     return;
   }
@@ -330,13 +335,7 @@ function _main(): void {
     return;
   }
 
-  _runGit(["add", ".changeset"]);
-  _runGit([
-    "commit",
-    "-m",
-    `chore: add changesets for ${descriptions.join(", ")} [skip deploy]`,
-  ]);
-  _runGit(["push", "origin", "HEAD:develop"]);
+  console.log(`Wrote changesets for ${descriptions.join(", ")}.`);
 }
 
 try {

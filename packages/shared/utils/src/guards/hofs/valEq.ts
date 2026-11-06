@@ -3,7 +3,7 @@
  * @param value - The value to check.
  * @returns A function that checks if a value is equal to a given value.
  */
-export function valEq<T>(value: T): (v: unknown) => v is T {
+export function valEq<const T>(value: T): (v: unknown) => v is T {
   return (v: unknown): v is T => {
     return v === value;
   };

@@ -1,0 +1,64 @@
+name:
+  id: motionAtlas.bar-race.name
+  message: Ranking in motion
+description:
+  id: motionAtlas.bar-race.description
+  message: Bars grow and change rank between two sample periods.
+category:
+  id: motionAtlas.bar-race.category
+  message: Charts
+tags:
+  - id: motionAtlas.bar-race.tags.0
+    message: bars
+  - id: motionAtlas.bar-race.tags.1
+    message: chart
+  - id: motionAtlas.bar-race.tags.2
+    message: comparison
+  - id: motionAtlas.bar-race.tags.3
+    message: ranking
+useWhen:
+  id: motionAtlas.bar-race.useWhen
+  message:
+    Compare a few supplied values and their changing ranks on a common scale; the
+    stock sample is fictional.
+prompt:
+  id: motionAtlas.bar-race.prompt
+  message:
+    Use Motion Atlas "Ranking in motion" (bar-race) as a conceptual graphic.
+    Compare a few supplied values and their changing ranks on a common scale; the stock
+    sample is fictional. Keep the restrained motion and readable labels; replace sample
+    content with approved facts before making product claims.
+creativeDirection:
+  id: motionAtlas.bar-race.creativeDirection
+  message: Bars grow and change rank between two sample periods.
+goodFor:
+  - id: motionAtlas.bar-race.goodFor.0
+    message:
+      Compare a few supplied values and their changing ranks on a common scale; the
+      stock sample is fictional.
+intent:
+  id: motionAtlas.bar-race.intent
+  message:
+    Compare a few supplied values and their changing ranks on a common scale; the
+    stock sample is fictional.
+domains:
+  - id: motionAtlas.bar-race.domains.0
+    message: Charts
+aliases:
+  - id: motionAtlas.bar-race.aliases.0
+    message: bars
+  - id: motionAtlas.bar-race.aliases.1
+    message: chart
+  - id: motionAtlas.bar-race.aliases.2
+    message: comparison
+  - id: motionAtlas.bar-race.aliases.3
+    message: ranking
+notFor:
+  - id: motionAtlas.bar-race.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.bar-race.distinction
+  message: Bars grow and change rank between two sample periods.

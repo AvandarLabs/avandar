@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { VizTypeSelect } from "@/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect";
 import { QUERY_EDITOR_MODES } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { DrawerTab } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import type { QueryEditorMode } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
 import type { ReactNode } from "react";
@@ -22,13 +22,13 @@ type Props = {
   regionId: string;
 
   queryEditorMode: QueryEditorMode;
-  vizType: VizConfig.Type;
+  vizType: AvaVizConfig.Type;
 
   /** False when the SQL has parts the manual form cannot represent. */
   isStructuredQueryInSync: boolean;
 
   onQueryEditorModeChange: (mode: QueryEditorMode) => void;
-  onVizTypeChange: (vizType: VizConfig.Type) => void;
+  onVizTypeChange: (vizType: AvaVizConfig.Type) => void;
   onToggleCollapsed: () => void;
 };
 

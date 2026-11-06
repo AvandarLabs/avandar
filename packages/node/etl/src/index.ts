@@ -1,5 +1,16 @@
 export { EtlEngine } from "@etl/EtlEngine/EtlEngine";
 export {
+  getWorkspaceLoadabilityRules,
+  normalizeEtlFormat,
+} from "@etl/EtlConfig/getWorkspaceLoadabilityRules/getWorkspaceLoadabilityRules";
+export { parseEtlConfig } from "@etl/EtlConfig/parseEtlConfig/parseEtlConfig";
+export { readEtlConfigFile } from "@etl/EtlConfig/readEtlConfigFile/readEtlConfigFile";
+export type {
+  EtlConfig,
+  EtlPipelineWorkspaceLoadability,
+  EtlWorkspaceLoadabilityRules,
+} from "@etl/EtlConfig/EtlConfig.types";
+export {
   ETL_RUN_FAILED_ERROR_NAME,
   EtlRunFailedError,
 } from "@etl/EtlEngine/EtlRunFailedError";

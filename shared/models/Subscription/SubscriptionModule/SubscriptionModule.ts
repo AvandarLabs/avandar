@@ -72,9 +72,7 @@ export const SubscriptionModule = {
   /**
    * Whether the workspace still needs billing onboarding (no row or inactive).
    */
-  shouldPromptForBillingSetup: (
-    subscription: SubscriptionRead | undefined,
-  ): boolean => {
+  needsBillingSetup: (subscription: SubscriptionRead | undefined): boolean => {
     return !doesSubscriptionGrantEntitlements(subscription);
   },
 
@@ -92,7 +90,7 @@ export const SubscriptionModule = {
   ): boolean => {
     return (
       !options.isAddAllowed &&
-      !SubscriptionModule.shouldPromptForBillingSetup(options.subscription)
+      !SubscriptionModule.needsBillingSetup(options.subscription)
     );
   },
 

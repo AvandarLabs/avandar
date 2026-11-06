@@ -1,0 +1,110 @@
+name:
+  id: motionAtlas.recurring-leak-prevention.name
+  message: Fix the source after containing the leak
+description:
+  id: motionAtlas.recurring-leak-prevention.description
+  message:
+    A worker first contains a recurring leak, then repairs its source and performs
+    one supplied retest. Temporary containment and prevention remain visibly different
+    actions.
+category:
+  id: motionAtlas.recurring-leak-prevention.category
+  message: Resilience and maintenance
+useWhen:
+  id: motionAtlas.recurring-leak-prevention.useWhen
+  message: Make source repair visibly different from repeatedly managing its consequences.
+prompt:
+  id: motionAtlas.recurring-leak-prevention.prompt
+  message: Make source repair visibly different from repeatedly managing its consequences.
+creativeDirection:
+  id: motionAtlas.recurring-leak-prevention.creativeDirection
+  message:
+    Frames 12..38 reveal a schematic pipe joint leaking beside its normal outlet.
+    Frames 39..62 place a catch tray under the leak while flow continues through the
+    joint. Frames 63..106 pause the flow and let the worker apply the authored joint
+    repair. Frames 107..140 restore the normal outlet flow only when a retest exists,
+    showing either no side leak or a continued side leak according to the supplied
+    result. For not-tested, retain the paused flow and an untested tag. Frames 141..167
+    hold the catch tray, repaired joint and explicit observation. The normal outlet must
+    still run for a stopped-leak result so closing the supply cannot masquerade as
+    prevention. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30
+    fps, with the shared palette. Reveal during frames 0..11 and fade to the common
+    opaque ground during frames 168..179.
+intent:
+  id: motionAtlas.recurring-leak-prevention.intent
+  message: Make source repair visibly different from repeatedly managing its consequences.
+distinction:
+  id: motionAtlas.recurring-leak-prevention.distinction
+  message: Unlike grievance-remedy-retest, this explicitly separates downstream
+    containment from upstream intervention and checks recurrence under resumed
+    operation. Unlike retry-backoff, the underlying object changes before the retry.
+tags:
+  - id: motionAtlas.recurring-leak-prevention.tags.0
+    message: prevention
+  - id: motionAtlas.recurring-leak-prevention.tags.1
+    message: recurrence
+  - id: motionAtlas.recurring-leak-prevention.tags.2
+    message: root cause
+  - id: motionAtlas.recurring-leak-prevention.tags.3
+    message: incident learning
+  - id: motionAtlas.recurring-leak-prevention.tags.4
+    message: temporary relief
+  - id: motionAtlas.recurring-leak-prevention.tags.5
+    message: retest
+goodFor:
+  - id: motionAtlas.recurring-leak-prevention.goodFor.0
+    message: Distinguish immediate relief from recurring-cause repair
+  - id: motionAtlas.recurring-leak-prevention.goodFor.1
+    message: Explain incident follow-through without celebrating constant crisis
+  - id: motionAtlas.recurring-leak-prevention.goodFor.2
+    message: Retain a failed or unperformed retest
+domains:
+  - id: motionAtlas.recurring-leak-prevention.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.recurring-leak-prevention.aliases.0
+    message: recurring leak prevention
+notFor:
+  - id: motionAtlas.recurring-leak-prevention.notFor.0
+    message:
+      This is a schematic operational metaphor, not a plumbing tutorial or a
+      diagnosis of a real incident.
+  - id: motionAtlas.recurring-leak-prevention.notFor.1
+    message:
+      Drops and line thickness are nonquantitative motion cues. No volume, loss rate
+      or saved cost is claimed.
+  - id: motionAtlas.recurring-leak-prevention.notFor.2
+    message:
+      One authored observation cannot establish permanent prevention. A repair action
+      alone never determines the test outcome.
+  - id: motionAtlas.recurring-leak-prevention.notFor.3
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 12
+    endFrame: 38
+    description:
+      id: motionAtlas.recurring-leak-prevention.motionBeats.0
+      message: Reveal a leaking joint beside its running normal outlet.
+  - startFrame: 39
+    endFrame: 62
+    description:
+      id: motionAtlas.recurring-leak-prevention.motionBeats.1
+      message: Place a catch tray under the side leak without stopping flow.
+  - startFrame: 63
+    endFrame: 106
+    description:
+      id: motionAtlas.recurring-leak-prevention.motionBeats.2
+      message: Pause flow while the worker applies the authored joint repair.
+  - startFrame: 107
+    endFrame: 140
+    description:
+      id: motionAtlas.recurring-leak-prevention.motionBeats.3
+      message: Resume flow only for a supplied retest and retain its actual result.
+  - startFrame: 141
+    endFrame: 167
+    description:
+      id: motionAtlas.recurring-leak-prevention.motionBeats.4
+      message: Hold the tray, repaired joint and explicit observation.

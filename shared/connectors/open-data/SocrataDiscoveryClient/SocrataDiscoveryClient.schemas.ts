@@ -18,6 +18,11 @@ export const SocrataDiscoveryResultSchema = z.object({
       name: z.string(),
       createdAt: SocrataTimestampSchema,
       updatedAt: SocrataTimestampSchema,
+      // The asset type, such as `dataset`, `filter`, `map`, `file`, `href`,
+      // `story`, or `chart`.
+      type: z.string().optional(),
+      // A `file` asset's MIME type. Null on every other type.
+      blob_mime_type: z.string().nullish(),
       // Three parallel lists, one entry per column. A result that lists no
       // columns has none of them.
       columns_name: z.array(z.string()).default([]),

@@ -51,8 +51,11 @@ command exits with an error. `ava pipeline reset` selects listings by their
 `pipeline_name`.
 
 A scope is a slice of a drive that is crawled and resumed on its own: `hdx`
-has `format:csv` and `format:parquet`, and a Socrata drive has `all` unless
-`CONFIGURED_DRIVES` gives it category or tag scopes. Removing a scope from
+has `format:csv`, `format:parquet`, and `format:other` (every other
+format), and a Socrata drive has `all` unless `CONFIGURED_DRIVES` gives it
+category or tag scopes. The Socrata drives are NYC Open Data
+(`data.cityofnewyork.us`), NY State Open Data (`data.ny.gov`), and NY State
+Department of Health (`health.data.ny.gov`). Removing a scope from
 the code only stops crawling it. `ava pipeline prune-retired-scopes` deletes
 what only retired scopes produced, after a confirmation, and never a listing
 a workspace uses. `ava pipeline reset` deletes the pipeline's checkpoints
@@ -60,16 +63,29 @@ before its listings, and `--scope` resets one scope.
 
 Every listing is written in one transaction with its relation columns, so
 the two always land together, and deleting a listing (by reset or prune)
-deletes its columns too. A Socrata file or link, which has no columns, is
-not listed, and neither is an HDX Parquet file whose columns cannot be
-read. Each listing records in `date_column_type_last_verified` when its
+deletes its columns too.
+
+Every asset a drive lists becomes a listing, so a catalog search finds it
+even when a workspace cannot add it. `is_workspace_loadable` says which
+ones a workspace can add, and `source_url` links to the original either
+way. A listing is unloadable when its pipeline cannot read the asset (a
+Socrata map, file, link, story, or chart, a Socrata dataset with no
+exported columns, or an HDX resource that is not a hosted CSV or Parquet
+file with readable columns), or when its format is in
+`pipelines/etl.config.yaml`. That file holds the formats no pipeline's
+listings can be added in (PDF, XLSX, and others), with per-pipeline
+overrides. Supporting a format later means removing it there and flipping
+`is_workspace_loadable` on the matching listings with a data migration, not
+a re-crawl.
+
+Each listing records in `date_column_type_last_verified` when its
 column types were checked against real data, and only a listing with
 verified column types can be added to a workspace:
 
 - `socrata` takes each dataset's columns from the Discovery API, as text
   with Socrata's type label as the original type, unverified. The list can
-  name columns the CSV export lacks. A file or link with no columns is
-  skipped.
+  name columns the CSV export lacks. Any other asset type is listed
+  unloadable, with no columns.
 - `hdx` uses the headers HDX's file check recorded, as text of unknown
   original type, unverified. When those are missing or ambiguous, a Parquet
   file's footer is read with DuckDB, giving verified types, and a CSV gets

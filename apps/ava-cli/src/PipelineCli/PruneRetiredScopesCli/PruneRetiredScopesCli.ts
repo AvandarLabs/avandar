@@ -46,9 +46,9 @@ type _PruneOptions = Readonly<{
  * scopes look retired.
  */
 function _assertLocalOnlyInDevelopment(isLocal: boolean): void {
-  if (isLocal && AvaEnv.getLoadedEnvTarget() !== "local") {
+  if (isLocal && !AvaEnv.isLocal()) {
     throw new Error(
-      "--local reads scopes from this checkout, which can differ from what a deployed pipeline server crawls. Run without --local against staging or production.",
+      "--local reads scopes from this checkout, which can differ from what a deployed pipeline server crawls. Run without --local against any --env other than development.",
     );
   }
 }
@@ -318,7 +318,7 @@ export const PruneRetiredScopesCli = Acclimate.createCLI("prune-retired-scopes")
       "what each retired scope's prune would do, then asks before changing " +
       "anything. Listings a workspace uses are never deleted. Reads live " +
       "scopes from the pipeline server and the database in .env.development, " +
-      "or the --staging/--prod ones. Do not run it while a pipeline run is " +
+      "or the --env one. Do not run it while a pipeline run is " +
       "in progress: the run can write back the checkpoints and scope keys " +
       "it removes. Records each prune, including a dry run, in the " +
       "database's pipeline_executions table.",

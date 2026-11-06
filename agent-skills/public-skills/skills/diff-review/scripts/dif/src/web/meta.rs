@@ -1,5 +1,5 @@
-//! Shell identity served at `/__wrap/meta.json`: the branch under review and
-//! the worktree it lives in.
+//! Shell identity served at `/__wrap/meta.json`: the branch under review, the
+//! worktree it lives in, and how many times difit has restarted.
 //!
 //! The header renders the **branch** as its title. When the checkout's
 //! directory does not correspond to the branch (a linked git worktree whose
@@ -66,16 +66,19 @@ pub fn show_worktree(branch: &str, worktree: &str) -> bool {
 
 /// Serialize the header identity as the `/__wrap/meta.json` body.
 ///
-/// Shape: `{"branch": "...", "worktree": "...", "showWorktree": bool}`. Uses
-/// `serde_json` so branch/worktree names are escaped correctly. (Whether the
-/// guide is stale is decided in the browser by comparing the guide's file list
-/// against difit's real diff, so it isn't served here.)
+/// Shape: `{"branch": "...", "worktree": "...", "showWorktree": bool,
+/// "difitRestarts": n}`. Uses `serde_json` so branch/worktree names are
+/// escaped correctly. The shell polls `difitRestarts` and reloads itself when
+/// it grows, so a `Ctrl+R` restart refreshes the open tab instead of opening
+/// another. (Whether the guide is stale is decided in the browser by comparing
+/// the guide's file list against difit's real diff, so it isn't served here.)
 #[must_use]
-pub fn meta_json(branch: &str, worktree: &str) -> Vec<u8> {
+pub fn meta_json(branch: &str, worktree: &str, difit_restarts: u64) -> Vec<u8> {
     let value = serde_json::json!({
         "branch": branch,
         "worktree": worktree,
         "showWorktree": show_worktree(branch, worktree),
+        "difitRestarts": difit_restarts,
     });
     serde_json::to_vec(&value).unwrap_or_else(|_| b"{}".to_vec())
 }
@@ -123,7 +126,7 @@ mod tests {
 
     #[test]
     fn meta_json_carries_branch_worktree_and_flag() {
-        let body = meta_json("develop", "avandar");
+        let body = meta_json("develop", "avandar", 0);
         let v: serde_json::Value = serde_json::from_slice(&body).unwrap();
         assert_eq!(v["branch"], "develop");
         assert_eq!(v["worktree"], "avandar");
@@ -131,15 +134,22 @@ mod tests {
     }
 
     #[test]
+    fn meta_json_counts_difit_restarts() {
+        let body = meta_json("develop", "avandar", 3);
+        let v: serde_json::Value = serde_json::from_slice(&body).unwrap();
+        assert_eq!(v["difitRestarts"], 3);
+    }
+
+    #[test]
     fn meta_json_hides_pill_when_names_match() {
-        let body = meta_json("feat/web-shell", "feat/web-shell");
+        let body = meta_json("feat/web-shell", "feat/web-shell", 0);
         let v: serde_json::Value = serde_json::from_slice(&body).unwrap();
         assert_eq!(v["showWorktree"], false);
     }
 
     #[test]
     fn meta_json_escapes_special_characters() {
-        let body = meta_json("feat/\"quote\"", "wt\\slash");
+        let body = meta_json("feat/\"quote\"", "wt\\slash", 0);
         let v: serde_json::Value = serde_json::from_slice(&body).unwrap();
         assert_eq!(v["branch"], "feat/\"quote\"");
         assert_eq!(v["worktree"], "wt\\slash");

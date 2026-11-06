@@ -164,7 +164,7 @@ describe("resetPipelineCommand", () => {
     process.env.VITE_SUPABASE_API_URL = API_URL;
     process.env.SUPABASE_SERVICE_ROLE_KEY = "sb_secret_test";
     vi.spyOn(Acclimate, "log").mockImplementation(() => {});
-    vi.spyOn(AvaEnv, "getLoadedEnvTarget").mockReturnValue("local");
+    vi.spyOn(AvaEnv, "getLoadedEnvName").mockReturnValue("development");
   });
 
   afterEach(() => {
@@ -207,8 +207,8 @@ describe("resetPipelineCommand", () => {
     ]).toEqual([0, 0]);
   });
 
-  it("warns that the production database is affected on --prod", async () => {
-    vi.mocked(AvaEnv.getLoadedEnvTarget).mockReturnValue("production");
+  it("warns that the production database is affected on --env production", async () => {
+    vi.mocked(AvaEnv.getLoadedEnvName).mockReturnValue("production");
     _mockPostgrest({ listingCount: 3 });
 
     await resetPipelineCommand({ name: "socrata" });
@@ -222,6 +222,18 @@ describe("resetPipelineCommand", () => {
     await resetPipelineCommand({ name: "socrata" });
 
     expect(_getCombinedLogs()).not.toContain("PRODUCTION");
+  });
+
+  it("names the env it deletes from and gives no production warning on --env demo", async () => {
+    vi.mocked(AvaEnv.getLoadedEnvName).mockReturnValue("demo");
+    _mockPostgrest({ listingCount: 3 });
+
+    await resetPipelineCommand({ name: "socrata" });
+
+    expect([
+      _getCombinedLogs().includes(`Database: demo (${API_URL})`),
+      _getCombinedLogs().includes("PRODUCTION"),
+    ]).toEqual([true, false]);
   });
 
   it("asks nothing about workspaces when no listing is in use", async () => {

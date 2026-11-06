@@ -1,0 +1,59 @@
+.galleryHeaderNavigation {
+  align-items: center;
+  border-bottom: 1px solid #c8cec4;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding-bottom: 22px;
+}
+
+.galleryHeaderLinks {
+  display: flex;
+  gap: 24px;
+}
+
+.galleryHeaderBrand {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.galleryHeaderIntroduction {
+  align-items: baseline;
+  display: flex;
+  gap: 40px;
+  justify-content: space-between;
+  padding: 32px 0;
+}
+
+.galleryHeaderIntroduction h1 {
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.galleryHeaderIntroduction p {
+  color: #4b5b52;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 560px;
+}
+
+@media (width <= 900px) {
+  .galleryHeaderIntroduction {
+    display: block;
+  }
+
+  .galleryHeaderIntroduction p {
+    margin-top: 16px;
+  }
+
+  .galleryHeaderNavigation {
+    align-items: flex-start;
+  }
+
+  .galleryHeaderLinks {
+    font-size: 14px;
+    gap: 12px;
+  }
+}

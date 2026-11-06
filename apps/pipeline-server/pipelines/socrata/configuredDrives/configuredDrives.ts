@@ -53,4 +53,12 @@ export const CONFIGURED_DRIVES: readonly ConfiguredDrive[] = [
     baseUrl: "https://data.cityofnewyork.us",
     organizationName: "City of New York",
   },
+  {
+    baseUrl: "https://data.ny.gov",
+    organizationName: "State of New York",
+  },
+  {
+    baseUrl: "https://health.data.ny.gov",
+    organizationName: "New York State Department of Health",
+  },
 ];

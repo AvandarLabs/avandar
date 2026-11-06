@@ -106,6 +106,44 @@ create table public.data_catalog_listings (
   is_invalid boolean not null default false,
   -- Why the dataset cannot be loaded. Set exactly when `is_invalid` is.
   invalid_dataset_reason public.data_catalog_listings__invalid_dataset_reason,
+  -- Whether a workspace can add this listing. A pipeline lists every asset a
+  -- drive has, including maps, documents, and files Avandar cannot read yet,
+  -- and writes this false for those, so they still show up in the catalog
+  -- and link to the original through `source_url`. Unlike `is_invalid`, this
+  -- is a product decision made without sampling the data.
+  is_workspace_loadable boolean not null default true,
+  -- The source's own name for the kind of asset this is, such as Socrata's
+  -- `dataset`, `map`, or `file`, or a CKAN resource's `url_type`. Null when
+  -- the source gives none.
+  source_asset_type text,
+  -- Where the asset's bytes can be downloaded, when the source exposes one.
+  -- `source_url` is the page a person opens instead.
+  source_download_url text,
+  -- What catalog search matches words against, weighted by how strongly a
+  -- match in each field says this is the listing the user wants: the name
+  -- (A), who publishes it (B), then what it says about itself (C).
+  search_vector tsvector generated always as (
+    setweight(
+      to_tsvector('english'::regconfig, coalesce(display_name, '')),
+      'A'
+    ) ||
+    setweight(
+      to_tsvector(
+        'english'::regconfig,
+        coalesce(external_organization_name, '') || ' ' ||
+        coalesce(external_service_name, '') || ' ' ||
+        coalesce(pipeline_name, '')
+      ),
+      'B'
+    ) ||
+    setweight(
+      to_tsvector(
+        'english'::regconfig,
+        coalesce(description, '') || ' ' || coalesce(notes, '')
+      ),
+      'C'
+    )
+  ) stored,
   constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name),
   -- A pipeline listing carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning
@@ -126,14 +164,19 @@ create table public.data_catalog_listings (
     )
   ),
   -- An API listing names its service, instance, dataset and resource, and
-  -- carries no Parquet object. It may name the pipeline that wrote it.
+  -- carries no Parquet object. It may name the pipeline that wrote it. Only
+  -- a loadable one needs a format, since that is what it is read as: a map
+  -- or a link has none.
   constraint data_catalog_listings__api_access_complete check (
     access_kind <> 'api_resource' or
     (
       api_service is not null and
       api_base_url is not null and
       api_resource_id is not null and
-      api_resource_format is not null and
+      (
+        api_resource_format is not null or
+        not is_workspace_loadable
+      ) and
       external_dataset_id is not null and
       parquet_file_name is null
     )
@@ -193,6 +236,13 @@ create index data_catalog_listings__pipeline_drive_last_update on public.data_ca
   api_base_url,
   date_of_last_update
 );
+
+-- Serves catalog search's whole-word matching on `search_vector`.
+create index data_catalog_listings__search_vector on public.data_catalog_listings using gin (search_vector);
+
+-- Serves catalog search's partial and misspelled word matching on a
+-- listing's name.
+create index data_catalog_listings__display_name_trgm on public.data_catalog_listings using gin (display_name extensions.gin_trgm_ops);
 
 -- Enable row level security
 alter table public.data_catalog_listings enable row level security;

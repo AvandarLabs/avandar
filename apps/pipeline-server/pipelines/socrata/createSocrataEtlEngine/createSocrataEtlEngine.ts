@@ -10,6 +10,7 @@ import type {
   EtlDestination,
   EtlEngineInstance,
   EtlStores,
+  EtlWorkspaceLoadabilityRules,
 } from "@avandar/etl";
 import type {
   ConfiguredDrive,
@@ -18,12 +19,15 @@ import type {
 
 /**
  * Creates the Socrata pipeline's engine. Each configured drive is crawled
- * and resumed on its own, by each dataset's `updatedAt`, so a newly added
+ * and resumed on its own, by each asset's `updatedAt`, so a newly added
  * drive is indexed from scratch while the others only fetch what changed.
+ * Every asset becomes a listing. Only a dataset or filtered view with
+ * exported columns, in a format the rules allow, is workspace-loadable.
  *
  * @param args.discovery - The Discovery API client every drive shares.
  * @param args.drives - Replaces `CONFIGURED_DRIVES`, for tests.
  * @param args.stores - Replaces the Supabase stores, for tests.
+ * @param args.workspaceLoadability - The formats a workspace cannot load.
  */
 export function createSocrataEtlEngine(
   args: EtlDestination &
@@ -31,6 +35,7 @@ export function createSocrataEtlEngine(
       discovery: SocrataDiscoveryClient;
       drives?: readonly ConfiguredDrive[];
       stores?: EtlStores;
+      workspaceLoadability?: EtlWorkspaceLoadabilityRules;
     }>,
 ): EtlEngineInstance {
   const { discovery, drives = CONFIGURED_DRIVES, ...destination } = args;
@@ -58,11 +63,9 @@ export function createSocrataEtlEngine(
       return result.datasetId;
     },
     transform: ({ drive, connection }) => {
-      const relation = makeApiResourceRelationFromSocrataResult({
-        drive,
-        result: connection,
-      });
-      return relation === undefined ? [] : [relation];
+      return [
+        makeApiResourceRelationFromSocrataResult({ drive, result: connection }),
+      ];
     },
     incremental: {
       getConnectionTimestamp: (result) => {

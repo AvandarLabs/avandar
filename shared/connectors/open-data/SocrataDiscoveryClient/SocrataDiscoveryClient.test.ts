@@ -97,6 +97,35 @@ describe("SocrataDiscoveryClient.search", () => {
     });
   });
 
+  it("reads each result's asset type and file MIME type", async () => {
+    const http = _http({
+      get: vi.fn(async () => {
+        return {
+          results: [
+            _rawResult({
+              id: "file-0001",
+              type: "file",
+              blob_mime_type: "application/pdf",
+            }),
+            _rawResult({ id: "map-0001", type: "map", blob_mime_type: null }),
+          ],
+          resultSetSize: 2,
+        };
+      }),
+    });
+
+    const page = await createSocrataDiscoveryClient(http).search({});
+
+    expect(
+      page.results.map((result) => {
+        return [result.datasetId, result.assetType, result.blobMimeType];
+      }),
+    ).toEqual([
+      ["file-0001", "file", "application/pdf"],
+      ["map-0001", "map", undefined],
+    ]);
+  });
+
   it("returns no columns for a result that lists none", async () => {
     const http = _http({
       get: vi.fn(async () => {

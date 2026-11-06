@@ -1,0 +1,11 @@
+Avandar: import a CSV
+
+Choose the fictional Harborfield CSV.
+
+Give the dataset a clear name.
+
+Review 200 rows and 13 detected columns.
+
+Save the dataset for later exploration.
+
+The saved source contains 240 cases.

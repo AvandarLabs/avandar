@@ -1,0 +1,14 @@
+{
+  "preset": "event-bus",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "8ba5f00c6ccd89bbe68c019ab7d8e966938b488787c223bc2899d7e8238117f5",
+  "posterSha256": "76b523539e8e73fe120c3be4b425b205bb1946474f5b3f9c2c312468eec495f3",
+  "generatedAt": "2026-10-14T23:55:20.327Z"
+}

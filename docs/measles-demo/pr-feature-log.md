@@ -64,6 +64,8 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F12 | Invalid catalog listings, and DuckDB-parsed column type samples | not started | F4, F7, and the column type verification feature (`verifyOpenDataColumnTypes`, `rpc_data_catalog_listings__write_verified_column_types`), which this log does not map yet | [AVA-396](https://linear.app/avandar/issue/AVA-396) (follow-up) |
 | F13 | Demo deployment: `demo/*` branches deploy to `demo.avandarlabs.com` | not started | none | |
 | F14 | Show only the plan picker when a workspace has no active plan | PR open: [#314](https://github.com/AvandarLabs/avandar/pull/314) | none | |
+| F15 | `ava --env <name>` loads any `.env.<name>`, replacing `--staging` and `--prod` | PR open: [#319](https://github.com/AvandarLabs/avandar/pull/319) | none, but see its section for hunks in files `develop` lacks | |
+| F16 | Index every catalog asset behind `is_workspace_loadable`, and add the NY State Socrata portals | not started | F4, F6, F7, F12 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -85,7 +87,9 @@ API. It's new work, not something this branch built.
 | 10 | F12 | Extends the column type verification route and the F4 listings table. Merge after the verification feature it rewrites. |
 | any | F13 | Self-contained CI and scripts. Merge before the next demo branch is cut from `develop`, so it inherits the workflow. |
 | any | F14 | Self-contained billing UI fix. The bug is already on `develop`, so it can merge first. |
-| 11 | F9 | Last, because the docs describe the merged features. |
+| any | F15 | Self-contained CLI change. Its hunks in `ava supabase sql`, `ava pipeline reset`, and `ava pipeline prune-retired-scopes` go with whichever of F15 and those commands lands on `develop` second. |
+| 11 | F16 | Extends the F4 listings table and upsert, both F6 and F7 pipelines, and F12's invalid-listing UI. Merge after all four. |
+| 12 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -712,6 +716,112 @@ not reached.
 
 **Verification:**
 `npx vitest run shared/models/Subscription/SubscriptionModule/SubscriptionModule.test.ts`.
+
+---
+
+## F15: `ava --env <name>` loads any `.env.<name>`
+
+**Purpose:** Replace the `--staging` and `--prod` global flags with one
+`--env <name>` option that loads `.env.<name>` from the repo root. With no
+`--env`, the CLI loads `.env.development`. `--staging` and `--prod` are
+refused with the `--env` that replaces them, and `.gitignore` covers every
+`.env.*` file except the examples. **Value:** Pointing `ava` at a new
+deployment, such as a demo's Supabase branch, only takes a new env file:
+`ava pipeline run socrata --local --env demo`.
+
+**PR title:** `feat(ava-cli)!: replace --staging and --prod with a global --env <name>`
+
+**PR:** [#319](https://github.com/AvandarLabs/avandar/pull/319), branch
+`feat/ava-env-flag`, built from `develop` as `77f0ee7a5`. It carries every
+hunk below in files `develop` has, and none of the hunks in files it lacks.
+Its README example runs `world-bank__wdi --env staging` instead of `socrata`.
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `78c8296ef` | feat(ava-cli)!: replace --staging and --prod with a global --env <name> | All of it, except the hunks in files `develop` lacks (below) |
+
+**Files:**
+- On `develop`: `.gitignore`, `docs/google-sheets-e2e.md`,
+  `apps/ava-cli/README.md`, `apps/ava-cli/src/main.ts`,
+  `apps/ava-cli/src/AvaEnv/AvaEnv.ts` and `AvaEnv.test.ts`,
+  `GoogleTokenGetCli.ts`, `SupabaseRunCli.ts`, and
+  `SupabaseRunCli/supabase-script-runner/main.ts`.
+- Not on `develop` yet: `SupabaseSqlCli.ts`, `ResetPipelineCli.ts`,
+  `PruneRetiredScopesCli.ts` (each with its test), and
+  `announcePostgrestTarget.ts`. They come from the `ava supabase sql` command
+  and the pipeline executions work, which this log does not map yet. Whichever
+  of F15 and those lands second carries these hunks:
+  `AvaEnv.getLoadedEnvTarget()` becomes `AvaEnv.getLoadedEnvName()`, and a
+  `!== "local"` check becomes `!AvaEnv.isLocal()`.
+- The README's pipeline example names `socrata`, which F6 adds. Use
+  `world-bank__wdi` instead if F6 has not merged.
+
+**Schema:** none.
+
+**Verification:**
+```sh
+pnpm test:ava-cli && pnpm exec tsc --noEmit -p tsconfig.node.json
+pnpm --filter @avandar/ava-cli build
+node apps/ava-cli/dist/main.cjs supabase sql "select 1" --staging   # refused, names --env staging
+```
+
+---
+
+## F16: Index every catalog asset behind `is_workspace_loadable`
+
+**Purpose:** Pipelines list every asset a drive has instead of skipping the
+ones Avandar cannot load. `data_catalog_listings` gains
+`is_workspace_loadable`, `source_asset_type`, and `source_download_url`. An
+unloadable listing shows up in catalog search labelled "Not supported yet",
+links to the original through `source_url`, cannot be added (UI and a
+database trigger), and is never sampled. The flag comes from the pipeline's
+own verdict per asset plus a shared YAML file of unloadable formats,
+`apps/pipeline-server/pipelines/etl.config.yaml`, with per-pipeline
+overrides, read by `@avandar/etl`. Socrata now crawls `data.ny.gov` and
+`health.data.ny.gov` too, and HDX gains a `format:other` scope. **Value:**
+Maps, PDFs, spreadsheets, and links stop silently disappearing from search,
+and supporting a format later is a data migration, not a re-crawl.
+
+**PR title:** `feat(catalog): index every catalog asset and flag which ones a workspace can load`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `bc393997a` | feat(catalog): store whether a workspace can load each catalog listing | All of it. Regenerate the migration, types, and desktop migration. |
+| `bdba34bb7` | feat(etl): decide each listing's workspace loadability from a shared YAML config | All of it. The lockfile hunk only adds `yaml` and `zod` to `packages/node/etl`: re-add them with `pnpm add`, then restore `pnpm-workspace.yaml`, which `pnpm add` rewrites. |
+| `184db8124` | feat(socrata): index every portal asset and add the NY State portals | All of it |
+| `706b0c2dc` | feat(hdx): list unreadable and non-CSV resources as unloadable | All of it |
+| `ba841747c` | feat(catalog): show unsupported catalog listings with a link to the original | All of it. Regenerate the `.po` catalogs. |
+| `71279818a` | docs(catalog): document indexing every asset behind is_workspace_loadable | The two READMEs. The `open-data-catalog-architecture.md` hunk goes with F9. |
+
+**Files:** `supabase/schemas/10.data_catalog_listings.sql`,
+`20.datasets__open_data.sql`,
+`50.rpc_data_catalog_listings__upsert_with_relation_columns.sql`, the pgTAP
+test `data_catalog_listings_workspace_loadable.test.sql`,
+`packages/node/etl/src/EtlConfig/**` and the row contract files it touches,
+`apps/pipeline-server/pipelines/etl.config.yaml`,
+`pipelines/shared/getPipelineWorkspaceLoadability/`, the Socrata and HDX
+pipeline files, `shared/connectors/open-data/SocrataDiscoveryClient/`, the
+`DataCatalogListing` model and parsers, `verifyOpenDataColumnTypes.ts`, and
+the `DataCatalogView` list, detail, view, and new
+`DataCatalogUnsupportedNotice`.
+
+**Schema:** `20261106212011_index_unsupported_catalog_listings.sql` (adds
+three columns, relaxes `data_catalog_listings__api_access_complete` so an
+unloadable API listing needs no format, and replaces the upsert RPC and the
+add trigger).
+
+**Verification:**
+```sh
+pnpm --filter @avandar/etl test && pnpm --filter @avandar/etl test:supabase
+pnpm --filter @avandar/pipeline-server test
+pnpm vitest run src/lib/openData src/views/DataManagerApp/DataImportView shared/connectors/open-data shared/models/data-catalog-listings
+pnpm test:db
+ava pipeline run socrata --local --limit 400   # maps, files, and links land with is_workspace_loadable false
+```
 
 ---
 

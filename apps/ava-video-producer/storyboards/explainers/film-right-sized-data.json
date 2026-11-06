@@ -1,0 +1,598 @@
+{
+  "version": 1,
+  "id": "right-sized-data",
+  "title": "The right scale changes the design",
+  "description": "A workload, selected transfer, local execution and resource allocation explain the small-to-medium data thesis.",
+  "sourceNotes": [
+    "Authored explainer informed by Avandar business-plan arguments. Diagrams are conceptual, not measured backend telemetry.",
+    "Product leaves import current Avandar source. Navigation, queries and form state use deterministic fictional fixtures. No live backend behavior is asserted.",
+    "Continuity overlaps are internal to the explanation shot. Caption times include those overlaps. Stock poses hold before their loop reset."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 1989,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "The right scale changes the design",
+        "category": "motion-motion",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#9fefca",
+        "beats": [
+          {
+            "id": "scale",
+            "title": "Useful data does not have to be big data.",
+            "subtitle": "Design around the work a team actually needs.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "A mission-sized workload.",
+                "A different architectural opportunity."
+              ],
+              "emphasis": "Fit the infrastructure to the work."
+            },
+            "duration": 308,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "workload",
+            "title": "Begin with the relevant workload.",
+            "subtitle": "Illustrative proportions, not measured customer statistics.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "dot-matrix",
+                "schemaVersion": 1,
+                "input": {
+                  "groups": [
+                    {
+                      "label": "needed now",
+                      "value": 32,
+                      "selected": true
+                    },
+                    {
+                      "label": "other work",
+                      "value": 68,
+                      "selected": false
+                    }
+                  ],
+                  "heading": "A bounded working set",
+                  "cohortLabel": "Example work",
+                  "showLegend": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 2.5,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 2.5,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1.35,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1.35,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "wipe",
+              "frames": 24
+            }
+          },
+          {
+            "id": "transfer",
+            "title": "Move the data the task needs.",
+            "subtitle": "Fewer unnecessary transfers can reduce remote work.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "packet-stream",
+                "schemaVersion": 1,
+                "input": {
+                  "lanes": [
+                    {
+                      "label": "ROWS",
+                      "color": "#82c8f2",
+                      "offset": 0
+                    },
+                    {
+                      "label": "COLUMNS",
+                      "color": "#9fefca",
+                      "offset": 28
+                    },
+                    {
+                      "label": "RESULT",
+                      "color": "#f0ba83",
+                      "offset": 59
+                    }
+                  ],
+                  "packetsPerLane": 4,
+                  "heading": "Transfer follows the task",
+                  "showReceipts": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 290,
+                  "y": 300,
+                  "zoom": 1.7,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 290,
+                  "y": 300,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 670,
+                  "y": 300,
+                  "zoom": 1.7,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 670,
+                  "y": 300,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "spatial",
+              "frames": 24
+            }
+          },
+          {
+            "id": "local",
+            "title": "Use local computation when it fits.",
+            "subtitle": "This example sends a schema and runs the returned plan locally.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "schema-plan-local-execution",
+                "schemaVersion": 1,
+                "input": {
+                  "columns": {
+                    "category": "Team",
+                    "measure": "Items"
+                  },
+                  "rows": [
+                    {
+                      "id": "a",
+                      "category": "North",
+                      "value": 2
+                    },
+                    {
+                      "id": "b",
+                      "category": "South",
+                      "value": 5
+                    },
+                    {
+                      "id": "c",
+                      "category": "North",
+                      "value": 3
+                    }
+                  ],
+                  "request": {
+                    "question": "Total items for North?",
+                    "selectedCategory": "North",
+                    "planLabel": "Filter North, then sum Items"
+                  },
+                  "boundaryLabels": {
+                    "local": "Local device",
+                    "remote": "Remote query planner",
+                    "outbound": "Question + schema only",
+                    "inbound": "Authored query plan",
+                    "result": "Local result"
+                  },
+                  "showRows": true,
+                  "copy": {
+                    "context": "Fictional example",
+                    "before": "Before",
+                    "after": "After"
+                  }
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 90,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 114,
+                  "x": 680,
+                  "y": 240,
+                  "zoom": 1.9,
+                  "ease": "push"
+                },
+                {
+                  "at": 169,
+                  "x": 680,
+                  "y": 240,
+                  "zoom": 1.9,
+                  "ease": "glide"
+                },
+                {
+                  "at": 183,
+                  "x": 310,
+                  "y": 370,
+                  "zoom": 1.9,
+                  "ease": "whip"
+                },
+                {
+                  "at": 300,
+                  "x": 310,
+                  "y": 370,
+                  "zoom": 1.9,
+                  "ease": "glide"
+                },
+                {
+                  "at": 330,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 465,
+            "transition": {
+              "kind": "aperture",
+              "frames": 24,
+              "origin": {
+                "x": 800,
+                "y": 480
+              }
+            }
+          },
+          {
+            "id": "capacity",
+            "title": "Resource allocation should follow actual demand.",
+            "subtitle": "A separate conceptual example of conserved work and fewer active hosts.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "compute-capacity-consolidation",
+                "schemaVersion": 1,
+                "input": {
+                  "hosts": [
+                    {
+                      "id": "a",
+                      "label": "Host A",
+                      "capacityCpuHours": 4
+                    },
+                    {
+                      "id": "b",
+                      "label": "Host B",
+                      "capacityCpuHours": 4
+                    },
+                    {
+                      "id": "c",
+                      "label": "Host C",
+                      "capacityCpuHours": 4
+                    }
+                  ],
+                  "jobs": [
+                    {
+                      "id": "one",
+                      "label": "Batch A",
+                      "cpuHours": 2,
+                      "initialHostId": "a",
+                      "finalHostId": "a"
+                    },
+                    {
+                      "id": "two",
+                      "label": "Batch B",
+                      "cpuHours": 2,
+                      "initialHostId": "b",
+                      "finalHostId": "b"
+                    },
+                    {
+                      "id": "three",
+                      "label": "Batch C",
+                      "cpuHours": 2,
+                      "initialHostId": "c",
+                      "finalHostId": "a"
+                    }
+                  ],
+                  "windowLabel": "Same 2-hour work window",
+                  "decision": {
+                    "actorLabel": "Platform operator",
+                    "actionLabel": "Apply approved placement"
+                  },
+                  "emptyHostState": "sleep",
+                  "showCapacityGuides": true,
+                  "copy": {
+                    "before": "Initial placement",
+                    "after": "Approved placement",
+                    "work": "Work conserved",
+                    "occupied": "Occupied hosts",
+                    "sleep": "Sleep",
+                    "available": "Available",
+                    "unit": "CPU-hours",
+                    "disclaimer": "Fictional resource allocation"
+                  }
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 80,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 104,
+                  "x": 295,
+                  "y": 315,
+                  "zoom": 1.75,
+                  "ease": "push"
+                },
+                {
+                  "at": 169,
+                  "x": 295,
+                  "y": 315,
+                  "zoom": 1.75,
+                  "ease": "glide"
+                },
+                {
+                  "at": 183,
+                  "x": 665,
+                  "y": 315,
+                  "zoom": 1.75,
+                  "ease": "whip"
+                },
+                {
+                  "at": 292,
+                  "x": 665,
+                  "y": 315,
+                  "zoom": 1.75,
+                  "ease": "glide"
+                },
+                {
+                  "at": 320,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 334,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 24
+            }
+          },
+          {
+            "id": "fit",
+            "title": "Optimize for the teams doing the work.",
+            "subtitle": "Benefits depend on workload, device and source support.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Less unnecessary remote work.",
+                "More capability near the team."
+              ],
+              "emphasis": "A deliberate fit for the social sector."
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "scale-0",
+      "shotId": "explanation",
+      "startFrame": 18,
+      "endFrame": 138,
+      "text": "Avandar focuses on teams with limited resources.",
+      "beatId": "scale"
+    },
+    {
+      "id": "scale-1",
+      "shotId": "explanation",
+      "startFrame": 143,
+      "endFrame": 263,
+      "text": "That workload can call for a different architecture.",
+      "beatId": "scale"
+    },
+    {
+      "id": "workload-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "Separate the needed subset from other work.",
+      "beatId": "workload"
+    },
+    {
+      "id": "workload-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "These proportions explain a concept, not a benchmark.",
+      "beatId": "workload"
+    },
+    {
+      "id": "transfer-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "The requested subset determines what needs to move.",
+      "beatId": "transfer"
+    },
+    {
+      "id": "transfer-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "Avoiding unnecessary transfers can reduce remote work.",
+      "beatId": "transfer"
+    },
+    {
+      "id": "local-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 170,
+      "text": "In this example, a schema leaves the device for planning.",
+      "beatId": "local"
+    },
+    {
+      "id": "local-1",
+      "shotId": "explanation",
+      "startFrame": 175,
+      "endFrame": 295,
+      "text": "The returned plan runs on local data.",
+      "beatId": "local"
+    },
+    {
+      "id": "local-2",
+      "shotId": "explanation",
+      "startFrame": 300,
+      "endFrame": 420,
+      "text": "Local execution does not mean every step is offline.",
+      "beatId": "local"
+    },
+    {
+      "id": "capacity-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 170,
+      "text": "A separate allocation example keeps the same amount of work.",
+      "beatId": "capacity"
+    },
+    {
+      "id": "capacity-1",
+      "shotId": "explanation",
+      "startFrame": 175,
+      "endFrame": 295,
+      "text": "Packing it differently leaves some capacity idle.",
+      "beatId": "capacity"
+    },
+    {
+      "id": "fit-0",
+      "shotId": "explanation",
+      "startFrame": 36,
+      "endFrame": 186,
+      "text": "The business argument is a closer fit to small and medium work.",
+      "beatId": "fit"
+    },
+    {
+      "id": "fit-1",
+      "shotId": "explanation",
+      "startFrame": 191,
+      "endFrame": 311,
+      "text": "Performance and cost depend on real conditions.",
+      "beatId": "fit"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

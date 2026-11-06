@@ -1,0 +1,12 @@
+.contentFieldBodyObject > legend {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.contentFieldBodyObject {
+  border: 0;
+  margin: 20px 0;
+  min-width: 0;
+  padding: 0;
+}

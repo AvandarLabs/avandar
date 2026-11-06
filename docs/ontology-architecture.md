@@ -506,8 +506,8 @@ defined, so the datasets and the spine must already exist._
 | --- | --- | --- |
 | Planning | `conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts` | No Postgres read for SQL that names no concept; foreign concepts and contributors throw (fail closed) |
 | Column resolution | `conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | One column per attribute; one key column per dataset; duplicate names suffixed `_2`, `_3`; manual-entry and unmapped attributes become typed NULL columns; a missing dataset column or key column throws |
-| Spine | `conceptRelation/loadConceptSpine/loadConceptSpine.ts`, `conceptRelation/toCsvColumn.ts` | Keys travel as RFC 4180 CSV, never spliced into SQL; key pinned to `VARCHAR`; empty `external_id` refused; empty concept gets an empty typed table |
-| View | `conceptRelation/buildConceptViewSql.ts` | `FROM` is the spine alone, every attribute a correlated subquery, so the grain is one row per individual and a missing contribution is NULL; columns sorted by name for byte-stable SQL; array attributes as `list(... ORDER BY file_row_number)` |
+| Spine | `conceptRelation/loadConceptSpine/loadConceptSpine.ts`, `conceptRelation/toCsvColumn/toCsvColumn.ts` | Keys travel as RFC 4180 CSV, never spliced into SQL; key pinned to `VARCHAR`; empty `external_id` refused; empty concept gets an empty typed table |
+| View | `conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | `FROM` is the spine alone, every attribute a correlated subquery, so the grain is one row per individual and a missing contribution is NULL; columns sorted by name for byte-stable SQL; array attributes as `list(... ORDER BY file_row_number)` |
 | Ordering and lease | `src/clients/qetl/QueryMediator/queryRunner.ts`, `conceptRelation/loadConceptRelations.ts` | Datasets, then spine, then view, then user SQL; spine names included in the lease |
 
 **Naming.** `concept_<id>` is the view; `concept_<id>__individuals` is the
@@ -625,7 +625,7 @@ means TypeScript lists the site once the database enum gains the value;
 | 29 | `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index.ts` | Only if the kind may be the label | **Silent** (crash) |
 | 30 | `src/clients/ontology/AttributeAssertionClient/AttributeAssertionClient.ts` | Record page arm | Compile |
 | 31 | `src/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getAttributeAssertions.ts` | Legacy extension arm | Compile |
-| 32 | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql.ts` | Column kind and selector; a computed column needs an outer `SELECT`, since DuckDB cannot reuse an alias whose expression is a subquery | Inherent |
+| 32 | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | Column kind and selector; a computed column needs an outer `SELECT`, since DuckDB cannot reuse an alias whose expression is a subquery | Inherent |
 | 33 | `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | Otherwise the kind becomes a typed NULL column | **Silent** |
 | 34 | `src/views/IndividualManagerApp/SingleIndividualView/index.tsx` | Provenance display, if wanted | Inherent |
 
@@ -739,7 +739,7 @@ Follow [rules/testing.md](rules/testing.md). Existing coverage:
 | Layer | Files | Run with |
 | --- | --- | --- |
 | RLS (pgTAP) | `supabase/tests/database/permissions/rls_concepts.test.sql` and the four peers | `pnpm test:db`, only after `ava supabase status` reads green for the current branch (on any branch other than `develop`, that means its own switched project; see `CLAUDE.md`) |
-| Concept view and column resolution against real DuckDB | `src/lib/sql/__tests__/buildConceptViewSql.executed.test.ts`, `conceptAttributeColumns.executed.test.ts`, `toCsvColumn.executed.test.ts` | `pnpm vitest run --config vitest.executed.config.ts <files>` (or `pnpm test:executed`) |
+| Concept view and column resolution against real DuckDB | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/__tests__/conceptAttributeColumns.integration.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/toCsvColumn/toCsvColumn.executed.test.ts` | `pnpm vitest run --config vitest.executed.config.ts <files>` (or `pnpm test:executed`) |
 | QETL planning, spine, ordering | `src/clients/qetl/QueryMediator/conceptRelation/**/*.test.ts`, `src/clients/qetl/QueryMediator/__tests__/QueryMediator.concepts.test.ts`, `src/clients/qetl/wrappers/ConceptWrapper/ConceptWrapper.test.ts` | `pnpm vitest run <paths>` |
 | Authoring conversion and draft card | `src/views/OntologyDesignerApp/**/*.test.ts(x)`, `src/components/ChatPanel/CaseTypeDraftBlock/*.test.ts(x)`, `src/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff.test.ts` | `pnpm vitest run <paths>` |
 | Edge function parsing and prompt | `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.test.ts`, `parseCreateCaseTypes.test.ts`, `prompt/buildCaseManagerSystemPrompt.test.ts` | `pnpm vitest run <paths>` |

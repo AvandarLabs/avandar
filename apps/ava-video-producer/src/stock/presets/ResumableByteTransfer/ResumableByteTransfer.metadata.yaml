@@ -1,0 +1,94 @@
+name:
+  id: motionAtlas.resumable-byte-transfer.name
+  message: Continue after the acknowledged byte
+description:
+  id: motionAtlas.resumable-byte-transfer.description
+  message:
+    A bounded file strip crosses in chunks. After an interruption, the sender
+    resumes at the stored acknowledgment offset while the already confirmed prefix stays
+    in place.
+category:
+  id: motionAtlas.resumable-byte-transfer.category
+  message: Resumable transport
+useWhen:
+  id: motionAtlas.resumable-byte-transfer.useWhen
+  message: Distinguish confirmed progress from work that must be retransmitted.
+prompt:
+  id: motionAtlas.resumable-byte-transfer.prompt
+  message: Distinguish confirmed progress from work that must be retransmitted.
+creativeDirection:
+  id: motionAtlas.resumable-byte-transfer.creativeDirection
+  message:
+    960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+    0-12 reveal the scene. Frames 13-55 transfer chunks to the acknowledged boundary.
+    Frames 56-90 interrupt one unacknowledged segment without adding it to confirmed
+    progress. Frames 91-139 restart at the confirmed offset and append the remaining
+    chunks. Hold the resolved meaning during frames 140-165. Frames 166-179 return to
+    the same opaque ground for a six-second loop; reset is editorial.
+intent:
+  id: motionAtlas.resumable-byte-transfer.intent
+  message: Distinguish confirmed progress from work that must be retransmitted.
+distinction:
+  id: motionAtlas.resumable-byte-transfer.distinction
+  message:
+    Retry-backoff repeats whole attempts. This retains a confirmed prefix and
+    resumes by byte offset, so interruption does not restart the entire file.
+tags:
+  - id: motionAtlas.resumable-byte-transfer.tags.0
+    message: resumable upload
+  - id: motionAtlas.resumable-byte-transfer.tags.1
+    message: byte offset
+  - id: motionAtlas.resumable-byte-transfer.tags.2
+    message: checkpoint
+  - id: motionAtlas.resumable-byte-transfer.tags.3
+    message: partial transfer
+goodFor:
+  - id: motionAtlas.resumable-byte-transfer.goodFor.0
+    message: Explain resumable file uploads by acknowledged offset
+  - id: motionAtlas.resumable-byte-transfer.goodFor.1
+    message: Distinguish confirmed bytes from in-flight bytes
+domains:
+  - id: motionAtlas.resumable-byte-transfer.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.resumable-byte-transfer.aliases.0
+    message: resumable byte transfer
+notFor:
+  - id: motionAtlas.resumable-byte-transfer.notFor.0
+    message:
+      Confirmed means acknowledged in this authored protocol, not independently
+      verified integrity.
+  - id: motionAtlas.resumable-byte-transfer.notFor.1
+    message: No compression ratio, transfer speed or duration is measured.
+  - id: motionAtlas.resumable-byte-transfer.notFor.2
+    message: Final short chunk uses exact remaining bytes.
+  - id: motionAtlas.resumable-byte-transfer.notFor.3
+    message:
+      No real product screen, external fetch, supplied code execution, or measured
+      performance claim. All text is authored; no JSX, functions or URLs in props.
+  - id: motionAtlas.resumable-byte-transfer.notFor.4
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 13
+    endFrame: 55
+    description:
+      id: motionAtlas.resumable-byte-transfer.motionBeats.0
+      message: Transfer the exact acknowledged prefix.
+  - startFrame: 56
+    endFrame: 90
+    description:
+      id: motionAtlas.resumable-byte-transfer.motionBeats.1
+      message: Interrupt an unacknowledged chunk without confirming it.
+  - startFrame: 91
+    endFrame: 139
+    description:
+      id: motionAtlas.resumable-byte-transfer.motionBeats.2
+      message: Resume from the stored boundary and append exact chunks.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.resumable-byte-transfer.motionBeats.3
+      message: Hold the resolved relationship.
