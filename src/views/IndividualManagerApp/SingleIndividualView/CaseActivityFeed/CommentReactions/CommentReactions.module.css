@@ -28,3 +28,17 @@
   display: flex;
   gap: 2px;
 }
+
+.summary {
+  align-items: center;
+  border-radius: var(--mantine-radius-xs);
+  display: inline-flex;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  gap: 4px;
+}
+
+.summary:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 2px;
+}

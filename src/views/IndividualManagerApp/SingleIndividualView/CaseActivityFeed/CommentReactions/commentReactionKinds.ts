@@ -43,6 +43,11 @@ export const COMMENT_REACTION_DISPLAY: Readonly<
   funny: { label: msg`Funny`, Icon: IconMoodHappy, color: "info.8" },
 };
 
+/** The CSS variable for a reaction's `palette.shade` theme color. */
+export function buildReactionColorVar(color: string): string {
+  return `var(--mantine-color-${color.replace(".", "-")})`;
+}
+
 /**
  * The reaction after a member picks `pickedKind`: picking your current
  * reaction removes it, anything else replaces it.
