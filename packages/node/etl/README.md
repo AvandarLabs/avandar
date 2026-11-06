@@ -207,7 +207,8 @@ The engine writes only these listings-table columns
 | --- | --- |
 | `id` (read only), `access_kind`, `pipeline_name`, `pipeline_run_id`, `display_name`, `external_organization_name`, `external_dataset_id`, `date_of_last_update`, `date_of_last_sync`, `pipeline_scope_keys` | every row |
 | `date_column_type_last_verified` | every row, `null` when the column types are not verified |
-| `external_service_name`, `source_url`, `canonical_urls`, `license`, `update_frequency`, `description`, `notes`, `metadata`, `coverage_start_date`, `coverage_end_date` | every row, `null` when unset |
+| `is_workspace_loadable` | every row (see "Workspace loadability") |
+| `external_service_name`, `source_url`, `source_download_url`, `source_asset_type`, `canonical_urls`, `license`, `update_frequency`, `description`, `notes`, `metadata`, `coverage_start_date`, `coverage_end_date` | every row, `null` when unset |
 | `api_service`, `api_base_url`, `api_resource_id`, `api_resource_format` | `api_resource` rows |
 | `parquet_file_name` | `pipeline_parquet` rows |
 
@@ -246,6 +247,38 @@ that work survives, an unverified rewrite whose
 `relation_columns_sha256` matches the stored row's keeps the stored
 columns and verification date. The change check never compares
 `date_column_type_last_verified`.
+
+**Workspace loadability.** A pipeline lists every asset its drive has,
+including ones a workspace cannot load yet, such as a map or a PDF, so a
+catalog search still finds them. `is_workspace_loadable` says which ones a
+workspace can add. A `pipeline_parquet` row is always loadable. An
+`api_resource` row is loadable unless:
+
+- its relation sets `isWorkspaceLoadable: false`, which a pipeline does for
+  an asset it cannot read whatever its format, such as a Socrata map or an
+  HDX file whose columns could not be read,
+- its relation has no `apiResourceFormat`, or
+- its format is in the engine's `workspaceLoadability.unloadableFormats`.
+
+A pipeline loads those rules from a shared YAML file with
+`readEtlConfigFile` and `getWorkspaceLoadabilityRules`. The file lists the
+global unloadable formats and lets each pipeline, keyed by its name, make a
+global format loadable (`loadableFormats`) or add its own
+(`unloadableFormats`):
+
+```yaml
+workspaceLoadability:
+  unloadableFormats: [PDF, XLSX]
+pipelines:
+  hdx:
+    workspaceLoadability:
+      loadableFormats: [XLSX]
+```
+
+Formats match case-insensitively and may be written as extensions
+(`.pdf`). An unknown key fails the parse. Since a format rule can only
+make a row unloadable, a relation that sets `isWorkspaceLoadable: true`
+does not override it.
 
 `output.upsertListingsFunction` names the database function that does the
 write. It takes `p_listings`, a JSON array of `{ listing, relation_columns }`
