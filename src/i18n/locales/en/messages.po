@@ -638,6 +638,10 @@ msgstr "Upload file"
 msgid "Privacy log cleared."
 msgstr "Privacy log cleared."
 
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "{slug} is already taken. Try another ID."
+msgstr "{slug} is already taken. Try another ID."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Export CSV"
 msgstr "Export CSV"
@@ -690,7 +694,7 @@ msgstr "Free"
 msgid "The table visualization has no extra settings."
 msgstr "The table visualization has no extra settings."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "About you"
 
@@ -1672,10 +1676,6 @@ msgstr "Show the first 20 rows of {datasetName}"
 msgid "Map of {0}"
 msgstr "Map of {0}"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
-msgstr "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
-
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "Refreshed from Google Sheets"
 msgstr "Refreshed from Google Sheets"
@@ -1886,10 +1886,6 @@ msgstr "Table view has no chart settings."
 msgid "You save {discount}% compared to monthly billing"
 msgstr "You save {discount}% compared to monthly billing"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be at least {SLUG_MIN_LENGTH} characters long"
-msgstr "The workspace ID must be at least {SLUG_MIN_LENGTH} characters long"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Built-in presets"
 msgstr "Built-in presets"
@@ -1974,6 +1970,10 @@ msgstr "Gap"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "Select a data source"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "{slug} is available"
+msgstr "{slug} is available"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Opacity"
@@ -2091,7 +2091,7 @@ msgid "Are you sure you want to proceed with this action? This cannot be "
 msgstr "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
 msgstr "This is the unique ID of your organization used in URLs."
 
@@ -2123,6 +2123,10 @@ msgstr "{droppedRowCount} of {totalRowCount} rows could not be mapped"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "Are you sure you want to remove this user from the workspace?"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Enter an ID for your workspace."
+msgstr "Enter an ID for your workspace."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Configure this filter: set its id, label, and column name in the side "
@@ -2180,6 +2184,12 @@ msgstr "Bias detected:"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
 msgstr "Body"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "We couldn't check this ID. Check your connection, then edit the ID to "
+"try again."
+msgstr "We couldn't check this ID. Check your connection, then edit the ID to "
+"try again."
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
@@ -2376,10 +2386,6 @@ msgstr "Manual"
 msgid "Understanding your question…"
 msgstr "Understanding your question…"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot be empty"
-msgstr "The workspace ID cannot be empty"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "By default we use a direct UUID-based link."
@@ -2437,6 +2443,10 @@ msgstr "Roles & Permissions"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
 msgstr "100% stacked"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
+msgstr "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Write a field name in braces to fill it from the clicked feature, for "
@@ -2611,7 +2621,7 @@ msgstr "WHERE clause uses an expression on the left-hand side that is not a "
 msgid "PDF downloaded."
 msgstr "PDF downloaded."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "Workspace ID"
 
@@ -2820,6 +2830,10 @@ msgstr "E"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 5"
 msgstr "Column 5"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use only letters, numbers, and hyphens."
+msgstr "Use only letters, numbers, and hyphens."
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline"
@@ -3555,6 +3569,10 @@ msgstr "Couldn't capture dashboard"
 msgid "Processing dataset…"
 msgstr "Processing dataset…"
 
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
+msgstr "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Offline chat model ready. Click to switch or re-download."
@@ -3629,7 +3647,7 @@ msgstr "Please <0>email us</0> if you would like access."
 msgid "Private maps"
 msgstr "Private maps"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "About your workspace"
 
@@ -4981,10 +4999,6 @@ msgstr "Count rows in {datasetName} by {groupByColumn}"
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "SQL was not applied. Sign in to approve filter values."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID can only contain letters, numbers, and hyphens"
-msgstr "The workspace ID can only contain letters, numbers, and hyphens"
-
 #. placeholder {0}: workspace.name
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
@@ -5033,7 +5047,7 @@ msgstr "Let AI decide (legacy)"
 msgid "New field"
 msgstr "New field"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "Workspace created successfully!"
 
@@ -5454,7 +5468,7 @@ msgstr "Orientation"
 msgid "Dashboard deleted successfully!"
 msgstr "Dashboard deleted successfully!"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "The name you want other team members to see."
 
@@ -6673,6 +6687,10 @@ msgstr "does not end with"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Add layer"
 msgstr "Add layer"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "Checking if {slug} is available…"
+msgstr "Checking if {slug} is available…"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
@@ -7952,10 +7970,6 @@ msgstr "is not blank"
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "No boundary layer on this map to look up a P-code."
 msgstr "No boundary layer on this map to look up a P-code."
-
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot contain spaces"
-msgstr "The workspace ID cannot contain spaces"
 
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"

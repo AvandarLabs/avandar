@@ -638,6 +638,10 @@ msgstr "تحميل ملف"
 msgid "Privacy log cleared."
 msgstr "تم مسح سجل الخصوصية."
 
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "{slug} is already taken. Try another ID."
+msgstr "‏{slug} مستخدم بالفعل. جرّب معرّفًا آخر."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Export CSV"
 msgstr "تصدير CSV"
@@ -689,7 +693,7 @@ msgstr "مجاني"
 msgid "The table visualization has no extra settings."
 msgstr "لا تحتوي تصور الجدول على إعدادات إضافية."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "حولك"
 
@@ -1675,10 +1679,6 @@ msgstr "عرض أول 20 صفًا من {datasetName}"
 msgid "Map of {0}"
 msgstr "خريطة {0}"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
-msgstr "يجب أن يكون معرّف مساحة العمل أقصر من {SLUG_MAX_LENGTH} حرفًا"
-
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "Refreshed from Google Sheets"
 msgstr "تم التحديث من Google Sheets"
@@ -1889,10 +1889,6 @@ msgstr "لا يحتوي عرض الجدول على إعدادات للمخطط."
 msgid "You save {discount}% compared to monthly billing"
 msgstr "أنت توفر {discount}% مقارنة بالفوترة الشهرية"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be at least {SLUG_MIN_LENGTH} characters long"
-msgstr "يجب ألا يقل طول معرّف مساحة العمل عن {SLUG_MIN_LENGTH} أحرف"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Built-in presets"
 msgstr "الإعدادات المدمجة"
@@ -1977,6 +1973,10 @@ msgstr "فجوة"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "اختر مصدر البيانات"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "{slug} is available"
+msgstr "‏{slug} متاح"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Opacity"
@@ -2093,7 +2093,7 @@ msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "هل أنت متأكد أنك تريد المتابعة مع هذا الإجراء؟ لا يمكن التراجع عن ذلك."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
 msgstr "هذا هو المعرف الفريد لمؤسستك المستخدم في عناوين URL."
 
@@ -2124,6 +2124,10 @@ msgstr "تعذّر رسم {droppedRowCount} من أصل {totalRowCount} صفًا
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "هل أنت متأكد أنك تريد إزالة هذا المستخدم من مساحة العمل؟"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Enter an ID for your workspace."
+msgstr "أدخل معرّفًا لمساحة العمل الخاصة بك."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Configure this filter: set its id, label, and column name in the side "
@@ -2182,6 +2186,12 @@ msgstr "تم الكشف عن تحيز:"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
 msgstr "المتن"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "We couldn't check this ID. Check your connection, then edit the ID to "
+"try again."
+msgstr "تعذّر علينا التحقق من هذا المعرّف. تحقّق من اتصالك، ثم عدّل المعرّف "
+"وحاول مرة أخرى."
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
@@ -2378,10 +2388,6 @@ msgstr "يدوي"
 msgid "Understanding your question…"
 msgstr "جارٍ فهم سؤالك…"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot be empty"
-msgstr "لا يمكن أن يكون معرّف مساحة العمل فارغًا"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "نستخدم تلقائيًا رابطًا مباشرًا يستند إلى UUID."
@@ -2439,6 +2445,10 @@ msgstr "الأدوار والأذونات"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
 msgstr "تكديس بنسبة 100%"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
+msgstr "استخدم {WORKSPACE_SLUG_MAX_LENGTH} حرفًا أو أقل."
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Write a field name in braces to fill it from the clicked feature, for "
@@ -2611,7 +2621,7 @@ msgstr "تستخدم عبارة WHERE تعبيرًا في الجانب الأي�
 msgid "PDF downloaded."
 msgstr "تم تنزيل PDF."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "معرّف مساحة العمل"
 
@@ -2820,6 +2830,10 @@ msgstr "E"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 5"
 msgstr "العمود 5"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use only letters, numbers, and hyphens."
+msgstr "استخدم الأحرف والأرقام والواصلات فقط."
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline"
@@ -3554,6 +3568,10 @@ msgstr "لم يتمكن من التقاط اللوحة"
 msgid "Processing dataset…"
 msgstr "جارٍ معالجة مجموعة البيانات…"
 
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
+msgstr "استخدم {WORKSPACE_SLUG_MIN_LENGTH} أحرف على الأقل."
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "نموذج الدردشة دون اتصال جاهز. انقر للتبديل أو إعادة التنزيل."
@@ -3627,7 +3645,7 @@ msgstr "يُرجى <0>مراسلتنا عبر البريد الإلكتروني<
 msgid "Private maps"
 msgstr "الخرائط الخاصة"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "حول مساحة العمل الخاصة بك"
 
@@ -4978,10 +4996,6 @@ msgstr "عدّ الصفوف في {datasetName} حسب {groupByColumn}"
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "لم يتم تطبيق SQL. سجّل الدخول للموافقة على قيم عامل التصفية."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID can only contain letters, numbers, and hyphens"
-msgstr "يمكن أن يحتوي معرّف مساحة العمل على أحرف وأرقام وواصلات فقط"
-
 #. placeholder {0}: workspace.name
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
@@ -5029,7 +5043,7 @@ msgstr "دع الذكاء الاصطناعي يقرر (الإصدار القدي
 msgid "New field"
 msgstr "حقل جديد"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "تم إنشاء مساحة العمل بنجاح!"
 
@@ -5448,7 +5462,7 @@ msgstr "الاتجاه"
 msgid "Dashboard deleted successfully!"
 msgstr "تم حذف لوحة التحكم بنجاح!"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "الاسم الذي تريد أن يراه أعضاء الفريق الآخرون."
 
@@ -6660,6 +6674,10 @@ msgstr "لا ينتهي بـ"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Add layer"
 msgstr "إضافة طبقة"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "Checking if {slug} is available…"
+msgstr "جارٍ التحقق من توفّر {slug}…"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
@@ -7937,10 +7955,6 @@ msgstr "ليس فارغًا"
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "No boundary layer on this map to look up a P-code."
 msgstr "لا توجد طبقة حدود على هذه الخريطة للبحث عن رمز P."
-
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot contain spaces"
-msgstr "لا يمكن أن يحتوي معرّف مساحة العمل على مسافات"
 
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"

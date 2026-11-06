@@ -74,6 +74,34 @@ type Props<
 };
 
 /**
+ * Returns `hydratedField` with `rightSection`, `error`, and `inputContainer`
+ * taken from `latestField` when both are text fields, or `hydratedField`
+ * unchanged otherwise. Used by `AvaForm` when rendering each field, because
+ * hydrated schemas are computed once on mount but these props show live
+ * status.
+ */
+function _withLiveTextFieldProps<
+  FieldKey extends string,
+  FormValues extends ValuesOfFieldRecord<GenericFormSchemaRecord>,
+>({
+  hydratedField,
+  latestField,
+}: {
+  hydratedField: FormFieldSchema<FieldKey, FormValues>;
+  latestField: FormFieldSchema<FieldKey, FormValues>;
+}): FormFieldSchema<FieldKey, FormValues> {
+  if (hydratedField.type !== "text" || latestField.type !== "text") {
+    return hydratedField;
+  }
+  return {
+    ...hydratedField,
+    rightSection: latestField.rightSection,
+    error: latestField.error,
+    inputContainer: latestField.inputContainer,
+  };
+}
+
+/**
  * A basic form component that renders a form with a submit button.
  *
  * This is a wrapper around the `useForm` hook and provides a far more
@@ -228,10 +256,10 @@ export function AvaForm<
         if (typeof formElement === "string") {
           if (formElement in improvedFields) {
             const fieldKey = formElement as FieldKey;
-            const field = improvedFields[fieldKey]! as FormFieldSchema<
-              FieldKey,
-              FormValues
-            >;
+            const field = _withLiveTextFieldProps<FieldKey, FormValues>({
+              hydratedField: improvedFields[fieldKey]!,
+              latestField: fields[fieldKey]!,
+            });
             return (
               <UnknownAvaInput
                 key={field.key}

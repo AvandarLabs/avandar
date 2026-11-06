@@ -223,4 +223,69 @@ describe("AvaForm", () => {
       );
     });
   });
+
+  it("updates a text field's status props when the field schema changes", () => {
+    const renderWithStatus = (status: "checking" | "taken") => {
+      return (
+        <AvaForm
+          fields={{
+            username: {
+              key: "username",
+              type: "text",
+              initialValue: "ada",
+              label: "Username",
+              rightSection:
+                status === "checking" ? (
+                  <span>Checking</span>
+                ) : (
+                  <span>Taken icon</span>
+                ),
+              error: status === "taken" ? "That name is taken" : undefined,
+            },
+          }}
+          formElements={["username"]}
+        />
+      );
+    };
+
+    const { rerender } = render(renderWithStatus("checking"));
+    expect(screen.getByText("Checking")).toBeInTheDocument();
+    expect(screen.getByLabelText("Username")).not.toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+
+    rerender(renderWithStatus("taken"));
+    expect(screen.queryByText("Checking")).not.toBeInTheDocument();
+    expect(screen.getByText("Taken icon")).toBeInTheDocument();
+    expect(screen.getByText("That name is taken")).toBeInTheDocument();
+    expect(screen.getByLabelText("Username")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+  });
+
+  it("keeps validation errors when no error prop is given", async () => {
+    render(
+      <AvaForm
+        fields={{
+          username: {
+            key: "username",
+            type: "text",
+            initialValue: "ab",
+            label: "Username",
+            error: undefined,
+            validateFn: (value: string) => {
+              return value.length < 3 ? "Too short" : undefined;
+            },
+          },
+        }}
+        formElements={["username"]}
+        onSubmit={() => {}}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+    expect(await screen.findByText("Too short")).toBeInTheDocument();
+  });
 });
