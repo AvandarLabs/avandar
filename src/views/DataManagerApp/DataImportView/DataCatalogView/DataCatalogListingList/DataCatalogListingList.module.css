@@ -18,3 +18,35 @@
 .dataCatalogListingListRowSelected:hover {
   background-color: var(--mantine-color-primary-0);
 }
+
+/*
+ * The scrolling body of the list pane. The virtualizer reads its scroll
+ * position, so it fills whatever height the pane gives it.
+ */
+.dataCatalogListingListScroller {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--mantine-spacing-xs) var(--mantine-spacing-xs);
+  scrollbar-width: thin;
+}
+
+/* As tall as every row would be, so the scrollbar reflects the whole list. */
+.dataCatalogListingListTrack {
+  position: relative;
+  width: 100%;
+}
+
+/* One rendered row, placed at its offset in the track. */
+.dataCatalogListingListSlot {
+  inset-inline-start: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.dataCatalogListingListMoreLoader {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--mantine-spacing-xs);
+}

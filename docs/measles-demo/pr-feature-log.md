@@ -66,7 +66,8 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F14 | Show only the plan picker when a workspace has no active plan | PR open: [#314](https://github.com/AvandarLabs/avandar/pull/314) | none | |
 | F15 | `ava --env <name>` loads any `.env.<name>`, replacing `--staging` and `--prod` | PR open: [#319](https://github.com/AvandarLabs/avandar/pull/319) | none, but see its section for hunks in files `develop` lacks | |
 | F16 | Index every catalog asset behind `is_workspace_loadable`, and add the NY State Socrata portals | not started | F4, F6, F7, F12 | |
-| F17 | Case comments and the case activity feed | not started | none | |
+| F17 | Search the catalog in Postgres and load listings as the user scrolls | not started | F4, F12, F16 | |
+| F18 | Case comments and the case activity feed | not started | none | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -90,8 +91,9 @@ API. It's new work, not something this branch built.
 | any | F14 | Self-contained billing UI fix. The bug is already on `develop`, so it can merge first. |
 | any | F15 | Self-contained CLI change. Its hunks in `ava supabase sql`, `ava pipeline reset`, and `ava pipeline prune-retired-scopes` go with whichever of F15 and those commands lands on `develop` second. |
 | 11 | F16 | Extends the F4 listings table and upsert, both F6 and F7 pipelines, and F12's invalid-listing UI. Merge after all four. |
-| any | F17 | Self-contained: new tables, the record page feed, and one shared client typing fix. It touches no other feature's files, and nothing depends on it. |
-| 12 | F9 | Last, because the docs describe the merged features. |
+| 12 | F17 | Adds a column and indexes to the F4 listings table, and rewrites the catalog list that F12 and F16 extended. Merge after both. |
+| any | F18 | Self-contained: new tables, the record page feed, and one shared client typing fix. It touches no other feature's files, and nothing depends on it. |
+| 13 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -109,12 +111,13 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/functions/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts` | F3, F6 | F6: Socrata failure codes (`d9f488ff1`). |
 | `shared/connectors/open-data/openDataErrors.ts` | F3, F6 | F6: Socrata failure codes. |
 | `shared/connectors/open-data/CkanClient/CkanClient.ts` | F3, F2, F7 | F2: `get`. F7: `ckanActionApiHelpers` refactor. |
-| `shared/models/data-catalog-listings/DataCatalogListing/*` | F3, F4, F6, F8 | F3: `OpenDataAccess` field rename (`65b4cc8ad`). F4: the rename itself. F6: the `socrata` `api_service` arm. F8: cache fields. |
+| `shared/models/data-catalog-listings/DataCatalogListing/*` | F3, F4, F6, F8, F17 | F3: `OpenDataAccess` field rename (`65b4cc8ad`). F4: the rename itself. F6: the `socrata` `api_service` arm. F8: cache fields. F17: `search_vector` in `DBReadSchema` and dropped by `fromDBReadToModelRead`, and the `SearchResult` type. |
+| `src/views/DataManagerApp/DataImportView/DataCatalogView/{DataCatalogView,DataCatalogListingList/DataCatalogListingList}.tsx` and their CSS modules | F12, F16, F17 | F12 and F16: see their sections. F17: server search through `useDataCatalogSearch`, the virtualized list with its fixed header, and the by-id detail fetch. |
 | `supabase/schemas/00.enum.data_catalog_listings__api_service.sql` | F4, F6 | F4: rename. F6: the `socrata` value. |
-| `supabase/schemas/10.data_catalog_listings.sql` | F4, F8 | F4: rename and the non-partial `api_resource` unique index. F8: cache columns and their CHECK clauses. |
+| `supabase/schemas/10.data_catalog_listings.sql` | F4, F8, F17 | F4: rename and the non-partial `api_resource` unique index. F8: cache columns and their CHECK clauses. F17: the `search_vector` column and its two GIN indexes. |
 | `supabase/tests/database/data_catalog_listings_access.test.sql` | F4, F8 | F4: rename and the index test. F8: cache-column and `pipeline_access_complete` tests. |
 | `apps/pipeline-server/pipelines/world-bank__wdi/run.ts` | F1, F4, F10 | F1: `EtlEngine.create(name, { state })`. F4: `createSupabaseAdminClient` import from `pipelines/shared`. F10: `run(options)` rejecting `--limit`. |
-| `shared/types/database.types.ts` | F4, F6, F8 | Generated: regenerate in each. |
+| `shared/types/database.types.ts` | F4, F6, F8, F17 | Generated: regenerate in each. |
 
 ---
 
@@ -653,6 +656,7 @@ branch only. `pr-feature-log.md` itself stays off `develop`.
 | `9ae975a73` | prebuilt metacatalog plan | `docs/measles-demo/open-data-prebuilt-metacatalog-plan.md` |
 | `6053f4772`, `8297adad6` | modules and HttpClient design and plan | `docs/measles-demo/modules-factory-and-http-client-design.md`, `modules-factory-and-http-client-plan.md` |
 | `045066166` | docs(open-data): handoff brief for the next data-catalog rename pass | nothing: `03cf621ed` deleted the file |
+| `e1976a576`, `465b72ddb` | catalog search design | `docs/measles-demo/catalog-search-design.md` (final). `465b72ddb` is **MIXED**: only that file. |
 
 **Also take:**
 `a325df511` docs(open-data): document what every drive index pipeline must
@@ -827,7 +831,56 @@ ava pipeline run socrata --local --limit 400   # maps, files, and links land wit
 
 ---
 
-## F17: Case comments and the case activity feed
+## F17: Search the catalog in Postgres and load listings as the user scrolls
+
+**Purpose:** The catalog view stops loading every listing (5,000+) and
+fuzzy-searching them in the browser with Fuse. Postgres matches whole words
+through a weighted `search_vector` column (name, then publisher, then
+description), and partial or misspelled words in a listing's name through
+`pg_trgm` at a 0.5 word-similarity threshold. One RPC,
+`rpc_data_catalog_listings__search`, returns ranked pages of slim rows with
+a total count. The view loads 50 at a time with `useInfiniteQuery` as the
+user scrolls, renders only the rows in view with `@tanstack/react-virtual`,
+and reads the selected listing in full by id. **Value:** Browser memory goes
+to DuckDB instead of three copies of the catalog (rows, Fuse index, DOM).
+Design: `docs/measles-demo/catalog-search-design.md` (goes with F9).
+
+**PR title:** `feat(catalog): search the catalog in Postgres and load listings as the user scrolls`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `e1976a576` | docs(measles-demo): design backend catalog search with infinite scroll | Nothing: goes with F9. |
+| `465b72ddb` | feat(catalog): search catalog listings in Postgres with full-text and trigram matching | All of it. Regenerate the migration and types. The design doc hunk goes with F9. |
+| `e36e0ae9b` | feat(catalog): search the catalog on the server and load listings as the user scrolls | All of it. Regenerate the `.po` catalogs. |
+| `7e24c81fb` | fix(desktop): skip tsvector columns and GIN indexes when mirroring migrations to SQLite | All of it. Regenerate the desktop migration. Without this, the generator mirrors the Postgres-only column into SQLite. |
+
+**Files:** `supabase/schemas/00.extension.pg_trgm.sql`,
+`10.data_catalog_listings.sql`, `50.rpc_data_catalog_listings__search.sql`,
+the pgTAP test `rpc_data_catalog_listings__search.test.sql`, the
+`DataCatalogListing` model, types, and parsers,
+`src/clients/data-catalog-listings/DataCatalogListingClient.ts` and
+`createDataCatalogSearchPage/`, `src/lib/openData/ColumnTypeVerifications.ts`
+(invalidates every listing query, not just `getAll`), the `DataCatalogView`
+view, list, CSS modules, and new `useDataCatalogSearch/`, and
+`apps/desktop/scripts/gen-sqlite-migrations/parse.ts` with its test.
+
+**Schema:** `20261106223031_add_catalog_listing_search.sql` (installs
+`pg_trgm` in `extensions`, adds the generated `search_vector` column and two
+GIN indexes, and adds the RPC with `execute` for `authenticated` only).
+
+**Verification:**
+```sh
+pnpm vitest run src/clients/data-catalog-listings src/views/DataManagerApp/DataImportView/DataCatalogView src/lib/openData shared/models/data-catalog-listings
+pnpm --filter @avandar/desktop test
+supabase test db supabase/tests/database/rpc_data_catalog_listings__search.test.sql
+pnpm test:db
+```
+
+---
+
+## F18: Case comments and the case activity feed
 
 **Purpose:** Members comment on a case record in a TipTap 3 editor with
 markdown shortcuts and paste, `@` mentions of workspace members, and six
@@ -1041,8 +1094,8 @@ port the final files, not the commit.
 | 88 | `b7cbe395a` | F6 |
 | 89 | `f78be622b` | F7 |
 
-F17's commits came in through the `e331cbdcc` merge and are listed in full
-under F17 above rather than numbered here.
+F18's commits came in through the `e331cbdcc` merge and are listed in full
+under F18 above rather than numbered here.
 
 Commits that only update this log are branch-only and are not listed.
 

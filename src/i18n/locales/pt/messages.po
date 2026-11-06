@@ -1206,10 +1206,6 @@ msgstr "Este campo não pode estar vazio"
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "\"{value}\" não é uma data. Use AAAA-MM-DD."
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-#~ msgid "Add a note"
-#~ msgstr "Adicionar uma observação"
-
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
@@ -2888,6 +2884,10 @@ msgstr "A cláusula HAVING usa um lado esquerdo que o formulário não pode "
 msgid "has no value"
 msgstr "não tem valor"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Catalog datasets"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -3485,6 +3485,10 @@ msgstr "Duplicar"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
 msgstr "Resultado"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Searching the catalog"
+msgstr ""
 
 #: src/components/RichText/UserMention/UserMentionList.tsx
 msgid "No teammates match"
@@ -4927,7 +4931,7 @@ msgstr "Assentos comprados com sucesso"
 msgid "Open chat (⌘/)"
 msgstr "Abrir chat (⌘/)"
 
-#. placeholder {0}: displayedListings.length
+#. placeholder {0}: catalogSearch.totalCount
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "Catálogo ({0})"
@@ -6101,10 +6105,6 @@ msgstr "Qwen 2.5 3B"
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "Recolher painel"
-
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-#~ msgid "Add note"
-#~ msgstr "Adicionar nota"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
@@ -7799,6 +7799,10 @@ msgstr "{lengthValue} km"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "Linha de origem"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Loading more datasets"
+msgstr ""
 
 #: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"

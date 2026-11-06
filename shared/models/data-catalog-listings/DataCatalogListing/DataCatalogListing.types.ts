@@ -147,6 +147,20 @@ export type DataCatalogListingRead = {
 };
 
 /**
+ * One listing as catalog search returns it: only the columns the catalog's
+ * list shows. The detail pane reads the full listing by id.
+ */
+export type DataCatalogListingSearchResult = Pick<
+  DataCatalogListingRead,
+  | "id"
+  | "displayName"
+  | "externalOrganizationName"
+  | "pipelineName"
+  | "isWorkspaceLoadable"
+  | "isInvalid"
+>;
+
+/**
  * Why an entry's dataset cannot be loaded. Mirrors the database enum
  * `data_catalog_listings__invalid_dataset_reason`.
  */

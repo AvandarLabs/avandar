@@ -1198,10 +1198,6 @@ msgstr "Uwanja huu hauwezi kuwa tupu"
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "\"{value}\" si tarehe. Tumia YYYY-MM-DD."
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-#~ msgid "Add a note"
-#~ msgstr "Ongeza dokezo"
-
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
@@ -2884,6 +2880,10 @@ msgstr "Kifungu cha HAVING kinatumia upande wa kushoto ambao fomu haiwezi "
 msgid "has no value"
 msgstr "haina thamani"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Catalog datasets"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -3478,6 +3478,10 @@ msgstr "Rudufu"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
 msgstr "Matokeo"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Searching the catalog"
+msgstr ""
 
 #: src/components/RichText/UserMention/UserMentionList.tsx
 msgid "No teammates match"
@@ -4921,7 +4925,7 @@ msgstr "Viti vimenunuliwa kwa mafanikio"
 msgid "Open chat (⌘/)"
 msgstr "Fungua mazungumzo (⌘/)"
 
-#. placeholder {0}: displayedListings.length
+#. placeholder {0}: catalogSearch.totalCount
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "Katalogi ({0})"
@@ -6093,10 +6097,6 @@ msgstr "Qwen 2.5 3B"
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "Kunja paneli ya pembeni"
-
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-#~ msgid "Add note"
-#~ msgstr "Ongeza dokezo"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
@@ -7789,6 +7789,10 @@ msgstr "{lengthValue} km"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "Mstari wa chanzo"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Loading more datasets"
+msgstr ""
 
 #: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"

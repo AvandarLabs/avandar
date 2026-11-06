@@ -1151,10 +1151,6 @@ msgstr "此字段不能为空"
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "“{value}”不是日期。请使用 YYYY-MM-DD 格式。"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-#~ msgid "Add a note"
-#~ msgstr "添加备注"
-
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
@@ -2771,6 +2767,10 @@ msgstr "HAVING 子句使用了表单无法表示的左侧表达式。"
 msgid "has no value"
 msgstr "没有值"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Catalog datasets"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -3336,6 +3336,10 @@ msgstr "复制"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
 msgstr "结果"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Searching the catalog"
+msgstr ""
 
 #: src/components/RichText/UserMention/UserMentionList.tsx
 msgid "No teammates match"
@@ -4738,7 +4742,7 @@ msgstr "座位购买成功"
 msgid "Open chat (⌘/)"
 msgstr "打开聊天 (⌘/)"
 
-#. placeholder {0}: displayedListings.length
+#. placeholder {0}: catalogSearch.totalCount
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "目录 ({0})"
@@ -5877,10 +5881,6 @@ msgstr "Qwen 2.5 3B"
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "收起抽屉"
-
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-#~ msgid "Add note"
-#~ msgstr "添加备注"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
@@ -7518,6 +7518,10 @@ msgstr "{lengthValue} 千米"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "来源行"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Loading more datasets"
+msgstr ""
 
 #: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"

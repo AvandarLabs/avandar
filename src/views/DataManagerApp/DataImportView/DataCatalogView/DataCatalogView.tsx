@@ -13,8 +13,7 @@ import {
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch, IconWorldSearch } from "@tabler/icons-react";
-import Fuse from "fuse.js";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { uuid } from "$/lib/uuid";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DataCatalogRelationColumnClient } from "@/clients/data-catalog-listings/DataCatalogRelationColumnClient";
@@ -35,6 +34,7 @@ import { DataCatalogListingDetail } from "@/views/DataManagerApp/DataImportView/
 import { DataCatalogListingList } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
 import { readCatalogColumnsForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/readCatalogColumnsForAdding/readCatalogColumnsForAdding";
+import { useDataCatalogSearch } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogSearch";
 import {
   useColumnTypeVerificationStatus,
   useVerifyColumnTypesOnDwell,
@@ -91,10 +91,19 @@ export function DataCatalogView({
   const workspace = useCurrentWorkspace();
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 150);
-  const [selectedId, setSelectedId] = useState<string | undefined>();
+  const [selectedId, setSelectedId] = useState<
+    DataCatalogListing.Id | undefined
+  >();
 
-  const [catalogListings = [], isLoadingCatalog] =
-    DataCatalogListingClient.useGetAll({});
+  const catalogSearch = useDataCatalogSearch(debouncedSearch);
+
+  const [selectedListing, isLoadingSelectedListing] =
+    DataCatalogListingClient.useGetById({
+      id: selectedId,
+      useQueryOptions: {
+        enabled: selectedId !== undefined,
+      },
+    });
 
   const [catalogListingColumns = [], isLoadingCatalogColumns] =
     DataCatalogRelationColumnClient.useGetAll({
@@ -103,40 +112,6 @@ export function DataCatalogView({
         enabled: selectedId !== undefined,
       },
     });
-
-  const fuse = useMemo(() => {
-    return new Fuse(catalogListings, {
-      ignoreLocation: true,
-      keys: [
-        { name: "displayName", weight: 2 },
-        "description",
-        "externalOrganizationName",
-        "pipelineName",
-        "externalServiceName",
-        "notes",
-      ],
-      threshold: 0.35,
-    });
-  }, [catalogListings]);
-
-  const displayedListings = useMemo(() => {
-    const query = debouncedSearch.trim();
-    if (!query) {
-      return catalogListings;
-    }
-    return fuse.search(query).map((result) => {
-      return result.item;
-    });
-  }, [catalogListings, debouncedSearch, fuse]);
-
-  const selectedListing: DataCatalogListingRead | undefined = useMemo(() => {
-    if (!selectedId) {
-      return undefined;
-    }
-    return catalogListings.find((listing) => {
-      return listing.id === selectedId;
-    });
-  }, [catalogListings, selectedId]);
 
   useVerifyColumnTypesOnDwell({
     listing: selectedListing,
@@ -248,7 +223,12 @@ export function DataCatalogView({
   // asks the user to pick from an empty list. The activation state replaces
   // all of it and carries the one move that does something, which is telling
   // us what to publish next. Same rule the no-datasets route follows.
-  if (!isLoadingCatalog && catalogListings.length === 0) {
+  const isCatalogEmpty =
+    !catalogSearch.isLoading &&
+    !catalogSearch.isShowingPreviousSearch &&
+    debouncedSearch.trim() === "" &&
+    catalogSearch.totalCount === 0;
+  if (isCatalogEmpty) {
     return (
       <Box {...boxProps}>
         <AppSlateEmptyState
@@ -277,6 +257,11 @@ export function DataCatalogView({
             setSearch(event.currentTarget.value);
           }}
           placeholder={t`Search by name, organization, pipeline…`}
+          rightSection={
+            catalogSearch.isShowingPreviousSearch ? (
+              <Loader size="xs" aria-label={t`Searching the catalog`} />
+            ) : null
+          }
           value={search}
         />
 
@@ -312,13 +297,13 @@ export function DataCatalogView({
           </Trans>
         </Text>
 
-        {isLoadingCatalog ? (
+        {catalogSearch.isLoading ? (
           <Group justify="center" py="xl">
             <Loader />
           </Group>
         ) : (
           <div className={css.dataCatalogViewBrowser}>
-            {displayedListings.length === 0 ? (
+            {catalogSearch.listings.length === 0 ? (
               /*
                * The catalog has listings; this query matched none of them. One
                * message spanning the frame rather than a "no matches" note in
@@ -349,34 +334,44 @@ export function DataCatalogView({
                     component="h4"
                     className={css.dataCatalogViewBrowserListTitle}
                   >
-                    <Trans>Catalog ({displayedListings.length})</Trans>
+                    <Trans>Catalog ({catalogSearch.totalCount})</Trans>
                   </Text>
                   <DataCatalogListingList
-                    displayedListings={displayedListings}
+                    listings={catalogSearch.listings}
+                    totalCount={catalogSearch.totalCount}
                     selectedId={selectedId}
                     onSelect={setSelectedId}
+                    hasNextPage={catalogSearch.hasNextPage}
+                    isFetchingNextPage={catalogSearch.isFetchingNextPage}
+                    fetchNextPage={catalogSearch.fetchNextPage}
                   />
                 </div>
 
                 <div className={css.dataCatalogViewBrowserDetail}>
-                  <DataCatalogListingDetail
-                    listing={selectedListing}
-                    columns={catalogListingColumns}
-                    columnTypeState={_toColumnTypeState(
-                      selectedListing,
-                      columnTypeVerificationStatus,
-                    )}
-                    isAddAllowed={isAddAllowed}
-                    isAdding={isInsertPending}
-                    isWaitingForColumnTypes={
-                      waitingToAddListingId !== undefined &&
-                      waitingToAddListingId === selectedListing?.id
-                    }
-                    isLoadingColumnMetadata={isLoadingCatalogColumns}
-                    onAddToWorkspace={() => {
-                      void onAddToWorkspace();
-                    }}
-                  />
+                  {isLoadingSelectedListing ? (
+                    <Group justify="center" py="xl">
+                      <Loader size="sm" />
+                    </Group>
+                  ) : (
+                    <DataCatalogListingDetail
+                      listing={selectedListing}
+                      columns={catalogListingColumns}
+                      columnTypeState={_toColumnTypeState(
+                        selectedListing,
+                        columnTypeVerificationStatus,
+                      )}
+                      isAddAllowed={isAddAllowed}
+                      isAdding={isInsertPending}
+                      isWaitingForColumnTypes={
+                        waitingToAddListingId !== undefined &&
+                        waitingToAddListingId === selectedListing?.id
+                      }
+                      isLoadingColumnMetadata={isLoadingCatalogColumns}
+                      onAddToWorkspace={() => {
+                        void onAddToWorkspace();
+                      }}
+                    />
+                  )}
                 </div>
               </>
             )}

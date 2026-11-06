@@ -1215,10 +1215,6 @@ msgstr "Ce champ ne peut pas être vide"
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "« {value} » n'est pas une date. Utilisez le format AAAA-MM-JJ."
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-#~ msgid "Add a note"
-#~ msgstr "Ajouter une note"
-
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
@@ -2915,6 +2911,10 @@ msgstr "La clause HAVING utilise un côté gauche que le formulaire ne peut pas 
 msgid "has no value"
 msgstr "n’a aucune valeur"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Catalog datasets"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -3516,6 +3516,10 @@ msgstr "Dupliquer"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
 msgstr "Résultat"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Searching the catalog"
+msgstr ""
 
 #: src/components/RichText/UserMention/UserMentionList.tsx
 msgid "No teammates match"
@@ -4973,7 +4977,7 @@ msgstr "Sièges achetés avec succès"
 msgid "Open chat (⌘/)"
 msgstr "Ouvrir le chat (⌘/)"
 
-#. placeholder {0}: displayedListings.length
+#. placeholder {0}: catalogSearch.totalCount
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "Catalogue ({0})"
@@ -6160,10 +6164,6 @@ msgstr "Qwen 2.5 3B"
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "Réduire le panneau"
-
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-#~ msgid "Add note"
-#~ msgstr "Ajouter une note"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
@@ -7874,6 +7874,10 @@ msgstr "{lengthValue} km"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "Ligne source"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Loading more datasets"
+msgstr ""
 
 #: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"
