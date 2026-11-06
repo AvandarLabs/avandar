@@ -1,0 +1,30 @@
+.row {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xxs);
+  margin-block-start: var(--mantine-spacing-xs);
+}
+
+.stack {
+  display: inline-flex;
+}
+
+.dot {
+  background-color: var(--mantine-color-neutral-1);
+  border: 1.5px solid var(--ava-surface-raised);
+  border-radius: 50%;
+  display: grid;
+  height: 18px;
+  margin-inline-start: -5px;
+  place-items: center;
+  width: 18px;
+}
+
+.dot:first-child {
+  margin-inline-start: 0;
+}
+
+.picker {
+  display: flex;
+  gap: 2px;
+}
