@@ -6,15 +6,19 @@ type FeedMembers = {
   mentionCandidates: MentionCandidate[];
   membersLookup: {
     getMemberName: (userId: string) => string | undefined;
+    isLoadingMembers: boolean;
   };
 };
 
-/** The workspace's members as mention candidates and a name lookup. */
+/**
+ * The workspace's members as mention candidates and a name lookup.
+ * `undefined` members are still loading, so no one is a former member yet.
+ */
 export function useFeedMembers(
-  members: readonly UserProfile.WithRole[],
+  members: readonly UserProfile.WithRole[] | undefined,
 ): FeedMembers {
   return useMemo(() => {
-    const mentionCandidates = members.map((member): MentionCandidate => {
+    const mentionCandidates = (members ?? []).map((member): MentionCandidate => {
       return {
         userId: member.userId,
         displayName: member.displayName || member.fullName,
@@ -32,6 +36,7 @@ export function useFeedMembers(
         getMemberName: (userId: string) => {
           return namesById.get(userId);
         },
+        isLoadingMembers: members === undefined,
       },
     };
   }, [members]);

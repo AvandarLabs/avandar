@@ -65,6 +65,25 @@ afterEach(() => {
 });
 
 describe("CaseActivityFeed", () => {
+  it("shows a loading author, not a former member, while members are undefined", async () => {
+    vi.spyOn(ActivityEventClient, "getCaseActivityPage").mockResolvedValue({
+      hasMore: false,
+      entries: [_commentEntry("e1", "Specimens sent", "2026-10-27T13:40:00")],
+    });
+    render(
+      <CaseActivityFeed
+        workspaceId={"w1" as Workspace.Id}
+        individualId={"i1" as Individual.Id}
+        members={undefined}
+        highlightedCommentId={undefined}
+      />,
+      { wrapper: _wrapper },
+    );
+    await screen.findByText("Specimens sent");
+    expect(screen.getByText("Loading author")).toBeInTheDocument();
+    expect(screen.queryByText("Former member")).not.toBeInTheDocument();
+  });
+
   it("keeps the loaded comments and offers a retry when earlier activity fails", async () => {
     const pageSpy = vi
       .spyOn(ActivityEventClient, "getCaseActivityPage")

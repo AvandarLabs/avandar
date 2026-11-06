@@ -10,6 +10,8 @@ export type ActivityFeedItemProps = {
   entry: ActivityFeedEntry;
   currentUserId: User.Id | undefined;
   getMemberName: (userId: string) => string | undefined;
+  /** True while the workspace members load, so names are not yet known. */
+  isLoadingMembers: boolean;
   mentionCandidates: readonly MentionCandidate[];
   highlightedCommentId: string | undefined;
 };

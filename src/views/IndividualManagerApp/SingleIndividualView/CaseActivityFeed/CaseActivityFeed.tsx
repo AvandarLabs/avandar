@@ -18,7 +18,8 @@ import type { ReactNode } from "react";
 type Props = {
   workspaceId: Workspace.Id;
   individualId: Individual.Id;
-  members: readonly UserProfile.WithRole[];
+  /** The workspace's members, or `undefined` while they load. */
+  members: readonly UserProfile.WithRole[] | undefined;
   highlightedCommentId: string | undefined;
 };
 
@@ -63,6 +64,7 @@ export function CaseActivityFeed({
           itemProps={{
             currentUserId: currentUser?.id,
             getMemberName: membersLookup.getMemberName,
+            isLoadingMembers: membersLookup.isLoadingMembers,
             mentionCandidates,
             highlightedCommentId,
           }}

@@ -23,4 +23,21 @@ describe("UserMentionChip", () => {
     render(<UserMentionChip userId="gone" />);
     expect(screen.getByText("@Former member")).toBeInTheDocument();
   });
+
+  it("shows neutral text, not a former member, while members load", () => {
+    render(
+      <RichTextMembersContext.Provider
+        value={{
+          getMemberName: () => {
+            return undefined;
+          },
+          isLoadingMembers: true,
+        }}
+      >
+        <UserMentionChip userId="1" />
+      </RichTextMembersContext.Provider>,
+    );
+    expect(screen.queryByText("@Former member")).not.toBeInTheDocument();
+    expect(screen.getByText("@member")).toBeInTheDocument();
+  });
 });

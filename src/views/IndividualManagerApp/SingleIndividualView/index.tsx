@@ -17,6 +17,7 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { CaseActivityFeed } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed";
 import { CaseDetailsRail } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
 import css from "@/views/IndividualManagerApp/SingleIndividualView/SingleIndividualView.module.css";
@@ -166,9 +167,12 @@ export function SingleIndividualView({
       concept,
       individual,
     });
-  const [members] = WorkspaceClient.useGetUsersForWorkspace({
-    workspaceId: individual.workspaceId,
-  });
+  const [members, isLoadingMembers] = WorkspaceClient.useGetUsersForWorkspace(
+    {
+      workspaceId: individual.workspaceId,
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    },
+  );
 
   const attributeRows: CaseDetailsRow[] | undefined = useMemo(() => {
     if (!hydratedIndividual.assertions) {
@@ -218,7 +222,7 @@ export function SingleIndividualView({
           <CaseActivityFeed
             workspaceId={individual.workspaceId}
             individualId={individual.id}
-            members={members ?? EMPTY_MEMBERS}
+            members={isLoadingMembers ? undefined : (members ?? EMPTY_MEMBERS)}
             highlightedCommentId={highlightedCommentId}
           />
         </div>

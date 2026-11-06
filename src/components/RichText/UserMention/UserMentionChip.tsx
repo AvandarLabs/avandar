@@ -10,15 +10,16 @@ import type { ReactNode } from "react";
  */
 export function UserMentionChip({ userId }: { userId: string }): ReactNode {
   const { t } = useLingui();
-  const { getMemberName } = useRichTextMembers();
+  const { getMemberName, isLoadingMembers } = useRichTextMembers();
   const memberName = getMemberName(userId);
+  const isFormerMember = memberName === undefined && !isLoadingMembers;
   return (
     <span
-      className={clsx(classes.chip, memberName === undefined && classes.former)}
+      className={clsx(classes.chip, isFormerMember && classes.former)}
       data-type="userMention"
       data-id={userId}
     >
-      @{memberName ?? t`Former member`}
+      @{memberName ?? (isFormerMember ? t`Former member` : t`member`)}
     </span>
   );
 }

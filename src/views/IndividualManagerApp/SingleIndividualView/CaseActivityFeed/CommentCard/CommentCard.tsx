@@ -17,6 +17,12 @@ type Props = {
   reactions: readonly CommentReaction.T[];
   currentUserId: User.Id | undefined;
   getMemberName: (userId: string) => string | undefined;
+
+  /**
+   * True while the workspace members load. The author then shows a
+   * placeholder instead of "Former member".
+   */
+  isLoadingMembers?: boolean;
   mentionCandidates: readonly MentionCandidate[];
   isHighlighted: boolean;
 };
@@ -42,6 +48,7 @@ export function CommentCard({
   reactions,
   currentUserId,
   getMemberName,
+  isLoadingMembers = false,
   mentionCandidates,
   isHighlighted,
 }: Props): ReactNode {
@@ -49,9 +56,16 @@ export function CommentCard({
   const articleRef = useRef<HTMLElement>(null);
   const editing = useCommentEditing(comment, articleRef);
   const isHighlightVisible = useBriefHighlight(isHighlighted);
-  const authorName =
-    (comment.authorUserId && getMemberName(comment.authorUserId)) ??
-    t`Former member`;
+  const memberName = comment.authorUserId
+    ? getMemberName(comment.authorUserId)
+    : undefined;
+  const isAuthorPending =
+    memberName === undefined &&
+    isLoadingMembers &&
+    comment.authorUserId !== undefined;
+  const authorName = isAuthorPending
+    ? undefined
+    : (memberName ?? t`Former member`);
   const authorLabelId = `comment-${comment.id}-author`;
   const isOwnLiveComment =
     comment.deletedAt === undefined &&
@@ -67,7 +81,7 @@ export function CommentCard({
       aria-labelledby={authorLabelId}
     >
       <span className={classes.avatar} aria-hidden>
-        {_buildInitials(authorName)}
+        {authorName === undefined ? null : _buildInitials(authorName)}
       </span>
       <div>
         <CommentCardHeader

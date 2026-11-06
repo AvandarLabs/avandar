@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { Text, Tooltip } from "@mantine/core";
+import { Skeleton, Text, Tooltip, VisuallyHidden } from "@mantine/core";
 import { CommentActionsMenu } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu";
 import classes from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCard.module.css";
 import { useDateTimeFormatter } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/useDateTimeFormatter";
@@ -15,7 +15,8 @@ const FULL_TIMESTAMP_FORMAT: Intl.DateTimeFormatOptions = {
 
 type Props = {
   comment: Comment.T;
-  authorName: string;
+  /** The author's name, or `undefined` while the members still load. */
+  authorName: string | undefined;
   authorLabelId: string;
   /** Shows the edit and delete menu; only for your own live comment. */
   hasActions: boolean;
@@ -38,7 +39,22 @@ export function CommentCardHeader({
   return (
     <div className={classes.header}>
       <Text id={authorLabelId} size="sm" fw={600}>
-        {authorName}
+        {authorName === undefined ? (
+          <>
+            <Skeleton
+              component="span"
+              height={12}
+              width={96}
+              display="inline-block"
+              aria-hidden
+            />
+            <VisuallyHidden>
+              <Trans>Loading author</Trans>
+            </VisuallyHidden>
+          </>
+        ) : (
+          authorName
+        )}
       </Text>
       <Tooltip label={fullFormatter.format(new Date(comment.createdAt))}>
         <Text

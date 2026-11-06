@@ -74,6 +74,25 @@ afterEach(() => {
 });
 
 describe("CommentCard", () => {
+  it("shows a loading placeholder for the author, not a former member, while members load", () => {
+    render(
+      <CommentCard
+        comment={_comment()}
+        reactions={[]}
+        currentUserId={"u2" as User.Id}
+        getMemberName={() => {
+          return undefined;
+        }}
+        isLoadingMembers
+        mentionCandidates={[]}
+        isHighlighted={false}
+      />,
+      { wrapper: _wrapper },
+    );
+    expect(screen.queryByText("Former member")).not.toBeInTheDocument();
+    expect(screen.getByText("Loading author")).toBeInTheDocument();
+  });
+
   it("deletes your comment after you confirm and keeps focus on the card", async () => {
     const updateSpy = vi
       .spyOn(CommentClient, "update")

@@ -6,6 +6,12 @@ type RichTextMembers = {
    * in the workspace.
    */
   getMemberName: (userId: string) => string | undefined;
+
+  /**
+   * True while the members are still loading, so an unknown id may yet
+   * resolve to a name and must not be shown as a former member.
+   */
+  isLoadingMembers?: boolean;
 };
 
 const NO_MEMBERS: RichTextMembers = {

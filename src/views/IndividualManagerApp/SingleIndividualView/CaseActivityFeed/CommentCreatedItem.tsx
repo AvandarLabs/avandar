@@ -7,6 +7,7 @@ export function CommentCreatedItem({
   entry,
   currentUserId,
   getMemberName,
+  isLoadingMembers,
   mentionCandidates,
   highlightedCommentId,
 }: ActivityFeedItemProps): ReactNode {
@@ -19,6 +20,7 @@ export function CommentCreatedItem({
       reactions={entry.reactions}
       currentUserId={currentUserId}
       getMemberName={getMemberName}
+      isLoadingMembers={isLoadingMembers}
       mentionCandidates={mentionCandidates}
       isHighlighted={highlightedCommentId === entry.comment.id}
     />
