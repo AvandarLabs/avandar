@@ -78,7 +78,7 @@ what each caller sees. It pages on the keyset
 `idx_activity_events__individual_occurred` covers. The full keyset means
 events that share a timestamp are never skipped or repeated across pages.
 On the client, `ActivityEventClient.getCaseActivityPage` takes
-`before: ActivityFeedCursor` (null for the first page).
+`before: ActivityFeedCursor` (`undefined` for the first page).
 
 Comments are addressable by id. The record route
 (`src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx`)

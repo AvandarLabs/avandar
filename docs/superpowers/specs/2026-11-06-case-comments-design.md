@@ -366,8 +366,8 @@ window focus. There is no Realtime subscription in Phase 1.
 
 ### 7.4 Drafts and offline
 
-- The composer saves its draft per case to `localStorage` under
-  `ava:case-activity-draft:<workspaceId>:<individualId>`, read and written in
+- The composer saves its draft per member and case to `localStorage` under
+  `ava:case-activity-draft:<userId>:<workspaceId>:<individualId>`, read and written in
   `try/catch`, and clears it after a successful post.
 - When `navigator.onLine` is false, "Post" is disabled and a strip above the
   editor says the draft is saved on this device and can be posted on

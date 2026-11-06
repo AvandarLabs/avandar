@@ -6120,6 +6120,6 @@ Do not run `ava supabase restore` unless a merge to `develop` was requested. Tel
 - The record header shows the case type only. The time of the latest activity is listed as future work, because it needs its own query.
 - The `@` dropdown uses the house pattern from `PillEditPopover` (fixed anchor plus a code-driven `Combobox`) instead of the suggestion plugin's `props.mount`.
 - `CommentParsers` does not validate the document, so one comment with an unknown node cannot break the whole feed. `RichTextView` falls back to plain text, and Edit refuses with a notification.
-- A linked comment stays highlighted while the `comment` search param is present, rather than for a fixed few seconds.
+- A linked comment is highlighted when it is scrolled into view, and the highlight fades after about 2.4 seconds even while the `comment` search param is still present.
 - The feed pages on a full `(occurred_at, recorded_at, id)` keyset through the security-invoker RPC `rpc_activity_events__get_case_page`, replacing Task 9's `lt("occurred_at")` cursor, which skipped events that shared a timestamp at a page boundary. `getCaseActivityPage` takes `before: ActivityFeedCursor`.
 - The rich text parser requires `userMention` ids to be uuids, `text` on text nodes, and `http`, `https`, or `mailto` link hrefs.
