@@ -572,7 +572,7 @@ tracked as P5b/P5c in `docs/production-plan-world-humanitarian-day.md`:
   caseload" view. (P5c.3.)
 - **No comments or activity log.** At the snapshot date the record page's
   comment block called `notifyNotImplemented`. Comments have since shipped
-  (P5c.2, see `docs/case-activity-architecture.md`); the audit log of case
+  (P5c.2, see `docs/case-activity-architecture.md`). The audit log of case
   changes is still open. (P5c.5.)
 - **No filterable case list.** The records screen is a single-record detail
   view plus an unfiltered, unsearchable navbar list; there is no "show me

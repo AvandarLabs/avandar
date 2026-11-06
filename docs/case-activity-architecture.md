@@ -85,7 +85,8 @@ Comments are addressable by id. The record route
 takes an optional `?comment=<id>` search param, and a malformed id is dropped
 rather than failing the page. "Copy link to comment" builds that URL. The
 record page passes the id to the feed as `highlightedCommentId`, and the feed
-pages back (up to 10 pages) until it finds that comment, then scrolls to it and highlights it.
+pages back (up to 10 pages) until it finds that comment, then scrolls to it
+and highlights it.
 
 ## Rich text
 
