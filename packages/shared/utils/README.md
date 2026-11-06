@@ -149,8 +149,8 @@ narrows the value in the matching branch.
 | `isUndefined`      | `undefined`                                                      |
 | `isValidDateValue` | Anything `parseDate` would accept                                |
 | `hasDefinedProps`  | A record where the listed keys are non-`undefined`               |
-| `isNotEmpty`    | `NonEmpty<T>`: not `null`, `undefined`, `""`, `[]`, or `{}`         |
-| `isEmpty`       | `Empty<T>`: `null`, `undefined`, `""`, `[]`, or `{}`                |
+| `isNotEmpty`    | `NonEmpty<T>`: not `null`, `undefined`, `""`, `[]`, `{}`, or an empty `Set` or `Map` |
+| `isEmpty`       | `Empty<T>`: `null`, `undefined`, `""`, `[]`, `{}`, or an empty `Set` or `Map` |
 
 ### Higher-order guards
 

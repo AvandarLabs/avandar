@@ -29,6 +29,32 @@ describe("isNotEmpty", () => {
     );
   });
 
+  it("treats sets and maps with no entries as empty", () => {
+    expect([
+      isNotEmpty(new Set()),
+      isNotEmpty(new Map()),
+      isNotEmpty(new Set([1])),
+      isNotEmpty(new Map([["a", 1]])),
+    ]).toEqual([false, false, true, true]);
+  });
+
+  it("keeps a set and a map usable in both branches", () => {
+    const ids = new Set<number>();
+    if (isNotEmpty(ids)) {
+      expectTypeOf(ids).not.toBeNever();
+      expectTypeOf(ids).toExtend<Set<number>>();
+    } else {
+      expectTypeOf(ids).toEqualTypeOf<Set<number>>();
+    }
+    const totals = new Map<string, number>();
+    if (isNotEmpty(totals)) {
+      expectTypeOf(totals).not.toBeNever();
+      expectTypeOf(totals).toExtend<Map<string, number>>();
+    } else {
+      expectTypeOf(totals).toEqualTypeOf<Map<string, number>>();
+    }
+  });
+
   it("removes only the empty string from a literal union", () => {
     const status = "" as "" | "draft" | "done";
     if (isNotEmpty(status)) {

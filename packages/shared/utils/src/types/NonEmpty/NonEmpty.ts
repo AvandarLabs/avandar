@@ -27,7 +27,8 @@ type NonEmptyFromObject<T> = T extends EmptyObject
 /**
  * The part of `T` that can never be empty. Literal unions lose `""`, arrays
  * gain a guaranteed first element, `null` and `undefined` are removed, and a
- * wide `string` or an object that could be empty is branded. Other
+ * wide `string`, an object that could be empty, a `Set`, or a `Map` is
+ * branded. Other
  * primitives, such as numbers and booleans, are left unchanged.
  */
 export type NonEmpty<T> = unknown extends T
@@ -40,6 +41,8 @@ export type NonEmpty<T> = unknown extends T
         : Exclude<T, "">
       : T extends readonly unknown[]
         ? T & readonly [T[number], ...Array<T[number]>]
-        : T extends object
-          ? NonEmptyFromObject<T>
-          : T;
+        : T extends ReadonlySet<unknown> | ReadonlyMap<unknown, unknown>
+          ? T & NonEmptyBrand
+          : T extends object
+            ? NonEmptyFromObject<T>
+            : T;

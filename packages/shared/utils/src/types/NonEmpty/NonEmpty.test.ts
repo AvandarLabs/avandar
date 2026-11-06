@@ -73,6 +73,15 @@ describe("Type: NonEmpty", () => {
     expectTypeOf<NonEmpty<{ id: string }>>().toEqualTypeOf<{ id: string }>();
   });
 
+  it("narrows a set and a map without collapsing to never", () => {
+    expectTypeOf<NonEmpty<Set<number>>>().not.toBeNever();
+    expectTypeOf<NonEmpty<Set<number>>>().toExtend<Set<number>>();
+    expectTypeOf<NonEmpty<Map<string, number>>>().not.toBeNever();
+    expectTypeOf<NonEmpty<Map<string, number>>>().toExtend<
+      Map<string, number>
+    >();
+  });
+
   it("leaves numbers and booleans unchanged", () => {
     expectTypeOf<NonEmpty<number>>().toEqualTypeOf<number>();
     expectTypeOf<NonEmpty<boolean>>().toEqualTypeOf<boolean>();
