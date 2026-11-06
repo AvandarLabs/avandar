@@ -3,7 +3,7 @@
 **Author:** Juan Pablo Sarmiento (pablo@avandarlabs.com)
 **Date:** 2026-11-06
 **Status:** Architecture approved. Each milestone in
-[Build order](#build-order) gets its own spec, plan, and implementation cycle.
+"Build order" gets its own spec, plan, and implementation cycle.
 
 ## Context
 
@@ -296,7 +296,7 @@ community and trusted tiers without a rewrite.
 Trusted plugins have two extra capabilities:
 
 - Raw React slots, for complete reskins.
-- Server functions (see [Avandar services](#3-avandar-services-avandar)).
+- Server functions (see section 3, Avandar services).
 
 ### Remote component catalog (`@avandar/plugin-ui`)
 
