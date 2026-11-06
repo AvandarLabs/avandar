@@ -63,7 +63,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F11 | Live progress output for `ava pipeline run` | not started | F10, the ETL engine's per-scope crawl (`crawlScope`), which this log does not map yet | |
 | F12 | Invalid catalog listings, and DuckDB-parsed column type samples | not started | F4, F7, and the column type verification feature (`verifyOpenDataColumnTypes`, `rpc_data_catalog_listings__write_verified_column_types`), which this log does not map yet | [AVA-396](https://linear.app/avandar/issue/AVA-396) (follow-up) |
 | F13 | Demo deployment: `demo/*` branches deploy to `demo.avandarlabs.com` | not started | none | |
-| F14 | Show only the plan picker when a workspace has no active plan | not started | none | |
+| F14 | Show only the plan picker when a workspace has no active plan | PR open: [#314](https://github.com/AvandarLabs/avandar/pull/314) | none | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -703,6 +703,7 @@ not reached.
 | SHA | Subject | Take |
 |---|---|---|
 | `30c62fefb` | fix(billing): show only the plan picker when a workspace has no active plan | All of it |
+| `b8cc02d97` | refactor(billing): take the dataset limit prompt options as Readonly | All of it |
 
 **Files:**
 `shared/models/Subscription/SubscriptionModule/SubscriptionModule.ts`,
