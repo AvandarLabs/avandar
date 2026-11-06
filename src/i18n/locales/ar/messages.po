@@ -352,6 +352,10 @@ msgstr "H4"
 msgid "Query"
 msgstr "استعلام"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Hide datasets that can't be loaded"
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Join key"
 msgstr "مفتاح الربط"
@@ -616,6 +620,10 @@ msgstr "التحريك والتحديد"
 msgid "List"
 msgstr "قائمة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "Sort datasets by"
+msgstr ""
+
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/config/AppLinks/AppLinks.tsx
@@ -824,6 +832,10 @@ msgstr "اختر حالة افتراضية من هذه القائمة."
 msgid "Layer name"
 msgstr "اسم الطبقة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "Best match"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick a sheet"
 msgstr "اختر ورقة"
@@ -874,6 +886,10 @@ msgstr "حدث خطأ أثناء تحميل خدمات Google."
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
 msgstr "إخفاء تاريخ النشر"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Updated over a year ago"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
 msgid "Pick both a latitude and a longitude column. One on its own plots every "
@@ -933,10 +949,10 @@ msgid "Something else…"
 msgstr "شيء آخر…"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-msgid "The catalog is still in <0/> and grows as people tell us what they need. "
-"Missing a dataset? <1>tell us</1>."
-msgstr "لا يزال الكتالوج في <0/>، وينمو مع إخبارنا باحتياجات المستخدمين. هل "
-"تفتقد مجموعة بيانات؟ <1>أخبرنا</1>."
+#~ msgid "The catalog is still in <0/> and grows as people tell us what they need. "
+#~ "Missing a dataset? <1>tell us</1>."
+#~ msgstr "لا يزال الكتالوج في <0/>، وينمو مع إخبارنا باحتياجات المستخدمين. هل "
+#~ "تفتقد مجموعة بيانات؟ <1>أخبرنا</1>."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
@@ -998,6 +1014,10 @@ msgstr "جدول"
 msgid "First tick value"
 msgstr "قيمة التدريج الأول"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Covers"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
 msgstr "سيفقد {shareClause} إمكانية الوصول."
@@ -1055,10 +1075,13 @@ msgid "The current SQL contains parts the form could not represent. Continuing "
 msgstr "يحتوي SQL الحالي على أجزاء لا يمكن للنموذج تمثيلها. سيؤدي المتابعة إلى "
 "استبداله بـ SQL الذي تم إنشاؤه من النموذج."
 
+#. placeholder {0}: formatCatalogListingDate(updatedDate)
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
 #. placeholder {0}: formatDate(dataset.updatedAt, { format: "MMM D, YYYY" })
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Updated {0}"
 msgstr "تم التحديث {0}"
@@ -1292,8 +1315,8 @@ msgid "Seat limit reached"
 msgstr "تم الوصول إلى حد المقاعد"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-msgid "Pipeline"
-msgstr "خط الأنابيب"
+#~ msgid "Pipeline"
+#~ msgstr "خط الأنابيب"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
@@ -1315,6 +1338,10 @@ msgstr "تظهر هذه المجموعات في مساحة العمل الخاص
 "بيانات المصدر الخاصة بها في التخزين المحلي لديك. لمتابعة، تحتاج إلى "
 "إعادة تحميل مجموعة البيانات أو حذفها من مساحة العمل الخاصة بك."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
+msgid "Show fewer"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "البيانات الوصفية"
@@ -1331,6 +1358,10 @@ msgstr "تعذّرت إعادة تسلسل الاستعلام الفرعي لـ 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "اكتب سؤالًا وسأُنشئ SQL وأُشغّله نيابةً عنك."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Search datasets"
+msgstr ""
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
@@ -1384,6 +1415,10 @@ msgid "Pixels of detail to remove at the current zoom. Set to zero to disable "
 msgstr "وحدات البكسل التفصيلية التي يجب إزالتها عند مستوى التكبير الحالي. "
 "اضبطها على صفر لتعطيل التبسيط."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Any time"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Regular expression"
 msgstr "تعبير نمطي"
@@ -1412,8 +1447,14 @@ msgstr "اسم مساحة العمل"
 msgid "Your dashboard is published at:"
 msgstr "تم نشر لوحة المعلومات الخاصة بك في:"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "The catalog is in <0/> and grows from what people ask for. Missing a "
+"dataset? <1>Request one</1>"
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
@@ -1429,6 +1470,11 @@ msgstr "سؤالك يحتوي على لغة قد تؤثر على إجابة ال
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Vertical padding"
 msgstr "المسافة الداخلية الرأسية"
+
+#. placeholder {0}: activeFilters.length
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "Filters ({0})"
+msgstr ""
 
 #. placeholder {0}: aggregateLayer.name
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
@@ -2580,6 +2626,10 @@ msgstr "تجاهل"
 msgid "Two statuses have the same name. Give each one its own name."
 msgstr "هناك حالتان تحملان الاسم نفسه. امنح كل واحدة منهما اسمًا خاصًا بها."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Last updated"
+msgstr ""
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
 msgstr "قد لا تُنسخ الخريطة الأساسية الداكنة أو خريطة الأقمار الصناعية جيدًا."
@@ -2662,8 +2712,8 @@ msgid "Welcome to Avandar"
 msgstr "مرحبًا بك في Avandar"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-msgid "Tell us which open dataset you want via feedback"
-msgstr "أخبرنا أي مجموعة بيانات مفتوحة تريدها عبر التعليقات"
+#~ msgid "Tell us which open dataset you want via feedback"
+#~ msgstr "أخبرنا أي مجموعة بيانات مفتوحة تريدها عبر التعليقات"
 
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
@@ -2820,6 +2870,11 @@ msgstr "{numColumns} أعمدة"
 msgid "Normal"
 msgstr "عادي"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Filters"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Annotate, then export"
 msgstr "قم بالتعليق، ثم التصدير"
@@ -2836,10 +2891,10 @@ msgid "Synced to the cloud"
 msgstr "تمت المزامنة مع السحابة"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
-"how often it updates."
-msgstr "اختر مجموعة بيانات من اليسار لقراءة ما تغطيه، ومن ينشرها، ومدى تكرار "
-"تحديثها."
+#~ msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
+#~ "how often it updates."
+#~ msgstr "اختر مجموعة بيانات من اليسار لقراءة ما تغطيه، ومن ينشرها، ومدى تكرار "
+#~ "تحديثها."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
@@ -3207,8 +3262,8 @@ msgid "Result size"
 msgstr "حجم النتيجة"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-msgid "Search open data catalog"
-msgstr "ابحث في كتالوج البيانات المفتوحة"
+#~ msgid "Search open data catalog"
+#~ msgstr "ابحث في كتالوج البيانات المفتوحة"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
@@ -3585,6 +3640,10 @@ msgstr "مشتق"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
 msgstr "نص"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+#~ msgid "{numResults} of {numCatalogListings} datasets"
+#~ msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "Review filter"
@@ -3996,6 +4055,10 @@ msgstr "تعذّر تحميل {layerName}"
 msgid "Custom role groups"
 msgstr "مجموعات الأدوار المخصصة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Updated in the past month"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterListInput.tsx
 msgid "Add a value"
 msgstr "إضافة قيمة"
@@ -4321,8 +4384,8 @@ msgid "New chat"
 msgstr "محادثة جديدة"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-msgid "Search by name, organization, pipeline…"
-msgstr "البحث بالاسم، المنظمة، خط الأنابيب…"
+#~ msgid "Search by name, organization, pipeline…"
+#~ msgstr "البحث بالاسم، المنظمة، خط الأنابيب…"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -4347,9 +4410,14 @@ msgstr "غير متاح دون اتصال"
 msgid "Back to the login page"
 msgstr "العودة إلى صفحة تسجيل الدخول"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Dataset details"
 msgstr "تفاصيل مجموعة البيانات"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Updated in the past year"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
 msgid "1 filter"
@@ -4470,6 +4538,10 @@ msgstr "مجموعة البيانات الآن متاحة فقط في وضع ع�
 msgid "{0} copy"
 msgstr "نسخة {0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Original"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "One row per number"
 msgstr "صف واحد لكل رقم"
@@ -4553,6 +4625,11 @@ msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه."
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
 msgid "Zoom to cluster"
 msgstr "تكبير المجموعة"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "No datasets match your search and filters. Try fewer filters or "
+"different words."
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is true"
@@ -4749,6 +4826,11 @@ msgstr "اسم عرض الحدود"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
 msgstr "عمود Y"
+
+#. placeholder {0}: facets.numUnloadable
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "{0} hidden"
+msgstr ""
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Go home"
@@ -4955,8 +5037,8 @@ msgstr "فتح الدردشة (⌘/)"
 
 #. placeholder {0}: displayedListings.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-msgid "Catalog ({0})"
-msgstr "الفهرس ({0})"
+#~ msgid "Catalog ({0})"
+#~ msgstr "الفهرس ({0})"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
@@ -4991,6 +5073,10 @@ msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
 "SQL offline."
 msgstr "نموذج instruct عالي الجودة بحجم 7B. الأفضل للمخططات الصعبة وSQL المعقد "
 "دون اتصال بالإنترنت."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{numResults, plural, one {# dataset} other {# datasets}}"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "This query could not run"
@@ -5240,6 +5326,10 @@ msgstr "رمز EPSG"
 msgid "Allow manual edit"
 msgstr "السماح بالتعديل اليدوي"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Format"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not"
 msgstr "ليس"
@@ -5371,6 +5461,10 @@ msgstr "لا تزال لوحة المعلومات هذه عامة على الو�
 msgid "Filter by status"
 msgstr "التصفية حسب الحالة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Results"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields.tsx
 msgid "Select columns"
 msgstr "اختر الأعمدة"
@@ -5443,8 +5537,8 @@ msgstr "أخبرنا عن مصدر بيانات {singularConceptName}..."
 
 #. placeholder {0}: debouncedSearch.trim()
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-msgid "No catalog dataset matches “{0}”."
-msgstr "لا تتطابق أي مجموعة بيانات في الكتالوج مع «{0}»."
+#~ msgid "No catalog dataset matches “{0}”."
+#~ msgstr "لا تتطابق أي مجموعة بيانات في الكتالوج مع «{0}»."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -5694,6 +5788,10 @@ msgstr "توجد حالة أخرى بهذا الاسم."
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
 msgstr "لم تتم إضافة أي حقول"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "All results"
+msgstr ""
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -6370,8 +6468,8 @@ msgstr "لون تدريجات المحور Y"
 #. placeholder {0}: listing.pipelineName
 #. placeholder {1}: listing.pipelineRunId
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-msgid "{0} · run {1}"
-msgstr "{0} · تشغيل {1}"
+#~ msgid "{0} · run {1}"
+#~ msgstr "{0} · تشغيل {1}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
@@ -6454,6 +6552,10 @@ msgstr "يوجد عامل تصفية واحد نشط على هذه الطبقة.
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
 msgstr "تم تحديث اسم مساحة العمل"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Search open data"
+msgstr ""
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
@@ -7450,6 +7552,11 @@ msgstr "مجموعة بيانات الحدود"
 msgid "Shared with me"
 msgstr "تمت مشاركته معي"
 
+#. placeholder {0}: activeFilter.label
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "Remove filter: {0}"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 "support."
@@ -7534,6 +7641,10 @@ msgstr "مفتاح الربط"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Created \"{dashboardName}\""
 msgstr "تم إنشاء \"{dashboardName}\""
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Past month"
+msgstr ""
 
 #. placeholder {0}: diagnostics.unmatchedBoundaryCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
@@ -7684,6 +7795,11 @@ msgstr "عشري"
 msgid "Error"
 msgstr "خطأ"
 
+#. placeholder {0}: options.length
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
+msgid "Show all {0}"
+msgstr ""
+
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
 msgstr "إرسال الإجابة"
@@ -7788,6 +7904,10 @@ msgstr "لم نتمكن من تحديث اشتراكك. يرجى الاتصال 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "First"
 msgstr "الأول"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
+msgstr ""
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -8182,6 +8302,10 @@ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers 
 msgstr "يُنصح بهذا الخيار إذا كانت ذاكرة RAM لديك بسعة 12 GB وتريد إجابات SQL "
 "أفضل بشكل ملحوظ دون اتصال."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Clear filters"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
 msgstr "تحديد فردي"
@@ -8233,8 +8357,8 @@ msgid "Entered manually"
 msgstr "تم الإدخال يدويًا"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-msgid "Organization"
-msgstr "المنظمة"
+#~ msgid "Organization"
+#~ msgstr "المنظمة"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
@@ -8465,6 +8589,7 @@ msgstr "إذا كانت هناك قيم متعددة لـ {attributeName} لوا
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "تعبير عمود غير مُسمّى في SELECT؛ تم تخطيه."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "مسح البحث"
@@ -8671,6 +8796,11 @@ msgstr "يجب أن تكون نقاط التقسيم منتهية ومتزايد
 msgid "Dataset name"
 msgstr "اسم مجموعة البيانات"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Select a dataset to see its columns, where it comes from, and how "
+"recently it changed."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Source column"
 msgstr "عمود المصدر"
@@ -8725,6 +8855,10 @@ msgstr "تم الإلغاء"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Color ramp"
 msgstr "تدرج الألوان"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Over a year ago"
+msgstr ""
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
@@ -8783,6 +8917,10 @@ msgstr "إعادة التوليد مع الخطأ"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add context, methodology, or a key takeaway."
 msgstr "أضف سياقًا أو منهجية أو خلاصة مهمة."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Open datasets"
+msgstr ""
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a table of the top 10 rows of {datasetName}"
@@ -8903,7 +9041,7 @@ msgid "Case type"
 msgstr "نوع الحالة"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -9137,6 +9275,10 @@ msgstr "أقل من"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom right"
 msgstr "أسفل اليمين"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "Recently updated"
+msgstr ""
 
 #. placeholder {0}: scale.meters
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -9680,6 +9822,7 @@ msgid "Role & user groups"
 msgstr "الدور ومجموعات المستخدمين"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Clear all"
 msgstr "مسح الكل"
 
@@ -9907,6 +10050,10 @@ msgstr "يشير ORDER BY إلى العمود \"{columnName}\" غير الموج
 msgid "Blue"
 msgstr "أزرق"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Including datasets that can't be loaded"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Select a numeric column"
 msgstr "حدّد عمودًا رقميًا"
@@ -9962,6 +10109,10 @@ msgstr "أضف على الأقل سلسلة واحدة من X / Y"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Show QR code"
 msgstr "عرض رمز QR"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Past year"
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"

@@ -1,6 +1,7 @@
 import { Modal, Tabs } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text, Title } from "@mantine/core";
+import clsx from "clsx";
 import { useState } from "react";
 import { MODAL_ROOT_Z_INDEX } from "@/config/Theme";
 import { buildSelectAllPreviewSql } from "@/views/DataExplorerApp/OpenDatasetDrawer/buildSelectAllPreviewSql";
@@ -9,6 +10,7 @@ import css from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.modu
 import { SavedDatasetsView } from "@/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
+import type { DataImportTabId } from "@/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs";
 
 type Props = {
   opened: boolean;
@@ -36,6 +38,13 @@ export function OpenDatasetModal({
   // Tabs indicator once the modal has laid out. Only the change matters, not
   // the value, so there's no need to reset it on close.
   const [indicatorRemountKey, setIndicatorRemountKey] = useState(0);
+  const [modalTabId, setModalTabId] = useState<"saved" | "import">("saved");
+  const [importTabId, setImportTabId] =
+    useState<DataImportTabId>("upload-view");
+  // Browsing the open data catalog needs room for its three panes, so the
+  // modal grows to nearly the whole viewport while the catalog is showing.
+  const isShowingCatalog =
+    modalTabId === "import" && importTabId === "open-data-catalog";
 
   const onImportSaved = (dataset: Dataset.T) => {
     onOpen(
@@ -52,8 +61,13 @@ export function OpenDatasetModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      size="xl"
+      size={isShowingCatalog ? "100%" : "xl"}
       zIndex={MODAL_ROOT_Z_INDEX}
+      classNames={
+        isShowingCatalog
+          ? { content: css.contentFill, body: css.bodyFill }
+          : undefined
+      }
       transitionProps={{
         onEntered: () => {
           setIndicatorRemountKey((key) => {
@@ -78,10 +92,16 @@ export function OpenDatasetModal({
         body: { paddingTop: "var(--mantine-spacing-sm)" },
       }}
     >
-      <div className={css.body}>
+      <div className={clsx(css.body, isShowingCatalog && css.bodyFill)}>
         <Tabs
           indicatorRemountKey={indicatorRemountKey}
           tabIds={["saved", "import"] as const}
+          onTabChange={setModalTabId}
+          classNames={
+            isShowingCatalog
+              ? { root: css.tabsFill, panel: css.tabsFillPanel }
+              : undefined
+          }
           renderTabHeader={{
             saved: t`Saved datasets`,
             import: t`Import dataset`,
@@ -96,8 +116,17 @@ export function OpenDatasetModal({
             },
             import: () => {
               return (
-                <div className={`${css.tabPanel} ${css.importPanel}`}>
-                  <ImportDatasetView onSaveSuccess={onImportSaved} />
+                <div
+                  className={clsx(
+                    css.tabPanel,
+                    css.importPanel,
+                    isShowingCatalog && css.importPanelFill,
+                  )}
+                >
+                  <ImportDatasetView
+                    onSaveSuccess={onImportSaved}
+                    onTabChange={setImportTabId}
+                  />
                 </div>
               );
             },

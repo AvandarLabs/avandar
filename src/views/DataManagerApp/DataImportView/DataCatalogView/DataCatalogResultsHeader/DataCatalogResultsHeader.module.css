@@ -1,0 +1,35 @@
+.dataCatalogResultsHeader {
+  border-bottom: 1px solid var(--ava-border-default);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: var(--mantine-spacing-xs);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+}
+
+.dataCatalogResultsHeaderCount {
+  color: var(--mantine-color-neutral-9);
+  font-size: var(--mantine-font-size-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.dataCatalogResultsHeaderChips {
+  min-width: 0;
+}
+
+/*
+ * The rail carries the filters wherever there is room for it. Only when the
+ * catalog is too narrow for a rail does this button stand in for it.
+ */
+.dataCatalogResultsHeaderFiltersButton {
+  display: none;
+}
+
+@container data-catalog (width < 50rem) {
+  .dataCatalogResultsHeaderFiltersButton {
+    display: inline-flex;
+  }
+}

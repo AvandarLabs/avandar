@@ -27,6 +27,18 @@
 }
 
 /*
+ * A fill-height view scrolls inside its own panes, so the column is exactly
+ * as tall as the scroller and the trailing padding matches the gutter
+ * instead of leaving room to scroll past the end.
+ */
+.appViewBodyContentFillHeight {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: var(--mantine-spacing-lg);
+}
+
+/*
  * The rail sits on the tinted body surface so the content column stays the
  * only lit region. It scrolls on its own: a fifty-column outline should not
  * drag the record's facts off screen.
