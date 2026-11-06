@@ -1,0 +1,31 @@
+.editor {
+  border-color: var(--ava-border-strong);
+}
+
+.editor:focus-within {
+  border-color: var(--ava-border-focus);
+}
+
+.content :global(.tiptap) {
+  max-height: 320px;
+  min-height: 64px;
+  overflow-y: auto;
+}
+
+.footer {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  padding: var(--mantine-spacing-xxs) var(--mantine-spacing-xs)
+    var(--mantine-spacing-xs);
+}
+
+.toolbar {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.counter {
+  margin-inline-start: auto;
+}
