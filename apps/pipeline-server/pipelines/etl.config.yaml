@@ -1,0 +1,74 @@
+# Shared ETL config that every pipeline in this server loads through
+# `getPipelineWorkspaceLoadability`.
+#
+# workspaceLoadability decides which catalog listings a workspace can add.
+# A pipeline still lists every asset a drive has. A listing in one of these
+# formats is written with `is_workspace_loadable` false, so it shows up in
+# the catalog, links to the original, and cannot be added. Formats match
+# case-insensitively and may be written as extensions (`.pdf`).
+#
+# A pipeline can also mark one asset unloadable whatever its format, such as
+# a Socrata map or an HDX file whose columns could not be read. A format
+# listed here wins over a pipeline that calls an asset loadable.
+#
+# Supporting a format later: remove it here (or add it to a pipeline's
+# `loadableFormats`), then flip `is_workspace_loadable` on the matching
+# listings with a data migration. No re-crawl is needed, because every
+# listing is already indexed.
+workspaceLoadability:
+  unloadableFormats:
+    # Documents and slides
+    - PDF
+    - DOC
+    - DOCX
+    - PPT
+    - PPTX
+    - RTF
+    - TXT
+    - HTML
+    # Spreadsheets
+    - XLS
+    - XLSX
+    - XLSM
+    - ODS
+    # Archives
+    - ZIP
+    - 7Z
+    - RAR
+    - GZ
+    - TAR
+    # Structured data and geodata
+    - JSON
+    - GEOJSON
+    - TOPOJSON
+    - XML
+    - KML
+    - KMZ
+    - SHP
+    - GDB
+    - GPKG
+    # Statistical packages and databases
+    - SAV
+    - DTA
+    - SAS7BDAT
+    - RDATA
+    - MDB
+    - ACCDB
+    # Images and video
+    - JPG
+    - JPEG
+    - PNG
+    - GIF
+    - TIF
+    - TIFF
+    - SVG
+    - MP4
+
+# Per-pipeline overrides, keyed by pipeline name, for example:
+#
+# pipelines:
+#   hdx:
+#     workspaceLoadability:
+#       loadableFormats: [XLSX]   # loadable for this pipeline only
+#       unloadableFormats: [CSV]  # unloadable for this pipeline only
+pipelines: {}

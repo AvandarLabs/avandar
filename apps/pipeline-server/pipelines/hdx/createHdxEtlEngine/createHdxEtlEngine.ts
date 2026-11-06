@@ -11,6 +11,7 @@ import type {
   EtlDestination,
   EtlEngineInstance,
   EtlStores,
+  EtlWorkspaceLoadabilityRules,
 } from "@avandar/etl";
 import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
 import type { HdxScope } from "@pipelines/hdx/hdxScopes";
@@ -18,15 +19,18 @@ import type { HdxFileColumnReader } from "@pipelines/hdx/readHdxResourceColumns/
 
 /**
  * Creates the HDX pipeline's engine, which crawls the one HDX drive by
- * `metadata_modified` and writes one listing per readable resource. Each
- * drive is crawled once per scope in `HDX_SCOPES`, asking CKAN only for
- * datasets with a resource in that format.
+ * `metadata_modified` and writes one listing per resource. Only a hosted
+ * CSV or Parquet resource whose columns can be read is workspace-loadable.
+ * Each drive is crawled once per scope in `HDX_SCOPES`, asking CKAN only for
+ * datasets with a resource in that format, or for every dataset in the
+ * scope that covers every other format.
  *
  * @param args.discovery - The CKAN discovery client for HDX.
  * @param args.drive - Replaces `HDX_DRIVE`; `undefined` crawls nothing.
  * @param args.stores - Replaces the Supabase stores, for tests.
  * @param args.readFileColumns - Replaces the DuckDB reader that resources
  *   without usable HDX headers fall back to, for tests.
+ * @param args.workspaceLoadability - The formats a workspace cannot load.
  */
 export function createHdxEtlEngine(
   args: EtlDestination &
@@ -35,6 +39,7 @@ export function createHdxEtlEngine(
       drive?: HdxDrive | undefined;
       stores?: EtlStores;
       readFileColumns?: HdxFileColumnReader;
+      workspaceLoadability?: EtlWorkspaceLoadabilityRules;
     }>,
 ): EtlEngineInstance {
   const { discovery, drive, readFileColumns, ...destination } = args;
@@ -57,7 +62,10 @@ export function createHdxEtlEngine(
         drive: current,
         window,
         discovery,
-        resourceFormats: [scope.resourceFormat],
+        resourceFormats:
+          scope.resourceFormat === undefined
+            ? undefined
+            : [scope.resourceFormat],
       });
     },
     getConnectionId: (ckanPackage) => {
@@ -67,7 +75,7 @@ export function createHdxEtlEngine(
       return makeApiResourceRelationsFromCkanPackage({
         drive: current,
         ckanPackage: connection,
-        resourceFormat: scope.resourceFormat,
+        scope,
         metrics,
         readFileColumns:
           readFileColumns ??

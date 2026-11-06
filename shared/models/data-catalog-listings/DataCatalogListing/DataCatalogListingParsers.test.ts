@@ -31,6 +31,9 @@ const SHARED_DB_COLUMNS = {
   date_column_type_last_verified: null,
   is_invalid: false,
   invalid_dataset_reason: null,
+  is_workspace_loadable: true,
+  source_asset_type: null,
+  source_download_url: null,
 } as const;
 
 function _pipelineDBRow(): DataCatalogListingModel["DBRead"] {

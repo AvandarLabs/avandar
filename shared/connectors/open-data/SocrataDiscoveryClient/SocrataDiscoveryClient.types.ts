@@ -10,6 +10,13 @@ export type SocrataDiscoveryResult = {
   /** When the asset last changed in any way, as ISO 8601 with a time zone. */
   updatedAt: string;
   /**
+   * Socrata's asset type: `dataset`, `filter`, `map`, `file`, `href`,
+   * `story`, or `chart`. `undefined` when the result names none.
+   */
+  assetType: string | undefined;
+  /** A `file` asset's MIME type, such as `application/pdf`. */
+  blobMimeType: string | undefined;
+  /**
    * The dataset's columns, in the order the Discovery API lists them, which
    * is not always the dataset's own column order. Includes Socrata's
    * computed region columns (`:@computed_region_...`), which a `.csv`

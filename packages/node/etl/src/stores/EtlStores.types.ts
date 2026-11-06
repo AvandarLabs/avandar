@@ -40,6 +40,10 @@ export type ListingRowValues = Readonly<{
    * when it verifies a listing's types, so it never counts as a change.
    */
   date_column_type_last_verified: string | null;
+  /** Whether a workspace can add this listing. */
+  is_workspace_loadable: boolean;
+  source_asset_type: string | null;
+  source_download_url: string | null;
 }>;
 
 /** A listing row as stored, with its primary key. */

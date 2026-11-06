@@ -194,9 +194,13 @@ export function DataCatalogView({
   }
 
   async function onAddToWorkspace(): Promise<void> {
-    // An invalid listing's button is only styled disabled, so it still
-    // clicks.
-    if (!selectedListing || selectedListing.isInvalid) {
+    // An invalid or unsupported listing's button is only styled disabled,
+    // so it still clicks.
+    if (
+      !selectedListing ||
+      selectedListing.isInvalid ||
+      !selectedListing.isWorkspaceLoadable
+    ) {
       return;
     }
     const listing = selectedListing;

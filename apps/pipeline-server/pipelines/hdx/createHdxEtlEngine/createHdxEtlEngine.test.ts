@@ -179,7 +179,7 @@ describe("createHdxEtlEngine", () => {
     ]).toEqual([[], 0]);
   });
 
-  it("crawls the CSV scope, then the Parquet scope, each writing only its format", async () => {
+  it("crawls the CSV scope, the Parquet scope, then every other format, each writing only its own", async () => {
     const listings = createInMemoryListingsStore();
     const discovery = _discovery([_packageWithParquet("a", 1)]);
 
@@ -202,7 +202,7 @@ describe("createHdxEtlEngine", () => {
         return [row.api_resource_id, row.pipeline_scope_keys];
       }),
     ]).toEqual([
-      [["CSV"], ["Parquet"]],
+      [["CSV"], ["Parquet"], undefined],
       [
         ["a-csv", ["format:csv"]],
         ["a-parquet", ["format:parquet"]],
@@ -275,7 +275,10 @@ describe("createHdxEtlEngine", () => {
     }).listScopes();
 
     expect(scopes).toEqual([
-      { driveKey: DRIVE.baseUrl, scopeKeys: ["format:csv", "format:parquet"] },
+      {
+        driveKey: DRIVE.baseUrl,
+        scopeKeys: ["format:csv", "format:parquet", "format:other"],
+      },
     ]);
   });
 });

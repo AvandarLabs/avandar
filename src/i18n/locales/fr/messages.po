@@ -4342,6 +4342,10 @@ msgstr "Soumettre"
 msgid "dashboard"
 msgstr "tableau de bord"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "You can still open the original, where it is published."
+msgstr ""
+
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "A new version is ready. Update now, or close this and update later."
 msgstr "Une nouvelle version est disponible. Mettez à jour maintenant ou fermez "
@@ -5594,6 +5598,10 @@ msgstr "Rechercher des sources de données"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Tool"
 msgstr "Outil"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Not supported yet"
+msgstr ""
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -8062,6 +8070,10 @@ msgstr "Colonne de clé de limite"
 msgid "Time window: {0}"
 msgstr "Période : {0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Open it on {serviceName}"
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
 msgstr "La coordonnée est en dehors de la plage valide"
@@ -8075,6 +8087,10 @@ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers 
 "offline."
 msgstr "Recommandé si vous disposez de 12 Go de RAM et souhaitez obtenir des "
 "réponses SQL hors ligne sensiblement meilleures."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "Avandar can't add this kind of dataset yet."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
