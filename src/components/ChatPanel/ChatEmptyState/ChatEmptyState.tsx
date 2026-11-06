@@ -1,8 +1,9 @@
 import { useThreadRuntime } from "@assistant-ui/react";
-import { Link, TruncatedText } from "@avandar/ui";
+import { Link } from "@avandar/ui";
 import { getRandomItem, matchLiteral, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Badge, Button, Group, Stack, Text } from "@mantine/core";
+import { Badge, Stack, Text, Title, UnstyledButton } from "@mantine/core";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -31,8 +32,9 @@ function usePageLabel(app: ChatPageContext.ChatApp): string {
 
 /**
  * Empty-state shown above the composer when the thread has no messages yet.
- * Shows the current page context as a chip and, for Data Explorer, three
- * starter prompts the user can click to send.
+ * Sits at the foot of the thread, next to the composer where the eye already
+ * is, and shows the current page context as a chip and, for Data Explorer,
+ * three starter prompts the user can click to send.
  */
 export function ChatEmptyState(): React.ReactNode {
   const context = useChatPageContext();
@@ -80,14 +82,19 @@ export function ChatEmptyState(): React.ReactNode {
   const dataExplorerLink = AppLinks.dataExplorer(workspace.slug);
 
   return (
-    <Stack gap="md" p="md">
-      <Group gap="xs">
-        <Badge variant="light" color="primary" radius="sm">
+    <Stack gap="md" className={css.chatEmptyState}>
+      <Stack gap="xs" align="flex-start">
+        <Badge
+          variant="light"
+          color="neutral"
+          radius="sm"
+          size="sm"
+          tt="none"
+          fw={500}
+        >
           {pageLabel}
         </Badge>
-      </Group>
-      <Stack gap={4}>
-        <Text size="md" fw={600} c="neutral.9">
+        <Title order={3} size="lg" fw={650} c="neutral.9" lh={1.3}>
           {context.app === "dashboards" ? (
             <Trans>Build a chart in chat</Trans>
           ) : context.app === "case-manager" ? (
@@ -95,8 +102,8 @@ export function ChatEmptyState(): React.ReactNode {
           ) : (
             <Trans>Ask about your data</Trans>
           )}
-        </Text>
-        <Text size="sm" c="neutral.6" lh={1.5}>
+        </Title>
+        <Text size="sm" c="neutral.6" lh={1.55}>
           {context.app === "data-explorer" ? (
             <Trans>
               Type a question and I will generate the SQL and run it for you.
@@ -130,33 +137,33 @@ export function ChatEmptyState(): React.ReactNode {
         </Text>
       </Stack>
       {suggestions.length > 0 ? (
-        <Stack gap="xxs" mt="xs">
-          <Text size="xs" c="neutral.6" tt="uppercase" fw={600}>
-            <Trans>Try one of these</Trans>
+        <Stack gap="xxs">
+          <Text size="xs" c="neutral.6" fw={500}>
+            <Trans>Try asking</Trans>
           </Text>
-          {suggestions.map((prompt) => {
-            return (
-              <Button
-                key={prompt}
-                variant="default"
-                size="xs"
-                justify="flex-start"
-                fullWidth
-                onClick={() => {
-                  sendPrompt(prompt);
-                }}
-                classNames={{
-                  root: css.suggestionButton,
-                  inner: css.suggestionButtonInner,
-                  label: css.suggestionButtonLabel,
-                }}
-              >
-                <TruncatedText withFullTextTooltip maw="100%" size="xs">
-                  {prompt}
-                </TruncatedText>
-              </Button>
-            );
-          })}
+          <ul className={css.suggestionList}>
+            {suggestions.map((prompt) => {
+              return (
+                <li key={prompt}>
+                  <UnstyledButton
+                    className={css.suggestionButton}
+                    onClick={() => {
+                      sendPrompt(prompt);
+                    }}
+                  >
+                    <Text span size="sm" c="neutral.8" lh={1.45} lineClamp={2}>
+                      {prompt}
+                    </Text>
+                    <IconArrowUpRight
+                      size={14}
+                      aria-hidden
+                      className={css.suggestionButtonIcon}
+                    />
+                  </UnstyledButton>
+                </li>
+              );
+            })}
+          </ul>
         </Stack>
       ) : null}
     </Stack>

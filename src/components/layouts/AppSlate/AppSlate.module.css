@@ -12,9 +12,39 @@
  * overlay is layered against this one value: see APP_SLATE_Z_INDEX in
  * src/config/Theme/Theme.ts.
  */
+
+/*
+ * The gutter around the slate. Its inline-end side gives way to the docked
+ * chat aside (see `.root[data-chat-fused]` in AppShell.module.css), and it
+ * moves in step with Mantine's own aside slide so the gutter closes as the
+ * chat arrives and reopens as it leaves.
+ */
+.frame {
+  padding: var(--mantine-spacing-xs);
+  padding-inline-end: var(
+    --ava-slate-gutter-inline-end,
+    var(--mantine-spacing-xs)
+  );
+  transition: padding-inline-end var(--app-shell-transition-duration, 200ms)
+    var(--app-shell-transition-timing-function, ease);
+}
+
+/*
+ * The neutral.7 edge reaches the screen through `--ava-paper-border-color`:
+ * the theme paints every Paper's border color inline, which a plain
+ * `border-color` here cannot beat. Widths are not inline, so the
+ * inline-end side can still drop out when the chat aside fuses on and draws
+ * the divider itself.
+ */
 .slate {
+  --ava-paper-border-color: var(--mantine-color-neutral-7);
+
   border: 1px solid var(--mantine-color-neutral-7);
-  border-radius: 8px 8px 12px;
+  border-end-end-radius: var(--ava-slate-inline-end-radius, 12px);
+  border-end-start-radius: 8px;
+  border-inline-end-width: var(--ava-slate-inline-end-border-width, 1px);
+  border-start-end-radius: var(--ava-slate-inline-end-radius, 8px);
+  border-start-start-radius: 8px;
   box-shadow:
     0 1px 2px rgb(0 0 0 / 20%),
     0 8px 24px rgb(0 0 0 / 25%);
@@ -26,5 +56,23 @@
   overscroll-behavior: none;
   padding: 0;
   position: relative;
+  transition: border-radius var(--app-shell-transition-duration, 200ms)
+    var(--app-shell-transition-timing-function, ease);
   z-index: var(--mantine-z-index-app-slate);
+}
+
+/*
+ * Custom properties inherit, so without this the slate's edge would reach
+ * every Paper inside the view. Resetting it hands nested Papers back the
+ * theme's default edge.
+ */
+.slate :global(.mantine-Paper-root) {
+  --ava-paper-border-color: initial;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame,
+  .slate {
+    transition: none;
+  }
 }

@@ -3414,6 +3414,10 @@ msgid "Microsoft's compact instruct model. Solid structure and instruction "
 "following for dashboards."
 msgstr "Microsoft 的精簡指令模型。具備穩固的結構和指令遵循能力，適合儀表板。"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Try asking"
+msgstr "試著問問"
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit"
 msgstr "編輯"
@@ -9007,8 +9011,8 @@ msgid "Read as"
 msgstr "讀取為"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Try one of these"
-msgstr "嘗試這些"
+#~ msgid "Try one of these"
+#~ msgstr "嘗試這些"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"

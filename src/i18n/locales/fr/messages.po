@@ -3597,6 +3597,10 @@ msgid "Microsoft's compact instruct model. Solid structure and instruction "
 msgstr "Modèle instruct compact de Microsoft. Structure solide et bonne "
 "capacité à suivre les instructions pour les tableaux de bord."
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Try asking"
+msgstr "Essayez de demander"
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit"
 msgstr "Modifier"
@@ -9435,8 +9439,8 @@ msgid "Read as"
 msgstr "Interprété comme"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Try one of these"
-msgstr "Essayez l'une de ces options"
+#~ msgid "Try one of these"
+#~ msgstr "Essayez l'une de ces options"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"

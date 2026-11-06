@@ -18,7 +18,7 @@ import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { JobProgressPanel } from "@/components/JobProgressPanel/JobProgressPanel";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppSlate/AppSlate";
-import { APP_CHROME_Z_INDEX } from "@/config/Theme";
+import { APP_CHAT_ASIDE_Z_INDEX, APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { ANIMATION_DURATION_MS } from "@/config/Theme/AnimationTheme/AnimationTheme";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
@@ -138,6 +138,17 @@ function AppShellComponent({
     [...APP_SHELL_HOTKEY_TAGS_TO_IGNORE],
   );
 
+  const isChatComposerOpen = isChatPanelOpen && chatPanelLayout === "composer";
+
+  // While chat is open beside the slate, the two are fused into one surface.
+  // The root publishes that so AppSlate can square off and drop the gutter on
+  // its inline-end edge, where the chat aside takes over the frame.
+  const isChatFusedToSlate =
+    isChatPanelOpen &&
+    showChatPanel &&
+    isChatPanelAvailable &&
+    !isMobileViewSize;
+
   const headerHeight = isMobileViewSize
     ? HEADER_MOBILE_DEFAULT_HEIGHT
     : isDesktopPlatform
@@ -149,6 +160,7 @@ function AppShellComponent({
       <MantineAppShell
         layout="default"
         header={{ height: headerHeight }}
+        mod={{ "chat-fused": isChatFusedToSlate }}
         classNames={{
           navbar: css.navbar,
           root: css.root,
@@ -224,7 +236,7 @@ function AppShellComponent({
             minHeight: "calc(100dvh - var(--ava-shell-main-offset-top))",
           }}
         >
-          {isChatPanelOpen && chatPanelLayout === "composer" ? (
+          {isChatComposerOpen ? (
             <ChatComposerOverlay
               onDismiss={chatPanelDispatch.collapseComposer}
             />
@@ -236,12 +248,12 @@ function AppShellComponent({
           p={0}
           bg="transparent"
           style={
-            isChatPanelOpen && chatPanelLayout === "composer"
+            isChatComposerOpen
               ? {
                   width: ASIDE_COMPOSER_WIDTH,
                   zIndex: APP_CHROME_Z_INDEX + 1,
                 }
-              : undefined
+              : { zIndex: APP_CHAT_ASIDE_Z_INDEX }
           }
         >
           {showChatPanel && isChatPanelAvailable ? <ChatPanel /> : null}

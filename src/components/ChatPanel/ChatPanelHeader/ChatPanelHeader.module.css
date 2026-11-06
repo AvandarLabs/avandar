@@ -1,3 +1,14 @@
+/*
+ * Same white band and bottom rule as the slate toolbar, so the line runs
+ * unbroken from the view into the chat.
+ */
 .chatPanelHeader {
-  border-bottom: 1px solid var(--ava-border-default);
+  background-color: var(--mantine-color-white);
+  border-bottom: 1px solid var(--mantine-color-neutral-2);
+  flex-shrink: 0;
+}
+
+/* The collapse icon points toward the edge the panel slides out through. */
+:global([dir="rtl"]) .chatPanelHeaderCloseIcon {
+  transform: scaleX(-1);
 }

@@ -56,7 +56,7 @@ export function AppSlate({
   return (
     <Flex
       direction="column"
-      p="xs"
+      className={css.frame}
       // On desktop, drop the Flex's top padding so the drag spacer below
       // sits flush against the bottom of the AppShell header — otherwise the
       // 8px gap between them is a dead zone in the title-bar drag region.

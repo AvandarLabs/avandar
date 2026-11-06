@@ -1,13 +1,42 @@
 .userMessageRow {
   align-self: flex-end;
+  animation: user-message-in var(--ava-animation-duration-normal)
+    var(--ava-animation-easing-out);
   display: flex;
   justify-content: flex-end;
   max-width: 85%;
 }
 
+/*
+ * Pale Blue Wash with ink text: the user's own words are marked as theirs
+ * without a solid blue block competing with the one filled action (Send).
+ * The tighter inline-end bottom corner points the bubble at its sender.
+ */
 .userMessageBubble {
-  background: var(--mantine-color-primary-6);
-  border-radius: var(--mantine-radius-md);
-  color: var(--mantine-color-white);
+  background: var(--mantine-color-primary-0);
+  border: 1px solid var(--mantine-color-primary-1);
+  border-end-end-radius: var(--mantine-radius-xs);
+  border-end-start-radius: var(--mantine-radius-lg);
+  border-start-end-radius: var(--mantine-radius-lg);
+  border-start-start-radius: var(--mantine-radius-lg);
+  color: var(--mantine-color-neutral-9);
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+}
+
+@keyframes user-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .userMessageRow {
+    animation: none;
+  }
 }
