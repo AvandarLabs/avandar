@@ -44,7 +44,11 @@ values
 
 update public.comments set deleted_at = now() where id = 'e2500002-0000-4000-8000-000000000002'::uuid;
 
-select plan (13);
+-- The author's own reaction, which another member must not change or remove.
+insert into public.comment_reactions (id, comment_id, user_id, workspace_id, kind)
+values ('e2600001-0000-4000-8000-000000000001'::uuid, 'e2500001-0000-4000-8000-000000000001'::uuid, 'e2000001-0000-4000-8000-000000000001'::uuid, 'e2100001-0000-4000-8000-000000000001'::uuid, 'like');
+
+select plan (16);
 
 -- 1. A member reads a teammate's comment and the case activity.
 select lives_ok (
@@ -240,6 +244,60 @@ select throws_ok (
   '42501',
   null,
   'authenticated cannot insert mentions'
+);
+
+-- 14. A member's update of someone else's reaction changes nothing.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  update public.comment_reactions set kind = 'funny' where id = 'e2600001-0000-4000-8000-000000000001'::uuid;
+  reset role;
+  do $chk$
+  begin
+    if (select kind::text from public.comment_reactions where id = 'e2600001-0000-4000-8000-000000000001'::uuid) <> 'like' then
+      raise exception 'a member changed someone else''s reaction';
+    end if;
+  end $chk$;
+  $t$,
+  'a member cannot change someone else''s reaction'
+);
+
+-- 15. A member's delete of someone else's reaction removes nothing.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  delete from public.comment_reactions where id = 'e2600001-0000-4000-8000-000000000001'::uuid;
+  reset role;
+  do $chk$
+  begin
+    if not exists (select 1 from public.comment_reactions where id = 'e2600001-0000-4000-8000-000000000001'::uuid) then
+      raise exception 'a member removed someone else''s reaction';
+    end if;
+  end $chk$;
+  $t$,
+  'a member cannot remove someone else''s reaction'
+);
+
+-- 16. A member's soft delete of someone else's comment changes nothing.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e2000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  update public.comments set deleted_at = now() where id = 'e2500001-0000-4000-8000-000000000001'::uuid;
+  reset role;
+  do $chk$
+  begin
+    if (select deleted_at from public.comments where id = 'e2500001-0000-4000-8000-000000000001'::uuid) is not null then
+      raise exception 'a member deleted someone else''s comment';
+    end if;
+  end $chk$;
+  $t$,
+  'only the author can delete a comment'
 );
 
 select * from finish ();

@@ -55,7 +55,7 @@ values (
   'first'
 );
 
-select plan (16);
+select plan (20);
 
 -- 1. Insert writes one comment_created event.
 select is (
@@ -239,6 +239,77 @@ select is (
   (select count(*)::int from public.activity_events e where e.comment_id = 'e1500002-0000-4000-8000-000000000002'::uuid),
   0,
   'deleting the case cascades to its comments and activity'
+);
+
+-- 17. A mention inside a blockquote is extracted.
+insert into public.comments (id, workspace_id, individual_id, author_user_id, body, body_text)
+values (
+  'e1500003-0000-4000-8000-000000000003'::uuid,
+  'e1100001-0000-4000-8000-000000000001'::uuid,
+  'e1400001-0000-4000-8000-000000000001'::uuid,
+  'e1000001-0000-4000-8000-000000000001'::uuid,
+  '{"type":"doc","content":[{"type":"blockquote","content":[{"type":"paragraph","content":[
+    {"type":"userMention","attrs":{"id":"e1000002-0000-4000-8000-000000000002"}}
+  ]}]}]}'::jsonb,
+  '@member'
+);
+select is (
+  (
+    select array_agg(m.mentioned_user_id)
+    from public.comment_mentions m
+    where m.comment_id = 'e1500003-0000-4000-8000-000000000003'::uuid
+  ),
+  array['e1000002-0000-4000-8000-000000000002'::uuid],
+  'a member mentioned inside a blockquote is extracted'
+);
+
+-- 18. A comment cannot move to another case, even in its own workspace.
+insert into public.individuals (id, workspace_id, name, concept_id, external_id)
+values ('e1400004-0000-4000-8000-000000000004'::uuid, 'e1100001-0000-4000-8000-000000000001'::uuid, 'Case four', 'e1300001-0000-4000-8000-000000000001'::uuid, 'ext-4')
+on conflict (id) do nothing;
+select throws_ok (
+  $$
+  update public.comments
+  set individual_id = 'e1400004-0000-4000-8000-000000000004'::uuid
+  where id = 'e1500003-0000-4000-8000-000000000003'::uuid
+  $$,
+  '22023',
+  null,
+  'a comment cannot be moved to another case'
+);
+
+-- 19. A comment must have a subject.
+select throws_ok (
+  $$
+  insert into public.comments (workspace_id, individual_id, author_user_id, body, body_text)
+  values (
+    'e1100001-0000-4000-8000-000000000001'::uuid,
+    null,
+    'e1000001-0000-4000-8000-000000000001'::uuid,
+    '{"type":"doc"}'::jsonb,
+    ''
+  )
+  $$,
+  '23514',
+  'new row for relation "comments" violates check constraint "comments__exactly_one_subject"',
+  'a comment without a case is rejected'
+);
+
+-- 20. A document over 256 KB is rejected.
+select throws_ok (
+  $$
+  insert into public.comments (workspace_id, individual_id, author_user_id, body, body_text)
+  values (
+    'e1100001-0000-4000-8000-000000000001'::uuid,
+    'e1400001-0000-4000-8000-000000000001'::uuid,
+    'e1000001-0000-4000-8000-000000000001'::uuid,
+    jsonb_build_object('type', 'doc', 'pad', repeat('x', 300000)),
+    'short'
+  )
+  $$,
+  '23514',
+  'new row for relation "comments" violates check constraint "comments__body_size"',
+  'body is capped at 256 KB'
 );
 
 select * from finish ();
