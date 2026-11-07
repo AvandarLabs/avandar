@@ -5,7 +5,10 @@ import {
   fetchRowsForInvocation,
   MAX_FETCH_ROWS_LIMIT,
 } from "@/lib/plugins/fetchRowsForInvocation/fetchRowsForInvocation";
-import { QueryHandleRegistry } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
+import {
+  MAX_LIVE_QUERY_HANDLES,
+  QueryHandleRegistry,
+} from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
 import type { QueryHandle } from "@avandar/plugin-sdk";
 
 const ROWS = [
@@ -92,10 +95,54 @@ describe("fetchRowsForInvocation", () => {
     expect(result.isTruncated).toBe(true);
   });
 
+  it("returns the default limit of rows when the limit is NaN", () => {
+    const rows = _makeNumberedRows(DEFAULT_FETCH_ROWS_LIMIT + 1);
+
+    const result = _fetchRowsFromRows({ rows, limit: Number.NaN });
+
+    expect(result.rows).toHaveLength(DEFAULT_FETCH_ROWS_LIMIT);
+  });
+
+  it("reports truncation when the limit is NaN and rows exceed the default", () => {
+    const rows = _makeNumberedRows(DEFAULT_FETCH_ROWS_LIMIT + 1);
+
+    const result = _fetchRowsFromRows({ rows, limit: Number.NaN });
+
+    expect(result.isTruncated).toBe(true);
+  });
+
+  it("clamps an infinite limit to the maximum", () => {
+    const rows = _makeNumberedRows(MAX_FETCH_ROWS_LIMIT + 1);
+
+    const result = _fetchRowsFromRows({ rows, limit: Infinity });
+
+    expect(result.rows).toHaveLength(MAX_FETCH_ROWS_LIMIT);
+  });
+
   it("clamps a limit below one to one row", () => {
     const result = _fetchRowsFromRows({ rows: ROWS, limit: 0 });
 
     expect(result.rows).toEqual([{ x: 1 }]);
+  });
+
+  it("yields undefined for a requested column absent from the rows", () => {
+    const result = fetchRowsForInvocation({
+      invocationHandle: QueryHandleRegistry.getOrCreate(ROWS),
+      queryHandle: QueryHandleRegistry.getOrCreate(ROWS),
+      columns: ["missing"],
+    });
+
+    expect(result.rows[0]).toStrictEqual({ missing: undefined });
+  });
+
+  it("yields undefined for an inherited property name", () => {
+    const result = fetchRowsForInvocation({
+      invocationHandle: QueryHandleRegistry.getOrCreate(ROWS),
+      queryHandle: QueryHandleRegistry.getOrCreate(ROWS),
+      columns: ["toString"],
+    });
+
+    expect(result.rows[0]).toStrictEqual({ toString: undefined });
   });
 
   it("rejects a handle from another invocation", () => {
@@ -111,6 +158,37 @@ describe("fetchRowsForInvocation", () => {
     });
 
     expect(code).toBe("PermissionDenied");
+  });
+
+  it("rejects an unregistered handle that is not the invocation handle", () => {
+    const invocationHandle = QueryHandleRegistry.getOrCreate(ROWS);
+
+    const code = _getPluginErrorCode(() => {
+      return fetchRowsForInvocation({
+        invocationHandle,
+        queryHandle: "never-registered" as QueryHandle,
+        columns: ["x"],
+      });
+    });
+
+    expect(code).toBe("PermissionDenied");
+  });
+
+  it("rejects the invocation handle when its rows were evicted", () => {
+    const evictedHandle = QueryHandleRegistry.getOrCreate([{ x: 0 }]);
+    Array.from({ length: MAX_LIVE_QUERY_HANDLES }, (_unused, rowIndex) => {
+      return QueryHandleRegistry.getOrCreate([{ x: rowIndex }]);
+    });
+
+    const code = _getPluginErrorCode(() => {
+      return fetchRowsForInvocation({
+        invocationHandle: evictedHandle,
+        queryHandle: evictedHandle,
+        columns: ["x"],
+      });
+    });
+
+    expect(code).toBe("InvalidHandle");
   });
 
   it("rejects the invocation handle when its rows are no longer held", () => {

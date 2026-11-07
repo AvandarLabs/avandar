@@ -1,7 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { makeQueryHandleRegistry } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
+import type { QueryHandle } from "@avandar/plugin-sdk";
 
 const ROWS = [{ x: 1 }, { x: 2 }];
+
+function _registerFreshRowSets(options: {
+  registry: ReturnType<typeof makeQueryHandleRegistry>;
+  numRowSets: number;
+}): QueryHandle[] {
+  return Array.from({ length: options.numRowSets }, (_unused, rowIndex) => {
+    return options.registry.getOrCreate([{ x: rowIndex }]);
+  });
+}
 
 describe("makeQueryHandleRegistry", () => {
   it("returns the same handle for the same rows", () => {
@@ -44,9 +54,7 @@ describe("makeQueryHandleRegistry", () => {
     const registry = makeQueryHandleRegistry({ maxLiveHandles: 3 });
     const oldestHandle = registry.getOrCreate(ROWS);
 
-    for (let rowIndex = 0; rowIndex < 3; rowIndex += 1) {
-      registry.getOrCreate([{ x: rowIndex }]);
-    }
+    _registerFreshRowSets({ registry, numRowSets: 3 });
 
     expect(registry.getRows(oldestHandle)).toBeUndefined();
   });
@@ -54,9 +62,7 @@ describe("makeQueryHandleRegistry", () => {
   it("keeps serving the newest handle once the live limit is exceeded", () => {
     const registry = makeQueryHandleRegistry({ maxLiveHandles: 3 });
     const newestRows = [{ x: 99 }];
-    for (let rowIndex = 0; rowIndex < 3; rowIndex += 1) {
-      registry.getOrCreate([{ x: rowIndex }]);
-    }
+    _registerFreshRowSets({ registry, numRowSets: 3 });
 
     const newestHandle = registry.getOrCreate(newestRows);
 
@@ -66,9 +72,7 @@ describe("makeQueryHandleRegistry", () => {
   it("makes evicted rows readable again when they are requested again", () => {
     const registry = makeQueryHandleRegistry({ maxLiveHandles: 3 });
     registry.getOrCreate(ROWS);
-    for (let rowIndex = 0; rowIndex < 3; rowIndex += 1) {
-      registry.getOrCreate([{ x: rowIndex }]);
-    }
+    _registerFreshRowSets({ registry, numRowSets: 3 });
 
     const reissuedHandle = registry.getOrCreate(ROWS);
 
@@ -78,9 +82,7 @@ describe("makeQueryHandleRegistry", () => {
   it("reuses the original handle when evicted rows are requested again", () => {
     const registry = makeQueryHandleRegistry({ maxLiveHandles: 3 });
     const originalHandle = registry.getOrCreate(ROWS);
-    for (let rowIndex = 0; rowIndex < 3; rowIndex += 1) {
-      registry.getOrCreate([{ x: rowIndex }]);
-    }
+    _registerFreshRowSets({ registry, numRowSets: 3 });
 
     expect(registry.getOrCreate(ROWS)).toBe(originalHandle);
   });

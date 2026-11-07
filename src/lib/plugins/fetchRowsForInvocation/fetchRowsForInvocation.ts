@@ -10,13 +10,18 @@ export const MAX_FETCH_ROWS_LIMIT = 200_000;
 
 function _clampLimit(requestedLimit: number | undefined): number {
   const flooredLimit = Math.floor(requestedLimit ?? DEFAULT_FETCH_ROWS_LIMIT);
-  return Math.min(Math.max(flooredLimit, 1), MAX_FETCH_ROWS_LIMIT);
+  const limit = Number.isNaN(flooredLimit)
+    ? DEFAULT_FETCH_ROWS_LIMIT
+    : flooredLimit;
+  return Math.min(Math.max(limit, 1), MAX_FETCH_ROWS_LIMIT);
 }
 
 /**
  * Implements `avandar.data.fetchRows` under `data:context`: only the handle
  * of the current invocation is readable, and only the requested columns are
- * returned. A limit above `MAX_FETCH_ROWS_LIMIT` is clamped to it.
+ * returned, read from each row's own properties. A limit above
+ * `MAX_FETCH_ROWS_LIMIT` is clamped to it, and a NaN limit is treated as not
+ * provided.
  */
 export function fetchRowsForInvocation(options: {
   invocationHandle: QueryHandle;
@@ -42,7 +47,7 @@ export function fetchRowsForInvocation(options: {
   const projectedRows = rows.slice(0, limit).map((row) => {
     return Object.fromEntries(
       columns.map((column) => {
-        return [column, row[column]];
+        return [column, Object.hasOwn(row, column) ? row[column] : undefined];
       }),
     );
   });

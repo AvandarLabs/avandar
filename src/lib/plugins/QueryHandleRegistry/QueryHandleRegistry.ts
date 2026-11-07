@@ -8,20 +8,19 @@ type QueryHandleRegistryApi = Readonly<{
 }>;
 
 /** How many query handles the app-wide registry keeps readable at once. */
-const MAX_LIVE_QUERY_HANDLES = 10;
+export const MAX_LIVE_QUERY_HANDLES = 10;
 
 function _evictOldestHandles(options: {
   rowsByHandle: Map<QueryHandle, readonly UnknownRow[]>;
   maxLiveHandles: number;
 }): void {
   const { rowsByHandle, maxLiveHandles } = options;
-  while (rowsByHandle.size > maxLiveHandles) {
-    const oldestHandle = rowsByHandle.keys().next().value;
-    if (oldestHandle === undefined) {
-      return;
-    }
-    rowsByHandle.delete(oldestHandle);
-  }
+  const numHandlesToEvict = Math.max(0, rowsByHandle.size - maxLiveHandles);
+  [...rowsByHandle.keys()]
+    .slice(0, numHandlesToEvict)
+    .forEach((oldestHandle) => {
+      rowsByHandle.delete(oldestHandle);
+    });
 }
 
 /**
