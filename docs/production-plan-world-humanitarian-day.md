@@ -345,6 +345,15 @@ Postgres/direct-DB source type.** Open-data catalog is generic + Beta with
   Today each browser tries a listing at most once per page load, and
   concurrent verifications write the same result, so the cost is duplicate
   work, not wrong data.
+- P6.8 `[NEW]` **Ask about an Open Data Catalog (ODC) listing before adding
+  it**: let a user ask Ava questions about an ODC dataset straight from the
+  ODC page, without first adding it to the workspace. The ODC page already
+  reads a listing's first 200 rows for its data preview without adding it
+  (`fetchCatalogListingPreview`), so the open questions are how chat
+  addresses a relation that is not a workspace dataset (an ODC listing is a
+  relation, not a dataset: `docs/measles-demo/connector-nomenclature.md`),
+  how much of it a query may read, and what a chat session that cites it
+  keeps once the listing is never added. Needs P10's app-wide chat.
 - `[Depends on: P0 (live-source extractors P0.8) for Sheets/Postgres; pipeline
   framework already exists for HDX]`
 
