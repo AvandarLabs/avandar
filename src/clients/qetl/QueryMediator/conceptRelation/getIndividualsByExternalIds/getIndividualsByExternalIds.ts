@@ -14,12 +14,18 @@ export const MAX_EXTERNAL_IDS_PER_READ = 50;
  * Whether a key can travel inside a PostgREST `in` list unchanged.
  *
  * `postgrest-js` wraps a list value in double quotes when it holds `,`, `(`,
- * or `)`, but never escapes a `"` or a `\` inside it, and PostgREST reads both
- * as list syntax. A key holding either is read with an equality filter
- * instead, whose value PostgREST takes verbatim.
+ * or `)`, but never escapes a `"` or a `\` inside it, and a `"` or `\` can
+ * change how PostgREST reads a value. PostgREST also drops spaces and tabs
+ * right after `in.(`, so a key that starts with one could be read as a
+ * different key. Such keys are read with an equality filter instead, whose
+ * value PostgREST takes verbatim.
  */
 function _isListSafeExternalId(externalId: string): boolean {
-  return !externalId.includes('"') && !externalId.includes("\\");
+  return (
+    !/^[ \t]/.test(externalId) &&
+    !externalId.includes('"') &&
+    !externalId.includes("\\")
+  );
 }
 
 function _splitIntoBatches(externalIds: readonly string[]): string[][] {

@@ -57,6 +57,22 @@ describe("getIndividualsByExternalIds", () => {
     ]);
   });
 
+  // PostgREST drops spaces and tabs right after `in.(`, so a key that starts
+  // with one could be read as a different key. An equality filter takes it
+  // verbatim.
+  it("reads a key that starts with a space or a tab with an equality filter of its own", async () => {
+    await getIndividualsByExternalIds({
+      conceptId: CONCEPT_ID,
+      externalIds: [" p1", "p2", "\tp3"],
+    });
+
+    expect(_getReadFilters()).toEqual([
+      { concept_id: { eq: CONCEPT_ID }, external_id: { in: ["p2"] } },
+      { concept_id: { eq: CONCEPT_ID }, external_id: { eq: " p1" } },
+      { concept_id: { eq: CONCEPT_ID }, external_id: { eq: "\tp3" } },
+    ]);
+  });
+
   it("reads each key once when the caller names it twice", async () => {
     await getIndividualsByExternalIds({
       conceptId: CONCEPT_ID,
