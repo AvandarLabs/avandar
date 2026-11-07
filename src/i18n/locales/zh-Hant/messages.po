@@ -2321,10 +2321,6 @@ msgstr "工作區名稱是必填的"
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "發生未預期的錯誤。您可以再試一次，或返回首頁。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "I ran the query, but it returned no rows."
-msgstr "我已執行查詢，但沒有傳回任何列。"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "儲存網址"
@@ -8965,6 +8961,10 @@ msgstr "您目前的計畫僅支援最多 {0} 個資料集。升級到我們的�
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig.tsx
 msgid "Prompt"
 msgstr "提示"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but no data matched it."
+msgstr "我執行了查詢，但沒有符合的資料。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx

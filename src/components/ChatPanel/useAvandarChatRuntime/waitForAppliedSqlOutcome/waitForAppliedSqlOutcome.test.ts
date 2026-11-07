@@ -69,6 +69,34 @@ describe("waitForAppliedSqlOutcome", () => {
     await expect(outcome).resolves.toBe("empty");
   });
 
+  it("resolves empty when every value in the result is blank, as a SUM over no rows is", async () => {
+    const outcome = _wait();
+    _observe(_makeDataQueryKey(WORKSPACE_ID, SQL), async () => {
+      return {
+        id: "result",
+        columns: [],
+        data: [{ total_deaths: null }],
+        numRows: 1,
+      };
+    });
+
+    await expect(outcome).resolves.toBe("empty");
+  });
+
+  it("resolves rows when a result row holds a value next to blanks", async () => {
+    const outcome = _wait();
+    _observe(_makeDataQueryKey(WORKSPACE_ID, SQL), async () => {
+      return {
+        id: "result",
+        columns: [],
+        data: [{ state: "American Samoa", total_cases: null }],
+        numRows: 1,
+      };
+    });
+
+    await expect(outcome).resolves.toBe("rows");
+  });
+
   it("resolves failed when the explorer query errors", async () => {
     const outcome = _wait();
     _observe(_makeDataQueryKey(WORKSPACE_ID, SQL), async () => {

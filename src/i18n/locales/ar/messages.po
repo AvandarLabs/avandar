@@ -2379,10 +2379,6 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "حدث خطأ غير متوقع. يمكنك المحاولة مرة أخرى أو العودة إلى الصفحة "
 "الرئيسية."
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "I ran the query, but it returned no rows."
-msgstr "شغّلت الاستعلام، لكنه لم يُرجع أي صفوف."
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "حفظ عنوان URL"
@@ -9170,6 +9166,10 @@ msgstr "الخطة الحالية الخاصة بك تدعم فقط حتى {0} �
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig.tsx
 msgid "Prompt"
 msgstr "المطالبة"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but no data matched it."
+msgstr "شغّلت الاستعلام، لكن لم تتطابق معه أي بيانات."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
