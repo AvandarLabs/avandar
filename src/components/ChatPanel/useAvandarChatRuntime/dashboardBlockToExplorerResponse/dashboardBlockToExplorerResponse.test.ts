@@ -8,7 +8,7 @@ describe("dashboardBlockToExplorerResponse", () => {
   it("turns a chart block into SQL for the explorer and the chart type to show", () => {
     const converted = dashboardBlockToExplorerResponse(
       Model.make("ChatResponse", {
-        assistantText: 'Added "US deaths over time" to your dashboard as a line.',
+        assistantText: "Monthly US deaths over the whole period.",
         dashboardBlock: {
           kind: "DataViz",
           prompt: "US deaths over time",
@@ -22,7 +22,7 @@ describe("dashboardBlockToExplorerResponse", () => {
       kind: "chart",
       vizType: "line",
       response: Model.make("ChatResponse", {
-        assistantText: "",
+        assistantText: "Monthly US deaths over the whole period.",
         generatedSql: { sql: SQL, prompt: "US deaths over time" },
       }),
     });

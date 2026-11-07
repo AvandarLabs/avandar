@@ -7,7 +7,7 @@ import type { ChatDashboardVizType } from "$/types/chat.types";
  * dashboard to add a block to.
  *
  * - `chart`: a chart block, turned into SQL for the explorer to run, plus the
- *   chart type to show its result as.
+ *   chart type to show its result as. The model's own text stays the reply.
  * - `dashboard_only`: a block only a dashboard can hold, such as a heading.
  * - `unchanged`: no dashboard block.
  */
@@ -35,7 +35,7 @@ export function dashboardBlockToExplorerResponse(
       kind: "chart",
       vizType: block.vizType,
       response: Model.make("ChatResponse", {
-        assistantText: "",
+        assistantText: response.assistantText,
         generatedSql: { sql: block.sql, prompt: block.prompt },
       }),
     };

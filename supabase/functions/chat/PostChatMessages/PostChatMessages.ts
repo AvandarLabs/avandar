@@ -211,7 +211,12 @@ export const PostChatMessages = POST({
           return clarification.question;
         }
         if (dashboardBlock) {
-          return dashboardBlockSummary(dashboardBlock);
+          // Outside a dashboard the client shows the block another way (a
+          // chart runs in the Data Explorer), so "added to your dashboard"
+          // would be untrue there.
+          return context.app === "dashboards"
+            ? dashboardBlockSummary(dashboardBlock)
+            : "";
         }
         if (createdCaseTypes && createdCaseTypes.length > 0) {
           return createdCaseTypes

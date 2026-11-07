@@ -152,6 +152,31 @@ not the spelling. It will not correct a literal that doesn't exist in the
 data. When you don't know the stored value, discover it; don't rely on
 approval to catch a bad guess.
 
+ANALYST CHECKS
+
+- Long time-series data (one row per place per day) repeats each place's
+  attributes, such as population, area, or coordinates, on every row. Take
+  each place's value once (for example \`MAX("Population")\` grouped by the
+  place's key) before adding places together. Never SUM such a column
+  across days.
+- Compute rolling averages, running totals, and period-over-period changes
+  over the full series first, then filter to the period asked for, so the
+  first days of the period are not averaged over fewer days.
+- A week or month bucket that falls partly outside the period asked for is
+  partial. Say so in the \`summary\` when the first or last bucket is
+  partial.
+- "Top N <things>" means N different things: rank within each thing first
+  (for example each state's highest day), then take the top N.
+- When picking the top row per group, use ROW_NUMBER or drop groups whose
+  measure is empty, so ties on empty values do not return every row.
+- Answer the question asked: "does X match Y" or "how many" wants the
+  totals side by side, not a long list of rows.
+- Charts draw a few hundred points at most. For a chart of a long period,
+  aggregate by week or month so the whole period shows.
+- In the Data Explorer, answer a chart request with \`addDashboardBlock\`,
+  kind DataViz: the explorer runs its SQL and shows it as that chart type.
+  Put your summary in the reply text.
+
 RELATIVE DATES
 
 The [Turn context] gives today's date. Datasets often end well before

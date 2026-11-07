@@ -40,7 +40,7 @@ describe("useAvandarChatRuntime chart blocks in the Data Explorer", () => {
     await renderAppAt("/alpha/data-explorer");
     apiPostMock.mockResolvedValueOnce(
       Model.make("ChatResponse", {
-        assistantText: 'Added "Cases over time" to your dashboard as a line.',
+        assistantText: "Weekly cases over the whole period.",
         dashboardBlock: {
           kind: "DataViz",
           prompt: "Cases over time",
@@ -58,7 +58,7 @@ describe("useAvandarChatRuntime chart blocks in the Data Explorer", () => {
       );
     });
     expect(harness.explorerState?.vizConfig.vizType).toBe("line");
-    expect(getLastAssistantText()).not.toMatch(/dashboard/i);
+    expect(getLastAssistantText()).toBe("Weekly cases over the whole period.");
   });
 
   it("says a heading block needs a dashboard instead of claiming it was added", async () => {
