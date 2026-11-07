@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makeOptimizeDepsEntriesFromPlugins } from "./makeOptimizeDepsEntries";
+import { makeOptimizeDepsEntriesFromPlugins } from "./makeOptimizeDepsEntriesFromPlugins";
 import type { PluginDirectory } from "@avandar/plugin-manifest/node";
 
 // A partial fixture: it carries only the field the entries read, so the cast

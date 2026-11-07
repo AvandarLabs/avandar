@@ -194,6 +194,28 @@ describe("makePluginApi", () => {
     expect(await screen.findByText("rows: 2")).toBeInTheDocument();
   });
 
+  it("opens no modal for an api made before the host unmounted", async () => {
+    render(<ModalsProvider>{null}</ModalsProvider>);
+    const previousHost = render(<PluginDrawerHost />);
+    const staleApi = _makeApiFromRows();
+    previousHost.unmount();
+    render(<PluginDrawerHost />);
+    act(() => {
+      _makeApiFromRows().ui.openModal({
+        title: "Fresh",
+        content: <p>fresh body</p>,
+      });
+    });
+    await screen.findByText("fresh body");
+
+    act(() => {
+      staleApi.ui.openModal({ title: "Stale", content: <p>stale body</p> });
+    });
+
+    expect(screen.getByText("fresh body")).toBeInTheDocument();
+    expect(screen.queryByText("stale body")).not.toBeInTheDocument();
+  });
+
   it("names the modal's close button", async () => {
     render(<ModalsProvider>{null}</ModalsProvider>);
 

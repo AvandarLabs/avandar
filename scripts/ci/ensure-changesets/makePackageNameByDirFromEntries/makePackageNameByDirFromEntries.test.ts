@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { createPackageDirToName } from "./createPackageDirToName";
+import { makePackageNameByDirFromEntries } from "./makePackageNameByDirFromEntries";
 
-describe("createPackageDirToName", () => {
+describe("makePackageNameByDirFromEntries", () => {
   it("maps each package directory to its package name", () => {
-    const result = createPackageDirToName([
+    const result = makePackageNameByDirFromEntries([
       {
         packageDir: "packages/web/ui",
         packageJson: { name: "@avandar/ui" },
@@ -20,7 +20,7 @@ describe("createPackageDirToName", () => {
   });
 
   it("excludes private packages", () => {
-    const result = createPackageDirToName([
+    const result = makePackageNameByDirFromEntries([
       {
         packageDir: "packages/web/ui",
         packageJson: { name: "@avandar/ui" },
@@ -34,7 +34,7 @@ describe("createPackageDirToName", () => {
   });
 
   it("returns an empty map when every package is private", () => {
-    const result = createPackageDirToName([
+    const result = makePackageNameByDirFromEntries([
       {
         packageDir: "packages/web/plugin-sdk",
         packageJson: { name: "@avandar/plugin-sdk", private: true },

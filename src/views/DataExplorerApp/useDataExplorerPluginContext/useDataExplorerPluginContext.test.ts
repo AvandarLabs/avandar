@@ -48,6 +48,32 @@ function _renderWithSettledResult(): RenderHookResult<
   });
 }
 
+type RunState = { isLoadingResults: boolean; hasResults: boolean };
+
+const SETTLED_RUN_STATE: RunState = {
+  isLoadingResults: false,
+  hasResults: true,
+};
+
+/**
+ * Renders the hook on a settled result, so a test can rerender it with the
+ * `RunState` of a later run.
+ */
+function _renderWithRunStates(): RenderHookResult<
+  ReturnType<typeof useDataExplorerPluginContext>,
+  RunState
+> {
+  return renderHook(
+    (runState: RunState) => {
+      return useDataExplorerPluginContext({
+        queryResults: runState.hasResults ? QUERY_RESULTS : undefined,
+        isLoadingResults: runState.isLoadingResults,
+      });
+    },
+    { initialProps: SETTLED_RUN_STATE },
+  );
+}
+
 describe("useDataExplorerPluginContext", () => {
   beforeEach(() => {
     QueryHandleRegistry.clear();
@@ -78,6 +104,33 @@ describe("useDataExplorerPluginContext", () => {
 
     expect(result.current.getContext).toBeUndefined();
     expect(result.current.facts).toMatchObject({ hasResult: false });
+  });
+
+  it("keeps the last settled facts while a new run is loading", () => {
+    const { result, rerender } = _renderWithRunStates();
+    const settledFacts = result.current.facts;
+
+    rerender({ isLoadingResults: true, hasResults: false });
+
+    expect(result.current.getContext).toBeUndefined();
+    expect(result.current.facts).toBe(settledFacts);
+    expect(result.current.facts).toMatchObject({
+      hasResult: true,
+      rowCount: 2,
+      numericColumnCount: 1,
+    });
+  });
+
+  it("clears the facts when a run settles with no result", () => {
+    const { result, rerender } = _renderWithRunStates();
+
+    rerender({ isLoadingResults: true, hasResults: false });
+    rerender({ isLoadingResults: false, hasResults: false });
+
+    expect(result.current.facts).toMatchObject({
+      hasResult: false,
+      rowCount: 0,
+    });
   });
 
   it("builds the toolbar context and facts from a settled result", () => {

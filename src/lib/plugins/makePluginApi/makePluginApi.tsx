@@ -32,13 +32,21 @@ function _makeUiApi(
     pluginName: string;
     wrapContent: (content: ReactNode) => ReactNode;
 
-    /** The drawer generation the API was made in. */
-    drawerGeneration: number;
+    /** The drawer host generation the API was made in. */
+    hostGeneration: number;
   }>,
 ): AvandarApi["ui"] {
-  const { pluginName, wrapContent, drawerGeneration } = options;
+  const { pluginName, wrapContent, hostGeneration } = options;
+  // A command can outlive the workspace it started in. Its modal or drawer
+  // must not appear in the next workspace.
+  const isFromCurrentHost = (): boolean => {
+    return PluginDrawerStore.getGeneration() === hostGeneration;
+  };
   return {
     openModal: ({ title, content }) => {
+      if (!isFromCurrentHost()) {
+        return;
+      }
       modals.open({
         title,
         size: "lg",
@@ -47,9 +55,7 @@ function _makeUiApi(
       });
     },
     openDrawer: ({ title, content }) => {
-      // A command can outlive the workspace it started in. Its drawer must
-      // not appear in the next workspace.
-      if (PluginDrawerStore.getGeneration() !== drawerGeneration) {
+      if (!isFromCurrentHost()) {
         return;
       }
       PluginDrawerStore.open({ title, content: wrapContent(content) });
@@ -68,9 +74,9 @@ function _makeUiApi(
  * Makes the `avandar` object one command invocation receives, scoped to the
  * plugin, the workspace, and the query result the command was invoked on.
  * `runPluginCommand` calls it once per invocation and passes the result to the
- * plugin's command handler. Its `openDrawer` does nothing once the drawer host
- * has unmounted, so a command left running by a workspace switch cannot open a
- * drawer in the next workspace.
+ * plugin's command handler. Its `openModal` and `openDrawer` do nothing once
+ * the drawer host has unmounted, so a command left running by a workspace
+ * switch cannot open a modal or a drawer in the next workspace.
  *
  * It pulls in the plugin SDK runtime and Lingui's message compiler, so import
  * it lazily, at the time a command runs, to keep them out of the main bundle.
@@ -100,7 +106,7 @@ export function makePluginApi(
     ui: _makeUiApi({
       pluginName,
       wrapContent,
-      drawerGeneration: PluginDrawerStore.getGeneration(),
+      hostGeneration: PluginDrawerStore.getGeneration(),
     }),
     i18n: {
       t: makePluginTranslator({ locale: workspace.locale, messages }),

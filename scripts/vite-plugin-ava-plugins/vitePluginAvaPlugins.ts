@@ -6,7 +6,7 @@ import {
   checkPluginBundle,
   makeChunkSummariesFromBundle,
 } from "./checkPluginBundle/checkPluginBundle";
-import { makeOptimizeDepsEntriesFromPlugins } from "./makeOptimizeDepsEntries/makeOptimizeDepsEntries";
+import { makeOptimizeDepsEntriesFromPlugins } from "./makeOptimizeDepsEntriesFromPlugins/makeOptimizeDepsEntriesFromPlugins";
 import {
   makeIndexModuleSourceFromPlugins,
   makeLocalesModuleSourceFromPlugin,

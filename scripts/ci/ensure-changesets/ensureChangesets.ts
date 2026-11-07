@@ -7,14 +7,14 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { createPackageDirToName } from "./createPackageDirToName/createPackageDirToName";
 import { findLastReleaseCommitSha } from "./findLastReleaseCommitSha/findLastReleaseCommitSha";
 import { getPackageNamesFromChangedFiles } from "./getPackageNamesFromChangedFiles/getPackageNamesFromChangedFiles";
 import { inferBumpType } from "./inferBumpType/inferBumpType";
 import { makeChangesetMarkdown } from "./makeChangesetMarkdown/makeChangesetMarkdown";
-import type { PackageDirEntry } from "./createPackageDirToName/createPackageDirToName";
+import { makePackageNameByDirFromEntries } from "./makePackageNameByDirFromEntries/makePackageNameByDirFromEntries";
 import type { CommitSummary } from "./findLastReleaseCommitSha/findLastReleaseCommitSha";
 import type { SemverBump } from "./inferBumpType/inferBumpType";
+import type { PackageDirEntry } from "./makePackageNameByDirFromEntries/makePackageNameByDirFromEntries";
 
 const REPO_ROOT = process.cwd();
 const CHANGESET_DIR = join(REPO_ROOT, ".changeset");
@@ -47,7 +47,7 @@ function _runGh(args: string[]): string {
 
 /**
  * Maps each publishable `packages/<tier>/<name>` directory to its package.json
- * name. Private packages are left out, see `createPackageDirToName`.
+ * name. Private packages are left out, see `makePackageNameByDirFromEntries`.
  */
 function _loadPackageDirToName(): Map<string, string> {
   const packageEntries = PACKAGE_TIERS.flatMap((tier) => {
@@ -70,7 +70,7 @@ function _loadPackageDirToName(): Map<string, string> {
         };
       });
   });
-  return createPackageDirToName(packageEntries);
+  return makePackageNameByDirFromEntries(packageEntries);
 }
 
 /**

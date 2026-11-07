@@ -10,7 +10,7 @@ export type PackageDirEntry = {
  * listed in the Changesets `ignore` config, and `changeset version` rejects
  * a single changeset that names both ignored and non-ignored packages.
  */
-export function createPackageDirToName(
+export function makePackageNameByDirFromEntries(
   packageEntries: readonly PackageDirEntry[],
 ): Map<string, string> {
   return new Map(
