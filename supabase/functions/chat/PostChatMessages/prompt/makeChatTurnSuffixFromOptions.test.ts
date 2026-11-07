@@ -53,4 +53,18 @@ describe("makeChatTurnSuffixFromOptions", () => {
     });
     expect(suffix).toContain("Today's date: 2026-11-06");
   });
+
+  it("marks the explorer's SQL as possibly older than this conversation", () => {
+    const suffix = makeChatTurnSuffixFromOptions({
+      context: ChatPageContext.createDataExplorerViewContext({
+        lastSql: "select 1",
+        lastError: "boom",
+      }),
+      lastUserPrompt: "how many cases in Texas",
+    });
+    expect(suffix).toMatch(
+      /may come from before this conversation[\s\S]*select 1/,
+    );
+    expect(suffix).toMatch(/last run of that SQL failed[\s\S]*boom/i);
+  });
 });
