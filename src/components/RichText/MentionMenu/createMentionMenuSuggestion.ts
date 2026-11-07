@@ -1,4 +1,5 @@
 import { ReactRenderer } from "@tiptap/react";
+import { GADGET_TYPES } from "$/models/gadgets/Gadget/Gadget";
 import { searchGadgets } from "@/clients/gadgets/searchGadgets/searchGadgets";
 import { buildMentionMenuGroups } from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
 import { MentionMenuList } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList";
@@ -17,14 +18,14 @@ import type { SuggestionProps } from "@tiptap/suggestion";
 /** How long typing must pause before the gadget search runs. */
 const GADGET_SEARCH_DEBOUNCE_MS = 150;
 
-/** Gadget types the search returns rows for, the `@` menu's gadget groups. */
-const GADGET_TYPE_COUNT = 6;
-
-/** The most rows the search returns for one gadget type. */
+/**
+ * The most rows the search returns for one gadget type. Mirrors
+ * `type_position <= 5` in `supabase/schemas/50.rpc_gadgets__search.sql`.
+ */
 const GADGET_SEARCH_ROWS_PER_TYPE = 5;
 
 /** Rows asked of the search: every type's rows, so none is cut off. */
-const GADGET_SEARCH_LIMIT = GADGET_SEARCH_ROWS_PER_TYPE * GADGET_TYPE_COUNT;
+const GADGET_SEARCH_LIMIT = GADGET_SEARCH_ROWS_PER_TYPE * GADGET_TYPES.length;
 
 type GadgetSearchState = {
   gadgets: GadgetSearchResult[];
