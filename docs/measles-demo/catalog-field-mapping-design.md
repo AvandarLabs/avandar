@@ -1,10 +1,11 @@
 # Catalog field mapping: design
 
-Status: approved design, not yet built. Covers the pipelines, the schema,
+Status: approved design, partly built. Covers the pipelines, the schema,
 catalog search's use of the new metadata, and how the catalog shows and
 filters by it. Builds on
 [catalog-search-design.md](catalog-search-design.md), which moved search into
-Postgres and deferred filtering to this document.
+Postgres, and on `feat/catalog-filters`, which added filters, sort, facets,
+and the filter rail; sections 6 and 7 extend that work.
 
 ## 1. Problem
 
@@ -51,11 +52,20 @@ than from a single source field:
 HDX's crawl scopes (`hdxScopes.ts`) also stay in code: they are how the
 pipeline pages through HDX, not a description of a drive.
 
-Catalog search (`465b72ddb`, `e36e0ae9b`) stays as designed: the
-`search_vector` generated column, the trigram index on `display_name`,
-`rpc_data_catalog_listings__search`, `useDataCatalogSearch`, the virtualized
-list, and the detail pane reading its listing by id. Section 6 extends each
-of them.
+Catalog search and the catalog browser stay as built, and sections 6 and 7
+extend them rather than replacing them:
+
+- Server search (`465b72ddb`, `e36e0ae9b`): the `search_vector` generated
+  column, the trigram index on `display_name`, and the detail pane reading
+  its listing by id.
+- Filters, sort, and facets (`c0f7b1954`, `3440d68b6`, merged from
+  `feat/catalog-filters`): `data_catalog_listings__search_matches`, which
+  matches a search and reports whether each listing passes each filter;
+  `rpc_data_catalog_listings__search` (filters by source, format, update
+  window, and loadability, plus a sort); `rpc_data_catalog_listings__search_facets`
+  (each facet counted against every other filter); and the three-pane
+  browser with its filter rail (`DataCatalogFilterRail`), results list, and
+  detail pane.
 
 ## 3. The common metadata schema
 
@@ -306,135 +316,98 @@ mappings from drifting apart.
 
 ## 6. Search and filtering
 
-### 6.1 `rpc_data_catalog_listings__search`
+The filters this design adds follow the pattern `feat/catalog-filters`
+already set: `data_catalog_listings__search_matches` decides what a filter
+keeps, `rpc_data_catalog_listings__search` keeps the rows that pass every
+filter, and `rpc_data_catalog_listings__search_facets` counts the rows that
+pass every filter but one. Adding a filter means adding it in all three,
+through that one match function, so a page and its counts never disagree.
 
-The RPC gains four filter parameters and returns the organization levels in
-place of `external_organization_name` and `pipeline_name`:
+### 6.1 What changes in the existing functions
 
-```sql
-rpc_data_catalog_listings__search(
-  p_query text,
-  p_limit integer default 50,
-  p_offset integer default 0,
-  p_organization1_names text[] default null,
-  p_organization2_names text[] default null,
-  p_domains text[] default null,
-  p_tags text[] default null
-) returns table (
-  id uuid,
-  display_name text,
-  organization1_name text,
-  organization2_name text,
-  organization3_name text,
-  organization4_name text,
-  is_workspace_loadable boolean,
-  is_invalid boolean,
-  total_count bigint
-)
-```
+**The rename.** The match function and the search RPC read and return
+`external_organization_name`; they read and return `organization1_name`.
+The existing "source" filter (`p_sources`, `passes_source`) filters by
+`organization1_name`. Its parameter keeps its name; its docstring says it is
+the level-1 organization.
 
-- A null or empty array is no filter. Values within one filter are ORed and
-  filters are ANDed: `organization1_name = any(p_organization1_names)`,
-  `domains && p_domains`, `tags && p_tags`.
-- Filters apply to blank queries too, so choosing a publisher with an empty
-  search box lists that publisher's catalog by name.
-- Matching, ranking, paging, and privileges are unchanged from
-  `catalog-search-design.md` section 4.
-- The argument list and the return type both change, so the migration drops
-  the old function before creating the new one. `pipeline_name` leaves the
-  list row: it is an internal name ("socrata"), not the user's noun.
+**New parameters** on `data_catalog_listings__search_matches`,
+`rpc_data_catalog_listings__search`, and
+`rpc_data_catalog_listings__search_facets`, each `text[] default '{}'`,
+after the existing filter parameters and before `p_sort_by`:
 
-### 6.2 `rpc_data_catalog_listings__search_facets`
+| Parameter | Keeps a listing when | Pass column |
+|---|---|---|
+| `p_organization2_names` | its `organization2_name` is one of them | `passes_organization2` |
+| `p_domains` | its `domains` overlap them (`&&`) | `passes_domain` |
+| `p_tags` | its `tags` overlap them | `passes_tag` |
 
-The values a user can filter by, with how many listings each would leave,
-for the current query and filters:
+An empty array keeps everything, as for the existing filters. Values within
+one filter are ORed; filters are ANDed.
 
-```sql
-rpc_data_catalog_listings__search_facets(
-  p_query text,
-  p_organization1_names text[] default null,
-  p_organization2_names text[] default null,
-  p_domains text[] default null,
-  p_tags text[] default null
-) returns table (facet text, value text, listing_count bigint)
-```
+**New output columns.** The match function and the search RPC return
+`organization2_name`, `organization3_name`, and `organization4_name` after
+`organization1_name`, so the list can show a listing's organizations without
+reading the full row. The match function also returns `domains`, `tags`,
+and `drive_id`, which the facets need.
+
+**New facets** in `rpc_data_catalog_listings__search_facets`, each counted
+against every other filter but its own, plus each chosen value even at 0,
+as the existing facets are:
 
 | `facet` | `value` | Counted over |
 |---|---|---|
-| `organization1` | A level-1 organization | The query and every filter except `p_organization1_names` |
-| `organization2` | A level-2 organization | The query and every filter except `p_organization2_names` |
-| `organization2_label` | A level-2 label from `data_catalog_drives` | The same listings as `organization2` |
-| `domain` | One element of `domains` | The query and every filter except `p_domains` |
+| `organization2` | A level-2 organization | Rows passing every filter except `passes_organization2` |
+| `organization2_label` | A level-2 label from `data_catalog_drives`, via `drive_id` | The same rows as `organization2` |
+| `domain` | One element of `domains` | Rows passing every filter except `passes_domain` |
 
-Each facet counts over every filter but its own, so an option is never a dead
-end and a chosen value's siblings stay visible to switch to. Each facet
-returns at most its 100 most common values, by count descending then value.
-Tags are not a facet: there are thousands, and a user reaches a tag by
-clicking it on a listing (section 7.3). Same privileges as the search RPC.
+Tags are not a facet: there are thousands, and a user reaches a tag from a
+listing (section 7.3). The existing `source` facet is the level-1 facet.
 
-The query matching repeats the search RPC's two-line condition rather than
-calling a shared function: a function with `set search_path` (which every
-function here has) is never inlined, so the planner could not use the
-`search_vector` or trigram indexes through it. A pgTAP test runs the same
-queries and filters through both RPCs and checks that the facet counts sum to
-the search's `total_count`, so the two cannot drift unnoticed.
+Each signature change means the migration drops the old function before
+creating the new one, as `feat/catalog-filters`'s migration did.
 
 ## 7. The catalog
 
-The catalog keeps its shape: a search field over a two-pane browser, a
-virtualized list on the left, the selected listing on the right
-(`DataCatalogView`). Everything below fits inside that frame and follows
-`DESIGN.md` and `docs/design/app-view-layout.md`.
+The catalog keeps the three-pane browser `feat/catalog-filters` built: the
+filter rail, the results list, and the selected listing. Everything below
+fits inside it and follows `DESIGN.md` and `docs/design/app-view-layout.md`.
 
-### 7.1 The list row
+### 7.1 The results row
 
 ```text
 Active For-Hire Vehicles (FHV)
-Taxi and Limousine Commission (TLC) · City of New York
+Taxi and Limousine Commission (TLC) · City of New York · CSV · Updated Nov 6, 2026
 ```
 
-- The second line is the listing's two deepest organization levels, deepest
-  first, joined by a middot. The deepest level is the one that tells two
-  rows from the same portal apart: on NYC every row is "City of New York",
-  and the agency is the information. A listing with one level shows one.
-- The pipeline name leaves the row.
-- The status line ("Not supported yet", "Can't be loaded") is unchanged.
+- The row's facts line starts with the listing's two deepest organization
+  levels, deepest first, in place of the single external organization it
+  shows today. The format and the update date follow, as they do now.
+- The deepest level is the one that tells two rows from the same portal
+  apart: on NYC every row is "City of New York", and the agency is the
+  information. A listing with one level shows one.
 
-### 7.2 Filters
+### 7.2 Filters in the rail
 
-A filter row sits between the search field and the browser.
+The rail's order becomes: search, **Publisher**, the second-level filter,
+**Topic**, **Keywords**, Format, Last updated, and the loadable switch.
 
-```text
-⌕ Search by name, publisher, topic, or keyword…
-[Publisher ▾] [Agency ▾] [Topic ▾]  Keyword: taxi ×   Clear filters
-```
-
-- **Publisher** filters by `organization1_name`. "Publisher" is the user's
-  noun for level 1 everywhere in the filters, because level-1 labels differ
-  by portal ("City", "State", "Organization") and one filter spans them.
-- **The second-level filter** appears only once a publisher is chosen. Its
-  label is that publisher's level-2 label from the `organization2_label`
-  facet ("Agency"). When the matching drives disagree ("Agency" on
-  data.ny.gov, "Department" on health.data.ny.gov), the labels are joined
-  with " or ".
-- **Topic** filters by `domains`.
-- **Keyword** filters by `tags`. It has no dropdown. Clicking a keyword on a
-  listing (section 7.3) adds it, and each chosen keyword shows as a
-  removable chip in the row.
-- Each dropdown is a searchable Mantine `Select`, `size="xs"`, clearable,
-  with each option's listing count beside it. Single choice per filter for
-  now; the RPC already accepts several.
-- **Chrome is withheld until it earns its line.** A dropdown shows only when
-  its facet has at least two values, or when it has a value chosen (so it can
-  be cleared). With no dropdown and no keyword to show, the row is not
-  rendered. "Clear filters" shows only while a filter is set.
-- The header count ("Catalog (N)") counts what the filters leave.
-- When the filters and query match nothing, the frame's empty message says
-  so and offers the action that undoes the cause: "Clear filters" when a
-  filter is set, "Clear search" otherwise.
-- Filters live in component state alongside the query and reset nothing else
-  when they change. A selected listing stays selected while it is still in
-  the results.
+- **Publisher** is the existing "Source" facet, relabelled. "Publisher" is
+  the user's noun for level 1 everywhere, because level-1 labels differ by
+  portal ("City", "State", "Organization") and one filter spans them.
+- **The second-level filter** is a checkbox facet over `organization2`. It
+  appears only once at least one publisher is chosen and the facet has
+  values, and its label is the `organization2_label` facet's values joined
+  with " or " ("Agency", or "Agency or Department" when the chosen
+  publishers' portals disagree). Unchoosing every publisher clears it.
+- **Topic** is a checkbox facet over `domain`.
+- **Keywords** has no options to browse. A user adds a keyword by clicking it
+  on a listing (section 7.3); the section then shows each chosen keyword as
+  a removable chip, and is not rendered while none is chosen.
+- All three reuse `DataCatalogCheckboxFacet` and its counts, and follow its
+  rules for long option lists. A facet with no values is not rendered.
+- The results header's count and "clear filters" behaviour count the new
+  filters like the existing ones.
 
 ### 7.3 The detail pane
 
@@ -456,6 +429,7 @@ Agency          Taxi and Limousine Commission (TLC)
 ABOUT
 Topics          [Transportation]
 Keywords        [fhv] [for hire] [taxi] [drivers] [active]  +3 more
+Covers          …
 Updates         Daily
 License         …
 
@@ -468,34 +442,31 @@ COLUMNS …
 ▸ Technical details
 ```
 
-- **The facts line** under the title: the organization path (the same rule
-  as the list row) and "Updated {date_of_last_update}". Omitted parts leave
-  no stray separators.
+- **The facts line** under the title uses the organization line from 7.1,
+  then the update date. Omitted parts leave no stray separators.
 - **Description**: plain text in a Mantine `Spoiler` capped at about six
-  lines, with "Show more" and "Show less". A long description no longer
-  pushes the columns off screen.
+  lines, with "Show more" and "Show less".
 - **Published by**: one fact per organization level the listing has, each
   labelled with its drive's label for that level. Without a drive (World
   Bank WDI) or without a label, level 1 is "Organization" and a deeper level
   is "Level {n}".
-- **About**: Topics and Keywords as chips, then Updates, License, Coverage
-  (start to end, when either is set), and Notes. Chips use the small-fill
-  step (`neutral.1`) at `radius="sm"`, never blue, per the One Blue Rule.
-  Each chip is a button: a topic sets the Topic filter, a keyword adds a
-  Keyword filter. That is view-scoped navigation, which the rail allows; it
-  is not an action on the record. Keywords show the first eight with
-  "+{n} more" to expand.
-- **Source**: the source page as a link whose text is its host
-  ("data.cityofnewyork.us"), not the full URL, and the download link labelled
-  with the listing's format when there is one. Canonical URLs, when set,
-  follow.
+- **About**: Topics and Keywords as chips, then the facts the pane already
+  shows (Covers, Updates, License, Notes). Chips use the small-fill step
+  (`neutral.1`) at `radius="sm"`, never blue, per the One Blue Rule. Each
+  chip is a button: a topic adds that topic to the Topic filter, a keyword
+  adds that keyword to the Keywords filter. That is view-scoped navigation,
+  which the rail allows; it is not an action on the record. Keywords show
+  the first eight with "+{n} more" to expand.
+- **Source**: "Original" links to the source page with its host
+  ("data.cityofnewyork.us") as the text, not the full URL; "Download" links
+  to `source_download_url`, labelled with the listing's format; Canonical
+  URLs, when set, follow, also named by host.
 - **Technical details**, collapsed by default, replaces "Raw metadata": the
   pipeline that indexed the listing, its last run id, when it was last
-  indexed, and the source record (`source_metadata`) as formatted JSON.
-  The pipeline and run id leave the main fact list, where they were
-  internal names in the user's way.
-- A fact with no value is omitted, never shown empty, and a group with no
-  facts is omitted with its title.
+  indexed, and the source record (`source_metadata`, or `metadata` when a
+  listing has none) as formatted JSON.
+- A fact with no value is omitted, and a group with no facts is omitted with
+  its title.
 
 The detail pane reads the drive with `DataCatalogDriveClient.useGetById`
 when the listing has a `drive_id`.
@@ -504,10 +475,10 @@ when the listing has a `drive_id`.
 
 | Where | Text |
 |---|---|
-| Search placeholder | "Search by name, publisher, topic, or keyword…" |
-| Filters | "Publisher", the drive's level-2 label, "Topic", "Keyword: {tag}", "Clear filters" |
+| Rail | "Publisher" (replacing "Source"), the drive's level-2 label, "Topic", "Keywords", "Remove keyword {tag}" |
 | Detail groups | "Published by", "About", "Source", "Technical details" |
-| Detail facts | "Topics", "Keywords", "Updates", "License", "Coverage", "Notes", "Original", "Download", "Indexed by", "Last indexed", "Source record" |
+| Detail facts | "Topics", "Keywords", "Original", "Download", "Indexed by", "Last run", "Last indexed", "Source record" |
+| Chip actions | "Show datasets in {topic}", "Show datasets tagged {keyword}" |
 
 Every string goes through Lingui. Organization labels and values come from
 the data and are not translated.
@@ -600,16 +571,15 @@ Red/green TDD, in this order:
 | The drive row upsert and listing link | Engine and Supabase store tests |
 | The rename keeps existing values, and the new columns and policies exist | Database tests (`pnpm test:db`), including a migration upgrade test |
 | A tag, a domain, and a level-2 organization make a listing searchable | pgTAP, `rpc_data_catalog_listings__search.test.sql` |
-| Each filter narrows results, filters AND together, and apply to a blank query | Same |
-| Facets count over every filter but their own, return drive labels, and agree with the search's matches | pgTAP, `rpc_data_catalog_listings__search_facets.test.sql` |
-| The list row's organization line, the filter row's withheld chrome, and the detail pane's groups | Vitest and Testing Library, beside each component |
+| The level-2, topic, and keyword filters narrow results, AND with the existing filters, and apply to a blank query | pgTAP, `rpc_data_catalog_listings__search_filters.test.sql` (extending `feat/catalog-filters`'s file) |
+| The new facets count over every filter but their own, keep chosen values at 0, and return drive labels | Same |
+| The results row's organization line, the rail's new sections, and the detail pane's groups | Vitest and Testing Library, beside each component |
 | Choosing a publisher, then its agency, then clicking a keyword narrows the list, and clearing restores it | Playwright, `tests/e2e/data-catalog-filters.spec.ts` |
 
 ## 12. Out of scope
 
 - Mapping `pipeline_parquet` pipelines such as World Bank WDI. They write
   one hand-built listing, not a source catalog.
-- Multi-select filters and filters in the URL. The RPCs already take arrays,
-  so either is a UI change later.
+- Filters in the URL.
 - Rendering HDX's Markdown notes as Markdown.
 - A tag facet with counts. Tags are reached from a listing.
