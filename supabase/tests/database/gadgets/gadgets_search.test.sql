@@ -208,14 +208,28 @@ values (
 )
 on conflict (id) do nothing;
 
-insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, updated_at)
+-- A case type and its default status reference each other; the
+-- foreign key is deferred, so both rows go in before the commit.
+insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id, updated_at)
 values (
   'e4800001-0000-4000-8000-000000000001'::uuid,
   'e4000001-0000-4000-8000-000000000001'::uuid,
   'e4100001-0000-4000-8000-000000000001'::uuid,
   'Measles case',
   true,
+  'e48f0001-0000-4000-8000-000000000001'::uuid,
   now() - interval '2 minutes'
+)
+on conflict (id) do nothing;
+
+insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
+values (
+  'e48f0001-0000-4000-8000-000000000001'::uuid,
+  'e4100001-0000-4000-8000-000000000001'::uuid,
+  'e4800001-0000-4000-8000-000000000001'::uuid,
+  'Open',
+  '#40c057',
+  0
 )
 on conflict (id) do nothing;
 
