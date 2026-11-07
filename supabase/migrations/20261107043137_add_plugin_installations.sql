@@ -35,7 +35,7 @@ alter table "public"."plugin_installations" validate constraint "plugin_installa
 
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.plugin_installations__prevent_workspace_id_change()
+CREATE OR REPLACE FUNCTION public.plugin_installations__prevent_identity_change()
  RETURNS trigger
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -43,6 +43,11 @@ AS $function$
 begin
   if new.workspace_id is distinct from old.workspace_id then
     raise exception 'plugin installation workspace_id cannot be changed'
+      using errcode = '23514';
+  end if;
+
+  if new.plugin_id is distinct from old.plugin_id then
+    raise exception 'plugin installation plugin_id cannot be changed'
       using errcode = '23514';
   end if;
 
@@ -91,7 +96,7 @@ using (public.util__can_manage_workspace_settings(workspace_id));
   as permissive
   for insert
   to authenticated
-with check (public.util__can_manage_workspace_settings(workspace_id));
+with check ((public.util__can_manage_workspace_settings(workspace_id) AND (NOT (installed_by IS DISTINCT FROM ( SELECT auth.uid() AS uid)))));
 
 
 
@@ -104,7 +109,7 @@ using (public.util__can_manage_workspace_settings(workspace_id))
 with check (public.util__can_manage_workspace_settings(workspace_id));
 
 
-CREATE TRIGGER tr__plugin_installations__prevent_workspace_id_change BEFORE UPDATE OF workspace_id ON public.plugin_installations FOR EACH ROW EXECUTE FUNCTION public.plugin_installations__prevent_workspace_id_change();
+CREATE TRIGGER tr__plugin_installations__prevent_identity_change BEFORE UPDATE OF workspace_id, plugin_id ON public.plugin_installations FOR EACH ROW EXECUTE FUNCTION public.plugin_installations__prevent_identity_change();
 
 CREATE TRIGGER tr__plugin_installations__set_updated_at BEFORE UPDATE ON public.plugin_installations FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
 
@@ -113,4 +118,4 @@ CREATE TRIGGER tr__plugin_installations__set_updated_at BEFORE UPDATE ON public.
 -- Privileges that `supabase db diff` cannot see: default, schema, column,
 -- and view grants. Appended by `pnpm db:new-migration` from what
 -- `supabase/schemas/` declares. Do not hand-edit; re-run the command.
-revoke all privileges on function public.plugin_installations__prevent_workspace_id_change() from public, anon, authenticated, service_role;
+revoke all privileges on function public.plugin_installations__prevent_identity_change() from public, anon, authenticated, service_role;

@@ -36,13 +36,21 @@ update,
 delete on table public.plugin_installations to authenticated,
 service_role;
 
-/** Prevents an install from moving to another workspace. */
-create or replace function public.plugin_installations__prevent_workspace_id_change () returns trigger language plpgsql
+/**
+ * Prevents an install from moving to another workspace or from being
+ * repointed at another plugin. Either would make the row a different install.
+ */
+create or replace function public.plugin_installations__prevent_identity_change () returns trigger language plpgsql
 set
   search_path = '' as $$
 begin
   if new.workspace_id is distinct from old.workspace_id then
     raise exception 'plugin installation workspace_id cannot be changed'
+      using errcode = '23514';
+  end if;
+
+  if new.plugin_id is distinct from old.plugin_id then
+    raise exception 'plugin installation plugin_id cannot be changed'
       using errcode = '23514';
   end if;
 
@@ -52,16 +60,17 @@ $$;
 
 -- Trigger-only. The trigger machinery does not consult EXECUTE.
 revoke
-execute on function public.plugin_installations__prevent_workspace_id_change ()
+execute on function public.plugin_installations__prevent_identity_change ()
 from
   public,
   anon,
   authenticated,
   service_role;
 
-create trigger tr__plugin_installations__prevent_workspace_id_change before
-update of workspace_id on public.plugin_installations for each row
-execute function public.plugin_installations__prevent_workspace_id_change ();
+create trigger tr__plugin_installations__prevent_identity_change before
+update of workspace_id,
+plugin_id on public.plugin_installations for each row
+execute function public.plugin_installations__prevent_identity_change ();
 
 create trigger tr__plugin_installations__set_updated_at before
 update on public.plugin_installations for each row
@@ -82,19 +91,33 @@ select
 create policy "Settings admins can INSERT plugin installations" on public.plugin_installations for insert to authenticated
 with
   check (
-    public.util__can_manage_workspace_settings (public.plugin_installations.workspace_id)
+    public.util__can_manage_workspace_settings (
+      public.plugin_installations.workspace_id
+    ) and
+    -- Pins the installer to the caller. Not enforced on UPDATE, because
+    -- deleting the user sets `installed_by` to null through an update.
+    public.plugin_installations.installed_by is not distinct from (
+      select
+        auth.uid ()
+    )
   );
 
 create policy "Settings admins can UPDATE plugin installations" on public.plugin_installations
 for update
   to authenticated using (
-    public.util__can_manage_workspace_settings (public.plugin_installations.workspace_id)
+    public.util__can_manage_workspace_settings (
+      public.plugin_installations.workspace_id
+    )
   )
 with
   check (
-    public.util__can_manage_workspace_settings (public.plugin_installations.workspace_id)
+    public.util__can_manage_workspace_settings (
+      public.plugin_installations.workspace_id
+    )
   );
 
 create policy "Settings admins can DELETE plugin installations" on public.plugin_installations for delete to authenticated using (
-  public.util__can_manage_workspace_settings (public.plugin_installations.workspace_id)
+  public.util__can_manage_workspace_settings (
+    public.plugin_installations.workspace_id
+  )
 );
