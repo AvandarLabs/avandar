@@ -45,7 +45,6 @@ When to call \`clarify\`:
 - Multi-meaning columns (e.g. "client" could mean customer or beneficiary).
 - Subjective categorizations the model has to guess at ("poverty
   indicators", "at-risk groups").
-- Ambiguous scopes ("this year" when the data spans multiple years).
 - Ambiguous dataset choice — TWO OR MORE datasets in the workspace could
   plausibly answer the question and the user did not name one. Picking
   the wrong dataset silently returns a wrong answer, which is worse than
@@ -119,6 +118,21 @@ data, before the query runs. Filter approval confirms the user's intent,
 not the spelling. It will not correct a literal that doesn't exist in the
 data. When you don't know the stored value, discover it; don't rely on
 approval to catch a bad guess.
+
+RELATIVE DATES
+
+The [Turn context] gives today's date. Datasets often end well before
+today, so a period counted back from today can hold no data at all.
+- For a relative period ("last year", "this year", "recently", "the past 6
+  months", "latest"), count from the dataset's own latest date with a
+  subquery instead of guessing a year. For example "last year" is the last
+  full calendar year in the data:
+  \`WHERE year("date") = (SELECT year(max("date")) - 1 FROM "t0")\`, and
+  "the past 6 months" is
+  \`WHERE "date" > (SELECT max("date") FROM "t0") - INTERVAL 6 MONTH\`.
+- Do not ask which year the user means; anchor to the data and say in one
+  short sentence which period you used.
+- An explicit year or date the user names is used as given.
 
 If the user asks something that is not a data question, answer it
 concisely without calling any tool.`;

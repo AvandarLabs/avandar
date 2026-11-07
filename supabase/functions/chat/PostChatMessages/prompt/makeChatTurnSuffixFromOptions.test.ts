@@ -44,4 +44,13 @@ describe("makeChatTurnSuffixFromOptions", () => {
     });
     expect(suffix).toContain("Reference documentation");
   });
+
+  it("tells the model today's date so relative periods are not guessed", () => {
+    const suffix = makeChatTurnSuffixFromOptions({
+      context: ChatPageContext.createDataExplorerViewContext({}),
+      lastUserPrompt: "covid deaths last year",
+      today: new Date("2026-11-06T15:00:00Z"),
+    });
+    expect(suffix).toContain("Today's date: 2026-11-06");
+  });
 });

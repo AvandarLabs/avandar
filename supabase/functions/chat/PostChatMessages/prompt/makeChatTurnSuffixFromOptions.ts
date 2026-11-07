@@ -25,19 +25,29 @@ function formatResultColumns(
 }
 
 /**
- * Builds the volatile turn suffix appended after committed messages. Empty
- * when there is no live SQL, error, result schema, spatial docs, or retry
- * note for this turn.
+ * Today's date, so the model reads "last year" or "recent" against the
+ * calendar it is asked in rather than a year it guesses.
+ */
+function formatToday(today: Date): string {
+  return `Today's date: ${today.toISOString().slice(0, 10)}`;
+}
+
+/**
+ * Builds the volatile turn suffix appended after committed messages: today's
+ * date, plus any live SQL, error, result schema, spatial docs, or retry note
+ * for this turn.
  */
 export function makeChatTurnSuffixFromOptions(
   options: Readonly<{
     context: ChatPageContext.T;
     retryContext?: ChatRetryContext;
     lastUserPrompt: string;
+    today?: Date;
   }>,
 ): string {
-  const { context, retryContext, lastUserPrompt } = options;
+  const { context, retryContext, lastUserPrompt, today = new Date() } = options;
   const sections = [
+    formatToday(today),
     formatPreviousSql(context.lastSql),
     formatLastError(context.lastError),
     formatResultColumns(context.lastResultColumns),
@@ -46,7 +56,5 @@ export function makeChatTurnSuffixFromOptions(
   ].filter((section) => {
     return section.length > 0;
   });
-  return sections.length === 0
-    ? ""
-    : `[Turn context]\n${sections.join("\n\n")}`;
+  return `[Turn context]\n${sections.join("\n\n")}`;
 }
