@@ -84,6 +84,36 @@ describe("parseClarify", () => {
     ).toEqual(EXPECTED_DISCOVERY_REQUEST);
   });
 
+  it("keeps one bounded candidate group per value the user named", () => {
+    const parsed = parseClarify(
+      JSON.stringify({
+        question: "Which of these are California and Texas?",
+        responseShape: {
+          kind: "discovery",
+          query: 'SELECT DISTINCT "state" FROM "t0" LIMIT 100',
+          column: "state",
+          multi: true,
+          candidateValues: ["California", "Texas"],
+          candidateGroups: [
+            [" California ", "CA", 7],
+            ["Texas", "TX"],
+            [],
+            "not a group",
+          ],
+        },
+      }),
+      0,
+    );
+
+    expect(parsed?.responseShape).toMatchObject({
+      kind: "discovery",
+      candidateGroups: [
+        ["California", "CA"],
+        ["Texas", "TX"],
+      ],
+    });
+  });
+
   it("does not count view-change lines as clarification answers", () => {
     // View-change lines lack the `[Clarification answer:` marker.
     expect(

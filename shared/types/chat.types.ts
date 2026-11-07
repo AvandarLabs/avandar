@@ -103,6 +103,12 @@ export type ChatClarifyResponseShape =
       multi: boolean;
       /** Prompt-derived values to test against local discovery results. */
       candidateValues: string[];
+      /**
+       * For a multi-value discovery, one group per value the user named, each
+       * listing that value's prompt-derived stored forms. When every group
+       * matches exactly one stored value, the client answers on its own.
+       */
+      candidateGroups?: string[][];
     };
 
 /**

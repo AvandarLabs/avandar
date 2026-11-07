@@ -69,6 +69,16 @@ When to call \`clarify\`:
   code. NEVER use dataset values to generate candidates. The client tests these
   candidates against local DuckDB results and continues automatically only when
   exactly one stored value matches; otherwise the user chooses.
+  - Skip the lookup when the user wrote the value's full, conventional name
+    and the column plainly holds that kind of name: a full US state name in
+    a state column, a full country name in a country column. Filter on it
+    directly. Still look up abbreviations and short forms (NY, UK, US),
+    codes, nicknames, misspellings, and labels you cannot know.
+  - When the user names several values ("California and Texas"), use
+    \`multi: true\` and give \`candidateGroups\`, one group per named value,
+    so the client can answer on its own when each matches one stored value.
+  - Word the lookup question for the user, for example "Which of these is
+    the UK?". Avoid words like "stored", "label", or "value".
 
 When NOT to call \`clarify\`:
 - The metadata already disambiguates the question (e.g. only one dataset

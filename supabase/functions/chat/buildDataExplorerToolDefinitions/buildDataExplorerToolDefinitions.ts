@@ -1,6 +1,8 @@
 import {
   MAX_DISCOVERY_CANDIDATE_CHARS,
+  MAX_DISCOVERY_CANDIDATE_GROUPS,
   MAX_DISCOVERY_CANDIDATE_VALUES,
+  MAX_DISCOVERY_CANDIDATES_PER_GROUP,
 } from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
 import { MAX_DISCOVERY_QUERY_CHARS } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
 
@@ -112,6 +114,20 @@ const CLARIFY_TOOL = {
                   },
                   description:
                     "Possible stored representations inferred only from the user's prompt and general knowledge, never from dataset values. Include the user's exact wording plus plausible codes or abbreviations.",
+                },
+                candidateGroups: {
+                  type: "array",
+                  maxItems: MAX_DISCOVERY_CANDIDATE_GROUPS,
+                  items: {
+                    type: "array",
+                    maxItems: MAX_DISCOVERY_CANDIDATES_PER_GROUP,
+                    items: {
+                      type: "string",
+                      maxLength: MAX_DISCOVERY_CANDIDATE_CHARS,
+                    },
+                  },
+                  description:
+                    'With multi: true, one group per value the user named, each listing that value\'s plausible stored forms, e.g. [["California", "CA"], ["Texas", "TX"]]. The client answers on its own when every group matches exactly one stored value.',
                 },
               },
               required: ["kind", "query", "column", "multi", "candidateValues"],
