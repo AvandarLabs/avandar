@@ -3218,8 +3218,8 @@ msgid "Using your custom URL."
 msgstr "Usando sua URL personalizada."
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
-msgid "Searching..."
-msgstr ""
+#~ msgid "Searching..."
+#~ msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
@@ -7729,6 +7729,10 @@ msgstr "Digite o nome do conjunto de dados"
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."
 msgstr "Selecione uma anotação no mapa para editá-la."
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
+msgid "Searching…"
+msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"

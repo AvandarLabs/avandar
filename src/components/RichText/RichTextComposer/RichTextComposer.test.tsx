@@ -572,9 +572,9 @@ describe("RichTextComposer gadget search", () => {
     act(() => {
       _getEditor().commands.insertContent("@meas");
     });
-    expect(await screen.findByText("Searching...")).toBeInTheDocument();
+    expect(await screen.findByText("Searching…")).toBeInTheDocument();
     expect(await screen.findByText("Measles by borough")).toBeInTheDocument();
-    expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+    expect(screen.queryByText("Searching…")).not.toBeInTheDocument();
     expect(mocks.searchGadgets).toHaveBeenCalledWith({
       workspaceId: WORKSPACE_ID,
       query: "meas",
@@ -689,7 +689,7 @@ describe("RichTextComposer gadget search timing", () => {
     expect(screen.getByText("Priya Natarajan")).toBeInTheDocument();
     await _advanceTime(300);
     expect(mocks.searchGadgets).not.toHaveBeenCalled();
-    expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+    expect(screen.queryByText("Searching…")).not.toBeInTheDocument();
   });
 
   it("searches once, for the last query, when typing faster than the pause", async () => {
@@ -721,7 +721,7 @@ describe("RichTextComposer gadget search timing", () => {
     expect(pendingSearches).toHaveLength(2);
     expect(screen.getByText("Measles by borough")).toBeInTheDocument();
     expect(screen.getByTestId("mention-menu-refreshing")).toBeInTheDocument();
-    expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+    expect(screen.queryByText("Searching…")).not.toBeInTheDocument();
   });
 
   it("ignores and aborts a search that a later query replaced", async () => {

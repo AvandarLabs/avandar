@@ -31,7 +31,7 @@ export function MentionMenuSearchStatus({
   if (isSearching && !hasGadgetGroups) {
     return (
       <div className={classes.status} role="status">
-        <Trans>Searching...</Trans>
+        <Trans>Searching…</Trans>
       </div>
     );
   }

@@ -3211,8 +3211,8 @@ msgid "Using your custom URL."
 msgstr "Unatumia URL yako maalum."
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
-msgid "Searching..."
-msgstr ""
+#~ msgid "Searching..."
+#~ msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
@@ -7716,6 +7716,10 @@ msgstr "Ingiza jina la seti ya data"
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."
 msgstr "Chagua dokezo kwenye ramani ili kulihariri."
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
+msgid "Searching…"
+msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"

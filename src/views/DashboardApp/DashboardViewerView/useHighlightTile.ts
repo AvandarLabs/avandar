@@ -46,6 +46,7 @@ export function useHighlightTile(tileId: string | undefined): void {
     if (!tileId) {
       return undefined;
     }
+    const highlightedClass = classes.highlighted!;
     let highlightedTile: HTMLElement | undefined;
     let timerId = 0;
     const stopWaiting = _waitForElement({
@@ -61,17 +62,17 @@ export function useHighlightTile(tileId: string | undefined): void {
         });
         // The CSS fades the highlight out. This drops it afterwards, which
         // is all that happens under reduced motion.
-        tile.classList.add(classes.highlighted!);
+        tile.classList.add(highlightedClass);
         highlightedTile = tile;
         timerId = window.setTimeout(() => {
-          tile.classList.remove(classes.highlighted!);
+          tile.classList.remove(highlightedClass);
         }, HIGHLIGHT_DURATION_MS);
       },
     });
     return () => {
       stopWaiting();
       window.clearTimeout(timerId);
-      highlightedTile?.classList.remove(classes.highlighted!);
+      highlightedTile?.classList.remove(highlightedClass);
     };
   }, [tileId]);
 }

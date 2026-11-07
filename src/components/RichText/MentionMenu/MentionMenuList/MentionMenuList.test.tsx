@@ -289,7 +289,7 @@ describe("MentionMenuList gadgets", () => {
 describe("MentionMenuList search states", () => {
   it("shows a searching row above the people while no gadgets are shown yet", async () => {
     _renderList({ isSearching: true });
-    expect(await screen.findByText("Searching...")).toBeInTheDocument();
+    expect(await screen.findByText("Searching…")).toBeInTheDocument();
     expect(screen.getByText("Priya Natarajan")).toBeInTheDocument();
     expect(screen.getByRole("listbox")).toHaveAttribute("aria-busy", "true");
   });
@@ -298,7 +298,7 @@ describe("MentionMenuList search states", () => {
     _renderList({ gadgets: [DASHBOARD], isSearching: true });
     expect(await screen.findByText("Measles by borough")).toBeInTheDocument();
     expect(screen.getByText("Dashboards")).toBeInTheDocument();
-    expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+    expect(screen.queryByText("Searching…")).not.toBeInTheDocument();
     expect(screen.getByTestId("mention-menu-refreshing")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Updating results");
     expect(screen.getByRole("listbox")).toHaveAttribute("aria-busy", "true");
@@ -306,9 +306,9 @@ describe("MentionMenuList search states", () => {
 
   it("announces the search status outside the listbox", async () => {
     _renderList({ isSearching: true });
-    await screen.findByText("Searching...");
+    await screen.findByText("Searching…");
     const listbox = screen.getByRole("listbox");
-    expect(screen.getByRole("status")).toHaveTextContent("Searching...");
+    expect(screen.getByRole("status")).toHaveTextContent("Searching…");
     expect(within(listbox).queryByRole("status")).not.toBeInTheDocument();
   });
 
@@ -341,7 +341,7 @@ describe("MentionMenuList search states", () => {
 
   it("does not claim nothing matches while still searching", async () => {
     _renderList({ people: [], isSearching: true });
-    expect(await screen.findByText("Searching...")).toBeInTheDocument();
+    expect(await screen.findByText("Searching…")).toBeInTheDocument();
     expect(screen.queryByText("No matches")).not.toBeInTheDocument();
   });
 });

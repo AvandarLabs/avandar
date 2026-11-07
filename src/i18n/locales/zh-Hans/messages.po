@@ -3086,8 +3086,8 @@ msgid "Using your custom URL."
 msgstr "使用您的自定义 URL。"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
-msgid "Searching..."
-msgstr ""
+#~ msgid "Searching..."
+#~ msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
@@ -7448,6 +7448,10 @@ msgstr "输入数据集名称"
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."
 msgstr "在地图上选择注释以进行编辑。"
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
+msgid "Searching…"
+msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"
