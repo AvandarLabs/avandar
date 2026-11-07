@@ -8416,6 +8416,15 @@ msgstr "匯入您的第一個資料集"
 msgid "Left"
 msgstr "靠左"
 
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: data.length
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so it shows an even sample of the "
+"{3} rows across the whole range."
+msgstr "{0} 最多只能呈現 {1} 個 {2}，因此會在整個範圍內平均取樣 {3} 列並顯示。"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
 msgstr "您需要案件記錄編輯者存取權限，才能變更記錄的狀態。"

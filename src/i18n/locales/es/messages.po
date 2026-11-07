@@ -8755,6 +8755,16 @@ msgstr "Incorpore su primer conjunto de datos"
 msgid "Left"
 msgstr "Izquierda"
 
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: data.length
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so it shows an even sample of the "
+"{3} rows across the whole range."
+msgstr "El {0} solo puede renderizar hasta {1} {2}, por lo que muestra una "
+"muestra uniforme de las {3} filas en todo el rango."
+
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
 msgstr "Necesita acceso de editor de Registros de casos para cambiar el estado "

@@ -8816,6 +8816,16 @@ msgstr "Importez votre premier jeu de données"
 msgid "Left"
 msgstr "Gauche"
 
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: data.length
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so it shows an even sample of the "
+"{3} rows across the whole range."
+msgstr "Le {0} ne peut afficher que jusqu’à {1} {2}, il présente donc un "
+"échantillon régulier des {3} lignes sur l’ensemble de la plage."
+
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
 msgstr "Vous devez disposer d’un accès de modification aux dossiers de cas pour "
