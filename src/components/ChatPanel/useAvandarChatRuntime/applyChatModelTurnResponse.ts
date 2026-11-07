@@ -1,4 +1,4 @@
-import { prop, propEq } from "@avandar/utils";
+import { prop } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
@@ -9,6 +9,8 @@ import {
   assumptionNeedsSignInOrApproval,
   buildSqlNotAppliedAssistantText,
 } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
+import { dashboardBlockToExplorerResponse } from "@/components/ChatPanel/useAvandarChatRuntime/dashboardBlockToExplorerResponse/dashboardBlockToExplorerResponse";
+import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { shouldQueueDashboardBlock } from "@/components/ChatPanel/useAvandarChatRuntime/shouldQueueDashboardBlock/shouldQueueDashboardBlock";
 import { waitForAppliedSqlOutcome } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
@@ -93,9 +95,7 @@ async function reviewAndApplySql(
   if (options.isGenerationStale()) {
     return false;
   }
-  const prompt =
-    [...options.apiMessages].reverse().find(propEq("role", "user"))?.content ??
-    "";
+  const prompt = getLastQuestionFromMessages(options.apiMessages);
   options.dataExplorerDispatch.setRawSql(options.sql);
   options.dataExplorerDispatch.setNlPrompt(prompt);
   try {
@@ -143,12 +143,31 @@ async function _getAppliedSqlOutcome(
  * to the live page, or returns assistant text when SQL cannot be applied.
  */
 export async function applyChatModelTurnResponse(
-  options: Readonly<ApplyChatModelTurnResponseOptions>,
+  rawOptions: Readonly<ApplyChatModelTurnResponseOptions>,
 ): Promise<ChatModelRunResult> {
+  // The dashboard tool is offered on every page, so a chart request in the
+  // Data Explorer can come back as a dashboard block.
+  const explorerResponse =
+    rawOptions.currentPageContext.app === "data-explorer"
+      ? dashboardBlockToExplorerResponse(rawOptions.response)
+      : undefined;
+  if (explorerResponse?.kind === "dashboard_only") {
+    return {
+      content: [
+        { type: "text", text: rawOptions.copyRef.current.dashboardOnlyBlock },
+      ],
+    };
+  }
+  const options = explorerResponse
+    ? { ...rawOptions, response: explorerResponse.response }
+    : rawOptions;
   const generatedSql = options.response.generatedSql?.sql;
   const sqlApplied = generatedSql
     ? await reviewAndApplySql({ ...options, sql: generatedSql })
     : false;
+  if (sqlApplied && explorerResponse?.kind === "chart") {
+    options.dataExplorerDispatch.setActiveVizType(explorerResponse.vizType);
+  }
   if (options.isGenerationStale()) {
     return { content: [] };
   }

@@ -36,9 +36,10 @@ export function CaseActivityComposer({
     <RichTextComposer
       key={`${workspaceId}:${individualId}`}
       label={t`Write an update`}
-      placeholder={t`Write an update. Type @ to mention a teammate.`}
+      placeholder={t`Write an update. Type @ to mention a teammate or link a dashboard, dataset, or case.`}
       initialContent={draft.initialDraft}
       mentionCandidates={mentionCandidates}
+      workspaceId={workspaceId}
       submitLabel={t`Post`}
       isSubmitting={isPosting}
       isSubmitBlocked={!isOnline}

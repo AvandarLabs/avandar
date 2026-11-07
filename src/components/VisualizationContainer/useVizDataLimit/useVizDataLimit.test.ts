@@ -44,6 +44,24 @@ describe("useVizDataLimit", () => {
     expect(result.current[max - 1]).toEqual(data[max - 1]);
   });
 
+  it("samples a line chart evenly across its whole range when over the cap", () => {
+    const max = VIZ_RENDER_LIMITS.line!.max;
+    const data = makeArrayWithLength(1143).map((_, index) => {
+      return { day: index, deaths: index };
+    });
+    const { result } = renderHook(() => {
+      return useVizDataLimit("line", data);
+    });
+    expect(result.current.length).toBeLessThanOrEqual(max);
+    expect(result.current[0]).toEqual(data[0]);
+    expect(result.current.at(-1)).toEqual(data.at(-1));
+    expect(notifyWarningMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringMatching(/across the whole range/),
+      }),
+    );
+  });
+
   it("shows a warning toast once when data first exceeds the cap", () => {
     const max = VIZ_RENDER_LIMITS.pie!.max;
     const overLimitData = makeArrayWithLength(max + 1).map((_, index) => {

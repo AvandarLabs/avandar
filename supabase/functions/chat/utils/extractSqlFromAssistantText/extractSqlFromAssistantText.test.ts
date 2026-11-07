@@ -9,28 +9,30 @@ describe("extractSqlFromAssistantText", () => {
   it("returns the SQL inside a fenced ```sql block", () => {
     const text =
       "Here is the query:\n```sql\nSELECT region, COUNT(*) FROM cases\n```\n";
-    expect(extractSqlFromAssistantText(text)).toBe(
-      "SELECT region, COUNT(*) FROM cases",
-    );
+    expect(extractSqlFromAssistantText(text)).toEqual({
+      sql: "SELECT region, COUNT(*) FROM cases",
+      textWithoutSql: "Here is the query:",
+    });
   });
 
   it("handles a fenced ```duckdb block", () => {
     const text = "```duckdb\nSELECT 1 FROM t\n```";
-    expect(extractSqlFromAssistantText(text)).toBe("SELECT 1 FROM t");
+    expect(extractSqlFromAssistantText(text)?.sql).toBe("SELECT 1 FROM t");
   });
 
   it("falls back to a bare SELECT statement when no fence is present", () => {
     const text =
       "I'll run this: SELECT region, COUNT(*) AS n FROM cases GROUP BY region;";
-    expect(extractSqlFromAssistantText(text)).toBe(
-      "SELECT region, COUNT(*) AS n FROM cases GROUP BY region",
-    );
+    expect(extractSqlFromAssistantText(text)).toEqual({
+      sql: "SELECT region, COUNT(*) AS n FROM cases GROUP BY region",
+      textWithoutSql: "I'll run this:",
+    });
   });
 
   it("recognizes WITH ... SELECT patterns", () => {
     const text =
       "WITH grouped AS (SELECT region, COUNT(*) AS n FROM cases GROUP BY region) SELECT * FROM grouped";
-    const sql = extractSqlFromAssistantText(text);
+    const sql = extractSqlFromAssistantText(text)?.sql;
     expect(sql).toContain("WITH grouped AS");
     expect(sql).toContain("SELECT * FROM grouped");
   });

@@ -16,8 +16,8 @@ export function CaseActivityFeedEmptyState(): ReactNode {
       </Title>
       <Text c="dimmed" size="sm">
         <Trans>
-          Post the first update below. Mention a teammate with @ to bring them
-          in.
+          Post the first update below. Type @ to mention a teammate or link a
+          dashboard, dataset, or case.
         </Trans>
       </Text>
     </Stack>

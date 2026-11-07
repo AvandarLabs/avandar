@@ -211,7 +211,7 @@ where
 --
 alter table "data_catalog_listings" add column "pipeline_scope_keys" text not null default '[]';
 `,
-  "20261107013616_catalog_field_mapping.sql": `-- SQLite override. The Postgres migration drops \`search_vector\` and its GIN
+  "20261107180000_catalog_field_mapping.sql": `-- SQLite override. The Postgres migration drops \`search_vector\` and its GIN
 -- index before renaming \`external_organization_name\`, because the generated
 -- column reads it, then adds both back. The generator transpiles the drops but
 -- skips the generated column, so SQLite never had \`search_vector\`. It also

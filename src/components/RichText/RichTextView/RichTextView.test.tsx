@@ -1,8 +1,62 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { RichTextMembersContext } from "@/components/RichText/RichTextMembersContext";
 import { RichTextView } from "@/components/RichText/RichTextView/RichTextView";
 import { render, screen } from "@/test-utils";
 import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
+import type { ReactNode } from "react";
+
+vi.mock(
+  "@/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries",
+  () => {
+    const unavailable = () => {
+      return { status: "unavailable" };
+    };
+    return {
+      useDashboardSummary: () => {
+        return {
+          status: "available",
+          name: "Measles by borough",
+          facts: [],
+          link: {
+            to: "/$workspaceSlug/dashboards/preview/$dashboardId",
+            params: { workspaceSlug: "nyc-doh", dashboardId: GADGET_ID },
+          },
+        };
+      },
+      useDashboardTileSummary: unavailable,
+      useDatasetSummary: unavailable,
+      useMapSummary: unavailable,
+      useConceptSummary: unavailable,
+      useIndividualSummary: unavailable,
+    };
+  },
+);
+
+// A plain anchor, so the view renders without a router.
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  const { createElement } = await import("react");
+  const actual =
+    await importOriginal<typeof import("@tanstack/react-router")>();
+  return {
+    ...actual,
+    Link: ({
+      children,
+      to,
+      params: _params,
+      search: _search,
+      ...rest
+    }: {
+      children: ReactNode;
+      to: string;
+      params?: Record<string, string>;
+      search?: Record<string, string>;
+    }) => {
+      return createElement("a", { href: to, ...rest }, children);
+    },
+  };
+});
+
+const GADGET_ID = "22222222-2222-4222-8222-222222222222";
 
 describe("RichTextView", () => {
   it("renders formatting and mentions without an editor", () => {
@@ -36,6 +90,46 @@ describe("RichTextView", () => {
     );
     expect(screen.getByText("@Dana Whitfield")).toBeInTheDocument();
     expect(screen.getByText("Oct 24").tagName).toBe("STRONG");
+  });
+
+  it("draws a gadget link as a chip and a gadget embed as a card", () => {
+    render(
+      <RichTextView
+        document={{
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [
+                { type: "text", text: "See " },
+                {
+                  type: "gadgetLink",
+                  attrs: {
+                    gadgetType: "dashboard",
+                    gadgetId: GADGET_ID,
+                    subId: null,
+                  },
+                },
+              ],
+            },
+            {
+              type: "gadgetEmbed",
+              attrs: {
+                gadgetType: "dashboard_tile",
+                gadgetId: GADGET_ID,
+                subId: "DataViz-top",
+              },
+            },
+          ],
+        }}
+      />,
+    );
+    expect(
+      screen.getByRole("link", { name: "Measles by borough" }),
+    ).toHaveAttribute("data-type", "gadgetLink");
+    expect(
+      screen.getByRole("group", { name: "Unavailable dashboard tile" }),
+    ).toBeInTheDocument();
   });
 
   it("falls back to plain text for a node it does not know", () => {

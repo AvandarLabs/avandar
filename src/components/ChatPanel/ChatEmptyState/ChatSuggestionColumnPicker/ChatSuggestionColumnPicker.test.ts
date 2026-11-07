@@ -188,3 +188,42 @@ describe("pickAverageColumn", () => {
     expect(pickAverageColumn(columns)).toBeUndefined();
   });
 });
+
+describe("coordinates and codes", () => {
+  it("treats latitude, longitude, FIPS, and numbered code columns as non-averageable", () => {
+    expect(
+      ["Lat", "Long_", "lng", "FIPS", "code3"].map(
+        ChatSuggestionColumnPicker.isNonAverageableColumnName,
+      ),
+    ).toEqual([true, true, true, true, true]);
+  });
+});
+
+describe("pickMeasureColumn", () => {
+  it("returns the last numeric column that is not an id, code, or coordinate", () => {
+    const columns = [
+      createColumnMeta("Province_State", "varchar", 0),
+      createColumnMeta("UID", "bigint", 1),
+      createColumnMeta("code3", "bigint", 2),
+      createColumnMeta("FIPS", "double", 3),
+      createColumnMeta("Lat", "double", 4),
+      createColumnMeta("Long_", "double", 5),
+      createColumnMeta("Population", "bigint", 6),
+      createColumnMeta("date", "date", 7),
+      createColumnMeta("daily_new_deaths", "bigint", 8),
+    ];
+    expect(ChatSuggestionColumnPicker.pickMeasureColumn(columns)).toBe(
+      "daily_new_deaths",
+    );
+    expect(ChatSuggestionColumnPicker.pickDateColumn(columns)).toBe("date");
+  });
+
+  it("returns undefined when every numeric column is a coordinate", () => {
+    expect(
+      ChatSuggestionColumnPicker.pickMeasureColumn([
+        createColumnMeta("Lat", "double", 0),
+        createColumnMeta("Long", "double", 1),
+      ]),
+    ).toBeUndefined();
+  });
+});

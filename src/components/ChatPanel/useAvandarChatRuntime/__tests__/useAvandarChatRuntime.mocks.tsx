@@ -33,6 +33,7 @@ const { hoistedHarness, hoistedApiPostMock, hoistedRunQueryMock } = vi.hoisted(
     return {
       hoistedHarness: {} as {
         runtime?: ChatRuntime;
+        startNewChat?: () => void;
         explorerState?: ExplorerState;
         explorerDispatch?: ExplorerDispatch;
         queryStatus?: "pending" | "success" | "error";
@@ -44,8 +45,9 @@ const { hoistedHarness, hoistedApiPostMock, hoistedRunQueryMock } = vi.hoisted(
 );
 
 /**
- * What the mounted app exposes to the test: the chat runtime, the explorer's
- * state and dispatch, and the status of the explorer's current query.
+ * What the mounted app exposes to the test: the chat runtime and its New chat
+ * action, the explorer's state and dispatch, and the status of the explorer's
+ * current query.
  */
 export const harness = hoistedHarness;
 
@@ -210,8 +212,9 @@ vi.mock("@/components/AppShell/AppShell", async () => {
     await import("@/components/ChatPanel/useChatViewTranscript/ChatViewTranscriptSync");
 
   function ChatPanelStandIn(): React.ReactNode {
-    const { runtime } = useAvandarChatRuntime();
+    const { runtime, startNewChat } = useAvandarChatRuntime();
     hoistedHarness.runtime = runtime;
+    hoistedHarness.startNewChat = startNewChat;
     return (
       <AssistantRuntimeProvider runtime={runtime}>
         <ChatViewTranscriptSync />

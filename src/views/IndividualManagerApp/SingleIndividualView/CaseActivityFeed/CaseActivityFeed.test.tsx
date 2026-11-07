@@ -201,6 +201,11 @@ describe("CaseActivityFeed", () => {
     expect(
       await screen.findByText("No activity on this case yet"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Post the first update below. Type @ to mention a teammate or link a dashboard, dataset, or case.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("shows comments under a day separator", async () => {

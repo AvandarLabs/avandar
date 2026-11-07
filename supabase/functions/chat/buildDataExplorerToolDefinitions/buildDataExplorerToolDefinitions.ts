@@ -1,6 +1,8 @@
 import {
   MAX_DISCOVERY_CANDIDATE_CHARS,
+  MAX_DISCOVERY_CANDIDATE_GROUPS,
   MAX_DISCOVERY_CANDIDATE_VALUES,
+  MAX_DISCOVERY_CANDIDATES_PER_GROUP,
 } from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
 import { MAX_DISCOVERY_QUERY_CHARS } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
 
@@ -26,6 +28,12 @@ const GENERATE_SQL_TOOL = {
           type: "string",
           description:
             "Valid DuckDB SELECT. Use the short table aliases from the schema (t0, t1, …). Wrap aliases and column names in double quotes.",
+        },
+        summary: {
+          type: "string",
+          maxLength: 400,
+          description:
+            'One or two short, plain sentences shown to the user as your reply: what the result shows, which dataset it uses, and any choice you made (the period, what a word like "most" was taken to mean, what was included or left out). You never see the results, so do not state numbers or findings. No SQL, table aliases, or column names in quotes.',
         },
       },
       required: ["sql"],
@@ -106,6 +114,20 @@ const CLARIFY_TOOL = {
                   },
                   description:
                     "Possible stored representations inferred only from the user's prompt and general knowledge, never from dataset values. Include the user's exact wording plus plausible codes or abbreviations.",
+                },
+                candidateGroups: {
+                  type: "array",
+                  maxItems: MAX_DISCOVERY_CANDIDATE_GROUPS,
+                  items: {
+                    type: "array",
+                    maxItems: MAX_DISCOVERY_CANDIDATES_PER_GROUP,
+                    items: {
+                      type: "string",
+                      maxLength: MAX_DISCOVERY_CANDIDATE_CHARS,
+                    },
+                  },
+                  description:
+                    'With multi: true, one group per value the user named, each listing that value\'s plausible stored forms, e.g. [["California", "CA"], ["Texas", "TX"]]. The client answers on its own when every group matches exactly one stored value.',
                 },
               },
               required: ["kind", "query", "column", "multi", "candidateValues"],

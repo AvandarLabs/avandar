@@ -20,6 +20,11 @@ export type ChatRuntimeCopy = OfflineChatPipelineCopy & {
   sqlQueryFailed: string;
   /** The SQL was applied but no query outcome was observed. */
   sqlQueryApplied: string;
+  /**
+   * The model offered a block, such as a heading, that only a dashboard can
+   * hold, while the user is in the Data Explorer.
+   */
+  dashboardOnlyBlock: string;
   fallbackTitle: string;
   fallbackMessage: string;
   contextWindowExceeded: string;

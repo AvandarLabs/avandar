@@ -41,6 +41,10 @@
   text-underline-offset: 2px;
 }
 
+.gadgetEmbed {
+  margin-block-start: var(--mantine-spacing-xs);
+}
+
 .plainText {
   white-space: pre-line;
 }

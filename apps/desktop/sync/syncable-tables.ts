@@ -25,7 +25,7 @@
  *     billing, sensitive OAuth tokens, admin-only signups, legacy role
  *     tables, the web-only `dexie_dbs` tracker, web GIS `maps`, and case
  *     activity (`comments`, `comment_reactions`, `comment_mentions`,
- *     `comment_revisions`, `activity_events`).
+ *     `comment_gadget_refs`, `comment_revisions`, `activity_events`).
  */
 
 /**
@@ -181,6 +181,7 @@ export const EXCLUDED_TABLES = [
   // Case activity: collaborative, server-of-truth, and audit data. The
   // desktop does not render case comments offline.
   "activity_events",
+  "comment_gadget_refs",
   "comment_mentions",
   "comment_reactions",
   "comment_revisions",

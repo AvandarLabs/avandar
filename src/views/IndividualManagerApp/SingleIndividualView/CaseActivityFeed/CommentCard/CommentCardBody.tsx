@@ -53,6 +53,7 @@ export function CommentCardBody({
         placeholder={t`Write an update`}
         initialContent={comment.body}
         mentionCandidates={mentionCandidates}
+        workspaceId={comment.workspaceId}
         submitLabel={t`Save`}
         isSubmitting={isSaving}
         onSubmit={onSaveEdit}

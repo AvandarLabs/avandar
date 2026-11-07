@@ -2,6 +2,17 @@ drop function if exists "public"."rpc_data_catalog_listings__search"(p_query tex
 
 set check_function_bodies = off;
 
+-- Load pg_trgm into this session before a function below sets
+-- `pg_trgm.word_similarity_threshold`. Until the library is loaded the
+-- parameter is an unknown placeholder, and only a superuser may attach one to
+-- a function, which the hosted `postgres` role is not. Calling any pg_trgm
+-- function loads it and registers the parameter as user-settable.
+do $$
+begin
+  perform extensions.word_similarity('', '');
+end
+$$;
+
 CREATE OR REPLACE FUNCTION public.data_catalog_listings__is_updated_within(p_last_updated_at timestamp with time zone, p_updated_within text)
  RETURNS boolean
  LANGUAGE sql

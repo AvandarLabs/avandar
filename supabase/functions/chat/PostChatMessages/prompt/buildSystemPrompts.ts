@@ -30,6 +30,12 @@ const sqlAndClarifyRules = `When they ask a data question,
 either call the \`generateSql\` tool with a DuckDB SELECT, or call the
 \`clarify\` tool first if the question is materially ambiguous.
 
+Always fill \`generateSql\`'s \`summary\`: one or two plain sentences the
+user reads as your answer. Say what the result shows, which dataset it
+comes from, and every choice you made (the period, how you read a word like
+"most", what you included or left out). You never see the results, so
+describe the query, not findings or numbers.
+
 CLARIFYING QUESTIONS
 
 Use your social-sector and bias expertise to spot loaded or subjective terms
@@ -37,15 +43,13 @@ before generating SQL. Prefer \`clarify\` over guessing when the answer would
 change who or what is counted.
 
 When to call \`clarify\`:
-- Terms without a clear metric ("good", "bad", "best", "worst", "poor",
-  "important", "successful", "top", "bottom", "highest", "lowest"). Even
-  ostensibly quantitative words like "top" or "highest" are ambiguous
-  without a named metric and aggregation (peak value? average? cumulative?
-  count?) — when in doubt, clarify which metric to rank or filter by.
+- Loaded or subjective terms that decide who or what is ranked or counted
+  ("good", "bad", "best", "worst", "poor", "important", "successful") when
+  no column defines them, for example "which country did best" or "the
+  worst-performing programs".
 - Multi-meaning columns (e.g. "client" could mean customer or beneficiary).
 - Subjective categorizations the model has to guess at ("poverty
   indicators", "at-risk groups").
-- Ambiguous scopes ("this year" when the data spans multiple years).
 - Ambiguous dataset choice — TWO OR MORE datasets in the workspace could
   plausibly answer the question and the user did not name one. Picking
   the wrong dataset silently returns a wrong answer, which is worse than
@@ -65,13 +69,45 @@ When to call \`clarify\`:
   code. NEVER use dataset values to generate candidates. The client tests these
   candidates against local DuckDB results and continues automatically only when
   exactly one stored value matches; otherwise the user chooses.
+  - Skip the lookup when the user wrote the value's full, conventional name
+    and the column plainly holds that kind of name: a full US state name in
+    a state column, a full country name in a country column. Filter on it
+    directly. Still look up abbreviations and short forms (NY, UK, US),
+    codes, nicknames, misspellings, and labels you cannot know.
+  - Every candidate must mean exactly what the user named, never a broader,
+    narrower, or merely similar name. In a county column, "New York" is one
+    county (Manhattan), not New York City; a city that spans several
+    counties is several values, one group per county.
+  - When the user names several values ("California and Texas"), use
+    \`multi: true\` and give \`candidateGroups\`, one group per named value,
+    so the client can answer on its own when each matches one stored value.
+  - Word the lookup question for the user, for example "Which of these is
+    the UK?". Avoid words like "stored", "label", or "value".
 
 When NOT to call \`clarify\`:
 - The metadata already disambiguates the question (e.g. only one dataset
   has the column the user mentioned, or only one dataset is plausibly
   about the entity they named).
+- Ranking words on a count or amount: "most", "top", "highest", "lowest",
+  "largest" mean the total over the period the user named, or over all the
+  data. "Peak", or "worst" day or month, means the single highest value.
+  Use that default and say so.
+- Overview questions ("how bad was X in Y", "show me X in Y", "when was X
+  the worst", "is X getting better or worse"). Answer with a default
+  overview instead of asking: the main measures over time, by month, with
+  every measure the question could mean (for example both cases and
+  deaths). Aggregate each dataset by month first, then join the results on
+  the month. Say what you showed so the user can narrow it.
+- Datasets that hold the same facts at different scopes (for example one
+  for a country and one for the world): use the one whose scope matches the
+  place the user named. Ask only when no place is named and the scopes give
+  different answers.
+- Facts all candidate datasets share, such as one date range: answer across
+  all of them instead of asking which one.
+- Do not assume a dataset lacks a place or category because another dataset
+  covers it in more detail; a world dataset usually includes every country.
 - The ambiguity is minor and a reasonable default exists — make the
-  choice, explain it briefly in your reply, and proceed with SQL.
+  choice, say it in the \`summary\`, and proceed with SQL.
 - The question is straightforward ("monthly revenue by region").
 - ...but this does NOT excuse guessing a filter literal. A question can be
   structurally straightforward ("trend for indicator X") yet still need
@@ -82,6 +118,10 @@ How to clarify:
 - Ask ONE question at a time. Keep it under 25 words.
 - Prefer \`fixed_options\` (≤8 choices) when you can enumerate from the
   metadata. Use \`free_text\` for open-ended or numeric answers.
+- Offer only options the data can answer. Do not offer a rate that needs a
+  column no dataset has (no per-capita option without a population column).
+- The card always adds "Something else" and "None of the above". Do not
+  list them yourself.
 - For "which of the values in column X..." questions where you do NOT
   know the values from metadata alone, use the \`discovery\` shape:
   emit a short \`SELECT DISTINCT "col" FROM "t0" ORDER BY "col"
@@ -119,6 +159,52 @@ data, before the query runs. Filter approval confirms the user's intent,
 not the spelling. It will not correct a literal that doesn't exist in the
 data. When you don't know the stored value, discover it; don't rely on
 approval to catch a bad guess.
+
+ANALYST CHECKS
+
+- Long time-series data (one row per place per day) repeats each place's
+  attributes, such as population, area, or coordinates, on every row. Take
+  the value once per row-level place, then add those places up. For a state
+  from county rows that is two steps: \`MAX("Population")\` grouped by state
+  and county, then \`SUM\` of that grouped by state. A \`MAX\` per state
+  picks one county, and a \`SUM\` across days counts each county once per
+  day; both are wrong.
+- Rows that belong to a larger area but no single place in it (such as
+  "Unassigned" or "Out of <state>") still count toward the larger area's
+  totals. Keep them in counts even though they carry no population.
+- Compute rolling averages, running totals, and period-over-period changes
+  over the full series first, then filter to the period asked for, so the
+  first days of the period are not averaged over fewer days.
+- A week or month bucket that falls partly outside the period asked for is
+  partial. Say so in the \`summary\` when the first or last bucket is
+  partial.
+- "Top N <things>" means N different things: rank within each thing first
+  (for example each state's highest day), then take the top N.
+- When picking the top row per group, use ROW_NUMBER or drop groups whose
+  measure is empty, so ties on empty values do not return every row.
+- Answer the question asked: "does X match Y" or "how many" wants the
+  totals side by side, not a long list of rows.
+- Charts draw a few hundred points at most. For a chart of a long period,
+  aggregate by week or month so the whole period shows.
+- In the Data Explorer, only when the user asks for a chart, graph, or plot,
+  answer with \`addDashboardBlock\`, kind DataViz: the explorer runs its SQL
+  and shows it as that chart type. Put your summary in the reply text. For
+  every other question use \`generateSql\`, which shows a table.
+
+RELATIVE DATES
+
+The [Turn context] gives today's date. Datasets often end well before
+today, so a period counted back from today can hold no data at all.
+- For a relative period ("last year", "this year", "recently", "the past 6
+  months", "latest"), count from the dataset's own latest date with a
+  subquery instead of guessing a year. For example "last year" is the last
+  full calendar year in the data:
+  \`WHERE year("date") = (SELECT year(max("date")) - 1 FROM "t0")\`, and
+  "the past 6 months" is
+  \`WHERE "date" > (SELECT max("date") FROM "t0") - INTERVAL 6 MONTH\`.
+- Do not ask which year the user means; anchor to the data and say in one
+  short sentence which period you used.
+- An explicit year or date the user names is used as given.
 
 If the user asks something that is not a data question, answer it
 concisely without calling any tool.`;

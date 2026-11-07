@@ -70,7 +70,9 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F18 | Case comments and the case activity feed | not started | none | |
 | F19 | Open data catalog browser: full-height three-pane layout with search, filters, and sort | not started | F12, F16, F17 | |
 | F20 | Phone widths: Data Sources shows one pane at a time, and the slate stays on screen | not started | none | |
-| F21 | Catalog field mapping: per-pipeline YAML metadata mapping, drives, and publisher, agency, topic, and keyword filters | not started | F4, F6, F7, F16, F17, F19 | |
+| F21 | Gadget references: link and embed dashboards, tiles, datasets, maps, case types, and cases in a case comment | not started | F18 | |
+| F22 | AI harness audit: 15 chat and Data Explorer bug fixes and 8 harness improvements | not started | none (see its section for order within it) | |
+| F23 | Catalog field mapping: per-pipeline YAML metadata mapping, drives, and publisher, agency, topic, and keyword filters | not started | F4, F6, F7, F16, F17, F19 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -98,7 +100,9 @@ API. It's new work, not something this branch built.
 | 13 | F19 | Moves the catalog browser onto F17's server search: its filters, facets, and sort become search parameters, and its list keeps F17's infinite scroll. Merge after F17. |
 | any | F18 | Self-contained: new tables, the record page feed, and one shared client typing fix. It touches no other feature's files, and nothing depends on it. |
 | any | F20 | Self-contained layout fix. The slate overflowing the bottom of a phone screen is already on `develop`, so it can merge first. |
-| 14 | F21 | Renames a column that F4, F6, F7, F16, F17 and F19 all read, replaces the hardcoded drive lists F6 and F7 added (`configuredDrives.ts` and `hdxDrive.ts`), and extends the search and filter rail F17 and F19 built. Merge after all of them. |
+| after F18 | F21 | Extends F18's rich text model, editor, and comment triggers, so it cannot land first. Otherwise self-contained. |
+| any | F22 | Chat and Data Explorer code that every other feature leaves alone. Its own PRs go in the order its section gives. |
+| 14 | F23 | Renames a column that F4, F6, F7, F16, F17 and F19 all read, replaces the hardcoded drive lists F6 and F7 added (`configuredDrives.ts` and `hdxDrive.ts`), and extends the search and filter rail F17 and F19 built. Merge after all of them. |
 | 15 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -124,11 +128,11 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/tests/database/data_catalog_listings_access.test.sql` | F4, F8 | F4: rename and the index test. F8: cache-column and `pipeline_access_complete` tests. |
 | `apps/pipeline-server/pipelines/world-bank__wdi/run.ts` | F1, F4, F10 | F1: `EtlEngine.create(name, { state })`. F4: `createSupabaseAdminClient` import from `pipelines/shared`. F10: `run(options)` rejecting `--limit`. |
 | `shared/types/database.types.ts` | F4, F6, F8, F17, F19 | Generated: regenerate in each. |
-| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx` | F12, F16, F19, F21 | F12: `DataCatalogInvalidNotice`. F16: `DataCatalogUnsupportedNotice`, the `isWorkspaceLoadable` guard on the invalid notice, and `!listing.isWorkspaceLoadable` in `isAddBlocked`. F19: the scrolling body, pinned foot, back button, and fact list. F21: the Published by, About, Source, and Technical details groups, the clickable topic and keyword chips, and the drive read. |
-| `supabase/schemas/11.data_catalog_listings.sql` (F4, F8, F17 know it as `10.data_catalog_listings.sql`) | F4, F8, F17, F21 | F21: the rename to `11.` (so `10.data_catalog_drives.sql` sorts first), `external_organization_name` becomes `organization1_name`, the new organization, `domains`, `tags`, `source_metadata`, and `drive_id` columns, the wider `search_vector`, and the filter indexes. |
-| `supabase/schemas/51.data_catalog_listings__search_matches.sql`, `52.rpc_data_catalog_listings__search.sql`, `52.rpc_data_catalog_listings__search_facets.sql` | F19, F21 | F21: the `organization1_name` rename, the level-2, topic, and keyword filters and facets, and the organization columns in the output. |
-| `apps/pipeline-server/pipelines/etl.config.yaml`, `packages/node/etl/src/EtlConfig/**` | F16, F21 | F21: per-pipeline loadability overrides move into each `<pipeline>.pipeline.yaml`, and the config parser, field mapper, and organization label lookup are added. |
-| `apps/pipeline-server/pipelines/{socrata,hdx}/**` and `packages/node/etl/src/{EtlEngine,stores}/**` | F6, F7, F10, F16, F21 | F21: YAML drives and mappers replace the hardcoded drive lists in `configuredDrives.ts` and `hdxDrive.ts`, the engine writes each drive row and `drive_id`, and listing rows carry the new columns. |
+| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx` | F12, F16, F19, F23 | F12: `DataCatalogInvalidNotice`. F16: `DataCatalogUnsupportedNotice`, the `isWorkspaceLoadable` guard on the invalid notice, and `!listing.isWorkspaceLoadable` in `isAddBlocked`. F19: the scrolling body, pinned foot, back button, and fact list. F23: the Published by, About, Source, and Technical details groups, the clickable topic and keyword chips, and the drive read. |
+| `supabase/schemas/11.data_catalog_listings.sql` (F4, F8, F17 know it as `10.data_catalog_listings.sql`) | F4, F8, F17, F23 | F23: the rename to `11.` (so `10.data_catalog_drives.sql` sorts first), `external_organization_name` becomes `organization1_name`, the new organization, `domains`, `tags`, `source_metadata`, and `drive_id` columns, the wider `search_vector`, and the filter indexes. |
+| `supabase/schemas/51.data_catalog_listings__search_matches.sql`, `52.rpc_data_catalog_listings__search.sql`, `52.rpc_data_catalog_listings__search_facets.sql` | F19, F23 | F23: the `organization1_name` rename, the level-2, topic, and keyword filters and facets, and the organization columns in the output. |
+| `apps/pipeline-server/pipelines/etl.config.yaml`, `packages/node/etl/src/EtlConfig/**` | F16, F23 | F23: per-pipeline loadability overrides move into each `<pipeline>.pipeline.yaml`, and the config parser, field mapper, and organization label lookup are added. |
+| `apps/pipeline-server/pipelines/{socrata,hdx}/**` and `packages/node/etl/src/{EtlEngine,stores}/**` | F6, F7, F10, F16, F23 | F23: YAML drives and mappers replace the hardcoded drive lists in `configuredDrives.ts` and `hdxDrive.ts`, the engine writes each drive row and `drive_id`, and listing rows carry the new columns. |
 
 ---
 
@@ -1122,7 +1126,109 @@ or Import data shows only the page, and the slate's bottom gutter is visible.
 
 ---
 
-## F21: Catalog field mapping
+## F21: Gadget references in case comments
+
+**Purpose:** A case comment links or embeds a dashboard, a single dashboard
+tile, a dataset, a map, a case type, or another case. Typing `@` searches
+teammates and these gadgets together. Enter inserts an inline link chip and
+Shift+Enter an embed card with key facts, and the editor switches either one
+to the other. Opening a tile lands on the dashboard preview scrolled to the
+tile and highlighted. The stored document never holds a gadget's or a
+member's name, and a reader who cannot open a gadget sees "Unavailable".
+**Value:** Case discussion points straight at the evidence (the chart, the
+dataset, the related case) instead of describing it, without leaking
+restricted resources to teammates who cannot see them.
+
+**PR title:** `feat(comments): link and embed dashboards, datasets, maps, and cases in case comments`
+
+**Built on:** `feat/comment-embeds`, branched from `demo/measles` after F18.
+See [gadgets.md](gadgets.md) for the as-built reference and
+[gadget-references-design.md](gadget-references-design.md) for the design.
+
+**Commits to read:** all of these, oldest first. They contain no other
+feature's work. The last two, which write this entry and add the end-to-end
+spec, follow `375cbf2e0`:
+`docs(measles-demo): document gadgets and log gadget references` and
+`test(comments): cover linking and embedding gadgets in a case comment`.
+
+| SHA | Subject |
+|---|---|
+| `50a83a3df` | docs(measles-demo): design gadget references in case comments |
+| `7c6e2c9cb` | docs(measles-demo): plan gadget references in case comments |
+| `ec1a3dfed` | feat(comments): add gadget search and mirror comment gadget references |
+| `862453ca2` | fix(comments): harden gadget search and cover its edge cases |
+| `a3865dbfa` | feat(comments): add the Gadget model |
+| `393375afe` | feat(comments): store gadget links and embeds in rich text documents |
+| `c299ebaf8` | feat(comments): add the gadget search client |
+| `c8dbed637` | feat(comments): find dashboard tiles in a dashboard config |
+| `af925c7e6` | refactor(datasets): share dataset source labels |
+| `cc29f02fb` | fix(comments): make gadget nodes strict and check gadget types against the database |
+| `b7aaf7f39` | feat(comments): resolve gadget references into summaries |
+| `05244612e` | feat(comments): render gadget chips and cards |
+| `82f2a3d77` | fix(comments): translate gadget states as whole phrases and trim chip queries |
+| `02fa1f61d` | feat(comments): add gadget link and embed nodes |
+| `7cad621e1` | fix(comments): keep gadget chips in the editor from navigating and tidy the embed switch |
+| `4cbc6753f` | fix(comments): avoid the internal word gadget in unavailable copy |
+| `07a7ffd6f` | feat(comments): search gadgets from the @ menu |
+| `ed3a4041c` | fix(comments): keep the @ menu highlight and results steady while searching |
+| `170aef3b2` | feat(dashboards): scroll to and highlight a linked tile in the dashboard preview |
+| `a1f8e67bc` | fix(comments): make stored mentions strict so they can never carry a name |
+| `375cbf2e0` | chore(comments): extract gadget messages |
+
+**Files:** `supabase/schemas/00.enum.gadget_type.sql`,
+`22.comment_gadget_refs.sql`, `50.rpc_gadgets__search.sql`, the
+`comments__sync_gadget_refs` trigger in `23.comments__audit_triggers.sql`,
+the `idx_individuals__workspace_id` index in `20.individuals.sql`, pgTAP
+tests under `supabase/tests/database/gadgets/` (plus the
+`exact_data_api_grants` edit), `shared/models/gadgets/Gadget/**`, the gadget
+and strict-mention hunks of `shared/models/RichTextDocument/**`,
+`src/clients/gadgets/searchGadgets/**`,
+`src/clients/dashboards/findDashboardTile/**`,
+`src/components/RichText/Gadget/**`, `src/components/RichText/MentionMenu/**`
+(which replaces `UserMention/UserMentionList*` and
+`UserMention/createUserMentionSuggestion.ts`), the gadget hunks of
+`createRichTextExtensions.ts`, `RichTextComposer`, `RichTextView`, and
+`UserMention/filterMentionCandidates.ts`,
+`src/components/RichText/__tests__/gadgetDisplaySwitch.integration.test.tsx`,
+`src/hooks/datasets/useDatasetSourceLabels.ts` with the
+`DatasetMetaView.tsx` refactor that uses it, the `?tile=` handling in
+`src/routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId.tsx`,
+`DashboardViewerView/{DashboardViewerView,DashboardViewerContent}.tsx` and
+`useHighlightTile.{ts,module.css,test.tsx}`, the `data-tile-id` in
+`DataVizPBlock/DataVizPBlock/{DataVizContent,DataVizPBlock}.tsx`, small
+hunks in the case feed (`CaseActivityComposer.tsx`,
+`CaseActivityFeedEmptyState.tsx`, `CommentCardBody.tsx`,
+`CaseActivityFeed.test.tsx`), `comment_gadget_refs` in
+`apps/desktop/sync/syncable-tables.ts`, and
+`tests/e2e/case-gadgets.spec.ts` with
+`tests/e2e/helpers/seedDashboardWithTile.ts`.
+
+**Docs:** `docs/measles-demo/gadgets.md`,
+`docs/measles-demo/gadget-references-design.md`, and
+`docs/measles-demo/gadget-references-plan.md` are new on this branch. Port
+them with F18's docs, and port the "Gadget references" section of
+`case-activity-architecture.md`, the gadgets line in `AGENTS.md`, and the
+gadget references bullet under P5c.2 in
+`docs/production-plan-world-humanitarian-day.md`.
+
+**Schema:** one migration, `20261107004932_gadget_references.sql` (and its
+desktop mirror `apps/desktop/migrations/20261107004932_gadget_references.gen.sql`).
+Regenerate both on the PR branch after `ava supabase switch`, rather than
+copying them, so they sort after whatever `develop` has then.
+
+**Verification:**
+```sh
+pnpm test:db
+pnpm vitest run shared/models/gadgets shared/models/RichTextDocument src/clients/gadgets src/clients/dashboards/findDashboardTile src/components/RichText src/views/DashboardApp/DashboardViewerView src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock src/views/IndividualManagerApp
+pnpm test:desktop
+pnpm i18n:check
+pnpm test:e2e case-gadgets.spec.ts
+pnpm test:e2e case-activity.spec.ts
+```
+
+---
+
+## F23: Catalog field mapping
 
 **Purpose:** Each drive-index pipeline maps its source's dataset records
 onto a common catalog metadata schema through one YAML file beside it,
@@ -1224,7 +1330,7 @@ commits belong to the features that own them, not here.
 | `9545f385a` | docs(measles-demo): use the getOrganizationLabelsFromDrive name | Nothing: goes with F9. |
 | `7ff389c30` | docs(measles-demo): build catalog filters on the merged filter rail and search | Nothing: goes with F9. |
 
-No commit is `MIXED`: every hunk belongs to F21. Several edit files other
+No commit is `MIXED`: every hunk belongs to F23. Several edit files other
 features own, so apply them on top of those features' final files rather than
 copying a file whole (see **Files shared by several features**).
 
@@ -1250,10 +1356,10 @@ row contract and `listingContractColumns`), `packages/node/etl/README.md`,
 `supabase/migration-upgrade-tests/catalog_field_mapping.*`, and
 `apps/desktop/scripts/gen-sqlite-migrations/getManualMigrationBodyFromSourceFile.ts`.
 
-**Schema:** `20261107013616_catalog_field_mapping.sql` (renames
+**Schema:** `20261107180000_catalog_field_mapping.sql` (renames
 `external_organization_name`, adds the drives table and the new listing
 columns, rebuilds `search_vector`, and replaces the search functions on the
-renamed column) and `20261107015103_catalog_search_organization_filters.sql`
+renamed column) and `20261107180100_catalog_search_organization_filters.sql`
 (adds the level-2, topic, and keyword parameters and facets). Hand-write the
 first, because the schema diff would turn the rename into a drop and a
 create: confirm the result has no `drop column` of a data column. Regenerate
@@ -1409,46 +1515,47 @@ Its commits are covered by F19, not numbered here.
 
 | # | SHA | Feature(s) |
 |---|---|---|
-| 90 | `9b62c64da` | F21 |
-| 91 | `24af95af7` | F21 |
-| 92 | `5bb703a2b` | F21 |
-| 93 | `2fedf1ba9` | F21 |
-| 94 | `b191f4cbf` | F21 |
-| 95 | `f82a67efb` | F21 |
+| 90 | `9b62c64da` | F23 |
+| 91 | `24af95af7` | F23 |
+| 92 | `5bb703a2b` | F23 |
+| 93 | `2fedf1ba9` | F23 |
+| 94 | `b191f4cbf` | F23 |
+| 95 | `f82a67efb` | F23 |
 | 96 | `9545f385a` | F9 |
-| 97 | `c59864844` | F21 (history) |
-| 98 | `4291d2500` | F21 (history) |
-| 99 | `2b7199729` | F21 (history) |
-| 100 | `4499fcec1` | F21 |
-| 101 | `b5a03820b` | F21 |
-| 102 | `4d4b6b49b` | F21 |
-| 103 | `937a118f7` | F21 |
-| 104 | `26993b266` | F21 |
-| 105 | `6a0bcbfba` | F21 |
-| 106 | `e8e592d1a` | F21 |
-| 107 | `2020b4642` | F21 |
-| 108 | `c99e46b54` | F21 |
-| 109 | `5e3b6ee3d` | F21 |
-| 110 | `8578eaecb` | F21 |
-| 111 | `bcac141e7` | F21 |
+| 97 | `c59864844` | F23 (history) |
+| 98 | `4291d2500` | F23 (history) |
+| 99 | `2b7199729` | F23 (history) |
+| 100 | `4499fcec1` | F23 |
+| 101 | `b5a03820b` | F23 |
+| 102 | `4d4b6b49b` | F23 |
+| 103 | `937a118f7` | F23 |
+| 104 | `26993b266` | F23 |
+| 105 | `6a0bcbfba` | F23 |
+| 106 | `e8e592d1a` | F23 |
+| 107 | `2020b4642` | F23 |
+| 108 | `c99e46b54` | F23 |
+| 109 | `5e3b6ee3d` | F23 |
+| 110 | `8578eaecb` | F23 |
+| 111 | `bcac141e7` | F23 |
 | 112 | `7ff389c30` | F9 |
-| 113 | `79dc85076` | F21 |
-| 114 | `bf8e7cfa2` | F21 |
-| 115 | `5ebe11ba5` | F21 |
-| 116 | `80a6e1ffe` | F21 |
-| 117 | `b1a8199b7` | F21 |
-| 118 | `68b003a2f` | F21 |
-| 119 | `d64d11d83` | F21 |
-| 120 | `d90481335` | F21 |
-| 121 | `14984e21b` | F21 |
-| 122 | `ef758d937` | F21 |
-| 123 | `6c43b5a65` | F21 |
-| 124 | `d7fd436a8` | F21 |
-| 125 | `bc4baf853` | F21 |
-| 126 | `d50583f7e` | F21 |
+| 113 | `79dc85076` | F23 |
+| 114 | `bf8e7cfa2` | F23 |
+| 115 | `5ebe11ba5` | F23 |
+| 116 | `80a6e1ffe` | F23 |
+| 117 | `b1a8199b7` | F23 |
+| 118 | `68b003a2f` | F23 |
+| 119 | `d64d11d83` | F23 |
+| 120 | `d90481335` | F23 |
+| 121 | `14984e21b` | F23 |
+| 122 | `ef758d937` | F23 |
+| 123 | `6c43b5a65` | F23 |
+| 124 | `d7fd436a8` | F23 |
+| 125 | `bc4baf853` | F23 |
+| 126 | `d50583f7e` | F23 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
-under F18 above rather than numbered here.
+under F18 above rather than numbered here. F21's commits are listed in full
+under F21 in the same way.
 
 Commits that only update this log are branch-only and are not listed.
 
@@ -1456,3 +1563,27 @@ Commits that only update this log are branch-only and are not listed.
 - `b920bee1b` (desktop SQLite generator catch-up) is on the Postgres branch.
 - `7dbb2210a`'s non-open-data files (`db_connections*`, `PostgresTableWrapper*`, the Postgres import views, `supabase/functions/connectors/*`, `supabase/functions/_shared/*`, `createRegistryForFetch.ts`, `http-api.types.ts`, `ConnectorsAdvisory.tsx`, `save*Dataset.ts`, `postgres-connector-option-a-prototype.html`, `tests/e2e/postgres-connector-import.spec.ts`) are formatting and Postgres work. They belong to the Postgres branch, not to any feature here.
 - `supabase/config.toml`: `7dbb2210a` committed this branch's Supabase switch (project `feat-demo-measles`, ports 553xx). Never port it. Run `ava supabase restore` and commit the standard config before this branch itself is ever merged anywhere. Done in `f710dcb68`.
+
+## F22: AI harness audit fixes
+
+Status: not started. Branch base for each PR: `develop`.
+
+The COVID audit in [`docs/ai-harness-audit/`](../ai-harness-audit/README.md)
+produced one branch per fix, each merged into `demo/measles`. Every entry in
+[`bug-log.md`](../ai-harness-audit/bug-log.md) and
+[`harness-improvements.md`](../ai-harness-audit/harness-improvements.md)
+names its branch, its merge commit on `demo/measles`, its tests, and the PR
+title to use. Each is its own PR.
+
+Order: the bugs first, BUG-001 to BUG-015, then the improvements, C1 to C7.
+Later entries edit the same files as earlier ones
+(`buildSystemPrompts.ts`, `parseOpenRouterResponse.ts`, `parseClarify.ts`,
+`applyChatModelTurnResponse.ts`, `makeDataGridColumnDefs.ts`, the
+discovery components), so taking them in order keeps each diff small.
+BUG-007 and its follow-up `c0c08b571` go together, as do C2 and
+`fix/summary-test-types`, and the three C4 branches.
+
+Regenerate the Lingui catalogs (`pnpm translations <path>`) in each PR that
+adds user-facing strings: BUG-002, BUG-004, BUG-011, BUG-012, C7, and the
+chart sampling change in C4.
+

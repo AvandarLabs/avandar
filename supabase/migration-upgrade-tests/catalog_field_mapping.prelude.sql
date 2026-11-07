@@ -12,7 +12,7 @@ begin;
 -- the new columns and the function it calls, and the search functions that
 -- read `organization1_name`. The search functions are dropped by the
 -- signatures the fully migrated database has, which
--- `20261107015103_catalog_search_organization_filters` widened with the
+-- `20261107180100_catalog_search_organization_filters` widened with the
 -- level-2 organization, topic, and keyword filters.
 alter table public.data_catalog_listings drop column search_vector;
 

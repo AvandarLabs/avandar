@@ -3,6 +3,7 @@ import { isNotNull, matchLiteral, propEq } from "@avandar/utils";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
 import { applyChatModelTurnResponse } from "@/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse";
@@ -115,7 +116,11 @@ export function createChatModelAdapter(
             }),
             user: Model.make("ChatClientMessage", {
               role: "user" as const,
-              content,
+              content: DiscoveryContinuationMessage.isInternal(
+                threadMessage.metadata,
+              )
+                ? DiscoveryContinuationMessage.toModelContent(content)
+                : content,
             }),
           });
         })
