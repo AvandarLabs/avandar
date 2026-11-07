@@ -185,10 +185,12 @@ A Vite plugin (`vite-plugin-ava-plugins`) runs during `vite build` and
 fails:
 
 - Any `plugins/**` module is statically reachable from the entry chunk.
-- The entry chunk grows by more than the budget, measured against a build
-  with an empty `bundled.yaml`. The starting budget is 8 KB gzipped for the
-  plugin host, plus 200 bytes gzipped per bundled plugin. Both are
-  constants in the script.
+- The plugin host's modules add more than their budget to statically loaded
+  chunks. The check runs in a single build and reads Rollup's per-module
+  rendered sizes, so no second build with an empty `bundled.yaml` is
+  needed. The starting budget is 24,000 rendered bytes for the host plus 600
+  per bundled plugin, roughly 8 KB and 200 bytes gzipped. Both are constants
+  in the check.
 
 ### Import restriction
 
@@ -245,10 +247,11 @@ type DataExplorerToolbarContext = {
 
 Facts for `when` are derived from this context.
 
-A `QueryHandle` is an opaque ID. The host registers it against the current
-executable query, meaning the SQL plus its data source. The handle is
-invalidated when the query changes. This lets the API cross the sandbox
-boundary in Milestone 2 without exposing SQL.
+A `QueryHandle` is an opaque ID. The host registers it against the result
+rows Data Explorer already holds in memory, which is exactly the result the
+user invoked the command on, so nothing is queried twice. A new result gets
+a new handle, and only the most recent handles stay live. This lets the API
+cross the sandbox boundary in Milestone 2 without exposing SQL.
 
 ### Activation and command execution
 
@@ -288,7 +291,7 @@ translate strings with `useT()`.
 | Member | Purpose | Permission |
 | --- | --- | --- |
 | `avandar.context` | The invocation context (`DataExplorerToolbarContext` in 1a) | None |
-| `avandar.data.fetchRows(queryHandle, { columns, limit })` | Fetches rows of the invocation's result as `{ rows: Record<string, unknown>[], isTruncated: boolean }`. The default limit is 50,000 and the maximum is 200,000. Runs through the app's existing DuckDB query path, selecting only the requested columns | `data:context` |
+| `avandar.data.fetchRows(queryHandle, { columns, limit })` | Fetches rows of the invocation's result as `{ rows: Record<string, unknown>[], isTruncated: boolean }`. The default limit is 50,000 and the maximum is 200,000. Reads the in-memory result behind the handle, selecting only the requested columns | `data:context` |
 | `avandar.ui.openModal({ title, content })`, `openDrawer(...)`, `notify({ message, color })` | Show UI. `content` must be built from `@avandar/plugin-ui` components | None |
 | `avandar.i18n.t(key, values?)`, `useT()` | Plugin strings from `locales/`, formatted as ICU messages in the user's locale | None |
 | `avandar.workspace` | `{ id, slug, locale }`, read-only | None |
