@@ -4,7 +4,10 @@ import {
   SlotFactRegistry,
 } from "@plugin-manifest/SlotFacts/SlotFactRegistry.ts";
 import { z } from "zod";
-import type { WhenCondition } from "@plugin-manifest/WhenCondition/WhenCondition.types.ts";
+import type {
+  WhenCondition,
+  WhenOperator,
+} from "@plugin-manifest/WhenCondition/WhenCondition.types.ts";
 
 const PLUGIN_ID_PATTERN = /^[a-z0-9-]+\.[a-z0-9-]+$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
@@ -12,7 +15,16 @@ const LOCALIZED_KEY_PATTERN = /^%[A-Za-z0-9_.-]+%$/;
 const COMMAND_ID_PATTERN = /^[a-z0-9-]+(?:\.[a-z0-9-]+)*$/;
 const ICON_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ENTRY_PATTERN = /^(?!\/)(?!.*\.\.)[A-Za-z0-9_./-]+\.tsx?$/;
-const WHEN_OPERATORS = ["eq", "ne", "gt", "gte", "lt", "lte", "in"] as const;
+const WHEN_OPERATORS = [
+  "eq",
+  "ne",
+  "gt",
+  "gte",
+  "lt",
+  "lte",
+  "in",
+] as const satisfies readonly WhenOperator[];
+const WHEN_SHAPES_MESSAGE = `must be "all: [...]", "any: [...]", "not: ...", or "{ <fact>: { <operator>: value } }" with an operator of ${WHEN_OPERATORS.join(", ")}`;
 
 /** Permissions a manifest may request in this version of the schema. */
 export const PLUGIN_PERMISSIONS = ["data:context"] as const;
@@ -53,18 +65,24 @@ const FactComparisonSchema = z
   );
 
 const WhenConditionSchema: z.ZodType<WhenCondition> = z.lazy(() => {
-  return z.union([
-    z.strictObject({ all: z.array(WhenConditionSchema).min(1) }),
-    z.strictObject({ any: z.array(WhenConditionSchema).min(1) }),
-    z.strictObject({ not: WhenConditionSchema }),
-    FactComparisonSchema,
-  ]);
+  return z.union(
+    [
+      z.strictObject({ all: z.array(WhenConditionSchema).min(1) }),
+      z.strictObject({ any: z.array(WhenConditionSchema).min(1) }),
+      z.strictObject({ not: WhenConditionSchema }),
+      FactComparisonSchema,
+    ],
+    { error: WHEN_SHAPES_MESSAGE },
+  );
 });
 
 const CommandSchema = z.strictObject({
   id: z
     .string()
-    .regex(COMMAND_ID_PATTERN, "must be lowercase words separated by dots"),
+    .regex(
+      COMMAND_ID_PATTERN,
+      "must be lowercase letters, digits, and hyphens, in dot-separated words",
+    ),
   title: LocalizedStringSchema,
   icon: IconNameSchema,
 });
@@ -72,6 +90,14 @@ const CommandSchema = z.strictObject({
 const MenuItemSchema = z.strictObject({
   command: z.string(),
   when: WhenConditionSchema.optional(),
+});
+
+const MenusSchema = z.partialRecord(z.enum(SLOT_IDS), z.array(MenuItemSchema), {
+  error: (issue) => {
+    return issue.code === "invalid_key"
+      ? `unknown slot "${String(issue.input)}". Known slots: ${SLOT_IDS.join(", ")}`
+      : undefined;
+  },
 });
 
 const BasePluginManifestSchema = z.strictObject({
@@ -98,9 +124,7 @@ const BasePluginManifestSchema = z.strictObject({
   permissions: z.array(z.enum(PLUGIN_PERMISSIONS)).default([]),
   contributes: z.strictObject({
     commands: z.array(CommandSchema).default([]),
-    menus: z
-      .partialRecord(z.enum(SLOT_IDS), z.array(MenuItemSchema))
-      .default({}),
+    menus: MenusSchema.default({}),
   }),
 });
 
@@ -171,10 +195,17 @@ export const PluginManifestSchema = BasePluginManifestSchema.superRefine(
   },
 );
 
-/** A validated plugin manifest. */
+/**
+ * A plugin manifest that passed `PluginManifestSchema`, with omitted lists
+ * defaulted to empty. Use it wherever code reads a plugin's declared metadata
+ * and contributions.
+ */
 export type PluginManifest = z.output<typeof PluginManifestSchema>;
 
-/** A command a plugin declares. */
+/**
+ * A command a plugin declares under `contributes.commands`, for example the
+ * target a menu item invokes.
+ */
 export type PluginCommand = PluginManifest["contributes"]["commands"][number];
 
 /** A plugin command placed in a slot. */

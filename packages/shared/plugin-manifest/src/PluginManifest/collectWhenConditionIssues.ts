@@ -10,7 +10,10 @@ import type {
   WhenOperator,
 } from "@plugin-manifest/WhenCondition/WhenCondition.types.ts";
 
-/** A schema issue located inside a `when` condition. */
+/**
+ * A problem found in a `when` condition and where it sits, in the shape the
+ * manifest schema needs to report it as a Zod issue.
+ */
 export type WhenConditionIssue = Readonly<{
   path: ReadonlyArray<string | number>;
   message: string;
@@ -24,6 +27,68 @@ const OPERATORS_BY_FACT_TYPE = {
 
 function _isValueOfFactType(value: unknown, factType: FactType): boolean {
   return typeof value === factType;
+}
+
+function _collectOperatorShapeIssues(options: {
+  factName: string;
+  factType: FactType;
+  operator: string;
+  value: unknown;
+  path: ReadonlyArray<string | number>;
+}): WhenConditionIssue[] {
+  const { factName, factType, operator, value, path } = options;
+  const isList = Array.isArray(value);
+  if (operator === "in" && (!isList || value.length === 0)) {
+    return [
+      {
+        path,
+        message: `"in" needs a non-empty list of values for "${factName}"`,
+      },
+    ];
+  }
+  if (operator !== "in" && isList) {
+    return [
+      {
+        path,
+        message: `"${operator}" needs a single ${factType} for "${factName}"`,
+      },
+    ];
+  }
+  return [];
+}
+
+function _collectOperatorIssues(options: {
+  factName: string;
+  factType: FactType;
+  operator: string;
+  value: unknown;
+  path: ReadonlyArray<string | number>;
+}): WhenConditionIssue[] {
+  const { factName, factType, operator, value, path } = options;
+  const allowed: readonly string[] = OPERATORS_BY_FACT_TYPE[factType];
+  if (!allowed.includes(operator)) {
+    return [
+      {
+        path,
+        message: `operator "${operator}" does not apply to ${factType} fact "${factName}"`,
+      },
+    ];
+  }
+  const operatorPath = [...path, operator];
+  const shapeIssues = _collectOperatorShapeIssues({
+    ...options,
+    path: operatorPath,
+  });
+  if (shapeIssues.length > 0) {
+    return shapeIssues;
+  }
+  const values = Array.isArray(value) ? value : [value];
+  const isValid = values.every((item: unknown) => {
+    return _isValueOfFactType(item, factType);
+  });
+  return isValid
+    ? []
+    : [{ path: operatorPath, message: `"${factName}" is a ${factType} fact` }];
 }
 
 function _collectComparisonIssues(options: {
@@ -43,28 +108,28 @@ function _collectComparisonIssues(options: {
       ];
     }
     return Object.entries(operators).flatMap(([operator, value]) => {
-      const allowed: readonly string[] = OPERATORS_BY_FACT_TYPE[factType];
-      if (!allowed.includes(operator)) {
-        return [
-          {
-            path: [...path, factName],
-            message: `operator "${operator}" does not apply to ${factType} fact "${factName}"`,
-          },
-        ];
-      }
-      const values =
-        operator === "in" && Array.isArray(value) ? value : [value];
-      const isValid = values.every((item: unknown) => {
-        return _isValueOfFactType(item, factType);
+      return _collectOperatorIssues({
+        factName,
+        factType,
+        operator,
+        value,
+        path: [...path, factName],
       });
-      return isValid
-        ? []
-        : [
-            {
-              path: [...path, factName, operator],
-              message: `"${factName}" is a ${factType} fact`,
-            },
-          ];
+    });
+  });
+}
+
+function _collectChildIssues(options: {
+  children: readonly WhenCondition[];
+  slotFacts: Readonly<Record<string, FactType>>;
+  path: ReadonlyArray<string | number>;
+}): WhenConditionIssue[] {
+  const { children, slotFacts, path } = options;
+  return children.flatMap((child, index) => {
+    return collectWhenConditionIssues({
+      condition: child,
+      slotFacts,
+      path: [...path, index],
     });
   });
 }
@@ -79,15 +144,18 @@ export function collectWhenConditionIssues(options: {
   path: ReadonlyArray<string | number>;
 }): WhenConditionIssue[] {
   const { condition, slotFacts, path } = options;
-  if (isAllCondition(condition) || isAnyCondition(condition)) {
-    const key = isAllCondition(condition) ? "all" : "any";
-    const children = isAllCondition(condition) ? condition.all : condition.any;
-    return children.flatMap((child, index) => {
-      return collectWhenConditionIssues({
-        condition: child,
-        slotFacts,
-        path: [...path, key, index],
-      });
+  if (isAllCondition(condition)) {
+    return _collectChildIssues({
+      children: condition.all,
+      slotFacts,
+      path: [...path, "all"],
+    });
+  }
+  if (isAnyCondition(condition)) {
+    return _collectChildIssues({
+      children: condition.any,
+      slotFacts,
+      path: [...path, "any"],
     });
   }
   if (isNotCondition(condition)) {
@@ -98,7 +166,7 @@ export function collectWhenConditionIssues(options: {
     });
   }
   return _collectComparisonIssues({
-    comparison: condition as FactComparison,
+    comparison: condition,
     slotFacts,
     path,
   });

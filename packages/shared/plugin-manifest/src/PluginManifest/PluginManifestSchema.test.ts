@@ -32,14 +32,31 @@ function _makeValidManifest(): Record<string, unknown> {
   };
 }
 
-function _getIssueMessages(input: unknown): string[] {
+function _makeManifestWithWhen(when: unknown): Record<string, unknown> {
+  const manifest = _makeValidManifest();
+  manifest.contributes = {
+    commands: [{ id: "x", title: "%x%", icon: "trending-up" }],
+    menus: { "dataExplorer.toolbar": [{ command: "x", when }] },
+  };
+  return manifest;
+}
+
+function _getIssues(input: unknown): Array<{ path: string; message: string }> {
   const result = PluginManifestSchema.safeParse(input);
   return result.success
     ? []
     : result.error.issues.map((issue) => {
-        return `${issue.path.join(".")}: ${issue.message}`;
+        return { path: issue.path.join("."), message: issue.message };
       });
 }
+
+function _getIssueMessages(input: unknown): string[] {
+  return _getIssues(input).map((issue) => {
+    return `${issue.path}: ${issue.message}`;
+  });
+}
+
+const WHEN_PATH = "contributes.menus.dataExplorer.toolbar.0.when";
 
 describe("PluginManifestSchema", () => {
   it("accepts a valid manifest and defaults omitted lists", () => {
@@ -50,10 +67,15 @@ describe("PluginManifestSchema", () => {
     expect(result.contributes.commands).toHaveLength(1);
   });
 
-  it("rejects unknown keys", () => {
-    expect(
-      _getIssueMessages({ ..._makeValidManifest(), colour: "red" }),
-    ).not.toEqual([]);
+  it("rejects unknown keys and names the offending key", () => {
+    const result = PluginManifestSchema.safeParse({
+      ..._makeValidManifest(),
+      colour: "red",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues).toMatchObject([
+      { code: "unrecognized_keys", keys: ["colour"], path: [] },
+    ]);
   });
 
   it("rejects an id that is not publisher.name", () => {
@@ -123,11 +145,131 @@ describe("PluginManifestSchema", () => {
   });
 
   it("rejects a permission this schema version does not support", () => {
-    expect(
-      _getIssueMessages({
-        ..._makeValidManifest(),
-        permissions: ["data:read"],
-      }),
-    ).not.toEqual([]);
+    const issues = _getIssues({
+      ..._makeValidManifest(),
+      permissions: ["data:read"],
+    });
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toBe("permissions.0");
+  });
+
+  it("rejects an invalid fact nested inside all, not, and any", () => {
+    const manifest = _makeManifestWithWhen({
+      all: [{ not: { any: [{ mapZoom: { gt: 3 } }] } }],
+    });
+    expect(_getIssues(manifest)).toMatchObject([
+      {
+        path: `${WHEN_PATH}.all.0.not.any.0`,
+        message: expect.stringContaining('unknown fact "mapZoom"'),
+      },
+    ]);
+  });
+
+  it("rejects a value whose type does not fit the fact", () => {
+    const manifest = _makeManifestWithWhen({
+      numericColumnCount: { gte: "2" },
+    });
+    expect(_getIssues(manifest)).toMatchObject([
+      {
+        path: `${WHEN_PATH}.numericColumnCount.gte`,
+        message: expect.stringContaining(
+          '"numericColumnCount" is a number fact',
+        ),
+      },
+    ]);
+  });
+
+  it("rejects in with a single value instead of a list", () => {
+    const manifest = _makeManifestWithWhen({ rowCount: { in: 3 } });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: `${WHEN_PATH}.rowCount.in`,
+        message: '"in" needs a non-empty list of values for "rowCount"',
+      },
+    ]);
+  });
+
+  it("rejects in with an empty list", () => {
+    const manifest = _makeManifestWithWhen({ rowCount: { in: [] } });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: `${WHEN_PATH}.rowCount.in`,
+        message: '"in" needs a non-empty list of values for "rowCount"',
+      },
+    ]);
+  });
+
+  it("rejects a non-in operator given a list", () => {
+    const manifest = _makeManifestWithWhen({ rowCount: { gte: [2] } });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: `${WHEN_PATH}.rowCount.gte`,
+        message: '"gte" needs a single number for "rowCount"',
+      },
+    ]);
+  });
+
+  it("accepts in with a non-empty list of values of the fact's type", () => {
+    const manifest = _makeManifestWithWhen({ rowCount: { in: [1, 2] } });
+    expect(_getIssues(manifest)).toEqual([]);
+  });
+
+  it("explains the valid when shapes when an operator is misspelled", () => {
+    const manifest = _makeManifestWithWhen({ rowCount: { gtee: 2 } });
+    const issues = _getIssues(manifest);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toBe(WHEN_PATH);
+    expect(issues[0]?.message).toContain("all: [...]");
+    expect(issues[0]?.message).toContain("any: [...]");
+    expect(issues[0]?.message).toContain("not: ...");
+    expect(issues[0]?.message).toContain("{ <fact>: { <operator>: value } }");
+    expect(issues[0]?.message).toContain("eq, ne, gt, gte, lt, lte, in");
+  });
+
+  it.each([
+    ["all is an object instead of a list", { all: { rowCount: { gt: 1 } } }],
+    ["an extra key sits beside all", { all: [{ rowCount: { gt: 1 } }], x: 1 }],
+  ])("explains the valid when shapes when %s", (_name, when) => {
+    const issues = _getIssues(_makeManifestWithWhen(when));
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toBe(WHEN_PATH);
+    expect(issues[0]?.message).toContain("all: [...]");
+  });
+
+  it("explains the valid when shapes for a malformed nested condition", () => {
+    const manifest = _makeManifestWithWhen({
+      all: [{ rowCount: { gtee: 2 } }],
+    });
+    const issues = _getIssues(manifest);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toBe(WHEN_PATH);
+    expect(issues[0]?.message).toContain("all: [...]");
+  });
+
+  it("lists the valid slots when a menu names an unknown slot", () => {
+    const manifest = _makeValidManifest();
+    manifest.contributes = {
+      commands: [{ id: "x", title: "%x%", icon: "trending-up" }],
+      menus: { "gis.toolbar": [{ command: "x" }] },
+    };
+    const issues = _getIssues(manifest);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toBe("contributes.menus.gis.toolbar");
+    expect(issues[0]?.message).toContain('unknown slot "gis.toolbar"');
+    expect(issues[0]?.message).toContain("dataExplorer.toolbar");
+  });
+
+  it("explains the command id format in lowercase words", () => {
+    const manifest = _makeValidManifest();
+    manifest.contributes = {
+      commands: [{ id: "Bad_Id", title: "%x%", icon: "trending-up" }],
+      menus: {},
+    };
+    const issues = _getIssues(manifest);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toBe("contributes.commands.0.id");
+    expect(issues[0]?.message).toBe(
+      "must be lowercase letters, digits, and hyphens, in dot-separated words",
+    );
   });
 });
