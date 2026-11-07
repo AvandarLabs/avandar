@@ -610,7 +610,8 @@ compile error.
    `pnpm test:e2e case-bucketed-fields.spec.ts` passes on its own.
 4. Existing case types read exactly as before: every new column defaults to
    NULL, and existing tests change only where a fixture gains `bucketGrain`
-   or `bucketColumnId`, or where G3's rule-check message is asserted.
+   or `bucketColumnId`, or where they assert G3's rule-check message, its
+   shape control's accessible name, or its tool schema's shape enum.
 5. `docs/ontology-architecture.md` describes per-period fields (sections 4,
    5, 7, 8, 9, 10, 12, 15, 16).
 

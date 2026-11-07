@@ -4,13 +4,13 @@
 
 **Goal:** Let one field of a case type read several dataset columns, in one dataset or several, with one rule reducing every source's rows, one ID field per new case type, and every source listed wherever a field's provenance is shown.
 
-**Architecture:** The value rule moves from the mapping row to the field (`concept_attributes.value_picker_rule_type`), and a field keeps one mapping row per source, ordered by `position`. The concept view stacks a field's sources with `UNION ALL` inside the field's correlated subquery, each source keyed by its own dataset's key column, then reduces the stacked rows once with the field's rule, list, or per-bucket rule. Authoring (form and chat) builds sources, and folds the join key columns into one ID field.
+**Architecture:** The value rule moves from the mapping row to the field (`concept_attributes.value_picker_rule_type`), and a field keeps one mapping row per source, ordered by `position`. A new module, `buildStackedSourceRowsSql`, stacks a field's sources with `UNION ALL` inside the field's correlated subquery, each keyed by its own dataset's key column; plan 1's `buildAttributeValueSql` (single values, lists) and plan 4's `buildBucketedListValueSql` (per period) reduce those rows instead of one dataset's. Authoring (form and chat) builds sources, and folds the join key columns into one ID field.
 
 **Tech Stack:** Postgres (Supabase declarative schema, pgTAP, migration upgrade tests), TypeScript, Zod, React, Mantine, Lingui, DuckDB (QETL), Deno edge functions, Vitest, Playwright.
 
 **Spec:** `docs/superpowers/specs/2026-11-06-joined-cases-5-multi-source-fields-design.md`. Section numbers (§) refer to it. **Overview and ground rules:** `docs/superpowers/plans/2026-11-06-joined-cases.md`. **Shared names:** umbrella §6.
 
-**Prerequisite:** plans 1 to 4 have landed on `feat/joined-cases`. Task 0 checks what they actually named things.
+**Prerequisite:** plans 1 to 4 have landed on `feat/joined-cases`. This plan edits their code as their plans write it; Task 0 checks what actually landed.
 
 ---
 
@@ -18,7 +18,7 @@
 
 - **`supabase-declarative-schema`** before Tasks 1 to 4. Edit `supabase/schemas/`, run `pnpm db:reset` and then immediately `pnpm db:new-migration <name>`, and never hand-edit what it generates. Task 2's data move is the one hand-written migration (`supabase migration new`), because `db diff` never emits DML.
 - **`test-driven-development`** throughout.
-- **`impeccable`** before Task 17. The multi-source editor is a new surface. Task 19 reuses that component and needs no second pass.
+- **`impeccable`** before Task 17. The multi-source editor is a new surface. Tasks 18 and 19 mount that component and need no second pass.
 - **`playwright-best-practices`** before Task 21.
 
 ## Database command rule
@@ -40,8 +40,8 @@ Commit after every task by path (never `git add -A`, never `supabase/config.toml
 | Order | Migration | Kind | Contents |
 | --- | --- | --- | --- |
 | 1 | `<ts>_add_attribute_rule_and_source_position.sql` | generated | nullable `concept_attributes.value_picker_rule_type`; `attribute_mappings__dataset_column.position integer not null default 0` |
-| 2 | `<ts>_move_value_picker_rule_to_concept_attributes.sql` | hand-written | copy each mapping's rule onto its field |
-| 3 | `<ts>_allow_many_sources_per_attribute.sql` | generated | drop the mapping's rule; swap `unique (concept_attribute_id)` for `attribute_mappings__dataset_column__attribute_column_unique`; add `concept_attributes__value_picker_rule_type_by_shape`; replace `rpc_concepts__create` |
+| 2 | `<ts>_move_value_picker_rule_to_concept_attributes.sql` | hand-written | copy, correct, and complete each field's rule and `data_type` |
+| 3 | `<ts>_allow_many_sources_per_attribute.sql` | generated | drop the mapping's rule; swap `unique (concept_attribute_id)` for `attribute_mappings__dataset_column__attribute_column_unique`; add `concept_attributes__value_picker_rule_type_by_shape`; replace `rpc_concepts__create` without plan 3's `value_rule_mismatch` check |
 
 A generated migration from the final schema would drop the mapping's rule before anything could copy it, which is why the change is split around the copy (§7).
 
@@ -54,28 +54,28 @@ A generated migration from the final schema would drop the mapping's rule before
 | `supabase/schemas/00.enum.attribute_mappings__value_picker_rule_type.sql` (new) | The rule enum, moved so layer 20 can use it |
 | `supabase/schemas/20.concept_attributes.sql` | `value_picker_rule_type` and its shape check |
 | `supabase/schemas/30.attribute_mappings__dataset_column.sql` | No rule, `position`, the two-column unique |
-| `supabase/schemas/50.rpc_concepts__create.sql` | Rule on attributes, position on mappings |
-| `supabase/migration-upgrade-tests/value_picker_rule_move.{prelude,assertions}.sql` (new), `scripts/test-dashboard-publishing-migrations.sh` | Replays the data move |
-| `supabase/tests/database/concept_attributes__value_picker_rule_type.test.sql` (new) | The shape check |
-| `supabase/tests/database/attribute_mappings__dataset_column__sources.test.sql` (new) | Position default, several sources, one column once |
-| `supabase/tests/database/rpc_concepts__create.test.sql`, `supabase/tests/database/permissions/rls_attribute_mappings__dataset_column.test.sql` | Payload shape; a two-source case type; position as the update probe |
+| `supabase/schemas/50.rpc_concepts__create.sql` | Rule on attributes, position on mappings, no `value_rule_mismatch` |
+| `supabase/migration-upgrade-tests/value_picker_rule_move.{prelude,assertions}.sql` (new), `value_rule_data_types.prelude.sql` (plan 2's), `scripts/test-dashboard-publishing-migrations.sh` | Replays |
+| `supabase/tests/database/concept_attributes__value_picker_rule_type.test.sql` (new), `attribute_mappings__dataset_column__sources.test.sql` (new) | The shape check; several sources |
+| `supabase/tests/database/rpc_concepts__create.test.sql`, `concept_attributes__bucketed_list.test.sql` (plan 4's), `permissions/rls_attribute_mappings__dataset_column.test.sql` | Payloads and fixtures move the rule onto the field |
 | `apps/desktop/scripts/gen-sqlite-migrations/getManualMigrationBodyFromSourceFile.ts` | SQLite body for migration 3 |
 | `shared/models/ontology/ConceptAttribute/*`, `shared/models/ontology/AttributeMapping/DatasetColumnMapping/*` | Rule on the field, position on the source |
 | `shared/models/ontology/AttributeMapping/DatasetColumnMapping/AttributeSources/` (new) | A field's sources in read order |
 | `shared/models/ontology/Concept/Concept.types.ts`, `ConceptModule.ts` | `mappings` per hydrated attribute |
-| `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | `ConceptAttributeSource`, the column arm |
-| `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.ts` | Stacked sources, one reduction |
-| `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | Sources, keys, shared type |
+| `src/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/` (new) | `ConceptAttributeSource`; the stacked rows |
+| `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/`, `buildBucketedListValueSql/` | Reduce the stacked rows |
+| `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | The column arm and dispatch |
+| `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | Sources, keys, shared type, rule checks |
 | `src/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQuery.ts` | Every source's columns |
 | `src/views/OntologyDesignerApp/ConceptMetaView/*` | Hydration, Refresh, provenance on the case type page, Sync |
-| `src/views/IndividualManagerApp/SingleIndividualView/*` | Provenance on the record page |
+| `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/` | Provenance in read order |
 | `shared/types/chat.types.ts`, `supabase/functions/chat/PostChatMessages/{parsing,prompt}/*` | Chat contract, parsers, tools, prompt |
 | `src/views/OntologyDesignerApp/makeAttributesWithIdentifierFromKeyColumns/` (new) | One ID field from the join keys |
 | `src/views/OntologyDesignerApp/{createdCaseTypeToFormValues,proposedCaseTypeToCreatedCaseType,insertConceptFromFormValues}/` | Chat conversion and the insert |
 | `src/views/OntologyDesignerApp/ConceptCreatorView/*` | Form state, sources, join keys |
 | `src/components/caseFields/FieldSourcesEditor/` (new) | The multi-source editor |
 | `src/components/ChatPanel/CaseTypeDraftBlock/*` | Sources in the draft card |
-| `apps/ava-video-producer/avandar-adapter/{OntologyScreen,AttributeMappingScreen,CasesScreen}/*` | Adapter fixtures follow the model |
+| `apps/ava-video-producer/avandar-adapter/*` | Adapter fixtures follow the model |
 | `tests/e2e/multi-source-fields.spec.ts`, `tests/data/multi-source-fields/*.csv` (new), `tests/e2e/helpers/CaseTypeSeedHelpers.ts` | E2E |
 | `docs/ontology-architecture.md` | The end state |
 
@@ -85,34 +85,34 @@ A generated migration from the final schema would drop the mapping's rule before
 
 **Files:** none. Nothing is committed.
 
-This plan's code assumes the names in spec §4. Where a landed name differs, keep the landed name and adapt this plan's code mechanically. Where a landed **decision** differs (for example, the record page does not read provenance from mappings), stop and record it in spec §4 before continuing.
+This plan's code edits plans 1 to 4's code as their plans write it (spec §4). Where a landed name differs, keep the landed name and adapt this plan's code mechanically. Where a landed **decision** differs (for example, provenance is no longer built from mappings), stop and record it in spec §4 before continuing.
 
 - [ ] **Step 1: Check the Supabase switch**
 
 Run: `ava supabase status`
 Expected: names `feat-joined-cases`.
 
-- [ ] **Step 2: Locate each assumed name**
+- [ ] **Step 2: Locate each name this plan edits**
 
 ```bash
-rg -n "export function buildAttributeValueSql" src/clients/qetl
-rg -n "getSQLSelectOfMapping|getAttributeAssertions\b" src shared
-rg -n "attributeId|bucketGrain|bucketColumnName|isArray" src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts
-rg -n "bucket_grain|bucket_column_id" supabase/schemas
-rg -n "bucketGrain|BucketGrain|ValueShape|getValueShape" shared/models/ontology/ConceptAttribute
-rg -n "bucketColumnId" shared/models/ontology/AttributeMapping
-rg -ln "ValuePickerRule\b" shared/models/ontology
-rg -n "ValuePickerTypes" shared src supabase/functions
-rg -n "sourceName" src/views/IndividualManagerApp
-rg -n "valueShape|bucketGrain|bucketColumnId" shared/types/chat.types.ts
-rg -n "bucketColumnId|bucketGrain" src/views/OntologyDesignerApp/ConceptCreatorView src/components/ChatPanel/CaseTypeDraftBlock
+rg -n "export (function|type) (buildAttributeValueSql|AttributeValueSqlOptions)|function _buildReducedValueSql|ValueSqlParts" src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql
+rg -n "export function buildBucketedListValueSql|BucketedListValueSqlOptions|function _buildSourceRowsSql|DATE_TRUNC_PART_BY_GRAIN|AGGREGATE_SQL_BY_RULE" src/clients/qetl/QueryMediator/conceptRelation/buildBucketedListValueSql
+rg -n "ConceptAttributeValueRule|_buildColumnSelector|_isBucketedColumn|bucketColumnName|valueShape" src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts
+rg -n "function _(assertRuleAllowedForColumn|getValueRule|resolveBucketColumnName|getDatasetColumnMappingsForAttribute)" src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts
+rg -n "value_rule_mismatch|list_field_is_key_or_label|bucket_grain|bucket_column_id" supabase/schemas/50.rpc_concepts__create.sql
+rg -n "tr__attribute_mappings__dataset_column__validate_bucket_column" supabase/schemas
+rg -n "function _getSourceNames" src/views/IndividualManagerApp
+rg -n "export function (withFieldDataTypes|keepKeyAndLabelFieldsSingle)" src/views/OntologyDesignerApp/ConceptCreatorView
+rg -n "export function parseProposeCaseType|ProposeCaseTypeCatalogColumn|bucketColumnId|valueShape" supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts
+rg -n "setAttributeBucket|setAttributeValueShape" src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.ts
+ls supabase/migration-upgrade-tests
 ```
 
-Expected: `buildAttributeValueSql` exists and `getSQLSelectOfMapping` does not; `bucket_grain` is on `concept_attributes` and `bucket_column_id` on `attribute_mappings__dataset_column`; the `dataset_column` arm has `attributeId`, `bucketGrain` and `bucketColumnName`; the record page builds `sourceName` from mappings.
+Expected: each name exists as spec §4 describes. In particular: `buildAttributeValueSql` takes `selectColumnName`, `primaryKeyColumnName`, `datasetId`, `valueShape` and `valuePickerRuleType`; `buildBucketedListValueSql` has `_buildSourceRowsSql` emitting `bucket, value, row_order`; `ConceptAttributeColumn`'s `dataset_column` arm is an intersection with `ConceptAttributeValueRule`, whose arms are `single` (with a rule), `list`, and `bucketed_list` (with a rule); the RPC has both plan 3 checks; `value_rule_data_types.prelude.sql` exists.
 
 - [ ] **Step 3: Write down the differences**
 
-Keep a short list (in the session, not in the repo) of every landed name that differs from this plan, for example "G4 calls the arm's grain `grain`". Apply it to every code block below.
+Keep a short list (in the session, not the repo) of every landed name that differs from this plan, and apply it to every code block below.
 
 ---
 
@@ -120,7 +120,7 @@ Keep a short list (in the session, not in the repo) of every landed name that di
 
 **Files:**
 - Create: `supabase/schemas/00.enum.attribute_mappings__value_picker_rule_type.sql`
-- Modify: `supabase/schemas/30.attribute_mappings__dataset_column.sql:1-9` (enum moves out), `:11-21` (column)
+- Modify: `supabase/schemas/30.attribute_mappings__dataset_column.sql:1-9` (enum moves out), the `create table` (column)
 - Modify: `supabase/schemas/20.concept_attributes.sql` (column)
 - Create: `supabase/tests/database/attribute_mappings__dataset_column__sources.test.sql`
 - Create: `supabase/migrations/<ts>_add_attribute_rule_and_source_position.sql` (generated)
@@ -178,7 +178,7 @@ Create `supabase/schemas/00.enum.attribute_mappings__value_picker_rule_type.sql`
 ```sql
 /**
  * The rule that reduces a field's dataset rows to one value, or to one value
- * per bucket for a bucketed list. Single-value and bucketed-list fields of a
+ * per period for a per-period field. Single-value and per-period fields of a
  * case type store one in `concept_attributes.value_picker_rule_type`.
  *
  * Enum values:
@@ -210,20 +210,20 @@ create type public.attribute_mappings__value_picker_rule_type as enum(
 );
 ```
 
-Delete lines 1 to 9 of `supabase/schemas/30.attribute_mappings__dataset_column.sql` (the same `create type`). If plan 2 changed the enum's values or comments, carry its version over instead of the block above, keeping the docstring.
+Delete the same `create type` statement (lines 1 to 9) from `supabase/schemas/30.attribute_mappings__dataset_column.sql`.
 
 - [ ] **Step 5: Add the two columns**
 
-In `supabase/schemas/20.concept_attributes.sql`, inside `create table public.concept_attributes`, directly after the `bucket_grain` column plan 4 added, add:
+In `supabase/schemas/20.concept_attributes.sql`, inside `create table public.concept_attributes`, directly after plan 4's `bucket_grain` column, add:
 
 ```sql
   -- The rule that reduces this field's rows from every source to one value,
-  -- or to one value per bucket. Set on single-value and bucketed-list
+  -- or to one value per period. Set on single-value and per-period
   -- dataset-column fields only.
   value_picker_rule_type public.attribute_mappings__value_picker_rule_type,
 ```
 
-In `supabase/schemas/30.attribute_mappings__dataset_column.sql`, inside `create table public.attribute_mappings__dataset_column`, directly after `dataset_column_id uuid not null` (and after plan 4's `bucket_column_id`, if it follows), add:
+In `supabase/schemas/30.attribute_mappings__dataset_column.sql`, inside `create table public.attribute_mappings__dataset_column`, directly after plan 4's `bucket_column_id` column (give it a trailing comma), add:
 
 ```sql
   -- This source's place in its field's read order. `first` and lists read a
@@ -231,9 +231,7 @@ In `supabase/schemas/30.attribute_mappings__dataset_column.sql`, inside `create 
   position integer not null default 0
 ```
 
-Mind the commas: the column above it now ends with `,`. Leave `value_picker_rule_type` and `unique` on the mapping table alone in this task.
-
-Run `pnpm format`. Formatting may re-indent the SQL. Do not change the statements.
+Leave the mapping's `value_picker_rule_type` and its `unique` alone in this task. Run `pnpm format`; do not change the statements it re-indents.
 
 - [ ] **Step 6: Generate the migration**
 
@@ -243,7 +241,7 @@ pnpm db:reset
 pnpm db:new-migration add_attribute_rule_and_source_position
 ```
 
-Expected: a new `supabase/migrations/<ts>_add_attribute_rule_and_source_position.sql` containing exactly two statements, `alter table "public"."concept_attributes" add column "value_picker_rule_type" ...` and `alter table "public"."attribute_mappings__dataset_column" add column "position" integer not null default 0`. If it also drops or creates the enum, the file order is wrong: the enum must be in a `00.` file. Fix the schema files, reset, and regenerate.
+Expected: a new `supabase/migrations/<ts>_add_attribute_rule_and_source_position.sql` with exactly two statements: `alter table "public"."concept_attributes" add column "value_picker_rule_type" ...` and `alter table "public"."attribute_mappings__dataset_column" add column "position" integer not null default 0`. If it drops or creates the enum, the enum is not in a `00.` file: fix, reset, regenerate.
 
 - [ ] **Step 7: Run the test and watch it pass**
 
@@ -272,7 +270,7 @@ git commit -m "feat(joined-cases): add a rule column to fields and a position to
 - Create: `supabase/migration-upgrade-tests/value_picker_rule_move.assertions.sql`
 - Modify: `scripts/test-dashboard-publishing-migrations.sh` (append one replay)
 
-Spec §7. The prelude and assertions are written to work both now and after Task 3: they re-add the mapping's rule only if it is missing and drop the shape check only if it exists.
+Spec §7. The prelude restores the mapping's rule only if it is missing and drops the shape check only if it exists, so it works now and after Task 3. Fixture ids start with `c5` (plan 2's replay uses `ae`).
 
 - [ ] **Step 1: Create the empty migration**
 
@@ -291,7 +289,7 @@ Create `supabase/migration-upgrade-tests/value_picker_rule_move.prelude.sql`:
 -- dataset-column mapping carries the rule and no field holds one. A later
 -- migration drops the mapping's rule and requires the field's, so both are
 -- lifted first and the move replays against the shape it was written for.
--- Every fixture id starts with `ae`.
+-- Every fixture id starts with `c5`.
 begin;
 
 alter table public.attribute_mappings__dataset_column
@@ -301,95 +299,129 @@ alter table public.concept_attributes
 drop constraint if exists concept_attributes__value_picker_rule_type_by_shape;
 
 insert into auth.users (id, email, aud, role)
-values ('ae000001-0000-4000-8000-000000000001'::uuid, 'rule_move@test.dev', 'authenticated', 'authenticated')
+values ('c5000001-0000-4000-8000-000000000001'::uuid, 'rule_move@test.dev', 'authenticated', 'authenticated')
 on conflict (id) do nothing;
 
 insert into public.workspaces (id, owner_id, name, slug)
-values ('ae001001-0000-4000-8000-000000000001'::uuid, 'ae000001-0000-4000-8000-000000000001'::uuid, 'rule move ws', 'rule-move-ws')
+values ('c5001001-0000-4000-8000-000000000001'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid, 'rule move ws', 'rule-move-ws')
 on conflict (id) do nothing;
 
+insert into public.workspace_memberships (id, workspace_id, user_id)
+values ('c5001101-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid)
+on conflict (id) do nothing;
+
+insert into public.user_profiles (id, user_id, workspace_id, membership_id, full_name, display_name)
+values ('c5001201-0000-4000-8000-000000000001'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5001101-0000-4000-8000-000000000001'::uuid, 'Owner', 'Owner')
+on conflict (id) do nothing;
+
+insert into public.datasets (id, workspace_id, owner_id, owner_profile_id, name, source_type)
+values ('c5005001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid, 'c5001201-0000-4000-8000-000000000001'::uuid, 'rule move line list', 'csv_file'::public.datasets__source_type)
+on conflict (id) do nothing;
+
+-- `note_text` was a number column when a `sum` was mapped to it, and has
+-- since been retyped to text.
+insert into public.dataset_columns (
+  id, dataset_id, workspace_id, original_name, name, original_data_type, detected_data_type, data_type, column_idx
+)
+values
+  ('c5006001-0000-4000-8000-000000000001'::uuid, 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'case_id', 'case_id', 'VARCHAR', 'VARCHAR', 'varchar', 0),
+  ('c5006002-0000-4000-8000-000000000002'::uuid, 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'titer', 'titer', 'BIGINT', 'BIGINT', 'bigint', 1),
+  ('c5006003-0000-4000-8000-000000000003'::uuid, 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'result', 'result', 'VARCHAR', 'VARCHAR', 'varchar', 2),
+  ('c5006004-0000-4000-8000-000000000004'::uuid, 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'onset', 'onset', 'DATE', 'DATE', 'date', 3),
+  ('c5006005-0000-4000-8000-000000000005'::uuid, 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'note_text', 'note_text', 'BIGINT', 'VARCHAR', 'varchar', 4);
+
 -- Case type 1 holds every shape. Case type 2 has two identifier fields in
--- one dataset, which the label and identifier trigger rejects on update.
+-- one dataset, which the label and identifier trigger refuses on update.
 insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
 values
-  ('ae002001-0000-4000-8000-000000000001'::uuid, 'ae000001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'rule move shapes', false, 'ae003001-0000-4000-8000-000000000001'::uuid),
-  ('ae002002-0000-4000-8000-000000000002'::uuid, 'ae000001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'rule move two keys', false, 'ae003002-0000-4000-8000-000000000002'::uuid);
+  ('c5002001-0000-4000-8000-000000000001'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'rule move shapes', false, 'c5007001-0000-4000-8000-000000000001'::uuid),
+  ('c5002002-0000-4000-8000-000000000002'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'rule move two keys', false, 'c5007002-0000-4000-8000-000000000002'::uuid);
 
 insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
 values
-  ('ae003001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'Active', '#40c057', 0),
-  ('ae003002-0000-4000-8000-000000000002'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002002-0000-4000-8000-000000000002'::uuid, 'Active', '#40c057', 0);
+  ('c5007001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002001-0000-4000-8000-000000000001'::uuid, 'Active', '#40c057', 0),
+  ('c5007002-0000-4000-8000-000000000002'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002002-0000-4000-8000-000000000002'::uuid, 'Active', '#40c057', 0);
 
 -- One statement per case type, so the label trigger counts every attribute
--- of it at once. "Already moved" already holds a rule on the field.
+-- of it at once. "Already moved" holds a rule on the field already, and
+-- "Stale count" has the column's type instead of its rule's output type.
 insert into public.concept_attributes (
   id, workspace_id, concept_id, name, data_type, mapping_type,
   is_label, is_identifier, is_array, allow_manual_edit, bucket_grain, value_picker_rule_type
 )
 values
-  ('ae004001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'Case ID', 'varchar', 'dataset_column', true, true, false, false, null, null),
-  ('ae004002-0000-4000-8000-000000000002'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'Peak titer', 'bigint', 'dataset_column', false, false, false, false, null, null),
-  ('ae004003-0000-4000-8000-000000000003'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'Every result', 'varchar', 'dataset_column', false, false, true, false, null, null),
-  ('ae004004-0000-4000-8000-000000000004'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'Monthly titer', 'double', 'dataset_column', false, false, true, false, 'month', null),
-  ('ae004005-0000-4000-8000-000000000005'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'Notes', 'varchar', 'manual_entry', false, false, false, false, null, null),
-  ('ae004006-0000-4000-8000-000000000006'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'Orphan', 'varchar', 'dataset_column', false, false, false, false, null, null),
-  ('ae004007-0000-4000-8000-000000000007'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'Already moved', 'bigint', 'dataset_column', false, false, false, false, null, 'count');
+  ('c5003001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002001-0000-4000-8000-000000000001'::uuid, 'Case ID', 'varchar', 'dataset_column', true, true, false, false, null, null),
+  ('c5003002-0000-4000-8000-000000000002'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002001-0000-4000-8000-000000000001'::uuid, 'Peak titer', 'bigint', 'dataset_column', false, false, false, false, null, null),
+  ('c5003003-0000-4000-8000-000000000003'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002001-0000-4000-8000-000000000001'::uuid, 'Every result', 'varchar', 'dataset_column', false, false, true, false, null, null),
+  ('c5003004-0000-4000-8000-000000000004'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002001-0000-4000-8000-000000000001'::uuid, 'Monthly titer', 'double', 'dataset_column', false, false, true, false, 'month', null),
+  ('c5003005-0000-4000-8000-000000000005'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002001-0000-4000-8000-000000000001'::uuid, 'Notes', 'varchar', 'manual_entry', false, false, false, false, null, null),
+  ('c5003006-0000-4000-8000-000000000006'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002001-0000-4000-8000-000000000001'::uuid, 'Orphan', 'varchar', 'dataset_column', false, false, false, false, null, null),
+  ('c5003007-0000-4000-8000-000000000007'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002001-0000-4000-8000-000000000001'::uuid, 'Already moved', 'bigint', 'dataset_column', false, false, false, false, null, 'count'),
+  ('c5003008-0000-4000-8000-000000000008'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002001-0000-4000-8000-000000000001'::uuid, 'Retyped total', 'double', 'dataset_column', false, false, false, false, null, null),
+  ('c5003009-0000-4000-8000-000000000009'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002001-0000-4000-8000-000000000001'::uuid, 'Stale count', 'varchar', 'dataset_column', false, false, false, false, null, null);
 
 insert into public.concept_attributes (
   id, workspace_id, concept_id, name, data_type, mapping_type,
   is_label, is_identifier, is_array, allow_manual_edit, bucket_grain, value_picker_rule_type
 )
 values
-  ('ae004011-0000-4000-8000-000000000011'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002002-0000-4000-8000-000000000002'::uuid, 'Key A', 'varchar', 'dataset_column', true, true, false, false, null, null),
-  ('ae004012-0000-4000-8000-000000000012'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002002-0000-4000-8000-000000000002'::uuid, 'Key B', 'varchar', 'dataset_column', false, true, false, false, null, null);
+  ('c5003101-0000-4000-8000-000000000101'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002002-0000-4000-8000-000000000002'::uuid, 'Key A', 'varchar', 'dataset_column', true, true, false, false, null, null),
+  ('c5003102-0000-4000-8000-000000000102'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5002002-0000-4000-8000-000000000002'::uuid, 'Key B', 'varchar', 'dataset_column', false, true, false, false, null, null);
 
 -- Mappings come after attributes, the order the creation RPC uses, so the
 -- identifier check passes on insert and only an update would re-run it.
+-- "Every result" is a list made before lists stored no rule.
 insert into public.attribute_mappings__dataset_column (
-  id, workspace_id, concept_attribute_id, value_picker_rule_type,
-  dataset_id, dataset_column_id, bucket_column_id
+  id, workspace_id, concept_attribute_id, value_picker_rule_type, dataset_id, dataset_column_id, bucket_column_id
 )
 values
-  ('ae005001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae004001-0000-4000-8000-000000000001'::uuid, 'first', 'ae006001-0000-4000-8000-000000000001'::uuid, 'ae007001-0000-4000-8000-000000000001'::uuid, null),
-  ('ae005002-0000-4000-8000-000000000002'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae004002-0000-4000-8000-000000000002'::uuid, 'max', 'ae006001-0000-4000-8000-000000000001'::uuid, 'ae007002-0000-4000-8000-000000000002'::uuid, null),
-  ('ae005003-0000-4000-8000-000000000003'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae004003-0000-4000-8000-000000000003'::uuid, 'sum', 'ae006001-0000-4000-8000-000000000001'::uuid, 'ae007003-0000-4000-8000-000000000003'::uuid, null),
-  ('ae005004-0000-4000-8000-000000000004'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae004004-0000-4000-8000-000000000004'::uuid, 'avg', 'ae006001-0000-4000-8000-000000000001'::uuid, 'ae007002-0000-4000-8000-000000000002'::uuid, 'ae007004-0000-4000-8000-000000000004'::uuid),
-  ('ae005007-0000-4000-8000-000000000007'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae004007-0000-4000-8000-000000000007'::uuid, 'min', 'ae006001-0000-4000-8000-000000000001'::uuid, 'ae007002-0000-4000-8000-000000000002'::uuid, null),
-  ('ae005011-0000-4000-8000-000000000011'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae004011-0000-4000-8000-000000000011'::uuid, 'first', 'ae006002-0000-4000-8000-000000000002'::uuid, 'ae007011-0000-4000-8000-000000000011'::uuid, null),
-  ('ae005012-0000-4000-8000-000000000012'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae004012-0000-4000-8000-000000000012'::uuid, 'most_frequent', 'ae006002-0000-4000-8000-000000000002'::uuid, 'ae007012-0000-4000-8000-000000000012'::uuid, null);
+  ('c5004001-0000-4000-8000-000000000001'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5003001-0000-4000-8000-000000000001'::uuid, 'first', 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5006001-0000-4000-8000-000000000001'::uuid, null),
+  ('c5004002-0000-4000-8000-000000000002'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5003002-0000-4000-8000-000000000002'::uuid, 'max', 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5006002-0000-4000-8000-000000000002'::uuid, null),
+  ('c5004003-0000-4000-8000-000000000003'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5003003-0000-4000-8000-000000000003'::uuid, 'first', 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5006003-0000-4000-8000-000000000003'::uuid, null),
+  ('c5004004-0000-4000-8000-000000000004'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5003004-0000-4000-8000-000000000004'::uuid, 'avg', 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5006002-0000-4000-8000-000000000002'::uuid, 'c5006004-0000-4000-8000-000000000004'::uuid),
+  ('c5004007-0000-4000-8000-000000000007'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5003007-0000-4000-8000-000000000007'::uuid, 'min', 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5006002-0000-4000-8000-000000000002'::uuid, null),
+  ('c5004008-0000-4000-8000-000000000008'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5003008-0000-4000-8000-000000000008'::uuid, 'sum', 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5006005-0000-4000-8000-000000000005'::uuid, null),
+  ('c5004009-0000-4000-8000-000000000009'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5003009-0000-4000-8000-000000000009'::uuid, 'count', 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5006003-0000-4000-8000-000000000003'::uuid, null),
+  ('c5004101-0000-4000-8000-000000000101'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5003101-0000-4000-8000-000000000101'::uuid, 'first', 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5006001-0000-4000-8000-000000000001'::uuid, null),
+  ('c5004102-0000-4000-8000-000000000102'::uuid, 'c5001001-0000-4000-8000-000000000001'::uuid, 'c5003102-0000-4000-8000-000000000102'::uuid, 'most_frequent', 'c5005001-0000-4000-8000-000000000001'::uuid, 'c5006003-0000-4000-8000-000000000003'::uuid, null);
 ```
 
-If plan 4 named `bucket_grain` or `bucket_column_id` differently, use its names here.
+Copy the `workspace_memberships`, `user_profiles`, `datasets` and `dataset_columns` column lists from plan 2's `value_rule_data_types.prelude.sql` if they differ from the ones above.
 
 - [ ] **Step 3: Write the replay assertions**
 
 Create `supabase/migration-upgrade-tests/value_picker_rule_move.assertions.sql`:
 
 ```sql
--- Verify every single-value and bucketed-list field took its mapping's rule,
--- a plain list and a manual-entry field took none, a field with no mapping
--- took most_frequent, a field that already had a rule kept it, the case type
--- with two keys in one dataset moved too, and the trigger is back on.
+-- Verify every single-value and per-period field took its mapping's rule
+-- (a disallowed one replaced), a list and a manual-entry field took none, a
+-- field with no mapping took most_frequent, a field that already had a rule
+-- kept it, each field's type follows its rule, the case type with two keys
+-- in one dataset moved too, and the trigger is back on.
 do $$
 begin
   if exists (
     select 1
     from (
       values
-        ('ae004001-0000-4000-8000-000000000001'::uuid, 'first'),
-        ('ae004002-0000-4000-8000-000000000002'::uuid, 'max'),
-        ('ae004003-0000-4000-8000-000000000003'::uuid, null),
-        ('ae004004-0000-4000-8000-000000000004'::uuid, 'avg'),
-        ('ae004005-0000-4000-8000-000000000005'::uuid, null),
-        ('ae004006-0000-4000-8000-000000000006'::uuid, 'most_frequent'),
-        ('ae004007-0000-4000-8000-000000000007'::uuid, 'count'),
-        ('ae004011-0000-4000-8000-000000000011'::uuid, 'first'),
-        ('ae004012-0000-4000-8000-000000000012'::uuid, 'most_frequent')
-    ) as expected (attribute_id, rule_type)
+        ('c5003001-0000-4000-8000-000000000001'::uuid, 'first', 'varchar'),
+        ('c5003002-0000-4000-8000-000000000002'::uuid, 'max', 'bigint'),
+        ('c5003003-0000-4000-8000-000000000003'::uuid, null, 'varchar'),
+        ('c5003004-0000-4000-8000-000000000004'::uuid, 'avg', 'double'),
+        ('c5003005-0000-4000-8000-000000000005'::uuid, null, 'varchar'),
+        ('c5003006-0000-4000-8000-000000000006'::uuid, 'most_frequent', 'varchar'),
+        ('c5003007-0000-4000-8000-000000000007'::uuid, 'count', 'bigint'),
+        ('c5003008-0000-4000-8000-000000000008'::uuid, 'most_frequent', 'varchar'),
+        ('c5003009-0000-4000-8000-000000000009'::uuid, 'count', 'bigint'),
+        ('c5003101-0000-4000-8000-000000000101'::uuid, 'first', 'varchar'),
+        ('c5003102-0000-4000-8000-000000000102'::uuid, 'most_frequent', 'varchar')
+    ) as expected (attribute_id, rule_type, data_type)
     left join public.concept_attributes ca on ca.id = expected.attribute_id
-    where ca.value_picker_rule_type::text is distinct from expected.rule_type
+    where
+      ca.value_picker_rule_type::text is distinct from expected.rule_type
+      or ca.data_type::text is distinct from expected.data_type
   ) then
-    raise exception 'a field does not hold the rule its mapping held';
+    raise exception 'a field does not hold the rule and type its mapping implied';
   end if;
 
   if (
@@ -422,7 +454,8 @@ Append to `scripts/test-dashboard-publishing-migrations.sh`, replacing `<ts>` wi
 ```bash
 
 # Value rule move: copy each dataset-column mapping's rule onto its field,
-# leaving plain lists and manual-entry fields without one.
+# correct a rule its column no longer allows, leave lists and manual-entry
+# fields without one, and set each field's type from its rule.
 run_migration_replay \
   "$repo_root/supabase/migration-upgrade-tests/value_picker_rule_move.prelude.sql" \
   "$repo_root/supabase/migrations/<ts>_move_value_picker_rule_to_concept_attributes.sql" \
@@ -437,7 +470,7 @@ pnpm db:reset
 ./scripts/test-dashboard-publishing-migrations.sh
 ```
 
-Expected: FAIL with `a field does not hold the rule its mapping held` (the migration is still empty).
+Expected: FAIL with `a field does not hold the rule and type its mapping implied` (the migration is still empty).
 
 - [ ] **Step 6: Write the migration**
 
@@ -445,12 +478,14 @@ Put this in `supabase/migrations/<ts>_move_value_picker_rule_to_concept_attribut
 
 ```sql
 -- Moves each dataset-column field's value rule from its mapping row onto the
--- field, so one rule can reduce the rows of several sources.
+-- field, so one rule can reduce the rows of several sources, and leaves each
+-- moved rule and field type the way the rule table defines them.
 --
 -- Hand-written because `db diff` never emits DML. It runs after the migration
 -- that adds `concept_attributes.value_picker_rule_type` and before the one
--- that drops the mapping's rule and requires the field's. Each step skips
--- fields that already hold a rule, so a re-run changes nothing.
+-- that drops the mapping's rule and requires the field's. Every field has at
+-- most one mapping row until then, so each join below is unambiguous. Each
+-- step skips rows that are already right, so a re-run changes nothing.
 --
 -- The move changes no label and no identifier, so the trigger that validates
 -- them is paused for it. Left on, it would re-check every moved field's case
@@ -459,8 +494,9 @@ Put this in `supabase/migrations/<ts>_move_value_picker_rule_to_concept_attribut
 alter table public.concept_attributes
 disable trigger tr_concept_attributes__validate_label_and_identifiers;
 
--- A single-value or bucketed-list field keeps the rule its one mapping row
--- holds. A plain list keeps every value and reads no rule, so it gets none.
+-- A single-value or per-period field keeps the rule its mapping holds. A
+-- plain list keeps every value and reads no rule, so it gets none, which also
+-- clears the rule a list made before lists stored none still carries.
 update public.concept_attributes ca
 set
   value_picker_rule_type = m.value_picker_rule_type
@@ -475,9 +511,33 @@ where
   )
   and ca.value_picker_rule_type is null;
 
--- A single-value or bucketed-list field with no mapping row reads nothing, so
--- every rule gives it the same empty value. It takes most_frequent, the rule
--- the create form and chat default to.
+-- The rule table: sum and avg need a bigint or double column, and max and
+-- min never apply to a boolean one. A column retyped since its rule was
+-- chosen can break that, so such a rule becomes most_frequent, which every
+-- type allows.
+update public.concept_attributes ca
+set
+  value_picker_rule_type = 'most_frequent'
+from
+  public.attribute_mappings__dataset_column m
+  join public.dataset_columns c on c.id = m.dataset_column_id
+  and c.dataset_id = m.dataset_id
+where
+  m.concept_attribute_id = ca.id
+  and (
+    (
+      ca.value_picker_rule_type in ('sum', 'avg')
+      and c.data_type not in ('bigint', 'double')
+    )
+    or (
+      ca.value_picker_rule_type in ('max', 'min')
+      and c.data_type = 'boolean'
+    )
+  );
+
+-- A single-value or per-period field with no mapping row, or a mapping with
+-- no rule, reads nothing, so every rule gives it the same empty value. It
+-- takes most_frequent, the rule the create form and chat default to.
 update public.concept_attributes ca
 set
   value_picker_rule_type = 'most_frequent'
@@ -489,11 +549,42 @@ where
   )
   and ca.value_picker_rule_type is null;
 
+-- A field's type is the type of one value as the view emits it: the column's
+-- type for a list, double for sum and avg, bigint for count, and the column's
+-- type for every other rule.
+with
+  expected_types as (
+    select
+      ca.id,
+      case
+        when ca.is_array
+        and ca.bucket_grain is null then c.data_type
+        when ca.value_picker_rule_type in ('sum', 'avg') then 'double'::public.datasets__ava_data_type
+        when ca.value_picker_rule_type = 'count' then 'bigint'::public.datasets__ava_data_type
+        else c.data_type
+      end as data_type
+    from
+      public.concept_attributes ca
+      join public.attribute_mappings__dataset_column m on m.concept_attribute_id = ca.id
+      join public.dataset_columns c on c.id = m.dataset_column_id
+      and c.dataset_id = m.dataset_id
+    where
+      ca.mapping_type = 'dataset_column'
+  )
+update public.concept_attributes ca
+set
+  data_type = expected_types.data_type
+from
+  expected_types
+where
+  expected_types.id = ca.id
+  and ca.data_type is distinct from expected_types.data_type;
+
 alter table public.concept_attributes
 enable trigger tr_concept_attributes__validate_label_and_identifiers;
 ```
 
-Run `pnpm format`. Formatting may re-indent the SQL. Do not change the statements.
+Run `pnpm format`; do not change the statements it re-indents.
 
 - [ ] **Step 7: Apply and run the replay again**
 
@@ -519,12 +610,14 @@ git commit -m "feat(joined-cases): move each field's value rule from its mapping
 **Files:**
 - Modify: `supabase/schemas/30.attribute_mappings__dataset_column.sql` (table)
 - Modify: `supabase/schemas/20.concept_attributes.sql` (check)
-- Modify: `supabase/schemas/50.rpc_concepts__create.sql:1-25` (docstring), `:93-148` (inserts)
+- Modify: `supabase/schemas/50.rpc_concepts__create.sql` (docstring, inserts, plan 3's checks)
 - Create: `supabase/tests/database/concept_attributes__value_picker_rule_type.test.sql`
 - Modify: `supabase/tests/database/attribute_mappings__dataset_column__sources.test.sql`
 - Modify: `supabase/tests/database/rpc_concepts__create.test.sql`
+- Modify: `supabase/tests/database/concept_attributes__bucketed_list.test.sql` (plan 4's)
 - Modify: `supabase/tests/database/permissions/rls_attribute_mappings__dataset_column.test.sql`
-- Modify: `tests/e2e/helpers/CaseTypeSeedHelpers.ts:107-129`
+- Modify: `supabase/migration-upgrade-tests/value_rule_data_types.prelude.sql` (plan 2's)
+- Modify: `tests/e2e/helpers/CaseTypeSeedHelpers.ts` (the RPC payload)
 - Create: `supabase/migrations/<ts>_allow_many_sources_per_attribute.sql` (generated)
 
 - [ ] **Step 1: Check the Supabase switch**
@@ -540,8 +633,8 @@ Create `supabase/tests/database/concept_attributes__value_picker_rule_type.test.
 \set ON_ERROR_STOP on
 
 /**
- * A single-value or bucketed-list dataset-column field reduces its rows with
- * a rule, so it must hold one. A plain list keeps every value and a
+ * A single-value or per-period dataset-column field reduces its rows with a
+ * rule, so it must hold one. A plain list keeps every value and a
  * manual-entry field reads no rows, so neither may hold one.
  */
 begin;
@@ -608,11 +701,11 @@ select throws_ok (
 select throws_ok (
   $t4$
   insert into public.concept_attributes (workspace_id, concept_id, name, data_type, mapping_type, is_label, is_identifier, is_array, allow_manual_edit, bucket_grain, value_picker_rule_type)
-  values ('b9001001-0000-4000-8000-000000000001'::uuid, 'b9002001-0000-4000-8000-000000000001'::uuid, 'Bucketed without rule', 'double', 'dataset_column', false, false, true, false, 'month', null);
+  values ('b9001001-0000-4000-8000-000000000001'::uuid, 'b9002001-0000-4000-8000-000000000001'::uuid, 'Per month without rule', 'double', 'dataset_column', false, false, true, false, 'month', null);
   $t4$,
   '23514',
   null,
-  'a bucketed-list field without a rule is rejected'
+  'a per-period field without a rule is rejected'
 );
 
 -- 5.
@@ -637,9 +730,9 @@ select lives_ok (
 select lives_ok (
   $t7$
   insert into public.concept_attributes (workspace_id, concept_id, name, data_type, mapping_type, is_label, is_identifier, is_array, allow_manual_edit, bucket_grain, value_picker_rule_type)
-  values ('b9001001-0000-4000-8000-000000000001'::uuid, 'b9002001-0000-4000-8000-000000000001'::uuid, 'Bucketed with rule', 'double', 'dataset_column', false, false, true, false, 'month', 'avg');
+  values ('b9001001-0000-4000-8000-000000000001'::uuid, 'b9002001-0000-4000-8000-000000000001'::uuid, 'Per month with rule', 'double', 'dataset_column', false, false, true, false, 'month', 'avg');
   $t7$,
-  'a bucketed-list field with a rule is accepted'
+  'a per-period field with a rule is accepted'
 );
 
 -- 8.
@@ -684,7 +777,7 @@ values
   ('af004002-0000-4000-8000-000000000002'::uuid, 'af001001-0000-4000-8000-000000000001'::uuid, 'af002001-0000-4000-8000-000000000001'::uuid, 'Every result', 'varchar', 'dataset_column', false, false, true, false, null);
 ```
 
-Change `select plan (1);` to `select plan (4);`, and insert these assertions directly above `select * from finish ();`:
+Change `select plan (1);` to `select plan (4);`, and insert directly above `select * from finish ();`:
 
 ```sql
 -- 2. Lab results kept in two sheets: one field, one row per sheet.
@@ -719,11 +812,13 @@ select lives_ok (
 );
 ```
 
-- [ ] **Step 4: Extend the creation RPC test**
+No field here has a period, so plan 4's bucket column trigger lets these rows through.
+
+- [ ] **Step 4: Extend and adjust the creation RPC test**
 
 In `supabase/tests/database/rpc_concepts__create.test.sql`:
 
-1. Change `select plan (15);` to `select plan (18);`.
+1. Raise `select plan (N);` by 3.
 2. In test 9, replace the attributes and mappings payloads with:
 
 ```sql
@@ -731,46 +826,70 @@ In `supabase/tests/database/rpc_concepts__create.test.sql`:
     '[{"concept_attribute_id":"ac006099-0000-4000-8000-000000000099","dataset_id":"ac007001-0000-4000-8000-000000000001","dataset_column_id":"ac008001-0000-4000-8000-000000000001","position":0}]'::jsonb,
 ```
 
-3. Insert directly above `select * from finish ();`:
+3. Plan 3's assertions 16 to 19 move the rule onto the field:
+   - In 16, add `,"value_picker_rule_type":"first"` to the `County` attribute JSON and delete `"value_picker_rule_type":"first",` from its mapping JSON.
+   - Replace 17 with:
 
 ```sql
--- 16. One ID field reading two datasets' keys, and a field reading one
--- column of each.
+-- 17.
+select is (
+  (
+    select count(*)::int
+    from public.concept_attributes
+    where
+      id = 'ac006008-0000-4000-8000-000000000008'::uuid
+      and value_picker_rule_type is null
+  ),
+  1,
+  'a list field stores no value rule'
+);
+```
+
+   - In 18, add `,"value_picker_rule_type":"first"` to the `County` attribute and `,"value_picker_rule_type":"sum"` to the `Daily new cases` attribute, delete both rules from the mapping JSON, and change the expected message to `'new row for relation "concept_attributes" violates check constraint "concept_attributes__value_picker_rule_type_by_shape"'`.
+   - In 19, change the expected message the same way (its attribute names no rule).
+   - Assertion 20 (a list label) is unchanged: plan 3's `list_field_is_key_or_label` check still refuses it.
+   - If plan 4 added RPC assertions to this file, move each mapping's rule onto its attribute JSON the same way.
+
+4. Insert directly above `select * from finish ();`:
+
+```sql
+-- One ID field reading two datasets' keys, and a field reading one column
+-- of each.
 select lives_ok (
-  $t16$
+  $t_two_sources$
   set local role authenticated;
   select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
   select public.rpc_concepts__create (
-    '{"id":"ac004011-0000-4000-8000-000000000011","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"Two-source case type","description":null,"allow_manual_creation":false,"default_status_id":"ac005011-0000-4000-8000-000000000011"}'::jsonb,
-    '[{"id":"ac006011-0000-4000-8000-000000000011","name":"Case ID","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":false,"allow_manual_edit":false,"value_picker_rule_type":"first"},{"id":"ac006012-0000-4000-8000-000000000012","name":"Result","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":false,"is_identifier":false,"is_array":false,"allow_manual_edit":false,"value_picker_rule_type":"most_frequent"}]'::jsonb,
-    '[{"concept_attribute_id":"ac006011-0000-4000-8000-000000000011","dataset_id":"ac007011-0000-4000-8000-000000000011","dataset_column_id":"ac008011-0000-4000-8000-000000000011","position":0},{"concept_attribute_id":"ac006011-0000-4000-8000-000000000011","dataset_id":"ac007012-0000-4000-8000-000000000012","dataset_column_id":"ac008012-0000-4000-8000-000000000012","position":1},{"concept_attribute_id":"ac006012-0000-4000-8000-000000000012","dataset_id":"ac007011-0000-4000-8000-000000000011","dataset_column_id":"ac008013-0000-4000-8000-000000000013","position":0},{"concept_attribute_id":"ac006012-0000-4000-8000-000000000012","dataset_id":"ac007012-0000-4000-8000-000000000012","dataset_column_id":"ac008014-0000-4000-8000-000000000014","position":1}]'::jsonb,
+    '{"id":"ac004031-0000-4000-8000-000000000031","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"Two-source case type","description":null,"allow_manual_creation":false,"default_status_id":"ac005031-0000-4000-8000-000000000031"}'::jsonb,
+    '[{"id":"ac006031-0000-4000-8000-000000000031","name":"Case ID","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":false,"allow_manual_edit":false,"value_picker_rule_type":"first"},{"id":"ac006032-0000-4000-8000-000000000032","name":"Result","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":false,"is_identifier":false,"is_array":false,"allow_manual_edit":false,"value_picker_rule_type":"most_frequent"}]'::jsonb,
+    '[{"concept_attribute_id":"ac006031-0000-4000-8000-000000000031","dataset_id":"ac007031-0000-4000-8000-000000000031","dataset_column_id":"ac008031-0000-4000-8000-000000000031","position":0},{"concept_attribute_id":"ac006031-0000-4000-8000-000000000031","dataset_id":"ac007032-0000-4000-8000-000000000032","dataset_column_id":"ac008032-0000-4000-8000-000000000032","position":1},{"concept_attribute_id":"ac006032-0000-4000-8000-000000000032","dataset_id":"ac007031-0000-4000-8000-000000000031","dataset_column_id":"ac008033-0000-4000-8000-000000000033","position":0},{"concept_attribute_id":"ac006032-0000-4000-8000-000000000032","dataset_id":"ac007032-0000-4000-8000-000000000032","dataset_column_id":"ac008034-0000-4000-8000-000000000034","position":1}]'::jsonb,
     '[]'::jsonb,
-    '[{"id":"ac005011-0000-4000-8000-000000000011","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+    '[{"id":"ac005031-0000-4000-8000-000000000031","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
   );
-  $t16$,
+  $t_two_sources$,
   'a Case Types editor creates a case type whose fields each read two sources'
 );
 
 reset role;
 
--- 17.
 select is (
-  (select value_picker_rule_type::text from public.concept_attributes where id = 'ac006012-0000-4000-8000-000000000012'::uuid),
+  (select value_picker_rule_type::text from public.concept_attributes where id = 'ac006032-0000-4000-8000-000000000032'::uuid),
   'most_frequent',
   'the rule is stored on the field'
 );
 
--- 18.
 select is (
   (
     select array_agg(dataset_column_id order by position)
     from public.attribute_mappings__dataset_column
-    where concept_attribute_id = 'ac006012-0000-4000-8000-000000000012'::uuid
+    where concept_attribute_id = 'ac006032-0000-4000-8000-000000000032'::uuid
   ),
-  array['ac008013-0000-4000-8000-000000000013'::uuid, 'ac008014-0000-4000-8000-000000000014'::uuid],
+  array['ac008033-0000-4000-8000-000000000033'::uuid, 'ac008034-0000-4000-8000-000000000034'::uuid],
   'each source is stored with its position'
 );
 ```
+
+Number the three new assertions' comments after the file's last one.
 
 - [ ] **Step 5: Run the three files and watch them fail**
 
@@ -779,41 +898,34 @@ ava supabase status
 supabase test db supabase/tests/database/concept_attributes__value_picker_rule_type.test.sql supabase/tests/database/attribute_mappings__dataset_column__sources.test.sql supabase/tests/database/rpc_concepts__create.test.sql
 ```
 
-Expected: FAIL. The shape test's assertions 1 to 4 `threw no exception`; the sources test fails on the insert in assertion 2 (`value_picker_rule_type` is still `not null` on the mapping); the RPC test fails on test 16 for the same reason.
+Expected: FAIL. The shape test's assertions 1 to 4 `threw no exception`; the sources test's assertion 3 lives (one column twice is still allowed by `unique (concept_attribute_id)`... no: the old `unique (concept_attribute_id)` refuses assertion 2's second row with `23505`); the RPC test's new case and plan 3's 18 and 19 fail on the old RPC.
 
 - [ ] **Step 6: Change the mapping table**
 
-In `supabase/schemas/30.attribute_mappings__dataset_column.sql`, replace the `create table` statement with (keep plan 4's `bucket_column_id` line and comment where shown):
+In `supabase/schemas/30.attribute_mappings__dataset_column.sql`:
+
+1. Replace `concept_attribute_id uuid not null unique references concept_attributes (id) on update cascade on delete cascade,` with:
 
 ```sql
-create table public.attribute_mappings__dataset_column (
-  id uuid primary key default gen_random_uuid(),
-  -- Workspace this attribute mapping belongs to
-  workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
   -- A field has one row per source, so this is not unique on its own.
   concept_attribute_id uuid not null references concept_attributes (id) on update cascade on delete cascade,
-  dataset_id uuid not null,
-  dataset_column_id uuid not null,
-  -- (plan 4's bucket_column_id column and comment, unchanged)
-  -- This source's place in its field's read order. `first` and lists read a
-  -- field's sources in ascending position, ties broken by dataset column id.
-  position integer not null default 0,
-  -- A field reads each column at most once.
-  constraint attribute_mappings__dataset_column__attribute_column_unique unique (concept_attribute_id, dataset_column_id)
-);
 ```
 
-Replace the placeholder comment line with plan 4's real `bucket_column_id` definition.
+2. Delete the `value_picker_rule_type` column and the comment plan 3 put above it.
+3. After the `position` column (give it a trailing comma), add:
+
+```sql
+  -- A field reads each column at most once.
+  constraint attribute_mappings__dataset_column__attribute_column_unique unique (concept_attribute_id, dataset_column_id)
+```
 
 - [ ] **Step 7: Add the shape check**
 
-In `supabase/schemas/20.concept_attributes.sql`, add this constraint to the end of the `create table public.concept_attributes` column list, after the last existing constraint (give that constraint a trailing comma):
+In `supabase/schemas/20.concept_attributes.sql`, add this constraint after the last constraint of `create table public.concept_attributes` (give that one a trailing comma):
 
 ```sql
-  -- A single-value or bucketed-list dataset-column field reduces its rows with
-  -- a rule. A plain list keeps every value and a manual-entry field reads no
+  -- A single-value or per-period dataset-column field reduces its rows with a
+  -- rule. A plain list keeps every value and a manual-entry field reads no
   -- rows, so neither has one.
   constraint concept_attributes__value_picker_rule_type_by_shape check (
     (value_picker_rule_type is not null) = (
@@ -826,24 +938,32 @@ In `supabase/schemas/20.concept_attributes.sql`, add this constraint to the end 
   )
 ```
 
-In the same file, the comment above `tr_concept_attributes__validate_label_and_identifiers` and the trigger function are unchanged.
-
 - [ ] **Step 8: Write the rule and positions in the creation RPC**
 
-In `supabase/schemas/50.rpc_concepts__create.sql`, change the docstring's two mapping lines to:
+In `supabase/schemas/50.rpc_concepts__create.sql`:
+
+1. Replace the docstring's `p_attributes` and `p_dataset_column_mappings` lines with:
 
 ```sql
- * @param p_attributes The `concept_attributes` rows, each with its `id` and,
- *   for a single-value or bucketed-list dataset-column field, its
+ * @param p_attributes The `concept_attributes` rows, each with its `id`, and
+ *   for a single-value or per-period dataset-column field its
  *   `value_picker_rule_type`.
  * @param p_dataset_column_mappings The `attribute_mappings__dataset_column`
  *   rows, one per source of each dataset-column field, each with its
  *   `position`.
 ```
 
-In the attributes insert, add `value_picker_rule_type` to the column list, to the `select` list as `a.value_picker_rule_type`, and to the `jsonb_to_recordset` definition as `value_picker_rule_type public.attribute_mappings__value_picker_rule_type`, each after the `bucket_grain` entry plan 4 added.
+and replace the paragraph plan 3 added about the two hints with:
 
-Replace the dataset-column mapping insert with (keep plan 4's `bucket_column_id` in all three lists):
+```sql
+ *
+ * A list is never the label or an identifier, refused with errcode `23514`
+ * and the hint `list_field_is_key_or_label`. Which fields hold a value rule
+ * is the `concept_attributes__value_picker_rule_type_by_shape` constraint's.
+```
+
+2. In the attributes insert, add `value_picker_rule_type` to the column list, `a.value_picker_rule_type` to the `select` list, and `value_picker_rule_type public.attribute_mappings__value_picker_rule_type` to the `jsonb_to_recordset` definition, each after plan 4's `bucket_grain`.
+3. Replace the dataset-column mapping insert with:
 
 ```sql
   insert into public.attribute_mappings__dataset_column (
@@ -872,6 +992,8 @@ Replace the dataset-column mapping insert with (keep plan 4's `bucket_column_id`
   );
 ```
 
+4. Delete plan 3's block that raises `value_rule_mismatch` (from its comment `-- A list field keeps every value, so its mapping names no rule, ...` through its `end if;`). Keep the `list_field_is_key_or_label` block.
+
 Run `pnpm format`.
 
 - [ ] **Step 9: Generate the migration**
@@ -882,37 +1004,51 @@ pnpm db:reset
 pnpm db:new-migration allow_many_sources_per_attribute
 ```
 
-Expected: a new `<ts>_allow_many_sources_per_attribute.sql` containing: drop of `attribute_mappings__dataset_column_concept_attribute_id_key` (constraint and its index), drop column `value_picker_rule_type` on the mapping table, the new `attribute_mappings__dataset_column__attribute_column_unique` (index and constraint), the new `concept_attributes__value_picker_rule_type_by_shape`, and `create or replace function public.rpc_concepts__create`. Nothing else. If it drops anything else, it is the shared-stack bug in `CLAUDE.md`: reset, regenerate, compare.
+Expected: a new `<ts>_allow_many_sources_per_attribute.sql` containing: the drop of `attribute_mappings__dataset_column_concept_attribute_id_key` (constraint and index), the drop of the mapping's `value_picker_rule_type`, the new `attribute_mappings__dataset_column__attribute_column_unique` (index and constraint), the new `concept_attributes__value_picker_rule_type_by_shape`, and `create or replace function public.rpc_concepts__create`. Nothing else. If it drops anything else, it is the shared-stack bug in `CLAUDE.md`: reset, regenerate, compare.
 
-- [ ] **Step 10: Move the mapping RLS test off the rule**
+- [ ] **Step 10: Move every other database test off the mapping's rule**
 
-In `supabase/tests/database/permissions/rls_attribute_mappings__dataset_column.test.sql`:
-
-1. In the `insert into public.concept_attributes` seed block, add `value_picker_rule_type` to the column list after `allow_manual_edit`, and `'first'::public.attribute_mappings__value_picker_rule_type` to the end of each of the five rows.
-2. Make these replacements everywhere in the file:
+1. `supabase/tests/database/permissions/rls_attribute_mappings__dataset_column.test.sql`: in the `insert into public.concept_attributes` seed block, add `value_picker_rule_type` to the column list after `allow_manual_edit`, and `'first'::public.attribute_mappings__value_picker_rule_type` to the end of each of its five rows. Then make these replacements everywhere in the file:
 
 | Find | Replace with |
 | --- | --- |
-| `id, workspace_id, concept_attribute_id, value_picker_rule_type,` (seed column list) | `id, workspace_id, concept_attribute_id,` |
-| `'first'::public.attribute_mappings__value_picker_rule_type,` on its own line inside the mapping seed rows | nothing (delete the line) |
+| `id, workspace_id, concept_attribute_id, value_picker_rule_type,` (mapping seed column list) | `id, workspace_id, concept_attribute_id,` |
+| a line holding only `'first'::public.attribute_mappings__value_picker_rule_type,` inside the mapping seed rows | nothing (delete the line) |
 | `(id, workspace_id, concept_attribute_id, value_picker_rule_type, dataset_id, dataset_column_id)` | `(id, workspace_id, concept_attribute_id, dataset_id, dataset_column_id)` |
-| `'f500b002-0000-4000-8000-000000000002'::uuid, 'first'::public.attribute_mappings__value_picker_rule_type,` and `'f500b004-0000-4000-8000-000000000004'::uuid, 'first'::public.attribute_mappings__value_picker_rule_type,` (test inserts) | the same uuid followed by `,` only |
+| `::uuid, 'first'::public.attribute_mappings__value_picker_rule_type, '` in the test inserts | `::uuid, '` |
 | `set value_picker_rule_type = 'sum'::public.attribute_mappings__value_picker_rule_type` | `set position = 5` |
 | `t.value_picker_rule_type = 'first'::public.attribute_mappings__value_picker_rule_type` | `t.position = 0` |
 | `t.value_picker_rule_type = 'sum'::public.attribute_mappings__value_picker_rule_type` | `t.position = 5` |
 | `-- 11. A case_types editor changes a mapping's value picker.` | `-- 11. A case_types editor changes a source's position.` |
 
-Then confirm nothing was missed:
+2. `supabase/tests/database/concept_attributes__bucketed_list.test.sql` (plan 4's): delete `value_picker_rule_type` from every `attribute_mappings__dataset_column` insert's column list and its value, and give every single-value or per-period dataset-column field in its `concept_attributes` inserts and RPC attribute payloads a `value_picker_rule_type` (the rule its mapping had; `first` where it had none).
 
-```bash
-rg -n "value_picker_rule_type" supabase/tests/database/permissions/rls_attribute_mappings__dataset_column.test.sql
+3. `supabase/migration-upgrade-tests/value_rule_data_types.prelude.sql` (plan 2's): directly after `begin;`, add:
+
+```sql
+-- The value rule has since moved onto `concept_attributes`: restore the
+-- mapping's rule and lift the field's requirement, so this replay runs
+-- against the shape it was written for.
+alter table public.attribute_mappings__dataset_column
+add column if not exists value_picker_rule_type public.attribute_mappings__value_picker_rule_type;
+
+alter table public.concept_attributes
+drop constraint if exists concept_attributes__value_picker_rule_type_by_shape;
 ```
 
-Expected: only the concept attribute seed block's column list and its five `'first'` values.
+and remove the header sentence that says nothing is lifted.
+
+4. Confirm nothing was missed:
+
+```bash
+rg -n "value_picker_rule_type" supabase/tests/database
+```
+
+Expected: only `concept_attributes` column lists, values, and payload keys, never an `attribute_mappings__dataset_column` column.
 
 - [ ] **Step 11: Move the E2E seeding helper onto the new payload**
 
-In `tests/e2e/helpers/CaseTypeSeedHelpers.ts`, in `p_attributes`, add `value_picker_rule_type: "first",` after `allow_manual_edit: false,`. In `p_dataset_column_mappings`, delete `value_picker_rule_type: "first",` and add `position: 0,` after `dataset_column_id: datasetColumnId,`.
+In `tests/e2e/helpers/CaseTypeSeedHelpers.ts`, in `p_attributes` add `value_picker_rule_type: "first",` after `allow_manual_edit: false,`; in `p_dataset_column_mappings` delete `value_picker_rule_type: "first",` and add `position: 0,` after `dataset_column_id: datasetColumnId,`.
 
 - [ ] **Step 12: Run the whole database suite**
 
@@ -921,12 +1057,12 @@ ava supabase status
 pnpm test:db
 ```
 
-Expected: PASS for every pgTAP file (including the three from Steps 2 to 4), the privilege reconcile, and every migration replay, including `value_picker_rule_move`.
+Expected: PASS for every pgTAP file, the privilege reconcile, and every replay, including `value_rule_data_types` and `value_picker_rule_move`.
 
 - [ ] **Step 13: Commit**
 
 ```bash
-git add supabase/schemas/20.concept_attributes.sql supabase/schemas/30.attribute_mappings__dataset_column.sql supabase/schemas/50.rpc_concepts__create.sql supabase/migrations/*_allow_many_sources_per_attribute.sql supabase/tests/database tests/e2e/helpers/CaseTypeSeedHelpers.ts
+git add supabase/schemas/20.concept_attributes.sql supabase/schemas/30.attribute_mappings__dataset_column.sql supabase/schemas/50.rpc_concepts__create.sql supabase/migrations/*_allow_many_sources_per_attribute.sql supabase/tests/database supabase/migration-upgrade-tests/value_rule_data_types.prelude.sql tests/e2e/helpers/CaseTypeSeedHelpers.ts
 git commit -m "feat(joined-cases): let a field read several sources and require its rule by shape"
 ```
 
@@ -939,7 +1075,7 @@ git commit -m "feat(joined-cases): let a field read several sources and require 
 - Modify: `apps/desktop/scripts/gen-sqlite-migrations/getManualMigrationBodyFromSourceFile.ts`
 - Create: `apps/desktop/migrations/<ts>_*.gen.sql` (generated, one per migration from Tasks 1 to 3)
 
-The SQLite mirror still has a unique index on `concept_attribute_id`, under the name `value_extractors__dataset_column_val_entity_field_config_id_key` (`apps/desktop/migrations/20250820162238_*.gen.sql:52`). A field's second source would fail to sync into it, so migration 3 gets a hand-written SQLite body.
+The SQLite mirror still has a unique index on `concept_attribute_id`, named `value_extractors__dataset_column_val_entity_field_config_id_key` (`apps/desktop/migrations/20250820162238_*.gen.sql:52`). A field's second source would fail to sync into it, so migration 3 gets a hand-written SQLite body.
 
 - [ ] **Step 1: Regenerate the database types**
 
@@ -948,7 +1084,7 @@ ava supabase status
 pnpm db:gen-types
 ```
 
-Expected: `shared/types/database.types.ts` gains `concept_attributes.value_picker_rule_type` and `attribute_mappings__dataset_column.position`, and loses `attribute_mappings__dataset_column.value_picker_rule_type`. Never hand-edit this file.
+Expected: `shared/types/database.types.ts` gains `concept_attributes.value_picker_rule_type` and `attribute_mappings__dataset_column.position`, and loses `attribute_mappings__dataset_column.value_picker_rule_type`.
 
 - [ ] **Step 2: Confirm the mirror's index name**
 
@@ -956,7 +1092,7 @@ Expected: `shared/types/database.types.ts` gains `concept_attributes.value_picke
 rg -n "UNIQUE INDEX .*entity_field_config_id_key|concept_attribute_id_key" apps/desktop/migrations
 ```
 
-Expected: `value_extractors__dataset_column_val_entity_field_config_id_key` is created in `20250820162238_*.gen.sql` and never dropped. If a later file renamed it, use that name in Step 3 as well.
+Expected: `value_extractors__dataset_column_val_entity_field_config_id_key` is created in `20250820162238_*.gen.sql` and never dropped. If a later file renamed it, add that name to Step 3's drops.
 
 - [ ] **Step 3: Add the SQLite body for migration 3**
 
@@ -988,7 +1124,7 @@ pnpm desktop:sqlite:gen-migrations
 pnpm desktop:sqlite:check-migrations
 ```
 
-Expected: three new `.gen.sql` files. Migration 1's adds the two columns; migration 2's reports no schema-shape changes; migration 3's is the body from Step 3. The check reports no drift.
+Expected: three new `.gen.sql` files. Migration 1's adds the two columns, migration 2's reports no schema-shape changes, and migration 3's is the body from Step 3. The check reports no drift.
 
 - [ ] **Step 5: Commit**
 
@@ -1004,8 +1140,8 @@ git commit -m "chore(joined-cases): regenerate database types and the desktop mi
 **Files:**
 - Create: `shared/models/ontology/AttributeMapping/DatasetColumnMapping/AttributeSources/AttributeSources.ts`
 - Create: `shared/models/ontology/AttributeMapping/DatasetColumnMapping/AttributeSources/AttributeSources.test.ts`
-- Modify: `shared/models/ontology/ConceptAttribute/ConceptAttribute.types.ts:12-29`, `ConceptAttribute.ts`, `ConceptAttributeParsers.ts:22-36`
-- Modify: `shared/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types.ts:12-13, 28-29`, `DatasetColumnMappingParsers.ts:24-74`, `DatasetColumnMappings.ts:1-2`
+- Modify: `shared/models/ontology/ConceptAttribute/ConceptAttribute.types.ts`, `ConceptAttribute.ts`, `ConceptAttributeParsers.ts`
+- Modify: `shared/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types.ts`, `DatasetColumnMappingParsers.ts`, `DatasetColumnMappings.ts`
 - Modify: `shared/models/ontology/Concept/Concept.types.ts:58-65, 92-94`, `shared/models/ontology/Concept/ConceptModule.ts:8-17`
 - Modify: `src/clients/ontology/ConceptAttributeClient.ts:28-35` (docstring)
 
@@ -1118,8 +1254,6 @@ describe("AttributeSources.getDatasetIdsFromMappings", () => {
 });
 ```
 
-If plan 4 did not add `bucketColumnId` to the mapping model, drop that line from `_source`.
-
 - [ ] **Step 2: Run it and watch it fail**
 
 Run: `pnpm test:frontend shared/models/ontology/AttributeMapping/DatasetColumnMapping/AttributeSources`
@@ -1196,37 +1330,31 @@ export const AttributeSources = {
 
 - [ ] **Step 4: Move the rule onto the field model**
 
-In `shared/models/ontology/ConceptAttribute/ConceptAttribute.types.ts`, add the import `import type { Enums } from "$/types/database.types.ts";`, then above `type ConceptAttributeRead` add:
+In `shared/models/ontology/ConceptAttribute/ConceptAttribute.types.ts`, add `import type { Enums } from "$/types/database.types.ts";` and, above `type ConceptAttributeRead`:
 
 ```ts
 /**
  * The rule that reduces a field's rows from every source to one value, or
- * to one value per bucket. Read from `concept_attributes.value_picker_rule_type`.
+ * to one value per period. Read from `concept_attributes.value_picker_rule_type`.
  */
 export type ValuePickerRuleType =
   Enums<"attribute_mappings__value_picker_rule_type">;
 ```
 
-and in `ConceptAttributeRead`, after `isArray: boolean;` (and plan 4's `bucketGrain`):
+and in `ConceptAttributeRead`, after plan 4's `bucketGrain`:
 
 ```ts
     /**
      * The rule that reduces this field's rows from every source. Set on a
-     * single-value or bucketed-list dataset-column field, undefined on a
-     * plain list and on a manual-entry field.
+     * single-value or per-period dataset-column field, undefined on a plain
+     * list and on a manual-entry field.
      */
     valuePickerRuleType: ValuePickerRuleType | undefined;
 ```
 
-If plan 2 already moved `ValuePickerRuleType` out of `DatasetColumnMapping.types.ts`, import it from there instead of declaring it here.
+In `ConceptAttribute.ts`, add `ValuePickerRuleType as ValuePickerRuleTypeT` to the type import and `export type ValuePickerRuleType = ValuePickerRuleTypeT;` inside the namespace.
 
-In `shared/models/ontology/ConceptAttribute/ConceptAttribute.ts`, add `ValuePickerRuleType as ValuePickerRuleTypeT` to the type import and, inside the namespace:
-
-```ts
-  export type ValuePickerRuleType = ValuePickerRuleTypeT;
-```
-
-In `shared/models/ontology/ConceptAttribute/ConceptAttributeParsers.ts`, import `DatasetColumnMappings` (`$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMappings.ts`) and add to `DBReadSchema`:
+In `ConceptAttributeParsers.ts`, import `DatasetColumnMappings` (`$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMappings.ts`) and add to `DBReadSchema`:
 
 ```ts
   value_picker_rule_type: z
@@ -1234,11 +1362,9 @@ In `shared/models/ontology/ConceptAttribute/ConceptAttributeParsers.ts`, import 
     .nullable(),
 ```
 
-If plan 2 moved the list of rule names to `ValuePickerRule`, use that list here.
-
 - [ ] **Step 5: Take the rule off the mapping model and add the position**
 
-In `shared/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types.ts`, delete the `ValuePickerRuleType` export (`:12-13`) and the `valuePickerRuleType` field (`:28-29`), and after `datasetColumnId` add:
+In `DatasetColumnMapping.types.ts`, delete the `ValuePickerRuleType` export and the `valuePickerRuleType` field (plan 3 made it optional), and after `datasetColumnId` add:
 
 ```ts
   /**
@@ -1248,21 +1374,9 @@ In `shared/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMa
   position: number;
 ```
 
-In `DatasetColumnMappings.ts`, import `ValuePickerRuleType` from `$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts`.
+Every file that imported `ValuePickerRuleType` from `DatasetColumnMapping.types` (`DatasetColumnMappings.ts`, plan 2's `ValuePickerRule`, plan 3's builders; find them with `rg -n "ValuePickerRuleType.*DatasetColumnMapping.types" shared src supabase/functions`) imports it from `$/models/ontology/ConceptAttribute/ConceptAttribute.types` instead.
 
-In `DatasetColumnMappingParsers.ts`:
-
-1. In `DBReadSchema`, replace `value_picker_rule_type: z.enum(DatasetColumnMappings.ValuePickerTypes),` with `position: z.number().int(),` and remove the now unused `DatasetColumnMappings` import.
-2. In `fromDBReadToModelRead`, delete `valuePickerRuleType: obj.valuePickerRuleType ?? "most_frequent",`.
-3. Replace `fromModelInsertToDBInsert` with:
-
-```ts
-    fromModelInsertToDBInsert: pipe(
-      snakeCaseKeysDeep,
-      excludeUndefinedDeep,
-      omitProps("type"),
-    ),
-```
+In `DatasetColumnMappingParsers.ts`, in `DBReadSchema` replace the `value_picker_rule_type` entry with `position: z.number().int(),` and remove whatever plan 3 left that reads or writes the rule, then remove imports that become unused.
 
 - [ ] **Step 6: Give each hydrated attribute all of its mappings**
 
@@ -1285,7 +1399,7 @@ export type BuildableConcept = ConceptWith<
 >;
 ```
 
-In `shared/models/ontology/Concept/ConceptModule.ts`, rename `ConceptAttributeWithMapping` to `ConceptAttributeWithMappings` (every use in the file) and change its body to:
+In `ConceptModule.ts`, rename `ConceptAttributeWithMapping` to `ConceptAttributeWithMappings` (every use) with the body:
 
 ```ts
 type ConceptAttributeWithMappings = ConceptAttributeModel["Read"] & {
@@ -1308,8 +1422,8 @@ In `src/clients/ontology/ConceptAttributeClient.ts`, replace the docstring above
 
 - [ ] **Step 8: Run the test and watch it pass**
 
-Run: `pnpm test:frontend shared/models/ontology/AttributeMapping/DatasetColumnMapping/AttributeSources`
-Expected: PASS, 4 tests.
+Run: `pnpm test:frontend shared/models/ontology`
+Expected: PASS, including the 4 new tests.
 
 - [ ] **Step 9: Commit**
 
@@ -1320,49 +1434,37 @@ git commit -m "feat(joined-cases): keep the value rule on the field and order a 
 
 ---
 
-## Task 6: `buildAttributeValueSql` stacks a field's sources
+## Task 6: The view reads a field by stacking its sources
 
 **Files:**
-- Modify: `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts:16-40, 101-155`
+- Create: `src/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql.ts`
 - Modify: `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.ts` (rewrite)
-- Modify: `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.executed.test.ts` (create if plan 1 did not)
-- Modify: `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.executed.test.ts` (fixture shape)
+- Modify: `src/clients/qetl/QueryMediator/conceptRelation/buildBucketedListValueSql/buildBucketedListValueSql.ts`
+- Modify: `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` (arm and dispatch)
+- Modify: `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.executed.test.ts`
+- Modify (fixture shape): `buildAttributeValueSql.executed.test.ts`, `buildBucketedListValueSql.executed.test.ts`
 
-Spec §6.3 and §6.4. The SQL and every expected value below were run against `@duckdb/node-api@1.5.5-r.4` on 2026-11-06 with this exact fixture and implementation.
+Spec §6.3 and §6.4. The SQL below, under plan 1's single and list reductions and plan 4's per-period reductions, and every expected value in Step 1, were run against `@duckdb/node-api@1.5.5-r.4` on 2026-11-06 with this exact fixture.
 
 - [ ] **Step 1: Write the failing executed tests**
 
-Append to `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.executed.test.ts` (merge the imports into the file's existing ones; if the file does not exist, create it with a file header saying it runs each field's emitted SQL against real DuckDB over real parquet and asserts rows):
+Append to `buildConceptViewSql.executed.test.ts` (merge the imports into the file's own; the view test covers both value builders, whichever shape each serves):
 
 ```ts
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { describe, expect, it } from "vitest";
-import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
-import { buildAttributeValueSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
-import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type {
-  ConceptAttributeColumn,
-  ConceptAttributeSource,
-} from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
-import type { DuckDBConnection } from "@duckdb/node-api";
+import type { ConceptAttributeSource } from "@/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql";
 
 const LINE_LIST_ID = "aaaaaaaa-5555-4555-8555-aaaaaaaaaaaa";
 const LABS_ID = "bbbbbbbb-6666-4666-8666-bbbbbbbbbbbb";
-const TWO_SOURCE_SPINE = "two_source_spine";
-
-type DatasetColumnAttributeColumn = Extract<
-  ConceptAttributeColumn,
-  { kind: "dataset_column" }
->;
+const TWO_SOURCE_VIEW = "concept_dddddddd-7777-4777-8777-dddddddddddd";
+const TWO_SOURCE_SPINE = `${TWO_SOURCE_VIEW}__individuals`;
 
 /**
  * Two datasets with different key columns: a line list keyed by `case_id`
  * and a lab sheet keyed by `patient_ref`, whose `titer` is BIGINT where the
  * line list's is INTEGER. `c1` has values in both and ties between them,
- * `c2` has a NULL in the line list and a NULL bucket date in the labs, `c3`
- * has only NULLs, `c4` is only in the labs, and `c5` is in neither.
+ * `c2` has a NULL in the line list and a NULL date in the labs, `c3` has only
+ * NULLs, `c4` is only in the labs, and `c5` is in neither.
  */
 async function _seedTwoSources(connection: DuckDBConnection): Promise<void> {
   const lineListPath = join(tmpdir(), "ava-two-source-line-list.parquet");
@@ -1394,7 +1496,9 @@ async function _seedTwoSources(connection: DuckDBConnection): Promise<void> {
     CREATE VIEW "${getRowNumberedViewName(LABS_ID)}" AS
       SELECT * FROM read_parquet('${labsPath}', file_row_number = true);
     CREATE TABLE "${TWO_SOURCE_SPINE}" AS
-      SELECT * FROM (VALUES ('c1'), ('c2'), ('c3'), ('c4'), ('c5')) AS t(external_id);
+      SELECT * FROM (VALUES
+        ('c1', 'Active'), ('c2', 'Active'), ('c3', 'Active'), ('c4', 'Active'), ('c5', 'Active')
+      ) AS t(external_id, status);
   `);
 }
 
@@ -1438,75 +1542,73 @@ const PHONE_SOURCES = [
   _lineListSource({ selectColumnName: "phone_2", position: 1 }),
 ];
 
-function _column(
+/** A two-source column, every source cast to `sharedType`. */
+function _twoSourceColumn(
   options: Readonly<{
     name: string;
     sources: readonly ConceptAttributeSource[];
-    sharedType: string;
-    ruleType?: ConceptAttribute.ValuePickerRuleType;
-    isArray?: boolean;
-    bucketGrain?: ConceptAttribute.BucketGrain;
+    sharedType: "VARCHAR" | "BIGINT";
+    rule:
+      | { valueShape: "single"; valuePickerRuleType: ConceptAttribute.ValuePickerRuleType }
+      | { valueShape: "list" }
+      | { valueShape: "bucketed_list"; valuePickerRuleType: ConceptAttribute.ValuePickerRuleType };
   }>,
-): DatasetColumnAttributeColumn {
+): ConceptAttributeColumn {
   return {
     kind: "dataset_column",
     attributeId: `attr-${options.name}` as ConceptAttribute.Id,
     attributeName: options.name,
     sources: [...options.sources],
-    sharedSourceDuckDbDataType: options.sharedType as DatasetColumnAttributeColumn["sharedSourceDuckDbDataType"],
-    valuePickerRuleType: options.ruleType,
-    isArray: options.isArray ?? false,
-    bucketGrain: options.bucketGrain,
+    sharedSourceDuckDbDataType: options.sharedType,
+    bucketGrain: options.rule.valueShape === "bucketed_list" ? "month" : undefined,
+    ...options.rule,
   };
 }
 
 /**
- * Selects the given fields for every record, ordered by key. JSON rows carry
- * a BIGINT as a string, so the BIGINT rules' values read as strings here.
+ * Builds the view over the two-source world and returns its rows by key.
+ * JSON rows carry a BIGINT as a string, so the BIGINT rules read as strings.
  */
-async function _queryTwoSourceFields(
-  columns: readonly DatasetColumnAttributeColumn[],
+async function _queryTwoSourceView(
+  attributeColumns: readonly ConceptAttributeColumn[],
 ): Promise<Array<Record<string, unknown>>> {
   return await withDuckDb(async (connection) => {
     await _seedTwoSources(connection);
-    const selectors = columns.map((column) => {
-      return buildAttributeValueSql({
-        column,
-        externalIdsTable: "individuals",
-        externalIdColumn: "external_id",
-        outputColumnName: column.attributeName,
-      });
-    });
-    const reader = await connection.runAndReadAll(`
-      SELECT individuals.external_id, ${selectors.join(",\n")}
-      FROM "${TWO_SOURCE_SPINE}" individuals
-      ORDER BY individuals.external_id
-    `);
+    await connection.run(
+      buildConceptViewSql({
+        viewName: TWO_SOURCE_VIEW,
+        spineTableName: TWO_SOURCE_SPINE,
+        attributeColumns,
+      }),
+    );
+    const reader = await connection.runAndReadAll(
+      `SELECT * FROM "${TWO_SOURCE_VIEW}" ORDER BY external_id`,
+    );
     return reader.getRowObjectsJson();
   });
 }
 
-/** One field's value for every record, in key order. */
+/** One field's value for each of c1 to c5. */
 async function _queryFieldValues(
-  column: DatasetColumnAttributeColumn,
+  column: ConceptAttributeColumn,
 ): Promise<unknown[]> {
-  const rows = await _queryTwoSourceFields([column]);
+  const rows = await _queryTwoSourceView([column]);
   return rows.map((row) => {
     return row[column.attributeName];
   });
 }
 
-describe("buildAttributeValueSql over two sources", () => {
+describe("buildConceptViewSql with a field read from two sources", () => {
   // c1's first line-list row says negative. c2 has a NULL in the line list,
   // so the labs' value is its first. c4 is only in the labs.
   it("`first` takes the earliest source's first non-NULL value, reading the next source when it has none", async () => {
     expect(
       await _queryFieldValues(
-        _column({
+        _twoSourceColumn({
           name: "result",
           sources: RESULT_SOURCES,
           sharedType: "VARCHAR",
-          ruleType: "first",
+          rule: { valueShape: "single", valuePickerRuleType: "first" },
         }),
       ),
     ).toEqual(["negative", "positive", null, "positive", null]);
@@ -1515,14 +1617,11 @@ describe("buildAttributeValueSql over two sources", () => {
   it("`first` follows source position, not the order the sources are listed in", async () => {
     expect(
       await _queryFieldValues(
-        _column({
+        _twoSourceColumn({
           name: "result",
-          sources: [
-            _lineListSource({ position: 1 }),
-            _labsSource({ position: 0 }),
-          ],
+          sources: [_lineListSource({ position: 1 }), _labsSource({ position: 0 })],
           sharedType: "VARCHAR",
-          ruleType: "first",
+          rule: { valueShape: "single", valuePickerRuleType: "first" },
         }),
       ),
     ).toEqual(["positive", "positive", null, "positive", null]);
@@ -1531,11 +1630,11 @@ describe("buildAttributeValueSql over two sources", () => {
   // Ten runs, because a `first` that is deterministic only by luck returns
   // different values across runs of unchanged data.
   it("`first` across two sources returns the same value in ten consecutive runs", async () => {
-    const column = _column({
+    const column = _twoSourceColumn({
       name: "result",
       sources: RESULT_SOURCES,
       sharedType: "VARCHAR",
-      ruleType: "first",
+      rule: { valueShape: "single", valuePickerRuleType: "first" },
     });
     const values = new Set<unknown>();
     for (let run = 0; run < 10; run += 1) {
@@ -1549,11 +1648,11 @@ describe("buildAttributeValueSql over two sources", () => {
   it("`most_frequent` counts values across sources and breaks a tie by value", async () => {
     expect(
       await _queryFieldValues(
-        _column({
+        _twoSourceColumn({
           name: "result",
           sources: RESULT_SOURCES,
           sharedType: "VARCHAR",
-          ruleType: "most_frequent",
+          rule: { valueShape: "single", valuePickerRuleType: "most_frequent" },
         }),
       ),
     ).toEqual(["negative", "positive", null, "positive", null]);
@@ -1562,11 +1661,11 @@ describe("buildAttributeValueSql over two sources", () => {
   // c1's titers are 0 and 30 in the line list and 30 and 30 in the labs.
   it("`most_frequent` picks the value most frequent across both sources", async () => {
     const [c1] = await _queryFieldValues(
-      _column({
+      _twoSourceColumn({
         name: "titer",
         sources: TITER_SOURCES,
         sharedType: "BIGINT",
-        ruleType: "most_frequent",
+        rule: { valueShape: "single", valuePickerRuleType: "most_frequent" },
       }),
     );
     expect(c1).toBe("30");
@@ -1575,40 +1674,38 @@ describe("buildAttributeValueSql over two sources", () => {
   it("`count` counts every source's non-NULL values, and 0 when there are none", async () => {
     expect(
       await _queryFieldValues(
-        _column({
+        _twoSourceColumn({
           name: "result",
           sources: RESULT_SOURCES,
           sharedType: "VARCHAR",
-          ruleType: "count",
+          rule: { valueShape: "single", valuePickerRuleType: "count" },
         }),
       ),
     ).toEqual(["4", "1", "0", "1", "0"]);
   });
 
   it("`sum`, `avg`, `min`, and `max` cover both sources once they are cast to one type", async () => {
-    const rows = await _queryTwoSourceFields([
-      _column({ name: "sum", sources: TITER_SOURCES, sharedType: "BIGINT", ruleType: "sum" }),
-      _column({ name: "avg", sources: TITER_SOURCES, sharedType: "BIGINT", ruleType: "avg" }),
-      _column({ name: "min", sources: TITER_SOURCES, sharedType: "BIGINT", ruleType: "min" }),
-      _column({ name: "max", sources: TITER_SOURCES, sharedType: "BIGINT", ruleType: "max" }),
-    ]);
-    expect(rows[0]).toEqual({
-      external_id: "c1",
-      sum: 90,
-      avg: 22.5,
-      min: "0",
-      max: "30",
-    });
+    const rows = await _queryTwoSourceView(
+      (["sum", "avg", "min", "max"] as const).map((ruleType) => {
+        return _twoSourceColumn({
+          name: ruleType,
+          sources: TITER_SOURCES,
+          sharedType: "BIGINT",
+          rule: { valueShape: "single", valuePickerRuleType: ruleType },
+        });
+      }),
+    );
+    expect(rows[0]).toMatchObject({ sum: 90, avg: 22.5, min: "0", max: "30" });
   });
 
   it("a list holds every non-NULL value in source order, then file order", async () => {
     expect(
       await _queryFieldValues(
-        _column({
+        _twoSourceColumn({
           name: "results",
           sources: RESULT_SOURCES,
           sharedType: "VARCHAR",
-          isArray: true,
+          rule: { valueShape: "list" },
         }),
       ),
     ).toEqual([
@@ -1624,11 +1721,11 @@ describe("buildAttributeValueSql over two sources", () => {
   it("a list over two columns of one dataset keeps both columns' values, duplicates included", async () => {
     expect(
       await _queryFieldValues(
-        _column({
+        _twoSourceColumn({
           name: "phones",
           sources: PHONE_SOURCES,
           sharedType: "VARCHAR",
-          isArray: true,
+          rule: { valueShape: "list" },
         }),
       ),
     ).toEqual([
@@ -1641,17 +1738,15 @@ describe("buildAttributeValueSql over two sources", () => {
   });
 
   // c1's January titers are 0 and 30 (line list) and 30 (labs). c2's only
-  // titer has no date, so it falls in no bucket.
-  it("a bucketed `avg` averages both sources per month and drops a row with no date", async () => {
+  // titer has no date, so it falls in no period.
+  it("a per-month `avg` averages both sources per month and drops a row with no date", async () => {
     expect(
       await _queryFieldValues(
-        _column({
+        _twoSourceColumn({
           name: "monthly",
           sources: DATED_TITER_SOURCES,
           sharedType: "BIGINT",
-          ruleType: "avg",
-          isArray: true,
-          bucketGrain: "month",
+          rule: { valueShape: "bucketed_list", valuePickerRuleType: "avg" },
         }),
       ),
     ).toEqual([
@@ -1666,15 +1761,13 @@ describe("buildAttributeValueSql over two sources", () => {
     ]);
   });
 
-  it("a bucketed `most_frequent` counts across sources within each month", async () => {
+  it("a per-month `most_frequent` counts across sources within each month", async () => {
     const [c1] = await _queryFieldValues(
-      _column({
+      _twoSourceColumn({
         name: "monthly",
         sources: DATED_TITER_SOURCES,
         sharedType: "BIGINT",
-        ruleType: "most_frequent",
-        isArray: true,
-        bucketGrain: "month",
+        rule: { valueShape: "bucketed_list", valuePickerRuleType: "most_frequent" },
       }),
     );
     expect(c1).toEqual([
@@ -1683,28 +1776,24 @@ describe("buildAttributeValueSql over two sources", () => {
     ]);
   });
 
-  it("a bucketed `first` follows source position within each month", async () => {
+  it("a per-month `first` follows source position within each month", async () => {
     const lineListFirst = await _queryFieldValues(
-      _column({
+      _twoSourceColumn({
         name: "monthly",
         sources: DATED_TITER_SOURCES,
         sharedType: "BIGINT",
-        ruleType: "first",
-        isArray: true,
-        bucketGrain: "month",
+        rule: { valueShape: "bucketed_list", valuePickerRuleType: "first" },
       }),
     );
     const labsFirst = await _queryFieldValues(
-      _column({
+      _twoSourceColumn({
         name: "monthly",
         sources: [
           { ...DATED_TITER_SOURCES[0]!, position: 1 },
           { ...DATED_TITER_SOURCES[1]!, position: 0 },
         ],
         sharedType: "BIGINT",
-        ruleType: "first",
-        isArray: true,
-        bucketGrain: "month",
+        rule: { valueShape: "bucketed_list", valuePickerRuleType: "first" },
       }),
     );
     expect([lineListFirst[0], labsFirst[0]]).toEqual([
@@ -1721,22 +1810,30 @@ describe("buildAttributeValueSql over two sources", () => {
 });
 ```
 
-If plan 4 named the arm's grain or bucket column differently, use its names in `_column` and `_lineListSource`.
+If plan 4 emits the bucket as epoch milliseconds in JSON rows, assert through `ConceptAttribute.toBucketedListEntries` instead of the literal objects.
 
 - [ ] **Step 2: Run it and watch it fail**
 
-Run: `pnpm test:executed src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql`
-Expected: FAIL. The new cases fail with a DuckDB binder or parser error, because the current builder reads `column.datasetId`, which these columns do not have.
+Run: `pnpm test:executed src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql`
+Expected: FAIL. The new cases fail when the view is created, because the dispatch still reads `column.datasetId`, which these columns do not have.
 
-- [ ] **Step 3: Give the column arm its sources**
+- [ ] **Step 3: Write the stacked rows module**
 
-In `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts`, add `import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";` (if absent), and replace the `ConceptAttributeColumn` type with:
+Create `src/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql.ts`:
 
 ```ts
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import {
+  getEntityKeyComparisonSql,
+  getRowNumberedViewName,
+} from "@/clients/DuckDbClient/duckDbSqlText";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+
 /**
  * One source of a dataset-column field as the view reads it: one column of
  * one dataset, matched to records by that dataset's own key column. Built by
- * column resolution from a mapping row, and read by `buildAttributeValueSql`.
+ * column resolution from a mapping row, and read by `buildStackedSourceRowsSql`.
  */
 export type ConceptAttributeSource = {
   datasetId: string;
@@ -1744,98 +1841,31 @@ export type ConceptAttributeSource = {
   selectColumnName: string;
   /** The dataset's key column, which its rows are matched to records by. */
   primaryKeyColumnName: string;
-  /** The date column that assigns rows to buckets, on a bucketed field only. */
+  /** The date column that places rows in a period, on a per-period field only. */
   bucketColumnName: string | undefined;
   /** The source's place in the field's read order. */
   position: number;
 };
 
-/** One column of the concept relation, already resolved to what it reads. */
-export type ConceptAttributeColumn =
-  | {
-      kind: "dataset_column";
-      /** The field this column computes, whatever name it is emitted under. */
-      attributeId: ConceptAttribute.Id;
-      /** The relation's column name, which is the attribute's name. */
-      attributeName: string;
-      /** Every source, in read order. Never empty. */
-      sources: ConceptAttributeSource[];
-      /**
-       * The DuckDB type every source's values are cast to so the stacked
-       * rows share one type. Undefined for a field with one source, which
-       * reads its column as stored.
-       */
-      sharedSourceDuckDbDataType: DuckDbDataType | undefined;
-      /** Undefined only on a plain list, which keeps every value. */
-      valuePickerRuleType: ConceptAttribute.ValuePickerRuleType | undefined;
-      isArray: boolean;
-      /** Set on a bucketed list, which reduces each bucket with the rule. */
-      bucketGrain: ConceptAttribute.BucketGrain | undefined;
-    }
-  | {
-      /**
-       * An attribute with no dataset contribution to read, which today means a
-       * manual-entry mapping. It becomes a typed NULL so the relation's schema
-       * is stable whether or not a value exists, rather than the column
-       * vanishing and breaking a saved query.
-       */
-      kind: "unmapped";
-      attributeId: ConceptAttribute.Id;
-      attributeName: string;
-      duckDbDataType: DuckDbDataType;
-    };
-```
-
-Replace `_buildColumnSelector` with the version below, and delete `_buildArraySelector` and every import only it used (`getEntityKeyComparisonSql`, `getRowNumberedViewName`, the `DatasetColumnMapping` type) if plan 1 left them:
-
-```ts
-function _buildColumnSelector(column: ConceptAttributeColumn): string {
-  if (column.kind === "unmapped") {
-    return `CAST(NULL AS ${column.duckDbDataType}) AS ${quoteSqlIdentifier(column.attributeName)}`;
-  }
-  return buildAttributeValueSql({
-    column,
-    externalIdsTable: SPINE_ALIAS,
-    externalIdColumn: EXTERNAL_ID_COLUMN,
-    outputColumnName: column.attributeName,
-  });
-}
-```
-
-- [ ] **Step 4: Rewrite `buildAttributeValueSql`**
-
-Replace the contents of `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.ts` with the following. If plan 4 already has a grain-to-`date_trunc` table, use it instead of `DATE_TRUNC_PART_BY_GRAIN`.
-
-```ts
-import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import { match } from "ts-pattern";
-import {
-  getEntityKeyComparisonSql,
-  getRowNumberedViewName,
-} from "@/clients/DuckDbClient/duckDbSqlText";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type {
-  ConceptAttributeColumn,
-  ConceptAttributeSource,
-} from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
-
-/** A concept view column that reads dataset rows. */
-type DatasetColumnAttributeColumn = Extract<
-  ConceptAttributeColumn,
-  { kind: "dataset_column" }
->;
-
-/** The outer table whose key each source's rows are matched against. */
-type ExternalIds = Readonly<{
+/** What a field's stacked source rows are built from. */
+export type StackedSourceRowsSqlOptions = Readonly<{
+  sources: readonly ConceptAttributeSource[];
+  /** The type every source's value is cast to; undefined for one source. */
+  sharedSourceDuckDbDataType: DuckDbDataType | undefined;
+  /** Set on a per-period field, which also gets each row's period. */
+  bucketGrain: ConceptAttribute.BucketGrain | undefined;
+  /** The outer table carrying the record keys, and its key column. */
   externalIdsTable: string;
   externalIdColumn: string;
 }>;
 
-/** The alias every rule reads a field's stacked source rows under. */
-const STACKED_ALIAS = "stacked";
-
-/** The `date_trunc` part for each grain, so no stored text reaches the SQL. */
-const DATE_TRUNC_PART_BY_GRAIN: Record<ConceptAttribute.BucketGrain, string> = {
+/**
+ * The DuckDB `date_trunc` part for each period. An exhaustive record, so a
+ * period reaches SQL only as one of these five literals.
+ */
+const DATE_TRUNC_PART_BY_GRAIN: Readonly<
+  Record<ConceptAttribute.BucketGrain, string>
+> = {
   day: "day",
   week: "week",
   month: "month",
@@ -1845,54 +1875,52 @@ const DATE_TRUNC_PART_BY_GRAIN: Record<ConceptAttribute.BucketGrain, string> = {
 
 function _buildBucketSql(
   options: Readonly<{
-    column: DatasetColumnAttributeColumn;
     source: ConceptAttributeSource;
+    bucketGrain: ConceptAttribute.BucketGrain | undefined;
   }>,
 ): string | undefined {
-  const { column, source } = options;
-  if (column.bucketGrain === undefined) {
+  const { source, bucketGrain } = options;
+  if (bucketGrain === undefined) {
     return undefined;
   }
   if (source.bucketColumnName === undefined) {
     throw new Error(
-      `Field '${column.attributeName}' is bucketed, but its source ` +
-        `'${source.selectColumnName}' has no date column to bucket by.`,
+      `Source column '${source.selectColumnName}' of a per-${bucketGrain} ` +
+        `field names no date column.`,
     );
   }
-  const part = DATE_TRUNC_PART_BY_GRAIN[column.bucketGrain];
-  const bucketColumn = quoteSqlIdentifier(source.bucketColumnName);
-  return `CAST(date_trunc('${part}', dataset.${bucketColumn}) AS DATE)`;
+  const bucketColumn = `dataset.${quoteSqlIdentifier(source.bucketColumnName)}`;
+  return `CAST(date_trunc('${DATE_TRUNC_PART_BY_GRAIN[bucketGrain]}', ${bucketColumn}) AS DATE)`;
 }
 
 /**
  * One source's rows for the outer record: each non-NULL value, the source's
- * place in the read order, the row's place in its file, and for a bucketed
- * field the bucket. A row whose bucket date is NULL is dropped here.
+ * place in the read order, the row's place in its file, and for a per-period
+ * field the period. A row whose value or date is NULL never leaves here.
  */
 function _buildSourceRowsSql(
-  options: Readonly<{
-    column: DatasetColumnAttributeColumn;
-    source: ConceptAttributeSource;
-    sourceOrder: number;
-    externalIds: ExternalIds;
-  }>,
+  options: StackedSourceRowsSqlOptions &
+    Readonly<{ source: ConceptAttributeSource; sourcePosition: number }>,
 ): string {
-  const { column, source, sourceOrder, externalIds } = options;
-  const valueSql = `dataset.${quoteSqlIdentifier(source.selectColumnName)}`;
-  const sharedType = column.sharedSourceDuckDbDataType;
-  const bucketSql = _buildBucketSql({ column, source });
+  const { source, sharedSourceDuckDbDataType: sharedType } = options;
+  const valueColumn = `dataset.${quoteSqlIdentifier(source.selectColumnName)}`;
+  const bucketSql = _buildBucketSql({
+    source,
+    bucketGrain: options.bucketGrain,
+  });
   const selectList = [
-    `${sharedType ? `CAST(${valueSql} AS ${sharedType})` : valueSql} AS value`,
-    `${sourceOrder} AS source_order`,
-    "dataset.file_row_number AS file_row_number",
+    `${sharedType ? `CAST(${valueColumn} AS ${sharedType})` : valueColumn} AS value`,
+    `${options.sourcePosition} AS source_position`,
+    "dataset.file_row_number AS row_order",
     ...(bucketSql ? [`${bucketSql} AS bucket`] : []),
   ];
   const conditions = [
     getEntityKeyComparisonSql({
-      ...externalIds,
+      externalIdsTable: options.externalIdsTable,
+      externalIdColumn: options.externalIdColumn,
       primaryKeyColumnName: source.primaryKeyColumnName,
     }),
-    `${valueSql} IS NOT NULL`,
+    `${valueColumn} IS NOT NULL`,
     ...(bucketSql ? [`${bucketSql} IS NOT NULL`] : []),
   ];
   const rowsView = quoteSqlIdentifier(getRowNumberedViewName(source.datasetId));
@@ -1902,161 +1930,246 @@ WHERE ${conditions.join("\n  AND ")}`;
 }
 
 /**
- * Every source's rows for the outer record, stacked into one relation in read
- * order: ascending `position`, with equal positions keeping the order the
- * sources were given in.
+ * Builds one field's rows for the outer record, read from every source and
+ * stacked with `UNION ALL` in read order (ascending `position`; equal
+ * positions keep the order given). Columns: `value`, `source_position` (0
+ * for the first source read), `row_order` (`file_row_number`), and `bucket`
+ * on a per-period field. Every value shape reduces these rows, so a source
+ * is matched, filtered, and cast the same way whatever the field keeps.
+ *
+ * Returns a bare `SELECT ... UNION ALL ...`; the caller wraps it as
+ * `(<sql>) source_rows`.
  */
-function _buildStackedRowsSql(
-  options: Readonly<{
-    column: DatasetColumnAttributeColumn;
-    externalIds: ExternalIds;
-  }>,
+export function buildStackedSourceRowsSql(
+  options: StackedSourceRowsSqlOptions,
 ): string {
-  const { column, externalIds } = options;
-  if (column.sources.length === 0) {
-    throw new Error(`Field '${column.attributeName}' has no source to read.`);
+  if (options.sources.length === 0) {
+    throw new Error("A dataset-column field needs at least one source.");
   }
-  const orderedSources = [...column.sources].sort((left, right) => {
+  const orderedSources = [...options.sources].sort((left, right) => {
     return left.position - right.position;
   });
-  const branches = orderedSources.map((source, sourceOrder) => {
-    return _buildSourceRowsSql({ column, source, sourceOrder, externalIds });
-  });
-  return `(\n${branches.join("\nUNION ALL\n")}\n) ${STACKED_ALIAS}`;
+  return orderedSources
+    .map((source, sourcePosition) => {
+      return _buildSourceRowsSql({ ...options, source, sourcePosition });
+    })
+    .join("\nUNION ALL\n");
 }
+```
 
-/** The aggregate that reduces stacked rows to one value under a rule. */
-function _buildRuleAggregateSql(
-  ruleType: Exclude<ConceptAttribute.ValuePickerRuleType, "most_frequent">,
+If plan 1 changed `getEntityKeyComparisonSql`'s signature, call it the way plan 1's `buildAttributeValueSql` does.
+
+- [ ] **Step 4: Rewrite `buildAttributeValueSql` over the stacked rows**
+
+Replace the contents of `buildAttributeValueSql.ts` with:
+
+```ts
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { match } from "ts-pattern";
+import { buildStackedSourceRowsSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ConceptAttributeSource } from "@/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql";
+
+/** The alias every rule reads a field's stacked source rows under. */
+const SOURCE_ROWS_ALIAS = "source_rows";
+
+/**
+ * What one field's single value or list is read from, and the outer table of
+ * record keys it is read for. The concept view passes one per dataset-backed
+ * field, for example, and Sync passes its label's, so both read values the
+ * same way.
+ */
+export type AttributeValueSqlOptions = {
+  /** Every column the field reads, in read order. */
+  sources: readonly ConceptAttributeSource[];
+  /** The type every source's value is cast to; undefined for one source. */
+  sharedSourceDuckDbDataType: DuckDbDataType | undefined;
+  /** Keep one value, picked by `valuePickerRuleType`, or every value as a list. */
+  valueShape: "single" | "list";
+  /** How the rows reduce to one value. Required for one value; a list ignores it. */
+  valuePickerRuleType: ConceptAttribute.ValuePickerRuleType | undefined;
+  /** The name of the column the subquery emits. */
+  outputColumnName: string;
+  /** The outer table, by name or alias, holding one row per record key. */
+  externalIdsTable: string;
+  /** That table's record key column. */
+  externalIdColumn: string;
+};
+
+/** The `SELECT` that reduces one record's stacked rows to its value. */
+function _buildReducedValueSql(
+  options: Readonly<{
+    sourceRowsSql: string;
+    valuePickerRuleType: ConceptAttribute.ValuePickerRuleType;
+  }>,
 ): string {
-  const value = `${STACKED_ALIAS}.value`;
-  return match(ruleType)
+  const from = `FROM (${options.sourceRowsSql}) ${SOURCE_ROWS_ALIAS}`;
+  const value = `${SOURCE_ROWS_ALIAS}.value`;
+  const aggregateSql = (aggregate: string): string => {
+    return `SELECT ${aggregate} ${from}`;
+  };
+  return match(options.valuePickerRuleType)
     .with("first", () => {
-      return `first(${value} ORDER BY ${STACKED_ALIAS}.source_order, ${STACKED_ALIAS}.file_row_number)`;
+      // Source position, then `file_row_number`, is a total order. Do not use
+      // `row_number() OVER ()`: parallel scan order is unstable.
+      return `SELECT ${value} ${from} ORDER BY ${SOURCE_ROWS_ALIAS}.source_position, ${SOURCE_ROWS_ALIAS}.row_order LIMIT 1`;
+    })
+    .with("most_frequent", () => {
+      // The value tie-break makes a tie on COUNT(*) deterministic.
+      return `SELECT ${value} ${from} GROUP BY ${value} ORDER BY COUNT(*) DESC, ${value} LIMIT 1`;
     })
     .with("sum", () => {
-      return `CAST(SUM(${value}) AS DOUBLE)`;
+      return aggregateSql(`CAST(SUM(${value}) AS DOUBLE)`);
     })
     .with("avg", () => {
-      return `CAST(AVG(${value}) AS DOUBLE)`;
+      return aggregateSql(`CAST(AVG(${value}) AS DOUBLE)`);
     })
     .with("count", () => {
-      return `COUNT(${value})`;
+      return aggregateSql(`COUNT(${value})`);
     })
     .with("max", () => {
-      return `MAX(${value})`;
+      return aggregateSql(`MAX(${value})`);
     })
     .with("min", () => {
-      return `MIN(${value})`;
+      return aggregateSql(`MIN(${value})`);
     })
     .exhaustive();
 }
 
 /**
- * Reduces stacked rows under the field's rule: to one row for a single value,
- * or to one row per bucket for a bucketed list. Both shapes use this one
- * function, so a per-bucket rule cannot drift from the single-value rule of
- * the same name.
- */
-function _buildReducedRowsSql(
-  options: Readonly<{
-    ruleType: ConceptAttribute.ValuePickerRuleType;
-    stackedSql: string;
-    isPerBucket: boolean;
-  }>,
-): string {
-  const { ruleType, stackedSql, isPerBucket } = options;
-  if (ruleType !== "most_frequent") {
-    const bucket = isPerBucket ? `${STACKED_ALIAS}.bucket, ` : "";
-    const groupBy = isPerBucket ? `\nGROUP BY ${STACKED_ALIAS}.bucket` : "";
-    return `SELECT ${bucket}${_buildRuleAggregateSql(ruleType)} AS value
-FROM ${stackedSql}${groupBy}`;
-  }
-  // Ties go to the smallest value, so the rule is deterministic.
-  const outerBucket = isPerBucket ? "counted.bucket, " : "";
-  const innerBucket = isPerBucket ? `${STACKED_ALIAS}.bucket, ` : "";
-  const outerGroupBy = isPerBucket ? "\nGROUP BY counted.bucket" : "";
-  return `SELECT ${outerBucket}first(counted.value ORDER BY counted.value_count DESC, counted.value) AS value
-FROM (
-  SELECT ${innerBucket}${STACKED_ALIAS}.value, COUNT(*) AS value_count
-  FROM ${stackedSql}
-  GROUP BY ${innerBucket}${STACKED_ALIAS}.value
-) counted${outerGroupBy}`;
-}
-
-function _getRequiredRuleType(
-  column: DatasetColumnAttributeColumn,
-): ConceptAttribute.ValuePickerRuleType {
-  if (column.valuePickerRuleType === undefined) {
-    throw new Error(
-      `Field '${column.attributeName}' needs a value rule to reduce its rows.`,
-    );
-  }
-  return column.valuePickerRuleType;
-}
-
-/** The body of the field's scalar subquery, by value shape. */
-function _buildValueSql(
-  options: Readonly<{
-    column: DatasetColumnAttributeColumn;
-    stackedSql: string;
-  }>,
-): string {
-  const { column, stackedSql } = options;
-  if (column.bucketGrain !== undefined) {
-    const perBucketSql = _buildReducedRowsSql({
-      ruleType: _getRequiredRuleType(column),
-      stackedSql,
-      isPerBucket: true,
-    });
-    return `SELECT COALESCE(list({'bucket': reduced.bucket, 'value': reduced.value} ORDER BY reduced.bucket), [])
-FROM (
-${perBucketSql}
-) reduced`;
-  }
-  if (column.isArray) {
-    return `SELECT COALESCE(list(${STACKED_ALIAS}.value ORDER BY ${STACKED_ALIAS}.source_order, ${STACKED_ALIAS}.file_row_number), [])
-FROM ${stackedSql}`;
-  }
-  return _buildReducedRowsSql({
-    ruleType: _getRequiredRuleType(column),
-    stackedSql,
-    isPerBucket: false,
-  });
-}
-
-/**
- * Builds the correlated scalar subquery that computes one field's value for
- * the outer query's current record.
+ * Builds the correlated subquery that reads one field's single value or list
+ * for the outer row's record key, aliased to `outputColumnName`.
  *
  * Every source contributes its rows, keyed by its own dataset's key column,
- * and the field's single-value rule, list, or per-bucket rule runs once over
- * all of them. NULL values never reach a rule, and rows are ordered by
- * source position, then file row number. Use it wherever a field's value is
- * read from datasets, such as a concept view column or a record's name.
+ * and the rule or the list runs once over all of them. Every rule reads only
+ * non-NULL cells, because NULL means "no value". Use it wherever a field's
+ * value is read from datasets, for example a column of a concept's view or
+ * the name Sync stages for each record.
  */
 export function buildAttributeValueSql(
-  options: Readonly<{
-    column: DatasetColumnAttributeColumn;
-    externalIdsTable: string;
-    externalIdColumn: string;
-    outputColumnName: string;
-  }>,
+  options: Readonly<AttributeValueSqlOptions>,
 ): string {
-  const { column, externalIdsTable, externalIdColumn } = options;
-  const stackedSql = _buildStackedRowsSql({
-    column,
-    externalIds: { externalIdsTable, externalIdColumn },
+  const sourceRowsSql = buildStackedSourceRowsSql({
+    sources: options.sources,
+    sharedSourceDuckDbDataType: options.sharedSourceDuckDbDataType,
+    bucketGrain: undefined,
+    externalIdsTable: options.externalIdsTable,
+    externalIdColumn: options.externalIdColumn,
   });
-  return `(
-${_buildValueSql({ column, stackedSql })}
-) AS ${quoteSqlIdentifier(options.outputColumnName)}`;
+  const body = match(options.valueShape)
+    .with("list", () => {
+      // `list()` over no rows is NULL. A record with no values gets an empty
+      // list, which reads as "none" rather than "unknown".
+      return `SELECT COALESCE(list(${SOURCE_ROWS_ALIAS}.value ORDER BY ${SOURCE_ROWS_ALIAS}.source_position, ${SOURCE_ROWS_ALIAS}.row_order), []) FROM (${sourceRowsSql}) ${SOURCE_ROWS_ALIAS}`;
+    })
+    .with("single", () => {
+      const { valuePickerRuleType } = options;
+      // A guessed rule would answer with a value nobody chose.
+      if (valuePickerRuleType === undefined) {
+        throw new Error(
+          `Column '${options.outputColumnName}' keeps one value, but names no value rule.`,
+        );
+      }
+      return _buildReducedValueSql({ sourceRowsSql, valuePickerRuleType });
+    })
+    .exhaustive();
+  return `(${body}) AS ${quoteSqlIdentifier(options.outputColumnName)}`;
 }
 ```
 
-- [ ] **Step 5: Move every single-source fixture to the new arm**
+If plan 4 typed `valueShape` here differently (for example `Exclude<ConceptAttribute.ValueShape, "bucketed_list">`), keep plan 4's type.
 
-In `buildConceptViewSql.executed.test.ts` and in plan 1 to 4's cases of `buildAttributeValueSql.executed.test.ts`, change every `kind: "dataset_column"` fixture by moving its dataset, column, key and bucket column into one source and adding the shared type. For example, `AGE` becomes:
+- [ ] **Step 5: Point the per-period builder at the stacked rows**
+
+In `buildBucketedListValueSql.ts`:
+
+1. In `BucketedListValueSqlOptions`, replace `datasetId`, `selectColumnName`, `primaryKeyColumnName` and `bucketColumnName` with:
+
+```ts
+  /** Every column the field reads, each with its date column, in read order. */
+  sources: readonly ConceptAttributeSource[];
+  /** The type every source's value is cast to; undefined for one source. */
+  sharedSourceDuckDbDataType: DuckDbDataType | undefined;
+```
+
+importing both types (`ConceptAttributeSource` from the stacked module).
+2. Delete `DATE_TRUNC_PART_BY_GRAIN` and `_buildSourceRowsSql` (the stacked module owns both).
+3. In `AGGREGATE_SQL_BY_RULE`, change `first` to:
+
+```ts
+  first:
+    "first(source_rows.value ORDER BY source_rows.source_position, source_rows.row_order)",
+```
+
+4. In `buildBucketedListValueSql`, replace `sourceRowsSql: _buildSourceRowsSql(options),` with:
+
+```ts
+    sourceRowsSql: buildStackedSourceRowsSql({
+      sources: options.sources,
+      sharedSourceDuckDbDataType: options.sharedSourceDuckDbDataType,
+      bucketGrain: options.bucketGrain,
+      externalIdsTable: options.externalIdsTable,
+      externalIdColumn: options.externalIdColumn,
+    }),
+```
+
+5. Update the module docstring's sentence about one dataset's rows to say "every source's rows".
+
+- [ ] **Step 6: Give the column arm its sources, and dispatch on them**
+
+In `buildConceptViewSql.ts`:
+
+1. Import `import type { ConceptAttributeSource } from "@/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql";`.
+2. In the `dataset_column` arm of `ConceptAttributeColumn`, delete `selectColumnName`, `datasetId`, `primaryKeyColumnName` and plan 4's `bucketColumnName` (and their comments), and add:
+
+```ts
+      /** Every column the field reads, in read order. Never empty. */
+      sources: ConceptAttributeSource[];
+      /**
+       * The DuckDB type every source's value is cast to so the stacked rows
+       * share one type. Undefined for a field with one source, which reads
+       * its column as stored.
+       */
+      sharedSourceDuckDbDataType: DuckDbDataType | undefined;
+```
+
+   Keep `attributeId`, `attributeName`, plan 4's `bucketGrain`, and the intersection with `ConceptAttributeValueRule`.
+3. Replace the `dataset_column` part of the column dispatch (`_buildColumnSelector`, after its `unmapped` branch, including plan 4's `_isBucketedColumn` branch; delete `_isBucketedColumn` and its type if nothing else uses them) with:
+
+```ts
+  const sourceOptions = {
+    sources: column.sources,
+    sharedSourceDuckDbDataType: column.sharedSourceDuckDbDataType,
+    externalIdsTable: SPINE_ALIAS,
+    externalIdColumn: EXTERNAL_ID_COLUMN,
+  };
+  if (column.valueShape === "bucketed_list") {
+    if (column.bucketGrain === undefined) {
+      throw new Error(
+        `Column '${column.attributeName}' keeps one value per period, but names no period.`,
+      );
+    }
+    return `${buildBucketedListValueSql({
+      ...sourceOptions,
+      bucketGrain: column.bucketGrain,
+      ruleType: column.valuePickerRuleType,
+    })} AS ${quoteSqlIdentifier(column.attributeName)}`;
+  }
+  // Single values and lists alike: one function owns every value rule, so the
+  // view and everything that reads it agree with Sync on every value.
+  return buildAttributeValueSql({
+    ...sourceOptions,
+    valueShape: column.valueShape,
+    valuePickerRuleType:
+      column.valueShape === "single" ? column.valuePickerRuleType : undefined,
+    outputColumnName: column.attributeName,
+  });
+```
+
+- [ ] **Step 7: Move every one-source fixture to the new arm**
+
+In `buildConceptViewSql.executed.test.ts` (the fixtures plans 1 to 4 wrote), `buildAttributeValueSql.executed.test.ts`, and `buildBucketedListValueSql.executed.test.ts`, move each fixture's `datasetId`, `selectColumnName`, `primaryKeyColumnName` and `bucketColumnName` into one source and add the shared type. For example, `AGE` becomes:
 
 ```ts
 const AGE: ConceptAttributeColumn = {
@@ -2073,24 +2186,24 @@ const AGE: ConceptAttributeColumn = {
     },
   ],
   sharedSourceDuckDbDataType: undefined,
-  valuePickerRuleType: "first",
-  isArray: false,
   bucketGrain: undefined,
+  valueShape: "single",
+  valuePickerRuleType: "first",
 };
 ```
 
-A list fixture (`TAGS`) gets `valuePickerRuleType: undefined`. Do not change any expected row: a field with one source must return exactly what it returned before.
+and a `buildAttributeValueSql` or `buildBucketedListValueSql` options fixture takes `sources: [{ ...that source }]` and `sharedSourceDuckDbDataType: undefined` in place of the four fields. Do not change any expected row: a field with one source must return exactly what it returned before.
 
-- [ ] **Step 6: Run both files and watch them pass**
+- [ ] **Step 8: Run the three suites and watch them pass**
 
-Run: `pnpm test:executed src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql`
-Expected: PASS, including the 12 new two-source cases and every earlier case unchanged.
+Run: `pnpm test:executed src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql src/clients/qetl/QueryMediator/conceptRelation/buildBucketedListValueSql`
+Expected: PASS, the 12 new two-source cases and every earlier case unchanged.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
-git add src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql
-git commit -m "feat(joined-cases): read a field by stacking its sources and reducing them once"
+git add src/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql src/clients/qetl/QueryMediator/conceptRelation/buildBucketedListValueSql src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql
+git commit -m "feat(joined-cases): read a field by stacking its sources before its rule runs"
 ```
 
 ---
@@ -2101,53 +2214,15 @@ git commit -m "feat(joined-cases): read a field by stacking its sources and redu
 - Modify: `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts`
 - Modify: `src/clients/qetl/QueryMediator/conceptRelation/__tests__/conceptAttributeColumns.integration.executed.test.ts`
 
-Spec §6.5 and §6.6.
+Spec §6.5 and §6.6. Plans 2, 3 and 4 left three per-mapping helpers in this file: `_assertRuleAllowedForColumn` (plan 2), `_getValueRule` (plan 3), and `_resolveBucketColumnName` (plan 4). This task keeps `_resolveBucketColumnName` per source, reads the rule from the field, and checks it against every source.
 
 - [ ] **Step 1: Update the fixture helpers**
 
 In `conceptAttributeColumns.integration.executed.test.ts`:
 
-1. In `_attribute`, add `valuePickerRuleType: "first",` and `bucketGrain: undefined,` before `...overrides`.
-2. Replace `_mapping` with:
-
-```ts
-function _mapping(
-  options: Readonly<{
-    attributeName: string;
-    datasetId: Dataset.Id;
-    columnName: string;
-    dataType?: DatasetColumn.T["dataType"];
-    position?: number;
-  }>,
-): MappedColumn {
-  const datasetColumnId =
-    `col-${options.datasetId}-${options.columnName}` as DatasetColumn.Id;
-  return {
-    mapping: {
-      id: `map-${options.attributeName}-${options.columnName}` as DatasetColumnMapping["id"],
-      workspaceId:
-        "wwwwwwww-4444-4444-8444-wwwwwwwwwwww" as DatasetColumnMapping["workspaceId"],
-      type: "dataset_column",
-      conceptAttributeId:
-        `attr-${options.attributeName}` as ConceptAttribute.Id,
-      datasetId: options.datasetId,
-      datasetColumnId,
-      bucketColumnId: undefined,
-      position: options.position ?? 0,
-      createdAt: "2026-08-19T00:00:00Z",
-      updatedAt: "2026-08-19T00:00:00Z",
-    },
-    datasetColumn: {
-      id: datasetColumnId,
-      name: options.columnName,
-      datasetId: options.datasetId,
-      dataType: options.dataType ?? "varchar",
-    } as DatasetColumn.T,
-  };
-}
-```
-
-3. Where an existing case passed `ruleType` to `_mapping`, pass it to that attribute's `_attribute(...)` as `valuePickerRuleType` instead. A list attribute (`TAGS`) gets `valuePickerRuleType: undefined`.
+1. In `_attribute`, add `valuePickerRuleType: "first",` before `...overrides` (plan 4 already added `bucketGrain: undefined`).
+2. In `_mapping`, delete the `ruleType` option and its use; add `position?: number`, put `position: options.position ?? 0,` on the mapping; and make the mapping id `` `map-${options.attributeName}-${options.columnName}` `` so a field can have two. Keep plan 2's `columnDataType` (default `bigint`) and plan 4's `bucketColumnId`.
+3. Wherever a case passed `ruleType` to `_mapping`, pass it to that field's `_attribute(...)` as `valuePickerRuleType` instead (for example plan 2's `total` gets `valuePickerRuleType: "sum"`, and plan 4's `AGE_PER_MONTH` gets `valuePickerRuleType: "max"`). A list field (`TAGS`) gets `valuePickerRuleType: undefined`. Plan 2's "reads a list field whatever rule its mapping stores" no longer has a mapping rule to store; delete that case (the database refuses a list with a rule).
 
 - [ ] **Step 2: Write the failing cases**
 
@@ -2235,28 +2310,32 @@ const CASE_REF_SOURCE = _mapping({
   attributeName: "Case ref",
   datasetId: LINE_LIST,
   columnName: "case_ref",
+  columnDataType: "varchar",
 });
 const PATIENT_NO_SOURCE = _mapping({
   attributeName: "Case ref",
   datasetId: LABS,
   columnName: "patient_no",
-  dataType: "bigint",
+  columnDataType: "bigint",
   position: 1,
 });
 const RESULT_LINE_LIST_SOURCE = _mapping({
   attributeName: "Result",
   datasetId: LINE_LIST,
   columnName: "result",
+  columnDataType: "varchar",
 });
 const RESULT_LABS_SOURCE = _mapping({
   attributeName: "Result",
   datasetId: LABS,
   columnName: "lab_result",
+  columnDataType: "varchar",
   position: 1,
 });
 const CASE_REF = _attribute({ name: "Case ref", isIdentifier: true });
 const RESULT = _attribute({
   name: "Result",
+  dataType: "varchar",
   valuePickerRuleType: "most_frequent",
 });
 
@@ -2309,7 +2388,7 @@ describe("makeConceptAttributeColumnsFromMetadata with several sources", () => {
             attributeName: "Patient no",
             datasetId: LABS,
             columnName: "patient_no",
-            dataType: "bigint",
+            columnDataType: "bigint",
           }),
           RESULT_LINE_LIST_SOURCE,
           RESULT_LABS_SOURCE,
@@ -2335,12 +2414,13 @@ describe("makeConceptAttributeColumnsFromMetadata with several sources", () => {
               attributeName: "Mixed",
               datasetId: LINE_LIST,
               columnName: "result",
+              columnDataType: "varchar",
             }),
             _mapping({
               attributeName: "Mixed",
               datasetId: LABS,
               columnName: "patient_no",
-              dataType: "bigint",
+              columnDataType: "bigint",
               position: 1,
             }),
           ],
@@ -2361,6 +2441,7 @@ describe("makeConceptAttributeColumnsFromMetadata with several sources", () => {
               attributeName: "Result",
               datasetId: UNKEYED,
               columnName: "result",
+              columnDataType: "varchar",
               position: 1,
             }),
           ],
@@ -2369,31 +2450,25 @@ describe("makeConceptAttributeColumnsFromMetadata with several sources", () => {
     }).toThrow(/has no identifier attribute mapped into it/);
   });
 
-  it("refuses a bucketed field whose source has no date column", () => {
+  it("refuses a rule the sources' shared type does not allow, naming every column", () => {
     expect(() => {
       makeConceptAttributeColumnsFromMetadata(
         _metadata({
           attributes: [
             CASE_REF,
-            _attribute({
-              name: "Monthly result",
-              isArray: true,
-              bucketGrain: "month",
-              valuePickerRuleType: "count",
-            }),
+            _attribute({ name: "Result", valuePickerRuleType: "sum" }),
           ],
           mappings: [
             CASE_REF_SOURCE,
             PATIENT_NO_SOURCE,
-            _mapping({
-              attributeName: "Monthly result",
-              datasetId: LINE_LIST,
-              columnName: "result",
-            }),
+            RESULT_LINE_LIST_SOURCE,
+            RESULT_LABS_SOURCE,
           ],
         }),
       );
-    }).toThrow(/no date column to bucket by/);
+    }).toThrow(
+      /applies 'sum' to dataset columns 'result', 'lab_result', whose type 'varchar' does not allow it/,
+    );
   });
 });
 ```
@@ -2401,30 +2476,20 @@ describe("makeConceptAttributeColumnsFromMetadata with several sources", () => {
 - [ ] **Step 3: Run it and watch it fail**
 
 Run: `pnpm test:executed src/clients/qetl/QueryMediator/conceptRelation/__tests__/conceptAttributeColumns`
-Expected: FAIL. The first case returns `negative` for record 7 (only the first mapping is read today), and the three `toThrow` cases throw nothing or a different message.
+Expected: FAIL. Only each field's first mapping is read today, so the first case returns `negative` for record 7, and the three refusals throw nothing or a different message.
 
-- [ ] **Step 4: Rewrite column resolution**
+- [ ] **Step 4: Rewrite the per-field helpers**
 
-In `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts`:
+In `makeConceptAttributeColumnsFromMetadata.ts`:
 
-1. Replace the imports with:
+1. Add the imports (keep the file's others):
 
 ```ts
 import { prop } from "@avandar/utils";
 import { AttributeSources } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/AttributeSources/AttributeSources";
-import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
-import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type {
-  ConceptAttributeColumn,
-  ConceptAttributeSource,
-} from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { ConceptAttributeSource } from "@/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql";
 ```
 
 2. Replace `BuiltAttributeColumn` with:
@@ -2444,7 +2509,7 @@ type BuiltSource = {
 };
 ```
 
-3. Delete `_isDatasetColumnMapping` and `_getDatasetColumnMappingsForAttribute`. In `_getPrimaryKeyColumnNameByDatasetId`, replace the `_getDatasetColumnMappingsForAttribute({ ... })` call with `AttributeSources.getSourceMappingsFromMappings({ attributeId: attribute.id, mappings: metadata.mappings })`, and change the last paragraph of its docstring to:
+3. Delete `_isDatasetColumnMapping` and `_getDatasetColumnMappingsForAttribute`. In `_getPrimaryKeyColumnNameByDatasetId`, call `AttributeSources.getSourceMappingsFromMappings({ attributeId: attribute.id, mappings: metadata.mappings })` in their place, and end its docstring with:
 
 ```ts
  * A dataset reached by two identifier sources is resolved by attribute order,
@@ -2453,9 +2518,90 @@ type BuiltSource = {
  * map exactly as one identifier field per dataset does.
 ```
 
-4. In `_buildUnmappedColumn`, add `attributeId: attribute.id,` to the returned object.
+4. Replace plan 3's `_getValueRule` with:
 
-5. Replace `_buildAttributeColumn` (and its docstring) with these four functions:
+```ts
+/**
+ * How a dataset-column field's rows become its value, from its value shape
+ * and its own rule. A list keeps every value. A single or per-period field
+ * needs a rule, and one without is a broken ontology: guessing a rule would
+ * answer with a value nobody chose, so it throws, naming the field.
+ */
+function _getValueRule(
+  attribute: Readonly<ConceptAttribute.T>,
+): ConceptAttributeValueRule {
+  const _getRequiredRuleType = (): ConceptAttribute.ValuePickerRuleType => {
+    if (attribute.valuePickerRuleType === undefined) {
+      throw new Error(
+        `Concept attribute '${attribute.name}' (${attribute.id}) reduces ` +
+          `its rows, but names no value rule.`,
+      );
+    }
+    return attribute.valuePickerRuleType;
+  };
+  return match(ConceptAttribute.getValueShape(attribute))
+    .with("single", (): ConceptAttributeValueRule => {
+      return { valueShape: "single", valuePickerRuleType: _getRequiredRuleType() };
+    })
+    .with("list", (): ConceptAttributeValueRule => {
+      return { valueShape: "list" };
+    })
+    .with("bucketed_list", (): ConceptAttributeValueRule => {
+      return {
+        valueShape: "bucketed_list",
+        valuePickerRuleType: _getRequiredRuleType(),
+      };
+    })
+    .exhaustive();
+}
+```
+
+(If plans 3 or 4 test the old message, `keeps one value, but its mapping names no value rule`, change that test's regex to `names no value rule`.)
+
+5. Replace plan 2's `_assertRuleAllowedForColumn` with:
+
+```ts
+/**
+ * Throws when a single or per-period field applies a rule its sources'
+ * shared type does not allow, which happens only when a column's type is
+ * edited after the field was made. DuckDB would otherwise refuse the whole
+ * view (`sum(VARCHAR)` does not bind) or answer with a value the rule table
+ * calls meaningless, and neither names the field. A list applies no rule.
+ */
+function _assertRuleAllowedForSources(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    valueRule: ConceptAttributeValueRule;
+    valueColumns: readonly DatasetColumn.T[];
+    sharedAvaDataType: AvaDataType.T;
+  }>,
+): void {
+  const { attribute, valueRule, sharedAvaDataType } = options;
+  if (
+    valueRule.valueShape === "list" ||
+    ValuePickerRule.isAllowedForColumnType({
+      ruleType: valueRule.valuePickerRuleType,
+      columnDataType: sharedAvaDataType,
+    })
+  ) {
+    return;
+  }
+  const columnNames = options.valueColumns
+    .map((column) => {
+      return `'${column.name}'`;
+    })
+    .join(", ");
+  const columnNoun =
+    options.valueColumns.length === 1 ? "dataset column" : "dataset columns";
+  throw new Error(
+    `Concept attribute '${attribute.name}' (${attribute.id}) applies ` +
+      `'${valueRule.valuePickerRuleType}' to ${columnNoun} ${columnNames}, ` +
+      `whose type '${sharedAvaDataType}' does not allow it.`,
+  );
+}
+```
+
+6. Keep plan 4's `_resolveBucketColumnName({ attribute, mapping, metadata })` as it is. Replace `_buildAttributeColumn` (and its docstring) with these functions:
 
 ```ts
 function _getDatasetColumn(
@@ -2504,26 +2650,16 @@ function _buildSource(
         `into it, so its rows cannot be matched to an individual.`,
     );
   }
-  const bucketColumn =
-    mapping.bucketColumnId === undefined
-      ? undefined
-      : _getDatasetColumn({
-          attribute,
-          datasetColumnId: mapping.bucketColumnId,
-          metadata,
-        });
-  if (attribute.bucketGrain !== undefined && bucketColumn === undefined) {
-    throw new Error(
-      `Concept attribute '${attribute.name}' (${attribute.id}) is bucketed, ` +
-        `but its source '${valueColumn.name}' has no date column to bucket by.`,
-    );
-  }
   return {
     source: {
       datasetId: mapping.datasetId,
       selectColumnName: valueColumn.name,
       primaryKeyColumnName,
-      bucketColumnName: bucketColumn?.name,
+      bucketColumnName: _resolveBucketColumnName({
+        attribute,
+        mapping,
+        metadata,
+      }),
       position: mapping.position,
     },
     datasetId: mapping.datasetId,
@@ -2532,29 +2668,24 @@ function _buildSource(
 }
 
 /**
- * The DuckDB type a field's sources are cast to so they stack into one
- * relation, or undefined for a single source, which reads its column as
- * stored. An identifier's sources are keys, which are compared as text, so
- * they may differ in type and are then read as VARCHAR. Any other field's
- * sources must share a type.
+ * The one Ava type a field's sources stack as. Any other field's sources
+ * must share a type. An identifier's sources are keys, which are compared as
+ * text, so they may differ and are then read as `varchar`.
  */
-function _getSharedSourceDuckDbDataType(
+function _getSharedSourceAvaDataType(
   options: Readonly<{
     attribute: ConceptAttribute.T;
     valueColumns: readonly DatasetColumn.T[];
   }>,
-): DuckDbDataType | undefined {
-  const { attribute, valueColumns } = options;
-  if (valueColumns.length <= 1) {
-    return undefined;
-  }
-  const dataTypes = removeDuplicates(valueColumns.map(prop("dataType")));
+): AvaDataType.T {
+  const { attribute } = options;
+  const dataTypes = removeDuplicates(options.valueColumns.map(prop("dataType")));
   const [onlyDataType] = dataTypes;
   if (dataTypes.length === 1 && onlyDataType !== undefined) {
-    return DuckDbDataTypeUtils.fromDatasetColumnType(onlyDataType);
+    return onlyDataType;
   }
   if (attribute.isIdentifier) {
-    return "VARCHAR";
+    return "varchar";
   }
   throw new Error(
     `Concept attribute '${attribute.name}' (${attribute.id}) reads columns ` +
@@ -2567,8 +2698,8 @@ function _getSharedSourceDuckDbDataType(
  * Turns one attribute into the column the concept's view emits for it.
  *
  * A `manual_entry` attribute, and an attribute with no mapping row at all,
- * become a typed NULL rather than an error: the relation's schema stays
- * complete, and it is honest, because we hold no value for it.
+ * become a typed NULL (or empty list) rather than an error: the relation's
+ * schema stays complete, and it is honest, because we hold no value for it.
  */
 function _buildAttributeColumn(
   options: Readonly<{
@@ -2583,10 +2714,7 @@ function _buildAttributeColumn(
     mappings: metadata.mappings,
   });
   if (attribute.mappingType === "manual_entry" || mappings.length === 0) {
-    return {
-      column: _buildUnmappedColumn(attribute),
-      contributingDatasetIds: [],
-    };
+    return { column: _buildUnmappedColumn(attribute), contributingDatasetIds: [] };
   }
   const builtSources = mappings.map((mapping) => {
     return _buildSource({
@@ -2596,39 +2724,31 @@ function _buildAttributeColumn(
       primaryKeyColumnNameByDatasetId: options.primaryKeyColumnNameByDatasetId,
     });
   });
+  const valueColumns = builtSources.map(prop("valueColumn"));
+  const sharedAvaDataType = _getSharedSourceAvaDataType({ attribute, valueColumns });
+  const valueRule = _getValueRule(attribute);
+  _assertRuleAllowedForSources({ attribute, valueRule, valueColumns, sharedAvaDataType });
   return {
     column: {
       kind: "dataset_column",
       attributeId: attribute.id,
       attributeName: attribute.name,
       sources: builtSources.map(prop("source")),
-      sharedSourceDuckDbDataType: _getSharedSourceDuckDbDataType({
-        attribute,
-        valueColumns: builtSources.map(prop("valueColumn")),
-      }),
-      valuePickerRuleType: attribute.valuePickerRuleType,
-      isArray: attribute.isArray,
+      // One source reads its column as stored, so an existing field's type
+      // never changes; several are cast so `UNION ALL` has one type.
+      sharedSourceDuckDbDataType:
+        builtSources.length > 1
+          ? DuckDbDataTypeUtils.fromDatasetColumnType(sharedAvaDataType)
+          : undefined,
       bucketGrain: attribute.bucketGrain,
+      ...valueRule,
     },
     contributingDatasetIds: builtSources.map(prop("datasetId")),
   };
 }
 ```
 
-6. In `makeConceptAttributeColumnsFromMetadata`, replace
-
-```ts
-    const { column, contributingDatasetId } = _buildAttributeColumn({
-```
-
-through
-
-```ts
-      contributingDatasetIds.add(contributingDatasetId);
-    }
-```
-
-with:
+7. In `makeConceptAttributeColumnsFromMetadata`, replace the destructuring of `contributingDatasetId` and the `if (contributingDatasetId !== undefined) { ... }` block with:
 
 ```ts
     const { column, contributingDatasetIds: columnDatasetIds } =
@@ -2642,25 +2762,20 @@ with:
     });
 ```
 
-and in its docstring replace the last paragraph with:
+and end its docstring with `One column per attribute, never one per mapping: a field with several sources is one column computed over all of them.`
 
-```ts
- * One column per attribute, never one per mapping: a field with several
- * sources is one column whose value the view computes over all of them.
-```
+Remove imports that become unused. Run `pnpm format`.
 
-Remove the `AttributeMapping` type import if nothing uses it any more.
-
-- [ ] **Step 5: Run the file and watch it pass**
+- [ ] **Step 5: Run the suite and watch it pass**
 
 Run: `pnpm test:executed src/clients/qetl/QueryMediator/conceptRelation`
-Expected: PASS, including the six new cases and every earlier case.
+Expected: PASS, including the six new cases and plans 1 to 4's cases (plan 2's "refuses a sum over a text column" still matches its one-column message).
 
 - [ ] **Step 6: Commit**
 
 ```bash
 git add src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts src/clients/qetl/QueryMediator/conceptRelation/__tests__/conceptAttributeColumns.integration.executed.test.ts
-git commit -m "feat(joined-cases): resolve every source of a field, keyed by its own dataset"
+git commit -m "feat(joined-cases): resolve every source of a field and check its rule against them all"
 ```
 
 ---
@@ -2671,11 +2786,11 @@ git commit -m "feat(joined-cases): resolve every source of a field, keyed by its
 - Modify: `src/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQuery.ts:78-93`
 - Modify: `src/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQuery.test.ts`
 - Modify: `src/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.test.ts`
-- Modify: `src/clients/qetl/QueryMediator/__tests__/QueryMediator.concepts.test.ts:~120-140` (fixture shape)
+- Modify: `src/clients/qetl/QueryMediator/__tests__/QueryMediator.concepts.test.ts` (fixture shape)
 
 - [ ] **Step 1: Write the failing tests**
 
-In `getNeededColumnsFromQuery.test.ts`, change the `CONCEPT_PLAN` column to the new arm (one source, as in Task 6 Step 5; the expected `["age_years", "person_id"]` does not change), add `const OTHER_DATASET_ID = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb" as Dataset.Id;` and the `ConceptAttribute` type import, and add:
+In `getNeededColumnsFromQuery.test.ts`, move `CONCEPT_PLAN`'s column to the new arm (one source, as in Task 6 Step 7; its expected columns do not change), add `const OTHER_DATASET_ID = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb" as Dataset.Id;` and the `ConceptAttribute` type import, and add:
 
 ```ts
   it("takes every source's value, key, and date columns into that source's dataset", () => {
@@ -2704,9 +2819,9 @@ In `getNeededColumnsFromQuery.test.ts`, change the `CONCEPT_PLAN` column to the 
             },
           ],
           sharedSourceDuckDbDataType: "BIGINT",
-          valuePickerRuleType: "avg",
-          isArray: true,
           bucketGrain: "month",
+          valueShape: "bucketed_list",
+          valuePickerRuleType: "avg",
         },
       ],
     };
@@ -2724,7 +2839,7 @@ In `getNeededColumnsFromQuery.test.ts`, change the `CONCEPT_PLAN` column to the 
   });
 ```
 
-In `getConceptRelationPlansFromSql.test.ts`, add `valuePickerRuleType: "first"` (and plan 4's `bucketGrain: undefined`) to `IDENTIFIER_ATTRIBUTE`, replace `valuePickerRuleType: "first",` in `IDENTIFIER_MAPPING` with `position: 0, bucketColumnId: undefined,`, add `dataType: "varchar"` to `IDENTIFIER_COLUMN`, and add:
+In `getConceptRelationPlansFromSql.test.ts`, add `valuePickerRuleType: "first"` to `IDENTIFIER_ATTRIBUTE`, replace any rule on `IDENTIFIER_MAPPING` with `position: 0,` (keep plan 4's `bucketColumnId: undefined`), give `IDENTIFIER_COLUMN` a `dataType: "varchar"`, and add:
 
 ```ts
   // The allowlist is per dataset, so a field's second source must pass it
@@ -2763,16 +2878,16 @@ In `getConceptRelationPlansFromSql.test.ts`, add `valuePickerRuleType: "first"` 
   });
 ```
 
-In `QueryMediator.concepts.test.ts`, move the `dataset_column` fixture column to the new arm the same way (expected results unchanged).
+In `QueryMediator.concepts.test.ts`, move the `dataset_column` fixture to the new arm the same way (expected results unchanged).
 
 - [ ] **Step 2: Run them and watch the needed-columns case fail**
 
 Run: `pnpm test:frontend src/clients/qetl/QueryMediator/getNeededColumnsFromQuery src/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql src/clients/qetl/QueryMediator/__tests__/QueryMediator.concepts`
-Expected: the new needed-columns case FAILS (`undefined` keys, because the function still reads `column.datasetId`). The contributor case already PASSES, because Task 7 added every source's dataset to `contributingDatasetIds`; it stays as the regression guard.
+Expected: the new needed-columns case FAILS (it still reads `column.datasetId`). The contributor case already PASSES, because Task 7 adds every source's dataset to `contributingDatasetIds`; it stays as the regression guard.
 
 - [ ] **Step 3: Read every source**
 
-In `getNeededColumnsFromQuery.ts`, replace the inner `.reduce` callback of `_getConceptColumnsByDatasetId` with:
+In `getNeededColumnsFromQuery.ts`, replace the inner `.reduce` callback of `_getConceptColumnsByDatasetId` (including plan 4's bucket column) with:
 
 ```ts
       .reduce((nextColumnsByDatasetId, column) => {
@@ -2789,8 +2904,6 @@ In `getNeededColumnsFromQuery.ts`, replace the inner `.reduce` callback of `_get
         return nextColumnsByDatasetId;
       }, columnsByDatasetId);
 ```
-
-If plan 4 already added the bucket column here, keep one copy of it.
 
 - [ ] **Step 4: Run them and watch them pass**
 
@@ -2812,14 +2925,12 @@ git commit -m "feat(joined-cases): load and authorize every source dataset of a 
 - Modify: `src/views/OntologyDesignerApp/ConceptMetaView/useHydratedConcept.ts:52-69`
 - Modify: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts:46-68` (`getAttributesWithMapping`)
 - Modify: `src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx`, `CaseTypeActions.test.tsx:65`
-- Modify: `src/views/OntologyDesignerApp/insertConceptFromFormValues/insertConceptFromFormValues.ts:75-106`, `insertConceptFromFormValues.test.ts:47-58`
-- Modify: `src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx:114-125, 52, 97-101`
-
-The case type page and Sync read a field's mappings from the hydrated concept, so they must hold all of them (spec §6.2, §6.8).
+- Modify: `src/views/OntologyDesignerApp/insertConceptFromFormValues/insertConceptFromFormValues.ts:75-106`, its test
+- Modify: `src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx:114-125, 52`
 
 - [ ] **Step 1: Write the failing test**
 
-In `insertConceptFromFormValues.test.ts`, replace the `generateIndividuals` mock's `getAttributesWithMapping` with:
+In `insertConceptFromFormValues.test.ts`, replace the mocked `getAttributesWithMapping` with:
 
 ```ts
       getAttributesWithMappings: (
@@ -2831,7 +2942,7 @@ In `insertConceptFromFormValues.test.ts`, replace the `generateIndividuals` mock
       },
 ```
 
-and add this case to the `describe` block:
+and add:
 
 ```ts
   it("hands the first sync every mapping of a field with several sources", async () => {
@@ -2859,12 +2970,12 @@ and add this case to the `describe` block:
   });
 ```
 
-In `src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.test.tsx:65`, rename `getAttributesWithMapping` to `getAttributesWithMappings`.
+In `CaseTypeActions.test.tsx:65`, rename `getAttributesWithMapping` to `getAttributesWithMappings`.
 
 - [ ] **Step 2: Run it and watch it fail**
 
 Run: `pnpm test:frontend src/views/OntologyDesignerApp/insertConceptFromFormValues`
-Expected: FAIL. `getAttributesWithMappings` is not exported from the mocked module's real counterpart, and the attribute has no `mappings`.
+Expected: FAIL: `getAttributesWithMappings` does not exist on the real module the code imports, and no attribute has `mappings`.
 
 - [ ] **Step 3: Hydrate every mapping**
 
@@ -2898,7 +3009,7 @@ export function getAttributesWithMappings<
 }
 ```
 
-In `insertConceptFromFormValues.ts`, rename the import to `getAttributesWithMappings` and in `_getFullConcept` replace the `attributesWithMappings` block with:
+In `insertConceptFromFormValues.ts`, import `getAttributesWithMappings`, and in `_getFullConcept` replace the `attributesWithMappings` block with:
 
 ```ts
   const attributesWithMappings = getAttributesWithMappings(
@@ -2913,9 +3024,7 @@ In `insertConceptFromFormValues.ts`, rename the import to `getAttributesWithMapp
   );
 ```
 
-In `RefreshRecordsButton.tsx`, rename the import and call to `getAttributesWithMappings`.
-
-In `useHydratedConcept.ts`, replace the `attributes:` mapping inside `hydratedConcept` with:
+In `RefreshRecordsButton.tsx`, rename the import and call. In `useHydratedConcept.ts`, replace the `attributes:` mapping inside `hydratedConcept` with:
 
 ```ts
       attributes: conceptAttributes?.map((attribute) => {
@@ -2930,7 +3039,7 @@ In `useHydratedConcept.ts`, replace the `attributes:` mapping inside `hydratedCo
 
 - [ ] **Step 4: Name every source dataset on the case type page**
 
-In `CaseTypeAttributesList.tsx`, add the imports `import { useLingui } from "@lingui/react/macro";`, `import { useMemo } from "react";` and `import { AttributeSources } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/AttributeSources/AttributeSources";`. Replace `datasetNameForAttribute` with:
+In `CaseTypeAttributesList.tsx`, import `useLingui` (`@lingui/react/macro`), `useMemo` (`react`) and `AttributeSources`, and replace `datasetNameForAttribute` with:
 
 ```ts
 /** The names of the datasets a field reads, in read order, each once. */
@@ -2982,18 +3091,19 @@ git commit -m "feat(joined-cases): hydrate every source of a field and name each
 ## Task 10: Sync reads every identifier source and a multi-source name
 
 **Files:**
-- Modify: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts:151-314`
+- Modify: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts` (`_resolveIndividualSourceMappings`, `_stageIndividuals`, `_runGenerateIndividuals`)
 - Modify: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.test.ts`
 
-Spec §6.7. Plan 6 later removes the name from Sync; until then it must read several sources.
+Spec §6.7. Plan 6 later removes the name from Sync; until then it reads several sources through the same column resolution as the view.
 
 - [ ] **Step 1: Update the fixture and write the failing test**
 
 In `generateIndividuals.test.ts`:
 
-1. Give `_makeMapping` an optional `datasetId` and `position` argument, and replace its `valuePickerRuleType: "first",` with `position: args.position ?? 0, bucketColumnId: undefined,` and `datasetId: args.datasetId ?? DATASET_ID,`.
+1. Give `_makeMapping` optional `datasetId` and `position` arguments; replace any rule on it with `position: args.position ?? 0,` and `datasetId: args.datasetId ?? DATASET_ID,` (keep plan 4's `bucketColumnId: undefined`).
 2. Give `_makeDatasetColumn` an optional `datasetId` argument (default `DATASET_ID`).
-3. In `_makeConcept`'s `_makeAttribute`, add `valuePickerRuleType: "first" as const,` (and plan 4's `bucketGrain: undefined,`) to the `Model.make` call, and replace `mapping: _makeMapping(...)` with `mappings: [_makeMapping({ conceptAttributeId: args.id, datasetColumnId: args.datasetColumnId })]`.
+3. In `_makeConcept`'s `_makeAttribute`, add `valuePickerRuleType: "first" as const,` to the `Model.make` call (plan 4 already added `bucketGrain`), and replace `mapping: _makeMapping(...)` with `mappings: [_makeMapping({ conceptAttributeId: args.id, datasetColumnId: args.datasetColumnId })]`.
+4. Plan 3's "a label without a rule fails the sync" case now builds the label with `valuePickerRuleType: undefined` on the attribute; change its expected message to match `names no value rule`.
 
 Then add:
 
@@ -3066,42 +3176,45 @@ describe("generateIndividuals over two sources", () => {
 });
 ```
 
-Reuse the file's existing `beforeEach` resets (`vi.clearAllMocks()` and the `JobProgressStore` spies) if the outer `describe` does not already cover this block.
+Reuse the file's existing `beforeEach` resets if the outer `describe` does not cover this block.
 
 - [ ] **Step 2: Run it and watch it fail**
 
 Run: `pnpm test:frontend src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.test.ts`
-Expected: FAIL. Sync reads `attribute.mapping`, which no longer exists, so it throws before staging.
+Expected: FAIL. Sync reads `attribute.mapping`, which no longer exists.
 
 - [ ] **Step 3: Resolve Sync's sources through column resolution**
 
-In `generateIndividuals.ts`, add the imports:
+In `generateIndividuals.ts`, add the imports (keep plan 1's `buildAttributeValueSql` import; remove imports this step leaves unused):
 
 ```ts
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import { buildAttributeValueSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
 import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
-import type {
-  ConceptAttributeColumn,
-  ConceptAttributeSource,
-} from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
+import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
+import type { ConceptAttributeSource } from "@/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql";
 ```
 
-(add `makeIdLookupRecord` to the `@avandar/utils` import, and remove imports this step leaves unused). Replace `IndividualSourceMappings` and `_resolveIndividualSourceMappings` with:
+and add `makeIdLookupRecord` to the `@avandar/utils` import. Replace the source-mapping type and `_resolveIndividualSourceMappings` with:
 
 ```ts
+/** The label field's view column, which keeps one value. */
+type LabelColumn = Extract<
+  ConceptAttributeColumn,
+  { kind: "dataset_column"; valueShape: "single" }
+>;
+
 /**
  * What the staging SQL reads: every identifier source, the record name's
  * field as a view column, and the columns each dataset must load.
  */
 type IndividualSources = {
   identifierSources: ConceptAttributeSource[];
-  labelColumn: Extract<ConceptAttributeColumn, { kind: "dataset_column" }>;
+  labelColumn: LabelColumn;
   neededColumnsByDatasetId: Record<string, string[]>;
 };
 
-/** Every column a set of dataset-column mappings names, bucket dates included. */
+/** Every column a set of dataset-column mappings names, date columns included. */
 function _getMappedColumnIds(
   mappings: readonly AttributeMapping[],
 ): DatasetColumnId[] {
@@ -3158,10 +3271,10 @@ async function _resolveIndividualSources(
   const labelColumn = attributeColumns.find((column) => {
     return column.attributeId === labelAttribute.id;
   });
-  if (labelColumn?.kind !== "dataset_column") {
+  if (labelColumn?.kind !== "dataset_column" || labelColumn.valueShape !== "single") {
     throw new Error(
       `Concept ${concept.name} names its records from ` +
-        `'${labelAttribute.name}', which does not read a dataset.`,
+        `'${labelAttribute.name}', which does not keep one dataset value.`,
     );
   }
   const identifierIds = new Set(identifierAttributes.map(prop("id")));
@@ -3182,27 +3295,29 @@ async function _resolveIndividualSources(
 }
 ```
 
-`_resolveIndividualSources` is over 45 lines if `_getNeededColumnsByDatasetId` is inlined; keep them separate as shown.
-
-In `_stageIndividuals`, change the `mappings` option to `sources: IndividualSources`, destructure `{ identifierSources, labelColumn, neededColumnsByDatasetId }`, and replace the two template values with:
+In `_stageIndividuals`, take `sources: IndividualSources` instead of the old mappings, destructure `{ identifierSources, labelColumn, neededColumnsByDatasetId }`, and replace the two template values with:
 
 ```ts
+      // One selector per identifier source. Uncast on purpose: casting a key
+      // column would re-key a record whose key is a number, and DuckDB already
+      // reads a union of a BIGINT key and a text key as text.
       externalIdSelectors: identifierSources
         .map((source) => {
           return `SELECT ${quoteSqlIdentifier(source.selectColumnName)} AS external_id FROM ${quoteSqlIdentifier(source.datasetId)}`;
         })
         .join(" UNION ALL "),
       titleSelector: buildAttributeValueSql({
-        column: labelColumn,
+        sources: labelColumn.sources,
+        sharedSourceDuckDbDataType: labelColumn.sharedSourceDuckDbDataType,
+        valueShape: "single",
+        valuePickerRuleType: labelColumn.valuePickerRuleType,
+        outputColumnName: "name",
         externalIdsTable: "external_ids",
         externalIdColumn: "external_id",
-        outputColumnName: "name",
       }),
 ```
 
-Update the comment above `WorkspaceQuerySession.runQuery` to say Sync reads each identifier source's key column and each label source's value and key column. In `_runGenerateIndividuals`, replace `const mappings = await _resolveIndividualSourceMappings(concept);` with `const sources = await _resolveIndividualSources(concept);` and pass `sources` to `_stageIndividuals`.
-
-The external id selectors keep today's uncast shape on purpose: casting a key column would re-key existing records whose keys are not text.
+Update the comment above `WorkspaceQuerySession.runQuery` to say Sync reads each identifier source's key column and each label source's value and key column. In `_runGenerateIndividuals`, call `_resolveIndividualSources(concept)` and pass its result to `_stageIndividuals`. Keep each function at or under 45 lines.
 
 - [ ] **Step 4: Run the file and watch it pass**
 
@@ -3218,84 +3333,65 @@ git commit -m "feat(joined-cases): sync records from every identifier source and
 
 ---
 
-## Task 11: The record page names every source dataset
+## Task 11: The record page lists a field's sources in read order
 
 **Files:**
-- Modify: `src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx:13-19, 57-81`
-- Modify: `src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.test.tsx`
-- Modify: the file where plan 1 builds `CaseDetailsRow.sourceName` (Task 0 found it with `rg -n "sourceName" src/views/IndividualManagerApp`)
+- Modify: `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes.ts` (`_getSourceNames`)
+- Modify: `.../makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes.test.ts`
+
+Plan 1 already lists every dataset a field's mappings read, one per line, sorted by name. This task lists them in the order the field reads them, so the source a `first` field prefers comes first.
 
 - [ ] **Step 1: Write the failing test**
 
-In `CaseDetailsRail.test.tsx`, change `sourceName: "Measles line list",` to `sourceNames: ["Measles line list"],`, add `sourceNames: [],` to the MMR row, and add:
+In `makeCaseDetailsRowsFromAttributes.test.ts`, add (using the file's attribute and dataset factories):
 
 ```ts
-  it("names every source dataset of a field, in read order", () => {
-    render(
-      <CaseDetailsRail
-        attributes={[
-          {
-            id: uuid<ConceptAttribute.Id>(),
-            name: "Result",
-            value: "positive",
-            sourceNames: ["Line list", "Lab results"],
-          },
-        ]}
-      />,
-    );
-    expect(screen.getByText("Line list, Lab results")).toBeInTheDocument();
+  it("lists a field's source datasets in the order the field reads them, not by name", () => {
+    const [row] = makeCaseDetailsRowsFromAttributes({
+      attributes: [RESULT_ATTRIBUTE],
+      valuesByAttributeId: {},
+      mappings: [
+        { ...RESULT_SOURCE, datasetId: ALPHA_DATASET.id, datasetColumnId: "col-b", position: 1 },
+        { ...RESULT_SOURCE, datasetId: ZETA_DATASET.id, datasetColumnId: "col-a", position: 0 },
+      ],
+      datasets: [ALPHA_DATASET, ZETA_DATASET],
+    });
+
+    expect(row?.sourceNames).toEqual(["Zeta labs", "Alpha list"]);
   });
 ```
 
+with `ALPHA_DATASET` named `Alpha list`, `ZETA_DATASET` named `Zeta labs`, and `RESULT_SOURCE` a `dataset_column` mapping of `RESULT_ATTRIBUTE` (add them beside the file's fixtures). If an existing case asserts alphabetical order for one field's several datasets, change its expectation to read order.
+
 - [ ] **Step 2: Run it and watch it fail**
 
-Run: `pnpm test:frontend src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail`
-Expected: FAIL, `Unable to find an element with the text: Line list, Lab results`.
+Run: `pnpm test:frontend src/views/IndividualManagerApp/SingleIndividualView/useRecordFields`
+Expected: FAIL, `["Alpha list", "Zeta labs"]`.
 
-- [ ] **Step 3: List the sources**
+- [ ] **Step 3: Read the names in read order**
 
-In `CaseDetailsRail.tsx`, add `import { useLingui } from "@lingui/react/macro";` and `import { useMemo } from "react";`, and replace `sourceName?: string;` in `CaseDetailsRow` with:
-
-```ts
-  /** The datasets this field reads, in read order, each once. */
-  sourceNames: readonly string[];
-```
-
-In `CaseDetailsRail`, before `return`, add:
+Import `AttributeSources` and replace `_getSourceNames` with:
 
 ```ts
-  const { i18n } = useLingui();
-  const sourceNameList = useMemo(() => {
-    return new Intl.ListFormat(i18n.locale, {
-      style: "short",
-      type: "unit",
-    });
-  }, [i18n.locale]);
+/** The names of the datasets one field reads, in the order it reads them. */
+function _getSourceNames(
+  options: Readonly<{
+    attributeId: ConceptAttribute.Id;
+    mappings: readonly AttributeMapping[];
+    datasetNamesById: ReadonlyMap<string, string>;
+  }>,
+): string[] {
+  return AttributeSources.getDatasetIdsFromMappings({
+    attributeId: options.attributeId,
+    mappings: options.mappings,
+  }).flatMap((datasetId) => {
+    const datasetName = options.datasetNamesById.get(datasetId);
+    return datasetName === undefined ? [] : [datasetName];
+  });
+}
 ```
 
-and replace the `attribute.sourceName ? (...) : null` block with:
-
-```tsx
-                {attribute.sourceNames.length > 0 ? (
-                  <Text size="xs" c="dimmed">
-                    {sourceNameList.format(attribute.sourceNames)}
-                  </Text>
-                ) : null}
-```
-
-In the file where plan 1 sets `sourceName`, set `sourceNames` instead, built from every dataset-column mapping of the field:
-
-```ts
-        sourceNames: AttributeSources.getDatasetIdsFromMappings({
-          attributeId: attribute.id,
-          mappings,
-        }).flatMap((datasetId) => {
-          const datasetName = datasetNamesById[datasetId];
-          return datasetName === undefined ? [] : [datasetName];
-        }),
-```
-
-using the mappings and dataset names plan 1 already fetches there (rename to match).
+Change "the datasets the field reads" in `makeCaseDetailsRowsFromAttributes`' docstring to "the datasets the field reads, in read order", and remove the now unused `removeDuplicates` import.
 
 - [ ] **Step 4: Run it and watch it pass**
 
@@ -3305,8 +3401,8 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/views/IndividualManagerApp/SingleIndividualView
-git commit -m "feat(joined-cases): list every source dataset of a field on the record page"
+git add src/views/IndividualManagerApp/SingleIndividualView/useRecordFields
+git commit -m "feat(joined-cases): list a field's source datasets in read order on the record page"
 ```
 
 ---
@@ -3314,13 +3410,12 @@ git commit -m "feat(joined-cases): list every source dataset of a field on the r
 ## Task 12: The chat contract and parsers carry sources
 
 **Files:**
-- Modify: `shared/types/chat.types.ts:108-137, 187-201, 227-231`
-- Create: `supabase/functions/chat/PostChatMessages/parsing/parseChatCaseAttributeSources.ts`
-- Create: `supabase/functions/chat/PostChatMessages/parsing/parseChatCaseAttributeSources.test.ts`
-- Modify: `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts:14-24, 67-89, 140-161, 198-201`, `parseProposeCaseType.test.ts`
-- Modify: `supabase/functions/chat/PostChatMessages/parsing/parseCreateCaseTypes.ts:21-64, 96-123`, `parseCreateCaseTypes.test.ts`
+- Modify: `shared/types/chat.types.ts` (rule docstring, `ChatCaseAttributeSource`, both attribute types, `labelColumnId`)
+- Create: `supabase/functions/chat/PostChatMessages/parsing/parseChatCaseAttributeSources.ts` and `.test.ts`
+- Modify: `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts`, `parseProposeCaseType.test.ts`
+- Modify: `supabase/functions/chat/PostChatMessages/parsing/parseCreateCaseTypes.ts`, `parseCreateCaseTypes.test.ts`
 
-Spec §6.9.
+Spec §6.9. Plan 2 gave `parseProposeCaseType` the catalog columns; plan 3 parses `valueShape` and coerces a join key or label field to one value; plan 4 parses `bucketGrain` and `bucketColumnId`. This task keeps each of those, keyed by a field's first source.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -3378,7 +3473,7 @@ describe("parseChatCaseAttributeSources", () => {
 });
 ```
 
-In `parseProposeCaseType.test.ts`, change every attribute in every fixture from `datasetId: X, columnId: Y,` to `sources: [{ datasetId: X, columnId: Y }],`, and the matching expectations the same way. Then add:
+In `parseProposeCaseType.test.ts` and `parseCreateCaseTypes.test.ts`, change every dataset attribute fixture from `datasetId: X, columnId: Y,` to `sources: [{ datasetId: X, columnId: Y }],` (a plan 4 bucketed fixture moves its `bucketColumnId` into that source), and every expectation that reads `columnId` or `datasetId` off an attribute to read `sources[0]`. Then add to `parseProposeCaseType.test.ts` (pass plan 2's catalog argument as the file's other cases do):
 
 ```ts
   it("keeps a field's sources across two datasets, in the order given", () => {
@@ -3397,17 +3492,54 @@ In `parseProposeCaseType.test.ts`, change every attribute in every fixture from 
             ],
             name: "Result",
             isIncluded: true,
+            valueShape: "single",
             valuePickerRuleType: "most_frequent",
           },
         ],
         manualEntryAttributes: [],
       }),
+      [],
     );
 
     expect(parsed?.attributes[0]?.sources).toEqual([
       { datasetId: DEATHS_DATASET_ID, columnId: STATE_COLUMN_ID },
       { datasetId: CENSUS_DATASET_ID, columnId: POPULATION_COLUMN_ID },
     ]);
+  });
+
+  it("drops a source whose catalog type differs from the field's first source", () => {
+    const parsed = parseProposeCaseType(
+      JSON.stringify({
+        name: "Measles case",
+        sourceDatasets: [
+          { datasetId: DEATHS_DATASET_ID, primaryKeyColumnId: DEATHS_KEY_COLUMN_ID },
+          { datasetId: CENSUS_DATASET_ID, primaryKeyColumnId: CENSUS_KEY_COLUMN_ID },
+        ],
+        attributes: [
+          {
+            sources: [
+              { datasetId: DEATHS_DATASET_ID, columnId: STATE_COLUMN_ID },
+              { datasetId: CENSUS_DATASET_ID, columnId: POPULATION_COLUMN_ID },
+            ],
+            name: "State",
+            isIncluded: true,
+            valueShape: "single",
+            valuePickerRuleType: "first",
+          },
+        ],
+        manualEntryAttributes: [],
+      }),
+      [
+        { id: STATE_COLUMN_ID, data_type: "varchar" },
+        { id: POPULATION_COLUMN_ID, data_type: "bigint" },
+      ],
+    );
+
+    expect(
+      parsed?.attributes[0]?.sources.map((source) => {
+        return source.columnId;
+      }),
+    ).toEqual([STATE_COLUMN_ID]);
   });
 
   // The card names a field by its first source's column, so two fields with
@@ -3424,17 +3556,20 @@ In `parseProposeCaseType.test.ts`, change every attribute in every fixture from 
             sources: [{ datasetId: DEATHS_DATASET_ID, columnId: STATE_COLUMN_ID }],
             name: "State",
             isIncluded: true,
+            valueShape: "single",
             valuePickerRuleType: "first",
           },
           {
             sources: [{ datasetId: DEATHS_DATASET_ID, columnId: STATE_COLUMN_ID }],
             name: "State again",
             isIncluded: true,
+            valueShape: "single",
             valuePickerRuleType: "first",
           },
         ],
         manualEntryAttributes: [],
       }),
+      [],
     );
 
     expect(
@@ -3445,7 +3580,7 @@ In `parseProposeCaseType.test.ts`, change every attribute in every fixture from 
   });
 ```
 
-In `parseCreateCaseTypes.test.ts`, move every `dataset_column` attribute fixture and expectation to `sources` the same way, and add:
+and to `parseCreateCaseTypes.test.ts` (using that file's id constants; add `OTHER_DATASET_ID` and `OTHER_COLUMN_ID` as fresh UUID strings if it has none):
 
 ```ts
   it("keeps a created field's sources that a declared identity holds", () => {
@@ -3472,15 +3607,13 @@ In `parseCreateCaseTypes.test.ts`, move every `dataset_column` attribute fixture
       }),
     );
 
-    expect(parsed?.[0]?.attributes[0]).toEqual({
+    expect(parsed?.[0]?.attributes[0]).toMatchObject({
       name: "Result",
       kind: "dataset_column",
       sources: [{ datasetId: DATASET_ID, columnId: COLUMN_ID }],
     });
   });
 ```
-
-using that file's existing id constants (add `OTHER_DATASET_ID` and `OTHER_COLUMN_ID` as fresh uuid strings if it has none).
 
 - [ ] **Step 2: Run them and watch them fail**
 
@@ -3491,7 +3624,7 @@ Expected: FAIL. `parseChatCaseAttributeSources.ts` does not exist, and both pars
 
 In `shared/types/chat.types.ts`:
 
-1. Change the `ChatCaseValuePickerRuleType` docstring to: `Which value a dataset-column field keeps when its sources hold several rows per case. Mirrors the attribute_mappings__value_picker_rule_type database enum.`
+1. `ChatCaseValuePickerRuleType`'s docstring becomes: `Which value a dataset-column field keeps when its sources hold several rows per case. Mirrors the attribute_mappings__value_picker_rule_type database enum.`
 2. Above `ChatCreatedCaseAttribute`, add:
 
 ```ts
@@ -3503,12 +3636,12 @@ In `shared/types/chat.types.ts`:
 export type ChatCaseAttributeSource = {
   datasetId: string;
   columnId: string;
-  /** The date column that buckets this source's rows, on a bucketed field. */
+  /** The date column that places this source's rows in periods, on a per-period field. */
   bucketColumnId?: string;
 };
 ```
 
-3. In `ChatCreatedCaseAttribute`'s `dataset_column` arm and in `ChatProposedCaseAttribute`, replace `datasetId: string;` and `columnId: string;` (and their comments) with:
+3. In `ChatProposedCaseAttribute` and the `dataset_column` arm of `ChatCreatedCaseAttribute`, replace `datasetId` and `columnId` (and plan 4's attribute-level `bucketColumnId`) with:
 
 ```ts
   /**
@@ -3518,9 +3651,8 @@ export type ChatCaseAttributeSource = {
   sources: ChatCaseAttributeSource[];
 ```
 
-and delete plan 4's attribute-level `bucketColumnId` from both (it now lives on each source).
-
-4. Change `labelColumnId`'s docstring to: `The first source column of the field whose value labels each case in the UI. The client falls back to a join key when it names no field.`
+   Keep plan 3's `valueShape`, plan 4's `bucketGrain`, and the rule. Update plan 4's comment that `bucketGrain` and `bucketColumnId` are present together to: `bucketGrain is present exactly when valueShape is "bucketed_list", and then every source has a bucketColumnId.`
+4. `labelColumnId`'s docstring becomes: `The first source column of the field whose value labels each case in the UI. The client falls back to a join key when it names no field.`
 
 - [ ] **Step 4: Write the shared sources parser**
 
@@ -3585,37 +3717,50 @@ export function parseChatCaseAttributeSources(
 
 - [ ] **Step 5: Parse sources in the proposal**
 
-In `parseProposeCaseType.ts`, import `parseChatCaseAttributeSources`, change the comment above `VALUE_PICKER_RULE_TYPES` (add one if missing) to `The rules a field's rows can be reduced by. Mirrors ChatCaseValuePickerRuleType.`, and replace `_parseAttribute` and `_parseSourceAttributes` with:
+In `parseProposeCaseType.ts`, import `parseChatCaseAttributeSources`, and give `VALUE_PICKER_RULE_TYPES` the comment `The rules that reduce a field's rows from every source. Mirrors ChatCaseValuePickerRuleType.` Add above `_parseAttribute`:
 
 ```ts
-function _parseAttribute(
-  raw: unknown,
-  sourceDatasetIds: ReadonlySet<string>,
-): ChatProposedCaseAttribute | undefined {
-  if (!raw || typeof raw !== "object") {
-    return undefined;
-  }
-  const record = raw as Record<string, unknown>;
+/**
+ * A field's sources, kept to the type of its first catalogued source: one
+ * field reads one type, and a source of another would fail the case type
+ * when it is queried. A source the catalog does not list is kept, and the
+ * client drops it when it resolves columns.
+ */
+function _parseFieldSources(
+  options: Readonly<{
+    rawSources: unknown;
+    sourceDatasetIds: ReadonlySet<string>;
+    columnDataTypesById: ColumnDataTypesById;
+  }>,
+): ChatCaseAttributeSource[] {
   const sources = parseChatCaseAttributeSources({
-    rawSources: record.sources,
-    datasetIds: sourceDatasetIds,
+    rawSources: options.rawSources,
+    datasetIds: options.sourceDatasetIds,
   });
-  const name = _asTrimmedString(record.name);
-  if (sources.length === 0 || !name) {
-    return undefined;
-  }
-  const description = _asTrimmedString(record.description);
-  return {
-    sources,
-    // Every case type has a built-in `status`, and a dataset `status` column
-    // is common, so the attribute is renamed rather than dropped.
-    name: ConceptStatus.toNonReservedAttributeName(name),
-    isIncluded: record.isIncluded !== false,
-    valuePickerRuleType: _asValuePickerRuleType(record.valuePickerRuleType),
-    ...(description ? { description } : {}),
-  };
+  const firstDataType = sources
+    .map((source) => {
+      return options.columnDataTypesById.get(source.columnId);
+    })
+    .find((dataType) => {
+      return dataType !== undefined;
+    });
+  return sources.filter((source) => {
+    const dataType = options.columnDataTypesById.get(source.columnId);
+    return dataType === undefined || dataType === firstDataType;
+  });
 }
+```
 
+Then change plan 2, 3 and 4's `_parseAttribute` so that:
+
+1. It takes `sourceDatasetIds: ReadonlySet<string>` beside plan 2's `columnDataTypesById`, reads `const sources = _parseFieldSources({ rawSources: record.sources, sourceDatasetIds, columnDataTypesById });`, returns `undefined` when `sources.length === 0` or the name is missing, and returns `sources` in place of `datasetId` and `columnId`.
+2. Plan 2's rule check reads the type of `sources[0]` (`columnDataTypesById.get(sources[0].columnId)`).
+3. Plan 4's per-period parse becomes per source: the field keeps `"bucketed_list"` only with a known grain and a `bucketColumnId` on its first source; any other source without a `bucketColumnId` is dropped; when the field falls back to one value, every source's `bucketColumnId` is removed.
+4. Plan 3's coercion of a join key or the label column to one value compares `sources[0].columnId` where it compared `columnId`.
+
+Replace `_parseSourceAttributes` with:
+
+```ts
 /**
  * The proposed fields with at least one source a declared dataset holds,
  * each named by a first source column no earlier field has. The card keys a
@@ -3626,6 +3771,7 @@ function _parseSourceAttributes(
   options: Readonly<{
     rawAttributes: unknown;
     sourceDatasets: readonly ChatCaseSourceDataset[];
+    columnDataTypesById: ColumnDataTypesById;
   }>,
 ): ChatProposedCaseAttribute[] {
   const sourceDatasetIds = new Set(
@@ -3635,7 +3781,10 @@ function _parseSourceAttributes(
   );
   const seenFirstColumnIds = new Set<string>();
   return _parseList(options.rawAttributes, (raw) => {
-    return _parseAttribute(raw, sourceDatasetIds);
+    return _parseAttribute(raw, {
+      sourceDatasetIds,
+      columnDataTypesById: options.columnDataTypesById,
+    });
   }).filter((attribute) => {
     const firstColumnId = attribute.sources[0]?.columnId;
     if (firstColumnId === undefined || seenFirstColumnIds.has(firstColumnId)) {
@@ -3647,74 +3796,11 @@ function _parseSourceAttributes(
 }
 ```
 
-Keep plan 3's `valueShape` and plan 4's `bucketGrain` parsing inside `_parseAttribute`, and delete plan 4's attribute-level `bucketColumnId` parsing. In `parseProposeCaseType`, change the label check to:
-
-```ts
-  const hasLabelAttribute = attributes.some((attribute) => {
-    return attribute.sources[0]?.columnId === labelColumnId;
-  });
-```
+(adapt `_parseAttribute`'s second parameter to that object). In `parseProposeCaseType`, the label check becomes `attribute.sources[0]?.columnId === labelColumnId`.
 
 - [ ] **Step 6: Parse sources in created case types**
 
-In `parseCreateCaseTypes.ts`, import `parseChatCaseAttributeSources` and replace `_parseDatasetColumnAttribute` and `_parseAttribute` with:
-
-```ts
-function _parseDatasetColumnAttribute(
-  options: Readonly<{
-    raw: Record<string, unknown>;
-    name: string;
-    datasetIds: ReadonlySet<string>;
-  }>,
-): ChatCreatedCaseAttribute | undefined {
-  const { raw, name } = options;
-  const sources = parseChatCaseAttributeSources({
-    rawSources: raw.sources,
-    datasetIds: options.datasetIds,
-  });
-  if (sources.length === 0) {
-    return undefined;
-  }
-  return {
-    name,
-    kind: "dataset_column",
-    sources,
-    ...(_asTrimmedString(raw.description)
-      ? { description: _asTrimmedString(raw.description) }
-      : {}),
-    ...(raw.isLabel === true ? { isLabel: true } : {}),
-  };
-}
-
-function _parseAttribute(
-  raw: unknown,
-  datasetIds: ReadonlySet<string>,
-): ChatCreatedCaseAttribute | undefined {
-  if (!raw || typeof raw !== "object") {
-    return undefined;
-  }
-  const record = raw as Record<string, unknown>;
-  const name = _asTrimmedString(record.name);
-  if (!name) {
-    return undefined;
-  }
-  if (record.kind === "manual_entry") {
-    return {
-      name,
-      kind: "manual_entry",
-      ...(_asTrimmedString(record.description)
-        ? { description: _asTrimmedString(record.description) }
-        : {}),
-    };
-  }
-  if (record.kind === "dataset_column") {
-    return _parseDatasetColumnAttribute({ raw: record, name, datasetIds });
-  }
-  return undefined;
-}
-```
-
-In `_parseCaseType`, replace the `attributes` expression with:
+In `parseCreateCaseTypes.ts`, import `parseChatCaseAttributeSources`, give `_parseDatasetColumnAttribute` an options object `{ raw, name, datasetIds }`, and make it read `sources` with `parseChatCaseAttributeSources({ rawSources: raw.sources, datasetIds })`, returning `undefined` when none remain, and `sources` in place of `datasetId` and `columnId` (keep plan 3's `valueShape`). Give `_parseAttribute` the case's `datasetIds` and pass it through. In `_parseCaseType`, replace the attributes filter with:
 
 ```ts
   // A dataset column with no join key cannot be matched to a case, so its
@@ -3729,6 +3815,8 @@ In `_parseCaseType`, replace the `attributes` expression with:
         })
     : [];
 ```
+
+Plan 3's coercion of a join key or `isLabel` field to one value compares `sources[0].columnId` where it compared `columnId`.
 
 - [ ] **Step 7: Run them and watch them pass**
 
@@ -3747,8 +3835,8 @@ git commit -m "feat(joined-cases): let chat give a field several sources"
 ## Task 13: The tool schemas and the prompt describe sources
 
 **Files:**
-- Modify: `supabase/functions/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts:167-221, 325-341`, `makeChatToolConfigFromOptions.test.ts`
-- Modify: `supabase/functions/chat/PostChatMessages/prompt/buildCaseManagerSystemPrompt.ts:81-93`, `buildCaseManagerSystemPrompt.test.ts`
+- Modify: `supabase/functions/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts`, its test
+- Modify: `supabase/functions/chat/PostChatMessages/prompt/buildCaseManagerSystemPrompt.ts`, its test
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -3781,7 +3869,7 @@ In `makeChatToolConfigFromOptions.test.ts`, add:
 
     expect({
       keys: Object.keys(attributeItems?.properties ?? {}).filter((key) => {
-        return ["sources", "datasetId", "columnId"].includes(key);
+        return ["sources", "datasetId", "columnId", "bucketColumnId"].includes(key);
       }),
       minSources: attributeItems?.properties.sources?.minItems,
       requiresSources: attributeItems?.required.includes("sources"),
@@ -3789,7 +3877,7 @@ In `makeChatToolConfigFromOptions.test.ts`, add:
   });
 ```
 
-In `buildCaseManagerSystemPrompt.test.ts`, add (using that file's existing call helper or arguments):
+In `buildCaseManagerSystemPrompt.test.ts`, add (with that file's usual arguments):
 
 ```ts
   it("tells the model a field can read several columns, listed in priority order", () => {
@@ -3815,7 +3903,7 @@ In `makeChatToolConfigFromOptions.ts`, `proposeCaseType`:
 
 1. `labelColumnId.description`: `"Column id of the first source of the attribute whose value names each case in the UI. Must be the first source of one of \`attributes\`."`
 2. `attributes.description`: `"One entry per field worth mapping, across all source datasets. Preselect the useful ones with isIncluded true and offer marginal ones with isIncluded false."`
-3. In `attributes.items.properties`, delete `datasetId` and `columnId` (and plan 4's `bucketColumnId`) and add, first:
+3. In `attributes.items.properties`, delete `datasetId`, `columnId`, and plan 4's `bucketColumnId`, and add first:
 
 ```ts
                 sources: {
@@ -3835,6 +3923,11 @@ In `makeChatToolConfigFromOptions.ts`, `proposeCaseType`:
                         type: "string",
                         description: "Catalog column id, copied verbatim.",
                       },
+                      bucketColumnId: {
+                        type: "string",
+                        description:
+                          "Only for a per-period field: a date or timestamp column of this source's dataset that places each row in a period.",
+                      },
                     },
                     required: ["datasetId", "columnId"],
                     additionalProperties: false,
@@ -3842,8 +3935,7 @@ In `makeChatToolConfigFromOptions.ts`, `proposeCaseType`:
                 },
 ```
 
-(if plan 4 added `bucketColumnId` to the attribute, add it to these source `properties` instead, unrequired, with its description changed to "this source's date column").
-4. `valuePickerRuleType.description`: `"Which value to keep when the field's sources hold several rows per case. Use sum or max for cumulative measures, first for dates, most_frequent for categories."`
+4. Prefix plan 2's `valuePickerRuleType.description` with `"Which value to keep when the field's sources hold several rows per case. "` in place of its opening clause about a dataset.
 5. In `required`, replace `"datasetId", "columnId",` with `"sources",`.
 
 In `createCaseTypes`, in `attributes.items.properties`, replace `datasetId: { type: "string" }, columnId: { type: "string" },` with:
@@ -3867,17 +3959,11 @@ In `createCaseTypes`, in `attributes.items.properties`, replace `datasetId: { ty
 
 In `buildCaseManagerSystemPrompt.ts`, inside `caseManagerRules`:
 
-1. Replace the `labelColumnId` bullet with:
+1. Replace the `labelColumnId` bullet's last sentence with `It must be the first source of one of \`attributes\`.`
+2. Directly after the value picker bullet (and plans 2 to 4's bullets beside it), add:
 
 ```
-- \`labelColumnId\` is the column a human would read to recognise a case, such as a name, county, or title. It must be the first source of one of \`attributes\`.
-```
-
-2. Replace the "Choose the value picker per column" bullet with:
-
-```
-- Choose the value picker per field: sum or max for cumulative measures, first for dates, most_frequent for categories and text. A dataset at a finer grain than the case type usually needs sum or max.
-- A field can read several columns when they hold the same thing: phone 1 and phone 2 in one dataset, or lab results kept in two sheets. Give that field one entry per column in its \`sources\`, in priority order: when the field keeps one value, the earliest source with a value wins, and a list holds the sources' values in that order. Every source of a field must have the same column type, and each source's dataset must be in \`sourceDatasets\`.
+- A field can read several columns when they hold the same thing: phone 1 and phone 2 in one dataset, or lab results kept in two sheets. Give that field one entry per column in its \`sources\`, in priority order: when the field keeps one value, the earliest source with a value wins, and a list holds the sources' values in that order. Every source of a field must have the same column type, and each source's dataset must be in \`sourceDatasets\`. A per-period field gives every source its own date column.
 - The join key columns become one ID field that reads every dataset's key. Still list each join key column as an attribute with that column as its only source.
 ```
 
@@ -3901,7 +3987,7 @@ git commit -m "feat(joined-cases): describe field sources in the case type tools
 - Create: `src/views/OntologyDesignerApp/makeAttributesWithIdentifierFromKeyColumns/makeAttributesWithIdentifierFromKeyColumns.ts`
 - Create: `src/views/OntologyDesignerApp/makeAttributesWithIdentifierFromKeyColumns/makeAttributesWithIdentifierFromKeyColumns.test.ts`
 
-Spec §6.6. This task depends on Task 16's form types (`mappings.datasetColumn` is an array and the rule is on the attribute); do Task 16 Steps 3 and 4 first if you run tasks out of order.
+Spec §6.6. This task uses Task 16's form types (`mappings.datasetColumn` is an array, the rule is on the attribute). If you run tasks out of order, do Task 16 Steps 3 and 4 first.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -3971,35 +4057,34 @@ function _field(options: {
   };
 }
 
-function _identifierOf(attributes: readonly AttributeFormValues[]) {
-  return attributes.filter((attribute) => {
-    return attribute.isIdentifier;
-  });
-}
-
 describe("makeAttributesWithIdentifierFromKeyColumns", () => {
   it("makes one ID field reading each dataset's key column, in order", () => {
-    const [identifier, ...rest] = _identifierOf(
-      makeAttributesWithIdentifierFromKeyColumns({
-        conceptId: CONCEPT_ID,
-        keyColumns: [CASE_ID_COLUMN, PATIENT_REF_COLUMN],
-        attributes: [],
-      }),
-    );
-
-    expect({
-      count: rest.length + 1,
-      name: identifier?.name,
-      rule: identifier?.valuePickerRuleType,
-      columnIds: identifier?.mappings.datasetColumn.map((source) => {
-        return source.datasetColumnId;
-      }),
-    }).toEqual({
-      count: 1,
-      name: "case_id",
-      rule: "first",
-      columnIds: [CASE_ID_COLUMN.id, PATIENT_REF_COLUMN.id],
+    const attributes = makeAttributesWithIdentifierFromKeyColumns({
+      conceptId: CONCEPT_ID,
+      keyColumns: [CASE_ID_COLUMN, PATIENT_REF_COLUMN],
+      attributes: [],
     });
+    const identifiers = attributes.filter((attribute) => {
+      return attribute.isIdentifier;
+    });
+
+    expect(
+      identifiers.map((identifier) => {
+        return {
+          name: identifier.name,
+          rule: identifier.valuePickerRuleType,
+          columnIds: identifier.mappings.datasetColumn.map((source) => {
+            return source.datasetColumnId;
+          }),
+        };
+      }),
+    ).toEqual([
+      {
+        name: "case_id",
+        rule: "first",
+        columnIds: [CASE_ID_COLUMN.id, PATIENT_REF_COLUMN.id],
+      },
+    ]);
   });
 
   it("folds a field that reads only key columns into the ID field, keeping its name", () => {
@@ -4141,47 +4226,27 @@ function _getKeyDataType(keyColumns: readonly KeyColumn[]): AvaDataType.T {
     : "varchar";
 }
 
-/**
- * Gives a new case type one ID field whose sources are each dataset's join
- * key column, in the order the datasets were added, and folds into it every
- * field that reads only key columns. A folded field's name and description
- * name the ID field, and if one was the label, the ID field is the label and
- * keeps its id. Called by the create form's submit transform and by
- * `createdCaseTypeToFormValues`, so both paths build the same ID field.
- */
-export function makeAttributesWithIdentifierFromKeyColumns(
+function _makeIdentifierField(
   options: Readonly<{
+    id: ConceptAttributeId;
     conceptId: ConceptId;
-    keyColumns: readonly KeyColumn[];
-    attributes: readonly AttributeFormValues[];
+    namingField: AttributeFormValues | undefined;
+    isLabel: boolean;
+    keyColumns: readonly [KeyColumn, ...KeyColumn[]];
   }>,
-): AttributeFormValues[] {
-  const { conceptId, keyColumns, attributes } = options;
-  const [firstKeyColumn] = keyColumns;
-  if (firstKeyColumn === undefined) {
-    return [...attributes];
-  }
-  const keyColumnIds = new Set(keyColumns.map(prop("id")));
-  const keyFields = attributes.filter((attribute) => {
-    return _isKeyField(attribute, keyColumnIds);
-  });
-  const namingField =
-    keyFields.find((attribute) => {
-      return attribute.mappings.datasetColumn[0]?.datasetColumnId === firstKeyColumn.id;
-    }) ?? keyFields[0];
-  const labelField = keyFields.find(prop("isLabel"));
-  const id = (labelField ?? namingField)?.id ?? uuid<ConceptAttributeId>();
-  const identifier: AttributeFormValues = Model.make("ConceptAttribute", {
+): AttributeFormValues {
+  const { id, namingField, keyColumns } = options;
+  return Model.make("ConceptAttribute", {
     id,
-    conceptId,
+    conceptId: options.conceptId,
     name: ConceptStatus.toNonReservedAttributeName(
-      namingField?.name ?? firstKeyColumn.name,
+      namingField?.name ?? keyColumns[0].name,
     ),
     description: namingField?.description,
     dataType: _getKeyDataType(keyColumns),
     mappingType: "dataset_column",
     isIdentifier: true,
-    isLabel: labelField !== undefined,
+    isLabel: options.isLabel,
     allowManualEdit: false,
     isArray: false,
     bucketGrain: undefined,
@@ -4199,13 +4264,55 @@ export function makeAttributesWithIdentifierFromKeyColumns(
       }),
     },
   } as const);
-  return [identifier, ...attributes.filter((attribute) => {
-    return !keyFields.includes(attribute);
-  })];
+}
+
+/**
+ * Gives a new case type one ID field whose sources are each dataset's join
+ * key column, in the order the datasets were added, and folds into it every
+ * field that reads only key columns. A folded field's name and description
+ * name the ID field, and if one was the label, the ID field is the label and
+ * keeps its id. Called by the create form's submit transform and by
+ * `createdCaseTypeToFormValues`, so both paths build the same ID field.
+ */
+export function makeAttributesWithIdentifierFromKeyColumns(
+  options: Readonly<{
+    conceptId: ConceptId;
+    keyColumns: readonly KeyColumn[];
+    attributes: readonly AttributeFormValues[];
+  }>,
+): AttributeFormValues[] {
+  const { conceptId, keyColumns, attributes } = options;
+  const [firstKeyColumn, ...otherKeyColumns] = keyColumns;
+  if (firstKeyColumn === undefined) {
+    return [...attributes];
+  }
+  const keyColumnIds = new Set(keyColumns.map(prop("id")));
+  const keyFields = attributes.filter((attribute) => {
+    return _isKeyField(attribute, keyColumnIds);
+  });
+  const namingField =
+    keyFields.find((attribute) => {
+      return (
+        attribute.mappings.datasetColumn[0]?.datasetColumnId ===
+        firstKeyColumn.id
+      );
+    }) ?? keyFields[0];
+  const labelField = keyFields.find(prop("isLabel"));
+  const identifier = _makeIdentifierField({
+    id: (labelField ?? namingField)?.id ?? uuid<ConceptAttributeId>(),
+    conceptId,
+    namingField,
+    isLabel: labelField !== undefined,
+    keyColumns: [firstKeyColumn, ...otherKeyColumns],
+  });
+  return [
+    identifier,
+    ...attributes.filter((attribute) => {
+      return !keyFields.includes(attribute);
+    }),
+  ];
 }
 ```
-
-Run `pnpm format`. If the function exceeds 45 lines after formatting, extract the `Model.make` call into `_makeIdentifierField({ id, conceptId, namingField, labelField, keyColumns })`.
 
 - [ ] **Step 4: Run it and watch it pass**
 
@@ -4229,7 +4336,7 @@ git commit -m "feat(joined-cases): fold a case type's join keys into one ID fiel
 
 - [ ] **Step 1: Write the failing tests**
 
-In both test files, move every `dataset_column` attribute fixture from `datasetId`/`columnId` to `sources: [{ datasetId, columnId }]`. Then in `proposedCaseTypeToCreatedCaseType.test.ts` add (using that file's draft factory and ids):
+In both test files, move every dataset attribute fixture from `datasetId`/`columnId` to `sources: [{ datasetId, columnId }]` (a plan 4 per-period fixture moves its `bucketColumnId` into that source). Then add to `proposedCaseTypeToCreatedCaseType.test.ts` (with the file's own draft factory and ids):
 
 ```ts
   it("keeps a dataset that only a field's second source reads", () => {
@@ -4245,7 +4352,7 @@ In both test files, move every `dataset_column` attribute fixture from `datasetI
                 { datasetId: CENSUS_DATASET_ID, columnId: POPULATION_COLUMN_ID },
               ],
             }
-          : { ...attribute, isIncluded: attribute.sources[0]?.datasetId !== CENSUS_DATASET_ID ? attribute.isIncluded : false };
+          : attribute;
       }),
     });
 
@@ -4257,9 +4364,7 @@ In both test files, move every `dataset_column` attribute fixture from `datasetI
   });
 ```
 
-Adapt `_draft`, `CENSUS_DATASET_ID` and `POPULATION_COLUMN_ID` to the file's own factory and constants; the census dataset's key column must stay included, as the conversion forces.
-
-In `createdCaseTypeToFormValues.test.ts` add:
+and to `createdCaseTypeToFormValues.test.ts`:
 
 ```ts
   it("makes one ID field that reads each identity's key column", () => {
@@ -4341,6 +4446,8 @@ In `createdCaseTypeToFormValues.test.ts` add:
   });
 ```
 
+Plan 3's and plan 4's cases that expect one identifier attribute per identity now expect the one ID field; change those expectations.
+
 - [ ] **Step 2: Run them and watch them fail**
 
 Run: `pnpm test:frontend src/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType src/views/OntologyDesignerApp/createdCaseTypeToFormValues`
@@ -4361,50 +4468,50 @@ function _getFirstSourceColumnId(
 
 and change:
 
-- `_toDatasetColumnAttribute`: replace `datasetId: attribute.datasetId, columnId: attribute.columnId,` with `sources: attribute.sources,` (keep plan 3 and 4's shape fields).
+- `_toDatasetColumnAttribute`: `sources: attribute.sources,` in place of `datasetId` and `columnId` (keep plan 3's `valueShape`, plan 4's `bucketGrain`, and plan 3's single-only rule).
 - `_includedAttributes`: `return attribute.isIncluded || primaryKeyColumnIds.has(_getFirstSourceColumnId(attribute) ?? "");`
-- `_contributingSourceDatasets`: build `contributingDatasetIds` from `options.included.flatMap((attribute) => { return attribute.sources.map((source) => { return source.datasetId; }); })`, and change its docstring's first line to `Drops sources that no longer contribute anything, counting every source of every included field.`
-- `_resolveLabelColumnId`: `return _getFirstSourceColumnId(attribute) === draft.labelColumnId;`
-- The `isLabel` argument in the main function: `isLabel: _getFirstSourceColumnId(attribute) === labelColumnId,`
+- `_contributingSourceDatasets`: build `contributingDatasetIds` from `options.included.flatMap((attribute) => { return attribute.sources.map((source) => { return source.datasetId; }); })`, and begin its docstring with `Drops sources that no longer contribute anything, counting every source of every included field.`
+- `_resolveLabelColumnId` and the `isLabel` argument compare `_getFirstSourceColumnId(attribute)` where they compared `attribute.columnId`; so does plan 3's single-value coercion of the label and join keys.
 
 - [ ] **Step 4: Build fields with sources, then the ID field**
 
-In `createdCaseTypeToFormValues.ts`, replace the imports of `ValuePickerRuleType` and `ChatCaseSourceDataset` with:
+In `createdCaseTypeToFormValues.ts`, import `makeAttributesWithIdentifierFromKeyColumns` and `ChatCaseAttributeSource`, and delete `_makeMissingIdentifierAttributes`. Add:
 
 ```ts
-import { makeAttributesWithIdentifierFromKeyColumns } from "@/views/OntologyDesignerApp/makeAttributesWithIdentifierFromKeyColumns/makeAttributesWithIdentifierFromKeyColumns";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type {
-  ChatCaseAttributeSource,
-  ChatCreatedCaseType,
-} from "$/types/chat.types";
-```
-
-and replace `DEFAULT_VALUE_PICKER_RULE_TYPE`'s type with `ConceptAttribute.ValuePickerRuleType`. Delete `_makeMissingIdentifierAttributes`, and replace `_makeMappedAttribute` and `_attributesFromCaseType` with:
-
-```ts
-/** One chat source matched to the catalog column it names. */
+/** One chat source matched to the catalog column, and date column, it names. */
 type ResolvedSource = {
   source: ChatCaseAttributeSource;
   column: CatalogColumn;
+  bucketColumn: CatalogColumn | undefined;
 };
 
 /**
- * A field's sources the catalog knows, whose dataset has a join key, and
- * whose type matches the field's first such source: the planner refuses a
- * source with no key and sources of different types.
+ * A field's sources the catalog knows, whose dataset has a join key, whose
+ * type matches the field's first such source, and, on a per-period field,
+ * whose date column is a date or timestamp column of its own dataset. The
+ * planner refuses every other source.
  */
 function _getResolvedSources(options: {
   sources: readonly ChatCaseAttributeSource[];
   columns: readonly CatalogColumn[];
   identifiedDatasetIds: ReadonlySet<string>;
+  isPerPeriod: boolean;
 }): ResolvedSource[] {
-  const resolved = options.sources.flatMap((source) => {
+  const resolved = options.sources.flatMap((source): ResolvedSource[] => {
     const column = _findColumn(options.columns, source.columnId);
+    const bucketColumn = source.bucketColumnId
+      ? _findColumn(options.columns, source.bucketColumnId)
+      : undefined;
+    const isDateColumnUsable =
+      !options.isPerPeriod ||
+      (bucketColumn !== undefined &&
+        bucketColumn.datasetId === source.datasetId &&
+        ConceptAttribute.isBucketDateColumnType(bucketColumn.dataType));
     return column &&
       column.datasetId === source.datasetId &&
-      options.identifiedDatasetIds.has(source.datasetId)
-      ? [{ source, column }]
+      options.identifiedDatasetIds.has(source.datasetId) &&
+      isDateColumnUsable
+      ? [{ source, column, bucketColumn: options.isPerPeriod ? bucketColumn : undefined }]
       : [];
   });
   const firstDataType = resolved[0]?.column.dataType;
@@ -4412,83 +4519,39 @@ function _getResolvedSources(options: {
     return entry.column.dataType === firstDataType;
   });
 }
+```
 
-function _makeMappedAttribute(options: {
-  conceptId: ConceptId;
-  name: string;
-  description: string | undefined;
-  sources: readonly [ResolvedSource, ...ResolvedSource[]];
-  isLabel: boolean;
-  valuePickerRuleType: ConceptAttribute.ValuePickerRuleType;
-}): AttributeFormValues {
-  const conceptAttributeId = uuid<ConceptAttributeId>();
-  return Model.make("ConceptAttribute", {
-    id: conceptAttributeId,
-    conceptId: options.conceptId,
-    name: ConceptStatus.toNonReservedAttributeName(options.name),
-    description: options.description,
-    dataType: options.sources[0].column.dataType,
-    mappingType: "dataset_column",
-    isIdentifier: false,
-    isLabel: options.isLabel,
-    allowManualEdit: false,
-    isArray: false,
-    bucketGrain: undefined,
-    valuePickerRuleType: options.valuePickerRuleType,
-    mappings: {
-      manualEntry: { type: "manual_entry", conceptAttributeId },
-      datasetColumn: options.sources.map(({ source, column }) => {
+Change plan 2 to 4's `_makeMappedAttribute` to take `sources: readonly [ResolvedSource, ...ResolvedSource[]]` in place of its one `column`: read the column type from `sources[0].column.dataType` wherever it read `column.dataType` (the rule check, `ConceptAttribute.getOutputDataType`), set `isIdentifier: false` (the fold makes the ID field), and build the drafts as:
+
+```ts
+      datasetColumn: options.sources.map(({ column, bucketColumn }) => {
         return {
           type: "dataset_column",
           conceptAttributeId,
           datasetId: column.datasetId,
           datasetColumnId: column.id,
-          bucketColumnId: source.bucketColumnId as DatasetColumn.Id | undefined,
+          bucketColumnId: bucketColumn?.id,
         };
       }),
-    },
-  } as const);
-}
+```
 
-function _attributesFromCaseType(options: {
-  caseType: ChatCreatedCaseType;
-  conceptId: ConceptId;
-  columns: readonly CatalogColumn[];
-}): AttributeFormValues[] {
-  const { caseType, conceptId, columns } = options;
-  const identifiedDatasetIds = new Set(
-    caseType.identities.map((identity) => {
-      return identity.datasetId;
-    }),
-  );
-  const mapped = caseType.attributes.flatMap((attribute) => {
-    if (attribute.kind === "manual_entry") {
-      return [
-        makeDefaultManualEntryAttribute({
-          conceptId,
-          name: ConceptStatus.toNonReservedAttributeName(attribute.name),
-        }),
-      ];
-    }
+with `valuePickerRuleType` on the attribute (the value plan 2's `toAllowedRuleType` computes), not on a mapping draft. In `_attributesFromCaseType`, for a dataset attribute:
+
+```ts
     const [firstSource, ...otherSources] = _getResolvedSources({
       sources: attribute.sources,
       columns,
       identifiedDatasetIds,
+      isPerPeriod: attribute.valueShape === "bucketed_list",
     });
-    return firstSource
-      ? [
-          _makeMappedAttribute({
-            conceptId,
-            name: attribute.name,
-            description: attribute.description,
-            sources: [firstSource, ...otherSources],
-            isLabel: attribute.isLabel === true,
-            valuePickerRuleType:
-              attribute.valuePickerRuleType ?? DEFAULT_VALUE_PICKER_RULE_TYPE,
-          }),
-        ]
-      : [];
-  });
+    if (!firstSource) {
+      return [];
+    }
+```
+
+and pass `sources: [firstSource, ...otherSources]` to `_makeMappedAttribute` (keep plans 3 and 4's shape and grain arguments), where `identifiedDatasetIds` is `new Set(caseType.identities.map((identity) => { return identity.datasetId; }))`. End `_attributesFromCaseType` with:
+
+```ts
   const keyColumns = caseType.identities.flatMap((identity) => {
     const column = _findColumn(columns, identity.primaryKeyColumnId);
     return column && column.datasetId === identity.datasetId ? [column] : [];
@@ -4498,10 +4561,9 @@ function _attributesFromCaseType(options: {
     keyColumns,
     attributes: mapped,
   });
-}
 ```
 
-Plan 2 sets `dataType` from `ValuePickerRule.getOutputDataType`, and plans 3 and 4 set `isArray`, `bucketGrain`, and the rule from the chat field's shape: keep their expressions in place of the literals above. Change the main function's docstring to: `Turns a chat-created case type into the payload the concept creator submits. A case type may draw columns from several datasets, so a field may read several sources, and the datasets' join keys become one ID field.`
+Change the main function's docstring to: `Turns a chat-created case type into the payload the concept creator submits. A case type may draw columns from several datasets, so a field may read several sources, and the datasets' join keys become one ID field.`
 
 - [ ] **Step 5: Run them and watch them pass**
 
@@ -4517,13 +4579,14 @@ git commit -m "feat(joined-cases): turn chat drafts into fields with sources and
 
 ---
 
-## Task 16: Form state holds sources, and the insert writes their positions
+## Task 16: Form state holds sources, and the insert writes rules and positions
 
 **Files:**
-- Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes.ts:26-51, 106-186`
+- Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes.ts` (types, type test, factories, plan 2's `withFieldDataTypes`)
 - Create: `src/views/OntologyDesignerApp/ConceptCreatorView/makeSourceDatasetsFromAttributes/makeSourceDatasetsFromAttributes.ts` and `.test.ts`
-- Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx:55-152`
-- Modify: `src/views/OntologyDesignerApp/insertConceptFromFormValues/insertConceptFromFormValues.ts:26-49`, its test
+- Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx` (`transformValues`, `validate`)
+- Modify: `src/views/OntologyDesignerApp/insertConceptFromFormValues/insertConceptFromFormValues.ts`, its test
+- Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes.test.ts` (plan 2's `withFieldDataTypes` cases)
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -4626,10 +4689,10 @@ describe("makeSourceDatasetsFromAttributes", () => {
 });
 ```
 
-In `insertConceptFromFormValues.test.ts`, change the fixture attribute's `mappings.datasetColumn` to `[]`, add `valuePickerRuleType: undefined,` (and plan 4's `bucketGrain: undefined,`) to it, and add:
+In `insertConceptFromFormValues.test.ts`, change the fixture attribute's `mappings.datasetColumn` to `[]` and add `valuePickerRuleType: undefined,` to it; move plan 3's "a list field's mapping has no rule" case to assert the **attribute** row has no rule; and add:
 
 ```ts
-  it("writes one mapping per source, positioned in list order", async () => {
+  it("writes one mapping per source, positioned in list order, and the field's rule on the field", async () => {
     const values = _makeFormValues();
     const [manualAttribute] = values.attributes;
     const fieldId = uuid<ConceptAttributeId>();
@@ -4646,38 +4709,41 @@ In `insertConceptFromFormValues.test.ts`, change the fixture attribute's `mappin
           mappings: {
             manualEntry: { type: "manual_entry", conceptAttributeId: fieldId },
             datasetColumn: [
-              { type: "dataset_column", conceptAttributeId: fieldId, datasetId: "ds-a", datasetColumnId: "col-a", bucketColumnId: undefined },
-              { type: "dataset_column", conceptAttributeId: fieldId, datasetId: "ds-b", datasetColumnId: "col-b", bucketColumnId: undefined },
-            ] as never,
+              { type: "dataset_column", conceptAttributeId: fieldId, datasetId: uuid(), datasetColumnId: uuid(), bucketColumnId: undefined },
+              { type: "dataset_column", conceptAttributeId: fieldId, datasetId: uuid(), datasetColumnId: uuid(), bucketColumnId: undefined },
+            ],
           },
         },
       ],
     });
 
     const [createParams] = conceptCreateMock.mock.calls[0] as [
-      { mappings: Array<{ type: string; datasetColumnId?: string; position?: number }> },
+      {
+        attributes: Array<{ id: string; valuePickerRuleType?: string }>;
+        mappings: Array<{ type: string; position?: number }>;
+      },
     ];
-    expect(
-      createParams.mappings
+    expect({
+      rule: createParams.attributes.find((attribute) => {
+        return attribute.id === fieldId;
+      })?.valuePickerRuleType,
+      positions: createParams.mappings
         .filter((mapping) => {
           return mapping.type === "dataset_column";
         })
         .map((mapping) => {
-          return [mapping.datasetColumnId, mapping.position];
+          return mapping.position;
         }),
-    ).toEqual([
-      ["col-a", 0],
-      ["col-b", 1],
-    ]);
+    }).toEqual({ rule: "first", positions: [0, 1] });
   });
 ```
 
-(`as never` stands in for the branded ids in this mock-only payload; prefer the file's `uuid<...>()` helpers if the brands make the cast unnecessary.)
+In `conceptFormTypes.test.ts`, move plan 2's `withFieldDataTypes` fixtures' rule from `mappings.datasetColumn` onto the attribute and wrap their `mappings.datasetColumn` in an array.
 
 - [ ] **Step 2: Run them and watch them fail**
 
-Run: `pnpm test:frontend src/views/OntologyDesignerApp/ConceptCreatorView/makeSourceDatasetsFromAttributes src/views/OntologyDesignerApp/insertConceptFromFormValues`
-Expected: FAIL: the helper does not exist, and the insert writes one mapping per field with no position.
+Run: `pnpm test:frontend src/views/OntologyDesignerApp/ConceptCreatorView src/views/OntologyDesignerApp/insertConceptFromFormValues`
+Expected: FAIL: the helper does not exist, the insert writes one mapping per field with no position, and `withFieldDataTypes` reads a single mapping draft.
 
 - [ ] **Step 3: Change the form types**
 
@@ -4716,7 +4782,7 @@ type _Test_AttributeFormValues = Expect<
 >;
 ```
 
-In `makeDefaultDatasetColumnAttribute`, add `valuePickerRuleType: "most_frequent",` (plan 2's default, if it changed it) after `isArray: false,`, and replace its `datasetColumn` draft with:
+In `makeDefaultDatasetColumnAttribute`, put the rule plan 2 defaults to (`most_frequent`) on the attribute as `valuePickerRuleType`, and replace its `datasetColumn` draft with a one-element array:
 
 ```ts
       datasetColumn: [
@@ -4730,7 +4796,19 @@ In `makeDefaultDatasetColumnAttribute`, add `valuePickerRuleType: "most_frequent
       ],
 ```
 
-In `makeDefaultManualEntryAttribute`, add `valuePickerRuleType: undefined,` and replace its `datasetColumn` draft with `datasetColumn: [],`.
+In `makeDefaultManualEntryAttribute`, add `valuePickerRuleType: undefined,` and set `datasetColumn: [],`.
+
+In plan 2's `withFieldDataTypes`, replace the destructuring of `attribute.mappings.datasetColumn` with:
+
+```ts
+    const firstColumnId = attribute.mappings.datasetColumn[0]?.datasetColumnId;
+    const columnDataType = firstColumnId
+      ? columnDataTypesById.get(firstColumnId)
+      : undefined;
+    const ruleType = attribute.valuePickerRuleType;
+```
+
+return the attribute unchanged when `ruleType` is `undefined` as well, and pass `ruleType` where it passed the mapping's rule. Its docstring gains: `A field's sources share one type, so its first source's column gives it.`
 
 - [ ] **Step 4: Write the source datasets helper**
 
@@ -4751,7 +4829,7 @@ type SourceDataset = ConceptFormValues["sourceDatasets"][number];
  * The datasets a case type draws from, recomputed after its fields' sources
  * change: one entry per dataset any field reads, in first-use order, each
  * keeping the join key already chosen for it. Called by the create form after
- * a field or a source is added, removed, or moved.
+ * a field or a source is added or removed.
  */
 export function makeSourceDatasetsFromAttributes(
   options: Readonly<{
@@ -4778,9 +4856,9 @@ export function makeSourceDatasetsFromAttributes(
 }
 ```
 
-- [ ] **Step 5: Write one mapping per source**
+- [ ] **Step 5: Write rules on fields and one mapping per source**
 
-In `insertConceptFromFormValues.ts`, remove the `hasPropKeys` import and replace `_mappingsFromAttributes` with:
+In `insertConceptFromFormValues.ts`, import `ConceptAttribute` as a value, remove `hasPropKeys`, and replace `_mappingsFromAttributes` (including plan 3's list handling) with:
 
 ```ts
 /** Every field's mappings: one per source, positioned in list order. */
@@ -4801,15 +4879,37 @@ function _mappingsFromAttributes(
       .exhaustive();
   });
 }
+
+/**
+ * A field's row. The form keeps a rule on every dataset field so the user can
+ * switch back to one value, but only a field that reduces its rows stores
+ * one, as `concept_attributes__value_picker_rule_type_by_shape` requires.
+ */
+function _attributeRowFromFormValues(
+  attribute: ConceptFormSubmitValues["attributes"][number],
+  workspaceId: Workspace.Id,
+): ConceptAttribute.T<"Insert"> {
+  const reducesRows =
+    attribute.mappingType === "dataset_column" &&
+    ConceptAttribute.getValueShape(attribute) !== "list";
+  return {
+    ...attribute,
+    workspaceId,
+    valuePickerRuleType: reducesRows ? attribute.valuePickerRuleType : undefined,
+  };
+}
 ```
+
+and in `insertConceptFromFormValues`, map `attributes` through `_attributeRowFromFormValues(attribute, workspaceId)`.
 
 - [ ] **Step 6: Build the ID field on submit**
 
-In `ConceptCreatorView/index.tsx`, import `makeAttributesWithIdentifierFromKeyColumns`, and replace `transformValues` with:
+In `ConceptCreatorView/index.tsx`, import `makeAttributesWithIdentifierFromKeyColumns`, and replace the body of `transformValues` (plan 3's `keepKeyAndLabelFieldsSingle` and plan 2's `withFieldDataTypes` stay, in this order) with:
 
 ```ts
-    // The submitted `attributes` are every field, the label flagged, with the
-    // datasets' join keys folded into one ID field.
+    // The submitted `attributes` are every field, the label flagged and kept
+    // to one value, each typed from its rule, then the datasets' join keys
+    // folded into one ID field, which sets its own type.
     transformValues: (values: ConceptFormValues): ConceptFormSubmitValues => {
       const keyColumns = values.sourceDatasets.flatMap(
         ({ dataset, primaryKeyColumnId }) => {
@@ -4824,18 +4924,25 @@ In `ConceptCreatorView/index.tsx`, import `makeAttributesWithIdentifierFromKeyCo
             ? setValue(attribute, "isLabel", true)
             : attribute;
         });
+      const typedAttributes = withFieldDataTypes({
+        attributes: keepKeyAndLabelFieldsSingle({
+          attributes: labelledAttributes,
+          labelAttributeId: values.labelAttributeId,
+        }),
+        sourceDatasets: values.sourceDatasets,
+      });
       return {
         ...values,
         attributes: makeAttributesWithIdentifierFromKeyColumns({
           conceptId: values.id,
           keyColumns,
-          attributes: labelledAttributes,
+          attributes: typedAttributes,
         }),
       };
     },
 ```
 
-and in `validate`, after `sourceDatasets`, add (only if plan 4 added a `bucketGrain` to the form's fields):
+In `validate`, replace plan 4's single date column rule with one that checks every source:
 
 ```ts
       datasetColumnAttributes: {
@@ -4845,7 +4952,7 @@ and in `validate`, after `sourceDatasets`, add (only if plan 4 added a `bucketGr
               const attributeIdx = Number(path.split(".")[1]);
               return values.datasetColumnAttributes[attributeIdx]?.bucketGrain !==
                 undefined && bucketColumnId === undefined
-                ? t`Choose the date column this source's rows are grouped by.`
+                ? t`Choose the date column for this source.`
                 : null;
             },
           },
@@ -4853,7 +4960,7 @@ and in `validate`, after `sourceDatasets`, add (only if plan 4 added a `bucketGr
       },
 ```
 
-replacing plan 4's single-mapping date column rule if it has one. Remove imports `transformValues` no longer uses (`isDefined`, `prop`, `makeDefaultDatasetColumnAttribute` if unused).
+Remove imports `transformValues` no longer uses.
 
 - [ ] **Step 7: Run them and watch them pass**
 
@@ -4867,7 +4974,7 @@ ava supabase status
 pnpm test:db
 ```
 
-Expected: PASS. Creation through the RPC is covered there; the browser path is covered by Task 21.
+Expected: PASS. The browser path is covered by Task 21.
 
 - [ ] **Step 9: Commit**
 
@@ -4887,7 +4994,7 @@ git commit -m "feat(joined-cases): hold a field's sources in the create form and
 - Create: `src/components/caseFields/FieldSourcesEditor/FieldSourcesEditor.test.tsx`
 - Create: `src/components/caseFields/FieldSourcesEditor/getAddableSourceColumns/getAddableSourceColumns.ts` and `.test.ts`
 
-Load the **`impeccable`** skill before Step 5. This is a new surface: it sits inside a field's settings in the create form and inside a field row of the chat draft card. Follow `DESIGN.md`'s Named Rules (neutral by default, blue only for focus, 6px radius, no `Paper` inside the slate, hairline before shadow) and `docs/design/app-view-layout.md`. Copy says "source", "field", and "column", never "mapping". The code below is the functional baseline the impeccable pass refines; do not change its props or accessible names, which Tasks 18, 19, and 21 rely on.
+Load the **`impeccable`** skill before Step 5. This is a new surface: it sits inside a field's settings in the create form and inside a field row of the chat draft card, beside plan 3's `ValueShapeControl`. Follow `DESIGN.md`'s Named Rules (neutral by default, blue only for focus and selection, 6px radius, no `Paper` inside the slate, hairline before shadow) and `docs/design/app-view-layout.md`. Copy says "source", "field", "column" and "date column", never "mapping" or "bucket". The code below is the functional baseline the impeccable pass refines; keep its props and accessible names, which Tasks 18, 19 and 21 rely on.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -5007,11 +5114,7 @@ describe("FieldSourcesEditor", () => {
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Move result down" }));
-    expect({
-      moved: onMove.mock.calls,
-      firstUp: screen.getByRole("button", { name: "Move result up" }),
-      lastDown: screen.getByRole("button", { name: "Move lab_result down" }),
-    }).toMatchObject({ moved: [["c-result", "down"]] });
+    expect(onMove.mock.calls).toEqual([["c-result", "down"]]);
     expect(screen.getByRole("button", { name: "Move result up" })).toBeDisabled();
     expect(
       screen.getByRole("button", { name: "Move lab_result down" }),
@@ -5032,12 +5135,39 @@ describe("FieldSourcesEditor", () => {
       screen.queryByRole("button", { name: /^Move / }),
     ).not.toBeInTheDocument();
   });
+
+  it("offers a date column choice for each source of a per-period field", () => {
+    const onDateColumnChange = vi.fn();
+    render(
+      <FieldSourcesEditor
+        fieldName="Titer"
+        sources={[
+          {
+            ...SOURCES[0]!,
+            dateColumn: {
+              columnId: undefined,
+              options: [{ value: "c-onset", label: "onset" }],
+            },
+          },
+        ]}
+        addableColumns={[]}
+        onAdd={vi.fn()}
+        onRemove={vi.fn()}
+        onDateColumnChange={onDateColumnChange}
+      />,
+    );
+    expect(
+      screen.getByRole("textbox", { name: "Date column for result" }),
+    ).toBeInTheDocument();
+  });
 });
 ```
 
+(If Mantine's `Select` renders as `combobox` in this test environment, use that role, as the e2e specs do.)
+
 - [ ] **Step 2: Run them and watch them fail**
 
-Run: `pnpm test:frontend src/components/caseFields`
+Run: `pnpm test:frontend src/components/caseFields/FieldSourcesEditor`
 Expected: FAIL, `Failed to resolve import`.
 
 - [ ] **Step 3: Write `getAddableSourceColumns`**
@@ -5126,6 +5256,10 @@ Create `FieldSourcesEditor.module.css`:
 
 .icon {
   color: var(--mantine-color-neutral-6);
+}
+
+.dateColumn {
+  grid-column: 2 / -1;
 }
 ```
 
@@ -5221,7 +5355,7 @@ export function FieldSourceRow({
       {source.dateColumn && onDateColumnChange ? (
         <Select
           size={size}
-          style={{ gridColumn: "2 / -1" }}
+          className={css.dateColumn}
           label={t`Date column for ${source.columnName}`}
           data={source.dateColumn.options}
           value={source.dateColumn.columnId ?? null}
@@ -5237,8 +5371,6 @@ export function FieldSourceRow({
   );
 }
 ```
-
-Move the `style={{ gridColumn: ... }}` into the CSS module as `.dateColumn` during the impeccable pass (inline styles are for computed values only).
 
 Create `FieldSourcesEditor.tsx`:
 
@@ -5257,7 +5389,7 @@ export type FieldSourceItem = {
   datasetName: string;
   columnName: string;
   canRemove: boolean;
-  /** Set on a bucketed field's source: its date column and the choices. */
+  /** Set on a per-period field's source: its date column and the choices. */
   dateColumn?: {
     columnId: string | undefined;
     options: ReadonlyArray<{ value: string; label: string }>;
@@ -5278,9 +5410,10 @@ type Props = {
 
 /**
  * Lists the columns one field reads, in the order it reads them, and lets
- * the user add a column of the same type, remove one, or reorder them. A
- * field keeps the earliest source's value when it keeps one, so the order is
- * meaningful. Controlled: the caller owns the sources.
+ * the user add a column of the same type, remove one, reorder them, and on a
+ * per-period field choose each one's date column. A field keeps the earliest
+ * source's value when it keeps one, so the order is meaningful. Controlled:
+ * the caller owns the sources.
  */
 export function FieldSourcesEditor({
   fieldName,
@@ -5345,7 +5478,7 @@ export function FieldSourcesEditor({
 
 - [ ] **Step 5: Run the impeccable pass**
 
-With the `impeccable` skill loaded, review the editor inside both hosts (Tasks 18 and 19 mount it; mount it in a scratch story or the running create form). Keep the props, the group name `Sources of <field>`, and the button and select names exactly as tested. Re-run the tests afterwards.
+With `impeccable` loaded, review the editor inside both hosts once Tasks 18 and 19 mount it (or in the running create form). Keep the props, the group name `Sources of <field>`, and the button and select names exactly as tested. Re-run the tests afterwards.
 
 - [ ] **Step 6: Run them and watch them pass**
 
@@ -5355,7 +5488,7 @@ Expected: PASS.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add src/components/caseFields
+git add src/components/caseFields/FieldSourcesEditor
 git commit -m "feat(joined-cases): add the field sources editor"
 ```
 
@@ -5366,10 +5499,11 @@ git commit -m "feat(joined-cases): add the field sources editor"
 **Files:**
 - Create: `src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnSourcesField.tsx`
 - Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx`
-- Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx:73-180, 252-263`
+- Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx`
 - Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx:21-29`
+- Modify: plan 2's `DatasetColumnMappingCreator.test.tsx` (fixture shape)
 
-This task wires tested pieces (Tasks 16 and 17) into the form; the e2e in Task 21 is its test.
+This task wires Tasks 16 and 17 into the form; Task 21's e2e is its end-to-end test.
 
 - [ ] **Step 1: Write the form adapter**
 
@@ -5378,6 +5512,7 @@ Create `DatasetColumnSourcesField.tsx`:
 ```tsx
 import { prop } from "@avandar/utils";
 import { useMemo } from "react";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { FieldSourcesEditor } from "@/components/caseFields/FieldSourcesEditor/FieldSourcesEditor";
 import { getAddableSourceColumns } from "@/components/caseFields/FieldSourcesEditor/getAddableSourceColumns/getAddableSourceColumns";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
@@ -5386,7 +5521,7 @@ import type { ConceptFormValues } from "@/views/OntologyDesignerApp/ConceptCreat
 import type { FormType } from "@avandar/ui/hooks";
 import type { ReactNode } from "react";
 
-/** A dataset column with the dataset it belongs to. */
+/** Every column of every dataset, with its dataset, by column id. */
 export type DatasetColumnLookup = Readonly<
   Record<string, { dataset: DatasetWithColumns; column: DatasetColumn.T } | undefined>
 >;
@@ -5399,6 +5534,19 @@ type Props = {
   /** Called after a source is added or removed, so join keys can follow. */
   onSourcesChange: () => void;
 };
+
+/** A dataset's date and timestamp columns, the ones a period can group by. */
+function _getDateColumnOptions(
+  dataset: DatasetWithColumns | undefined,
+): Array<{ value: string; label: string }> {
+  return (dataset?.columns ?? [])
+    .filter((column) => {
+      return ConceptAttribute.isBucketDateColumnType(column.dataType);
+    })
+    .map((column) => {
+      return { value: column.id, label: column.name };
+    });
+}
 
 /**
  * Binds the sources of one of the create form's dataset-column fields to the
@@ -5444,6 +5592,13 @@ export function DatasetColumnSourcesField({
           datasetName: entry?.dataset.name ?? "",
           columnName: entry?.column.name ?? "",
           canRemove: sources.length > 1,
+          dateColumn:
+            attribute.bucketGrain === undefined
+              ? undefined
+              : {
+                  columnId: source.bucketColumnId,
+                  options: _getDateColumnOptions(entry?.dataset),
+                },
         };
       })}
       addableColumns={getAddableSourceColumns({
@@ -5461,7 +5616,12 @@ export function DatasetColumnSourcesField({
           conceptAttributeId: attribute.id,
           datasetId: entry.dataset.id,
           datasetColumnId: entry.column.id,
-          bucketColumnId: undefined,
+          // A per-period field starts each new source on its dataset's first
+          // date column, as a new per-period field does.
+          bucketColumnId:
+            attribute.bucketGrain === undefined
+              ? undefined
+              : _getDateColumnOptions(entry.dataset)[0]?.value,
         });
         onSourcesChange();
       }}
@@ -5476,20 +5636,40 @@ export function DatasetColumnSourcesField({
           conceptForm.reorderListItem(sourcesPath, { from, to });
         }
       }}
+      onDateColumnChange={(columnId, bucketColumnId) => {
+        conceptForm.setFieldValue(
+          `${sourcesPath}.${_findSourceIdx(columnId)}.bucketColumnId`,
+          bucketColumnId,
+        );
+      }}
     />
   );
 }
 ```
 
-If plan 4 gave fields a bucket grain in the form, pass `dateColumn` per source when `attribute.bucketGrain` is set (options: the source dataset's columns whose `dataType` is `date` or `timestamp`; value: `source.bucketColumnId`) and an `onDateColumnChange` that sets `${sourcesPath}.${idx}.bucketColumnId`, and delete plan 4's single date column select from `DatasetColumnMappingCreator`.
+If the component exceeds what reads well, move the `sources.map(...)` into a `_makeSourceItems` helper in the same file.
 
 - [ ] **Step 2: Bind the rule to the field and mount the sources**
 
 In `DatasetColumnMappingCreator.tsx`:
 
 1. Add props `datasetColumnLookup: DatasetColumnLookup;` and `onSourcesChange: () => void;`.
-2. Add `"valuePickerRuleType"` to the attribute `keysAndProps` field list, delete the `mappingKeys`/`mappingInputProps` `keysAndProps` call, and bind the rule `Select` to `attributeKeys.valuePickerRuleType` and `attributeInputProps.valuePickerRuleType()`.
-3. Directly after the `Allow manual edit` checkbox, render:
+2. Add `"valuePickerRuleType"` to the attribute `keysAndProps` field list, delete the `mappingKeys` / `mappingInputProps` `keysAndProps` call on `mappings.datasetColumn`, and bind the rule `Select` to `attributeKeys.valuePickerRuleType` and `attributeInputProps.valuePickerRuleType()`. Plan 2's column type for the rule options reads `sources[0]`'s column.
+3. Delete plan 4's field-level date column `Select` (the editor shows one per source). Where plan 4's shape control sets or clears `mappings.datasetColumn.bucketColumnId` on choosing or leaving a period, set or clear it on every source instead:
+
+```ts
+attribute.mappings.datasetColumn.forEach((source, sourceIdx) => {
+  conceptForm.setFieldValue(
+    `datasetColumnAttributes.${attributeIdx}.mappings.datasetColumn.${sourceIdx}.bucketColumnId`,
+    bucketGrain === undefined
+      ? undefined
+      : _getFirstDateColumnId(datasetColumnLookup[source.datasetColumnId]?.dataset),
+  );
+});
+```
+
+   where `_getFirstDateColumnId` is plan 4's "first date or timestamp column of the dataset" helper (rename to match).
+4. Directly after the `Allow manual edit` checkbox, render:
 
 ```tsx
         <DatasetColumnSourcesField
@@ -5501,11 +5681,13 @@ In `DatasetColumnMappingCreator.tsx`:
         />
 ```
 
+In plan 2's `DatasetColumnMappingCreator.test.tsx`, move the fixture's rule onto the attribute, wrap its mapping draft in an array, and pass `datasetColumnLookup={{}}` and `onSourcesChange={vi.fn()}`.
+
 - [ ] **Step 3: Recompute join keys from every source**
 
 In `DatasetColumnAttributesBlock/index.tsx`:
 
-1. Delete `useMap`, `attributeToColumnMap`, and every `updateAttributeToColumnMap` call. Compute the picker's exclusions from the sources:
+1. Delete `useMap`, `attributeToColumnMap`, and every `updateAttributeToColumnMap` call, and compute the picker's exclusions from the sources:
 
 ```ts
   const addedColumns = useMemo(() => {
@@ -5515,7 +5697,7 @@ In `DatasetColumnAttributesBlock/index.tsx`:
   }, [addedAttributes]);
 ```
 
-2. Add, after `datasetColumnLookup`:
+2. After `datasetColumnLookup`, add:
 
 ```ts
   const datasetsById = useMemo(() => {
@@ -5537,7 +5719,7 @@ In `DatasetColumnAttributesBlock/index.tsx`:
   }, [conceptForm, datasetsById]);
 ```
 
-3. In `addDatasetColumnAsAttribute`, replace the `sourceDatasets` bookkeeping after `insertListItem` with `syncSourceDatasets();`. In `removeAttribute`, replace everything after `setSelectedAttributeId(newAttributes[0]?.id);` with `syncSourceDatasets();`, and remove the `sourceDatasetId` lookup above it. Update both callbacks' dependency lists.
+3. In `addDatasetColumnAsAttribute`, replace the `sourceDatasets` bookkeeping after `insertListItem` with `syncSourceDatasets();`. In `removeAttribute`, replace everything after `setSelectedAttributeId(newAttributes[0]?.id);` with `syncSourceDatasets();` and remove the `sourceDatasetId` lookup above it. Update both dependency lists.
 4. Pass `datasetColumnLookup={datasetColumnLookup}` and `onSourcesChange={syncSourceDatasets}` to `DatasetColumnMappingCreator`.
 
 In `IdentifierBlock/index.tsx`, replace `datasetIdsToPullFrom`'s body with:
@@ -5571,16 +5753,15 @@ git commit -m "feat(joined-cases): edit a field's sources in the create form"
 ## Task 19: The draft card edits a field's sources
 
 **Files:**
-- Modify: `src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.ts:10-53, 137-144, 183-197`
-- Modify: `src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.test.ts`
+- Modify: `src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.ts`, its test
 - Modify: `src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftBlock.tsx`, `CaseTypeDraftCard.tsx`, `CaseTypeDraftSourceSection.tsx`, `CaseTypeDraftAttributeRow.tsx`
 - Modify: `src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftBlock.test.tsx` (fixture shape)
 
-Spec §6.9. The first source is the field's key: it is never removed or reordered in the card.
+Spec §6.9. The first source is the field's key: the card never removes or reorders it.
 
 - [ ] **Step 1: Write the failing tests**
 
-In `useCaseTypeDraftEditor.test.ts`, change every fixture attribute from `datasetId: X, columnId: Y,` to `sources: [{ datasetId: X, columnId: Y }],` and every expectation that reads `attribute.columnId` or `attribute.datasetId` to read `attribute.sources[0]?.columnId` or `.datasetId`. Then add:
+In `useCaseTypeDraftEditor.test.ts`, change every fixture attribute from `datasetId: X, columnId: Y,` to `sources: [{ datasetId: X, columnId: Y }],` and every expectation reading `attribute.columnId` or `attribute.datasetId` to read `attribute.sources[0]?.columnId` or `.datasetId`. Then add:
 
 ```ts
   it("adds a source to a field, and refuses a column the field already reads", () => {
@@ -5673,8 +5854,7 @@ Expected: FAIL: `addAttributeSource` is not a function, and grouping reads `attr
 
 In `useCaseTypeDraftEditor.ts`:
 
-1. Import `ChatCaseAttributeSource`.
-2. Add to `CaseTypeDraftEditor`:
+1. Import `ChatCaseAttributeSource`, and add to `CaseTypeDraftEditor`:
 
 ```ts
   /** Adds a column to a field's sources, unless the field already reads it. */
@@ -5684,11 +5864,16 @@ In `useCaseTypeDraftEditor.ts`:
   ) => void;
   /** Removes one of a field's sources. A field's first source stays. */
   removeAttributeSource: (columnId: string, sourceColumnId: string) => void;
+  /** Sets the date column of one source of a per-period field. */
+  setAttributeSourceDateColumn: (
+    columnId: string,
+    sourceColumnId: string,
+    bucketColumnId: string,
+  ) => void;
 ```
 
-and change the docstring above `setAttributeName` (add one if missing) to say every per-field setter names the field by its first source's column.
-
-3. Replace `_mapAttribute` with:
+   Every per-field setter (plan 3's `setAttributeValueShape`, plan 4's `setAttributeBucket`, and the existing ones) names the field by its first source's column; say so in the type's docstring.
+2. Replace `_mapAttribute` with:
 
 ```ts
 /**
@@ -5712,20 +5897,8 @@ function _mapAttribute(
 }
 ```
 
-4. Group by the first source's dataset:
-
-```ts
-  const sourceGroups = draft.sourceDatasets.map((sourceDataset) => {
-    return {
-      ...sourceDataset,
-      attributes: draft.attributes.filter((attribute) => {
-        return attribute.sources[0]?.datasetId === sourceDataset.datasetId;
-      }),
-    };
-  });
-```
-
-5. In `removeSourceDataset`, replace the `attributes:` expression with:
+3. Group `sourceGroups` by `attribute.sources[0]?.datasetId`.
+4. In `removeSourceDataset`, replace the `attributes:` expression with:
 
 ```ts
           attributes: current.attributes
@@ -5742,9 +5915,9 @@ function _mapAttribute(
             }),
 ```
 
-and its comment to: `Dropping the source alone would leave fields reading a dataset with no join key, which the relation builder rejects, so its fields and its columns in other fields go too.`
-
-6. Add the two members to the returned object:
+   and its comment to: `Dropping the source alone would leave fields reading a dataset with no join key, which the relation builder rejects, so its fields, and its columns in other fields, go too.`
+5. Plan 4's `setAttributeBucket(columnId, { bucketGrain, bucketColumnId })` sets the grain on the field and `bucketColumnId` on its first source; plan 3's shape setter, when it clears the period, removes `bucketColumnId` from every source.
+6. Add the three members to the returned object:
 
 ```ts
     addAttributeSource: (columnId, source) => {
@@ -5771,13 +5944,27 @@ and its comment to: `Dropping the source alone would leave fields reading a data
         });
       });
     },
+    setAttributeSourceDateColumn: (columnId, sourceColumnId, bucketColumnId) => {
+      setDraft((current) => {
+        return _mapAttribute(current, columnId, (attribute) => {
+          return {
+            ...attribute,
+            sources: attribute.sources.map((source) => {
+              return source.columnId === sourceColumnId
+                ? { ...source, bucketColumnId }
+                : source;
+            }),
+          };
+        });
+      });
+    },
 ```
 
-7. If plan 4 lets the card bucket a field, add `setAttributeSourceDateColumn(columnId, sourceColumnId, bucketColumnId)` in the same shape, and make `canCreate` false while any included bucketed field has a source without `bucketColumnId`.
+7. `canCreate` is false while any included per-period field has a source without a `bucketColumnId` (replace plan 4's one-field check).
 
 - [ ] **Step 4: Show and edit sources in the card**
 
-In `CaseTypeDraftBlock.tsx`, pass `datasetColumns={datasetColumns ?? []}` to `CaseTypeDraftCard`. In `CaseTypeDraftCard.tsx`, add the prop `datasetColumns: ReadonlyArray<Pick<DatasetColumn.T, "id" | "name" | "datasetId" | "dataType">>;` and pass it, with `datasetNamesById`, to each `CaseTypeDraftSourceSection`, which passes both to each `CaseTypeDraftAttributeRow`. In the card's `labelOptions`, read the column from `attribute.sources[0]?.columnId` (skip a field without one). In `CaseTypeDraftSourceSection.tsx`, build `joinKeyOptions` and the rows' `key`, `columnLabel`, `isPrimaryKey` and `isLabelColumn` from `attribute.sources[0]?.columnId`, and under the join key `Select`, when the card has two or more datasets (`canRemove` is true), render:
+`CaseTypeDraftBlock.tsx` passes `datasetColumns={datasetColumns ?? []}` to `CaseTypeDraftCard`, which passes it and `datasetNamesById` to each `CaseTypeDraftSourceSection`, which passes both to each `CaseTypeDraftAttributeRow` (beside plan 2's `columnDataTypesById` and plan 4's date column options). In the card's `labelOptions`, read the column from `attribute.sources[0]?.columnId` (skip a field without one). In `CaseTypeDraftSourceSection.tsx`, build `joinKeyOptions` and each row's `key`, `columnLabel`, `isPrimaryKey` and `isLabelColumn` from `attribute.sources[0]?.columnId`, and under the join key `Select`, when the card has two or more datasets (`canRemove`), render:
 
 ```tsx
       {canRemove ? (
@@ -5787,7 +5974,7 @@ In `CaseTypeDraftBlock.tsx`, pass `datasetColumns={datasetColumns ?? []}` to `Ca
       ) : null}
 ```
 
-In `CaseTypeDraftAttributeRow.tsx`, add the props `datasetColumns` and `datasetNamesById`, read every `attribute.columnId` from `attribute.sources[0]?.columnId ?? ""`, and directly after the name `TextInput`'s hint `Group`, when the field is included, render:
+In `CaseTypeDraftAttributeRow.tsx`, add the props `datasetColumns` and `datasetNamesById`, read every `attribute.columnId` as `firstColumnId` (`const firstColumnId = attribute.sources[0]?.columnId ?? "";`), drop plan 4's field-level date column select, and after the controls line, when the field is included, render:
 
 ```tsx
         {attribute.isIncluded ? (
@@ -5804,6 +5991,13 @@ In `CaseTypeDraftAttributeRow.tsx`, add the props `datasetColumns` and `datasetN
                   })?.name ?? "",
                 // The first source names the field in the card.
                 canRemove: index > 0,
+                dateColumn:
+                  attribute.valueShape === "bucketed_list"
+                    ? {
+                        columnId: source.bucketColumnId,
+                        options: dateColumnOptionsByDatasetId[source.datasetId] ?? [],
+                      }
+                    : undefined,
               };
             })}
             addableColumns={getAddableSourceColumns({
@@ -5827,11 +6021,14 @@ In `CaseTypeDraftAttributeRow.tsx`, add the props `datasetColumns` and `datasetN
             onRemove={(columnId) => {
               editor.removeAttributeSource(firstColumnId, columnId);
             }}
+            onDateColumnChange={(columnId, bucketColumnId) => {
+              editor.setAttributeSourceDateColumn(firstColumnId, columnId, bucketColumnId);
+            }}
           />
         ) : null}
 ```
 
-with `const firstColumnId = attribute.sources[0]?.columnId ?? "";` at the top of the component. The card has no move buttons (open question 3 in the spec).
+where `dateColumnOptionsByDatasetId` is plan 4's per-dataset date column options. The card passes no `onMove` (spec open question 3).
 
 - [ ] **Step 5: Run them and watch them pass**
 
@@ -5847,28 +6044,27 @@ git commit -m "feat(joined-cases): add and remove a field's sources in the chat 
 
 ---
 
-## Task 20: Video producer adapters follow the model
+## Task 20: Video producer adapters, and a clean type check
 
 **Files:**
-- Modify: `apps/ava-video-producer/avandar-adapter/OntologyScreen/OntologyScreen.types.ts:10-22`, `OntologyScreen.tsx:~99-100`
-- Modify: `apps/ava-video-producer/avandar-adapter/CasesScreen/CasesScreen.tsx:~65-78`, `RecordDetail.tsx`
-- Modify: `apps/ava-video-producer/avandar-adapter/AttributeMappingScreen/AttributeMappingScreen.types.ts:5-31`, `createMappingFormFromFrame.ts:28-30, 66-75`
+- Modify: `apps/ava-video-producer/avandar-adapter/OntologyScreen/OntologyScreen.types.ts`, `OntologyScreen.tsx`
+- Modify: `apps/ava-video-producer/avandar-adapter/CasesScreen/CasesScreen.tsx`
+- Modify: `apps/ava-video-producer/avandar-adapter/AttributeMappingScreen/AttributeMappingScreen.types.ts`, `createMappingFormFromFrame.ts`
+- Modify: any other file `pnpm type-check` names
 
-Read `apps/ava-video-producer/docs/component-videos.md` first. These adapters render the real product components with fixtures; only the fixture shapes change.
+Read `apps/ava-video-producer/docs/component-videos.md` first. These adapters render the real product components with fixtures; only fixture shapes change.
 
-- [ ] **Step 1: Run the type check and list the adapter errors**
+- [ ] **Step 1: Run the type check and list the errors**
 
 Run: `pnpm type-check`
-Expected: errors in the three adapter directories (and any other file Tasks 5 to 19 missed; fix those too, one file at a time, until the list is clean).
+Expected: errors in the three adapter directories and in any file Tasks 5 to 19 missed. Work the list file by file until it is clean.
 
-- [ ] **Step 2: Move the fixtures to `mappings` and `sourceNames`**
+- [ ] **Step 2: Move the adapter fixtures to the new model**
 
-- `OntologyScreen.types.ts`: `Attribute["mapping"]` becomes `NonNullable<Attribute["mappings"]>[number]`, and `OntologyAttributeProjection`'s `& { mapping: ... }` becomes `& { mappings: Array<Pick<DatasetMapping, "type" | "datasetId" | "conceptAttributeId" | "datasetColumnId" | "position">> }`.
-- `OntologyScreen.tsx`: each field's `mapping: { type: "dataset_column", datasetId }` becomes `mappings: [{ type: "dataset_column", datasetId, conceptAttributeId: <the field's id>, datasetColumnId: <a fixed uuid per field>, position: 0 }]` (hoist the id into a local so both uses share it).
-- `CasesScreen.tsx`: the attribute fixture's `mapping: { ... }` becomes `mappings: [{ type: "dataset_column", conceptAttributeId: \`field-${index}\`, datasetColumnId: \`column-${index}\`, position: 0, datasetId: ... }]`. This file casts through `unknown`, so the type check does not catch it; the case type list reads `mappings` at render time.
-- `RecordDetail.tsx`: each `CaseDetailsRow`'s `sourceName: x` becomes `sourceNames: [x]` (or `[]` when there was none).
-- `AttributeMappingScreen.types.ts`: `Rule` becomes `Pick<Attribute, "valuePickerRuleType">`; `MappingValuesProjection.datasetColumnAttributes` items become `Pick<Attribute, "isArray" | "allowManualEdit" | "valuePickerRuleType">`; remove `"datasetColumnAttributes.0.mappings.datasetColumn"` from `MappingInputPrefix`.
-- `createMappingFormFromFrame.ts`: put `valuePickerRuleType: stage.valuePickerRuleType` on the attribute instead of `mappings.datasetColumn`, and serve it for the `datasetColumnAttributes.0` prefix (delete the `prefix.endsWith("datasetColumn")` branch).
+- `OntologyScreen.types.ts`: `Attribute["mapping"]` becomes `NonNullable<Attribute["mappings"]>[number]`, and the projection's `& { mapping: ... }` becomes `& { mappings: Array<Pick<DatasetMapping, "type" | "datasetId" | "conceptAttributeId" | "datasetColumnId" | "position">> }`.
+- `OntologyScreen.tsx`: each field's `mapping: { type: "dataset_column", datasetId }` becomes `mappings: [{ type: "dataset_column", datasetId, conceptAttributeId: <the field's id>, datasetColumnId: <a fixed uuid per field>, position: 0 }]` (hoist the field id into a local so both uses share it).
+- `CasesScreen.tsx`: the attribute fixture's `mapping: { ... }` becomes `mappings: [{ type: "dataset_column", conceptAttributeId: \`field-${index}\`, datasetColumnId: \`column-${index}\`, position: 0, datasetId: ... }]`. This file casts through `unknown`, so the type check does not catch it; `CaseTypeAttributesList` reads `mappings` at render time.
+- `AttributeMappingScreen.types.ts` and `createMappingFormFromFrame.ts`: the rule moves from `mappings.datasetColumn` onto the attribute; `Rule` becomes `Pick<Attribute, "valuePickerRuleType">`; remove the `"datasetColumnAttributes.0.mappings.datasetColumn"` prefix and serve the rule for `"datasetColumnAttributes.0"`.
 
 - [ ] **Step 3: Check the adapters**
 
@@ -5886,6 +6082,8 @@ git add apps/ava-video-producer/avandar-adapter
 git commit -m "chore(joined-cases): move video adapter fixtures to field sources"
 ```
 
+(Add any other file Step 1 named to this commit, or to a `fix(joined-cases)` commit of its own.)
+
 ---
 
 ## Task 21: E2E: a field read from two datasets
@@ -5895,7 +6093,7 @@ git commit -m "chore(joined-cases): move video adapter fixtures to field sources
 - Create: `tests/data/multi-source-fields/lab-results.csv`
 - Create: `tests/e2e/multi-source-fields.spec.ts`
 
-Load **`playwright-best-practices`**. The case type is created through the UI, because creating it is the behavior under test. Only the dataset uploads (through the UI, in `beforeAll`), oracle reads, and teardown touch the database directly.
+Load **`playwright-best-practices`**. The case type is created through the UI, because creating it is the behavior under test. Only the uploads (through the UI, in `beforeAll`), oracle reads, and teardown touch the database directly.
 
 - [ ] **Step 1: Add the fixtures**
 
@@ -6039,7 +6237,7 @@ async function _createCaseType(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Create case type" }).click();
 }
 
-/** The value and source line the record page shows for one field. */
+/** The value and source lines the record page shows for one field. */
 function _factOf(page: Page, fieldName: string) {
   return page
     .locator("dt", { hasText: fieldName })
@@ -6136,27 +6334,25 @@ test.describe("Multi-source fields", () => {
     ).toBeVisible({ timeout: MEDIUM_WAIT });
     await page.getByRole("link", { name: "View records" }).click();
 
-    const sourcesText = `${seededWorld.lineListName}, ${seededWorld.labResultsName}`;
     await page.getByRole("link", { name: /Ben Okafor$/ }).click();
-    await expect(_factOf(page, RESULT_FIELD_NAME)).toHaveText(
-      `inconclusive${sourcesText}`,
-      { timeout: MEDIUM_WAIT },
-    );
+    const benResult = _factOf(page, RESULT_FIELD_NAME);
+    await expect(benResult).toContainText("inconclusive", { timeout: MEDIUM_WAIT });
+    await expect(benResult).toContainText(seededWorld.lineListName);
+    await expect(benResult).toContainText(seededWorld.labResultsName);
 
     await page.getByRole("link", { name: /Ana Diaz$/ }).click();
-    await expect(_factOf(page, RESULT_FIELD_NAME)).toHaveText(
-      `positive${sourcesText}`,
-      { timeout: MEDIUM_WAIT },
-    );
+    await expect(_factOf(page, RESULT_FIELD_NAME)).toContainText("positive", {
+      timeout: MEDIUM_WAIT,
+    });
   });
 });
 ```
 
-`for ... of` is used for sequential async teardown, as other specs do; replace it with a `reduce` chain if the lint rule rejects it. Check every locator against the running app on the first red run (the create form's DOM, in particular the column picker's radios and the `View records` control, which may be a button); adjust the locator, never the assertion.
+Sequential async teardown uses `for ... of`, as other specs do; switch to a `reduce` chain if the lint rule rejects it. Check every locator against the running app on the first run (the column picker's radios and the `View records` control in particular, which may be a button); adjust the locator, never the assertion.
 
-- [ ] **Step 3: Run it and watch it pass**
+- [ ] **Step 3: Run it, and prove it can fail**
 
-The feature is complete by this task, so this spec passes on its first run unless a locator is wrong. To prove it can fail, temporarily change `inconclusive` to `negative` in the first assertion and watch it fail with the received text, then revert.
+The feature is complete by this task, so the spec passes on its first run unless a locator is wrong. Temporarily change `inconclusive` to `negative` and watch it fail with the received text, then revert.
 
 ```bash
 pnpm test:e2e multi-source-fields.spec.ts
@@ -6184,7 +6380,7 @@ git commit -m "test(joined-cases): a field read from two datasets shows both on 
 pnpm i18n:extract && pnpm i18n:compile
 ```
 
-Expected: `src/i18n/locales/en/messages.po` gains `Sources`, `Sources of {fieldName}`, `Add a source`, `Choose a column of the same type`, `No other column has this type`, `Move {0} up`, `Move {0} down`, `Remove {0} from {fieldName}`, `Date column for {0}`, and `The join keys become one ID field.`, each with a `#:` reference to its file.
+Expected: `src/i18n/locales/en/messages.po` gains `Sources`, `Sources of {fieldName}`, `Add a source`, `Choose a column of the same type`, `No other column has this type`, `Move {0} up`, `Move {0} down`, `Remove {0} from {fieldName}`, `Date column for {0}`, `Choose the date column for this source.`, and `The join keys become one ID field.`, each with a `#:` reference.
 
 - [ ] **Step 2: Run everything**
 
@@ -6206,12 +6402,18 @@ Expected: every command passes, and both `rg` commands print nothing.
 - [ ] **Step 3: Run the case type E2E specs, one at a time**
 
 ```bash
-pnpm test:e2e multi-source-fields.spec.ts
-pnpm test:e2e case-statuses-data-explorer.spec.ts
-pnpm test:e2e case-statuses-record.spec.ts
+ls tests/e2e | grep -iE "case|multi-source"
 ```
 
-Expected: each PASSES on its own (the two case status specs seed through `CaseTypeSeedHelpers`, which Task 3 moved to the new payload).
+Run each listed spec on its own, for example:
+
+```bash
+pnpm test:e2e multi-source-fields.spec.ts
+pnpm test:e2e case-statuses-data-explorer.spec.ts
+pnpm test:e2e case-list-field.spec.ts
+```
+
+Expected: each PASSES on its own (the case status specs seed through `CaseTypeSeedHelpers`, which Task 3 moved to the new payload; plans 3 and 4's specs exercise the draft card and form this plan changed).
 
 - [ ] **Step 4: Commit**
 
@@ -6231,27 +6433,38 @@ Comments and docs describe the code as it is; no gap or plan names.
 
 - [ ] **Step 1: Section 4 (data model)**
 
-- In the ER diagram, change the `concept_attributes ||--o| attribute_mappings__dataset_column` edge to `||--o{` with the label `"concept_attribute_id<br/>one row per source, cascade"`, add `enum value_picker_rule_type` to `concept_attributes`, and in `attribute_mappings__dataset_column` replace `enum value_picker_rule_type` with `int position`.
+- In the ER diagram, change the `concept_attributes ||--o| attribute_mappings__dataset_column` edge to `||--o{` labelled `"concept_attribute_id<br/>one row per source, cascade"`, add `enum value_picker_rule_type` to `concept_attributes`, and in `attribute_mappings__dataset_column` replace `enum value_picker_rule_type` with `int position`.
 - Replace the caption's first sentence with: `A manual-entry field has one mapping row; a dataset-column field has one per source, in the table its mapping_type names.`
-- In the table, the `concept_attributes` row's notes gain: `value_picker_rule_type is set exactly on single-value and bucketed-list dataset-column fields (concept_attributes__value_picker_rule_type_by_shape)`. The `attribute_mappings__dataset_column` row becomes: `"This field reads this column of this dataset, in this position" | One row per source; unique on (concept_attribute_id, dataset_column_id); dataset_id and dataset_column_id are bare ids, not foreign keys`.
+- In the table, the `concept_attributes` row's notes gain: `value_picker_rule_type is set exactly on single-value and per-period dataset-column fields (concept_attributes__value_picker_rule_type_by_shape)`. The `attribute_mappings__dataset_column` row becomes: `"This field reads this column of this dataset, in this position" | One row per source; unique on (concept_attribute_id, dataset_column_id); dataset_id and dataset_column_id are bare ids, not foreign keys`.
 
 - [ ] **Step 2: Sections 5.2 and 5.3 (authoring)**
 
-- 5.2: `AttributeFormValues.mappings.datasetColumn` is a field's sources in read order; `FieldSourcesEditor` (`src/components/caseFields/FieldSourcesEditor/`) adds, removes, and reorders them, offering only same-type columns; `makeSourceDatasetsFromAttributes` keeps one join key entry per dataset any source reads; `transformValues` folds the join keys into one ID field with `makeAttributesWithIdentifierFromKeyColumns`.
-- 5.3: chat fields carry `sources: ChatCaseAttributeSource[]`, keyed in the card by the first source's column; the card adds and removes extra sources (not the first) and does not reorder; `createdCaseTypeToFormValues` drops unknown sources, sources in datasets with no join key, and sources of another type, then folds the join keys into one ID field. Replace the sentence about adding a missing identifier attribute per source.
+- 5.2: `AttributeFormValues.mappings.datasetColumn` is a field's sources in read order and the rule is on the field; `FieldSourcesEditor` (`src/components/caseFields/FieldSourcesEditor/`) adds, removes, and reorders sources, offering only same-type columns, and chooses each source's date column on a per-period field; `makeSourceDatasetsFromAttributes` keeps one join key entry per dataset any source reads; `transformValues` flags the label, keeps keys and the label to one value, types each field, then folds the join keys into one ID field with `makeAttributesWithIdentifierFromKeyColumns`.
+- 5.3: chat fields carry `sources: ChatCaseAttributeSource[]`, keyed in the card by the first source's column; the card adds and removes extra sources (not the first) and does not reorder; `parseProposeCaseType` keeps a field's sources to its first catalogued source's type; `createdCaseTypeToFormValues` drops unknown sources, sources in datasets with no join key, sources of another type, and per-period sources without a usable date column, then folds the join keys into one ID field. Replace the sentence about adding a missing identifier attribute per source.
 
 - [ ] **Step 3: Sections 6, 7, 7.1, and 8 (reading values)**
 
-- 6: Sync stages one `SELECT` per identifier source (one ID field may have one per dataset) and names records through the label field's column from `makeConceptAttributeColumnsFromMetadata`, built by `buildAttributeValueSql`.
-- 7: add a subsection "7.x Fields with several sources" with the stacked SQL shape from spec §6.4, the read order (position, then dataset column id, then `file_row_number`), the shared-type cast (none for one source; `VARCHAR` for an ID field over keys of different types), and that one reduction serves single values and buckets.
-- 7.1: the rule lives on `concept_attributes`. Update the five homes: the enum is `supabase/schemas/00.enum.attribute_mappings__value_picker_rule_type.sql`.
-- 8: in the column resolution row, replace "One column per attribute; one key column per dataset" with "One column per attribute, reading every source; one key column per dataset, from the first identifier source of each; sources of different types throw, except an ID field's, read as text; a source in a dataset with no key, or a bucketed source with no date column, throws". In the View row, say every dataset-column field is one stacked scalar subquery.
+- 6: Sync stages one `SELECT` per identifier source (one ID field may have one per dataset), uncast, and names records through the label field's column from `makeConceptAttributeColumnsFromMetadata`, built by `buildAttributeValueSql`.
+- 7: add a subsection "Fields with several sources": `buildStackedSourceRowsSql` builds one branch per source (its own key column, the NULL rule, the date and the cast), stacked with `UNION ALL` in read order (position, then dataset column id, then `file_row_number`), and both value builders reduce those rows; one source is not cast, several are cast to their shared column type, and an ID field over keys of different types is read as text.
+- 7.1: the rule lives on `concept_attributes`; the enum is `supabase/schemas/00.enum.attribute_mappings__value_picker_rule_type.sql`. Restate the rule audit query with the field's rule:
+
+```sql
+select count(*)
+from public.concept_attributes a
+join public.attribute_mappings__dataset_column m on m.concept_attribute_id = a.id
+join public.dataset_columns c on c.id = m.dataset_column_id and c.dataset_id = m.dataset_id
+where
+  (a.value_picker_rule_type in ('sum', 'avg') and c.data_type not in ('bigint', 'double'))
+  or (a.value_picker_rule_type in ('max', 'min') and c.data_type = 'boolean');
+```
+
+- 8: in the column resolution row, replace "One column per attribute; one key column per dataset" with "One column per attribute, reading every source; one key column per dataset, from the first identifier source of each; sources of different types throw, except an ID field's, read as text; a rule the sources' shared type disallows throws; a source in a dataset with no key, or a per-period source without a usable date column, throws". In the View row, say every dataset-column field reads its stacked sources.
 
 - [ ] **Step 4: Sections 10, 12, and 16**
 
-- 10: replace "At most one mapping row per attribute in each mapping table" with "A field reads each column at most once | `attribute_mappings__dataset_column__attribute_column_unique`; `unique` on `concept_attribute_id` in the manual-entry table". Replace "One identifier attribute per contributing dataset" with "One identifier source per contributing dataset; a new case type has one ID field with a source per dataset, an older one may have one identifier field per dataset".
+- 10: replace "At most one mapping row per attribute in each mapping table" with "A field reads each column at most once | `attribute_mappings__dataset_column__attribute_column_unique`; `unique` on `concept_attribute_id` in the manual-entry table". Replace "One identifier attribute per contributing dataset" with "One identifier source per contributing dataset; a new case type has one ID field with a source per dataset, an older one may have one identifier field per dataset". Add "Which fields hold a value rule | `concept_attributes__value_picker_rule_type_by_shape`".
 - 12: in the checklist, note that a new mapping kind's rows are not ordered by `AttributeSources` unless it is a dataset-column source.
-- 16: remove any row saying a field reads one dataset or column; add nothing for this gap unless verification found a limitation.
+- 16: remove any row saying a field reads one dataset or column.
 
 - [ ] **Step 5: Check the doc**
 
@@ -6272,7 +6485,7 @@ git commit -m "docs(joined-cases): describe multi-source fields in the ontology 
 
 ## Verification once this plan lands
 
-- [ ] `pnpm test:db` passes, including the `value_picker_rule_move` replay.
+- [ ] `pnpm test:db` passes, including the `value_picker_rule_move` and `value_rule_data_types` replays.
 - [ ] `pnpm test:frontend`, `pnpm test:executed`, `pnpm type-check`, `pnpm lint`, and `pnpm i18n:check` pass.
 - [ ] `pnpm test:e2e multi-source-fields.spec.ts` passes on its own.
 - [ ] Spec §10's exit criteria hold.
