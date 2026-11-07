@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Publisher"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "يمكن إجراء تغييرات على طريقة الدفع الخاصة بك في"
@@ -122,6 +126,10 @@ msgstr "قم بتشغيل استعلام لرؤية النتائج."
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "ابدأ (مثل 2024-01-01)"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+msgid "Keywords"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
@@ -787,6 +795,10 @@ msgstr "شخص واحد"
 msgid "Rename"
 msgstr "إعادة التسمية"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+msgid "Remove keyword {keyword}"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
 msgstr "← العودة"
@@ -907,7 +919,7 @@ msgstr "حدث خطأ أثناء تحميل خدمات Google."
 msgid "Hide published date"
 msgstr "إخفاء تاريخ النشر"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated over a year ago"
 msgstr "تم تحديثها منذ أكثر من عام"
 
@@ -4033,6 +4045,10 @@ msgstr "رمز الاستجابة السريعة"
 msgid "SQL contains multiple statements; the form maps only the first."
 msgstr "تحتوي SQL على عبارات متعددة؛ يطابق النموذج العبارة الأولى فقط."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
+msgid "Topic: {topic}"
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
 "analytics work."
@@ -4106,7 +4122,7 @@ msgstr "تعذّر تحميل {layerName}"
 msgid "Custom role groups"
 msgstr "مجموعات الأدوار المخصصة"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past month"
 msgstr "تم تحديثها خلال الشهر الماضي"
 
@@ -4466,7 +4482,7 @@ msgstr "العودة إلى صفحة تسجيل الدخول"
 msgid "Dataset details"
 msgstr "تفاصيل مجموعة البيانات"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past year"
 msgstr "تم تحديثها خلال العام الماضي"
 
@@ -7226,6 +7242,10 @@ msgstr "فشلت هذه الاستعلام. يرجى إصلاح SQL والمحا
 msgid "Schema"
 msgstr "المخطط"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Topic"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Repeating labelled blocks"
 msgstr "الكتل ذات التسميات المتكررة"
@@ -8489,6 +8509,10 @@ msgstr "محرر"
 msgid "Entered manually"
 msgstr "تم الإدخال يدويًا"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Organization"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
 msgstr "بوابة الفوترة."
@@ -9178,7 +9202,6 @@ msgid "Case type"
 msgstr "نوع الحالة"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -9326,6 +9349,10 @@ msgstr "أضف سلسلة لاختيار العمود الرقمي الذي يق
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "عمود الهندسة"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
+msgid "Keyword: {keyword}"
+msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
@@ -10222,7 +10249,7 @@ msgstr "يشير ORDER BY إلى العمود \"{columnName}\" غير الموج
 msgid "Blue"
 msgstr "أزرق"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Including datasets that can't be loaded"
 msgstr "بما في ذلك مجموعات البيانات التي يتعذّر تحميلها"
 

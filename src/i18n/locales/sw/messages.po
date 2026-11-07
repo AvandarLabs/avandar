@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Publisher"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "Mabadiliko ya njia yako ya malipo yanaweza kufanywa katika yako"
@@ -122,6 +126,10 @@ msgstr "Fanya swali ili kuona matokeo."
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Anza (mfano: 2024-01-01)"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+msgid "Keywords"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
@@ -796,6 +804,10 @@ msgstr "Mtu 1"
 msgid "Rename"
 msgstr "Badilisha jina"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+msgid "Remove keyword {keyword}"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
 msgstr "← Nyuma"
@@ -917,7 +929,7 @@ msgstr "Kulikuwa na hitilafu wakati wa kupakia huduma za Google."
 msgid "Hide published date"
 msgstr "Ficha tarehe ya kuchapishwa"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated over a year ago"
 msgstr "Ilisasishwa zaidi ya mwaka mmoja uliopita"
 
@@ -4090,6 +4102,10 @@ msgstr "Nambari ya QR"
 msgid "SQL contains multiple statements; the form maps only the first."
 msgstr "SQL ina taarifa nyingi; fomu inaweka ya kwanza pekee."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
+msgid "Topic: {topic}"
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
 "analytics work."
@@ -4164,7 +4180,7 @@ msgstr "Imeshindwa kupakia {layerName}"
 msgid "Custom role groups"
 msgstr "Makundi ya jukumu la kawaida"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past month"
 msgstr "Ilisasishwa katika mwezi uliopita"
 
@@ -4528,7 +4544,7 @@ msgstr "Rudi kwenye ukurasa wa kuingia"
 msgid "Dataset details"
 msgstr "Maelezo ya seti ya data"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past year"
 msgstr "Ilisasishwa katika mwaka uliopita"
 
@@ -7320,6 +7336,10 @@ msgstr "Swali hilo limefeli. Tafadhali rekebisha SQL na ujaribu tena."
 msgid "Schema"
 msgstr "Skima"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Topic"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Repeating labelled blocks"
 msgstr "Vizuizi vilivyo na lebo vinavyojirudia"
@@ -8597,6 +8617,10 @@ msgstr "Mhariri"
 msgid "Entered manually"
 msgstr "Imeingizwa mwenyewe"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Organization"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
 msgstr "portali ya malipo."
@@ -9293,7 +9317,6 @@ msgid "Case type"
 msgstr "Aina ya kesi"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -9441,6 +9464,10 @@ msgstr "Ongeza mfululizo kuchagua ni safu ipi ya nambari inayoendesha chati."
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "Safu wima ya jiometri"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
+msgid "Keyword: {keyword}"
+msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
@@ -10345,7 +10372,7 @@ msgstr "ORDER BY inarejelea safu wima \"{columnName}\" ambayo haipo kwenye "
 msgid "Blue"
 msgstr "Bluu"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Including datasets that can't be loaded"
 msgstr "Pamoja na seti za data ambazo haziwezi kupakiwa"
 

@@ -16,6 +16,7 @@ import {
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { DataCatalogCheckboxFacet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.module.css";
+import { DataCatalogKeywordFacet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet";
 import type {
   CatalogFacets,
   CatalogListingFilters,
@@ -33,9 +34,9 @@ type Props = {
 
 /**
  * Everything that narrows the catalog, in the order a user reaches for it:
- * search first, then where the data comes from, its format, and how fresh
- * it is. Every option carries the number of results it would leave, so a
- * user can see a dead end before walking into it.
+ * search first, then who published the data and what it is about, its
+ * format, and how fresh it is. Every option carries the number of results it
+ * would leave, so a user can see a dead end before walking into it.
  */
 export function DataCatalogFilterRail({
   search,
@@ -44,7 +45,7 @@ export function DataCatalogFilterRail({
   facets,
   onFiltersChange,
 }: Props): ReactNode {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const updatedWithinLabels: Record<CatalogUpdatedWithin, string> = {
     any: t`Any time`,
     pastMonth: t`Past month`,
@@ -77,11 +78,49 @@ export function DataCatalogFilterRail({
         />
 
         <DataCatalogCheckboxFacet
-          label={t`Source`}
+          label={t`Publisher`}
           options={facets.sources}
           chosenValues={filters.sources}
           onChange={(sources) => {
             onFiltersChange({ ...filters, sources });
+          }}
+        />
+
+        {/*
+         * The second level only means something inside a chosen publisher,
+         * and its name comes from that publisher's portal ("Agency",
+         * "Department"), so it waits for a publisher to be chosen.
+         */}
+        {filters.sources.length > 0 ? (
+          <DataCatalogCheckboxFacet
+            label={
+              facets.organization2Labels.length > 0
+                ? new Intl.ListFormat(i18n.locale, {
+                    type: "disjunction",
+                  }).format(facets.organization2Labels)
+                : t`Organization`
+            }
+            options={facets.organization2}
+            chosenValues={filters.organization2Names}
+            onChange={(organization2Names) => {
+              onFiltersChange({ ...filters, organization2Names });
+            }}
+          />
+        ) : null}
+
+        <DataCatalogCheckboxFacet
+          label={t`Topic`}
+          options={facets.domains}
+          chosenValues={filters.domains}
+          onChange={(domains) => {
+            onFiltersChange({ ...filters, domains });
+          }}
+        />
+
+        <DataCatalogKeywordFacet
+          chosenKeywords={filters.tags}
+          onChange={(tags) => {
+            onFiltersChange({ ...filters, tags });
           }}
         />
 

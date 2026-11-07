@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Publisher"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "Los cambios en su método de pago se pueden realizar en su"
@@ -123,6 +127,10 @@ msgstr "Ejecuta una consulta para ver los resultados."
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Inicio (por ejemplo, 2024-01-01)"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+msgid "Keywords"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
@@ -796,6 +804,10 @@ msgstr "1 persona"
 msgid "Rename"
 msgstr "Cambiar nombre"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+msgid "Remove keyword {keyword}"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
 msgstr "← Regresar"
@@ -920,7 +932,7 @@ msgstr "Se produjo un error al cargar los servicios de Google."
 msgid "Hide published date"
 msgstr "Ocultar fecha de publicación"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated over a year ago"
 msgstr "Actualizado hace más de un año"
 
@@ -4103,6 +4115,10 @@ msgid "SQL contains multiple statements; the form maps only the first."
 msgstr "SQL contiene varias instrucciones; el formulario solo asigna la "
 "primera."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
+msgid "Topic: {topic}"
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
 "analytics work."
@@ -4176,7 +4192,7 @@ msgstr "No se pudo cargar {layerName}"
 msgid "Custom role groups"
 msgstr "Grupos de roles personalizados"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past month"
 msgstr "Actualizado durante el último mes"
 
@@ -4541,7 +4557,7 @@ msgstr "Volver a la página de inicio de sesión"
 msgid "Dataset details"
 msgstr "Detalles del conjunto de datos"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past year"
 msgstr "Actualizado durante el último año"
 
@@ -7346,6 +7362,10 @@ msgstr "Esa consulta falló. Por favor, corrige el SQL y vuelve a intentarlo."
 msgid "Schema"
 msgstr "Esquema"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Topic"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Repeating labelled blocks"
 msgstr "Bloques etiquetados repetidos"
@@ -8632,6 +8652,10 @@ msgstr "Editor"
 msgid "Entered manually"
 msgstr "Ingresado manualmente"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Organization"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
 msgstr "portal de facturación."
@@ -9333,7 +9357,6 @@ msgid "Case type"
 msgstr "Tipo de caso"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -9482,6 +9505,10 @@ msgstr "Agrega una serie para elegir qué columna numérica impulsa el gráfico.
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "Columna de geometría"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
+msgid "Keyword: {keyword}"
+msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
@@ -10394,7 +10421,7 @@ msgstr "ORDER BY hace referencia a la columna \"{columnName}\", que no está en 
 msgid "Blue"
 msgstr "Azul"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Including datasets that can't be loaded"
 msgstr "Incluir conjuntos de datos que no se pueden cargar"
 

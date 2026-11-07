@@ -81,7 +81,7 @@ export function hasActiveCatalogFilters(
  * needs to change.
  */
 export function settleCatalogListingFilters(
-  filters: CatalogListingFilters,
+  filters: Readonly<CatalogListingFilters>,
 ): CatalogListingFilters {
   if (filters.sources.length === 0 && filters.organization2Names.length > 0) {
     return { ...filters, organization2Names: [] };

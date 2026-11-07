@@ -35,7 +35,6 @@ import {
   EMPTY_CATALOG_FACETS,
   EMPTY_CATALOG_LISTING_FILTERS,
   hasActiveCatalogFilters,
-  removeCatalogFilterValue,
   resolveCatalogSortBy,
   settleCatalogListingFilters,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
@@ -45,6 +44,7 @@ import { DataCatalogListingList } from "@/views/DataManagerApp/DataImportView/Da
 import { DataCatalogResultsHeader } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
 import { readCatalogColumnsForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/readCatalogColumnsForAdding/readCatalogColumnsForAdding";
+import { useActiveCatalogFilters } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters";
 import { useDataCatalogFacets } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogFacets";
 import { useDataCatalogSearch } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogSearch";
 import {
@@ -58,10 +58,8 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   CatalogListingFilters,
   CatalogSortBy,
-  CatalogValueFilterKey,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
 import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
-import type { ActiveCatalogFilter } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader";
 
 /**
  * Whether the open listing's column types are known: `checking` while they
@@ -79,61 +77,6 @@ function _toColumnTypeState(
     return "verified";
   }
   return status === "failed" ? "failed" : "checking";
-}
-
-/**
- * One removable chip per thing narrowing the results beyond the default, so
- * a user can always see why a dataset they expected is missing.
- */
-function _buildActiveFilters(options: {
-  filters: Readonly<CatalogListingFilters>;
-  onFiltersChange: (filters: CatalogListingFilters) => void;
-  labels: { updatedWithin: string; showingUnloadable: string };
-}): ActiveCatalogFilter[] {
-  const { filters, onFiltersChange, labels } = options;
-  const removeValue = (key: CatalogValueFilterKey, value: string) => {
-    return () => {
-      onFiltersChange(removeCatalogFilterValue(filters, key, value));
-    };
-  };
-  const toValueChips = (key: CatalogValueFilterKey): ActiveCatalogFilter[] => {
-    return filters[key].map((value) => {
-      return {
-        key: `${key}:${value}`,
-        label: value,
-        onRemove: removeValue(key, value),
-      };
-    });
-  };
-  return [
-    ...toValueChips("sources"),
-    ...toValueChips("organization2Names"),
-    ...toValueChips("domains"),
-    ...toValueChips("tags"),
-    ...toValueChips("formats"),
-    ...(filters.updatedWithin === "any"
-      ? []
-      : [
-          {
-            key: "updatedWithin",
-            label: labels.updatedWithin,
-            onRemove: () => {
-              onFiltersChange({ ...filters, updatedWithin: "any" });
-            },
-          },
-        ]),
-    ...(filters.isLoadableOnly
-      ? []
-      : [
-          {
-            key: "isLoadableOnly",
-            label: labels.showingUnloadable,
-            onRemove: () => {
-              onFiltersChange({ ...filters, isLoadableOnly: true });
-            },
-          },
-        ]),
-  ];
 }
 
 type Props = BoxProps & {
@@ -190,6 +133,10 @@ export function DataCatalogView({
   const changeFilters = (nextFilters: CatalogListingFilters): void => {
     setFilters(settleCatalogListingFilters(nextFilters));
   };
+  const activeFilters = useActiveCatalogFilters({
+    filters,
+    onFiltersChange: changeFilters,
+  });
 
   const [catalogListingColumns = [], isLoadingCatalogColumns] =
     DataCatalogRelationColumnClient.useGetAll({
@@ -346,20 +293,6 @@ export function DataCatalogView({
     );
   }
 
-  const updatedWithinLabels = {
-    any: "",
-    pastMonth: t`Updated in the past month`,
-    pastYear: t`Updated in the past year`,
-    overAYear: t`Updated over a year ago`,
-  };
-  const activeFilters = _buildActiveFilters({
-    filters,
-    onFiltersChange: changeFilters,
-    labels: {
-      updatedWithin: updatedWithinLabels[filters.updatedWithin],
-      showingUnloadable: t`Including datasets that can't be loaded`,
-    },
-  });
   const hasNoMatches = !isLoadingCatalog && catalogSearch.listings.length === 0;
   const filterRail = (
     <DataCatalogFilterRail

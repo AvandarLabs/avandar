@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Publisher"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "您可以在您的支付方式中进行更改"
@@ -117,6 +121,10 @@ msgstr "运行查询以查看结果。"
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "开始时间（例如：2024-01-01）"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+msgid "Keywords"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
@@ -771,6 +779,10 @@ msgstr "1 人"
 msgid "Rename"
 msgstr "重命名"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+msgid "Remove keyword {keyword}"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
 msgstr "← 返回"
@@ -887,7 +899,7 @@ msgstr "加载 Google 服务时出错。"
 msgid "Hide published date"
 msgstr "隐藏发布日期"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated over a year ago"
 msgstr "一年多以前更新"
 
@@ -3931,6 +3943,10 @@ msgstr "二维码"
 msgid "SQL contains multiple statements; the form maps only the first."
 msgstr "SQL 包含多个语句；表单仅映射第一个。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
+msgid "Topic: {topic}"
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
 "analytics work."
@@ -4002,7 +4018,7 @@ msgstr "无法加载 {layerName}"
 msgid "Custom role groups"
 msgstr "自定义角色组"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past month"
 msgstr "过去一个月内更新"
 
@@ -4355,7 +4371,7 @@ msgstr "返回登录页面"
 msgid "Dataset details"
 msgstr "数据集详情"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past year"
 msgstr "过去一年内更新"
 
@@ -7069,6 +7085,10 @@ msgstr "该查询失败。请修复 SQL 并重试。"
 msgid "Schema"
 msgstr "架构"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Topic"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Repeating labelled blocks"
 msgstr "重复的带标签区块"
@@ -8300,6 +8320,10 @@ msgstr "编辑者"
 msgid "Entered manually"
 msgstr "手动输入"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "Organization"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
 msgstr "账单门户。"
@@ -8973,7 +8997,6 @@ msgid "Case type"
 msgstr "案例类型"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -9119,6 +9142,10 @@ msgstr "添加一个系列以选择哪个数值列驱动图表。"
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "几何列"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
+msgid "Keyword: {keyword}"
+msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
@@ -9994,7 +10021,7 @@ msgstr "ORDER BY 引用了不在 SELECT 列表中的列“{columnName}”。"
 msgid "Blue"
 msgstr "蓝色"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Including datasets that can't be loaded"
 msgstr "包括无法加载的数据集"
 
