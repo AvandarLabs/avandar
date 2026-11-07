@@ -251,6 +251,35 @@ not a URL, the same shape `parquet_file_name` already is for pipeline rows
 and deliberately not the `canonical_urls` free-text-array shape the original
 CKAN generalization spec called a mistake (section 13.2 there).
 
+### 4.1 Drives and listing metadata columns
+
+The field mapping work adds a `data_catalog_drives` table, one row per drive
+a pipeline crawls, and more columns on `data_catalog_listings`. The cache
+columns above are unchanged.
+
+`data_catalog_drives` has a unique `(pipeline_name, drive_key)` and four
+`organization1_label` to `organization4_label` columns, which say what each
+organization level is called on that drive. The catalog reads it to label a
+listing's organization levels. Only the pipeline's service role writes it.
+
+`data_catalog_listings` changes:
+
+- `external_organization_name` is renamed `organization1_name`. It is still
+  the top organization level and still `not null`.
+- `organization2_name` to `organization4_name` hold deeper levels, such as an
+  agency and then an office.
+- `domains` and `tags` are `text[]`: the subject areas and free-form
+  keywords the source files a dataset under. Both are searchable and
+  filterable.
+- `source_metadata` is `jsonb`: the source's full, untouched record.
+- `drive_id` references `data_catalog_drives(id)`. It is null on a listing no
+  drive-index pipeline wrote, such as World Bank WDI.
+
+The listings schema file is now `supabase/schemas/11.data_catalog_listings.sql`,
+because the drives table must exist first. See
+[`catalog-field-mapping-design.md`](catalog-field-mapping-design.md) section 3
+for the full column meanings.
+
 ## 5. The freshness-check and write-back cache flow
 
 One function (`acquireOpenDataResourceWithCache`), shared across both
@@ -317,12 +346,12 @@ real and keeps the version-token race (two workspaces' requests landing
 inside the "is this stale" window at the same time) inside one process
 instead of two browsers.
 
-## 6. Drive index: prebuilt, from a hardcoded list of drives
+## 6. Drive index: prebuilt, from a configured list of drives
 
 **Revised 2026-10-16: no longer deferred.** The original version of this
 section called the drive index "live, not prebuilt, for v1" and pushed the
 prebuilt shape to future work. That is reversed: Avandar now prebuilds the
-drive index for a short, hardcoded list of drives, via a new pipeline. The
+drive index for a short, configured list of drives, via a new pipeline. The
 live-search capability this section previously described
 (`SocrataDiscoveryClient`) is not removed - it is still the right tool for
 letting a human *pick which drives to add* to that list - but it is no longer
@@ -363,52 +392,37 @@ which drives to enumerate.
 
 **Split per pipeline, not one shared registry** - see
 `connector-nomenclature.md`'s "One pipeline per service" section for why. Each
-pipeline owns its own config, with no `apiService` field in either shape:
+pipeline owns its own config file, with no `apiService` field in either:
 single-service pipelines don't need to discriminate a field that only ever
 has one value.
 
-`apps/pipeline-server/pipelines/hdx/hdxDrive.ts` - a single optional value,
-not an array, because HDX is one specific CKAN deployment, not a list of
-them:
+The drives are not hardcoded in TypeScript. Each pipeline has one YAML file
+beside it:
 
-```ts
-export type HdxDrive = {
-  baseUrl: string;
-  organizationName: string;
-};
+- `apps/pipeline-server/pipelines/socrata/socrata.pipeline.yaml` lists
+  Socrata's portals, an array, because Socrata genuinely has many
+  independent portals. `listConfiguredDrives` reads them.
+- `apps/pipeline-server/pipelines/hdx/hdx.pipeline.yaml` lists HDX's one
+  drive, because HDX is one specific CKAN deployment, not a list of them.
+  `listHdxDrives` reads it and rejects a second drive.
 
-export const HDX_DRIVE: HdxDrive | undefined = {
-  baseUrl: "https://data.humdata.org",
-  organizationName: "Humanitarian Data Exchange",
-};
-```
+Each file also holds:
 
-`apps/pipeline-server/pipelines/socrata/configuredDrives/configuredDrives.ts` -
-an array, because Socrata genuinely has many independent portals:
+- `organizationLabels`: what each organization level is called on a drive
+  (such as "City" and "Agency"), as a default for the pipeline that a drive
+  can replace.
+- `fields`: how each source record's fields map onto the catalog's
+  common metadata (description, license, the organization levels, domains,
+  tags, and so on), as a `from` path, a constant `value`, or a `script`
+  under the pipeline's `mappers/` directory.
+- Each drive's `organization1_name`. It replaces the single
+  `organizationName` the old registry used, and is now one mapped field
+  among the rest.
 
-```ts
-export type ConfiguredDrive = {
-  baseUrl: string;
-  /**
-   * Used as every discovered dataset's `external_organization_name`. Neither
-   * client parses an organization field from its own API today (CKAN's
-   * `package_show` has one, Socrata's Discovery API has a different one, and
-   * the two are not alike enough to normalize), so the registry names it
-   * once per drive instead of extending either client's schema just for
-   * this.
-   */
-  organizationName: string;
-};
-
-export const CONFIGURED_DRIVES: readonly ConfiguredDrive[] = [
-  // A handful of entries, picked by whoever maintains this Avandar
-  // deployment. A fork maintains its own list.
-];
-```
-
-This is the "short list of drives" - a handful of entries, not thousands of
-per-dataset rows. Adding a new Socrata drive is a one-line addition here, not
-a schema change or a new connector.
+Adding a Socrata drive is a few lines in `socrata.pipeline.yaml`, not a
+schema change or a new connector. The file's shape, the mapping kinds, and
+how a run loads them are in
+[`catalog-field-mapping-design.md`](catalog-field-mapping-design.md).
 
 ### 6.3 New discovery capabilities needed
 
@@ -465,7 +479,7 @@ listings store (`createSupabaseListingsStore.ts`) upserts those rows with
 api_resource_id)`, against a plain (not partial) unique index:
 
 ```sql
--- supabase/schemas/10.data_catalog_listings.sql
+-- supabase/schemas/11.data_catalog_listings.sql
 create unique index data_catalog_listings__api_resource_unique on public.data_catalog_listings (
   api_service,
   api_base_url,
@@ -481,7 +495,7 @@ arbiter of a bare `on conflict` column list. It still only constrains
 the tuple exempts a row from a unique-index conflict.
 
 Re-running the pipeline is safe and idempotent: a dataset's `display_name`,
-`external_organization_name`, or `api_resource_format` can change on a
+`organization1_name`, or `api_resource_format` can change on a
 re-run (upstream renamed something), but **the upserted row objects never
 include `cached_object_path`, `cached_source_version`, or `cached_at`**
 (the store writes only `LISTING_CONTRACT_COLUMNS`) - so
@@ -543,7 +557,7 @@ Prebuilding a Parquet file is not symmetric across `access_kind`:
   `pipeline_parquet` row with no corresponding Parquet object is invalid data,
   not a lazily-filled cache miss - nothing else will ever populate it. This
   is also what the `data_catalog_listings__pipeline_access_complete` CHECK
-  constraint (`supabase/schemas/10.data_catalog_listings.sql`) enforces at the
+  constraint (`supabase/schemas/11.data_catalog_listings.sql`) enforces at the
   database level for the columns it covers.
 
 The engine upholds both halves: it writes a listing for every relation a

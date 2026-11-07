@@ -70,6 +70,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F18 | Case comments and the case activity feed | not started | none | |
 | F19 | Open data catalog browser: full-height three-pane layout with search, filters, and sort | not started | F12, F16, F17 | |
 | F20 | Phone widths: Data Sources shows one pane at a time, and the slate stays on screen | not started | none | |
+| F21 | Catalog field mapping: per-pipeline YAML metadata mapping, drives, and publisher, agency, topic, and keyword filters | not started | F4, F6, F7, F16, F17, F19 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -97,7 +98,8 @@ API. It's new work, not something this branch built.
 | 13 | F19 | Moves the catalog browser onto F17's server search: its filters, facets, and sort become search parameters, and its list keeps F17's infinite scroll. Merge after F17. |
 | any | F18 | Self-contained: new tables, the record page feed, and one shared client typing fix. It touches no other feature's files, and nothing depends on it. |
 | any | F20 | Self-contained layout fix. The slate overflowing the bottom of a phone screen is already on `develop`, so it can merge first. |
-| 14 | F9 | Last, because the docs describe the merged features. |
+| 14 | F21 | Renames a column that F4, F6, F7, F16, F17 and F19 all read, replaces the hardcoded drive lists F6 and F7 added (`configuredDrives.ts` and `hdxDrive.ts`), and extends the search and filter rail F17 and F19 built. Merge after all of them. |
+| 15 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -122,7 +124,11 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/tests/database/data_catalog_listings_access.test.sql` | F4, F8 | F4: rename and the index test. F8: cache-column and `pipeline_access_complete` tests. |
 | `apps/pipeline-server/pipelines/world-bank__wdi/run.ts` | F1, F4, F10 | F1: `EtlEngine.create(name, { state })`. F4: `createSupabaseAdminClient` import from `pipelines/shared`. F10: `run(options)` rejecting `--limit`. |
 | `shared/types/database.types.ts` | F4, F6, F8, F17, F19 | Generated: regenerate in each. |
-| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx` | F12, F16, F19 | F12: `DataCatalogInvalidNotice`. F16: `DataCatalogUnsupportedNotice`, the `isWorkspaceLoadable` guard on the invalid notice, and `!listing.isWorkspaceLoadable` in `isAddBlocked`. F19: the scrolling body, pinned foot, back button, and fact list. |
+| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx` | F12, F16, F19, F21 | F12: `DataCatalogInvalidNotice`. F16: `DataCatalogUnsupportedNotice`, the `isWorkspaceLoadable` guard on the invalid notice, and `!listing.isWorkspaceLoadable` in `isAddBlocked`. F19: the scrolling body, pinned foot, back button, and fact list. F21: the Published by, About, Source, and Technical details groups, the clickable topic and keyword chips, and the drive read. |
+| `supabase/schemas/11.data_catalog_listings.sql` (F4, F8, F17 know it as `10.data_catalog_listings.sql`) | F4, F8, F17, F21 | F21: the rename to `11.` (so `10.data_catalog_drives.sql` sorts first), `external_organization_name` becomes `organization1_name`, the new organization, `domains`, `tags`, `source_metadata`, and `drive_id` columns, the wider `search_vector`, and the filter indexes. |
+| `supabase/schemas/51.data_catalog_listings__search_matches.sql`, `52.rpc_data_catalog_listings__search.sql`, `52.rpc_data_catalog_listings__search_facets.sql` | F19, F21 | F21: the `organization1_name` rename, the level-2, topic, and keyword filters and facets, and the organization columns in the output. |
+| `apps/pipeline-server/pipelines/etl.config.yaml`, `packages/node/etl/src/EtlConfig/**` | F16, F21 | F21: per-pipeline loadability overrides move into each `<pipeline>.pipeline.yaml`, and the config parser, field mapper, and organization label lookup are added. |
+| `apps/pipeline-server/pipelines/{socrata,hdx}/**` and `packages/node/etl/src/{EtlEngine,stores}/**` | F6, F7, F10, F16, F21 | F21: YAML drives and mappers replace the hardcoded drive lists in `configuredDrives.ts` and `hdxDrive.ts`, the engine writes each drive row and `drive_id`, and listing rows carry the new columns. |
 
 ---
 
@@ -1116,6 +1122,176 @@ or Import data shows only the page, and the slate's bottom gutter is visible.
 
 ---
 
+## F21: Catalog field mapping
+
+**Purpose:** Each drive-index pipeline maps its source's dataset records
+onto a common catalog metadata schema through one YAML file beside it,
+`socrata.pipeline.yaml` and `hdx.pipeline.yaml`. A mapping is a dotted path
+into the source record, a constant, or a script under `mappers/`. The YAML
+also lists the pipeline's drives (replacing `configuredDrives.ts` and
+`hdxDrive.ts`) and each drive's organization labels, and a new
+`data_catalog_drives` table records them. `data_catalog_listings` renames
+`external_organization_name` to `organization1_name`, gains
+`organization2_name` to `organization4_name`, `domains`, `tags`, the raw
+`source_metadata`, and `drive_id`, and `search_vector` weighs the new text.
+Search gains level-2 organization, topic, and keyword filters, and the
+facets that count them. The catalog shows a listing's two deepest
+organization levels in each row. Its rail gains Publisher (the old Source
+filter, relabelled), a level-2 filter, Topic, and Keywords. Its detail pane
+groups a listing into Published by, About, Source, and Technical details,
+with topic and keyword chips that add a filter. **Value:** Listings stop
+being a name and one hardcoded organization. A new portal or a corrected
+field is a config edit, search matches a listing's agency, topics, and
+keywords, and a user can narrow thousands of listings by who published them
+and what they cover. Design: `docs/measles-demo/catalog-field-mapping-design.md` and its
+plan `catalog-field-mapping-plan.md` (both go with F9).
+
+**PR title:** `feat(catalog)!: map catalog metadata from per-pipeline YAML and filter by it`
+
+**Depends on:** F16 (the loadability config and flags it extends) and F19
+(`feat/catalog-filters`: the match function, the search RPCs, the facets, and
+the filter rail it extends). Merge after both, and after F17.
+
+**Commits to read:** all 37 non-merge commits of
+`feat/catalog-field-mapping` since `b2fcba4a1`. The merge commit
+`9766851e7` brought `demo/measles` and F19's work into the branch. Those
+commits belong to the features that own them, not here.
+
+*The pipeline config parser and the field mapper (`@avandar/etl`):*
+
+| SHA | Subject | Take |
+|---|---|---|
+| `9b62c64da` | feat(etl): parse per-pipeline catalog field mapping configs | All of it |
+| `24af95af7` | feat(etl): read catalog field paths and coerce mapped values | All of it |
+| `5bb703a2b` | chore(etl): format the pipeline config parser | Formatting: take the final file |
+| `2fedf1ba9` | fix(etl): reject non-ISO dates and undefined list items in catalog coercion | All of it |
+| `b191f4cbf` | feat(etl): compile pipeline field mappings, importing each script once | All of it |
+| `f82a67efb` | refactor(etl): name the drive label lookup getOrganizationLabelsFromDrive | All of it |
+| `bf8e7cfa2` | fix(etl): name the config file on YAML errors and explain non-text values | All of it |
+| `26993b266` | refactor(etl)!: read per-pipeline loadability overrides from the pipeline config | All of it. Its `etl.config.yaml` and `getPipelineWorkspaceLoadability` hunks are in F16's files: apply on top of F16. |
+| `6a0bcbfba` | docs(etl): point the loadability comment at the pipeline config | All of it |
+| `e8e592d1a` | docs(etl): document pipeline configs, field mapping, and drives | All of it (`packages/node/etl/README.md`) |
+
+*The schema (rename, drives table, new columns, filtered search):*
+
+| SHA | Subject | Take |
+|---|---|---|
+| `c59864844` | feat(db)!: add catalog drives, organization levels, and filtered search; rename external_organization_name | History: built on the pre-merge search. Do not port it. Port the final `supabase/schemas/` files, the pgTAP tests, the upgrade tests, and the desktop manual-migration body. |
+| `4291d2500` | chore(catalog): apply the formatter to the catalog schema and label tests | History: formatting of `c59864844`'s files. |
+| `2b7199729` | fix(db): keep the catalog migration's desktop body and replay the production shape | History: its desktop body and upgrade-test prelude changes are in the final files. |
+| `5ebe11ba5` | fix(db)!: rebuild the catalog field mapping migration on filtered search | The final rename migration and its upgrade test. Hand-write the rename: port its SQL, give it a new timestamp. |
+| `80a6e1ffe` | feat(catalog): filter and facet catalog search by agency, topic, and keyword | All of it. Regenerate the migration, types, and desktop migration after the rename migration. |
+| `b1a8199b7` | test(db): check every new listing column starts empty after the rename | All of it |
+
+*The ETL engine and its stores write the new columns and the drive:*
+
+| SHA | Subject | Take |
+|---|---|---|
+| `b5a03820b` | feat(etl): write organization levels, domains, tags, and the source record | All of it |
+| `4d4b6b49b` | feat(etl): record each drive's organization labels and link listings to it | All of it |
+| `937a118f7` | fix(etl): write a drive row only for crawls that run | All of it |
+
+*The sources keep their raw record, and the pipelines read YAML:*
+
+| SHA | Subject | Take |
+|---|---|---|
+| `2020b4642` | feat(open-data): keep each Socrata and CKAN result's raw record | All of it |
+| `c99e46b54` | test(open-data): give hand-built source fixtures their raw record | All of it |
+| `5e3b6ee3d` | feat(socrata): map catalog metadata from socrata.pipeline.yaml | All of it. The lockfile hunk adds a dependency to `apps/pipeline-server`: re-add it with `pnpm add`, then restore `pnpm-workspace.yaml`. |
+| `8578eaecb` | fix(pipelines): keep out-of-range HTML entities and restore warn spies | All of it |
+| `bcac141e7` | feat(hdx): map catalog metadata from hdx.pipeline.yaml | All of it |
+| `79dc85076` | fix(hdx): read only HDX's own update frequency codes | All of it |
+| `d50583f7e` | fix(socrata): read a health dataset's office from either metadata key | All of it |
+
+*The app reads the renamed column, the drives, and the new filters:*
+
+| SHA | Subject | Take |
+|---|---|---|
+| `4499fcec1` | refactor(catalog): read organization1_name and the new listing columns | All of it, but it edits files other features own (the pipelines, the `DataCatalogListing` model, and the `DataCatalogView` list and detail): apply its hunks on top of them. |
+| `68b003a2f` | feat(catalog): read catalog drives and their organization labels | All of it |
+| `d64d11d83` | feat(catalog): send the agency, topic, and keyword filters and read their facets | All of it. Regenerate the `.po` catalogs. |
+| `d90481335` | feat(catalog): filter by publisher, agency, topic, and keyword in the rail | All of it. Regenerate the `.po` catalogs. |
+| `14984e21b` | fix(catalog): let keyboard and screen reader users remove filter chips | All of it |
+| `ef758d937` | feat(catalog): show publisher, topics, keywords, and source in the listing detail | All of it. Regenerate the `.po` catalogs. |
+| `6c43b5a65` | chore(catalog): apply the formatter to the results header test | Formatting: take the final file |
+| `d7fd436a8` | fix(catalog): keep the source record as the source sent it | All of it |
+| `bc4baf853` | test(catalog): filter the open data catalog by publisher, agency, and keyword end to end | All of it |
+
+*Docs, which go with F9:*
+
+| SHA | Subject | Take |
+|---|---|---|
+| `9545f385a` | docs(measles-demo): use the getOrganizationLabelsFromDrive name | Nothing: goes with F9. |
+| `7ff389c30` | docs(measles-demo): build catalog filters on the merged filter rail and search | Nothing: goes with F9. |
+
+No commit is `MIXED`: every hunk belongs to F21. Several edit files other
+features own, so apply them on top of those features' final files rather than
+copying a file whole (see **Files shared by several features**).
+
+**Files:** `packages/node/etl/src/EtlConfig/**` (the pipeline config parser,
+`buildCatalogFieldPathReader`, `coerceCatalogFieldValue`,
+`loadCatalogFieldMapper`, `getOrganizationLabelsFromDrive`),
+`packages/node/etl/src/EtlEngine/**` and `stores/**` (the drives store, the
+row contract and `listingContractColumns`), `packages/node/etl/README.md`,
+`apps/pipeline-server/pipelines/{socrata,hdx}/**` (the two
+`.pipeline.yaml` files, `mappers/`, `run.ts`, and the engine factories),
+`pipelines/shared/htmlToPlainText/`, `pipelines/etl.config.yaml`,
+`apps/pipeline-server/README.md`,
+`shared/connectors/open-data/{CkanClient,CkanDiscoveryClient,SocrataDiscoveryClient}/`
+(`sourceRecord`), the `DataCatalogListing` and new `DataCatalogDrive` models,
+`src/clients/data-catalog-listings/` (`DataCatalogDriveClient.ts`,
+`buildDataCatalogSearchFilterArgs/`, `createDataCatalogSearchFacets/`,
+`createDataCatalogSearchPage/`), the `DataCatalogView` rail, list, detail,
+`buildOrganizationLine/`, `DataCatalogMetadataChips/`, `getSourceHost/`, and
+`formatCatalogListingDate.ts`, `tests/e2e/data-catalog-filters.spec.ts`,
+`supabase/schemas/00.util__text_array_to_text.sql`, `10.data_catalog_drives.sql`,
+`11.data_catalog_listings.sql`, the three search schemas, the pgTAP test
+`data_catalog_drives.test.sql`, and the search and filter pgTAP tests,
+`supabase/migration-upgrade-tests/catalog_field_mapping.*`, and
+`apps/desktop/scripts/gen-sqlite-migrations/getManualMigrationBodyFromSourceFile.ts`.
+
+**Schema:** `20261107013616_catalog_field_mapping.sql` (renames
+`external_organization_name`, adds the drives table and the new listing
+columns, rebuilds `search_vector`, and replaces the search functions on the
+renamed column) and `20261107015103_catalog_search_organization_filters.sql`
+(adds the level-2, topic, and keyword parameters and facets). Hand-write the
+first, because the schema diff would turn the rename into a drop and a
+create: confirm the result has no `drop column` of a data column. Regenerate
+the second after it. Both land after F16, F17 and F19's migrations.
+
+**Verification:**
+```sh
+pnpm --filter @avandar/etl test && pnpm --filter @avandar/etl test:supabase
+pnpm --filter @avandar/pipeline-server test
+pnpm vitest run src/clients/data-catalog-listings src/views/DataManagerApp shared/models/data-catalog-listings shared/connectors/open-data
+pnpm test:db
+pnpm exec tsc -b --force
+pnpm test:e2e data-catalog-filters.spec.ts
+ava pipeline run socrata --local --limit 20   # local stack only: rows carry organization1_name to 3, domains, tags
+```
+Then open the Open data tab with a few hundred listings: choose a publisher,
+then its agency, then click a keyword on a listing, and clear the filters.
+
+**Follow-ups found in review, not done here:**
+- `passes_loadable` in `51.data_catalog_listings__search_matches.sql` tests
+  `is_invalid`, not `is_workspace_loadable`, so "Hide datasets that can't be
+  loaded" still shows unsupported listings. This came from
+  `feat/catalog-filters` (F19).
+- `ava pipeline run --local` discards the runner's warnings on a successful
+  run (`runPipelineLocal.ts` keeps stderr only for a failed run). Mapping
+  warnings are invisible unless the runner is run directly. The pipeline
+  server README says how.
+- `DataCatalogListingDetail` is still over the 45-line function rule.
+- The production pipeline-server Dockerfile may not resolve the
+  `@pipelines/*` and `$/` aliases the new mapper imports use. Raised in
+  review, unverified: build the image and run one pipeline in it before
+  deploying.
+- Backfill the demo instance with one full (non-incremental) run of each
+  pipeline. Incremental runs only touch datasets that changed, so unchanged
+  listings keep empty new columns.
+
+---
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -1213,6 +1389,51 @@ port the final files, not the commit.
 | 87 | `eba708217` | F10 |
 | 88 | `b7cbe395a` | F6 |
 | 89 | `f78be622b` | F7 |
+
+Commits of `feat/catalog-field-mapping` since its base `b2fcba4a1`
+(37, oldest first), numbered on from the table above. They sit on top of
+`feat/catalog-filters` (F19), which came in through the `9766851e7` merge.
+Its commits are covered by F19, not numbered here.
+
+| # | SHA | Feature(s) |
+|---|---|---|
+| 90 | `9b62c64da` | F21 |
+| 91 | `24af95af7` | F21 |
+| 92 | `5bb703a2b` | F21 |
+| 93 | `2fedf1ba9` | F21 |
+| 94 | `b191f4cbf` | F21 |
+| 95 | `f82a67efb` | F21 |
+| 96 | `9545f385a` | F9 |
+| 97 | `c59864844` | F21 (history) |
+| 98 | `4291d2500` | F21 (history) |
+| 99 | `2b7199729` | F21 (history) |
+| 100 | `4499fcec1` | F21 |
+| 101 | `b5a03820b` | F21 |
+| 102 | `4d4b6b49b` | F21 |
+| 103 | `937a118f7` | F21 |
+| 104 | `26993b266` | F21 |
+| 105 | `6a0bcbfba` | F21 |
+| 106 | `e8e592d1a` | F21 |
+| 107 | `2020b4642` | F21 |
+| 108 | `c99e46b54` | F21 |
+| 109 | `5e3b6ee3d` | F21 |
+| 110 | `8578eaecb` | F21 |
+| 111 | `bcac141e7` | F21 |
+| 112 | `7ff389c30` | F9 |
+| 113 | `79dc85076` | F21 |
+| 114 | `bf8e7cfa2` | F21 |
+| 115 | `5ebe11ba5` | F21 |
+| 116 | `80a6e1ffe` | F21 |
+| 117 | `b1a8199b7` | F21 |
+| 118 | `68b003a2f` | F21 |
+| 119 | `d64d11d83` | F21 |
+| 120 | `d90481335` | F21 |
+| 121 | `14984e21b` | F21 |
+| 122 | `ef758d937` | F21 |
+| 123 | `6c43b5a65` | F21 |
+| 124 | `d7fd436a8` | F21 |
+| 125 | `bc4baf853` | F21 |
+| 126 | `d50583f7e` | F21 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here.

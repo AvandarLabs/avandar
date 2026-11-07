@@ -1,6 +1,6 @@
 # Catalog field mapping: design
 
-Status: approved design, partly built. Covers the pipelines, the schema,
+Status: approved design, built. Covers the pipelines, the schema,
 catalog search's use of the new metadata, and how the catalog shows and
 filters by it. Builds on
 [catalog-search-design.md](catalog-search-design.md), which moved search into
@@ -515,7 +515,7 @@ the data and are not translated.
 | Labels | NYC: City, Agency. NY State: State, Agency. NYS Health: State, Department, Office. | Organization |
 | `organization1_name` | `value` per drive | `organization.title`, such as "World Health Organization" |
 | `organization2_name` | `resource.attribution` (NYC, NY State); `value` "Department of Health" (NYS Health) | None |
-| `organization3_name` | Script: the `Dataset-Summary_Office/Division` entry in `classification.domain_metadata` (NYS Health only, where `resource.attribution` is the department itself) | None |
+| `organization3_name` | Script (NYS Health only, where `resource.attribution` is the department itself): the `Dataset-Summary_Office/Division` entry in `classification.domain_metadata`, else its `Dataset-Summary_Organization` entry (older datasets) unless that names the department itself | None |
 | `description` | Script: `resource.description` as plain text | `notes` |
 | `domains` | Script: `classification.domain_category` plus `classification.categories` (the latter is empty on NYC today) | Script: `groups[].title` (countries on HDX) |
 | `tags` | `classification.domain_tags` | Script: `tags[].name` |

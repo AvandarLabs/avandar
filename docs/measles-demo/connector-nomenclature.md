@@ -314,11 +314,12 @@ A drive-index pipeline (above) is named and scoped per **service** (layer
   deployment is its own island, so a second CKAN deployment, if Avandar
   ever adds one, gets its **own** separate pipeline rather than joining
   `hdx`'s drive list, even though both speak the same protocol.
-- This is why `hdx`'s own drive config (`hdxDrive.ts`) is a single
-  optional value, not a `ConfiguredDrive[]` registry: a list implies a
-  second drive this pipeline will never have. `socrata`'s registry
-  (`configuredDrives.ts`) stays an array, because Socrata genuinely has
-  many independent drives.
+- This is why `hdx`'s drive config is still exactly one drive, not a
+  list a second drive could join: a list implies a second drive this
+  pipeline will never have. HDX's one drive now comes from
+  `hdx.pipeline.yaml` through `listHdxDrives`, which rejects a second one.
+  `socrata`'s drives, in `socrata.pipeline.yaml`, stay a list, because
+  Socrata genuinely has many independent drives.
 
 ## Open Data Catalog, "catalog", and "drive index" are three different words
 
