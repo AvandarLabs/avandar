@@ -114,6 +114,32 @@ describe("parseClarify", () => {
     });
   });
 
+  it("drops options that repeat the card's own Something else and None of the above", () => {
+    const parsed = parseClarify(
+      JSON.stringify({
+        question: "How should best be measured?",
+        responseShape: {
+          kind: "fixed_options",
+          options: [
+            "Fewest total deaths",
+            "Something else",
+            "Lowest average daily deaths",
+            "None of the above.",
+            "Other…",
+          ],
+          multi: false,
+        },
+      }),
+      0,
+    );
+
+    expect(parsed?.responseShape).toEqual({
+      kind: "fixed_options",
+      options: ["Fewest total deaths", "Lowest average daily deaths"],
+      multi: false,
+    });
+  });
+
   it("does not count view-change lines as clarification answers", () => {
     // View-change lines lack the `[Clarification answer:` marker.
     expect(
