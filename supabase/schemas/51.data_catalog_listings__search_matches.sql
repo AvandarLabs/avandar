@@ -22,7 +22,9 @@
  * @param p_updated_within A window of
  * `data_catalog_listings__is_updated_within`. Any other value raises
  * `22023` (invalid parameter value).
- * @param p_is_loadable_only Whether listings that cannot be loaded fail.
+ * @param p_is_loadable_only Whether listings that cannot be loaded fail: an
+ * asset no workspace can add (`is_workspace_loadable` false), or one whose
+ * sample failed (`is_invalid`).
  * @param p_organization2_names Level-2 organizations (`organization2_name`)
  * to keep. Empty keeps every level-2 organization.
  * @param p_domains Topics to keep: a listing passes when its `domains`
@@ -143,8 +145,10 @@ begin
     cardinality(v_formats) = 0 or
     coalesce(matched.file_format = any (v_formats), false),
     public.data_catalog_listings__is_updated_within (matched.last_updated_at, v_updated_within),
-    not v_is_loadable_only or
-    not matched.is_invalid,
+    not v_is_loadable_only or (
+      matched.is_workspace_loadable and
+      not matched.is_invalid
+    ),
     cardinality(v_organization2_names) = 0 or
     coalesce(matched.organization2_name = any (v_organization2_names), false),
     cardinality(v_domains) = 0 or
