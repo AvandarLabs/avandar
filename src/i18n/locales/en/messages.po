@@ -3171,10 +3171,6 @@ msgstr "A short, memorable URL for flyers, reports, and QR codes."
 msgid "Using your custom URL."
 msgstr "Using your custom URL."
 
-#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
-#~ msgid "Searching..."
-#~ msgstr "Searching..."
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
 msgstr "You can't save to a dashboard until you've run a query."
@@ -3529,10 +3525,6 @@ msgstr "Outcome"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Searching the catalog"
 msgstr "Searching the catalog"
-
-#: src/components/RichText/UserMention/UserMentionList.tsx
-#~ msgid "No teammates match"
-#~ msgstr "No teammates match"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
 msgid "Write an update. Type @ to mention a teammate or link a dashboard, "
@@ -4935,11 +4927,6 @@ msgid "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
 msgstr "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
-
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
-#~ msgid "Post the first update below. Mention a teammate with @ to bring them in."
-#~ msgstr "Post the first update below. Mention a teammate with @ to bring them "
-#~ "in."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
@@ -9168,10 +9155,6 @@ msgstr "Invalid value column selected"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "Row {rowNum} / Col {colNum}"
-
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
-#~ msgid "Write an update. Type @ to mention a teammate."
-#~ msgstr "Write an update. Type @ to mention a teammate."
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList.tsx
 msgid "You can't go to this step until you create a new dashboard."

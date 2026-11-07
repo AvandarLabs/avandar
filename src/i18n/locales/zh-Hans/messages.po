@@ -165,7 +165,7 @@ msgstr "区分大小写"
 #: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Updated"
-msgstr ""
+msgstr "已更新"
 
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
@@ -304,7 +304,7 @@ msgstr "图表设置"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard"
-msgstr ""
+msgstr "不可用的仪表板"
 
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
@@ -536,7 +536,7 @@ msgstr "无法从 FROM 子句中确定基础表。"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 msgid "People"
-msgstr ""
+msgstr "人员"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx
@@ -791,7 +791,7 @@ msgstr "允许多个值"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this dashboard. Teammates on this case without "
 "access will see \"Unavailable\"."
-msgstr ""
+msgstr "只有部分人员可以打开此仪表板。无权访问的同事将在此案例中看到“不可用”。"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B (offline)"
@@ -897,7 +897,7 @@ msgstr "标题说明"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
 msgid "Post the first update below. Type @ to mention a teammate or link a "
 "dashboard, dataset, or case."
-msgstr ""
+msgstr "在下方发布第一条动态。输入 @ 可提及同事，或链接仪表板、数据集或案例。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Collapse at"
@@ -913,7 +913,7 @@ msgstr "重新开始教程"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 msgid "Cases"
-msgstr ""
+msgstr "案例"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it."
@@ -1268,7 +1268,7 @@ msgstr "无法取消发布仪表板"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this map. Teammates on this case without "
 "access will see \"Unavailable\"."
-msgstr ""
+msgstr "只有部分人员可以打开此地图。无权访问的同事将在此案例中看到“不可用”。"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Where the fields come from"
@@ -1509,7 +1509,7 @@ msgstr "新角色组"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Dashboard"
-msgstr ""
+msgstr "仪表板"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -1659,7 +1659,7 @@ msgstr "漏斗图"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this dashboard tile. Teammates on this case "
 "without access will see \"Unavailable\"."
-msgstr ""
+msgstr "只有部分人员可以打开此仪表板磁贴。无权访问的同事将在此案例中看到“不可用”。"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Link address"
@@ -2312,7 +2312,7 @@ msgstr "从 {column} 返回的值为空。请描述您需要的内容。"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open map"
-msgstr ""
+msgstr "打开地图"
 
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? ( <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> ) : ( "." )
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
@@ -2494,7 +2494,7 @@ msgstr "使用数据探索器分析您的数据集，创建可视化并发现数
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Case"
-msgstr ""
+msgstr "案例"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles & Permissions"
@@ -2578,7 +2578,7 @@ msgstr "将此仪表板导出为 PDF，或先进行草图绘制。注释支持�
 #: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Audience"
-msgstr ""
+msgstr "受众"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude is outside the valid range but would be a valid longitude, and "
@@ -2762,7 +2762,7 @@ msgstr "每个系列是绘制在 Y 轴上的数值列。值按 X 轴（\"{axisKe
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Mention a teammate or link a dashboard, dataset, or case"
-msgstr ""
+msgstr "提及同事，或链接仪表板、数据集或案例"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 msgid "Filled in by hand"
@@ -3085,10 +3085,6 @@ msgstr "适用于传单、报告和二维码的简短易记 URL。"
 msgid "Using your custom URL."
 msgstr "使用您的自定义 URL。"
 
-#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
-#~ msgid "Searching..."
-#~ msgstr ""
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
 msgstr "运行查询后才能保存到信息中心。"
@@ -3325,7 +3321,7 @@ msgstr "需要额外的席位"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable case"
-msgstr ""
+msgstr "不可用的案例"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/PillsFieldTarget.tsx
 msgid "Type a value"
@@ -3345,7 +3341,7 @@ msgstr "要素"
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Draft"
-msgstr ""
+msgstr "草稿"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Choose who should own this member’s private dashboards and datasets. You "
@@ -3400,7 +3396,7 @@ msgstr "上次同步"
 #: src/components/RichText/Gadget/GadgetCard/GadgetCardBody.tsx
 msgid "It may have been deleted, or you don't have access. Ask the comment's "
 "author to share it."
-msgstr ""
+msgstr "它可能已被删除，或者你无权访问。请让评论作者与其共享。"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Bring a spreadsheet into Avandar."
@@ -3428,14 +3424,10 @@ msgstr "结果"
 msgid "Searching the catalog"
 msgstr "正在搜索目录"
 
-#: src/components/RichText/UserMention/UserMentionList.tsx
-#~ msgid "No teammates match"
-#~ msgstr "没有匹配的队友"
-
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
 msgid "Write an update. Type @ to mention a teammate or link a dashboard, "
 "dataset, or case."
-msgstr ""
+msgstr "撰写动态。输入 @ 可提及同事，或链接仪表板、数据集或案例。"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -4320,7 +4312,7 @@ msgstr "要导入的标签页"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Couldn't search. Keep typing to retry."
-msgstr ""
+msgstr "无法搜索。继续输入以重试。"
 
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
@@ -4490,7 +4482,7 @@ msgstr "此表单仅支持 SELECT 查询。"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Updating results"
-msgstr ""
+msgstr "正在更新结果"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Disclaimer"
@@ -4498,7 +4490,7 @@ msgstr "免责声明"
 
 #: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
 msgid "Unavailable item"
-msgstr ""
+msgstr "不可用的项目"
 
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
@@ -4593,7 +4585,7 @@ msgstr "生成的 SQL"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
 msgid "<0>Shift</0> <1>Enter</1> embed"
-msgstr ""
+msgstr "<0>Shift</0> <1>Enter</1> 嵌入"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid " m"
@@ -4768,7 +4760,7 @@ msgstr "正在修复查询…"
 
 #: src/components/RichText/Gadget/GadgetActionsMenu/GadgetActionsMenu.tsx
 msgid "More actions"
-msgstr ""
+msgstr "更多操作"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Horizontal gridlines"
@@ -4808,10 +4800,6 @@ msgstr "规范值"
 msgid "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
 msgstr "任何拥有链接的人都可以查看此{resource}。下方的人员和群组仍可控制谁可以编辑。"
-
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
-#~ msgid "Post the first update below. Mention a teammate with @ to bring them in."
-#~ msgstr "在下方发布第一条更新。使用 @ 提及队友，邀请他们参与。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
@@ -4978,7 +4966,7 @@ msgstr "结束（例如：2024-12-31）"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open dashboard tile"
-msgstr ""
+msgstr "打开仪表板磁贴"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -5244,7 +5232,7 @@ msgstr "是否永久删除此设备上的所有同意决定？此操作无法撤
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
 msgid "<0>Enter</0> link"
-msgstr ""
+msgstr "<0>Enter</0> 链接"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Let AI decide (legacy)"
@@ -5488,7 +5476,7 @@ msgstr "每个系列是一个绘制在径向值上的数值列。值按类别轴
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading case type"
-msgstr ""
+msgstr "正在加载案例类型"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -6167,12 +6155,12 @@ msgstr "描述"
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Chart"
-msgstr ""
+msgstr "图表"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this case. Teammates on this case without "
 "access will see \"Unavailable\"."
-msgstr ""
+msgstr "只有部分人员可以打开此案例。无权访问的同事将在此案例中看到“不可用”。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Categories"
@@ -6255,7 +6243,7 @@ msgstr "编码"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard tile"
-msgstr ""
+msgstr "正在加载仪表板磁贴"
 
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
@@ -6288,7 +6276,7 @@ msgstr "编辑案例类型"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open case"
-msgstr ""
+msgstr "打开案例"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
@@ -6664,7 +6652,7 @@ msgstr "放置文本"
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Workspace"
-msgstr ""
+msgstr "工作区"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Layer"
@@ -6757,7 +6745,7 @@ msgstr "深色"
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Records"
-msgstr ""
+msgstr "记录"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "Rebind required"
@@ -7204,7 +7192,7 @@ msgstr "文件托管在列出该文件的网站之外的其他网站上，因此
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading map"
-msgstr ""
+msgstr "正在加载地图"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Leave empty when the geometry is already WGS 84."
@@ -7302,7 +7290,7 @@ msgstr "几何功能不可用"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
-msgstr ""
+msgstr "正在加载仪表板"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -7403,7 +7391,7 @@ msgstr "{0} 个边界没有数据"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this dataset. Teammates on this case without "
 "access will see \"Unavailable\"."
-msgstr ""
+msgstr "只有部分人员可以打开此数据集。无权访问的同事将在此案例中看到“不可用”。"
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
@@ -7451,7 +7439,7 @@ msgstr "在地图上选择注释以进行编辑。"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Searching…"
-msgstr ""
+msgstr "正在搜索…"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"
@@ -8150,7 +8138,7 @@ msgstr "购买 {seatsToAdd} 个座位"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dataset"
-msgstr ""
+msgstr "正在加载数据集"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
@@ -8260,7 +8248,7 @@ msgstr "此自定义 URL 已被占用"
 
 #: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
 msgid "Show as embed"
-msgstr ""
+msgstr "显示为嵌入内容"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Drive access is not configured for this deployment."
@@ -8712,7 +8700,7 @@ msgstr "计数"
 #: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Tiles"
-msgstr ""
+msgstr "磁贴"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
@@ -8734,11 +8722,11 @@ msgstr "感谢您的关注！"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Case type"
-msgstr ""
+msgstr "案例类型"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Dashboard tile"
-msgstr ""
+msgstr "仪表板磁贴"
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
@@ -8789,7 +8777,7 @@ msgstr "正在预览此仪表板"
 
 #: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
 msgid "Show as link"
-msgstr ""
+msgstr "显示为链接"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "No value"
@@ -8944,10 +8932,6 @@ msgstr "选择的值列无效"
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "第 {rowNum} 行 / 第 {colNum} 列"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
-#~ msgid "Write an update. Type @ to mention a teammate."
-#~ msgstr "写下更新。输入 @ 提及队友。"
-
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList.tsx
 msgid "You can't go to this step until you create a new dashboard."
 msgstr "创建新仪表板后才能进入此步骤。"
@@ -8962,7 +8946,7 @@ msgstr "高级选项"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable map"
-msgstr ""
+msgstr "不可用的地图"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is less than"
@@ -8976,7 +8960,7 @@ msgstr "右下"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this case type. Teammates on this case without "
 "access will see \"Unavailable\"."
-msgstr ""
+msgstr "只有部分人员可以打开此案例类型。对此案例无访问权限的队友将看到“不可用”。"
 
 #. placeholder {0}: scale.meters
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -9274,7 +9258,7 @@ msgstr "提出您的第一个问题"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dataset"
-msgstr ""
+msgstr "不可用的数据集"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Change URL"
@@ -9599,7 +9583,7 @@ msgstr "加载中..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"
-msgstr ""
+msgstr "不可用的仪表板图块"
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureFields.tsx
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
@@ -9755,7 +9739,7 @@ msgstr "注释文本"
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Untitled chart"
-msgstr ""
+msgstr "未命名的图表"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
@@ -9812,7 +9796,7 @@ msgstr "离线准备就绪"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable case type"
-msgstr ""
+msgstr "不可用的案例类型"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionOptions.tsx
 msgid "Reactions"
