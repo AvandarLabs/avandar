@@ -93,7 +93,7 @@ const config: EtlEngineConfig<Portal, Dataset> = {
       kind: "api_resource",
       externalDatasetId: connection.id,
       displayName: connection.name,
-      externalOrganizationName: "Example City",
+      organization1Name: "Example City",
       sourceUpdatedAt: getUpdatedAt(connection),
       apiResourceId: connection.id,
       apiResourceFormat: "json",
@@ -205,7 +205,7 @@ The engine writes only these listings-table columns
 
 | Column | Written for |
 | --- | --- |
-| `id` (read only), `access_kind`, `pipeline_name`, `pipeline_run_id`, `display_name`, `external_organization_name`, `external_dataset_id`, `date_of_last_update`, `date_of_last_sync`, `pipeline_scope_keys` | every row |
+| `id` (read only), `access_kind`, `pipeline_name`, `pipeline_run_id`, `display_name`, `organization1_name`, `external_dataset_id`, `date_of_last_update`, `date_of_last_sync`, `pipeline_scope_keys` | every row |
 | `date_column_type_last_verified` | every row, `null` when the column types are not verified |
 | `is_workspace_loadable` | every row (see "Workspace loadability") |
 | `external_service_name`, `source_url`, `source_download_url`, `source_asset_type`, `canonical_urls`, `license`, `update_frequency`, `description`, `notes`, `metadata`, `coverage_start_date`, `coverage_end_date` | every row, `null` when unset |

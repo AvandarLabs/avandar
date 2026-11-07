@@ -42,7 +42,7 @@ describe("makeApiResourceRelationFromSocrataResult", () => {
       apiResourceId: "erm2-nwe9",
       apiResourceFormat: "CSV",
       displayName: "311 Service Requests",
-      externalOrganizationName: "City of New York",
+      organization1Name: "City of New York",
       sourceUpdatedAt: new Date("2026-10-19T08:30:00.000Z"),
       sourceAssetType: "dataset",
       sourceUrl: "https://data.cityofnewyork.us/d/erm2-nwe9",

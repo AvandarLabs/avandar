@@ -34,6 +34,13 @@ const SHARED_DB_COLUMNS = {
   is_workspace_loadable: true,
   source_asset_type: null,
   source_download_url: null,
+  organization2_name: null,
+  organization3_name: null,
+  organization4_name: null,
+  domains: null,
+  tags: null,
+  source_metadata: null,
+  drive_id: null,
   search_vector: "'seri':1A 'world':2B 'bank':3B",
 } as const;
 
@@ -41,7 +48,7 @@ function _pipelineDBRow(): DataCatalogListingModel["DBRead"] {
   return {
     ...SHARED_DB_COLUMNS,
     display_name: "Series",
-    external_organization_name: "World Bank",
+    organization1_name: "World Bank",
     external_dataset_id: "series",
     access_kind: "pipeline_parquet",
     parquet_file_name: "series.parquet",
@@ -58,7 +65,7 @@ function _apiDBRow(): DataCatalogListingModel["DBRead"] {
   return {
     ...SHARED_DB_COLUMNS,
     display_name: "Operational Presence",
-    external_organization_name: "OCHA",
+    organization1_name: "OCHA",
     external_dataset_id: "hdx-hapi-operational-presence",
     access_kind: "api_resource",
     parquet_file_name: null,

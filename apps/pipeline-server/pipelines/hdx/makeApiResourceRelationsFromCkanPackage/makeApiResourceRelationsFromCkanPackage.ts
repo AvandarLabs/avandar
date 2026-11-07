@@ -80,7 +80,7 @@ function _toRelation(params: {
     apiResourceFormat:
       resource.format === "" ? undefined : resource.format.toUpperCase(),
     displayName: resource.name,
-    externalOrganizationName: drive.organizationName,
+    organization1Name: drive.organizationName,
     sourceUpdatedAt: params.sourceUpdatedAt,
     ...(resource.url_type === "" ? {} : { sourceAssetType: resource.url_type }),
     sourceUrl: `${drive.baseUrl}/dataset/${ckanPackage.name}/resource/${resource.id}`,

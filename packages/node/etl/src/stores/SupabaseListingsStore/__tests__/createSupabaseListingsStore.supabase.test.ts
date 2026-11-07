@@ -34,7 +34,7 @@ function _apiRow(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     pipeline_name: PIPELINE_NAME,
     pipeline_run_id: "run-1",
     display_name: "Fixture dataset",
-    external_organization_name: "Fixture Org",
+    organization1_name: "Fixture Org",
     external_dataset_id: "etl-fixture-dataset",
     date_of_last_update: "2026-10-01T00:00:00.000Z",
     date_of_last_sync: "2026-10-20T00:00:00.000Z",

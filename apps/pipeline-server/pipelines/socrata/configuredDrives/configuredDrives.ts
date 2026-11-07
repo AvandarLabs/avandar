@@ -21,7 +21,7 @@ export type ConfiguredDrive = {
   /** No trailing slash, always `https://`. */
   baseUrl: string;
   /**
-   * Used as every discovered dataset's `external_organization_name`.
+   * Used as every discovered dataset's `organization1_name`.
    * Socrata's Discovery API has its own organization field, but it is not
    * reliable enough across every portal to parse automatically, so the
    * registry names it once per drive instead.

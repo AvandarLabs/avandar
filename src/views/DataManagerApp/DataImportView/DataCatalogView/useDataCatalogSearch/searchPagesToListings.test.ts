@@ -6,8 +6,10 @@ function _listing(id: string): DataCatalogListing.SearchResult {
   return {
     id: id as DataCatalogListing.Id,
     displayName: `Listing ${id}`,
-    externalOrganizationName: "City of New York",
-    pipelineName: undefined,
+    organization1Name: "City of New York",
+    organization2Name: undefined,
+    organization3Name: undefined,
+    organization4Name: undefined,
     isWorkspaceLoadable: true,
     isInvalid: false,
   };

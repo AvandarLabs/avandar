@@ -20,7 +20,7 @@ const ROW: ListingRowValues = {
   pipeline_name: "etl-fixture",
   pipeline_run_id: "run-1",
   display_name: "Fixture dataset",
-  external_organization_name: "Fixture Org",
+  organization1_name: "Fixture Org",
   external_dataset_id: "etl-fixture-dataset",
   date_of_last_update: null,
   date_of_last_sync: "2026-10-20T00:00:00.000Z",

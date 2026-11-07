@@ -164,8 +164,7 @@ function DataCatalogListingListRow({
         {listing.displayName}
       </Text>
       <Text c="dimmed" lineClamp={1} size="xs">
-        {listing.externalOrganizationName}
-        {listing.pipelineName ? ` · ${listing.pipelineName}` : ""}
+        {listing.organization1Name}
       </Text>
       {!listing.isWorkspaceLoadable ? (
         <Text c="dimmed" size="xs">

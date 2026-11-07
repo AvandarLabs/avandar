@@ -54,7 +54,7 @@ function _relation(
     csvPath,
     csvColumns: [],
     displayName: "World Development Indicators (WDI)",
-    externalOrganizationName: "World Bank",
+    organization1Name: "World Bank",
     sourceUpdatedAt: undefined,
     ...overrides,
   };

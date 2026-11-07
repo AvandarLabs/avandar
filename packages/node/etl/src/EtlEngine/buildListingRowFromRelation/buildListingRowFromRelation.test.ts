@@ -16,7 +16,7 @@ const API_RELATION: ApiResourceRelation = {
   apiResourceId: "abcd-1234",
   apiResourceFormat: "CSV",
   displayName: "Rodent Inspections",
-  externalOrganizationName: "City of New York",
+  organization1Name: "City of New York",
   sourceUpdatedAt: new Date("2026-10-19T08:30:00.000Z"),
   columns: [{ name: "a", originalDataType: "text", castDataType: "VARCHAR" }],
 };
@@ -28,7 +28,7 @@ const PARQUET_RELATION: PipelineParquetRelation = {
   csvPath: "/tmp/WDICSV.csv",
   csvColumns: [],
   displayName: "World Development Indicators (WDI)",
-  externalOrganizationName: "World Bank",
+  organization1Name: "World Bank",
   sourceUpdatedAt: undefined,
 };
 

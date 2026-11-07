@@ -4,17 +4,21 @@ import type { Database } from "$/types/database.types";
 type GeneratedSearchDBRow =
   Database["public"]["Functions"]["rpc_data_catalog_listings__search"]["Returns"][number];
 
+type _NullableSearchColumn =
+  | "organization2_name"
+  | "organization3_name"
+  | "organization4_name";
+
 /**
- * One row `rpc_data_catalog_listings__search` returns. The generated types
- * mark every `returns table` column non-null, but `pipeline_name` is null on
- * a listing no pipeline wrote.
+ * One row `rpc_data_catalog_listings__search` returns. The generated
+ * types mark every `returns table` column non-null, but a listing's
+ * deeper organization levels are null when its source has none.
  */
 export type DataCatalogSearchDBRow = Omit<
   GeneratedSearchDBRow,
-  "pipeline_name"
-> & {
-  pipeline_name: string | null;
-};
+  _NullableSearchColumn
+> &
+  Readonly<Record<_NullableSearchColumn, string | null>>;
 
 /** One page of catalog search results. */
 export type DataCatalogSearchPage = {
@@ -49,8 +53,10 @@ export function createDataCatalogSearchPage({
       return {
         id: dbRow.id as DataCatalogListing.Id,
         displayName: dbRow.display_name,
-        externalOrganizationName: dbRow.external_organization_name,
-        pipelineName: dbRow.pipeline_name ?? undefined,
+        organization1Name: dbRow.organization1_name,
+        organization2Name: dbRow.organization2_name ?? undefined,
+        organization3Name: dbRow.organization3_name ?? undefined,
+        organization4Name: dbRow.organization4_name ?? undefined,
         isWorkspaceLoadable: dbRow.is_workspace_loadable,
         isInvalid: dbRow.is_invalid,
       };

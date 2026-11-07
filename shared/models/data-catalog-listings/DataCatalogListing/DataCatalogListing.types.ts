@@ -45,7 +45,7 @@ export type DataCatalogListingRead = {
   /** The pipeline run that last wrote this listing, when there is one. */
   pipelineRunId: string | undefined;
 
-  externalOrganizationName: string;
+  organization1Name: string;
 
   externalServiceName: string | undefined;
 
@@ -144,6 +144,23 @@ export type DataCatalogListingRead = {
 
   /** Where the asset's bytes can be downloaded, when the source says. */
   sourceDownloadUrl: string | undefined;
+
+  /** Deeper organization levels, inside `organization1Name`. */
+  organization2Name: string | undefined;
+  organization3Name: string | undefined;
+  organization4Name: string | undefined;
+
+  /** Subject areas the source files the dataset under. */
+  domains: string[] | undefined;
+
+  /** The source's free-form keywords. */
+  tags: string[] | undefined;
+
+  /** The source record the listing was built from, untouched. */
+  sourceMetadata: Json | undefined;
+
+  /** The drive that produced the listing. */
+  driveId: string | undefined;
 };
 
 /**
@@ -154,8 +171,10 @@ export type DataCatalogListingSearchResult = Pick<
   DataCatalogListingRead,
   | "id"
   | "displayName"
-  | "externalOrganizationName"
-  | "pipelineName"
+  | "organization1Name"
+  | "organization2Name"
+  | "organization3Name"
+  | "organization4Name"
   | "isWorkspaceLoadable"
   | "isInvalid"
 >;

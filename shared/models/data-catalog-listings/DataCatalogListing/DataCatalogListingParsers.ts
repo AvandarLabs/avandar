@@ -29,7 +29,7 @@ const DBReadSchema = z.object({
   display_name: z.string(),
   pipeline_name: z.string().nullable(),
   pipeline_run_id: z.string().nullable(),
-  external_organization_name: z.string(),
+  organization1_name: z.string(),
   external_service_name: z.string().nullable(),
   external_dataset_id: z.string().nullable(),
   source_url: z.string().nullable(),
@@ -64,6 +64,13 @@ const DBReadSchema = z.object({
   is_workspace_loadable: z.boolean(),
   source_asset_type: z.string().nullable(),
   source_download_url: z.string().nullable(),
+  organization2_name: z.string().nullable(),
+  organization3_name: z.string().nullable(),
+  organization4_name: z.string().nullable(),
+  domains: z.array(z.string()).nullable(),
+  tags: z.array(z.string()).nullable(),
+  source_metadata: supabaseJSONSchema.nullable(),
+  drive_id: z.uuid().nullable(),
   search_vector: z.unknown(),
 });
 
@@ -82,6 +89,7 @@ export const DataCatalogListingParsers =
           ...obj,
           id: obj.id as DataCatalogListingId,
           metadata: obj.metadata as Json | undefined,
+          sourceMetadata: obj.sourceMetadata as Json | undefined,
         };
       },
     ),

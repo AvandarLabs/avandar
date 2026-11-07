@@ -11,7 +11,7 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     pipeline_name: "socrata",
     pipeline_run_id: "run-1",
     display_name: "Rodent Inspections",
-    external_organization_name: "City of New York",
+    organization1_name: "City of New York",
     external_dataset_id: "abcd-1234",
     date_of_last_update: "2026-10-19T08:30:00.000Z",
     date_of_last_sync: "2026-10-20T00:00:00.000Z",

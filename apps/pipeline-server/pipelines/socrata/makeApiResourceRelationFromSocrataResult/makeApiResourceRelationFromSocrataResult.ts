@@ -122,7 +122,7 @@ export function makeApiResourceRelationFromSocrataResult(params: {
     apiResourceId: result.datasetId,
     apiResourceFormat: isTabular ? "CSV" : _getFileFormat(result.blobMimeType),
     displayName: result.name,
-    externalOrganizationName: drive.organizationName,
+    organization1Name: drive.organizationName,
     sourceUpdatedAt: new Date(result.updatedAt),
     ...(result.assetType === undefined
       ? {}

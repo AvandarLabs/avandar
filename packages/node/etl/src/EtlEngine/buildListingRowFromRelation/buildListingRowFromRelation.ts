@@ -50,7 +50,7 @@ function _buildSharedColumns(args: _BuildArgs): _SharedColumns {
     pipeline_name: args.pipelineName,
     pipeline_run_id: args.pipelineRunId,
     display_name: relation.displayName,
-    external_organization_name: relation.externalOrganizationName,
+    organization1_name: relation.organization1Name,
     external_dataset_id: relation.externalDatasetId,
     date_of_last_update: _readIsoOrNull(relation, "sourceUpdatedAt"),
     date_of_last_sync: args.syncedAt.toISOString(),

@@ -142,7 +142,7 @@ export type RelationDescription = Readonly<{
   /** The connection's id in the source, written to `external_dataset_id`. */
   externalDatasetId: string;
   displayName: string;
-  externalOrganizationName: string;
+  organization1Name: string;
   /**
    * The connection's source modification time, written to
    * `date_of_last_update`.

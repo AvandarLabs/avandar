@@ -117,7 +117,7 @@ function _relationsFor(connection: FakeConnection): ApiResourceRelation[] {
       apiResourceId: `${connection.id}-r${index}`,
       apiResourceFormat: "CSV",
       displayName: `Dataset ${connection.id}`,
-      externalOrganizationName: "Fake Org",
+      organization1Name: "Fake Org",
       sourceUpdatedAt: connection.modifiedAt,
       columns: [
         { name: "a", originalDataType: "text", castDataType: "VARCHAR" },

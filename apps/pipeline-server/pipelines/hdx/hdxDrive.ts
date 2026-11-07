@@ -10,7 +10,7 @@ export type HdxDrive = {
   /** No trailing slash, always `https://`. */
   baseUrl: string;
   /**
-   * Used as every discovered dataset's `external_organization_name`.
+   * Used as every discovered dataset's `organization1_name`.
    * `CkanClient`'s `package_show` has an organization field, but this
    * pipeline names it once here instead of parsing it, for the same reason
    * `configuredDrives.ts` gives for Socrata.

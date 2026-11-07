@@ -12,7 +12,7 @@ export const LISTING_CONTRACT_COLUMNS = [
   "pipeline_name",
   "pipeline_run_id",
   "display_name",
-  "external_organization_name",
+  "organization1_name",
   "external_dataset_id",
   "date_of_last_update",
   "date_of_last_sync",

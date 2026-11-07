@@ -124,7 +124,7 @@ export function DataCatalogListingDetail({
 
       {!listing.isWorkspaceLoadable ? (
         <DataCatalogUnsupportedNotice
-          serviceName={listing.externalOrganizationName}
+          serviceName={listing.organization1Name}
           sourceUrl={listing.sourceUrl}
         />
       ) : null}
@@ -133,9 +133,7 @@ export function DataCatalogListingDetail({
       listing.isInvalid &&
       listing.invalidDatasetReason ? (
         <DataCatalogInvalidNotice
-          serviceName={
-            listing.externalServiceName ?? listing.externalOrganizationName
-          }
+          serviceName={listing.externalServiceName ?? listing.organization1Name}
           reason={listing.invalidDatasetReason}
         />
       ) : null}
@@ -166,7 +164,7 @@ export function DataCatalogListingDetail({
 
       <AppViewRail.Group>
         <AppViewRail.Fact label={t`Organization`}>
-          {listing.externalOrganizationName}
+          {listing.organization1Name}
         </AppViewRail.Fact>
         {listing.externalServiceName ? (
           <AppViewRail.Fact label={t`Service`}>

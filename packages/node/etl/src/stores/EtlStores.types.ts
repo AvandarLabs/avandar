@@ -13,7 +13,7 @@ export type ListingRowValues = Readonly<{
   pipeline_name: string;
   pipeline_run_id: string;
   display_name: string;
-  external_organization_name: string;
+  organization1_name: string;
   external_dataset_id: string;
   date_of_last_update: string | null;
   date_of_last_sync: string;

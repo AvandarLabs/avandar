@@ -129,7 +129,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         apiResourceId: "csv-1",
         apiResourceFormat: "CSV",
         displayName: "data.csv",
-        externalOrganizationName: "Humanitarian Data Exchange",
+        organization1Name: "Humanitarian Data Exchange",
         sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
         sourceAssetType: "upload",
         sourceUrl:
