@@ -121,12 +121,13 @@ const NodeSchema: z.ZodType<RichTextNode> = z.lazy(() => {
       text: z.string(),
       marks: z.array(MarkSchema).optional(),
     }),
-    z.object({
+    // Mentions and gadget nodes are strict so a stored document can never
+    // carry a member's or a gadget's name, which every member could read.
+    z.strictObject({
       type: z.literal("userMention"),
-      attrs: z.object({ id: z.uuid() }).catchall(z.unknown()),
+      attrs: z.strictObject({ id: z.uuid() }),
+      marks: z.array(MarkSchema).optional(),
     }),
-    // Gadget nodes are strict so a stored document can never carry a
-    // gadget's name, which every member could read.
     z.strictObject({
       type: z.literal("gadgetLink"),
       attrs: GadgetRefSchema,

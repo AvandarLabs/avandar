@@ -81,6 +81,47 @@ describe("parseRichTextDocument", () => {
     expect(isRichTextDocument(withBadMention)).toBe(false);
   });
 
+  it("rejects a mention that carries a name", () => {
+    const withNamedMention = {
+      type: "doc",
+      content: [
+        _paragraph({
+          type: "userMention",
+          attrs: { id: MEMBER_ID, label: "Priya" },
+        }),
+      ],
+    };
+    expect(isRichTextDocument(withNamedMention)).toBe(false);
+  });
+
+  it("rejects a mention with an unknown top-level key", () => {
+    const withExtraKey = {
+      type: "doc",
+      content: [
+        _paragraph({
+          type: "userMention",
+          attrs: { id: MEMBER_ID },
+          text: "@Priya",
+        }),
+      ],
+    };
+    expect(isRichTextDocument(withExtraKey)).toBe(false);
+  });
+
+  it("accepts a bold mention", () => {
+    const withBoldMention = {
+      type: "doc",
+      content: [
+        _paragraph({
+          type: "userMention",
+          attrs: { id: MEMBER_ID },
+          marks: [{ type: "bold" }],
+        }),
+      ],
+    };
+    expect(isRichTextDocument(withBoldMention)).toBe(true);
+  });
+
   it("rejects a text node without text", () => {
     const withEmptyText = {
       type: "doc",
