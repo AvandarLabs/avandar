@@ -1,7 +1,7 @@
 # @avandar/plugin-ui
 
 The components Avandar plugin UI may render. Plugins must import UI only from
-this package, so their code moves into the sandbox unchanged.
+this package, so the host controls which components plugins can render.
 
 ## Exports
 

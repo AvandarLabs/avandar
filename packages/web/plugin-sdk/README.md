@@ -1,10 +1,10 @@
 # @avandar/plugin-sdk
 
-The API Avandar plugins are written against. Calls are async or
-fire-and-forget and pass serializable data, so the same plugin runs in-process
-today and inside the sandbox later. There are two exceptions: `i18n.t` is
-synchronous and runs on the plugin side, and the `content` of `ui.openModal`
-and `ui.openDrawer` is a React tree that the host renders.
+The API Avandar plugins are written against. Plugins run in-process in the
+host app. Calls are async or fire-and-forget and pass serializable data. There
+are two exceptions: `i18n.t` is synchronous and runs on the plugin side, and
+the `content` of `ui.openModal` and `ui.openDrawer` is a React tree that the
+host renders.
 
 ## Exports
 

@@ -1,7 +1,7 @@
 /**
- * The components plugin UI may render. In-process plugins get these Mantine
- * components directly. When plugins move into the sandbox, the same names
- * become remote components, so plugin code does not change.
+ * The components plugin UI may render. Plugins import UI only from this
+ * module, so the host controls which components plugins can render. Each
+ * export is a Mantine component with Avandar's theme.
  */
 export {
   Alert,

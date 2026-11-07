@@ -2,9 +2,9 @@
  * Import specifiers plugin code may use, as regex fragments joined into one
  * allowlist: relative files, the plugin SDK packages, React, and the approved
  * npm packages. Keep this in sync with `APPROVED_PLUGIN_DEPENDENCIES` in
- * `@avandar/plugin-manifest`: a plugin that reaches into app code would break
- * when it moves into the sandbox. `plugin-restrictions.test.js` fails when
- * the two drift apart.
+ * `@avandar/plugin-manifest`: a plugin may only depend on the packages the
+ * manifest approves, and must not reach into app code.
+ * `plugin-restrictions.test.js` fails when the two drift apart.
  *
  * Every entry other than relative files, `react/jsx-runtime` (the automatic
  * JSX runtime), and the `date-fns` subpaths must be an exact package name.
