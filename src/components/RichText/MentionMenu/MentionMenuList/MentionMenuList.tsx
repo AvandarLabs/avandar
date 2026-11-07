@@ -1,5 +1,6 @@
 import { Combobox, useCombobox } from "@mantine/core";
 import { forwardRef, useId } from "react";
+import { getMenuMaxHeight } from "@/components/RichText/MentionMenu/MentionMenuList/getMenuMaxHeight";
 import { MentionMenuFooter } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter";
 import { MentionMenuGroups } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroups";
 import classes from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList.module.css";
@@ -9,11 +10,8 @@ import type { GadgetSearchResult } from "@/clients/gadgets/searchGadgets/searchG
 import type { MentionMenuGroup } from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
 import type { MentionCandidate } from "@/components/RichText/UserMention/filterMentionCandidates";
 
-/**
- * Floor for the menu's height cap. A smaller cap hides the overflow that
- * `flip` needs to see, so the menu would never move above the caret.
- */
-const MIN_MENU_HEIGHT = 240;
+/** Space kept between the menu and the window's edge. */
+const MENU_VIEWPORT_PADDING = 8;
 
 /** Lets the suggestion plugin forward the editor's key presses. */
 export type MentionMenuListHandle = {
@@ -102,9 +100,15 @@ export const MentionMenuList = forwardRef<
           flip: true,
           shift: true,
           size: {
-            padding: 8,
-            apply: ({ availableHeight, elements }) => {
-              elements.floating.style.maxHeight = `${Math.max(availableHeight, MIN_MENU_HEIGHT)}px`;
+            padding: MENU_VIEWPORT_PADDING,
+            apply: ({ availableHeight, elements, placement }) => {
+              elements.floating.style.maxHeight = `${getMenuMaxHeight({
+                placement,
+                availableHeight,
+                referenceRect: elements.reference.getBoundingClientRect(),
+                viewportHeight: window.innerHeight,
+                padding: MENU_VIEWPORT_PADDING,
+              })}px`;
             },
           },
         }}
