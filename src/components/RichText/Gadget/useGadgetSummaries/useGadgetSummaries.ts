@@ -74,6 +74,18 @@ function _buildChartFacts(
 }
 
 /**
+ * Whether a fetched gadget row belongs to the current workspace. A stored ref
+ * can name any id, so a row another workspace owns must not render as if it
+ * were here, under this workspace's slug.
+ */
+function _isInWorkspace(
+  row: { workspaceId: string },
+  workspace: { id: string },
+): boolean {
+  return row.workspaceId === workspace.id;
+}
+
+/**
  * Summarizes a dashboard for a gadget chip or card: its tile count, who can
  * see it, and when it last changed. Opens in the dashboard preview.
  */
@@ -89,7 +101,7 @@ export function useDashboardSummary(
   if (isLoading) {
     return { status: "loading" };
   }
-  if (!dashboard) {
+  if (!dashboard || !_isInWorkspace(dashboard, workspace)) {
     return { status: "unavailable" };
   }
   return {
@@ -133,7 +145,7 @@ export function useDashboardTileSummary(
     return { status: "loading" };
   }
   const tile =
-    dashboard && ref.subId !== null
+    dashboard && _isInWorkspace(dashboard, workspace) && ref.subId !== null
       ? findDashboardTile(dashboard.config, ref.subId)
       : undefined;
   if (!dashboard || !tile) {
@@ -177,7 +189,7 @@ export function useDatasetSummary(
   if (isLoadingDataset || isLoadingColumns) {
     return { status: "loading" };
   }
-  if (!dataset) {
+  if (!dataset || !_isInWorkspace(dataset, workspace)) {
     return { status: "unavailable" };
   }
   const appLink = AppLinks.dataManagerDatasetView({
@@ -214,7 +226,7 @@ export function useMapSummary(
   if (isLoading) {
     return { status: "loading" };
   }
-  if (!map) {
+  if (!map || !_isInWorkspace(map, workspace)) {
     return { status: "unavailable" };
   }
   const appLink = AppLinks.mapEditor({
@@ -257,7 +269,7 @@ export function useConceptSummary(
   if (isLoadingConcept || isLoadingRecords || isLoadingFields) {
     return { status: "loading" };
   }
-  if (!concept) {
+  if (!concept || !_isInWorkspace(concept, workspace)) {
     return { status: "unavailable" };
   }
   const appLink = AppLinks.individualManagerHome({
@@ -297,7 +309,7 @@ export function useIndividualSummary(
   if (isLoadingIndividual || isLoadingConcept) {
     return { status: "loading" };
   }
-  if (!individual) {
+  if (!individual || !_isInWorkspace(individual, workspace)) {
     return { status: "unavailable" };
   }
   const appLink = AppLinks.individualManagerIndividualView({

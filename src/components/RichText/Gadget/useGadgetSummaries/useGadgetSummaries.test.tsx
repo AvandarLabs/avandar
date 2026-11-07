@@ -22,6 +22,10 @@ import type {
   GadgetSummary,
 } from "@/components/RichText/Gadget/gadgetRegistry/gadgetRegistry";
 
+const { WORKSPACE_ID } = vi.hoisted(() => {
+  return { WORKSPACE_ID: "00000000-0000-4000-8000-000000000000" };
+});
+
 const mocks = vi.hoisted(() => {
   return {
     useDashboardById: vi.fn(),
@@ -66,11 +70,12 @@ vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
     useCurrentWorkspace: () => {
-      return { slug: "nyc-doh" };
+      return { id: WORKSPACE_ID, slug: "nyc-doh" };
     },
   };
 });
 
+const OTHER_WORKSPACE_ID = "99999999-9999-4999-8999-999999999999";
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111";
 const DATASET_ID = "22222222-2222-4222-8222-222222222222";
 const MAP_ID = "33333333-3333-4333-8333-333333333333";
@@ -111,6 +116,7 @@ const DASHBOARD_CONFIG = {
 
 const DASHBOARD = {
   id: DASHBOARD_ID,
+  workspaceId: WORKSPACE_ID,
   name: "Measles by borough",
   visibility: "workspace",
   isRestricted: false,
@@ -185,6 +191,16 @@ describe("useDashboardSummary", () => {
     ).toEqual({ status: "loading" });
   });
 
+  it("is unavailable for a dashboard in another workspace", () => {
+    mocks.useDashboardById.mockReturnValue([
+      { ...DASHBOARD, workspaceId: OTHER_WORKSPACE_ID },
+      false,
+    ]);
+    expect(
+      _renderSummary(useDashboardSummary, _ref("dashboard", DASHBOARD_ID)),
+    ).toEqual({ status: "unavailable" });
+  });
+
   it("is unavailable when no dashboard row comes back", () => {
     expect(
       _renderSummary(useDashboardSummary, _ref("dashboard", DASHBOARD_ID)),
@@ -240,6 +256,19 @@ describe("useDashboardTileSummary", () => {
     ]);
   });
 
+  it("is unavailable for a tile of a dashboard in another workspace", () => {
+    mocks.useDashboardById.mockReturnValue([
+      { ...DASHBOARD, workspaceId: OTHER_WORKSPACE_ID },
+      false,
+    ]);
+    expect(
+      _renderSummary(
+        useDashboardTileSummary,
+        _ref("dashboard_tile", DASHBOARD_ID, "DataViz-top"),
+      ),
+    ).toEqual({ status: "unavailable" });
+  });
+
   it("is unavailable when the ref names no tile", () => {
     mocks.useDashboardById.mockReturnValue([DASHBOARD, false]);
     expect(
@@ -266,6 +295,7 @@ describe("useDatasetSummary", () => {
     mocks.useDatasetById.mockReturnValue([
       {
         id: DATASET_ID,
+        workspaceId: WORKSPACE_ID,
         name: "Borough boundaries",
         sourceType: "csv_file",
         updatedAt: UPDATED_AT,
@@ -297,6 +327,23 @@ describe("useDatasetSummary", () => {
     );
   });
 
+  it("is unavailable for a dataset in another workspace", () => {
+    mocks.useDatasetById.mockReturnValue([
+      {
+        id: DATASET_ID,
+        workspaceId: OTHER_WORKSPACE_ID,
+        name: "Borough boundaries",
+        sourceType: "csv_file",
+        updatedAt: UPDATED_AT,
+      },
+      false,
+    ]);
+    mocks.useDatasetColumnCount.mockReturnValue([4, false]);
+    expect(
+      _renderSummary(useDatasetSummary, _ref("dataset", DATASET_ID)),
+    ).toEqual({ status: "unavailable" });
+  });
+
   it("is unavailable when no dataset row comes back", () => {
     mocks.useDatasetColumnCount.mockReturnValue([0, false]);
     expect(
@@ -308,6 +355,7 @@ describe("useDatasetSummary", () => {
     mocks.useDatasetById.mockReturnValue([
       {
         id: DATASET_ID,
+        workspaceId: WORKSPACE_ID,
         name: "Borough boundaries",
         sourceType: "csv_file",
         updatedAt: UPDATED_AT,
@@ -327,7 +375,12 @@ describe("useDatasetSummary", () => {
 
   it("is loading while the column count is fetched", () => {
     mocks.useDatasetById.mockReturnValue([
-      { id: DATASET_ID, name: "Borough boundaries", sourceType: "csv_file" },
+      {
+        id: DATASET_ID,
+        workspaceId: WORKSPACE_ID,
+        name: "Borough boundaries",
+        sourceType: "csv_file",
+      },
       false,
     ]);
     mocks.useDatasetColumnCount.mockReturnValue([undefined, true]);
@@ -342,6 +395,7 @@ describe("useMapSummary", () => {
     mocks.useMapById.mockReturnValue([
       {
         id: MAP_ID,
+        workspaceId: WORKSPACE_ID,
         name: "Exposure sites",
         updatedAt: UPDATED_AT,
         config: { layers: [{}, {}, {}] },
@@ -368,7 +422,7 @@ describe("useMapSummary", () => {
 describe("useConceptSummary", () => {
   it("summarizes a case type with its record and field counts", () => {
     mocks.useConceptById.mockReturnValue([
-      { id: CONCEPT_ID, name: "Measles case" },
+      { id: CONCEPT_ID, workspaceId: WORKSPACE_ID, name: "Measles case" },
       false,
     ]);
     mocks.useIndividualCount.mockReturnValue([38, false]);
@@ -401,7 +455,7 @@ describe("useConceptSummary", () => {
 
   it("is loading while the record count is fetched", () => {
     mocks.useConceptById.mockReturnValue([
-      { id: CONCEPT_ID, name: "Measles case" },
+      { id: CONCEPT_ID, workspaceId: WORKSPACE_ID, name: "Measles case" },
       false,
     ]);
     mocks.useIndividualCount.mockReturnValue([undefined, true]);
@@ -412,7 +466,7 @@ describe("useConceptSummary", () => {
 
   it("skips both counts when facts are not needed", () => {
     mocks.useConceptById.mockReturnValue([
-      { id: CONCEPT_ID, name: "Measles case" },
+      { id: CONCEPT_ID, workspaceId: WORKSPACE_ID, name: "Measles case" },
       false,
     ]);
     const summary = _renderSummary(
@@ -435,6 +489,7 @@ describe("useIndividualSummary", () => {
     mocks.useIndividualById.mockReturnValue([
       {
         id: INDIVIDUAL_ID,
+        workspaceId: WORKSPACE_ID,
         name: "Amara Okafor",
         conceptId: CONCEPT_ID,
         updatedAt: UPDATED_AT,
@@ -442,7 +497,7 @@ describe("useIndividualSummary", () => {
       false,
     ]);
     mocks.useConceptById.mockReturnValue([
-      { id: CONCEPT_ID, name: "Measles case" },
+      { id: CONCEPT_ID, workspaceId: WORKSPACE_ID, name: "Measles case" },
       false,
     ]);
     const summary = _renderSummary(
@@ -470,6 +525,7 @@ describe("useIndividualSummary", () => {
     mocks.useIndividualById.mockReturnValue([
       {
         id: INDIVIDUAL_ID,
+        workspaceId: WORKSPACE_ID,
         name: "Amara Okafor",
         conceptId: CONCEPT_ID,
         updatedAt: UPDATED_AT,
@@ -487,6 +543,7 @@ describe("useIndividualSummary", () => {
     mocks.useIndividualById.mockReturnValue([
       {
         id: INDIVIDUAL_ID,
+        workspaceId: WORKSPACE_ID,
         name: "Amara Okafor",
         conceptId: CONCEPT_ID,
         updatedAt: UPDATED_AT,
@@ -503,6 +560,7 @@ describe("useIndividualSummary", () => {
     mocks.useIndividualById.mockReturnValue([
       {
         id: INDIVIDUAL_ID,
+        workspaceId: WORKSPACE_ID,
         name: "Amara Okafor",
         conceptId: CONCEPT_ID,
         updatedAt: UPDATED_AT,
@@ -515,6 +573,22 @@ describe("useIndividualSummary", () => {
     expect(mocks.useConceptById).toHaveBeenCalledWith(
       expect.objectContaining({ useQueryOptions: { enabled: false } }),
     );
+  });
+
+  it("is unavailable for a case in another workspace", () => {
+    mocks.useIndividualById.mockReturnValue([
+      {
+        id: INDIVIDUAL_ID,
+        workspaceId: OTHER_WORKSPACE_ID,
+        conceptId: CONCEPT_ID,
+        name: "Amara Okafor",
+        updatedAt: UPDATED_AT,
+      },
+      false,
+    ]);
+    expect(
+      _renderSummary(useIndividualSummary, _ref("individual", INDIVIDUAL_ID)),
+    ).toEqual({ status: "unavailable" });
   });
 
   it("is unavailable when no case row comes back", () => {
