@@ -12,10 +12,12 @@ type Props = Readonly<{
   slotId: SlotId;
 
   /**
-   * What a command runs on, such as the current query result. Commands are
-   * disabled while it is undefined.
+   * Builds what a command runs on, such as the current query result. The slot
+   * calls it only when a command is clicked, so whatever it registers is
+   * created only for a command that runs. Commands are disabled while it is
+   * undefined.
    */
-  context: PluginInvocationContext | undefined;
+  getContext: (() => PluginInvocationContext) | undefined;
 
   /** The slot's current facts, which the plugins' `when` conditions read. */
   facts: WhenFacts;
@@ -29,11 +31,11 @@ type Props = Readonly<{
  */
 export function PluginMenuSlot({
   slotId,
-  context,
+  getContext,
   facts,
 }: Props): JSX.Element | null {
   const items = usePluginMenuItems({ slotId, facts });
-  const { runningKey, run } = usePluginCommandRunner(context);
+  const { runningKey, run } = usePluginCommandRunner(getContext);
 
   if (items.length === 0) {
     return null;
@@ -44,7 +46,7 @@ export function PluginMenuSlot({
     <ItemList
       items={items}
       runningKey={runningKey}
-      isDisabled={context === undefined || runningKey !== undefined}
+      isDisabled={getContext === undefined || runningKey !== undefined}
       onRunItem={(item: PluginMenuItem) => {
         void run(item);
       }}

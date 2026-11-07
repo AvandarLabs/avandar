@@ -5,10 +5,11 @@ type UnknownRow = Readonly<Record<string, unknown>>;
 type QueryHandleRegistryApi = Readonly<{
   getOrCreate: (rows: readonly UnknownRow[]) => QueryHandle;
   getRows: (handle: QueryHandle) => readonly UnknownRow[] | undefined;
+  clear: () => void;
 }>;
 
 /** How many query handles the app-wide registry keeps readable at once. */
-export const MAX_LIVE_QUERY_HANDLES = 10;
+export const MAX_LIVE_QUERY_HANDLES = 3;
 
 function _evictOldestHandles(options: {
   rowsByHandle: Map<QueryHandle, readonly UnknownRow[]>;
@@ -27,9 +28,10 @@ function _evictOldestHandles(options: {
  * Makes a registry that maps opaque query handles to result rows already in
  * memory, such as the app-wide `QueryHandleRegistry`. `getOrCreate` is
  * idempotent for the same rows array, so it is safe to call during render.
- * Only the `maxLiveHandles` most recently registered handles stay readable.
- * Asking again for rows whose handle was evicted registers that same handle
- * again, so the result a user is looking at never loses its handle.
+ * Only the `maxLiveHandles` most recently registered handles stay readable,
+ * and `clear` drops them all. Asking again for rows whose handle was evicted
+ * or cleared registers that same handle again, so the result a user is
+ * looking at never loses its handle.
  */
 export function makeQueryHandleRegistry(options: {
   maxLiveHandles: number;
@@ -54,12 +56,16 @@ export function makeQueryHandleRegistry(options: {
     getRows: (handle) => {
       return rowsByHandle.get(handle);
     },
+    clear: () => {
+      rowsByHandle.clear();
+    },
   };
 }
 
 /**
  * The app-wide query handle registry. Data Explorer registers the result rows
- * it holds, and a plugin reads them back through `fetchRows`.
+ * a plugin command runs on when the command is clicked, a plugin reads them
+ * back through `fetchRows`, and `PluginHost` clears it when it unmounts.
  */
 export const QueryHandleRegistry = makeQueryHandleRegistry({
   maxLiveHandles: MAX_LIVE_QUERY_HANDLES,

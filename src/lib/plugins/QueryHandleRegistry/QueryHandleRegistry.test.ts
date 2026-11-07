@@ -99,4 +99,27 @@ describe("makeQueryHandleRegistry", () => {
     expect(registry.getRows(oldestLiveHandle)).toBeUndefined();
     expect(registry.getRows(newestLiveHandle)).toBeDefined();
   });
+
+  it("stops serving every handle once cleared", () => {
+    const registry = makeQueryHandleRegistry({ maxLiveHandles: 3 });
+    const handles = _registerFreshRowSets({ registry, numRowSets: 3 });
+
+    registry.clear();
+
+    expect(
+      handles.map((handle) => {
+        return registry.getRows(handle);
+      }),
+    ).toEqual([undefined, undefined, undefined]);
+  });
+
+  it("serves rows registered again after a clear", () => {
+    const registry = makeQueryHandleRegistry({ maxLiveHandles: 3 });
+    registry.getOrCreate(ROWS);
+    registry.clear();
+
+    const handle = registry.getOrCreate(ROWS);
+
+    expect(registry.getRows(handle)).toBe(ROWS);
+  });
 });

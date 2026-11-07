@@ -60,7 +60,9 @@ describe("usePluginCommandRunner", () => {
     mocks.runPluginCommand.mockRejectedValue(new Error("runner crashed"));
     const { result } = renderHook(
       () => {
-        return usePluginCommandRunner(CONTEXT);
+        return usePluginCommandRunner(() => {
+          return CONTEXT;
+        });
       },
       { wrapper: TestProviders },
     );
@@ -76,7 +78,9 @@ describe("usePluginCommandRunner", () => {
     mocks.runPluginCommand.mockResolvedValue(undefined);
     const { result } = renderHook(
       () => {
-        return usePluginCommandRunner(CONTEXT);
+        return usePluginCommandRunner(() => {
+          return CONTEXT;
+        });
       },
       { wrapper: TestProviders },
     );

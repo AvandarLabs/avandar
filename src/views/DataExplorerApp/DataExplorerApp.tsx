@@ -241,7 +241,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
         >
           <PluginMenuSlot
             slotId="dataExplorer.toolbar"
-            context={pluginContext.context}
+            getContext={pluginContext.getContext}
             facts={pluginContext.facts}
           />
           <Button

@@ -19,24 +19,25 @@ type Options = Readonly<{
 }>;
 
 type PluginContext = Readonly<{
-  context: DataExplorerToolbarContext | undefined;
+  getContext: (() => DataExplorerToolbarContext) | undefined;
   facts: WhenFacts;
 }>;
 
 /**
- * Builds what plugin commands in the Data Explorer toolbar need: the
- * invocation context they run on and the `when` facts that decide which of
- * them show. The context is undefined while there is no settled result to run
- * on. Both values keep their identity until the result or the loading flag
- * changes, so a slot that memoizes on them does not rebuild its items on
- * every render.
+ * Builds what plugin commands in the Data Explorer toolbar need: a getter for
+ * the invocation context they run on and the `when` facts that decide which
+ * of them show. The getter is undefined while there is no settled result to
+ * run on. It registers the result's rows in `QueryHandleRegistry` only when
+ * called, which `PluginMenuSlot` does when a command is clicked, so results
+ * no command runs on are never held there. Both values keep their identity
+ * until the result or the loading flag changes.
  */
 export function useDataExplorerPluginContext(options: Options): PluginContext {
   const { queryResults, isLoadingResults } = options;
   return useMemo(() => {
     if (isLoadingResults || queryResults === undefined) {
       return {
-        context: undefined,
+        getContext: undefined,
         facts: makeToolbarFactsFromQueryResult({
           hasResult: false,
           rowCount: 0,
@@ -46,13 +47,15 @@ export function useDataExplorerPluginContext(options: Options): PluginContext {
     }
     const { columns, data } = queryResults;
     return {
-      context: {
-        slotId: "dataExplorer.toolbar",
-        queryHandle: QueryHandleRegistry.getOrCreate(data),
-        columns: columns.map((column) => {
-          return { name: column.name, dataType: column.dataType };
-        }),
-        rowCount: data.length,
+      getContext: () => {
+        return {
+          slotId: "dataExplorer.toolbar",
+          queryHandle: QueryHandleRegistry.getOrCreate(data),
+          columns: columns.map((column) => {
+            return { name: column.name, dataType: column.dataType };
+          }),
+          rowCount: data.length,
+        };
       },
       facts: makeToolbarFactsFromQueryResult({
         hasResult: true,

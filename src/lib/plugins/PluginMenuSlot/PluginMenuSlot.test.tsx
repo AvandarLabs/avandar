@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => {
     loadRunPluginCommand: vi.fn(),
     notifyError: vi.fn(),
     usePluginMenuItems: vi.fn(),
+    getContext: vi.fn(),
   };
 });
 
@@ -67,7 +68,7 @@ function _makeItem(
 
 function _renderSlotWithItems(options: {
   itemCount: number;
-  context?: DataExplorerToolbarContext;
+  getContext?: () => DataExplorerToolbarContext;
   icon?: PluginIconComponent;
 }): ReturnType<typeof render> {
   mocks.usePluginMenuItems.mockReturnValue(
@@ -78,7 +79,9 @@ function _renderSlotWithItems(options: {
   return render(
     <PluginMenuSlot
       slotId={SLOT_ID}
-      context={"context" in options ? options.context : CONTEXT}
+      getContext={
+        "getContext" in options ? options.getContext : mocks.getContext
+      }
       facts={{ rowCount: 1 }}
     />,
   );
@@ -90,12 +93,32 @@ describe("PluginMenuSlot", () => {
     mocks.loadRunPluginCommand.mockReset();
     mocks.loadRunPluginCommand.mockResolvedValue(mocks.runPluginCommand);
     mocks.notifyError.mockReset();
+    mocks.getContext.mockReset();
+    mocks.getContext.mockReturnValue(CONTEXT);
   });
 
   it("does not load the runner when the slot renders", () => {
     _renderSlotWithItems({ itemCount: 1 });
 
     expect(mocks.loadRunPluginCommand).not.toHaveBeenCalled();
+  });
+
+  it("does not build the invocation context when the slot renders", () => {
+    _renderSlotWithItems({ itemCount: 2 });
+
+    expect(mocks.getContext).not.toHaveBeenCalled();
+  });
+
+  it("builds the invocation context once when a command is clicked", async () => {
+    mocks.runPluginCommand.mockResolvedValue(undefined);
+    _renderSlotWithItems({ itemCount: 2 });
+
+    fireEvent.click(screen.getByRole("button", { name: "Command 1" }));
+
+    await waitFor(() => {
+      expect(mocks.runPluginCommand).toHaveBeenCalled();
+    });
+    expect(mocks.getContext).toHaveBeenCalledTimes(1);
   });
 
   it("loads the runner when a command is clicked", async () => {
@@ -203,13 +226,13 @@ describe("PluginMenuSlot", () => {
   });
 
   it("disables the buttons when there is no result to run on", () => {
-    _renderSlotWithItems({ itemCount: 1, context: undefined });
+    _renderSlotWithItems({ itemCount: 1, getContext: undefined });
 
     expect(screen.getByRole("button", { name: "Command 1" })).toBeDisabled();
   });
 
   it("disables the Plugins button when there is no result to run on", () => {
-    _renderSlotWithItems({ itemCount: 3, context: undefined });
+    _renderSlotWithItems({ itemCount: 3, getContext: undefined });
 
     expect(screen.getByRole("button", { name: "Plugins" })).toBeDisabled();
   });

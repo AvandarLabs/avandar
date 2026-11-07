@@ -1,6 +1,6 @@
 import { useQuery } from "@avandar/query-hooks";
 import { where } from "@avandar/utils";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -10,6 +10,7 @@ import { loadManifestModules } from "@/lib/plugins/loadManifestModules/loadManif
 import { PluginDrawerHost } from "@/lib/plugins/PluginDrawerHost/PluginDrawerHost";
 import { ActivePluginsContext } from "@/lib/plugins/PluginHost/ActivePluginsContext";
 import { getPluginIndexEntry } from "@/lib/plugins/pluginIndexHelpers";
+import { QueryHandleRegistry } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { LoadablePluginInstallation } from "@/lib/plugins/getLoadablePluginsFromInstallations/getLoadablePluginsFromInstallations";
 import type { LoadedManifestModules } from "@/lib/plugins/loadManifestModules/loadManifestModules";
@@ -73,7 +74,8 @@ function useLoadedManifests(
  * Loads the manifests of the current workspace's enabled plugins and provides
  * the active ones to every plugin slot below it, such as a toolbar's plugin
  * buttons. It also mounts the drawer that plugin commands open. A workspace
- * with no installed plugins loads nothing.
+ * with no installed plugins loads nothing. Unmounting it, as a workspace
+ * switch or sign-out does, drops the query results plugin commands ran on.
  */
 export function PluginHost({ children }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
@@ -96,6 +98,10 @@ export function PluginHost({ children }: Props): JSX.Element {
   const activePlugins = useMemo(() => {
     return getActivePluginsFromLoadablePlugins({ loadable, manifestModules });
   }, [loadable, manifestModules]);
+
+  useEffect(() => {
+    return QueryHandleRegistry.clear;
+  }, []);
 
   return (
     <ActivePluginsContext.Provider value={activePlugins}>

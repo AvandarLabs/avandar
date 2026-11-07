@@ -80,11 +80,12 @@ function _reportFailure(options: {
 /**
  * Runs the plugin commands a slot offers and reports failures to the user in
  * a notification. `runningKey` is the key of the item whose command has not
- * finished yet, so a slot can show it as loading. Nothing runs when there is
- * no invocation context.
+ * finished yet, so a slot can show it as loading. Each run builds its
+ * invocation context with `getContext` at that moment, and nothing runs when
+ * there is no `getContext`.
  */
 export function usePluginCommandRunner(
-  context: PluginInvocationContext | undefined,
+  getContext: (() => PluginInvocationContext) | undefined,
 ): Readonly<{
   runningKey: string | undefined;
   run: (item: PluginMenuItem) => Promise<void>;
@@ -94,9 +95,10 @@ export function usePluginCommandRunner(
   const [runningKey, setRunningKey] = useState<string>();
 
   const run = async (item: PluginMenuItem): Promise<void> => {
-    if (context === undefined) {
+    if (getContext === undefined) {
       return;
     }
+    const context = getContext();
     setRunningKey(item.key);
     let failure: PluginCommandFailure | undefined;
     try {
