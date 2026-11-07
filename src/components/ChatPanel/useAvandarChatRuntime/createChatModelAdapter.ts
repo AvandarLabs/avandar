@@ -21,10 +21,10 @@ import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRun
 import { runOfflineChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatTurn";
 import { shouldSkipUserMessageConsent } from "@/components/ChatPanel/useAvandarChatRuntime/shouldSkipUserMessageConsent/shouldSkipUserMessageConsent";
 import { tryExecuteOfflineSql } from "@/components/ChatPanel/useAvandarChatRuntime/tryExecuteOfflineSql";
-import { DataAgentFeature } from "@/lib/agent/dataAgent/browser/DataAgentFeature";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
+import { DataAgentFeature } from "@/lib/agent/dataAgent/browser/DataAgentFeature";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
@@ -334,9 +334,8 @@ export function createChatModelAdapter(
         DataAgentFeature.isEnabled()
       ) {
         // Loaded on first use so the agent stays out of the main bundle.
-        const { runDataAgentTurn } = await import(
-          "@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn"
-        );
+        const { runDataAgentTurn } =
+          await import("@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn");
         return finishIfCurrent(
           await runDataAgentTurn({
             apiMessages,

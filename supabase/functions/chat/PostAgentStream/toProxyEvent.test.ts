@@ -16,8 +16,8 @@ import {
 } from "@earendil-works/pi-ai";
 import { toProxyEvent } from "@sbfn/chat/PostAgentStream/toProxyEvent.ts";
 import { afterEach, describe, expect, it } from "vitest";
-import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
+import type { AddressInfo } from "node:net";
 
 const faux = fauxProvider();
 const models = createModels();

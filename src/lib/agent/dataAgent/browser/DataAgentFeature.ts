@@ -20,4 +20,7 @@ function _isEnabled(): boolean {
 }
 
 /** The data agent's on/off switch. */
-export const DataAgentFeature = { isEnabled: _isEnabled, storageKey: STORAGE_KEY };
+export const DataAgentFeature = {
+  isEnabled: _isEnabled,
+  storageKey: STORAGE_KEY,
+};

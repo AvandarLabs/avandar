@@ -62,7 +62,12 @@ beforeEach(() => {
   sendOpenRouterRequestMock.mockResolvedValue({
     message: {},
     text: "",
-    usage: { ...OpenRouterUsage.empty, calls: 1, promptTokens: 100, cost: 0.01 },
+    usage: {
+      ...OpenRouterUsage.empty,
+      calls: 1,
+      promptTokens: 100,
+      cost: 0.01,
+    },
   });
 });
 

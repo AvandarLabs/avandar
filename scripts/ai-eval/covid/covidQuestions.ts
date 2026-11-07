@@ -28,7 +28,11 @@ function _rows(
   spec: TruthRowSpec,
 ): () => Verdict {
   return () => {
-    return ResultChecks.matchTruthRows(context.result, context.truth[name]!, spec);
+    return ResultChecks.matchTruthRows(
+      context.result,
+      context.truth[name]!,
+      spec,
+    );
   };
 }
 
@@ -63,7 +67,10 @@ function _weeklyTotal(
 ): Verdict {
   const rowCount = context.result.rows.length;
   if (Math.abs(rowCount - weekCount) > 2) {
-    return { pass: false, detail: `expected about ${weekCount} weekly rows, got ${rowCount}` };
+    return {
+      pass: false,
+      detail: `expected about ${weekCount} weekly rows, got ${rowCount}`,
+    };
   }
   return ResultChecks.hasColumnSum(context.result, _scalar(context, name), {
     tolerance: 0.05,
@@ -89,7 +96,10 @@ const BASIC_QUESTIONS: readonly EvalQuestion[] = [
     clarification: "not_needed",
     truth: {
       us: Sql.monthly("us_deaths", `year("date") = 2022`),
-      global: Sql.monthly("global_deaths", `${COUNTRY} = 'US' AND year("date") = 2022`),
+      global: Sql.monthly(
+        "global_deaths",
+        `${COUNTRY} = 'US' AND year("date") = 2022`,
+      ),
     },
     grade: (context) => {
       return ResultChecks.anyOf([
@@ -104,7 +114,10 @@ const BASIC_QUESTIONS: readonly EvalQuestion[] = [
     prompt: "Show me monthly covid cases in California in 2022",
     clarification: "not_needed",
     truth: {
-      monthly: Sql.monthly("us_cases", `${US_STATE} = 'California' AND year("date") = 2022`),
+      monthly: Sql.monthly(
+        "us_cases",
+        `${US_STATE} = 'California' AND year("date") = 2022`,
+      ),
     },
     grade: (context) => {
       return _rows(context, "monthly", { ...MONTH_SERIES, exactRows: true })();
@@ -179,7 +192,10 @@ const BASIC_QUESTIONS: readonly EvalQuestion[] = [
     prompt: "Show daily covid deaths in Texas in January 2021",
     clarification: "not_needed",
     truth: {
-      daily: Sql.daily("us_deaths", `${US_STATE} = 'Texas' AND strftime("date", '%Y-%m') = '2021-01'`),
+      daily: Sql.daily(
+        "us_deaths",
+        `${US_STATE} = 'Texas' AND strftime("date", '%Y-%m') = '2021-01'`,
+      ),
     },
     grade: (context) => {
       return _rows(context, "daily", {
@@ -196,7 +212,10 @@ const BASIC_QUESTIONS: readonly EvalQuestion[] = [
     prompt: "Total covid cases in New York in 2021",
     clarification: "not_needed",
     truth: {
-      total: Sql.total("us_cases", `${US_STATE} = 'New York' AND year("date") = 2021`),
+      total: Sql.total(
+        "us_cases",
+        `${US_STATE} = 'New York' AND year("date") = 2021`,
+      ),
     },
     grade: (context) => {
       return _value(context, "total")();
@@ -257,7 +276,10 @@ const INTERMEDIATE_QUESTIONS: readonly EvalQuestion[] = [
     prompt: "What was the deadliest month for covid in the US?",
     clarification: "not_needed",
     truth: {
-      top: `${Sql.monthly("us_deaths")} `.replace("ORDER BY 1", "ORDER BY 2 DESC LIMIT 1"),
+      top: `${Sql.monthly("us_deaths")} `.replace(
+        "ORDER BY 1",
+        "ORDER BY 2 DESC LIMIT 1",
+      ),
     },
     grade: (context) => {
       return _rows(context, "top", {
@@ -293,7 +315,10 @@ SELECT strftime("date", '%Y-%m-%d') AS day, value FROM rolled WHERE year("date")
     prompt: "Which day had the most new covid cases in the US?",
     clarification: "not_needed",
     truth: {
-      top: Sql.daily("us_cases").replace("ORDER BY 1", "ORDER BY 2 DESC LIMIT 1"),
+      top: Sql.daily("us_cases").replace(
+        "ORDER BY 1",
+        "ORDER BY 2 DESC LIMIT 1",
+      ),
     },
     grade: (context) => {
       return _rows(context, "top", {
@@ -327,8 +352,14 @@ SELECT strftime("date", '%Y-%m-%d') AS day, value FROM rolled WHERE year("date")
     user: { pick: ["United Kingdom"] },
     truth: {
       us: Sql.total("us_deaths", `year("date") = 2021`),
-      ukAll: Sql.total("global_deaths", `${COUNTRY} = 'United Kingdom' AND year("date") = 2021`),
-      ukMain: Sql.total("global_deaths", `${COUNTRY} = 'United Kingdom' AND "Province/State" IS NULL AND year("date") = 2021`),
+      ukAll: Sql.total(
+        "global_deaths",
+        `${COUNTRY} = 'United Kingdom' AND year("date") = 2021`,
+      ),
+      ukMain: Sql.total(
+        "global_deaths",
+        `${COUNTRY} = 'United Kingdom' AND "Province/State" IS NULL AND year("date") = 2021`,
+      ),
     },
     grade: (context) => {
       return _gradeUsVsUk(context);
@@ -383,7 +414,10 @@ SELECT strftime("date", '%Y-%m-%d') AS day, value FROM rolled WHERE year("date")
 ];
 
 /** Sums the result's numbers in rows or columns that name a place. */
-function _sumForPlace(context: GradeContext, aliases: readonly string[]): number[] {
+function _sumForPlace(
+  context: GradeContext,
+  aliases: readonly string[],
+): number[] {
   const { result } = context;
   const isPlace = (text: string): boolean => {
     const tokens = MatcherText.normalize(text).split(/[^a-z0-9]+/);
@@ -453,9 +487,11 @@ const HARD_QUESTIONS: readonly EvalQuestion[] = [
     truth: {
       rate: `WITH d AS (SELECT "Province_State" AS state, SUM(daily_new_deaths) AS deaths FROM us_deaths GROUP BY 1),
 c AS (SELECT "Province_State" AS state, SUM(daily_new_cases) AS cases FROM us_cases GROUP BY 1)
-SELECT state, deaths / cases AS value FROM d JOIN c USING (state) WHERE cases > 0 AND state IN (${US_STATE_NAMES.map((name) => {
-        return `'${name}'`;
-      }).join(", ")}) ORDER BY 1`,
+SELECT state, deaths / cases AS value FROM d JOIN c USING (state) WHERE cases > 0 AND state IN (${US_STATE_NAMES.map(
+        (name) => {
+          return `'${name}'`;
+        },
+      ).join(", ")}) ORDER BY 1`,
     },
     grade: (context) => {
       return _rows(context, "rate", {
@@ -506,7 +542,11 @@ FROM us_deaths WHERE "Province_State" IN (${US_STATE_NAMES.map((name) => {
           values: ["deaths_2021", "deaths_2022"],
           mode: "all",
         }),
-        _rows(context, "change", { keys: ["state"], values: ["change"], mode: "all" }),
+        _rows(context, "change", {
+          keys: ["state"],
+          values: ["change"],
+          mode: "all",
+        }),
       ]);
     },
   },
@@ -554,7 +594,8 @@ HAVING SUM(daily_new_deaths) FILTER (WHERE year("date") = 2022) > SUM(daily_new_
   {
     id: "H07",
     category: "hard",
-    prompt: "Does the US total in the global deaths file match the US deaths file?",
+    prompt:
+      "Does the US total in the global deaths file match the US deaths file?",
     clarification: "not_needed",
     truth: {
       us: Sql.total("us_deaths"),
@@ -666,13 +707,25 @@ const NON_TECHNICAL_QUESTIONS: readonly EvalQuestion[] = [
       usDeaths: Sql.monthly("us_deaths"),
       usCases: Sql.monthly("us_cases"),
       globalDeaths: Sql.monthly("global_deaths"),
-      peakUsDeaths: Sql.monthly("us_deaths").replace("ORDER BY 1", "ORDER BY 2 DESC LIMIT 1"),
-      peakUsCases: Sql.monthly("us_cases").replace("ORDER BY 1", "ORDER BY 2 DESC LIMIT 1"),
-      peakGlobalDeaths: Sql.monthly("global_deaths").replace("ORDER BY 1", "ORDER BY 2 DESC LIMIT 1"),
+      peakUsDeaths: Sql.monthly("us_deaths").replace(
+        "ORDER BY 1",
+        "ORDER BY 2 DESC LIMIT 1",
+      ),
+      peakUsCases: Sql.monthly("us_cases").replace(
+        "ORDER BY 1",
+        "ORDER BY 2 DESC LIMIT 1",
+      ),
+      peakGlobalDeaths: Sql.monthly("global_deaths").replace(
+        "ORDER BY 1",
+        "ORDER BY 2 DESC LIMIT 1",
+      ),
       peakDays: [
         Sql.daily("us_deaths").replace("ORDER BY 1", "ORDER BY 2 DESC LIMIT 1"),
         Sql.daily("us_cases").replace("ORDER BY 1", "ORDER BY 2 DESC LIMIT 1"),
-        Sql.daily("global_deaths").replace("ORDER BY 1", "ORDER BY 2 DESC LIMIT 1"),
+        Sql.daily("global_deaths").replace(
+          "ORDER BY 1",
+          "ORDER BY 2 DESC LIMIT 1",
+        ),
       ]
         .map((sql) => {
           return `(${sql})`;
@@ -680,9 +733,17 @@ const NON_TECHNICAL_QUESTIONS: readonly EvalQuestion[] = [
         .join(" UNION ALL "),
     },
     grade: (context) => {
-      const peak: TruthRowSpec = { ...MONTH_SERIES, mode: "prefix", prefixLength: 1 };
+      const peak: TruthRowSpec = {
+        ...MONTH_SERIES,
+        mode: "prefix",
+        prefixLength: 1,
+      };
       return ResultChecks.anyOf([
-        _rows(context, "peakDays", { keys: ["day"], values: ["value"], mode: "subset" }),
+        _rows(context, "peakDays", {
+          keys: ["day"],
+          values: ["value"],
+          mode: "subset",
+        }),
         _rows(context, "usDeaths", NEARLY_ALL_MONTHS),
         _rows(context, "usCases", NEARLY_ALL_MONTHS),
         _rows(context, "globalDeaths", NEARLY_ALL_MONTHS),
@@ -700,7 +761,10 @@ const NON_TECHNICAL_QUESTIONS: readonly EvalQuestion[] = [
     user: { choose: /world|global|all countries/i, say: "worldwide" },
     truth: { world: Sql.total("global_deaths"), us: Sql.total("us_deaths") },
     grade: (context) => {
-      return ResultChecks.anyOf([_value(context, "world"), _value(context, "us")]);
+      return ResultChecks.anyOf([
+        _value(context, "world"),
+        _value(context, "us"),
+      ]);
     },
   },
   {
@@ -776,7 +840,10 @@ const NON_TECHNICAL_QUESTIONS: readonly EvalQuestion[] = [
     clarification: "not_needed",
     user: { pick: ["California"] },
     truth: {
-      total: Sql.total("us_deaths", `${US_STATE} = 'California' AND year("date") = 2021`),
+      total: Sql.total(
+        "us_deaths",
+        `${US_STATE} = 'California' AND year("date") = 2021`,
+      ),
     },
     grade: (context) => {
       return _totalOrSum(context, "total");
@@ -798,7 +865,11 @@ const NON_TECHNICAL_QUESTIONS: readonly EvalQuestion[] = [
     },
     grade: (context) => {
       const recentMonths: TruthRowSpec = { ...MONTH_SERIES, mode: "subset" };
-      const recentWeeks: TruthRowSpec = { keys: ["week"], values: ["value"], mode: "subset" };
+      const recentWeeks: TruthRowSpec = {
+        keys: ["week"],
+        values: ["value"],
+        mode: "subset",
+      };
       return ResultChecks.anyOf([
         _rows(context, "usDeaths", recentMonths),
         _rows(context, "usCases", recentMonths),
@@ -823,8 +894,18 @@ const NON_TECHNICAL_QUESTIONS: readonly EvalQuestion[] = [
     grade: (context) => {
       return ResultChecks.anyOf([
         _rows(context, "monthly", NEARLY_ALL_MONTHS),
-        _rows(context, "weekly", { keys: ["week"], values: ["value"], mode: "all", minShare: 0.95 }),
-        _rows(context, "daily", { keys: ["day"], values: ["value"], mode: "all", minShare: 0.95 }),
+        _rows(context, "weekly", {
+          keys: ["week"],
+          values: ["value"],
+          mode: "all",
+          minShare: 0.95,
+        }),
+        _rows(context, "daily", {
+          keys: ["day"],
+          values: ["value"],
+          mode: "all",
+          minShare: 0.95,
+        }),
       ]);
     },
   },
@@ -833,7 +914,11 @@ const NON_TECHNICAL_QUESTIONS: readonly EvalQuestion[] = [
     category: "non_technical",
     prompt: "show me covid in new york city",
     clarification: "allowed",
-    user: { choose: /all five|five boroughs|all 5|all boroughs|whole city/i, say: "all five boroughs", pick: NYC_COUNTIES },
+    user: {
+      choose: /all five|five boroughs|all 5|all boroughs|whole city/i,
+      say: "all five boroughs",
+      pick: NYC_COUNTIES,
+    },
     truth: {
       deaths: Sql.monthly("us_deaths", NYC_WHERE),
       cases: Sql.monthly("us_cases", NYC_WHERE),
@@ -843,7 +928,11 @@ const NON_TECHNICAL_QUESTIONS: readonly EvalQuestion[] = [
       totalCases: Sql.total("us_cases", NYC_WHERE),
     },
     grade: (context) => {
-      const counties: TruthRowSpec = { keys: ["name"], values: ["value"], mode: "all" };
+      const counties: TruthRowSpec = {
+        keys: ["name"],
+        values: ["value"],
+        mode: "all",
+      };
       return ResultChecks.anyOf([
         _rows(context, "deaths", NEARLY_ALL_MONTHS),
         _rows(context, "cases", NEARLY_ALL_MONTHS),

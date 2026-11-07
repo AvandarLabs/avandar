@@ -3,7 +3,7 @@ import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type { AgentTool } from "@earendil-works/pi-agent-core";
 
-/** After this many questions in one answer, the agent must choose on its own. */
+/** After this many questions in one answer, the agent chooses on its own. */
 const MAX_QUESTIONS_PER_ANSWER = 2;
 
 /** Options the card adds by itself, so the model should not repeat them. */
@@ -44,7 +44,12 @@ export function createAskUserTool(
       }).length;
       if (askedCount >= MAX_QUESTIONS_PER_ANSWER) {
         return {
-          content: [{ type: "text", text: "Do not ask again. Make a reasonable choice, say it in the summary, and run the query." }],
+          content: [
+            {
+              type: "text",
+              text: "Do not ask again. Make a reasonable choice, say it in the summary, and run the query.",
+            },
+          ],
           details: undefined,
         };
       }
@@ -57,7 +62,12 @@ export function createAskUserTool(
         kind: "choice",
       });
       if (answer.kind === "deferred") {
-        options.state.questions.push({ kind: "choice", question: params.question, answer: "(on screen)", isAutomatic: false });
+        options.state.questions.push({
+          kind: "choice",
+          question: params.question,
+          answer: "(on screen)",
+          isAutomatic: false,
+        });
         return {
           content: [{ type: "text", text: DEFERRED_ANSWER_TEXT }],
           details: undefined,
@@ -70,7 +80,12 @@ export function createAskUserTool(
           : answer.kind === "typed"
             ? answer.text
             : "(dismissed)";
-      options.state.questions.push({ kind: "choice", question: params.question, answer: answerText, isAutomatic: false });
+      options.state.questions.push({
+        kind: "choice",
+        question: params.question,
+        answer: answerText,
+        isAutomatic: false,
+      });
       return {
         content: [
           {

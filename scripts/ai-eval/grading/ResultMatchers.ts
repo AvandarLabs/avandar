@@ -30,7 +30,10 @@ function _toNumber(value: Cell): number | undefined {
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : undefined;
   }
-  if (typeof value === "string" && /^-?[\d,]*\.?\d+(e[-+]?\d+)?$/i.test(value)) {
+  if (
+    typeof value === "string" &&
+    /^-?[\d,]*\.?\d+(e[-+]?\d+)?$/i.test(value)
+  ) {
     const parsed = Number(value.replaceAll(",", ""));
     return Number.isFinite(parsed) ? parsed : undefined;
   }
@@ -38,7 +41,11 @@ function _toNumber(value: Cell): number | undefined {
 }
 
 /** Whether two numbers agree within a relative or absolute tolerance. */
-function _isClose(actual: number, expected: number, tolerance: number): boolean {
+function _isClose(
+  actual: number,
+  expected: number,
+  tolerance: number,
+): boolean {
   const scale = Math.max(Math.abs(expected), 1);
   return Math.abs(actual - expected) <= Math.max(tolerance * scale, 0.51);
 }
@@ -80,7 +87,8 @@ function _rowHasKey(row: readonly Cell[], key: Cell): boolean {
   return row.some((cell) => {
     if (keyNumber !== undefined) {
       return (
-        _toNumber(cell) === keyNumber || _normalizeText(cell).startsWith(keyText)
+        _toNumber(cell) === keyNumber ||
+        _normalizeText(cell).startsWith(keyText)
       );
     }
     return _normalizeText(cell) === keyText;

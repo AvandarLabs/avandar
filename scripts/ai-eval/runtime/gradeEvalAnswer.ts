@@ -30,7 +30,10 @@ function _gradeResult(
   if (!answer.result) {
     return { pass: false, detail: answer.error ?? "no result" };
   }
-  if (question.expectsChart && (!answer.vizType || answer.vizType === "table")) {
+  if (
+    question.expectsChart &&
+    (!answer.vizType || answer.vizType === "table")
+  ) {
     return { pass: false, detail: "asked for a chart, got a table" };
   }
   try {
@@ -61,8 +64,10 @@ export function gradeEvalAnswer(
     pass: verdict.pass,
     detail: verdict.detail,
     questionsAsked,
-    isNeedlessQuestion: question.clarification === "not_needed" && questionsAsked > 0,
-    isMissedQuestion: question.clarification === "expected" && questionsAsked === 0,
+    isNeedlessQuestion:
+      question.clarification === "not_needed" && questionsAsked > 0,
+    isMissedQuestion:
+      question.clarification === "expected" && questionsAsked === 0,
     answer: {
       ...answerWithoutResult,
       resultColumns: result?.columns.map((column) => {

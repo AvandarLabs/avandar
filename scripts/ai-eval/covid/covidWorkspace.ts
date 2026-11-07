@@ -29,7 +29,7 @@ const US_COLUMNS_BEFORE_POPULATION = [
   { name: "Combined_Key", dataType: "varchar" },
 ] as const;
 
-/** The datasets in the eval workspace, in the app's alias order (t0, t1, t2). */
+/** The eval workspace's datasets, in the app's alias order (t0, t1, t2). */
 export const COVID_DATASETS: readonly CovidDataset[] = [
   {
     id: "86440223-249d-4b3d-9be4-159a4e615e0a",

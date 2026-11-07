@@ -1,7 +1,9 @@
+import { where } from "@avandar/utils";
 import { streamProxy } from "@earendil-works/pi-agent-core";
 import { createModels } from "@earendil-works/pi-ai/models";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
 import { DATA_AGENT_MODEL_ROSTER } from "$/agent/DataAgentModelRoster";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import {
@@ -9,10 +11,8 @@ import {
   waitForAppliedSqlOutcome,
 } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { createBrowserDataAgentHost } from "@/lib/agent/dataAgent/browser/createBrowserDataAgentHost";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
-import { where } from "@avandar/utils";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -25,8 +25,8 @@ import type {
 import type { DataAgentQueryOutcome } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
-import type { StreamFn } from "@earendil-works/pi-agent-core";
 import type { ChatModelRunResult } from "@assistant-ui/react";
+import type { StreamFn } from "@earendil-works/pi-agent-core";
 import type { MutableRefObject } from "react";
 
 /** The chat runtime pieces a data agent turn uses. */
@@ -100,7 +100,9 @@ function _createShowQuery(options: Readonly<RunDataAgentTurnOptions>) {
   ): Promise<DataAgentQueryOutcome> => {
     const { dataExplorerDispatch, workspaceId } = options;
     dataExplorerDispatch.setRawSql(request.sql);
-    dataExplorerDispatch.setNlPrompt(getLastQuestionFromMessages(options.apiMessages));
+    dataExplorerDispatch.setNlPrompt(
+      getLastQuestionFromMessages(options.apiMessages),
+    );
     try {
       const mapping = options.parseSqlRef.current({ sql: request.sql });
       dataExplorerDispatch.applySqlMapping(mapping);
@@ -108,11 +110,20 @@ function _createShowQuery(options: Readonly<RunDataAgentTurnOptions>) {
       // The structured form stays out of sync; the SQL still runs.
     }
     if (request.chart) {
-      dataExplorerDispatch.setActiveVizType(request.chart as ChatDashboardVizType);
+      dataExplorerDispatch.setActiveVizType(
+        request.chart as ChatDashboardVizType,
+      );
     }
     const queryCache = AvaQueryClient.getQueryCache();
-    const outcome = await waitForAppliedSqlOutcome({ queryCache, workspaceId, rawSql: request.sql });
-    return _toQueryOutcome(outcome, readAppliedSqlResult({ queryCache, workspaceId, rawSql: request.sql }));
+    const outcome = await waitForAppliedSqlOutcome({
+      queryCache,
+      workspaceId,
+      rawSql: request.sql,
+    });
+    return _toQueryOutcome(
+      outcome,
+      readAppliedSqlResult({ queryCache, workspaceId, rawSql: request.sql }),
+    );
   };
 }
 
@@ -181,6 +192,8 @@ export async function runDataAgentTurn(
   const dataAgent = existing ?? (await _createAgent(options));
   agentsByConversation.set(key, dataAgent);
   options.chatPanelDispatch.setPendingClarification(undefined);
-  const reply = await dataAgent.ask(_buildPromptText(options.apiMessages, !existing));
+  const reply = await dataAgent.ask(
+    _buildPromptText(options.apiMessages, !existing),
+  );
   return { content: [{ type: "text", text: reply.text }] };
 }

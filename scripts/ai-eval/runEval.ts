@@ -4,7 +4,8 @@
  *
  * Usage:
  *   pnpm vite-script scripts/ai-eval/runEval.ts -- \
- *     --harness baseline --model anthropic/claude-sonnet-5 [--questions B01,B02]
+ *     --harness baseline --model anthropic/claude-sonnet-5 \
+ *     [--questions B01,B02]
  *     [--concurrency 4]
  *
  * Needs `~/cleaned-test-data` (the JHU long-format CSVs) and
@@ -35,11 +36,17 @@ function _readOpenRouterApiKey(): string {
   if (process.env.OPEN_ROUTER_API_KEY) {
     return process.env.OPEN_ROUTER_API_KEY;
   }
-  const envText = readFileSync(join(REPO_ROOT, ".env.development.edge"), "utf8");
+  const envText = readFileSync(
+    join(REPO_ROOT, ".env.development.edge"),
+    "utf8",
+  );
   const line = envText.split("\n").find((envLine) => {
     return envLine.startsWith("OPEN_ROUTER_API_KEY=");
   });
-  const key = line?.slice("OPEN_ROUTER_API_KEY=".length).replaceAll('"', "").trim();
+  const key = line
+    ?.slice("OPEN_ROUTER_API_KEY=".length)
+    .replaceAll('"', "")
+    .trim();
   if (!key) {
     throw new Error("OPEN_ROUTER_API_KEY is not set");
   }
@@ -176,9 +183,11 @@ function _writeRun(
   });
   writeFileSync(
     join(runDir, "results.jsonl"),
-    ordered.map((answer) => {
-      return JSON.stringify(answer);
-    }).join("\n"),
+    ordered
+      .map((answer) => {
+        return JSON.stringify(answer);
+      })
+      .join("\n"),
   );
   const summary = summarizeEvalRun(harnessLabel, ordered);
   writeFileSync(join(runDir, "summary.json"), JSON.stringify(summary, null, 2));
@@ -217,7 +226,9 @@ async function main(): Promise<void> {
   await harness.close();
   database.close();
   const runDir = _writeRun(label, graded);
-  console.log(`\n${SUMMARY_TABLE_HEADER}\n| ${formatSummaryRow(summarizeEvalRun(label, graded))} |`);
+  console.log(
+    `\n${SUMMARY_TABLE_HEADER}\n| ${formatSummaryRow(summarizeEvalRun(label, graded))} |`,
+  );
   console.log(`\nResults: ${runDir}`);
 }
 

@@ -8,8 +8,17 @@ import { createDataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState
 import type { DataAgentDataset } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
-import type { AgentEvent, StreamFn, ThinkingLevel } from "@earendil-works/pi-agent-core";
-import type { Api, AssistantMessage, Model, Usage } from "@earendil-works/pi-ai";
+import type {
+  AgentEvent,
+  StreamFn,
+  ThinkingLevel,
+} from "@earendil-works/pi-agent-core";
+import type {
+  Api,
+  AssistantMessage,
+  Model,
+  Usage,
+} from "@earendil-works/pi-ai";
 
 /** Model requests per user message, after which the agent stops. */
 const MAX_MODEL_TURNS_PER_ANSWER = 6;
@@ -58,7 +67,8 @@ export type DataAgent = {
 function _addUsage(total: DataAgentUsage, usage: Usage): DataAgentUsage {
   return {
     calls: total.calls + 1,
-    inputTokens: total.inputTokens + usage.input + usage.cacheRead + usage.cacheWrite,
+    inputTokens:
+      total.inputTokens + usage.input + usage.cacheRead + usage.cacheWrite,
     cachedInputTokens: total.cachedInputTokens + usage.cacheRead,
     outputTokens: total.outputTokens + usage.output,
     reasoningTokens: total.reasoningTokens + (usage.reasoning ?? 0),
@@ -66,6 +76,11 @@ function _addUsage(total: DataAgentUsage, usage: Usage): DataAgentUsage {
   };
 }
 
+/**
+ * The reply to show. When the turn ended on a query, the query's summary is
+ * the answer; any text the model wrote beside the tool call is narration
+ * ("let me run that") written before the query ran.
+ */
 function _getReplyText(
   messages: Agent["state"]["messages"],
   state: DataAgentRunState,
@@ -73,6 +88,12 @@ function _getReplyText(
   const lastAssistant = [...messages].reverse().find((message) => {
     return message.role === "assistant";
   }) as AssistantMessage | undefined;
+  const endedOnToolCall = (lastAssistant?.content ?? []).some((block) => {
+    return block.type === "toolCall";
+  });
+  if (endedOnToolCall && state.lastQuery?.outcome.kind === "rows") {
+    return state.lastQuery.summary;
+  }
   const text = (lastAssistant?.content ?? [])
     .flatMap((block) => {
       return block.type === "text" ? [block.text] : [];
@@ -91,7 +112,10 @@ function _createAgent(
   const { primary, escalation } = options.policy;
   return new Agent({
     initialState: {
-      systemPrompt: buildDataAgentSystemPrompt({ datasets: options.datasets, today: options.today }),
+      systemPrompt: buildDataAgentSystemPrompt({
+        datasets: options.datasets,
+        today: options.today,
+      }),
       model: primary.model,
       thinkingLevel: primary.thinkingLevel,
       tools: [
@@ -109,7 +133,9 @@ function _createAgent(
     },
     finishTurn: () => {
       turnCounter.turns += 1;
-      return turnCounter.turns >= MAX_MODEL_TURNS_PER_ANSWER ? { action: "end" } : undefined;
+      return turnCounter.turns >= MAX_MODEL_TURNS_PER_ANSWER
+        ? { action: "end" }
+        : undefined;
     },
   });
 }
@@ -145,10 +171,20 @@ export function createDataAgent(
       turnCounter.turns = 0;
       agent.state.model = options.policy.primary.model;
       agent.state.thinkingLevel = options.policy.primary.thinkingLevel;
-      let usage: DataAgentUsage = { calls: 0, inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, reasoningTokens: 0, cost: 0 };
+      let usage: DataAgentUsage = {
+        calls: 0,
+        inputTokens: 0,
+        cachedInputTokens: 0,
+        outputTokens: 0,
+        reasoningTokens: 0,
+        cost: 0,
+      };
       const modelIds: string[] = [];
       const unsubscribe = agent.subscribe((event: AgentEvent) => {
-        if (event.type === "message_end" && event.message.role === "assistant") {
+        if (
+          event.type === "message_end" &&
+          event.message.role === "assistant"
+        ) {
           usage = _addUsage(usage, event.message.usage);
           modelIds.push(event.message.model);
         }
@@ -158,7 +194,12 @@ export function createDataAgent(
       } finally {
         unsubscribe();
       }
-      return { text: _getReplyText(agent.state.messages, state), state, usage, modelIds };
+      return {
+        text: _getReplyText(agent.state.messages, state),
+        state,
+        usage,
+        modelIds,
+      };
     },
   };
 }

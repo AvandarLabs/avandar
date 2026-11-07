@@ -1,7 +1,7 @@
 import { obj, oneOf, opt, str } from "@earendil-works/pi-schema";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
-import { sanitizeQueryError } from "@/lib/agent/dataAgent/sanitizeQueryError/sanitizeQueryError";
 import { extractSingleQuotedSqlLiterals } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
+import { sanitizeQueryError } from "@/lib/agent/dataAgent/sanitizeQueryError/sanitizeQueryError";
 import type {
   DataAgentHost,
   DataAgentQueryOutcome,
@@ -13,9 +13,12 @@ import type { AgentTool } from "@earendil-works/pi-agent-core";
 const MAX_QUERY_RUNS_PER_ANSWER = 3;
 
 const RUN_QUERY_PARAMETERS = obj({
-  sql: str({ description: "One DuckDB SELECT or WITH statement over the aliases." }),
+  sql: str({
+    description: "One DuckDB SELECT or WITH statement over the aliases.",
+  }),
   summary: str({
-    description: "One or two plain sentences for the user: what the result shows, the dataset, and your choices.",
+    description:
+      "One or two plain sentences for the user: what the result shows, the dataset, and your choices.",
   }),
   chart: opt(
     oneOf(["bar", "line", "area", "scatter", "pie"], {
@@ -71,17 +74,36 @@ export function createRunQueryTool(
       });
       if (!isApproved) {
         return {
-          content: [{ type: "text", text: "The user declined the filter values in this query. Explain how to run it in the Data Explorer instead." }],
+          content: [
+            {
+              type: "text",
+              text: "The user declined the filter values in this query. Explain how to run it in the Data Explorer instead.",
+            },
+          ],
           details: { sql, outcome: "declined" },
         };
       }
       options.state.queryRuns += 1;
-      const outcome = await options.host.showQuery({ sql, summary: params.summary, chart: params.chart });
-      options.state.lastQuery = { sql, summary: params.summary, chart: params.chart, outcome };
+      const outcome = await options.host.showQuery({
+        sql,
+        summary: params.summary,
+        chart: params.chart,
+      });
+      options.state.lastQuery = {
+        sql,
+        summary: params.summary,
+        chart: params.chart,
+        outcome,
+      };
       const isLastRun = options.state.queryRuns >= MAX_QUERY_RUNS_PER_ANSWER;
       if (outcome.kind === "rows") {
         return {
-          content: [{ type: "text", text: `Shown to the user: ${_describeShape(outcome.columns, outcome.rowCount)}.` }],
+          content: [
+            {
+              type: "text",
+              text: `Shown to the user: ${_describeShape(outcome.columns, outcome.rowCount)}.`,
+            },
+          ],
           details: { sql, outcome: outcome.kind },
           terminate: true,
         };

@@ -24,7 +24,9 @@ async function _readColumnValues(
   sql: string,
 ): Promise<string[] | { error: string }> {
   try {
-    const result = await WorkspaceQuerySession.runQuery<Record<string, unknown>>({
+    const result = await WorkspaceQuerySession.runQuery<
+      Record<string, unknown>
+    >({
       rawSql: sql,
       workspaceId,
     });

@@ -37,7 +37,7 @@ type Clarification = NonNullable<
   NonNullable<DenoChatTurnResponse["result"]>["clarification"]
 >;
 
-/** The client's reply text for applied SQL, as `applyChatTurnResponse` builds it. */
+/** The reply text for applied SQL, as `applyChatTurnResponse` builds it. */
 function _buildThreadText(
   assistantText: string,
   outcome: "rows" | "empty" | "failed",
@@ -64,7 +64,9 @@ function _getAppliedSql(
 }
 
 function _needsConsent(values: readonly string[]): boolean {
-  return values.length > 0 && detectPii({ values: [...values] }).severity !== "clean";
+  return (
+    values.length > 0 && detectPii({ values: [...values] }).severity !== "clean"
+  );
 }
 
 /**
@@ -106,7 +108,10 @@ class BaselineConversation implements EvalConversation {
     };
   }
 
-  /** Runs one model call and applies it. Returns true when the question is answered. */
+  /**
+   * Runs one model call and applies it. Returns true when the question is
+   * answered.
+   */
   private async runModelTurn(
     question: EvalQuestion,
     answer: EvalAnswer,
@@ -118,7 +123,10 @@ class BaselineConversation implements EvalConversation {
       retryContext: undefined,
       schema: COVID_WORKSPACE_SCHEMA,
     });
-    answer.usage = addEvalUsage(answer.usage, response.usage ?? EMPTY_EVAL_USAGE);
+    answer.usage = addEvalUsage(
+      answer.usage,
+      response.usage ?? EMPTY_EVAL_USAGE,
+    );
     if (!response.result) {
       answer.error = `Chat request failed: ${response.error ?? "no response"}`;
       return true;
@@ -129,8 +137,15 @@ class BaselineConversation implements EvalConversation {
       return true;
     }
     if (response.result.clarification) {
-      this.messages.push({ role: "assistant", content: response.result.assistantText });
-      await this.answerClarification(question, response.result.clarification, answer);
+      this.messages.push({
+        role: "assistant",
+        content: response.result.assistantText,
+      });
+      await this.answerClarification(
+        question,
+        response.result.clarification,
+        answer,
+      );
       return false;
     }
     const text = response.result.dashboardBlock
@@ -160,7 +175,11 @@ class BaselineConversation implements EvalConversation {
     answer.vizType = appliedSql.vizType;
     if (outcome.kind === "failed") {
       answer.error = outcome.error;
-      this.context = { app: "data-explorer", lastSql: appliedSql.sql, lastError: outcome.error };
+      this.context = {
+        app: "data-explorer",
+        lastSql: appliedSql.sql,
+        lastError: outcome.error,
+      };
       return;
     }
     answer.result = outcome.result;
@@ -203,23 +222,36 @@ class BaselineConversation implements EvalConversation {
     const resolved = await resolveEvalDiscovery(this.database, {
       query: shape.query,
       column: shape.column,
-      candidateValues: [...new Set([...shape.candidateValues, ...candidateGroups.flat()])],
+      candidateValues: [
+        ...new Set([...shape.candidateValues, ...candidateGroups.flat()]),
+      ],
     });
     const values = "values" in resolved ? resolved.values : [];
     const match = shape.multi
-      ? DiscoveryCandidateValues.getGroupMatches({ candidateGroups, discoveredValues: values })
+      ? DiscoveryCandidateValues.getGroupMatches({
+          candidateGroups,
+          discoveredValues: values,
+        })
       : DiscoveryCandidateValues.getUniqueMatch({
           candidateValues: shape.candidateValues,
           discoveredValues: values,
         });
     if (match) {
-      this.recordUserAnswer(clarification, { kind: "preset", value: match }, answer, true);
+      this.recordUserAnswer(
+        clarification,
+        { kind: "preset", value: match },
+        answer,
+        true,
+      );
       return;
     }
     const userAnswer =
       values.length > 0
         ? SimulatedUser.pickValues(values, question.user, question.prompt)
-        : { kind: "custom" as const, text: SimulatedUser.answerFreeText(question.user) };
+        : {
+            kind: "custom" as const,
+            text: SimulatedUser.answerFreeText(question.user),
+          };
     this.recordUserAnswer(clarification, userAnswer, answer, false);
   }
 
@@ -232,7 +264,9 @@ class BaselineConversation implements EvalConversation {
     const threadText = SimulatedUser.toThreadText(userAnswer);
     const isDiscovery = clarification.responseShape.kind === "discovery";
     const sentValues =
-      userAnswer.kind === "preset" && isDiscovery ? [userAnswer.value].flat() : [];
+      userAnswer.kind === "preset" && isDiscovery
+        ? [userAnswer.value].flat()
+        : [];
     answer.valuesSentToModel.push(...sentValues);
     answer.consentPrompts += _needsConsent(
       userAnswer.kind === "custom" ? [userAnswer.text] : sentValues,

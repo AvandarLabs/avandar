@@ -17,13 +17,15 @@ const LOOKUP_VALUES_PARAMETERS = obj({
     obj({
       named: str({ description: "What the user wrote, such as UK." }),
       forms: arr(str(), {
-        description: "Stored forms to try that mean exactly the same thing: full name, abbreviation, code.",
+        description:
+          "Stored forms to try that mean exactly the same thing: full name, abbreviation, code.",
       }),
     }),
     { description: "One entry per value the user named." },
   ),
   question: str({
-    description: "Question for the user if the device cannot settle it, such as: Which of these is the UK?",
+    description:
+      "Question for the user if the device cannot settle it, such as: Which of these is the UK?",
   }),
 });
 
@@ -86,27 +88,56 @@ async function _askUserToPick(
     lookup: {
       listQuery,
       column: context.column,
-      candidateValues: unmatched.map((lookup) => lookup.named),
+      candidateValues: unmatched.map((lookup) => {
+        return lookup.named;
+      }),
     },
   });
   if (answer.kind === "deferred") {
-    context.state.questions.push({ kind: "values", question, answer: "(on screen)", isAutomatic: false });
+    context.state.questions.push({
+      kind: "values",
+      question,
+      answer: "(on screen)",
+      isAutomatic: false,
+    });
     context.state.isWaitingForUser = true;
     return DEFERRED_ANSWER_TEXT;
   }
   if (answer.kind === "dismissed") {
-    context.state.questions.push({ kind: "values", question, answer: "(dismissed)", isAutomatic: false });
+    context.state.questions.push({
+      kind: "values",
+      question,
+      answer: "(dismissed)",
+      isAutomatic: false,
+    });
     return "The user dismissed the lookup. Do not filter on those values; say so in the summary.";
   }
   const picked = answer.kind === "picked" ? [...answer.values] : [];
-  const isApproved = await context.host.approveValuesForModel({ values: picked, reason: "picked_lookup" });
+  const isApproved = await context.host.approveValuesForModel({
+    values: picked,
+    reason: "picked_lookup",
+  });
   if (!isApproved) {
     return "The user would not share the picked values. Explain how to filter for them in the Data Explorer.";
   }
   context.state.valuesSentToModel.push(...picked);
-  const text = answer.kind === "typed" ? answer.text : picked.map((value) => `"${value}"`).join(", ");
-  context.state.questions.push({ kind: "values", question, answer: text, isAutomatic: false });
-  return answer.kind === "typed" ? `The user wrote: ${text}` : `The user picked: ${text}`;
+  const text =
+    answer.kind === "typed"
+      ? answer.text
+      : picked
+          .map((value) => {
+            return `"${value}"`;
+          })
+          .join(", ");
+  context.state.questions.push({
+    kind: "values",
+    question,
+    answer: text,
+    isAutomatic: false,
+  });
+  return answer.kind === "typed"
+    ? `The user wrote: ${text}`
+    : `The user picked: ${text}`;
 }
 
 function _describeMatches(matches: readonly LookupMatch[]): string {
@@ -119,28 +150,49 @@ function _describeMatches(matches: readonly LookupMatch[]): string {
 
 async function _execute(
   context: LookupContext,
-  params: Readonly<{ values: ReadonlyArray<{ named: string; forms: readonly string[] }>; question: string }>,
+  params: Readonly<{
+    values: ReadonlyArray<{ named: string; forms: readonly string[] }>;
+    question: string;
+  }>,
 ): Promise<AgentToolResult<undefined>> {
   const lookups = await Promise.all(
     params.values.map((value) => {
       return _findStoredValue(context, value);
     }),
   );
-  const matched = lookups.filter((lookup) => lookup.storedValue !== undefined);
-  const unmatched = lookups.filter((lookup) => lookup.storedValue === undefined);
-  const matchedValues = matched.map((lookup) => lookup.storedValue!);
-  const isApproved = await context.host.approveValuesForModel({ values: matchedValues, reason: "matched_lookup" });
+  const matched = lookups.filter((lookup) => {
+    return lookup.storedValue !== undefined;
+  });
+  const unmatched = lookups.filter((lookup) => {
+    return lookup.storedValue === undefined;
+  });
+  const matchedValues = matched.map((lookup) => {
+    return lookup.storedValue!;
+  });
+  const isApproved = await context.host.approveValuesForModel({
+    values: matchedValues,
+    reason: "matched_lookup",
+  });
   const parts: string[] = [];
   if (matched.length > 0 && isApproved) {
     context.state.valuesSentToModel.push(...matchedValues);
-    context.state.questions.push({ kind: "values", question: params.question, answer: matchedValues.join(", "), isAutomatic: true });
-    parts.push(`${_describeMatches(matched)} (matched automatically; use only if it means exactly what the user named).`);
+    context.state.questions.push({
+      kind: "values",
+      question: params.question,
+      answer: matchedValues.join(", "),
+      isAutomatic: true,
+    });
+    parts.push(
+      `${_describeMatches(matched)} (matched automatically; use only if it means exactly what the user named).`,
+    );
   }
   if (unmatched.length > 0) {
     parts.push(await _askUserToPick(context, unmatched, params.question));
   }
   return {
-    content: [{ type: "text", text: parts.join("\n") || "No matching values." }],
+    content: [
+      { type: "text", text: parts.join("\n") || "No matching values." },
+    ],
     details: undefined,
     terminate: context.state.isWaitingForUser,
   };
@@ -167,12 +219,21 @@ export function createLookupValuesTool(
     parameters: LOOKUP_VALUES_PARAMETERS,
     executionMode: "sequential",
     execute: async (_toolCallId, params) => {
-      const alias = options.aliases.find((entry) => entry.alias === params.table);
+      const alias = options.aliases.find((entry) => {
+        return entry.alias === params.table;
+      });
       if (!alias) {
-        throw new Error(`Unknown table alias "${params.table}". Use one of the aliases under DATASETS.`);
+        throw new Error(
+          `Unknown table alias "${params.table}". Use one of the aliases under DATASETS.`,
+        );
       }
       return await _execute(
-        { host: options.host, state: options.state, tableName: alias.tableName, column: params.column },
+        {
+          host: options.host,
+          state: options.state,
+          tableName: alias.tableName,
+          column: params.column,
+        },
         params,
       );
     },

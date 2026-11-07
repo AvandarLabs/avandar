@@ -33,7 +33,10 @@ export type EvalQuestion = {
    */
   clarification: "not_needed" | "allowed" | "expected";
   user?: SimulatedUserScript;
-  /** Ground-truth SQL by name, over the `us_deaths`, `us_cases`, and `global_deaths` views. */
+  /**
+   * Ground-truth SQL by name, over the `us_deaths`, `us_cases`, and
+   * `global_deaths` views.
+   */
   truth: Readonly<Record<string, string>>;
   grade: (context: GradeContext) => Verdict;
   /** The user asked for a chart, so a table alone is a miss. */

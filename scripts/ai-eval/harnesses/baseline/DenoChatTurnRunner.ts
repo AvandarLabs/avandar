@@ -5,7 +5,10 @@ import type { ChildProcessWithoutNullStreams } from "node:child_process";
 
 /** The request `supabase/functions/_eval/runChatTurnCli.ts` reads per line. */
 export type DenoChatTurn = {
-  messages: ReadonlyArray<{ role: "user" | "assistant" | "system"; content: string }>;
+  messages: ReadonlyArray<{
+    role: "user" | "assistant" | "system";
+    content: string;
+  }>;
   context: Record<string, unknown>;
   model: string;
   retryContext: undefined;
@@ -49,7 +52,9 @@ export class DenoChatTurnRunner {
   private readonly pending = new Map<string, PendingTurn>();
   private nextId = 0;
 
-  constructor(options: Readonly<{ repoRoot: string; openRouterApiKey: string }>) {
+  constructor(
+    options: Readonly<{ repoRoot: string; openRouterApiKey: string }>,
+  ) {
     this.process = spawn(
       "deno",
       [
@@ -68,18 +73,25 @@ export class DenoChatTurnRunner {
     );
     this.process.stderr.on("data", (chunk: Buffer) => {
       const text = chunk.toString();
-      if (!/^(Download|Warning|Check)|experimentalDecorators/.test(text.trim())) {
+      if (
+        !/^(Download|Warning|Check)|experimentalDecorators/.test(text.trim())
+      ) {
         process.stderr.write(`[deno] ${text}`);
       }
     });
     this.process.on("exit", (code) => {
       for (const [id, resolvePending] of this.pending) {
-        resolvePending({ error: `Deno exited with code ${code}`, latencyMs: 0 });
+        resolvePending({
+          error: `Deno exited with code ${code}`,
+          latencyMs: 0,
+        });
         this.pending.delete(id);
       }
     });
     createInterface({ input: this.process.stdout }).on("line", (line) => {
-      const response = JSON.parse(line) as DenoChatTurnResponse & { id: string };
+      const response = JSON.parse(line) as DenoChatTurnResponse & {
+        id: string;
+      };
       this.pending.get(response.id)?.(response);
       this.pending.delete(response.id);
     });

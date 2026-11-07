@@ -10,11 +10,11 @@ import type { EvalQuestion } from "../../EvalQuestion";
 import type { EvalDatabase, EvalQueryResult } from "../../runtime/EvalDatabase";
 import type { EvalAnswer, EvalConversation, EvalHarness } from "../EvalHarness";
 import type { PiEvalModelSpec } from "./piEvalConfigs";
+import type { DataAgentModelPolicy } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type {
   DataAgentHost,
   DataAgentUserAnswer,
 } from "@/lib/agent/dataAgent/DataAgentHost";
-import type { DataAgentModelPolicy } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 
 type QuestionRecorder = {
@@ -49,25 +49,36 @@ function _createEvalHost(
       }
       recorder.result = outcome.result;
       recorder.error = undefined;
-      return { kind: outcome.kind, columns: outcome.result.columns, rowCount: outcome.result.rows.length };
+      return {
+        kind: outcome.kind,
+        columns: outcome.result.columns,
+        rowCount: outcome.result.rows.length,
+      };
     },
     readColumnValues: async (sql) => {
       const outcome = await runEvalSql(database, sql);
       return outcome.kind === "failed"
         ? { error: outcome.error }
-        : outcome.result.rows.map((row) => String(row[0]));
+        : outcome.result.rows.map((row) => {
+            return String(row[0]);
+          });
     },
     askUser: async (request) => {
       const script = recorder.question?.user;
       return _toUserAnswer(
         request.kind === "values"
-          ? SimulatedUser.pickValues(request.options, script, recorder.question?.prompt ?? "")
+          ? SimulatedUser.pickValues(
+              request.options,
+              script,
+              recorder.question?.prompt ?? "",
+            )
           : SimulatedUser.answerOptions(request.options, script),
       );
     },
     approveValuesForModel: async (request) => {
       const needsPrompt =
-        request.values.length > 0 && detectPii({ values: [...request.values] }).severity !== "clean";
+        request.values.length > 0 &&
+        detectPii({ values: [...request.values] }).severity !== "clean";
       recorder.consentPrompts += needsPrompt ? 1 : 0;
       return true;
     },
@@ -92,7 +103,11 @@ function _createPolicy(
 }
 
 function _createConversation(
-  options: Readonly<{ database: EvalDatabase; policy: DataAgentModelPolicy; streamFn: StreamFn }>,
+  options: Readonly<{
+    database: EvalDatabase;
+    policy: DataAgentModelPolicy;
+    streamFn: StreamFn;
+  }>,
 ): EvalConversation {
   const recorder: QuestionRecorder = { consentPrompts: 0 };
   const dataAgent = createDataAgent({
@@ -105,7 +120,13 @@ function _createConversation(
   });
   return {
     ask: async (question) => {
-      Object.assign(recorder, { question, result: undefined, error: undefined, vizType: undefined, consentPrompts: 0 });
+      Object.assign(recorder, {
+        question,
+        result: undefined,
+        error: undefined,
+        vizType: undefined,
+        consentPrompts: 0,
+      });
       const startedAt = performance.now();
       const reply = await dataAgent.ask(question.prompt);
       const lastQuery = reply.state.lastQuery;
@@ -113,10 +134,17 @@ function _createConversation(
         finalSql: lastQuery?.sql,
         vizType: recorder.vizType,
         result: recorder.result,
-        error: lastQuery ? recorder.error : "Answered in text without running a query",
+        error: lastQuery
+          ? recorder.error
+          : "Answered in text without running a query",
         assistantText: reply.text,
         clarifications: reply.state.questions.map((record) => {
-          return { kind: record.kind === "values" ? "discovery" : "fixed_options", question: record.question, answer: record.answer, isAutomatic: record.isAutomatic };
+          return {
+            kind: record.kind === "values" ? "discovery" : "fixed_options",
+            question: record.question,
+            answer: record.answer,
+            isAutomatic: record.isAutomatic,
+          };
         }),
         consentPrompts: recorder.consentPrompts,
         valuesSentToModel: reply.state.valuesSentToModel,
@@ -135,10 +163,13 @@ function _createConversation(
   };
 }
 
-/** Parses `id` or `id@thinking`, for a one-model config from the command line. */
+/** Parses `id` or `id@thinking`, for a one-model config. */
 function _parseModelSpec(text: string): PiEvalModelSpec {
   const [id, thinkingLevel] = text.split("@");
-  return { id: id!, thinkingLevel: (thinkingLevel ?? "off") as PiEvalModelSpec["thinkingLevel"] };
+  return {
+    id: id!,
+    thinkingLevel: (thinkingLevel ?? "off") as PiEvalModelSpec["thinkingLevel"],
+  };
 }
 
 /**
@@ -165,7 +196,10 @@ export function createPiHarness(
   }
   const policy = _createPolicy(models, specs);
   const streamFn: StreamFn = (model, context, streamOptions) => {
-    return models.streamSimple(model, context, { ...streamOptions, apiKey: options.openRouterApiKey });
+    return models.streamSimple(model, context, {
+      ...streamOptions,
+      apiKey: options.openRouterApiKey,
+    });
   };
   const label =
     options.configName === "single" || options.configName === "default"
@@ -174,7 +208,11 @@ export function createPiHarness(
   return {
     label,
     startConversation: () => {
-      return _createConversation({ database: options.database, policy, streamFn });
+      return _createConversation({
+        database: options.database,
+        policy,
+        streamFn,
+      });
     },
     close: async () => {},
   };

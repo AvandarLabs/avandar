@@ -26,10 +26,15 @@ function _percentile(values: readonly number[], share: number): number {
   const sorted = [...values].sort((left, right) => {
     return left - right;
   });
-  return sorted[Math.min(sorted.length - 1, Math.floor(share * sorted.length))]!;
+  return sorted[
+    Math.min(sorted.length - 1, Math.floor(share * sorted.length))
+  ]!;
 }
 
-function _sum(answers: readonly GradedAnswer[], pick: (answer: GradedAnswer) => number): number {
+function _sum(
+  answers: readonly GradedAnswer[],
+  pick: (answer: GradedAnswer) => number,
+): number {
   return answers.reduce((total, answer) => {
     return total + pick(answer);
   }, 0);
@@ -95,7 +100,9 @@ export function formatSummaryRow(summary: EvalRunSummary): string {
     String(summary.needlessQuestions),
     String(summary.missedQuestions),
     (summary.modelCalls / Math.max(summary.questionCount, 1)).toFixed(2),
-    Math.round(summary.promptTokens / Math.max(summary.modelCalls, 1)).toString(),
+    Math.round(
+      summary.promptTokens / Math.max(summary.modelCalls, 1),
+    ).toString(),
     `$${summary.costPerQuestion.toFixed(5)}`,
     `${(summary.latencyMedianMs / 1000).toFixed(1)}s / ${(summary.latencyP90Ms / 1000).toFixed(1)}s`,
     summary.failedIds.join(" "),

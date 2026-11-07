@@ -15,7 +15,7 @@ export type TruthRowSpec = {
   mode: "all" | "prefix" | "subset";
   /** Share of rows that must match (default 1). */
   minShare?: number;
-  /** For `prefix`, how many leading rows to compare (default all truth rows). */
+  /** For `prefix`, how many leading rows to compare (default: all). */
   prefixLength?: number;
   /** Relative tolerance on numbers (default 0.001). */
   tolerance?: number;
@@ -77,7 +77,9 @@ function _rowMatches(
       if (!MatcherText.cellMatchesValue(cell, value, options)) {
         return false;
       }
-      const columnName = MatcherText.normalize(result.columns[columnIndex]?.name);
+      const columnName = MatcherText.normalize(
+        result.columns[columnIndex]?.name,
+      );
       return missingKeys.every((key) => {
         return columnName.includes(MatcherText.normalize(key));
       });
@@ -124,9 +126,11 @@ function _matchPrefix(
       detail: `expected at least ${length} rows, got ${result.rows.length}`,
     };
   }
-  const firstMismatch = truthRows.slice(0, length).findIndex((truthRow, index) => {
-    return !_rowMatches(result, result.rows[index]!, truthRow, spec);
-  });
+  const firstMismatch = truthRows
+    .slice(0, length)
+    .findIndex((truthRow, index) => {
+      return !_rowMatches(result, result.rows[index]!, truthRow, spec);
+    });
   return firstMismatch < 0
     ? { pass: true, detail: `first ${length} rows match in order` }
     : {
@@ -231,7 +235,10 @@ function _hasKeySet(
   optional: readonly string[] = [],
 ): Verdict {
   const expectedSet = new Set(expected.map(MatcherText.normalize));
-  const allowedSet = new Set([...expectedSet, ...optional.map(MatcherText.normalize)]);
+  const allowedSet = new Set([
+    ...expectedSet,
+    ...optional.map(MatcherText.normalize),
+  ]);
   const isMatch = result.columns.some((_column, columnIndex) => {
     const values = new Set(
       result.rows.map((row) => {

@@ -45,7 +45,9 @@ export async function resolveEvalDiscovery(
     column: options.column,
     candidateValues: options.candidateValues,
   });
-  const matched = lookupSql ? await _firstColumnValues(database, lookupSql) : [];
+  const matched = lookupSql
+    ? await _firstColumnValues(database, lookupSql)
+    : [];
   const matches = Array.isArray(matched) ? matched : [];
   const others = [...new Set(listed)]
     .filter((value) => {
