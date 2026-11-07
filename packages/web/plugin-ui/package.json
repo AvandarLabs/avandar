@@ -1,0 +1,46 @@
+{
+  "name": "@avandar/plugin-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The components Avandar plugin UI may render.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/web/plugin-ui"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "type-check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@mantine/core": "^9.2.0",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@mantine/core": "catalog:",
+    "react": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  }
+}
