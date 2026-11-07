@@ -10,6 +10,7 @@ import {
 } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
 import { dashboardBlockSummary } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
 import { caseTypeDraftIntro } from "@sbfn/chat/PostChatMessages/parsing/parseProposeCaseType.ts";
+import { annotateClarificationAnswersForModel } from "@sbfn/chat/PostChatMessages/prompt/annotateClarificationAnswersForModel.ts";
 import { buildCaseManagerSystemPrompt } from "@sbfn/chat/PostChatMessages/prompt/buildCaseManagerSystemPrompt.ts";
 import { unifiedSystemPrefix } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
 import { getLastUserPromptFromMessages } from "@sbfn/chat/PostChatMessages/prompt/getLastUserPromptFromMessages.ts";
@@ -148,7 +149,7 @@ export const PostChatMessages = POST({
         model,
         messages: [
           { role: "system", content: systemContent },
-          ...messages,
+          ...annotateClarificationAnswersForModel(messages),
           ...(turnSuffix ? [{ role: "user", content: turnSuffix }] : []),
         ],
         temperature: 0.3,
