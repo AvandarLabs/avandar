@@ -2,6 +2,7 @@ import { mergeAttributes, Node } from "@tiptap/core";
 import { NodeSelection } from "@tiptap/pm/state";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import clsx from "clsx";
+import { richTextToPlainText } from "$/models/RichTextDocument/RichTextDocument";
 import { GadgetActionsMenu } from "@/components/RichText/Gadget/GadgetActionsMenu/GadgetActionsMenu";
 import { GadgetCard } from "@/components/RichText/Gadget/GadgetCard/GadgetCard";
 import { UnknownGadgetChip } from "@/components/RichText/Gadget/GadgetChip/GadgetChip";
@@ -14,6 +15,7 @@ import {
 } from "@/components/RichText/Gadget/GadgetNodes/gadgetNodeTransforms";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { Attribute } from "@tiptap/core";
+import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import type { NodeViewProps } from "@tiptap/react";
 import type { ReactNode } from "react";
 
@@ -45,6 +47,14 @@ declare module "@tiptap/core" {
       showGadgetAsLink: (position: number) => ReturnType;
     };
   }
+}
+
+/**
+ * The plain text a copied gadget node becomes: its `[noun]`, written by the
+ * same code that builds a stored comment's body text.
+ */
+function _renderGadgetText({ node }: { node: ProseMirrorNode }): string {
+  return richTextToPlainText(node.toJSON());
 }
 
 /**
@@ -171,9 +181,7 @@ export const GadgetLink = Node.create({
     ];
   },
 
-  renderText() {
-    return "[gadget]";
-  },
+  renderText: _renderGadgetText,
 
   addNodeView() {
     return ReactNodeViewRenderer(GadgetLinkView);
@@ -226,6 +234,8 @@ export const GadgetEmbed = Node.create({
       { tag: 'div[data-type="gadgetEmbed"]', getAttrs: _readRefFromElement },
     ];
   },
+
+  renderText: _renderGadgetText,
 
   renderHTML({ HTMLAttributes }) {
     return [

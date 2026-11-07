@@ -106,6 +106,24 @@ describe("insertGadgetLink", () => {
   });
 });
 
+describe("plain text", () => {
+  it("copies a gadget link as its type noun, like the stored body text", () => {
+    editor = _createEditor([
+      _paragraph(
+        _text("See "),
+        { type: "gadgetLink", attrs: TILE_REF },
+        _text(" "),
+      ),
+    ]);
+    expect(editor.getText()).toBe("See [tile] ");
+  });
+
+  it("copies a gadget embed as its type noun", () => {
+    editor = _createEditor([{ type: "gadgetEmbed", attrs: DASHBOARD_REF }]);
+    expect(editor.getText()).toBe("[dashboard]");
+  });
+});
+
 describe("insertGadgetEmbed", () => {
   it("inserts a top-level embed after the paragraph holding the cursor", () => {
     editor = _createEditor([
