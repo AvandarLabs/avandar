@@ -38,15 +38,15 @@ describe("findTokenSearchMatch", () => {
   });
 
   it("prefers an occurrence that starts a word", () => {
-    expect(
-      findTokenSearchMatch("Ultra transit", "tra")?.matchedRanges,
-    ).toEqual([{ start: 6, end: 9 }]);
+    expect(findTokenSearchMatch("Ultra transit", "tra")?.matchedRanges).toEqual(
+      [{ start: 6, end: 9 }],
+    );
   });
 
   it("merges tokens that match side by side into one range", () => {
-    expect(findTokenSearchMatch("Transit", "tran sit")?.matchedRanges).toEqual(
-      [{ start: 0, end: 7 }],
-    );
+    expect(findTokenSearchMatch("Transit", "tran sit")?.matchedRanges).toEqual([
+      { start: 0, end: 7 },
+    ]);
   });
 
   it("matches everything with no ranges when the search is blank", () => {
