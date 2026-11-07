@@ -10,7 +10,9 @@ describe("DataCatalogResultsHeader", () => {
         numResults={3}
         numCatalogListings={10}
         isNarrowed
-        activeFilters={[{ key: "domains:Health", label: "Topic: Health", onRemove }]}
+        activeFilters={[
+          { key: "domains:Health", label: "Topic: Health", onRemove },
+        ]}
         onClearAll={vi.fn()}
         sortBy="updated"
         isSearching={false}
