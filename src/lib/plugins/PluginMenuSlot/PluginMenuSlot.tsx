@@ -1,7 +1,7 @@
 import { usePluginMenuItems } from "@/lib/plugins/PluginHost/usePluginMenuItems";
 import { PluginInlineButtons } from "@/lib/plugins/PluginMenuSlot/PluginInlineButtons";
 import { PluginOverflowMenu } from "@/lib/plugins/PluginMenuSlot/PluginOverflowMenu";
-import { usePluginCommandRunner } from "@/lib/plugins/PluginMenuSlot/usePluginCommandRunner";
+import { usePluginCommandRunner } from "@/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner";
 import type { PluginMenuItem } from "@/lib/plugins/getMenuItemsFromActivePlugins/getMenuItemsFromActivePlugins";
 import type { SlotId, WhenFacts } from "@avandar/plugin-manifest/runtime";
 import type { PluginInvocationContext } from "@avandar/plugin-sdk";

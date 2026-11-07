@@ -10,23 +10,21 @@ import type {
 const mocks = vi.hoisted(() => {
   return {
     runPluginCommand: vi.fn(),
+    loadRunPluginCommand: vi.fn(),
     notifyError: vi.fn(),
     usePluginMenuItems: vi.fn(),
-    runnerModuleLoadCount: 0,
-    isRunnerChunkBroken: false,
   };
 });
 
 vi.mock("@/lib/plugins/PluginHost/usePluginMenuItems", () => {
   return { usePluginMenuItems: mocks.usePluginMenuItems };
 });
-vi.mock("@/lib/plugins/runPluginCommand/runPluginCommand", () => {
-  mocks.runnerModuleLoadCount += 1;
-  if (mocks.isRunnerChunkBroken) {
-    throw new Error("Failed to fetch dynamically imported module");
-  }
-  return { runPluginCommand: mocks.runPluginCommand };
-});
+vi.mock(
+  "@/lib/plugins/PluginMenuSlot/loadRunPluginCommand/loadRunPluginCommand",
+  () => {
+    return { loadRunPluginCommand: mocks.loadRunPluginCommand };
+  },
+);
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
     useCurrentWorkspace: () => {
@@ -83,31 +81,53 @@ function _renderSlotWithItems(options: {
 describe("PluginMenuSlot", () => {
   beforeEach(() => {
     mocks.runPluginCommand.mockReset();
+    mocks.loadRunPluginCommand.mockReset();
+    mocks.loadRunPluginCommand.mockResolvedValue(mocks.runPluginCommand);
     mocks.notifyError.mockReset();
-    mocks.isRunnerChunkBroken = false;
   });
 
-  // This runs first on purpose. The runner is loaded once and kept for the
-  // page's lifetime, so only the first click in this file can see it unloaded.
-  it("loads the runner on a click, and loads it again after a failed load", async () => {
-    mocks.isRunnerChunkBroken = true;
+  it("does not load the runner when the slot renders", () => {
     _renderSlotWithItems({ itemCount: 1 });
-    expect(mocks.runnerModuleLoadCount).toBe(0);
+
+    expect(mocks.loadRunPluginCommand).not.toHaveBeenCalled();
+  });
+
+  it("loads the runner when a command is clicked", async () => {
+    mocks.runPluginCommand.mockResolvedValue(undefined);
+    _renderSlotWithItems({ itemCount: 1 });
 
     fireEvent.click(screen.getByRole("button", { name: "Command 1" }));
+
+    await waitFor(() => {
+      expect(mocks.loadRunPluginCommand).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("reports a runner that fails to load in a notification naming the plugin", async () => {
+    mocks.loadRunPluginCommand.mockRejectedValue(
+      new Error("Failed to fetch dynamically imported module"),
+    );
+    _renderSlotWithItems({ itemCount: 1 });
+
+    fireEvent.click(screen.getByRole("button", { name: "Command 1" }));
+
     await waitFor(() => {
       expect(mocks.notifyError).toHaveBeenCalledWith(
         expect.objectContaining({ title: "Could not load Epidemiology" }),
       );
     });
-    expect(mocks.runPluginCommand).not.toHaveBeenCalled();
+  });
 
-    mocks.isRunnerChunkBroken = false;
-    mocks.runPluginCommand.mockResolvedValue(undefined);
+  it("runs no command when the runner fails to load", async () => {
+    mocks.loadRunPluginCommand.mockRejectedValue(new Error("chunk failed"));
+    _renderSlotWithItems({ itemCount: 1 });
+
     fireEvent.click(screen.getByRole("button", { name: "Command 1" }));
+
     await waitFor(() => {
-      expect(mocks.runPluginCommand).toHaveBeenCalledTimes(1);
+      expect(mocks.notifyError).toHaveBeenCalled();
     });
+    expect(mocks.runPluginCommand).not.toHaveBeenCalled();
   });
 
   it("renders nothing when no plugin has an item for the slot", () => {
@@ -180,6 +200,12 @@ describe("PluginMenuSlot", () => {
     _renderSlotWithItems({ itemCount: 1, context: undefined });
 
     expect(screen.getByRole("button", { name: "Command 1" })).toBeDisabled();
+  });
+
+  it("disables the Plugins button when there is no result to run on", () => {
+    _renderSlotWithItems({ itemCount: 3, context: undefined });
+
+    expect(screen.getByRole("button", { name: "Plugins" })).toBeDisabled();
   });
 
   it("shows a loading state on the running command's button only", () => {

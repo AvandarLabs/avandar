@@ -31,9 +31,12 @@ function _makeUiApi(
   options: Readonly<{
     pluginName: string;
     wrapContent: (content: ReactNode) => ReactNode;
+
+    /** The drawer generation the API was made in. */
+    drawerGeneration: number;
   }>,
 ): AvandarApi["ui"] {
-  const { pluginName, wrapContent } = options;
+  const { pluginName, wrapContent, drawerGeneration } = options;
   return {
     openModal: ({ title, content }) => {
       modals.open({
@@ -44,6 +47,11 @@ function _makeUiApi(
       });
     },
     openDrawer: ({ title, content }) => {
+      // A command can outlive the workspace it started in. Its drawer must
+      // not appear in the next workspace.
+      if (PluginDrawerStore.getGeneration() !== drawerGeneration) {
+        return;
+      }
       PluginDrawerStore.open({ title, content: wrapContent(content) });
     },
     notify: ({ title, message, color }) => {
@@ -60,7 +68,9 @@ function _makeUiApi(
  * Makes the `avandar` object one command invocation receives, scoped to the
  * plugin, the workspace, and the query result the command was invoked on.
  * `runPluginCommand` calls it once per invocation and passes the result to the
- * plugin's command handler.
+ * plugin's command handler. Its `openDrawer` does nothing once the drawer host
+ * has unmounted, so a command left running by a workspace switch cannot open a
+ * drawer in the next workspace.
  *
  * It pulls in the plugin SDK runtime and Lingui's message compiler, so import
  * it lazily, at the time a command runs, to keep them out of the main bundle.
@@ -87,7 +97,11 @@ export function makePluginApi(
     context,
     workspace,
     data: _makeDataApi(context),
-    ui: _makeUiApi({ pluginName, wrapContent }),
+    ui: _makeUiApi({
+      pluginName,
+      wrapContent,
+      drawerGeneration: PluginDrawerStore.getGeneration(),
+    }),
     i18n: {
       t: makePluginTranslator({ locale: workspace.locale, messages }),
     },

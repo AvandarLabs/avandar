@@ -1,15 +1,17 @@
+import { useQuery } from "@avandar/query-hooks";
 import { where } from "@avandar/utils";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { getActivePluginsFromLoadablePlugins } from "@/lib/plugins/getActivePluginsFromLoadablePlugins/getActivePluginsFromLoadablePlugins";
 import { getLoadablePluginsFromInstallations } from "@/lib/plugins/getLoadablePluginsFromInstallations/getLoadablePluginsFromInstallations";
-import { PluginModuleCache } from "@/lib/plugins/makePluginModuleCache/makePluginModuleCache";
+import { loadManifestModules } from "@/lib/plugins/loadManifestModules/loadManifestModules";
 import { PluginDrawerHost } from "@/lib/plugins/PluginDrawerHost/PluginDrawerHost";
 import { ActivePluginsContext } from "@/lib/plugins/PluginHost/ActivePluginsContext";
 import { getPluginIndexEntry } from "@/lib/plugins/pluginIndexHelpers";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
+import type { LoadablePluginInstallation } from "@/lib/plugins/getLoadablePluginsFromInstallations/getLoadablePluginsFromInstallations";
+import type { LoadedManifestModules } from "@/lib/plugins/loadManifestModules/loadManifestModules";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{ children: ReactNode }>;
@@ -17,6 +19,50 @@ type Props = Readonly<{ children: ReactNode }>;
 // A stable default, so a workspace still loading its installs does not hand
 // the memoized selection below a new array on every render.
 const NO_INSTALLATIONS: PluginInstallation.T[] = [];
+
+// A stable default, so the active selection below keeps its identity while
+// the manifests are still loading.
+const NO_MANIFESTS: LoadedManifestModules = {
+  manifestModules: [],
+  hasFailures: false,
+};
+
+/**
+ * Loads the manifests of the given plugins, each on its own so one failure
+ * does not hide the rest. Gives an empty result until the first load ends.
+ */
+function useLoadedManifests(
+  loadable: readonly LoadablePluginInstallation[],
+): LoadedManifestModules {
+  // Sorted, so installs arriving in another order reuse the same query.
+  const sortedPluginIds = useMemo(() => {
+    return loadable
+      .map(({ entry }) => {
+        return entry.id;
+      })
+      .toSorted();
+  }, [loadable]);
+  const [loadedManifests = NO_MANIFESTS] = useQuery({
+    queryKey: ["plugins", "manifests", ...sortedPluginIds],
+    queryFn: () => {
+      return loadManifestModules({
+        entries: loadable.map(({ entry }) => {
+          return entry;
+        }),
+      });
+    },
+    enabled: loadable.length > 0,
+    // A manifest that failed to load is retried the next time the query is
+    // used, while a fully loaded set stays cached.
+    staleTime: (query) => {
+      return query.state.data?.hasFailures ? 0 : Infinity;
+    },
+    // Installing a plugin changes the key. Keep the loaded plugins active
+    // until the new set arrives, rather than hiding them while it loads.
+    usePreviousDataAsPlaceholder: true,
+  });
+  return loadedManifests;
+}
 
 /**
  * Loads the manifests of the current workspace's enabled plugins and provides
@@ -35,30 +81,10 @@ export function PluginHost({ children }: Props): JSX.Element {
       getEntry: getPluginIndexEntry,
     });
   }, [installations]);
-  const manifestsQuery = useQuery({
-    queryKey: [
-      "plugins",
-      "manifests",
-      ...loadable.map(({ entry }) => {
-        return entry.id;
-      }),
-    ],
-    queryFn: () => {
-      return Promise.all(
-        loadable.map(({ entry }) => {
-          return PluginModuleCache.loadManifest(entry);
-        }),
-      );
-    },
-    enabled: loadable.length > 0,
-    staleTime: Infinity,
-  });
+  const { manifestModules } = useLoadedManifests(loadable);
   const activePlugins = useMemo(() => {
-    return getActivePluginsFromLoadablePlugins({
-      loadable,
-      manifestModules: manifestsQuery.data ?? [],
-    });
-  }, [loadable, manifestsQuery.data]);
+    return getActivePluginsFromLoadablePlugins({ loadable, manifestModules });
+  }, [loadable, manifestModules]);
 
   return (
     <ActivePluginsContext.Provider value={activePlugins}>

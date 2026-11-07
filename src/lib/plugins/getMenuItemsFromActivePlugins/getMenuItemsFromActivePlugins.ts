@@ -23,10 +23,65 @@ export type PluginMenuItem = Readonly<{
   Icon: PluginIconComponent | undefined;
 }>;
 
+function _getItemsFromPlugin(options: {
+  plugin: ActivePlugin;
+  slotId: SlotId;
+  facts: WhenFacts;
+  locale: string;
+}): PluginMenuItem[] {
+  const { plugin, slotId, facts, locale } = options;
+  const { manifest, strings, icons } = plugin.manifestModule;
+  const pluginName = getLocalizedTextFromManifestStrings({
+    strings,
+    locale,
+    value: manifest.name,
+  });
+  return (manifest.contributes.menus[slotId] ?? []).flatMap((menuEntry) => {
+    const command = manifest.contributes.commands.find((candidate) => {
+      return candidate.id === menuEntry.command;
+    });
+    if (
+      command === undefined ||
+      !evaluateWhenCondition(menuEntry.when, facts)
+    ) {
+      return [];
+    }
+    return [
+      {
+        key: `${manifest.id}/${command.id}`,
+        plugin,
+        pluginName,
+        commandId: command.id,
+        title: getLocalizedTextFromManifestStrings({
+          strings,
+          locale,
+          value: command.title,
+        }),
+        Icon: icons[command.icon],
+      },
+    ];
+  });
+}
+
+/** Keeps the first item of each key, so a React key is never repeated. */
+function _getFirstItemOfEachKey(
+  items: readonly PluginMenuItem[],
+): PluginMenuItem[] {
+  const seenKeys = new Set<string>();
+  return items.filter((item) => {
+    if (seenKeys.has(item.key)) {
+      return false;
+    }
+    seenKeys.add(item.key);
+    return true;
+  });
+}
+
 /**
  * Gets the commands that active plugins place in a slot and whose `when`
- * condition holds for the slot's current facts. Lets a slot decide what to
- * render, for example the plugin buttons in the Data Explorer toolbar.
+ * condition holds for the slot's current facts. A command a manifest lists
+ * more than once in a slot appears once. Lets a slot decide what to render,
+ * for example the plugin buttons in the Data Explorer toolbar.
  */
 export function getMenuItemsFromActivePlugins(options: {
   activePlugins: readonly ActivePlugin[];
@@ -35,37 +90,9 @@ export function getMenuItemsFromActivePlugins(options: {
   locale: string;
 }): PluginMenuItem[] {
   const { activePlugins, slotId, facts, locale } = options;
-  return activePlugins.flatMap((plugin) => {
-    const { manifest, strings, icons } = plugin.manifestModule;
-    const pluginName = getLocalizedTextFromManifestStrings({
-      strings,
-      locale,
-      value: manifest.name,
-    });
-    return (manifest.contributes.menus[slotId] ?? []).flatMap((menuEntry) => {
-      const command = manifest.contributes.commands.find((candidate) => {
-        return candidate.id === menuEntry.command;
-      });
-      if (
-        command === undefined ||
-        !evaluateWhenCondition(menuEntry.when, facts)
-      ) {
-        return [];
-      }
-      return [
-        {
-          key: `${manifest.id}/${command.id}`,
-          plugin,
-          pluginName,
-          commandId: command.id,
-          title: getLocalizedTextFromManifestStrings({
-            strings,
-            locale,
-            value: command.title,
-          }),
-          Icon: icons[command.icon],
-        },
-      ];
-    });
-  });
+  return _getFirstItemOfEachKey(
+    activePlugins.flatMap((plugin) => {
+      return _getItemsFromPlugin({ plugin, slotId, facts, locale });
+    }),
+  );
 }

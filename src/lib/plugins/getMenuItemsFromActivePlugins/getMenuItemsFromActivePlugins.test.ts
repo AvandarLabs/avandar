@@ -109,4 +109,45 @@ describe("getMenuItemsFromActivePlugins", () => {
 
     expect(items).toEqual([]);
   });
+
+  it("returns a command listed twice in one slot once", () => {
+    const plugin = _makeActivePlugin();
+    plugin.manifestModule.manifest.contributes.menus = {
+      [SLOT_ID]: [
+        { command: "regression.linear" },
+        { command: "regression.linear" },
+      ],
+    };
+
+    const items = getMenuItemsFromActivePlugins({
+      activePlugins: [plugin],
+      slotId: SLOT_ID,
+      facts: {},
+      locale: "en",
+    });
+
+    expect(items).toHaveLength(1);
+  });
+
+  it("returns a command once when only its second entry holds", () => {
+    const plugin = _makeActivePlugin();
+    plugin.manifestModule.manifest.contributes.menus = {
+      [SLOT_ID]: [
+        {
+          command: "regression.linear",
+          when: { numericColumnCount: { gte: 1 } },
+        },
+        { command: "regression.linear" },
+      ],
+    };
+
+    const items = getMenuItemsFromActivePlugins({
+      activePlugins: [plugin],
+      slotId: SLOT_ID,
+      facts: { numericColumnCount: 0 },
+      locale: "en",
+    });
+
+    expect(items).toHaveLength(1);
+  });
 });

@@ -4,40 +4,13 @@ import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { PluginModuleCache } from "@/lib/plugins/makePluginModuleCache/makePluginModuleCache";
+import { loadRunPluginCommand } from "@/lib/plugins/PluginMenuSlot/loadRunPluginCommand/loadRunPluginCommand";
 import { Logger } from "@/utils/Logger";
 import { notifyError } from "@/utils/notifications/notify";
 import type { PluginMenuItem } from "@/lib/plugins/getMenuItemsFromActivePlugins/getMenuItemsFromActivePlugins";
-import type {
-  PluginCommandFailure,
-  runPluginCommand,
-} from "@/lib/plugins/runPluginCommand/runPluginCommand";
+import type { PluginCommandFailure } from "@/lib/plugins/runPluginCommand/runPluginCommand";
 import type { PluginInvocationContext } from "@avandar/plugin-sdk";
 import type { I18n } from "@lingui/core";
-
-type RunPluginCommand = typeof runPluginCommand;
-
-function _importRunPluginCommand(): Promise<RunPluginCommand> {
-  return import("@/lib/plugins/runPluginCommand/runPluginCommand").then(
-    (runnerModule) => {
-      return runnerModule.runPluginCommand;
-    },
-  );
-}
-
-let runPluginCommandPromise: Promise<RunPluginCommand> | undefined;
-
-// The runner reaches the plugin SDK runtime and Lingui's message compiler, so
-// it loads on the first click rather than with the app. A failed import is
-// forgotten so the next click retries it.
-function _loadRunPluginCommand(): Promise<RunPluginCommand> {
-  runPluginCommandPromise ??= _importRunPluginCommand().catch(
-    (error: unknown) => {
-      runPluginCommandPromise = undefined;
-      throw error;
-    },
-  );
-  return runPluginCommandPromise;
-}
 
 function _runCommandWithLazyRunner(options: {
   item: PluginMenuItem;
@@ -45,7 +18,7 @@ function _runCommandWithLazyRunner(options: {
   workspace: { id: string; slug: string; locale: string };
 }): Promise<PluginCommandFailure | undefined> {
   const { item, context, workspace } = options;
-  return _loadRunPluginCommand().then(
+  return loadRunPluginCommand().then(
     (runCommand) => {
       return runCommand({
         plugin: item.plugin,
@@ -125,16 +98,20 @@ export function usePluginCommandRunner(
       return;
     }
     setRunningKey(item.key);
-    const failure = await _runCommandWithLazyRunner({
-      item,
-      context,
-      workspace: {
-        id: workspace.id,
-        slug: workspace.slug,
-        locale: i18n.locale,
-      },
-    });
-    setRunningKey(undefined);
+    let failure: PluginCommandFailure | undefined;
+    try {
+      failure = await _runCommandWithLazyRunner({
+        item,
+        context,
+        workspace: {
+          id: workspace.id,
+          slug: workspace.slug,
+          locale: i18n.locale,
+        },
+      });
+    } finally {
+      setRunningKey(undefined);
+    }
     if (failure !== undefined) {
       _reportFailure({ item, failure, i18n });
     }

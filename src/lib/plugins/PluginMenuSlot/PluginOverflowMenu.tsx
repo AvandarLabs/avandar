@@ -14,7 +14,7 @@ type Props = Readonly<{
 /**
  * One "Plugins" button that opens a menu of plugin commands, for a slot with
  * more commands than fit as buttons. The button shows a loading state while
- * any of the commands is running.
+ * any of the commands is running, and is disabled whenever the commands are.
  */
 export function PluginOverflowMenu({
   items,
@@ -32,6 +32,7 @@ export function PluginOverflowMenu({
           size="compact-sm"
           leftSection={<IconPuzzle size={16} aria-hidden />}
           loading={runningKey !== undefined}
+          disabled={isDisabled}
         >
           {t`Plugins`}
         </Button>

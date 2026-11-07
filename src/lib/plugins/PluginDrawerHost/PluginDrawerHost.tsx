@@ -19,7 +19,9 @@ export function PluginDrawerHost(): JSX.Element {
   );
 
   // A workspace switch unmounts the host. Drop the drawer so the next host
-  // does not show a plugin's drawer from the previous workspace.
+  // does not show a plugin's drawer from the previous workspace. Clearing also
+  // ends the store's generation, so a command still running from that
+  // workspace cannot open a drawer in the next one.
   useEffect(() => {
     return PluginDrawerStore.clear;
   }, []);

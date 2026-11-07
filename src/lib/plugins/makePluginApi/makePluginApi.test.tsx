@@ -108,6 +108,31 @@ describe("makePluginApi", () => {
     expect(await screen.findByText("Details")).toBeTruthy();
   });
 
+  it("opens no drawer for an api made before the host unmounted", () => {
+    const previousHost = render(<PluginDrawerHost />);
+    const api = _makeApiFromRows();
+    previousHost.unmount();
+    render(<PluginDrawerHost />);
+
+    act(() => {
+      api.ui.openDrawer({ title: "Stale", content: <p>stale body</p> });
+    });
+
+    expect(PluginDrawerStore.getSnapshot()).toBeUndefined();
+  });
+
+  it("opens a drawer for an api made after the host mounted again", async () => {
+    const previousHost = render(<PluginDrawerHost />);
+    previousHost.unmount();
+    render(<PluginDrawerHost />);
+
+    act(() => {
+      _makeApiFromRows().ui.openDrawer({ title: "Fresh", content: null });
+    });
+
+    expect(await screen.findByText("Fresh")).toBeTruthy();
+  });
+
   it("gives drawer content the scoped API through useAvandar", async () => {
     render(<PluginDrawerHost />);
 
