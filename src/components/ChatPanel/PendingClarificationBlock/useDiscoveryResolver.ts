@@ -1,22 +1,29 @@
 import { isDefined } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback } from "react";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
 
 /**
  * Creates the callback that turns a discovery query into clarification
  * options.
+ *
+ * The lookup runs through `WorkspaceQuerySession`, like the Data Explorer's
+ * own queries, so a dataset the explorer has not opened yet is loaded into
+ * DuckDB first and only this workspace's datasets can be read.
  */
-export function useDiscoveryResolver(): DiscoveryResolver {
+export function useDiscoveryResolver(
+  workspaceId: Workspace.Id,
+): DiscoveryResolver {
   const { t } = useLingui();
 
   return useCallback<DiscoveryResolver>(
     async function resolveDiscoveryOptions(options) {
       try {
-        const queryResult = await DuckDbClient.runRawQuery<
+        const queryResult = await WorkspaceQuerySession.runQuery<
           Record<string, unknown>
-        >(options.query);
+        >({ rawSql: options.query, workspaceId });
         const values = queryResult.data
           .map((row) => {
             const rowKeys = Object.keys(row);
@@ -48,6 +55,6 @@ export function useDiscoveryResolver(): DiscoveryResolver {
         };
       }
     },
-    [t],
+    [t, workspaceId],
   );
 }
