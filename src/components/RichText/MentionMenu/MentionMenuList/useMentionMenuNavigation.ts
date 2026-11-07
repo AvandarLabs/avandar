@@ -172,6 +172,7 @@ function useVisibleGroups(
  * The highlight and keyboard handling behind `MentionMenuList`: one flat
  * highlight across every visible group, the key handler the suggestion
  * plugin calls through `ref`, and the editing area's combobox attributes.
+ * It also keeps the highlighted row scrolled into view.
  */
 export function useMentionMenuNavigation(
   ref: Ref<MentionMenuListHandle>,
@@ -184,11 +185,20 @@ export function useMentionMenuNavigation(
   const buildOptionId = (itemId: string) => {
     return `${listboxId}-${itemId}`;
   };
-  useEditingAreaComboboxAria(
-    editingArea,
-    listboxId,
-    highlightedItem ? buildOptionId(highlightedItem.id) : undefined,
-  );
+  const highlightedOptionId = highlightedItem
+    ? buildOptionId(highlightedItem.id)
+    : undefined;
+  // The editor keeps focus, so the browser never scrolls to the highlight.
+  // Rerun on `items` too: groups arriving above the pinned row push it out
+  // of view without the highlight itself changing.
+  useEffect(() => {
+    if (highlightedOptionId !== undefined) {
+      document
+        .getElementById(highlightedOptionId)
+        ?.scrollIntoView({ block: "nearest" });
+    }
+  }, [highlightedOptionId, items]);
+  useEditingAreaComboboxAria(editingArea, listboxId, highlightedOptionId);
   useImperativeHandle(ref, () => {
     return {
       onKeyDown: (event) => {

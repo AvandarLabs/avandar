@@ -9,6 +9,12 @@ import type { GadgetSearchResult } from "@/clients/gadgets/searchGadgets/searchG
 import type { MentionMenuGroup } from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
 import type { MentionCandidate } from "@/components/RichText/UserMention/filterMentionCandidates";
 
+/**
+ * Floor for the menu's height cap. A smaller cap hides the overflow that
+ * `flip` needs to see, so the menu would never move above the caret.
+ */
+const MIN_MENU_HEIGHT = 240;
+
 /** Lets the suggestion plugin forward the editor's key presses. */
 export type MentionMenuListHandle = {
   onKeyDown: (event: KeyboardEvent) => boolean;
@@ -81,7 +87,16 @@ export const MentionMenuList = forwardRef<
         // Near the bottom of the window the menu flips above the caret, and
         // `size` caps its height to the room left so the groups scroll
         // while the status row and footer stay visible.
-        middlewares={{ flip: true, shift: true, size: { padding: 8 } }}
+        middlewares={{
+          flip: true,
+          shift: true,
+          size: {
+            padding: 8,
+            apply: ({ availableHeight, elements }) => {
+              elements.floating.style.maxHeight = `${Math.max(availableHeight, MIN_MENU_HEIGHT)}px`;
+            },
+          },
+        }}
         onOptionSubmit={chooseItemById}
       >
         <Combobox.Target>

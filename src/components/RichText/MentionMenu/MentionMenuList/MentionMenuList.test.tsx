@@ -433,6 +433,21 @@ describe("MentionMenuList scrolling", () => {
   });
 });
 
+describe("MentionMenuList scrolling after results arrive", () => {
+  it("scrolls the pinned row into view again when gadget groups arrive above it", async () => {
+    const scrollIntoView = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+    const ref = createRef<MentionMenuListHandle>();
+    const { rerender } = _renderList({ ref });
+    await screen.findByText("Priya Natarajan");
+    scrollIntoView.mockClear();
+    rerender(_buildList({ ref, gadgets: [DASHBOARD, DATASET] }));
+    await screen.findByText("Measles by borough");
+    const priyaOption = screen.getAllByRole("option")[2];
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest" });
+    expect(scrollIntoView.mock.contexts).toContain(priyaOption);
+  });
+});
+
 describe("MentionMenuList accessibility", () => {
   it("makes the editing area a combobox pointing at the highlighted option", async () => {
     const editingArea = _createEditingArea();
