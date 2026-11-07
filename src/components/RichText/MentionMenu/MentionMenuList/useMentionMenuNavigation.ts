@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -121,8 +122,12 @@ function _onListKeyDown(
  * Keeps the highlight as a row id in React state rather than in the
  * Combobox store's DOM-based selection, which misses options the portal has
  * not rendered yet. Keying it by id keeps the author's row highlighted when
- * gadget results arrive above it. The ref mirrors it so key presses arriving
- * before a re-render still see the latest row.
+ * gadget results arrive above it. Until the author moves the highlight, the
+ * first row is pinned the same way, so people who show up first stay
+ * highlighted when gadget groups later arrive before them. When the pinned
+ * row goes away, the first row is pinned instead. The ref mirrors the
+ * highlight so key presses arriving before a re-render still see the latest
+ * row.
  */
 function useHighlightedItem(items: readonly MentionMenuItem[]) {
   const [highlightedId, setHighlightedId] = useState<string>();
@@ -131,6 +136,15 @@ function useHighlightedItem(items: readonly MentionMenuItem[]) {
     highlightedIdRef.current = itemId;
     setHighlightedId(itemId);
   }, []);
+  const firstItemId = items[0]?.id;
+  const isHighlightedIdShown = items.some((item) => {
+    return item.id === highlightedId;
+  });
+  useEffect(() => {
+    if (firstItemId !== undefined && !isHighlightedIdShown) {
+      highlightId(firstItemId);
+    }
+  }, [firstItemId, isHighlightedIdShown, highlightId]);
   const highlightedItem = items[_getHighlightedIndex(items, highlightedId)];
   return { highlightedItem, highlightedIdRef, highlightId };
 }

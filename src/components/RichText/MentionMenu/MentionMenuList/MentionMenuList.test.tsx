@@ -362,6 +362,20 @@ describe("MentionMenuList highlight", () => {
     );
   });
 
+  it("keeps the first member chosen by Enter when gadgets arrive above before any key", async () => {
+    const command = vi.fn();
+    const ref = createRef<MentionMenuListHandle>();
+    const { rerender } = _renderList({ ref, command });
+    await screen.findByText("Priya Natarajan");
+    rerender(_buildList({ ref, command, gadgets: [DASHBOARD, DATASET] }));
+    await screen.findByText("Measles by borough");
+    _pressKey(ref, { key: "Enter" });
+    expect(command).toHaveBeenCalledWith({
+      kind: "person",
+      candidate: PEOPLE[0],
+    });
+  });
+
   it("falls back to the first row when the highlighted row goes away", async () => {
     const editingArea = _createEditingArea();
     const ref = createRef<MentionMenuListHandle>();
