@@ -77,6 +77,8 @@ export type {
 export type {
   CheckpointKey,
   CheckpointStore,
+  DriveRow,
+  DrivesStore,
   ListingAccessKind,
   ListingRowValues,
   ListingsStore,
@@ -97,6 +99,11 @@ export {
   type InMemoryCheckpointStore,
 } from "@etl/stores/InMemoryCheckpointStore/createInMemoryCheckpointStore";
 export {
+  createInMemoryDrivesStore,
+  type InMemoryDrivesStore,
+  type StoredDriveRow,
+} from "@etl/stores/InMemoryDrivesStore/createInMemoryDrivesStore";
+export {
   createInMemoryObjectStore,
   type InMemoryObjectStore,
 } from "@etl/stores/InMemoryObjectStore/createInMemoryObjectStore";
@@ -108,6 +115,10 @@ export {
   createSupabaseCheckpointStore,
   type SupabaseCheckpointStoreOptions,
 } from "@etl/stores/SupabaseCheckpointStore/createSupabaseCheckpointStore";
+export {
+  createSupabaseDrivesStore,
+  type SupabaseDrivesStoreOptions,
+} from "@etl/stores/SupabaseDrivesStore/createSupabaseDrivesStore";
 export { createSupabaseObjectStore } from "@etl/stores/SupabaseObjectStore/createSupabaseObjectStore";
 export {
   ETL_INPUT_BASE_DIR,

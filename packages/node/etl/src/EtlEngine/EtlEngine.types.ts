@@ -4,6 +4,7 @@ import type { TransformedColumnDescription } from "@etl/EtlEngine/transformedCsv
 import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 import type {
   CheckpointStore,
+  DrivesStore,
   ListingsStore,
   ObjectStore,
 } from "@etl/stores/EtlStores.types";
@@ -266,6 +267,11 @@ export type EtlOutput = Readonly<{
    * `rpc_pipeline_executions__start`. Omit to record nothing.
    */
   executionFunctions?: ExecutionFunctions;
+  /**
+   * The drives table, such as `data_catalog_drives`. Omit to record no
+   * drives.
+   */
+  drivesTable?: string;
 }>;
 
 /** Where a pipeline's output goes: Supabase credentials and output names. */
@@ -287,6 +293,8 @@ export type EtlStores = Readonly<{
   checkpoints?: CheckpointStore;
   /** Where runs are recorded. Omit to record nothing. */
   executions?: ExecutionStore;
+  /** Where drives are recorded. Omit to write no drive and no `drive_id`. */
+  drives?: DrivesStore;
 }>;
 
 /**
@@ -316,6 +324,11 @@ export type EtlEngineConfig<
     listDrives: () => PromisedOrValue<readonly TDrive[]>;
     /** Written to `api_base_url` on `api_resource` rows. */
     getDriveKey: (drive: TDrive) => string;
+    /**
+     * What the drives table records about a drive, such as its organization
+     * labels. Omit to record each drive with no labels.
+     */
+    describeDrive?: (drive: TDrive) => EtlDriveDescription;
     /**
      * The drive's scopes, crawled in this order. Omit for one scope,
      * `all`, which leaves `TScope` at its default, `EtlScope`.

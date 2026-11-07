@@ -1,3 +1,4 @@
+import type { EtlOrganizationLabels } from "@etl/EtlEngine/EtlEngine.types";
 import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 
 /** Which of the two listing shapes a row is. */
@@ -148,4 +149,20 @@ export type CheckpointStore = Readonly<{
   read: (key: CheckpointKey) => Promise<Date | undefined>;
   /** Creates the checkpoint, or replaces its value and run id. */
   write: (checkpoint: StoredCheckpoint) => Promise<void>;
+}>;
+
+/** One drive as the drives table stores it. */
+export type DriveRow = Readonly<{
+  pipelineName: string;
+  driveKey: string;
+  organizationLabels: EtlOrganizationLabels;
+}>;
+
+/** Writes the drives table. */
+export type DrivesStore = Readonly<{
+  /**
+   * Inserts the drive, or replaces its labels when the pipeline already
+   * wrote it, and resolves to its id.
+   */
+  upsert: (drive: DriveRow) => Promise<string>;
 }>;
