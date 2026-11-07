@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 describe("getPipelineWorkspaceLoadability", () => {
   it("reads the shipped ETL config, which rules out PDF and XLSX", () => {
-    const rules = getPipelineWorkspaceLoadability("socrata");
+    const rules = getPipelineWorkspaceLoadability({ drives: [] });
 
     expect(rules.unloadableFormats).toEqual(
       expect.arrayContaining(["pdf", "xlsx"]),
@@ -11,7 +11,7 @@ describe("getPipelineWorkspaceLoadability", () => {
   });
 
   it("never rules out the formats the app reads", () => {
-    const rules = getPipelineWorkspaceLoadability("hdx");
+    const rules = getPipelineWorkspaceLoadability({ drives: [] });
 
     expect(rules.unloadableFormats).not.toEqual(
       expect.arrayContaining(["csv"]),

@@ -20,7 +20,7 @@ function _createEngine(): EtlEngineInstance {
   return createSocrataEtlEngine({
     ...getPipelineEtlDestination(),
     discovery,
-    workspaceLoadability: getPipelineWorkspaceLoadability("socrata"),
+    workspaceLoadability: getPipelineWorkspaceLoadability({ drives: [] }),
   });
 }
 

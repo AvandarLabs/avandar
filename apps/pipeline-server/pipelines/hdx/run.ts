@@ -18,7 +18,7 @@ function _createEngine(): EtlEngineInstance {
   return createHdxEtlEngine({
     ...getPipelineEtlDestination(),
     discovery,
-    workspaceLoadability: getPipelineWorkspaceLoadability("hdx"),
+    workspaceLoadability: getPipelineWorkspaceLoadability({ drives: [] }),
   });
 }
 

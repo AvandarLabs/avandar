@@ -1,6 +1,9 @@
 import { fileURLToPath } from "node:url";
 import { getWorkspaceLoadabilityRules, readEtlConfigFile } from "@avandar/etl";
-import type { EtlWorkspaceLoadabilityRules } from "@avandar/etl";
+import type {
+  EtlWorkspaceLoadabilityRules,
+  PipelineConfig,
+} from "@avandar/etl";
 
 /** The ETL config every pipeline in this server shares. */
 const ETL_CONFIG_PATH = fileURLToPath(
@@ -8,18 +11,19 @@ const ETL_CONFIG_PATH = fileURLToPath(
 );
 
 /**
- * The formats a workspace cannot load from one pipeline's listings, as
- * `pipelines/etl.config.yaml` declares them globally and for that pipeline.
+ * The formats a workspace cannot load from one pipeline's listings:
+ * `pipelines/etl.config.yaml`'s global rules with the pipeline config's
+ * own `workspaceLoadability` applied.
  *
- * @param pipelineName - The pipeline whose overrides apply.
+ * @param pipelineConfig - The pipeline's parsed config.
  * @returns The rules to pass to the pipeline's engine.
- * @throws When the config file cannot be read or is invalid.
+ * @throws When the shared config file cannot be read or is invalid.
  */
 export function getPipelineWorkspaceLoadability(
-  pipelineName: string,
+  pipelineConfig: PipelineConfig,
 ): EtlWorkspaceLoadabilityRules {
   return getWorkspaceLoadabilityRules({
     config: readEtlConfigFile(ETL_CONFIG_PATH),
-    pipelineName,
+    pipelineOverrides: pipelineConfig.workspaceLoadability,
   });
 }

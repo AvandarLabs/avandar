@@ -262,17 +262,15 @@ workspace can add. A `pipeline_parquet` row is always loadable. An
 
 A pipeline loads those rules from a shared YAML file with
 `readEtlConfigFile` and `getWorkspaceLoadabilityRules`. The file lists the
-global unloadable formats and lets each pipeline, keyed by its name, make a
-global format loadable (`loadableFormats`) or add its own
-(`unloadableFormats`):
+global unloadable formats. A pipeline's own config can make a global
+format loadable (`loadableFormats`) or add its own (`unloadableFormats`)
+under its `workspaceLoadability`, and passes that as `pipelineOverrides` to
+`getWorkspaceLoadabilityRules`. A `pipelines` key in the shared file fails
+the parse.
 
 ```yaml
 workspaceLoadability:
   unloadableFormats: [PDF, XLSX]
-pipelines:
-  hdx:
-    workspaceLoadability:
-      loadableFormats: [XLSX]
 ```
 
 Formats match case-insensitively and may be written as extensions

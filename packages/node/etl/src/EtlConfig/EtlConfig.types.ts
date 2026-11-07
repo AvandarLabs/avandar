@@ -21,11 +21,4 @@ export type EtlPipelineWorkspaceLoadability = Readonly<{
  */
 export type EtlConfig = Readonly<{
   workspaceLoadability: Readonly<{ unloadableFormats: readonly string[] }>;
-  /** Per-pipeline overrides, keyed by pipeline name. */
-  pipelines: Readonly<
-    Record<
-      string,
-      Readonly<{ workspaceLoadability?: EtlPipelineWorkspaceLoadability }>
-    >
-  >;
 }>;
