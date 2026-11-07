@@ -1,5 +1,6 @@
 import { Drawer } from "@avandar/ui";
-import { useSyncExternalStore } from "react";
+import { useLingui } from "@lingui/react/macro";
+import { Fragment, useEffect, useSyncExternalStore } from "react";
 import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
 
 /**
@@ -11,19 +12,31 @@ import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerSt
  * `makePluginApi`.
  */
 export function PluginDrawerHost(): JSX.Element {
+  const { t } = useLingui();
   const drawer = useSyncExternalStore(
     PluginDrawerStore.subscribe,
     PluginDrawerStore.getSnapshot,
   );
+
+  // A workspace switch unmounts the host. Drop the drawer so the next host
+  // does not show a plugin's drawer from the previous workspace.
+  useEffect(() => {
+    return PluginDrawerStore.clear;
+  }, []);
+
   return (
     <Drawer
-      opened={drawer !== undefined}
+      opened={drawer?.isOpen ?? false}
       onClose={PluginDrawerStore.close}
+      onExitTransitionEnd={PluginDrawerStore.clearClosed}
       title={drawer?.title}
+      closeButtonProps={{ "aria-label": t`Close` }}
       position="right"
       size="lg"
     >
-      {drawer?.content}
+      {/* Keying on the open remounts the content, so a drawer that opens
+          after another one never inherits its state or its error boundary. */}
+      <Fragment key={drawer?.openId}>{drawer?.content}</Fragment>
     </Drawer>
   );
 }

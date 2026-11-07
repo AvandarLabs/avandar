@@ -1,4 +1,5 @@
 import { AvandarProvider, makePluginTranslator } from "@avandar/plugin-sdk";
+import { t } from "@lingui/core/macro";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { fetchRowsForInvocation } from "@/lib/plugins/fetchRowsForInvocation/fetchRowsForInvocation";
@@ -26,14 +27,21 @@ function _makeDataApi(context: PluginInvocationContext): AvandarApi["data"] {
   };
 }
 
-function _makeUiApi(options: {
-  pluginName: string;
-  wrapContent: (content: ReactNode) => ReactNode;
-}): AvandarApi["ui"] {
+function _makeUiApi(
+  options: Readonly<{
+    pluginName: string;
+    wrapContent: (content: ReactNode) => ReactNode;
+  }>,
+): AvandarApi["ui"] {
   const { pluginName, wrapContent } = options;
   return {
     openModal: ({ title, content }) => {
-      modals.open({ title, size: "lg", children: wrapContent(content) });
+      modals.open({
+        title,
+        size: "lg",
+        children: wrapContent(content),
+        closeButtonProps: { "aria-label": t`Close` },
+      });
     },
     openDrawer: ({ title, content }) => {
       PluginDrawerStore.open({ title, content: wrapContent(content) });
@@ -51,17 +59,20 @@ function _makeUiApi(options: {
 /**
  * Makes the `avandar` object one command invocation receives, scoped to the
  * plugin, the workspace, and the query result the command was invoked on.
- * Use it to run a plugin command, for example from `runPluginCommand`.
+ * `runPluginCommand` calls it once per invocation and passes the result to the
+ * plugin's command handler.
  *
  * It pulls in the plugin SDK runtime and Lingui's message compiler, so import
  * it lazily, at the time a command runs, to keep them out of the main bundle.
  */
-export function makePluginApi(options: {
-  pluginName: string;
-  context: PluginInvocationContext;
-  workspace: AvandarApi["workspace"];
-  messages: PluginMessages;
-}): AvandarApi {
+export function makePluginApi(
+  options: Readonly<{
+    pluginName: string;
+    context: PluginInvocationContext;
+    workspace: AvandarApi["workspace"];
+    messages: PluginMessages;
+  }>,
+): AvandarApi {
   const { pluginName, context, workspace, messages } = options;
   // Overlay content renders after this function returns, so it can read
   // `api` through the closure to give plugin UI its own scoped API.

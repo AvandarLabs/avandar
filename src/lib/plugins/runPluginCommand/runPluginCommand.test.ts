@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { runPluginCommand } from "@/lib/plugins/runPluginCommand/runPluginCommand";
 import type { ActivePlugin } from "@/lib/plugins/getActivePluginsFromLoadablePlugins/getActivePluginsFromLoadablePlugins";
 import type { PluginCodeModule } from "@/lib/plugins/PluginIndex.types";
+import type { PluginCommandFailure } from "@/lib/plugins/runPluginCommand/runPluginCommand";
 import type {
   CommandHandler,
   DataExplorerToolbarContext,
@@ -25,9 +26,9 @@ function _makeCodeModuleFromCommands(
 }
 
 function _runCommandFromLoader(options: {
-  loadCode: () => Promise<PluginCodeModule>;
+  loadCode: () => Promise<PluginCodeModule | undefined>;
   commandId?: string;
-}) {
+}): Promise<PluginCommandFailure | undefined> {
   return runPluginCommand({
     plugin: PLUGIN,
     pluginName: "Test",
@@ -41,15 +42,23 @@ function _runCommandFromLoader(options: {
 describe("runPluginCommand", () => {
   it("runs the handler with an API scoped to the invocation", async () => {
     const handler = vi.fn();
-    const failure = await _runCommandFromLoader({
+    await _runCommandFromLoader({
       loadCode: async () => {
         return _makeCodeModuleFromCommands({ hello: handler });
       },
     });
-    expect(failure).toBeUndefined();
     expect(handler).toHaveBeenCalledWith(
       expect.objectContaining({ context: CONTEXT, workspace: WORKSPACE }),
     );
+  });
+
+  it("reports no failure when the handler completes", async () => {
+    const failure = await _runCommandFromLoader({
+      loadCode: async () => {
+        return _makeCodeModuleFromCommands({ hello: vi.fn() });
+      },
+    });
+    expect(failure).toBeUndefined();
   });
 
   it("reports load_failed when the plugin code cannot load", async () => {
@@ -87,6 +96,44 @@ describe("runPluginCommand", () => {
       },
     });
     expect(failure?.kind).toBe("missing_handler");
+  });
+
+  it("reports load_failed when the loader resolves no module", async () => {
+    const failure = await _runCommandFromLoader({
+      loadCode: async () => {
+        return undefined;
+      },
+    });
+    expect(failure?.kind).toBe("load_failed");
+  });
+
+  it("reports missing_handler when the handler is not a function", async () => {
+    const failure = await _runCommandFromLoader({
+      loadCode: async () => {
+        return {
+          definition: { kind: "avandar-plugin", commands: { hello: "nope" } },
+          messages: { en: {} },
+        };
+      },
+    });
+    expect(failure?.kind).toBe("missing_handler");
+  });
+
+  it("reports command_failed when reading the commands throws", async () => {
+    const failure = await _runCommandFromLoader({
+      loadCode: async () => {
+        return {
+          definition: {
+            kind: "avandar-plugin",
+            get commands(): never {
+              throw new Error("hostile getter");
+            },
+          },
+          messages: { en: {} },
+        };
+      },
+    });
+    expect(failure?.kind).toBe("command_failed");
   });
 
   it("reports command_failed with the error a handler throws", async () => {

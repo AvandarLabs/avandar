@@ -11,7 +11,15 @@ import type {
   PluginInvocationContext,
 } from "@avandar/plugin-sdk";
 
-/** Why a plugin command did not complete. */
+/**
+ * Why a plugin command did not complete. The plugin menu slot reads it to
+ * report the failure to the user.
+ *
+ * `load_failed` covers plugin code that did not load, including a load that
+ * resolves without a module. `missing_handler` means the module loaded but
+ * declares no function for the command. `command_failed` means the handler,
+ * or reading it from the module, threw.
+ */
 export type PluginCommandFailure = Readonly<{
   kind: "load_failed" | "missing_handler" | "command_failed";
   error?: unknown;
@@ -20,7 +28,7 @@ export type PluginCommandFailure = Readonly<{
 /**
  * Reads the handler a plugin's code module declares for a command id. Only
  * the module's own commands count, so an id such as `constructor` finds
- * nothing.
+ * nothing, and an entry that is not a function does not count either.
  */
 function _getHandlerFromCodeModule(options: {
   codeModule: PluginCodeModule;
@@ -34,7 +42,8 @@ function _getHandlerFromCodeModule(options: {
   ) {
     return undefined;
   }
-  return definition.commands[commandId];
+  const handler = definition.commands[commandId];
+  return typeof handler === "function" ? handler : undefined;
 }
 
 /**
@@ -48,26 +57,34 @@ function _getHandlerFromCodeModule(options: {
  * through `makePluginApi`, and a static import from anything rendered at
  * startup would put both in the main bundle.
  */
-export async function runPluginCommand(options: {
-  plugin: ActivePlugin;
-  pluginName: string;
-  commandId: string;
-  context: PluginInvocationContext;
-  workspace: AvandarApi["workspace"];
-  loadCode: (entry: PluginIndexEntry) => Promise<PluginCodeModule>;
-}): Promise<PluginCommandFailure | undefined> {
+export async function runPluginCommand(
+  options: Readonly<{
+    plugin: ActivePlugin;
+    pluginName: string;
+    commandId: string;
+    context: PluginInvocationContext;
+    workspace: AvandarApi["workspace"];
+    loadCode: (
+      entry: PluginIndexEntry,
+    ) => Promise<PluginCodeModule | undefined>;
+  }>,
+): Promise<PluginCommandFailure | undefined> {
   const { plugin, pluginName, commandId, context, workspace } = options;
-  let codeModule: PluginCodeModule;
+  let codeModule: PluginCodeModule | undefined;
   try {
     codeModule = await options.loadCode(plugin.entry);
   } catch (error) {
     return { kind: "load_failed", error };
   }
-  const handler = _getHandlerFromCodeModule({ codeModule, commandId });
-  if (handler === undefined) {
-    return { kind: "missing_handler" };
+  if (codeModule === undefined) {
+    return { kind: "load_failed" };
   }
+  // Plugin code is untrusted, so reading its handler can throw too.
   try {
+    const handler = _getHandlerFromCodeModule({ codeModule, commandId });
+    if (handler === undefined) {
+      return { kind: "missing_handler" };
+    }
     const api = makePluginApi({
       pluginName,
       context,

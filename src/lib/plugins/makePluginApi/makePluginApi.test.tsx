@@ -1,4 +1,6 @@
 import { useAvandar } from "@avandar/plugin-sdk";
+import { ModalsProvider, modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { makePluginApi } from "@/lib/plugins/makePluginApi/makePluginApi";
 import { PluginDrawerHost } from "@/lib/plugins/PluginDrawerHost/PluginDrawerHost";
@@ -10,6 +12,9 @@ import type {
   DataExplorerToolbarContext,
 } from "@avandar/plugin-sdk";
 import type { ReactNode } from "react";
+
+const CRASH_FALLBACK_TEXT =
+  "Something went wrong in this plugin. Close this panel and try again.";
 
 const ROWS = [
   { x: 1, y: "a" },
@@ -41,10 +46,12 @@ function CrashingContent(): ReactNode {
 
 describe("makePluginApi", () => {
   afterEach(() => {
-    act(() => {
-      PluginDrawerStore.close();
-    });
     cleanup();
+    act(() => {
+      PluginDrawerStore.clear();
+      modals.closeAll();
+      notifications.clean();
+    });
     vi.restoreAllMocks();
   });
 
@@ -79,7 +86,26 @@ describe("makePluginApi", () => {
     });
 
     expect(await screen.findByText("Test plugin")).toBeTruthy();
+  });
+
+  it("shows the message a plugin notifies", async () => {
+    render(<PluginDrawerHost />);
+
+    act(() => {
+      _makeApiFromRows().ui.notify({ message: "Saved" });
+    });
+
     expect(await screen.findByText("Saved")).toBeTruthy();
+  });
+
+  it("titles the drawer with the title the plugin gives", async () => {
+    render(<PluginDrawerHost />);
+
+    act(() => {
+      _makeApiFromRows().ui.openDrawer({ title: "Details", content: null });
+    });
+
+    expect(await screen.findByText("Details")).toBeTruthy();
   });
 
   it("gives drawer content the scoped API through useAvandar", async () => {
@@ -92,7 +118,6 @@ describe("makePluginApi", () => {
       });
     });
 
-    expect(await screen.findByText("Details")).toBeTruthy();
     expect(await screen.findByText("rows: 2")).toBeTruthy();
   });
 
@@ -108,10 +133,46 @@ describe("makePluginApi", () => {
       });
     });
 
-    expect(
-      await screen.findByText(
-        "Something went wrong in this plugin. Close this panel and try again.",
-      ),
-    ).toBeTruthy();
+    expect(await screen.findByText(CRASH_FALLBACK_TEXT)).toBeTruthy();
+  });
+
+  it("renders drawer content that opens after content that crashed", async () => {
+    // React and the boundary both log the crash. Keep the test output clean.
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    render(<PluginDrawerHost />);
+    const api = _makeApiFromRows();
+    act(() => {
+      api.ui.openDrawer({ title: "Broken", content: <CrashingContent /> });
+    });
+    await screen.findByText(CRASH_FALLBACK_TEXT);
+
+    act(() => {
+      api.ui.openDrawer({ title: "Details", content: <ContextProbe /> });
+    });
+
+    expect(await screen.findByText("rows: 2")).toBeTruthy();
+  });
+
+  it("gives modal content the scoped API through useAvandar", async () => {
+    render(<ModalsProvider>{null}</ModalsProvider>);
+
+    act(() => {
+      _makeApiFromRows().ui.openModal({
+        title: "Details",
+        content: <ContextProbe />,
+      });
+    });
+
+    expect(await screen.findByText("rows: 2")).toBeTruthy();
+  });
+
+  it("names the modal's close button", async () => {
+    render(<ModalsProvider>{null}</ModalsProvider>);
+
+    act(() => {
+      _makeApiFromRows().ui.openModal({ title: "Details", content: null });
+    });
+
+    expect(await screen.findByRole("button", { name: "Close" })).toBeTruthy();
   });
 });
