@@ -57,7 +57,7 @@ type _CrawlTasksArgs<TDrive, TConnection, TScope extends EtlScope> = Readonly<{
   syncedAt: Date;
   clock: EtlClock;
   /**
-   * The drive's `data_catalog_drives` id, written the first time the run
+   * The drive's id in the drives table, written the first time the run
    * reaches the drive, or `undefined` when there is no drives store.
    */
   resolveDriveId: (
@@ -241,7 +241,8 @@ function _createDriveIdResolver<
 
 /**
  * The listed task's drive id, or the failed crawl to report when its drive
- * row could not be written.
+ * row could not be written. A crawl with no limit left is skipped without
+ * writing a drive row, so its id is `undefined`.
  */
 async function _resolveDriveIdOrFailure<
   TDrive,
@@ -249,12 +250,18 @@ async function _resolveDriveIdOrFailure<
   TScope extends EtlScope,
 >(
   args: _CrawlTasksArgs<TDrive, TConnection, TScope> &
-    Readonly<{ task: Extract<_CrawlTask<TDrive, TScope>, { isListed: true }> }>,
+    Readonly<{
+      task: Extract<_CrawlTask<TDrive, TScope>, { isListed: true }>;
+      remaining: number;
+    }>,
 ): Promise<
   | Readonly<{ driveId: string | undefined }>
   | Readonly<{ failure: CrawlScopeResult }>
 > {
   const { task } = args;
+  if (args.remaining <= 0) {
+    return { driveId: undefined };
+  }
   try {
     return { driveId: await args.resolveDriveId(task.drive, task.driveKey) };
   } catch (error: unknown) {

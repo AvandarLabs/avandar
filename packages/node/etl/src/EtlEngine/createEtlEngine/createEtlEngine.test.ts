@@ -2186,6 +2186,38 @@ describe("createEtlEngine", () => {
       expect(_datasetIds(listings)).toEqual(["b1"]);
     });
 
+    it("writes no drive row for a crawl the limit skips", async () => {
+      const listings = createInMemoryListingsStore();
+      const drives = createInMemoryDrivesStore();
+      const failingDrives = {
+        upsert: async (drive: Parameters<typeof drives.upsert>[0]) => {
+          if (drive.driveKey === "b") {
+            throw new Error("drives table unavailable");
+          }
+          return await drives.upsert(drive);
+        },
+      };
+
+      const report = await _run(
+        _config({
+          drives: [
+            _drive("a", [[_connection("a1", 1)]]),
+            _drive("b", [[_connection("b1", 2)]]),
+          ],
+          recorder: _recorder(),
+          stores: { ..._stores(listings), drives: failingDrives },
+        }),
+        { mode: "full", limit: 1 },
+      );
+
+      expect(_statusesOf(report)).toEqual([
+        ["a", "ok", undefined],
+        ["b", "skipped", undefined],
+      ]);
+      expect(drives.getUpsertCount()).toBe(1);
+      expect(listings.getRows()[0]?.drive_id).toBe(drives.getDrives()[0]?.id);
+    });
+
     it("writes no drive_id when the stores have no drives store", async () => {
       const recorder = _recorder();
       const listings = createInMemoryListingsStore();
