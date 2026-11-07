@@ -79,6 +79,38 @@ describe("makeDataGridColumnDefs", () => {
     });
     expect(columnDefs[0]!.valueFormatter({ value: null })).toBe("");
     expect(columnDefs[0]!.valueFormatter({ value: "Texas" })).toBe("Texas");
-    expect(columnDefs[1]!.valueFormatter({ value: 12 })).toBe("12.00");
+    expect(columnDefs[1]!.valueFormatter({ value: 12 })).toBe("12");
+  });
+
+  it("shows whole-number counts without decimals and fractions with two", () => {
+    const columnDefs = makeDataGridColumnDefs({
+      columnNames: ["total_deaths", "Lat"],
+      data: [{ total_deaths: 63_437, Lat: 32.53952745 }],
+      dateColumns: new Set(),
+      dateFormat: "YYYY-MM-DD",
+    });
+    expect(columnDefs[0]!.valueFormatter({ value: 63_437 })).toBe("63,437");
+    expect(columnDefs[0]!.valueFormatter({ value: 1_123_836 })).toBe(
+      "1,123,836",
+    );
+    expect(columnDefs[1]!.valueFormatter({ value: 32.53952745 })).toBe(
+      "32.54",
+    );
+  });
+
+  it("shows years, ids, and codes as plain digits", () => {
+    const columnNames = ["year", "UID", "FIPS", "code3", "fiscal_year"];
+    const columnDefs = makeDataGridColumnDefs({
+      columnNames,
+      data: [],
+      dateColumns: new Set(),
+      dateFormat: "YYYY-MM-DD",
+    });
+    const values = [2020, 84_001_001, 1001, 840, 2021];
+    expect(
+      columnDefs.map((columnDef, index) => {
+        return columnDef.valueFormatter({ value: values[index] });
+      }),
+    ).toEqual(["2020", "84001001", "1001", "840", "2021"]);
   });
 });

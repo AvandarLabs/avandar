@@ -1,3 +1,4 @@
+import { formatNumber } from "@avandar/utils";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { formatQueryResultDate } from "@/lib/ui/viz/formatQueryResultDate/formatQueryResultDate";
 import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
@@ -12,6 +13,28 @@ export type DataGridColumnDef = {
 
 const DATE_ONLY_FORMAT = "YYYY-MM-DD";
 const MILLISECONDS_PER_DAY = 86_400_000;
+
+/**
+ * Column names whose whole numbers are labels rather than amounts, such as
+ * `year`, `UID`, `FIPS`, or `country_code`. Grouping their digits turns the
+ * year 2020 into "2,020".
+ */
+const IDENTIFIER_COLUMN_NAME_REGEX =
+  /(?:^|[^a-z])(?:year|yr|id|uid|fips|zip|zipcode|postcode|code\d*)$/i;
+
+/**
+ * How one number in the grid reads. Whole numbers show no decimals, so a count
+ * of 63,437 deaths does not read as "63,437.00", and whole numbers in a
+ * year, id, or code column show plain digits.
+ */
+function _formatGridNumber(value: number, columnName: string): string {
+  if (!Number.isInteger(value)) {
+    return formatChartNumber(value);
+  }
+  return IDENTIFIER_COLUMN_NAME_REGEX.test(columnName)
+    ? String(value)
+    : formatNumber(value, { maximumFractionDigits: 0 });
+}
 
 /**
  * Whether every value in a date column falls on midnight UTC, which is how a
@@ -77,7 +100,7 @@ export function makeDataGridColumnDefs(
           }
         : (params: { value: unknown }) => {
             return typeof params.value === "number"
-              ? formatChartNumber(params.value)
+              ? _formatGridNumber(params.value, field)
               : params.value == null
                 ? ""
                 : String(params.value);
