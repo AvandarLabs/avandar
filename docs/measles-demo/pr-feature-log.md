@@ -1403,8 +1403,6 @@ rejects the new listing shape, so the catalog would not load.
   listings keep empty new columns.
 - Removing one of two chosen publishers leaves the agencies chosen under it
   selected, which can empty the list.
-- 23 new UI strings have an empty `msgstr` in 7 locales. The pre-push hook's
-  LLM translation step (or `pnpm translations`) fills them.
 - No automated test runs the mapper loader under Bun. It was verified
   manually.
 
