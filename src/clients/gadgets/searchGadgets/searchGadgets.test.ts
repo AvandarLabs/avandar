@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { searchGadgets } from "@/clients/gadgets/searchGadgets/searchGadgets";
 
-const { rpcMock } = vi.hoisted(() => {
-  return { rpcMock: vi.fn() };
+const { rpcMock, throwOnErrorMock } = vi.hoisted(() => {
+  return { rpcMock: vi.fn(), throwOnErrorMock: vi.fn() };
 });
 
 vi.mock("$/db/supabase/AvaSupabase.ts", () => {
@@ -26,22 +26,33 @@ const ROW = {
   rank: 1.2,
 };
 
+function _mockRows(rows: unknown[]): void {
+  throwOnErrorMock.mockResolvedValue({ data: rows, error: null });
+}
+
 beforeEach(() => {
   rpcMock.mockReset();
+  throwOnErrorMock.mockReset();
+  rpcMock.mockReturnValue({ throwOnError: throwOnErrorMock });
 });
 
 describe("searchGadgets", () => {
-  it("calls the RPC and maps rows to results", async () => {
-    rpcMock.mockResolvedValue({ data: [ROW], error: null });
-    const results = await searchGadgets({
-      workspaceId: "w1",
-      query: "cases",
-      limit: 20,
-    });
+  it("passes the workspace, query, and limit to the search RPC", async () => {
+    _mockRows([]);
+    await searchGadgets({ workspaceId: "w1", query: "cases", limit: 20 });
     expect(rpcMock).toHaveBeenCalledWith("rpc_gadgets__search", {
       p_workspace_id: "w1",
       p_query: "cases",
       p_limit: 20,
+    });
+  });
+
+  it("maps a tile row to a result with its ref and labels", async () => {
+    _mockRows([ROW]);
+    const results = await searchGadgets({
+      workspaceId: "w1",
+      query: "cases",
+      limit: 20,
     });
     expect(results).toEqual([
       {
@@ -58,27 +69,23 @@ describe("searchGadgets", () => {
   });
 
   it("drops rows that are not valid refs", async () => {
-    rpcMock.mockResolvedValue({
-      data: [{ ...ROW, sub_id: null }],
-      error: null,
-    });
+    _mockRows([{ ...ROW, sub_id: null }]);
+    expect(
+      await searchGadgets({ workspaceId: "w1", query: "", limit: 20 }),
+    ).toEqual([]);
+  });
+
+  it("drops rows whose columns do not have the expected types", async () => {
+    _mockRows([{ ...ROW, has_limited_audience: null }]);
     expect(
       await searchGadgets({ workspaceId: "w1", query: "", limit: 20 }),
     ).toEqual([]);
   });
 
   it("gives a gadget with a null sub label no sub label", async () => {
-    rpcMock.mockResolvedValue({
-      data: [
-        {
-          ...ROW,
-          gadget_type: "dashboard",
-          sub_id: null,
-          sub_label: null,
-        },
-      ],
-      error: null,
-    });
+    _mockRows([
+      { ...ROW, gadget_type: "dashboard", sub_id: null, sub_label: null },
+    ]);
     const results = await searchGadgets({
       workspaceId: "w1",
       query: "",
@@ -95,9 +102,9 @@ describe("searchGadgets", () => {
   });
 
   it("throws when the RPC fails", async () => {
-    rpcMock.mockResolvedValue({ data: null, error: { message: "boom" } });
+    throwOnErrorMock.mockRejectedValue(new Error("boom"));
     await expect(
       searchGadgets({ workspaceId: "w1", query: "x", limit: 20 }),
-    ).rejects.toThrow();
+    ).rejects.toThrow("boom");
   });
 });

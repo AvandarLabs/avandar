@@ -32,10 +32,11 @@ type GadgetRef = {
 /**
  * Validates a gadget ref, such as the attributes of a stored gadget node or
  * a row returned by gadget search. `subId` is `null` rather than optional
- * because it round-trips through JSON and a nullable column.
+ * because it round-trips through JSON and a nullable column. Extra fields
+ * are rejected, so a stored ref can never carry the gadget's name.
  */
 export const GadgetRefSchema: z.ZodType<GadgetRef> = z
-  .object({
+  .strictObject({
     gadgetType: z.enum(GADGET_TYPES),
     gadgetId: z.uuid(),
     subId: z.string().min(1).nullable(),

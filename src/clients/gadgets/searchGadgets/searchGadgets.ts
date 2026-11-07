@@ -53,20 +53,21 @@ function _rowToResult(row: unknown): GadgetSearchResult | undefined {
  * after `@` in a comment. Rows that do not form a valid ref are dropped
  * rather than shown.
  */
-export async function searchGadgets(params: {
-  workspaceId: string;
-  query: string;
-  limit: number;
-}): Promise<GadgetSearchResult[]> {
-  const { data, error } = await AvaSupabase.db().rpc("rpc_gadgets__search", {
-    p_workspace_id: params.workspaceId,
-    p_query: params.query,
-    p_limit: params.limit,
-  });
-  if (error) {
-    throw new Error(`Gadget search failed: ${error.message}`);
-  }
-  return (data ?? []).flatMap((row) => {
+export async function searchGadgets(
+  params: Readonly<{
+    workspaceId: string;
+    query: string;
+    limit: number;
+  }>,
+): Promise<GadgetSearchResult[]> {
+  const { data } = await AvaSupabase.db()
+    .rpc("rpc_gadgets__search", {
+      p_workspace_id: params.workspaceId,
+      p_query: params.query,
+      p_limit: params.limit,
+    })
+    .throwOnError();
+  return data.flatMap((row) => {
     const result = _rowToResult(row);
     return result === undefined ? [] : [result];
   });

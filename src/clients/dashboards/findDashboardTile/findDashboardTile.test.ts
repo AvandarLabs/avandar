@@ -36,12 +36,15 @@ const CONFIG = {
 };
 
 describe("findDashboardTile", () => {
-  it("finds a top-level and a nested tile", () => {
+  it("finds a top-level tile", () => {
     expect(findDashboardTile(CONFIG, "DataViz-top")).toEqual({
       id: "DataViz-top",
       prompt: "Weekly cases",
       vizType: "line",
     });
+  });
+
+  it("finds a tile nested in a layout slot", () => {
     expect(findDashboardTile(CONFIG, "DataViz-nested")).toEqual({
       id: "DataViz-nested",
       prompt: "By borough",
@@ -49,8 +52,11 @@ describe("findDashboardTile", () => {
     });
   });
 
-  it("returns undefined for a missing block or a non-tile block", () => {
+  it("returns undefined for a block id that is not in the config", () => {
     expect(findDashboardTile(CONFIG, "DataViz-gone")).toBeUndefined();
+  });
+
+  it("returns undefined for a block that is not a tile", () => {
     expect(findDashboardTile(CONFIG, "Text-1")).toBeUndefined();
   });
 
