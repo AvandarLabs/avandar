@@ -12,7 +12,10 @@ and which are not gadgets yet. The design is in
 ## How it works
 
 Typing `@` in the comment composer opens one menu for teammates and gadgets.
-Teammates are filtered in the browser. Gadgets come from
+Teammates are filtered in the browser and listed first, then the gadget
+groups (Dashboards, Datasets, Maps, Case types, Cases). Gadget results arrive
+after a search, so they append below the teammates and never move the
+highlight. Gadgets come from
 `rpc_gadgets__search`, which runs as the caller (security invoker), so RLS
 filters every branch and a gadget the author cannot read never appears. It
 returns at most five rows per gadget type, returns nothing to a caller who is

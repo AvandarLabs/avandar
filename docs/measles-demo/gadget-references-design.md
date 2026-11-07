@@ -162,9 +162,11 @@ The existing mention suggestion becomes a combined menu:
 - Teammates are filtered in the browser, as today.
 - Gadgets come from `rpc_gadgets__search` (section 7), called after a
   150 ms pause in typing, with the query after `@`.
-- Results are grouped: Dashboards (dashboards and tiles), Datasets, Maps,
-  Case types, Cases, then People; at most 5 per group; groups with no
-  results are hidden. Keyboard navigation runs across groups.
+- Results are grouped: People, then Dashboards (dashboards and tiles),
+  Datasets, Maps, Case types, and Cases; at most 5 per group; groups with
+  no results are hidden. Keyboard navigation runs across groups. People
+  come first because they filter synchronously in the browser, so gadget
+  results that arrive later append below them and never move the highlight.
 - **Enter** inserts a `gadgetLink` (or a `userMention` for a person).
   **Shift+Enter** on a gadget inserts a `gadgetEmbed`. A footer shows both.
 - When the highlighted row's `has_limited_audience` is true, a hint under the

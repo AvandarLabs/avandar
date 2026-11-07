@@ -15,7 +15,7 @@ const {
 } = MentionMenuListTestFixtures;
 
 describe("MentionMenuList highlight", () => {
-  it("keeps a highlighted member highlighted when gadgets arrive above", async () => {
+  it("keeps a highlighted member highlighted when gadgets arrive below", async () => {
     const editingArea = _createEditingArea();
     const ref = createRef<MentionMenuListHandle>();
     const { rerender } = _renderList({ ref, editingArea });
@@ -30,7 +30,7 @@ describe("MentionMenuList highlight", () => {
     );
   });
 
-  it("keeps the first member chosen by Enter when gadgets arrive above before any key", async () => {
+  it("keeps the first member chosen by Enter when gadgets arrive below before any key", async () => {
     const command = vi.fn();
     const ref = createRef<MentionMenuListHandle>();
     const { rerender } = _renderList({ ref, command });
@@ -44,7 +44,7 @@ describe("MentionMenuList highlight", () => {
     });
   });
 
-  it("falls back to the first row when the highlighted row goes away", async () => {
+  it("falls back to the first gadget when the highlighted member goes away and no member is left", async () => {
     const editingArea = _createEditingArea();
     const ref = createRef<MentionMenuListHandle>();
     const { rerender } = _renderList({ ref, editingArea });
@@ -55,7 +55,7 @@ describe("MentionMenuList highlight", () => {
         ref,
         editingArea,
         gadgets: [DASHBOARD],
-        people: [PEOPLE[0]!],
+        people: [],
       }),
     );
     await screen.findByText("Measles by borough");
@@ -76,7 +76,7 @@ describe("MentionMenuList highlight", () => {
     await screen.findByText("Measles by borough");
     _pressKey(ref, { key: "ArrowDown" });
     _pressKey(ref, { key: "Enter" });
-    // Priscilla was the last row, so the highlight wraps to the dashboard.
+    // The dashboard arrived below Priscilla, so the next row is the dashboard.
     expect(command).toHaveBeenCalledWith({
       kind: "gadget",
       display: "link",

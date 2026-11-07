@@ -6,7 +6,6 @@ import type { GadgetSearchResult } from "@/clients/gadgets/searchGadgets/searchG
 import type { MentionMenuListHandle } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList";
 
 const {
-  PEOPLE,
   DASHBOARD,
   DATASET,
   LIMITED_HINT,
@@ -27,24 +26,41 @@ describe("MentionMenuList gadgets", () => {
     expect(screen.getByText("priya.n@example.org")).toBeInTheDocument();
   });
 
-  it("moves the highlight across groups with the arrow keys", async () => {
+  it("moves the highlight from the people into the gadget groups with the arrow keys", async () => {
     const command = vi.fn();
     const ref = createRef<MentionMenuListHandle>();
     _renderList({ ref, command, gadgets: [DASHBOARD, DATASET] });
     await screen.findByText("Measles by borough");
     _pressKey(ref, { key: "ArrowDown" });
     _pressKey(ref, { key: "ArrowDown" });
+    _pressKey(ref, { key: "ArrowDown" });
     _pressKey(ref, { key: "Enter" });
     expect(command).toHaveBeenCalledWith({
-      kind: "person",
-      candidate: PEOPLE[0],
+      kind: "gadget",
+      display: "link",
+      result: DATASET,
     });
   });
 
+  it("wraps the highlight from the first person to the last gadget with ArrowUp", async () => {
+    const command = vi.fn();
+    const ref = createRef<MentionMenuListHandle>();
+    _renderList({ ref, command, gadgets: [DASHBOARD, DATASET] });
+    await screen.findByText("Measles by borough");
+    _pressKey(ref, { key: "ArrowUp" });
+    _pressKey(ref, { key: "Enter" });
+    expect(command).toHaveBeenCalledWith({
+      kind: "gadget",
+      display: "link",
+      result: DATASET,
+    });
+  });
+
+  // With no member matching, the first gadget is highlighted by default.
   it("links the highlighted gadget on Enter", async () => {
     const command = vi.fn();
     const ref = createRef<MentionMenuListHandle>();
-    _renderList({ ref, command, gadgets: [DASHBOARD] });
+    _renderList({ ref, command, gadgets: [DASHBOARD], people: [] });
     await screen.findByText("Measles by borough");
     expect(_pressKey(ref, { key: "Enter" })).toBe(true);
     expect(command).toHaveBeenCalledWith({
@@ -57,7 +73,7 @@ describe("MentionMenuList gadgets", () => {
   it("embeds the highlighted gadget on Shift+Enter", async () => {
     const command = vi.fn();
     const ref = createRef<MentionMenuListHandle>();
-    _renderList({ ref, command, gadgets: [DASHBOARD] });
+    _renderList({ ref, command, gadgets: [DASHBOARD], people: [] });
     await screen.findByText("Measles by borough");
     expect(_pressKey(ref, { key: "Enter", shiftKey: true })).toBe(true);
     expect(command).toHaveBeenCalledWith({
@@ -70,7 +86,7 @@ describe("MentionMenuList gadgets", () => {
   it("lets Ctrl, Meta, and Alt with Enter fall through to the editor", async () => {
     const command = vi.fn();
     const ref = createRef<MentionMenuListHandle>();
-    _renderList({ ref, command, gadgets: [DASHBOARD] });
+    _renderList({ ref, command, gadgets: [DASHBOARD], people: [] });
     await screen.findByText("Measles by borough");
     expect(_pressKey(ref, { key: "Enter", ctrlKey: true })).toBe(false);
     expect(_pressKey(ref, { key: "Enter", metaKey: true })).toBe(false);
@@ -81,7 +97,7 @@ describe("MentionMenuList gadgets", () => {
   it("links the highlighted gadget on Tab", async () => {
     const command = vi.fn();
     const ref = createRef<MentionMenuListHandle>();
-    _renderList({ ref, command, gadgets: [DASHBOARD] });
+    _renderList({ ref, command, gadgets: [DASHBOARD], people: [] });
     await screen.findByText("Measles by borough");
     expect(_pressKey(ref, { key: "Tab" })).toBe(true);
     expect(command).toHaveBeenCalledWith({
@@ -106,14 +122,14 @@ describe("MentionMenuList gadgets", () => {
       ],
     });
     const orderedTexts = [
+      "People",
+      "Priya Natarajan",
       "Maps",
       "Exposure sites",
       "Case types",
       "Measles case",
       "Cases",
       "Amara Okafor",
-      "People",
-      "Priya Natarajan",
     ].map((text) => {
       return screen.getByText(text);
     });
@@ -131,6 +147,10 @@ describe("MentionMenuList gadgets", () => {
       ref,
       gadgets: [{ ...DASHBOARD, hasLimitedAudience: true }, DATASET],
     });
+    await screen.findByText("Measles by borough");
+    expect(screen.queryByText(LIMITED_HINT)).not.toBeInTheDocument();
+    _pressKey(ref, { key: "ArrowDown" });
+    _pressKey(ref, { key: "ArrowDown" });
     expect(await screen.findByText(LIMITED_HINT)).toBeInTheDocument();
     _pressKey(ref, { key: "ArrowDown" });
     expect(screen.queryByText(LIMITED_HINT)).not.toBeInTheDocument();
@@ -139,6 +159,12 @@ describe("MentionMenuList gadgets", () => {
   it("shows the link and embed keys only while a gadget is highlighted", async () => {
     const ref = createRef<MentionMenuListHandle>();
     _renderList({ ref, gadgets: [DASHBOARD] });
+    await screen.findByText("Measles by borough");
+    expect(
+      screen.queryByText(_hasWholeText("Enter link")),
+    ).not.toBeInTheDocument();
+    _pressKey(ref, { key: "ArrowDown" });
+    _pressKey(ref, { key: "ArrowDown" });
     expect(
       await screen.findByText(_hasWholeText("Enter link")),
     ).toBeInTheDocument();

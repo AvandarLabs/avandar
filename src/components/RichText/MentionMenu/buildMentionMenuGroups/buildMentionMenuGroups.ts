@@ -41,13 +41,16 @@ export type MentionMenuGroup = {
 
 const MAX_ITEMS_PER_GROUP = 5;
 
+// People come first because they filter in the browser and show at once,
+// while gadget groups arrive after a search. Appending them below keeps the
+// default highlight from shifting.
 const GROUP_ORDER: readonly MentionMenuGroupKey[] = [
+  "people",
   "dashboards",
   "datasets",
   "maps",
   "caseTypes",
   "cases",
-  "people",
 ];
 
 const GROUP_KEY_BY_GADGET_TYPE: Readonly<
@@ -84,9 +87,9 @@ function _buildPersonItem(candidate: MentionCandidate): MentionMenuItem {
 
 /**
  * Sorts the `@` menu's people and gadget search results into its groups:
- * Dashboards (with their tiles), Datasets, Maps, Case types,
- * Cases, then People. Keeps each group's search order, caps each group at
- * five rows, and leaves out empty groups. Used by the mention menu
+ * People, then Dashboards (with their tiles), Datasets, Maps, Case types,
+ * and Cases. Keeps each group's search order, caps each group at five rows,
+ * and leaves out empty groups. Used by the mention menu
  * suggestion every time its people or gadget results change.
  */
 export function buildMentionMenuGroups(

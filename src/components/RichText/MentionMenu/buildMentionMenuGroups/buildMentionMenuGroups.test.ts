@@ -17,7 +17,7 @@ function _gadget(gadgetType: Gadget.Type, label: string): GadgetSearchResult {
 }
 
 describe("buildMentionMenuGroups", () => {
-  it("groups gadgets by type in menu order, people last, at most 5 each, hiding empty groups", () => {
+  it("puts people first, then gadgets by type in menu order, at most 5 each, hiding empty groups", () => {
     const groups = buildMentionMenuGroups({
       gadgets: [
         _gadget("individual", "Amara"),
@@ -33,13 +33,13 @@ describe("buildMentionMenuGroups", () => {
       groups.map((group) => {
         return group.key;
       }),
-    ).toEqual(["dashboards", "datasets", "cases", "people"]);
+    ).toEqual(["people", "dashboards", "datasets", "cases"]);
     expect(
-      groups[0]?.items.map((item) => {
+      groups[1]?.items.map((item) => {
         return item.label;
       }),
     ).toEqual(["Cases per week", "Measles"]);
-    expect(groups[1]?.items).toHaveLength(5);
+    expect(groups[2]?.items).toHaveLength(5);
   });
 
   it("keeps the search rank inside Dashboards, so tiles are not pushed below every dashboard", () => {
@@ -82,7 +82,7 @@ describe("buildMentionMenuGroups", () => {
           return item.detail;
         });
       }),
-    ).toEqual(["Measles by borough", "b@example.org"]);
+    ).toEqual(["b@example.org", "Measles by borough"]);
   });
 
   it("gives every item a distinct option id, even two tiles of one dashboard", () => {

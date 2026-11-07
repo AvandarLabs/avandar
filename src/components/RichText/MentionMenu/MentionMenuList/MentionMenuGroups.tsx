@@ -36,8 +36,11 @@ export function MentionMenuGroups({
   highlightedItemId,
   buildOptionId,
 }: Props): ReactNode {
-  const refreshingGroupKey =
-    isSearching && groups[0]?.key !== "people" ? groups[0]?.key : undefined;
+  const refreshingGroupKey = isSearching
+    ? groups.find((group) => {
+        return group.key !== "people";
+      })?.key
+    : undefined;
   return (
     <Combobox.Options
       id={listboxId}

@@ -4,7 +4,7 @@ import { screen, waitFor } from "@/test-utils";
 import { MentionMenuListTestFixtures } from "./MentionMenuListTestFixtures";
 import type { MentionMenuListHandle } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList";
 
-const { DASHBOARD, DATASET, _buildList, _renderList, _pressKey } =
+const { PEOPLE, DASHBOARD, DATASET, _buildList, _renderList, _pressKey } =
   MentionMenuListTestFixtures;
 
 const LIST_HEIGHT = 100;
@@ -85,17 +85,42 @@ describe("MentionMenuList scrolling", () => {
     expect(scrollTops).toEqual([]);
   });
 
-  it("scrolls the pinned row into view again when gadget groups arrive above it", async () => {
+  it("leaves the list at the top when gadget groups arrive below the highlighted member", async () => {
     const ref = createRef<MentionMenuListHandle>();
     const { rerender } = _renderList({ ref });
     await screen.findByText("Priya Natarajan");
-    let priyaTop = 0;
     const { scrollTops } = _layoutList((row) => {
-      return row.textContent?.includes("Priya") ? priyaTop : 0;
+      return row.textContent?.includes("Priya") ? 0 : 200;
     });
-    priyaTop = 300;
     rerender(_buildList({ ref, gadgets: [DASHBOARD, DATASET] }));
     await screen.findByText("Measles by borough");
+    expect(scrollTops).toEqual([]);
+  });
+
+  it("scrolls the highlighted row into view again when rows arrive above it", async () => {
+    const ref = createRef<MentionMenuListHandle>();
+    const { rerender } = _renderList({ ref });
+    await screen.findByText("Priya Natarajan");
+    let priscillaTop = 0;
+    const { scrollTops } = _layoutList((row) => {
+      return row.textContent?.includes("Priscilla") ? priscillaTop : 0;
+    });
+    _pressKey(ref, { key: "ArrowDown" });
+    priscillaTop = 300;
+    rerender(
+      _buildList({
+        ref,
+        people: [
+          {
+            userId: "3",
+            displayName: "Aaron Bell",
+            email: "a.bell@example.org",
+          },
+          ...PEOPLE,
+        ],
+      }),
+    );
+    await screen.findByText("Aaron Bell");
     await waitFor(() => {
       expect(scrollTops.at(-1)).toBe(240);
     });
