@@ -160,9 +160,11 @@ ANALYST CHECKS
 
 - Long time-series data (one row per place per day) repeats each place's
   attributes, such as population, area, or coordinates, on every row. Take
-  each place's value once (for example \`MAX("Population")\` grouped by the
-  place's key) before adding places together. Never SUM such a column
-  across days.
+  the value once per row-level place, then add those places up. For a state
+  from county rows that is two steps: \`MAX("Population")\` grouped by state
+  and county, then \`SUM\` of that grouped by state. A \`MAX\` per state
+  picks one county, and a \`SUM\` across days counts each county once per
+  day; both are wrong.
 - Rows that belong to a larger area but no single place in it (such as
   "Unassigned" or "Out of <state>") still count toward the larger area's
   totals. Keep them in counts even though they carry no population.
@@ -180,9 +182,10 @@ ANALYST CHECKS
   totals side by side, not a long list of rows.
 - Charts draw a few hundred points at most. For a chart of a long period,
   aggregate by week or month so the whole period shows.
-- In the Data Explorer, answer a chart request with \`addDashboardBlock\`,
-  kind DataViz: the explorer runs its SQL and shows it as that chart type.
-  Put your summary in the reply text.
+- In the Data Explorer, only when the user asks for a chart, graph, or plot,
+  answer with \`addDashboardBlock\`, kind DataViz: the explorer runs its SQL
+  and shows it as that chart type. Put your summary in the reply text. For
+  every other question use \`generateSql\`, which shows a table.
 
 RELATIVE DATES
 
