@@ -530,6 +530,10 @@ msgid "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
 msgstr "您的方案不允許與其他人分享此儀表板。請升級方案，或取消分享另一個儀表板，然後再試一次。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.tsx
+msgid "Show {numHidden} more"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "PDF file"
 msgstr "PDF 檔案"

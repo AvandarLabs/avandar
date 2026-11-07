@@ -5,8 +5,11 @@
  * unchanged when it is not a URL, so a malformed value still shows.
  */
 export function getSourceHost(url: string): string {
-  if (!URL.canParse(url)) {
+  // `URL.canParse` is missing from older Safari and desktop WebViews, so a
+  // failed parse is caught instead.
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
     return url;
   }
-  return new URL(url).hostname.replace(/^www\./, "");
 }

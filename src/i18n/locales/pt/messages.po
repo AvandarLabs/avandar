@@ -551,6 +551,10 @@ msgstr "Seu plano não permite compartilhar este dashboard com outras pessoas. "
 "Faça upgrade do seu plano ou deixe de compartilhar outro dashboard e "
 "tente novamente."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.tsx
+msgid "Show {numHidden} more"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "PDF file"
 msgstr "Arquivo PDF"

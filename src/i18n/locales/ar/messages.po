@@ -543,6 +543,10 @@ msgid "Your plan does not allow sharing this dashboard with anyone else. "
 msgstr "لا تسمح خطتك بمشاركة لوحة المعلومات هذه مع أي شخص آخر. قم بترقية خطتك "
 "أو ألغِ مشاركة لوحة معلومات أخرى، ثم حاول مرة أخرى."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.tsx
+msgid "Show {numHidden} more"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "PDF file"
 msgstr "ملف PDF"

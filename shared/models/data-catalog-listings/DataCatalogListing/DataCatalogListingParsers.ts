@@ -2,8 +2,7 @@ import { makeParserRegistry } from "@avandar/clients";
 import {
   camelCaseKeysDeep,
   nullsToUndefinedDeep,
-  omitProps,
-  pipe,
+  omit,
   snakeCaseKeysDeep,
 } from "@avandar/utils";
 import { z } from "zod";
@@ -14,7 +13,6 @@ import type {
   DataCatalogListingModel,
   DataCatalogListingRead,
 } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
-import type { Json } from "$/types/database.types.ts";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 
@@ -75,26 +73,36 @@ const DBReadSchema = z.object({
   search_vector: z.unknown(),
 });
 
+/**
+ * Reads a listing row. `metadata` and `source_metadata` are JSON documents
+ * a pipeline wrote, not columns, so they keep their keys and nulls exactly
+ * as stored: readers look up a source's own key names in them, and the
+ * source record is shown as the source sent it. Only a missing document
+ * becomes undefined.
+ */
+function _fromDBReadToModelRead(
+  dbRow: DataCatalogListingModel["DBRead"],
+): DataCatalogListingRead {
+  const { metadata, source_metadata, ...columns } = dbRow;
+  // The search document exists for catalog search in Postgres. Nothing in
+  // the app reads it.
+  const fields = nullsToUndefinedDeep(
+    camelCaseKeysDeep(omit(columns, "search_vector")),
+  );
+  return {
+    ...fields,
+    id: fields.id as DataCatalogListingId,
+    driveId: fields.driveId as DataCatalogDriveId | undefined,
+    metadata: metadata ?? undefined,
+    sourceMetadata: source_metadata ?? undefined,
+  };
+}
+
 export const DataCatalogListingParsers =
   makeParserRegistry<DataCatalogListingModel>().build({
     modelName: "DataCatalogListing",
     DBReadSchema,
-    fromDBReadToModelRead: pipe(
-      // The search document exists for catalog search in Postgres. Nothing
-      // in the app reads it.
-      omitProps("search_vector"),
-      camelCaseKeysDeep,
-      nullsToUndefinedDeep,
-      (obj): DataCatalogListingRead => {
-        return {
-          ...obj,
-          id: obj.id as DataCatalogListingId,
-          driveId: obj.driveId as DataCatalogDriveId | undefined,
-          metadata: obj.metadata as Json | undefined,
-          sourceMetadata: obj.sourceMetadata as Json | undefined,
-        };
-      },
-    ),
+    fromDBReadToModelRead: _fromDBReadToModelRead,
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
     fromModelUpdateToDBUpdate: snakeCaseKeysDeep,
   });

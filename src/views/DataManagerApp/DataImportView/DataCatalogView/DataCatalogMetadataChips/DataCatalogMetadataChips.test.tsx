@@ -39,7 +39,9 @@ describe("DataCatalogMetadataChips", () => {
     expect(
       screen.queryByRole("button", { name: "Show datasets tagged taxi" }),
     ).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "+3 more" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Show 3 more" }),
+    ).toBeInTheDocument();
   });
 
   it("shows every value once the more button is clicked", () => {
@@ -52,11 +54,28 @@ describe("DataCatalogMetadataChips", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "+3 more" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show 3 more" }));
 
     expect(
       screen.getByRole("button", { name: "Show datasets tagged active" }),
     ).toBeInTheDocument();
+  });
+
+  it("moves focus to the first revealed chip when the more button is clicked", () => {
+    render(
+      <DataCatalogMetadataChips
+        values={KEYWORDS}
+        numVisible={2}
+        getActionLabel={_getActionLabel}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Show 3 more" }));
+
+    expect(
+      screen.getByRole("button", { name: "Show datasets tagged taxi" }),
+    ).toHaveFocus();
   });
 
   it("offers no more button when every value fits", () => {

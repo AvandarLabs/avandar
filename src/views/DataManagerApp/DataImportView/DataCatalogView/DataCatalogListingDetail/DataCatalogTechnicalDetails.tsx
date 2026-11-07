@@ -69,7 +69,7 @@ function TechnicalDetailsBody({
 }
 
 /** The disclosure's button, its chevron turning as it opens. */
-function TechnicalDetailsToggle({
+function _TechnicalDetailsToggle({
   isOpen,
   onToggle,
 }: {
@@ -130,7 +130,7 @@ export function DataCatalogTechnicalDetails({ listing }: Props): ReactNode {
 
   return (
     <Stack gap="xs" align="flex-start">
-      <TechnicalDetailsToggle isOpen={isOpen} onToggle={disclosure.toggle} />
+      <_TechnicalDetailsToggle isOpen={isOpen} onToggle={disclosure.toggle} />
       <Collapse expanded={isOpen} w="100%">
         <TechnicalDetailsBody facts={facts} sourceRecord={sourceRecord} />
       </Collapse>

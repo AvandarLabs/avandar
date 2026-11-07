@@ -186,13 +186,15 @@ describe("DataCatalogListingDetail", () => {
     expect(
       screen.queryByRole("button", { name: "Show datasets tagged i" }),
     ).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "+2 more" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Show 2 more" }),
+    ).toBeInTheDocument();
   });
 
   it("folds the keywords again when another listing opens", () => {
     const tags = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
     const { rerender } = _renderDetail({ listing: _createListing({ tags }) });
-    fireEvent.click(screen.getByRole("button", { name: "+2 more" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show 2 more" }));
 
     rerender(
       _buildDetail({
@@ -203,7 +205,9 @@ describe("DataCatalogListingDetail", () => {
       }),
     );
 
-    expect(screen.getByRole("button", { name: "+2 more" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Show 2 more" }),
+    ).toBeInTheDocument();
   });
 
   it("omits a group with no facts along with its title", () => {

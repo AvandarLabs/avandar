@@ -553,6 +553,10 @@ msgstr "Votre forfait ne permet pas de partager ce tableau de bord avec "
 "d’autres personnes. Passez à un forfait supérieur ou cessez de partager "
 "un autre tableau de bord, puis réessayez."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.tsx
+msgid "Show {numHidden} more"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "PDF file"
 msgstr "Fichier PDF"

@@ -548,6 +548,10 @@ msgid "Your plan does not allow sharing this dashboard with anyone else. "
 msgstr "Mpango wako hauruhusu kushiriki dashibodi hii na mtu mwingine. Boresha "
 "mpango wako, au acha kushiriki dashibodi nyingine, kisha ujaribu tena."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.tsx
+msgid "Show {numHidden} more"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "PDF file"
 msgstr "Faili ya PDF"

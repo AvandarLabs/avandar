@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { UnstyledButton } from "@mantine/core";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.module.css";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 
 type Props = {
   /** The values to show, one chip each, in the order given. */
@@ -24,6 +24,57 @@ type Props = {
   onSelect: (value: string) => void;
 };
 
+/** One value's chip: a button that selects the value. */
+function _Chip({
+  value,
+  actionLabel,
+  buttonRef,
+  onSelect,
+}: {
+  value: string;
+  actionLabel: string;
+  buttonRef: RefObject<HTMLButtonElement | null> | undefined;
+  onSelect: (value: string) => void;
+}): ReactNode {
+  return (
+    <li>
+      <UnstyledButton
+        ref={buttonRef}
+        className={css.dataCatalogMetadataChip}
+        aria-label={actionLabel}
+        onClick={() => {
+          onSelect(value);
+        }}
+      >
+        {value}
+      </UnstyledButton>
+    </li>
+  );
+}
+
+/** The button that reveals the chips past the first few. */
+function _MoreButton({
+  label,
+  ariaLabel,
+  onClick,
+}: {
+  label: string;
+  ariaLabel: string;
+  onClick: () => void;
+}): ReactNode {
+  return (
+    <li>
+      <UnstyledButton
+        className={css.dataCatalogMetadataChipsMore}
+        aria-label={ariaLabel}
+        onClick={onClick}
+      >
+        {label}
+      </UnstyledButton>
+    </li>
+  );
+}
+
 /**
  * A listing's metadata values, such as its topics or keywords, as a run of
  * small chips. Each chip is a button that narrows the catalog to that value,
@@ -40,35 +91,36 @@ export function DataCatalogMetadataChips({
   // Slicing to an undefined end keeps every value.
   const shownValues = values.slice(0, isShowingAll ? undefined : numVisible);
   const numHidden = values.length - shownValues.length;
+  const firstRevealedChipRef = useRef<HTMLButtonElement>(null);
+
+  // The clicked more button is gone, so focus the first chip it revealed.
+  useEffect(() => {
+    if (isShowingAll) {
+      firstRevealedChipRef.current?.focus();
+    }
+  }, [isShowingAll]);
 
   return (
     <ul className={css.dataCatalogMetadataChips}>
-      {shownValues.map((value) => {
+      {shownValues.map((value, index) => {
         return (
-          <li key={value}>
-            <UnstyledButton
-              className={css.dataCatalogMetadataChip}
-              aria-label={getActionLabel(value)}
-              onClick={() => {
-                onSelect(value);
-              }}
-            >
-              {value}
-            </UnstyledButton>
-          </li>
+          <_Chip
+            key={value}
+            value={value}
+            actionLabel={getActionLabel(value)}
+            buttonRef={index === numVisible ? firstRevealedChipRef : undefined}
+            onSelect={onSelect}
+          />
         );
       })}
       {numHidden > 0 ? (
-        <li>
-          <UnstyledButton
-            className={css.dataCatalogMetadataChipsMore}
-            onClick={() => {
-              setIsShowingAll(true);
-            }}
-          >
-            {t`+${numHidden} more`}
-          </UnstyledButton>
-        </li>
+        <_MoreButton
+          label={t`+${numHidden} more`}
+          ariaLabel={t`Show ${numHidden} more`}
+          onClick={() => {
+            setIsShowingAll(true);
+          }}
+        />
       ) : null}
     </ul>
   );

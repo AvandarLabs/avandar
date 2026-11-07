@@ -117,6 +117,41 @@ describe("DataCatalogListingParsers", () => {
     expect(entry).not.toHaveProperty("searchVector");
   });
 
+  it("keeps the source record's keys and nulls as the source sent them", () => {
+    const sourceRecord = {
+      resource: { id: "8wbx-tsch", page_views: { last_week: null } },
+      classification: { domain_category: "Transportation" },
+    };
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse({
+        ..._apiDBRow(),
+        source_metadata: sourceRecord,
+      }),
+    );
+
+    expect(entry.sourceMetadata).toEqual(sourceRecord);
+  });
+
+  it("keeps the metadata's keys and nulls as the pipeline wrote them", () => {
+    const metadata = { table: { column_names: ["year"], row_count: null } };
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse({
+        ..._pipelineDBRow(),
+        metadata,
+      }),
+    );
+
+    expect(entry.metadata).toEqual(metadata);
+  });
+
+  it("reads a missing source record as undefined", () => {
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse(_apiDBRow()),
+    );
+
+    expect(entry.sourceMetadata).toBeUndefined();
+  });
+
   it("rejects an unknown access kind", () => {
     const row = { ..._apiDBRow(), access_kind: "sftp_drop" };
 

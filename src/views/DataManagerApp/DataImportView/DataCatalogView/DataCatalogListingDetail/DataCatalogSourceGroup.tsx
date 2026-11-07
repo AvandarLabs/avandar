@@ -11,7 +11,7 @@ type Props = {
 };
 
 /** A link that leaves Avandar, opened in a new tab. */
-function ExternalLink({
+function _ExternalLink({
   href,
   children,
 }: {
@@ -26,14 +26,14 @@ function ExternalLink({
 }
 
 /** The listing's canonical pages, one per line, each named by its host. */
-function CanonicalLinks({ urls }: { urls: readonly string[] }): ReactNode {
+function _CanonicalLinks({ urls }: { urls: readonly string[] }): ReactNode {
   return (
     <Stack gap={2}>
       {urls.map((url) => {
         return (
-          <ExternalLink key={url} href={url}>
+          <_ExternalLink key={url} href={url}>
             {getSourceHost(url)}
-          </ExternalLink>
+          </_ExternalLink>
         );
       })}
     </Stack>
@@ -67,21 +67,21 @@ export function DataCatalogSourceGroup({ listing }: Props): ReactNode {
       ) : null}
       {listing.sourceUrl ? (
         <AppViewRail.Fact label={t`Original`}>
-          <ExternalLink href={listing.sourceUrl}>
+          <_ExternalLink href={listing.sourceUrl}>
             {getSourceHost(listing.sourceUrl)}
-          </ExternalLink>
+          </_ExternalLink>
         </AppViewRail.Fact>
       ) : null}
       {listing.sourceDownloadUrl ? (
         <AppViewRail.Fact label={t`Download`}>
-          <ExternalLink href={listing.sourceDownloadUrl}>
+          <_ExternalLink href={listing.sourceDownloadUrl}>
             {getCatalogListingFormat(listing) ?? t`File`}
-          </ExternalLink>
+          </_ExternalLink>
         </AppViewRail.Fact>
       ) : null}
       {canonicalUrls.length > 0 ? (
         <AppViewRail.Fact label={t`Canonical`}>
-          <CanonicalLinks urls={canonicalUrls} />
+          <_CanonicalLinks urls={canonicalUrls} />
         </AppViewRail.Fact>
       ) : null}
     </AppViewRail.Group>

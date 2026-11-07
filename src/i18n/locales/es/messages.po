@@ -549,6 +549,10 @@ msgid "Your plan does not allow sharing this dashboard with anyone else. "
 msgstr "Su plan no permite compartir este dashboard con nadie más. Actualice su "
 "plan o deje de compartir otro dashboard y vuelva a intentarlo."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.tsx
+msgid "Show {numHidden} more"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "PDF file"
 msgstr "Archivo PDF"
