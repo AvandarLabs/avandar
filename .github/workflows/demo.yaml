@@ -21,7 +21,11 @@ concurrency:
 
 env:
   NODE_VERSION: 24.15.0
-  SUPABASE_CLI_VERSION: 2.98.2
+  # Matches the `supabase` devDependency in package.json. CLI 2.98.2 tried
+  # import map entries in random order when bundling, so `@avandar/utils/sql`
+  # resolved through `@avandar/utils` on some runs and edge functions failed
+  # with "Module not found". 2.114.0 picks the longest matching entry.
+  SUPABASE_CLI_VERSION: 2.114.0
   VERCEL_CLI_VERSION: 64.7.0
   DEMO_APP_URL: https://demo.avandarlabs.com
   VERCEL_ENVIRONMENT: demo
