@@ -1,13 +1,17 @@
-drop function if exists "public"."rpc_data_catalog_listings__search"(p_query text, p_limit integer, p_offset integer);
+drop function if exists "public"."data_catalog_listings__search_matches"(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean);
+
+drop function if exists "public"."rpc_data_catalog_listings__search"(p_query text, p_limit integer, p_offset integer, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean, p_sort_by text);
 
 -- `search_vector` reads `external_organization_name`, which blocks the rename
--- below. It is rebuilt after the new columns exist.
+-- below. It is rebuilt after the new columns exist. The search functions
+-- dropped above read both, and are recreated below against the new names.
 drop index if exists "public"."data_catalog_listings__search_vector";
 
 alter table "public"."data_catalog_listings" drop column if exists "search_vector";
 
 -- A rename, not a drop and an add, so every listing keeps its organization.
 alter table "public"."data_catalog_listings" rename column "external_organization_name" to "organization1_name";
+
 
   create table "public"."data_catalog_drives" (
     "id" uuid not null default gen_random_uuid(),
@@ -24,11 +28,9 @@ alter table "public"."data_catalog_listings" rename column "external_organizatio
 
 alter table "public"."data_catalog_drives" enable row level security;
 
-
 alter table "public"."data_catalog_listings" add column "domains" text[];
 
 alter table "public"."data_catalog_listings" add column "drive_id" uuid;
-
 
 alter table "public"."data_catalog_listings" add column "organization2_name" text;
 
@@ -57,7 +59,6 @@ alter table "public"."data_catalog_listings" add column "search_vector" tsvector
 
 CREATE INDEX data_catalog_listings__search_vector ON public.data_catalog_listings USING gin (search_vector);
 
-
 CREATE UNIQUE INDEX data_catalog_drives__pipeline_drive_unique ON public.data_catalog_drives USING btree (pipeline_name, drive_key);
 
 CREATE UNIQUE INDEX data_catalog_drives_pkey ON public.data_catalog_drives USING btree (id);
@@ -80,8 +81,8 @@ alter table "public"."data_catalog_listings" validate constraint "data_catalog_l
 
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.rpc_data_catalog_listings__search(p_query text, p_limit integer DEFAULT 50, p_offset integer DEFAULT 0, p_organization1_names text[] DEFAULT NULL::text[], p_organization2_names text[] DEFAULT NULL::text[], p_domains text[] DEFAULT NULL::text[], p_tags text[] DEFAULT NULL::text[])
- RETURNS TABLE(id uuid, display_name text, organization1_name text, organization2_name text, organization3_name text, organization4_name text, is_workspace_loadable boolean, is_invalid boolean, total_count bigint)
+CREATE OR REPLACE FUNCTION public.data_catalog_listings__search_matches(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean)
+ RETURNS TABLE(id uuid, display_name text, organization1_name text, pipeline_name text, is_workspace_loadable boolean, is_invalid boolean, file_format text, last_updated_at timestamp with time zone, score real, passes_source boolean, passes_format boolean, passes_updated boolean, passes_loadable boolean)
  LANGUAGE plpgsql
  STABLE
  SET search_path TO ''
@@ -89,176 +90,243 @@ CREATE OR REPLACE FUNCTION public.rpc_data_catalog_listings__search(p_query text
 AS $function$
 declare
   v_query text := nullif(btrim(p_query), '');
-  v_limit integer := least(greatest(coalesce(p_limit, 50), 1), 200);
-  v_offset integer := greatest(coalesce(p_offset, 0), 0);
-  v_organization1_names text[] := nullif(p_organization1_names, '{}'::text[]);
-  v_organization2_names text[] := nullif(p_organization2_names, '{}'::text[]);
-  v_domains text[] := nullif(p_domains, '{}'::text[]);
-  v_tags text[] := nullif(p_tags, '{}'::text[]);
+  v_sources text[] := coalesce(p_sources, '{}');
+  v_formats text[] := coalesce(p_formats, '{}');
+  v_updated_within text := coalesce(p_updated_within, 'any');
+  v_is_loadable_only boolean := coalesce(p_is_loadable_only, false);
   v_ts_query tsquery;
 begin
-  if v_query is null then
-    return query
-    select
-      listing.id,
-      listing.display_name,
-      listing.organization1_name,
-      listing.organization2_name,
-      listing.organization3_name,
-      listing.organization4_name,
-      listing.is_workspace_loadable,
-      listing.is_invalid,
-      count(*) over ()
-    from public.data_catalog_listings listing
-    where
-      (v_organization1_names is null or listing.organization1_name = any (v_organization1_names)) and
-      (v_organization2_names is null or listing.organization2_name = any (v_organization2_names)) and
-      (v_domains is null or listing.domains && v_domains) and
-      (v_tags is null or listing.tags && v_tags)
-    order by listing.display_name, listing.id
-    limit v_limit
-    offset v_offset;
-    return;
+  if v_updated_within not in ('any', 'past_month', 'past_year', 'over_a_year') then
+    raise exception 'Unknown catalog update window: %', p_updated_within
+    using
+      errcode = '22023';
   end if;
 
-  v_ts_query := websearch_to_tsquery('english'::regconfig, v_query);
-
-  return query
-  select
-    listing.id,
-    listing.display_name,
-    listing.organization1_name,
-    listing.organization2_name,
-    listing.organization3_name,
-    listing.organization4_name,
-    listing.is_workspace_loadable,
-    listing.is_invalid,
-    count(*) over ()
-  from public.data_catalog_listings listing
-  where
-    (
-      listing.search_vector @@ v_ts_query or
-      v_query operator(extensions.<%) listing.display_name
-    ) and
-    (v_organization1_names is null or listing.organization1_name = any (v_organization1_names)) and
-    (v_organization2_names is null or listing.organization2_name = any (v_organization2_names)) and
-    (v_domains is null or listing.domains && v_domains) and
-    (v_tags is null or listing.tags && v_tags)
-  order by
-    ts_rank(listing.search_vector, v_ts_query) +
-    extensions.word_similarity(v_query, listing.display_name) desc,
-    listing.display_name,
-    listing.id
-  limit v_limit
-  offset v_offset;
-end;
-$function$
-;
-
-CREATE OR REPLACE FUNCTION public.rpc_data_catalog_listings__search_facets(p_query text, p_organization1_names text[] DEFAULT NULL::text[], p_organization2_names text[] DEFAULT NULL::text[], p_domains text[] DEFAULT NULL::text[], p_tags text[] DEFAULT NULL::text[])
- RETURNS TABLE(facet text, value text, listing_count bigint)
- LANGUAGE plpgsql
- STABLE
- SET search_path TO ''
- SET "pg_trgm.word_similarity_threshold" TO '0.5'
-AS $function$
-declare
-  v_query text := nullif(btrim(p_query), '');
-  v_organization1_names text[] := nullif(p_organization1_names, '{}'::text[]);
-  v_organization2_names text[] := nullif(p_organization2_names, '{}'::text[]);
-  v_domains text[] := nullif(p_domains, '{}'::text[]);
-  v_tags text[] := nullif(p_tags, '{}'::text[]);
-  v_ts_query tsquery;
-begin
   if v_query is not null then
     v_ts_query := websearch_to_tsquery('english'::regconfig, v_query);
   end if;
 
   return query
-  with matched as (
-    select
-      listing.organization1_name as organization1_name,
-      listing.organization2_name as organization2_name,
-      listing.domains as domains,
-      listing.tags as tags,
-      listing.drive_id as drive_id
-    from public.data_catalog_listings listing
-    where
-      v_query is null or
-      listing.search_vector @@ v_ts_query or
-      v_query operator(extensions.<%) listing.display_name
-  ),
-  organization1_counts as (
-    select
-      'organization1'::text as facet_name,
-      matched.organization1_name as facet_value,
-      count(*) as facet_count
-    from matched
-    where
-      (v_organization2_names is null or matched.organization2_name = any (v_organization2_names)) and
-      (v_domains is null or matched.domains && v_domains) and
-      (v_tags is null or matched.tags && v_tags)
-    group by matched.organization1_name
-    order by 3 desc, 2
-    limit 100
-  ),
-  organization2_listings as (
-    select matched.organization2_name, matched.drive_id
-    from matched
-    where
-      matched.organization2_name is not null and
-      (v_organization1_names is null or matched.organization1_name = any (v_organization1_names)) and
-      (v_domains is null or matched.domains && v_domains) and
-      (v_tags is null or matched.tags && v_tags)
-  ),
-  organization2_counts as (
-    select
-      'organization2'::text as facet_name,
-      organization2_listings.organization2_name as facet_value,
-      count(*) as facet_count
-    from organization2_listings
-    group by organization2_listings.organization2_name
-    order by 3 desc, 2
-    limit 100
-  ),
-  organization2_label_counts as (
-    select
-      'organization2_label'::text as facet_name,
-      drive.organization2_label as facet_value,
-      count(*) as facet_count
-    from organization2_listings
-    join public.data_catalog_drives drive on drive.id = organization2_listings.drive_id
-    where drive.organization2_label is not null
-    group by drive.organization2_label
-    order by 3 desc, 2
-    limit 100
-  ),
-  domain_counts as (
-    select
-      'domain'::text as facet_name,
-      listing_domain.domain_value as facet_value,
-      count(*) as facet_count
-    from matched
-    cross join lateral unnest(matched.domains) as listing_domain (domain_value)
-    where
-      (v_organization1_names is null or matched.organization1_name = any (v_organization1_names)) and
-      (v_organization2_names is null or matched.organization2_name = any (v_organization2_names)) and
-      (v_tags is null or matched.tags && v_tags)
-    group by listing_domain.domain_value
-    order by 3 desc, 2
-    limit 100
-  )
-  select * from organization1_counts
-  union all
-  select * from organization2_counts
-  union all
-  select * from organization2_label_counts
-  union all
-  select * from domain_counts;
+  with
+    matched as (
+      select
+        listing.id,
+        listing.display_name,
+        listing.organization1_name,
+        listing.pipeline_name,
+        listing.is_workspace_loadable,
+        listing.is_invalid,
+        case
+          when listing.api_resource_format is not null then upper(listing.api_resource_format)
+          when listing.parquet_file_name is not null then 'PARQUET'
+        end as file_format,
+        coalesce(listing.date_of_last_update, listing.date_of_last_sync) as last_updated_at,
+        case
+          when v_query is null then 0::real
+          else ts_rank(listing.search_vector, v_ts_query) + extensions.word_similarity(v_query, listing.display_name)
+        end as score
+      from
+        public.data_catalog_listings listing
+      where
+        v_query is null or
+        listing.search_vector @@ v_ts_query or
+        v_query operator(extensions.<%) listing.display_name
+    )
+  select
+    matched.id,
+    matched.display_name,
+    matched.organization1_name,
+    matched.pipeline_name,
+    matched.is_workspace_loadable,
+    matched.is_invalid,
+    matched.file_format,
+    matched.last_updated_at,
+    matched.score,
+    cardinality(v_sources) = 0 or
+    matched.organization1_name = any (v_sources),
+    cardinality(v_formats) = 0 or
+    coalesce(matched.file_format = any (v_formats), false),
+    public.data_catalog_listings__is_updated_within (matched.last_updated_at, v_updated_within),
+    not v_is_loadable_only or
+    not matched.is_invalid
+  from
+    matched;
 end;
 $function$
 ;
 
+CREATE OR REPLACE FUNCTION public.rpc_data_catalog_listings__search(p_query text, p_limit integer DEFAULT 50, p_offset integer DEFAULT 0, p_sources text[] DEFAULT '{}'::text[], p_formats text[] DEFAULT '{}'::text[], p_updated_within text DEFAULT 'any'::text, p_is_loadable_only boolean DEFAULT false, p_sort_by text DEFAULT NULL::text)
+ RETURNS TABLE(id uuid, display_name text, organization1_name text, pipeline_name text, is_workspace_loadable boolean, is_invalid boolean, file_format text, last_updated_at timestamp with time zone, total_count bigint)
+ LANGUAGE plpgsql
+ STABLE
+ SET search_path TO ''
+AS $function$
+declare
+  v_limit integer := least(greatest(coalesce(p_limit, 50), 1), 200);
+  v_offset integer := greatest(coalesce(p_offset, 0), 0);
+  v_sort_by text := coalesce(
+    p_sort_by,
+    case
+      when nullif(btrim(p_query), '') is null then 'name'
+      else 'relevance'
+    end
+  );
+begin
+  if v_sort_by not in ('relevance', 'updated', 'name') then
+    raise exception 'Unknown catalog sort: %', p_sort_by
+    using
+      errcode = '22023';
+  end if;
+
+  return query
+  select
+    match.id,
+    match.display_name,
+    match.organization1_name,
+    match.pipeline_name,
+    match.is_workspace_loadable,
+    match.is_invalid,
+    match.file_format,
+    match.last_updated_at,
+    count(*) over ()
+  from
+    public.data_catalog_listings__search_matches (
+      p_query,
+      p_sources,
+      p_formats,
+      p_updated_within,
+      p_is_loadable_only
+    ) match
+  where
+    match.passes_source and
+    match.passes_format and
+    match.passes_updated and
+    match.passes_loadable
+  order by
+    case
+      when v_sort_by = 'relevance' then match.score
+    end desc nulls last,
+    case
+      when v_sort_by = 'updated' then match.last_updated_at
+    end desc nulls last,
+    match.display_name,
+    match.id
+  limit
+    v_limit
+  offset
+    v_offset;
+end;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.rpc_data_catalog_listings__search_facets(p_query text, p_sources text[] DEFAULT '{}'::text[], p_formats text[] DEFAULT '{}'::text[], p_updated_within text DEFAULT 'any'::text, p_is_loadable_only boolean DEFAULT false)
+ RETURNS TABLE(facet text, value text, listing_count bigint)
+ LANGUAGE sql
+ STABLE
+ SET search_path TO ''
+AS $function$
+  with
+    match as (
+      select
+        *
+      from
+        public.data_catalog_listings__search_matches (
+          p_query,
+          p_sources,
+          p_formats,
+          p_updated_within,
+          p_is_loadable_only
+        )
+    ),
+    facet_counts as (
+      select
+        'source' as facet,
+        match.organization1_name as value,
+        count(*) as listing_count
+      from
+        match
+      where
+        match.passes_format and
+        match.passes_updated and
+        match.passes_loadable
+      group by
+        match.organization1_name
+      union all
+      select
+        'source',
+        chosen.value,
+        0
+      from
+        unnest(coalesce(p_sources, '{}')) as chosen (value)
+      union all
+      select
+        'format',
+        match.file_format,
+        count(*)
+      from
+        match
+      where
+        match.file_format is not null and
+        match.passes_source and
+        match.passes_updated and
+        match.passes_loadable
+      group by
+        match.file_format
+      union all
+      select
+        'format',
+        chosen.value,
+        0
+      from
+        unnest(coalesce(p_formats, '{}')) as chosen (value)
+      union all
+      select
+        'updated_within',
+        update_window.name,
+        count(match.id)
+      from
+        unnest(array['any', 'past_month', 'past_year', 'over_a_year']) as update_window (name)
+        left join match on match.passes_source and
+        match.passes_format and
+        match.passes_loadable and
+        public.data_catalog_listings__is_updated_within (match.last_updated_at, update_window.name)
+      group by
+        update_window.name
+      union all
+      select
+        'unloadable',
+        null,
+        count(*)
+      from
+        match
+      where
+        match.is_invalid and
+        match.passes_source and
+        match.passes_format and
+        match.passes_updated
+      union all
+      select
+        'catalog',
+        null,
+        count(*)
+      from
+        public.data_catalog_listings
+    )
+  select
+    facet_counts.facet,
+    facet_counts.value,
+    max(facet_counts.listing_count) as listing_count
+  from
+    facet_counts
+  group by
+    facet_counts.facet,
+    facet_counts.value
+  order by
+    facet_counts.facet,
+    max(facet_counts.listing_count) desc,
+    facet_counts.value;
+$function$
+;
 
 CREATE OR REPLACE FUNCTION public.rpc_data_catalog_listings__upsert_with_relation_columns(p_listings jsonb)
  RETURNS SETOF public.data_catalog_listings
@@ -514,10 +582,10 @@ CREATE TRIGGER tr__data_catalog_drives__set_updated_at BEFORE UPDATE ON public.d
 -- Privileges that `supabase db diff` cannot see: default, schema, column,
 -- and view grants. Appended by `pnpm db:new-migration` from what
 -- `supabase/schemas/` declares. Do not hand-edit; re-run the command.
-revoke all privileges on function public.rpc_data_catalog_listings__search_facets(p_query text, p_organization1_names text[], p_organization2_names text[], p_domains text[], p_tags text[]) from public, anon, authenticated, service_role;
-grant EXECUTE on function public.rpc_data_catalog_listings__search_facets(p_query text, p_organization1_names text[], p_organization2_names text[], p_domains text[], p_tags text[]) to "authenticated";
-revoke all privileges on function public.rpc_data_catalog_listings__search(p_query text, p_limit integer, p_offset integer, p_organization1_names text[], p_organization2_names text[], p_domains text[], p_tags text[]) from public, anon, authenticated, service_role;
-grant EXECUTE on function public.rpc_data_catalog_listings__search(p_query text, p_limit integer, p_offset integer, p_organization1_names text[], p_organization2_names text[], p_domains text[], p_tags text[]) to "authenticated";
+revoke all privileges on function public.data_catalog_listings__search_matches(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.data_catalog_listings__search_matches(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean) to "authenticated";
+revoke all privileges on function public.rpc_data_catalog_listings__search(p_query text, p_limit integer, p_offset integer, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean, p_sort_by text) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.rpc_data_catalog_listings__search(p_query text, p_limit integer, p_offset integer, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean, p_sort_by text) to "authenticated";
 revoke all privileges on function public.util__text_array_to_text(p_values text[]) from public, anon, authenticated, service_role;
 grant EXECUTE on function public.util__text_array_to_text(p_values text[]) to "authenticated";
 grant EXECUTE on function public.util__text_array_to_text(p_values text[]) to "service_role";

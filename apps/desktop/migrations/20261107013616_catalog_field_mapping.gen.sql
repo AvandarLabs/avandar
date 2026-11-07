@@ -1,8 +1,8 @@
--- Generated from supabase/migrations/20261107000129_catalog_field_mapping.sql by
+-- Generated from supabase/migrations/20261107013616_catalog_field_mapping.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 15
--- Statements dropped (RLS/funcs/triggers/data/etc.): 28
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 30
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 1
 -- SQLite override. The Postgres migration drops `search_vector` and its GIN

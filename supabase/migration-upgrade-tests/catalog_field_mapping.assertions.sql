@@ -1,5 +1,6 @@
--- Verify the rename kept every organization name and the new columns start
--- empty.
+-- Verify the rename kept every organization name, the new columns start
+-- empty, and the rebuilt search, source filter, and source facet read the
+-- renamed column.
 do $$
 begin
   if (
@@ -24,12 +25,6 @@ begin
     raise exception 'a new column was not empty after the migration';
   end if;
 
-  if to_regprocedure(
-    'public.rpc_data_catalog_listings__search(text, integer, integer)'
-  ) is not null then
-    raise exception 'the three-argument search RPC was not dropped';
-  end if;
-
   if not exists (
     select 1 from public.rpc_data_catalog_listings__search('"City of New York"', 50, 0)
     where id = (
@@ -38,6 +33,26 @@ begin
     )
   ) then
     raise exception 'search did not find a listing by its renamed organization';
+  end if;
+
+  if not exists (
+    select 1 from public.rpc_data_catalog_listings__search(
+      p_query => 'pgtap-fixture',
+      p_sources => array['World Bank']
+    )
+    where id = (
+      select id from public.data_catalog_listings
+      where parquet_file_name = 'pgtap-fixture-rename.parquet'
+    )
+  ) then
+    raise exception 'the source filter did not keep a listing by its renamed organization';
+  end if;
+
+  if not exists (
+    select 1 from public.rpc_data_catalog_listings__search_facets(p_query => 'pgtap-fixture')
+    where facet = 'source' and value = 'City of New York' and listing_count >= 1
+  ) then
+    raise exception 'the source facet did not count a listing by its renamed organization';
   end if;
 end;
 $$;

@@ -68,5 +68,5 @@ run_migration_replay \
 # search finds a listing by it.
 run_migration_replay \
   "$repo_root/supabase/migration-upgrade-tests/catalog_field_mapping.prelude.sql" \
-  "$repo_root/supabase/migrations/20261107000129_catalog_field_mapping.sql" \
+  "$repo_root/supabase/migrations/20261107013616_catalog_field_mapping.sql" \
   "$repo_root/supabase/migration-upgrade-tests/catalog_field_mapping.assertions.sql"
