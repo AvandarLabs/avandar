@@ -1,11 +1,12 @@
 import { existsSync, realpathSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { readBundledPlugins } from "@avandar/plugin-manifest/node";
 import { normalizePath } from "vite";
 import {
   checkPluginBundle,
   makeChunkSummariesFromBundle,
 } from "./checkPluginBundle/checkPluginBundle";
+import { makeOptimizeDepsEntriesFromPlugins } from "./makeOptimizeDepsEntries/makeOptimizeDepsEntries";
 import {
   makeIndexModuleSourceFromPlugins,
   makeLocalesModuleSourceFromPlugin,
@@ -227,10 +228,11 @@ function _failOnPluginBundleViolations(options: {
 /**
  * Bundles the plugins listed in `plugins/bundled.yaml`. Generates
  * `virtual:ava-plugin-index` plus one lazy manifest and locale module per
- * plugin, reloads the dev server when a manifest or locale file is added,
- * removed, or changed, and when `isBundleCheckEnabled` is set fails the build
- * if plugin code reaches the main bundle. The repo root is Vite's resolved
- * `root`.
+ * plugin, points Vite's dependency scan at each plugin's entry file so their
+ * npm packages are pre-bundled at server start, reloads the dev server when a
+ * manifest or locale file is added, removed, or changed, and when
+ * `isBundleCheckEnabled` is set fails the build if plugin code reaches the
+ * main bundle. The repo root is Vite's resolved `root`.
  */
 export function vitePluginAvaPlugins(options: {
   isBundleCheckEnabled: boolean;
@@ -239,6 +241,19 @@ export function vitePluginAvaPlugins(options: {
   let plugins: PluginDirectory[] = [];
   return {
     name: "ava-plugins",
+    config(userConfig) {
+      // Runs before `configResolved`, so the root is worked out the way Vite
+      // does it. The bundled plugins are read again in `buildStart`.
+      const configRoot = resolve(userConfig.root ?? process.cwd());
+      return {
+        optimizeDeps: {
+          entries: makeOptimizeDepsEntriesFromPlugins({
+            plugins: readBundledPlugins(configRoot),
+            repoRoot: configRoot,
+          }),
+        },
+      };
+    },
     configResolved(config) {
       repoRoot = config.root;
     },
