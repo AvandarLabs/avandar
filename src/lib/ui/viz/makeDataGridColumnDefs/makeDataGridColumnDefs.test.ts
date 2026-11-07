@@ -96,6 +96,16 @@ describe("makeDataGridColumnDefs", () => {
     expect(columnDefs[1]!.valueFormatter({ value: 32.53952745 })).toBe("32.54");
   });
 
+  it("groups the digits of a count whose column name ends in year", () => {
+    const [columnDef] = makeDataGridColumnDefs({
+      columnNames: ["total_deaths_last_year"],
+      data: [],
+      dateColumns: new Set(),
+      dateFormat: "YYYY-MM-DD",
+    });
+    expect(columnDef!.valueFormatter({ value: 267_296 })).toBe("267,296");
+  });
+
   it("shows years, ids, and codes as plain digits", () => {
     const columnNames = ["year", "UID", "FIPS", "code3", "fiscal_year"];
     const columnDefs = makeDataGridColumnDefs({
