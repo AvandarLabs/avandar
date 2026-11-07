@@ -1,4 +1,4 @@
-import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError.ts";
+import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError/PluginManifestError.ts";
 import { parseDocument } from "yaml";
 
 function _readDocumentValue(options: {

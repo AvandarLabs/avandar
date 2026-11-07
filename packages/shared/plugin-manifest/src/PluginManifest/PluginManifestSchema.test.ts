@@ -236,6 +236,19 @@ describe("PluginManifestSchema", () => {
     expect(issues[0]?.message).toContain("all: [...]");
   });
 
+  it.each([["all"], ["any"]])(
+    "reports an empty %s list as needing at least one condition",
+    (combinator) => {
+      const manifest = _makeManifestWithWhen({ [combinator]: [] });
+      expect(_getIssues(manifest)).toEqual([
+        {
+          path: `${WHEN_PATH}.${combinator}`,
+          message: "needs at least one condition",
+        },
+      ]);
+    },
+  );
+
   it("explains the valid when shapes for a malformed nested condition", () => {
     const manifest = _makeManifestWithWhen({
       all: [{ rowCount: { gtee: 2 } }],

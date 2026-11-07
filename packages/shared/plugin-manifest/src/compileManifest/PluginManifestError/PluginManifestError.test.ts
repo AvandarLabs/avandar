@@ -1,4 +1,4 @@
-import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError.ts";
+import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError/PluginManifestError.ts";
 import { describe, expect, it } from "vitest";
 
 describe("PluginManifestError", () => {

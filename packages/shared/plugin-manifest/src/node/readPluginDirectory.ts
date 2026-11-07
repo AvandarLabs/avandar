@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, join, relative } from "node:path";
 import { compileManifest } from "@plugin-manifest/compileManifest/compileManifest.ts";
-import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError.ts";
+import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError/PluginManifestError.ts";
 import { getUnapprovedDependenciesFromPackageJson } from "@plugin-manifest/dependencies/getUnapprovedDependenciesFromPackageJson.ts";
 import { makeTablerComponentNameFromIconName } from "@plugin-manifest/icons/makeTablerComponentNameFromIconName.ts";
 import { z } from "zod";

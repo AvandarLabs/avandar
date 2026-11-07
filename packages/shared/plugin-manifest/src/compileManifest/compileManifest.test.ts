@@ -1,5 +1,5 @@
 import { compileManifest } from "@plugin-manifest/compileManifest/compileManifest.ts";
-import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError.ts";
+import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError/PluginManifestError.ts";
 import { describe, expect, it } from "vitest";
 import type { PluginLocaleMessages } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
 

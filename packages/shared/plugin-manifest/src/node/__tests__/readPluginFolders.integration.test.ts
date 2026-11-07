@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError.ts";
+import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError/PluginManifestError.ts";
 import { readBundledPlugins } from "@plugin-manifest/node/readBundledPlugins.ts";
 import { readPluginDirectory } from "@plugin-manifest/node/readPluginDirectory.ts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";

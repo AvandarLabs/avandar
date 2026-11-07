@@ -24,12 +24,16 @@ const WHEN_OPERATORS = [
   "lte",
   "in",
 ] as const satisfies readonly WhenOperator[];
+const EMPTY_COMBINATOR_MESSAGE = "needs at least one condition";
 const WHEN_SHAPES_MESSAGE = `must be "all: [...]", "any: [...]", "not: ...", or "{ <fact>: { <operator>: value } }" with an operator of ${WHEN_OPERATORS.join(", ")}`;
 
 /** Permissions a manifest may request in this version of the schema. */
 export const PLUGIN_PERMISSIONS = ["data:context"] as const;
 
-/** A permission a plugin may request. */
+/**
+ * A permission a plugin may request in `permissions`, for typing code that
+ * checks what a plugin is allowed to do.
+ */
 export type PluginPermission = (typeof PLUGIN_PERMISSIONS)[number];
 
 const LocalizedStringSchema = z
@@ -67,8 +71,12 @@ const FactComparisonSchema = z
 const WhenConditionSchema: z.ZodType<WhenCondition> = z.lazy(() => {
   return z.union(
     [
-      z.strictObject({ all: z.array(WhenConditionSchema).min(1) }),
-      z.strictObject({ any: z.array(WhenConditionSchema).min(1) }),
+      z.strictObject({
+        all: z.array(WhenConditionSchema).min(1, EMPTY_COMBINATOR_MESSAGE),
+      }),
+      z.strictObject({
+        any: z.array(WhenConditionSchema).min(1, EMPTY_COMBINATOR_MESSAGE),
+      }),
       z.strictObject({ not: WhenConditionSchema }),
       FactComparisonSchema,
     ],
@@ -208,5 +216,8 @@ export type PluginManifest = z.output<typeof PluginManifestSchema>;
  */
 export type PluginCommand = PluginManifest["contributes"]["commands"][number];
 
-/** A plugin command placed in a slot. */
+/**
+ * One entry in a slot's `contributes.menus` list, for typing code that builds
+ * a slot's menu: the command to show plus its optional `when` condition.
+ */
 export type PluginMenuEntry = z.output<typeof MenuItemSchema>;

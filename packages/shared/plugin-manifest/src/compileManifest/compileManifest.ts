@@ -1,4 +1,4 @@
-import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError.ts";
+import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError/PluginManifestError.ts";
 import { PluginManifestSchema } from "@plugin-manifest/PluginManifest/PluginManifestSchema.ts";
 import { getMessageKeyFromManifestString } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
 import { parseStrictYaml } from "@plugin-manifest/yaml/parseStrictYaml/parseStrictYaml.ts";
