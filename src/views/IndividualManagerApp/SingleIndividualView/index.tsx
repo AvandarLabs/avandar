@@ -76,7 +76,7 @@ export function SingleIndividualView({
         id: assertion.conceptAttributeId,
         name: assertion.attributeName ?? t`Loading...`,
         value: assertion.value,
-        sourceName: assertion.sourceName,
+        sourceNames: assertion.sourceName ? [assertion.sourceName] : [],
       };
     });
   }, [hydratedIndividual.assertions, t]);
