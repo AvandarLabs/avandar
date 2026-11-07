@@ -9,44 +9,75 @@
 -- query below matches only them, from two sources, in three formats, updated
 -- 5, 10, 100, and 400 days ago. The 400-day one reports no update date of its
 -- own, so it is dated by its last sync. The 5-day one cannot be loaded.
+--
+-- The listings also carry made-up level-2 organizations ("Quillfen Office",
+-- "Vorpane Office", "Drellmoor Office"), topics ("Zanthology",
+-- "Murkonomy"), and keywords ("gribbleweed", "snorfle"). The North listings
+-- come from a drive that calls level 2 a "Bureau", the South ones from a
+-- drive that calls it a "Ministry". The broken feed has no level 2, topics,
+-- or keywords.
 
 begin;
 
 set search_path to extensions, public;
+
+insert into public.data_catalog_drives
+  (id, pipeline_name, drive_key, organization1_label, organization2_label)
+values
+  ('e9007002-0000-4000-8000-000000000001'::uuid,
+   'pgtap-fixture-filters', 'https://plimbrook-north.example.org',
+   'Shire', 'Bureau'),
+  ('e9007002-0000-4000-8000-000000000002'::uuid,
+   'pgtap-fixture-filters', 'https://plimbrook-south.example.org',
+   'Shire', 'Ministry');
 
 insert into public.data_catalog_listings
   (id, display_name, organization1_name, access_kind,
    parquet_file_name, pipeline_name, pipeline_run_id,
    api_service, api_base_url, api_resource_id, api_resource_format,
    external_dataset_id, date_of_last_update, date_of_last_sync,
-   is_invalid, invalid_dataset_reason)
+   is_invalid, invalid_dataset_reason,
+   organization2_name, organization3_name, organization4_name,
+   domains, tags, drive_id)
 values
   ('e9007001-0000-4000-8000-000000000001'::uuid,
    'Plimbrook measles cases', 'Fixture North Agency', 'pipeline_parquet',
    'plimbrook-1.parquet', 'pgtap-fixture-filters', 'run-1',
    null, null, null, null,
    null, now() - interval '10 days', null,
-   false, null),
+   false, null,
+   'Quillfen Office', 'Quillfen Annex', 'Quillfen Desk',
+   array['Zanthology'], array['gribbleweed'],
+   'e9007002-0000-4000-8000-000000000001'::uuid),
   ('e9007001-0000-4000-8000-000000000002'::uuid,
    'Plimbrook school census', 'Fixture North Agency', 'api_resource',
    null, null, null,
    'socrata', 'https://plimbrook.example.org', 'pl-0002', 'csv',
    'pl-0002', now() - interval '100 days', null,
-   false, null),
+   false, null,
+   'Vorpane Office', null, null,
+   array['Zanthology', 'Murkonomy'], array['snorfle'],
+   'e9007002-0000-4000-8000-000000000001'::uuid),
   ('e9007001-0000-4000-8000-000000000003'::uuid,
    'Plimbrook road works', 'Fixture South Agency', 'api_resource',
    null, null, null,
    'socrata', 'https://plimbrook.example.org', 'pl-0003', 'json',
    'pl-0003', null, now() - interval '400 days',
-   false, null),
+   false, null,
+   'Drellmoor Office', null, null,
+   array['Murkonomy'], array['gribbleweed', 'snorfle'],
+   'e9007002-0000-4000-8000-000000000002'::uuid),
   ('e9007001-0000-4000-8000-000000000004'::uuid,
    'Plimbrook broken feed', 'Fixture South Agency', 'pipeline_parquet',
    'plimbrook-4.parquet', 'pgtap-fixture-filters', 'run-1',
    null, null, null, null,
    null, now() - interval '5 days', null,
-   true, 'empty_dataset');
+   true, 'empty_dataset',
+   null, null, null,
+   null, null,
+   'e9007002-0000-4000-8000-000000000002'::uuid);
 
-select plan(22);
+select plan(43);
 
 -- Search filters
 
@@ -222,12 +253,204 @@ select results_eq(
   'a chosen value with no matches is still listed, so it can be unchosen'
 );
 
+-- Level-2 organization, topic, and keyword search
+
+select bag_eq(
+  $$select id from public.rpc_data_catalog_listings__search(p_query => 'gribbleweed')$$,
+  $$values
+    ('e9007001-0000-4000-8000-000000000001'::uuid),
+    ('e9007001-0000-4000-8000-000000000003'::uuid)$$,
+  'a keyword makes a listing searchable'
+);
+
+select bag_eq(
+  $$select id from public.rpc_data_catalog_listings__search(p_query => 'zanthology')$$,
+  $$values
+    ('e9007001-0000-4000-8000-000000000001'::uuid),
+    ('e9007001-0000-4000-8000-000000000002'::uuid)$$,
+  'a topic makes a listing searchable'
+);
+
+select results_eq(
+  $$select id from public.rpc_data_catalog_listings__search(p_query => 'quillfen')$$,
+  $$values ('e9007001-0000-4000-8000-000000000001'::uuid)$$,
+  'a level-2 organization makes a listing searchable'
+);
+
+-- Level-2 organization, topic, and keyword filters
+
+select results_eq(
+  $$select id from public.rpc_data_catalog_listings__search(
+    p_query => 'plimbrook', p_organization2_names => array['Vorpane Office'])$$,
+  $$values ('e9007001-0000-4000-8000-000000000002'::uuid)$$,
+  'a level-2 organization keeps only its own listings'
+);
+
+select bag_eq(
+  $$select id from public.rpc_data_catalog_listings__search(
+    p_query => 'plimbrook', p_domains => array['Murkonomy'])$$,
+  $$values
+    ('e9007001-0000-4000-8000-000000000002'::uuid),
+    ('e9007001-0000-4000-8000-000000000003'::uuid)$$,
+  'a topic keeps only listings filed under it'
+);
+
+select bag_eq(
+  $$select id from public.rpc_data_catalog_listings__search(
+    p_query => 'plimbrook', p_tags => array['snorfle'])$$,
+  $$values
+    ('e9007001-0000-4000-8000-000000000002'::uuid),
+    ('e9007001-0000-4000-8000-000000000003'::uuid)$$,
+  'a keyword keeps only listings tagged with it'
+);
+
+select bag_eq(
+  $$select id from public.rpc_data_catalog_listings__search(
+    p_query => 'plimbrook', p_tags => array['gribbleweed', 'snorfle'])$$,
+  $$values
+    ('e9007001-0000-4000-8000-000000000001'::uuid),
+    ('e9007001-0000-4000-8000-000000000002'::uuid),
+    ('e9007001-0000-4000-8000-000000000003'::uuid)$$,
+  'values within one filter are ORed'
+);
+
+select results_eq(
+  $$select id from public.rpc_data_catalog_listings__search(
+    p_query => 'plimbrook', p_domains => array['Murkonomy'],
+    p_sources => array['Fixture North Agency'])$$,
+  $$values ('e9007001-0000-4000-8000-000000000002'::uuid)$$,
+  'a topic ANDs with a source'
+);
+
+select results_eq(
+  $$select id from public.rpc_data_catalog_listings__search(
+    p_query => 'plimbrook',
+    p_organization2_names => array['Quillfen Office', 'Drellmoor Office'],
+    p_tags => array['snorfle'])$$,
+  $$values ('e9007001-0000-4000-8000-000000000003'::uuid)$$,
+  'a level-2 organization ANDs with a keyword'
+);
+
+select bag_eq(
+  $$select id from public.rpc_data_catalog_listings__search(
+    p_query => '', p_tags => array['gribbleweed'])$$,
+  $$values
+    ('e9007001-0000-4000-8000-000000000001'::uuid),
+    ('e9007001-0000-4000-8000-000000000003'::uuid)$$,
+  'a keyword filters a blank query'
+);
+
+select results_eq(
+  $$select count(*) from public.rpc_data_catalog_listings__search(
+    p_query => 'plimbrook', p_organization2_names => '{}', p_domains => '{}',
+    p_tags => '{}')$$,
+  $$values (4::bigint)$$,
+  'an empty level-2 organization, topic, or keyword list is no filter'
+);
+
+select results_eq(
+  $$select organization1_name, organization2_name, organization3_name,
+      organization4_name
+    from public.rpc_data_catalog_listings__search(p_query => 'quillfen')$$,
+  $$values ('Fixture North Agency'::text, 'Quillfen Office'::text,
+            'Quillfen Annex'::text, 'Quillfen Desk'::text)$$,
+  'each row carries its organization levels'
+);
+
+-- Level-2 organization, topic, and keyword facets
+
+select bag_eq(
+  $$select value, listing_count
+    from public.rpc_data_catalog_listings__search_facets(
+      p_query => 'plimbrook', p_tags => array['gribbleweed'],
+      p_organization2_names => array['Quillfen Office'])
+    where facet = 'organization2'$$,
+  $$values ('Quillfen Office'::text, 1::bigint), ('Drellmoor Office', 1)$$,
+  'the level-2 facet counts over every filter but its own'
+);
+
+select results_eq(
+  $$select listing_count
+    from public.rpc_data_catalog_listings__search_facets(
+      p_query => 'plimbrook', p_organization2_names => array['Glimmerholt Office'])
+    where facet = 'organization2' and value = 'Glimmerholt Office'$$,
+  $$values (0::bigint)$$,
+  'a chosen level-2 organization with no matches is still listed'
+);
+
+select bag_eq(
+  $$select value, listing_count
+    from public.rpc_data_catalog_listings__search_facets(
+      p_query => 'plimbrook', p_sources => array['Fixture North Agency'],
+      p_organization2_names => array['Drellmoor Office'])
+    where facet = 'organization2_label'$$,
+  $$values ('Bureau'::text, 2::bigint)$$,
+  'the level-2 label facet names the level on the drives of the same rows'
+);
+
+select bag_eq(
+  $$select value, listing_count
+    from public.rpc_data_catalog_listings__search_facets(
+      p_query => 'plimbrook', p_domains => array['Murkonomy'],
+      p_sources => array['Fixture North Agency'])
+    where facet = 'domain'$$,
+  $$values ('Zanthology'::text, 2::bigint), ('Murkonomy', 1)$$,
+  'the topic facet counts each topic over every filter but its own'
+);
+
+select results_eq(
+  $$select listing_count
+    from public.rpc_data_catalog_listings__search_facets(
+      p_query => 'plimbrook', p_domains => array['Nothingology'])
+    where facet = 'domain' and value = 'Nothingology'$$,
+  $$values (0::bigint)$$,
+  'a chosen topic with no matches is still listed'
+);
+
+select bag_eq(
+  $$select value, listing_count
+    from public.rpc_data_catalog_listings__search_facets(
+      p_query => 'plimbrook', p_tags => array['snorfle'])
+    where facet = 'source'$$,
+  $$values ('Fixture North Agency'::text, 1::bigint),
+           ('Fixture South Agency', 1)$$,
+  'the source facet applies the keyword filter'
+);
+
+select bag_eq(
+  $$select value, listing_count
+    from public.rpc_data_catalog_listings__search_facets(
+      p_query => 'plimbrook', p_organization2_names => array['Quillfen Office'])
+    where facet = 'format'$$,
+  $$values ('PARQUET'::text, 1::bigint)$$,
+  'the format facet applies the level-2 filter'
+);
+
+select bag_eq(
+  $$select value, listing_count
+    from public.rpc_data_catalog_listings__search_facets(
+      p_query => 'plimbrook', p_domains => array['Zanthology'])
+    where facet = 'updated_within'$$,
+  $$values ('any'::text, 2::bigint), ('past_month', 1), ('past_year', 2),
+           ('over_a_year', 0)$$,
+  'the update facet applies the topic filter'
+);
+
+select results_eq(
+  $$select listing_count
+    from public.rpc_data_catalog_listings__search_facets(
+      p_query => 'plimbrook', p_tags => array['snorfle'])
+    where facet = 'unloadable'$$,
+  $$values (0::bigint)$$,
+  'the unloadable count applies the keyword filter'
+);
+
 -- Privileges
 
 select ok(
   has_function_privilege(
     'authenticated',
-    'public.rpc_data_catalog_listings__search_facets(text, text[], text[], text, boolean)',
+    'public.rpc_data_catalog_listings__search_facets(text, text[], text[], text, boolean, text[], text[], text[])',
     'execute'
   ),
   'a signed-in user may count the catalog''s facets'
@@ -236,7 +459,7 @@ select ok(
 select ok(
   not has_function_privilege(
     'anon',
-    'public.rpc_data_catalog_listings__search_facets(text, text[], text[], text, boolean)',
+    'public.rpc_data_catalog_listings__search_facets(text, text[], text[], text, boolean, text[], text[], text[])',
     'execute'
   ),
   'a signed-out visitor may not count the catalog''s facets'

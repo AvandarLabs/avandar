@@ -10,16 +10,49 @@ begin;
 
 -- What this migration builds, removed first: the search column that reads
 -- the new columns and the function it calls, and the search functions that
--- read `organization1_name`.
+-- read `organization1_name`. The search functions are dropped by the
+-- signatures the fully migrated database has, which
+-- `20261107015103_catalog_search_organization_filters` widened with the
+-- level-2 organization, topic, and keyword filters.
 alter table public.data_catalog_listings drop column search_vector;
 
 drop function public.util__text_array_to_text (text[]);
 
-drop function public.rpc_data_catalog_listings__search_facets (text, text[], text[], text, boolean);
+drop function public.rpc_data_catalog_listings__search_facets (
+  text,
+  text[],
+  text[],
+  text,
+  boolean,
+  text[],
+  text[],
+  text[]
+);
 
-drop function public.rpc_data_catalog_listings__search (text, integer, integer, text[], text[], text, boolean, text);
+drop function public.rpc_data_catalog_listings__search (
+  text,
+  integer,
+  integer,
+  text[],
+  text[],
+  text,
+  boolean,
+  text[],
+  text[],
+  text[],
+  text
+);
 
-drop function public.data_catalog_listings__search_matches (text, text[], text[], text, boolean);
+drop function public.data_catalog_listings__search_matches (
+  text,
+  text[],
+  text[],
+  text,
+  boolean,
+  text[],
+  text[],
+  text[]
+);
 
 alter table public.data_catalog_listings
   drop column drive_id,

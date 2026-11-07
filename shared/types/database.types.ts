@@ -2577,26 +2577,38 @@ export type Database = {
       }
       data_catalog_listings__search_matches: {
         Args: {
+          p_domains: string[]
           p_formats: string[]
           p_is_loadable_only: boolean
+          p_organization2_names: string[]
           p_query: string
           p_sources: string[]
+          p_tags: string[]
           p_updated_within: string
         }
         Returns: {
           display_name: string
+          domains: string[]
+          drive_id: string
           file_format: string
           id: string
           is_invalid: boolean
           is_workspace_loadable: boolean
           last_updated_at: string
           organization1_name: string
+          organization2_name: string
+          organization3_name: string
+          organization4_name: string
+          passes_domain: boolean
           passes_format: boolean
           passes_loadable: boolean
+          passes_organization2: boolean
           passes_source: boolean
+          passes_tag: boolean
           passes_updated: boolean
           pipeline_name: string
           score: number
+          tags: string[]
         }[]
       }
       datasets__auth_user_may_add_column: {
@@ -2777,13 +2789,16 @@ export type Database = {
       }
       rpc_data_catalog_listings__search: {
         Args: {
+          p_domains?: string[]
           p_formats?: string[]
           p_is_loadable_only?: boolean
           p_limit?: number
           p_offset?: number
+          p_organization2_names?: string[]
           p_query: string
           p_sort_by?: string
           p_sources?: string[]
+          p_tags?: string[]
           p_updated_within?: string
         }
         Returns: {
@@ -2794,16 +2809,22 @@ export type Database = {
           is_workspace_loadable: boolean
           last_updated_at: string
           organization1_name: string
+          organization2_name: string
+          organization3_name: string
+          organization4_name: string
           pipeline_name: string
           total_count: number
         }[]
       }
       rpc_data_catalog_listings__search_facets: {
         Args: {
+          p_domains?: string[]
           p_formats?: string[]
           p_is_loadable_only?: boolean
+          p_organization2_names?: string[]
           p_query: string
           p_sources?: string[]
+          p_tags?: string[]
           p_updated_within?: string
         }
         Returns: {
