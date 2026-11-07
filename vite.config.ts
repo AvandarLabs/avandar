@@ -41,7 +41,11 @@ const reactWithLinguiMacro = () => {
 // `@avandar/plugin-manifest` source directly and fail on its
 // `@plugin-manifest/...` path aliases. The module runner resolves them with
 // `vite-tsconfig-paths`. Only call it outside test mode, where the plugin is
-// not registered.
+// not registered. `runnerImport` is marked experimental in Vite 7, so its
+// behavior may change in a minor release. The plugin is loaded once when the
+// config is read, so editing the plugin's own source
+// (`vitePluginAvaPlugins.ts` or `@avandar/plugin-manifest`) while `pnpm dev`
+// runs needs a manual dev server restart.
 const loadVitePluginAvaPlugins = async () => {
   const { module } = await runnerImport<typeof VitePluginAvaPluginsModule>(
     join(
