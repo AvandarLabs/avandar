@@ -9,12 +9,16 @@ has run, and each category is addressed in
 | ID | Question | Model | Summary |
 |---|---|---|---|
 | NI-001 | (empty chat) | n/a | Starter suggestions are not analytic questions ("What is the average Lat in long-global-deaths.csv?") |
-| NI-002 | B01 | Claude | Whole-number totals shown with decimals (`63,437.00`) |
+| NI-002 | B01 | Claude | Whole-number totals shown with decimals (`63,437.00`). Fixed with BUG-007. |
 | NI-003 | B01 | Claude | The reply says only "I ran the query. Your results are ready." with no answer in words and no note of which dataset it used |
 | NI-004 | B02 | ChatGPT | Ran a lookup round trip to confirm "California", the user's exact wording |
 | NI-005 | B03 | ChatGPT | Asked whether "most deaths" means the cumulative total or the single-day peak |
 | NI-006 | B03 | Claude | A new chat inherits the explorer's previous SQL and error, and the model copied the other model's failed SQL |
 | NI-007 | B02 | ChatGPT | The discovery question reads "Which stored state value should I use for California?" |
+| NI-008 | I02 | ChatGPT | A two-state lookup ("California and Texas") never continues on its own, so the user picks both from 58 states |
+| NI-009 | I04, I07 | Both | Boundary effects are silent: a 7-day average restarts at Jan 1, and a partial first week (Dec 28 to Jan 3) is shown as a full week |
+| NI-010 | B07 | ChatGPT | Asked which dataset's date range to show, when all three share one range |
+| NI-011 | I07 | Both | "The UK" silently includes 14 overseas territories, and the US comes from a different dataset than the UK, with neither choice stated |
 
 ---
 
@@ -93,3 +97,48 @@ Counts of people should display as `63,437`.
 - **What should happen:** "Which of these is California?" or no question at
   all when the lookup resolves on its own (which it did here, so the user
   never saw it).
+
+## NI-008: multi-value lookups never continue on their own
+
+- **Question:** I02, "Compare monthly covid deaths in California and Texas in
+  2021". **Model:** ChatGPT.
+- **What happened:** a `discovery` with `multi: true` and candidates
+  `["California", "CA", "Texas", "TX"]`. Automatic continuation only runs for
+  single-value lookups (`useStartDiscovery` skips `multi`), so the user saw
+  every state and had to tick California and Texas by hand, although both
+  match exactly.
+- **What should happen:** when the candidates resolve to stored values the
+  user plainly named, continue with those values. Candidates are a flat list,
+  so the client cannot tell "California or CA" from "California and Texas";
+  grouping candidates per named value would let it.
+
+## NI-009: boundary effects are silent
+
+- **Questions:** I04 (7-day rolling average of US cases in 2022) and I07
+  (weekly deaths in 2021). **Models:** both.
+- **What happened:** both models filter to the year before computing the
+  window, so the averages for Jan 1 to Jan 6 cover 1 to 6 days instead of 7.
+  `date_trunc('week', ...)` makes the first 2021 week start on 2020-12-28 and
+  hold only Jan 1 to 3. Neither is mentioned.
+- **What should happen:** compute the window over the full series and filter
+  afterwards, and either drop or flag partial periods.
+
+## NI-010: asked which dataset's date range to show
+
+- **Question:** B07, "What date range does the data cover?" **Model:**
+  ChatGPT (on one of two runs).
+- **What happened:** a four-option question (US deaths, US cases, global
+  deaths, all three). All three datasets cover 2020-01-22 to 2023-03-09.
+  Claude answered directly. On a re-run ChatGPT answered with a `UNION ALL`
+  over all three, which is the right default.
+
+## NI-011: unstated choices in country comparisons
+
+- **Question:** I07. **Models:** both.
+- **What happened:** "the UK" was taken as every `United Kingdom` row, which
+  includes Bermuda, Gibraltar and 12 other territories (2,453 deaths in the
+  first week against 2,449 for the mainland row). Claude took the US from
+  `long-us-deaths.csv` and the UK from `long-global-deaths.csv`. Both are
+  defensible; neither is said.
+- **What should happen:** one short line naming the datasets and any
+  inclusion choice, for example "UK includes overseas territories".

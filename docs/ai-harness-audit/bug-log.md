@@ -13,6 +13,9 @@ listed here with what a reviewer needs to rebuild it as a PR to `develop`.
 | BUG-004 | A discovery lookup on a dataset the explorer had not opened failed with `Catalog Error` | fixed | `b21698925` |
 | BUG-005 | Valid SQL with a CTE or `QUALIFY` failed while building the column projection | fixed | `bb3a66132` |
 | BUG-006 | A new chat that repeats the last question was sent to the model as "Try again" | fixed | `75435c18e` |
+| BUG-007 | Years shown as `2,020.00` and counts as `63,437.00` in the data grid | fixed | `ca509aae7` |
+| BUG-008 | SQL a model wrote as plain text was shown in the chat bubble, with internal `t0` aliases | fixed | `d6e67b293` |
+| BUG-009 | A discovery lookup missed the user's value when it sorted past the first 100 values | fixed | `18ae7b452` |
 
 ---
 
@@ -189,3 +192,68 @@ listed here with what a reviewer needs to rebuild it as a PR to `develop`.
   does. The harness now exposes `startNewChat`.
 - **Branch:** `fix/new-chat-retry-context`, merged as `989c2f10a`.
 - **PR title for develop:** `fix(chat): stop treating a new chat's repeated question as Try again`
+
+## BUG-007: years shown as `2,020.00`, counts as `63,437.00`
+
+- **Question:** B10, "How many covid deaths were there in each year in the
+  US?" Both models wrote `EXTRACT(YEAR FROM "date") AS "year"`.
+- **What the user saw:** a `year` column reading `2,020.00`, `2,021.00`,
+  `2,022.00`, `2,023.00`. Every count in every answer so far also carried
+  `.00`, and one column could mix `2,922,730` with `541,406.00` (B02).
+- **Root cause:** `DataGrid` formatted every number with `formatChartNumber`,
+  a chart-axis formatter that shows two decimals for any value between 1 and
+  1,000,000 and none above.
+- **Fix:** `makeDataGridColumnDefs` formats whole numbers without decimals.
+  Whole numbers in a column named like a year, id, or code (`year`, `UID`,
+  `FIPS`, `code3`, `country_code`) show plain digits. Fractions keep two
+  decimals. This also closes NI-002.
+- **Tests:** two new cases in `makeDataGridColumnDefs.test.ts`.
+- **Verified in the app:** B10 shows `2020 | 350,604`.
+- **Branch:** `fix/grid-number-display`, merged as `5b79ba82b`.
+- **PR title for develop:** `fix(viz): show whole numbers and years plainly in the data grid`
+
+## BUG-008: inline SQL shown in the chat bubble
+
+- **Question:** I02, after answering the state lookup. **Model:** ChatGPT.
+- **What happened:** ChatGPT wrote its query as plain text instead of calling
+  `generateSql`. The edge function extracted and ran it correctly, but also
+  returned the whole text as the reply, so the chat bubble showed raw SQL
+  reading `FROM "t0"`, an internal alias the user never sees anywhere else.
+- **Root cause:** `parseOpenRouterResponse` kept `attemptText` as the reply
+  even after `extractSqlFromAssistantText` took the SQL out of it.
+- **Fix:** `extractSqlFromAssistantText` returns `{ sql, textWithoutSql }`, and
+  the parser replies with the text minus the SQL (prose around a fenced block
+  is kept). An empty remainder falls back to the client's "results are
+  ready" line.
+- **Tests:** two new cases in `parseOpenRouterResponse.test.ts`; the extractor's
+  own tests updated for the new return shape.
+- **Branch:** `fix/chat-sql-text-leak`, merged as `eee640c83`.
+- **PR title for develop:** `fix(chat): keep inline SQL out of the reply the user reads`
+
+## BUG-009: a discovery lookup missed values past the first 100
+
+- **Question:** I07, "Weekly covid deaths in the US vs the UK in 2021".
+  **Model:** ChatGPT.
+- **What happened:** the model looked up how the UK is stored with
+  `SELECT DISTINCT "Country/Region" ... ORDER BY "Country/Region" LIMIT 100`
+  and candidates `["UK", "United Kingdom", "U.K.", "Great Britain"]`. The
+  global file has 201 countries. "United Kingdom" sorts past the 100th
+  ("Latvia"), so no candidate matched, the chat did not continue, and the card
+  asked the user to pick from a list that did not contain the answer.
+- **Root cause:** discovery relies on the model's lookup query, which the
+  system prompt tells it to cap at 100 values, and the client caps at 100 as
+  well. Columns with more values than that (2,000 US counties, 201 countries)
+  can drop the value the user named.
+- **Fix:** `useDiscoveryResolver` also runs
+  `buildCandidateLookupSqlFromDiscovery`: a local
+  `SELECT DISTINCT col FROM <dataset> WHERE lower(trim(col)) IN (<candidates>)`
+  on the lookup's single dataset and column. Matches go first in the options,
+  so a single match continues automatically wherever it sorts. Nothing new
+  leaves the browser.
+- **Tests:** `buildCandidateLookupSqlFromDiscovery.test.ts` (new), a new case in
+  `useDiscoveryResolver.test.tsx`, and a pass-through case in
+  `DiscoveryBody.test.tsx`.
+- **Verified in the app:** I07 on ChatGPT resolves `United Kingdom` on its own
+  and returns ground-truth weekly totals.
+- **Branch:** `fix/discovery-candidate-lookup`, merged as `b02679c3f`.
+- **PR title for develop:** `fix(chat): find the named value even past a discovery's first 100 rows`
