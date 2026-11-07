@@ -1272,6 +1272,12 @@ ava pipeline run socrata --local --limit 20   # local stack only: rows carry org
 Then open the Open data tab with a few hundred listings: choose a publisher,
 then its agency, then click a keyword on a listing, and clear the filters.
 
+**Rollout:** Deploy the two migrations, the frontend, and the
+pipeline-server together, with no pipeline run in between. An old
+pipeline-server still writes `external_organization_name`, so its inserts fail
+on the `NOT NULL` `organization1_name`. An old frontend's `DBReadSchema`
+rejects the new listing shape, so the catalog would not load.
+
 **Follow-ups found in review, not done here:**
 - `passes_loadable` in `51.data_catalog_listings__search_matches.sql` tests
   `is_invalid`, not `is_workspace_loadable`, so "Hide datasets that can't be
@@ -1289,6 +1295,12 @@ then its agency, then click a keyword on a listing, and clear the filters.
 - Backfill the demo instance with one full (non-incremental) run of each
   pipeline. Incremental runs only touch datasets that changed, so unchanged
   listings keep empty new columns.
+- Removing one of two chosen publishers leaves the agencies chosen under it
+  selected, which can empty the list.
+- 23 new UI strings have an empty `msgstr` in 7 locales. The pre-push hook's
+  LLM translation step (or `pnpm translations`) fills them.
+- No automated test runs the mapper loader under Bun. It was verified
+  manually.
 
 ---
 
