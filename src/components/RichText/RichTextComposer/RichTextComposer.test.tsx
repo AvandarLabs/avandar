@@ -1,11 +1,42 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { RICH_TEXT_MAX_TEXT_LENGTH } from "$/models/RichTextDocument/RichTextDocument";
 import { RichTextComposer } from "@/components/RichText/RichTextComposer/RichTextComposer";
 import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
 import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
+import type { GadgetSearchResult } from "@/clients/gadgets/searchGadgets/searchGadgets";
 import type { MentionCandidate } from "@/components/RichText/UserMention/filterMentionCandidates";
 import type { Editor } from "@tiptap/core";
 import type { ComponentProps } from "react";
+
+const mocks = vi.hoisted(() => {
+  return { searchGadgets: vi.fn() };
+});
+
+vi.mock("@/clients/gadgets/searchGadgets/searchGadgets", () => {
+  return { searchGadgets: mocks.searchGadgets };
+});
+
+vi.mock(
+  "@/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries",
+  () => {
+    const unavailable = () => {
+      return { status: "unavailable" };
+    };
+    return {
+      useDashboardSummary: unavailable,
+      useDashboardTileSummary: unavailable,
+      useDatasetSummary: unavailable,
+      useMapSummary: unavailable,
+      useConceptSummary: unavailable,
+      useIndividualSummary: unavailable,
+    };
+  },
+);
+
+beforeEach(() => {
+  mocks.searchGadgets.mockReset();
+  mocks.searchGadgets.mockResolvedValue([]);
+});
 
 const DOCUMENT = {
   type: "doc" as const,
@@ -443,5 +474,128 @@ describe("RichTextComposer labels", () => {
     ].forEach((name) => {
       expect(screen.getByRole("button", { name })).toBeInTheDocument();
     });
+  });
+});
+
+const WORKSPACE_ID = "33333333-3333-4333-8333-333333333333";
+const DASHBOARD_ID = "44444444-4444-4444-8444-444444444444";
+
+const MEASLES_DASHBOARD: GadgetSearchResult = {
+  ref: { gadgetType: "dashboard", gadgetId: DASHBOARD_ID, subId: null },
+  label: "Measles by borough",
+  subLabel: undefined,
+  hasLimitedAudience: false,
+};
+
+const GADGET_ATTRS_JSON = `{"gadgetType":"dashboard","gadgetId":"${DASHBOARD_ID}","subId":null}`;
+
+/** Types `@meas` in an empty composer and waits for the dashboard row. */
+async function _openGadgetMenu(
+  onSubmit: ComponentProps<typeof RichTextComposer>["onSubmit"],
+): Promise<void> {
+  mocks.searchGadgets.mockResolvedValue([MEASLES_DASHBOARD]);
+  _renderComposer({
+    onSubmit,
+    initialContent: undefined,
+    workspaceId: WORKSPACE_ID,
+  });
+  act(() => {
+    _getEditor().commands.insertContent("@meas");
+  });
+  expect(await screen.findByText("Measles by borough")).toBeInTheDocument();
+  // The insert command collapses the DOM selection, and jsdom throws on
+  // that when no range exists, unlike a real browser.
+  window.getSelection()?.selectAllChildren(_getEditingArea());
+}
+
+async function _postAndGetCall(
+  onSubmit: ReturnType<typeof vi.fn>,
+): Promise<[RichTextDocument.T, string]> {
+  fireEvent.click(screen.getByRole("button", { name: "Post" }));
+  await waitFor(() => {
+    expect(onSubmit).toHaveBeenCalled();
+  });
+  return onSubmit.mock.calls[0] as [RichTextDocument.T, string];
+}
+
+describe("RichTextComposer gadget search", () => {
+  it("searches the workspace for the typed query and shows searching first", async () => {
+    mocks.searchGadgets.mockResolvedValue([MEASLES_DASHBOARD]);
+    _renderComposer({ initialContent: undefined, workspaceId: WORKSPACE_ID });
+    act(() => {
+      _getEditor().commands.insertContent("@meas");
+    });
+    expect(await screen.findByText("Searching...")).toBeInTheDocument();
+    expect(await screen.findByText("Measles by borough")).toBeInTheDocument();
+    expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+    expect(mocks.searchGadgets).toHaveBeenCalledWith({
+      workspaceId: WORKSPACE_ID,
+      query: "meas",
+      limit: 20,
+    });
+  });
+
+  it("links the gadget on Enter and posts only its type noun as plain text", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(true);
+    await _openGadgetMenu(onSubmit);
+    fireEvent.keyDown(_getEditingArea(), { key: "Enter" });
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    });
+    const [document, plainText] = await _postAndGetCall(onSubmit);
+    expect(JSON.stringify(document)).toContain(
+      `{"type":"gadgetLink","attrs":${GADGET_ATTRS_JSON}}`,
+    );
+    expect(plainText).toContain("[dashboard]");
+    expect(plainText).not.toContain("Measles by borough");
+  });
+
+  it("embeds the gadget on Shift+Enter", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(true);
+    await _openGadgetMenu(onSubmit);
+    fireEvent.keyDown(_getEditingArea(), { key: "Enter", shiftKey: true });
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    });
+    const [document] = await _postAndGetCall(onSubmit);
+    expect(JSON.stringify(document)).toContain(
+      `{"type":"gadgetEmbed","attrs":${GADGET_ATTRS_JSON}}`,
+    );
+    expect(JSON.stringify(document)).not.toContain("gadgetLink");
+  });
+
+  it("still lists members when the gadget search fails", async () => {
+    mocks.searchGadgets.mockRejectedValue(new Error("offline"));
+    _renderComposer({ initialContent: undefined, workspaceId: WORKSPACE_ID });
+    act(() => {
+      _getEditor().commands.insertContent("@pri");
+    });
+    expect(
+      await screen.findByText("Couldn't search. Keep typing to retry."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Priya Natarajan")).toBeInTheDocument();
+  });
+
+  it("never searches gadgets without a workspace", async () => {
+    _renderComposer({ initialContent: undefined });
+    act(() => {
+      _getEditor().commands.insertContent("@pri");
+    });
+    expect(await screen.findByText("Priya Natarajan")).toBeInTheDocument();
+    // Wait out the search pause so a scheduled search would have run.
+    await new Promise((resolve) => {
+      setTimeout(resolve, 300);
+    });
+    expect(mocks.searchGadgets).not.toHaveBeenCalled();
+    expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+  });
+
+  it("names the @ control for gadgets too when a workspace is given", () => {
+    _renderComposer({ workspaceId: WORKSPACE_ID });
+    expect(
+      screen.getByRole("button", {
+        name: "Mention a teammate or link a dashboard, dataset, or case",
+      }),
+    ).toBeInTheDocument();
   });
 });

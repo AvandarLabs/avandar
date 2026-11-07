@@ -1,0 +1,94 @@
+.anchor {
+  block-size: 0;
+  pointer-events: none;
+  position: fixed;
+}
+
+/*
+ * A pale wash, not Mantine's filled default, so the dimmed detail line
+ * stays legible on the highlighted row.
+ */
+.optionRow[data-combobox-selected] {
+  background-color: var(--mantine-color-primary-0);
+  color: var(--mantine-color-neutral-9);
+}
+
+.option {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.initials {
+  background-color: var(--mantine-color-neutral-1);
+  block-size: 24px;
+  border: 1px solid var(--ava-border-default);
+  border-radius: 50%;
+  display: grid;
+  flex: none;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  inline-size: 24px;
+  place-items: center;
+}
+
+.iconTile {
+  background-color: var(--mantine-color-neutral-1);
+  block-size: 26px;
+  border-radius: var(--mantine-radius-sm);
+  color: var(--mantine-color-neutral-8);
+  display: grid;
+  flex: none;
+  inline-size: 26px;
+  place-items: center;
+}
+
+.status {
+  color: var(--mantine-color-dimmed);
+  font-size: var(--mantine-font-size-sm);
+  padding-block: 6px;
+  padding-inline: var(--mantine-spacing-xs);
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+}
+
+/* Never blocks inserting: it only warns the author before they post. */
+.hint {
+  align-items: flex-start;
+  background-color: var(--mantine-color-warning-0);
+  border-radius: var(--mantine-radius-xs);
+  color: var(--mantine-color-neutral-8);
+  display: flex;
+  font-size: var(--mantine-font-size-xs);
+  gap: 6px;
+  line-height: 1.45;
+  padding-block: 6px;
+  padding-inline: var(--mantine-spacing-xs);
+}
+
+.hintIcon {
+  color: var(--mantine-color-warning-8);
+  flex: none;
+  margin-block-start: 1px;
+}
+
+.keys {
+  color: var(--mantine-color-dimmed);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--mantine-font-size-xs);
+  gap: var(--mantine-spacing-sm);
+  padding-block: 2px;
+  padding-inline: var(--mantine-spacing-xs);
+}

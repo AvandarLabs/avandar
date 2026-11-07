@@ -1,0 +1,95 @@
+import { Combobox, useCombobox } from "@mantine/core";
+import { forwardRef, useId } from "react";
+import { MentionMenuFooter } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter";
+import { MentionMenuGroups } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroups";
+import classes from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList.module.css";
+import { useMentionMenuNavigation } from "@/components/RichText/MentionMenu/MentionMenuList/useMentionMenuNavigation";
+import type { GadgetSearchResult } from "@/clients/gadgets/searchGadgets/searchGadgets";
+import type { MentionMenuGroup } from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
+import type { MentionCandidate } from "@/components/RichText/UserMention/filterMentionCandidates";
+
+/** Lets the suggestion plugin forward the editor's key presses. */
+export type MentionMenuListHandle = {
+  onKeyDown: (event: KeyboardEvent) => boolean;
+};
+
+/**
+ * What the author chose in the `@` menu: a member to mention, or a gadget to
+ * insert as an inline link or as an embed on its own line.
+ */
+export type MentionMenuSelection =
+  | { kind: "person"; candidate: MentionCandidate }
+  | { kind: "gadget"; display: "link" | "embed"; result: GadgetSearchResult };
+
+/** The props `createMentionMenuSuggestion` renders the list with. */
+export type MentionMenuListProps = {
+  groups: readonly MentionMenuGroup[];
+
+  /** The gadget search is in flight, so gadget groups show one status row. */
+  isSearching: boolean;
+
+  /** The gadget search failed, so gadget groups show a retry message. */
+  searchFailed: boolean;
+  clientRect: (() => DOMRect | null) | null | undefined;
+  command: (selection: MentionMenuSelection) => void;
+
+  /**
+   * The editor's editing area. While the list is mounted it becomes an ARIA
+   * combobox that controls the list and points at the highlighted row.
+   */
+  editingArea?: HTMLElement;
+};
+
+/**
+ * The `@` menu: gadgets the author can open, grouped by type, then the
+ * workspace members who match. The editor keeps focus, so keyboard
+ * navigation arrives through `onKeyDown` from the suggestion plugin rather
+ * than from the DOM.
+ */
+export const MentionMenuList = forwardRef<
+  MentionMenuListHandle,
+  MentionMenuListProps
+>(function MentionMenuList(props, ref) {
+  const listboxId = useId();
+  // Always open while mounted: the suggestion plugin mounts and unmounts
+  // the list as the `@` query starts and ends.
+  const combobox = useCombobox({ opened: true });
+  const { visibleGroups, highlightedItem, buildOptionId, chooseItemById } =
+    useMentionMenuNavigation(ref, { ...props, listboxId });
+  const rect = props.clientRect?.() ?? null;
+
+  return (
+    <div
+      className={classes.anchor}
+      style={{ left: rect?.left ?? 0, top: rect?.bottom ?? 0 }}
+    >
+      <Combobox
+        store={combobox}
+        position="bottom-start"
+        width={300}
+        withinPortal
+        // The anchor is a zero-size point at the caret, which floating-ui
+        // can report as detached. The list must show whenever it is mounted.
+        hideDetached={false}
+        onOptionSubmit={chooseItemById}
+      >
+        <Combobox.Target>
+          <div />
+        </Combobox.Target>
+        <Combobox.Dropdown>
+          <MentionMenuGroups
+            listboxId={listboxId}
+            groups={visibleGroups}
+            isSearching={props.isSearching}
+            searchFailed={props.searchFailed}
+            highlightedItemId={highlightedItem?.id}
+            buildOptionId={buildOptionId}
+          />
+          {highlightedItem?.kind === "gadget" ? (
+            <MentionMenuFooter result={highlightedItem.result} />
+          ) : null}
+        </Combobox.Dropdown>
+      </Combobox>
+    </div>
+  );
+});
