@@ -53,7 +53,7 @@ export function DataCatalogKeywordFacet({
                   }),
                 );
               }}
-              className={css.dataCatalogFilterRailKeywordChip}
+              className={css.dataCatalogFilterRailChip}
             >
               {keyword}
             </Pill>

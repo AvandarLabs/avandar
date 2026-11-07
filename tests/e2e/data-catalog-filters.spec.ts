@@ -136,6 +136,25 @@ async function _searchOpenDataCatalog(
 }
 
 /**
+ * Types part of an option's name into a facet's combobox and picks the
+ * option, the way a user narrows a long facet rather than scrolling it.
+ */
+async function _pickFacetOption(
+  options: Readonly<{
+    page: Page;
+    facet: Locator;
+    search: string;
+    optionName: RegExp;
+  }>,
+): Promise<void> {
+  const { page, facet, search, optionName } = options;
+  await facet.click();
+  await facet.fill(search);
+  await page.getByRole("option", { name: optionName }).click();
+  await facet.press("Escape");
+}
+
+/**
  * Opens the taxi listing, checks its Published by group names the agency by
  * its drive's label, and narrows the catalog to its keyword from its chip.
  */
@@ -180,17 +199,25 @@ test.describe("Open data catalog filters", () => {
       });
 
       // The agency level only means something inside a chosen publisher.
-      const agencyFacet = rail.getByRole("group", { name: "Agency" });
+      const agencyFacet = rail.getByRole("combobox", { name: "Agency" });
       await expect(agencyFacet).toHaveCount(0);
-      await rail
-        .getByRole("group", { name: "Publisher" })
-        .getByRole("checkbox", { name: /^E2E City\b/ })
-        .check();
+      await _pickFacetOption({
+        page,
+        facet: rail.getByRole("combobox", { name: "Publisher" }),
+        search: "e2e ty",
+        optionName: /^E2E City\b/,
+      });
+      await expect(
+        rail.getByRole("button", { name: "Remove E2E City" }),
+      ).toBeVisible();
       await _expectNumResults({ page, numResults: 2 });
 
-      await agencyFacet
-        .getByRole("checkbox", { name: /^E2E Taxi Office\b/ })
-        .check();
+      await _pickFacetOption({
+        page,
+        facet: agencyFacet,
+        search: "taxi",
+        optionName: /^E2E Taxi Office\b/,
+      });
       await _expectNumResults({ page, numResults: 1 });
 
       await _openTaxiListingAndChooseItsKeyword(page);

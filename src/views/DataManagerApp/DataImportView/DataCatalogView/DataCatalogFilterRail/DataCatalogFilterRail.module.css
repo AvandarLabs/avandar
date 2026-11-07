@@ -29,28 +29,46 @@
   margin-bottom: var(--mantine-spacing-xs);
 }
 
-/* Let the label run the full rail width so the count sits on the far edge. */
-.dataCatalogFilterRailOptionBody {
-  width: 100%;
-}
-
-.dataCatalogFilterRailOptionLabelWrapper {
-  flex: 1;
-  min-width: 0;
-}
-
+/* The option row fills the dropdown so its count sits on the far edge. */
 .dataCatalogFilterRailOption {
   align-items: baseline;
   display: flex;
+  flex: 1;
   gap: var(--mantine-spacing-xs);
   justify-content: space-between;
+  min-width: 0;
+}
+
+/*
+ * Names wrap rather than truncate: among hundreds of publishers, two that
+ * share a long prefix are only told apart by their ends.
+ */
+
+/* Sized to Mantine's own option check, so the mark matches other selects. */
+.dataCatalogFilterRailOptionCheck {
+  align-self: center;
+  color: var(--mantine-color-neutral-9);
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 10px;
 }
 
 .dataCatalogFilterRailOptionName {
+  flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * The characters a typed search matched. Weight carries the mark, and the
+ * small-fill neutral step keeps it legible on the hovered and checked rows
+ * without spending the one blue on what is not a selection.
+ */
+.dataCatalogFilterRailOptionMatch {
+  background-color: var(--mantine-color-neutral-1);
+  border-radius: var(--mantine-radius-xs);
+  color: var(--mantine-color-neutral-9);
+  font-weight: 650;
 }
 
 /*
@@ -60,12 +78,8 @@
 .dataCatalogFilterRailOptionCount {
   color: var(--mantine-color-neutral-6);
   flex-shrink: 0;
+  font-size: var(--mantine-font-size-xs);
   font-variant-numeric: tabular-nums;
-}
-
-.dataCatalogFilterRailFoldToggle {
-  align-self: flex-start;
-  margin-inline-start: calc(var(--mantine-spacing-xs) * -1);
 }
 
 .dataCatalogFilterRailFoot {
@@ -85,9 +99,24 @@
 
 /*
  * A chip is a fill small enough for the rail's ground to swallow, so it
- * takes the small-fill step, and neutral rather than blue: a chosen keyword
+ * takes the small-fill step, and neutral rather than blue: a chosen value
  * is a filter, not an intent.
  */
-.dataCatalogFilterRailKeywordChip {
+.dataCatalogFilterRailChip {
   background-color: var(--mantine-color-neutral-1);
+
+  /*
+   * Mantine sizes a pill from a zero basis, which squeezes every name in a
+   * narrow field down to a few letters. Size it from its name instead; its
+   * max-width still stops it at the field's edge.
+   */
+  flex: 0 1 auto;
+}
+
+/* The name clips inside its own direction, so the ellipsis lands at its end. */
+.dataCatalogFilterRailChipLabel {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

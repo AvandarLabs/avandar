@@ -200,6 +200,10 @@ msgstr "مطابقة حالة الأحرف"
 msgid "Updated"
 msgstr "تم التحديث"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All publishers"
+msgstr "جميع الناشرين"
+
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
 msgstr "تحقق من بريدك الإلكتروني للحصول على رابط إعادة تعيين كلمة المرور"
@@ -1135,6 +1139,8 @@ msgstr "الانتقال إلى سجل الخصوصية"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroups.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "No matches"
 msgstr "لا توجد تطابقات"
 
@@ -1429,8 +1435,8 @@ msgstr "تظهر هذه المجموعات في مساحة العمل الخاص
 "إعادة تحميل مجموعة البيانات أو حذفها من مساحة العمل الخاصة بك."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-msgid "Show fewer"
-msgstr "عرض عدد أقل"
+#~ msgid "Show fewer"
+#~ msgstr "عرض عدد أقل"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
@@ -1509,7 +1515,7 @@ msgid "Pixels of detail to remove at the current zoom. Set to zero to disable "
 msgstr "وحدات البكسل التفصيلية التي يجب إزالتها عند مستوى التكبير الحالي. "
 "اضبطها على صفر لتعطيل التبسيط."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Any time"
 msgstr "أي وقت"
 
@@ -2578,6 +2584,10 @@ msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 msgstr "يتراوح من <0>{numericLow}</0> إلى <1>{numericHigh}</1>، بمتوسط "
 "<2>{avg}</2>{0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All formats"
+msgstr "جميع التنسيقات"
+
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "No columns are available"
@@ -2762,7 +2772,7 @@ msgstr "تجاهل"
 msgid "Two statuses have the same name. Give each one its own name."
 msgstr "هناك حالتان تحملان الاسم نفسه. امنح كل واحدة منهما اسمًا خاصًا بها."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "آخر تحديث"
 
@@ -3519,6 +3529,10 @@ msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
 "download it again later."
 msgstr "{0} (~{1} ميغابايت) سيتم حذفه من هذا المتصفح لتحرير المساحة. يمكنك "
 "تنزيله مرة أخرى لاحقًا."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+msgid "All organizations"
+msgstr "جميع المؤسسات"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
 msgid "Drop a file here, or click to browse"
@@ -7991,7 +8005,7 @@ msgstr "مفتاح الربط"
 msgid "Created \"{dashboardName}\""
 msgstr "تم إنشاء \"{dashboardName}\""
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past month"
 msgstr "الشهر الماضي"
 
@@ -8167,8 +8181,8 @@ msgstr "خطأ"
 
 #. placeholder {0}: options.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-msgid "Show all {0}"
-msgstr "عرض الكل ({0})"
+#~ msgid "Show all {0}"
+#~ msgstr "عرض الكل ({0})"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
@@ -9291,7 +9305,7 @@ msgstr "تم الإلغاء"
 msgid "Color ramp"
 msgstr "تدرج الألوان"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Over a year ago"
 msgstr "منذ أكثر من عام"
 
@@ -10007,6 +10021,10 @@ msgstr "يرجى المحاولة مرة أخرى أو التواصل مع ال�
 msgid "General access"
 msgstr "الوصول العام"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All topics"
+msgstr "جميع المواضيع"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Media"
 msgstr "الوسائط"
@@ -10171,6 +10189,10 @@ msgstr "يرجى تأكيد أنك ترغب في المتابعة مع تغيي�
 msgid "Derived Dataset"
 msgstr "مجموعة بيانات مشتقة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+msgid "Remove {pillLabel}"
+msgstr "إزالة {pillLabel}"
+
 #: src/components/AppShell/AppShell.tsx
 msgid "Search..."
 msgstr "ابحث..."
@@ -10290,6 +10312,10 @@ msgstr "حد"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Fix these issues before saving"
 msgstr "قم بإصلاح هذه المشكلات قبل الحفظ"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+msgid "Clear {label}"
+msgstr "مسح {label}"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
@@ -10668,7 +10694,7 @@ msgstr "أضف على الأقل سلسلة واحدة من X / Y"
 msgid "Show QR code"
 msgstr "عرض رمز QR"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
 msgstr "العام الماضي"
 

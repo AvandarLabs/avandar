@@ -201,6 +201,10 @@ msgstr "Linganisha herufi kubwa na ndogo"
 msgid "Updated"
 msgstr "Imesasishwa"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All publishers"
+msgstr "Wachapishaji wote"
+
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
 msgstr "Angalia barua pepe yako kwa kiungo cha kurekebisha nenosiri"
@@ -1149,6 +1153,8 @@ msgstr "Nenda kwenye kumbukumbu ya faragha"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroups.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "No matches"
 msgstr "Hakuna mechi"
 
@@ -1449,8 +1455,8 @@ msgstr "Seti hizi za data zimeorodheshwa kwenye eneo lako la kazi, lakini data "
 "kwenye eneo lako la kazi."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-msgid "Show fewer"
-msgstr "Onyesha chache"
+#~ msgid "Show fewer"
+#~ msgstr "Onyesha chache"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
@@ -1529,7 +1535,7 @@ msgid "Pixels of detail to remove at the current zoom. Set to zero to disable "
 msgstr "Pikseli za maelezo za kuondoa katika ukuzaji wa sasa. Weka sifuri ili "
 "kuzima kurahisisha."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Any time"
 msgstr "Wakati wowote"
 
@@ -2613,6 +2619,10 @@ msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 msgstr "Inatofautiana kutoka <0>{numericLow}</0> hadi <1>{numericHigh}</1>, "
 "ikiwemo wastani wa <2>{avg}</2>{0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All formats"
+msgstr "Miundo yote"
+
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "No columns are available"
@@ -2799,7 +2809,7 @@ msgstr "Tupa"
 msgid "Two statuses have the same name. Give each one its own name."
 msgstr "Hali mbili zina jina sawa. Zipe kila moja jina lake."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "Ilisasishwa mara ya mwisho"
 
@@ -3568,6 +3578,10 @@ msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
 "download it again later."
 msgstr "{0} (~{1} MB) itafutwa kutoka kwenye kivinjari hiki ili kuachilia "
 "nafasi. Unaweza kuipakua tena baadaye."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+msgid "All organizations"
+msgstr "Mashirika yote"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
 msgid "Drop a file here, or click to browse"
@@ -8092,7 +8106,7 @@ msgstr "ufunguo wa kuunganisha"
 msgid "Created \"{dashboardName}\""
 msgstr "Imetengenezwa \"{dashboardName}\""
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past month"
 msgstr "Mwezi uliopita"
 
@@ -8270,8 +8284,8 @@ msgstr "Kosa"
 
 #. placeholder {0}: options.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-msgid "Show all {0}"
-msgstr "Onyesha zote {0}"
+#~ msgid "Show all {0}"
+#~ msgstr "Onyesha zote {0}"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
@@ -9404,7 +9418,7 @@ msgstr "Imesitishwa"
 msgid "Color ramp"
 msgstr "Mseto wa rangi"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Over a year ago"
 msgstr "Zaidi ya mwaka mmoja uliopita"
 
@@ -10127,6 +10141,10 @@ msgstr "Tafadhali jaribu tena au wasiliana na msaada."
 msgid "General access"
 msgstr "Ufikiaji wa jumla"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All topics"
+msgstr "Mada zote"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Media"
 msgstr "Midia"
@@ -10291,6 +10309,10 @@ msgstr "Tafadhali thibitisha kwamba ungependa kuendelea na mabadiliko haya ya "
 msgid "Derived Dataset"
 msgstr "Dataset iliyotokana"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+msgid "Remove {pillLabel}"
+msgstr "Ondoa {pillLabel}"
+
 #: src/components/AppShell/AppShell.tsx
 msgid "Search..."
 msgstr "Tafuta..."
@@ -10411,6 +10433,10 @@ msgstr "Kikomo"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Fix these issues before saving"
 msgstr "Tengeneza masuala haya kabla ya kuhifadhi"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+msgid "Clear {label}"
+msgstr "Futa {label}"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
@@ -10792,7 +10818,7 @@ msgstr "Ongeza angalau mfululizo mmoja wa X / Y"
 msgid "Show QR code"
 msgstr "Onyesha QR code"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
 msgstr "Mwaka uliopita"
 

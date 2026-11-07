@@ -194,6 +194,10 @@ msgstr "区分大小写"
 msgid "Updated"
 msgstr "已更新"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All publishers"
+msgstr "所有发布者"
+
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
 msgstr "检查您的电子邮件以获取密码重置链接"
@@ -1108,6 +1112,8 @@ msgstr "前往隐私日志"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroups.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "No matches"
 msgstr "没有匹配项"
 
@@ -1390,8 +1396,8 @@ msgid "These datasets are listed in your workspace, but their source data could 
 msgstr "这些数据集在您的工作区中列出，但其源数据在您的本地存储中找不到。要继续，您需要重新上传数据集或将其从工作区中删除。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-msgid "Show fewer"
-msgstr "收起"
+#~ msgid "Show fewer"
+#~ msgstr "收起"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
@@ -1466,7 +1472,7 @@ msgid "Pixels of detail to remove at the current zoom. Set to zero to disable "
 "simplification."
 msgstr "当前缩放级别下要移除的细节像素数。设置为零可禁用简化。"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Any time"
 msgstr "任何时间"
 
@@ -2511,6 +2517,10 @@ msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 "<2>{avg}</2>{0}"
 msgstr "范围从 <0>{numericLow}</0> 到 <1>{numericHigh}</1>，平均 <2>{avg}</2>{0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All formats"
+msgstr "所有格式"
+
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "No columns are available"
@@ -2693,7 +2703,7 @@ msgstr "放弃"
 msgid "Two statuses have the same name. Give each one its own name."
 msgstr "两个状态名称相同。请分别为它们命名。"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "最近更新"
 
@@ -3425,6 +3435,10 @@ msgstr "请先重新分配私有资源"
 msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
 "download it again later."
 msgstr "{0} (~{1} MB) 将从此浏览器中删除以释放空间。您可以稍后再次下载。"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+msgid "All organizations"
+msgstr "所有组织"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
 msgid "Drop a file here, or click to browse"
@@ -7808,7 +7822,7 @@ msgstr "连接键"
 msgid "Created \"{dashboardName}\""
 msgstr "创建了 \"{dashboardName}\""
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past month"
 msgstr "过去一个月"
 
@@ -7978,8 +7992,8 @@ msgstr "错误"
 
 #. placeholder {0}: options.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-msgid "Show all {0}"
-msgstr "显示全部 {0} 个"
+#~ msgid "Show all {0}"
+#~ msgstr "显示全部 {0} 个"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
@@ -9077,7 +9091,7 @@ msgstr "已取消"
 msgid "Color ramp"
 msgstr "颜色渐变"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Over a year ago"
 msgstr "超过一年前"
 
@@ -9776,6 +9790,10 @@ msgstr "请重试或联系支持。"
 msgid "General access"
 msgstr "一般访问"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All topics"
+msgstr "所有主题"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Media"
 msgstr "媒体"
@@ -9937,6 +9955,10 @@ msgstr "请确认您是否希望继续进行此计划更改。您的订阅将相
 msgid "Derived Dataset"
 msgstr "派生数据集"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+msgid "Remove {pillLabel}"
+msgstr "移除 {pillLabel}"
+
 #: src/components/AppShell/AppShell.tsx
 msgid "Search..."
 msgstr "搜索..."
@@ -10051,6 +10073,10 @@ msgstr "限制"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Fix these issues before saving"
 msgstr "在保存之前修复这些问题"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+msgid "Clear {label}"
+msgstr "清除 {label}"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
@@ -10423,7 +10449,7 @@ msgstr "添加至少一个 X / Y 系列"
 msgid "Show QR code"
 msgstr "显示二维码"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
 msgstr "过去一年"
 

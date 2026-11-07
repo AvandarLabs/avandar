@@ -395,17 +395,24 @@ The rail's order becomes: search, **Publisher**, the second-level filter,
 - **Publisher** is the existing "Source" facet, relabelled. "Publisher" is
   the user's noun for level 1 everywhere, because level-1 labels differ by
   portal ("City", "State", "Organization") and one filter spans them.
-- **The second-level filter** is a checkbox facet over `organization2`. It
+- **The second-level filter** is a multi-choice facet over `organization2`. It
   appears only once at least one publisher is chosen and the facet has
   values, and its label is the `organization2_label` facet's values joined
   with " or " ("Agency", or "Agency or Department" when the chosen
   publishers' portals disagree). Unchoosing every publisher clears it.
-- **Topic** is a checkbox facet over `domain`.
+- **Topic** is a multi-choice facet over `domain`.
 - **Keywords** has no options to browse. A user adds a keyword by clicking it
   on a listing (section 7.3); the section then shows each chosen keyword as
   a removable chip, and is not rendered while none is chosen.
-- All three reuse `DataCatalogCheckboxFacet` and its counts, and follow its
-  rules for long option lists. A facet with no values is not rendered.
+- Publisher, the second level, Topic, and Format all reuse
+  `DataCatalogFacetSelect`: a searchable combobox, since a facet can grow to
+  hundreds of publishers or topics. Typing narrows the options by every
+  whitespace-separated fragment, case- and accent-insensitively and inside
+  words ("ty gov" finds "City government"), ranks word-start matches first,
+  and marks the matched characters. Each option shows how many results
+  choosing it would leave, and each chosen value sits in the field as a
+  removable pill. Last updated is the single-choice version of the same
+  combobox. A facet with no values and nothing chosen is not rendered.
 - The results header's count and "clear filters" behaviour count the new
   filters like the existing ones.
 

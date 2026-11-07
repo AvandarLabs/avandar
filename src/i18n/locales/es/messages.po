@@ -204,6 +204,10 @@ msgstr "Distinguir mayúsculas y minúsculas"
 msgid "Updated"
 msgstr "Actualizado"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All publishers"
+msgstr "Todos los publicadores"
+
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
 msgstr "Verifique su correo electrónico para un enlace de restablecimiento de "
@@ -1154,6 +1158,8 @@ msgstr "Ir al registro de privacidad"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroups.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "No matches"
 msgstr "Sin coincidencias"
 
@@ -1454,8 +1460,8 @@ msgstr "Estos conjuntos de datos están listados en tu espacio de trabajo, pero 
 "eliminarlo de tu espacio de trabajo."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-msgid "Show fewer"
-msgstr "Mostrar menos"
+#~ msgid "Show fewer"
+#~ msgstr "Mostrar menos"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
@@ -1535,7 +1541,7 @@ msgid "Pixels of detail to remove at the current zoom. Set to zero to disable "
 msgstr "Píxeles de detalle que se eliminarán con el nivel de zoom actual. "
 "Establezca cero para desactivar la simplificación."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Any time"
 msgstr "Cualquier fecha"
 
@@ -2622,6 +2628,10 @@ msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 msgstr "Rangos de <0>{numericLow}</0> a <1>{numericHigh}</1>, promediando "
 "<2>{avg}</2>{0}"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All formats"
+msgstr "Todos los formatos"
+
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "No columns are available"
@@ -2809,7 +2819,7 @@ msgid "Two statuses have the same name. Give each one its own name."
 msgstr "Dos estados tienen el mismo nombre. Asigne un nombre distinto a cada "
 "uno."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "Última actualización"
 
@@ -3580,6 +3590,10 @@ msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
 "download it again later."
 msgstr "{0} (~{1} MB) será eliminado de este navegador para liberar espacio. "
 "Puedes descargarlo nuevamente más tarde."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+msgid "All organizations"
+msgstr "Todas las organizaciones"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
 msgid "Drop a file here, or click to browse"
@@ -8125,7 +8139,7 @@ msgstr "clave de unión"
 msgid "Created \"{dashboardName}\""
 msgstr "Creado \"{dashboardName}\""
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past month"
 msgstr "Último mes"
 
@@ -8303,8 +8317,8 @@ msgstr "Error"
 
 #. placeholder {0}: options.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-msgid "Show all {0}"
-msgstr "Mostrar los {0}"
+#~ msgid "Show all {0}"
+#~ msgstr "Mostrar los {0}"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
@@ -9449,7 +9463,7 @@ msgstr "Cancelado"
 msgid "Color ramp"
 msgstr "Escala de color"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Over a year ago"
 msgstr "Hace más de un año"
 
@@ -10175,6 +10189,10 @@ msgstr "Por favor, intenta de nuevo o contacta al soporte."
 msgid "General access"
 msgstr "Acceso general"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All topics"
+msgstr "Todos los temas"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Media"
 msgstr "Multimedia"
@@ -10340,6 +10358,10 @@ msgstr "Por favor, confirma que deseas proceder con este cambio de plan. Tu "
 msgid "Derived Dataset"
 msgstr "Conjunto de datos derivado"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+msgid "Remove {pillLabel}"
+msgstr "Quitar {pillLabel}"
+
 #: src/components/AppShell/AppShell.tsx
 msgid "Search..."
 msgstr "Buscar..."
@@ -10461,6 +10483,10 @@ msgstr "Límite"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Fix these issues before saving"
 msgstr "Corrija estos problemas antes de guardar"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect.tsx
+msgid "Clear {label}"
+msgstr "Borrar {label}"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
@@ -10847,7 +10873,7 @@ msgstr "Agrega al menos una serie de X / Y"
 msgid "Show QR code"
 msgstr "Mostrar código QR"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
 msgstr "Último año"
 

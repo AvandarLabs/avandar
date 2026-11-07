@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   CloseButton,
-  Radio,
   Stack,
   Switch,
   Text,
@@ -14,14 +13,14 @@ import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
   openFeaturebaseFeedbackWidget,
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
-import { DataCatalogCheckboxFacet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet";
+import { DataCatalogFacetSelect } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.module.css";
 import { DataCatalogKeywordFacet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet";
 import { DataCatalogOrganization2Facet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet";
+import { DataCatalogUpdatedWithinSelect } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect";
 import type {
   CatalogFacets,
   CatalogListingFilters,
-  CatalogUpdatedWithin,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
 import type { ReactNode } from "react";
 
@@ -47,12 +46,6 @@ export function DataCatalogFilterRail({
   onFiltersChange,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const updatedWithinLabels: Record<CatalogUpdatedWithin, string> = {
-    any: t`Any time`,
-    pastMonth: t`Past month`,
-    pastYear: t`Past year`,
-    overAYear: t`Over a year ago`,
-  };
 
   return (
     <div className={css.dataCatalogFilterRail}>
@@ -78,8 +71,9 @@ export function DataCatalogFilterRail({
           }}
         />
 
-        <DataCatalogCheckboxFacet
+        <DataCatalogFacetSelect
           label={t`Publisher`}
+          placeholder={t`All publishers`}
           options={facets.sources}
           chosenValues={filters.sources}
           onChange={(sources) => {
@@ -97,8 +91,9 @@ export function DataCatalogFilterRail({
           }}
         />
 
-        <DataCatalogCheckboxFacet
+        <DataCatalogFacetSelect
           label={t`Topic`}
+          placeholder={t`All topics`}
           options={facets.domains}
           chosenValues={filters.domains}
           onChange={(domains) => {
@@ -113,8 +108,9 @@ export function DataCatalogFilterRail({
           }}
         />
 
-        <DataCatalogCheckboxFacet
+        <DataCatalogFacetSelect
           label={t`Format`}
+          placeholder={t`All formats`}
           options={facets.formats}
           chosenValues={filters.formats}
           onChange={(formats) => {
@@ -122,45 +118,13 @@ export function DataCatalogFilterRail({
           }}
         />
 
-        <Radio.Group
-          label={t`Last updated`}
+        <DataCatalogUpdatedWithinSelect
           value={filters.updatedWithin}
-          onChange={(value) => {
-            onFiltersChange({
-              ...filters,
-              updatedWithin: value as CatalogUpdatedWithin,
-            });
+          counts={facets.updatedWithin}
+          onChange={(updatedWithin) => {
+            onFiltersChange({ ...filters, updatedWithin });
           }}
-          classNames={{ label: css.dataCatalogFilterRailFacetLabel }}
-        >
-          <Stack gap={6}>
-            {(Object.keys(updatedWithinLabels) as CatalogUpdatedWithin[]).map(
-              (updatedWithin) => {
-                return (
-                  <Radio
-                    key={updatedWithin}
-                    value={updatedWithin}
-                    size="xs"
-                    classNames={{
-                      body: css.dataCatalogFilterRailOptionBody,
-                      labelWrapper: css.dataCatalogFilterRailOptionLabelWrapper,
-                    }}
-                    label={
-                      <span className={css.dataCatalogFilterRailOption}>
-                        <span className={css.dataCatalogFilterRailOptionName}>
-                          {updatedWithinLabels[updatedWithin]}
-                        </span>
-                        <span className={css.dataCatalogFilterRailOptionCount}>
-                          {facets.updatedWithin[updatedWithin]}
-                        </span>
-                      </span>
-                    }
-                  />
-                );
-              },
-            )}
-          </Stack>
-        </Radio.Group>
+        />
 
         <Switch
           size="xs"

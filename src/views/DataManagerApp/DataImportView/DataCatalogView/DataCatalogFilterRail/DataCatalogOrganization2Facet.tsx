@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { DataCatalogCheckboxFacet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet";
+import { DataCatalogFacetSelect } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect";
 import type { CatalogFacetOption } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
 import type { ReactNode } from "react";
 
@@ -33,7 +33,7 @@ export function DataCatalogOrganization2Facet({
   }
 
   return (
-    <DataCatalogCheckboxFacet
+    <DataCatalogFacetSelect
       label={
         labels.length > 0
           ? new Intl.ListFormat(i18n.locale, { type: "disjunction" }).format(
@@ -41,6 +41,7 @@ export function DataCatalogOrganization2Facet({
             )
           : t`Organization`
       }
+      placeholder={t`All organizations`}
       options={options}
       chosenValues={chosenValues}
       onChange={onChange}

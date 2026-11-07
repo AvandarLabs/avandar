@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import {
   EMPTY_CATALOG_FACETS,
   EMPTY_CATALOG_LISTING_FILTERS,
@@ -12,12 +12,17 @@ import type {
 
 const FACETS_WITH_AGENCIES: CatalogFacets = {
   ...EMPTY_CATALOG_FACETS,
-  sources: [{ value: "City of New York", count: 12 }],
+  sources: [
+    { value: "City of New York", count: 12 },
+    { value: "State of New York", count: 9 },
+    { value: "City government of Chicago", count: 4 },
+  ],
   organization2: [
     { value: "Taxi and Limousine Commission (TLC)", count: 7 },
     { value: "Department of Health", count: 5 },
   ],
   organization2Labels: ["Agency", "Department"],
+  updatedWithin: { any: 25, pastMonth: 3, pastYear: 11, overAYear: 14 },
 };
 
 function _renderRail(options: {
@@ -36,18 +41,31 @@ function _renderRail(options: {
   );
 }
 
+/** Types into a facet's combobox and returns the options left showing. */
+async function _searchFacet(
+  name: string,
+  search: string,
+): Promise<HTMLElement[]> {
+  const combobox = screen.getByRole("combobox", { name });
+  fireEvent.click(combobox);
+  fireEvent.change(combobox, { target: { value: search } });
+  return await screen.findAllByRole("option");
+}
+
 describe("DataCatalogFilterRail", () => {
   it("labels the first facet Publisher", () => {
     _renderRail({});
 
-    expect(screen.getAllByRole("group")[0]).toHaveAccessibleName("Publisher");
+    expect(screen.getAllByRole("combobox")[0]).toHaveAccessibleName(
+      "Publisher",
+    );
   });
 
   it("hides the second level while no publisher is chosen", () => {
     _renderRail({});
 
     expect(
-      screen.queryByRole("group", { name: "Agency or Department" }),
+      screen.queryByRole("combobox", { name: "Agency or Department" }),
     ).not.toBeInTheDocument();
   });
 
@@ -55,7 +73,7 @@ describe("DataCatalogFilterRail", () => {
     _renderRail({ filters: { sources: ["City of New York"] } });
 
     expect(
-      screen.getByRole("group", { name: "Agency or Department" }),
+      screen.getByRole("combobox", { name: "Agency or Department" }),
     ).toBeInTheDocument();
   });
 
@@ -66,7 +84,7 @@ describe("DataCatalogFilterRail", () => {
     });
 
     expect(
-      screen.queryByRole("group", { name: "Agency or Department" }),
+      screen.queryByRole("combobox", { name: "Agency or Department" }),
     ).not.toBeInTheDocument();
   });
 
@@ -77,7 +95,7 @@ describe("DataCatalogFilterRail", () => {
     });
 
     expect(
-      screen.getByRole("group", { name: "Organization" }),
+      screen.getByRole("combobox", { name: "Organization" }),
     ).toBeInTheDocument();
   });
 
@@ -85,7 +103,7 @@ describe("DataCatalogFilterRail", () => {
     _renderRail({});
 
     expect(
-      screen.queryByRole("group", { name: "Topic" }),
+      screen.queryByRole("combobox", { name: "Topic" }),
     ).not.toBeInTheDocument();
   });
 
@@ -97,7 +115,115 @@ describe("DataCatalogFilterRail", () => {
       },
     });
 
-    expect(screen.getByRole("group", { name: "Topic" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Topic" })).toBeInTheDocument();
+  });
+
+  it("narrows a facet's options to those matching every typed fragment", async () => {
+    _renderRail({});
+
+    const options = await _searchFacet("Publisher", "ty gov");
+
+    expect(options).toHaveLength(1);
+    expect(options[0]).toHaveTextContent("City government of Chicago");
+  });
+
+  it("highlights the characters each typed fragment matched", async () => {
+    _renderRail({});
+
+    const [option] = await _searchFacet("Publisher", "ty gov");
+
+    expect(
+      within(option!)
+        .getAllByTestId("facet-search-match")
+        .map((match) => {
+          return match.textContent;
+        }),
+    ).toEqual(["ty", "gov"]);
+  });
+
+  it("shows how many datasets each option would leave", async () => {
+    _renderRail({});
+
+    const options = await _searchFacet("Publisher", "state");
+
+    expect(options[0]).toHaveTextContent(/State of New York\s*9/);
+  });
+
+  it("adds a picked option to the filters", async () => {
+    const onFiltersChange = vi.fn();
+    _renderRail({ onFiltersChange });
+
+    const options = await _searchFacet("Publisher", "state");
+    fireEvent.click(options[0]!);
+
+    expect(onFiltersChange).toHaveBeenCalledWith(
+      expect.objectContaining({ sources: ["State of New York"] }),
+    );
+  });
+
+  it("checks off a chosen value in the dropdown and no other", async () => {
+    _renderRail({ filters: { sources: ["State of New York"] } });
+
+    const options = await _searchFacet("Publisher", "york");
+
+    expect(
+      options.map((option) => {
+        return within(option).queryByTestId("facet-option-check") !== null;
+      }),
+    ).toEqual([false, true]);
+  });
+
+  it("drops a chosen value from the filters when its pill is removed", () => {
+    const onFiltersChange = vi.fn();
+    _renderRail({
+      filters: { sources: ["City of New York", "State of New York"] },
+      onFiltersChange,
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Remove City of New York" }),
+    );
+
+    expect(onFiltersChange).toHaveBeenCalledWith(
+      expect.objectContaining({ sources: ["State of New York"] }),
+    );
+  });
+
+  it("drops every chosen value of a facet when it is cleared", () => {
+    const onFiltersChange = vi.fn();
+    _renderRail({
+      filters: { sources: ["City of New York", "State of New York"] },
+      onFiltersChange,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Clear Publisher" }));
+
+    expect(onFiltersChange).toHaveBeenCalledWith(
+      expect.objectContaining({ sources: [] }),
+    );
+  });
+
+  it("shows a chosen value as a pill even when the facet no longer offers it", () => {
+    _renderRail({
+      filters: { sources: ["Gone County"] },
+      facets: { ...FACETS_WITH_AGENCIES, organization2: [] },
+    });
+
+    expect(
+      screen.getByRole("button", { name: "Remove Gone County" }),
+    ).toBeInTheDocument();
+  });
+
+  it("sets Last updated to the single window picked", async () => {
+    const onFiltersChange = vi.fn();
+    _renderRail({ onFiltersChange });
+
+    const options = await _searchFacet("Last updated", "month");
+    fireEvent.click(options[0]!);
+
+    expect(onFiltersChange).toHaveBeenCalledWith(
+      expect.objectContaining({ updatedWithin: "pastMonth" }),
+    );
   });
 
   it("hides Keywords while no keyword is chosen", () => {
