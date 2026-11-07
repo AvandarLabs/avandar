@@ -6,7 +6,7 @@ import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/concep
 const AGE_ID = "attr-age" as ConceptAttribute.Id;
 const SECOND_AGE_ID = "attr-age-2" as ConceptAttribute.Id;
 
-/** Two attributes named `age`; the view emits the second as `age_2`. */
+/** Two attributes named `age`. The view emits the second as `age_2`. */
 const COLUMNS: ConceptAttributeColumn[] = [
   {
     kind: "unmapped",
@@ -38,14 +38,14 @@ describe("makeConceptRecordValuesFromRows", () => {
     ]);
   });
 
-  it("returns records in the requested order and leaves out keys with no record", () => {
+  it("returns records in the requested order", () => {
     const records = makeConceptRecordValuesFromRows({
       rows: [
         { external_id: "p1", status: "Active", age: 41, age_2: 7 },
         { external_id: "p2", status: "Active", age: 50, age_2: 8 },
       ],
       attributeColumns: COLUMNS,
-      externalIds: ["p2", "missing", "p1"],
+      externalIds: ["p2", "p1"],
     });
 
     expect(
@@ -53,6 +53,37 @@ describe("makeConceptRecordValuesFromRows", () => {
         return record.externalId;
       }),
     ).toEqual(["p2", "p1"]);
+  });
+
+  it("leaves out a key that names no record", () => {
+    const records = makeConceptRecordValuesFromRows({
+      rows: [{ external_id: "p1", status: "Active", age: 41, age_2: 7 }],
+      attributeColumns: COLUMNS,
+      externalIds: ["missing", "p1"],
+    });
+
+    expect(
+      records.map((record) => {
+        return record.externalId;
+      }),
+    ).toEqual(["p1"]);
+  });
+
+  it("does not read an attribute from the row's prototype", () => {
+    const records = makeConceptRecordValuesFromRows({
+      rows: [{ external_id: "p1", status: "Active" }],
+      attributeColumns: [
+        {
+          kind: "unmapped",
+          attributeId: AGE_ID,
+          attributeName: "constructor",
+          duckDbDataType: "BIGINT",
+        },
+      ],
+      externalIds: ["p1"],
+    });
+
+    expect(records[0]?.valuesByAttributeId).toEqual({});
   });
 
   it("leaves out an attribute whose column the row does not have", () => {

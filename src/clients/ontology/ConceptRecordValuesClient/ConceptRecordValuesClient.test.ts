@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ConceptRecordValuesClient } from "@/clients/ontology/ConceptRecordValuesClient/ConceptRecordValuesClient";
+import { MAX_RESTRICTED_EXTERNAL_IDS } from "@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -43,6 +44,11 @@ beforeEach(() => {
     renamedColumns: [],
   });
   runQueryMock.mockResolvedValue({
+    columns: [
+      { name: "external_id", dataType: "text" },
+      { name: "status", dataType: "text" },
+      { name: "age", dataType: "number" },
+    ],
     data: [{ external_id: "p1", status: "Active", age: 41 }],
   });
 });
@@ -87,6 +93,86 @@ describe("ConceptRecordValuesClient.getConceptRecordValues", () => {
     expect(records).toEqual([]);
     expect(runQueryMock).not.toHaveBeenCalled();
     expect(getConceptAttributeColumnsMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("ConceptRecordValuesClient.getConceptRecordValues guards", () => {
+  it("throws when the result's columns are not the columns it read", async () => {
+    // A field was added between the two reads, so the view now emits `age`
+    // for it and suffixes ours, which the client would file under the wrong
+    // field.
+    runQueryMock.mockResolvedValue({
+      columns: [
+        { name: "external_id", dataType: "text" },
+        { name: "status", dataType: "text" },
+        { name: "age_2", dataType: "number" },
+      ],
+      data: [{ external_id: "p1", status: "Active", age_2: 41 }],
+    });
+
+    await expect(
+      ConceptRecordValuesClient.getConceptRecordValues({
+        workspaceId: WORKSPACE_ID,
+        conceptId: CONCEPT_ID,
+        externalIds: ["p1"],
+      }),
+    ).rejects.toThrow(
+      "The case type's fields changed while their values were read. Load them again.",
+    );
+  });
+
+  it("checks the columns even when no row comes back", async () => {
+    runQueryMock.mockResolvedValue({
+      columns: [
+        { name: "external_id", dataType: "text" },
+        { name: "status", dataType: "text" },
+      ],
+      data: [],
+    });
+
+    await expect(
+      ConceptRecordValuesClient.getConceptRecordValues({
+        workspaceId: WORKSPACE_ID,
+        conceptId: CONCEPT_ID,
+        externalIds: ["p1"],
+      }),
+    ).rejects.toThrow("fields changed");
+  });
+
+  it("refuses more records than a restriction may name before reading anything", async () => {
+    const externalIds = Array.from(
+      { length: MAX_RESTRICTED_EXTERNAL_IDS + 1 },
+      (_, index) => {
+        return `p${index}`;
+      },
+    );
+
+    await expect(
+      ConceptRecordValuesClient.getConceptRecordValues({
+        workspaceId: WORKSPACE_ID,
+        conceptId: CONCEPT_ID,
+        externalIds,
+      }),
+    ).rejects.toThrow(String(MAX_RESTRICTED_EXTERNAL_IDS));
+    expect(getConceptAttributeColumnsMock).not.toHaveBeenCalled();
+    expect(runQueryMock).not.toHaveBeenCalled();
+  });
+
+  it("counts a repeated key once toward the cap", async () => {
+    const externalIds = Array.from(
+      { length: MAX_RESTRICTED_EXTERNAL_IDS * 2 },
+      () => {
+        return "p1";
+      },
+    );
+
+    await expect(
+      ConceptRecordValuesClient.getConceptRecordValues({
+        workspaceId: WORKSPACE_ID,
+        conceptId: CONCEPT_ID,
+        externalIds,
+      }),
+    ).resolves.toHaveLength(1);
   });
 });
 

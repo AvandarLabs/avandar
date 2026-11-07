@@ -32,7 +32,7 @@ export function makeConceptRecordValuesFromRows(
     }
     const valueEntries = options.attributeColumns
       .filter((column) => {
-        return column.attributeName in row;
+        return Object.hasOwn(row, column.attributeName);
       })
       .map((column) => {
         return [column.attributeId, row[column.attributeName]] as const;

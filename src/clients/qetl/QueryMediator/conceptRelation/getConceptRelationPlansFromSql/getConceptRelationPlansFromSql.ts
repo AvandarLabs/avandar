@@ -220,7 +220,8 @@ async function _getSpineRows(
  *
  * The columns come from `getConceptAttributeColumnsFromConceptId`, the same
  * read `ConceptRecordValuesClient` uses to map result columns back to their
- * attributes, so the two agree on every column's name.
+ * attributes. The two reads agree on every column's name unless fields are
+ * edited between them, and `ConceptRecordValuesClient` checks for that.
  */
 async function _getConceptRelationPlan(
   options: Readonly<{
