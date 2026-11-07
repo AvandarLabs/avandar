@@ -40,6 +40,12 @@ describe("getPipelineEtlDestination", () => {
     );
   });
 
+  it("records drives in data_catalog_drives", () => {
+    expect(getPipelineEtlDestination().output.drivesTable).toBe(
+      "data_catalog_drives",
+    );
+  });
+
   it("records runs through the pipeline execution functions", () => {
     expect(getPipelineEtlDestination().output.executionFunctions).toEqual({
       start: "rpc_pipeline_executions__start",

@@ -12,7 +12,7 @@ import type {
 
 const DRIVE: ConfiguredDrive = {
   baseUrl: "https://data.cityofnewyork.us",
-  organizationName: "City of New York",
+  organizationLabels: { 1: "City" },
 };
 const OPEN_WINDOW: EtlRunWindow = { since: undefined, until: undefined };
 

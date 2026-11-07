@@ -12,6 +12,7 @@
     "@avandar/etl": "workspace:*",
     "@avandar/utils": "workspace:*",
     "@supabase/supabase-js": "catalog:",
-    "fastify": "^5.6.0"
+    "fastify": "^5.6.0",
+    "zod": "catalog:"
   }
 }

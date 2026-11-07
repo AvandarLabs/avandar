@@ -1,4 +1,10 @@
-import type { EtlScope } from "@avandar/etl";
+import { getOrganizationLabelsFromDrive } from "@avandar/etl";
+import { z } from "zod";
+import type {
+  EtlOrganizationLabels,
+  EtlScope,
+  PipelineConfig,
+} from "@avandar/etl";
 
 /**
  * One Socrata scope, with `categories` and `tags` spelled as the portal
@@ -11,22 +17,17 @@ export type SocrataScope = EtlScope &
   Readonly<{ categories?: readonly string[]; tags?: readonly string[] }>;
 
 /**
- * One Socrata portal (drive) the metacatalog pipeline enumerates. No
- * `apiService` field: unlike the HDX pipeline's registry shape, every drive
- * here already speaks Socrata by construction, because Socrata genuinely is
- * one federated service with many portals underneath it - see
- * `connector-nomenclature.md`'s "One pipeline per service" section.
+ * One Socrata portal (drive) the pipeline enumerates, from its config. No
+ * `apiService` field: every drive here already speaks Socrata by
+ * construction, because Socrata genuinely is one federated service with many
+ * portals underneath it - see `connector-nomenclature.md`'s "One pipeline
+ * per service" section.
  */
-export type ConfiguredDrive = {
+export type ConfiguredDrive = Readonly<{
   /** No trailing slash, always `https://`. */
   baseUrl: string;
-  /**
-   * Used as every discovered dataset's `organization1_name`.
-   * Socrata's Discovery API has its own organization field, but it is not
-   * reliable enough across every portal to parse automatically, so the
-   * registry names it once per drive instead.
-   */
-  organizationName: string;
+  /** What each organization level is called on this portal. */
+  organizationLabels: EtlOrganizationLabels;
   /**
    * The drive's scopes, crawled in this order. Omit to index the whole
    * portal as one scope, `all`. Replacing `all` with category or tag scopes
@@ -34,31 +35,36 @@ export type ConfiguredDrive = {
    * datasets outside them.
    */
   scopes?: readonly SocrataScope[];
-};
+}>;
+
+const SocrataScopesSchema = z.array(
+  z.strictObject({
+    key: z.string(),
+    categories: z.array(z.string()).optional(),
+    tags: z.array(z.string()).optional(),
+  }),
+);
 
 /**
- * The short, hardcoded list of Socrata portals this Avandar deployment
- * prebuilds a metacatalog for, each drive independently enabled by its
- * presence in this array. A fork maintains its own list; nothing here is
- * shared across deployments. See `open-data-catalog-architecture.md`
- * section 6.2.
+ * The drives `socrata.pipeline.yaml` lists, with each drive's labels
+ * resolved and its `scopes` validated as Socrata scopes.
  *
- * Each drive is crawled and resumed on its own, so adding one indexes it from
- * scratch on the next run without re-indexing the others. A drive must have
- * at most 10,000 assets, the most the Discovery API can page through; the
- * pipeline fails a larger drive with an error naming it.
+ * @param config - The parsed Socrata pipeline config.
+ * @returns The drives, in config order.
+ * @throws When a drive's `scopes` is not a list of Socrata scopes.
  */
-export const CONFIGURED_DRIVES: readonly ConfiguredDrive[] = [
-  {
-    baseUrl: "https://data.cityofnewyork.us",
-    organizationName: "City of New York",
-  },
-  {
-    baseUrl: "https://data.ny.gov",
-    organizationName: "State of New York",
-  },
-  {
-    baseUrl: "https://health.data.ny.gov",
-    organizationName: "New York State Department of Health",
-  },
-];
+export function listConfiguredDrives(
+  config: PipelineConfig,
+): readonly ConfiguredDrive[] {
+  return config.drives.map((drive) => {
+    const scopes =
+      drive.scopes === undefined
+        ? undefined
+        : SocrataScopesSchema.parse(drive.scopes);
+    return {
+      baseUrl: drive.baseUrl,
+      organizationLabels: getOrganizationLabelsFromDrive({ config, drive }),
+      ...(scopes === undefined ? {} : { scopes }),
+    };
+  });
+}

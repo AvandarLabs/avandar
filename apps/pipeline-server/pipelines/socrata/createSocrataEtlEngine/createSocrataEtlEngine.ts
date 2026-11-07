@@ -1,5 +1,4 @@
 import { ETL_DEFAULT_SCOPE, EtlEngine } from "@avandar/etl";
-import { CONFIGURED_DRIVES } from "@pipelines/socrata/configuredDrives/configuredDrives";
 import { extractSocrataDrive } from "@pipelines/socrata/extractSocrataDrive/extractSocrataDrive";
 import { makeApiResourceRelationFromSocrataResult } from "@pipelines/socrata/makeApiResourceRelationFromSocrataResult/makeApiResourceRelationFromSocrataResult";
 import type {
@@ -7,6 +6,7 @@ import type {
   SocrataDiscoveryResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
 import type {
+  CatalogFieldMapper,
   EtlDestination,
   EtlEngineInstance,
   EtlStores,
@@ -24,8 +24,15 @@ import type {
  * Every asset becomes a listing. Only a dataset or filtered view with
  * exported columns, in a format the rules allow, is workspace-loadable.
  *
+ * Each result's catalog metadata comes from the pipeline config's field
+ * mapping. A field that cannot be mapped is left out with a warning, and a
+ * result whose `organization1_name` maps to nothing is skipped with a
+ * warning. Each drive's organization labels are recorded in the drives
+ * table.
+ *
  * @param args.discovery - The Discovery API client every drive shares.
- * @param args.drives - Replaces `CONFIGURED_DRIVES`, for tests.
+ * @param args.drives - The drives to crawl, from `listConfiguredDrives`.
+ * @param args.mapper - The pipeline config's compiled field mapper.
  * @param args.stores - Replaces the Supabase stores, for tests.
  * @param args.workspaceLoadability - The formats a workspace cannot load.
  */
@@ -33,12 +40,13 @@ export function createSocrataEtlEngine(
   args: EtlDestination &
     Readonly<{
       discovery: SocrataDiscoveryClient;
-      drives?: readonly ConfiguredDrive[];
+      drives: readonly ConfiguredDrive[];
+      mapper: CatalogFieldMapper;
       stores?: EtlStores;
       workspaceLoadability?: EtlWorkspaceLoadabilityRules;
     }>,
 ): EtlEngineInstance {
-  const { discovery, drives = CONFIGURED_DRIVES, ...destination } = args;
+  const { discovery, drives, mapper, ...destination } = args;
   return EtlEngine.create<
     ConfiguredDrive,
     SocrataDiscoveryResult,
@@ -53,6 +61,9 @@ export function createSocrataEtlEngine(
     getDriveKey: (drive) => {
       return drive.baseUrl;
     },
+    describeDrive: (drive) => {
+      return { organizationLabels: drive.organizationLabels };
+    },
     listScopes: (drive) => {
       return drive.scopes ?? [ETL_DEFAULT_SCOPE];
     },
@@ -63,8 +74,28 @@ export function createSocrataEtlEngine(
       return result.datasetId;
     },
     transform: ({ drive, connection }) => {
+      const { fields, problems } = mapper.mapFields(
+        connection.sourceRecord,
+        drive.baseUrl,
+      );
+      problems.forEach((problem) => {
+        console.warn(
+          `[socrata] drive ${drive.baseUrl}: ${connection.datasetId} ${problem.field}: ${problem.message}`,
+        );
+      });
+      const { organization1Name } = fields;
+      if (organization1Name === undefined) {
+        console.warn(
+          `[socrata] drive ${drive.baseUrl}: skipped ${connection.datasetId}: organization1_name mapped to nothing`,
+        );
+        return [];
+      }
       return [
-        makeApiResourceRelationFromSocrataResult({ drive, result: connection }),
+        makeApiResourceRelationFromSocrataResult({
+          drive,
+          result: connection,
+          mappedFields: { ...fields, organization1Name },
+        }),
       ];
     },
     incremental: {

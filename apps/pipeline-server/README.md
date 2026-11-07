@@ -52,8 +52,10 @@ command exits with an error. `ava pipeline reset` selects listings by their
 
 A scope is a slice of a drive that is crawled and resumed on its own: `hdx`
 has `format:csv`, `format:parquet`, and `format:other` (every other
-format), and a Socrata drive has `all` unless `CONFIGURED_DRIVES` gives it
-category or tag scopes. The Socrata drives are NYC Open Data
+format), and a Socrata drive has `all` unless `socrata.pipeline.yaml` gives
+it category or tag scopes. The Socrata drives, and how each Discovery API
+result maps onto catalog metadata, live in
+`pipelines/socrata/socrata.pipeline.yaml`. They are NYC Open Data
 (`data.cityofnewyork.us`), NY State Open Data (`data.ny.gov`), and NY State
 Department of Health (`health.data.ny.gov`). Removing a scope from
 the code only stops crawling it. `ava pipeline prune-retired-scopes` deletes
