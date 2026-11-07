@@ -1,28 +1,12 @@
-import { Model } from "@avandar/models";
 import { AvaModelSchema } from "@models/zod/index.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { emitChatTurnAnalytics } from "@sbfn/chat/PostChatMessages/analytics/emitChatTurnAnalytics/emitChatTurnAnalytics.ts";
 import { verifyChatConsentAcks } from "@sbfn/chat/PostChatMessages/consent/verifyChatConsentAcks.ts";
 import { enforceChatModelAllowlist } from "@sbfn/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts";
-import {
-  countClarificationsInHistory,
-  MAX_CLARIFICATIONS_PER_QUESTION,
-} from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
-import { dashboardBlockSummary } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
-import { caseTypeDraftIntro } from "@sbfn/chat/PostChatMessages/parsing/parseProposeCaseType.ts";
-import { annotateClarificationAnswersForModel } from "@sbfn/chat/PostChatMessages/prompt/annotateClarificationAnswersForModel.ts";
-import { buildCaseManagerSystemPrompt } from "@sbfn/chat/PostChatMessages/prompt/buildCaseManagerSystemPrompt.ts";
-import { unifiedSystemPrefix } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
-import { getLastUserPromptFromMessages } from "@sbfn/chat/PostChatMessages/prompt/getLastUserPromptFromMessages.ts";
-import { makeChatToolConfigFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts";
-import { makeChatTurnSuffixFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatTurnSuffixFromOptions.ts";
-import { runChatAttemptsWithEscalation } from "@sbfn/chat/PostChatMessages/runChatAttemptsWithEscalation/runChatAttemptsWithEscalation.ts";
+import { runChatTurn } from "@sbfn/chat/PostChatMessages/runChatTurn/runChatTurn.ts";
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
-import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import { z } from "zod";
 import { getAppURL } from "$/env/getAppURL.ts";
-import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
-import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 if (!openRouterApiKey) {
@@ -115,67 +99,19 @@ export const PostChatMessages = POST({
         supabaseClient,
         workspaceId,
       });
-      const lastUserPrompt = getLastUserPromptFromMessages(messages);
-      const sqlSystemPrompt = buildSqlSystemPrompt({
-        prompt: lastUserPrompt,
-        datasets: schema.datasets,
-        columns: schema.columns,
-        concepts: schema.concepts,
-        conceptAttributes: schema.conceptAttributes,
-        conceptStatuses: schema.conceptStatuses,
-        includeSpatialDocumentation: false,
-      });
-      const systemContent =
-        context.app === "case-manager"
-          ? buildCaseManagerSystemPrompt({
-              datasets: schema.datasets,
-              columns: schema.columns,
-              concepts: schema.concepts,
-            })
-          : `${unifiedSystemPrefix}\n\n${sqlSystemPrompt}`;
-      const turnSuffix =
-        context.app === "case-manager"
-          ? ""
-          : makeChatTurnSuffixFromOptions({
-              context,
-              retryContext,
-              lastUserPrompt,
-            });
-
-      const priorClarifications = countClarificationsInHistory(messages);
-      const clarificationCapReached =
-        priorClarifications >= MAX_CLARIFICATIONS_PER_QUESTION;
-      const requestBody: Record<string, unknown> = {
-        model,
-        messages: [
-          { role: "system", content: systemContent },
-          ...annotateClarificationAnswersForModel(messages),
-          ...(turnSuffix ? [{ role: "user", content: turnSuffix }] : []),
-        ],
-        temperature: 0.3,
-      };
-      Object.assign(
-        requestBody,
-        makeChatToolConfigFromOptions({
-          clarificationCapReached,
-          app: context.app,
-        }),
-      );
 
       const turnStartedAt = performance.now();
-      let parsed: ParsedAttempt;
-      let attemptCount: number;
+      let turn: Awaited<ReturnType<typeof runChatTurn>>;
       try {
-        ({ parsed, attemptCount } = await runChatAttemptsWithEscalation({
-          requestBody,
+        turn = await runChatTurn({
+          messages,
+          context,
+          model,
+          retryContext,
+          schema,
           apiKey: openRouterApiKey,
           referer: openRouterReferer,
-          lastUserPrompt,
-          priorClarifications,
-          datasets: schema.datasets,
-          concepts: schema.concepts,
-          skipSqlExtraction: context.app === "case-manager",
-        }));
+        });
       } catch (error) {
         await emitChatTurnAnalytics({
           supabaseAdminClient,
@@ -192,56 +128,6 @@ export const PostChatMessages = POST({
         throw error;
       }
 
-      const {
-        text,
-        generatedSql,
-        clarification,
-        dashboardBlock,
-        createdCaseTypes,
-        proposedCaseType,
-      } = parsed;
-      const assistantText = ((): string => {
-        if (text) {
-          return text;
-        }
-        if (generatedSql) {
-          return "";
-        }
-        if (clarification) {
-          return clarification.question;
-        }
-        if (dashboardBlock) {
-          // Outside a dashboard the client shows the block another way (a
-          // chart runs in the Data Explorer), so "added to your dashboard"
-          // would be untrue there.
-          return context.app === "dashboards"
-            ? dashboardBlockSummary(dashboardBlock)
-            : "";
-        }
-        if (createdCaseTypes && createdCaseTypes.length > 0) {
-          return createdCaseTypes
-            .map((caseType) => {
-              return caseType.name;
-            })
-            .join(", ");
-        }
-        if (proposedCaseType) {
-          return caseTypeDraftIntro(proposedCaseType.name);
-        }
-        return context.app === "case-manager"
-          ? "I could not create those case types. Try choosing again or describing what you want."
-          : "I could not generate a query for that. Try rephrasing.";
-      })();
-
-      const result: ChatResponse.T = Model.make("ChatResponse", {
-        assistantText,
-        ...(generatedSql ? { generatedSql: generatedSql } : {}),
-        ...(clarification ? { clarification } : {}),
-        ...(dashboardBlock ? { dashboardBlock } : {}),
-        ...(createdCaseTypes ? { createdCaseTypes } : {}),
-        ...(proposedCaseType ? { proposedCaseType } : {}),
-      });
-
       await emitChatTurnAnalytics({
         supabaseAdminClient,
         workspaceId,
@@ -251,14 +137,14 @@ export const PostChatMessages = POST({
           kind: "completed",
           modelId: model,
           latencyMs: performance.now() - turnStartedAt,
-          attemptCount,
-          promptChars: lastUserPrompt.length,
+          attemptCount: turn.attemptCount,
+          promptChars: turn.lastUserPrompt.length,
           schemaDatasetCount: schema.datasets.length,
-          assistantText,
-          parsed,
+          assistantText: turn.result.assistantText,
+          parsed: turn.parsed,
         },
       });
 
-      return result;
+      return turn.result;
     },
   );

@@ -1,0 +1,159 @@
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { arr, obj, str } from "@earendil-works/pi-schema";
+import { DiscoveryCandidateValues } from "@/components/ChatPanel/ClarificationCard/DiscoveryCandidateValues/DiscoveryCandidateValues";
+import { buildCandidateLookupSqlFromDiscovery } from "@/components/ChatPanel/PendingClarificationBlock/buildCandidateLookupSqlFromDiscovery/buildCandidateLookupSqlFromDiscovery";
+import type { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
+import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
+import type { AgentTool, AgentToolResult } from "@earendil-works/pi-agent-core";
+
+const MAX_LISTED_VALUES = 100;
+
+const LOOKUP_VALUES_PARAMETERS = obj({
+  table: str({ description: "Dataset alias, such as t0." }),
+  column: str({ description: "Text column to search." }),
+  values: arr(
+    obj({
+      named: str({ description: "What the user wrote, such as UK." }),
+      forms: arr(str(), {
+        description: "Stored forms to try that mean exactly the same thing: full name, abbreviation, code.",
+      }),
+    }),
+    { description: "One entry per value the user named." },
+  ),
+  question: str({
+    description: "Question for the user if the device cannot settle it, such as: Which of these is the UK?",
+  }),
+});
+
+type LookupContext = Readonly<{
+  host: DataAgentHost;
+  state: DataAgentRunState;
+  tableName: string;
+  column: string;
+}>;
+
+type LookupMatch = { named: string; storedValue: string | undefined };
+
+async function _findStoredValue(
+  context: LookupContext,
+  value: Readonly<{ named: string; forms: readonly string[] }>,
+): Promise<LookupMatch> {
+  const candidateValues = [value.named, ...value.forms];
+  const sql = buildCandidateLookupSqlFromDiscovery({
+    discoveryQuery: `SELECT DISTINCT ${quoteSqlIdentifier(context.column)} FROM ${quoteSqlIdentifier(context.tableName)}`,
+    column: context.column,
+    candidateValues,
+  });
+  const matches = sql ? await context.host.readColumnValues(sql) : [];
+  return {
+    named: value.named,
+    storedValue: Array.isArray(matches)
+      ? DiscoveryCandidateValues.getUniqueMatch({
+          candidateValues,
+          discoveredValues: matches,
+        })
+      : undefined,
+  };
+}
+
+async function _listValues(context: LookupContext): Promise<string[]> {
+  const column = quoteSqlIdentifier(context.column);
+  const values = await context.host.readColumnValues(
+    `SELECT DISTINCT ${column} FROM ${quoteSqlIdentifier(context.tableName)} WHERE ${column} IS NOT NULL ORDER BY 1 LIMIT ${MAX_LISTED_VALUES}`,
+  );
+  return Array.isArray(values) ? values : [];
+}
+
+/** Shows the card for values the device could not match on its own. */
+async function _askUserToPick(
+  context: LookupContext,
+  unmatched: readonly LookupMatch[],
+  question: string,
+): Promise<string> {
+  const answer = await context.host.askUser({
+    question,
+    options: await _listValues(context),
+    isMulti: unmatched.length > 1,
+    kind: "values",
+  });
+  if (answer.kind === "dismissed") {
+    context.state.questions.push({ kind: "values", question, answer: "(dismissed)", isAutomatic: false });
+    return "The user dismissed the lookup. Do not filter on those values; say so in the summary.";
+  }
+  const picked = answer.kind === "picked" ? [...answer.values] : [];
+  const isApproved = await context.host.approveValuesForModel({ values: picked, reason: "picked_lookup" });
+  if (!isApproved) {
+    return "The user would not share the picked values. Explain how to filter for them in the Data Explorer.";
+  }
+  context.state.valuesSentToModel.push(...picked);
+  const text = answer.kind === "typed" ? answer.text : picked.map((value) => `"${value}"`).join(", ");
+  context.state.questions.push({ kind: "values", question, answer: text, isAutomatic: false });
+  return answer.kind === "typed" ? `The user wrote: ${text}` : `The user picked: ${text}`;
+}
+
+function _describeMatches(matches: readonly LookupMatch[]): string {
+  return matches
+    .map((match) => {
+      return `"${match.named}" is stored as "${match.storedValue}"`;
+    })
+    .join("; ");
+}
+
+async function _execute(
+  context: LookupContext,
+  params: Readonly<{ values: ReadonlyArray<{ named: string; forms: readonly string[] }>; question: string }>,
+): Promise<AgentToolResult<undefined>> {
+  const lookups = await Promise.all(
+    params.values.map((value) => {
+      return _findStoredValue(context, value);
+    }),
+  );
+  const matched = lookups.filter((lookup) => lookup.storedValue !== undefined);
+  const unmatched = lookups.filter((lookup) => lookup.storedValue === undefined);
+  const matchedValues = matched.map((lookup) => lookup.storedValue!);
+  const isApproved = await context.host.approveValuesForModel({ values: matchedValues, reason: "matched_lookup" });
+  const parts: string[] = [];
+  if (matched.length > 0 && isApproved) {
+    context.state.valuesSentToModel.push(...matchedValues);
+    context.state.questions.push({ kind: "values", question: params.question, answer: matchedValues.join(", "), isAutomatic: true });
+    parts.push(`${_describeMatches(matched)} (matched automatically; use only if it means exactly what the user named).`);
+  }
+  if (unmatched.length > 0) {
+    parts.push(await _askUserToPick(context, unmatched, params.question));
+  }
+  return { content: [{ type: "text", text: parts.join("\n") || "No matching values." }], details: undefined };
+}
+
+/**
+ * The tool that finds how values the user named are stored. It runs on the
+ * device: an exact match (ignoring case and spaces) answers on its own, and
+ * anything else shows the user a card of stored values to pick from. Only
+ * matched or picked values reach the model.
+ */
+export function createLookupValuesTool(
+  options: Readonly<{
+    host: DataAgentHost;
+    aliases: readonly SqlTableAlias.T[];
+    state: DataAgentRunState;
+  }>,
+): AgentTool<typeof LOOKUP_VALUES_PARAMETERS> {
+  return {
+    name: "lookup_values",
+    label: "Look up values",
+    description:
+      "Finds how values the user named are stored in a text column. Runs on the user's device; returns only matching stored values or the user's pick.",
+    parameters: LOOKUP_VALUES_PARAMETERS,
+    executionMode: "sequential",
+    execute: async (_toolCallId, params) => {
+      const alias = options.aliases.find((entry) => entry.alias === params.table);
+      if (!alias) {
+        throw new Error(`Unknown table alias "${params.table}". Use one of the aliases under DATASETS.`);
+      }
+      return await _execute(
+        { host: options.host, state: options.state, tableName: alias.tableName, column: params.column },
+        params,
+      );
+    },
+  };
+}
