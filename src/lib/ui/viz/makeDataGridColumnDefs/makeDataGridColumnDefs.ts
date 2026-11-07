@@ -16,22 +16,31 @@ const MILLISECONDS_PER_DAY = 86_400_000;
 
 /**
  * Column names whose whole numbers are labels rather than amounts, such as
- * `year`, `UID`, `FIPS`, or `country_code`. Grouping their digits turns the
- * year 2020 into "2,020".
+ * `UID`, `FIPS`, or `country_code`. Grouping their digits turns a FIPS code
+ * of 1001 into "1,001".
  */
 const IDENTIFIER_COLUMN_NAME_REGEX =
-  /(?:^|[^a-z])(?:year|yr|id|uid|fips|zip|zipcode|postcode|code\d*)$/i;
+  /(?:^|[^a-z])(?:id|uid|fips|zip|zipcode|postcode|code\d*)$/i;
+
+/**
+ * Column names that may hold a year, such as `year` or `fiscal_year`. A name
+ * like `total_deaths_last_year` also ends in "year" and holds a count, so a
+ * value in one of these columns only reads as a year when it has four digits.
+ */
+const YEAR_COLUMN_NAME_REGEX = /(?:^|[^a-z])(?:year|yr)$/i;
 
 /**
  * How one number in the grid reads. Whole numbers show no decimals, so a count
- * of 63,437 deaths does not read as "63,437.00", and whole numbers in a
- * year, id, or code column show plain digits.
+ * of 63,437 deaths does not read as "63,437.00", and ids, codes, and years
+ * show plain digits, so the year 2020 does not read as "2,020".
  */
 function _formatGridNumber(value: number, columnName: string): string {
   if (!Number.isInteger(value)) {
     return formatChartNumber(value);
   }
-  return IDENTIFIER_COLUMN_NAME_REGEX.test(columnName)
+  const isYear =
+    YEAR_COLUMN_NAME_REGEX.test(columnName) && value >= 1000 && value <= 9999;
+  return isYear || IDENTIFIER_COLUMN_NAME_REGEX.test(columnName)
     ? String(value)
     : formatNumber(value, { maximumFractionDigits: 0 });
 }
