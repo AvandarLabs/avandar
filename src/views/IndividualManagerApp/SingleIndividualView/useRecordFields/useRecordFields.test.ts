@@ -19,14 +19,21 @@ type QueryState = {
   refetch: ReturnType<typeof vi.fn>;
 };
 
-const { attributesResultRef, valuesResultRef, useGetConceptRecordValuesMock } =
-  vi.hoisted(() => {
-    return {
-      attributesResultRef: { current: [] as unknown[] },
-      valuesResultRef: { current: [] as unknown[] },
-      useGetConceptRecordValuesMock: vi.fn(),
-    };
-  });
+const {
+  attributesResultRef,
+  mappingsResultRef,
+  datasetsResultRef,
+  valuesResultRef,
+  useGetConceptRecordValuesMock,
+} = vi.hoisted(() => {
+  return {
+    attributesResultRef: { current: [] as unknown[] },
+    mappingsResultRef: { current: [] as unknown[] },
+    datasetsResultRef: { current: [] as unknown[] },
+    valuesResultRef: { current: [] as unknown[] },
+    useGetConceptRecordValuesMock: vi.fn(),
+  };
+});
 
 vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
   return {
@@ -35,7 +42,7 @@ vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
         return attributesResultRef.current;
       },
       useGetAllAttributeMappings: () => {
-        return [[], false, {}];
+        return mappingsResultRef.current;
       },
     },
   };
@@ -45,7 +52,7 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       useGetAll: () => {
-        return [[], false, {}];
+        return datasetsResultRef.current;
       },
     },
   };
@@ -116,6 +123,15 @@ function _makeQueryState(isError: boolean): QueryState {
   };
 }
 
+/** A values read that has returned the record's age. */
+function _makeLoadedValuesResult(): unknown[] {
+  return [
+    [{ externalId: "CH-0001", valuesByAttributeId: { [AGE.id]: 41 } }],
+    false,
+    _makeQueryState(false),
+  ];
+}
+
 function _renderRecordFields(): RenderHookResult<RecordFields, unknown> {
   return renderHook(() => {
     return useRecordFields({ concept: CONCEPT, individual: RECORD });
@@ -125,6 +141,8 @@ function _renderRecordFields(): RenderHookResult<RecordFields, unknown> {
 beforeEach(() => {
   vi.clearAllMocks();
   attributesResultRef.current = [[AGE], false, _makeQueryState(false)];
+  mappingsResultRef.current = [[], false, _makeQueryState(false)];
+  datasetsResultRef.current = [[], false, _makeQueryState(false)];
   valuesResultRef.current = [undefined, true, _makeQueryState(false)];
   useGetConceptRecordValuesMock.mockImplementation(() => {
     return valuesResultRef.current;
@@ -142,6 +160,44 @@ describe("useRecordFields", () => {
     expect(result.current.isLoadError).toBe(true);
   });
 
+  it("reports a load error when the fields fail to load", () => {
+    attributesResultRef.current = [undefined, false, _makeQueryState(true)];
+
+    const { result } = _renderRecordFields();
+
+    expect(result.current.isLoadError).toBe(true);
+  });
+
+  // Placeholder rows, not "No value", until the values are known.
+  it("keeps the fields loading until the record's values arrive", () => {
+    const { result } = _renderRecordFields();
+
+    expect(result.current.rows).toBeUndefined();
+  });
+
+  // The source lines would otherwise appear after the values and shift the
+  // rail.
+  it("keeps the fields loading until their sources arrive", () => {
+    mappingsResultRef.current = [undefined, true, _makeQueryState(false)];
+    valuesResultRef.current = _makeLoadedValuesResult();
+
+    const { result } = _renderRecordFields();
+
+    expect(result.current.rows).toBeUndefined();
+  });
+
+  it("shows the fields without sources when their sources fail to load", () => {
+    mappingsResultRef.current = [undefined, false, _makeQueryState(true)];
+    valuesResultRef.current = _makeLoadedValuesResult();
+
+    const { result } = _renderRecordFields();
+
+    expect(result.current.rows).toEqual([
+      { id: AGE.id, name: "age", value: 41, sourceNames: [] },
+    ]);
+    expect(result.current.isLoadError).toBe(false);
+  });
+
   it("retries only the read that failed", () => {
     const attributesState = _makeQueryState(false);
     const valuesState = _makeQueryState(true);
@@ -155,6 +211,36 @@ describe("useRecordFields", () => {
 
     expect(valuesState.refetch).toHaveBeenCalledTimes(1);
     expect(attributesState.refetch).not.toHaveBeenCalled();
+  });
+
+  it("retries both reads when both failed", () => {
+    const attributesState = _makeQueryState(true);
+    const valuesState = _makeQueryState(true);
+    attributesResultRef.current = [undefined, false, attributesState];
+    valuesResultRef.current = [undefined, false, valuesState];
+    const { result } = _renderRecordFields();
+
+    act(() => {
+      result.current.retry();
+    });
+
+    expect(attributesState.refetch).toHaveBeenCalledTimes(1);
+    expect(valuesState.refetch).toHaveBeenCalledTimes(1);
+  });
+
+  // Only a retry spins the button, not a background refresh of a read that
+  // succeeded.
+  it("reports no retry while only a healthy read refreshes", () => {
+    attributesResultRef.current = [
+      [AGE],
+      false,
+      { ..._makeQueryState(false), isRefetching: true },
+    ];
+    valuesResultRef.current = [undefined, false, _makeQueryState(true)];
+
+    const { result } = _renderRecordFields();
+
+    expect(result.current.isRetrying).toBe(false);
   });
 
   // A case type with no fields has nothing to compute, so it never starts a
@@ -171,11 +257,7 @@ describe("useRecordFields", () => {
   });
 
   it("builds one row per field from the record's values", () => {
-    valuesResultRef.current = [
-      [{ externalId: "CH-0001", valuesByAttributeId: { [AGE.id]: 41 } }],
-      false,
-      _makeQueryState(false),
-    ];
+    valuesResultRef.current = _makeLoadedValuesResult();
 
     const { result } = _renderRecordFields();
 
