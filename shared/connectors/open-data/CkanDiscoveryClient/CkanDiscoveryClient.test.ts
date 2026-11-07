@@ -237,6 +237,16 @@ describe("CkanDiscoveryClient.searchDatasets", () => {
     ]).toEqual(["movement-range-maps", "csv-1", "upload"]);
   });
 
+  it("keeps each dataset exactly as package_search returned it", async () => {
+    const rawPackage = _wireDataset({ extra_field: { a: 1 } });
+
+    const page = await createCkanDiscoveryClient(
+      _searchHttp([rawPackage]),
+    ).searchDatasets({ baseUrl: BASE_URL, rows: 1000 });
+
+    expect(page.datasets[0]?.sourceRecord).toEqual(rawPackage);
+  });
+
   it("returns the valid datasets and lists an invalid one as skipped", async () => {
     const page = await createCkanDiscoveryClient(
       _pageEndingInAnInvalidDataset(),

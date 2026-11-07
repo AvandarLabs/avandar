@@ -52,8 +52,10 @@ command exits with an error. `ava pipeline reset` selects listings by their
 
 A scope is a slice of a drive that is crawled and resumed on its own: `hdx`
 has `format:csv`, `format:parquet`, and `format:other` (every other
-format), and a Socrata drive has `all` unless `CONFIGURED_DRIVES` gives it
-category or tag scopes. The Socrata drives are NYC Open Data
+format), and a Socrata drive has `all` unless `socrata.pipeline.yaml` gives
+it category or tag scopes. The Socrata drives, and how each Discovery API
+result maps onto catalog metadata, live in
+`pipelines/socrata/socrata.pipeline.yaml`. They are NYC Open Data
 (`data.cityofnewyork.us`), NY State Open Data (`data.ny.gov`), and NY State
 Department of Health (`health.data.ny.gov`). Removing a scope from
 the code only stops crawling it. `ava pipeline prune-retired-scopes` deletes
@@ -96,6 +98,70 @@ verified column types can be added to a workspace:
 The app verifies unverified or stale column types later from a sample of
 the source, and a pipeline rewrite keeps those verified columns as long as
 the pipeline's own view of the columns has not changed.
+
+## Pipeline config files
+
+Each drive-index pipeline has one YAML file beside its `run.ts`, read once at
+the start of a run:
+
+- `pipelines/socrata/socrata.pipeline.yaml`: Socrata's drives (portals).
+- `pipelines/hdx/hdx.pipeline.yaml`: HDX's one drive.
+
+A file lists the pipeline's `drives`, what each organization level is called
+(`organizationLabels`), and `fields`, which map the source's record onto the
+catalog's common metadata. A drive can replace the labels and override any
+field. Mapped values come from a dotted path into the source record (`from`),
+a constant (`value`), or a script under the pipeline's `mappers/` directory
+(`script`). A script default-exports `(record, context) => value`, and a
+script that throws nulls only its own field for that record and logs a
+warning. The full shape is in
+[`catalog-field-mapping-design.md`](../../docs/measles-demo/catalog-field-mapping-design.md).
+
+`pipelines/etl.config.yaml` still holds what every pipeline shares: the
+formats no pipeline's listings can be added in. A pipeline's own overrides of
+it live under `workspaceLoadability` in its `.pipeline.yaml`.
+
+### Adding a portal
+
+To index another Socrata portal:
+
+1. Add a drive to `socrata.pipeline.yaml`: its `baseUrl` (`https://`, no
+   trailing slash) and `organization1_name`, such as
+   `organization1_name: { value: State of Illinois }`. A drive without
+   `organization1_name` fails the config when it loads.
+2. If the portal's organization levels are named differently from the
+   defaults, give the drive its own `organizationLabels`. A drive's labels
+   replace the defaults whole, so list every level the drive fills.
+3. Map any field the portal records differently, per drive, with `from`,
+   `value`, or a script under `pipelines/socrata/mappers/`. Fields the drive
+   omits use the pipeline's shared `fields`.
+4. Try it against the local stack only (check `ava supabase status` first):
+
+   ```bash
+   ava pipeline run socrata --local --limit 20
+   ```
+
+   Then check the rows in `data_catalog_listings`: `organization1_name`
+   through `organization4_name`, `domains`, `tags`, `description`, and
+   `drive_id`, and the drive's row in `data_catalog_drives`.
+
+A new drive is crawled from scratch on its next run. A field mapping that
+changes rewrites the affected listings on the next full run, but not on an
+incremental one, which only touches datasets that changed.
+
+`ava pipeline run --local` hides the runner's warnings when the run
+succeeds: it prints only the report, and keeps stderr only for a failed run.
+Mapping warnings (a script that threw, a value that would not coerce, a
+dataset skipped for a missing `organization1_name`) are therefore invisible
+there. To see them, run the runner directly from the repo root, with the
+environment `ava` normally loads (`.env.development`) exported in the shell:
+
+```bash
+pnpm exec vite-node --config vite.script.config.ts scripts/runPipelineOnce.ts socrata --limit 20
+```
+
+It takes the same flags as `ava pipeline run`, and prints warnings to stderr
+as they happen.
 
 ## Execution history
 

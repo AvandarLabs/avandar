@@ -2,30 +2,17 @@ import { parseEtlConfig } from "@etl/EtlConfig/parseEtlConfig/parseEtlConfig";
 import { describe, expect, it } from "vitest";
 
 describe("parseEtlConfig", () => {
-  it("reads the global unloadable formats and each pipeline's overrides", () => {
+  it("reads the global unloadable formats", () => {
     const config = parseEtlConfig({
       yamlText: [
         "workspaceLoadability:",
         "  unloadableFormats: [PDF, XLSX]",
-        "pipelines:",
-        "  hdx:",
-        "    workspaceLoadability:",
-        "      loadableFormats: [XLSX]",
-        "      unloadableFormats: [JSON]",
       ].join("\n"),
       sourceName: "etl.config.yaml",
     });
 
     expect(config).toEqual({
       workspaceLoadability: { unloadableFormats: ["PDF", "XLSX"] },
-      pipelines: {
-        hdx: {
-          workspaceLoadability: {
-            loadableFormats: ["XLSX"],
-            unloadableFormats: ["JSON"],
-          },
-        },
-      },
     });
   });
 
@@ -34,7 +21,6 @@ describe("parseEtlConfig", () => {
       parseEtlConfig({ yamlText: "", sourceName: "etl.config.yaml" }),
     ).toEqual({
       workspaceLoadability: { unloadableFormats: [] },
-      pipelines: {},
     });
   });
 
@@ -54,5 +40,14 @@ describe("parseEtlConfig", () => {
         sourceName: "etl.config.yaml",
       });
     }).toThrow(/etl\.config\.yaml/);
+  });
+
+  it("refuses the per-pipeline section, which moved to each pipeline's config", () => {
+    expect(() => {
+      return parseEtlConfig({
+        yamlText: "pipelines: {}",
+        sourceName: "etl.config.yaml",
+      });
+    }).toThrow("etl.config.yaml is not a valid ETL config");
   });
 });

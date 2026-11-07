@@ -1,0 +1,48 @@
+# The Socrata pipeline's drives, and how each Discovery API result becomes
+# catalog metadata. Read once per run by `run.ts`.
+#
+# A field maps from exactly one of:
+#   from:   a dotted path into the raw Discovery API result
+#   value:  a constant
+#   script: a .ts file, relative to this file, that default-exports
+#           (record, context) => value
+# A drive's fields override these shared ones, key by key. A drive's
+# organizationLabels replace these whole.
+#
+# See docs/measles-demo/catalog-field-mapping-design.md.
+
+organizationLabels:
+  1: City
+  2: Agency
+
+fields:
+  description: { script: ./mappers/socrataDescription/socrataDescription.ts }
+  license: { from: metadata.license }
+  organization2_name: { from: resource.attribution }
+  domains: { script: ./mappers/socrataDomains/socrataDomains.ts }
+  tags: { from: classification.domain_tags }
+  update_frequency:
+    { script: ./mappers/socrataUpdateFrequency/socrataUpdateFrequency.ts }
+
+# Each drive is crawled and resumed on its own, so adding one indexes it from
+# scratch on the next run. A drive must have at most 10,000 assets, the most
+# the Discovery API can page through. A drive may list `scopes`, each a
+# `key` with optional `categories` and `tags`; omit them to index the whole
+# portal as one scope, `all`.
+drives:
+  - baseUrl: https://data.cityofnewyork.us
+    fields:
+      organization1_name: { value: City of New York }
+
+  - baseUrl: https://data.ny.gov
+    organizationLabels: { 1: State, 2: Agency }
+    fields:
+      organization1_name: { value: State of New York }
+
+  - baseUrl: https://health.data.ny.gov
+    organizationLabels: { 1: State, 2: Department, 3: Office }
+    fields:
+      organization1_name: { value: State of New York }
+      organization2_name: { value: Department of Health }
+      organization3_name:
+        { script: ./mappers/socrataOfficeDivision/socrataOfficeDivision.ts }

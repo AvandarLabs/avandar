@@ -1,6 +1,8 @@
 import {
   createInMemoryCheckpointStore,
+  createInMemoryDrivesStore,
   createInMemoryListingsStore,
+  loadCatalogFieldMapper,
 } from "@avandar/etl";
 import { createSocrataEtlEngine } from "@pipelines/socrata/createSocrataEtlEngine/createSocrataEtlEngine";
 import { describe, expect, it, vi } from "vitest";
@@ -8,11 +10,15 @@ import type {
   SocrataDiscoveryClient,
   SocrataDiscoveryResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
-import type { EtlStores } from "@avandar/etl";
+import type {
+  CatalogFieldMapper,
+  EtlStores,
+  PipelineConfig,
+} from "@avandar/etl";
 
 const DRIVE = {
   baseUrl: "https://data.cityofnewyork.us",
-  organizationName: "City of New York",
+  organizationLabels: { 1: "City" },
 };
 const OUTPUT = {
   listingsTable: "data_catalog_listings",
@@ -23,6 +29,7 @@ const OUTPUT = {
 function _catalog(size: number): SocrataDiscoveryResult[] {
   return Array.from({ length: size }, (_, index) => {
     return {
+      sourceRecord: {},
       datasetId: `ds-${index}`,
       name: `Dataset ${index}`,
       domain: "data.cityofnewyork.us",
@@ -49,7 +56,19 @@ function _discoveryOver(
   };
 }
 
-function _engine(
+async function _mapper(
+  fields: PipelineConfig["fields"] = {},
+): Promise<CatalogFieldMapper> {
+  return await loadCatalogFieldMapper({
+    config: {
+      fields: { organization1_name: { value: "City of New York" }, ...fields },
+      drives: [{ baseUrl: DRIVE.baseUrl }],
+    },
+    configDir: "/",
+  });
+}
+
+async function _engine(
   stores: EtlStores,
   catalog: readonly SocrataDiscoveryResult[],
   unloadableFormats: readonly string[] = [],
@@ -58,6 +77,7 @@ function _engine(
     output: OUTPUT,
     discovery: _discoveryOver(catalog),
     drives: [DRIVE],
+    mapper: await _mapper(),
     stores,
     workspaceLoadability: { unloadableFormats },
   });
@@ -72,7 +92,7 @@ describe("createSocrataEtlEngine", () => {
       checkpoints: createInMemoryCheckpointStore(),
     };
 
-    await _engine(stores, _catalog(3)).run({ mode: "full" });
+    await (await _engine(stores, _catalog(3))).run({ mode: "full" });
 
     expect(
       listings.getRows().map((row) => {
@@ -102,13 +122,15 @@ describe("createSocrataEtlEngine", () => {
           };
     });
 
-    const report = await _engine(
-      {
-        listings,
-        objects: undefined,
-        checkpoints: createInMemoryCheckpointStore(),
-      },
-      catalog,
+    const report = await (
+      await _engine(
+        {
+          listings,
+          objects: undefined,
+          checkpoints: createInMemoryCheckpointStore(),
+        },
+        catalog,
+      )
     ).run({ mode: "full" });
 
     const [row, columnlessRow] = listings.getRows();
@@ -140,13 +162,15 @@ describe("createSocrataEtlEngine", () => {
       return result;
     });
 
-    await _engine(
-      {
-        listings,
-        objects: undefined,
-        checkpoints: createInMemoryCheckpointStore(),
-      },
-      catalog,
+    await (
+      await _engine(
+        {
+          listings,
+          objects: undefined,
+          checkpoints: createInMemoryCheckpointStore(),
+        },
+        catalog,
+      )
     ).run({ mode: "full" });
 
     expect(
@@ -168,14 +192,16 @@ describe("createSocrataEtlEngine", () => {
   it("applies the workspace loadability rules it is given", async () => {
     const listings = createInMemoryListingsStore();
 
-    await _engine(
-      {
-        listings,
-        objects: undefined,
-        checkpoints: createInMemoryCheckpointStore(),
-      },
-      _catalog(1),
-      ["csv"],
+    await (
+      await _engine(
+        {
+          listings,
+          objects: undefined,
+          checkpoints: createInMemoryCheckpointStore(),
+        },
+        _catalog(1),
+        ["csv"],
+      )
     ).run({ mode: "full" });
 
     expect(listings.getRows()[0]?.is_workspace_loadable).toBe(false);
@@ -189,7 +215,7 @@ describe("createSocrataEtlEngine", () => {
       checkpoints: createInMemoryCheckpointStore(),
     };
 
-    await _engine(stores, _catalog(1500)).run({ mode: "full" });
+    await (await _engine(stores, _catalog(1500))).run({ mode: "full" });
 
     const upserted = listings.getUpsertBatches().reduce((sum, batch) => {
       return sum + batch.length;
@@ -204,9 +230,11 @@ describe("createSocrataEtlEngine", () => {
       objects: undefined,
       checkpoints: createInMemoryCheckpointStore(),
     };
-    await _engine(stores, _catalog(5)).run({ mode: "full", limit: 2 });
+    await (await _engine(stores, _catalog(5))).run({ mode: "full", limit: 2 });
 
-    const report = await _engine(stores, _catalog(5)).run({
+    const report = await (
+      await _engine(stores, _catalog(5))
+    ).run({
       mode: "incremental",
     });
 
@@ -232,6 +260,7 @@ describe("createSocrataEtlEngine", () => {
           ],
         },
       ],
+      mapper: await _mapper(),
       stores: {
         listings,
         objects: undefined,
@@ -260,8 +289,80 @@ describe("createSocrataEtlEngine", () => {
       output: OUTPUT,
       discovery: _discoveryOver([]),
       drives: [DRIVE],
+      mapper: await _mapper(),
     }).listScopes();
 
     expect(scopes).toEqual([{ driveKey: DRIVE.baseUrl, scopeKeys: ["all"] }]);
+  });
+
+  it("maps each result's metadata and records the drive's labels", async () => {
+    const listings = createInMemoryListingsStore();
+    const drives = createInMemoryDrivesStore();
+    const catalog = _catalog(1).map((result) => {
+      return {
+        ...result,
+        sourceRecord: { resource: { attribution: "TLC" } },
+      };
+    });
+    const engine = createSocrataEtlEngine({
+      output: OUTPUT,
+      discovery: _discoveryOver(catalog),
+      drives: [DRIVE],
+      mapper: await _mapper({
+        organization2_name: { from: "resource.attribution" },
+      }),
+      stores: {
+        listings,
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+        drives,
+      },
+      workspaceLoadability: { unloadableFormats: [] },
+    });
+
+    await engine.run({ mode: "full" });
+
+    expect(listings.getRows()[0]).toMatchObject({
+      organization1_name: "City of New York",
+      organization2_name: "TLC",
+      source_metadata: { resource: { attribution: "TLC" } },
+      drive_id: drives.getDrives()[0]?.id,
+    });
+    expect(drives.getDrives()[0]?.organizationLabels).toEqual({ 1: "City" });
+  });
+
+  it("skips a result whose organization1_name maps to nothing, with a warning", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const listings = createInMemoryListingsStore();
+      const engine = createSocrataEtlEngine({
+        output: OUTPUT,
+        discovery: _discoveryOver(_catalog(1)),
+        drives: [DRIVE],
+        mapper: await loadCatalogFieldMapper({
+          config: {
+            fields: { organization1_name: { from: "missing.path" } },
+            drives: [{ baseUrl: DRIVE.baseUrl }],
+          },
+          configDir: "/",
+        }),
+        stores: {
+          listings,
+          objects: undefined,
+          checkpoints: createInMemoryCheckpointStore(),
+        },
+      });
+
+      await engine.run({ mode: "full" });
+
+      expect(listings.getRows()).toEqual([]);
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "skipped ds-0: organization1_name mapped to nothing",
+        ),
+      );
+    } finally {
+      warn.mockRestore();
+    }
   });
 });

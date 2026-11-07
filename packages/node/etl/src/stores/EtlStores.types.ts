@@ -1,3 +1,4 @@
+import type { EtlOrganizationLabels } from "@etl/EtlEngine/EtlEngine.types";
 import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 
 /** Which of the two listing shapes a row is. */
@@ -13,7 +14,7 @@ export type ListingRowValues = Readonly<{
   pipeline_name: string;
   pipeline_run_id: string;
   display_name: string;
-  external_organization_name: string;
+  organization1_name: string;
   external_dataset_id: string;
   date_of_last_update: string | null;
   date_of_last_sync: string;
@@ -44,6 +45,15 @@ export type ListingRowValues = Readonly<{
   is_workspace_loadable: boolean;
   source_asset_type: string | null;
   source_download_url: string | null;
+  organization2_name: string | null;
+  organization3_name: string | null;
+  organization4_name: string | null;
+  domains: readonly string[] | null;
+  tags: readonly string[] | null;
+  /** The raw source record. Never counts as a change on its own. */
+  source_metadata: unknown;
+  /** The drive's `data_catalog_drives.id`, when the run has a drives store. */
+  drive_id: string | null;
 }>;
 
 /** A listing row as stored, with its primary key. */
@@ -139,4 +149,20 @@ export type CheckpointStore = Readonly<{
   read: (key: CheckpointKey) => Promise<Date | undefined>;
   /** Creates the checkpoint, or replaces its value and run id. */
   write: (checkpoint: StoredCheckpoint) => Promise<void>;
+}>;
+
+/** One drive as the drives table stores it. */
+export type DriveRow = Readonly<{
+  pipelineName: string;
+  driveKey: string;
+  organizationLabels: EtlOrganizationLabels;
+}>;
+
+/** Writes the drives table. */
+export type DrivesStore = Readonly<{
+  /**
+   * Inserts the drive, or replaces its labels when the pipeline already
+   * wrote it, and resolves to its id.
+   */
+  upsert: (drive: DriveRow) => Promise<string>;
 }>;

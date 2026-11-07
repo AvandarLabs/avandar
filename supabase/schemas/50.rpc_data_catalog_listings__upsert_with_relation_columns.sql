@@ -111,7 +111,7 @@ begin
       pipeline_name,
       pipeline_run_id,
       display_name,
-      external_organization_name,
+      organization1_name,
       external_dataset_id,
       date_of_last_update,
       date_of_last_sync,
@@ -136,14 +136,21 @@ begin
       invalid_dataset_reason,
       is_workspace_loadable,
       source_asset_type,
-      source_download_url
+      source_download_url,
+      organization2_name,
+      organization3_name,
+      organization4_name,
+      domains,
+      tags,
+      source_metadata,
+      drive_id
     ) values (
       coalesce(v_input.id, gen_random_uuid()),
       v_input.access_kind,
       v_input.pipeline_name,
       v_input.pipeline_run_id,
       v_input.display_name,
-      v_input.external_organization_name,
+      v_input.organization1_name,
       v_input.external_dataset_id,
       v_input.date_of_last_update,
       v_input.date_of_last_sync,
@@ -168,14 +175,21 @@ begin
       v_input.invalid_dataset_reason,
       coalesce(v_input.is_workspace_loadable, true),
       v_input.source_asset_type,
-      v_input.source_download_url
+      v_input.source_download_url,
+      v_input.organization2_name,
+      v_input.organization3_name,
+      v_input.organization4_name,
+      v_input.domains,
+      v_input.tags,
+      v_input.source_metadata,
+      v_input.drive_id
     )
     on conflict (id) do update set
       access_kind = excluded.access_kind,
       pipeline_name = excluded.pipeline_name,
       pipeline_run_id = excluded.pipeline_run_id,
       display_name = excluded.display_name,
-      external_organization_name = excluded.external_organization_name,
+      organization1_name = excluded.organization1_name,
       external_dataset_id = excluded.external_dataset_id,
       date_of_last_update = excluded.date_of_last_update,
       date_of_last_sync = excluded.date_of_last_sync,
@@ -200,7 +214,14 @@ begin
       invalid_dataset_reason = excluded.invalid_dataset_reason,
       is_workspace_loadable = excluded.is_workspace_loadable,
       source_asset_type = excluded.source_asset_type,
-      source_download_url = excluded.source_download_url
+      source_download_url = excluded.source_download_url,
+      organization2_name = excluded.organization2_name,
+      organization3_name = excluded.organization3_name,
+      organization4_name = excluded.organization4_name,
+      domains = excluded.domains,
+      tags = excluded.tags,
+      source_metadata = excluded.source_metadata,
+      drive_id = excluded.drive_id
     returning * into v_listing;
 
     v_written_ids := v_written_ids || v_listing.id;

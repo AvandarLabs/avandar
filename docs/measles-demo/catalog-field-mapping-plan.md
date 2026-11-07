@@ -32,6 +32,36 @@ Virtual, Lingui, Playwright.
 **Spec:** [`catalog-field-mapping-design.md`](catalog-field-mapping-design.md).
 Read it first. Section numbers below (for example "spec §4.4") point into it.
 
+## Execution notes
+
+This plan was executed on `feat/catalog-field-mapping`, branched from
+`demo/measles` at `b2fcba4a1`, not on `demo/measles` itself. Where the plan
+below differs from what shipped, the shipped design is the spec's sections 6
+and 7. What changed while building:
+
+- **Tasks 13b and 13c were added.** `feat/catalog-filters` landed on
+  `demo/measles` after this branch was cut and replaced catalog search with
+  filters, sort, and facets. Task 13b merges `demo/measles` into this branch
+  and rebuilds the Task 4 migration on that search. Task 13c extends the
+  merged search with the agency, topic, and keyword filters and facets.
+- **Tasks 15-18 were rewritten.** They described a separate filter row and
+  this branch's own search RPCs. They now extend the merged filter rail
+  (`DataCatalogFilterRail`, `useDataCatalogFacets`) and send the new filters
+  through the existing search and facets RPCs. Task 4's text still describes
+  the original schema and search work: the migration that shipped is
+  `5ebe11ba5`, rebuilt in Task 13b.
+- **Notable deviations found in review:**
+  - The drive label lookup is named `getOrganizationLabelsFromDrive`, not
+    the name the early tasks used.
+  - Type-check with `pnpm exec tsc -b --force`. Plain `tsc -b` can report a
+    stale clean from its incremental cache.
+  - The listing parser keeps the `metadata` and `source_metadata` documents
+    exactly as stored, instead of camel-casing and null-stripping their keys.
+  - The engine writes a drive row only for a crawl that runs, so a crawl a
+    `--limit` skips leaves no drive row.
+  - The health office mapper reads the office from either
+    `Dataset-Summary_Office/Division` or `Dataset-Summary_Organization`.
+
 ---
 
 ## Ground rules for this plan
@@ -68,7 +98,7 @@ Read it first. Section numbers below (for example "spec §4.4") point into it.
 | `packages/node/etl/src/EtlConfig/readPipelineConfigFile/readPipelineConfigFile.ts` | Create. Reads and parses one config file |
 | `packages/node/etl/src/EtlConfig/buildCatalogFieldPathReader/buildCatalogFieldPathReader.ts` | Create. A `from` path to a lookup function |
 | `packages/node/etl/src/EtlConfig/coerceCatalogFieldValue/coerceCatalogFieldValue.ts` | Create. Coerces a raw value to a field's type (spec §4.4) |
-| `packages/node/etl/src/EtlConfig/resolveDriveOrganizationLabels/resolveDriveOrganizationLabels.ts` | Create. A drive's labels: its own, or the pipeline's |
+| `packages/node/etl/src/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive.ts` | Create. A drive's labels: its own, or the pipeline's |
 | `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/loadCatalogFieldMapper.ts` | Create. Compiles a config into a `CatalogFieldMapper`, importing each script once |
 | `packages/node/etl/src/EtlConfig/EtlConfig.types.ts`, `parseEtlConfig.ts`, `getWorkspaceLoadabilityRules.ts` | Modify. Per-pipeline loadability overrides move into the pipeline config |
 | `packages/node/etl/src/EtlEngine/EtlEngine.types.ts` | Modify. Organization labels, drive description, new relation fields, `drivesTable` |
@@ -904,17 +934,17 @@ git commit -m "feat(etl): read catalog field paths and coerce mapped values"
 ### Task 3: The field mapper, with scripts imported once
 
 **Files:**
-- Create: `packages/node/etl/src/EtlConfig/resolveDriveOrganizationLabels/resolveDriveOrganizationLabels.ts` and its test
+- Create: `packages/node/etl/src/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive.ts` and its test
 - Create: `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/loadCatalogFieldMapper.ts`
 - Create: `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/__fixtures__/upperCaseName.ts`
 - Create: `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/__fixtures__/throwsOnRecord.ts`
 - Create: `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/__fixtures__/noDefaultFunction.ts`
 - Test: `packages/node/etl/src/EtlConfig/loadCatalogFieldMapper/loadCatalogFieldMapper.test.ts`
 
-- [ ] **Step 1: Write the failing test** `resolveDriveOrganizationLabels.test.ts`:
+- [ ] **Step 1: Write the failing test** `getOrganizationLabelsFromDrive.test.ts`:
 
 ```ts
-import { resolveDriveOrganizationLabels } from "@etl/EtlConfig/resolveDriveOrganizationLabels/resolveDriveOrganizationLabels";
+import { getOrganizationLabelsFromDrive } from "@etl/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive";
 import { describe, expect, it } from "vitest";
 
 const CONFIG = {
@@ -922,10 +952,10 @@ const CONFIG = {
   drives: [],
 };
 
-describe("resolveDriveOrganizationLabels", () => {
+describe("getOrganizationLabelsFromDrive", () => {
   it("gives a drive with no labels the pipeline's", () => {
     expect(
-      resolveDriveOrganizationLabels({
+      getOrganizationLabelsFromDrive({
         config: CONFIG,
         drive: { baseUrl: "https://a.example.gov" },
       }),
@@ -934,7 +964,7 @@ describe("resolveDriveOrganizationLabels", () => {
 
   it("replaces the pipeline's labels whole, not level by level", () => {
     expect(
-      resolveDriveOrganizationLabels({
+      getOrganizationLabelsFromDrive({
         config: CONFIG,
         drive: { baseUrl: "https://a.example.gov", organizationLabels: { 1: "State" } },
       }),
@@ -943,7 +973,7 @@ describe("resolveDriveOrganizationLabels", () => {
 
   it("gives no labels when neither sets any", () => {
     expect(
-      resolveDriveOrganizationLabels({
+      getOrganizationLabelsFromDrive({
         config: { drives: [] },
         drive: { baseUrl: "https://a.example.gov" },
       }),
@@ -953,7 +983,7 @@ describe("resolveDriveOrganizationLabels", () => {
 ```
 
 - [ ] **Step 2: Run it, watch it fail, then implement
-  `resolveDriveOrganizationLabels.ts`:**
+  `getOrganizationLabelsFromDrive.ts`:**
 
 ```ts
 import type {
@@ -971,7 +1001,7 @@ import type { EtlOrganizationLabels } from "@etl/EtlEngine/EtlEngine.types";
  * @param args.drive - One of its drives.
  * @returns The labels, possibly empty.
  */
-export function resolveDriveOrganizationLabels(args: {
+export function getOrganizationLabelsFromDrive(args: {
   config: PipelineConfig;
   drive: PipelineDriveConfig;
 }): EtlOrganizationLabels {
@@ -979,7 +1009,7 @@ export function resolveDriveOrganizationLabels(args: {
 }
 ```
 
-Run: `pnpm --filter @avandar/etl test resolveDriveOrganizationLabels`
+Run: `pnpm --filter @avandar/etl test getOrganizationLabelsFromDrive`
 Expected: FAIL first (module not found), then PASS, 3 tests.
 
 - [ ] **Step 3: Create the fixture scripts.**
@@ -1512,7 +1542,7 @@ If Bun cannot resolve the `@etl/` alias inside the loader, run it from
 - [ ] **Step 9: Export them** from `packages/node/etl/src/index.ts`:
 
 ```ts
-export { resolveDriveOrganizationLabels } from "@etl/EtlConfig/resolveDriveOrganizationLabels/resolveDriveOrganizationLabels";
+export { getOrganizationLabelsFromDrive } from "@etl/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive";
 export {
   loadCatalogFieldMapper,
   type CatalogFieldMapper,
@@ -1529,7 +1559,7 @@ export {
 ```bash
 pnpm --filter @avandar/etl type-check
 pnpm format
-git add packages/node/etl/src/EtlConfig/resolveDriveOrganizationLabels \
+git add packages/node/etl/src/EtlConfig/getOrganizationLabelsFromDrive \
   packages/node/etl/src/EtlConfig/loadCatalogFieldMapper \
   packages/node/etl/src/index.ts
 git commit -m "feat(etl): compile pipeline field mappings, importing each script once"
@@ -3619,7 +3649,7 @@ README after Step 2.
     mapping kinds, the mappable fields, coercion, that scripts load once
     per run, and a table of the new exports (`parsePipelineConfig`,
     `readPipelineConfigFile`, `loadCatalogFieldMapper`,
-    `resolveDriveOrganizationLabels`, `CATALOG_MAPPABLE_FIELDS`, the types),
+    `getOrganizationLabelsFromDrive`, `CATALOG_MAPPABLE_FIELDS`, the types),
     following the format of the README's existing tables.
   - The stores table or section: add `createInMemoryDrivesStore` and
     `createSupabaseDrivesStore`, `EtlOutput.drivesTable`, and
@@ -4169,14 +4199,14 @@ export function listConfiguredDrives(
         : SocrataScopesSchema.parse(drive.scopes);
     return {
       baseUrl: drive.baseUrl,
-      organizationLabels: resolveDriveOrganizationLabels({ config, drive }),
+      organizationLabels: getOrganizationLabelsFromDrive({ config, drive }),
       ...(scopes === undefined ? {} : { scopes }),
     };
   });
 }
 ```
 
-with imports `import { resolveDriveOrganizationLabels } from "@avandar/etl";`,
+with imports `import { getOrganizationLabelsFromDrive } from "@avandar/etl";`,
 `import { z } from "zod";`, and
 `import type { EtlOrganizationLabels, EtlScope, PipelineConfig } from "@avandar/etl";`.
 If `apps/pipeline-server/package.json` does not list `zod`, add
@@ -4598,7 +4628,7 @@ export function listHdxDrives(config: PipelineConfig): readonly HdxDrive[] {
     }
     return {
       baseUrl: drive.baseUrl,
-      organizationLabels: resolveDriveOrganizationLabels({ config, drive }),
+      organizationLabels: getOrganizationLabelsFromDrive({ config, drive }),
     };
   });
 }
@@ -4740,6 +4770,185 @@ summarize a failure as a pass.
 
 - [ ] **Step 3: Commit any sweep fixes** with
   `fix(catalog): finish the organization1_name rename`.
+
+---
+
+### Task 13b: Merge `demo/measles` and rebuild this branch's migration on its search
+
+`feat/catalog-filters` was merged into `demo/measles` after this branch was
+cut. It replaced catalog search with a filter, sort, and facet design:
+`supabase/schemas/51.data_catalog_listings__search_matches.sql`,
+`52.rpc_data_catalog_listings__search.sql`,
+`52.rpc_data_catalog_listings__search_facets.sql`,
+`50.data_catalog_listings__is_updated_within.sql`, migration
+`20261106235455_add_catalog_listing_search_filters.sql`, pgTAP
+`rpc_data_catalog_listings__search_filters.test.sql`, and a three-pane
+catalog browser with `DataCatalogFilterRail`, `DataCatalogResultsHeader`,
+`catalogListingFilters`, `useDataCatalogFacets`, and a rewritten list and
+detail pane.
+
+This branch's Task 4 also changed the search RPC and added a facets RPC with
+the same name, and Task 5 renamed `external_organization_name` to
+`organization1_name` everywhere. This task merges the two, keeping
+`feat/catalog-filters`'s search design and this branch's data model. Task 13c
+then adds the new filters to their design.
+
+Read spec §2, §6, and §10 (`docs/measles-demo/catalog-field-mapping-design.md`,
+already updated for this) before starting. Load the
+`supabase-declarative-schema` skill.
+
+**Steps**
+
+1. `ava supabase status` must read green SWITCHED.
+2. `git merge demo/measles` (the local branch; do not fetch or pull). Expect
+   conflicts.
+3. Resolve, with these rules:
+   - **Search and facets SQL: theirs wins.** Delete this branch's
+     `supabase/schemas/50.rpc_data_catalog_listings__search.sql` and
+     `50.rpc_data_catalog_listings__search_facets.sql` (Task 4's versions);
+     keep their `51.`/`52.` files. Apply the rename to their SQL:
+     `external_organization_name` becomes `organization1_name` in
+     `search_matches` and the search RPC (columns, output columns, the
+     `passes_source` comparison, docstrings: "source" is the level-1
+     organization). Do not add the new filters yet (Task 13c).
+   - **pgTAP**: keep their `rpc_data_catalog_listings__search_filters.test.sql`
+     and apply the rename to its fixtures. This branch's Task 4 file of the
+     same name, and its `rpc_data_catalog_listings__search_facets.test.sql`,
+     tested Task 4's now-deleted RPCs: delete them (Task 13c re-adds those
+     cases against the merged RPCs). Keep every other Task 4 test
+     (`data_catalog_drives.test.sql`, upsert checks, the upgrade replay).
+   - **Everything else this branch changed** (drives table, new columns,
+     rename, `search_vector` rebuild with the new columns at weight B,
+     `util__text_array_to_text`, the filter indexes, the upsert RPC, the
+     desktop sync registration) stays.
+   - **App code: their structure wins, this branch's names win.** Keep their
+     browser, rail, hooks, client argument builders, and model types; apply
+     `externalOrganizationName` -> `organization1Name` and keep this branch's
+     new model columns (organization2-4, domains, tags, sourceMetadata,
+     driveId). Their search result type carries `fileFormat` and
+     `lastUpdatedAt`; keep those and also carry `organization2Name..4` only if
+     the search RPC returns them after this task (it does not until 13c, so
+     leave them out here if the build requires).
+   - **Generated files**: never hand-merge `shared/types/database.types.ts`
+     or `*.gen.sql`, or `src/i18n/locales/*/messages.ts`; regenerate them.
+     For `messages.po` conflicts take theirs and re-run Lingui extraction
+     (`pnpm i18n:extract` or the repo's equivalent; check package.json).
+4. **Rebuild this branch's migration on top of theirs.** Delete
+   `supabase/migrations/20261107000129_catalog_field_mapping.sql` and its
+   desktop twin `apps/desktop/migrations/20261107000129_catalog_field_mapping.gen.sql`,
+   and remove its entry from `_MANUAL_MIGRATION_BODIES` in
+   `apps/desktop/scripts/gen-sqlite-migrations/getManualMigrationBodyFromSourceFile.ts`
+   (you will re-add an entry for the new file name). This branch has never
+   been deployed, so regenerating is safe. Then `pnpm db:reset` and
+   `pnpm db:new-migration catalog_field_mapping`, and hand-fix exactly as
+   Task 4 did (its Step 14, in the Task 4 task file next to this one):
+   rename not drop+add for `external_organization_name`; `if exists` on the
+   drops of `search_vector`, its index, and the search functions the
+   migration rebuilds; `search_vector` re-added as `generated always ...
+   stored` after the new columns and `util__text_array_to_text` exist. Their
+   `search_matches` and search RPC depend on the renamed column and on
+   `search_vector`; order the statements so dependants are dropped before and
+   recreated after.
+5. Update the migration upgrade test (`supabase/migration-upgrade-tests/catalog_field_mapping.*`
+   and its line in `scripts/test-dashboard-publishing-migrations.sh`) to the
+   new migration file name, and make its prelude rebuild the production shape
+   as of THEIR migration (their `search_matches`, search RPC with 8 args,
+   facets RPC with 5 args, reading `external_organization_name`), so the
+   replay proves the rename works with their functions depending on it.
+6. Desktop: re-add a `_MANUAL_MIGRATION_BODIES` entry for the new file if
+   the generator emits SQLite it cannot run (as Task 4 did), regenerate
+   (`pnpm desktop:sqlite:gen-migrations`), and confirm
+   `pnpm desktop:sqlite:check-migrations` reports no drift.
+7. `pnpm db:gen-types`.
+8. Verify: `pnpm test:db` (all pass, privileges match),
+   `pnpm exec tsc -b --force` (exit 0), `pnpm --filter @avandar/etl test`,
+   `pnpm --filter @avandar/pipeline-server test`, and
+   `pnpm exec vitest run src/views/DataManagerApp/DataImportView/DataCatalogView src/clients/data-catalog-listings shared/models/data-catalog-listings shared/connectors/open-data`.
+9. Commit the merge (one merge commit, message
+   `chore(catalog): merge demo/measles into feat/catalog-field-mapping`), then
+   the regenerated migration and its tests as
+   `fix(db)!: rebuild the catalog field mapping migration on filtered search`
+   (with a `BREAKING CHANGE:` footer naming the rename). Stage by path; never
+   `supabase/config.toml`.
+
+**Report**: the conflict list and how each was resolved, the final list of
+`drop` statements in the new migration, the `pnpm test:db` summary, and
+`tsc --force` exit code.
+
+---
+
+### Task 13c: Agency, topic, and keyword filters in the merged search
+
+Task 13b merged `feat/catalog-filters`'s search design into this branch.
+This task adds the level-2 organization, topic (`domains`), and keyword
+(`tags`) filters and facets to it, exactly as spec §6 describes (read §6
+first: `docs/measles-demo/catalog-field-mapping-design.md`). Load the
+`supabase-declarative-schema` skill and read `docs/rules/sql.md`.
+
+**Schema changes** (in `supabase/schemas/`):
+
+1. `51.data_catalog_listings__search_matches.sql`:
+   - New parameters after `p_is_loadable_only`: `p_organization2_names text[]`,
+     `p_domains text[]`, `p_tags text[]` (coalesce null to `'{}'` like the
+     existing arrays).
+   - New output columns: `organization2_name`, `organization3_name`,
+     `organization4_name` after `organization1_name`; `domains text[]`,
+     `tags text[]`, `drive_id uuid` (before `score`); and
+     `passes_organization2`, `passes_domain`, `passes_tag` after the existing
+     pass columns.
+   - Pass rules: `cardinality(v) = 0 or listing.organization2_name = any (v)`;
+     `cardinality(v) = 0 or coalesce(listing.domains && v, false)`; same for
+     tags. Update the docstring and `@param`s.
+2. `52.rpc_data_catalog_listings__search.sql`: the three new parameters
+   (`default '{}'`) before `p_sort_by`, passed through; the `where` keeps
+   rows passing all seven filters; return `organization2_name`..`4` after
+   `organization1_name`.
+3. `52.rpc_data_catalog_listings__search_facets.sql`: the three new
+   parameters; every existing facet's "every other filter" condition now also
+   includes the three new pass columns; new facets `organization2`,
+   `organization2_label` (join `public.data_catalog_drives` on `drive_id`,
+   same rows as `organization2`), and `domain` (unnest `domains`), each
+   counted against every filter but its own and including each chosen value
+   at 0, following the file's existing facet pattern exactly.
+4. Revoke/grant statements updated to the new signatures. No comments inside
+   `$$` bodies.
+
+**Tests first** (pgTAP, extend
+`supabase/tests/database/rpc_data_catalog_listings__search_filters.test.sql`
+from `feat/catalog-filters`; read it and follow its fixture style). Add
+fixtures with organization2_name, domains, tags, and drives with
+`organization2_label`, using made-up words so no seeded listing matches.
+Cover:
+- a tag, a domain, and a level-2 organization make a listing searchable
+  (word search);
+- each new filter narrows results, ANDs with an existing filter (e.g.
+  `p_sources`), ORs within itself, and applies to a blank query; an empty
+  array is no filter;
+- a row carries its organization levels;
+- the `organization2`, `organization2_label`, and `domain` facets count over
+  every filter but their own, and keep a chosen value at 0;
+- an existing facet (e.g. `source`) now respects the new filters;
+- privileges on the new signatures (authenticated yes, anon no), wherever
+  the file checks privileges today.
+Update `plan(n)`. Watch them fail before the schema change.
+
+**Migration**: `pnpm db:reset`, then
+`pnpm db:new-migration catalog_search_organization_filters`. Check the
+generated `drop`s are only of the three functions being re-signed (no data
+columns). Desktop: regenerate and confirm no drift; add a manual body only if
+SQLite cannot run the generated one.
+
+**Types and client**: `pnpm db:gen-types`. The client's search argument
+builder and result type will not use the new parameters/columns until Task
+15, but the build must stay green: if `createDataCatalogSearchPage`'s
+widened row type needs the new nullable columns declared (as it does for
+other nullable `returns table` columns), add them there and map them to
+`organization2Name..4Name` on the search result type now, with a test.
+
+**Verify**: `pnpm test:db`, `pnpm exec tsc -b --force`,
+`pnpm exec vitest run src/clients/data-catalog-listings src/views/DataManagerApp/DataImportView/DataCatalogView`.
+
+**Commit**: `feat(catalog): filter and facet catalog search by agency, topic, and keyword`.
 
 ---
 
@@ -4948,1451 +5157,221 @@ git commit -m "feat(catalog): read catalog drives and their organization labels"
 
 ---
 
-### Task 15: Filtered search and facets on the client
+### Task 15: The client sends the new filters and reads the new facets
 
-**Files:**
-- Modify: `shared/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts`, `DataCatalogListing.ts`
-- Create: `src/clients/data-catalog-listings/buildDataCatalogSearchFilterParams/buildDataCatalogSearchFilterParams.ts` and its test
-- Create: `src/clients/data-catalog-listings/createDataCatalogFacets/createDataCatalogFacets.ts` and its test
-- Modify: `src/clients/data-catalog-listings/DataCatalogListingClient.ts`
-- Modify: `src/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogSearch.ts`
-- Create: `src/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogFacets/useDataCatalogFacets.ts`
+Task 13c added `p_organization2_names`, `p_domains`, and `p_tags` to
+`rpc_data_catalog_listings__search` and `rpc_data_catalog_listings__search_facets`,
+the `organization2`, `organization2_label`, and `domain` facets, and the
+organization levels on each search row. `feat/catalog-filters` (merged in
+13b) built the client side this task extends: the model's search filter,
+sort, and facet types in
+`shared/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts`,
+`src/clients/data-catalog-listings/buildDataCatalogSearchFilterArgs`,
+`createDataCatalogSearchFacets`, `DataCatalogListingClient.search` and
+`searchFacets`, and the view-level `catalogListingFilters` and
+`useDataCatalogFacets` under
+`src/views/DataManagerApp/DataImportView/DataCatalogView/`. Read all of them
+first; extend them, do not add parallel ones.
 
-- [ ] **Step 1: The filter and facet types.** Add to
-  `DataCatalogListing.types.ts`:
+Read spec §6 and §7.2.
 
-```ts
-/**
- * What the catalog's filters narrow a search to. Each is one value for now;
- * the search RPC accepts several.
- */
-export type DataCatalogListingSearchFilters = Readonly<{
-  /** A level-1 organization ("Publisher"). */
-  organization1Name: string | undefined;
-  /** A level-2 organization under the chosen publisher. */
-  organization2Name: string | undefined;
-  /** A domain ("Topic"). */
-  domain: string | undefined;
-  /** Tags ("Keywords"), any of which a listing must have. */
-  tags: readonly string[];
-}>;
+**Requirements**
 
-/** One value a catalog filter can take, and how many listings it leaves. */
-export type DataCatalogListingFacetValue = Readonly<{
-  value: string;
-  listingCount: number;
-}>;
+1. **Filter type**: add `organization2Names: string[]`, `domains: string[]`,
+   `tags: string[]` to the model's search filters type (and the view's
+   `CatalogListingFilters` if it is a separate type), each defaulting to `[]`
+   wherever the empty filters are built.
+2. **Argument builder**: `buildDataCatalogSearchFilterArgs` sends
+   `p_organization2_names`, `p_domains`, `p_tags` from them. Tests first,
+   following the builder's existing tests.
+3. **Facets**: the facet type gains `organization2: FacetOption[]`,
+   `organization2Labels: string[]` (most listings first), and
+   `domains: FacetOption[]`; `createDataCatalogSearchFacets` fills them from
+   the `organization2`, `organization2_label`, and `domain` rows. Tests first,
+   following its existing tests.
+4. **Search rows**: confirm the search result type and
+   `createDataCatalogSearchPage` carry `organization1Name`..`organization4Name`
+   (Task 13c may already have done this); add any missing piece with a test.
+5. **Clearing**: wherever the view decides whether any filter is set or
+   clears all filters (`catalogListingFilters` and the results header), the
+   three new filters count. Extend the existing tests for that.
+6. **Unchoosing every publisher clears the second level**: implement this in
+   the view-level filter update logic (pure function, tested), not in a
+   component.
 
-/** The values each catalog filter can take for the current search. */
-export type DataCatalogListingFacets = Readonly<{
-  organization1: readonly DataCatalogListingFacetValue[];
-  organization2: readonly DataCatalogListingFacetValue[];
-  /** What the second-level filter's drives call it, most common first. */
-  organization2Labels: readonly string[];
-  domains: readonly DataCatalogListingFacetValue[];
-}>;
-```
+No UI rendering in this task (Task 16 adds the rail sections). The build
+must be green: `pnpm exec tsc -b --force`, and
+`pnpm exec vitest run src/clients/data-catalog-listings src/views/DataManagerApp/DataImportView/DataCatalogView shared/models/data-catalog-listings`.
 
-and expose them on the namespace in `DataCatalogListing.ts`:
-`export type SearchFilters = DataCatalogListingSearchFilters;`,
-`export type FacetValue = DataCatalogListingFacetValue;`,
-`export type Facets = DataCatalogListingFacets;`. Also add, in the same
-file, beside the namespace:
-
-```ts
-/** No filter set. */
-export const EMPTY_DATA_CATALOG_SEARCH_FILTERS: DataCatalogListing.SearchFilters =
-  {
-    organization1Name: undefined,
-    organization2Name: undefined,
-    domain: undefined,
-    tags: [],
-  };
-```
-
-If the namespace file only re-exports types by convention, put the constant
-in its own file under `DataCatalogListing/` and export it from there instead.
-
-- [ ] **Step 2: Write the failing tests.**
-
-`buildDataCatalogSearchFilterParams.test.ts`:
-
-```ts
-import { describe, expect, it } from "vitest";
-import { buildDataCatalogSearchFilterParams } from "@/clients/data-catalog-listings/buildDataCatalogSearchFilterParams/buildDataCatalogSearchFilterParams";
-
-describe("buildDataCatalogSearchFilterParams", () => {
-  it("sends each set filter as a one-item array and leaves the rest out", () => {
-    expect(
-      buildDataCatalogSearchFilterParams({
-        organization1Name: "City of New York",
-        organization2Name: undefined,
-        domain: "Health",
-        tags: ["taxi", "fhv"],
-      }),
-    ).toEqual({
-      p_organization1_names: ["City of New York"],
-      p_domains: ["Health"],
-      p_tags: ["taxi", "fhv"],
-    });
-  });
-
-  it("sends nothing when no filter is set", () => {
-    expect(
-      buildDataCatalogSearchFilterParams({
-        organization1Name: undefined,
-        organization2Name: undefined,
-        domain: undefined,
-        tags: [],
-      }),
-    ).toEqual({});
-  });
-});
-```
-
-`createDataCatalogFacets.test.ts`:
-
-```ts
-import { describe, expect, it } from "vitest";
-import { createDataCatalogFacets } from "@/clients/data-catalog-listings/createDataCatalogFacets/createDataCatalogFacets";
-
-describe("createDataCatalogFacets", () => {
-  it("groups facet rows by facet, keeping their order", () => {
-    expect(
-      createDataCatalogFacets([
-        { facet: "organization1", value: "City of New York", listing_count: 9 },
-        { facet: "organization1", value: "State of New York", listing_count: 4 },
-        { facet: "organization2", value: "TLC", listing_count: 3 },
-        { facet: "organization2_label", value: "Agency", listing_count: 3 },
-        { facet: "domain", value: "Health", listing_count: 2 },
-      ]),
-    ).toEqual({
-      organization1: [
-        { value: "City of New York", listingCount: 9 },
-        { value: "State of New York", listingCount: 4 },
-      ],
-      organization2: [{ value: "TLC", listingCount: 3 }],
-      organization2Labels: ["Agency"],
-      domains: [{ value: "Health", listingCount: 2 }],
-    });
-  });
-
-  it("ignores a facet it does not know", () => {
-    expect(
-      createDataCatalogFacets([{ facet: "tag", value: "x", listing_count: 1 }])
-        .organization1,
-    ).toEqual([]);
-  });
-});
-```
-
-Run: `pnpm test:frontend -- buildDataCatalogSearchFilterParams createDataCatalogFacets`
-Expected: FAIL, modules not found.
-
-- [ ] **Step 3: Implement them.**
-
-`buildDataCatalogSearchFilterParams.ts`:
-
-```ts
-import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
-
-/** The search and facet RPCs' filter arguments. */
-export type DataCatalogSearchFilterParams = Readonly<{
-  p_organization1_names?: string[];
-  p_organization2_names?: string[];
-  p_domains?: string[];
-  p_tags?: string[];
-}>;
-
-/**
- * The catalog's filters as the search and facet RPCs take them. An unset
- * filter is left out, so the RPC's `null` default applies.
- */
-export function buildDataCatalogSearchFilterParams(
-  filters: DataCatalogListing.SearchFilters,
-): DataCatalogSearchFilterParams {
-  return {
-    ...(filters.organization1Name === undefined
-      ? {}
-      : { p_organization1_names: [filters.organization1Name] }),
-    ...(filters.organization2Name === undefined
-      ? {}
-      : { p_organization2_names: [filters.organization2Name] }),
-    ...(filters.domain === undefined ? {} : { p_domains: [filters.domain] }),
-    ...(filters.tags.length === 0 ? {} : { p_tags: [...filters.tags] }),
-  };
-}
-```
-
-`createDataCatalogFacets.ts`:
-
-```ts
-import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
-
-/** One row `rpc_data_catalog_listings__search_facets` returns. */
-export type DataCatalogFacetDBRow = Readonly<{
-  facet: string;
-  value: string;
-  listing_count: number;
-}>;
-
-function _valuesOf(
-  dbRows: readonly DataCatalogFacetDBRow[],
-  facet: string,
-): DataCatalogListing.FacetValue[] {
-  return dbRows
-    .filter((dbRow) => {
-      return dbRow.facet === facet;
-    })
-    .map((dbRow) => {
-      return { value: dbRow.value, listingCount: dbRow.listing_count };
-    });
-}
-
-/**
- * Groups the facet RPC's rows into the values each catalog filter can take,
- * in the order the RPC ranked them.
- */
-export function createDataCatalogFacets(
-  dbRows: readonly DataCatalogFacetDBRow[],
-): DataCatalogListing.Facets {
-  return {
-    organization1: _valuesOf(dbRows, "organization1"),
-    organization2: _valuesOf(dbRows, "organization2"),
-    organization2Labels: _valuesOf(dbRows, "organization2_label").map(
-      (facetValue) => {
-        return facetValue.value;
-      },
-    ),
-    domains: _valuesOf(dbRows, "domain"),
-  };
-}
-```
-
-Run the two tests: PASS.
-
-- [ ] **Step 4: The client.** In `DataCatalogListingClient.ts`, give
-  `search` a `filters` argument and add `searchFacets`:
-
-```ts
-        search: async ({
-          query,
-          filters,
-          pageSize,
-          pageNum,
-        }: {
-          query: string;
-          filters: DataCatalogListing.SearchFilters;
-          pageSize: number;
-          pageNum: number;
-        }): Promise<DataCatalogSearchPage> => {
-          const logger = clientLogger.appendName("search");
-          logger.log("Searching catalog listings", { query, filters, pageNum });
-
-          const { data: dbRows } = await dbClient
-            .rpc("rpc_data_catalog_listings__search", {
-              p_query: query,
-              p_limit: pageSize,
-              p_offset: pageNum * pageSize,
-              ...buildDataCatalogSearchFilterParams(filters),
-            })
-            .throwOnError();
-
-          return createDataCatalogSearchPage({
-            dbRows: dbRows ?? [],
-            pageNum,
-            pageSize,
-          });
-        },
-
-        /**
-         * The values each catalog filter can take for `query` and
-         * `filters`, with how many listings each would leave.
-         */
-        searchFacets: async ({
-          query,
-          filters,
-        }: {
-          query: string;
-          filters: DataCatalogListing.SearchFilters;
-        }): Promise<DataCatalogListing.Facets> => {
-          const logger = clientLogger.appendName("searchFacets");
-          logger.log("Reading catalog facets", { query, filters });
-
-          const { data: dbRows } = await dbClient
-            .rpc("rpc_data_catalog_listings__search_facets", {
-              p_query: query,
-              ...buildDataCatalogSearchFilterParams(filters),
-            })
-            .throwOnError();
-
-          return createDataCatalogFacets(dbRows ?? []);
-        },
-```
-
-If the generated `database.types.ts` types the RPC's array arguments as
-required, pass `undefined` explicitly rather than casting: re-read the
-generated `Args` type first.
-
-- [ ] **Step 5: The hooks.** `useDataCatalogSearch(query, filters)`: add the
-  `filters` parameter, put it in the query key next to the query
-  (`{ query: trimmedQuery, filters }`), and pass it to
-  `DataCatalogListingClient.search`. Update its docstring.
-
-Create `useDataCatalogFacets.ts`:
-
-```ts
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
-import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
-
-const NO_FACETS: DataCatalogListing.Facets = {
-  organization1: [],
-  organization2: [],
-  organization2Labels: [],
-  domains: [],
-};
-
-/**
- * The values each catalog filter can take for a search and the filters
- * already set. Keeps the previous facets on screen while new ones load, so
- * the filter row does not flicker as the user types.
- *
- * The query key starts with the client's name, so invalidating every
- * catalog listing query also refetches the facets.
- */
-export function useDataCatalogFacets(
-  query: string,
-  filters: DataCatalogListing.SearchFilters,
-): DataCatalogListing.Facets {
-  const trimmedQuery = query.trim();
-  const facetsQuery = useQuery({
-    queryKey: [
-      DataCatalogListingClient.getClientName(),
-      "searchFacets",
-      { query: trimmedQuery, filters },
-    ],
-    queryFn: () => {
-      return DataCatalogListingClient.searchFacets({
-        query: trimmedQuery,
-        filters,
-      });
-    },
-    placeholderData: keepPreviousData,
-  });
-  return facetsQuery.data ?? NO_FACETS;
-}
-```
-
-Until Task 16 wires filters into the view, `DataCatalogView` passes
-`EMPTY_DATA_CATALOG_SEARCH_FILTERS` to `useDataCatalogSearch` so the build
-stays green.
-
-- [ ] **Step 6: Run and commit.**
-
-```bash
-pnpm exec tsc -b
-pnpm test:frontend -- data-catalog-listings DataCatalogView
-pnpm format
-git add shared/models/data-catalog-listings src/clients/data-catalog-listings \
-  src/views/DataManagerApp/DataImportView/DataCatalogView
-git commit -m "feat(catalog): search with filters and read filter facets"
-```
+Commit: `feat(catalog): send the agency, topic, and keyword filters and read their facets`.
 
 ---
 
-### Task 16: The list row's organizations and the filter row
+### Task 16: The rail's new sections and the results row's organizations
 
-Before this task, read `DESIGN.md` (Named Rules, Components, Do's and
-Don'ts) and `docs/design/app-view-layout.md` ("Withhold chrome until it
-earns its line").
+Read before starting: `DESIGN.md` (Named Rules, Components, Do's and
+Don'ts), `docs/design/app-view-layout.md` ("Withhold chrome until it earns
+its line"), spec §7.1, §7.2, §7.4, and the merged components:
+`src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/`
+(`DataCatalogFilterRail.tsx`, `DataCatalogCheckboxFacet.tsx`, their CSS),
+`DataCatalogListingList/DataCatalogListingList.tsx`, `DataCatalogView.tsx`.
+Extend them; follow their patterns, CSS module conventions, and copy style.
 
-**Files:**
-- Create: `src/views/DataManagerApp/DataImportView/DataCatalogView/buildOrganizationLine/buildOrganizationLine.ts` and its test
-- Modify: `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx`
-- Create: `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterBar/DataCatalogFilterBar.tsx`, `.module.css`, and its test
-- Modify: `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx`
+**Requirements**
 
-- [ ] **Step 1: Write the failing test** `buildOrganizationLine.test.ts`:
+1. **`buildOrganizationLine(listing)`**, a pure function in
+   `DataCatalogView/buildOrganizationLine/` with tests: a listing's two
+   deepest organization levels (of organization1Name..organization4Name),
+   deepest first, joined with " · ", skipping missing levels; one level shows
+   one. Tests: four-level, one-level, and missing-middle-level cases.
+2. **Results row**: the row's facts line uses `buildOrganizationLine` in
+   place of `organization1Name`, followed by the format and update date as
+   now.
+3. **Rail order and labels** (spec §7.2): search, **Publisher** (the
+   existing source facet, relabelled from "Source"), the second-level
+   facet, **Topic**, **Keywords**, then Format, Last updated, and the
+   loadable switch as today.
+   - Second level: a `DataCatalogCheckboxFacet` over `facets.organization2`,
+     rendered only when at least one publisher is chosen and the facet has
+     options; label = `facets.organization2Labels` joined with " or "
+     (translated joiner), falling back to "Organization" when there are no
+     labels.
+   - Topic: a `DataCatalogCheckboxFacet` over `facets.domains`, rendered only
+     when it has options or a chosen value.
+   - Keywords: rendered only when at least one keyword is chosen; each chosen
+     keyword is a removable chip with an accessible "Remove keyword {tag}"
+     button. Chips use `neutral.1` fill and `radius-sm` (DESIGN.md "Area
+     decides which step a fill takes", One Blue Rule); put styles in the
+     rail's CSS module.
+4. **Copy** goes through Lingui (spec §7.4). Run the repo's Lingui extraction
+   (check package.json) and commit the `.po` changes; never edit
+   `messages.ts` by hand.
 
-```ts
-import { describe, expect, it } from "vitest";
-import { buildOrganizationLine } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOrganizationLine/buildOrganizationLine";
+**Tests** (Vitest + Testing Library via `@/test-utils`, beside the
+components; follow existing component tests' style): the second level is
+hidden with no publisher chosen and shows with the drives' labels when one
+is; Topic is hidden with no options; Keywords shows chosen chips and removing
+one calls `onFiltersChange` without it; "Publisher" labels the first facet.
 
-describe("buildOrganizationLine", () => {
-  it("shows the two deepest levels, deepest first", () => {
-    expect(
-      buildOrganizationLine({
-        organization1Name: "State of New York",
-        organization2Name: "Department of Health",
-        organization3Name: "Office of Quality",
-        organization4Name: undefined,
-      }),
-    ).toBe("Office of Quality · Department of Health");
-  });
+**Verify**: `pnpm exec tsc -b --force`, the DataCatalogView vitest run,
+`pnpm exec eslint src/views/DataManagerApp/DataImportView/DataCatalogView`,
+and the design detector:
+`.claude/skills/impeccable/scripts/impeccable detect --json src/views/DataManagerApp/DataImportView/DataCatalogView`
+(report its output; fix what it flags in files you touched).
 
-  it("shows one level when the listing has one", () => {
-    expect(
-      buildOrganizationLine({
-        organization1Name: "World Health Organization",
-        organization2Name: undefined,
-        organization3Name: undefined,
-        organization4Name: undefined,
-      }),
-    ).toBe("World Health Organization");
-  });
-
-  it("skips a missing middle level", () => {
-    expect(
-      buildOrganizationLine({
-        organization1Name: "City of New York",
-        organization2Name: undefined,
-        organization3Name: "Licensing",
-        organization4Name: undefined,
-      }),
-    ).toBe("Licensing · City of New York");
-  });
-});
-```
-
-- [ ] **Step 2: Run it, watch it fail, then implement
-  `buildOrganizationLine.ts`:**
-
-```ts
-import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
-
-/** How many organization levels a one-line summary shows. */
-const LEVELS_SHOWN = 2;
-
-/**
- * A listing's organizations as one line: its two deepest levels, deepest
- * first, joined by a middot, such as "Taxi and Limousine Commission · City
- * of New York". The deepest level is what tells two listings from one
- * portal apart, so it leads. A missing level is skipped.
- */
-export function buildOrganizationLine(
-  listing: Pick<
-    DataCatalogListingRead,
-    | "organization1Name"
-    | "organization2Name"
-    | "organization3Name"
-    | "organization4Name"
-  >,
-): string {
-  return [
-    listing.organization1Name,
-    listing.organization2Name,
-    listing.organization3Name,
-    listing.organization4Name,
-  ]
-    .filter((name): name is string => {
-      return name !== undefined && name !== "";
-    })
-    .slice(-LEVELS_SHOWN)
-    .reverse()
-    .join(" · ");
-}
-```
-
-Run: PASS, 3 tests.
-
-- [ ] **Step 3: Use it in the list row.** In `DataCatalogListingList.tsx`,
-  replace the row's second `Text` (which Task 5 left showing
-  `organization1Name`) with:
-
-```tsx
-      <Text c="dimmed" lineClamp={1} size="xs">
-        {buildOrganizationLine(listing)}
-      </Text>
-```
-
-and update the component docstring: the row shows the listing's name and
-the organizations that publish it.
-
-- [ ] **Step 4: Write the failing filter bar test**
-  `DataCatalogFilterBar.test.tsx`:
-
-```tsx
-import { describe, expect, it, vi } from "vitest";
-import { render, screen, userEvent } from "@/test-utils";
-import { DataCatalogFilterBar } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterBar/DataCatalogFilterBar";
-import { EMPTY_DATA_CATALOG_SEARCH_FILTERS } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
-
-const FACETS = {
-  organization1: [
-    { value: "City of New York", listingCount: 9 },
-    { value: "State of New York", listingCount: 4 },
-  ],
-  organization2: [
-    { value: "Taxi and Limousine Commission", listingCount: 3 },
-    { value: "Department of Buildings", listingCount: 2 },
-  ],
-  organization2Labels: ["Agency", "Department"],
-  domains: [
-    { value: "Health", listingCount: 5 },
-    { value: "Transportation", listingCount: 3 },
-  ],
-};
-
-describe("DataCatalogFilterBar", () => {
-  it("shows Publisher and Topic, but no second level until a publisher is chosen", () => {
-    render(
-      <DataCatalogFilterBar
-        facets={FACETS}
-        filters={EMPTY_DATA_CATALOG_SEARCH_FILTERS}
-        onChange={vi.fn()}
-      />,
-    );
-
-    expect([
-      screen.queryByRole("textbox", { name: "Publisher" }) !== null,
-      screen.queryByRole("textbox", { name: "Topic" }) !== null,
-      screen.queryByRole("textbox", { name: "Agency or Department" }),
-      screen.queryByRole("button", { name: "Clear filters" }),
-    ]).toEqual([true, true, null, null]);
-  });
-
-  it("labels the second level with the chosen publisher's drive labels", () => {
-    render(
-      <DataCatalogFilterBar
-        facets={FACETS}
-        filters={{
-          ...EMPTY_DATA_CATALOG_SEARCH_FILTERS,
-          organization1Name: "State of New York",
-        }}
-        onChange={vi.fn()}
-      />,
-    );
-
-    expect(
-      screen.getByRole("textbox", { name: "Agency or Department" }),
-    ).toBeDefined();
-  });
-
-  it("withholds a filter with fewer than two values", () => {
-    render(
-      <DataCatalogFilterBar
-        facets={{ ...FACETS, domains: [{ value: "Health", listingCount: 5 }] }}
-        filters={EMPTY_DATA_CATALOG_SEARCH_FILTERS}
-        onChange={vi.fn()}
-      />,
-    );
-
-    expect(screen.queryByRole("textbox", { name: "Topic" })).toBeNull();
-  });
-
-  it("renders nothing when no filter has a choice to offer", () => {
-    const { container } = render(
-      <DataCatalogFilterBar
-        facets={{
-          organization1: [{ value: "City of New York", listingCount: 9 }],
-          organization2: [],
-          organization2Labels: [],
-          domains: [],
-        }}
-        filters={EMPTY_DATA_CATALOG_SEARCH_FILTERS}
-        onChange={vi.fn()}
-      />,
-    );
-
-    expect(container.textContent).toBe("");
-  });
-
-  it("removes a keyword chip and clears every filter", async () => {
-    const onChange = vi.fn();
-    const filters = {
-      ...EMPTY_DATA_CATALOG_SEARCH_FILTERS,
-      domain: "Health",
-      tags: ["taxi", "fhv"],
-    };
-    render(
-      <DataCatalogFilterBar facets={FACETS} filters={filters} onChange={onChange} />,
-    );
-
-    await userEvent.click(
-      screen.getByRole("button", { name: "Remove keyword taxi" }),
-    );
-    await userEvent.click(screen.getByRole("button", { name: "Clear filters" }));
-
-    expect(onChange.mock.calls).toEqual([
-      [{ ...filters, tags: ["fhv"] }],
-      [EMPTY_DATA_CATALOG_SEARCH_FILTERS],
-    ]);
-  });
-});
-```
-
-Check `@/test-utils` exports `userEvent`; if it does not, import it from
-`@testing-library/user-event` the way other component tests in `src/` do.
-Mantine's `Select` renders its input as a `textbox` named by its label; if
-your Mantine version gives it a `combobox` role instead, use that role in
-the queries.
-
-- [ ] **Step 5: Run it, watch it fail, then implement
-  `DataCatalogFilterBar.tsx`:**
-
-```tsx
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Group, Select, UnstyledButton } from "@mantine/core";
-import { IconX } from "@tabler/icons-react";
-import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterBar/DataCatalogFilterBar.module.css";
-import { EMPTY_DATA_CATALOG_SEARCH_FILTERS } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
-import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
-import type { ReactNode } from "react";
-
-type Props = {
-  /** The values each filter can take for the current search. */
-  facets: DataCatalogListing.Facets;
-  /** The filters set now. */
-  filters: DataCatalogListing.SearchFilters;
-  /** Called with the whole next set of filters. */
-  onChange: (filters: DataCatalogListing.SearchFilters) => void;
-};
-
-/** A filter earns its place with a real choice, or a value to clear. */
-function _isShown(
-  values: readonly DataCatalogListing.FacetValue[],
-  chosen: string | undefined,
-): boolean {
-  return chosen !== undefined || values.length >= 2;
-}
-
-function _toOptions(
-  values: readonly DataCatalogListing.FacetValue[],
-): Array<{ value: string; label: string }> {
-  return values.map((facetValue) => {
-    return {
-      value: facetValue.value,
-      label: `${facetValue.value} (${facetValue.listingCount.toLocaleString()})`,
-    };
-  });
-}
-
-function _hasFilters(filters: DataCatalogListing.SearchFilters): boolean {
-  return (
-    filters.organization1Name !== undefined ||
-    filters.organization2Name !== undefined ||
-    filters.domain !== undefined ||
-    filters.tags.length > 0
-  );
-}
-
-/**
- * The catalog's filters: publisher, the publisher's second organization
- * level, topic, and any keywords chosen from a listing. A dropdown shows only
- * when it offers a real choice or holds a value to clear, and the row is not
- * rendered at all when nothing in it would. The second level waits for a
- * publisher, and is labelled with what that publisher's portals call it.
- */
-export function DataCatalogFilterBar({
-  facets,
-  filters,
-  onChange,
-}: Props): ReactNode {
-  const { t } = useLingui();
-  const isPublisherShown = _isShown(facets.organization1, filters.organization1Name);
-  const isSecondLevelShown =
-    filters.organization1Name !== undefined &&
-    _isShown(facets.organization2, filters.organization2Name);
-  const isTopicShown = _isShown(facets.domains, filters.domain);
-  const hasFilters = _hasFilters(filters);
-  if (!isPublisherShown && !isTopicShown && !hasFilters) {
-    return null;
-  }
-  const secondLevelLabel =
-    facets.organization2Labels.length > 0
-      ? facets.organization2Labels.join(t` or `)
-      : t`Organization`;
-
-  return (
-    <Group gap="xs" wrap="wrap" className={css.dataCatalogFilterBar}>
-      {isPublisherShown ? (
-        <Select
-          size="xs"
-          searchable
-          clearable
-          label={t`Publisher`}
-          placeholder={t`Publisher`}
-          className={css.dataCatalogFilterBarSelect}
-          classNames={{ label: css.dataCatalogFilterBarVisuallyHidden }}
-          data={_toOptions(facets.organization1)}
-          value={filters.organization1Name ?? null}
-          onChange={(value) => {
-            onChange({
-              ...filters,
-              organization1Name: value ?? undefined,
-              organization2Name: undefined,
-            });
-          }}
-        />
-      ) : null}
-      {isSecondLevelShown ? (
-        <Select
-          size="xs"
-          searchable
-          clearable
-          label={secondLevelLabel}
-          placeholder={secondLevelLabel}
-          className={css.dataCatalogFilterBarSelect}
-          classNames={{ label: css.dataCatalogFilterBarVisuallyHidden }}
-          data={_toOptions(facets.organization2)}
-          value={filters.organization2Name ?? null}
-          onChange={(value) => {
-            onChange({ ...filters, organization2Name: value ?? undefined });
-          }}
-        />
-      ) : null}
-      {isTopicShown ? (
-        <Select
-          size="xs"
-          searchable
-          clearable
-          label={t`Topic`}
-          placeholder={t`Topic`}
-          className={css.dataCatalogFilterBarSelect}
-          classNames={{ label: css.dataCatalogFilterBarVisuallyHidden }}
-          data={_toOptions(facets.domains)}
-          value={filters.domain ?? null}
-          onChange={(value) => {
-            onChange({ ...filters, domain: value ?? undefined });
-          }}
-        />
-      ) : null}
-      {filters.tags.map((tag) => {
-        return (
-          <span key={tag} className={css.dataCatalogFilterBarChip}>
-            <Trans>Keyword: {tag}</Trans>
-            <UnstyledButton
-              aria-label={t`Remove keyword ${tag}`}
-              className={css.dataCatalogFilterBarChipRemove}
-              onClick={() => {
-                onChange({
-                  ...filters,
-                  tags: filters.tags.filter((chosenTag) => {
-                    return chosenTag !== tag;
-                  }),
-                });
-              }}
-            >
-              <IconX size={12} stroke={2} aria-hidden />
-            </UnstyledButton>
-          </span>
-        );
-      })}
-      {hasFilters ? (
-        <Button
-          variant="subtle"
-          color="neutral"
-          size="compact-xs"
-          onClick={() => {
-            onChange(EMPTY_DATA_CATALOG_SEARCH_FILTERS);
-          }}
-        >
-          <Trans>Clear filters</Trans>
-        </Button>
-      ) : null}
-    </Group>
-  );
-}
-```
-
-The labels are visually hidden (the placeholder names each dropdown on
-screen) but stay in the accessibility tree, which is what the test's
-`{ name: "Publisher" }` queries rely on. If the codebase already has a
-visually-hidden utility class or Mantine's `VisuallyHidden` pattern for
-labels, use it instead of a new class.
-
-`DataCatalogFilterBar.module.css`:
-
-```css
-/*
- * The filter row: compact dropdowns and keyword chips on one wrapping line
- * between the search field and the browser.
- */
-.dataCatalogFilterBar {
-  min-height: 0;
-}
-
-.dataCatalogFilterBarSelect {
-  width: 12rem;
-}
-
-/* Names the dropdown for assistive technology; the placeholder names it on screen. */
-.dataCatalogFilterBarVisuallyHidden {
-  block-size: 1px;
-  clip-path: inset(50%);
-  inline-size: 1px;
-  overflow: hidden;
-  position: absolute;
-  white-space: nowrap;
-}
-
-/*
- * A chosen keyword. A small fill, so it takes `neutral.1` rather than the
- * flank tone (DESIGN.md, "Area decides which step a fill takes"), and never
- * blue: it is a value, not the current selection.
- */
-.dataCatalogFilterBarChip {
-  align-items: center;
-  background-color: var(--mantine-color-neutral-1);
-  border-radius: var(--mantine-radius-sm);
-  color: var(--mantine-color-neutral-9);
-  display: inline-flex;
-  font-size: var(--mantine-font-size-xs);
-  gap: var(--mantine-spacing-xxs);
-  padding: 2px var(--mantine-spacing-xxs) 2px var(--mantine-spacing-xs);
-}
-
-.dataCatalogFilterBarChipRemove {
-  border-radius: var(--mantine-radius-xs);
-  color: var(--mantine-color-neutral-6);
-  display: inline-flex;
-  padding: 2px;
-  transition: var(--ava-transition-interactive);
-}
-
-.dataCatalogFilterBarChipRemove:hover {
-  background-color: var(--mantine-color-neutral-2);
-  color: var(--mantine-color-neutral-9);
-}
-```
-
-Check `--ava-transition-interactive` and `--mantine-spacing-xxs` exist (grep
-`src/` for them); use the names the theme actually defines.
-
-Run: `pnpm test:frontend -- DataCatalogFilterBar`
-Expected: PASS, 5 tests.
-
-- [ ] **Step 6: Wire the view.** In `DataCatalogView.tsx`:
-  - Add `const [filters, setFilters] = useState<DataCatalogListing.SearchFilters>(EMPTY_DATA_CATALOG_SEARCH_FILTERS);`
-  - Pass `filters` to `useDataCatalogSearch(debouncedSearch, filters)` and
-    call `const facets = useDataCatalogFacets(debouncedSearch, filters);`.
-  - Render `<DataCatalogFilterBar facets={facets} filters={filters} onChange={setFilters} />`
-    between the search `TextInput` and the beta note.
-  - Change the search placeholder to
-    `t\`Search by name, publisher, topic, or keyword…\``.
-  - `isCatalogEmpty` also requires no filter set (an empty catalog is a
-    blank query with no filters and a total of 0).
-  - In the no-matches branch, when a filter is set show
-    `<Trans>No catalog dataset matches these filters.</Trans>` with a
-    "Clear filters" button that calls `setFilters(EMPTY_DATA_CATALOG_SEARCH_FILTERS)`;
-    otherwise keep the existing "No catalog dataset matches “…”" message and
-    "Clear search" button. When both a query and filters are set, the
-    filters message wins: clearing filters is the bigger widening.
-
-- [ ] **Step 7: Run, look, and commit.**
-
-```bash
-pnpm exec tsc -b
-pnpm test:frontend -- DataCatalog
-pnpm exec eslint src/views/DataManagerApp/DataImportView/DataCatalogView
-.claude/skills/impeccable/scripts/impeccable detect --json src/views/DataManagerApp/DataImportView/DataCatalogView
-pnpm format
-git add src/views/DataManagerApp/DataImportView/DataCatalogView src/i18n/locales
-git commit -m "feat(catalog): filter by publisher, organization, topic, and keyword"
-```
-
-The pre-push hook extracts and translates the new Lingui strings; if you
-run extraction yourself, commit the catalog files it changes in this
-commit.
+Commit: `feat(catalog): filter by publisher, agency, topic, and keyword in the rail`.
 
 ---
 
 ### Task 17: The detail pane shows the metadata
 
-Before this task, re-read `docs/design/app-view-layout.md` ("The rail",
-"Withhold chrome") and spec §7.3.
+Read before starting: `docs/design/app-view-layout.md` ("The rail",
+"Withhold chrome"), `DESIGN.md`, spec §7.3 and §7.4, and the merged
+`DataCatalogListingDetail/DataCatalogListingDetail.tsx` and its CSS, plus
+`DataCatalogView.tsx` (how the detail pane gets its listing, columns, and
+callbacks). Extend the merged pane; keep what it already does (title, Add
+button, notices, Covers/Updates/License/Notes facts, columns).
 
-**Files:**
-- Create: `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.tsx`, `.module.css`, and its test
-- Create: `src/views/DataManagerApp/DataImportView/DataCatalogView/getSourceHost/getSourceHost.ts` and its test
-- Modify: `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx`, `.module.css`
-- Create: `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.test.tsx`
-- Modify: `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx`
+**Requirements** (spec §7.3)
 
-- [ ] **Step 1: `getSourceHost`, test first.**
+1. **Props**: `drive: DataCatalogDrive.T | undefined`,
+   `onSelectTopic: (domain: string) => void`,
+   `onAddKeyword: (tag: string) => void`.
+2. **Facts line** under the title: `buildOrganizationLine(listing)` (Task 16)
+   then the update date, joined with " · ", omitting empty parts. Use the
+   date formatter the merged code already uses (`formatCatalogListingDate`).
+3. **Description** in a Mantine `Spoiler` (~6 lines, "Show more"/"Show
+   less"), with `white-space: pre-line` so the newlines from
+   `htmlToPlainText` show.
+4. **Published by** group: one `AppViewRail.Fact` per organization level the
+   listing has, labelled with the drive's label for that level
+   (`organization1Label`..), else "Organization" for level 1 and
+   "Level {n}" deeper.
+5. **About** group: Topics and Keywords as chips (a new small component,
+   `DataCatalogMetadataChips`, with its own CSS module and test: shows the
+   first N with "+{n} more" to expand; each chip is a button with an
+   accessible name from a `getActionLabel` prop; clicking calls `onSelect`).
+   Topics: "Show datasets in {topic}" -> `onSelectTopic`. Keywords (first
+   eight): "Show datasets tagged {keyword}" -> `onAddKeyword`. Then the
+   existing Covers, Updates, License, Notes facts.
+6. **Source** group: "Original" link named by host (`getSourceHost(url)`, a
+   small tested helper: host without `www.`, input unchanged if not a URL),
+   "Download" link to `sourceDownloadUrl` labelled with the format (or
+   "File"), and Canonical URLs named by host. All links
+   `target="_blank" rel="noopener noreferrer"`.
+7. **Technical details** replaces "Raw metadata": collapsed by default
+   (keep the existing Button + Collapse + chevron pattern), containing
+   "Indexed by" (pipelineName), "Last run" (pipelineRunId), "Last indexed"
+   (dateOfLastSync, formatted), and "Source record": `sourceMetadata`
+   (falling back to `metadata`) as formatted JSON. Rendered only when one of
+   those has a value.
+8. A fact with no value is omitted; a group with no facts is omitted with its
+   title. Keep each function ≤45 lines: extract each group into a small
+   component in the same folder.
+9. **Wiring in `DataCatalogView.tsx`**: read the drive with
+   `DataCatalogDriveClient.useGetById({ id: selectedListing?.driveId, useQueryOptions: { enabled: ... } })`
+   (Task 14's client); `onSelectTopic` adds the domain to `filters.domains`
+   if absent; `onAddKeyword` adds the tag to `filters.tags` if absent; both
+   go through the view's existing filter update path.
+10. Copy through Lingui; run extraction and commit `.po` changes.
 
-```ts
-// getSourceHost.test.ts
-import { describe, expect, it } from "vitest";
-import { getSourceHost } from "@/views/DataManagerApp/DataImportView/DataCatalogView/getSourceHost/getSourceHost";
+**Tests** (Testing Library, `@/test-utils`): drive labels label each level;
+fallback labels without a drive; topic and keyword chips call their
+callbacks; a group with no facts is omitted; the Original link is named by
+host; Technical details hides the pipeline until opened (if Mantine's
+Collapse keeps content in the DOM, assert `aria-expanded` and visibility).
 
-describe("getSourceHost", () => {
-  it("returns a URL's host without www", () => {
-    expect(getSourceHost("https://www.data.gov/dataset/x")).toBe("data.gov");
-    expect(getSourceHost("https://data.cityofnewyork.us/d/8wbx-tsch")).toBe(
-      "data.cityofnewyork.us",
-    );
-  });
+**Verify**: `pnpm exec tsc -b --force`, the DataCatalogView vitest run,
+eslint on the folder, and the impeccable detector on the folder (report its
+output; fix what it flags in files you touched).
 
-  it("returns the text itself when it is not a URL", () => {
-    expect(getSourceHost("not a url")).toBe("not a url");
-  });
-});
-```
-
-```ts
-// getSourceHost.ts
-/**
- * The host a link points at, without a leading `www.`, to name a link by
- * where it goes rather than by its whole URL. Returns the input unchanged
- * when it does not parse as a URL.
- */
-export function getSourceHost(url: string): string {
-  try {
-    return new URL(url).host.replace(/^www\./, "");
-  } catch {
-    return url;
-  }
-}
-```
-
-- [ ] **Step 2: `DataCatalogMetadataChips`, test first.**
-
-```tsx
-// DataCatalogMetadataChips.test.tsx
-import { describe, expect, it, vi } from "vitest";
-import { render, screen, userEvent } from "@/test-utils";
-import { DataCatalogMetadataChips } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips";
-
-describe("DataCatalogMetadataChips", () => {
-  it("shows the first few values and the rest behind +N more", async () => {
-    render(
-      <DataCatalogMetadataChips
-        values={["a", "b", "c", "d"]}
-        maxVisible={2}
-        getActionLabel={(value) => {
-          return `Filter by ${value}`;
-        }}
-        onSelect={vi.fn()}
-      />,
-    );
-
-    expect(screen.queryByRole("button", { name: "Filter by c" })).toBeNull();
-    await userEvent.click(screen.getByRole("button", { name: "+2 more" }));
-    expect(screen.getByRole("button", { name: "Filter by d" })).toBeDefined();
-  });
-
-  it("calls onSelect with the chip's value", async () => {
-    const onSelect = vi.fn();
-    render(
-      <DataCatalogMetadataChips
-        values={["taxi"]}
-        maxVisible={8}
-        getActionLabel={(value) => {
-          return `Filter by ${value}`;
-        }}
-        onSelect={onSelect}
-      />,
-    );
-
-    await userEvent.click(screen.getByRole("button", { name: "Filter by taxi" }));
-
-    expect(onSelect).toHaveBeenCalledWith("taxi");
-  });
-});
-```
-
-```tsx
-// DataCatalogMetadataChips.tsx
-import { Plural } from "@lingui/react/macro";
-import { UnstyledButton } from "@mantine/core";
-import { useState } from "react";
-import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.module.css";
-import type { ReactNode } from "react";
-
-type Props = {
-  /** The values, in the source's order. */
-  values: readonly string[];
-  /** How many to show before "+N more". */
-  maxVisible: number;
-  /** The accessible name of a chip's action, such as "Filter by taxi". */
-  getActionLabel: (value: string) => string;
-  /** Called with the chosen value. */
-  onSelect: (value: string) => void;
-};
-
-/**
- * A listing's topics or keywords as small chips. Each chip filters the
- * catalog by its value, which is navigation within the catalog rather than
- * an action on the listing. Long lists show their first few and the rest
- * behind "+N more".
- */
-export function DataCatalogMetadataChips({
-  values,
-  maxVisible,
-  getActionLabel,
-  onSelect,
-}: Props): ReactNode {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const visibleValues = isExpanded ? values : values.slice(0, maxVisible);
-  const hiddenCount = values.length - visibleValues.length;
-  return (
-    <span className={css.dataCatalogMetadataChips}>
-      {visibleValues.map((value) => {
-        return (
-          <UnstyledButton
-            key={value}
-            aria-label={getActionLabel(value)}
-            className={css.dataCatalogMetadataChip}
-            onClick={() => {
-              onSelect(value);
-            }}
-          >
-            {value}
-          </UnstyledButton>
-        );
-      })}
-      {hiddenCount > 0 ? (
-        <UnstyledButton
-          className={css.dataCatalogMetadataChipsMore}
-          onClick={() => {
-            setIsExpanded(true);
-          }}
-        >
-          <Plural value={hiddenCount} other="+# more" />
-        </UnstyledButton>
-      ) : null}
-    </span>
-  );
-}
-```
-
-```css
-/* DataCatalogMetadataChips.module.css */
-
-/* Chips wrap inside a rail fact's value column. */
-.dataCatalogMetadataChips {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: var(--mantine-spacing-xxs);
-}
-
-/*
- * A small fill takes `neutral.1` (DESIGN.md, "Area decides which step a fill
- * takes"), at the default 6px radius, and stays neutral: the One Blue Rule
- * keeps blue for the current selection.
- */
-.dataCatalogMetadataChip {
-  background-color: var(--mantine-color-neutral-1);
-  border-radius: var(--mantine-radius-sm);
-  color: var(--mantine-color-neutral-9);
-  font-size: var(--mantine-font-size-xs);
-  line-height: 1.4;
-  padding: 1px var(--mantine-spacing-xs);
-  transition: var(--ava-transition-interactive);
-}
-
-.dataCatalogMetadataChip:hover {
-  background-color: var(--mantine-color-neutral-2);
-}
-
-.dataCatalogMetadataChipsMore {
-  color: var(--mantine-color-neutral-6);
-  font-size: var(--mantine-font-size-xs);
-  padding: 1px var(--mantine-spacing-xxs);
-  text-decoration: underline;
-}
-```
-
-Run both tests: PASS.
-
-- [ ] **Step 3: Write the failing detail test**
-  `DataCatalogListingDetail.test.tsx`. Build a full `DataCatalogListingRead`
-  fixture with a `_listing(overrides)` helper (copy the field list from
-  `DataCatalogListing.types.ts`; every optional field `undefined`, booleans
-  `true`/`false` as a loadable valid listing). Then:
-
-```tsx
-const DRIVE = {
-  id: "6f7e2c1a-0000-4000-8000-000000000001",
-  createdAt: "2026-11-06T00:00:00+00:00",
-  updatedAt: "2026-11-06T00:00:00+00:00",
-  pipelineName: "socrata",
-  driveKey: "https://data.cityofnewyork.us",
-  organization1Label: "City",
-  organization2Label: "Agency",
-  organization3Label: undefined,
-  organization4Label: undefined,
-} as DataCatalogDrive.T;
-
-function _renderDetail(
-  listing: DataCatalogListingRead,
-  options: { drive?: DataCatalogDrive.T; onSelectTopic?: (domain: string) => void; onAddKeyword?: (tag: string) => void } = {},
-) {
-  return render(
-    <DataCatalogListingDetail
-      listing={listing}
-      drive={options.drive}
-      columns={[]}
-      columnTypeState="verified"
-      isAddAllowed
-      isAdding={false}
-      isWaitingForColumnTypes={false}
-      isLoadingColumnMetadata={false}
-      onAddToWorkspace={vi.fn()}
-      onSelectTopic={options.onSelectTopic ?? vi.fn()}
-      onAddKeyword={options.onAddKeyword ?? vi.fn()}
-    />,
-  );
-}
-
-describe("DataCatalogListingDetail", () => {
-  it("labels each organization level with its drive's label", () => {
-    _renderDetail(
-      _listing({
-        organization1Name: "City of New York",
-        organization2Name: "Taxi and Limousine Commission",
-      }),
-      { drive: DRIVE },
-    );
-
-    expect([
-      screen.getByText("City").nextSibling?.textContent,
-      screen.getByText("Agency").nextSibling?.textContent,
-    ]).toEqual(["City of New York", "Taxi and Limousine Commission"]);
-  });
-
-  it("falls back to generic labels without a drive", () => {
-    _renderDetail(_listing({ organization1Name: "World Bank" }));
-
-    expect(screen.getByText("Organization").nextSibling?.textContent).toBe(
-      "World Bank",
-    );
-  });
-
-  it("filters by a topic and adds a keyword from their chips", async () => {
-    const onSelectTopic = vi.fn();
-    const onAddKeyword = vi.fn();
-    _renderDetail(
-      _listing({ domains: ["Transportation"], tags: ["taxi"] }),
-      { onSelectTopic, onAddKeyword },
-    );
-
-    await userEvent.click(
-      screen.getByRole("button", { name: "Show datasets in Transportation" }),
-    );
-    await userEvent.click(
-      screen.getByRole("button", { name: "Show datasets tagged taxi" }),
-    );
-
-    expect([onSelectTopic.mock.calls, onAddKeyword.mock.calls]).toEqual([
-      [["Transportation"]],
-      [["taxi"]],
-    ]);
-  });
-
-  it("omits a group with no facts, and names the source link by its host", () => {
-    _renderDetail(
-      _listing({ sourceUrl: "https://data.cityofnewyork.us/d/8wbx-tsch" }),
-    );
-
-    expect([
-      screen.queryByText("About"),
-      screen.getByRole("link", { name: /data\.cityofnewyork\.us/ }).getAttribute("href"),
-    ]).toEqual([null, "https://data.cityofnewyork.us/d/8wbx-tsch"]);
-  });
-
-  it("keeps the pipeline and the source record in Technical details", async () => {
-    _renderDetail(
-      _listing({
-        pipelineName: "socrata",
-        pipelineRunId: "run-7",
-        sourceMetadata: { resource: { id: "8wbx-tsch" } },
-      }),
-    );
-
-    expect(screen.queryByText("socrata")).toBeNull();
-    await userEvent.click(screen.getByRole("button", { name: "Technical details" }));
-    expect([
-      screen.getByText("socrata") !== null,
-      screen.getByText(/"8wbx-tsch"/) !== null,
-    ]).toEqual([true, true]);
-  });
-});
-```
-
-Mantine's `Collapse` may keep collapsed content in the DOM; if the
-"queryByText('socrata') is null" assertion fails for that reason, assert on
-the disclosure button's `aria-expanded` instead and check visibility with
-`toBeVisible` after the click.
-
-Run: `pnpm test:frontend -- DataCatalogListingDetail`
-Expected: FAIL (new props, groups, and labels do not exist).
-
-- [ ] **Step 4: Rebuild the pane.** In `DataCatalogListingDetail.tsx`:
-  - **Props:** add
-    `drive: DataCatalogDrive.T | undefined;`,
-    `onSelectTopic: (domain: string) => void;`,
-    `onAddKeyword: (tag: string) => void;`, each with a docstring.
-  - **Facts line** under the title `Group`, before the notices:
-
-    ```tsx
-    {factsLine ? (
-      <Text size="sm" c="dimmed" className={css.dataCatalogListingDetailFacts}>
-        {factsLine}
-      </Text>
-    ) : null}
-    ```
-
-    where `factsLine` joins `buildOrganizationLine(listing)` and, when
-    `listing.dateOfLastUpdate` is set, `t\`Updated ${formattedDate}\`` with
-    `" · "`, skipping empty parts. Format the date with the codebase's
-    existing date formatter (grep `src/` for how other views format a
-    timestamp as a medium date; use that helper rather than
-    `toLocaleDateString` directly).
-  - **Description** in a Mantine `Spoiler` instead of a bare `Text`:
-
-    ```tsx
-    {listing.description ? (
-      <Spoiler
-        maxHeight={132}
-        showLabel={t`Show more`}
-        hideLabel={t`Show less`}
-        maw="70ch"
-      >
-        <Text size="sm" className={css.dataCatalogListingDetailDescription}>
-          {listing.description}
-        </Text>
-      </Spoiler>
-    ) : null}
-    ```
-
-    with `white-space: pre-line` on `.dataCatalogListingDetailDescription`,
-    so the newlines `socrataDescription` keeps show as line breaks. 132px is
-    about six lines at the small size; adjust to the theme's real line
-    height.
-  - **Replace the single `AppViewRail.Group`** with three groups, each
-    rendered only when it has at least one fact:
-
-    ```tsx
-    <AppViewRail.Group title={t`Published by`}>
-      {organizationFacts.map(({ level, name }) => {
-        return (
-          <AppViewRail.Fact key={level} label={_getLevelLabel(level)}>
-            {name}
-          </AppViewRail.Fact>
-        );
-      })}
-      {listing.externalServiceName ? (
-        <AppViewRail.Fact label={t`Service`}>
-          {listing.externalServiceName}
-        </AppViewRail.Fact>
-      ) : null}
-    </AppViewRail.Group>
-
-    <AppViewRail.Group title={t`About`}>
-      {/* Topics, Keywords, Updates, License, Coverage, Notes, each only when set */}
-    </AppViewRail.Group>
-
-    <AppViewRail.Group title={t`Source`}>
-      {/* Original, Download, Canonical, each only when set */}
-    </AppViewRail.Group>
-    ```
-
-    - `organizationFacts` is levels 1-4 with a name, in order.
-    - `_getLevelLabel(level)` is the drive's label for that level
-      (`drive?.organization1Label`, …) or, without one, `t\`Organization\``
-      for level 1 and `t\`Level ${level}\`` deeper.
-    - **Topics**: `<DataCatalogMetadataChips values={listing.domains} maxVisible={8} getActionLabel={(domain) => t\`Show datasets in ${domain}\`} onSelect={onSelectTopic} />`.
-    - **Keywords**: the same with `listing.tags`,
-      `t\`Show datasets tagged ${tag}\``, and `onAddKeyword`.
-    - **Updates**: `listing.updateFrequency`. **License**: `listing.license`.
-    - **Coverage**: when either coverage date is set, the two formatted
-      dates joined by an en dash with spaces, or just the one that is set.
-      (An en dash in a date range is a range mark, not prose punctuation.)
-    - **Notes**: `listing.notes`.
-    - **Original**: `<Anchor href={listing.sourceUrl} size="xs" target="_blank" rel="noopener noreferrer">{getSourceHost(listing.sourceUrl)}</Anchor>`.
-    - **Download**: when `listing.sourceDownloadUrl` is set, an `Anchor` to it
-      whose text is `listing.apiResourceFormat ?? t\`File\``.
-    - **Canonical**: the existing canonical URL list, with each link's text
-      `getSourceHost(url)`.
-    - Remove the old "Pipeline · run" fact.
-  - **Technical details** replaces the "Raw metadata" disclosure: the same
-    `Button` + `Collapse` pattern and chevron classes, labelled
-    `t\`Technical details\``, containing an `AppViewRail.Group` with
-    "Indexed by" (`listing.pipelineName`), "Last run" (`listing.pipelineRunId`),
-    "Last indexed" (`listing.dateOfLastSync`, formatted), and then a
-    "Source record" label over the existing `<Text component="pre">` block
-    showing `JSON.stringify(listing.sourceMetadata ?? listing.metadata, undefined, 2)`.
-    Render the disclosure only when at least one of those has a value.
-  - Update the component's docstring: the facts line, the three groups, the
-    chips as catalog navigation, and Technical details.
-
-  Keep the component under the 45-line function rule by extracting each
-  group into a small component in the same folder
-  (`DataCatalogListingPublisherFacts`, `DataCatalogListingAboutFacts`,
-  `DataCatalogListingSourceFacts`, `DataCatalogListingTechnicalDetails`), each
-  returning `null` when it has nothing to show.
-
-- [ ] **Step 5: Wire the drive and handlers in `DataCatalogView.tsx`:**
-
-```tsx
-  const [selectedDrive] = DataCatalogDriveClient.useGetById({
-    id: selectedListing?.driveId,
-    useQueryOptions: {
-      enabled: selectedListing?.driveId !== undefined,
-    },
-  });
-
-  function onSelectTopic(domain: string): void {
-    setFilters({ ...filters, domain });
-  }
-
-  function onAddKeyword(tag: string): void {
-    if (!filters.tags.includes(tag)) {
-      setFilters({ ...filters, tags: [...filters.tags, tag] });
-    }
-  }
-```
-
-and pass `drive={selectedDrive}`, `onSelectTopic={onSelectTopic}`, and
-`onAddKeyword={onAddKeyword}` to `DataCatalogListingDetail`.
-
-- [ ] **Step 6: Run, look, and commit.**
-
-```bash
-pnpm exec tsc -b
-pnpm test:frontend -- DataCatalog getSourceHost
-pnpm exec eslint src/views/DataManagerApp/DataImportView/DataCatalogView
-.claude/skills/impeccable/scripts/impeccable detect --json src/views/DataManagerApp/DataImportView/DataCatalogView
-pnpm format
-git add src/views/DataManagerApp/DataImportView/DataCatalogView src/i18n/locales
-git commit -m "feat(catalog): show publisher, topics, keywords, and source in the listing detail"
-```
+Commit: `feat(catalog): show publisher, topics, keywords, and source in the listing detail`.
 
 ---
 
-### Task 18: An end-to-end test of the catalog filters
+### Task 18: An end-to-end test of the new catalog filters
 
 Read `docs/rules/e2e-testing.md` and the "End-to-end tests with Playwright"
-section of `CLAUDE.md` first. Seeding the listings through the admin client
-is allowed (pre-test setup); every filter interaction goes through the UI.
+section of `CLAUDE.md` first, and one existing spec for setup patterns
+(`tests/e2e/csv-import.spec.ts`: `test`/`expect` from
+`./fixtures/e2e.fixture`, `signInWithEmailPassword`, `createSupabaseAdminClient`
+from `./helpers/supabaseAdminClient`, timeouts from `./helpers/timeouts`).
+Seeding listings and drives through the admin client is allowed pre-test
+setup; every filter interaction goes through the UI, and cleanup runs in
+`finally`, deleting only what the test inserted.
 
-**Files:**
-- Create: `tests/e2e/data-catalog-filters.spec.ts`
+**Spec**: `tests/e2e/data-catalog-filters.spec.ts`. If a spec with that name
+already exists (from `feat/catalog-filters`), add a new `test` to it instead
+of a new file.
 
-- [ ] **Step 1: Write the spec.**
+**Fixtures** (made-up search word, e.g. "quillfeather", in each display
+name; unique `pipeline_name` for cleanup):
+- one drive with `organization2_label: "Agency"`;
+- three `pipeline_parquet` listings: two with `organization1_name: "E2E City"`
+  (organization2 "E2E Taxi Office" and "E2E Transit Office", domain
+  "Transportation", tags `e2e-taxi` / `e2e-ferry`) and one with
+  `organization1_name: "E2E State"` (organization2 "E2E Health Office",
+  domain "Health", tag `e2e-clinic`), all with the drive's id.
 
-```ts
-import { expect, test } from "./fixtures/e2e.fixture";
-import { signInWithEmailPassword } from "./helpers/auth";
-import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
-import { MEDIUM_WAIT } from "./helpers/timeouts";
+**Flow**: sign in, open Data Manager -> Import -> "Open data", search the
+word (3 results), check the "E2E City" Publisher option (2 results), the
+"Agency" facet appears; check "E2E Taxi Office" (1 result); open the
+listing, see "Agency" in Published by, click the `e2e-taxi` keyword chip
+("Show datasets tagged e2e-taxi"), see the keyword chip in the rail; clear
+filters (the rail's or the results header's existing clear control) and see
+3 results again.
 
-const PIPELINE = "e2e-catalog-filters";
+Use role-based locators that match the real UI (read the rail, the checkbox
+facet, and the results header components for their accessible names). Keep
+the test under 45 seconds.
 
-/** Made-up words, so no seeded listing matches the search. */
-const SEARCH_WORD = "quillfeather";
+**Run it alone**: `pnpm test:e2e data-catalog-filters.spec.ts` against the
+worktree's switched local stack (the dev server must point at it; follow how
+`pnpm test:e2e` starts its server). Never run the whole suite. If the e2e
+environment cannot start in this worktree, report BLOCKED with the exact
+error rather than skipping.
 
-const DRIVES = [
-  {
-    pipeline_name: PIPELINE,
-    drive_key: "https://e2e-catalog-a.invalid",
-    organization1_label: "City",
-    organization2_label: "Agency",
-  },
-];
-
-function _listing(args: {
-  name: string;
-  organization1Name: string;
-  organization2Name: string;
-  domains: string[];
-  tags: string[];
-  driveId: string;
-}) {
-  return {
-    display_name: `${SEARCH_WORD} ${args.name}`,
-    organization1_name: args.organization1Name,
-    organization2_name: args.organization2Name,
-    domains: args.domains,
-    tags: args.tags,
-    drive_id: args.driveId,
-    parquet_file_name: `${PIPELINE}-${args.name}.parquet`,
-    pipeline_name: PIPELINE,
-    pipeline_run_id: "run-1",
-  };
-}
-
-test.describe("Open data catalog filters", () => {
-  test("narrows by publisher, agency, and keyword, then clears", async ({
-    page,
-    e2eWorkerDb,
-  }) => {
-    const admin = createSupabaseAdminClient();
-    try {
-      const { data: drives } = await admin
-        .from("data_catalog_drives")
-        .insert(DRIVES)
-        .select("id")
-        .throwOnError();
-      const driveId = drives?.[0]?.id ?? "";
-      await admin
-        .from("data_catalog_listings")
-        .insert([
-          _listing({ name: "taxi trips", organization1Name: "E2E City", organization2Name: "E2E Taxi Office", domains: ["Transportation"], tags: ["e2e-taxi"], driveId }),
-          _listing({ name: "ferry riders", organization1Name: "E2E City", organization2Name: "E2E Transit Office", domains: ["Transportation"], tags: ["e2e-ferry"], driveId }),
-          _listing({ name: "clinic visits", organization1Name: "E2E State", organization2Name: "E2E Health Office", domains: ["Health"], tags: ["e2e-clinic"], driveId }),
-        ])
-        .throwOnError();
-
-      await signInWithEmailPassword(page, {
-        email: e2eWorkerDb.primaryUser.email,
-        password: e2eWorkerDb.primaryUser.password,
-        workspaceSlug: e2eWorkerDb.workspaceSlug,
-      });
-      await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-manager/data-import`, {
-        waitUntil: "domcontentloaded",
-      });
-      await page.getByRole("tab", { name: "Open data" }).click();
-
-      await page.getByRole("textbox", { name: "Search open data catalog" }).fill(SEARCH_WORD);
-      const list = page.getByRole("listbox", { name: "Catalog datasets" });
-      await expect(list.getByRole("option")).toHaveCount(3, { timeout: MEDIUM_WAIT });
-
-      await page.getByRole("textbox", { name: "Publisher" }).click();
-      await page.getByRole("option", { name: /E2E City/ }).click();
-      await expect(list.getByRole("option")).toHaveCount(2);
-      await page.getByRole("textbox", { name: "Agency" }).click();
-      await page.getByRole("option", { name: /E2E Taxi Office/ }).click();
-      await expect(list.getByRole("option")).toHaveCount(1);
-
-      await list.getByRole("option").first().click();
-      await expect(page.getByText("Agency").first()).toBeVisible();
-      await page.getByRole("button", { name: "Show datasets tagged e2e-taxi" }).click();
-      await expect(page.getByText("Keyword: e2e-taxi")).toBeVisible();
-
-      await page.getByRole("button", { name: "Clear filters" }).click();
-      await expect(list.getByRole("option")).toHaveCount(3);
-    } finally {
-      await admin.from("data_catalog_listings").delete().eq("pipeline_name", PIPELINE);
-      await admin.from("data_catalog_drives").delete().eq("pipeline_name", PIPELINE);
-    }
-  });
-});
-```
-
-Two publishers ("E2E City", "E2E State") are what make the Publisher
-dropdown appear: a filter with one value is withheld (spec §7.2). Check the
-fixture's real field names (`e2eWorkerDb.workspaceSlug`,
-`primaryUser`) and the timeout constants against `tests/e2e/fixtures/e2e.fixture.ts`
-and `tests/e2e/helpers/timeouts.ts`, and the publisher option's accessible
-name (it includes the count, hence the regex). Keep the test under 45
-seconds.
-
-- [ ] **Step 2: Run it alone.**
-
-Run: `pnpm test:e2e data-catalog-filters.spec.ts`
-Expected: PASS. Never run the whole e2e suite.
-
-- [ ] **Step 3: Commit.**
-
-```bash
-pnpm format
-git add tests/e2e/data-catalog-filters.spec.ts
-git commit -m "test(catalog): filter the open data catalog end to end"
-```
+Commit: `test(catalog): filter the open data catalog by publisher, agency, and keyword end to end`.
 
 ---
 

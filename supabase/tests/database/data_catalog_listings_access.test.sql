@@ -48,7 +48,7 @@ select col_is_null(
 select lives_ok(
   $$insert into public.data_catalog_listings
       (parquet_file_name, display_name, pipeline_name, pipeline_run_id,
-       external_organization_name)
+       organization1_name)
     values ('pgtap-fixture.parquet', 'Series', 'pgtap-fixture-pipeline', 'run-1',
             'World Bank')$$,
   'a pipeline listing inserts without naming access_kind'
@@ -71,7 +71,7 @@ select is(
 select lives_ok(
   $$insert into public.data_catalog_listings
       (parquet_file_name, display_name, pipeline_name, pipeline_run_id,
-       external_organization_name)
+       organization1_name)
     values ('pgtap-fixture.parquet', 'Series v2', 'pgtap-fixture-pipeline', 'run-2',
             'World Bank')
     on conflict (parquet_file_name, pipeline_name)
@@ -109,7 +109,7 @@ select is(
 
 select lives_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Operational Presence', 'OCHA', 'api_resource', 'ckan',
             'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-a',
@@ -119,7 +119,7 @@ select lives_ok(
 
 select lives_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Movement Range', 'Meta', 'api_resource', 'ckan',
             'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-b',
@@ -129,7 +129,7 @@ select lives_ok(
 
 select throws_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Operational Presence again', 'OCHA', 'api_resource', 'ckan',
             'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-a',
@@ -141,7 +141,7 @@ select throws_ok(
 
 select lives_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Operational Presence elsewhere', 'OCHA', 'api_resource', 'ckan',
             'https://pgtap-fixture-other.invalid', 'pgtap-fixture-dataset-a',
@@ -156,7 +156,7 @@ select lives_ok(
 
 select throws_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_format)
     values ('No resource named', 'OCHA', 'api_resource', 'ckan',
             'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-b', 'CSV')$$,
@@ -168,7 +168,7 @@ select throws_ok(
 select throws_ok(
   $$insert into public.data_catalog_listings
       (parquet_file_name, display_name, pipeline_name, pipeline_run_id,
-       external_organization_name, api_service)
+       organization1_name, api_service)
     values ('pgtap-fixture-other.parquet', 'Mixed', 'pgtap-fixture-pipeline', 'run-3',
             'World Bank', 'ckan')$$,
   '23514',
@@ -184,7 +184,7 @@ select throws_ok(
 
 select lives_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format,
        pipeline_name, pipeline_run_id)
     values ('Pipeline-written API listing', 'OCHA', 'api_resource', 'ckan',
@@ -196,7 +196,7 @@ select lives_ok(
 
 select lives_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Hand-curated API listing', 'OCHA', 'api_resource', 'ckan',
             'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-q',
@@ -206,7 +206,7 @@ select lives_ok(
 
 select throws_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format,
        parquet_file_name)
     values ('API listing with an object', 'OCHA', 'api_resource', 'ckan',
@@ -227,7 +227,7 @@ select has_index(
 
 select throws_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Insecure', 'OCHA', 'api_resource', 'ckan',
             'http://pgtap-fixture.invalid', 'pgtap-fixture-dataset-b',
@@ -244,7 +244,7 @@ select throws_ok(
 
 select lives_ok(
   $$insert into public.data_catalog_listings
-      (id, display_name, external_organization_name, access_kind, api_service,
+      (id, display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values
       ('aaaaaaaa-0000-4000-8000-000000000101', 'pgtap-fixture no cache yet',
@@ -255,7 +255,7 @@ select lives_ok(
 
 select lives_ok(
   $$insert into public.data_catalog_listings
-      (id, display_name, external_organization_name, access_kind, api_service,
+      (id, display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format,
        cached_object_path, cached_source_version, cached_at)
     values
@@ -268,7 +268,7 @@ select lives_ok(
 
 select throws_ok(
   $$insert into public.data_catalog_listings
-      (id, display_name, external_organization_name, access_kind, api_service,
+      (id, display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format,
        cached_object_path)
     values
@@ -283,7 +283,7 @@ select throws_ok(
 
 select throws_ok(
   $$insert into public.data_catalog_listings
-      (id, display_name, external_organization_name, access_kind,
+      (id, display_name, organization1_name, access_kind,
        parquet_file_name, pipeline_name, pipeline_run_id,
        cached_object_path, cached_source_version, cached_at)
     values
@@ -306,7 +306,7 @@ select throws_ok(
 
 select lives_ok(
   $$insert into public.data_catalog_listings
-      (id, display_name, external_organization_name, access_kind, api_service,
+      (id, display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values
       ('aaaaaaaa-0000-4000-8000-000000000105', 'pgtap-fixture upsert test',
@@ -339,7 +339,7 @@ select is(
 
 select throws_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Smuggled', 'Nobody', 'api_resource', 'ckan',
             'https://pgtap-fixture.invalid', 'smuggled', 'smuggled-resource', 'CSV')$$,

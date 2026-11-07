@@ -6,14 +6,24 @@ type GeneratedSearchDBRow =
 
 /**
  * One row `rpc_data_catalog_listings__search` returns. The generated types
- * mark every `returns table` column non-null, but `pipeline_name` is null on
- * a listing no pipeline wrote, `file_format` on one with no format (a map or
- * a link), and `last_updated_at` on one with no update or sync date.
+ * mark every `returns table` column non-null, but `organization2_name`
+ * through `organization4_name` are null on a listing without that level,
+ * `pipeline_name` on a listing no pipeline wrote, `file_format` on one with
+ * no format (a map or a link), and `last_updated_at` on one with no update or
+ * sync date.
  */
 export type DataCatalogSearchDBRow = Omit<
   GeneratedSearchDBRow,
-  "pipeline_name" | "file_format" | "last_updated_at"
+  | "organization2_name"
+  | "organization3_name"
+  | "organization4_name"
+  | "pipeline_name"
+  | "file_format"
+  | "last_updated_at"
 > & {
+  organization2_name: string | null;
+  organization3_name: string | null;
+  organization4_name: string | null;
   pipeline_name: string | null;
   file_format: string | null;
   last_updated_at: string | null;
@@ -52,7 +62,10 @@ export function createDataCatalogSearchPage({
       return {
         id: dbRow.id as DataCatalogListing.Id,
         displayName: dbRow.display_name,
-        externalOrganizationName: dbRow.external_organization_name,
+        organization1Name: dbRow.organization1_name,
+        organization2Name: dbRow.organization2_name ?? undefined,
+        organization3Name: dbRow.organization3_name ?? undefined,
+        organization4Name: dbRow.organization4_name ?? undefined,
         pipelineName: dbRow.pipeline_name ?? undefined,
         isWorkspaceLoadable: dbRow.is_workspace_loadable,
         isInvalid: dbRow.is_invalid,

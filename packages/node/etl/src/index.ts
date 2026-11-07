@@ -10,6 +10,16 @@ export type {
   EtlPipelineWorkspaceLoadability,
   EtlWorkspaceLoadabilityRules,
 } from "@etl/EtlConfig/EtlConfig.types";
+export { CATALOG_MAPPABLE_FIELDS } from "@etl/EtlConfig/PipelineConfig.types";
+export type {
+  CatalogFieldMappings,
+  CatalogFieldSource,
+  CatalogMappableField,
+  PipelineConfig,
+  PipelineDriveConfig,
+} from "@etl/EtlConfig/PipelineConfig.types";
+export { parsePipelineConfig } from "@etl/EtlConfig/parsePipelineConfig/parsePipelineConfig";
+export { readPipelineConfigFile } from "@etl/EtlConfig/readPipelineConfigFile/readPipelineConfigFile";
 export {
   ETL_RUN_FAILED_ERROR_NAME,
   EtlRunFailedError,
@@ -42,10 +52,13 @@ export type {
   EtlCrawlReport,
   EtlCrawlStatus,
   EtlDestination,
+  EtlDriveDescription,
   EtlDriveScopes,
   EtlEngineConfig,
   EtlEngineInstance,
   EtlIncrementalConfig,
+  EtlOrganizationLabels,
+  EtlOrganizationLevel,
   EtlOutput,
   EtlPipelineMetrics,
   EtlPipelineRunId,
@@ -64,6 +77,8 @@ export type {
 export type {
   CheckpointKey,
   CheckpointStore,
+  DriveRow,
+  DrivesStore,
   ListingAccessKind,
   ListingRowValues,
   ListingsStore,
@@ -84,6 +99,11 @@ export {
   type InMemoryCheckpointStore,
 } from "@etl/stores/InMemoryCheckpointStore/createInMemoryCheckpointStore";
 export {
+  createInMemoryDrivesStore,
+  type InMemoryDrivesStore,
+  type StoredDriveRow,
+} from "@etl/stores/InMemoryDrivesStore/createInMemoryDrivesStore";
+export {
   createInMemoryObjectStore,
   type InMemoryObjectStore,
 } from "@etl/stores/InMemoryObjectStore/createInMemoryObjectStore";
@@ -95,6 +115,10 @@ export {
   createSupabaseCheckpointStore,
   type SupabaseCheckpointStoreOptions,
 } from "@etl/stores/SupabaseCheckpointStore/createSupabaseCheckpointStore";
+export {
+  createSupabaseDrivesStore,
+  type SupabaseDrivesStoreOptions,
+} from "@etl/stores/SupabaseDrivesStore/createSupabaseDrivesStore";
 export { createSupabaseObjectStore } from "@etl/stores/SupabaseObjectStore/createSupabaseObjectStore";
 export {
   ETL_INPUT_BASE_DIR,
@@ -157,3 +181,13 @@ export {
   type ExecutionFunctions,
   type SupabaseExecutionStoreOptions,
 } from "@etl/stores/SupabaseExecutionStore/createSupabaseExecutionStore";
+export { getOrganizationLabelsFromDrive } from "@etl/EtlConfig/getOrganizationLabelsFromDrive/getOrganizationLabelsFromDrive";
+export {
+  loadCatalogFieldMapper,
+  type CatalogFieldMapper,
+  type CatalogFieldMapProblem,
+  type CatalogFieldMapResult,
+  type CatalogFieldScript,
+  type CatalogFieldScriptContext,
+  type CatalogMappedFields,
+} from "@etl/EtlConfig/loadCatalogFieldMapper/loadCatalogFieldMapper";

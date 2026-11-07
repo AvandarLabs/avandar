@@ -7,7 +7,19 @@ import type {
 
 const DRIVE = {
   baseUrl: "https://data.cityofnewyork.us",
-  organizationName: "City of New York",
+  organizationLabels: { 1: "City" },
+};
+
+const RESULT: SocrataDiscoveryResult = {
+  sourceRecord: {},
+  datasetId: "erm2-nwe9",
+  name: "311 Service Requests",
+  domain: "data.cityofnewyork.us",
+  createdAt: "2011-10-10T00:00:00.000Z",
+  updatedAt: "2026-10-19T08:30:00.000Z",
+  assetType: "dataset",
+  blobMimeType: undefined,
+  columns: [],
 };
 
 function _make(
@@ -16,17 +28,8 @@ function _make(
 ) {
   return makeApiResourceRelationFromSocrataResult({
     drive: DRIVE,
-    result: {
-      datasetId: "erm2-nwe9",
-      name: "311 Service Requests",
-      domain: "data.cityofnewyork.us",
-      createdAt: "2011-10-10T00:00:00.000Z",
-      updatedAt: "2026-10-19T08:30:00.000Z",
-      assetType: "dataset",
-      blobMimeType: undefined,
-      columns,
-      ...overrides,
-    },
+    result: { ...RESULT, columns, ...overrides },
+    mappedFields: { organization1Name: "City of New York" },
   });
 }
 
@@ -42,7 +45,8 @@ describe("makeApiResourceRelationFromSocrataResult", () => {
       apiResourceId: "erm2-nwe9",
       apiResourceFormat: "CSV",
       displayName: "311 Service Requests",
-      externalOrganizationName: "City of New York",
+      organization1Name: "City of New York",
+      sourceMetadata: {},
       sourceUpdatedAt: new Date("2026-10-19T08:30:00.000Z"),
       sourceAssetType: "dataset",
       sourceUrl: "https://data.cityofnewyork.us/d/erm2-nwe9",
@@ -178,5 +182,30 @@ describe("makeApiResourceRelationFromSocrataResult", () => {
     });
 
     expect(relation.isWorkspaceLoadable).toBe(false);
+  });
+
+  it("spreads the mapped fields and keeps the raw record", () => {
+    const relation = makeApiResourceRelationFromSocrataResult({
+      drive: {
+        baseUrl: "https://data.cityofnewyork.us",
+        organizationLabels: {},
+      },
+      result: {
+        ...RESULT,
+        sourceRecord: { resource: { id: RESULT.datasetId } },
+      },
+      mappedFields: {
+        organization1Name: "City of New York",
+        organization2Name: "TLC",
+        tags: ["fhv"],
+      },
+    });
+
+    expect(relation).toMatchObject({
+      organization1Name: "City of New York",
+      organization2Name: "TLC",
+      tags: ["fhv"],
+      sourceMetadata: { resource: { id: RESULT.datasetId } },
+    });
   });
 });

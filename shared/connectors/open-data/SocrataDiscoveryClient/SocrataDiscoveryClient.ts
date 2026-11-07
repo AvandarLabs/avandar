@@ -45,6 +45,7 @@ function _splitValidResults(rawResults: readonly unknown[]): {
     }
     const { resource, metadata } = parsed.data;
     results.push({
+      sourceRecord: rawResult,
       datasetId: resource.id,
       name: resource.name,
       domain: metadata.domain,

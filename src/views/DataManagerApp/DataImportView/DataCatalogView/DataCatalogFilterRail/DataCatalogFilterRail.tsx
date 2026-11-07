@@ -16,6 +16,8 @@ import {
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { DataCatalogCheckboxFacet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.module.css";
+import { DataCatalogKeywordFacet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet";
+import { DataCatalogOrganization2Facet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet";
 import type {
   CatalogFacets,
   CatalogListingFilters,
@@ -33,9 +35,9 @@ type Props = {
 
 /**
  * Everything that narrows the catalog, in the order a user reaches for it:
- * search first, then where the data comes from, its format, and how fresh
- * it is. Every option carries the number of results it would leave, so a
- * user can see a dead end before walking into it.
+ * search first, then who published the data and what it is about, its
+ * format, and how fresh it is. Every option carries the number of results it
+ * would leave, so a user can see a dead end before walking into it.
  */
 export function DataCatalogFilterRail({
   search,
@@ -77,11 +79,37 @@ export function DataCatalogFilterRail({
         />
 
         <DataCatalogCheckboxFacet
-          label={t`Source`}
+          label={t`Publisher`}
           options={facets.sources}
           chosenValues={filters.sources}
           onChange={(sources) => {
             onFiltersChange({ ...filters, sources });
+          }}
+        />
+
+        <DataCatalogOrganization2Facet
+          isPublisherChosen={filters.sources.length > 0}
+          labels={facets.organization2Labels}
+          options={facets.organization2}
+          chosenValues={filters.organization2Names}
+          onChange={(organization2Names) => {
+            onFiltersChange({ ...filters, organization2Names });
+          }}
+        />
+
+        <DataCatalogCheckboxFacet
+          label={t`Topic`}
+          options={facets.domains}
+          chosenValues={filters.domains}
+          onChange={(domains) => {
+            onFiltersChange({ ...filters, domains });
+          }}
+        />
+
+        <DataCatalogKeywordFacet
+          chosenKeywords={filters.tags}
+          onChange={(tags) => {
+            onFiltersChange({ ...filters, tags });
           }}
         />
 

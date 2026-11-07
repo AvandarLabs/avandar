@@ -10,7 +10,7 @@ import type { EtlRunWindow } from "@avandar/etl";
 
 const DRIVE = {
   baseUrl: "https://data.humdata.org",
-  organizationName: "Humanitarian Data Exchange",
+  organizationLabels: { 1: "Organization" },
 };
 const OPEN_WINDOW: EtlRunWindow = { since: undefined, until: undefined };
 
@@ -19,7 +19,13 @@ afterEach(() => {
 });
 
 function _package(name: string, modified: string): CkanPackage {
-  return { id: name, name, metadata_modified: modified, resources: [] };
+  return {
+    id: name,
+    name,
+    metadata_modified: modified,
+    resources: [],
+    sourceRecord: {},
+  };
 }
 
 const CATALOG: readonly CkanPackage[] = [

@@ -16,7 +16,7 @@ const API_RELATION: ApiResourceRelation = {
   apiResourceId: "abcd-1234",
   apiResourceFormat: "CSV",
   displayName: "Rodent Inspections",
-  externalOrganizationName: "City of New York",
+  organization1Name: "City of New York",
   sourceUpdatedAt: new Date("2026-10-19T08:30:00.000Z"),
   columns: [{ name: "a", originalDataType: "text", castDataType: "VARCHAR" }],
 };
@@ -28,7 +28,7 @@ const PARQUET_RELATION: PipelineParquetRelation = {
   csvPath: "/tmp/WDICSV.csv",
   csvColumns: [],
   displayName: "World Development Indicators (WDI)",
-  externalOrganizationName: "World Bank",
+  organization1Name: "World Bank",
   sourceUpdatedAt: undefined,
 };
 
@@ -37,6 +37,7 @@ function _build(
   options: {
     service?: string | undefined;
     unloadableFormats?: readonly string[];
+    driveId?: string;
   } = {},
 ) {
   return buildListingRowFromRelation({
@@ -45,6 +46,7 @@ function _build(
     pipelineRunId: "run-7",
     service: "service" in options ? options.service : "socrata",
     driveKey: DRIVE_KEY,
+    driveId: options.driveId,
     syncedAt: SYNCED_AT,
     scopeKey: "format:csv",
     workspaceLoadability: {
@@ -54,6 +56,44 @@ function _build(
 }
 
 describe("buildListingRowFromRelation", () => {
+  it("writes the organization levels, domains, tags, source record, and drive", () => {
+    const row = _build(
+      {
+        ...API_RELATION,
+        organization2Name: "Taxi and Limousine Commission",
+        organization3Name: "Licensing",
+        domains: ["Transportation"],
+        tags: ["taxi", "fhv"],
+        sourceMetadata: { resource: { id: "8wbx-tsch" } },
+      },
+      { driveId: "6f7e2c1a-0000-4000-8000-000000000001" },
+    );
+
+    expect(row).toMatchObject({
+      organization2_name: "Taxi and Limousine Commission",
+      organization3_name: "Licensing",
+      organization4_name: null,
+      domains: ["Transportation"],
+      tags: ["taxi", "fhv"],
+      source_metadata: { resource: { id: "8wbx-tsch" } },
+      drive_id: "6f7e2c1a-0000-4000-8000-000000000001",
+    });
+  });
+
+  it("writes null for every new column a relation leaves unset", () => {
+    const row = _build(API_RELATION);
+
+    expect(row).toMatchObject({
+      organization2_name: null,
+      organization3_name: null,
+      organization4_name: null,
+      domains: null,
+      tags: null,
+      source_metadata: null,
+      drive_id: null,
+    });
+  });
+
   it("stamps the row with this run's pipeline, run id, and sync time", () => {
     const row = _build(API_RELATION);
 

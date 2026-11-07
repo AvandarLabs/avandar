@@ -4,15 +4,31 @@ import type { EtlDestination } from "@avandar/etl";
 /** The public bucket prebuilt Parquet relations are written to. */
 const DEFAULT_OPEN_DATA_BUCKET = "opendata";
 
+/** Options for `getPipelineEtlDestination`. */
+export type PipelineEtlDestinationOptions = {
+  /**
+   * Whether the pipeline's drives are recorded in the drives table. Only
+   * pipelines with drives (each drive carries organization labels) opt in.
+   * Defaults to false.
+   */
+  isRecordingDrives?: boolean;
+};
+
 /**
  * Where every pipeline loads: the Supabase stack named by `SUPABASE_URL` and
  * `SUPABASE_SERVICE_ROLE_KEY`, the Open Data Catalog's two tables, the
  * pipeline checkpoints table, and the public `opendata` bucket (or
- * `SUPABASE_OPENDATA_BUCKET`). Each run is recorded through the pipeline
- * execution functions. A blank variable counts as unset. The engine
- * itself reports any missing credential when a run starts.
+ * `SUPABASE_OPENDATA_BUCKET`). A pipeline that has drives passes
+ * `isRecordingDrives` to also record each drive's organization labels in the
+ * drives table. Each run is recorded through the pipeline execution
+ * functions. A blank variable counts as unset. The engine itself reports any
+ * missing credential when a run starts.
  */
-export function getPipelineEtlDestination(): EtlDestination {
+export function getPipelineEtlDestination(
+  options: PipelineEtlDestinationOptions = {},
+): EtlDestination {
+  const { isRecordingDrives = false } = options;
+
   return {
     supabase: {
       url: getOptionalEnvVar("SUPABASE_URL"),
@@ -22,6 +38,7 @@ export function getPipelineEtlDestination(): EtlDestination {
       listingsTable: "data_catalog_listings",
       upsertListingsFunction:
         "rpc_data_catalog_listings__upsert_with_relation_columns",
+      ...(isRecordingDrives ? { drivesTable: "data_catalog_drives" } : {}),
       checkpointsTable: "pipeline_scope_checkpoints",
       executionFunctions: {
         start: "rpc_pipeline_executions__start",

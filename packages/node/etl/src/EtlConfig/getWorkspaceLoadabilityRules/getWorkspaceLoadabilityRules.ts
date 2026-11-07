@@ -1,5 +1,6 @@
 import type {
   EtlConfig,
+  EtlPipelineWorkspaceLoadability,
   EtlWorkspaceLoadabilityRules,
 } from "@etl/EtlConfig/EtlConfig.types";
 
@@ -12,20 +13,20 @@ export function normalizeEtlFormat(format: string): string {
 }
 
 /**
- * The loadability rules one pipeline's engine applies: the config's global
- * unloadable formats, minus the ones the pipeline can load anyway, plus the
- * pipeline's own.
+ * The loadability rules one pipeline's engine applies: the shared
+ * config's global unloadable formats, minus the ones the pipeline can
+ * load anyway, plus the pipeline's own.
  *
  * @param args.config - The shared ETL config.
- * @param args.pipelineName - The pipeline whose overrides apply.
+ * @param args.pipelineOverrides - The pipeline config's
+ *   `workspaceLoadability`. Omit for none.
  * @returns The rules, with every format normalized and listed once.
  */
 export function getWorkspaceLoadabilityRules(args: {
   config: EtlConfig;
-  pipelineName: string;
+  pipelineOverrides?: EtlPipelineWorkspaceLoadability;
 }): EtlWorkspaceLoadabilityRules {
-  const overrides =
-    args.config.pipelines[args.pipelineName]?.workspaceLoadability ?? {};
+  const overrides = args.pipelineOverrides ?? {};
   const loadableFormats = new Set(
     (overrides.loadableFormats ?? []).map(normalizeEtlFormat),
   );

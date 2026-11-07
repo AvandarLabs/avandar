@@ -12,7 +12,7 @@ import type {
 
 const DRIVE: ConfiguredDrive = {
   baseUrl: "https://data.cityofnewyork.us",
-  organizationName: "City of New York",
+  organizationLabels: { 1: "City" },
 };
 const OPEN_WINDOW: EtlRunWindow = { since: undefined, until: undefined };
 
@@ -27,6 +27,7 @@ function _at(minute: number): Date {
 function _catalog(size: number): SocrataDiscoveryResult[] {
   return Array.from({ length: size }, (_, index) => {
     return {
+      sourceRecord: {},
       datasetId: `ds-${index}`,
       name: `Dataset ${index}`,
       domain: "data.cityofnewyork.us",

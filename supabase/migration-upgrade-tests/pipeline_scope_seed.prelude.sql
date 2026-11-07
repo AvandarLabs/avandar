@@ -6,7 +6,7 @@
 begin;
 
 insert into public.data_catalog_listings
-  (display_name, external_organization_name, access_kind, api_service,
+  (display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format,
    pipeline_name, pipeline_run_id, date_of_last_update)
 values
@@ -41,7 +41,7 @@ values
 -- and `date_of_last_update` are null. A drive with only such listings has no
 -- date to seed a checkpoint from.
 insert into public.data_catalog_listings
-  (display_name, external_organization_name, access_kind, api_service,
+  (display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format,
    pipeline_name)
 values
@@ -62,7 +62,7 @@ values
 -- are older than their drive's newest update, so they leave its checkpoint
 -- where the listings above put it.
 insert into public.data_catalog_listings
-  (display_name, external_organization_name, access_kind, api_service,
+  (display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format,
    pipeline_name, pipeline_run_id, date_of_last_update, pipeline_scope_keys)
 values
@@ -80,7 +80,7 @@ values
    'socrata', 'run-2', '2026-08-01T00:00:00Z', array['category:health']);
 
 insert into public.data_catalog_listings
-  (display_name, external_organization_name, parquet_file_name,
+  (display_name, organization1_name, parquet_file_name,
    pipeline_name, pipeline_run_id)
 values
   ('pgtap-fixture wdi', 'World Bank', 'pgtap-fixture-scope-seed.parquet',

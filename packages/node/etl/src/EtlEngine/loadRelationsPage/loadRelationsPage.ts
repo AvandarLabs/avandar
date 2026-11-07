@@ -40,6 +40,8 @@ export type LoadRelationsPageContext = Readonly<{
   pipelineRunId: EtlPipelineRunId;
   service: string | undefined;
   driveKey: string;
+  /** The drive's `data_catalog_drives.id`, or undefined with no store. */
+  driveId: string | undefined;
   /** The scope the page was crawled for. */
   scopeKey: string;
   syncedAt: Date;
@@ -147,6 +149,7 @@ function _buildRelationsWithRows(args: {
       pipelineRunId: context.pipelineRunId,
       service: context.service,
       driveKey: context.driveKey,
+      driveId: context.driveId,
       syncedAt: context.syncedAt,
       scopeKey: context.scopeKey,
       workspaceLoadability: context.workspaceLoadability,

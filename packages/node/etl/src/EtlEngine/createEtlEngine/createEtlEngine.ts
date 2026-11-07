@@ -16,6 +16,7 @@ import { createRunExecutionRecorder } from "@etl/EtlEngine/recordRunExecution/cr
 import { resolveDriveScopes } from "@etl/EtlEngine/resolveDriveScopes/resolveDriveScopes";
 import { selectRequestedScopes } from "@etl/EtlEngine/selectRequestedScopes/selectRequestedScopes";
 import { createSupabaseCheckpointStore } from "@etl/stores/SupabaseCheckpointStore/createSupabaseCheckpointStore";
+import { createSupabaseDrivesStore } from "@etl/stores/SupabaseDrivesStore/createSupabaseDrivesStore";
 import { createSupabaseExecutionStore } from "@etl/stores/SupabaseExecutionStore/createSupabaseExecutionStore";
 import { createSupabaseListingsStore } from "@etl/stores/SupabaseListingsStore/createSupabaseListingsStore";
 import { createSupabaseObjectStore } from "@etl/stores/SupabaseObjectStore/createSupabaseObjectStore";
@@ -55,6 +56,14 @@ type _CrawlTasksArgs<TDrive, TConnection, TScope extends EtlScope> = Readonly<{
   stores: EtlStores;
   syncedAt: Date;
   clock: EtlClock;
+  /**
+   * The drive's id in the drives table, written the first time the run
+   * reaches the drive, or `undefined` when there is no drives store.
+   */
+  resolveDriveId: (
+    drive: TDrive,
+    driveKey: string,
+  ) => Promise<string | undefined>;
   /** Called as each crawl ends, in crawl order. */
   onCrawled: (crawl: EtlCrawlReport) => Promise<void>;
 }>;
@@ -146,6 +155,13 @@ function _createSupabaseStores(destination: EtlDestination): EtlStores {
             client,
             functions: output.executionFunctions,
           }),
+    drives:
+      output.drivesTable === undefined
+        ? undefined
+        : createSupabaseDrivesStore({
+            client,
+            drivesTable: output.drivesTable,
+          }),
   };
 }
 
@@ -189,6 +205,78 @@ function _buildCrawlTasks<TDrive, TScope extends EtlScope>(
   });
 }
 
+/**
+ * Resolves a drive's id, writing its row the first time the run reaches
+ * it. A failed write is not remembered, so the drive's next scope tries
+ * again. Resolves to `undefined` when there is no drives store.
+ */
+function _createDriveIdResolver<
+  TDrive,
+  TConnection,
+  TScope extends EtlScope,
+>(args: {
+  config: EtlEngineConfig<TDrive, TConnection, TScope>;
+  stores: EtlStores;
+}): (drive: TDrive, driveKey: string) => Promise<string | undefined> {
+  const idsByDriveKey = new Map<string, string>();
+  return async (drive, driveKey) => {
+    const { drives } = args.stores;
+    if (drives === undefined) {
+      return undefined;
+    }
+    const knownId = idsByDriveKey.get(driveKey);
+    if (knownId !== undefined) {
+      return knownId;
+    }
+    const id = await drives.upsert({
+      pipelineName: args.config.name,
+      driveKey,
+      organizationLabels:
+        args.config.describeDrive?.(drive).organizationLabels ?? {},
+    });
+    idsByDriveKey.set(driveKey, id);
+    return id;
+  };
+}
+
+/**
+ * The listed task's drive id, or the failed crawl to report when its drive
+ * row could not be written. A crawl with no limit left is skipped without
+ * writing a drive row, so its id is `undefined`.
+ */
+async function _resolveDriveIdOrFailure<
+  TDrive,
+  TConnection,
+  TScope extends EtlScope,
+>(
+  args: _CrawlTasksArgs<TDrive, TConnection, TScope> &
+    Readonly<{
+      task: Extract<_CrawlTask<TDrive, TScope>, { isListed: true }>;
+      remaining: number;
+    }>,
+): Promise<
+  | Readonly<{ driveId: string | undefined }>
+  | Readonly<{ failure: CrawlScopeResult }>
+> {
+  const { task } = args;
+  if (args.remaining <= 0) {
+    return { driveId: undefined };
+  }
+  try {
+    return { driveId: await args.resolveDriveId(task.drive, task.driveKey) };
+  } catch (error: unknown) {
+    const failure = buildUncrawledCrawlResult({
+      driveKey: task.driveKey,
+      scopeKey: task.scope.key,
+      options: args.options,
+      outcome: { status: "failed", error },
+      startedAt: args.clock.now(),
+      finishedAt: args.clock.now(),
+    });
+    return { failure };
+  }
+}
+
 async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
   args: _CrawlTasksArgs<TDrive, TConnection, TScope> &
     Readonly<{
@@ -209,6 +297,10 @@ async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
       finishedAt: args.clock.now(),
     });
   }
+  const resolution = await _resolveDriveIdOrFailure({ ...args, task });
+  if ("failure" in resolution) {
+    return resolution.failure;
+  }
   // A crawl with no limit left is skipped at once, so it only finishes.
   if (args.remaining > 0) {
     progress.crawlStarted(progressCrawl);
@@ -217,6 +309,7 @@ async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
     config: args.config,
     drive: task.drive,
     driveKey: task.driveKey,
+    driveId: resolution.driveId,
     scope: task.scope,
     options: args.options,
     pipelineRunId: args.pipelineRunId,
@@ -381,6 +474,7 @@ async function _runRecorded<TDrive, TConnection, TScope extends EtlScope>(
       stores: args.stores,
       syncedAt: args.startedAt,
       clock,
+      resolveDriveId: _createDriveIdResolver({ config, stores: args.stores }),
       onCrawled: execution.recordCrawl,
     });
     const report = _buildRunReport({

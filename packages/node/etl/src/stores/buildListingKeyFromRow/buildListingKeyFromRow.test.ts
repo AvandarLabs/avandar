@@ -8,7 +8,7 @@ function _apiRow(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     pipeline_name: "hdx",
     pipeline_run_id: "run-1",
     display_name: "Dataset",
-    external_organization_name: "HDX",
+    organization1_name: "HDX",
     external_dataset_id: "movement-range-maps",
     date_of_last_update: null,
     date_of_last_sync: "2026-10-20T00:00:00.000Z",
@@ -32,6 +32,13 @@ function _apiRow(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     is_workspace_loadable: true,
     source_asset_type: null,
     source_download_url: null,
+    organization2_name: null,
+    organization3_name: null,
+    organization4_name: null,
+    domains: null,
+    tags: null,
+    source_metadata: null,
+    drive_id: null,
     ...overrides,
   };
 }

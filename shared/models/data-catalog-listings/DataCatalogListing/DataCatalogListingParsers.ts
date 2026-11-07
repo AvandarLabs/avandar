@@ -2,18 +2,17 @@ import { makeParserRegistry } from "@avandar/clients";
 import {
   camelCaseKeysDeep,
   nullsToUndefinedDeep,
-  omitProps,
-  pipe,
+  omit,
   snakeCaseKeysDeep,
 } from "@avandar/utils";
 import { z } from "zod";
 import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
+import type { DataCatalogDriveId } from "$/models/data-catalog-listings/DataCatalogDrive/DataCatalogDrive.types.ts";
 import type {
   DataCatalogListingId,
   DataCatalogListingModel,
   DataCatalogListingRead,
 } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
-import type { Json } from "$/types/database.types.ts";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 
@@ -29,7 +28,7 @@ const DBReadSchema = z.object({
   display_name: z.string(),
   pipeline_name: z.string().nullable(),
   pipeline_run_id: z.string().nullable(),
-  external_organization_name: z.string(),
+  organization1_name: z.string(),
   external_service_name: z.string().nullable(),
   external_dataset_id: z.string().nullable(),
   source_url: z.string().nullable(),
@@ -64,27 +63,46 @@ const DBReadSchema = z.object({
   is_workspace_loadable: z.boolean(),
   source_asset_type: z.string().nullable(),
   source_download_url: z.string().nullable(),
+  organization2_name: z.string().nullable(),
+  organization3_name: z.string().nullable(),
+  organization4_name: z.string().nullable(),
+  domains: z.array(z.string()).nullable(),
+  tags: z.array(z.string()).nullable(),
+  source_metadata: supabaseJSONSchema.nullable(),
+  drive_id: z.uuid().nullable(),
   search_vector: z.unknown(),
 });
+
+/**
+ * Reads a listing row. `metadata` and `source_metadata` are JSON documents
+ * a pipeline wrote, not columns, so they keep their keys and nulls exactly
+ * as stored: readers look up a source's own key names in them, and the
+ * source record is shown as the source sent it. Only a missing document
+ * becomes undefined.
+ */
+function _fromDBReadToModelRead(
+  dbRow: DataCatalogListingModel["DBRead"],
+): DataCatalogListingRead {
+  const { metadata, source_metadata, ...columns } = dbRow;
+  // The search document exists for catalog search in Postgres. Nothing in
+  // the app reads it.
+  const fields = nullsToUndefinedDeep(
+    camelCaseKeysDeep(omit(columns, "search_vector")),
+  );
+  return {
+    ...fields,
+    id: fields.id as DataCatalogListingId,
+    driveId: fields.driveId as DataCatalogDriveId | undefined,
+    metadata: metadata ?? undefined,
+    sourceMetadata: source_metadata ?? undefined,
+  };
+}
 
 export const DataCatalogListingParsers =
   makeParserRegistry<DataCatalogListingModel>().build({
     modelName: "DataCatalogListing",
     DBReadSchema,
-    fromDBReadToModelRead: pipe(
-      // The search document exists for catalog search in Postgres. Nothing
-      // in the app reads it.
-      omitProps("search_vector"),
-      camelCaseKeysDeep,
-      nullsToUndefinedDeep,
-      (obj): DataCatalogListingRead => {
-        return {
-          ...obj,
-          id: obj.id as DataCatalogListingId,
-          metadata: obj.metadata as Json | undefined,
-        };
-      },
-    ),
+    fromDBReadToModelRead: _fromDBReadToModelRead,
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
     fromModelUpdateToDBUpdate: snakeCaseKeysDeep,
   });

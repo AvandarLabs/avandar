@@ -54,7 +54,7 @@ function _relation(
     csvPath,
     csvColumns: [],
     displayName: "World Development Indicators (WDI)",
-    externalOrganizationName: "World Bank",
+    organization1Name: "World Bank",
     sourceUpdatedAt: undefined,
     ...overrides,
   };
@@ -76,6 +76,7 @@ function _prepare(args: {
       pipelineRunId: RUN_ID,
       service: undefined,
       driveKey: PIPELINE_NAME,
+      driveId: undefined,
       syncedAt: new Date("2026-10-20T12:00:00.000Z"),
       scopeKey: "all",
     }),

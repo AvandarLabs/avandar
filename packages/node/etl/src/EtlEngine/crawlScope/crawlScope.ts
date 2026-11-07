@@ -39,6 +39,8 @@ export type CrawlScopeArgs<
   config: EtlEngineConfig<TDrive, TConnection, TScope>;
   drive: TDrive;
   driveKey: string;
+  /** The drive's `data_catalog_drives.id`, or undefined with no store. */
+  driveId: string | undefined;
   scope: TScope;
   options: EtlRunOptions;
   pipelineRunId: EtlPipelineRunId;
@@ -330,6 +332,7 @@ function _buildLoadContext<TDrive, TConnection, TScope extends EtlScope>(
     pipelineRunId: args.pipelineRunId,
     service: args.config.service,
     driveKey: args.driveKey,
+    driveId: args.driveId,
     scopeKey: args.scope.key,
     syncedAt: args.syncedAt,
     stores: args.stores,

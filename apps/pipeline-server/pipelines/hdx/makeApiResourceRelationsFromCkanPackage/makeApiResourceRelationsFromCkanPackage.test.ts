@@ -7,13 +7,15 @@ import type { HdxScope } from "@pipelines/hdx/hdxScopes";
 
 const CKAN_DRIVE: HdxDrive = {
   baseUrl: "https://data.humdata.org",
-  organizationName: "Humanitarian Data Exchange",
+  organizationLabels: { 1: "Organization" },
 };
+const MAPPED_FIELDS = { organization1Name: "Test Org" };
 
 function _packageWithOneCsv(
   overrides: Partial<CkanPackage["resources"][number]>,
 ): CkanPackage {
   return {
+    sourceRecord: {},
     id: "c3429f0e",
     name: "movement-range-maps",
     metadata_modified: "2025-11-19T10:29:46.280529",
@@ -71,6 +73,7 @@ function _metrics() {
 describe("makeApiResourceRelationsFromCkanPackage", () => {
   it("builds one relation per readable resource of the scope's format, dated by metadata_modified", async () => {
     const ckanPackage: CkanPackage = {
+      sourceRecord: {},
       id: "c3429f0e",
       name: "movement-range-maps",
       metadata_modified: "2025-11-19T10:29:46.280529",
@@ -116,6 +119,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
 
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
       ckanPackage,
       scope: CSV_SCOPE,
       readFileColumns: _readSniffedColumns,
@@ -129,7 +133,8 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         apiResourceId: "csv-1",
         apiResourceFormat: "CSV",
         displayName: "data.csv",
-        externalOrganizationName: "Humanitarian Data Exchange",
+        organization1Name: "Test Org",
+        sourceMetadata: {},
         sourceUpdatedAt: new Date("2025-11-19T10:29:46.280Z"),
         sourceAssetType: "upload",
         sourceUrl:
@@ -147,6 +152,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
 
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
       ckanPackage: _packageWithOneCsv({ fileHeaders: ["adm1", "year"] }),
       scope: CSV_SCOPE,
       readFileColumns,
@@ -164,6 +170,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
   it("lists a Parquet resource whose columns cannot be read as unloadable", async () => {
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
       ckanPackage: _packageWithOneCsv({ format: "Parquet" }),
       scope: PARQUET_SCOPE,
       readFileColumns: async () => {
@@ -184,6 +191,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
 
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
       ckanPackage: _packageWithOneCsv({
         url: "http://example.invalid/data.csv",
         url_type: "",
@@ -222,6 +230,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
 
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
       ckanPackage,
       scope: OTHER_SCOPE,
       readFileColumns,
@@ -246,6 +255,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
 
   it("returns no relations when the dataset has no resource in the scope's format", async () => {
     const ckanPackage: CkanPackage = {
+      sourceRecord: {},
       id: "c3429f0e",
       name: "docs-only-dataset",
       metadata_modified: undefined,
@@ -268,6 +278,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     expect(
       await makeApiResourceRelationsFromCkanPackage({
         drive: CKAN_DRIVE,
+        mappedFields: MAPPED_FIELDS,
         ckanPackage,
         scope: CSV_SCOPE,
         readFileColumns: _readSniffedColumns,
@@ -278,6 +289,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
 
   it("keeps only the scope's format, whatever the resource's case", async () => {
     const ckanPackage: CkanPackage = {
+      sourceRecord: {},
       id: "c3429f0e",
       name: "movement-range-maps",
       metadata_modified: "2025-11-19T10:29:46.280529",
@@ -311,6 +323,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
 
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
       ckanPackage,
       scope: PARQUET_SCOPE,
       readFileColumns: _readSniffedColumns,
@@ -327,6 +340,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
   it("reports the size CKAN records for each resource", async () => {
     const relations = await makeApiResourceRelationsFromCkanPackage({
       drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
       ckanPackage: _packageWithOneCsv({
         fileHeaders: ["adm1"],
         size: 4096,
@@ -337,5 +351,36 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     });
 
     expect(relations[0]?.sourceSizeBytes).toBe(4096);
+  });
+
+  it("gives every resource relation of a package the same mapped fields and raw record", async () => {
+    const [csvResource] = _packageWithOneCsv({}).resources;
+    const sourceRecord = { name: "movement-range-maps", tags: [{ name: "x" }] };
+    const ckanPackage: CkanPackage = {
+      ..._packageWithOneCsv({ fileHeaders: ["adm1"] }),
+      sourceRecord,
+      resources: [
+        { ...csvResource!, fileHeaders: ["adm1"] },
+        { ...csvResource!, id: "csv-2", fileHeaders: ["adm2"] },
+      ],
+    };
+
+    const relations = await makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      mappedFields: { ...MAPPED_FIELDS, tags: ["x"] },
+      ckanPackage,
+      scope: CSV_SCOPE,
+      readFileColumns: _readSniffedColumns,
+      metrics: _metrics().metrics,
+    });
+
+    expect(
+      relations.map((relation) => {
+        return [relation.apiResourceId, relation.tags, relation.sourceMetadata];
+      }),
+    ).toEqual([
+      ["csv-1", ["x"], sourceRecord],
+      ["csv-2", ["x"], sourceRecord],
+    ]);
   });
 });

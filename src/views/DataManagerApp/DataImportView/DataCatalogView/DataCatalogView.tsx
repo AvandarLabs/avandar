@@ -16,6 +16,7 @@ import { IconWorldSearch } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useState } from "react";
 import { uuid } from "$/lib/uuid";
+import { DataCatalogDriveClient } from "@/clients/data-catalog-listings/DataCatalogDriveClient";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DataCatalogRelationColumnClient } from "@/clients/data-catalog-listings/DataCatalogRelationColumnClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -32,9 +33,12 @@ import { Logger } from "@/utils/Logger";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOpenDataDatasetColumnInputs";
 import {
+  addCatalogFilterValue,
   EMPTY_CATALOG_FACETS,
   EMPTY_CATALOG_LISTING_FILTERS,
+  hasActiveCatalogFilters,
   resolveCatalogSortBy,
+  settleCatalogListingFilters,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
 import { DataCatalogFilterRail } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail";
 import { DataCatalogListingDetail } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail";
@@ -42,6 +46,7 @@ import { DataCatalogListingList } from "@/views/DataManagerApp/DataImportView/Da
 import { DataCatalogResultsHeader } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
 import { readCatalogColumnsForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/readCatalogColumnsForAdding/readCatalogColumnsForAdding";
+import { useActiveCatalogFilters } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters";
 import { useDataCatalogFacets } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogFacets";
 import { useDataCatalogSearch } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogSearch";
 import {
@@ -57,7 +62,6 @@ import type {
   CatalogSortBy,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
 import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
-import type { ActiveCatalogFilter } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader";
 
 /**
  * Whether the open listing's column types are known: `checking` while they
@@ -75,66 +79,6 @@ function _toColumnTypeState(
     return "verified";
   }
   return status === "failed" ? "failed" : "checking";
-}
-
-/**
- * One removable chip per thing narrowing the results beyond the default, so
- * a user can always see why a dataset they expected is missing.
- */
-function _buildActiveFilters(options: {
-  filters: Readonly<CatalogListingFilters>;
-  onFiltersChange: (filters: CatalogListingFilters) => void;
-  labels: { updatedWithin: string; showingUnloadable: string };
-}): ActiveCatalogFilter[] {
-  const { filters, onFiltersChange, labels } = options;
-  const removeValue = (key: "sources" | "formats", value: string) => {
-    return () => {
-      onFiltersChange({
-        ...filters,
-        [key]: filters[key].filter((chosenValue) => {
-          return chosenValue !== value;
-        }),
-      });
-    };
-  };
-  return [
-    ...filters.sources.map((source) => {
-      return {
-        key: `source:${source}`,
-        label: source,
-        onRemove: removeValue("sources", source),
-      };
-    }),
-    ...filters.formats.map((format) => {
-      return {
-        key: `format:${format}`,
-        label: format,
-        onRemove: removeValue("formats", format),
-      };
-    }),
-    ...(filters.updatedWithin === "any"
-      ? []
-      : [
-          {
-            key: "updatedWithin",
-            label: labels.updatedWithin,
-            onRemove: () => {
-              onFiltersChange({ ...filters, updatedWithin: "any" });
-            },
-          },
-        ]),
-    ...(filters.isLoadableOnly
-      ? []
-      : [
-          {
-            key: "isLoadableOnly",
-            label: labels.showingUnloadable,
-            onRemove: () => {
-              onFiltersChange({ ...filters, isLoadableOnly: true });
-            },
-          },
-        ]),
-  ];
 }
 
 type Props = BoxProps & {
@@ -188,6 +132,13 @@ export function DataCatalogView({
   });
   const facets = useDataCatalogFacets({ query: debouncedSearch, filters });
   const isLoadingCatalog = catalogSearch.isLoading;
+  const changeFilters = (nextFilters: CatalogListingFilters): void => {
+    setFilters(settleCatalogListingFilters(nextFilters));
+  };
+  const activeFilters = useActiveCatalogFilters({
+    filters,
+    onFiltersChange: changeFilters,
+  });
 
   const [catalogListingColumns = [], isLoadingCatalogColumns] =
     DataCatalogRelationColumnClient.useGetAll({
@@ -214,6 +165,12 @@ export function DataCatalogView({
   const selectedListing: DataCatalogListingRead | undefined = isSelectionShown
     ? fetchedListing
     : undefined;
+  const [selectedListingDrive] = DataCatalogDriveClient.useGetById({
+    id: selectedListing?.driveId,
+    useQueryOptions: {
+      enabled: selectedListing?.driveId !== undefined,
+    },
+  });
 
   useVerifyColumnTypesOnDwell({
     listing: selectedListing,
@@ -344,20 +301,6 @@ export function DataCatalogView({
     );
   }
 
-  const updatedWithinLabels = {
-    any: "",
-    pastMonth: t`Updated in the past month`,
-    pastYear: t`Updated in the past year`,
-    overAYear: t`Updated over a year ago`,
-  };
-  const activeFilters = _buildActiveFilters({
-    filters,
-    onFiltersChange: setFilters,
-    labels: {
-      updatedWithin: updatedWithinLabels[filters.updatedWithin],
-      showingUnloadable: t`Including datasets that can't be loaded`,
-    },
-  });
   const hasNoMatches = !isLoadingCatalog && catalogSearch.listings.length === 0;
   const filterRail = (
     <DataCatalogFilterRail
@@ -365,7 +308,7 @@ export function DataCatalogView({
       onSearchChange={setSearch}
       filters={filters}
       facets={facets ?? EMPTY_CATALOG_FACETS}
-      onFiltersChange={setFilters}
+      onFiltersChange={changeFilters}
     />
   );
 
@@ -389,7 +332,8 @@ export function DataCatalogView({
             // "X of Y" waits for the catalog's size, which the facet counts
             // carry, rather than reading "X of 0" for a moment.
             isNarrowed={
-              (isSearching || activeFilters.length > 0) && facets !== undefined
+              (isSearching || hasActiveCatalogFilters(filters)) &&
+              facets !== undefined
             }
             activeFilters={activeFilters}
             onClearAll={() => {
@@ -428,7 +372,7 @@ export function DataCatalogView({
                 </Trans>
               </Text>
               <Group gap="xs" justify="center">
-                {activeFilters.length > 0 ? (
+                {hasActiveCatalogFilters(filters) ? (
                   <Button
                     variant="default"
                     size="xs"
@@ -477,6 +421,7 @@ export function DataCatalogView({
             ) : (
               <DataCatalogListingDetail
                 listing={selectedListing}
+                drive={selectedListingDrive}
                 columns={catalogListingColumns}
                 columnTypeState={_toColumnTypeState(
                   selectedListing,
@@ -494,6 +439,14 @@ export function DataCatalogView({
                 }}
                 onBack={() => {
                   setSelectedId(undefined);
+                }}
+                onSelectTopic={(domain) => {
+                  changeFilters(
+                    addCatalogFilterValue(filters, "domains", domain),
+                  );
+                }}
+                onAddKeyword={(tag) => {
+                  changeFilters(addCatalogFilterValue(filters, "tags", tag));
                 }}
               />
             )}

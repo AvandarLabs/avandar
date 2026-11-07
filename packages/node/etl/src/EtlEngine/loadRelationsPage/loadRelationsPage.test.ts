@@ -49,6 +49,7 @@ function _context(
     pipelineRunId: RUN_ID,
     service: "socrata",
     driveKey: "https://data.cityofnewyork.us",
+    driveId: undefined,
     syncedAt: new Date("2026-10-20T12:00:00.000Z"),
     stores,
     bucket: undefined,
@@ -69,7 +70,7 @@ function _apiRelation(
     apiResourceId: id,
     apiResourceFormat: "CSV",
     displayName: `Dataset ${index}`,
-    externalOrganizationName: "City of New York",
+    organization1Name: "City of New York",
     sourceUpdatedAt: new Date(Date.UTC(2026, 9, 1, 0, index)),
     columns: [COLUMN_A],
     ...overrides,
@@ -84,7 +85,7 @@ function _parquetRelation(csvPath: string): PipelineParquetRelation {
     csvPath,
     csvColumns: [],
     displayName: "WDI",
-    externalOrganizationName: "World Bank",
+    organization1Name: "World Bank",
     sourceUpdatedAt: undefined,
   };
 }

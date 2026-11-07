@@ -34,8 +34,12 @@ create table public.data_catalog_listings (
   -- ID of the pipeline run that last wrote this listing, when a pipeline wrote
   -- it.
   pipeline_run_id text,
-  -- External organization this dataset comes from (e.g. World Bank)
-  external_organization_name text not null,
+  -- The broadest organization this dataset comes from, such as `City of New
+  -- York` or `World Bank`. Organization levels nest like administrative
+  -- levels; the drive's `data_catalog_drives.organization1_label` says what
+  -- this level is called. The number is attached to the word so the app's
+  -- camelCase round trip (`organization1Name`) lands back on this column.
+  organization1_name text not null,
   -- External name of the service, such as the API (e.g. World Bank WDI API)
   external_service_name text,
   -- External identifier of the dataset in the external service, such as
@@ -119,9 +123,28 @@ create table public.data_catalog_listings (
   -- Where the asset's bytes can be downloaded, when the source exposes one.
   -- `source_url` is the page a person opens instead.
   source_download_url text,
+  -- Deeper organization levels, each inside the one above, such as an
+  -- agency, then an office. Null when the source has no such level.
+  organization2_name text,
+  organization3_name text,
+  organization4_name text,
+  -- Subject areas the source files the dataset under, such as
+  -- `Transportation`.
+  domains text[],
+  -- The source's free-form keywords.
+  tags text[],
+  -- The source record this listing was built from, untouched, such as a
+  -- Socrata Discovery API result or a CKAN package. Keeps source metadata
+  -- that has no column of its own, so a later column can be filled from it
+  -- without re-crawling. As of the last write that changed another column.
+  source_metadata jsonb,
+  -- The drive that produced this listing. Null on a listing no drive-index
+  -- pipeline wrote.
+  drive_id uuid references public.data_catalog_drives (id) on delete set null,
   -- What catalog search matches words against, weighted by how strongly a
   -- match in each field says this is the listing the user wants: the name
-  -- (A), who publishes it (B), then what it says about itself (C).
+  -- (A), who publishes it and what it is filed under (B), then what it says
+  -- about itself (C).
   search_vector tsvector generated always as (
     setweight(
       to_tsvector(
@@ -132,7 +155,7 @@ create table public.data_catalog_listings (
     ) || setweight(
       to_tsvector(
         'english'::regconfig,
-        coalesce(external_organization_name, '') || ' ' || coalesce(external_service_name, '') || ' ' || coalesce(pipeline_name, '')
+        coalesce(organization1_name, '') || ' ' || coalesce(organization2_name, '') || ' ' || coalesce(organization3_name, '') || ' ' || coalesce(organization4_name, '') || ' ' || public.util__text_array_to_text (domains) || ' ' || public.util__text_array_to_text (tags) || ' ' || coalesce(external_service_name, '') || ' ' || coalesce(pipeline_name, '')
       ),
       'B'
     ) || setweight(
@@ -236,12 +259,26 @@ create index data_catalog_listings__pipeline_drive_last_update on public.data_ca
   date_of_last_update
 );
 
+-- Serves joining a listing to its drive's labels, and the foreign key's
+-- `on delete set null`.
+create index data_catalog_listings__drive_id on public.data_catalog_listings (drive_id);
+
 -- Serves catalog search's whole-word matching on `search_vector`.
 create index data_catalog_listings__search_vector on public.data_catalog_listings using gin (search_vector);
 
 -- Serves catalog search's partial and misspelled word matching on a
 -- listing's name.
 create index data_catalog_listings__display_name_trgm on public.data_catalog_listings using gin (display_name extensions.gin_trgm_ops);
+
+-- Serves the catalog's publisher filter, and its second-level filter under a
+-- chosen publisher.
+create index data_catalog_listings__organization_levels on public.data_catalog_listings (organization1_name, organization2_name);
+
+-- Serves the catalog's topic filter (`domains && ...`).
+create index data_catalog_listings__domains on public.data_catalog_listings using gin (domains);
+
+-- Serves the catalog's keyword filter (`tags && ...`).
+create index data_catalog_listings__tags on public.data_catalog_listings using gin (tags);
 
 -- Enable row level security
 alter table public.data_catalog_listings enable row level security;

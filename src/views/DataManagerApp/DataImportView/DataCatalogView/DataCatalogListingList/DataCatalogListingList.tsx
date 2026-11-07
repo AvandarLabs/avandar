@@ -4,6 +4,7 @@ import { useId } from "@mantine/hooks";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
+import { buildOrganizationLine } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOrganizationLine/buildOrganizationLine";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.module.css";
 import { formatCatalogListingDate } from "@/views/DataManagerApp/DataImportView/DataCatalogView/formatCatalogListingDate";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
@@ -176,7 +177,7 @@ export function DataCatalogListingList({
               </Text>
               <Text c="dimmed" lineClamp={1} size="xs">
                 {[
-                  listing.externalOrganizationName,
+                  buildOrganizationLine(listing),
                   listing.fileFormat,
                   updatedDate
                     ? t`Updated ${formatCatalogListingDate(updatedDate)}`

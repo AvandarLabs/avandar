@@ -4,6 +4,10 @@ Status: approved design. Follows
 [catalog-field-mapping-design.md](catalog-field-mapping-design.md), which
 deferred catalog search to this document.
 
+Since this was written, `feat/catalog-filters` added filters, sort, and
+facets to the search, and the field mapping design's section 6 extended them
+with the level-2 organization, topic, and keyword filters.
+
 ## 1. Problem
 
 The open data catalog has more than 5,000 listings. `DataCatalogView` loads
@@ -58,22 +62,25 @@ listing is the one the user wants:
 | Weight | Fields |
 |---|---|
 | A | `display_name` |
-| B | `external_organization_name`, `external_service_name`, `pipeline_name` |
+| B | `organization1_name` to `organization4_name`, `domains`, `tags`, `external_service_name`, `pipeline_name` |
 | C | `description`, `notes` |
 
 Trigram matching covers `display_name` only. A name is what a user types a
 fragment of. Organizations and pipelines are short, and full-text search
 already matches their whole words.
 
-When the field mapping design's columns land, `organization1_name` through
-`organization4_name`, `domains` and `tags` join weight B. Rebuilding a stored
-generated column rewrites the table, which takes well under a second at this
-size.
+`organization1_name` through `organization4_name`, `domains` and `tags` joined
+weight B with the field mapping work. The two array columns go through
+`public.util__text_array_to_text`, an immutable join, because a generated
+column may only call immutable functions. Rebuilding a stored generated
+column rewrites the table, which takes well under a second at this size.
 
 ## 4. The search RPC
 
 `public.rpc_data_catalog_listings__search(p_query text, p_limit integer,
-p_offset integer)`, in `supabase/schemas/50.rpc_data_catalog_listings__search.sql`.
+p_offset integer, ...)`, in
+`supabase/schemas/52.rpc_data_catalog_listings__search.sql`. The arguments
+after `p_offset` are the filters and the sort `feat/catalog-filters` added.
 
 ### 4.1 Matching
 
@@ -108,16 +115,21 @@ shift a row across a page boundary, so the client drops a row it already has.
 
 ### 4.4 Shape
 
-Each row carries only what the list shows, plus the total match count:
+Each row carries only what the list shows, plus the total match count. `domains`
+and `tags` are searched and filtered on but not returned: the detail pane reads
+them with the full row.
 
 | Column | Type |
 |---|---|
 | `id` | `uuid` |
 | `display_name` | `text` |
-| `external_organization_name` | `text` |
+| `organization1_name` | `text` |
+| `organization2_name` to `organization4_name` | `text` |
 | `pipeline_name` | `text` |
 | `is_workspace_loadable` | `boolean` |
 | `is_invalid` | `boolean` |
+| `file_format` | `text` |
+| `last_updated_at` | `timestamptz` |
 | `total_count` | `bigint`, from `count(*) over ()` |
 
 `total_count` feeds the "Catalog (N)" header without a second request. The

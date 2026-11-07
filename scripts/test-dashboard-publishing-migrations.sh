@@ -62,3 +62,11 @@ run_migration_replay \
   "$repo_root/supabase/migration-upgrade-tests/case_statuses_backfill.prelude.sql" \
   "$repo_root/supabase/migrations/20261026115137_backfill_case_statuses.sql" \
   "$repo_root/supabase/migration-upgrade-tests/case_statuses_backfill.assertions.sql"
+
+# Catalog field mapping: renaming `external_organization_name` to
+# `organization1_name` keeps every listing's organization, and the rebuilt
+# search finds a listing by it.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/catalog_field_mapping.prelude.sql" \
+  "$repo_root/supabase/migrations/20261107180000_catalog_field_mapping.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/catalog_field_mapping.assertions.sql"

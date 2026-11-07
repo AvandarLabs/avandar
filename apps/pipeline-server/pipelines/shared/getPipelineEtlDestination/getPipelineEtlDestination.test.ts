@@ -40,6 +40,23 @@ describe("getPipelineEtlDestination", () => {
     );
   });
 
+  it("records drives in data_catalog_drives when asked to", () => {
+    expect(
+      getPipelineEtlDestination({ isRecordingDrives: true }).output.drivesTable,
+    ).toBe("data_catalog_drives");
+  });
+
+  it("does not record drives by default", () => {
+    expect(getPipelineEtlDestination().output.drivesTable).toBeUndefined();
+  });
+
+  it("does not record drives when asked not to", () => {
+    expect(
+      getPipelineEtlDestination({ isRecordingDrives: false }).output
+        .drivesTable,
+    ).toBeUndefined();
+  });
+
   it("records runs through the pipeline execution functions", () => {
     expect(getPipelineEtlDestination().output.executionFunctions).toEqual({
       start: "rpc_pipeline_executions__start",

@@ -4,6 +4,7 @@ import type { TransformedColumnDescription } from "@etl/EtlEngine/transformedCsv
 import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 import type {
   CheckpointStore,
+  DrivesStore,
   ListingsStore,
   ObjectStore,
 } from "@etl/stores/EtlStores.types";
@@ -116,12 +117,48 @@ export type EtlScope = Readonly<{
   key: string;
 }>;
 
+/**
+ * An organization level, broadest first, the way admin1, admin2, and admin3
+ * nest administrative boundaries. Level 1 might be a city and level 2 one of
+ * its agencies.
+ */
+export type EtlOrganizationLevel = 1 | 2 | 3 | 4;
+
+/**
+ * What each organization level is called on one drive, such as `City` for
+ * level 1 and `Agency` for level 2. A level with no label is one the drive
+ * does not use.
+ */
+export type EtlOrganizationLabels = Readonly<
+  Partial<Record<EtlOrganizationLevel, string>>
+>;
+
+/** What the engine records about one drive in the drives table. */
+export type EtlDriveDescription = Readonly<{
+  organizationLabels: EtlOrganizationLabels;
+}>;
+
 /** The descriptive listing fields every relation carries or may carry. */
 export type RelationDescription = Readonly<{
   /** The connection's id in the source, written to `external_dataset_id`. */
   externalDatasetId: string;
   displayName: string;
-  externalOrganizationName: string;
+  organization1Name: string;
+  /** Organization level 2, inside level 1, such as an agency. */
+  organization2Name?: string;
+  /** Organization level 3, inside level 2. */
+  organization3Name?: string;
+  /** Organization level 4, inside level 3. */
+  organization4Name?: string;
+  /** Subject areas the source files the dataset under. */
+  domains?: readonly string[];
+  /** The source's free-form keywords. */
+  tags?: readonly string[];
+  /**
+   * The source record the relation was built from, untouched, written to
+   * `source_metadata`. Must survive `JSON.stringify`.
+   */
+  sourceMetadata?: unknown;
   /**
    * The connection's source modification time, written to
    * `date_of_last_update`.
@@ -230,6 +267,11 @@ export type EtlOutput = Readonly<{
    * `rpc_pipeline_executions__start`. Omit to record nothing.
    */
   executionFunctions?: ExecutionFunctions;
+  /**
+   * The drives table, such as `data_catalog_drives`. Omit to record no
+   * drives.
+   */
+  drivesTable?: string;
 }>;
 
 /** Where a pipeline's output goes: Supabase credentials and output names. */
@@ -251,6 +293,8 @@ export type EtlStores = Readonly<{
   checkpoints?: CheckpointStore;
   /** Where runs are recorded. Omit to record nothing. */
   executions?: ExecutionStore;
+  /** Where drives are recorded. Omit to write no drive and no `drive_id`. */
+  drives?: DrivesStore;
 }>;
 
 /**
@@ -280,6 +324,11 @@ export type EtlEngineConfig<
     listDrives: () => PromisedOrValue<readonly TDrive[]>;
     /** Written to `api_base_url` on `api_resource` rows. */
     getDriveKey: (drive: TDrive) => string;
+    /**
+     * What the drives table records about a drive, such as its organization
+     * labels. Omit to record each drive with no labels.
+     */
+    describeDrive?: (drive: TDrive) => EtlDriveDescription;
     /**
      * The drive's scopes, crawled in this order. Omit for one scope,
      * `all`, which leaves `TScope` at its default, `EtlScope`.

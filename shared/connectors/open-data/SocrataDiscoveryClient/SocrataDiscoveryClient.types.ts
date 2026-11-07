@@ -23,6 +23,12 @@ export type SocrataDiscoveryResult = {
    * export leaves out.
    */
   columns: SocrataDiscoveryColumn[];
+  /**
+   * The result exactly as the Discovery API returned it, before any of it
+   * was narrowed to the fields above. A pipeline maps catalog metadata
+   * from it and stores it as the listing's `source_metadata`.
+   */
+  sourceRecord: unknown;
 };
 
 /** One column of a Discovery API result. */

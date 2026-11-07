@@ -14,6 +14,9 @@ export const UPDATED_WITHIN_DB_VALUES: Record<
 /** The filter arguments both catalog search RPCs take. */
 export type DataCatalogSearchFilterArgs = {
   p_sources: string[];
+  p_organization2_names: string[];
+  p_domains: string[];
+  p_tags: string[];
   p_formats: string[];
   p_updated_within: string;
   p_is_loadable_only: boolean;
@@ -29,6 +32,9 @@ export function buildDataCatalogSearchFilterArgs(
 ): DataCatalogSearchFilterArgs {
   return {
     p_sources: [...filters.sources],
+    p_organization2_names: [...filters.organization2Names],
+    p_domains: [...filters.domains],
+    p_tags: [...filters.tags],
     p_formats: [...filters.formats],
     p_updated_within: UPDATED_WITHIN_DB_VALUES[filters.updatedWithin],
     p_is_loadable_only: filters.isLoadableOnly,

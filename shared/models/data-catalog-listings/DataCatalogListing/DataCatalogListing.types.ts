@@ -1,3 +1,4 @@
+import type { DataCatalogDriveId } from "$/models/data-catalog-listings/DataCatalogDrive/DataCatalogDrive.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Json } from "$/types/database.types.ts";
 import type { UUID } from "@avandar/utils";
@@ -45,7 +46,7 @@ export type DataCatalogListingRead = {
   /** The pipeline run that last wrote this listing, when there is one. */
   pipelineRunId: string | undefined;
 
-  externalOrganizationName: string;
+  organization1Name: string;
 
   externalServiceName: string | undefined;
 
@@ -144,6 +145,23 @@ export type DataCatalogListingRead = {
 
   /** Where the asset's bytes can be downloaded, when the source says. */
   sourceDownloadUrl: string | undefined;
+
+  /** Deeper organization levels, inside `organization1Name`. */
+  organization2Name: string | undefined;
+  organization3Name: string | undefined;
+  organization4Name: string | undefined;
+
+  /** Subject areas the source files the dataset under. */
+  domains: string[] | undefined;
+
+  /** The source's free-form keywords. */
+  tags: string[] | undefined;
+
+  /** The source record the listing was built from, untouched. */
+  sourceMetadata: Json | undefined;
+
+  /** The drive that produced the listing. */
+  driveId: DataCatalogDriveId | undefined;
 };
 
 /**
@@ -154,7 +172,10 @@ export type DataCatalogListingSearchResult = Pick<
   DataCatalogListingRead,
   | "id"
   | "displayName"
-  | "externalOrganizationName"
+  | "organization1Name"
+  | "organization2Name"
+  | "organization3Name"
+  | "organization4Name"
   | "pipelineName"
   | "isWorkspaceLoadable"
   | "isInvalid"
@@ -187,8 +208,23 @@ export type DataCatalogListingSortBy = "relevance" | "updated" | "name";
  * alternatives; separate facets must all match.
  */
 export type DataCatalogListingSearchFilters = {
-  /** External organizations to keep. Empty keeps every source. */
+  /**
+   * Level-1 organizations (`organization1Name`) to keep. Empty keeps every
+   * source.
+   */
   sources: string[];
+
+  /**
+   * Level-2 organizations (`organization2Name`) to keep. Empty keeps every
+   * listing.
+   */
+  organization2Names: string[];
+
+  /** Subject areas (`domains`) to keep. Empty keeps every listing. */
+  domains: string[];
+
+  /** Keywords (`tags`) to keep. Empty keeps every listing. */
+  tags: string[];
 
   /** Upper-cased file formats to keep. Empty keeps every format. */
   formats: string[];
@@ -211,6 +247,18 @@ export type DataCatalogListingFacetOption = {
  */
 export type DataCatalogListingSearchFacets = {
   sources: DataCatalogListingFacetOption[];
+
+  /** Level-2 organizations the listings in view belong to. */
+  organization2: DataCatalogListingFacetOption[];
+
+  /**
+   * What the drives call the level-2 organizations in view (such as
+   * "Agency"), the label with the most listings first.
+   */
+  organization2Labels: string[];
+
+  /** Subject areas the listings in view are filed under. */
+  domains: DataCatalogListingFacetOption[];
   formats: DataCatalogListingFacetOption[];
   updatedWithin: Record<DataCatalogListingUpdatedWithin, number>;
 

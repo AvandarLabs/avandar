@@ -10,17 +10,26 @@
  * quoted phrases, `or`, and `-word`.
  * @param p_limit Page size, clamped to between 1 and 200.
  * @param p_offset How many matches to skip, clamped to at least 0.
- * @param p_sources External organizations to keep. Empty keeps every source.
+ * @param p_sources Level-1 organizations (`organization1_name`) to keep: the
+ * catalog calls a listing's level-1 organization its source. Empty keeps
+ * every source.
  * @param p_formats Upper-cased file formats to keep. Empty keeps every format.
  * @param p_updated_within `any`, `past_month`, `past_year`, or `over_a_year`.
  * @param p_is_loadable_only Whether to hide listings that cannot be loaded.
+ * @param p_organization2_names Level-2 organizations (`organization2_name`)
+ * to keep. Empty keeps every level-2 organization.
+ * @param p_domains Topics to keep: a listing is kept when its `domains`
+ * overlap them. Empty keeps every topic.
+ * @param p_tags Keywords to keep: a listing is kept when its `tags` overlap
+ * them. Empty keeps every keyword.
  * @param p_sort_by `relevance` (best match first), `updated` (most recently
  * updated first, undated last), or `name`. Null sorts by relevance when there
  * is a query and by name when there is not. Any other value raises `22023`
  * (invalid parameter value).
  *
- * @returns One row per listing on the page. `total_count` is the number of
- * matches across every page, repeated on each row.
+ * @returns One row per listing on the page, with its organization levels.
+ * `total_count` is the number of matches across every page, repeated on each
+ * row.
  */
 create or replace function public.rpc_data_catalog_listings__search (
   p_query text,
@@ -30,11 +39,17 @@ create or replace function public.rpc_data_catalog_listings__search (
   p_formats text[] default '{}',
   p_updated_within text default 'any',
   p_is_loadable_only boolean default false,
+  p_organization2_names text[] default '{}',
+  p_domains text[] default '{}',
+  p_tags text[] default '{}',
   p_sort_by text default null
 ) returns table (
   id uuid,
   display_name text,
-  external_organization_name text,
+  organization1_name text,
+  organization2_name text,
+  organization3_name text,
+  organization4_name text,
   pipeline_name text,
   is_workspace_loadable boolean,
   is_invalid boolean,
@@ -63,7 +78,10 @@ begin
   select
     match.id,
     match.display_name,
-    match.external_organization_name,
+    match.organization1_name,
+    match.organization2_name,
+    match.organization3_name,
+    match.organization4_name,
     match.pipeline_name,
     match.is_workspace_loadable,
     match.is_invalid,
@@ -76,13 +94,19 @@ begin
       p_sources,
       p_formats,
       p_updated_within,
-      p_is_loadable_only
+      p_is_loadable_only,
+      p_organization2_names,
+      p_domains,
+      p_tags
     ) match
   where
     match.passes_source and
     match.passes_format and
     match.passes_updated and
-    match.passes_loadable
+    match.passes_loadable and
+    match.passes_organization2 and
+    match.passes_domain and
+    match.passes_tag
   order by
     case
       when v_sort_by = 'relevance' then match.score
@@ -111,6 +135,9 @@ revoke all on function public.rpc_data_catalog_listings__search (
   text[],
   text,
   boolean,
+  text[],
+  text[],
+  text[],
   text
 )
 from
@@ -128,5 +155,8 @@ execute on function public.rpc_data_catalog_listings__search (
   text[],
   text,
   boolean,
+  text[],
+  text[],
+  text[],
   text
 ) to authenticated;

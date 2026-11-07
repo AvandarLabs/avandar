@@ -9,26 +9,14 @@ const EtlConfigSchema = z
     workspaceLoadability: z
       .strictObject({ unloadableFormats: FormatListSchema.default([]) })
       .default({ unloadableFormats: [] }),
-    pipelines: z
-      .record(
-        z.string(),
-        z.strictObject({
-          workspaceLoadability: z
-            .strictObject({
-              loadableFormats: FormatListSchema.optional(),
-              unloadableFormats: FormatListSchema.optional(),
-            })
-            .optional(),
-        }),
-      )
-      .default({}),
   })
   .strict();
 
 /**
  * Parses the shared ETL config from YAML. An empty file is a config with no
  * rules. Unknown keys are refused, so a misspelled key fails loudly rather
- * than silently loosening a rule.
+ * than silently loosening a rule. Per-pipeline overrides live in each
+ * pipeline's own config, so a `pipelines` key is refused too.
  *
  * @param args.yamlText - The file's contents.
  * @param args.sourceName - Names the file in error messages.

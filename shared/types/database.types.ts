@@ -781,6 +781,42 @@ export type Database = {
           },
         ]
       }
+      data_catalog_drives: {
+        Row: {
+          created_at: string
+          drive_key: string
+          id: string
+          organization1_label: string | null
+          organization2_label: string | null
+          organization3_label: string | null
+          organization4_label: string | null
+          pipeline_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          drive_key: string
+          id?: string
+          organization1_label?: string | null
+          organization2_label?: string | null
+          organization3_label?: string | null
+          organization4_label?: string | null
+          pipeline_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          drive_key?: string
+          id?: string
+          organization1_label?: string | null
+          organization2_label?: string | null
+          organization3_label?: string | null
+          organization4_label?: string | null
+          pipeline_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       data_catalog_listings: {
         Row: {
           access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
@@ -802,8 +838,9 @@ export type Database = {
           date_of_last_update: string | null
           description: string | null
           display_name: string
+          domains: string[] | null
+          drive_id: string | null
           external_dataset_id: string | null
-          external_organization_name: string
           external_service_name: string | null
           id: string
           invalid_dataset_reason:
@@ -814,6 +851,10 @@ export type Database = {
           license: string | null
           metadata: Json | null
           notes: string | null
+          organization1_name: string
+          organization2_name: string | null
+          organization3_name: string | null
+          organization4_name: string | null
           parquet_file_name: string | null
           pipeline_name: string | null
           pipeline_run_id: string | null
@@ -821,7 +862,9 @@ export type Database = {
           search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
+          source_metadata: Json | null
           source_url: string | null
+          tags: string[] | null
           update_frequency: string | null
           updated_at: string
         }
@@ -845,8 +888,9 @@ export type Database = {
           date_of_last_update?: string | null
           description?: string | null
           display_name: string
+          domains?: string[] | null
+          drive_id?: string | null
           external_dataset_id?: string | null
-          external_organization_name: string
           external_service_name?: string | null
           id?: string
           invalid_dataset_reason?:
@@ -857,6 +901,10 @@ export type Database = {
           license?: string | null
           metadata?: Json | null
           notes?: string | null
+          organization1_name: string
+          organization2_name?: string | null
+          organization3_name?: string | null
+          organization4_name?: string | null
           parquet_file_name?: string | null
           pipeline_name?: string | null
           pipeline_run_id?: string | null
@@ -864,7 +912,9 @@ export type Database = {
           search_vector?: unknown
           source_asset_type?: string | null
           source_download_url?: string | null
+          source_metadata?: Json | null
           source_url?: string | null
+          tags?: string[] | null
           update_frequency?: string | null
           updated_at?: string
         }
@@ -888,8 +938,9 @@ export type Database = {
           date_of_last_update?: string | null
           description?: string | null
           display_name?: string
+          domains?: string[] | null
+          drive_id?: string | null
           external_dataset_id?: string | null
-          external_organization_name?: string
           external_service_name?: string | null
           id?: string
           invalid_dataset_reason?:
@@ -900,6 +951,10 @@ export type Database = {
           license?: string | null
           metadata?: Json | null
           notes?: string | null
+          organization1_name?: string
+          organization2_name?: string | null
+          organization3_name?: string | null
+          organization4_name?: string | null
           parquet_file_name?: string | null
           pipeline_name?: string | null
           pipeline_run_id?: string | null
@@ -907,11 +962,21 @@ export type Database = {
           search_vector?: unknown
           source_asset_type?: string | null
           source_download_url?: string | null
+          source_metadata?: Json | null
           source_url?: string | null
+          tags?: string[] | null
           update_frequency?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "data_catalog_listings_drive_id_fkey"
+            columns: ["drive_id"]
+            isOneToOne: false
+            referencedRelation: "data_catalog_drives"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       data_catalog_listings__relation_columns: {
         Row: {
@@ -2560,26 +2625,38 @@ export type Database = {
       }
       data_catalog_listings__search_matches: {
         Args: {
+          p_domains: string[]
           p_formats: string[]
           p_is_loadable_only: boolean
+          p_organization2_names: string[]
           p_query: string
           p_sources: string[]
+          p_tags: string[]
           p_updated_within: string
         }
         Returns: {
           display_name: string
-          external_organization_name: string
+          domains: string[]
+          drive_id: string
           file_format: string
           id: string
           is_invalid: boolean
           is_workspace_loadable: boolean
           last_updated_at: string
+          organization1_name: string
+          organization2_name: string
+          organization3_name: string
+          organization4_name: string
+          passes_domain: boolean
           passes_format: boolean
           passes_loadable: boolean
+          passes_organization2: boolean
           passes_source: boolean
+          passes_tag: boolean
           passes_updated: boolean
           pipeline_name: string
           score: number
+          tags: string[]
         }[]
       }
       datasets__auth_user_may_add_column: {
@@ -2707,8 +2784,9 @@ export type Database = {
           date_of_last_update: string | null
           description: string | null
           display_name: string
+          domains: string[] | null
+          drive_id: string | null
           external_dataset_id: string | null
-          external_organization_name: string
           external_service_name: string | null
           id: string
           invalid_dataset_reason:
@@ -2719,6 +2797,10 @@ export type Database = {
           license: string | null
           metadata: Json | null
           notes: string | null
+          organization1_name: string
+          organization2_name: string | null
+          organization3_name: string | null
+          organization4_name: string | null
           parquet_file_name: string | null
           pipeline_name: string | null
           pipeline_run_id: string | null
@@ -2726,7 +2808,9 @@ export type Database = {
           search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
+          source_metadata: Json | null
           source_url: string | null
+          tags: string[] | null
           update_frequency: string | null
           updated_at: string
         }
@@ -2753,33 +2837,42 @@ export type Database = {
       }
       rpc_data_catalog_listings__search: {
         Args: {
+          p_domains?: string[]
           p_formats?: string[]
           p_is_loadable_only?: boolean
           p_limit?: number
           p_offset?: number
+          p_organization2_names?: string[]
           p_query: string
           p_sort_by?: string
           p_sources?: string[]
+          p_tags?: string[]
           p_updated_within?: string
         }
         Returns: {
           display_name: string
-          external_organization_name: string
           file_format: string
           id: string
           is_invalid: boolean
           is_workspace_loadable: boolean
           last_updated_at: string
+          organization1_name: string
+          organization2_name: string
+          organization3_name: string
+          organization4_name: string
           pipeline_name: string
           total_count: number
         }[]
       }
       rpc_data_catalog_listings__search_facets: {
         Args: {
+          p_domains?: string[]
           p_formats?: string[]
           p_is_loadable_only?: boolean
+          p_organization2_names?: string[]
           p_query: string
           p_sources?: string[]
+          p_tags?: string[]
           p_updated_within?: string
         }
         Returns: {
@@ -2810,8 +2903,9 @@ export type Database = {
           date_of_last_update: string | null
           description: string | null
           display_name: string
+          domains: string[] | null
+          drive_id: string | null
           external_dataset_id: string | null
-          external_organization_name: string
           external_service_name: string | null
           id: string
           invalid_dataset_reason:
@@ -2822,6 +2916,10 @@ export type Database = {
           license: string | null
           metadata: Json | null
           notes: string | null
+          organization1_name: string
+          organization2_name: string | null
+          organization3_name: string | null
+          organization4_name: string | null
           parquet_file_name: string | null
           pipeline_name: string | null
           pipeline_run_id: string | null
@@ -2829,7 +2927,9 @@ export type Database = {
           search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
+          source_metadata: Json | null
           source_url: string | null
+          tags: string[] | null
           update_frequency: string | null
           updated_at: string
         }[]
@@ -2862,8 +2962,9 @@ export type Database = {
           date_of_last_update: string | null
           description: string | null
           display_name: string
+          domains: string[] | null
+          drive_id: string | null
           external_dataset_id: string | null
-          external_organization_name: string
           external_service_name: string | null
           id: string
           invalid_dataset_reason:
@@ -2874,6 +2975,10 @@ export type Database = {
           license: string | null
           metadata: Json | null
           notes: string | null
+          organization1_name: string
+          organization2_name: string | null
+          organization3_name: string | null
+          organization4_name: string | null
           parquet_file_name: string | null
           pipeline_name: string | null
           pipeline_run_id: string | null
@@ -2881,7 +2986,9 @@ export type Database = {
           search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
+          source_metadata: Json | null
           source_url: string | null
+          tags: string[] | null
           update_frequency: string | null
           updated_at: string
         }
@@ -3408,6 +3515,10 @@ export type Database = {
           p_plan: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
         }
         Returns: number
+      }
+      util__text_array_to_text: {
+        Args: { p_values: string[] }
+        Returns: string
       }
       util__workspace_max_shareable_dashboards: {
         Args: { p_workspace_id: string }

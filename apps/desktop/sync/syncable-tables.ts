@@ -17,9 +17,10 @@
  *
  * Today's split (every entry is a judgment call, review in the PR):
  *   - ACTIVE: dataset definitions and their per-format detail rows,
- *     catalog listings, dashboards, concepts + their statuses, attributes,
- *     and attribute mappings, individuals, user profile, plus `workspaces` and
- *     `workspace_memberships` so the workspace picker renders offline.
+ *     catalog listings and their drives, dashboards, concepts + their
+ *     statuses, attributes, and attribute mappings, individuals, user
+ *     profile, plus `workspaces` and `workspace_memberships` so the
+ *     workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
  *     billing, sensitive OAuth tokens, admin-only signups, legacy role
  *     tables, the web-only `dexie_dbs` tracker, web GIS `maps`, and case
@@ -43,6 +44,7 @@ const ACTIVE_TABLES = [
   "datasets__postgres_table",
   "data_catalog_listings",
   "data_catalog_listings__relation_columns",
+  "data_catalog_drives",
   "dashboards",
   "concepts",
   "concept_statuses",

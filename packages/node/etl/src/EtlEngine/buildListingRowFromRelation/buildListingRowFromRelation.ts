@@ -12,6 +12,7 @@ type _BuildArgs = Readonly<{
   pipelineRunId: string;
   service: string | undefined;
   driveKey: string;
+  driveId: string | undefined;
   syncedAt: Date;
   scopeKey: string;
   workspaceLoadability?: EtlWorkspaceLoadabilityRules;
@@ -50,7 +51,7 @@ function _buildSharedColumns(args: _BuildArgs): _SharedColumns {
     pipeline_name: args.pipelineName,
     pipeline_run_id: args.pipelineRunId,
     display_name: relation.displayName,
-    external_organization_name: relation.externalOrganizationName,
+    organization1_name: relation.organization1Name,
     external_dataset_id: relation.externalDatasetId,
     date_of_last_update: _readIsoOrNull(relation, "sourceUpdatedAt"),
     date_of_last_sync: args.syncedAt.toISOString(),
@@ -58,6 +59,13 @@ function _buildSharedColumns(args: _BuildArgs): _SharedColumns {
     source_url: relation.sourceUrl ?? null,
     source_download_url: relation.sourceDownloadUrl ?? null,
     source_asset_type: relation.sourceAssetType ?? null,
+    organization2_name: relation.organization2Name ?? null,
+    organization3_name: relation.organization3Name ?? null,
+    organization4_name: relation.organization4Name ?? null,
+    domains: relation.domains ? [...relation.domains] : null,
+    tags: relation.tags ? [...relation.tags] : null,
+    source_metadata: relation.sourceMetadata ?? null,
+    drive_id: args.driveId ?? null,
     canonical_urls: relation.canonicalUrls ? [...relation.canonicalUrls] : null,
     license: relation.license ?? null,
     update_frequency: relation.updateFrequency ?? null,
@@ -94,6 +102,7 @@ function _isApiRelationLoadable(
  * @param args.pipelineRunId - Written to `pipeline_run_id`.
  * @param args.service - Written to `api_service` on an `api_resource` row.
  * @param args.driveKey - Written to `api_base_url` on an `api_resource` row.
+ * @param args.driveId - Written to `drive_id`, or null when undefined.
  * @param args.syncedAt - Written to `date_of_last_sync`.
  * @param args.scopeKey - The scope that produced the row, written to
  *   `pipeline_scope_keys`.

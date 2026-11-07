@@ -2,7 +2,11 @@ import type {
   SocrataDiscoveryColumn,
   SocrataDiscoveryResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
-import type { ApiResourceRelation, RelationColumn } from "@avandar/etl";
+import type {
+  ApiResourceRelation,
+  CatalogMappedFields,
+  RelationColumn,
+} from "@avandar/etl";
 import type { ConfiguredDrive } from "@pipelines/socrata/configuredDrives/configuredDrives";
 
 /**
@@ -104,10 +108,21 @@ function _buildDownloadUrl(params: {
  *
  * Every other asset type is marked unloadable, with no columns. A `file`
  * takes its format from its MIME type.
+ *
+ * The catalog metadata (organizations, description, domains, tags, and the
+ * rest) comes from the pipeline config's field mapping, and the raw
+ * Discovery API result is kept as `sourceMetadata`. The mapped fields are
+ * spread first, so a mapping can never overwrite a field computed here.
+ *
+ * @param params.drive - The drive the result came from.
+ * @param params.result - The discovered asset.
+ * @param params.mappedFields - The result's mapped catalog metadata, which
+ *   must name its level 1 organization.
  */
 export function makeApiResourceRelationFromSocrataResult(params: {
   drive: Readonly<ConfiguredDrive>;
   result: Readonly<SocrataDiscoveryResult>;
+  mappedFields: CatalogMappedFields & Readonly<{ organization1Name: string }>;
 }): ApiResourceRelation {
   const { drive, result } = params;
   const isTabular =
@@ -117,12 +132,13 @@ export function makeApiResourceRelationFromSocrataResult(params: {
     : [];
   const sourceDownloadUrl = _buildDownloadUrl({ drive, result, isTabular });
   return {
+    ...params.mappedFields,
+    sourceMetadata: result.sourceRecord,
     kind: "api_resource",
     externalDatasetId: result.datasetId,
     apiResourceId: result.datasetId,
     apiResourceFormat: isTabular ? "CSV" : _getFileFormat(result.blobMimeType),
     displayName: result.name,
-    externalOrganizationName: drive.organizationName,
     sourceUpdatedAt: new Date(result.updatedAt),
     ...(result.assetType === undefined
       ? {}

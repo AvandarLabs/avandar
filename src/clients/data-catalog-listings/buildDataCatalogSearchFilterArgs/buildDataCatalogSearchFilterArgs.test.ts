@@ -6,12 +6,18 @@ describe("buildDataCatalogSearchFilterArgs", () => {
     expect(
       buildDataCatalogSearchFilterArgs({
         sources: ["World Bank"],
+        organization2Names: ["Department of Health"],
+        domains: ["Transportation"],
+        tags: ["taxi", "fhv"],
         formats: ["CSV", "PARQUET"],
         updatedWithin: "any",
         isLoadableOnly: true,
       }),
     ).toEqual({
       p_sources: ["World Bank"],
+      p_organization2_names: ["Department of Health"],
+      p_domains: ["Transportation"],
+      p_tags: ["taxi", "fhv"],
       p_formats: ["CSV", "PARQUET"],
       p_updated_within: "any",
       p_is_loadable_only: true,
@@ -24,6 +30,9 @@ describe("buildDataCatalogSearchFilterArgs", () => {
     ): string => {
       return buildDataCatalogSearchFilterArgs({
         sources: [],
+        organization2Names: [],
+        domains: [],
+        tags: [],
         formats: [],
         updatedWithin,
         isLoadableOnly: false,

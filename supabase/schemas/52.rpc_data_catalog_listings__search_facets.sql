@@ -10,11 +10,23 @@
  *
  * Facets:
  *
- * `source`: one row per external organization with matches, plus each
+ * `source`: one row per level-1 organization with matches, plus each
  * chosen source even at 0, so a user can always unchoose what they chose.
  *
  * `format`: one row per upper-cased file format, plus each chosen format even
  * at 0. Listings with no format are not counted.
+ *
+ * `organization2`: one row per level-2 organization with matches, plus each
+ * chosen level-2 organization even at 0. Listings with no level 2 are not
+ * counted.
+ *
+ * `organization2_label`: one row per name the matching listings' drives give
+ * level 2 (`data_catalog_drives.organization2_label`), counted over the same
+ * listings as `organization2`, so the catalog can label that filter.
+ *
+ * `domain`: one row per topic with matches, plus each chosen topic even at
+ * 0. A listing counts once under each of its topics, even when its source
+ * repeats one.
  *
  * `updated_within`: one row per window (`any`, `past_month`, `past_year`,
  * `over_a_year`). The windows are cumulative.
@@ -26,11 +38,16 @@
  * unsearched and unfiltered, so the list can say how much it narrowed.
  *
  * @param p_query What the user typed. Accepts `websearch_to_tsquery` syntax.
- * @param p_sources External organizations chosen. Empty keeps every source.
+ * @param p_sources Level-1 organizations (`organization1_name`) chosen. Empty
+ * keeps every source.
  * @param p_formats Upper-cased file formats chosen. Empty keeps every format.
  * @param p_updated_within `any`, `past_month`, `past_year`, or `over_a_year`.
  * Any other value raises `22023` (invalid parameter value).
  * @param p_is_loadable_only Whether listings that cannot be loaded are hidden.
+ * @param p_organization2_names Level-2 organizations (`organization2_name`)
+ * chosen. Empty keeps every level-2 organization.
+ * @param p_domains Topics chosen. Empty keeps every topic.
+ * @param p_tags Keywords chosen. Empty keeps every keyword.
  *
  * @returns Facet rows ordered by facet, then most listings first, then value.
  */
@@ -39,7 +56,10 @@ create or replace function public.rpc_data_catalog_listings__search_facets (
   p_sources text[] default '{}',
   p_formats text[] default '{}',
   p_updated_within text default 'any',
-  p_is_loadable_only boolean default false
+  p_is_loadable_only boolean default false,
+  p_organization2_names text[] default '{}',
+  p_domains text[] default '{}',
+  p_tags text[] default '{}'
 ) returns table (
   facet text,
   value text,
@@ -55,22 +75,28 @@ create or replace function public.rpc_data_catalog_listings__search_facets (
           p_sources,
           p_formats,
           p_updated_within,
-          p_is_loadable_only
+          p_is_loadable_only,
+          p_organization2_names,
+          p_domains,
+          p_tags
         )
     ),
     facet_counts as (
       select
         'source' as facet,
-        match.external_organization_name as value,
+        match.organization1_name as value,
         count(*) as listing_count
       from
         match
       where
         match.passes_format and
         match.passes_updated and
-        match.passes_loadable
+        match.passes_loadable and
+        match.passes_organization2 and
+        match.passes_domain and
+        match.passes_tag
       group by
-        match.external_organization_name
+        match.organization1_name
       union all
       select
         'source',
@@ -89,7 +115,10 @@ create or replace function public.rpc_data_catalog_listings__search_facets (
         match.file_format is not null and
         match.passes_source and
         match.passes_updated and
-        match.passes_loadable
+        match.passes_loadable and
+        match.passes_organization2 and
+        match.passes_domain and
+        match.passes_tag
       group by
         match.file_format
       union all
@@ -101,6 +130,73 @@ create or replace function public.rpc_data_catalog_listings__search_facets (
         unnest(coalesce(p_formats, '{}')) as chosen (value)
       union all
       select
+        'organization2',
+        match.organization2_name,
+        count(*)
+      from
+        match
+      where
+        match.organization2_name is not null and
+        match.passes_source and
+        match.passes_format and
+        match.passes_updated and
+        match.passes_loadable and
+        match.passes_domain and
+        match.passes_tag
+      group by
+        match.organization2_name
+      union all
+      select
+        'organization2',
+        chosen.value,
+        0
+      from
+        unnest(coalesce(p_organization2_names, '{}')) as chosen (value)
+      union all
+      select
+        'organization2_label',
+        drive.organization2_label,
+        count(*)
+      from
+        match
+        join public.data_catalog_drives drive on drive.id = match.drive_id
+      where
+        drive.organization2_label is not null and
+        match.organization2_name is not null and
+        match.passes_source and
+        match.passes_format and
+        match.passes_updated and
+        match.passes_loadable and
+        match.passes_domain and
+        match.passes_tag
+      group by
+        drive.organization2_label
+      union all
+      select
+        'domain',
+        listing_domain.value,
+        count(distinct match.id)
+      from
+        match
+        cross join unnest(match.domains) as listing_domain (value)
+      where
+        match.passes_source and
+        match.passes_format and
+        match.passes_updated and
+        match.passes_loadable and
+        match.passes_organization2 and
+        match.passes_tag
+      group by
+        listing_domain.value
+      union all
+      select
+        'domain',
+        chosen.value,
+        0
+      from
+        unnest(coalesce(p_domains, '{}')) as chosen (value)
+      union all
+      select
         'updated_within',
         update_window.name,
         count(match.id)
@@ -109,6 +205,9 @@ create or replace function public.rpc_data_catalog_listings__search_facets (
         left join match on match.passes_source and
         match.passes_format and
         match.passes_loadable and
+        match.passes_organization2 and
+        match.passes_domain and
+        match.passes_tag and
         public.data_catalog_listings__is_updated_within (match.last_updated_at, update_window.name)
       group by
         update_window.name
@@ -123,7 +222,10 @@ create or replace function public.rpc_data_catalog_listings__search_facets (
         match.is_invalid and
         match.passes_source and
         match.passes_format and
-        match.passes_updated
+        match.passes_updated and
+        match.passes_organization2 and
+        match.passes_domain and
+        match.passes_tag
       union all
       select
         'catalog',
@@ -150,7 +252,16 @@ set
   search_path = '';
 
 -- `authenticated` only, like the search it counts for.
-revoke all on function public.rpc_data_catalog_listings__search_facets (text, text[], text[], text, boolean)
+revoke all on function public.rpc_data_catalog_listings__search_facets (
+  text,
+  text[],
+  text[],
+  text,
+  boolean,
+  text[],
+  text[],
+  text[]
+)
 from
   public,
   anon,
@@ -158,4 +269,13 @@ from
   service_role;
 
 grant
-execute on function public.rpc_data_catalog_listings__search_facets (text, text[], text[], text, boolean) to authenticated;
+execute on function public.rpc_data_catalog_listings__search_facets (
+  text,
+  text[],
+  text[],
+  text,
+  boolean,
+  text[],
+  text[],
+  text[]
+) to authenticated;

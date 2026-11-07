@@ -1,8 +1,10 @@
+import { fileURLToPath } from "node:url";
 import { createHdxEtlEngine } from "@pipelines/hdx/createHdxEtlEngine/createHdxEtlEngine";
 import { createHdxHttpClient } from "@pipelines/hdx/createHdxHttpClient/createHdxHttpClient";
-import { HDX_BASE_URL } from "@pipelines/hdx/hdxDrive";
+import { HDX_BASE_URL, listHdxDrives } from "@pipelines/hdx/hdxDrive";
 import { getPipelineEtlDestination } from "@pipelines/shared/getPipelineEtlDestination/getPipelineEtlDestination";
 import { getPipelineWorkspaceLoadability } from "@pipelines/shared/getPipelineWorkspaceLoadability/getPipelineWorkspaceLoadability";
+import { loadPipelineDefinition } from "@pipelines/shared/loadPipelineDefinition/loadPipelineDefinition";
 import { createCkanDiscoveryClient } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient";
 import type {
   EtlDriveScopes,
@@ -11,25 +13,40 @@ import type {
 } from "@avandar/etl";
 import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
 
-function _createEngine(): EtlEngineInstance {
+/** This pipeline's drive and field mappings. */
+const HDX_PIPELINE_CONFIG_PATH = fileURLToPath(
+  new URL("./hdx.pipeline.yaml", import.meta.url),
+);
+
+/**
+ * Loads `hdx.pipeline.yaml` once and builds the engine over its drive and
+ * field mappings.
+ */
+async function _createEngine(): Promise<EtlEngineInstance> {
+  const { config, mapper } = await loadPipelineDefinition(
+    HDX_PIPELINE_CONFIG_PATH,
+  );
   const discovery = createCkanDiscoveryClient(
     createHdxHttpClient({ baseUrl: HDX_BASE_URL }),
   );
   return createHdxEtlEngine({
-    ...getPipelineEtlDestination(),
+    ...getPipelineEtlDestination({ isRecordingDrives: true }),
     discovery,
-    workspaceLoadability: getPipelineWorkspaceLoadability("hdx"),
+    drives: listHdxDrives(config),
+    mapper,
+    workspaceLoadability: getPipelineWorkspaceLoadability(config),
   });
 }
 
 /**
- * Runs the HDX pipeline over its one drive (`hdxDrive.ts`) and returns the
- * run's report. HDX needs no API key to read.
+ * Runs the HDX pipeline over the drive `hdx.pipeline.yaml` lists and returns
+ * the run's report. HDX needs no API key to read.
  */
 export async function run(
   options: PipelineRunOptions = { mode: "full" },
 ): Promise<EtlRunReport> {
-  return await _createEngine().run(options);
+  const engine = await _createEngine();
+  return await engine.run(options);
 }
 
 /**
@@ -37,5 +54,6 @@ export async function run(
  * credentials.
  */
 export async function listScopes(): Promise<readonly EtlDriveScopes[]> {
-  return await _createEngine().listScopes();
+  const engine = await _createEngine();
+  return await engine.listScopes();
 }

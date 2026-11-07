@@ -34,6 +34,7 @@ function _resource(overrides: Partial<CkanResource>): CkanResource {
  */
 function _readmeFirstPackage(): CkanPackage {
   return {
+    sourceRecord: {},
     id: "c3429f0e-651b-4788-bb2f-4adbf222c90e",
     name: "movement-range-maps",
     metadata_modified: "2025-11-19T10:29:46.280529",

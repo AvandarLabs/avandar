@@ -34,6 +34,13 @@ const SHARED_DB_COLUMNS = {
   is_workspace_loadable: true,
   source_asset_type: null,
   source_download_url: null,
+  organization2_name: null,
+  organization3_name: null,
+  organization4_name: null,
+  domains: null,
+  tags: null,
+  source_metadata: null,
+  drive_id: null,
   search_vector: "'seri':1A 'world':2B 'bank':3B",
 } as const;
 
@@ -41,7 +48,7 @@ function _pipelineDBRow(): DataCatalogListingModel["DBRead"] {
   return {
     ...SHARED_DB_COLUMNS,
     display_name: "Series",
-    external_organization_name: "World Bank",
+    organization1_name: "World Bank",
     external_dataset_id: "series",
     access_kind: "pipeline_parquet",
     parquet_file_name: "series.parquet",
@@ -58,7 +65,7 @@ function _apiDBRow(): DataCatalogListingModel["DBRead"] {
   return {
     ...SHARED_DB_COLUMNS,
     display_name: "Operational Presence",
-    external_organization_name: "OCHA",
+    organization1_name: "OCHA",
     external_dataset_id: "hdx-hapi-operational-presence",
     access_kind: "api_resource",
     parquet_file_name: null,
@@ -108,6 +115,41 @@ describe("DataCatalogListingParsers", () => {
     );
 
     expect(entry).not.toHaveProperty("searchVector");
+  });
+
+  it("keeps the source record's keys and nulls as the source sent them", () => {
+    const sourceRecord = {
+      resource: { id: "8wbx-tsch", page_views: { last_week: null } },
+      classification: { domain_category: "Transportation" },
+    };
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse({
+        ..._apiDBRow(),
+        source_metadata: sourceRecord,
+      }),
+    );
+
+    expect(entry.sourceMetadata).toEqual(sourceRecord);
+  });
+
+  it("keeps the metadata's keys and nulls as the pipeline wrote them", () => {
+    const metadata = { table: { column_names: ["year"], row_count: null } };
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse({
+        ..._pipelineDBRow(),
+        metadata,
+      }),
+    );
+
+    expect(entry.metadata).toEqual(metadata);
+  });
+
+  it("reads a missing source record as undefined", () => {
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse(_apiDBRow()),
+    );
+
+    expect(entry.sourceMetadata).toBeUndefined();
   });
 
   it("rejects an unknown access kind", () => {

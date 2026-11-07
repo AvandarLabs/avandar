@@ -34,10 +34,15 @@ function _toResource(wire: _WirePackage["resources"][number]): CkanResource {
 /**
  * Normalizes one wire dataset and its resources into the shape the rest of
  * this code reads. Shared by `package_show` and `package_search`, which
- * return the same dataset shape.
+ * return the same dataset shape. `sourceRecord` is the unparsed object the
+ * wire value was parsed from, kept as the package's `sourceRecord`.
  */
-export function createCkanPackageFromWire(wire: _WirePackage): CkanPackage {
+export function createCkanPackageFromWire(
+  wire: _WirePackage,
+  sourceRecord: unknown,
+): CkanPackage {
   return {
+    sourceRecord,
     id: wire.id,
     name: wire.name,
     metadata_modified: wire.metadata_modified ?? undefined,

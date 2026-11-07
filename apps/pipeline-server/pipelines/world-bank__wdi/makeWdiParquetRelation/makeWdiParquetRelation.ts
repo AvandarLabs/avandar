@@ -31,7 +31,7 @@ export function makeWdiParquetRelation(args: {
     externalDatasetId: args.tableBaseName,
     displayName: presentation.display_name,
     description: presentation.description,
-    externalOrganizationName: "World Bank",
+    organization1Name: "World Bank",
     externalServiceName: "World Development Indicators API",
     sourceUrl: WDI_SOURCE_URL,
     canonicalUrls: [

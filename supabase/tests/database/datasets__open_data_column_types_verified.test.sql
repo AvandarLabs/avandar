@@ -43,7 +43,7 @@ values (
 );
 
 insert into public.data_catalog_listings
-  (id, display_name, external_organization_name, access_kind, api_service,
+  (id, display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format,
    date_column_type_last_verified)
 values

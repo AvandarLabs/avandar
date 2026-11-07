@@ -4,6 +4,7 @@ import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
 import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
 import { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionError";
 import { createInMemoryCheckpointStore } from "@etl/stores/InMemoryCheckpointStore/createInMemoryCheckpointStore";
+import { createInMemoryDrivesStore } from "@etl/stores/InMemoryDrivesStore/createInMemoryDrivesStore";
 import { createInMemoryExecutionStore } from "@etl/stores/InMemoryExecutionStore/createInMemoryExecutionStore";
 import { createInMemoryListingsStore } from "@etl/stores/InMemoryListingsStore/createInMemoryListingsStore";
 import { describe, expect, it, vi } from "vitest";
@@ -117,7 +118,7 @@ function _relationsFor(connection: FakeConnection): ApiResourceRelation[] {
       apiResourceId: `${connection.id}-r${index}`,
       apiResourceFormat: "CSV",
       displayName: `Dataset ${connection.id}`,
-      externalOrganizationName: "Fake Org",
+      organization1Name: "Fake Org",
       sourceUpdatedAt: connection.modifiedAt,
       columns: [
         { name: "a", originalDataType: "text", castDataType: "VARCHAR" },
@@ -135,6 +136,7 @@ function _config(args: {
   getDriveKey?: FakeConfig["getDriveKey"];
   transform?: FakeConfig["transform"];
   listScopes?: FakeConfig["listScopes"];
+  describeDrive?: FakeConfig["describeDrive"];
   clock?: EtlClock;
 }): FakeConfig {
   return {
@@ -150,6 +152,9 @@ function _config(args: {
     stores: args.stores,
     ...(args.clock === undefined ? {} : { clock: args.clock }),
     ...(args.listScopes === undefined ? {} : { listScopes: args.listScopes }),
+    ...(args.describeDrive === undefined
+      ? {}
+      : { describeDrive: args.describeDrive }),
     listDrives: () => {
       args.recorder.events.push("listDrives");
       return args.drives;
@@ -2089,6 +2094,143 @@ describe("createEtlEngine", () => {
         ["crawl_finished", "a", 2, "ok"],
         ["crawl_finished", "b", 2, "skipped"],
       ]);
+    });
+  });
+
+  describe("drives", () => {
+    it("records each drive once, with its labels, and writes its id on every listing", async () => {
+      const recorder = _recorder();
+      const listings = createInMemoryListingsStore();
+      const drives = createInMemoryDrivesStore();
+
+      await _run(
+        _config({
+          drives: [
+            _drive("a", [[_connection("a1", 1)], [_connection("a2", 2)]]),
+            _drive("b", [[_connection("b1", 3)]]),
+          ],
+          recorder,
+          stores: { ..._stores(listings), drives },
+          listScopes: () => {
+            return [{ key: "one" }, { key: "two" }];
+          },
+          describeDrive: (drive) => {
+            return { organizationLabels: { 1: `Label ${drive.key}` } };
+          },
+        }),
+      );
+
+      expect(drives.getUpsertCount()).toBe(2);
+      const [driveA, driveB] = drives.getDrives();
+      expect(driveA).toMatchObject({
+        pipelineName: PIPELINE_NAME,
+        driveKey: "a",
+        organizationLabels: { 1: "Label a" },
+      });
+      const driveIdByDataset = Object.fromEntries(
+        listings.getRows().map((row) => {
+          return [row.external_dataset_id, row.drive_id];
+        }),
+      );
+      expect(driveIdByDataset).toEqual({
+        a1: driveA?.id,
+        a2: driveA?.id,
+        b1: driveB?.id,
+      });
+    });
+
+    it("records a drive with no labels when the config does not describe drives", async () => {
+      const drives = createInMemoryDrivesStore();
+
+      await _run(
+        _config({
+          drives: [_drive("a", [[_connection("a1", 1)]])],
+          recorder: _recorder(),
+          stores: { ..._stores(), drives },
+        }),
+      );
+
+      expect(drives.getDrives()).toMatchObject([
+        { driveKey: "a", organizationLabels: {} },
+      ]);
+    });
+
+    it("fails only that drive's crawls when its drive row cannot be written", async () => {
+      const recorder = _recorder();
+      const listings = createInMemoryListingsStore();
+      const drives = createInMemoryDrivesStore();
+      const failingDrives = {
+        upsert: async (drive: Parameters<typeof drives.upsert>[0]) => {
+          if (drive.driveKey === "a") {
+            throw new Error("drives table unavailable");
+          }
+          return await drives.upsert(drive);
+        },
+      };
+
+      const report = await _run(
+        _config({
+          drives: [
+            _drive("a", [[_connection("a1", 1)]]),
+            _drive("b", [[_connection("b1", 2)]]),
+          ],
+          recorder,
+          stores: { ..._stores(listings), drives: failingDrives },
+        }),
+      );
+
+      expect(_statusesOf(report)).toEqual([
+        ["a", "failed", expect.stringContaining("drives table unavailable")],
+        ["b", "ok", undefined],
+      ]);
+      expect(_datasetIds(listings)).toEqual(["b1"]);
+    });
+
+    it("writes no drive row for a crawl the limit skips", async () => {
+      const listings = createInMemoryListingsStore();
+      const drives = createInMemoryDrivesStore();
+      const failingDrives = {
+        upsert: async (drive: Parameters<typeof drives.upsert>[0]) => {
+          if (drive.driveKey === "b") {
+            throw new Error("drives table unavailable");
+          }
+          return await drives.upsert(drive);
+        },
+      };
+
+      const report = await _run(
+        _config({
+          drives: [
+            _drive("a", [[_connection("a1", 1)]]),
+            _drive("b", [[_connection("b1", 2)]]),
+          ],
+          recorder: _recorder(),
+          stores: { ..._stores(listings), drives: failingDrives },
+        }),
+        { mode: "full", limit: 1 },
+      );
+
+      expect(_statusesOf(report)).toEqual([
+        ["a", "ok", undefined],
+        ["b", "skipped", undefined],
+      ]);
+      expect(drives.getUpsertCount()).toBe(1);
+      expect(listings.getRows()[0]?.drive_id).toBe(drives.getDrives()[0]?.id);
+    });
+
+    it("writes no drive_id when the stores have no drives store", async () => {
+      const recorder = _recorder();
+      const listings = createInMemoryListingsStore();
+
+      await _run(
+        _config({
+          drives: [_drive("a", [[_connection("a1", 1)]])],
+          recorder,
+          stores: _stores(listings),
+        }),
+      );
+
+      expect(listings.getRows()[0]?.drive_id).toBeNull();
     });
   });
 });
