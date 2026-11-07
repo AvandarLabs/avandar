@@ -145,5 +145,9 @@ Notes:
 - Search performance: split the blank-query and non-blank paths, and add
   trigram indexes on the searched names.
 - A Status fact on the case card once case status sets exist.
+- Multi-word `@` queries. The menu closes on a space (TipTap's default
+  `allowSpaces: false`), so "measles by borough" is found by typing one word.
+  Allowing spaces needs a rule for when the menu closes instead. This also
+  applies to mentioning a teammate by full name.
 - Comments, saved queries, and catalog listings as gadgets, and gadgets
   outside case comments (dashboard text blocks, notes).
