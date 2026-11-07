@@ -70,6 +70,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F18 | Case comments and the case activity feed | not started | none | |
 | F19 | Open data catalog browser: full-height three-pane layout with search, filters, and sort | not started | F12, F16, F17 | |
 | F20 | Phone widths: Data Sources shows one pane at a time, and the slate stays on screen | not started | none | |
+| F21 | AI harness audit: 15 chat and Data Explorer bug fixes and 8 harness improvements | not started | none (see its section for order within it) | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -97,6 +98,7 @@ API. It's new work, not something this branch built.
 | 13 | F19 | Moves the catalog browser onto F17's server search: its filters, facets, and sort become search parameters, and its list keeps F17's infinite scroll. Merge after F17. |
 | any | F18 | Self-contained: new tables, the record page feed, and one shared client typing fix. It touches no other feature's files, and nothing depends on it. |
 | any | F20 | Self-contained layout fix. The slate overflowing the bottom of a phone screen is already on `develop`, so it can merge first. |
+| any | F21 | Chat and Data Explorer code that every other feature leaves alone. Its own PRs go in the order its section gives. |
 | 14 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -1223,3 +1225,27 @@ Commits that only update this log are branch-only and are not listed.
 - `b920bee1b` (desktop SQLite generator catch-up) is on the Postgres branch.
 - `7dbb2210a`'s non-open-data files (`db_connections*`, `PostgresTableWrapper*`, the Postgres import views, `supabase/functions/connectors/*`, `supabase/functions/_shared/*`, `createRegistryForFetch.ts`, `http-api.types.ts`, `ConnectorsAdvisory.tsx`, `save*Dataset.ts`, `postgres-connector-option-a-prototype.html`, `tests/e2e/postgres-connector-import.spec.ts`) are formatting and Postgres work. They belong to the Postgres branch, not to any feature here.
 - `supabase/config.toml`: `7dbb2210a` committed this branch's Supabase switch (project `feat-demo-measles`, ports 553xx). Never port it. Run `ava supabase restore` and commit the standard config before this branch itself is ever merged anywhere. Done in `f710dcb68`.
+
+## F21: AI harness audit fixes
+
+Status: not started. Branch base for each PR: `develop`.
+
+The COVID audit in [`docs/ai-harness-audit/`](../ai-harness-audit/README.md)
+produced one branch per fix, each merged into `demo/measles`. Every entry in
+[`bug-log.md`](../ai-harness-audit/bug-log.md) and
+[`harness-improvements.md`](../ai-harness-audit/harness-improvements.md)
+names its branch, its merge commit on `demo/measles`, its tests, and the PR
+title to use. Each is its own PR.
+
+Order: the bugs first, BUG-001 to BUG-015, then the improvements, C1 to C7.
+Later entries edit the same files as earlier ones
+(`buildSystemPrompts.ts`, `parseOpenRouterResponse.ts`, `parseClarify.ts`,
+`applyChatModelTurnResponse.ts`, `makeDataGridColumnDefs.ts`, the
+discovery components), so taking them in order keeps each diff small.
+BUG-007 and its follow-up `c0c08b571` go together, as do C2 and
+`fix/summary-test-types`, and the three C4 branches.
+
+Regenerate the Lingui catalogs (`pnpm translations <path>`) in each PR that
+adds user-facing strings: BUG-002, BUG-004, BUG-011, BUG-012, C7, and the
+chart sampling change in C4.
+
