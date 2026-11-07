@@ -4009,12 +4009,6 @@ msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Modèle de chat hors ligne prêt. Cliquez pour changer ou télécharger à "
 "nouveau."
 
-#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload a file, connect an external source, or browse the open data "
-"catalog."
-msgstr "Importez un fichier, connectez une source externe ou parcourez le "
-"catalogue de données ouvertes."
-
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
 msgstr "Félicitations"

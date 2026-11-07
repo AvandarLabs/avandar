@@ -3977,12 +3977,6 @@ msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Modelo de chat sin conexión listo. Haz clic para cambiar o volver a "
 "descargar."
 
-#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload a file, connect an external source, or browse the open data "
-"catalog."
-msgstr "Cargue un archivo, conecte una fuente externa o explore el catálogo de "
-"datos abiertos."
-
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
 msgstr "Felicidades"

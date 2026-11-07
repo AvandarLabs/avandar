@@ -3806,11 +3806,6 @@ msgstr "處理數據集中…"
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "離線聊天模型已準備好。點擊以切換或重新下載。"
 
-#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload a file, connect an external source, or browse the open data "
-"catalog."
-msgstr "上傳檔案、連線至外部來源，或瀏覽開放資料目錄。"
-
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
 msgstr "恭喜"
