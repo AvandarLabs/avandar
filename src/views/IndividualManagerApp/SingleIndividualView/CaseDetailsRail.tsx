@@ -64,6 +64,7 @@ function DetailsStatus({
         <Button
           variant="default"
           size="compact-sm"
+          className={css.retry}
           loading={loadError.isRetrying}
           onClick={loadError.onRetry}
         >
@@ -111,9 +112,9 @@ export function CaseDetailsRail({
                 ) : (
                   unknownToString(attribute.value)
                 )}
-                {attribute.sourceNames.map((sourceName) => {
+                {attribute.sourceNames.map((sourceName, index) => {
                   return (
-                    <Text key={sourceName} size="xs" c="dimmed">
+                    <Text key={`${index}-${sourceName}`} size="xs" c="dimmed">
                       {sourceName}
                     </Text>
                   );

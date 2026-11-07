@@ -18,3 +18,8 @@
   flex-direction: column;
   gap: var(--mantine-spacing-xs);
 }
+
+/* The callout stacks its children stretched. Keep the button its own width. */
+.retry {
+  align-self: flex-start;
+}

@@ -60,6 +60,45 @@ describe("CaseDetailsRail", () => {
     expect(screen.queryByText("null")).not.toBeInTheDocument();
   });
 
+  it("says a field has no value when its value is undefined", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Notes",
+            value: undefined,
+            sourceNames: [],
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByText("No value")).toBeInTheDocument();
+  });
+
+  // Two datasets can share a name. Each still gets its own line, and React
+  // must not see two siblings with the same key.
+  it("lists two datasets that share a name on separate lines", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Borough",
+            value: "Brooklyn",
+            sourceNames: ["Line list", "Line list"],
+          },
+        ]}
+      />,
+    );
+    expect(screen.getAllByText("Line list")).toHaveLength(2);
+    expect(consoleError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
   it("says so when the record has no fields, outside the fact list", () => {
     const { container } = render(<CaseDetailsRail attributes={[]} />);
     expect(screen.getByText("No fields yet")).toBeInTheDocument();
