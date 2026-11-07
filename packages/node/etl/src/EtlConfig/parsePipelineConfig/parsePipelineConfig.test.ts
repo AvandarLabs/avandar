@@ -144,4 +144,24 @@ describe("parsePipelineConfig", () => {
       return _parse(["organizationLabels: { 5: Ward }", "drives: []"]);
     }).toThrow("organizationLabels");
   });
+
+  it("names the file when the YAML has a syntax error", () => {
+    expect(() => {
+      return _parse(["drives: [", "  - baseUrl: : :"]);
+    }).toThrow(/^test\.pipeline\.yaml is not valid YAML: /);
+  });
+
+  it.each([
+    ["a number", "2024"],
+    ["a boolean", "true"],
+  ])("explains that a value mapping cannot be %s", (_label, literal) => {
+    expect(() => {
+      return _parse([
+        "drives:",
+        "  - baseUrl: https://data.example.gov",
+        "    fields:",
+        `      organization1_name: { value: ${literal} }`,
+      ]);
+    }).toThrow("value must be text or a list of text");
+  });
 });

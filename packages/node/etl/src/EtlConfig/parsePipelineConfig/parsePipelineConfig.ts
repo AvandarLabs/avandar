@@ -9,6 +9,23 @@ import type { PipelineConfig } from "@etl/EtlConfig/PipelineConfig.types";
 /** Dotted segments of letters, digits, `_`, and `-`, such as `a.b.0`. */
 const FIELD_PATH_PATTERN = /^[\w-]+(\.[\w-]+)*$/;
 
+/**
+ * Whether a mapping is exactly `{ value: ... }` with something that is
+ * neither text nor a list. YAML reads `2024` and `true` as a number and a
+ * boolean, so this is the one way a `value` source is set yet refused.
+ */
+function _isNonTextValueSource(input: unknown): boolean {
+  if (typeof input !== "object" || input === null || Array.isArray(input)) {
+    return false;
+  }
+  const keys = Object.keys(input);
+  if (keys.length !== 1 || keys[0] !== "value") {
+    return false;
+  }
+  const { value } = input as { value: unknown };
+  return typeof value !== "string" && !Array.isArray(value);
+}
+
 const FieldSourceSchema = z.union(
   [
     z.strictObject({ from: z.string().regex(FIELD_PATH_PATTERN) }),
@@ -17,7 +34,14 @@ const FieldSourceSchema = z.union(
     }),
     z.strictObject({ script: z.string().min(1) }),
   ],
-  { error: "must set exactly one of from, value, or script" },
+  {
+    error: (issue) => {
+      if (_isNonTextValueSource(issue.input)) {
+        return "value must be text or a list of text. Quote a number or boolean so YAML reads it as text";
+      }
+      return "must set exactly one of from, value, or script";
+    },
+  },
 );
 
 const FieldMappingsSchema = z.partialRecord(
@@ -84,6 +108,21 @@ function _assertValidDrives(config: PipelineConfig, sourceName: string): void {
 }
 
 /**
+ * Parses YAML text, naming the file when the YAML itself is malformed.
+ * An empty document reads as an empty object.
+ */
+function _parseYaml(args: { yamlText: string; sourceName: string }): unknown {
+  try {
+    return parse(args.yamlText) ?? {};
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${args.sourceName} is not valid YAML: ${message}`, {
+      cause: error,
+    });
+  }
+}
+
+/**
  * Parses one pipeline's config from YAML (see `PipelineConfig`). Unknown
  * keys, unmappable fields, and mappings with zero or two sources are
  * refused, so a typo fails the run before any network call rather than
@@ -92,14 +131,15 @@ function _assertValidDrives(config: PipelineConfig, sourceName: string): void {
  * @param args.yamlText - The file's contents.
  * @param args.sourceName - Names the file in error messages.
  * @returns The config.
- * @throws When the YAML does not parse, does not match the config's shape,
- * lists a drive twice, or has a drive that maps no `organization1_name`.
+ * @throws When the YAML is malformed (the error names the file and keeps the
+ * YAML library's error as `cause`), the config does not match its shape,
+ * a drive is listed twice, or a drive maps no `organization1_name`.
  */
 export function parsePipelineConfig(args: {
   yamlText: string;
   sourceName: string;
 }): PipelineConfig {
-  const rawConfig: unknown = parse(args.yamlText) ?? {};
+  const rawConfig = _parseYaml(args);
   const parsed = PipelineConfigSchema.safeParse(rawConfig);
   if (!parsed.success) {
     throw new Error(
