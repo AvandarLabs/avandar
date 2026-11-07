@@ -33,6 +33,20 @@ const STATUS_CASES: readonly StatusCase[] = [
     expected: "disabled",
   },
   {
+    scenario:
+      "the installation is disabled and the deployment no longer bundles the plugin",
+    installation: { ...GRANTED, isEnabled: false },
+    manifestPermissions: undefined,
+    expected: "unavailable",
+  },
+  {
+    scenario:
+      "the installation is disabled and the manifest asks for a permission that is not granted",
+    installation: { ...GRANTED, isEnabled: false },
+    manifestPermissions: ["data:context", "data:read"],
+    expected: "disabled",
+  },
+  {
     scenario: "the manifest asks for a permission that is not granted",
     installation: GRANTED,
     manifestPermissions: ["data:context", "data:read"],

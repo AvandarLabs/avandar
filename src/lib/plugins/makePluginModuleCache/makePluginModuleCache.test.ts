@@ -43,6 +43,31 @@ describe("makePluginModuleCache", () => {
     expect(loadManifest).toHaveBeenCalledTimes(1);
   });
 
+  it("shares one loadCode call between loads started before either settles", async () => {
+    const loadCode = vi.fn().mockResolvedValue(CODE_MODULE);
+    const cache = makePluginModuleCache();
+    const entry = _makeEntry({ loadCode });
+
+    const firstLoad = cache.loadCode(entry);
+    const secondLoad = cache.loadCode(entry);
+    await Promise.all([firstLoad, secondLoad]);
+
+    expect(loadCode).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns the same promise to loads started before either settles", async () => {
+    const cache = makePluginModuleCache();
+    const entry = _makeEntry({
+      loadCode: vi.fn().mockResolvedValue(CODE_MODULE),
+    });
+
+    const firstLoad = cache.loadCode(entry);
+    const secondLoad = cache.loadCode(entry);
+    await Promise.all([firstLoad, secondLoad]);
+
+    expect(secondLoad).toBe(firstLoad);
+  });
+
   it("calls loadCode again after the previous load rejected", async () => {
     const loadCode = vi
       .fn()

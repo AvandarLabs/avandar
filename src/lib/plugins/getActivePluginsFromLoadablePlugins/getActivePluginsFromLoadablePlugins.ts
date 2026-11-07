@@ -1,36 +1,10 @@
 import { getPluginInstallStatusFromInstallation } from "@/lib/plugins/getPluginInstallStatusFromInstallation/getPluginInstallStatusFromInstallation";
-import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
-import type {
-  PluginIndexEntry,
-  PluginManifestModule,
-} from "@/lib/plugins/PluginIndex.types";
-
-/** An enabled install of a bundled plugin, before its manifest loads. */
-export type LoadablePluginInstallation = Readonly<{
-  installation: PluginInstallation.T;
-  entry: PluginIndexEntry;
-}>;
+import type { LoadablePluginInstallation } from "@/lib/plugins/getLoadablePluginsFromInstallations/getLoadablePluginsFromInstallations";
+import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
 
 /** An installed plugin whose contributions are live in this workspace. */
 export type ActivePlugin = LoadablePluginInstallation &
   Readonly<{ manifestModule: PluginManifestModule }>;
-
-/**
- * Enabled installs of plugins this deployment bundles, each paired with its
- * index entry. Tells the plugin host which manifests are worth loading for a
- * workspace.
- */
-export function getLoadablePluginsFromInstallations(options: {
-  installations: readonly PluginInstallation.T[];
-  getEntry: (pluginId: string) => PluginIndexEntry | undefined;
-}): LoadablePluginInstallation[] {
-  return options.installations.flatMap((installation) => {
-    const entry = options.getEntry(installation.pluginId);
-    return installation.isEnabled && entry !== undefined
-      ? [{ installation, entry }]
-      : [];
-  });
-}
 
 /**
  * Pairs loadable installs with their manifests and keeps those whose status
