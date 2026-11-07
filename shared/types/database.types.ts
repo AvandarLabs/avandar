@@ -2081,6 +2081,50 @@ export type Database = {
         }
         Relationships: []
       }
+      plugin_installations: {
+        Row: {
+          created_at: string
+          granted_permissions: string[]
+          id: string
+          installed_by: string | null
+          installed_version: string
+          is_enabled: boolean
+          plugin_id: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_permissions?: string[]
+          id?: string
+          installed_by?: string | null
+          installed_version: string
+          is_enabled?: boolean
+          plugin_id: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_permissions?: string[]
+          id?: string
+          installed_by?: string | null
+          installed_version?: string
+          is_enabled?: boolean
+          plugin_id?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plugin_installations_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resource_shares: {
         Row: {
           created_at: string
