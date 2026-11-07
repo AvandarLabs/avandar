@@ -111,7 +111,7 @@ export function useAvandarChatRuntime(): {
         sqlResultsEmpty: t`I ran the query, but no data matched it.`,
         sqlQueryFailed: t`I ran the query, but it failed.`,
         sqlQueryApplied: t`I applied the query in the Data Explorer.`,
-    dashboardOnlyBlock: t`I can only add that to a dashboard. Open a dashboard and ask me again there.`,
+        dashboardOnlyBlock: t`I can only add that to a dashboard. Open a dashboard and ask me again there.`,
         fallbackTitle: t`Chat request failed`,
         fallbackMessage: t`The cloud assistant is unreachable. Use your downloaded on-device model for this message?`,
         replying: t`Replying…`,

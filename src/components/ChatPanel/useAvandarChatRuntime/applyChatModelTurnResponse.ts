@@ -9,8 +9,8 @@ import {
   assumptionNeedsSignInOrApproval,
   buildSqlNotAppliedAssistantText,
 } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
-import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { dashboardBlockToExplorerResponse } from "@/components/ChatPanel/useAvandarChatRuntime/dashboardBlockToExplorerResponse/dashboardBlockToExplorerResponse";
+import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { shouldQueueDashboardBlock } from "@/components/ChatPanel/useAvandarChatRuntime/shouldQueueDashboardBlock/shouldQueueDashboardBlock";
 import { waitForAppliedSqlOutcome } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";

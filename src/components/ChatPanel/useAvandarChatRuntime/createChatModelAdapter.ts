@@ -3,6 +3,7 @@ import { isNotNull, matchLiteral, propEq } from "@avandar/utils";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
 import { applyChatModelTurnResponse } from "@/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse";
@@ -20,7 +21,6 @@ import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRun
 import { runOfflineChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatTurn";
 import { shouldSkipUserMessageConsent } from "@/components/ChatPanel/useAvandarChatRuntime/shouldSkipUserMessageConsent/shouldSkipUserMessageConsent";
 import { tryExecuteOfflineSql } from "@/components/ChatPanel/useAvandarChatRuntime/tryExecuteOfflineSql";
-import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";

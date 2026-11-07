@@ -33,7 +33,7 @@ const GENERATE_SQL_TOOL = {
           type: "string",
           maxLength: 400,
           description:
-            "One or two short, plain sentences shown to the user as your reply: what the result shows, which dataset it uses, and any choice you made (the period, what a word like \"most\" was taken to mean, what was included or left out). You never see the results, so do not state numbers or findings. No SQL, table aliases, or column names in quotes.",
+            'One or two short, plain sentences shown to the user as your reply: what the result shows, which dataset it uses, and any choice you made (the period, what a word like "most" was taken to mean, what was included or left out). You never see the results, so do not state numbers or findings. No SQL, table aliases, or column names in quotes.',
         },
       },
       required: ["sql"],
