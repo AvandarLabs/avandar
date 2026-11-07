@@ -218,6 +218,29 @@ describe("applyChatTurnResponse", () => {
     },
   );
 
+  it("shows the summary for results, and leads with the outcome when nothing came back", async () => {
+    const summary = "Monthly US deaths in 2022, from the US deaths dataset.";
+    const texts = await Promise.all(
+      (["rows", "empty", "failed"] as const).map(async (sqlOutcome) => {
+        const result = await _applyChatTurnResponse({
+          response: Model.make("ChatResponse", {
+            assistantText: summary,
+            generatedSql: { prompt: "deaths", sql: "select 1" },
+          }),
+          sqlOutcome,
+          handlers: _createHandlers(),
+        });
+        return result.content[0]?.type === "text" ? result.content[0].text : "";
+      }),
+    );
+
+    expect(texts).toEqual([
+      summary,
+      `${SQL_OUTCOME_COPY.empty}\n\n${summary}`,
+      `${SQL_OUTCOME_COPY.failed}\n\n${summary}`,
+    ]);
+  });
+
   it("persists chat-created case types", async () => {
     const handlers = _createHandlers();
     const createdCaseTypes = [

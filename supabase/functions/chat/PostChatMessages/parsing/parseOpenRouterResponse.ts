@@ -62,6 +62,7 @@ export function parseOpenRouterResponse(options: {
   const sqlCall = calls.find((call) => {
     return call?.function?.name === "generateSql";
   });
+  let sqlSummary = "";
   if (sqlCall?.function) {
     try {
       const args = JSON.parse(sqlCall.function.arguments ?? "{}");
@@ -70,6 +71,8 @@ export function parseOpenRouterResponse(options: {
           sql: cleanLlmGeneratedSql(args.sql),
           prompt: options.lastUserPrompt,
         };
+        sqlSummary =
+          typeof args.summary === "string" ? args.summary.trim() : "";
       }
     } catch {
       // Malformed tool args are ignored.
@@ -88,7 +91,9 @@ export function parseOpenRouterResponse(options: {
     }
   }
 
-  let text = options.attemptText;
+  // A model that wrote no prose alongside the tool call still explains the
+  // result through generateSql's summary.
+  let text = options.attemptText || sqlSummary;
   if (
     !generatedSql &&
     !clarification &&
