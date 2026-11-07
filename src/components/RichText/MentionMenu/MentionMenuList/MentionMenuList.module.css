@@ -1,7 +1,10 @@
 .anchor {
-  block-size: 0;
   pointer-events: none;
   position: fixed;
+}
+
+.target {
+  block-size: 100%;
 }
 
 /* The groups scroll while the status row and footer stay in view. */

@@ -72,9 +72,15 @@ export const MentionMenuList = forwardRef<
   });
 
   return (
+    // The anchor spans the caret's line, so the menu opens below the line or,
+    // when flipped, above it without covering what was typed.
     <div
       className={classes.anchor}
-      style={{ left: rect?.left ?? 0, top: rect?.bottom ?? 0 }}
+      style={{
+        left: rect?.left ?? 0,
+        top: rect?.top ?? 0,
+        blockSize: rect?.height ?? 0,
+      }}
     >
       <Combobox
         store={combobox}
@@ -86,7 +92,7 @@ export const MentionMenuList = forwardRef<
         // open from mount, so the position would be computed once, while the
         // menu is still small, and never flip or resize as results arrive.
         keepMounted={false}
-        // The anchor is a zero-size point at the caret, which floating-ui
+        // The anchor is a zero-width line at the caret, which floating-ui
         // can report as detached. The list must show whenever it is mounted.
         hideDetached={false}
         // Near the bottom of the window the menu flips above the caret, and
@@ -105,7 +111,7 @@ export const MentionMenuList = forwardRef<
         onOptionSubmit={chooseItemById}
       >
         <Combobox.Target>
-          <div />
+          <div className={classes.target} />
         </Combobox.Target>
         <Combobox.Dropdown className={classes.dropdown}>
           <MentionMenuSearchStatus
