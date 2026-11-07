@@ -41,13 +41,19 @@ export type PluginInvocationContext = DataExplorerToolbarContext;
 
 /** Options for `avandar.data.fetchRows`. */
 export type FetchRowsOptions = Readonly<{
+  /** The names of the columns to read. */
   columns: readonly string[];
+  /** The most rows to return. Defaults to 50,000 and cannot exceed 200,000. */
   limit?: number;
 }>;
 
 /** Rows returned by `avandar.data.fetchRows`. */
 export type FetchRowsResult = Readonly<{
   rows: ReadonlyArray<Readonly<Record<string, unknown>>>;
+  /**
+   * True when the result had more rows than `rows` holds. A plugin can use it
+   * to tell the user that the data it worked on was partial.
+   */
   isTruncated: boolean;
 }>;
 
@@ -65,11 +71,17 @@ export type PluginMessages = Readonly<
 /** A modal or drawer a plugin opens. */
 export type PluginOverlayOptions = Readonly<{
   title: string;
+  /**
+   * What the overlay shows. It must be built from `@avandar/plugin-ui`
+   * components, so the host can render it and the sandbox can send it as a
+   * Remote DOM tree.
+   */
   content: ReactNode;
 }>;
 
 /** A notification a plugin shows. */
 export type PluginNotifyOptions = Readonly<{
+  /** The notification's heading. Defaults to the plugin's name. */
   title?: string;
   message: string;
   color?: "blue" | "green" | "red" | "yellow";
@@ -77,8 +89,13 @@ export type PluginNotifyOptions = Readonly<{
 
 /**
  * The API a plugin receives, scoped to one plugin, workspace, user, and
- * invocation. Every call is async or fire-and-forget and passes only
- * serializable data, so plugins run unchanged inside the sandbox later.
+ * invocation.
+ *
+ * Calls are async or fire-and-forget and pass serializable data, so a plugin
+ * runs unchanged inside the sandbox. There are two exceptions. `i18n.t` is
+ * synchronous and runs on the plugin side. The `content` of `ui.openModal`
+ * and `ui.openDrawer` is a React tree, which the host renders. In the sandbox
+ * it becomes a Remote DOM tree.
  */
 export type AvandarApi = Readonly<{
   context: PluginInvocationContext;
@@ -104,6 +121,11 @@ export type CommandHandler = (avandar: AvandarApi) => Promise<void> | void;
 
 /** What a plugin's entry module exports as its default. */
 export type PluginDefinition = Readonly<{
+  /** The marker the host checks before it runs anything in the module. */
   kind: "avandar-plugin";
+  /**
+   * The handlers, keyed by the command ids the plugin declares in its
+   * `ava.yaml`.
+   */
   commands: Readonly<Record<string, CommandHandler>>;
 }>;

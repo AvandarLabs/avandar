@@ -3,8 +3,9 @@ import {
   useAvandar,
   useT,
 } from "@plugin-sdk/AvandarContext/AvandarContext";
+import { PluginError } from "@plugin-sdk/PluginError/PluginError";
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AvandarApi } from "@plugin-sdk/PluginApi.types";
 import type { ReactNode } from "react";
 
@@ -26,10 +27,35 @@ describe("useAvandar", () => {
     expect(result.current).toBe(API);
   });
 
-  it("throws outside plugin UI", () => {
-    expect(() => {
-      return renderHook(useAvandar);
-    }).toThrow(/inside plugin UI/);
+  describe("outside an AvandarProvider", () => {
+    beforeEach(() => {
+      // React logs the error a component throws while rendering.
+      vi.spyOn(console, "error").mockImplementation(() => {
+        return undefined;
+      });
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("throws a PluginError", () => {
+      expect(() => {
+        return renderHook(useAvandar);
+      }).toThrow(PluginError);
+    });
+
+    it("throws with the CommandFailed code", () => {
+      expect(() => {
+        return renderHook(useAvandar);
+      }).toThrow(expect.objectContaining({ code: "CommandFailed" }));
+    });
+
+    it("throws a message that says where the hook can be used", () => {
+      expect(() => {
+        return renderHook(useAvandar);
+      }).toThrow(/inside plugin UI/);
+    });
   });
 
   it("exposes the plugin translator through useT", () => {

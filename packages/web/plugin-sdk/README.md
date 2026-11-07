@@ -1,8 +1,10 @@
 # @avandar/plugin-sdk
 
-The API Avandar plugins are written against. Every call is async and passes
-only serializable data, so the same plugin runs in-process today and inside
-the sandbox later.
+The API Avandar plugins are written against. Calls are async or
+fire-and-forget and pass serializable data, so the same plugin runs in-process
+today and inside the sandbox later. There are two exceptions: `i18n.t` is
+synchronous and runs on the plugin side, and the `content` of `ui.openModal`
+and `ui.openDrawer` is a React tree that the host renders.
 
 ## Exports
 
@@ -10,7 +12,7 @@ the sandbox later.
 | --- | --- | --- |
 | `definePlugin` | Function | Declares a plugin's command handlers. A plugin's entry module exports the result as its default export |
 | `isPluginDefinition` | Function | Checks that a value came from `definePlugin`, so a host can validate a plugin's entry module before it runs a command |
-| `makePluginTranslator` | Function | Makes a translator for a plugin's own ICU messages, falling back to English and then to the bare key |
+| `makePluginTranslator` | Function | Makes a translator for a plugin's own ICU messages. A key falls back from the exact locale to its base language (`es` for `es-MX`), then English, then the bare key. A message that cannot be compiled or formatted is returned as written instead of throwing |
 | `AvandarProvider` | Component | Gives plugin UI access to its scoped `avandar` API. The host renders it around content a plugin opens |
 | `useAvandar` | Hook | Gets the scoped `avandar` API inside plugin UI. Throws a `PluginError` outside an `AvandarProvider` |
 | `useT` | Hook | Gets the plugin's translator inside plugin UI |
