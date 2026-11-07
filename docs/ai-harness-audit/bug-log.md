@@ -20,6 +20,8 @@ listed here with what a reviewer needs to rebuild it as a PR to `develop`.
 | BUG-011 | "Last year" ran for a guessed year with no data, and a blank total was called "results" | fixed | `81506f673`, `c0c08b571` |
 | BUG-012 | A chart request in the Data Explorer was claimed as "added to your dashboard" and showed nothing | fixed | `39264bcfb` |
 | BUG-013 | Chart blocks added to dashboards kept the model's `t0` aliases and could not run | fixed | `394bec76d` |
+| BUG-014 | The explorer banner read "From your prompt: [Clarification answer: US]" | fixed | `38f2764bd` |
+| BUG-015 | An automatic lookup match was sent to the model as the user's choice, narrowing "New York City" to Manhattan | fixed | `f421d508f` |
 
 ---
 
@@ -352,3 +354,46 @@ listed here with what a reviewer needs to rebuild it as a PR to `develop`.
 - **Tests:** a new case in `parseOpenRouterResponse.test.ts`.
 - **Branch:** `fix/dashboard-block-aliases`, merged as `94ae480cc`.
 - **PR title for develop:** `fix(chat): resolve table aliases in charts the chat adds to dashboards`
+
+## BUG-014: the result banner showed a clarification marker
+
+- **Question:** H07 (ChatGPT), after a lookup for "US".
+- **What the user saw:** "From your prompt: [Clarification answer: US]" above
+  the result. The same text becomes the title of a chart saved to a
+  dashboard from the explorer.
+- **Root cause:** `applyChatModelTurnResponse` labeled the result with the
+  last user message in the thread, which after a clarification is the answer
+  marker.
+- **Fix:** `getLastQuestionFromMessages` returns the last message the user
+  actually asked, skipping clarification answers, view changes, and the case
+  design kickoff.
+- **Tests:** `getLastQuestionFromMessages.test.ts`.
+- **Branch:** `fix/prompt-banner-question`, merged as `77867e5ab`.
+- **PR title for develop:** `fix(chat): label results with the user's question, not a clarification marker`
+
+## BUG-015: an automatic match was presented as the user's choice
+
+- **Question:** N11, "show me covid in new york city". **Model:** Claude.
+- **What happened:** the lookup used candidates `["New York City", "NYC",
+  "New York"]`. "New York" matched one county (Manhattan), so the client
+  continued on its own. The thread said "[Clarification answer: New York]",
+  and BUG-010's note told the model the user had picked it. The answer showed
+  Manhattan only, "using the New York match you confirmed".
+- **Root cause:** an automatically matched answer and a user's pick were
+  identical in the thread sent to the model, and the candidate list included
+  a name that is not New York City.
+- **Fix:** `createChatModelAdapter` adds a second line to an automatic
+  continuation (`DiscoveryContinuationMessage.toModelContent`) saying it was
+  matched to the model's own candidates and not seen or confirmed by the
+  user, so the "user picked this" note no longer applies. The client's
+  approved-value parser accepts the extra line. The prompt says every
+  candidate must mean exactly what the user named, with New York City (five
+  counties) as the example.
+- **Tests:** new cases in `DiscoveryContinuationMessage.test.ts`,
+  `generatedSqlAssumptions.test.ts`, and
+  `annotateClarificationAnswersForModel.test.ts`.
+- **Verified in the app:** ChatGPT returns all five counties (March 2020:
+  43,139 cases, as in ground truth) and states the definition; Claude asks
+  "all five boroughs or just Manhattan?".
+- **Branch:** `fix/automatic-match-provenance`, merged as `87602b004`.
+- **PR title for develop:** `fix(chat): tell the model when a lookup answer was matched automatically`

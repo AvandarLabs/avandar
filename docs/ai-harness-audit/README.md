@@ -1,6 +1,7 @@
 # AI harness audit: COVID datasets
 
-Status: in progress. Started 2026-11-06 on `demo/measles`.
+Status: complete. Run 2026-11-06 to 2026-11-07 on `demo/measles`. 15 bugs
+fixed, 8 categories of non-ideal responses addressed.
 
 This audit drives the real app, end to end, with the large JHU COVID files
 and real OpenRouter models, to find where the Ask Avandar chat and the Data
@@ -170,3 +171,45 @@ chat composer, and records:
 - a screenshot.
 
 The generated SQL is then checked against the ground-truth answer.
+
+## 4. Final results
+
+After every fix and improvement, the last run of each question on both models
+(Claude `anthropic/claude-sonnet-5`, ChatGPT `openai/gpt-5.6-terra`). "Right"
+means the table matches the DuckDB ground truth.
+
+| ID | ChatGPT | Claude | Notes |
+|---|---|---|---|
+| B01 | right | right | |
+| B02 | right, 1 call | right | |
+| B03 | right, no question | right, no question | was a needless question (NI-005) |
+| B04 | asks cases or deaths, then right | same | warranted |
+| B05 to B10 | right | right | B10 years display as `2020` (BUG-007) |
+| I01 to I03, I05, I06, I08 | right | right | |
+| I04 | right, window over full series | right | |
+| I07 | right, UK found on its own | right, states UK choice | |
+| I09 | right, 1 call | right | was a loop (BUG-010) |
+| I10 | right, no question | right | |
+| H01, H02, H05, H06, H08, H09, H10 | right | right | H01, H06, H09 were wrong on ChatGPT before C4 |
+| H03 | right, plus tied empty months for American Samoa | right | residual, see harness-improvements C4 |
+| H04 | right | right | |
+| H07 | right, totals side by side | right | |
+| N01 | monthly overview | monthly overview | was a question on both |
+| N02 | asks US or global | monthly overview | allowed: no place named |
+| N03, N04, N06, N09 | asks one question | asks one question | warranted |
+| N05 | asks US or global, then 2022 (last full year) | same | was an empty result (BUG-011) |
+| N07, N08 | right | right | "NY" and typos read correctly |
+| N10 | chart, whole range | chart, whole range | was a false dashboard claim (BUG-012) |
+| N11 | right, all five counties | asks five or one | was Manhattan only (BUG-015) |
+| F01 to F03 | right | right | follow-ups carry state, period, and grain |
+
+Permission prompts: none appeared and none were needed. See
+[non-ideal-responses.md](non-ideal-responses.md#permission-prompts).
+
+## 5. Verification
+
+- `pnpm test:frontend`: 881 files, 5,680 tests passed (run before the last
+  fix; the chat, privacy, and edge-function suites were re-run after it).
+- `tsc -b --noEmit` and `deno check shared supabase/functions packages/shared`:
+  clean.
+- Each fix has its own failing-first test, listed in the bug log.
