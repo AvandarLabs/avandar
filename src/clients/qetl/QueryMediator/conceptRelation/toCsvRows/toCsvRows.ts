@@ -20,10 +20,9 @@ function _quoteCsvField(value: string): string {
  *
  * This exists so a concept's spine can reach DuckDB without any user data
  * entering a SQL string. `external_id` and status names are user-supplied, and
- * the one place the codebase interpolates such a value into SQL today
- * (`AttributeAssertionClient`, `WHERE "<pk>" = '<externalId>'`) is an injection
- * surface. Loading the spine as a registered CSV file avoids adding a second
- * one, which is why this is a CSV writer rather than a `VALUES` builder.
+ * interpolating them into SQL would be an injection surface. Loading the spine
+ * as a registered CSV file avoids one, which is why this is a CSV writer
+ * rather than a `VALUES` builder.
  *
  * RFC 4180 quoting and nothing more: double every `"`, and wrap a field in
  * quotes when it is empty or contains a quote, a comma, a carriage return or a

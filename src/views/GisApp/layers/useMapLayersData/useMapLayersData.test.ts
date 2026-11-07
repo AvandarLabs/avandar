@@ -59,15 +59,6 @@ vi.mock("@/clients/qetl/PublicQetlClient/PublicQetlClient", () => {
   };
 });
 
-vi.mock(
-  "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient",
-  () => {
-    return {
-      AttributeAssertionClient: { getConceptExtension: vi.fn() },
-    };
-  },
-);
-
 // Only consulted by `runStructuredQueryWithMetadata` when `rawSql` is
 // undefined. A separate test loads the real implementation to prove a
 // resolvable lat/lng layer never reaches it.

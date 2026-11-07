@@ -23,12 +23,6 @@ vi.mock("@/lib/analytics/AnalyticsClient", () => {
   return { AnalyticsClient: { logEvent } };
 });
 vi.mock(
-  "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient",
-  () => {
-    return { AttributeAssertionClient: {} };
-  },
-);
-vi.mock(
   "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery",
   () => {
     return { makeExecutableQueryFromManualQuery: vi.fn() };

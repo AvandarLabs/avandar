@@ -176,11 +176,10 @@ function _buildUnmappedColumn(
  * Turns one attribute into the column the concept's view emits for it.
  *
  * A `manual_entry` attribute, and an attribute with no mapping row at all,
- * become a typed NULL rather than an error. Today
- * `getAttributeAssertions._getAssertionsByMappingType` throws for any
- * manual-entry mapping, so one manually entered attribute makes a whole concept
- * unqueryable; a typed NULL keeps the relation's schema complete and is honest,
- * because we hold no value for it.
+ * become a typed NULL rather than an error. Do not throw for them instead: one
+ * manually entered attribute would make the whole concept unqueryable, while a
+ * typed NULL keeps the relation's schema complete and is honest, because no
+ * value is stored for it.
  */
 function _buildAttributeColumn(
   options: Readonly<{
@@ -272,9 +271,8 @@ function _getUniqueColumnName(
  * real SQL over a fake concept instead of asserting the shape of this return
  * value.
  *
- * One column per attribute, never one per mapping. That is the difference from
- * `getDatasetColumnAssertions`, which iterates mappings and therefore emits an
- * attribute twice when it has two.
+ * One column per attribute, never one per mapping. Iterating mappings instead
+ * would emit an attribute twice when it has two.
  */
 export function makeConceptAttributeColumnsFromMetadata(
   metadata: Readonly<ConceptRelationMetadata>,

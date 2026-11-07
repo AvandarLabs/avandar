@@ -571,8 +571,8 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     expect(columns.contributingDatasetIds).toEqual([DATASET_A, DATASET_B]);
   });
 
-  // A manual-entry attribute must not make the whole concept unqueryable, which
-  // is what `getAttributeAssertions` does today. It contributes no dataset.
+  // A manual-entry attribute must not make the whole concept unqueryable. It
+  // contributes no dataset.
   it("emits a manual-entry attribute as a column that reads no dataset", () => {
     const columns = makeConceptAttributeColumnsFromMetadata(
       _metadata({ attributes: [NOTE], mappings: [] }),
