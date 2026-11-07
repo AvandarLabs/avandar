@@ -45,6 +45,7 @@ msgstr "Aún no hay registros"
 msgid "Return online to view or make the page available offline."
 msgstr "Regresa en línea para ver o hacer la página disponible sin conexión."
 
+#: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The link could not be copied."
 msgstr "No se pudo copiar el enlace."
@@ -128,6 +129,7 @@ msgstr "Guardar la vista actual"
 msgid "Cell size (meters)"
 msgstr "Tamaño de celda (metros)"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "Abrir conjunto de datos"
@@ -167,6 +169,11 @@ msgstr "Eliminar acceso para {name}."
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/MatchCaseToggle.tsx
 msgid "Match case"
 msgstr "Distinguir mayúsculas y minúsculas"
+
+#: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+msgid "Updated"
+msgstr ""
 
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
@@ -307,6 +314,10 @@ msgstr "UNION/INTERSECT/EXCEPT no es compatible con el formulario."
 #: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "Configuraciones del gráfico"
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Unavailable dashboard"
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
@@ -457,6 +468,7 @@ msgstr "Conectado como {0}"
 msgid "Llama 3.2 1B"
 msgstr "Llama 3.2 1B"
 
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Datasets"
 msgstr "Conjuntos de datos"
@@ -512,10 +524,11 @@ msgid "Your plan does not allow sharing this dashboard with anyone else. "
 msgstr "Su plan no permite compartir este dashboard con nadie más. Actualice su "
 "plan o deje de compartir otro dashboard y vuelva a intentarlo."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "PDF file"
 msgstr "Archivo PDF"
 
+#: src/components/RichText/Gadget/GadgetCard/GadgetCardHeader.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Open"
@@ -541,6 +554,11 @@ msgstr "No"
 msgid "Could not determine a base table from FROM clause."
 msgstr "No se pudo determinar una tabla base a partir de la cláusula FROM."
 
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
+msgid "People"
+msgstr ""
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx
 msgid "Case types"
 msgstr "Tipos de caso"
@@ -798,6 +816,11 @@ msgstr "Volver a descargar"
 msgid "Allow multiple values"
 msgstr "Permitir múltiples valores"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Only some people can open this dashboard. Teammates on this case without "
+"access will see \"Unavailable\"."
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B (offline)"
 msgstr "Llama 3.1 8B (sin conexión)"
@@ -878,9 +901,9 @@ msgstr "Seleccione una columna de latitud y otra de longitud. Usar solo una "
 "ubica todos los puntos en una línea diagonal, lo que parece un "
 "resultado, pero no lo es."
 
+#: src/hooks/datasets/useDatasetSourceLabels.ts
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Open data"
 msgstr "Abrir datos"
@@ -905,6 +928,11 @@ msgstr "Obtener un conteo de cuántos valores hay"
 msgid "Caption"
 msgstr "Leyenda"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
+msgid "Post the first update below. Type @ to mention a teammate or link a "
+"dashboard, dataset, or case."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Collapse at"
 msgstr "Contraer en"
@@ -916,6 +944,10 @@ msgstr "Gráfico de burbujas"
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Restart tutorial"
 msgstr "Reiniciar tutorial"
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
+msgid "Cases"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it."
@@ -974,6 +1006,7 @@ msgstr "Diseñe tipos de caso en el chat"
 msgid "The sheet has a header row"
 msgstr "La hoja tiene una fila de encabezado"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Map"
 msgstr "Mapa"
@@ -1022,6 +1055,7 @@ msgid "Go to Privacy log"
 msgstr "Ir al registro de privacidad"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroups.tsx
 msgid "No matches"
 msgstr "Sin coincidencias"
 
@@ -1192,7 +1226,7 @@ msgid "However, we are not allowing new registrations at the moment."
 msgstr "Sin embargo, no estamos permitiendo nuevas inscripciones en este "
 "momento."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "Derived dataset"
 msgstr "Conjunto de datos derivado"
 
@@ -1284,6 +1318,11 @@ msgstr "Canalización"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
 msgstr "No se pudo dejar de publicar el dashboard"
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Only some people can open this map. Teammates on this case without "
+"access will see \"Unavailable\"."
+msgstr ""
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Where the fields come from"
@@ -1462,6 +1501,7 @@ msgstr "La coordenada es 0, 0"
 msgid "Natural"
 msgstr "Natural"
 
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Public"
 msgstr "Público"
@@ -1533,6 +1573,11 @@ msgstr "El restablecimiento de contraseña falló"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "New role group"
 msgstr "Nuevo grupo de roles"
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+msgid "Dashboard"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -1683,6 +1728,11 @@ msgstr "Por defecto a \"Y vs X\""
 #: shared/copy/vizTypeLabel.ts
 msgid "Funnel Chart"
 msgstr "Gráfico de embudo"
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Only some people can open this dashboard tile. Teammates on this case "
+"without access will see \"Unavailable\"."
+msgstr ""
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Link address"
@@ -1909,7 +1959,7 @@ msgstr "Subtítulo"
 msgid "Dataset updated successfully!"
 msgstr "¡Conjunto de datos actualizado con éxito!"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "Excel file"
 msgstr "Archivo de Excel"
 
@@ -2007,6 +2057,7 @@ msgstr "No hay texto en esta región para enviar. Se conservaron los resultados 
 msgid "Medium"
 msgstr "Mediano"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
 msgstr "Cargando caso"
@@ -2356,6 +2407,10 @@ msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "No se devolvieron valores de {column}. Describe lo que necesitas en su "
 "lugar."
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Open map"
+msgstr ""
+
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? ( <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> ) : ( "." )
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
@@ -2540,6 +2595,10 @@ msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
 msgstr "Utiliza el Explorador de Datos para analizar tus conjuntos de datos, "
 "crear visualizaciones y descubrir información de tus datos."
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Case"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles & Permissions"
 msgstr "Roles y permisos"
@@ -2627,6 +2686,11 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 msgstr "Exporta este tablero como un PDF, o dibuja en él primero. Las "
 "anotaciones admiten texto, flechas y dibujo a mano alzada con rugosidad "
 "ajustable (RoughJS)."
+
+#: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+msgid "Audience"
+msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude is outside the valid range but would be a valid longitude, and "
@@ -2815,6 +2879,10 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "Cada serie es una columna numérica trazada en el eje Y. Los valores se "
 "agrupan por el eje X (\"{axisKeyValue}\")."
+
+#: src/components/RichText/RichTextComposer/RichTextComposer.tsx
+msgid "Mention a teammate or link a dashboard, dataset, or case"
+msgstr ""
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 msgid "Filled in by hand"
@@ -3116,6 +3184,7 @@ msgstr "Hecho"
 msgid "From a database"
 msgstr "Desde una base de datos"
 
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
 msgstr "Capas"
@@ -3148,6 +3217,10 @@ msgstr "Una URL corta y fácil de recordar para volantes, informes y códigos QR
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
 msgstr "Usando su URL personalizada."
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
+msgid "Searching..."
+msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
@@ -3297,6 +3370,7 @@ msgstr "Enlace al registro de origen"
 msgid "None"
 msgstr "Ninguno"
 
+#: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Link copied"
 msgstr "Enlace copiado"
@@ -3397,6 +3471,10 @@ msgstr "Construir un gráfico en el chat"
 msgid "Additional seats required"
 msgstr "Se requieren asientos adicionales"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Unavailable case"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/PillsFieldTarget.tsx
 msgid "Type a value"
 msgstr "Ingrese un valor"
@@ -3412,6 +3490,10 @@ msgstr "Columna 7"
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Feature"
 msgstr "Función"
+
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+msgid "Draft"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Choose who should own this member’s private dashboards and datasets. You "
@@ -3469,6 +3551,11 @@ msgstr "Fuente de datos"
 msgid "Last synced"
 msgstr "Última sincronización"
 
+#: src/components/RichText/Gadget/GadgetCard/GadgetCardBody.tsx
+msgid "It may have been deleted, or you don't have access. Ask the comment's "
+"author to share it."
+msgstr ""
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Bring a spreadsheet into Avandar."
 msgstr "Importe una hoja de cálculo a Avandar."
@@ -3496,8 +3583,13 @@ msgid "Searching the catalog"
 msgstr "Buscando en el catálogo"
 
 #: src/components/RichText/UserMention/UserMentionList.tsx
-msgid "No teammates match"
-msgstr "Ningún compañero de equipo coincide"
+#~ msgid "No teammates match"
+#~ msgstr "Ningún compañero de equipo coincide"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
+msgid "Write an update. Type @ to mention a teammate or link a dashboard, "
+"dataset, or case."
+msgstr ""
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -4410,6 +4502,10 @@ msgstr "{0} fue eliminado de este navegador."
 msgid "Tab to import"
 msgstr "Pestaña para importar"
 
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
+msgid "Couldn't search. Keep typing to retry."
+msgstr ""
+
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB de descarga)."
@@ -4451,6 +4547,8 @@ msgstr "registro"
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: selectedDataset.name
+#. placeholder {0}: summary.name
+#: src/components/RichText/Gadget/GadgetCard/GadgetCardHeader.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Open {0}"
@@ -4579,9 +4677,17 @@ msgstr "Hacer privado"
 msgid "The form only supports SELECT queries."
 msgstr "El formulario solo admite consultas SELECT."
 
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
+msgid "Updating results"
+msgstr ""
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Disclaimer"
 msgstr "Aviso"
+
+#: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
+msgid "Unavailable item"
+msgstr ""
 
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
@@ -4674,6 +4780,10 @@ msgstr "Respuesta de aclaración"
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Generated SQL"
 msgstr "SQL generado"
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
+msgid "<0>Shift</0> <1>Enter</1> embed"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid " m"
@@ -4851,6 +4961,10 @@ msgstr "Agregaremos esta visualización a tu nuevo panel."
 msgid "Repairing query…"
 msgstr "Reparando la consulta…"
 
+#: src/components/RichText/Gadget/GadgetActionsMenu/GadgetActionsMenu.tsx
+msgid "More actions"
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Horizontal gridlines"
 msgstr "Líneas de cuadrícula horizontales"
@@ -4870,6 +4984,7 @@ msgid "Replace URL"
 msgstr "Reemplazar URL"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
@@ -4892,9 +5007,9 @@ msgstr "Cualquiera que tenga el enlace puede ver este {resource}. Las personas "
 "y los grupos que aparecen abajo aún controlan quién puede editarlo."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedEmptyState.tsx
-msgid "Post the first update below. Mention a teammate with @ to bring them in."
-msgstr "Publique la primera actualización a continuación. Mencione a un "
-"compañero de equipo con @ para incluirlo."
+#~ msgid "Post the first update below. Mention a teammate with @ to bring them in."
+#~ msgstr "Publique la primera actualización a continuación. Mencione a un "
+#~ "compañero de equipo con @ para incluirlo."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
@@ -5042,6 +5157,7 @@ msgstr "Eliminar fallido"
 msgid "{0} deleted successfully"
 msgstr "{0} eliminado con éxito"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Open dashboard"
 msgstr "Abrir panel"
@@ -5062,6 +5178,10 @@ msgstr "Desde el conjunto de datos"
 msgid "End (e.g. 2024-12-31)"
 msgstr "Fin (por ejemplo, 2024-12-31)"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Open dashboard tile"
+msgstr ""
+
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL is what actually runs."
@@ -5069,10 +5189,10 @@ msgstr "Algunas partes de este SQL no se pudieron representar en el formulario "
 "Manual. El formulario muestra una aproximación; el SQL es lo que "
 "realmente se ejecuta."
 
+#: src/hooks/datasets/useDatasetSourceLabels.ts
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Database"
 msgstr "Base de datos"
@@ -5337,6 +5457,10 @@ msgstr "¿Eliminar permanentemente todas las decisiones de consentimiento en "
 "este dispositivo? Esta acción no se puede deshacer, y el registro en "
 "otros dispositivos no se ve afectado."
 
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
+msgid "<0>Enter</0> link"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Let AI decide (legacy)"
 msgstr "Dejar que la IA decida (heredado)"
@@ -5582,6 +5706,10 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "Cada serie es una columna numérica trazada en el valor radial. Los "
 "valores se agrupan por el eje de categoría (\"{axisKeyValue}\")."
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Loading case type"
+msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -6280,6 +6408,15 @@ msgstr "Bajo"
 msgid "Description"
 msgstr "Descripción"
 
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+msgid "Chart"
+msgstr ""
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Only some people can open this case. Teammates on this case without "
+"access will see \"Unavailable\"."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Categories"
 msgstr "Categorías"
@@ -6362,6 +6499,10 @@ msgstr "Por favor, inténtelo de nuevo. Su tablero no ha sido publicado."
 msgid "Encoding"
 msgstr "Codificación"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Loading dashboard tile"
+msgstr ""
+
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -6390,6 +6531,10 @@ msgstr "Exportar como PDF"
 #: src/views/IndividualManagerApp/EditCaseTypeButton.tsx
 msgid "Edit case type"
 msgstr "Editar tipo de caso"
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Open case"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
@@ -6773,6 +6918,10 @@ msgstr "Expandir el panel de capas"
 msgid "Place text"
 msgstr "Colocar texto"
 
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+msgid "Workspace"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Layer"
 msgstr "Capa"
@@ -6865,6 +7014,10 @@ msgstr "Algunas partes del SQL no se pueden representar en el formulario "
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Dark"
 msgstr "Oscuro"
+
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+msgid "Records"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "Rebind required"
@@ -7033,6 +7186,7 @@ msgid "An error occurred while saving the dataset"
 msgstr "Ocurrió un error al guardar el conjunto de datos"
 
 #: shared/copy/appLabel.ts
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/GisApp/MapListView/MapListView.tsx
 msgid "Maps"
@@ -7301,7 +7455,7 @@ msgstr "Las consultas públicas no son compatibles con las consultas "
 msgid "Edit comment"
 msgstr "Editar comentario"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "CSV file"
 msgstr "Archivo CSV"
 
@@ -7330,6 +7484,10 @@ msgid "The file is hosted on a different site from the one that lists it, so "
 "Avandar doesn't download it."
 msgstr "El archivo está alojado en un sitio diferente del que lo incluye, por "
 "lo que Avandar no lo descarga."
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Loading map"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Leave empty when the geometry is already WGS 84."
@@ -7428,6 +7586,10 @@ msgstr "Le damos la bienvenida al administrador de fuentes de datos. Elija un "
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "Geometry unavailable"
 msgstr "Geometría no disponible"
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Loading dashboard"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -7530,6 +7692,11 @@ msgstr "Creado \"{dashboardName}\""
 msgid "{0} boundaries without data"
 msgstr "{0} límites sin datos"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Only some people can open this dataset. Teammates on this case without "
+"access will see \"Unavailable\"."
+msgstr ""
+
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Description must be under {maxDatasetDescriptionLength} characters "
@@ -7615,6 +7782,7 @@ msgstr "Los cambios no guardados no aparecerán en la vista previa. Guarde "
 msgid "This workspace does not have a valid subscription."
 msgstr "Este espacio de trabajo no tiene una suscripción válida."
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Dataset"
 msgstr "Conjunto de datos"
@@ -7714,6 +7882,7 @@ msgstr "No se pudo generar el código QR"
 msgid "Remove condition"
 msgstr "Eliminar condición"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
 msgid "Open case type"
 msgstr "Abrir tipo de caso"
@@ -7858,10 +8027,10 @@ msgstr "Extra pequeño"
 msgid "People with access"
 msgstr "Personas con acceso"
 
+#: src/hooks/datasets/useDatasetSourceLabels.ts
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Google Sheets"
 msgstr "Google Sheets"
@@ -8296,6 +8465,10 @@ msgstr "¿Enviar a AI?"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "Comprar {seatsToAdd} asientos"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Loading dataset"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
@@ -8403,6 +8576,10 @@ msgstr "No se pudo crear el PDF: {detail}"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "Esta URL personalizada ya está en uso"
+
+#: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
+msgid "Show as embed"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Drive access is not configured for this deployment."
@@ -8537,6 +8714,7 @@ msgstr "Solo se muestran los recuentos. El contenido privado nunca es visible "
 "para los administradores del espacio de trabajo. Puede reasignar la "
 "propiedad sin obtener acceso."
 
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupFieldSelect.tsx
 msgid "Fields"
 msgstr "Campos"
@@ -8824,6 +9002,7 @@ msgstr "está entre"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -8868,6 +9047,11 @@ msgstr "Estás en el plan Gratuito"
 msgid "Count"
 msgstr "Contar"
 
+#: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+msgid "Tiles"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Upgrade to our Impact plan to "
@@ -8888,6 +9072,16 @@ msgstr "Avandar aún está en beta. Algunas funciones pueden no funcionar como s
 msgid "Thank you for your interest!"
 msgstr "¡Gracias por tu interés!"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+msgid "Case type"
+msgstr ""
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Dashboard tile"
+msgstr ""
+
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -8935,6 +9129,10 @@ msgstr "Dibuje un cuadro alrededor de una tabla, un gráfico o un bloque de "
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Previewing this dashboard"
 msgstr "Previsualizando este panel"
+
+#: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
+msgid "Show as link"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "No value"
@@ -9093,9 +9291,9 @@ msgid "Row {rowNum} / Col {colNum}"
 msgstr "Fila {rowNum} / Col {colNum}"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
-msgid "Write an update. Type @ to mention a teammate."
-msgstr "Escriba una actualización. Escriba @ para mencionar a un compañero de "
-"equipo."
+#~ msgid "Write an update. Type @ to mention a teammate."
+#~ msgstr "Escriba una actualización. Escriba @ para mencionar a un compañero de "
+#~ "equipo."
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList.tsx
 msgid "You can't go to this step until you create a new dashboard."
@@ -9109,6 +9307,10 @@ msgstr "No se han agregado columnas aún."
 msgid "Advanced options"
 msgstr "Opciones avanzadas"
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Unavailable map"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is less than"
 msgstr "es menor que"
@@ -9117,6 +9319,11 @@ msgstr "es menor que"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom right"
 msgstr "Inferior derecha"
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Only some people can open this case type. Teammates on this case without "
+"access will see \"Unavailable\"."
+msgstr ""
 
 #. placeholder {0}: scale.meters
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -9374,6 +9581,7 @@ msgstr "Aún no hay mapas"
 msgid "Add a prompt and generate SQL to configure this visualization."
 msgstr "Agrega una solicitud y genera SQL para configurar esta visualización."
 
+#: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copy link"
 msgstr "Copiar enlace"
@@ -9423,6 +9631,10 @@ msgstr "¿Qué campo debe usarse como nombre de un {singularConceptName}?"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ask your first question"
 msgstr "Haga su primera pregunta"
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Unavailable dataset"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Change URL"
@@ -9759,6 +9971,10 @@ msgstr "Este panel está publicado públicamente."
 msgid "Loading..."
 msgstr "Cargando..."
 
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Unavailable dashboard tile"
+msgstr ""
+
 #: src/views/GisApp/panels/FeatureInspector/FeatureFields.tsx
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/FlatLegendEntry.tsx
@@ -9917,6 +10133,10 @@ msgstr "{0} imprimen columnas diferentes, por lo que no hay un conjunto de "
 msgid "Annotation text"
 msgstr "Texto de la anotación"
 
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+msgid "Untitled chart"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgstr "ORDER BY hace referencia a la columna \"{columnName}\", que no está en "
@@ -9971,6 +10191,10 @@ msgstr "Inferior"
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"
 msgstr "Listo para uso sin conexión"
+
+#: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+msgid "Unavailable case type"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionOptions.tsx
 msgid "Reactions"
