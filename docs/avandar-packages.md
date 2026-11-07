@@ -20,9 +20,12 @@ packages/
 │   ├── logger/       # Browser logger + module mixin
 │   ├── models/       # `Model` discriminated-data primitives
 │   ├── modules/      # Composable object modules (replaces class hierarchies)
+│   ├── plugin-manifest/  # Plugin manifest schema, ava.yaml compiler, `when` evaluator
 │   └── utils/        # General-purpose TypeScript utilities
 └── web/
     ├── hooks/        # React hooks (state + react-query wrappers)
+    ├── plugin-sdk/   # The API plugins are written against
+    ├── plugin-ui/    # The components plugin UI may render
     └── ui/           # React components, styled on top of Mantine
 ```
 
@@ -179,7 +182,56 @@ See [`packages/web/ui/README.md`](../packages/web/ui/README.md).
 
 ---
 
-## `@avandar/etl` — `packages/node/etl`
+## `@avandar/plugin-manifest` - `packages/shared/plugin-manifest`
+
+The plugin manifest toolkit. Provides the strict Zod schema for a plugin's
+`ava.yaml`, `compileManifest` (strict YAML 1.2 parsing plus the locale string
+checks), the `when` condition evaluator, the slot fact registry, the approved
+npm dependency list, and a Node-only reader for plugin folders. It has three
+entry points: `@avandar/plugin-manifest` for build tools and the CLI,
+`@avandar/plugin-manifest/runtime` for browser code (no Zod or YAML at
+runtime), and `@avandar/plugin-manifest/node` for the folder readers.
+
+Private for now (`"private": true`), so it is not published to npm. Runtime
+dependencies are `yaml` and a `zod` peer.
+
+See [`packages/shared/plugin-manifest/README.md`](../packages/shared/plugin-manifest/README.md).
+To write a plugin with it, see [`docs/plugin-authoring.md`](plugin-authoring.md).
+
+---
+
+## `@avandar/plugin-sdk` - `packages/web/plugin-sdk`
+
+The API Avandar plugins are written against. Exports `definePlugin` and
+`isPluginDefinition`, the `avandar` API types (`AvandarApi`, the invocation
+context, `QueryHandle`, `fetchRows` options and result), `PluginError`,
+`makePluginTranslator` (ICU messages with locale fallback), and the React
+`AvandarProvider`, `useAvandar`, and `useT` for plugin UI. Every call is async
+or fire-and-forget and passes serializable data.
+
+Private for now (`"private": true`), so it is not published to npm. It depends
+on Lingui's core and message compiler, with `react` as a peer.
+
+See [`packages/web/plugin-sdk/README.md`](../packages/web/plugin-sdk/README.md).
+
+---
+
+## `@avandar/plugin-ui` - `packages/web/plugin-ui`
+
+The components plugin UI may render. Re-exports a small set of Mantine
+components (`Alert`, `Badge`, `Button`, `Divider`, `Group`, `Loader`,
+`NumberInput`, `Select`, `SimpleGrid`, `Stack`, `Table`, `Text`, `TextInput`,
+`Title`). Plugins import UI only from this package, which keeps their code
+independent of the host's component library.
+
+Private for now (`"private": true`), so it is not published to npm. It has
+`@mantine/core` and `react` as peers.
+
+See [`packages/web/plugin-ui/README.md`](../packages/web/plugin-ui/README.md).
+
+---
+
+## `@avandar/etl` - `packages/node/etl`
 
 Node.js ETL toolkit. Two units:
 

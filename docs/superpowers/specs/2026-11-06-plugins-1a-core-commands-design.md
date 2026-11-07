@@ -409,3 +409,127 @@ Slice 1a is done when all of these hold:
   retired `createSupabaseCRUDClient`, so follow the `createRdbCrudClient`
   pattern used by `src/clients/maps/AvaMapClient/AvaMapClient.ts` instead.
 - **Test-driven.** Build each unit red/green, as the project rules require.
+
+## Implementation notes: as built
+
+What changed from this spec while building slice 1a. Where the two
+disagree, the code and `docs/plugin-authoring.md` are current.
+
+### Final exported names
+
+Repo naming rules (`create*` for objects, `make*` for strings and
+primitives, `get*From*` for derived values) renamed the helpers the plan
+named. Behavior is unchanged.
+
+| Plan or spec name | Built name |
+| --- | --- |
+| `collectWhenConditionIssues` | `getIssuesFromWhenCondition` |
+| `resolveManifestString` | `getLocalizedTextFromManifestStrings` |
+| `getLocalizedKey` | `getMessageKeyFromManifestString` |
+| `getManifestStringKeys` | `getMessageKeysFromManifest` |
+| `toTablerIconComponentName` | `makeTablerComponentNameFromIconName` |
+| `findUnapprovedDependencies` | `getUnapprovedDependenciesFromPackageJson` |
+| `createPluginTranslator` | `makePluginTranslator` |
+| `buildPluginIndexModule` | `makeIndexModuleSourceFromPlugins` |
+| `buildPluginManifestModule` | `makeManifestModuleSourceFromPlugin` |
+| `buildPluginLocalesModule` | `makeLocalesModuleSourceFromPlugin` |
+| `toChunkSummaries` | `makeChunkSummariesFromBundle` |
+| `createPluginModuleCache` | `makePluginModuleCache` (the shared instance is `PluginModuleCache`) |
+| `getPluginInstallStatus` | `getPluginInstallStatusFromInstallation` |
+| `selectLoadableInstallations` | `getLoadablePluginsFromInstallations` |
+| `selectActivePlugins` | `getActivePluginsFromLoadablePlugins` |
+| `selectPluginMenuItems` | `getMenuItemsFromActivePlugins` |
+| `countPluginContributions` | `getContributionCountsFromManifest` |
+| `createPluginApi` | `makePluginApi` |
+| `makeDataExplorerToolbarFacts` | `makeToolbarFactsFromQueryResult` |
+| `buildPluginScaffoldFiles` | `makePluginScaffoldFilesFromName` |
+| `toRegressionPoints` | `makeRegressionPointsFromRows` |
+| `PLUGIN_INDEX` read directly | `getBundledPluginEntries` and `getPluginIndexEntry` in `pluginIndexHelpers.ts` |
+| `PluginInstallationRead`, `PluginInstallationId` | `PluginInstallation.T`, `PluginInstallation.Id` |
+
+`makeQueryHandleRegistry` is new: `QueryHandleRegistry` is one instance of
+it, which lets a test build an isolated registry. `parseStrictYaml` is also
+new. It is the strict YAML 1.2 parser behind `compileManifest` and the
+`bundled.yaml` reader.
+
+### Per-module folder layout
+
+Every module sits in a folder named after it, with its test beside it, for
+example `src/lib/plugins/makePluginApi/makePluginApi.tsx` and
+`makePluginApi.test.tsx`. The flat files the plan listed became folders. The
+same holds in `packages/*`, `plugins/epidemiology`, `apps/ava-cli`, and the
+Settings tab. Integration tests live in `__tests__/` directories. The
+regression modal split into `RegressionModal/` with `ColumnPickers`,
+`RegressionForm`, `FitOutcome`, `FittedResult`, and
+`makeStatisticTextFromNumber`.
+
+### Build and bundle check
+
+- **Single-build bundle check.** The check is not a separate
+  `scripts/check-plugin-bundle/` step reading Vite's build manifest. It is
+  `checkPluginBundle` in `scripts/vite-plugin-ava-plugins/`, called from the
+  Vite plugin's `generateBundle` hook in the same build when
+  `AVA_PLUGIN_BUNDLE_CHECK=1`. `pnpm check:plugin-bundle` sets it, and
+  `pr-develop.yaml` runs that script.
+- **What it measures.** It walks the static `imports` of every entry chunk.
+  A `plugins/**` module, a plugin manifest module, or a plugin locale module
+  in any statically reachable chunk is a violation. It also sums the rendered
+  bytes of host modules in those chunks: `src/lib/plugins/`,
+  `@avandar/plugin-manifest`, `@avandar/plugin-sdk`, and the virtual plugin
+  index. The plugin SDK counts as host code. The budget is 24,000 bytes plus
+  600 per bundled plugin.
+- **Lazy runner.** `runPluginCommand` loads at click time through
+  `loadRunPluginCommand`, a dynamic `import()` cached after the first success.
+  The runner reaches the SDK runtime and Lingui's message compiler, so loading
+  it lazily keeps both out of the main bundle. A failed import is forgotten,
+  so the next click retries it.
+- **`runnerImport` in `vite.config.ts`.** The config loads
+  `vitePluginAvaPlugins` through Vite's `runnerImport` with
+  `vite-tsconfig-paths`, not a static import. A static import would have Node
+  load `@avandar/plugin-manifest` source directly and fail on its
+  `@plugin-manifest/...` aliases. `runnerImport` is experimental in Vite 7,
+  and editing the Vite plugin's own source needs a dev server restart.
+- **`optimizeDeps.entries`.** The Vite plugin adds each plugin's entry file to
+  `optimizeDeps.entries`. The startup dependency scan does not follow imports
+  out of a virtual module, so without these entries an npm package only a
+  plugin imports was first optimized when its chunk loaded, and the resulting
+  full page reload closed the user's open modal or drawer.
+
+### Runtime
+
+- **Settled per-plugin manifest loading.** `loadManifestModules` loads each
+  manifest with `Promise.allSettled`, so one failing chunk does not hide the
+  other plugins. Each failure is logged with its plugin id. The result carries
+  `hasFailures`, and a result with failures is stale at once, so the next use
+  retries it.
+- **Manifest queries excluded from persistence.** The manifest query sets
+  `meta: { persist: false }`. A manifest module carries React icon
+  components, and JSON persistence turns each one into `{}`, which crashed the
+  first render after a reload.
+- **Installation reads refetch on mount.** `PluginHost` and the Plugins tab
+  read installs with `ALWAYS_REFETCH_ON_MOUNT`. A reload right after an
+  install restored the pre-install snapshot from the persisted cache and
+  counted it as fresh, so the plugin stayed hidden until it went stale.
+- **Plugins tab errors.** When installs fail to load and there is no cached
+  installs data, the tab shows an error and no cards, because every plugin
+  would look uninstalled. A background refetch failure keeps showing the
+  cached cards.
+
+### Database
+
+- **Desktop sync exclusion.** `plugin_installations` is listed as not synced
+  in `apps/desktop/sync/syncable-tables.ts`, like `maps`.
+- **RLS hardening.** The insert policy pins `installed_by` to the caller. A
+  dedicated `plugin_installations__prevent_identity_change` trigger makes both
+  `workspace_id` and `plugin_id` immutable, in place of the standard
+  `prevent_workspace_id_change` trigger the spec named. `installed_by` is not
+  pinned on update, because deleting a user sets it to null through an update.
+
+### CLI
+
+`ava plugin init` takes `--publisher` (default `avandar`) and, in a terminal,
+asks for a missing name and publisher. Without a terminal, a missing name
+fails with the exact command to run. `ava plugin validate` runs the manifest
+checks (schema, locale keys, entry file, icons, approved dependencies), then
+`tsc`, then `eslint`, and skips the last two when the manifest fails. In a
+terminal it asks which plugin, and an empty answer validates all of them.
