@@ -5,6 +5,9 @@
     "@avandar/models": "../../../packages/shared/models/src/index.ts",
     "@avandar/models/zod": "../../../packages/shared/models/src/zod/index.ts",
     "@avandar/modules": "../../../packages/shared/modules/src/index.ts",
+    "@avandar/plugin-manifest": "../../../packages/shared/plugin-manifest/src/index.ts",
+    "@avandar/plugin-manifest/node": "../../../packages/shared/plugin-manifest/src/node/index.ts",
+    "@avandar/plugin-manifest/runtime": "../../../packages/shared/plugin-manifest/src/runtime.ts",
     "@avandar/utils": "../../../packages/shared/utils/src/index.ts",
     "@avandar/utils/encoding": "../../../packages/shared/utils/src/encoding/index.ts",
     "@avandar/utils/sql": "../../../packages/shared/utils/src/sql/index.ts",
@@ -13,6 +16,7 @@
     "@logger/": "../../../packages/shared/logger/src/",
     "@models/": "../../../packages/shared/models/src/",
     "@modules/": "../../../packages/shared/modules/src/",
+    "@plugin-manifest/": "../../../packages/shared/plugin-manifest/src/",
     "@sbfn/": "../",
     "@supabase/postgrest-js": "npm:@supabase/postgrest-js@2",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
@@ -20,6 +24,7 @@
     "$/": "../../../shared/",
     "ts-pattern": "npm:ts-pattern@5",
     "type-fest": "npm:type-fest@5",
+    "yaml": "npm:yaml@^2.9.0",
     "zod": "npm:zod@4"
   },
   "compilerOptions": {

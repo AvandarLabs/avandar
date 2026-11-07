@@ -39,13 +39,14 @@ cd "$(dirname "$0")/.."
 OUT_DIR="$(mktemp -d)"
 trap 'rm -rf "$OUT_DIR"' EXIT
 
-# Only `packages/**` is ever published. Everything under `apps/**` is internal
-# to this repo, and the root package is the app itself. `private: true` is what
+# Only `packages/**` is ever published. Everything under `apps/**` and
+# `plugins/**` is internal to this repo, and the root package is the app
+# itself. `private: true` is what
 # actually stops `pnpm publish` from sending one to the registry, so assert it
 # rather than trusting that each new app remembers.
 echo "==> Guard: nothing outside packages/ is publishable"
 guard_failed=0
-for pkg_json in package.json apps/*/package.json; do
+for pkg_json in package.json apps/*/package.json plugins/*/package.json; do
   [ -f "$pkg_json" ] || continue
   name="$(node -p "require('./$pkg_json').name")"
   is_private="$(node -p "require('./$pkg_json').private === true")"

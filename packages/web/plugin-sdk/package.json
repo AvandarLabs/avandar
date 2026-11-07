@@ -31,6 +31,7 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
+    "jsdom": "^26.1.0",
     "react": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",

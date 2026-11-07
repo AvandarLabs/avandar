@@ -32,7 +32,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@types/node": "^22.19.19",
+    "@types/node": "^22.15.0",
     "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
