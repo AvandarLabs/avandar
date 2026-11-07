@@ -68,6 +68,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F16 | Index every catalog asset behind `is_workspace_loadable`, and add the NY State Socrata portals | not started | F4, F6, F7, F12 | |
 | F17 | Search the catalog in Postgres and load listings as the user scrolls | not started | F4, F12, F16 | |
 | F18 | Case comments and the case activity feed | not started | none | |
+| F19 | Gadget references: link and embed dashboards, tiles, datasets, maps, case types, and cases in a case comment | not started | F18 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -93,6 +94,7 @@ API. It's new work, not something this branch built.
 | 11 | F16 | Extends the F4 listings table and upsert, both F6 and F7 pipelines, and F12's invalid-listing UI. Merge after all four. |
 | 12 | F17 | Adds a column and indexes to the F4 listings table, and rewrites the catalog list that F12 and F16 extended. Merge after both. |
 | any | F18 | Self-contained: new tables, the record page feed, and one shared client typing fix. It touches no other feature's files, and nothing depends on it. |
+| after F18 | F19 | Extends F18's rich text model, editor, and comment triggers, so it cannot land first. Otherwise self-contained. |
 | 13 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -996,6 +998,108 @@ pnpm test:e2e case-activity.spec.ts
 
 ---
 
+## F19: Gadget references in case comments
+
+**Purpose:** A case comment links or embeds a dashboard, a single dashboard
+tile, a dataset, a map, a case type, or another case. Typing `@` searches
+teammates and these gadgets together. Enter inserts an inline link chip and
+Shift+Enter an embed card with key facts, and the editor switches either one
+to the other. Opening a tile lands on the dashboard preview scrolled to the
+tile and highlighted. The stored document never holds a gadget's or a
+member's name, and a reader who cannot open a gadget sees "Unavailable".
+**Value:** Case discussion points straight at the evidence (the chart, the
+dataset, the related case) instead of describing it, without leaking
+restricted resources to teammates who cannot see them.
+
+**PR title:** `feat(comments): link and embed dashboards, datasets, maps, and cases in case comments`
+
+**Built on:** `feat/comment-embeds`, branched from `demo/measles` after F18.
+See [gadgets.md](gadgets.md) for the as-built reference and
+[gadget-references-design.md](gadget-references-design.md) for the design.
+
+**Commits to read:** all of these, oldest first. They contain no other
+feature's work. The last two, which write this entry and add the end-to-end
+spec, follow `375cbf2e0`:
+`docs(measles-demo): document gadgets and log gadget references` and
+`test(comments): cover linking and embedding gadgets in a case comment`.
+
+| SHA | Subject |
+|---|---|
+| `50a83a3df` | docs(measles-demo): design gadget references in case comments |
+| `7c6e2c9cb` | docs(measles-demo): plan gadget references in case comments |
+| `ec1a3dfed` | feat(comments): add gadget search and mirror comment gadget references |
+| `862453ca2` | fix(comments): harden gadget search and cover its edge cases |
+| `a3865dbfa` | feat(comments): add the Gadget model |
+| `393375afe` | feat(comments): store gadget links and embeds in rich text documents |
+| `c299ebaf8` | feat(comments): add the gadget search client |
+| `c8dbed637` | feat(comments): find dashboard tiles in a dashboard config |
+| `af925c7e6` | refactor(datasets): share dataset source labels |
+| `cc29f02fb` | fix(comments): make gadget nodes strict and check gadget types against the database |
+| `b7aaf7f39` | feat(comments): resolve gadget references into summaries |
+| `05244612e` | feat(comments): render gadget chips and cards |
+| `82f2a3d77` | fix(comments): translate gadget states as whole phrases and trim chip queries |
+| `02fa1f61d` | feat(comments): add gadget link and embed nodes |
+| `7cad621e1` | fix(comments): keep gadget chips in the editor from navigating and tidy the embed switch |
+| `4cbc6753f` | fix(comments): avoid the internal word gadget in unavailable copy |
+| `07a7ffd6f` | feat(comments): search gadgets from the @ menu |
+| `ed3a4041c` | fix(comments): keep the @ menu highlight and results steady while searching |
+| `170aef3b2` | feat(dashboards): scroll to and highlight a linked tile in the dashboard preview |
+| `a1f8e67bc` | fix(comments): make stored mentions strict so they can never carry a name |
+| `375cbf2e0` | chore(comments): extract gadget messages |
+
+**Files:** `supabase/schemas/00.enum.gadget_type.sql`,
+`22.comment_gadget_refs.sql`, `50.rpc_gadgets__search.sql`, the
+`comments__sync_gadget_refs` trigger in `23.comments__audit_triggers.sql`,
+the `idx_individuals__workspace_id` index in `20.individuals.sql`, pgTAP
+tests under `supabase/tests/database/gadgets/` (plus the
+`exact_data_api_grants` edit), `shared/models/gadgets/Gadget/**`, the gadget
+and strict-mention hunks of `shared/models/RichTextDocument/**`,
+`src/clients/gadgets/searchGadgets/**`,
+`src/clients/dashboards/findDashboardTile/**`,
+`src/components/RichText/Gadget/**`, `src/components/RichText/MentionMenu/**`
+(which replaces `UserMention/UserMentionList*` and
+`UserMention/createUserMentionSuggestion.ts`), the gadget hunks of
+`createRichTextExtensions.ts`, `RichTextComposer`, `RichTextView`, and
+`UserMention/filterMentionCandidates.ts`,
+`src/components/RichText/__tests__/gadgetDisplaySwitch.integration.test.tsx`,
+`src/hooks/datasets/useDatasetSourceLabels.ts` with the
+`DatasetMetaView.tsx` refactor that uses it, the `?tile=` handling in
+`src/routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId.tsx`,
+`DashboardViewerView/{DashboardViewerView,DashboardViewerContent}.tsx` and
+`useHighlightTile.{ts,module.css,test.tsx}`, the `data-tile-id` in
+`DataVizPBlock/DataVizPBlock/{DataVizContent,DataVizPBlock}.tsx`, small
+hunks in the case feed (`CaseActivityComposer.tsx`,
+`CaseActivityFeedEmptyState.tsx`, `CommentCardBody.tsx`,
+`CaseActivityFeed.test.tsx`), `comment_gadget_refs` in
+`apps/desktop/sync/syncable-tables.ts`, and
+`tests/e2e/case-gadgets.spec.ts` with
+`tests/e2e/helpers/seedDashboardWithTile.ts`.
+
+**Docs:** `docs/measles-demo/gadgets.md`,
+`docs/measles-demo/gadget-references-design.md`, and
+`docs/measles-demo/gadget-references-plan.md` are new on this branch. Port
+them with F18's docs, and port the "Gadget references" section of
+`case-activity-architecture.md`, the gadgets line in `AGENTS.md`, and the
+gadget references bullet under P5c.2 in
+`docs/production-plan-world-humanitarian-day.md`.
+
+**Schema:** one migration, `20261107004932_gadget_references.sql` (and its
+desktop mirror `apps/desktop/migrations/20261107004932_gadget_references.gen.sql`).
+Regenerate both on the PR branch after `ava supabase switch`, rather than
+copying them, so they sort after whatever `develop` has then.
+
+**Verification:**
+```sh
+pnpm test:db
+pnpm vitest run shared/models/gadgets shared/models/RichTextDocument src/clients/gadgets src/clients/dashboards/findDashboardTile src/components/RichText src/views/DashboardApp/DashboardViewerView src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock src/views/IndividualManagerApp
+pnpm test:desktop
+pnpm i18n:check
+pnpm test:e2e case-gadgets.spec.ts
+pnpm test:e2e case-activity.spec.ts
+```
+
+---
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -1095,7 +1199,8 @@ port the final files, not the commit.
 | 89 | `f78be622b` | F7 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
-under F18 above rather than numbered here.
+under F18 above rather than numbered here. F19's commits are listed in full
+under F19 in the same way.
 
 Commits that only update this log are branch-only and are not listed.
 

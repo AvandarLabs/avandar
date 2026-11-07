@@ -267,6 +267,16 @@ no writer/UI. Greenfield.
 - P5c.2 **Comments / activity feed** on an ABox: built. Rich text, markdown,
   @mentions, reactions, edit and delete, on an append-only activity log. See
   [case-activity-architecture.md](measles-demo/case-activity-architecture.md).
+  - **Gadget references:** built. A comment links or embeds a dashboard,
+    dashboard tile, dataset, map, case type, or case from the `@` menu, as a
+    chip or a card of key facts, without ever storing or leaking a name the
+    reader cannot see. See [gadgets.md](measles-demo/gadgets.md).
+    Follow-ups: live embed bodies (a running tile, a dataset preview, a map);
+    paste an Avandar URL to convert it; a `/` block menu; backlinks from
+    `comment_gadget_refs`; notifications when a gadget you own is
+    referenced; faster search (split blank and non-blank queries, trigram
+    indexes); a case Status fact once status sets exist (P5c.4); comments,
+    saved queries, and catalog listings as gadgets.
 - P5c.3 `[NEW]` **Assignment**: assign a case (ABox) to a user/user-group;
   persist `assignedTo`; "assigned to me" views.
 - P5c.4 `[NEW]` **Status workflow**: set/track status from the configurable set
