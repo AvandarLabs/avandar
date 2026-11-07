@@ -64,6 +64,52 @@ const INSPECTABLE_TABLE_FUNCTIONS = new Set([
   "json_each",
 ]);
 const INSPECTABLE_INTERNAL_TABLES = new Set(["reject_errors", "reject_scans"]);
+/**
+ * Scalar functions whose SQL-standard syntax puts a `FROM` between their
+ * arguments, as in `EXTRACT(year FROM "date")`. That `FROM` is followed by an
+ * expression, never a relation.
+ */
+const FROM_ARGUMENT_FUNCTIONS = new Set([
+  "EXTRACT",
+  "OVERLAY",
+  "SUBSTRING",
+  "TRIM",
+]);
+
+/**
+ * Indexes of `FROM` tokens that separate the arguments of a scalar function
+ * such as `EXTRACT`, rather than introducing a relation.
+ *
+ * Only a `FROM` directly inside that function's parentheses counts. A subquery
+ * nested in its arguments keeps its own `FROM`, so the relations it reads are
+ * still analyzed.
+ */
+function _getFunctionArgumentFromIndexes(
+  tokens: readonly SqlToken[],
+): Set<number> {
+  const openingIndexes: number[] = [];
+  const fromIndexes = new Set<number>();
+  tokens.forEach((token, index) => {
+    if (token.value === "(") {
+      openingIndexes.push(index);
+    } else if (token.value === ")") {
+      openingIndexes.pop();
+    } else if (isKeywordToken({ token, keywords: "FROM" })) {
+      const openingIndex = openingIndexes.at(-1);
+      const functionToken =
+        openingIndex === undefined ? undefined : tokens[openingIndex - 1];
+      if (
+        isKeywordToken({
+          token: functionToken,
+          keywords: FROM_ARGUMENT_FUNCTIONS,
+        })
+      ) {
+        fromIndexes.add(index);
+      }
+    }
+  });
+  return fromIndexes;
+}
 
 /** Builds a read-only source analysis over the given relation table names. */
 function _readSourceAnalysis(
@@ -281,10 +327,12 @@ function _getDirectSourceIndexes(tokens: readonly SqlToken[]): number[] {
     "UNPIVOT",
   ]);
   const copyDirectionKeywordIndexes = getCopyDirectionKeywordIndexes(tokens);
+  const functionArgumentFromIndexes = _getFunctionArgumentFromIndexes(tokens);
   const directIndexes = tokens.flatMap((token, index) => {
     if (
       !isKeywordToken({ token, keywords: sourceKeywords }) ||
-      copyDirectionKeywordIndexes.has(index)
+      copyDirectionKeywordIndexes.has(index) ||
+      functionArgumentFromIndexes.has(index)
     ) {
       return [];
     }
@@ -323,9 +371,13 @@ function _getCommaSourceIndexes(tokens: readonly SqlToken[]): number[] {
   ]);
   const activeFromDepths = new Set<number>();
   const depths = getParenthesisDepths(tokens);
+  const functionArgumentFromIndexes = _getFunctionArgumentFromIndexes(tokens);
   const sourceClauseIndexes = new Set([
     ...tokens.flatMap((token, index) => {
-      return isKeywordToken({ token, keywords: "FROM" }) ? [index] : [];
+      return isKeywordToken({ token, keywords: "FROM" }) &&
+        !functionArgumentFromIndexes.has(index)
+        ? [index]
+        : [];
     }),
     ...getDmlUsingKeywordIndexes(tokens),
   ]);
