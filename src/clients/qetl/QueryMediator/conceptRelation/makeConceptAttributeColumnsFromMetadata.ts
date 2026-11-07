@@ -10,6 +10,12 @@ import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/concep
 /** Each contributing dataset's key column, by dataset id. */
 type PrimaryKeyColumnNameByDatasetId = Record<Dataset.Id, string | undefined>;
 
+/**
+ * The view's record key column, which `buildConceptViewSql` reads from the
+ * spine.
+ */
+const RECORD_KEY_COLUMN_NAME = "external_id";
+
 /** The ontology rows one concept's relation columns are derived from. */
 export type ConceptRelationMetadata = {
   /** Every attribute of the concept. Each becomes exactly one column. */
@@ -163,6 +169,7 @@ function _buildUnmappedColumn(
 ): ConceptAttributeColumn {
   return {
     kind: "unmapped",
+    attributeId: attribute.id,
     attributeName: attribute.name,
     duckDbDataType: DuckDbDataTypeUtils.fromDatasetColumnType(
       attribute.dataType,
@@ -224,6 +231,7 @@ function _buildAttributeColumn(
   return {
     column: {
       kind: "dataset_column",
+      attributeId: attribute.id,
       attributeName: attribute.name,
       selectColumnName: datasetColumn.name,
       datasetId: mapping.datasetId,
@@ -279,11 +287,15 @@ export function makeConceptAttributeColumnsFromMetadata(
   const attributeColumns: ConceptAttributeColumn[] = [];
   const contributingDatasetIds = new Set<Dataset.Id>();
   const renamedColumns: RenamedConceptAttributeColumn[] = [];
-  // Seeded with the built-in status column's name, which the view reads from
-  // the spine, so an attribute of that name is suffixed rather than dropped.
-  // The `concept_attributes__name_not_reserved` check keeps such attributes
-  // out of the database; this guards rows that predate it.
-  const takenNames = new Set<string>([ConceptStatusColumn.COLUMN_NAME]);
+  // Seeded with the two columns the view reads from the spine, the record key
+  // and the status, so an attribute of either name is suffixed rather than
+  // dropped and keeps a column of its own. The
+  // `concept_attributes__name_not_reserved` check keeps `status` out of the
+  // database. Nothing reserves `external_id`, a common key column name.
+  const takenNames = new Set<string>([
+    RECORD_KEY_COLUMN_NAME,
+    ConceptStatusColumn.COLUMN_NAME,
+  ]);
 
   orderedAttributes.forEach((attribute) => {
     const { column, contributingDatasetId } = _buildAttributeColumn({

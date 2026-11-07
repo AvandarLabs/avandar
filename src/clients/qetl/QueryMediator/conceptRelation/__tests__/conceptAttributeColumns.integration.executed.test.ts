@@ -431,6 +431,67 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     });
   });
 
+  // A reader maps a view column back to its attribute. Two attributes can
+  // share a name, so mapping by name would hand one attribute's value to the
+  // other once the second is suffixed.
+  it("names each column's attribute by id, through a duplicate-name suffix", () => {
+    const duplicate = _attribute({
+      name: "age",
+      id: "attr-age-2" as ConceptAttribute.Id,
+    });
+    const metadata = _metadata({
+      attributes: [PERSON_ID, AGE, duplicate],
+      mappings: [PERSON_ID_MAPPING, AGE_MAPPING],
+    });
+    metadata.mappings.push({
+      ...AGE_MAPPING.mapping,
+      id: "map-age-2" as DatasetColumnMapping["id"],
+      conceptAttributeId: duplicate.id,
+    });
+
+    const { attributeColumns } =
+      makeConceptAttributeColumnsFromMetadata(metadata);
+
+    expect(
+      attributeColumns.map((column) => {
+        return [column.attributeName, column.attributeId];
+      }),
+    ).toEqual([
+      ["age", AGE.id],
+      ["age_2", duplicate.id],
+      ["person_id", PERSON_ID.id],
+    ]);
+  });
+
+  // `external_id` is the view's record key, read from the spine, and a common
+  // key column name. An attribute of that name is suffixed rather than
+  // dropped, so it still has a column.
+  it("suffixes an attribute named external_id so the record key keeps its name", async () => {
+    const keyAttribute = _attribute({
+      name: "external_id",
+      isIdentifier: true,
+    });
+    const keyMapping = _mapping({
+      attributeName: "external_id",
+      datasetId: DATASET_A,
+      columnName: "person_id",
+    });
+
+    const rows = await _queryConcept(
+      _metadata({
+        attributes: [keyAttribute, AGE],
+        mappings: [keyMapping, AGE_MAPPING],
+      }),
+    );
+
+    expect(rows[0]).toEqual({
+      external_id: "101",
+      status: "Active",
+      age: 41,
+      external_id_2: 101,
+    });
+  });
+
   // Only the datasets the emitted columns actually read, de-duplicated and
   // sorted, because the runner merges this into the set of relations to load
   // and the relation cache hashes that set.
@@ -448,7 +509,12 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     );
 
     expect(columns.attributeColumns).toEqual([
-      { kind: "unmapped", attributeName: "note", duckDbDataType: "VARCHAR" },
+      {
+        kind: "unmapped",
+        attributeId: NOTE.id,
+        attributeName: "note",
+        duckDbDataType: "VARCHAR",
+      },
     ]);
     expect(columns.contributingDatasetIds).toEqual([]);
   });

@@ -12,6 +12,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { QetlRunnerOptions } from "@/clients/qetl/QueryMediator/QueryMediator.types";
@@ -127,6 +128,7 @@ const CONCEPT_PLAN: ConceptRelationPlan = {
   attributeColumns: [
     {
       kind: "dataset_column",
+      attributeId: "attr-age" as ConceptAttribute.Id,
       attributeName: "age",
       selectColumnName: "age_years",
       datasetId: DATASET_ID,

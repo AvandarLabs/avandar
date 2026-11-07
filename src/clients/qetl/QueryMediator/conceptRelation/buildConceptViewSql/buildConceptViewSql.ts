@@ -7,6 +7,7 @@ import {
 import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 
 /** The spine's alias inside the view, and the columns it exposes. */
 const SPINE_ALIAS = "individuals";
@@ -17,6 +18,11 @@ const STATUS_COLUMN = ConceptStatusColumn.COLUMN_NAME;
 export type ConceptAttributeColumn =
   | {
       kind: "dataset_column";
+      /**
+       * The attribute this column holds. It survives a renamed column, so a
+       * reader of the view maps a column back to its attribute by this.
+       */
+      attributeId: ConceptAttribute.Id;
       /** The relation's column name, which is the attribute's name. */
       attributeName: string;
       /** The contributing dataset's column this attribute reads. */
@@ -35,6 +41,8 @@ export type ConceptAttributeColumn =
        * vanishing and breaking a saved query.
        */
       kind: "unmapped";
+      /** The attribute this column holds, as on the other arm. */
+      attributeId: ConceptAttribute.Id;
       attributeName: string;
       duckDbDataType: DuckDbDataType;
     };

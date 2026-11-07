@@ -19,6 +19,7 @@ import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import type { DuckDBConnection } from "@duckdb/node-api";
 
@@ -81,6 +82,7 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
 
 const AGE: ConceptAttributeColumn = {
   kind: "dataset_column",
+  attributeId: "attr-age" as ConceptAttribute.Id,
   attributeName: "age",
   selectColumnName: "age_years",
   datasetId: DATASET_A,
@@ -91,6 +93,7 @@ const AGE: ConceptAttributeColumn = {
 
 const REGION: ConceptAttributeColumn = {
   kind: "dataset_column",
+  attributeId: "attr-region" as ConceptAttribute.Id,
   attributeName: "region",
   selectColumnName: "region_name",
   datasetId: DATASET_B,
@@ -101,6 +104,7 @@ const REGION: ConceptAttributeColumn = {
 
 const TAGS: ConceptAttributeColumn = {
   kind: "dataset_column",
+  attributeId: "attr-tags" as ConceptAttribute.Id,
   attributeName: "tags",
   selectColumnName: "tag",
   datasetId: DATASET_A,
@@ -111,6 +115,7 @@ const TAGS: ConceptAttributeColumn = {
 
 const NOTE: ConceptAttributeColumn = {
   kind: "unmapped",
+  attributeId: "attr-note" as ConceptAttribute.Id,
   attributeName: "note",
   duckDbDataType: "VARCHAR",
 };
@@ -342,7 +347,12 @@ describe("buildConceptViewSql", () => {
   // name, which does not compile. The spine's column wins.
   it("keeps the spine's status when an attribute column is named status", async () => {
     const rows = await _queryView([
-      { kind: "unmapped", attributeName: "status", duckDbDataType: "VARCHAR" },
+      {
+        kind: "unmapped",
+        attributeId: "attr-status" as ConceptAttribute.Id,
+        attributeName: "status",
+        duckDbDataType: "VARCHAR",
+      },
     ]);
 
     expect(rows[1]).toEqual({ external_id: "p2", status: "Confirmed" });
