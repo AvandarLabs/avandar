@@ -1,5 +1,4 @@
 import { Model } from "@avandar/models";
-import { prop, sortObjList } from "@avandar/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
@@ -21,13 +20,11 @@ const SNAPSHOT_REVISION = "2026-08-14T01:00:00.000Z";
 const {
   runQueryMock,
   publicRunQueryMock,
-  getConceptExtensionMock,
   makeExecutableQueryFromManualQueryMock,
 } = vi.hoisted(() => {
   return {
     runQueryMock: vi.fn(),
     publicRunQueryMock: vi.fn(),
-    getConceptExtensionMock: vi.fn(),
     makeExecutableQueryFromManualQueryMock: vi.fn(),
   };
 });
@@ -38,16 +35,6 @@ vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
 vi.mock("@/clients/qetl/PublicQuerySession/PublicQuerySession", () => {
   return { PublicQuerySession: { runQuery: publicRunQueryMock } };
 });
-vi.mock(
-  "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient",
-  () => {
-    return {
-      AttributeAssertionClient: {
-        getConceptExtension: getConceptExtensionMock,
-      },
-    };
-  },
-);
 vi.mock(
   "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery",
   () => {
@@ -118,7 +105,6 @@ function _createDataset(): Dataset.T {
 beforeEach(() => {
   runQueryMock.mockReset();
   publicRunQueryMock.mockReset();
-  getConceptExtensionMock.mockReset();
   // Mirrors the real resolver's behavior for queries that never trip the
   // large-dataset auto-limit guard, which is every query these tests use
   // unless a test overrides this default.
@@ -242,59 +228,58 @@ describe("runStructuredQuery", () => {
     expect(publicRunQueryMock).not.toHaveBeenCalled();
   });
 
-  it("remaps attribute assertions from attribute ids to attribute names", async () => {
+  // A form out of sync with its SQL still compiles to SQL, for a case type as
+  // for a dataset, so filters, grouping, sorting, and status all apply.
+  it("runs an out-of-sync case type query as SQL over the case type's view", async () => {
     const concept = _createConcept();
-    const labelAttribute = _createConceptAttribute(concept.id, "name");
-    const ageField = _createConceptAttribute(concept.id, "age");
-    const nameColumn = QueryColumn.makeFromConceptAttribute(labelAttribute);
-    const ageColumn = QueryColumn.makeFromConceptAttribute(ageField);
+    const ageColumn = QueryColumn.makeFromConceptAttribute(
+      _createConceptAttribute(concept.id, "age"),
+    );
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
 
-    getConceptExtensionMock.mockResolvedValue([
-      { [labelAttribute.id]: "Ada", [ageField.id]: 30 },
-      { [labelAttribute.id]: "Grace", [ageField.id]: 40 },
-    ]);
-
-    const result = await runStructuredQuery({
+    await runStructuredQuery({
       auth: "workspace",
       workspaceId,
       query: {
         ...StructuredQuery.makeEmpty(),
         dataSource: concept,
-        queryColumns: [nameColumn, ageColumn],
+        queryColumns: [ageColumn],
       },
       rawSql: undefined,
       isStructuredQueryInSync: false,
     });
 
-    // `sortedQueryColumns` orders columns by query-column id (a random uuid),
-    // not by name, so compare the returned columns order-independently.
-    const columnsByName = sortObjList(result.columns, { sortBy: prop("name") });
-    expect(columnsByName).toEqual([
-      { name: "age", dataType: "varchar" },
-      { name: "name", dataType: "varchar" },
-    ]);
-    expect(result.data).toEqual([
-      { name: "Ada", age: 30 },
-      { name: "Grace", age: 40 },
-    ]);
+    expect(runQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSql: expect.stringContaining(`"concept_${concept.id}"`),
+      }),
+    );
   });
 
-  // The legacy path reads attribute values by attribute id. The status column
-  // has no attribute id, so handing it over would ask for a value that cannot
-  // exist.
-  it("leaves the status column out of the legacy attribute read", async () => {
+  it("selects the status column in an out-of-sync case type query", async () => {
     const concept = _createConcept();
-    const ageAttribute = _createConceptAttribute(concept.id, "age");
-    getConceptExtensionMock.mockResolvedValue([{ [ageAttribute.id]: 30 }]);
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
 
-    const result = await runStructuredQuery({
+    await runStructuredQuery({
       auth: "workspace",
       workspaceId,
       query: {
         ...StructuredQuery.makeEmpty(),
         dataSource: concept,
         queryColumns: [
-          QueryColumn.makeFromConceptAttribute(ageAttribute),
+          QueryColumn.makeFromConceptAttribute(
+            _createConceptAttribute(concept.id, "age"),
+          ),
           QueryColumn.makeFromConceptStatusColumn(
             ConceptStatusColumn.fromConceptId(concept.id),
           ),
@@ -304,10 +289,8 @@ describe("runStructuredQuery", () => {
       isStructuredQueryInSync: false,
     });
 
-    expect(getConceptExtensionMock).toHaveBeenCalledWith(
-      expect.objectContaining({ conceptAttributes: [ageAttribute] }),
-    );
-    expect(result.columns).toEqual([{ name: "age", dataType: "varchar" }]);
+    const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
+    expect(rawSql).toContain('"status"');
   });
 });
 

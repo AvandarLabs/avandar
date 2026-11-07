@@ -1,17 +1,13 @@
-import { Model } from "@avandar/models";
 import { prop, sortObjList } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { match } from "ts-pattern";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
 import { PublicQuerySession } from "@/clients/qetl/PublicQuerySession/PublicQuerySession";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
-import { buildConceptQueryResult } from "@/clients/qetl/wrappers/ConceptWrapper/buildConceptQueryResult";
 import { makeExecutableQueryFromManualQuery } from "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
-import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
@@ -131,7 +127,11 @@ function _getWorkspaceAuthFromStructuredQuery(
     .exhaustive();
 }
 
-/** Runs a structured query against its data source. */
+/**
+ * Runs a structured query against its data source. A dataset and a case type
+ * both compile to SQL: a case type's SQL names its `concept_<id>` view, which
+ * QETL builds inside the query's lease.
+ */
 async function _runSourceQuery({
   workspaceId,
   dataSource,
@@ -152,59 +152,10 @@ async function _runSourceQuery({
     dataSource,
   } as StructuredQuery.T;
 
-  return await Model.match(dataSource, {
-    Dataset: async (): Promise<QueryResult.T<UnknownRow>> => {
-      return await WorkspaceQuerySession.runQuery({
-        rawSql: StructuredQuery.toRawDuckDbQuery(executionQueryWithSource),
-        workspaceId,
-      });
-    },
-
-    // Individual sources resolve through AttributeAssertionClient, which may in
-    // turn query many datasets.
-    Concept: async (concept): Promise<QueryResult.T<UnknownRow>> => {
-      return await _runConceptQuery({
-        concept,
-        sortedQueryColumns,
-        workspaceId,
-      });
-    },
-  });
-}
-
-/**
- * Runs an individual-source query.
- *
- * @returns The requested attributes' values, keyed by attribute name.
- */
-async function _runConceptQuery({
-  concept,
-  sortedQueryColumns,
-  workspaceId,
-}: {
-  concept: Concept.T;
-  sortedQueryColumns: SortedQueryColumns;
-  workspaceId: Workspace.Id;
-}): Promise<QueryResult.T<UnknownRow>> {
-  // TODO(jpsyx): optimize this by using a progressive
-  // table-materialization approach
-  // Attributes only. A case type's built-in `status` column has no attribute
-  // id to read a value by, so this path leaves it out. SQL-backed queries,
-  // which read the concept relation, are the ones that return it.
-  const attributes = sortedQueryColumns
-    .map(prop("baseColumn"))
-    .filter(Model.valIsOfModelType("ConceptAttribute"));
-
-  // TODO(jpsyx): we still need to apply group bys, aggregations,
-  // and sorting. Right now its just returning all values for the
-  // requested attributes.
-  const rows = await AttributeAssertionClient.getConceptExtension({
-    conceptId: concept.id,
-    conceptAttributes: attributes,
+  return await WorkspaceQuerySession.runQuery({
+    rawSql: StructuredQuery.toRawDuckDbQuery(executionQueryWithSource),
     workspaceId,
   });
-
-  return buildConceptQueryResult(attributes, rows);
 }
 
 /**
