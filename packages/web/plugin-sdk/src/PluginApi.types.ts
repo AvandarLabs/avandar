@@ -72,9 +72,8 @@ export type PluginMessages = Readonly<
 export type PluginOverlayOptions = Readonly<{
   title: string;
   /**
-   * What the overlay shows. It must be built from `@avandar/plugin-ui`
-   * components, so the host can render it and the sandbox can send it as a
-   * Remote DOM tree.
+   * What the overlay shows. Build it from `@avandar/plugin-ui` components.
+   * The host renders this React tree inside the modal or drawer.
    */
   content: ReactNode;
 }>;
@@ -91,11 +90,10 @@ export type PluginNotifyOptions = Readonly<{
  * The API a plugin receives, scoped to one plugin, workspace, user, and
  * invocation.
  *
- * Calls are async or fire-and-forget and pass serializable data, so a plugin
- * runs unchanged inside the sandbox. There are two exceptions. `i18n.t` is
- * synchronous and runs on the plugin side. The `content` of `ui.openModal`
- * and `ui.openDrawer` is a React tree, which the host renders. In the sandbox
- * it becomes a Remote DOM tree.
+ * Calls are async or fire-and-forget and pass serializable data. There are
+ * two exceptions. `i18n.t` is synchronous and runs on the plugin side. The
+ * `content` of `ui.openModal` and `ui.openDrawer` is a React tree, which the
+ * host renders.
  */
 export type AvandarApi = Readonly<{
   context: PluginInvocationContext;

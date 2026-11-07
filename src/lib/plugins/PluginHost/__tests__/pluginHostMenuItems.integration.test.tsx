@@ -138,8 +138,8 @@ describe("PluginHost with usePluginMenuItems", () => {
 
     _renderHost();
 
-    expect(await screen.findByText("Run avandar.alpha")).toBeTruthy();
-    expect(await screen.findByText("Run avandar.beta")).toBeTruthy();
+    expect(await screen.findByText("Run avandar.alpha")).toBeInTheDocument();
+    expect(await screen.findByText("Run avandar.beta")).toBeInTheDocument();
   });
 
   it("lists the other plugins' commands when one manifest fails to load", async () => {
@@ -152,7 +152,7 @@ describe("PluginHost with usePluginMenuItems", () => {
 
     _renderHost();
 
-    expect(await screen.findByText("Run avandar.alpha")).toBeTruthy();
+    expect(await screen.findByText("Run avandar.alpha")).toBeInTheDocument();
     expect(screen.queryByText(`Run ${FAILING_PLUGIN_ID}`)).toBeNull();
   });
 
@@ -172,7 +172,9 @@ describe("PluginHost with usePluginMenuItems", () => {
 
     _renderHost();
 
-    expect(await screen.findByText(`Run ${FAILING_PLUGIN_ID}`)).toBeTruthy();
+    expect(
+      await screen.findByText(`Run ${FAILING_PLUGIN_ID}`),
+    ).toBeInTheDocument();
   });
 
   it("does not load manifests again when every one loaded before", async () => {
@@ -222,7 +224,7 @@ describe("PluginHost with usePluginMenuItems", () => {
     await waitFor(() => {
       expect(_countManifestLoadsOf("avandar.beta")).toBe(1);
     });
-    expect(screen.getByText("Run avandar.alpha")).toBeTruthy();
+    expect(screen.getByText("Run avandar.alpha")).toBeInTheDocument();
   });
 
   it("returns the same items on a rerender when nothing changed", async () => {

@@ -24,7 +24,7 @@
     "$/": "../../../shared/",
     "ts-pattern": "npm:ts-pattern@5",
     "type-fest": "npm:type-fest@5",
-    "yaml": "npm:yaml@^2.9.0",
+    "yaml": "npm:yaml@2",
     "zod": "npm:zod@4"
   },
   "compilerOptions": {

@@ -18,8 +18,9 @@ const NO_INSTALLATIONS: PluginInstallation.T[] = [];
 /**
  * Lists the plugins this deployment bundles, plus any installed plugin it no
  * longer bundles, and lets settings admins install and manage them. When the
- * workspace's installs fail to load it shows an error and no cards, because
- * without them every plugin would look uninstalled.
+ * workspace's installs fail to load and there is no installs data to show, it
+ * shows an error and no cards, because without them every plugin would look
+ * uninstalled. A background refetch that fails keeps the cached cards.
  */
 export function WorkspacePluginsTab(): JSX.Element {
   const { t } = useLingui();
@@ -28,22 +29,21 @@ export function WorkspacePluginsTab(): JSX.Element {
   // Refetched on mount, because a reload right after an install restores the
   // pre-install snapshot from the persisted cache, which would otherwise
   // count as fresh and show the plugin as not installed.
-  const [
-    installations = NO_INSTALLATIONS,
-    isLoadingInstallations,
-    installationsQuery,
-  ] = PluginInstallationClient.useGetAll({
-    ...where("workspace_id", "eq", workspace.id),
-    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
-  });
+  const [installationsData, isLoadingInstallations, installationsQuery] =
+    PluginInstallationClient.useGetAll({
+      ...where("workspace_id", "eq", workspace.id),
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    });
   const [loadedManifests, isLoadingManifests] = useBundledPluginManifests();
+  const hasInstallationsLoadFailed =
+    installationsQuery.isError && installationsData === undefined;
   if (isLoadingInstallations || isLoadingManifests) {
     return <Loader role="status" aria-label={t`Loading plugins`} />;
   }
   return (
     <Stack gap="lg">
       <PluginsTabHeader canManage={canManage} />
-      {installationsQuery.isError ? (
+      {hasInstallationsLoadFailed ? (
         <Callout
           messageSize="sm"
           message={t`Could not load this workspace's plugins. Reload to try again.`}
@@ -51,7 +51,7 @@ export function WorkspacePluginsTab(): JSX.Element {
       ) : (
         <PluginsTabContent
           loadedManifests={loadedManifests}
-          installations={installations}
+          installations={installationsData ?? NO_INSTALLATIONS}
           canManage={canManage}
         />
       )}

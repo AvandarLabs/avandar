@@ -75,7 +75,10 @@ describe("makePluginApi", () => {
   });
 
   it("translates plugin messages in the workspace locale", () => {
-    expect(_makeApiFromRows().i18n.t("greeting")).toBe("Hola");
+    // `translate` is not named `i18n.t`, which `lingui extract` would read as
+    // an app message and add to the catalogs.
+    const { t: translate } = _makeApiFromRows().i18n;
+    expect(translate("greeting")).toBe("Hola");
   });
 
   it("titles a notification with the plugin name by default", async () => {
@@ -85,7 +88,7 @@ describe("makePluginApi", () => {
       _makeApiFromRows().ui.notify({ message: "Saved" });
     });
 
-    expect(await screen.findByText("Test plugin")).toBeTruthy();
+    expect(await screen.findByText("Test plugin")).toBeInTheDocument();
   });
 
   it("shows the message a plugin notifies", async () => {
@@ -95,7 +98,7 @@ describe("makePluginApi", () => {
       _makeApiFromRows().ui.notify({ message: "Saved" });
     });
 
-    expect(await screen.findByText("Saved")).toBeTruthy();
+    expect(await screen.findByText("Saved")).toBeInTheDocument();
   });
 
   it("titles the drawer with the title the plugin gives", async () => {
@@ -105,7 +108,7 @@ describe("makePluginApi", () => {
       _makeApiFromRows().ui.openDrawer({ title: "Details", content: null });
     });
 
-    expect(await screen.findByText("Details")).toBeTruthy();
+    expect(await screen.findByText("Details")).toBeInTheDocument();
   });
 
   it("opens no drawer for an api made before the host unmounted", () => {
@@ -130,7 +133,7 @@ describe("makePluginApi", () => {
       _makeApiFromRows().ui.openDrawer({ title: "Fresh", content: null });
     });
 
-    expect(await screen.findByText("Fresh")).toBeTruthy();
+    expect(await screen.findByText("Fresh")).toBeInTheDocument();
   });
 
   it("gives drawer content the scoped API through useAvandar", async () => {
@@ -143,7 +146,7 @@ describe("makePluginApi", () => {
       });
     });
 
-    expect(await screen.findByText("rows: 2")).toBeTruthy();
+    expect(await screen.findByText("rows: 2")).toBeInTheDocument();
   });
 
   it("contains a crash in drawer content to the drawer", async () => {
@@ -158,7 +161,7 @@ describe("makePluginApi", () => {
       });
     });
 
-    expect(await screen.findByText(CRASH_FALLBACK_TEXT)).toBeTruthy();
+    expect(await screen.findByText(CRASH_FALLBACK_TEXT)).toBeInTheDocument();
   });
 
   it("renders drawer content that opens after content that crashed", async () => {
@@ -175,7 +178,7 @@ describe("makePluginApi", () => {
       api.ui.openDrawer({ title: "Details", content: <ContextProbe /> });
     });
 
-    expect(await screen.findByText("rows: 2")).toBeTruthy();
+    expect(await screen.findByText("rows: 2")).toBeInTheDocument();
   });
 
   it("gives modal content the scoped API through useAvandar", async () => {
@@ -188,7 +191,7 @@ describe("makePluginApi", () => {
       });
     });
 
-    expect(await screen.findByText("rows: 2")).toBeTruthy();
+    expect(await screen.findByText("rows: 2")).toBeInTheDocument();
   });
 
   it("names the modal's close button", async () => {
@@ -198,6 +201,8 @@ describe("makePluginApi", () => {
       _makeApiFromRows().ui.openModal({ title: "Details", content: null });
     });
 
-    expect(await screen.findByRole("button", { name: "Close" })).toBeTruthy();
+    expect(
+      await screen.findByRole("button", { name: "Close" }),
+    ).toBeInTheDocument();
   });
 });

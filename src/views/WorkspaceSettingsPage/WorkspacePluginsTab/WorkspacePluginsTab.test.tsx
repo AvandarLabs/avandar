@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => {
     canManage: true,
     isLoadingInstallations: false,
     hasInstallationsError: false,
+    hasInstallationsData: true,
   };
 });
 
@@ -51,7 +52,7 @@ vi.mock(
         useGetAll: (argument: unknown) => {
           mocks.getAllArguments.push(argument);
           return [
-            mocks.hasInstallationsError ? undefined : mocks.installations,
+            mocks.hasInstallationsData ? mocks.installations : undefined,
             mocks.isLoadingInstallations,
             { isError: mocks.hasInstallationsError },
           ];
@@ -164,6 +165,7 @@ describe("WorkspacePluginsTab", () => {
     mocks.canManage = true;
     mocks.isLoadingInstallations = false;
     mocks.hasInstallationsError = false;
+    mocks.hasInstallationsData = true;
   });
 
   it("offers Install for a bundled plugin the workspace lacks", async () => {
@@ -277,6 +279,7 @@ describe("WorkspacePluginsTab", () => {
   it("shows an error and no plugin cards when the workspace's installs fail to load", async () => {
     _addBundledPlugin();
     mocks.hasInstallationsError = true;
+    mocks.hasInstallationsData = false;
 
     _renderTab();
 
@@ -286,6 +289,20 @@ describe("WorkspacePluginsTab", () => {
     expect(screen.queryByRole("region")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Install" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps showing the cached plugin cards when a background refetch of the installs fails", async () => {
+    _addBundledPlugin();
+    _addInstallation({ pluginId: (mocks.entries[0] as PluginIndexEntry).id });
+    mocks.hasInstallationsError = true;
+
+    _renderTab();
+
+    const card = await screen.findByRole("region", { name: "Epidemiology" });
+    expect(within(card).getByText("Installed")).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Could not load this workspace's plugins/),
     ).not.toBeInTheDocument();
   });
 

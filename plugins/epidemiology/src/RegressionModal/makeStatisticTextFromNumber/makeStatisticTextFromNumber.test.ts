@@ -39,4 +39,31 @@ describe("makeStatisticTextFromNumber", () => {
     expect(_makeText(1234.5, "de-DE")).toBe("1.234,5");
     expect(_makeText(0.00001, "de-DE")).toBe("0,00001");
   });
+
+  it("writes floating point noise far below 1e-12 as 0, not a long string of zeros", () => {
+    expect(_makeText(3.388e-21)).toBe("0");
+    expect(_makeText(-3.388e-21)).toBe("0");
+  });
+
+  it("writes a magnitude just below 1e-12 as 0", () => {
+    expect(_makeText(9.99e-13)).toBe("0");
+    expect(_makeText(-9.99e-13)).toBe("0");
+  });
+
+  it("keeps a magnitude of exactly 1e-12 in scientific notation", () => {
+    expect(_makeText(1e-12)).toBe("1E-12");
+  });
+
+  it("uses scientific notation with 4 significant digits from 1e-12 up to 1e-6", () => {
+    expect(_makeText(1.23456e-8)).toBe("1.235E-8");
+    expect(_makeText(-1.23456e-8)).toBe("-1.235E-8");
+  });
+
+  it("writes scientific notation with the locale's decimal separator", () => {
+    expect(_makeText(1.23456e-8, "de-DE")).toBe("1,235E-8");
+  });
+
+  it("keeps plain decimal notation for a magnitude of exactly 1e-6", () => {
+    expect(_makeText(0.000001)).toBe("0.000001");
+  });
 });

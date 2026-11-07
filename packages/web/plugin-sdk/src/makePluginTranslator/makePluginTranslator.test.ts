@@ -64,7 +64,7 @@ describe("makePluginTranslator locale fallback", () => {
     expect(t("rows.count", { count: 2 })).toBe("2 rows");
   });
 
-  it("falls back from the base language to English per key", () => {
+  it("prefers the base language over English when the exact locale lacks the key", () => {
     const t = makePluginTranslator({
       locale: "es-MX",
       messages: {
@@ -74,6 +74,17 @@ describe("makePluginTranslator locale fallback", () => {
       },
     });
     expect(t("first")).toBe("Primero");
+  });
+
+  it("prefers the exact locale over English when the base language lacks the key", () => {
+    const t = makePluginTranslator({
+      locale: "es-MX",
+      messages: {
+        en: { first: "First", second: "Second" },
+        es: { first: "Primero" },
+        "es-MX": { second: "Segundo" },
+      },
+    });
     expect(t("second")).toBe("Segundo");
   });
 });
@@ -168,16 +179,20 @@ describe("makePluginTranslator with prototype keys", () => {
 
 describe("makePluginTranslator isolation", () => {
   it("leaves the global Lingui instance untouched", () => {
+    // The ids are variables, because `lingui extract` reads an `i18n._` call
+    // with a string literal as an app message and adds it to the catalogs.
+    const knownId = "known";
+    const pluginOnlyId = "greeting";
     i18n.loadAndActivate({
       locale: "fr",
-      messages: { known: "Connu" },
+      messages: { [knownId]: "Connu" },
     });
 
     makePluginTranslator({ locale: "es", messages: MESSAGES });
     makePluginTranslator({ locale: "en", messages: MESSAGES });
 
     expect(i18n.locale).toBe("fr");
-    expect(i18n._("known")).toBe("Connu");
-    expect(i18n._("greeting")).toBe("greeting");
+    expect(i18n._(knownId)).toBe("Connu");
+    expect(i18n._(pluginOnlyId)).toBe(pluginOnlyId);
   });
 });

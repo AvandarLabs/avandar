@@ -41,13 +41,13 @@ describe("PluginDrawerHost", () => {
       PluginDrawerStore.open({ title: "First", content: <Counter /> });
     });
     fireEvent.click(await screen.findByText("clicks: 0"));
-    expect(await screen.findByText("clicks: 1")).toBeTruthy();
+    expect(await screen.findByText("clicks: 1")).toBeInTheDocument();
 
     act(() => {
       PluginDrawerStore.open({ title: "Second", content: <Counter /> });
     });
 
-    expect(await screen.findByText("clicks: 0")).toBeTruthy();
+    expect(await screen.findByText("clicks: 0")).toBeInTheDocument();
   });
 
   it("closes the drawer when the host unmounts", () => {
@@ -68,7 +68,7 @@ describe("PluginDrawerHost", () => {
       PluginDrawerStore.close();
     });
 
-    expect(screen.getByText("body of Details")).toBeTruthy();
+    expect(screen.getByText("body of Details")).toBeInTheDocument();
   });
 
   it("drops the content once the drawer has animated out", async () => {
@@ -99,7 +99,9 @@ describe("PluginDrawerHost", () => {
     render(<PluginDrawerHost />);
     _openDrawerWithTitle("Details");
 
-    expect(await screen.findByRole("button", { name: "Close" })).toBeTruthy();
+    expect(
+      await screen.findByRole("button", { name: "Close" }),
+    ).toBeInTheDocument();
   });
 
   it("reports the drawer closed after its close button is used", async () => {

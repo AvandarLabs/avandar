@@ -4,8 +4,9 @@
 #
 # Four checks, in order:
 #   1. Nothing outside `packages/**` is publishable. Asserts `private: true` on
-#      the root manifest and every `apps/*` manifest, since `private` is the
-#      only thing that actually stops `pnpm publish` sending one to npm.
+#      the root manifest and every `apps/*` and `plugins/*` manifest, since
+#      `private` is the only thing that actually stops `pnpm publish` sending
+#      one to npm.
 #   2. Every package builds.
 #   3. `publint` on each packed tarball: the manifest is internally coherent,
 #      so `exports` and `types` point at files that exist in the tarball and
@@ -41,9 +42,9 @@ trap 'rm -rf "$OUT_DIR"' EXIT
 
 # Only `packages/**` is ever published. Everything under `apps/**` and
 # `plugins/**` is internal to this repo, and the root package is the app
-# itself. `private: true` is what
-# actually stops `pnpm publish` from sending one to the registry, so assert it
-# rather than trusting that each new app remembers.
+# itself. `private: true` is what actually stops `pnpm publish` from sending
+# one to the registry, so assert it rather than trusting that each new app or
+# plugin remembers.
 echo "==> Guard: nothing outside packages/ is publishable"
 guard_failed=0
 for pkg_json in package.json apps/*/package.json plugins/*/package.json; do
@@ -60,7 +61,7 @@ if [ "$guard_failed" -ne 0 ]; then
   echo "Add \"private\": true to the package(s) above. Only packages/** ships."
   exit 1
 fi
-echo "    all app and root packages are private"
+echo "    all root, app, and plugin packages are private"
 
 echo "==> Building all packages"
 pnpm build:packages

@@ -34,6 +34,7 @@
     "@testing-library/react": "^16.3.0",
     "jsdom": "^26.1.0",
     "react": "catalog:",
+    "react-dom": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

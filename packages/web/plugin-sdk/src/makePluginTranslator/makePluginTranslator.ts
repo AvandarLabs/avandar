@@ -20,7 +20,7 @@ function _createRecordWithoutPrototype<TValue>(
 }
 
 /** Lists the locales to read, from the lowest priority to the highest. */
-function _buildLocalesFromLowestPriority(locale: string): string[] {
+function _buildCandidateLocales(locale: string): string[] {
   const baseLanguage = locale.split("-")[0] ?? locale;
   return [FALLBACK_LOCALE, baseLanguage, locale];
 }
@@ -50,7 +50,7 @@ function _mergeMessagesForLocale(options: {
 }): Record<string, string> {
   const { messages, locale } = options;
   return _createRecordWithoutPrototype(
-    _buildLocalesFromLowestPriority(locale).flatMap((candidateLocale) => {
+    _buildCandidateLocales(locale).flatMap((candidateLocale) => {
       return _getOwnMessageEntries({ messages, locale: candidateLocale });
     }),
   );
