@@ -52,6 +52,10 @@ function useLoadedManifests(
       });
     },
     enabled: loadable.length > 0,
+    // Never written to disk. A manifest module carries React icon
+    // components, and JSON persistence turns each one into `{}`, which
+    // crashes the render that reads it after a reload.
+    meta: { persist: false },
     // A manifest that failed to load is retried the next time the query is
     // used, while a fully loaded set stays cached.
     staleTime: (query) => {

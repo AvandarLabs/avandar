@@ -232,7 +232,7 @@ describe("usePluginInstallationActions", () => {
       await screen.findByText(
         "avandar.epidemiology enabled=true version=1.2.0 granted=data:context",
       ),
-    ).toBeTruthy();
+    ).toBeInTheDocument();
   });
 
   it("leaves installed_by out of the insert so the database supplies it", async () => {
@@ -255,7 +255,7 @@ describe("usePluginInstallationActions", () => {
 
     fireEvent.click(screen.getByText("disable"));
 
-    expect(await screen.findByText(/enabled=false/)).toBeTruthy();
+    expect(await screen.findByText(/enabled=false/)).toBeInTheDocument();
   });
 
   it("shows re-approved permissions and version right away", async () => {
@@ -266,7 +266,7 @@ describe("usePluginInstallationActions", () => {
 
     expect(
       await screen.findByText(/version=1\.2\.0 granted=data:context/),
-    ).toBeTruthy();
+    ).toBeInTheDocument();
   });
 
   it("drops an uninstalled plugin from the host's installs query right away", async () => {
@@ -275,6 +275,6 @@ describe("usePluginInstallationActions", () => {
 
     fireEvent.click(screen.getByText("uninstall"));
 
-    expect(await screen.findByText("no installation")).toBeTruthy();
+    expect(await screen.findByText("no installation")).toBeInTheDocument();
   });
 });

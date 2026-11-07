@@ -1,3 +1,4 @@
+import { Model } from "@avandar/models";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { usePluginInstallationMutations } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
@@ -18,6 +19,14 @@ export type PluginInstallationActions = Readonly<{
   uninstall: () => void;
 }>;
 
+/** Everything the actions of one plugin read, gathered by the hook. */
+type ActionContext = Readonly<{
+  workspaceId: Workspace.Id;
+  manifest: PluginManifest | undefined;
+  installation: PluginInstallation.T | undefined;
+  mutations: ReturnType<typeof usePluginInstallationMutations>;
+}>;
+
 /**
  * The install row for a manifest, granting every permission it asks for.
  * `installedBy` is left out on purpose: the database fills it from the
@@ -28,40 +37,42 @@ function _makeInstallationFromManifest(options: {
   manifest: PluginManifest;
 }): PluginInstallation.T<"Insert"> {
   const { workspaceId, manifest } = options;
-  return {
+  return Model.make("PluginInstallation", {
     workspaceId,
     pluginId: manifest.id,
     installedVersion: manifest.version,
     grantedPermissions: [...manifest.permissions],
-  } as PluginInstallation.T<"Insert">;
+  });
 }
 
-/**
- * Install, enable, disable, approve, and uninstall for one plugin. The
- * Plugins settings tab gives each plugin card one, so the card's buttons only
- * call the returned actions.
- */
-export function usePluginInstallationActions(options: {
-  pluginName: string;
-  manifest: PluginManifest | undefined;
-  installation: PluginInstallation.T | undefined;
-}): PluginInstallationActions {
-  const { pluginName, manifest, installation } = options;
-  const workspace = useCurrentWorkspace();
-  const mutations = usePluginInstallationMutations(pluginName);
+/** Builds the actions that add a plugin to the workspace or remove it. */
+function _makeInstallActionsFromContext(
+  context: ActionContext,
+): Pick<PluginInstallationActions, "install" | "uninstall"> {
+  const { workspaceId, manifest, installation, mutations } = context;
   return {
-    isPending: mutations.isPending,
     install: () => {
       if (manifest === undefined) {
         return;
       }
       mutations.insertInstallation({
-        data: _makeInstallationFromManifest({
-          workspaceId: workspace.id,
-          manifest,
-        }),
+        data: _makeInstallationFromManifest({ workspaceId, manifest }),
       });
     },
+    uninstall: () => {
+      if (installation !== undefined) {
+        mutations.deleteInstallation({ id: installation.id });
+      }
+    },
+  };
+}
+
+/** Builds the actions that change an install the workspace already has. */
+function _makeUpdateActionsFromContext(
+  context: ActionContext,
+): Pick<PluginInstallationActions, "setIsEnabled" | "approvePermissions"> {
+  const { manifest, installation, mutations } = context;
+  return {
     setIsEnabled: (isEnabled) => {
       if (installation !== undefined) {
         mutations.updateInstallation({
@@ -81,10 +92,37 @@ export function usePluginInstallationActions(options: {
         });
       }
     },
-    uninstall: () => {
-      if (installation !== undefined) {
-        mutations.deleteInstallation({ id: installation.id });
-      }
-    },
   };
+}
+
+/** Combines every action of one plugin with its saving state. */
+function _makeActionsFromContext(
+  context: ActionContext,
+): PluginInstallationActions {
+  return {
+    isPending: context.mutations.isPending,
+    ..._makeInstallActionsFromContext(context),
+    ..._makeUpdateActionsFromContext(context),
+  };
+}
+
+/**
+ * Install, enable, disable, approve, and uninstall for one plugin. The
+ * Plugins settings tab gives each plugin card one, so the card's buttons only
+ * call the returned actions.
+ */
+export function usePluginInstallationActions(options: {
+  pluginName: string;
+  manifest: PluginManifest | undefined;
+  installation: PluginInstallation.T | undefined;
+}): PluginInstallationActions {
+  const { pluginName, manifest, installation } = options;
+  const workspace = useCurrentWorkspace();
+  const mutations = usePluginInstallationMutations(pluginName);
+  return _makeActionsFromContext({
+    workspaceId: workspace.id,
+    manifest,
+    installation,
+    mutations,
+  });
 }

@@ -15,6 +15,10 @@ type BundledManifestsResult = UseQueryResultTuple<LoadedManifestModules>;
 export function useBundledPluginManifests(): BundledManifestsResult {
   return useQuery({
     queryKey: ["plugins", "settings", "bundledManifests"],
+    // Never written to disk. A manifest module carries React icon
+    // components, and JSON persistence turns each one into `{}`, which
+    // crashes the render that reads it after a reload.
+    meta: { persist: false },
     queryFn: () => {
       return loadManifestModules({ entries: getBundledPluginEntries() });
     },

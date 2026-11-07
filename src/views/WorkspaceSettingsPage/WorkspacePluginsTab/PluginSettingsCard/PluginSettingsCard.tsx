@@ -1,8 +1,10 @@
-import { Card, Group, Stack, Title } from "@mantine/core";
+import { Trans } from "@lingui/react/macro";
+import { Card, Group, Stack, Text } from "@mantine/core";
+import { useId } from "react";
 import { getPluginInstallStatusFromInstallation } from "@/lib/plugins/getPluginInstallStatusFromInstallation/getPluginInstallStatusFromInstallation";
 import { PluginActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions";
+import { PluginCardHeading } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginCardHeading";
 import { PluginManifestSummary } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginManifestSummary";
-import { PluginStatusBadge } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge";
 import { usePluginDisplayText } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginDisplayText";
 import { usePluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
@@ -16,14 +18,15 @@ type Props = Readonly<{
 
 /**
  * One plugin on the Plugins settings tab. Without a manifest module, the
- * plugin is installed but no longer bundled, so the card names it by id and
- * offers only Uninstall.
+ * plugin is installed but no longer bundled, so the card names it by id,
+ * says why it can only be uninstalled, and offers only Uninstall.
  */
 export function PluginSettingsCard({
   manifestModule,
   installation,
   canManage,
 }: Props): JSX.Element {
+  const headingId = useId();
   const manifest = manifestModule?.manifest;
   const { pluginName, description } = usePluginDisplayText({
     manifestModule,
@@ -38,29 +41,38 @@ export function PluginSettingsCard({
     manifest,
     installation,
   });
-  const PluginIcon =
-    manifest === undefined ? undefined : manifestModule?.icons[manifest.icon];
   return (
-    <Card component="section" aria-label={pluginName} padding="lg">
+    <Card component="section" aria-labelledby={headingId} padding="lg">
       <Group justify="space-between" align="flex-start" wrap="nowrap">
-        <Group align="flex-start" wrap="nowrap">
-          {PluginIcon ? <PluginIcon size={28} aria-hidden /> : null}
-          <Stack gap="xxs">
-            <Group gap="xs">
-              <Title order={4}>{pluginName}</Title>
-              <PluginStatusBadge status={status} />
-            </Group>
-            {manifest === undefined ? null : (
-              <PluginManifestSummary
-                manifest={manifest}
-                description={description}
-              />
-            )}
-          </Stack>
-        </Group>
+        <Stack gap="xxs">
+          <PluginCardHeading
+            headingId={headingId}
+            pluginName={pluginName}
+            icon={
+              manifest === undefined
+                ? undefined
+                : manifestModule?.icons[manifest.icon]
+            }
+            status={status}
+          />
+          {manifest === undefined ? (
+            <Text size="sm" c="dimmed">
+              <Trans>
+                No longer included in this deployment. Uninstall to remove it
+                from this workspace.
+              </Trans>
+            </Text>
+          ) : (
+            <PluginManifestSummary
+              manifest={manifest}
+              description={description}
+            />
+          )}
+        </Stack>
         <PluginActions
           status={status}
           pluginName={pluginName}
+          headingId={headingId}
           canManage={canManage}
           actions={actions}
         />

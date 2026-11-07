@@ -14,6 +14,8 @@ const mocks = vi.hoisted(() => {
     entries: [] as unknown[],
     installations: [] as unknown[],
     canManage: true,
+    isLoadingInstallations: false,
+    hasInstallationsError: false,
   };
 });
 
@@ -45,7 +47,11 @@ vi.mock(
           },
         },
         useGetAll: () => {
-          return [mocks.installations, false];
+          return [
+            mocks.hasInstallationsError ? undefined : mocks.installations,
+            mocks.isLoadingInstallations,
+            { isError: mocks.hasInstallationsError },
+          ];
         },
         useInsert: useMutationStub,
         useUpdate: useMutationStub,
@@ -76,7 +82,10 @@ const REMOVED_PLUGIN_ID = "avandar.removed";
 let queryClient: QueryClient;
 let nextEntryNumber = 0;
 
-function _makeManifestModule(pluginId: string): PluginManifestModule {
+function _makeManifestModule(
+  pluginId: string,
+  icons: Record<string, unknown>,
+): PluginManifestModule {
   return {
     manifest: {
       id: pluginId,
@@ -93,18 +102,20 @@ function _makeManifestModule(pluginId: string): PluginManifestModule {
     strings: {
       en: { name: "Epidemiology", description: "Charts disease spread." },
     },
-    icons: {},
+    icons,
   } as unknown as PluginManifestModule;
 }
 
-function _addBundledPlugin(): void {
+function _addBundledPlugin(
+  options: { icons?: Record<string, unknown> } = {},
+): void {
   nextEntryNumber += 1;
   // A new id each test, because the plugin module cache lives for the session.
   const id = `${PLUGIN_ID}-${nextEntryNumber}`;
   mocks.entries.push({
     id,
     loadManifest: () => {
-      return Promise.resolve(_makeManifestModule(id));
+      return Promise.resolve(_makeManifestModule(id, options.icons ?? {}));
     },
   });
 }
@@ -147,6 +158,8 @@ describe("WorkspacePluginsTab", () => {
     mocks.entries = [];
     mocks.installations = [];
     mocks.canManage = true;
+    mocks.isLoadingInstallations = false;
+    mocks.hasInstallationsError = false;
   });
 
   it("offers Install for a bundled plugin the workspace lacks", async () => {
@@ -155,8 +168,10 @@ describe("WorkspacePluginsTab", () => {
     _renderTab();
 
     const card = await screen.findByRole("region", { name: "Epidemiology" });
-    expect(within(card).getByText("Charts disease spread.")).toBeTruthy();
-    expect(within(card).getByText("Not installed")).toBeTruthy();
+    expect(
+      within(card).getByText("Charts disease spread."),
+    ).toBeInTheDocument();
+    expect(within(card).getByText("Not installed")).toBeInTheDocument();
     expect(_getButtonLabelsIn(card)).toEqual(["Install"]);
   });
 
@@ -167,7 +182,7 @@ describe("WorkspacePluginsTab", () => {
     _renderTab();
 
     const card = await screen.findByRole("region", { name: "Epidemiology" });
-    expect(within(card).getByText("Installed")).toBeTruthy();
+    expect(within(card).getByText("Installed")).toBeInTheDocument();
     expect(_getButtonLabelsIn(card)).toEqual(["Disable", "Uninstall"]);
   });
 
@@ -177,7 +192,7 @@ describe("WorkspacePluginsTab", () => {
     _renderTab();
 
     const card = await screen.findByRole("region", { name: REMOVED_PLUGIN_ID });
-    expect(within(card).getByText("Unavailable")).toBeTruthy();
+    expect(within(card).getByText("Unavailable")).toBeInTheDocument();
     expect(_getButtonLabelsIn(card)).toEqual(["Uninstall"]);
   });
 
@@ -186,7 +201,7 @@ describe("WorkspacePluginsTab", () => {
 
     expect(
       await screen.findByText("No plugins are available in this deployment."),
-    ).toBeTruthy();
+    ).toBeInTheDocument();
   });
 
   it("disables the actions for users who cannot manage plugins", async () => {
@@ -214,7 +229,130 @@ describe("WorkspacePluginsTab", () => {
 
     expect(
       await screen.findByRole("region", { name: "Epidemiology" }),
-    ).toBeTruthy();
-    expect(screen.getByText(/Some plugins could not be loaded/)).toBeTruthy();
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Some plugins could not be loaded/),
+    ).toBeInTheDocument();
+  });
+
+  it("names each card by its heading", async () => {
+    _addBundledPlugin();
+
+    _renderTab();
+
+    const card = await screen.findByRole("region", { name: "Epidemiology" });
+    expect(
+      within(card).getByRole("heading", { level: 5, name: "Epidemiology" }),
+    ).toBeInTheDocument();
+  });
+
+  it("describes every action by its plugin, so a screen reader hears which plugin Install applies to", async () => {
+    _addBundledPlugin();
+    _addInstallation({ pluginId: (mocks.entries[0] as PluginIndexEntry).id });
+
+    _renderTab();
+
+    const card = await screen.findByRole("region", { name: "Epidemiology" });
+    within(card)
+      .getAllByRole("button")
+      .forEach((button) => {
+        expect(button).toHaveAccessibleDescription("Epidemiology");
+      });
+  });
+
+  it("announces that plugins are loading", () => {
+    mocks.isLoadingInstallations = true;
+
+    _renderTab();
+
+    expect(
+      screen.getByRole("status", { name: "Loading plugins" }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows an error and no plugin cards when the workspace's installs fail to load", async () => {
+    _addBundledPlugin();
+    mocks.hasInstallationsError = true;
+
+    _renderTab();
+
+    expect(
+      await screen.findByText(/Could not load this workspace's plugins/),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("region")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Install" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("explains on an unavailable card why only Uninstall is offered", async () => {
+    _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+    _renderTab();
+
+    const card = await screen.findByRole("region", { name: REMOVED_PLUGIN_ID });
+    expect(
+      within(card).getByText(
+        "No longer included in this deployment. Uninstall to remove it from this workspace.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("does not call a bundled plugin unavailable", async () => {
+    _addBundledPlugin();
+
+    _renderTab();
+
+    await screen.findByRole("region", { name: "Epidemiology" });
+    expect(
+      screen.queryByText(/No longer included in this deployment/),
+    ).not.toBeInTheDocument();
+  });
+
+  it("tells users who cannot manage plugins why the actions are disabled", async () => {
+    mocks.canManage = false;
+    _addBundledPlugin();
+
+    _renderTab();
+
+    await screen.findByRole("region", { name: "Epidemiology" });
+    expect(
+      screen.getByText(
+        "You do not have permission to manage plugins. Ask a workspace admin to make changes.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("shows no permission note to users who can manage plugins", async () => {
+    _addBundledPlugin();
+
+    _renderTab();
+
+    await screen.findByRole("region", { name: "Epidemiology" });
+    expect(
+      screen.queryByText(/You do not have permission to manage plugins/),
+    ).not.toBeInTheDocument();
+  });
+
+  it("still renders a card whose manifest icon is not a component", async () => {
+    // JSON persistence turns a component into `{}`, which React cannot render.
+    _addBundledPlugin({ icons: { "chart-dots": {} } });
+
+    _renderTab();
+
+    expect(
+      await screen.findByRole("region", { name: "Epidemiology" }),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the bundled manifests out of the persisted query cache", async () => {
+    _addBundledPlugin();
+
+    _renderTab();
+    await screen.findByRole("region", { name: "Epidemiology" });
+
+    const queries = queryClient.getQueryCache().getAll();
+    expect(queries).toHaveLength(1);
+    expect(queries[0]?.meta).toEqual({ persist: false });
   });
 });

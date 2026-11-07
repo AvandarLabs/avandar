@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Button, Menu } from "@mantine/core";
 import { IconPuzzle } from "@tabler/icons-react";
 import { POPOVER_Z_INDEX } from "@/config/Theme";
+import { isPluginIconComponent } from "@/lib/plugins/isPluginIconComponent/isPluginIconComponent";
 import type { PluginMenuItem } from "@/lib/plugins/getMenuItemsFromActivePlugins/getMenuItemsFromActivePlugins";
 
 type Props = Readonly<{
@@ -43,7 +44,11 @@ export function PluginOverflowMenu({
           return (
             <Menu.Item
               key={item.key}
-              leftSection={Icon ? <Icon size={16} aria-hidden /> : undefined}
+              leftSection={
+                isPluginIconComponent(Icon) ? (
+                  <Icon size={16} aria-hidden />
+                ) : undefined
+              }
               disabled={isDisabled}
               onClick={() => {
                 onRunItem(item);

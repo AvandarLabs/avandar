@@ -7,6 +7,9 @@ import type { PluginInstallationActions } from "@/views/WorkspaceSettingsPage/Wo
 type Props = Readonly<{
   status: PluginInstallStatus;
   pluginName: string;
+
+  /** The id of the plugin's card heading, which each action is described by. */
+  headingId: string;
   canManage: boolean;
   actions: PluginInstallationActions;
 }>;
@@ -31,6 +34,7 @@ const ACTION_KINDS_BY_STATUS: Record<
 export function PluginActions({
   status,
   pluginName,
+  headingId,
   canManage,
   actions,
 }: Props): JSX.Element {
@@ -42,6 +46,7 @@ export function PluginActions({
             key={kind}
             kind={kind}
             pluginName={pluginName}
+            headingId={headingId}
             isDisabled={!canManage || actions.isPending}
             actions={actions}
           />

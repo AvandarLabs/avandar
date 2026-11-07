@@ -6,6 +6,8 @@ import { PluginActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab
 import type { PluginInstallStatus } from "@/lib/plugins/getPluginInstallStatusFromInstallation/getPluginInstallStatusFromInstallation";
 import type { PluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
 
+const HEADING_ID = "plugin-heading";
+
 function _makeActions(
   overrides: Partial<PluginInstallationActions> = {},
 ): PluginInstallationActions {
@@ -27,9 +29,11 @@ function _renderActions(options: {
   const { status, canManage = true, actions = _makeActions() } = options;
   render(
     <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>
+      <h5 id={HEADING_ID}>Epidemiology</h5>
       <PluginActions
         status={status}
         pluginName="Epidemiology"
+        headingId={HEADING_ID}
         canManage={canManage}
         actions={actions}
       />
@@ -59,6 +63,14 @@ describe("PluginActions", () => {
     _renderActions({ status });
 
     expect(_getButtonLabels()).toEqual(expected);
+  });
+
+  it("describes every action by the plugin heading it belongs to", () => {
+    _renderActions({ status: "needs_review" });
+
+    screen.getAllByRole("button").forEach((button) => {
+      expect(button).toHaveAccessibleDescription("Epidemiology");
+    });
   });
 
   it("disables every action for users who cannot manage plugins", () => {

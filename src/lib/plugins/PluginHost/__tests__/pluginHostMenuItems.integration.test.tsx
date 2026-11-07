@@ -235,4 +235,15 @@ describe("PluginHost with usePluginMenuItems", () => {
 
     expect(lastItems).toBe(itemsBeforeRerender);
   });
+
+  it("keeps the loaded manifests out of the persisted query cache", async () => {
+    _setInstalledPlugins(["avandar.alpha"]);
+
+    _renderHost();
+    await screen.findByText("Run avandar.alpha");
+
+    const queries = queryClient.getQueryCache().getAll();
+    expect(queries).toHaveLength(1);
+    expect(queries[0]?.meta).toEqual({ persist: false });
+  });
 });

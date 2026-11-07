@@ -1,7 +1,9 @@
+import { IconPuzzle } from "@tabler/icons-react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PluginMenuSlot } from "@/lib/plugins/PluginMenuSlot/PluginMenuSlot";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import type { PluginMenuItem } from "@/lib/plugins/getMenuItemsFromActivePlugins/getMenuItemsFromActivePlugins";
+import type { PluginIconComponent } from "@/lib/plugins/PluginIndex.types";
 import type {
   DataExplorerToolbarContext,
   QueryHandle,
@@ -47,7 +49,10 @@ const CONTEXT: DataExplorerToolbarContext = {
   rowCount: 1,
 };
 
-function _makeItem(index: number): PluginMenuItem {
+function _makeItem(
+  index: number,
+  Icon: PluginIconComponent | undefined = undefined,
+): PluginMenuItem {
   return {
     key: `avandar.epidemiology/c${index}`,
     plugin: {
@@ -56,17 +61,18 @@ function _makeItem(index: number): PluginMenuItem {
     pluginName: "Epidemiology",
     commandId: `c${index}`,
     title: `Command ${index}`,
-    Icon: undefined,
+    Icon,
   };
 }
 
 function _renderSlotWithItems(options: {
   itemCount: number;
   context?: DataExplorerToolbarContext;
+  icon?: PluginIconComponent;
 }): ReturnType<typeof render> {
   mocks.usePluginMenuItems.mockReturnValue(
     Array.from({ length: options.itemCount }, (_, index) => {
-      return _makeItem(index + 1);
+      return _makeItem(index + 1, options.icon);
     }),
   );
   return render(
@@ -271,5 +277,37 @@ describe("PluginMenuSlot", () => {
         }),
       );
     });
+  });
+
+  it("shows a command's icon in its button when the icon is a component", () => {
+    _renderSlotWithItems({ itemCount: 1, icon: IconPuzzle });
+
+    expect(
+      screen.getByRole("button", { name: "Command 1" }).querySelector("svg"),
+    ).not.toBeNull();
+  });
+
+  it("still renders a command's button when its icon is not a component", () => {
+    // JSON persistence turns a component into `{}`, which React cannot render.
+    _renderSlotWithItems({
+      itemCount: 1,
+      icon: {} as unknown as PluginIconComponent,
+    });
+
+    const button = screen.getByRole("button", { name: "Command 1" });
+    expect(button.querySelector("svg")).toBeNull();
+  });
+
+  it("still renders a menu item when its icon is not a component", async () => {
+    _renderSlotWithItems({
+      itemCount: 3,
+      icon: {} as unknown as PluginIconComponent,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Plugins" }));
+
+    expect(
+      await screen.findByRole("menuitem", { name: "Command 3" }),
+    ).toBeInTheDocument();
   });
 });

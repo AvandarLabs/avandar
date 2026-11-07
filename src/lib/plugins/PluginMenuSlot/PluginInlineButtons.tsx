@@ -1,4 +1,5 @@
 import { Button } from "@mantine/core";
+import { isPluginIconComponent } from "@/lib/plugins/isPluginIconComponent/isPluginIconComponent";
 import type { PluginMenuItem } from "@/lib/plugins/getMenuItemsFromActivePlugins/getMenuItemsFromActivePlugins";
 
 type Props = Readonly<{
@@ -28,7 +29,11 @@ export function PluginInlineButtons({
             variant="outline"
             color="neutral"
             size="compact-sm"
-            leftSection={Icon ? <Icon size={16} aria-hidden /> : undefined}
+            leftSection={
+              isPluginIconComponent(Icon) ? (
+                <Icon size={16} aria-hidden />
+              ) : undefined
+            }
             loading={runningKey === item.key}
             disabled={isDisabled}
             onClick={() => {

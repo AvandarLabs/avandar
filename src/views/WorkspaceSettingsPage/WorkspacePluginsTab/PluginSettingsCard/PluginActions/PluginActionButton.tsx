@@ -9,6 +9,9 @@ import type { ButtonProps } from "@mantine/core";
 type Props = Readonly<{
   kind: PluginActionKind;
   pluginName: string;
+
+  /** The id of the plugin's card heading, which describes this button. */
+  headingId: string;
   isDisabled: boolean;
   actions: PluginInstallationActions;
 }>;
@@ -49,6 +52,7 @@ function _makeOnConfirmByKind(
 export function PluginActionButton({
   kind,
   pluginName,
+  headingId,
   isDisabled,
   actions,
 }: Props): JSX.Element {
@@ -59,6 +63,7 @@ export function PluginActionButton({
     <Button
       size="compact-sm"
       {...style}
+      aria-describedby={headingId}
       disabled={isDisabled}
       onClick={() => {
         modals.openConfirmModal({
