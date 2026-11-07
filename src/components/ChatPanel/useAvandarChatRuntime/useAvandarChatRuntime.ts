@@ -216,6 +216,10 @@ export function useAvandarChatRuntime(): {
 
   const startNewChat = useCallback(() => {
     chatGenerationRef.current += 1;
+    // A new chat that asks the previous question again sends the same
+    // messages as that turn, which is how a "Try again" is recognized. The
+    // last turn belongs to the old thread, so forget it.
+    lastTurnRef.current = undefined;
     runtime.thread.cancelRun();
     // Same as boot after empty hydrate: empty thread + pending view from the
     // current page. `useChatViewTranscript` only re-syncs when the snapshot
