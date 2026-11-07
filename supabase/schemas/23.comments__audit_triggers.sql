@@ -172,8 +172,8 @@ execute function public.comments__sync_mentions ();
 /**
  * Rebuilds a comment's `comment_gadget_refs` from the `gadgetLink` and
  * `gadgetEmbed` nodes in its stored document, keeping only nodes with a
- * known gadget type and a valid uuid id. A deleted comment references
- * nothing. Fires on every update (no column list) for the same reason as
+ * known gadget type, a valid uuid id, and a `subId` only when the type is
+ * `dashboard_tile`. A deleted comment references nothing. Fires on every update (no column list) for the same reason as
  * `comments__sync_mentions`. It does not check that the gadget exists or
  * that the author can see it: reading a reference goes through the reader's
  * own access.
@@ -211,7 +211,9 @@ begin
       'lax $.** ? (@.type == "gadgetLink" || @.type == "gadgetEmbed")'
     ) as node
   ) as ref
-  where ref.gadget_type is not null and ref.gadget_id is not null;
+  where ref.gadget_type is not null
+    and ref.gadget_id is not null
+    and (ref.gadget_type = 'dashboard_tile') = (ref.sub_id is not null);
 
   return null;
 end;

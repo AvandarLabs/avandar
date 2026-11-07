@@ -54,7 +54,7 @@ values (
   'See [dashboard]'
 );
 
-select plan (10);
+select plan (12);
 
 -- 1. One row per valid gadget node, invalid ones skipped.
 select is (
@@ -145,7 +145,32 @@ select is (
   'identical duplicate gadget nodes produce one row'
 );
 
--- 7. A member reads refs in their workspace.
+-- 7. A tile without a sub id, and a non-tile gadget with one, are skipped.
+select lives_ok (
+  $t$
+  insert into public.comments (id, workspace_id, individual_id, author_user_id, body, body_text)
+  values (
+    'e3500004-0000-4000-8000-000000000004'::uuid,
+    'e3100001-0000-4000-8000-000000000001'::uuid,
+    'e3400001-0000-4000-8000-000000000001'::uuid,
+    'e3000001-0000-4000-8000-000000000001'::uuid,
+    '{"type":"doc","content":[{"type":"paragraph","content":[
+      {"type":"gadgetLink","attrs":{"gadgetType":"dashboard_tile","gadgetId":"e3600003-0000-4000-8000-000000000003","subId":null}},
+      {"type":"gadgetLink","attrs":{"gadgetType":"dashboard","gadgetId":"e3600003-0000-4000-8000-000000000003","subId":"DataViz-abc"}}
+    ]}]}'::jsonb,
+    '[tile] [dashboard]'
+  )
+  $t$,
+  'a comment with a tile missing its sub id and a dashboard with one is saved'
+);
+
+select is (
+  (select count(*)::int from public.comment_gadget_refs where comment_id = 'e3500004-0000-4000-8000-000000000004'::uuid),
+  0,
+  'a tile without a sub id and a non-tile gadget with one produce no rows'
+);
+
+-- 8. A member reads refs in their workspace.
 select lives_ok (
   $t$
   set local role authenticated;
@@ -160,7 +185,7 @@ select lives_ok (
   'a member reads gadget refs in their workspace'
 );
 
--- 8. An outsider reads none.
+-- 9. An outsider reads none.
 select lives_ok (
   $t$
   reset role;
@@ -176,7 +201,7 @@ select lives_ok (
   'an outsider reads no gadget refs'
 );
 
--- 9. The client cannot write the table.
+-- 10. The client cannot write the table.
 select throws_ok (
   $t$
   reset role;
