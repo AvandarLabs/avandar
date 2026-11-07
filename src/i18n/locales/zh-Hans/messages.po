@@ -119,6 +119,10 @@ msgstr "运行查询以查看结果。"
 msgid "Start (e.g. 2024-01-01)"
 msgstr "开始时间（例如：2024-01-01）"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query isn't written correctly, so it couldn't be read."
+msgstr "此查询编写不正确，因此无法读取。"
+
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
 msgstr "保存当前视图"
@@ -135,6 +139,11 @@ msgstr "打开数据集"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Delete comment?"
 msgstr "删除评论？"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a function, {functionName}, that the query engine "
+"doesn't support."
+msgstr "此查询使用了查询引擎不支持的函数 {functionName}。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
@@ -853,6 +862,11 @@ msgstr "从此列表中选择默认状态。"
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
 msgstr "图层名称"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Avandar couldn't confirm that this query only reads your datasets, so it "
+"didn't run it."
+msgstr "Avandar 无法确认此查询仅读取您的数据集，因此未执行该查询。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
@@ -1853,6 +1867,11 @@ msgstr "您尝试接受的邀请无效。请联系工作区所有者以获取新
 msgid "Normalize by"
 msgstr "归一化依据"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a dataset that isn't in this workspace or hasn't "
+"finished loading."
+msgstr "此查询使用的数据集不在此工作区中，或尚未完成加载。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Annual billing)"
 msgstr "(年度计费)"
@@ -2190,6 +2209,10 @@ msgstr "添加新数据集"
 msgid "Switch to Free plan"
 msgstr "切换到免费计划"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Something went wrong while running this query."
+msgstr "运行此查询时出现问题。"
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "自定义 URL 只能包含小写字母、数字和连字符"
@@ -2346,10 +2369,6 @@ msgstr "工作区名称是必需的"
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "发生意外错误。你可以重试，或返回首页。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "I ran the query, but it returned no rows."
-msgstr "我已运行查询，但没有返回任何行。"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "保存 URL"
@@ -2486,6 +2505,8 @@ msgid "{0} / 3"
 msgstr "{0} / 3"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Show details"
 msgstr "显示详细信息"
@@ -3180,6 +3201,10 @@ msgstr "不允许使用此地址"
 msgid "Your Google connection expired"
 msgstr "您的 Google 连接已过期"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query was stopped before it finished."
+msgstr "此查询在完成前已停止。"
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
 msgstr "需要几何数据"
@@ -3858,11 +3883,6 @@ msgstr "正在处理数据集…"
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "离线聊天模型已准备好。点击切换或重新下载。"
-
-#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload a file, connect an external source, or browse the open data "
-"catalog."
-msgstr "上传文件、连接外部数据源，或浏览开放数据目录。"
 
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
@@ -4690,6 +4710,10 @@ msgstr "正在更新结果"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Disclaimer"
 msgstr "免责声明"
+
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Which {groupByColumn} has the highest total {measureColumn}?"
+msgstr "哪个 {groupByColumn} 的 {measureColumn} 总计最高？"
 
 #: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
 msgid "Unavailable item"
@@ -6372,6 +6396,10 @@ msgstr "未激活"
 msgid "Right"
 msgstr "右"
 
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Show total {measureColumn} by month in {datasetName}"
+msgstr "在 {datasetName} 中按月显示 {measureColumn} 总计"
+
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus.tsx
 msgid "{0} no data"
@@ -7408,6 +7436,11 @@ msgstr "纬度和经度必须都是数字。"
 msgid "Delete dataset"
 msgstr "删除数据集"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I can only add that to a dashboard. Open a dashboard and ask me again "
+"there."
+msgstr "我只能将其添加到仪表板。请打开一个仪表板，然后在那里重新向我提出请求。"
+
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "您的套餐不允许再分享更多仪表板。"
@@ -8340,6 +8373,10 @@ msgstr "手绘"
 msgid "Settings"
 msgstr "设置"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a column named \"{columnName}\" that isn't in the data."
+msgstr "此查询使用了名为“{columnName}”的列，但数据中不存在该列。"
+
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "Go to home"
 msgstr "前往主页"
@@ -8537,6 +8574,15 @@ msgstr "导入您的第一个数据集"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "左对齐"
+
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: data.length
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so it shows an even sample of the "
+"{3} rows across the whole range."
+msgstr "{0}最多只能渲染 {1} 个{2}，因此会在整个范围内均匀显示这 {3} 行中的样本。"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
@@ -8861,6 +8907,8 @@ msgid "Green"
 msgstr "绿色"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide details"
 msgstr "隐藏详情"
 
@@ -9100,6 +9148,10 @@ msgstr "您当前的计划仅支持最多 {0} 个数据集。升级到我们的�
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig.tsx
 msgid "Prompt"
 msgstr "提示"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but no data matched it."
+msgstr "我运行了查询，但没有匹配的数据。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -9413,6 +9465,11 @@ msgstr "仅读数"
 msgid "Display name updated"
 msgstr "显示名称已更新"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query mixes totals with individual rows in a way that can't be "
+"calculated."
+msgstr "此查询以无法计算的方式混合了汇总值和单独的行。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
@@ -9489,6 +9546,11 @@ msgstr "继续"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "搜索仪表板"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query treats one kind of value as another, such as text as a number "
+"or a date, so it couldn't run."
+msgstr "此查询将一种类型的值当作另一种类型处理，例如将文本当作数字或日期，因此无法运行。"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -9937,6 +9999,11 @@ msgstr "这些选项需要几何功能，但该功能无法加载。"
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
 msgstr "高"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query needs more memory than your browser has available. Try a "
+"narrower question, such as a shorter date range or fewer places."
+msgstr "此查询所需的内存超出了浏览器可用的内存。请尝试缩小查询范围，例如缩短日期范围或减少地点数量。"
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."

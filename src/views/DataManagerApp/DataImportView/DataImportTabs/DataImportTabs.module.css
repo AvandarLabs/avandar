@@ -14,3 +14,21 @@
   flex: 1;
   min-height: 0;
 }
+
+/*
+ * The tab strip is the first thing on the page, so it takes half the page
+ * gutter above it and the same step below, instead of the full gutter plus
+ * the list's own margin plus each panel's top padding. `--ava-content-gutter`
+ * is the gutter the host pays; a host that sets none (the Open dataset
+ * modal's other tabs) is left as it is.
+ */
+.dataImportTabs .dataImportTabsList {
+  margin-bottom: var(--mantine-spacing-sm);
+  margin-top: min(
+    0px,
+    calc(
+      var(--mantine-spacing-sm) -
+        var(--ava-content-gutter, var(--mantine-spacing-sm))
+    )
+  );
+}

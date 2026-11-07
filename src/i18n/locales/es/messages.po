@@ -125,6 +125,11 @@ msgstr "Ejecuta una consulta para ver los resultados."
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Inicio (por ejemplo, 2024-01-01)"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query isn't written correctly, so it couldn't be read."
+msgstr "Esta consulta no está escrita correctamente, por lo que no se pudo "
+"leer."
+
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
 msgstr "Guardar la vista actual"
@@ -141,6 +146,12 @@ msgstr "Abrir conjunto de datos"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Delete comment?"
 msgstr "¿Eliminar comentario?"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a function, {functionName}, that the query engine "
+"doesn't support."
+msgstr "Esta consulta usa una función, {functionName}, que el motor de "
+"consultas no admite."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
@@ -883,6 +894,12 @@ msgstr "Elija un estado predeterminado de esta lista."
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
 msgstr "Nombre de la capa"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Avandar couldn't confirm that this query only reads your datasets, so it "
+"didn't run it."
+msgstr "Avandar no pudo confirmar que esta consulta solo lee sus conjuntos de "
+"datos, por lo que no se ejecutó."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
@@ -1939,6 +1956,12 @@ msgstr "La invitación que estás intentando aceptar no es válida. Por favor, "
 msgid "Normalize by"
 msgstr "Normalizar por"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a dataset that isn't in this workspace or hasn't "
+"finished loading."
+msgstr "Esta consulta usa un conjunto de datos que no está en este espacio de "
+"trabajo o que aún no termina de cargarse."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Annual billing)"
 msgstr "(Facturación anual)"
@@ -2285,6 +2308,10 @@ msgstr "Agregar nuevo conjunto de datos"
 msgid "Switch to Free plan"
 msgstr "Cambiar a plan gratuito"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Something went wrong while running this query."
+msgstr "Algo salió mal al ejecutar esta consulta."
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "La URL personalizada solo puede contener letras minúsculas, números y "
@@ -2447,10 +2474,6 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Ocurrió un error inesperado. Puede intentarlo de nuevo o volver al "
 "inicio."
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "I ran the query, but it returned no rows."
-msgstr "Ejecuté la consulta, pero no devolvió ninguna fila."
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "Guardar URL"
@@ -2593,6 +2616,8 @@ msgid "{0} / 3"
 msgstr "{0} / 3"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Show details"
 msgstr "Mostrar detalles"
@@ -3321,6 +3346,10 @@ msgstr "Esta dirección no está permitida"
 msgid "Your Google connection expired"
 msgstr "Su conexión de Google expiró"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query was stopped before it finished."
+msgstr "Esta consulta se detuvo antes de terminar."
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
 msgstr "Necesita geometría"
@@ -4033,12 +4062,6 @@ msgstr "Procesando conjunto de datos…"
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Modelo de chat sin conexión listo. Haz clic para cambiar o volver a "
 "descargar."
-
-#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload a file, connect an external source, or browse the open data "
-"catalog."
-msgstr "Cargue un archivo, conecte una fuente externa o explore el catálogo de "
-"datos abiertos."
 
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
@@ -4893,6 +4916,10 @@ msgstr "Actualizando resultados"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Disclaimer"
 msgstr "Aviso"
+
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Which {groupByColumn} has the highest total {measureColumn}?"
+msgstr "¿Qué {groupByColumn} tiene el total más alto de {measureColumn}?"
 
 #: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
 msgid "Unavailable item"
@@ -6629,6 +6656,10 @@ msgstr "Inactivo"
 msgid "Right"
 msgstr "Derecha"
 
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Show total {measureColumn} by month in {datasetName}"
+msgstr "Mostrar el total de {measureColumn} por mes en {datasetName}"
+
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus.tsx
 msgid "{0} no data"
@@ -7702,6 +7733,12 @@ msgstr "La latitud y la longitud deben ser números."
 msgid "Delete dataset"
 msgstr "Eliminar conjunto de datos"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I can only add that to a dashboard. Open a dashboard and ask me again "
+"there."
+msgstr "Solo puedo agregar eso a un dashboard. Abre un dashboard y vuelve a "
+"pedírmelo allí."
+
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "Su plan no permite compartir más dashboards."
@@ -8679,6 +8716,11 @@ msgstr "A mano alzada"
 msgid "Settings"
 msgstr "Configuraciones"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a column named \"{columnName}\" that isn't in the data."
+msgstr "Esta consulta usa una columna llamada \"{columnName}\" que no está en "
+"los datos."
+
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "Go to home"
 msgstr "Ir al inicio"
@@ -8883,6 +8925,16 @@ msgstr "Incorpore su primer conjunto de datos"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "Izquierda"
+
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: data.length
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so it shows an even sample of the "
+"{3} rows across the whole range."
+msgstr "El {0} solo puede renderizar hasta {1} {2}, por lo que muestra una "
+"muestra uniforme de las {3} filas en todo el rango."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
@@ -9222,6 +9274,8 @@ msgid "Green"
 msgstr "Verde"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide details"
 msgstr "Ocultar detalles"
 
@@ -9469,6 +9523,10 @@ msgstr "Tu plan actual solo admite hasta {0} conjuntos de datos. Actualiza a "
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig.tsx
 msgid "Prompt"
 msgstr "Sugerencia"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but no data matched it."
+msgstr "Ejecuté la consulta, pero no se encontraron datos coincidentes."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -9792,6 +9850,12 @@ msgstr "Solo lecturas"
 msgid "Display name updated"
 msgstr "Nombre para mostrar actualizado"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query mixes totals with individual rows in a way that can't be "
+"calculated."
+msgstr "Esta consulta combina totales con filas individuales de una manera que "
+"no se puede calcular."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
@@ -9873,6 +9937,12 @@ msgstr "Continuar"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "Buscar paneles"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query treats one kind of value as another, such as text as a number "
+"or a date, so it couldn't run."
+msgstr "Esta consulta trata un tipo de valor como otro, por ejemplo, texto como "
+"número o fecha, por lo que no se pudo ejecutar."
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10342,6 +10412,13 @@ msgstr "Estas opciones necesitan el soporte de geometría, que no se pudo "
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
 msgstr "Alto"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query needs more memory than your browser has available. Try a "
+"narrower question, such as a shorter date range or fewer places."
+msgstr "Esta consulta necesita más memoria de la disponible en su navegador. "
+"Intente hacer una pregunta más específica, como usar un intervalo de "
+"fechas más corto o menos lugares."
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."

@@ -4,15 +4,17 @@ import { useStartDiscovery } from "./useStartDiscovery";
 import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
 
 const EMPTY_CANDIDATE_VALUES: readonly string[] = [];
+const EMPTY_CANDIDATE_GROUPS: ReadonlyArray<readonly string[]> = [];
 
 type DiscoveryOptionsParameters = {
   query: string;
   column: string;
   resolveDiscovery: DiscoveryResolver | undefined;
   candidateValues?: readonly string[];
+  candidateGroups?: ReadonlyArray<readonly string[]>;
   multi?: boolean;
   onUniqueMatch?: (
-    storedValue: string,
+    storedValue: string | string[],
   ) => boolean | void | Promise<boolean | void>;
 };
 
@@ -32,6 +34,7 @@ export function useDiscoveryOptions(
     column,
     resolveDiscovery,
     candidateValues = EMPTY_CANDIDATE_VALUES,
+    candidateGroups = EMPTY_CANDIDATE_GROUPS,
     multi = false,
     onUniqueMatch,
   } = options;
@@ -52,6 +55,7 @@ export function useDiscoveryOptions(
     column,
     resolveDiscovery,
     candidateValues,
+    candidateGroups,
     multi,
     onUniqueMatch,
     fallbackError: t`Query failed.`,

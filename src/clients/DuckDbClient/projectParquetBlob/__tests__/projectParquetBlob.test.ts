@@ -37,10 +37,32 @@ const LEASE = {
   datasetIds: new Set<string>(),
 } as unknown as DatasetDuckDbLease;
 
+/** Answers the schema read with `fileColumns` and the COPY with a blob. */
+function _mockFileColumns(fileColumns: readonly string[]): void {
+  runRawQueryMock.mockImplementation(
+    async (_sql: string, options: { returnType?: string }) => {
+      return options.returnType === "parquet"
+        ? new Blob(["projected"])
+        : {
+            data: fileColumns.map((columnName) => {
+              return { column_name: columnName };
+            }),
+          };
+    },
+  );
+}
+
+function _getProjectionSql(): string | undefined {
+  const projectionCall = runRawQueryMock.mock.calls.find((call) => {
+    return (call[1] as { returnType?: string }).returnType === "parquet";
+  });
+  return projectionCall?.[0] as string | undefined;
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   getDbMock.mockResolvedValue({ dropFile: dropFileMock });
-  runRawQueryMock.mockResolvedValue(new Blob(["projected"]));
+  _mockFileColumns(["case_id", "status", "district"]);
   registerParquetFileMock.mockResolvedValue(undefined);
 });
 
@@ -76,12 +98,12 @@ describe("projectParquetBlob", () => {
     });
 
     expect(result).toEqual(new Blob(["projected"]));
-    const sql = runRawQueryMock.mock.calls[0]?.[0] as string;
+    const sql = _getProjectionSql()!;
     expect(sql).toContain('SELECT "case_id", "status" FROM read_parquet');
     expect(sql).not.toMatch(/\bDISTINCT\b/i);
     expect(sql).not.toMatch(/\bGROUP BY\b/i);
     expect(sql).not.toMatch(/\bORDER BY\b/i);
-    expect(runRawQueryMock.mock.calls[0]?.[1]).toEqual(
+    expect(runRawQueryMock.mock.calls.at(-1)?.[1]).toEqual(
       expect.objectContaining({
         datasetDuckDbLease: LEASE,
         returnType: "parquet",
@@ -89,6 +111,48 @@ describe("projectParquetBlob", () => {
         params: { fileName: "ava_proj_proj-id" },
       }),
     );
+    expect(dropFileMock).toHaveBeenCalledWith("ava_proj_proj-id");
+  });
+
+  it("drops requested names that are not columns of the file, such as CTE names, aliases, and keywords", async () => {
+    const { projectParquetBlob } =
+      await import("@/clients/DuckDbClient/projectParquetBlob/projectParquetBlob");
+    _mockFileColumns(["Province_State", "daily_new_deaths", "date"]);
+
+    await projectParquetBlob({
+      client: _client() as DuckDbClientOperations,
+      columns: [
+        "Province_State",
+        "QUALIFY",
+        "daily_new_deaths",
+        "DATE",
+        "state",
+        "state_deaths",
+        "total_covid_deaths",
+      ],
+      datasetDuckDbLease: LEASE,
+      parquetBlob: new Blob(["src"]),
+    });
+
+    expect(_getProjectionSql()).toContain(
+      'SELECT "Province_State", "daily_new_deaths", "date" FROM read_parquet',
+    );
+  });
+
+  it("returns the source blob unchanged when no requested name is a column", async () => {
+    const { projectParquetBlob } =
+      await import("@/clients/DuckDbClient/projectParquetBlob/projectParquetBlob");
+    const parquetBlob = new Blob(["src"]);
+
+    const result = await projectParquetBlob({
+      client: _client() as DuckDbClientOperations,
+      columns: ["state", "total"],
+      datasetDuckDbLease: LEASE,
+      parquetBlob,
+    });
+
+    expect(result).toBe(parquetBlob);
+    expect(_getProjectionSql()).toBeUndefined();
     expect(dropFileMock).toHaveBeenCalledWith("ava_proj_proj-id");
   });
 });

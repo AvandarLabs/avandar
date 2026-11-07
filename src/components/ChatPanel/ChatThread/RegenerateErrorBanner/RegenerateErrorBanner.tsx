@@ -3,13 +3,15 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { useQueryErrorExplanation } from "@/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation";
 import css from "./RegenerateErrorBanner.module.css";
 
 /**
  * Sits above the composer and only renders when the most recent SQL turn
- * failed at runtime. One click sends a fix-it prompt to the thread; the
- * backend already receives the prior SQL and the error via `ChatPageContext`,
- * so the model has everything it needs to repair the query.
+ * failed at runtime. It explains the failure in plain language. One click
+ * sends a fix-it prompt to the thread; the backend already receives the prior
+ * SQL and the raw error via `ChatPageContext`, so the model has everything it
+ * needs to repair the query.
  *
  * One retry only: the banner clears the error optimistically so it doesn't
  * loop on the same failure. If the regenerated SQL also fails, the banner
@@ -21,6 +23,7 @@ export function RegenerateErrorBanner(): React.ReactNode {
   const dispatch = DataExplorerStateManager.useDispatch();
   const aui = useAui();
   const { t } = useLingui();
+  const explanation = useQueryErrorExplanation(lastQueryError);
 
   if (!lastQueryError || !rawSql) {
     return null;
@@ -39,7 +42,7 @@ export function RegenerateErrorBanner(): React.ReactNode {
             <Trans>That query failed</Trans>
           </Text>
           <Text size="xs" c="neutral.7" className={css.errorText}>
-            {lastQueryError}
+            {explanation}
           </Text>
         </Stack>
       </Group>

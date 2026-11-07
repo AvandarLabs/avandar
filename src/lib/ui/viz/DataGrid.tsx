@@ -1,11 +1,10 @@
 import { mantineColorVar, mantineVar } from "@avandar/ui";
-import { formatDate, FormattableTimezone } from "@avandar/utils";
 import { Box } from "@mantine/core";
 import { themeMaterial } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import type { UnknownDataFrame } from "@avandar/utils";
+import { makeDataGridColumnDefs } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
+import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
 import type {
   GridReadyEvent,
   GridSizeChangedEvent,
@@ -56,29 +55,14 @@ export function DataGrid({
   onGridSizeChanged,
 }: Props): JSX.Element {
   const columnDefs = useMemo(() => {
-    return columnNames.map((field) => {
-      const isDate = dateColumns?.has(field) ?? false;
-      return {
-        field: field,
-        headerName: field,
-        filter: true,
-        valueFormatter: isDate
-          ? (p: { value: unknown }) => {
-              return formatDate(p.value, {
-                format: dateFormat,
-                zone: timezone,
-              });
-            }
-          : (p: { value: unknown }) => {
-              return typeof p.value === "number"
-                ? formatChartNumber(p.value)
-                : p.value == null
-                  ? ""
-                  : String(p.value);
-            },
-      };
+    return makeDataGridColumnDefs({
+      columnNames,
+      data,
+      dateColumns,
+      dateFormat,
+      timezone,
     });
-  }, [columnNames, dateColumns, dateFormat, timezone]);
+  }, [columnNames, data, dateColumns, dateFormat, timezone]);
 
   // AgGrid will fill the size of the parent container
   return (

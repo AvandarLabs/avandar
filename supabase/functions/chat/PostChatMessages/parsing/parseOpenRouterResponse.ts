@@ -62,6 +62,7 @@ export function parseOpenRouterResponse(options: {
   const sqlCall = calls.find((call) => {
     return call?.function?.name === "generateSql";
   });
+  let sqlSummary = "";
   if (sqlCall?.function) {
     try {
       const args = JSON.parse(sqlCall.function.arguments ?? "{}");
@@ -70,6 +71,8 @@ export function parseOpenRouterResponse(options: {
           sql: cleanLlmGeneratedSql(args.sql),
           prompt: options.lastUserPrompt,
         };
+        sqlSummary =
+          typeof args.summary === "string" ? args.summary.trim() : "";
       }
     } catch {
       // Malformed tool args are ignored.
@@ -88,6 +91,9 @@ export function parseOpenRouterResponse(options: {
     }
   }
 
+  // A model that wrote no prose alongside the tool call still explains the
+  // result through generateSql's summary.
+  let text = options.attemptText || sqlSummary;
   if (
     !generatedSql &&
     !clarification &&
@@ -96,12 +102,13 @@ export function parseOpenRouterResponse(options: {
     !options.skipSqlExtraction &&
     options.attemptText.length > 0
   ) {
-    const extractedSql = extractSqlFromAssistantText(options.attemptText);
-    if (extractedSql) {
+    const extracted = extractSqlFromAssistantText(options.attemptText);
+    if (extracted) {
       generatedSql = {
-        sql: cleanLlmGeneratedSql(extractedSql),
+        sql: cleanLlmGeneratedSql(extracted.sql),
         prompt: options.lastUserPrompt,
       };
+      text = extracted.textWithoutSql;
     }
   }
 
@@ -121,7 +128,7 @@ export function parseOpenRouterResponse(options: {
 
   return applySqlTableAliasesToParsedAttempt(
     {
-      text: options.attemptText,
+      text,
       generatedSql,
       clarification,
       dashboardBlock,
@@ -152,7 +159,14 @@ function applySqlTableAliasesToParsedAttempt(
     parsed.clarification,
     aliases,
   );
-  return { ...parsed, generatedSql, clarification };
+  const dashboardBlock =
+    parsed.dashboardBlock?.kind === "DataViz"
+      ? {
+          ...parsed.dashboardBlock,
+          sql: SqlTableAlias.applyToSql(parsed.dashboardBlock.sql, aliases),
+        }
+      : parsed.dashboardBlock;
+  return { ...parsed, generatedSql, clarification, dashboardBlock };
 }
 
 function applySqlTableAliasesToClarification(

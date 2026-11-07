@@ -56,8 +56,17 @@ function _buildAssistantThreadText(
   const withoutSql = _stripSqlFences(options.assistantText);
   const hasNoOtherProse =
     withoutSql.length === 0 || _isSqlAnnouncement(withoutSql);
-  return options.hasGeneratedSql && options.sqlOutcome && hasNoOtherProse
-    ? options.sqlOutcomeCopy[options.sqlOutcome]
+  if (!options.hasGeneratedSql || !options.sqlOutcome) {
+    return withoutSql;
+  }
+  const outcomeCopy = options.sqlOutcomeCopy[options.sqlOutcome];
+  if (hasNoOtherProse) {
+    return outcomeCopy;
+  }
+  // The model describes the query it wrote before it runs, so when nothing
+  // came back the outcome leads and the description follows.
+  return options.sqlOutcome === "empty" || options.sqlOutcome === "failed"
+    ? `${outcomeCopy}\n\n${withoutSql}`
     : withoutSql;
 }
 

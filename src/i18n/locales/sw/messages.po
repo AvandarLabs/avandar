@@ -124,6 +124,10 @@ msgstr "Fanya swali ili kuona matokeo."
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Anza (mfano: 2024-01-01)"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query isn't written correctly, so it couldn't be read."
+msgstr "Hoja hii haijaandikwa kwa usahihi, kwa hivyo haikuweza kusomwa."
+
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
 msgstr "Hifadhi mwonekano wa sasa"
@@ -140,6 +144,12 @@ msgstr "Fungua dataset"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Delete comment?"
 msgstr "Ufute maoni?"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a function, {functionName}, that the query engine "
+"doesn't support."
+msgstr "Hoja hii inatumia function, {functionName}, ambayo injini ya hoja "
+"haiungi mkono."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
@@ -882,6 +892,12 @@ msgstr "Chagua hali chaguo-msingi kutoka kwenye orodha hii."
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
 msgstr "Jina la safu"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Avandar couldn't confirm that this query only reads your datasets, so it "
+"didn't run it."
+msgstr "Avandar haikuweza kuthibitisha kuwa hoja hii inasoma tu seti zako za "
+"data, kwa hivyo haikuiendesha."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
@@ -1930,6 +1946,12 @@ msgstr "Mwaliko unajaribu kukubali si halali. Tafadhali wasiliana na mmiliki wa 
 msgid "Normalize by"
 msgstr "Sanifisha kwa"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a dataset that isn't in this workspace or hasn't "
+"finished loading."
+msgstr "Hoja hii inatumia seti ya data ambayo haipo katika nafasi hii ya kazi "
+"au haijamaliza kupakiwa."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Annual billing)"
 msgstr "(Malipo ya kila mwaka)"
@@ -2277,6 +2299,10 @@ msgstr "Ongeza dataset mpya"
 msgid "Switch to Free plan"
 msgstr "Badilisha kuwa mpango wa Bure"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Something went wrong while running this query."
+msgstr "Hitilafu imetokea wakati wa kuendesha hoja hii."
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "URL maalum inaweza kuwa na herufi ndogo, nambari na vistari pekee"
@@ -2437,10 +2463,6 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Hitilafu isiyotarajiwa imetokea. Unaweza kujaribu tena au urudi kwenye "
 "ukurasa wa mwanzo."
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "I ran the query, but it returned no rows."
-msgstr "Nimeendesha hoja, lakini haikurudisha safu yoyote."
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "Hifadhi URL"
@@ -2585,6 +2607,8 @@ msgid "{0} / 3"
 msgstr "{0} / 3"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Show details"
 msgstr "Onyesha maelezo"
@@ -3311,6 +3335,10 @@ msgstr "Anwani hii hairuhusiwi"
 msgid "Your Google connection expired"
 msgstr "Muunganisho wako wa Google umeisha muda"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query was stopped before it finished."
+msgstr "Hoja hii ilisimamishwa kabla haijakamilika."
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
 msgstr "Inahitaji jiometri"
@@ -4020,12 +4048,6 @@ msgstr "Inashughulikia seti ya data…"
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Mfano wa mazungumzo bila mtandao uko tayari. Bonyeza kubadilisha au "
 "pakua tena."
-
-#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload a file, connect an external source, or browse the open data "
-"catalog."
-msgstr "Pakia faili, unganisha chanzo cha nje, au vinjari katalogi ya data "
-"huria."
 
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
@@ -4877,6 +4899,10 @@ msgstr "Inasasisha matokeo"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Disclaimer"
 msgstr "Kanusho"
+
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Which {groupByColumn} has the highest total {measureColumn}?"
+msgstr "Ni {groupByColumn} ipi iliyo na jumla ya juu zaidi ya {measureColumn}?"
 
 #: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
 msgid "Unavailable item"
@@ -6605,6 +6631,10 @@ msgstr "Isiyotumika"
 msgid "Right"
 msgstr "Kulia"
 
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Show total {measureColumn} by month in {datasetName}"
+msgstr "Onyesha jumla ya {measureColumn} kwa mwezi katika {datasetName}"
+
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus.tsx
 msgid "{0} no data"
@@ -7672,6 +7702,12 @@ msgstr "Latitudo na longitudo zote lazima ziwe nambari."
 msgid "Delete dataset"
 msgstr "Futa seti ya data"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I can only add that to a dashboard. Open a dashboard and ask me again "
+"there."
+msgstr "Ninaweza kuongeza hilo kwenye dashibodi pekee. Fungua dashibodi kisha "
+"uniulize tena huko."
+
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "Mpango wako hauruhusu kushiriki dashibodi zaidi."
@@ -8641,6 +8677,11 @@ msgstr "Mchoro wa bure"
 msgid "Settings"
 msgstr "Mipangilio"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a column named \"{columnName}\" that isn't in the data."
+msgstr "Hoja hii inatumia safu yenye jina \"{columnName}\" ambayo haipo kwenye "
+"data."
+
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "Go to home"
 msgstr "Nenda kwenye ukurasa wa mwanzo"
@@ -8844,6 +8885,16 @@ msgstr "Leta mkusanyiko wako wa kwanza wa data"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "Kushoto"
+
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: data.length
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so it shows an even sample of the "
+"{3} rows across the whole range."
+msgstr "{0} inaweza kuonyesha hadi {1} {2} pekee, kwa hivyo huonyesha sampuli "
+"iliyosambazwa kwa usawa ya {3} safu mlalo katika masafa yote."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
@@ -9178,6 +9229,8 @@ msgid "Green"
 msgstr "Kijani"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide details"
 msgstr "Ficha maelezo"
 
@@ -9425,6 +9478,10 @@ msgstr "Mpango wako wa sasa unasaidia hadi {0} datasets. Pandisha hadhi kwenye "
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig.tsx
 msgid "Prompt"
 msgstr "Kichocheo"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but no data matched it."
+msgstr "Nimeendesha query, lakini hakuna data iliyolingana nayo."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -9746,6 +9803,12 @@ msgstr "Vipimo pekee"
 msgid "Display name updated"
 msgstr "Jina la kuonyesha limeboreshwa"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query mixes totals with individual rows in a way that can't be "
+"calculated."
+msgstr "Hoja hii inachanganya jumla na safu mahususi kwa njia ambayo haiwezi "
+"kukokotolewa."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
@@ -9827,6 +9890,12 @@ msgstr "Endelea"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "Tafuta dashibodi"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query treats one kind of value as another, such as text as a number "
+"or a date, so it couldn't run."
+msgstr "Hoja hii inachukulia aina moja ya thamani kama aina nyingine, kama vile "
+"maandishi kuwa nambari au tarehe, kwa hivyo haikuweza kuendeshwa."
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10292,6 +10361,13 @@ msgstr "Chaguo hizi zinahitaji usaidizi wa jiometri, ambao haukuweza kupakiwa."
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
 msgstr "Juu"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query needs more memory than your browser has available. Try a "
+"narrower question, such as a shorter date range or fewer places."
+msgstr "Hoja hii inahitaji kumbukumbu zaidi ya ile inayopatikana kwenye "
+"kivinjari chako. Jaribu swali lenye upeo mdogo, kama vile kipindi "
+"kifupi zaidi cha tarehe au maeneo machache."
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."

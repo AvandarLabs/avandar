@@ -1,7 +1,9 @@
 import { Trans } from "@lingui/react/macro";
-import { Alert, Anchor, Code, Stack } from "@mantine/core";
+import { Alert, Anchor, Code, Group, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { QueryErrorKind } from "@/lib/sql/QueryErrorKind/QueryErrorKind";
+import { useQueryErrorExplanation } from "@/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -15,10 +17,13 @@ type Props = {
  * Reports a failed query where the results would otherwise be.
  *
  * This alert replaces the results area so a conversion or binder failure is
- * not shown as an empty grid.
+ * not shown as an empty grid. It explains the failure in plain language and
+ * keeps the technical message and the SQL behind disclosures.
  */
 export function QueryResultsError({ message, sql }: Props): ReactNode {
+  const [isDetailsOpen, { toggle: toggleDetails }] = useDisclosure(false);
   const [isSqlOpen, { toggle: toggleSql }] = useDisclosure(false);
+  const explanation = useQueryErrorExplanation(message);
 
   if (message === undefined) {
     return null;
@@ -33,9 +38,22 @@ export function QueryResultsError({ message, sql }: Props): ReactNode {
       title={<Trans>This query could not run</Trans>}
     >
       <Stack gap="xs">
-        <span>{message}</span>
-        {sql ? (
-          <>
+        <span>{explanation}</span>
+        <Group gap="md">
+          <Anchor
+            component="button"
+            type="button"
+            size="sm"
+            aria-expanded={isDetailsOpen}
+            onClick={toggleDetails}
+          >
+            {isDetailsOpen ? (
+              <Trans>Hide details</Trans>
+            ) : (
+              <Trans>Show details</Trans>
+            )}
+          </Anchor>
+          {sql ? (
             <Anchor
               component="button"
               type="button"
@@ -45,9 +63,12 @@ export function QueryResultsError({ message, sql }: Props): ReactNode {
             >
               {isSqlOpen ? <Trans>Hide SQL</Trans> : <Trans>Show SQL</Trans>}
             </Anchor>
-            {isSqlOpen ? <Code block>{sql}</Code> : null}
-          </>
+          ) : null}
+        </Group>
+        {isDetailsOpen ? (
+          <Code block>{QueryErrorKind.toTechnicalDetails(message)}</Code>
         ) : null}
+        {isSqlOpen && sql ? <Code block>{sql}</Code> : null}
       </Stack>
     </Alert>
   );

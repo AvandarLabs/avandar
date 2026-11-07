@@ -84,6 +84,62 @@ describe("parseClarify", () => {
     ).toEqual(EXPECTED_DISCOVERY_REQUEST);
   });
 
+  it("keeps one bounded candidate group per value the user named", () => {
+    const parsed = parseClarify(
+      JSON.stringify({
+        question: "Which of these are California and Texas?",
+        responseShape: {
+          kind: "discovery",
+          query: 'SELECT DISTINCT "state" FROM "t0" LIMIT 100',
+          column: "state",
+          multi: true,
+          candidateValues: ["California", "Texas"],
+          candidateGroups: [
+            [" California ", "CA", 7],
+            ["Texas", "TX"],
+            [],
+            "not a group",
+          ],
+        },
+      }),
+      0,
+    );
+
+    expect(parsed?.responseShape).toMatchObject({
+      kind: "discovery",
+      candidateGroups: [
+        ["California", "CA"],
+        ["Texas", "TX"],
+      ],
+    });
+  });
+
+  it("drops options that repeat the card's own Something else and None of the above", () => {
+    const parsed = parseClarify(
+      JSON.stringify({
+        question: "How should best be measured?",
+        responseShape: {
+          kind: "fixed_options",
+          options: [
+            "Fewest total deaths",
+            "Something else",
+            "Lowest average daily deaths",
+            "None of the above.",
+            "Other…",
+          ],
+          multi: false,
+        },
+      }),
+      0,
+    );
+
+    expect(parsed?.responseShape).toEqual({
+      kind: "fixed_options",
+      options: ["Fewest total deaths", "Lowest average daily deaths"],
+      multi: false,
+    });
+  });
+
   it("does not count view-change lines as clarification answers", () => {
     // View-change lines lack the `[Clarification answer:` marker.
     expect(

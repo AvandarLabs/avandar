@@ -70,9 +70,10 @@ export function useAvandarChatRuntime(): {
     sqlApprovalRequired: t`SQL was not applied. Approve the assumed filter values to run this query.`,
     sqlSignInRequired: t`SQL was not applied. Sign in to approve filter values.`,
     sqlResultsReady: t`I ran the query. Your results are ready.`,
-    sqlResultsEmpty: t`I ran the query, but it returned no rows.`,
+    sqlResultsEmpty: t`I ran the query, but no data matched it.`,
     sqlQueryFailed: t`I ran the query, but it failed.`,
     sqlQueryApplied: t`I applied the query in the Data Explorer.`,
+    dashboardOnlyBlock: t`I can only add that to a dashboard. Open a dashboard and ask me again there.`,
     fallbackTitle: t`Chat request failed`,
     fallbackMessage: t`The cloud assistant is unreachable. Use your downloaded on-device model for this message?`,
     replying: t`Replying…`,
@@ -107,9 +108,10 @@ export function useAvandarChatRuntime(): {
         sqlApprovalRequired: t`SQL was not applied. Approve the assumed filter values to run this query.`,
         sqlSignInRequired: t`SQL was not applied. Sign in to approve filter values.`,
         sqlResultsReady: t`I ran the query. Your results are ready.`,
-        sqlResultsEmpty: t`I ran the query, but it returned no rows.`,
+        sqlResultsEmpty: t`I ran the query, but no data matched it.`,
         sqlQueryFailed: t`I ran the query, but it failed.`,
         sqlQueryApplied: t`I applied the query in the Data Explorer.`,
+        dashboardOnlyBlock: t`I can only add that to a dashboard. Open a dashboard and ask me again there.`,
         fallbackTitle: t`Chat request failed`,
         fallbackMessage: t`The cloud assistant is unreachable. Use your downloaded on-device model for this message?`,
         replying: t`Replying…`,
@@ -216,6 +218,10 @@ export function useAvandarChatRuntime(): {
 
   const startNewChat = useCallback(() => {
     chatGenerationRef.current += 1;
+    // A new chat that asks the previous question again sends the same
+    // messages as that turn, which is how a "Try again" is recognized. The
+    // last turn belongs to the old thread, so forget it.
+    lastTurnRef.current = undefined;
     runtime.thread.cancelRun();
     // Same as boot after empty hydrate: empty thread + pending view from the
     // current page. `useChatViewTranscript` only re-syncs when the snapshot
