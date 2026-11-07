@@ -63,7 +63,9 @@ describe("socrataOfficeDivision", () => {
     ).toBeUndefined();
     expect(
       socrataOfficeDivision(
-        buildRecord({ "Dataset-Summary_Organization": " department of health " }),
+        buildRecord({
+          "Dataset-Summary_Organization": " department of health ",
+        }),
       ),
     ).toBeUndefined();
   });
