@@ -68,6 +68,33 @@ describe("DiscoveryBody", () => {
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
   });
 
+  it("asks the resolver to look up the candidates beyond its own list", async () => {
+    const resolveDiscovery = vi.fn().mockResolvedValue({
+      values: ["United Kingdom", "Afghanistan"],
+    });
+    const onSubmit = vi.fn();
+    render(
+      <DiscoveryBody
+        {...DISCOVERY_PROPS}
+        candidateValues={["UK", "United Kingdom"]}
+        resolveDiscovery={resolveDiscovery}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        answer: { kind: "preset", value: "United Kingdom" },
+        isInternalDiscovery: true,
+      });
+    });
+    expect(resolveDiscovery).toHaveBeenCalledWith({
+      query: DISCOVERY_PROPS.query,
+      column: DISCOVERY_PROPS.column,
+      candidateValues: ["UK", "United Kingdom"],
+    });
+  });
+
   it("shows the catalog when more than one stored value matches", async () => {
     const onSubmit = vi.fn();
     render(

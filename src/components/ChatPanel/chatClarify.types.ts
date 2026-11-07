@@ -15,5 +15,7 @@ export type DiscoveryResolver = (
   parameters: Readonly<{
     query: string;
     column: string;
+    /** Prompt-derived values to look up beyond the discovery's own list. */
+    candidateValues?: readonly string[];
   }>,
 ) => Promise<{ values: string[] } | { error: string }>;

@@ -57,4 +57,29 @@ describe("useDiscoveryResolver", () => {
       error: 'Binder Error: Referenced column "State" not found',
     });
   });
+
+  it("puts candidate matches first even when the lookup's own list cuts them off", async () => {
+    runQueryMock
+      .mockResolvedValueOnce({
+        data: [{ "Country/Region": "Afghanistan" }, { "Country/Region": "Albania" }],
+      })
+      .mockResolvedValueOnce({
+        data: [{ "Country/Region": "United Kingdom" }],
+      });
+    const resolveDiscovery = _renderResolver();
+
+    const result = await resolveDiscovery({
+      query: `SELECT DISTINCT "Country/Region" FROM "b3ce316e-d9e5-4279-89d7-bf42ab0d68fb" ORDER BY 1 LIMIT 100`,
+      column: "Country/Region",
+      candidateValues: ["UK", "United Kingdom"],
+    });
+
+    expect(runQueryMock).toHaveBeenLastCalledWith({
+      rawSql: expect.stringContaining("IN ('uk', 'united kingdom')"),
+      workspaceId: WORKSPACE_ID,
+    });
+    expect(result).toEqual({
+      values: ["United Kingdom", "Afghanistan", "Albania"],
+    });
+  });
 });
