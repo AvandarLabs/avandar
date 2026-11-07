@@ -191,8 +191,8 @@ async function _getConceptRelationPlan(
 
   columns.renamedColumns.forEach((renamed) => {
     Logger.warn(
-      `Concept '${options.ref.id}' has two attributes named ` +
-        `'${renamed.requestedName}'; emitting the later one as ` +
+      `Concept '${options.ref.id}' attribute '${renamed.requestedName}' ` +
+        `collides with another column. Emitting it as ` +
         `'${renamed.emittedName}'. Attribute id: ${renamed.attributeId}.`,
     );
   });

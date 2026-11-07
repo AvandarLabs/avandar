@@ -11,7 +11,7 @@ import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/Concep
 
 /** The spine's alias inside the view, and the columns it exposes. */
 const SPINE_ALIAS = "individuals";
-const EXTERNAL_ID_COLUMN = "external_id";
+export const EXTERNAL_ID_COLUMN = "external_id";
 const STATUS_COLUMN = ConceptStatusColumn.COLUMN_NAME;
 
 /** One column of the concept relation, already resolved to what it reads. */
@@ -91,10 +91,12 @@ export function buildConceptViewSql(
       .filter((column) => {
         // An attribute already named `external_id` or `status` would collide
         // with a spine column above. The spine wins: a join depends on the
-        // key, and every case type's status is that column.
+        // key, and every case type's status is that column. Column names are
+        // case-insensitive in DuckDB, so the comparison is too.
+        const lowercasedName = column.attributeName.toLowerCase();
         return (
-          column.attributeName !== EXTERNAL_ID_COLUMN &&
-          column.attributeName !== STATUS_COLUMN
+          lowercasedName !== EXTERNAL_ID_COLUMN &&
+          lowercasedName !== STATUS_COLUMN
         );
       })
       .map(_buildColumnSelector),

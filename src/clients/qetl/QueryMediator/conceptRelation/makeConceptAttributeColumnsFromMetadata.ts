@@ -1,5 +1,6 @@
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
+import { EXTERNAL_ID_COLUMN } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
@@ -9,12 +10,6 @@ import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/concep
 
 /** Each contributing dataset's key column, by dataset id. */
 type PrimaryKeyColumnNameByDatasetId = Record<Dataset.Id, string | undefined>;
-
-/**
- * The view's record key column, which `buildConceptViewSql` reads from the
- * spine.
- */
-const RECORD_KEY_COLUMN_NAME = "external_id";
 
 /** The ontology rows one concept's relation columns are derived from. */
 export type ConceptRelationMetadata = {
@@ -246,18 +241,22 @@ function _buildAttributeColumn(
 /**
  * Suffixes a name that an earlier attribute already took.
  *
- * `<name>_2`, `<name>_3`, and so on, matching the order
+ * `<name>_2`, `<name>_3`, and so on. The match ignores case, which is how
+ * DuckDB compares column names, and `takenNames` holds lowercased names. The
+ * emitted name keeps the requested casing. The order matches the order
  * `_compareAttributes` fixes, so the alphabetically first attribute id keeps
  * the plain name.
  */
 function _getUniqueColumnName(
   options: Readonly<{ requestedName: string; takenNames: ReadonlySet<string> }>,
 ): string {
-  if (!options.takenNames.has(options.requestedName)) {
+  if (!options.takenNames.has(options.requestedName.toLowerCase())) {
     return options.requestedName;
   }
   let suffix = 2;
-  while (options.takenNames.has(`${options.requestedName}_${suffix}`)) {
+  while (
+    options.takenNames.has(`${options.requestedName}_${suffix}`.toLowerCase())
+  ) {
     suffix += 1;
   }
   return `${options.requestedName}_${suffix}`;
@@ -292,9 +291,10 @@ export function makeConceptAttributeColumnsFromMetadata(
   // dropped and keeps a column of its own. The
   // `concept_attributes__name_not_reserved` check keeps `status` out of the
   // database. Nothing reserves `external_id`, a common key column name.
+  // Lowercased, because DuckDB column names are case-insensitive.
   const takenNames = new Set<string>([
-    RECORD_KEY_COLUMN_NAME,
-    ConceptStatusColumn.COLUMN_NAME,
+    EXTERNAL_ID_COLUMN,
+    ConceptStatusColumn.COLUMN_NAME.toLowerCase(),
   ]);
 
   orderedAttributes.forEach((attribute) => {
@@ -317,7 +317,7 @@ export function makeConceptAttributeColumnsFromMetadata(
         emittedName,
       });
     }
-    takenNames.add(emittedName);
+    takenNames.add(emittedName.toLowerCase());
     attributeColumns.push({ ...column, attributeName: emittedName });
   });
 

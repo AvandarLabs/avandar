@@ -492,6 +492,76 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     });
   });
 
+  // DuckDB column names are case-insensitive, so a name that differs from a
+  // reserved column only by case would be renamed by DuckDB itself, and the
+  // emitted name would no longer match the view's real column.
+  it("suffixes an attribute named EXTERNAL_ID, since column names ignore case", async () => {
+    const keyAttribute = _attribute({
+      name: "EXTERNAL_ID",
+      isIdentifier: true,
+    });
+    const keyMapping = _mapping({
+      attributeName: "EXTERNAL_ID",
+      datasetId: DATASET_A,
+      columnName: "person_id",
+    });
+    const metadata = _metadata({
+      attributes: [keyAttribute, AGE],
+      mappings: [keyMapping, AGE_MAPPING],
+    });
+
+    const { attributeColumns } =
+      makeConceptAttributeColumnsFromMetadata(metadata);
+    const rows = await _queryConcept(metadata);
+
+    expect(
+      attributeColumns.map((column) => {
+        return column.attributeName;
+      }),
+    ).toEqual(["age", "EXTERNAL_ID_2"]);
+    expect(rows[0]).toEqual({
+      external_id: "101",
+      status: "Active",
+      age: 41,
+      EXTERNAL_ID_2: 101,
+    });
+  });
+
+  // Two attribute names that differ only by case are one name to DuckDB, so
+  // the later one is suffixed and its original casing is kept.
+  it("suffixes attribute names that differ only by case", async () => {
+    const upperAge = _attribute({
+      name: "Age",
+      id: "attr-Age" as ConceptAttribute.Id,
+    });
+    const upperAgeMapping = _mapping({
+      attributeName: "Age",
+      datasetId: DATASET_A,
+      columnName: "age_years",
+    });
+    const metadata = _metadata({
+      attributes: [PERSON_ID, AGE, upperAge],
+      mappings: [PERSON_ID_MAPPING, AGE_MAPPING, upperAgeMapping],
+    });
+
+    const { attributeColumns } =
+      makeConceptAttributeColumnsFromMetadata(metadata);
+    const rows = await _queryConcept(metadata);
+
+    expect(
+      attributeColumns.map((column) => {
+        return column.attributeName;
+      }),
+    ).toEqual(["age", "Age_2", "person_id"]);
+    expect(rows[0]).toEqual({
+      external_id: "101",
+      status: "Active",
+      age: 41,
+      Age_2: 41,
+      person_id: 101,
+    });
+  });
+
   // Only the datasets the emitted columns actually read, de-duplicated and
   // sorted, because the runner merges this into the set of relations to load
   // and the relation cache hashes that set.
