@@ -4740,6 +4740,10 @@ msgstr "The form only supports SELECT queries."
 msgid "Disclaimer"
 msgstr "Disclaimer"
 
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Which {groupByColumn} has the highest total {measureColumn}?"
+msgstr "Which {groupByColumn} has the highest total {measureColumn}?"
+
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
 msgstr "Logo"
@@ -6431,6 +6435,10 @@ msgstr "Inactive"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "Right"
+
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Show total {measureColumn} by month in {datasetName}"
+msgstr "Show total {measureColumn} by month in {datasetName}"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus.tsx

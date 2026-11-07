@@ -4816,6 +4816,10 @@ msgstr "El formulario solo admite consultas SELECT."
 msgid "Disclaimer"
 msgstr "Aviso"
 
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Which {groupByColumn} has the highest total {measureColumn}?"
+msgstr "¿Qué {groupByColumn} tiene el total más alto de {measureColumn}?"
+
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
 msgstr "Logo"
@@ -6529,6 +6533,10 @@ msgstr "Inactivo"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "Derecha"
+
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Show total {measureColumn} by month in {datasetName}"
+msgstr "Mostrar el total de {measureColumn} por mes en {datasetName}"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus.tsx

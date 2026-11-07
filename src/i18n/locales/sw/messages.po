@@ -4802,6 +4802,10 @@ msgstr "Fomu hii inatumia hoja za SELECT pekee."
 msgid "Disclaimer"
 msgstr "Kanusho"
 
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Which {groupByColumn} has the highest total {measureColumn}?"
+msgstr "Ni {groupByColumn} ipi iliyo na jumla ya juu zaidi ya {measureColumn}?"
+
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
 msgstr "Nembo"
@@ -6507,6 +6511,10 @@ msgstr "Isiyotumika"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "Kulia"
+
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Show total {measureColumn} by month in {datasetName}"
+msgstr "Onyesha jumla ya {measureColumn} kwa mwezi katika {datasetName}"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus.tsx

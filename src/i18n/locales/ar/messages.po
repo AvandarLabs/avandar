@@ -4739,6 +4739,10 @@ msgstr "يدعم النموذج استعلامات SELECT فقط."
 msgid "Disclaimer"
 msgstr "إخلاء المسؤولية"
 
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Which {groupByColumn} has the highest total {measureColumn}?"
+msgstr "ما هو {groupByColumn} الذي يملك أعلى إجمالي لـ {measureColumn}؟"
+
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
 msgstr "الشعار"
@@ -6424,6 +6428,10 @@ msgstr "غير نشط"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "يمين"
+
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Show total {measureColumn} by month in {datasetName}"
+msgstr "عرض إجمالي {measureColumn} حسب الشهر في {datasetName}"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus.tsx

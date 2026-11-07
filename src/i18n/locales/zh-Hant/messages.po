@@ -4619,6 +4619,10 @@ msgstr "表單僅支援 SELECT 查詢。"
 msgid "Disclaimer"
 msgstr "免責聲明"
 
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Which {groupByColumn} has the highest total {measureColumn}?"
+msgstr "哪個 {groupByColumn} 的 {measureColumn} 總計最高？"
+
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
 msgstr "標誌"
@@ -6277,6 +6281,10 @@ msgstr "未啟用"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "右"
+
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
+msgid "Show total {measureColumn} by month in {datasetName}"
+msgstr "顯示 {datasetName} 中每月的 {measureColumn} 總計"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus.tsx
