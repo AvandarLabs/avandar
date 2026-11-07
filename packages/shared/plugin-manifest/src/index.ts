@@ -1,4 +1,22 @@
-export * from "@plugin-manifest/runtime.ts";
+export {
+  evaluateWhenCondition,
+  getLocalizedTextFromManifestStrings,
+  SLOT_IDS,
+  SlotFactRegistry,
+} from "@plugin-manifest/runtime.ts";
+export type {
+  CompiledPluginManifest,
+  FactType,
+  FactValue,
+  PluginCommand,
+  PluginLocaleMessages,
+  PluginManifest,
+  PluginMenuEntry,
+  PluginPermission,
+  SlotId,
+  WhenCondition,
+  WhenFacts,
+} from "@plugin-manifest/runtime.ts";
 export {
   compileManifest,
   getMessageKeysFromManifest,

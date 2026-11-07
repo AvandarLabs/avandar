@@ -5,8 +5,8 @@ The Avandar plugin manifest: its Zod schema, the `ava.yaml` compiler, the
 
 | Entry | Use it for |
 | --- | --- |
-| `@avandar/plugin-manifest` | Everything in `runtime` plus the schema, compiler, and dependency helpers, for build tools and the CLI. Pulls in Zod and YAML, but no Node-only modules |
-| `@avandar/plugin-manifest/runtime` | Browser code: types, `evaluateWhenCondition`, `getLocalizedTextFromManifestStrings`, `SlotFactRegistry`. No Zod or YAML |
+| `@avandar/plugin-manifest` | Everything in `runtime` plus the schema, compiler, error class, and helpers, for build tools and the CLI. Pulls in Zod and YAML, but no Node-only modules |
+| `@avandar/plugin-manifest/runtime` | Browser code: types, `evaluateWhenCondition`, `getLocalizedTextFromManifestStrings`, `SlotFactRegistry`, `SLOT_IDS`. No Zod or YAML at runtime |
 | `@avandar/plugin-manifest/node` | Node only: `readPluginDirectory`, `readBundledPlugins`, `readBundledPluginFolders` |
 
 ## Exports
