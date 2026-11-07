@@ -3,12 +3,21 @@ import { makeSpatialSqlDocumentationFromPrompt } from "@sbfn/chat/utils/buildSql
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { ChatRetryContext } from "$/types/chat.types.ts";
 
+/**
+ * The SQL the Data Explorer is showing. It stays on screen across a new chat,
+ * so it may come from an earlier conversation; the model builds on it only
+ * when the user refers to it.
+ */
 function formatPreviousSql(lastSql: string | undefined): string {
-  return lastSql ? `Previous SQL:\n\`\`\`sql\n${lastSql}\n\`\`\`` : "";
+  return lastSql
+    ? `The Data Explorer is showing this SQL. It may come from before this conversation, so build on it only when the user refers to it (for example "now do the same for Texas" or "make it weekly"):\n\`\`\`sql\n${lastSql}\n\`\`\``
+    : "";
 }
 
 function formatLastError(lastError: string | undefined): string {
-  return lastError ? `Error:\n${lastError}` : "";
+  return lastError
+    ? `The last run of that SQL failed with this error. Fix it only if the user asks about that query:\n${lastError}`
+    : "";
 }
 
 function formatResultColumns(
