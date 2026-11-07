@@ -7576,6 +7576,12 @@ msgstr "La latitud y la longitud deben ser números."
 msgid "Delete dataset"
 msgstr "Eliminar conjunto de datos"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I can only add that to a dashboard. Open a dashboard and ask me again "
+"there."
+msgstr "Solo puedo agregar eso a un dashboard. Abre un dashboard y vuelve a "
+"pedírmelo allí."
+
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "Su plan no permite compartir más dashboards."

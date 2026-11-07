@@ -7450,6 +7450,12 @@ msgstr "يجب أن يكون كل من خط العرض وخط الطول رقم�
 msgid "Delete dataset"
 msgstr "حذف مجموعة البيانات"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I can only add that to a dashboard. Open a dashboard and ask me again "
+"there."
+msgstr "لا يمكنني إضافة ذلك إلا إلى لوحة معلومات. افتح لوحة معلومات واطلب مني "
+"ذلك مرة أخرى من هناك."
+
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "لا تسمح خطتك بمشاركة المزيد من لوحات المعلومات."

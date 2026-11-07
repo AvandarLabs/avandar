@@ -7548,6 +7548,12 @@ msgstr "Latitudo na longitudo zote lazima ziwe nambari."
 msgid "Delete dataset"
 msgstr "Futa seti ya data"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I can only add that to a dashboard. Open a dashboard and ask me again "
+"there."
+msgstr "Ninaweza kuongeza hilo kwenye dashibodi pekee. Fungua dashibodi kisha "
+"uniulize tena huko."
+
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "Mpango wako hauruhusu kushiriki dashibodi zaidi."
