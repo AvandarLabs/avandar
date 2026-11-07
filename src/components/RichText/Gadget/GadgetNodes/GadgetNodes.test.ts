@@ -70,6 +70,27 @@ function _placeCursorAfter(target: Editor, text: string): void {
   );
 }
 
+/** The type of the node a node selection holds, if the selection is one. */
+function _getSelectedNodeType(target: Editor): string | undefined {
+  const { selection } = target.state;
+  return selection instanceof NodeSelection
+    ? selection.node.type.name
+    : undefined;
+}
+
+/** The top-level index of the block holding the cursor. */
+function _getCursorBlockIndex(target: Editor): number {
+  return target.state.selection.$from.index(0);
+}
+
+/**
+ * A paste event without clipboard data. jsdom has no `ClipboardEvent`,
+ * which ProseMirror would otherwise construct for a programmatic paste.
+ */
+function _createPasteEvent(): ClipboardEvent {
+  return new Event("paste") as ClipboardEvent;
+}
+
 describe("insertGadgetLink", () => {
   it("inserts a gadget link that stores only the gadget's ref", () => {
     editor = _createEditor([_paragraph(_text("See "))]);
@@ -98,6 +119,29 @@ describe("insertGadgetEmbed", () => {
       { type: "gadgetEmbed", attrs: DASHBOARD_REF },
       _paragraph(_text("Second")),
     ]);
+  });
+
+  it("puts the cursor in the paragraph after an inserted embed", () => {
+    editor = _createEditor([
+      _paragraph(_text("First")),
+      _paragraph(_text("Second")),
+    ]);
+    _placeCursorAfter(editor, "Fir");
+    editor.commands.insertGadgetEmbed(DASHBOARD_REF);
+    expect(_getCursorBlockIndex(editor)).toBe(2);
+    expect(editor.state.selection.$from.parentOffset).toBe(0);
+  });
+
+  it("replaces the empty paragraph holding the cursor with the embed", () => {
+    editor = _createEditor([_paragraph(_text("See")), _paragraph()]);
+    editor.commands.focus("end");
+    expect(editor.commands.insertGadgetEmbed(DASHBOARD_REF)).toBe(true);
+    expect(editor.getJSON().content).toEqual([
+      _paragraph(_text("See")),
+      { type: "gadgetEmbed", attrs: DASHBOARD_REF },
+      _paragraph(),
+    ]);
+    expect(_getCursorBlockIndex(editor)).toBe(2);
   });
 
   it("inserts after a selected top-level embed when the cursor is in no paragraph", () => {
@@ -138,6 +182,74 @@ describe("showGadgetAsEmbed", () => {
     ]);
   });
 
+  it("selects the embed it creates", () => {
+    editor = _createEditor([
+      _paragraph(_text("See "), { type: "gadgetLink", attrs: TILE_REF }),
+    ]);
+    editor.commands.showGadgetAsEmbed(_findPosition(editor, "gadgetLink"));
+    expect(_getSelectedNodeType(editor)).toBe("gadgetEmbed");
+  });
+
+  it("replaces a paragraph holding only the link and spaces with the embed", () => {
+    editor = _createEditor([
+      _paragraph(_text("Before")),
+      _paragraph({ type: "gadgetLink", attrs: TILE_REF }, _text(" ")),
+      _paragraph(_text("After")),
+    ]);
+    editor.commands.showGadgetAsEmbed(_findPosition(editor, "gadgetLink"));
+    expect(editor.getJSON().content).toEqual([
+      _paragraph(_text("Before")),
+      { type: "gadgetEmbed", attrs: TILE_REF },
+      _paragraph(_text("After")),
+    ]);
+    expect(_getSelectedNodeType(editor)).toBe("gadgetEmbed");
+  });
+
+  it("replaces a heading holding only the link with the embed", () => {
+    editor = _createEditor([
+      {
+        type: "heading",
+        attrs: { level: 2 },
+        content: [{ type: "gadgetLink", attrs: TILE_REF }],
+      },
+      _paragraph(_text("After")),
+    ]);
+    editor.commands.showGadgetAsEmbed(_findPosition(editor, "gadgetLink"));
+    expect(editor.getJSON().content).toEqual([
+      { type: "gadgetEmbed", attrs: TILE_REF },
+      _paragraph(_text("After")),
+    ]);
+  });
+
+  it("keeps a list item's first paragraph, which the list item requires", () => {
+    editor = _createEditor([
+      {
+        type: "bulletList",
+        content: [
+          {
+            type: "listItem",
+            content: [
+              _paragraph({ type: "gadgetLink", attrs: TILE_REF }, _text(" ")),
+            ],
+          },
+        ],
+      },
+    ]);
+    editor.commands.showGadgetAsEmbed(_findPosition(editor, "gadgetLink"));
+    expect(editor.getJSON().content?.[0]).toEqual({
+      type: "bulletList",
+      content: [
+        {
+          type: "listItem",
+          content: [
+            _paragraph(_text(" ")),
+            { type: "gadgetEmbed", attrs: TILE_REF },
+          ],
+        },
+      ],
+    });
+  });
+
   it("leaves the document alone when the position holds no gadget link", () => {
     editor = _createEditor([_paragraph(_text("Plain"))]);
     const before = editor.getJSON();
@@ -162,6 +274,15 @@ describe("showGadgetAsLink", () => {
       _paragraph({ type: "gadgetLink", attrs: TILE_REF }),
       _paragraph(_text("After")),
     ]);
+  });
+
+  it("selects the link it creates", () => {
+    editor = _createEditor([
+      { type: "gadgetEmbed", attrs: TILE_REF },
+      _paragraph(_text("After")),
+    ]);
+    editor.commands.showGadgetAsLink(0);
+    expect(_getSelectedNodeType(editor)).toBe("gadgetLink");
   });
 
   it("leaves the document alone when the position holds no gadget embed", () => {
@@ -203,6 +324,17 @@ describe("gadget nodes", () => {
       content:
         '<p><span data-type="gadgetLink" data-gadget-type="query" data-gadget-id="nope">Weekly cases</span></p>',
     });
+    expect(editor.getJSON().content).toEqual([
+      _paragraph(_text("Weekly cases")),
+    ]);
+  });
+
+  it("paste a gadget link with a malformed ref as its text", () => {
+    editor = _createEditor([_paragraph()]);
+    editor.view.pasteHTML(
+      `<p><span data-type="gadgetLink" data-gadget-type="dashboard" data-gadget-id="${DASHBOARD_ID}" data-sub-id="DataViz-top">Weekly cases</span></p>`,
+      _createPasteEvent(),
+    );
     expect(editor.getJSON().content).toEqual([
       _paragraph(_text("Weekly cases")),
     ]);

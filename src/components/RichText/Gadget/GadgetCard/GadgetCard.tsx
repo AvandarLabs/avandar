@@ -9,7 +9,11 @@ import type { ReactNode } from "react";
 type Props = {
   gadgetRef: Gadget.Ref;
 
-  /** Actions shown at the end of the header, such as the editor's menu. */
+  /**
+   * Actions shown at the end of the header, such as the editor's menu.
+   * When given, the header leaves out its Open link: the menu opens the
+   * gadget itself, without leaving an editor's draft.
+   */
   menu?: ReactNode;
 };
 

@@ -52,7 +52,7 @@ function GadgetCardTitle({
 
 /**
  * The header band of a `GadgetCard`: icon tile, title, type, the card's menu,
- * and an Open link once the gadget is available.
+ * and an Open link once the gadget is available, unless a menu is given.
  */
 export function GadgetCardHeader({
   definition,
@@ -75,7 +75,8 @@ export function GadgetCardHeader({
         />
       </div>
       {menu}
-      {summary.status === "available" ? (
+      {/* A menu brings its own Open action, which keeps an editor's draft. */}
+      {summary.status === "available" && menu === undefined ? (
         <Link
           {...summary.link}
           aria-label={t`Open ${summary.name}`}

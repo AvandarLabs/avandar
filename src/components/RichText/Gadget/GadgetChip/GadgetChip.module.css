@@ -26,11 +26,25 @@
   flex: none;
 }
 
-a.chip:hover {
+/* An editor's chip is a button, so it drops the browser's button styling. */
+button.chip {
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  line-height: inherit;
+  margin: 0;
+  padding-block: 0;
+}
+
+a.chip:hover,
+button.chip:hover,
+button.chip[data-expanded] {
   background-color: var(--ava-surface-sunken);
 }
 
-a.chip:focus-visible {
+a.chip:focus-visible,
+button.chip:focus-visible {
   outline: 2px solid var(--ava-border-focus);
   outline-offset: 1px;
 }

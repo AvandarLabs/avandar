@@ -7,7 +7,10 @@ import {
 } from "$/models/RichTextDocument/RichTextDocument";
 import { createRichTextExtensions } from "@/components/RichText/createRichTextExtensions";
 import { GadgetCard } from "@/components/RichText/Gadget/GadgetCard/GadgetCard";
-import { GadgetChip } from "@/components/RichText/Gadget/GadgetChip/GadgetChip";
+import {
+  GadgetChip,
+  UnknownGadgetChip,
+} from "@/components/RichText/Gadget/GadgetChip/GadgetChip";
 import { createGadgetRefFromAttrs } from "@/components/RichText/Gadget/GadgetNodes/createGadgetRefFromAttrs";
 import { useRichTextMembers } from "@/components/RichText/RichTextMembersContext";
 import classes from "@/components/RichText/RichTextView/RichTextView.module.css";
@@ -50,7 +53,11 @@ export function RichTextView({
           },
           gadgetLink: ({ node }) => {
             const gadgetRef = createGadgetRefFromAttrs(node.attrs);
-            return gadgetRef ? <GadgetChip gadgetRef={gadgetRef} /> : null;
+            return gadgetRef ? (
+              <GadgetChip gadgetRef={gadgetRef} />
+            ) : (
+              <UnknownGadgetChip />
+            );
           },
           gadgetEmbed: ({ node }) => {
             const gadgetRef = createGadgetRefFromAttrs(node.attrs);
@@ -58,7 +65,9 @@ export function RichTextView({
               <div className={classes.gadgetEmbed}>
                 <GadgetCard gadgetRef={gadgetRef} />
               </div>
-            ) : null;
+            ) : (
+              <UnknownGadgetChip />
+            );
           },
         },
       },

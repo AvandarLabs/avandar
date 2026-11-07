@@ -1,14 +1,19 @@
 import { mergeAttributes, Node } from "@tiptap/core";
+import { NodeSelection } from "@tiptap/pm/state";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import clsx from "clsx";
 import { GadgetActionsMenu } from "@/components/RichText/Gadget/GadgetActionsMenu/GadgetActionsMenu";
 import { GadgetCard } from "@/components/RichText/Gadget/GadgetCard/GadgetCard";
-import { GadgetChip } from "@/components/RichText/Gadget/GadgetChip/GadgetChip";
+import { UnknownGadgetChip } from "@/components/RichText/Gadget/GadgetChip/GadgetChip";
 import { createGadgetRefFromAttrs } from "@/components/RichText/Gadget/GadgetNodes/createGadgetRefFromAttrs";
 import classes from "@/components/RichText/Gadget/GadgetNodes/GadgetNodes.module.css";
+import {
+  findEmbedInsertRange,
+  placeCursorAfterNode,
+  replaceLinkWithEmbed,
+} from "@/components/RichText/Gadget/GadgetNodes/gadgetNodeTransforms";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { Attribute } from "@tiptap/core";
-import type { Selection } from "@tiptap/pm/state";
 import type { NodeViewProps } from "@tiptap/react";
 import type { ReactNode } from "react";
 
@@ -19,18 +24,23 @@ declare module "@tiptap/core" {
       insertGadgetLink: (gadgetRef: Gadget.Ref) => ReturnType;
 
       /**
-       * Replaces the gadget link at `position` with an embed placed after
-       * the paragraph that held it.
+       * Replaces the gadget link at `position` with an embed and selects it.
+       * The embed takes the place of a block holding only the link, and
+       * otherwise goes right after the block that held it.
        */
       showGadgetAsEmbed: (position: number) => ReturnType;
     };
     gadgetEmbed: {
-      /** Inserts a gadget embed after the block holding the cursor. */
+      /**
+       * Inserts a gadget embed in place of the empty block holding the
+       * cursor, or after the block when it has content, then moves the
+       * cursor past the embed. Fails when no embed fits there.
+       */
       insertGadgetEmbed: (gadgetRef: Gadget.Ref) => ReturnType;
 
       /**
        * Replaces the gadget embed at `position` with a paragraph holding a
-       * link to the same gadget.
+       * link to the same gadget, and selects the link.
        */
       showGadgetAsLink: (position: number) => ReturnType;
     };
@@ -74,16 +84,6 @@ function _readRefFromElement(element: HTMLElement): false | null {
   return ref ? null : false;
 }
 
-/**
- * Where a block inserted "after the cursor" goes: after the paragraph (or
- * other text block) holding the cursor, or after the selection when it is
- * not inside a text block, such as a selected embed.
- */
-function _findPositionAfterCursorBlock(selection: Selection): number {
-  const { $from } = selection;
-  return $from.parent.isTextblock ? $from.after() : selection.to;
-}
-
 function GadgetLinkView({
   node,
   editor,
@@ -99,10 +99,10 @@ function GadgetLinkView({
           display="link"
           editor={editor}
           getPos={getPos}
-        >
-          <GadgetChip gadgetRef={gadgetRef} />
-        </GadgetActionsMenu>
-      ) : null}
+        />
+      ) : (
+        <UnknownGadgetChip />
+      )}
     </NodeViewWrapper>
   );
 }
@@ -130,7 +130,9 @@ function GadgetEmbedView({
             />
           }
         />
-      ) : null}
+      ) : (
+        <UnknownGadgetChip />
+      )}
     </NodeViewWrapper>
   );
 }
@@ -189,16 +191,13 @@ export const GadgetLink = Node.create({
       },
       showGadgetAsEmbed: (position) => {
         return ({ state, tr, dispatch }) => {
-          const node = state.doc.nodeAt(position);
+          const node = tr.doc.nodeAt(position);
           const embedType = state.schema.nodes.gadgetEmbed;
           if (node?.type !== this.type || !embedType) {
             return false;
           }
-          // A block cannot sit in a paragraph, so the embed goes after it.
-          const afterParagraph = state.doc.resolve(position).after();
           if (dispatch) {
-            tr.insert(afterParagraph, embedType.create(node.attrs));
-            tr.delete(position, position + node.nodeSize);
+            replaceLinkWithEmbed(tr, position, embedType.create(node.attrs));
           }
           return true;
         };
@@ -242,19 +241,21 @@ export const GadgetEmbed = Node.create({
   addCommands() {
     return {
       insertGadgetEmbed: (gadgetRef) => {
-        return ({ state, tr, dispatch }) => {
+        return ({ tr, dispatch }) => {
+          const range = findEmbedInsertRange(tr.selection, this.type);
+          if (!range) {
+            return false;
+          }
           if (dispatch) {
-            tr.insert(
-              _findPositionAfterCursorBlock(state.selection),
-              this.type.create(gadgetRef),
-            );
+            tr.replaceWith(range.from, range.to, this.type.create(gadgetRef));
+            placeCursorAfterNode(tr, range.from);
           }
           return true;
         };
       },
       showGadgetAsLink: (position) => {
         return ({ state, tr, dispatch }) => {
-          const node = state.doc.nodeAt(position);
+          const node = tr.doc.nodeAt(position);
           const { gadgetLink: linkType, paragraph: paragraphType } =
             state.schema.nodes;
           if (node?.type !== this.type || !linkType || !paragraphType) {
@@ -266,6 +267,8 @@ export const GadgetEmbed = Node.create({
               position + node.nodeSize,
               paragraphType.create(null, linkType.create(node.attrs)),
             );
+            // The link sits just inside the paragraph that replaced the embed.
+            tr.setSelection(NodeSelection.create(tr.doc, position + 1));
           }
           return true;
         };

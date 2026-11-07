@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { GadgetChip } from "@/components/RichText/Gadget/GadgetChip/GadgetChip";
+import {
+  GadgetChip,
+  UnknownGadgetChip,
+} from "@/components/RichText/Gadget/GadgetChip/GadgetChip";
 import { render, screen } from "@/test-utils";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { ReactNode } from "react";
@@ -148,5 +151,38 @@ describe("GadgetChip", () => {
     expect(chip).toHaveAttribute("data-gadget-type", "dashboard_tile");
     expect(chip).toHaveAttribute("data-gadget-id", DASHBOARD_ID);
     expect(chip).toHaveAttribute("data-sub-id", "DataViz-top");
+  });
+
+  it("draws an unlinked chip as a button that never navigates", () => {
+    mocks.useDashboardSummary.mockReturnValue({
+      status: "available",
+      name: "Measles by borough",
+      facts: [],
+      link: {
+        to: "/$workspaceSlug/dashboards/preview/$dashboardId",
+        params: { workspaceSlug: "nyc-doh", dashboardId: DASHBOARD_ID },
+      },
+    });
+    render(<GadgetChip gadgetRef={DASHBOARD_REF} isLinked={false} />);
+    const chip = screen.getByRole("button", { name: "Measles by borough" });
+    expect(chip).toHaveAttribute("type", "button");
+    expect(chip).toHaveAttribute("data-gadget-id", DASHBOARD_ID);
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
+
+  it("keeps an unlinked chip a button while the gadget is unavailable", () => {
+    mocks.useDashboardTileSummary.mockReturnValue({ status: "unavailable" });
+    render(<GadgetChip gadgetRef={TILE_REF} isLinked={false} />);
+    expect(
+      screen.getByRole("button", { name: "Unavailable dashboard tile" }),
+    ).toHaveAttribute("data-sub-id", "DataViz-top");
+  });
+});
+
+describe("UnknownGadgetChip", () => {
+  it("shows a node with a malformed ref as an unavailable gadget", () => {
+    render(<UnknownGadgetChip />);
+    expect(screen.getByText("Unavailable gadget")).toBeInTheDocument();
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 });

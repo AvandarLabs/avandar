@@ -5,11 +5,7 @@ import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { Editor } from "@tiptap/core";
 
 const mocks = vi.hoisted(() => {
-  return {
-    useDashboardSummary: vi.fn(),
-    navigate: vi.fn(),
-    buildLocation: vi.fn(),
-  };
+  return { useDashboardSummary: vi.fn(), buildLocation: vi.fn() };
 });
 
 vi.mock(
@@ -34,9 +30,6 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
     await importOriginal<typeof import("@tanstack/react-router")>();
   return {
     ...actual,
-    useNavigate: () => {
-      return mocks.navigate;
-    },
     useRouter: () => {
       return { buildLocation: mocks.buildLocation };
     },
@@ -44,6 +37,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 });
 
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111";
+const DASHBOARD_HREF = `/nyc-doh/dashboards/preview/${DASHBOARD_ID}`;
 const NODE_POSITION = 12;
 
 const DASHBOARD_REF: Gadget.Ref = {
@@ -57,20 +51,58 @@ const DASHBOARD_LINK = {
   params: { workspaceSlug: "nyc-doh", dashboardId: DASHBOARD_ID },
 };
 
-/** Just enough of an editor for the menu: its mode and display switch. */
-function _createEditor(isEditable: boolean) {
-  const commands = {
-    showGadgetAsEmbed: vi.fn(),
-    showGadgetAsLink: vi.fn(),
+/**
+ * Just enough of an editor for the menu: its mode and a command chain that
+ * records which display switch ran, at which position, after focusing.
+ */
+function _createEditor({ isEditable = true } = {}) {
+  const calls: string[] = [];
+  const chain = {
+    focus: () => {
+      calls.push("focus");
+      return chain;
+    },
+    showGadgetAsEmbed: (position: number) => {
+      calls.push(`showGadgetAsEmbed(${position})`);
+      return chain;
+    },
+    showGadgetAsLink: (position: number) => {
+      calls.push(`showGadgetAsLink(${position})`);
+      return chain;
+    },
+    run: () => {
+      calls.push("run");
+      return true;
+    },
   };
-  return {
-    commands,
-    editor: { isEditable, commands } as unknown as Editor,
+  const editor = {
+    isEditable,
+    chain: () => {
+      return chain;
+    },
   };
+  return { calls, editor };
 }
+
+type FakeEditor = ReturnType<typeof _createEditor>["editor"];
 
 function _getPos(): number {
   return NODE_POSITION;
+}
+
+function _renderMenu(
+  display: "link" | "embed",
+  editor: FakeEditor,
+  getPos: () => number | undefined = _getPos,
+): void {
+  render(
+    <GadgetActionsMenu
+      gadgetRef={DASHBOARD_REF}
+      display={display}
+      editor={editor as unknown as Editor}
+      getPos={getPos}
+    />,
+  );
 }
 
 /** Opens an embed's actions menu and finds an item by its label. */
@@ -81,8 +113,8 @@ async function _findEmbedMenuItem(label: string): Promise<HTMLElement> {
 
 beforeEach(() => {
   mocks.useDashboardSummary.mockReset();
-  mocks.navigate.mockReset();
   mocks.buildLocation.mockReset();
+  mocks.buildLocation.mockReturnValue({ href: DASHBOARD_HREF });
   mocks.useDashboardSummary.mockReturnValue({
     status: "available",
     name: "Measles by borough",
@@ -93,35 +125,28 @@ beforeEach(() => {
 
 afterEach(() => {
   Reflect.deleteProperty(navigator, "clipboard");
+  vi.restoreAllMocks();
 });
 
 describe("GadgetActionsMenu on an embed", () => {
-  it("switches the embed to a link at the node's position", async () => {
-    const { editor, commands } = _createEditor(true);
-    render(
-      <GadgetActionsMenu
-        gadgetRef={DASHBOARD_REF}
-        display="embed"
-        editor={editor}
-        getPos={_getPos}
-      />,
-    );
+  it("focuses the editor, then switches the embed to a link at its position", async () => {
+    const { editor, calls } = _createEditor();
+    _renderMenu("embed", editor);
     fireEvent.click(await _findEmbedMenuItem("Show as link"));
-    expect(commands.showGadgetAsLink).toHaveBeenCalledWith(NODE_POSITION);
+    expect(calls).toEqual([
+      "focus",
+      `showGadgetAsLink(${NODE_POSITION})`,
+      "run",
+    ]);
   });
 
-  it("navigates to an available gadget's link from its open action", async () => {
-    const { editor } = _createEditor(true);
-    render(
-      <GadgetActionsMenu
-        gadgetRef={DASHBOARD_REF}
-        display="embed"
-        editor={editor}
-        getPos={_getPos}
-      />,
-    );
+  it("opens the gadget in a new tab so the draft is kept", async () => {
+    const open = vi.spyOn(window, "open").mockReturnValue(null);
+    const { editor } = _createEditor();
+    _renderMenu("embed", editor);
     fireEvent.click(await _findEmbedMenuItem("Open dashboard"));
-    expect(mocks.navigate).toHaveBeenCalledWith(DASHBOARD_LINK);
+    expect(mocks.buildLocation).toHaveBeenCalledWith(DASHBOARD_LINK);
+    expect(open).toHaveBeenCalledWith(DASHBOARD_HREF, "_blank", "noopener");
   });
 
   it("copies the gadget's absolute address", async () => {
@@ -131,37 +156,28 @@ describe("GadgetActionsMenu on an embed", () => {
       value: { writeText },
       configurable: true,
     });
-    mocks.buildLocation.mockReturnValue({
-      href: `/nyc-doh/dashboards/preview/${DASHBOARD_ID}`,
-    });
-    const { editor } = _createEditor(true);
-    render(
-      <GadgetActionsMenu
-        gadgetRef={DASHBOARD_REF}
-        display="embed"
-        editor={editor}
-        getPos={_getPos}
-      />,
-    );
+    const { editor } = _createEditor();
+    _renderMenu("embed", editor);
     fireEvent.click(await _findEmbedMenuItem("Copy link"));
-    expect(mocks.buildLocation).toHaveBeenCalledWith(DASHBOARD_LINK);
     expect(writeText).toHaveBeenCalledWith(
-      `${window.location.origin}/nyc-doh/dashboards/preview/${DASHBOARD_ID}`,
+      `${window.location.origin}${DASHBOARD_HREF}`,
     );
     expect(await screen.findByText("Link copied")).toBeInTheDocument();
   });
 
+  it("reports a failed copy when the browser has no clipboard", async () => {
+    const { editor } = _createEditor();
+    _renderMenu("embed", editor);
+    fireEvent.click(await _findEmbedMenuItem("Copy link"));
+    expect(
+      await screen.findByText("The link could not be copied."),
+    ).toBeInTheDocument();
+  });
+
   it("offers only the display switch for a gadget the reader cannot open", async () => {
     mocks.useDashboardSummary.mockReturnValue({ status: "unavailable" });
-    const { editor } = _createEditor(true);
-    render(
-      <GadgetActionsMenu
-        gadgetRef={DASHBOARD_REF}
-        display="embed"
-        editor={editor}
-        getPos={_getPos}
-      />,
-    );
+    const { editor } = _createEditor();
+    _renderMenu("embed", editor);
     await _findEmbedMenuItem("Show as link");
     expect(
       screen.getAllByRole("menuitem", { hidden: true }).map((item) => {
@@ -170,16 +186,30 @@ describe("GadgetActionsMenu on an embed", () => {
     ).toEqual(["Show as link"]);
   });
 
+  it("does nothing when the node has no position", async () => {
+    const { editor, calls } = _createEditor();
+    _renderMenu("embed", editor, () => {
+      return undefined;
+    });
+    fireEvent.click(await _findEmbedMenuItem("Show as link"));
+    expect(calls).toEqual([]);
+  });
+
+  it("does nothing once the editor has turned read-only", async () => {
+    const open = vi.spyOn(window, "open").mockReturnValue(null);
+    const { editor, calls } = _createEditor();
+    _renderMenu("embed", editor);
+    const openItem = await _findEmbedMenuItem("Open dashboard");
+    editor.isEditable = false;
+    fireEvent.click(openItem);
+    fireEvent.click(await _findEmbedMenuItem("Show as link"));
+    expect(open).not.toHaveBeenCalled();
+    expect(calls).toEqual([]);
+  });
+
   it("renders no menu when the editor is read-only", () => {
-    const { editor } = _createEditor(false);
-    render(
-      <GadgetActionsMenu
-        gadgetRef={DASHBOARD_REF}
-        display="embed"
-        editor={editor}
-        getPos={_getPos}
-      />,
-    );
+    const { editor } = _createEditor({ isEditable: false });
+    _renderMenu("embed", editor);
     expect(
       screen.queryByRole("button", { name: "More actions" }),
     ).not.toBeInTheDocument();
@@ -187,53 +217,67 @@ describe("GadgetActionsMenu on an embed", () => {
 });
 
 describe("GadgetActionsMenu on a link", () => {
-  function _renderLink(isEditable: boolean) {
-    const created = _createEditor(isEditable);
-    render(
-      <GadgetActionsMenu
-        gadgetRef={DASHBOARD_REF}
-        display="link"
-        editor={created.editor}
-        getPos={_getPos}
-      >
-        <a href="/dashboard">Measles by borough</a>
-      </GadgetActionsMenu>,
-    );
-    return created;
+  function _getChip(): HTMLElement {
+    return screen.getByRole("button", { name: "Measles by borough" });
   }
 
-  it("switches the link to an embed from the actions shown on focus", async () => {
-    const { commands } = _renderLink(true);
-    fireEvent.focus(screen.getByRole("link", { name: "Measles by borough" }));
+  it("switches the link to an embed from the menu the chip opens", async () => {
+    const { editor, calls } = _createEditor();
+    _renderMenu("link", editor);
+    fireEvent.click(_getChip());
     fireEvent.click(
-      await screen.findByRole("button", { name: "Show as embed" }),
+      await screen.findByRole("menuitem", {
+        name: "Show as embed",
+        hidden: true,
+      }),
     );
-    expect(commands.showGadgetAsEmbed).toHaveBeenCalledWith(NODE_POSITION);
+    expect(calls).toEqual([
+      "focus",
+      `showGadgetAsEmbed(${NODE_POSITION})`,
+      "run",
+    ]);
   });
 
-  it("shows the link's actions after the pointer rests on the chip", async () => {
-    _renderLink(true);
-    fireEvent.mouseEnter(
-      screen.getByRole("link", { name: "Measles by borough" }),
-    );
-    expect(
-      screen.queryByRole("button", { name: "Show as embed" }),
-    ).not.toBeInTheDocument();
+  it("opens the menu after the pointer rests on the chip and closes it after the pointer leaves", async () => {
+    const { editor } = _createEditor();
+    _renderMenu("link", editor);
+    fireEvent.mouseEnter(_getChip());
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(await screen.findByRole("menu")).toBeInTheDocument();
+    fireEvent.mouseLeave(_getChip());
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Show as embed" }),
-      ).toBeInTheDocument();
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
     });
   });
 
-  it("shows only the chip when the editor is read-only", () => {
-    _renderLink(false);
-    fireEvent.focus(screen.getByRole("link", { name: "Measles by borough" }));
-    expect(
-      screen.getByRole("link", { name: "Measles by borough" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: "Show as embed" }),
-    ).not.toBeInTheDocument();
+  it("keeps focus on the chip while the pointer opens the menu", async () => {
+    const { editor } = _createEditor();
+    _renderMenu("link", editor);
+    _getChip().focus();
+    fireEvent.mouseEnter(_getChip());
+    await screen.findByRole("menu");
+    expect(_getChip()).toHaveFocus();
+  });
+
+  it("returns focus to the chip when Escape closes the menu", async () => {
+    const { editor } = _createEditor();
+    _renderMenu("link", editor);
+    _getChip().focus();
+    fireEvent.click(_getChip());
+    const menu = await screen.findByRole("menu");
+    fireEvent.keyDown(menu, { key: "Escape" });
+    await waitFor(() => {
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(_getChip()).toHaveFocus();
+    });
+  });
+
+  it("shows only an unlinked chip when the editor is read-only", () => {
+    const { editor } = _createEditor({ isEditable: false });
+    _renderMenu("link", editor);
+    expect(_getChip()).not.toHaveAttribute("aria-haspopup");
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 });

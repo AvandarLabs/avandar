@@ -108,6 +108,19 @@ describe("GadgetCard", () => {
     );
   });
 
+  it("leaves the Open link to the menu when a menu is given", () => {
+    mocks.useDashboardSummary.mockReturnValue(AVAILABLE_DASHBOARD);
+    render(
+      <GadgetCard
+        gadgetRef={DASHBOARD_REF}
+        menu={<button type="button">More actions</button>}
+      />,
+    );
+    expect(
+      screen.queryByRole("link", { name: "Open Measles by borough" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("lists every fact of an available gadget with its label", () => {
     mocks.useDashboardSummary.mockReturnValue(AVAILABLE_DASHBOARD);
     render(<GadgetCard gadgetRef={DASHBOARD_REF} />);

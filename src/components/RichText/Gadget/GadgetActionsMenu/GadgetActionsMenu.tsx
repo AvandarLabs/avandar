@@ -1,9 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
-import { ActionIcon, Button, Menu, Popover } from "@mantine/core";
+import { ActionIcon, Menu } from "@mantine/core";
 import { IconDots } from "@tabler/icons-react";
-import classes from "@/components/RichText/Gadget/GadgetActionsMenu/GadgetActionsMenu.module.css";
+import { useState } from "react";
 import { useGadgetActions } from "@/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions";
-import { useHoverFocusOpen } from "@/components/RichText/Gadget/GadgetActionsMenu/useHoverFocusOpen";
+import { GadgetChip } from "@/components/RichText/Gadget/GadgetChip/GadgetChip";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type {
   GadgetAction,
@@ -19,84 +19,65 @@ type Props = {
 
   /** The node's position in the document, as a node view reports it. */
   getPos: () => number | undefined;
-
-  /** The chip the actions belong to. Without it, a menu button is drawn. */
-  children?: ReactNode;
 };
 
-type ActionListProps = {
-  actions: readonly GadgetAction[];
-
-  /** Called before an action runs, such as to close the hover card. */
-  onBeforeSelect: () => void;
-};
-
-/** The hover card's actions, one full-width button each. */
-function GadgetLinkActionList({
+function GadgetActionItems({
   actions,
-  onBeforeSelect,
-}: ActionListProps): ReactNode {
-  const { t } = useLingui();
-  return (
-    <div role="group" aria-label={t`More actions`}>
-      {actions.map((action) => {
-        return (
-          <Button
-            key={action.id}
-            variant="subtle"
-            color="neutral"
-            size="compact-sm"
-            fullWidth
-            justify="flex-start"
-            leftSection={<action.Icon size={14} aria-hidden />}
-            onClick={() => {
-              onBeforeSelect();
-              action.onSelect();
-            }}
-          >
-            {action.label}
-          </Button>
-        );
-      })}
-    </div>
-  );
-}
-
-/** A hover card of buttons over an inline chip, so the line stays clean. */
-function GadgetLinkActions({
-  actions,
-  children,
 }: {
   actions: readonly GadgetAction[];
-  children: ReactNode;
 }): ReactNode {
-  const { isOpen, close, handlers } = useHoverFocusOpen({
-    openDelay: 300,
-    closeDelay: 150,
-  });
-  // Kept in place rather than in a portal, so Tab moves from the chip into
-  // the actions and the pointer can cross into them without closing.
-  return (
-    <span {...handlers} className={classes.linkActions}>
-      <Popover
-        opened={isOpen}
-        onDismiss={close}
-        withinPortal={false}
-        floatingStrategy="fixed"
-        position="bottom-start"
-        offset={4}
-        shadow="md"
-        trapFocus={false}
-        returnFocus={false}
+  return actions.map((action) => {
+    return (
+      <Menu.Item
+        key={action.id}
+        leftSection={<action.Icon size={14} aria-hidden />}
+        onClick={action.onSelect}
       >
-        <Popover.Target>
-          <span>{children}</span>
-        </Popover.Target>
-        <Popover.Dropdown className={classes.dropdown}>
-          <GadgetLinkActionList actions={actions} onBeforeSelect={close} />
-        </Popover.Dropdown>
-      </Popover>
-    </span>
+        {action.label}
+      </Menu.Item>
+    );
+  });
+}
+
+/**
+ * An editor's chip as a button that opens the actions on hover or click.
+ * Only a click moves focus into the menu, so resting the pointer on a chip
+ * never pulls focus away from someone typing.
+ */
+function GadgetLinkActions({
+  gadgetRef,
+  actions,
+}: {
+  gadgetRef: Gadget.Ref;
+  actions: readonly GadgetAction[];
+}): ReactNode {
+  const [isOpenedByClick, setIsOpenedByClick] = useState(false);
+  return (
+    <Menu
+      trigger="click-hover"
+      openDelay={300}
+      closeDelay={150}
+      position="bottom-start"
+      shadow="md"
+      withinPortal
+      trapFocus={isOpenedByClick}
+      onClose={() => {
+        setIsOpenedByClick(false);
+      }}
+    >
+      <Menu.Target>
+        <GadgetChip
+          gadgetRef={gadgetRef}
+          isLinked={false}
+          onClick={() => {
+            setIsOpenedByClick(true);
+          }}
+        />
+      </Menu.Target>
+      <Menu.Dropdown>
+        <GadgetActionItems actions={actions} />
+      </Menu.Dropdown>
+    </Menu>
   );
 }
 
@@ -120,40 +101,32 @@ function GadgetEmbedActions({
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
-        {actions.map((action) => {
-          return (
-            <Menu.Item
-              key={action.id}
-              leftSection={<action.Icon size={14} aria-hidden />}
-              onClick={action.onSelect}
-            >
-              {action.label}
-            </Menu.Item>
-          );
-        })}
+        <GadgetActionItems actions={actions} />
       </Menu.Dropdown>
     </Menu>
   );
 }
 
-function GadgetActionsMenuContent({ children, ...options }: Props): ReactNode {
-  const actions = useGadgetActions(options);
-  if (children === undefined) {
+function GadgetActionsMenuContent(props: Props): ReactNode {
+  const actions = useGadgetActions(props);
+  if (props.display === "embed") {
     return <GadgetEmbedActions actions={actions} />;
   }
-  return <GadgetLinkActions actions={actions}>{children}</GadgetLinkActions>;
+  return <GadgetLinkActions gadgetRef={props.gadgetRef} actions={actions} />;
 }
 
 /**
- * The editor's actions on a gadget node: open it, show it as an embed or a
- * link, and copy a link to it. Wrapping a chip, the actions appear when the
- * chip is hovered or focused; on its own, it draws a menu button for a
- * card's header. Outside an editable editor it draws only `children`, since
- * a published comment offers no display switch.
+ * The editor's actions on a gadget node: open it in a new tab, show it as an
+ * embed or a link, and copy a link to it. For a link it draws the chip
+ * itself, as a button that opens the actions on hover or click and never
+ * navigates; for an embed it draws a menu button for the card's header. In
+ * a read-only editor a link is only the chip and an embed has no menu.
  */
 export function GadgetActionsMenu(props: Props): ReactNode {
   if (!props.editor.isEditable) {
-    return props.children ?? null;
+    return props.display === "link" ? (
+      <GadgetChip gadgetRef={props.gadgetRef} isLinked={false} />
+    ) : null;
   }
   // Each type calls different hooks, so a type change in place remounts.
   return (
