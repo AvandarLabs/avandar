@@ -76,7 +76,7 @@ names which ones must work by its end.
 | 2 | AI-built plugins | The AI builds plugins on demand. They live only in the workspace, always run sandboxed, and can be published later |
 | 3 | Data binding | Typed data slots, filled by ontology concepts or dataset columns. Slots drive a generic install wizard the AI can prefill |
 | 4 | Registry | Avandar's registry instance is private. The registry protocol is open. Self-hosted instances install from a URL, a file, or deployment config, or connect to Avandar's registry with a paid license key |
-| 5 | Plugin licensing | Avandar's own plugins are open source. Contract plugins follow the contract's terms and are distributed privately |
+| 5 | Plugin licensing | Avandar's own plugins are open source. Contract plugins follow the contract's terms and are distributed privately. They cannot be bundled into this public monorepo, so they ship as `.ava` files from Milestone 2 onward |
 | 6 | Package format | `.ava` files. Manifests are authored as `ava.yaml` and compiled to a canonical `manifest.json` inside the package |
 | 7 | Server-side | Avandar-provided server building blocks (proxy, webhook inbox, scheduled jobs, storage, AI) for every tier. Trusted plugins may also ship reviewed server functions |
 | 8 | Third-party services | Avandar-managed accounts, billed by usage. BYOK is always available so a workspace can avoid Avandar billing for a service |
@@ -164,7 +164,8 @@ contributes:
   menus:
     dataExplorer.toolbar:
       - command: regression.linear
-        when: query.numericColumnCount >= 2
+        when:
+          numericColumnCount: { gte: 2 }   # structured condition, no expression language
   vizTypes:
     - id: epicurve
       title: "%viz.epicurve%"
@@ -370,7 +371,7 @@ its offline support, and the UI disables features that need a connection.
 | Namespace | Purpose | Permission |
 | --- | --- | --- |
 | `context` | What the plugin was invoked on: the current query handle and columns in Data Explorer, map extent and selection in GIS, the row and value for a value action | None |
-| `data` | Query bound slots, write to datasets the plugin created, create datasets | `data:slots` (default), `data:read` (every dataset the user can see, flagged in the wizard), `data:write` |
+| `data` | Read the query result the plugin was invoked on, query bound slots, write to datasets the plugin created, create datasets | `data:context` (only the result the plugin was invoked on), `data:slots` (default for slot-based plugins), `data:read` (every dataset the user can see, flagged in the wizard), `data:write` |
 | `ontology` | Read concepts and attributes, propose mappings for admin approval | `ontology:read`, `ontology:write` |
 | `storage` | A document store scoped to the install, optionally per user, with a quota | Implicit |
 | `ai` | Call the workspace's AI with structured output. Sending row data goes through the existing consent system (`ConsentAuditEntry`) | `ai:invoke` (metered) |
@@ -594,15 +595,15 @@ The plan is approved as a single unit.
 | --- | --- |
 | `app_type` enum | An `apps` table with built-in rows and one row per full-view plugin. Every RLS helper that reads `app_type` migrates |
 | Hardcoded navbar links | Built-in apps plus plugin views from the manifest registry |
-| Fixed viz type set | A viz type registry: built-ins plus plugin viz types rendered through `VizRenderer` |
-| `generateSql \| clarify` tool union | The chat edge function accepts tool definitions from installed manifests. Plugin tools run in the browser |
+| Fixed viz type set | A viz type registry: built-ins plus plugin viz types rendered through `VizRenderer`. Plugin types use one open `plugin` variant in the `AvaVizConfig` union, routed through the registry, because the closed union is checked exhaustively in 15 to 20 places |
+| `generateSql \| clarify` tool union | The chat edge function accepts tool definitions from installed manifests. Plugin tools run in the browser, and their results return to the model through a new tool-result path. Today results only reach the model as page context on the next user turn |
 | `share_principal_type` | Add `plugin_installation` |
 | Permission catalog | Add `settings__can_manage_plugins` |
 | Seat-only Polar billing | Add usage meters for managed services, plus spend caps |
 | `apps/pipeline-server` placeholder | Runs declarative plugin jobs and plugin builds |
 | Static Mantine theme | Token overrides and layout presets from installed theme plugins |
-| `packages/` | New MIT packages: `@avandar/plugin-sdk`, `@avandar/plugin-ui`, `@avandar/plugin-build` |
-| `ava` CLI | New `ava plugin` commands: `init`, `dev`, `build`, `submit` |
+| `packages/` | New MIT packages: `@avandar/plugin-manifest`, `@avandar/plugin-sdk`, `@avandar/plugin-ui`, `@avandar/plugin-build` |
+| `ava` CLI | New `ava plugin` commands: `init` and `validate` (Milestone 1), `build` and `dev` (Milestone 2), `submit` (Milestone 4) |
 
 ## Build order
 
@@ -613,23 +614,28 @@ it works across the sandbox boundary later.
 
 ### Milestone 1: first-party plugins
 
-The plugin model and an in-process runtime for trusted plugins.
+The plugin model and an in-process runtime for trusted plugins. First-party
+plugins live in `plugins/<name>/` in this monorepo and are **bundled at build
+time**, each as its own lazy chunk. A per-workspace install is a row in
+`plugin_installations`.
 
-- **Packages and tooling:**
-  - The manifest schema and the `ava.yaml` to `manifest.json` compiler.
-  - The `.ava` format.
-  - `@avandar/plugin-sdk` and `@avandar/plugin-build`.
-  - `ava plugin init`, `build`, and `dev`.
-- **Install and runtime:**
-  - Install tables.
-  - Installs from deployment config and from files.
-  - The manifest registry and lazy activation.
-- **Contribution points:** `views` (including the `apps` table migration and
-  permission model C), `commands` and `menus` for Data Explorer and GIS,
-  `vizTypes`, `aiTools`, `content`.
-- **Services:** `context`, `data` (slots), `storage`, `ai`, `ui`,
-  `navigation`, `events`.
-- **Wizard:** a minimal version with Review, manual slot binding, and Confirm.
+Milestone 1 installs come only from the build. Installing a file before the
+sandbox exists would run uploaded code in-process, which the tier design
+forbids. File installs therefore move to Milestone 2. Permissions are
+declared and shown in Milestone 1, but are not enforced until the
+Milestone 2 broker.
+
+Milestone 1 is split into slices. Each slice gets its own spec, plan, and
+implementation cycle.
+
+| Slice | Delivers | Done when |
+| --- | --- | --- |
+| **1a. Plugin core and commands** (spec: `2026-11-06-plugins-1a-core-commands-design.md`) | Manifest schema and compiler, `plugin-manifest`/`plugin-sdk`/`plugin-ui` packages, build-time bundling, `plugin_installations`, Settings → Plugins, `commands` and `menus` in the Data Explorer toolbar, `context`, `data.fetchRows`, `ui`, `i18n`, `ava plugin init` and `validate` | The epidemiology plugin's "Linear regression" button works on the current query result |
+| 1b. Viz types | The open `plugin` viz variant, a registry, settings descriptors, persistence in the Explorer and dashboards | An epicurve renders in the Explorer and on a dashboard |
+| 1c. AI tools | A generic tool-call path in chat, with client-run plugin tools whose results return to the model | The chat calls `fitRegression` |
+| 1d. Data slots, content, minimal wizard | Slot declarations, manual binding, content import | The Mozambique pack installs, and the epidemiology plugin binds a `Case` slot |
+| 1e. Views and plugin roles | A catch-all route, sidebar links, per-plugin app roles, chat page context, plugin storage | A plugin view appears in the sidebar, gated by role |
+| 1f. GIS contributions | `gis.toolbar` commands and map layers through `MapSpec` | The first spatial statistics tool works |
 
 **Done when** the epidemiology plugin and the Mozambique pack install and work
 as first-party plugins.
@@ -638,6 +644,11 @@ as first-party plugins.
 
 The isolated runtime that community and AI-built plugins will use.
 
+- **Distribution:**
+  - The `.ava` format, `ava plugin build`, and `ava plugin dev`.
+  - File installs, always sandboxed and marked Unverified.
+  - Contract plugins ship as sandboxed `.ava` files. They can run trusted
+    once registry signing exists in Milestone 4.
 - **Isolation:**
   - The opaque-origin iframe plus Worker runtime. Run the browser-support
     spike first (see risks).
@@ -748,8 +759,13 @@ that, once approved, installs and binds everything.
   hardware common in the sector.
 - **Remote DOM scope.** Which components the v1 catalog includes, and how
   large full views perform over the message boundary.
-- **`when` clause language** for menus, and the format for localized
-  manifest strings (`%key%` references).
+- **Decision 9 is up for review in slice 1e.** Replacing the `app_type` enum
+  with an `apps` table is roughly a 300 to 600 line migration through every
+  RLS policy. A cheaper alternative gives users the same behavior: keep
+  `app_type` for the built-in apps and add a separate `plugin_app_roles`
+  table with its own role-check helper. Two known traps apply either way.
+  `parseAppTypeFromPermissionKey` and `userAppRolesMatrixToRows` silently
+  drop apps that are not in `RESTRICTABLE_APPS`.
 - **License keys for self-hosting.** How they are validated, including
   offline, how they expire, and how they are priced.
 - **Registry hosting.** Where the registry runs, and the layout of its
