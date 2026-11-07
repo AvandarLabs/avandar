@@ -118,6 +118,10 @@ msgstr "執行查詢以查看結果。"
 msgid "Start (e.g. 2024-01-01)"
 msgstr "開始日期（例如：2024-01-01）"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query isn't written correctly, so it couldn't be read."
+msgstr "此查詢的寫法不正確，因此無法讀取。"
+
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
 msgstr "儲存目前檢視"
@@ -133,6 +137,11 @@ msgstr "打開資料集"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Delete comment?"
 msgstr "要刪除留言嗎？"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a function, {functionName}, that the query engine "
+"doesn't support."
+msgstr "此查詢使用了查詢引擎不支援的函式 {functionName}。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
@@ -833,6 +842,11 @@ msgstr "從此清單選擇預設狀態。"
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
 msgstr "圖層名稱"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Avandar couldn't confirm that this query only reads your datasets, so it "
+"didn't run it."
+msgstr "Avandar 無法確認此查詢只會讀取您的資料集，因此未執行此查詢。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
@@ -1806,6 +1820,11 @@ msgstr "您嘗試接受的邀請無效。請聯繫工作區擁有者以獲取新
 msgid "Normalize by"
 msgstr "正規化依據"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a dataset that isn't in this workspace or hasn't "
+"finished loading."
+msgstr "此查詢使用的資料集不在此工作區中，或尚未完成載入。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Annual billing)"
 msgstr "(年度計費)"
@@ -2142,6 +2161,10 @@ msgstr "新增資料集"
 msgid "Switch to Free plan"
 msgstr "切換到免費計劃"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Something went wrong while running this query."
+msgstr "執行此查詢時發生錯誤。"
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "自訂 URL 只能包含小寫字母、數字和連字號"
@@ -2434,6 +2457,7 @@ msgid "{0} / 3"
 msgstr "{0} / 3"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Show details"
 msgstr "顯示詳細資料"
@@ -3114,6 +3138,10 @@ msgstr "不允許使用此地址"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Your Google connection expired"
 msgstr "您的 Google 連線已過期"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query was stopped before it finished."
+msgstr "此查詢在完成前已停止。"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
@@ -8182,6 +8210,10 @@ msgstr "手繪"
 msgid "Settings"
 msgstr "設置"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a column named \"{columnName}\" that isn't in the data."
+msgstr "此查詢使用了資料中不存在的欄位「{columnName}」。"
+
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "Go to home"
 msgstr "前往首頁"
@@ -8697,6 +8729,7 @@ msgid "Green"
 msgstr "綠色"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide details"
 msgstr "隱藏詳細資料"
 
@@ -9227,6 +9260,11 @@ msgstr "僅讀值"
 msgid "Display name updated"
 msgstr "顯示名稱已更新"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query mixes totals with individual rows in a way that can't be "
+"calculated."
+msgstr "此查詢以無法計算的方式混合了總計與個別資料列。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
@@ -9303,6 +9341,11 @@ msgstr "繼續"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "搜尋儀表板"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query treats one kind of value as another, such as text as a number "
+"or a date, so it couldn't run."
+msgstr "此查詢將某種值視為另一種值，例如將文字視為數字或日期，因此無法執行。"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -9746,6 +9789,11 @@ msgstr "這些選項需要幾何功能，但該功能無法載入。"
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
 msgstr "高"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query needs more memory than your browser has available. Try a "
+"narrower question, such as a shorter date range or fewer places."
+msgstr "此查詢需要的記憶體超過瀏覽器可用的記憶體。請嘗試縮小問題範圍，例如縮短日期範圍或減少地點數量。"
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
