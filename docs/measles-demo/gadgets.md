@@ -52,13 +52,18 @@ A reader resolves each ref through `GADGET_REGISTRY`
 Each state is a whole translated message rather than a noun spliced into a
 sentence, so translators can inflect it. A lookup that returns no row is
 unavailable: RLS makes a restricted gadget and a deleted one look the same,
-and the UI does not tell them apart.
+and the UI does not tell them apart. A row from another workspace is
+unavailable too. A stored ref can name any uuid, so every summary hook
+compares the row's `workspaceId` with the current workspace before it draws
+anything under that workspace's links.
 
 A trigger, `comments__sync_gadget_refs`, mirrors every gadget node in a
 comment's stored document into `comment_gadget_refs` (one row per distinct
 type, id, tile id, and display), so backlinks and notifications can find
 references without scanning bodies. It skips nodes with an unknown type or a
-non-uuid id, and clears the rows when the comment is deleted. It does not
+non-uuid id. It keeps `subId` only for `dashboard_tile`: a tile needs a
+non-empty one, and a node of any other type that carries one is skipped. It
+clears the rows when the comment is deleted. It does not
 check that the gadget exists or is in the comment's workspace, so **any
 reader of `comment_gadget_refs` must also filter by the gadget's own
 workspace**. Members can select the table; only the trigger writes it.
@@ -123,7 +128,10 @@ Notes:
    satisfy the generated `gadget_type` enum, so a value missing from the
    database fails to compile.
 2. Add a branch to `rpc_gadgets__search` (`50.rpc_gadgets__search.sql`),
-   filtered to the workspace, with its `has_limited_audience` rule.
+   filtered to the workspace, with its `has_limited_audience` rule. The
+   client's search limit in `createMentionMenuSuggestion.ts` is
+   `GADGET_TYPES.length` times the per-type cap, which mirrors
+   `type_position <= 5` in that function, so keep the two in sync.
 3. Add a summary hook to `useGadgetSummaries.ts` and a `GADGET_REGISTRY`
    entry. The registry's type fails to compile until the entry exists.
 4. Add the type's plain-text noun to `GADGET_PLAIN_TEXT_NOUNS` in
