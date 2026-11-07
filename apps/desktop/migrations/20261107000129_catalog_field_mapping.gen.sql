@@ -5,9 +5,18 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 28
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 1
--- Hand-edited: the generated drops of `search_vector` and its index are
--- removed. SQLite never had that column (the generator skips a generated
--- column), and SQLite has no `DROP COLUMN IF EXISTS`.
+-- SQLite override. The Postgres migration drops `search_vector` and its GIN
+-- index before renaming `external_organization_name`, because the generated
+-- column reads it, then adds both back. The generator transpiles the drops but
+-- skips the generated column, so SQLite never had `search_vector`. It also
+-- emits `DROP COLUMN IF EXISTS`, which SQLite rejects as a syntax error, so
+-- the whole migration batch would fail on every install. This body is the
+-- generated output without those two drops.
+--
+-- The foreign key from `data_catalog_listings.drive_id` to
+-- `data_catalog_drives` is not inlined, the same as every other
+-- `ADD CONSTRAINT` the generator reports as needing a hand-edit.
+--
 ALTER TABLE "data_catalog_listings" RENAME COLUMN "external_organization_name" TO "organization1_name";
 
 CREATE TABLE "data_catalog_drives" ("id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "pipeline_name" TEXT NOT NULL, "drive_key" TEXT NOT NULL, "organization1_label" TEXT, "organization2_label" TEXT, "organization3_label" TEXT, "organization4_label" TEXT);

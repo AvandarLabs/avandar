@@ -24,6 +24,12 @@ begin
     raise exception 'a new column was not empty after the migration';
   end if;
 
+  if to_regprocedure(
+    'public.rpc_data_catalog_listings__search(text, integer, integer)'
+  ) is not null then
+    raise exception 'the three-argument search RPC was not dropped';
+  end if;
+
   if not exists (
     select 1 from public.rpc_data_catalog_listings__search('"City of New York"', 50, 0)
     where id = (

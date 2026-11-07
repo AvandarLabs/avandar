@@ -61,7 +61,7 @@ create function pg_temp.one_column (p_name text) returns jsonb as $$
   ));
 $$ language sql;
 
-select plan(26);
+select plan(28);
 
 -- ---------------------------------------------------------------------------
 -- Refusing a listing without a column array, and rolling back the whole call
@@ -395,6 +395,54 @@ select results_eq(
       jsonb_build_array(pg_temp.invalid_fixture('2026-10-15T00:00:00Z')))$$,
   $$values (false, null::text)$$,
   'a rewrite after the source changed makes the listing valid again, to be checked anew'
+);
+
+-- The catalog metadata columns: written on insert, and replaced on a rewrite.
+insert into public.data_catalog_drives (id, pipeline_name, drive_key, organization1_label)
+values
+  ('e8004001-0000-4000-8000-0000000000d1'::uuid, 'pgtap-fixture-pipeline',
+   'https://pgtap-fixture-a.invalid', 'City'),
+  ('e8004001-0000-4000-8000-0000000000d2'::uuid, 'pgtap-fixture-pipeline',
+   'https://pgtap-fixture-b.invalid', 'State');
+
+-- Builds one `p_listings` element whose listing carries `p_metadata`'s
+-- catalog metadata columns.
+create function pg_temp.metadata_listing (p_metadata jsonb) returns jsonb as $$
+  select jsonb_set(
+    pg_temp.api_listing('pgtap-fixture-metadata', 'metadata', '[]'::jsonb),
+    '{listing}',
+    pg_temp.api_listing('pgtap-fixture-metadata', 'metadata', '[]'::jsonb) -> 'listing' || p_metadata
+  );
+$$ language sql;
+
+select results_eq(
+  $$select organization2_name, domains, tags, source_metadata, drive_id
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.metadata_listing(jsonb_build_object(
+        'organization2_name', 'Fixture Agency',
+        'domains', jsonb_build_array('Health'),
+        'tags', jsonb_build_array('clinics', 'visits'),
+        'source_metadata', jsonb_build_object('id', 'abcd-1234'),
+        'drive_id', 'e8004001-0000-4000-8000-0000000000d1'))))$$,
+  $$values (
+    'Fixture Agency'::text, array['Health'], array['clinics', 'visits'],
+    '{"id": "abcd-1234"}'::jsonb, 'e8004001-0000-4000-8000-0000000000d1'::uuid)$$,
+  'an upsert writes the catalog metadata columns'
+);
+
+select results_eq(
+  $$select organization2_name, domains, tags, source_metadata, drive_id
+    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+      jsonb_build_array(pg_temp.metadata_listing(jsonb_build_object(
+        'organization2_name', 'Fixture Office',
+        'domains', jsonb_build_array('Transportation'),
+        'tags', jsonb_build_array('ferry'),
+        'source_metadata', jsonb_build_object('id', 'efgh-5678'),
+        'drive_id', 'e8004001-0000-4000-8000-0000000000d2'))))$$,
+  $$values (
+    'Fixture Office'::text, array['Transportation'], array['ferry'],
+    '{"id": "efgh-5678"}'::jsonb, 'e8004001-0000-4000-8000-0000000000d2'::uuid)$$,
+  'a rewrite replaces the catalog metadata columns'
 );
 
 select * from finish();
