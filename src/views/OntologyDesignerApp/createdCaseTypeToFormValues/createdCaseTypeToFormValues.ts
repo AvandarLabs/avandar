@@ -1,6 +1,8 @@
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { makeDefaultManualEntryAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import { makeStatusSetValueFromChatStatuses } from "@/views/OntologyDesignerApp/makeStatusSetValueFromChatStatuses/makeStatusSetValueFromChatStatuses";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
@@ -45,7 +47,7 @@ function _makeMappedAttribute(options: {
   return Model.make("ConceptAttribute", {
     id: conceptAttributeId,
     conceptId: options.conceptId,
-    name: options.name,
+    name: ConceptStatus.toNonReservedAttributeName(options.name),
     description: options.description,
     dataType: options.column.dataType,
     mappingType: "dataset_column",
@@ -130,7 +132,7 @@ function _attributesFromCaseType(options: {
       return [
         makeDefaultManualEntryAttribute({
           conceptId,
-          name: attribute.name,
+          name: ConceptStatus.toNonReservedAttributeName(attribute.name),
         }),
       ];
     }
@@ -163,6 +165,27 @@ function _attributesFromCaseType(options: {
 }
 
 /**
+ * Makes the first identifier the label when no attribute was marked as one,
+ * then returns the label attribute.
+ */
+function _markFallbackLabel(
+  attributes: readonly AttributeFormValues[],
+): AttributeFormValues | undefined {
+  const labelAttribute = attributes.find((attribute) => {
+    return attribute.isLabel;
+  });
+  const identifier = attributes.find((attribute) => {
+    return attribute.isIdentifier;
+  });
+  if (identifier && !labelAttribute) {
+    identifier.isLabel = true;
+  }
+  return attributes.find((attribute) => {
+    return attribute.isLabel;
+  });
+}
+
+/**
  * Turns a chat-created case type into the payload the concept creator submits.
  * A case type may draw columns from several datasets, so each contributing
  * dataset's join key becomes its own identifier attribute.
@@ -178,18 +201,12 @@ export function createdCaseTypeToFormValues(options: {
     conceptId,
     columns: options.columns,
   });
-  const labelAttribute = attributes.find((attribute) => {
-    return attribute.isLabel;
-  });
-  const identifier = attributes.find((attribute) => {
-    return attribute.isIdentifier;
-  });
-  if (identifier && !labelAttribute) {
-    identifier.isLabel = true;
-  }
-  const label = attributes.find((attribute) => {
-    return attribute.isLabel;
-  });
+  const label = _markFallbackLabel(attributes);
+  // Chat's statuses when it proposed some; the translated default set
+  // otherwise, which is always the case for the `createCaseTypes` tool.
+  const { statuses, defaultStatusId } = makeStatusSetValueFromChatStatuses(
+    options.caseType,
+  );
   return {
     ...Model.make("Concept", {
       id: conceptId,
@@ -205,6 +222,8 @@ export function createdCaseTypeToFormValues(options: {
       manualEntryAttributes: attributes.filter((attribute) => {
         return attribute.mappingType === "manual_entry";
       }),
+      statuses,
+      defaultStatusId,
     }),
     attributes,
   };

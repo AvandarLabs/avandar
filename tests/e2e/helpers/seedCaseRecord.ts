@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { isString } from "@avandar/utils";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
@@ -28,29 +29,48 @@ export async function seedCaseRecord(options: {
       `Could not find the e2e owner ${ownerEmail}: ${ownerError?.message ?? "no id returned"}`,
     );
   }
-  const { data: concept } = await admin
-    .from("concepts")
-    .insert({
-      owner_id: ownerId,
-      workspace_id: workspaceId,
-      name: caseTypeName,
-      allow_manual_creation: true,
+  // A case type and its default status reference each other, so they are
+  // created together in one transaction.
+  const conceptId = randomUUID();
+  const statusId = randomUUID();
+  await admin
+    .rpc("rpc_concepts__create", {
+      p_concept: {
+        id: conceptId,
+        owner_id: ownerId,
+        workspace_id: workspaceId,
+        name: caseTypeName,
+        description: null,
+        allow_manual_creation: true,
+        default_status_id: statusId,
+      },
+      p_statuses: [
+        {
+          id: statusId,
+          name: "Open",
+          description: null,
+          color: "#40c057",
+          position: 0,
+        },
+      ],
+      p_attributes: [],
+      p_dataset_column_mappings: [],
+      p_manual_entry_mappings: [],
     })
-    .select("id")
-    .single()
     .throwOnError();
   const { data: individual } = await admin
     .from("individuals")
     .insert({
       workspace_id: workspaceId,
-      concept_id: concept.id,
+      concept_id: conceptId,
       external_id: `e2e-${Date.now()}`,
       name: recordName,
+      status_id: statusId,
     })
     .select("id")
     .single()
     .throwOnError();
-  return { conceptId: concept.id, individualId: individual.id };
+  return { conceptId, individualId: individual.id };
 }
 
 /**

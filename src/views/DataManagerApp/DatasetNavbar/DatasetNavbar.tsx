@@ -37,6 +37,7 @@ const FILTER_VISIBLE_THRESHOLD = 8;
 type Props = {
   datasets: Dataset.T[];
   isLoading: boolean;
+  className?: string;
 };
 
 type DatasetGroup = {
@@ -118,6 +119,7 @@ function makeDatasetLink(
 export function DatasetNavbar({
   datasets,
   isLoading,
+  className,
 }: Readonly<Props>): ReactNode {
   const workspace = useCurrentWorkspace();
   const workspaceSlug = workspace.slug;
@@ -250,6 +252,7 @@ export function DatasetNavbar({
 
   return (
     <AppListPane
+      className={className}
       title={<Trans>Datasets</Trans>}
       count={isLoading ? undefined : datasets.length}
       action={isLoading ? <Loader size={14} /> : null}

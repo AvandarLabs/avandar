@@ -1,8 +1,10 @@
 import { makeBucketMap } from "@avandar/utils";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import type {
   SqlTableAliasConcept,
   SqlTableAliasConceptAttribute,
+  SqlTableAliasConceptStatus,
   SqlTableAliasDataset,
   SqlTableAliasT,
 } from "$/models/chat/SqlTableAlias/SqlTableAlias.types.ts";
@@ -111,11 +113,29 @@ function _formatAliasLine(
   return `- ${entry.alias}: ${entry.name} (${names.join(", ")})`;
 }
 
+/**
+ * The `status: A | B` field for one concept, in position order, or nothing
+ * for a concept with no statuses. It tells the model the values `status` can
+ * hold, so a filter matches a real status name.
+ */
+function _buildStatusFields(
+  statuses: readonly SqlTableAliasConceptStatus[],
+): string[] {
+  if (statuses.length === 0) {
+    return [];
+  }
+  const names = ConceptStatus.sortByPosition(statuses).map((status) => {
+    return status.name;
+  });
+  return [`status: ${names.join(" | ")}`];
+}
+
 function _formatSchemaBlock(
   args: Readonly<{
     aliases: readonly SqlTableAliasT[];
     columns: readonly SchemaColumn[];
     conceptAttributes?: readonly SqlTableAliasConceptAttribute[];
+    conceptStatuses?: readonly SqlTableAliasConceptStatus[];
   }>,
 ): string {
   const namesByDatasetId = makeBucketMap(args.columns, {
@@ -126,12 +146,20 @@ function _formatSchemaBlock(
     key: "concept_id",
     valueKey: "name",
   });
+  const statusesByConceptId = makeBucketMap(args.conceptStatuses ?? [], {
+    key: "concept_id",
+  });
   return args.aliases
     .map((entry) => {
       const names =
         entry.kind === "dataset"
           ? (namesByDatasetId.get(entry.datasetId) ?? [])
-          : (namesByConceptId.get(entry.conceptId) ?? []);
+          : [
+              ...(namesByConceptId.get(entry.conceptId) ?? []),
+              ..._buildStatusFields(
+                statusesByConceptId.get(entry.conceptId) ?? [],
+              ),
+            ];
       return _formatAliasLine(entry, names);
     })
     .join("\n");
@@ -166,7 +194,10 @@ export const SqlTableAliasModule = {
   fromSchema: _fromSchema,
   /** Dataset id for a `tN` alias, or undefined. */
   getDatasetIdFromAlias: _getDatasetIdFromAlias,
-  /** One line per alias with column or attribute names. */
+  /**
+   * One line per alias with column or attribute names, and for a concept its
+   * allowed statuses.
+   */
   formatSchemaBlock: _formatSchemaBlock,
   /** Rewrites aliases to quoted DuckDB table names. */
   applyToSql: _applyToSql,

@@ -9,11 +9,11 @@ function _dbRow(
     id: "5b89fc55-586d-485f-8526-3c7a9a1b0d90",
     display_name: "Measles cases",
     organization1_name: "City of New York",
-    organization2_name: null,
-    organization3_name: null,
-    organization4_name: null,
+    pipeline_name: null,
     is_workspace_loadable: true,
     is_invalid: false,
+    file_format: "CSV",
+    last_updated_at: null,
     total_count: 120,
     ...overrides,
   };
@@ -32,25 +32,13 @@ describe("createDataCatalogSearchPage", () => {
         id: "5b89fc55-586d-485f-8526-3c7a9a1b0d90",
         displayName: "Measles cases",
         organization1Name: "City of New York",
-        organization2Name: undefined,
-        organization3Name: undefined,
-        organization4Name: undefined,
+        pipelineName: undefined,
         isWorkspaceLoadable: true,
         isInvalid: false,
+        fileFormat: "CSV",
+        lastUpdatedAt: undefined,
       },
     ]);
-  });
-
-  it("maps a deeper organization level when the row has one", () => {
-    const page = createDataCatalogSearchPage({
-      dbRows: [_dbRow({ organization2_name: "Taxi and Limousine Commission" })],
-      pageNum: 0,
-      pageSize: 50,
-    });
-
-    expect(page.rows[0]?.organization2Name).toBe(
-      "Taxi and Limousine Commission",
-    );
   });
 
   it("takes the total match count from the rows", () => {

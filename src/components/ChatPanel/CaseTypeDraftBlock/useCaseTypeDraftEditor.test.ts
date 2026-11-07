@@ -6,6 +6,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { useCaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
+import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { ChatProposedCaseType } from "$/types/chat.types";
 
 const DATASET_ID = "0f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff";
@@ -270,5 +271,100 @@ describe("useCaseTypeDraftEditor", () => {
     rerender({ draft: { ...makeDraft(), name: "Revised proposal" } });
 
     expect(result.current.draft.name).toBe("Revised proposal");
+  });
+
+  it("starts from the proposed statuses with the named default", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        ...makeDraft(),
+        statuses: [
+          { name: "Suspected", description: "", color: "#fab005" },
+          { name: "Confirmed", description: "", color: "#fa5252" },
+        ],
+        defaultStatusName: "Confirmed",
+      });
+    });
+
+    const { statusSet } = result.current;
+    expect(
+      statusSet.statuses.map((status) => {
+        return status.name;
+      }),
+    ).toEqual(["Suspected", "Confirmed"]);
+    expect(statusSet.defaultStatusId).toBe(statusSet.statuses[1]?.id);
+  });
+
+  it("starts from the default statuses when the proposal has none", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    expect(
+      result.current.statusSet.statuses.map((status) => {
+        return status.name;
+      }),
+    ).toEqual(["Active", "Inactive"]);
+  });
+
+  it("carries an edited status set into the draft it creates", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+    const [active, inactive] = result.current.statusSet.statuses;
+    const edited: ConceptStatus.SetValue = {
+      statuses: [{ ...active!, name: " Open " }, inactive!],
+      defaultStatusId: inactive!.id,
+    };
+
+    act(() => {
+      result.current.setStatusSet(edited);
+    });
+
+    expect(
+      result.current.draft.statuses?.map((status) => {
+        return status.name;
+      }),
+    ).toEqual(["Open", "Inactive"]);
+    expect(result.current.draft.defaultStatusName).toBe("Inactive");
+  });
+
+  it("blocks creation while the status set has a problem", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setStatusSet({ statuses: [], defaultStatusId: undefined });
+    });
+
+    expect(result.current.canCreate).toBe(false);
+  });
+
+  it("blocks creation while an included attribute is named status", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setAttributeName(STATE_COLUMN_ID, " Status ");
+    });
+
+    expect(result.current.canCreate).toBe(false);
+  });
+
+  it("refuses a hand-filled field named status", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.addManualEntryAttribute("status");
+    });
+
+    expect(
+      result.current.draft.manualEntryAttributes.map((attribute) => {
+        return attribute.name;
+      }),
+    ).toEqual(["Review notes"]);
   });
 });

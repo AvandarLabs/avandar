@@ -161,14 +161,17 @@ export const RouteMiddleware = {
      * or a thunk when resolving it requires initialized runtime state.
      * @param options.resourceFallback Optional per-resource fallback.
      */
-    checkUserPermissions: ({
+    checkUserPermissions: <TParams extends { workspaceSlug: string }>({
       permissionKey,
       appLabel,
       resourceFallback,
     }: Readonly<PermissionCheckOptions>) => {
       const permissionOptions = { permissionKey, appLabel, resourceFallback };
       return async (
-        loadContext: Readonly<PermissionLoadContext>,
+        loadContext: Readonly<{
+          context: { queryClient: QueryClient };
+          params: TParams;
+        }>,
       ): Promise<void> => {
         return _checkUserPermissions({ permissionOptions, loadContext });
       };

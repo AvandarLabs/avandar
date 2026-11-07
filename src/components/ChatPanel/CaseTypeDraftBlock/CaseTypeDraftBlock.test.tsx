@@ -5,8 +5,15 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import {
+  fireEvent,
+  makeHasPermissionFromAppRoles,
+  render,
+  screen,
+  waitFor,
+} from "@/test-utils";
 import { CaseTypeDraftBlock } from "./CaseTypeDraftBlock";
+import type { PermissionKey } from "$/models/Permissions/Permissions";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatProposedCaseType } from "$/types/chat.types";
 
@@ -21,17 +28,23 @@ const WORKSPACE_ID = "4d5e6f70-aaaa-4bbb-8ccc-ddddeeeeffff" as Workspace.Id;
 
 const {
   applyCreatedCaseTypesMock,
+  hasPermissionMock,
   setPendingCaseTypeDraftMock,
   useChatPanelStateMock,
 } = vi.hoisted(() => {
   return {
     applyCreatedCaseTypesMock: vi.fn().mockResolvedValue(undefined),
+    hasPermissionMock: vi.fn<(permissionKey: PermissionKey) => boolean>(),
     setPendingCaseTypeDraftMock: vi.fn(),
     useChatPanelStateMock: vi.fn(),
   };
 });
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace");
+
+vi.mock("@/hooks/permissions/useHasPermission/useHasPermission", () => {
+  return { useHasPermission: hasPermissionMock };
+});
 
 vi.mock(
   "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager",
@@ -145,6 +158,9 @@ describe("CaseTypeDraftBlock", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     applyCreatedCaseTypesMock.mockResolvedValue(undefined);
+    hasPermissionMock.mockImplementation(
+      makeHasPermissionFromAppRoles({ case_types: "editor" }),
+    );
     vi.mocked(useCurrentWorkspace).mockReturnValue({
       id: WORKSPACE_ID,
     } as ReturnType<typeof useCurrentWorkspace>);
@@ -312,5 +328,123 @@ describe("CaseTypeDraftBlock", () => {
 
     expect(setPendingCaseTypeDraftMock).toHaveBeenCalledWith(undefined);
     expect(applyCreatedCaseTypesMock).not.toHaveBeenCalled();
+  });
+
+  it("hides Create case type from a case_types viewer", () => {
+    hasPermissionMock.mockImplementation(
+      makeHasPermissionFromAppRoles({ case_types: "viewer" }),
+    );
+    render(<CaseTypeDraftBlock />);
+
+    expect(
+      screen.queryByRole("button", { name: "Create case type" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Discard" })).toBeInTheDocument();
+  });
+
+  it("lists the proposed statuses with what each one means", () => {
+    useChatPanelStateMock.mockReturnValue({
+      pendingCaseTypeDraft: {
+        ...makeDraft(),
+        statuses: [
+          {
+            name: "Suspected",
+            description: "Reported but not yet tested.",
+            color: "#fab005",
+          },
+          {
+            name: "Confirmed",
+            description: "A lab test came back positive.",
+            color: "#fa5252",
+          },
+        ],
+        defaultStatusName: "Suspected",
+      },
+    });
+    render(<CaseTypeDraftBlock />);
+
+    const list = screen.getByRole("list", { name: "Proposed statuses" });
+    expect(list).toHaveTextContent("Suspected");
+    expect(list).toHaveTextContent("A lab test came back positive.");
+  });
+
+  it("lists the default statuses when the proposal has none", () => {
+    render(<CaseTypeDraftBlock />);
+
+    const list = screen.getByRole("list", { name: "Proposed statuses" });
+    expect(list).toHaveTextContent("Active");
+    expect(list).toHaveTextContent("Inactive");
+  });
+
+  it("swaps the list for the status editor on Edit statuses", () => {
+    render(<CaseTypeDraftBlock />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit statuses" }));
+
+    expect(
+      screen.queryByRole("list", { name: "Proposed statuses" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("radiogroup", { name: "Default status" }),
+    ).toBeInTheDocument();
+  });
+
+  it("persists the proposed statuses and default when created", async () => {
+    useChatPanelStateMock.mockReturnValue({
+      pendingCaseTypeDraft: {
+        ...makeDraft(),
+        statuses: [
+          { name: "Suspected", description: "", color: "#fab005" },
+          { name: "Confirmed", description: "", color: "#fa5252" },
+        ],
+        defaultStatusName: "Confirmed",
+      },
+    });
+    render(<CaseTypeDraftBlock />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Create case type" }));
+
+    await waitFor(() => {
+      expect(applyCreatedCaseTypesMock).toHaveBeenCalled();
+    });
+    const caseType = applyCreatedCaseTypesMock.mock.calls[0]?.[0].caseTypes[0];
+    expect(
+      caseType.statuses.map((status: { name: string }) => {
+        return status.name;
+      }),
+    ).toEqual(["Suspected", "Confirmed"]);
+    expect(caseType.defaultStatusName).toBe("Confirmed");
+  });
+
+  it("flags an attribute renamed to status and blocks creation", () => {
+    render(<CaseTypeDraftBlock />);
+
+    fireEvent.change(screen.getByLabelText("Name for state"), {
+      target: { value: "Status" },
+    });
+
+    expect(
+      screen.getByText(
+        "Every case type already has a status. Choose another name.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Create case type" }),
+    ).toBeDisabled();
+  });
+
+  it("flags a hand-filled field named status and offers no add", () => {
+    render(<CaseTypeDraftBlock />);
+
+    fireEvent.change(screen.getByLabelText("Add a field filled in by hand"), {
+      target: { value: "status" },
+    });
+
+    expect(
+      screen.getByText(
+        "Every case type already has a status. Choose another name.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add field" })).toBeDisabled();
   });
 });

@@ -1,55 +1,67 @@
-import { constant } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Loader, Text, UnstyledButton } from "@mantine/core";
+import { Loader, Text } from "@mantine/core";
+import { useId } from "@mantine/hooks";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import clsx from "clsx";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.module.css";
+import { formatCatalogListingDate } from "@/views/DataManagerApp/DataImportView/DataCatalogView/formatCatalogListingDate";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
-import type { ReactNode } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
 
-/**
- * A guess at a row's height before it renders. Rows are measured once they
- * render, since a two-line name or a status line makes one taller.
- */
-const ESTIMATED_ROW_HEIGHT_PX = 52;
-
-/** Space between rows, matching the list's former two-pixel stack gap. */
-const ROW_GAP_PX = 2;
+/** A first guess at a row's height, corrected once the row is measured. */
+const ESTIMATED_ROW_HEIGHT_PX = 60;
 
 type Props = {
-  /** Every search result loaded so far, in ranked order. */
-  listings: readonly DataCatalogListing.SearchResult[];
-  /** How many listings match the search, loaded or not. */
+  /** Every result page loaded so far, in the order search sorted them. */
+  displayedListings: readonly DataCatalogListing.SearchResult[];
+  /** How many listings the search and filters match, loaded or not. */
   totalCount: number;
   /** Currently highlighted catalog listing id. */
-  selectedId: DataCatalogListing.Id | undefined;
+  selectedId: string | undefined;
   /** Called when the user picks a row. */
   onSelect: (id: DataCatalogListing.Id) => void;
-  /** Whether more matches exist past the loaded ones. */
+  /** Whether another page of results remains to load. */
   hasNextPage: boolean;
   /** Whether the next page is loading now. */
   isFetchingNextPage: boolean;
-  /** Loads the next page of matches. */
+  /** Loads the next page of results. */
   fetchNextPage: () => unknown;
 };
 
+/** Where an arrow, Home, or End key moves the active row, if anywhere. */
+function _getNextActiveIndex(options: {
+  key: string;
+  activeIndex: number;
+  numRows: number;
+}): number | undefined {
+  const lastIndex = options.numRows - 1;
+  switch (options.key) {
+    case "ArrowDown":
+      return Math.min(options.activeIndex + 1, lastIndex);
+    case "ArrowUp":
+      return Math.max(options.activeIndex - 1, 0);
+    case "Home":
+      return 0;
+    case "End":
+      return lastIndex;
+    default:
+      return undefined;
+  }
+}
+
 /**
- * The catalog as a scrolling list of rows that loads more matches as the
- * user nears the end. Only the rows in view are rendered, so a catalog of
- * thousands of listings costs the DOM a screenful.
+ * The catalog's results as one keyboard listbox. Only the rows in view are
+ * rendered, and the next page loads as the last loaded row scrolls into view,
+ * so a catalog of thousands scrolls as lightly as one of thirty.
  *
- * Selection is a fill and a weight change, which is both quieter and easier
- * to spot than a border that appears on one of thirty identical boxes. The
- * rows are plain, not bordered, shadowed cards. A listing whose dataset
- * cannot be loaded says so under its name.
- *
- * Only rendered when there is something to list. Which of the two empty
- * situations applies, an unpublished catalog or a query that matched nothing,
- * is the parent's to tell apart, and each wants a different answer.
+ * Arrow keys move the active row and Enter selects it, following the ARIA
+ * listbox pattern: the list is one tab stop, not one per row. Each row reads
+ * name first, then where the data comes from, its format, and when it last
+ * changed, because for most listings those facts are all the catalog has.
  */
 export function DataCatalogListingList({
-  listings,
+  displayedListings,
   totalCount,
   selectedId,
   onSelect,
@@ -58,22 +70,31 @@ export function DataCatalogListingList({
   fetchNextPage,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const scrollElementRef = useRef<HTMLDivElement | null>(null);
+  const optionIdPrefix = useId();
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const clampedActiveIndex = Math.min(
+    activeIndex,
+    Math.max(displayedListings.length - 1, 0),
+  );
+  const activeListing = displayedListings[clampedActiveIndex];
+
   const rowVirtualizer = useVirtualizer({
-    count: listings.length,
+    count: displayedListings.length,
     getScrollElement: () => {
-      return scrollElementRef.current;
+      return scrollerRef.current;
     },
-    estimateSize: constant(ESTIMATED_ROW_HEIGHT_PX),
-    gap: ROW_GAP_PX,
+    estimateSize: () => {
+      return ESTIMATED_ROW_HEIGHT_PX;
+    },
     overscan: 8,
   });
-  const virtualRows = rowVirtualizer.getVirtualItems();
-  const lastRenderedIndex = virtualRows.at(-1)?.index ?? -1;
+  const lastRenderedIndex = rowVirtualizer.getVirtualItems().at(-1)?.index;
 
   useEffect(() => {
     if (
-      lastRenderedIndex >= listings.length - 1 &&
+      lastRenderedIndex !== undefined &&
+      lastRenderedIndex >= displayedListings.length - 1 &&
       hasNextPage &&
       !isFetchingNextPage
     ) {
@@ -81,41 +102,98 @@ export function DataCatalogListingList({
     }
   }, [
     lastRenderedIndex,
-    listings.length,
+    displayedListings.length,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
   ]);
 
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if ((event.key === "Enter" || event.key === " ") && activeListing) {
+      event.preventDefault();
+      onSelect(activeListing.id);
+      return;
+    }
+    const nextActiveIndex = _getNextActiveIndex({
+      key: event.key,
+      activeIndex: clampedActiveIndex,
+      numRows: displayedListings.length,
+    });
+    if (nextActiveIndex !== undefined) {
+      event.preventDefault();
+      setActiveIndex(nextActiveIndex);
+      rowVirtualizer.scrollToIndex(nextActiveIndex);
+    }
+  };
+
   return (
-    <div ref={scrollElementRef} className={css.dataCatalogListingListScroller}>
+    <div
+      ref={scrollerRef}
+      role="listbox"
+      tabIndex={0}
+      aria-label={t`Open datasets`}
+      aria-activedescendant={
+        activeListing ? `${optionIdPrefix}-${activeListing.id}` : undefined
+      }
+      className={css.dataCatalogListingList}
+      onKeyDown={onKeyDown}
+    >
       <div
-        role="listbox"
-        aria-label={t`Catalog datasets`}
-        aria-orientation="vertical"
-        className={css.dataCatalogListingListTrack}
+        className={css.dataCatalogListingListSizer}
         style={{ height: rowVirtualizer.getTotalSize() }}
       >
-        {virtualRows.map((virtualRow) => {
-          const listing = listings[virtualRow.index];
-          if (!listing) {
-            return null;
-          }
+        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+          const listing = displayedListings[virtualRow.index]!;
+          const isSelected = listing.id === selectedId;
+          const updatedDate =
+            listing.lastUpdatedAt === undefined
+              ? undefined
+              : new Date(listing.lastUpdatedAt);
           return (
             <div
               key={listing.id}
+              id={`${optionIdPrefix}-${listing.id}`}
               ref={rowVirtualizer.measureElement}
               data-index={virtualRow.index}
-              className={css.dataCatalogListingListSlot}
+              role="option"
+              aria-selected={isSelected}
+              aria-setsize={totalCount}
+              aria-posinset={virtualRow.index + 1}
+              className={clsx(
+                css.dataCatalogListingListRow,
+                isSelected && css.dataCatalogListingListRowSelected,
+                virtualRow.index === clampedActiveIndex &&
+                  css.dataCatalogListingListRowActive,
+              )}
               style={{ transform: `translateY(${virtualRow.start}px)` }}
+              onClick={() => {
+                setActiveIndex(virtualRow.index);
+                onSelect(listing.id);
+              }}
             >
-              <DataCatalogListingListRow
-                listing={listing}
-                position={virtualRow.index + 1}
-                setSize={totalCount}
-                isSelected={listing.id === selectedId}
-                onSelect={onSelect}
-              />
+              <Text size="sm" fw={isSelected ? 600 : 500} lineClamp={2}>
+                {listing.displayName}
+              </Text>
+              <Text c="dimmed" lineClamp={1} size="xs">
+                {[
+                  listing.organization1Name,
+                  listing.fileFormat,
+                  updatedDate
+                    ? t`Updated ${formatCatalogListingDate(updatedDate)}`
+                    : undefined,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </Text>
+              {!listing.isWorkspaceLoadable ? (
+                <Text c="dimmed" size="xs">
+                  <Trans>Not supported yet</Trans>
+                </Text>
+              ) : listing.isInvalid ? (
+                <Text c="danger.8" size="xs">
+                  <Trans>Can't be loaded</Trans>
+                </Text>
+              ) : null}
             </div>
           );
         })}
@@ -126,55 +204,5 @@ export function DataCatalogListingList({
         </div>
       ) : null}
     </div>
-  );
-}
-
-/**
- * One listing in the list. Carries its position in the whole result set,
- * since only the rows in view exist for assistive technology to count.
- */
-function DataCatalogListingListRow({
-  listing,
-  position,
-  setSize,
-  isSelected,
-  onSelect,
-}: {
-  listing: DataCatalogListing.SearchResult;
-  position: number;
-  setSize: number;
-  isSelected: boolean;
-  onSelect: (id: DataCatalogListing.Id) => void;
-}): ReactNode {
-  return (
-    <UnstyledButton
-      role="option"
-      aria-selected={isSelected}
-      aria-posinset={position}
-      aria-setsize={setSize}
-      className={clsx(
-        css.dataCatalogListingListRow,
-        isSelected && css.dataCatalogListingListRowSelected,
-      )}
-      onClick={() => {
-        onSelect(listing.id);
-      }}
-    >
-      <Text size="sm" fw={isSelected ? 600 : 500} lineClamp={2}>
-        {listing.displayName}
-      </Text>
-      <Text c="dimmed" lineClamp={1} size="xs">
-        {listing.organization1Name}
-      </Text>
-      {!listing.isWorkspaceLoadable ? (
-        <Text c="dimmed" size="xs">
-          <Trans>Not supported yet</Trans>
-        </Text>
-      ) : listing.isInvalid ? (
-        <Text c="danger.8" size="xs">
-          <Trans>Can't be loaded</Trans>
-        </Text>
-      ) : null}
-    </UnstyledButton>
   );
 }

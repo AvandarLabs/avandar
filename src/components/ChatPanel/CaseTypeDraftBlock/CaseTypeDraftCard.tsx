@@ -13,6 +13,7 @@ import css from "./CaseTypeDraftCard.module.css";
 import { CaseTypeDraftIdentityFields } from "./CaseTypeDraftIdentityFields";
 import { CaseTypeDraftManualEntrySection } from "./CaseTypeDraftManualEntrySection";
 import { CaseTypeDraftSourceSection } from "./CaseTypeDraftSourceSection";
+import { CaseTypeDraftStatusSection } from "./CaseTypeDraftStatusSection";
 import { useValuePickerOptions } from "./useValuePickerOptions";
 import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 
@@ -23,7 +24,8 @@ type Props = {
   /** Catalog column names, keyed by column id, for the rows and pickers. */
   columnNamesById: Readonly<Record<string, string>>;
   isCreating: boolean;
-  onCreate: () => void;
+  /** Omitted when the user cannot create case types. */
+  onCreate?: () => void;
   onDismiss: () => void;
 };
 
@@ -102,6 +104,7 @@ export function CaseTypeDraftCard({
               );
             })}
             <CaseTypeDraftManualEntrySection editor={editor} />
+            <CaseTypeDraftStatusSection editor={editor} />
             <Checkbox
               size="xs"
               label={t`Let people create cases by hand too`}
@@ -123,14 +126,16 @@ export function CaseTypeDraftCard({
           >
             <Trans>Discard</Trans>
           </Button>
-          <Button
-            size="xs"
-            loading={isCreating}
-            disabled={!editor.canCreate}
-            onClick={onCreate}
-          >
-            <Trans>Create case type</Trans>
-          </Button>
+          {onCreate ? (
+            <Button
+              size="xs"
+              loading={isCreating}
+              disabled={!editor.canCreate}
+              onClick={onCreate}
+            >
+              <Trans>Create case type</Trans>
+            </Button>
+          ) : null}
         </Group>
       </Stack>
     </Paper>

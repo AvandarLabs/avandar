@@ -223,4 +223,30 @@ describe("proposedCaseTypeToCreatedCaseType", () => {
       allowManualCreation: true,
     });
   });
+
+  it("carries the card's statuses and default into the created case type", () => {
+    const created = proposedCaseTypeToCreatedCaseType(
+      makeDraft({
+        statuses: [
+          { name: "Suspected", description: "", color: "#fab005" },
+          { name: "Confirmed", description: "", color: "#fa5252" },
+        ],
+        defaultStatusName: "Confirmed",
+      }),
+    );
+
+    expect(
+      created.statuses?.map((status) => {
+        return status.name;
+      }),
+    ).toEqual(["Suspected", "Confirmed"]);
+    expect(created.defaultStatusName).toBe("Confirmed");
+  });
+
+  it("leaves statuses out when the draft has none", () => {
+    const created = proposedCaseTypeToCreatedCaseType(makeDraft());
+
+    expect(created).not.toHaveProperty("statuses");
+    expect(created).not.toHaveProperty("defaultStatusName");
+  });
 });

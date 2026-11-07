@@ -89,4 +89,23 @@ describe("buildSqlSystemPrompt", () => {
     expect(prompt).toContain("c0, c1");
     expect(prompt).not.toContain(conceptId);
   });
+
+  it("lists a case type's allowed statuses in the schema block", () => {
+    const conceptId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    const prompt = buildSqlSystemPrompt({
+      prompt: "how many confirmed cases",
+      datasets: [],
+      columns: [],
+      concepts: [{ id: conceptId, name: "Cholera case" }],
+      conceptAttributes: [{ concept_id: conceptId, name: "district" }],
+      conceptStatuses: [
+        { concept_id: conceptId, name: "Suspected", position: 0 },
+        { concept_id: conceptId, name: "Confirmed", position: 1 },
+      ],
+    });
+
+    expect(prompt).toContain(
+      "- c0: Cholera case (district, status: Suspected | Confirmed)",
+    );
+  });
 });

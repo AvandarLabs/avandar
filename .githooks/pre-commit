@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Blocks commits that retain a branch-scoped local Supabase configuration.
+# Blocks commits that change the project_id or ports in supabase/config.toml.
 
 set -uo pipefail
 
@@ -18,7 +18,7 @@ if [ -z "$REPO_ROOT" ]; then
 fi
 cd "$REPO_ROOT" || exit 0
 
-VALIDATOR="$REPO_ROOT/scripts/supabase/validate-standard-local-config.sh"
+VALIDATOR="$REPO_ROOT/scripts/supabase/validate-standard-local-config/validate-standard-local-config.sh"
 
 validate_working_config() {
   "$VALIDATOR" < "$REPO_ROOT/supabase/config.toml"
@@ -26,8 +26,8 @@ validate_working_config() {
 
 validate_staged_config() {
   if ! git cat-file -e :supabase/config.toml 2>/dev/null; then
-    echo "The staged tree does not contain supabase/config.toml." >&2
-    echo "${YELLOW}Run 'ava supabase restore', stage the restored files, and retry.${RESET}" >&2
+    echo "❌ The staged tree does not contain supabase/config.toml." >&2
+    echo "${YELLOW}  ⚠️ Restore it with 'git checkout HEAD -- supabase/config.toml', stage it, and retry.${RESET}" >&2
     return 1
   fi
 

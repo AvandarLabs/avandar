@@ -1,3 +1,4 @@
+import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -278,7 +279,11 @@ export function makeConceptAttributeColumnsFromMetadata(
   const attributeColumns: ConceptAttributeColumn[] = [];
   const contributingDatasetIds = new Set<Dataset.Id>();
   const renamedColumns: RenamedConceptAttributeColumn[] = [];
-  const takenNames = new Set<string>();
+  // Seeded with the built-in status column's name, which the view reads from
+  // the spine, so an attribute of that name is suffixed rather than dropped.
+  // The `concept_attributes__name_not_reserved` check keeps such attributes
+  // out of the database; this guards rows that predate it.
+  const takenNames = new Set<string>([ConceptStatusColumn.COLUMN_NAME]);
 
   orderedAttributes.forEach((attribute) => {
     const { column, contributingDatasetId } = _buildAttributeColumn({

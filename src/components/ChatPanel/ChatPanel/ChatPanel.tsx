@@ -25,10 +25,6 @@ export function ChatPanel(): React.ReactNode {
   const { runtime, startNewChat } = useAvandarChatRuntime();
   const context = useChatPageContext();
   const handledCaseDesignNonceRef = useRef(0);
-  const disabled =
-    context.app !== "data-explorer" &&
-    context.app !== "dashboards" &&
-    context.app !== "case-manager";
 
   useEffect(
     function resetThreadForCaseDesignSession() {
@@ -59,13 +55,12 @@ export function ChatPanel(): React.ReactNode {
   return (
     <>
       <NuxOpenChatPanelEffect />
-      <Box h="100%" py="xs" pr="xs">
+      <Box
+        className={clsx(css.dock, layout === "composer" && css.dockComposer)}
+      >
         <Stack
-          h="100%"
-          bdrs="md"
           className={clsx(
             css.shell,
-            disabled && css.chatPanelShellDisabled,
             layout === "composer" && css.shellComposer,
           )}
           gap={0}

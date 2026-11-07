@@ -1,16 +1,25 @@
 import { makeBucketMap } from "@avandar/utils";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { Box, BoxProps, Button, Loader, Select, Stack } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Loader,
+  Select,
+  Stack,
+  Text,
+  type BoxProps,
+} from "@mantine/core";
 import { IconDatabase } from "@tabler/icons-react";
 import { useState } from "react";
+import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId";
 import { ConnectorRow } from "@/views/DataManagerApp/DataImportView/ConnectorRow/ConnectorRow";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { formatSavedConnectionLabel } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/formatSavedConnectionLabel";
 import { PostgresConnectionForm } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm";
-import { useLoadPostgresTable } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
-import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
+import { useLoadPostgresTable } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
+import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
+import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
 
 type Props = BoxProps & {
   /**
@@ -114,7 +123,10 @@ export function PostgresConnectorImportView({
   // small, ungrouped `Select` the Sheets tab picker uses.
   const relationsBySchema = makeBucketMap(load.relations ?? [], {
     keyFn: (relation) => {
-      return relation.relationId.split(".")[0] ?? "";
+      return (
+        PostgresRelationId.splitRelationId(relation.relationId)?.schemaName ??
+        ""
+      );
     },
     valueFn: (relation) => {
       return { value: relation.relationId, label: relation.label };
@@ -150,6 +162,16 @@ export function PostgresConnectorImportView({
           ) : null}
 
           {!showForm && load.isLoadingRelations ? <Loader size="xs" /> : null}
+
+          {/* A saved connection has no form to show this inside of (unlike
+              the new-connection form's own inline error), so a listing or
+              preview failure needs its own surface here, or it fails
+              silently: no error, no loader, no picker. */}
+          {!showForm && load.connectionError ? (
+            <Text size="sm" c="error" role="alert">
+              {load.connectionError.message}
+            </Text>
+          ) : null}
 
           {!showForm && load.relations ? (
             <Select

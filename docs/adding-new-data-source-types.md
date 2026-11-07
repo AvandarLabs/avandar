@@ -187,7 +187,7 @@ the main touch points today; re-run the ripgrep commands in §1 to catch strays.
 
 | File / area                                 | Why                                                                                                                               |
 | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `src/clients/dashboards/DashboardClient.ts` | `publishDashboard`: special cases for `virtual` and `open_data`; default path uses `DatasetParquetStorageClient.downloadDataset`. |
+| `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts` | `_getSnapshotDatasetBlob` matches every source type exhaustively: a whole-dataset slice either copies a stored parquet or reads the rows through the workspace query. A source that keeps no parquet in Storage must take the query. |
 
 ### GIS / maps (reuses Explorer controls)
 
@@ -206,6 +206,10 @@ the main touch points today; re-run the ripgrep commands in §1 to catch strays.
 | File / area                                             | Why                                                                                                   |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | `tests/e2e/*import*.spec.ts`                            | Add or extend flows for new import path.                                                              |
+| `src/clients/qetl/wrappers/datasetSourceTypeContract.test.ts` | Add the source type's contract entry. It then checks staleness, column types and credential reuse the same way as every other live source. |
+| `src/views/DataManagerApp/DatasetMetaView/getDatasetRefreshFromSourceType/getDatasetRefreshFromSourceType.test.ts` | Add the manual refresh the source type offers, if it is live. |
+| `src/clients/dashboards/DashboardClient/__tests__/DashboardClient.publishSnapshotSources.test.ts` | Add where a whole-dataset slice of the source type publishes from. |
+| `tests/e2e/helpers/liveConnectors/LiveConnectorE2eRegistry.ts` | Give a live source type a `LiveConnectorE2e` adapter. The registry is keyed by the manual refresh `getDatasetRefreshFromSourceType` offers, so a source type that offers one fails to compile until it has an adapter. `live-connector-datasets.spec.ts` then runs, through the UI, the checks `docs/qetl-architecture.md` section 10.3 requires of every live connector: non-text column types, refresh, a non-importer reading it, a dashboard widget, and publishing a whole-dataset and a queried slice. |
 | `src/views/DataManagerApp/DataImportView/**/**.test.ts` | Unit tests for hooks/forms (`useSaveDataset`, `useImportedColumns`, `useLoadManualUploadFile`, etc.). |
 | `tests/e2e/helpers/*`                                   | Helpers that create/delete datasets may assume `sourceType`.                                          |
 
@@ -229,6 +233,7 @@ the main touch points today; re-run the ripgrep commands in §1 to catch strays.
 1. `pnpm db:gen-types` — no drift between SQL and `database.types.ts`.
 2. Typecheck — exhaustive `match` / `matchLiteral` on `DatasetSource.SourceType`
    should compile (TypeScript catches missing enum cases where used).
-3. **Smoke paths** — import once, open in Data Explorer, resync (if applicable),
-   toggle offline-only (if applicable), publish a dashboard that references the
-   dataset (if applicable).
+3. **Tests** — the automatic and written tests in
+   [`qetl-architecture.md` section 10.3](qetl-architecture.md#103-required-tests),
+   which every connector so far needed and none had: publishing, refresh,
+   column types, and reading by someone other than the importer.

@@ -1,6 +1,7 @@
 import { makeIdLookupRecord, prop, where } from "@avandar/utils";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
+import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
@@ -11,7 +12,10 @@ import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColum
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptRelationRef } from "$/models/relations/RelationRef/RelationRef.types";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type {
+  ConceptRelationPlan,
+  ConceptSpineRow,
+} from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 
 /**
  * The relations the caller is allowed to reach, supplied by the query session.
@@ -126,6 +130,39 @@ async function _getMappedDatasetColumns(
 }
 
 /**
+ * One concept's records as spine rows, each carrying its status name.
+ *
+ * The statuses are read once and matched to records in memory. A record
+ * whose status is not among them fails the query rather than loading a NULL
+ * status: the composite foreign key on `individuals` rules that state out, so
+ * it means the status set was saved between the two reads, and a retry sees
+ * both agree.
+ *
+ * Both reads are plain `getAll` calls, so a status renamed a moment ago shows
+ * in the next query.
+ */
+async function _getSpineRows(
+  conceptId: Concept.Id,
+): Promise<ConceptSpineRow[]> {
+  const [individuals, statuses] = await Promise.all([
+    IndividualClient.getAll(where("concept_id", "eq", conceptId)),
+    ConceptStatusClient.getAll(where("concept_id", "eq", conceptId)),
+  ]);
+  const statusesById = makeIdLookupRecord(statuses, { key: "id" });
+  return individuals.map((individual) => {
+    const status = statusesById[individual.statusId];
+    if (!status) {
+      throw new Error(
+        `Record '${individual.id}' of concept '${conceptId}' has status ` +
+          `'${individual.statusId}', which is not one of the concept's ` +
+          `statuses. Run the query again.`,
+      );
+    }
+    return { externalId: individual.externalId, statusName: status.name };
+  });
+}
+
+/**
  * Reads one concept's ontology rows and individuals into a plan.
  *
  * The reads mirror `getDatasetColumnAssertions`: attributes, then the mappings
@@ -166,14 +203,10 @@ async function _getConceptRelationPlan(
     allowedDatasetIds: options.allowedDatasetIds,
   });
 
-  const individuals = await IndividualClient.getAll(
-    where("concept_id", "eq", options.ref.id),
-  );
-
   return {
     ref: options.ref,
     contributingDatasetIds: columns.contributingDatasetIds,
-    externalIds: individuals.map(prop("externalId")),
+    spineRows: await _getSpineRows(options.ref.id),
     attributeColumns: columns.attributeColumns,
   };
 }

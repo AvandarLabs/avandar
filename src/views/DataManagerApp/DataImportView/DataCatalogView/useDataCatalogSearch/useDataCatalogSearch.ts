@@ -21,23 +21,31 @@ type DataCatalogSearch = {
 };
 
 /**
- * Searches the open data catalog in Postgres, one page at a time. Call
- * `fetchNextPage` as the user scrolls toward the end of `listings`.
+ * Searches the open data catalog in Postgres, filtered and sorted, one page at
+ * a time. Call `fetchNextPage` as the user scrolls toward the end of
+ * `listings`.
  *
  * The query key starts with the client's name, so invalidating every
  * catalog listing query also refetches the search.
  */
-export function useDataCatalogSearch(query: string): DataCatalogSearch {
-  const trimmedQuery = query.trim();
+export function useDataCatalogSearch(options: {
+  query: string;
+  filters: Readonly<DataCatalogListing.SearchFilters>;
+  sortBy: DataCatalogListing.SortBy;
+}): DataCatalogSearch {
+  const { filters, sortBy } = options;
+  const trimmedQuery = options.query.trim();
   const searchQuery = useInfiniteQuery({
     queryKey: [
       DataCatalogListingClient.getClientName(),
       "search",
-      { query: trimmedQuery },
+      { query: trimmedQuery, filters, sortBy },
     ],
     queryFn: (ctx) => {
       return DataCatalogListingClient.search({
         query: trimmedQuery,
+        filters,
+        sortBy,
         pageSize: PAGE_SIZE,
         pageNum: ctx.pageParam,
       });

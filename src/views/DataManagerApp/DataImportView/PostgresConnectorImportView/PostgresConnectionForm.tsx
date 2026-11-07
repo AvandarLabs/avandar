@@ -9,11 +9,11 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import type { PostgresDatabaseConnection } from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnection";
+import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection";
 import type {
   PostgresConnectionError,
   PostgresConnectionFormValues,
-} from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
+} from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
 
 const SSL_MODES = [
   "require",

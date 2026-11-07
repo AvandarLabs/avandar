@@ -11,6 +11,8 @@ const PERMISSIONS_THAT_DEFINE_ROUTE_ACCESS = {
   data_explorer: "data_explorer__can_run_query",
   dashboards: "dashboards__can_view_dashboard",
   gis: "gis__can_view_map",
+  case_types: "case_types__can_view_case_type",
+  case_records: "case_records__can_view_record",
   settings: "settings__can_manage_workspace_users",
 } as const satisfies Record<AppType, PermissionKey>;
 
@@ -29,6 +31,8 @@ function rolesMatrixWithAppRole(
     data_explorer: app === "data_explorer" ? role : undefined,
     dashboards: app === "dashboards" ? role : undefined,
     gis: app === "gis" ? role : undefined,
+    case_types: app === "case_types" ? role : undefined,
+    case_records: app === "case_records" ? role : undefined,
     settings: app === "settings" ? role : undefined,
   };
 }
@@ -73,6 +77,88 @@ describe("gis app permissions", () => {
         permissionKey: "gis__can_manage_maps",
       }),
     ).toBe(true);
+  });
+});
+
+describe("case app permissions", () => {
+  it("grants case type creation and editing at case_types editor", () => {
+    const editorRoles = rolesMatrixWithAppRole("case_types", "editor");
+
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: editorRoles,
+        permissionKey: "case_types__can_create_case_type",
+      }),
+    ).toBe(true);
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: editorRoles,
+        permissionKey: "case_types__can_edit_case_type",
+      }),
+    ).toBe(true);
+  });
+
+  it("withholds case type deletion until case_types admin", () => {
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: rolesMatrixWithAppRole("case_types", "editor"),
+        permissionKey: "case_types__can_delete_case_type",
+      }),
+    ).toBe(false);
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: rolesMatrixWithAppRole("case_types", "admin"),
+        permissionKey: "case_types__can_delete_case_type",
+      }),
+    ).toBe(true);
+  });
+
+  it("grants record syncing to an editor of either case app", () => {
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: rolesMatrixWithAppRole("case_types", "editor"),
+        permissionKey: "case_types__can_sync_records",
+      }),
+    ).toBe(true);
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: rolesMatrixWithAppRole("case_records", "editor"),
+        permissionKey: "case_records__can_sync_records",
+      }),
+    ).toBe(true);
+  });
+
+  it("withholds record syncing from a case_records viewer", () => {
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: rolesMatrixWithAppRole("case_records", "viewer"),
+        permissionKey: "case_records__can_sync_records",
+      }),
+    ).toBe(false);
+  });
+
+  it("withholds record deletion until case_records admin", () => {
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: rolesMatrixWithAppRole("case_records", "editor"),
+        permissionKey: "case_records__can_delete_record",
+      }),
+    ).toBe(false);
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: rolesMatrixWithAppRole("case_records", "admin"),
+        permissionKey: "case_records__can_delete_record",
+      }),
+    ).toBe(true);
+  });
+
+  it("keeps Records closed to a case_types admin with no case_records role", () => {
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: rolesMatrixWithAppRole("case_types", "admin"),
+        permissionKey: "case_records__can_view_record",
+      }),
+    ).toBe(false);
   });
 });
 

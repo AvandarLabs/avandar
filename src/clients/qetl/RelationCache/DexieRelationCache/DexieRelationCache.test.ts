@@ -46,11 +46,13 @@ function _makeWrite(
     payload?: Blob;
     columns?: readonly string[] | "all";
     identity?: Partial<RelationCacheWrite["identity"]>;
+    staleAt?: number;
   } = {},
 ): RelationCacheWrite {
   return {
     payload: overrides.payload ?? new Blob(["parquet-bytes"]),
     columns: overrides.columns ?? ["a", "b"],
+    staleAt: overrides.staleAt,
     identity: {
       principal: WORKSPACE_PRINCIPAL,
       relation: { kind: "dataset", id: DATASET_A },
@@ -222,17 +224,72 @@ describe("DexieRelationCache.probe", () => {
     expect(hits).toHaveLength(1);
   });
 
-  it("does not serve an entry once staleAt is set, and does not offer it as growFrom either", async () => {
+  it("does not serve an entry once its stale-at time is reached", async () => {
     await DexieRelationCache.write(_makeWrite());
     const [written] = await db.RelationCacheEntry.toArray();
     await db.RelationCacheEntry.update(written!.identityKey, {
       staleAt: Date.now(),
     });
 
-    const { hits, misses } = await DexieRelationCache.probe([_makeKey()]);
+    const { hits } = await DexieRelationCache.probe([_makeKey()]);
 
     expect(hits).toHaveLength(0);
+  });
+
+  it("serves a live source's entry until its stale-at time", async () => {
+    await DexieRelationCache.write(
+      _makeWrite({ staleAt: Date.now() + 60_000 }),
+    );
+
+    const { hits } = await DexieRelationCache.probe([_makeKey()]);
+
+    expect(hits).toHaveLength(1);
+  });
+
+  it("stops serving a live source's entry once its stale-at time has passed, so the source is acquired again", async () => {
+    await DexieRelationCache.write(_makeWrite({ staleAt: Date.now() - 1 }));
+
+    const { hits } = await DexieRelationCache.probe([_makeKey()]);
+
+    expect(hits).toHaveLength(0);
+  });
+
+  it("does not offer a stale narrower entry as growFrom, since its rows are the ones being replaced", async () => {
+    await DexieRelationCache.write(
+      _makeWrite({ columns: ["a"], staleAt: Date.now() - 1 }),
+    );
+
+    const { misses } = await DexieRelationCache.probe([
+      _makeKey({ columns: ["a", "b"] }),
+    ]);
+
     expect(misses[0]!.growFrom).toBeUndefined();
+  });
+
+  it("offers a narrower entry as growFrom until its stale-at time", async () => {
+    await DexieRelationCache.write(
+      _makeWrite({ columns: ["a"], staleAt: Date.now() + 60_000 }),
+    );
+
+    const { misses } = await DexieRelationCache.probe([
+      _makeKey({ columns: ["a", "b"] }),
+    ]);
+
+    expect(misses[0]!.growFrom?.columns).toEqual(["a"]);
+  });
+
+  it("keeps serving a stale entry while offline, since stale rows beat none when the source cannot be reached", async () => {
+    await DexieRelationCache.write(_makeWrite({ staleAt: Date.now() - 1 }));
+    const onLineSpy = vi
+      .spyOn(navigator, "onLine", "get")
+      .mockReturnValue(false);
+
+    try {
+      const { hits } = await DexieRelationCache.probe([_makeKey()]);
+      expect(hits).toHaveLength(1);
+    } finally {
+      onLineSpy.mockRestore();
+    }
   });
 
   it("partitions a mixed batch so every key lands in exactly one of hits or misses, with no drops or duplicates", async () => {

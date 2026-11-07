@@ -3,29 +3,40 @@ import { DevServerPort } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/Dev
 import { SupabaseBackupHierarchy } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupHierarchy";
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupPaths";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
-import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
-import { PROJECT_ID_PATTERN } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
+import {
+  DEVELOPMENT_ENV_FILE,
+  PROJECT_ID_PATTERN,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import { SupabasePorts } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabasePorts/SupabasePorts";
+import { SupabaseProjectPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseProjectPaths";
+import { SupabaseSwitchState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState";
 import { promiseMap } from "@avandar/utils";
 import type {
+  SupabaseBackupRecord,
   SupabaseConfigState,
   SupabaseLocalEnvironmentIo,
+  SupabaseSwitchTarget,
   SwitchPreparation,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
-type SwitchSource = {
-  config: SupabaseConfigState;
-  configContents: string;
-  configPath: string;
+/** The branch, worktree, and backup directory a switch belongs to. */
+type SwitchIdentity = {
+  branch: string;
+  worktreePath: string;
+  backupDirectory: string;
+};
+
+/** The validated env files a switch backs up and rewrites. */
+type SwitchFiles = {
+  identity: SwitchIdentity;
+  envFiles: string[];
+  /** The env file the Supabase CLI and the app read their connection from. */
+  developmentEnvPath: string;
 };
 
 async function _readSwitchIdentity(
   io: Readonly<SupabaseLocalEnvironmentIo>,
-): Promise<{
-  branch: string;
-  worktreePath: string;
-  backupDirectory: string;
-}> {
+): Promise<SwitchIdentity> {
   const branch = await io.readBranch();
   if (branch === "") {
     throw new Error("Supabase switch requires a named Git branch.");
@@ -39,22 +50,15 @@ async function _readSwitchIdentity(
   return { branch, worktreePath, backupDirectory };
 }
 
+/** The project and ports the worktree is on, checked against the new id. */
 async function _readSwitchSource(
   options: Readonly<{
     io: SupabaseLocalEnvironmentIo;
     temporaryProjectId: string;
-    worktreePath: string;
   }>,
-): Promise<SwitchSource> {
+): Promise<SupabaseConfigState> {
   const { io, temporaryProjectId } = options;
-  const configPath = path.join(io.projectRoot, "supabase", "config.toml");
-  await _requireSwitchSourceFiles({
-    io,
-    sourcePaths: [configPath],
-    worktreePath: options.worktreePath,
-  });
-  const configContents = await io.readTextFile(configPath);
-  const config = SupabaseConfig.makeStateFromContents(configContents);
+  const config = await SupabaseSwitchState.readEffectiveConfig(io);
   if (temporaryProjectId === config.projectId) {
     throw new Error(
       "The temporary project id must differ from the current id.",
@@ -65,7 +69,7 @@ async function _readSwitchSource(
       `Project id ${temporaryProjectId} already belongs to another local Supabase stack.`,
     );
   }
-  return { config, configContents, configPath };
+  return config;
 }
 
 function _isAllowedSwitchSource(
@@ -75,10 +79,9 @@ function _isAllowedSwitchSource(
   const relativePath = path.relative(worktreePath, sourcePath);
   const fileName = path.basename(sourcePath);
   return (
-    relativePath === path.join("supabase", "config.toml") ||
-    (path.dirname(relativePath) === "." &&
-      (fileName === ".env.development" ||
-        fileName.startsWith(".env.development.")))
+    path.dirname(relativePath) === "." &&
+    (fileName === DEVELOPMENT_ENV_FILE ||
+      fileName.startsWith(`${DEVELOPMENT_ENV_FILE}.`))
   );
 }
 
@@ -116,24 +119,69 @@ async function _requireSwitchSourceFiles(
   });
 }
 
-async function _selectSwitchPorts(
+/** Reads and checks the env files, failing before anything is written. */
+async function _readSwitchFiles(
+  io: Readonly<SupabaseLocalEnvironmentIo>,
+): Promise<SwitchFiles> {
+  const identity = await _readSwitchIdentity(io);
+  const envFiles = await io.findDevelopmentEnvFiles();
+  await _requireSwitchSourceFiles({
+    io,
+    sourcePaths: envFiles,
+    worktreePath: identity.worktreePath,
+  });
+  const developmentEnvPath =
+    SupabaseProjectPaths.getDevelopmentEnvPathFromProjectRoot(io.projectRoot);
+  if (!envFiles.includes(developmentEnvPath)) {
+    throw new Error(
+      `Supabase switch needs a ${DEVELOPMENT_ENV_FILE} in ${io.projectRoot}, because the Supabase CLI and the app read their connection from it. Copy .env.example to ${DEVELOPMENT_ENV_FILE} and retry.`,
+    );
+  }
+  return { identity, envFiles, developmentEnvPath };
+}
+
+/** Reserves this branch's backup and copies every env file into it. */
+async function _createSwitchBackup<Target extends SupabaseSwitchTarget>(
   options: Readonly<{
     io: SupabaseLocalEnvironmentIo;
-    source: SwitchSource;
-    requestedBasePort?: number;
-    occupiedHostPorts: readonly number[];
+    files: SwitchFiles;
+    target: Target;
   }>,
+): Promise<Target & SupabaseBackupRecord> {
+  const { io, files, target } = options;
+  await SupabaseBackupHierarchy.prepareBackupHierarchy({
+    io,
+    ...files.identity,
+  });
+  return await SupabaseBackupStore.createBackup({
+    io,
+    ...files.identity,
+    target,
+    sourcePaths: files.envFiles,
+  });
+}
+
+/** The config to move and the ports a new switch must avoid. */
+type SelectSwitchPortsOptions = {
+  io: SupabaseLocalEnvironmentIo;
+  source: SupabaseConfigState;
+  requestedBasePort?: number;
+  occupiedHostPorts: readonly number[];
+};
+
+async function _selectSwitchPorts(
+  options: Readonly<SelectSwitchPortsOptions>,
 ): Promise<{ basePort: number; derivedPorts: Record<string, number> }> {
   const basePort = await SupabasePorts.getAvailableBasePortFromPorts({
-    currentApiPort: options.source.config.apiPort,
-    currentPorts: options.source.config.ports,
+    currentApiPort: options.source.apiPort,
+    currentPorts: options.source.ports,
     requestedBasePort: options.requestedBasePort,
     occupiedHostPorts: options.occupiedHostPorts,
     isPortAvailable: options.io.isPortAvailable,
   });
   const derivedPorts = SupabasePorts.makeDerivedPortsFromBasePort({
-    currentApiPort: options.source.config.apiPort,
-    currentPorts: options.source.config.ports,
+    currentApiPort: options.source.apiPort,
+    currentPorts: options.source.ports,
     basePort,
   });
   return { basePort, derivedPorts };
@@ -186,15 +234,10 @@ async function _prepareSwitch(
 ): Promise<SwitchPreparation> {
   const { io, temporaryProjectId, requestedBasePort } = options;
   _requireSafeProjectId(temporaryProjectId);
-  const identity = await _readSwitchIdentity(io);
-  const [source, occupiedHostPorts, envFiles] = await Promise.all([
-    _readSwitchSource({
-      io,
-      temporaryProjectId,
-      worktreePath: identity.worktreePath,
-    }),
+  const files = await _readSwitchFiles(io);
+  const [source, occupiedHostPorts] = await Promise.all([
+    _readSwitchSource({ io, temporaryProjectId }),
     io.listPublishedHostPorts(),
-    io.findDevelopmentEnvFiles(),
   ]);
   const { basePort, derivedPorts } = await _selectSwitchPorts({
     io,
@@ -202,39 +245,43 @@ async function _prepareSwitch(
     requestedBasePort,
     occupiedHostPorts,
   });
-  await _requireSwitchSourceFiles({
-    io,
-    sourcePaths: envFiles,
-    worktreePath: identity.worktreePath,
-  });
   const devServerPort = await _selectDevServerPort({
     io,
-    envFiles,
-    currentApiPort: source.config.apiPort,
+    envFiles: files.envFiles,
+    currentApiPort: source.apiPort,
     basePort,
     derivedPorts,
     occupiedHostPorts,
   });
-  await SupabaseBackupHierarchy.prepareBackupHierarchy({ io, ...identity });
-  const manifest = await SupabaseBackupStore.createBackup({
-    io,
-    ...identity,
-    temporaryProjectId,
-    basePort,
-    derivedPorts,
-    sourcePaths: [source.configPath, ...envFiles],
-  });
   return {
-    backupDirectory: identity.backupDirectory,
-    configContents: source.configContents,
-    configPath: source.configPath,
+    backupDirectory: files.identity.backupDirectory,
+    developmentEnvPath: files.developmentEnvPath,
     devServerPort,
-    envFiles,
-    manifest,
+    envFiles: files.envFiles,
+    manifest: await _createSwitchBackup({
+      io,
+      files,
+      target: {
+        kind: "local" as const,
+        temporaryProjectId,
+        basePort,
+        derivedPorts,
+      },
+    }),
   };
 }
 
 /** Gathers and validates everything a switch needs before it mutates files. */
 export const SupabaseSwitchPreparation = {
+  /** Everything a local switch needs, with its backup already taken. */
   prepareSwitch: _prepareSwitch,
+
+  /**
+   * Reads the branch identity and env files any switch works on, refusing a
+   * worktree without a `.env.development` or with a retargeted env file.
+   */
+  readSwitchFiles: _readSwitchFiles,
+
+  /** Reserves the branch's backup and copies every env file into it. */
+  createSwitchBackup: _createSwitchBackup,
 };

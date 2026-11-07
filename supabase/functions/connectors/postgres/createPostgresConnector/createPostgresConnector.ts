@@ -1,0 +1,231 @@
+import { getSafeAddressFromHost as defaultGetSafeAddressFromHost } from "@sbfn/_shared/validateHostNotPrivate.ts";
+import {
+  ConnectorError,
+  type Connector,
+  type ConnectorContext,
+} from "@sbfn/connectors/Connector.ts";
+import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
+import { connectToPostgres as defaultConnectToPostgres } from "@sbfn/connectors/postgres/connectToPostgres/connectToPostgres.ts";
+import { getPostgresDatasetRelation } from "@sbfn/connectors/postgres/createPostgresConnector/getPostgresDatasetRelation.ts";
+import { PostgresCatalog } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCatalog.ts";
+import {
+  openSavedConnection,
+  type OpenSavedConnectionOptions,
+} from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
+import { readRelationCsvWithinCaps } from "@sbfn/connectors/postgres/createPostgresConnector/readRelationCsvWithinCaps/readRelationCsvWithinCaps.ts";
+import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
+import { quotePostgresRelationName } from "@sbfn/connectors/postgres/quotePostgresRelationName/quotePostgresRelationName.ts";
+import { runReadOnlyTransaction } from "@sbfn/connectors/postgres/runReadOnlyTransaction/runReadOnlyTransaction.ts";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig.ts";
+import type { PostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
+import type {
+  PostgresQueryRunner,
+  PostgresSql,
+} from "@sbfn/connectors/postgres/PostgresSql.types.ts";
+
+const MAX_PREVIEW_ROWS = 50;
+
+type CreatePostgresConnectorOptions = {
+  /** Injectable for tests - defaults to opening a real connection. */
+  connectToPostgres?: (config: PostgresConnectionConfig) => PostgresSql;
+
+  /** Injectable for tests - defaults to a real DNS lookup and SSRF check. */
+  getSafeAddressFromHost?: (host: string) => Promise<string>;
+};
+
+/** A saved connection, and how to open it. */
+type SavedConnectionTarget = OpenSavedConnectionOptions & {
+  context: ConnectorContext;
+};
+
+/** One relation on a saved connection, and how to open the connection. */
+type SavedRelationTarget = SavedConnectionTarget & { relationId: string };
+
+/** The columns to read from one relation on a saved connection. */
+type SavedRelationColumnsTarget = SavedRelationTarget & {
+  columnNames: readonly string[];
+};
+
+/** A saved connection to open, and what to run on it once it is open. */
+type WithSavedConnectionOptions<T> = SavedConnectionTarget & {
+  statementTimeoutMs: number;
+  run: (transaction: PostgresQueryRunner) => Promise<T>;
+};
+
+/**
+ * Opens a saved connection, runs `run` in a read-only transaction with a
+ * statement timeout, and closes the connection again, classifying any
+ * failure into a {@link ConnectorError}.
+ */
+async function _withSavedConnection<T>(
+  options: Readonly<WithSavedConnectionOptions<T>>,
+): Promise<T> {
+  let sql: PostgresSql | undefined;
+  try {
+    ({ sql } = await openSavedConnection(options.context, options));
+    return await runReadOnlyTransaction({ sql, ...options });
+  } catch (error) {
+    if (error instanceof ConnectorError) {
+      throw error;
+    }
+    throw new ConnectorError(
+      classifyPostgresConnectionError(error),
+      error instanceof Error ? error.message : String(error),
+    );
+  } finally {
+    await sql?.end({ timeout: 5 });
+  }
+}
+
+/** Lists a saved connection's relations, and records it as just verified. */
+async function _listRelations(
+  options: Readonly<SavedConnectionTarget>,
+): ReturnType<Connector["listRelations"]> {
+  const { context, connectionId } = options;
+  const relations = await _withSavedConnection({
+    ...options,
+    statementTimeoutMs:
+      GlobalAppConfig.postgresConnector.catalogStatementTimeoutMs,
+    run: PostgresCatalog.listCatalogRelations,
+  });
+  await context.supabaseAdminClient
+    .from("connections__postgres")
+    .update({ last_verified_at: new Date().toISOString() })
+    .eq("connection_id", connectionId)
+    .eq("workspace_id", context.workspaceId);
+  return relations;
+}
+
+/** Reads a relation's columns and first rows for the import preview. */
+async function _previewRelationRows(
+  options: Readonly<{
+    transaction: PostgresQueryRunner;
+    schemaName: string;
+    tableName: string;
+  }>,
+): ReturnType<Connector["previewRelation"]> {
+  const { transaction, schemaName, tableName } = options;
+  await PostgresCatalog.assertRelationStillExists(
+    transaction,
+    schemaName,
+    tableName,
+  );
+  const columns = await PostgresCatalog.readColumnTypes({
+    sql: transaction,
+    schemaName,
+    tableName,
+  });
+  // The schema and table are quoted as two separate identifiers (see
+  // `quotePostgresRelationName.ts`), so a dot inside either name stays part
+  // of that name.
+  const previewRows = await transaction<Record<string, unknown>>`
+    select * from ${quotePostgresRelationName({ sql: transaction, schemaName, tableName })} limit ${MAX_PREVIEW_ROWS}
+  `;
+  return { columns, previewRows };
+}
+
+/** Previews one relation on a saved connection. */
+async function _previewRelation(
+  options: Readonly<SavedRelationTarget>,
+): ReturnType<Connector["previewRelation"]> {
+  const { schemaName, tableName } = PostgresCatalog.parseRelationId(
+    options.relationId,
+  );
+  return await _withSavedConnection({
+    ...options,
+    statementTimeoutMs:
+      GlobalAppConfig.postgresConnector.catalogStatementTimeoutMs,
+    run: (transaction) => {
+      return _previewRelationRows({ transaction, schemaName, tableName });
+    },
+  });
+}
+
+/**
+ * Reads one relation on a saved connection as CSV, refusing it as `timeout`
+ * if it is still reading once the configured read deadline
+ * (`GlobalAppConfig.postgresConnector.rowsReadDeadlineMs`) has passed since
+ * the call began.
+ */
+async function _getRelationRows(
+  options: Readonly<SavedRelationColumnsTarget>,
+): ReturnType<Connector["getRelationRows"]> {
+  const deadlineAt =
+    Date.now() + GlobalAppConfig.postgresConnector.rowsReadDeadlineMs;
+  const { schemaName, tableName } = PostgresCatalog.parseRelationId(
+    options.relationId,
+  );
+  return await _withSavedConnection({
+    ...options,
+    statementTimeoutMs:
+      GlobalAppConfig.postgresConnector.rowsStatementTimeoutMs,
+    run: async (transaction) => {
+      const relationKind = await PostgresCatalog.assertRelationStillExists(
+        transaction,
+        schemaName,
+        tableName,
+      );
+      return await readRelationCsvWithinCaps({
+        transaction,
+        schemaName,
+        tableName,
+        relationKind,
+        columnNames: options.columnNames,
+        deadlineAt,
+      });
+    },
+  });
+}
+
+/**
+ * Builds the `postgres` {@link Connector}: test-and-save a connection, list a
+ * connection's tables/views, preview one, find what a dataset reads, and
+ * read a relation's rows as CSV.
+ * Every method re-checks the target host and connects to the address that
+ * check vetted (never trusts a previously-saved host as still safe, since its
+ * DNS records can change after it was saved), and every read/write against
+ * `connections`/`connections__postgres` scopes explicitly by `workspaceId`
+ * so one workspace's connection can never be read, previewed, or mutated
+ * through another workspace's session. Every query against the remote
+ * database runs read-only, with a statement timeout. The credential itself
+ * is never held here - it round-trips through Supabase Vault via
+ * `rpc_connections__{create,update,get_decrypted}_secret`.
+ */
+export function createPostgresConnector(
+  options: CreatePostgresConnectorOptions = {},
+): Connector {
+  const dependencies = {
+    connect: options.connectToPostgres ?? defaultConnectToPostgres,
+    getSafeAddressFromHost:
+      options.getSafeAddressFromHost ?? defaultGetSafeAddressFromHost,
+  };
+
+  return {
+    testAndSaveConnection: (context, rawInput) => {
+      return testAndSaveConnection(context, rawInput, {
+        ...dependencies,
+        statementTimeoutMs:
+          GlobalAppConfig.postgresConnector.catalogStatementTimeoutMs,
+      });
+    },
+
+    listRelations: (context, connectionId) => {
+      return _listRelations({ ...dependencies, context, connectionId });
+    },
+
+    previewRelation: (context, connectionId, relationId) => {
+      return _previewRelation({
+        ...dependencies,
+        context,
+        connectionId,
+        relationId,
+      });
+    },
+
+    getDatasetRelation: getPostgresDatasetRelation,
+
+    getRelationRows: (context, relation) => {
+      return _getRelationRows({ ...dependencies, ...relation, context });
+    },
+  };
+}

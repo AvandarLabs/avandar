@@ -1,7 +1,6 @@
 import { NavLinkList } from "@avandar/ui";
 import { Center, Flex, ScrollArea } from "@mantine/core";
 import { useLayoutEffect, useRef } from "react";
-import sidebarCss from "@/views/IndividualManagerApp/IndividualNavbar.module.css";
 import { IndividualSelectionEmptyState } from "@/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState";
 import { CaseTypeHome } from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome";
 import { CaseTypeAttributesList } from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList";
@@ -156,14 +155,14 @@ export function CasesScreen({
         </Flex>
       ) : (
         <Flex align="stretch" h="100%">
-          <div className={`${sidebarCss.pane} ${css.casesSidebarPane}`}>
+          <div className={css.casesSidebarPane}>
             <ScrollArea h="100%" w="100%">
               <NavLinkList
                 pr="md"
                 pl="xs"
                 gap="xs"
                 inactiveHoverColor="neutral.1"
-                className={sidebarCss.list}
+                className={css.casesSidebarList}
                 links={fixtures.cases.map((item) => ({
                   key: item.case_id,
                   label: item.case_label,

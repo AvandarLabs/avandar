@@ -12,6 +12,13 @@ type Props = {
   title: ReactNode;
 
   /**
+   * A control that belongs to the title rather than to the whole view, such
+   * as a record's status. It sits right after the name, outside the heading,
+   * so the heading's accessible name stays the name alone.
+   */
+  titleAccessory?: ReactNode;
+
+  /**
    * Short facts about the thing on screen, rendered on one line separated by
    * middots. Keep them to values a user scans rather than reads: a type, a
    * count, a date. Anything that needs a label belongs in the rail.
@@ -39,6 +46,7 @@ type Props = {
  */
 export function AppViewHeader({
   title,
+  titleAccessory,
   facts,
   description,
   actions,
@@ -68,6 +76,11 @@ export function AppViewHeader({
             {title}
           </div>
         )}
+        {titleAccessory ? (
+          <div className={css.appViewHeaderTitleAccessory}>
+            {titleAccessory}
+          </div>
+        ) : null}
         {actions ? (
           <Group gap="xs" wrap="nowrap" className={css.appViewHeaderActions}>
             {actions}

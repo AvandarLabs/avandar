@@ -275,3 +275,155 @@ describe("parseProposeCaseType", () => {
     expect(parseProposeCaseType(undefined)).toBeUndefined();
   });
 });
+
+/** A minimal valid proposal, plus whatever fields a case adds. */
+function _parseWithFields(
+  fields: Record<string, unknown>,
+): ReturnType<typeof parseProposeCaseType> {
+  return parseProposeCaseType(
+    JSON.stringify({
+      name: "Cholera case",
+      sourceDatasets: [
+        {
+          datasetId: DEATHS_DATASET_ID,
+          primaryKeyColumnId: DEATHS_KEY_COLUMN_ID,
+        },
+      ],
+      attributes: [],
+      manualEntryAttributes: [],
+      ...fields,
+    }),
+  );
+}
+
+const WORKFLOW = [
+  {
+    name: "Suspected",
+    description: "Reported but not yet tested.",
+    color: "#fab005",
+  },
+  {
+    name: "Confirmed",
+    description: "A lab test came back positive.",
+    color: "#fa5252",
+  },
+  {
+    name: "Ruled out",
+    description: "A lab test came back negative.",
+    color: "#637c95",
+  },
+];
+
+describe("parseProposeCaseType statuses", () => {
+  it("keeps proposed statuses in order with the named default", () => {
+    const parsed = _parseWithFields({
+      statuses: WORKFLOW,
+      defaultStatusName: "suspected",
+    });
+
+    expect(parsed?.statuses).toEqual(WORKFLOW);
+    expect(parsed?.defaultStatusName).toBe("Suspected");
+  });
+
+  it("makes the first status the default when none is named", () => {
+    const parsed = _parseWithFields({ statuses: WORKFLOW });
+
+    expect(parsed?.defaultStatusName).toBe("Suspected");
+  });
+
+  it("fills missing colors with the palette colors the set does not use", () => {
+    const parsed = _parseWithFields({
+      statuses: [
+        { name: "Suspected", description: "", color: "#fab005" },
+        { name: "Confirmed", description: "" },
+        { name: "Ruled out", description: "" },
+      ],
+    });
+
+    expect(
+      parsed?.statuses?.map((status) => {
+        return status.color;
+      }),
+    ).toEqual(["#fab005", "#637c95", "#40c057"]);
+  });
+
+  it("replaces a color outside the palette with a free palette color", () => {
+    const parsed = _parseWithFields({
+      statuses: [{ name: "Open", description: "", color: "#123456" }],
+    });
+
+    expect(parsed?.statuses?.[0]?.color).toBe("#637c95");
+  });
+
+  it("drops the status set when two statuses share a name in any case", () => {
+    const parsed = _parseWithFields({
+      statuses: [
+        { name: "Confirmed", description: "" },
+        { name: " confirmed ", description: "" },
+      ],
+    });
+
+    expect(parsed?.statuses).toBeUndefined();
+    expect(parsed?.defaultStatusName).toBeUndefined();
+  });
+
+  it("drops the status set when it has more than 12 statuses", () => {
+    const parsed = _parseWithFields({
+      statuses: Array.from({ length: 13 }, (_, index) => {
+        return { name: `Stage ${index}`, description: "" };
+      }),
+    });
+
+    expect(parsed?.statuses).toBeUndefined();
+  });
+
+  it("drops the status set when the default is not one of the statuses", () => {
+    const parsed = _parseWithFields({
+      statuses: WORKFLOW,
+      defaultStatusName: "Closed",
+    });
+
+    expect(parsed?.statuses).toBeUndefined();
+  });
+
+  it("drops the status set when a status has no name", () => {
+    const parsed = _parseWithFields({
+      statuses: [...WORKFLOW, { name: "  ", description: "" }],
+    });
+
+    expect(parsed?.statuses).toBeUndefined();
+  });
+
+  it("leaves statuses out when the proposal has none", () => {
+    const parsed = _parseWithFields({});
+
+    expect(parsed).toBeDefined();
+    expect(parsed?.statuses).toBeUndefined();
+  });
+});
+
+describe("parseProposeCaseType reserved attribute names", () => {
+  it("renames a dataset attribute named status rather than dropping it", () => {
+    const parsed = _parseWithFields({
+      attributes: [
+        {
+          datasetId: DEATHS_DATASET_ID,
+          columnId: STATE_COLUMN_ID,
+          name: "Status",
+          isIncluded: true,
+          valuePickerRuleType: "most_frequent",
+        },
+      ],
+    });
+
+    expect(parsed?.attributes[0]?.name).toBe("Status (attribute)");
+  });
+
+  it("renames a manual-entry attribute named status", () => {
+    const parsed = _parseWithFields({
+      manualEntryAttributes: [{ name: " status ", isIncluded: true }],
+    });
+
+    expect(parsed?.manualEntryAttributes[0]?.name).toBe("status (attribute)");
+  });
+});

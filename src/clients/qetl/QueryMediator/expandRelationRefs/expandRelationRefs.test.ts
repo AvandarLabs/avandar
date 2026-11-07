@@ -18,7 +18,7 @@ function _plan(
   return {
     ref: { kind: "concept", id: options.conceptId },
     contributingDatasetIds: [...options.contributingDatasetIds],
-    externalIds: [],
+    spineRows: [],
     attributeColumns: [],
   };
 }

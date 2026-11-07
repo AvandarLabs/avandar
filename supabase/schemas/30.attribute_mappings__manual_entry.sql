@@ -33,16 +33,17 @@ select
     )
   );
 
+-- Mappings are part of a case type's design, so every write requires
+-- `case_types` editor.
 create policy "
   User can INSERT attribute_mappings__manual_entry
 " on public.attribute_mappings__manual_entry for insert to authenticated
 with
   check (
-    public.attribute_mappings__manual_entry.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_meets_min_app_role (
+      public.attribute_mappings__manual_entry.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
     )
   );
 
@@ -50,25 +51,29 @@ create policy "
   User can UPDATE attribute_mappings__manual_entry
 " on public.attribute_mappings__manual_entry
 for update
-  to authenticated
+  to authenticated using (
+    public.util__auth_user_meets_min_app_role (
+      public.attribute_mappings__manual_entry.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
+    )
+  )
 with
   check (
-    public.attribute_mappings__manual_entry.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_meets_min_app_role (
+      public.attribute_mappings__manual_entry.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
     )
   );
 
 create policy "
   User can DELETE attribute_mappings__manual_entry
 " on public.attribute_mappings__manual_entry for delete to authenticated using (
-  public.attribute_mappings__manual_entry.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
+  public.util__auth_user_meets_min_app_role (
+    public.attribute_mappings__manual_entry.workspace_id,
+    'case_types'::public.app_type,
+    'editor'::public.role_level
   )
 );
 

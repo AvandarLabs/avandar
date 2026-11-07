@@ -83,7 +83,8 @@ function _resolveLabelColumnId(options: {
  * Converts a draft the user reviewed in the chat card into the payload
  * `applyCreatedCaseTypes` persists. Only attributes still checked in the card
  * are kept, the card's per-column value pickers are carried through, and every
- * dataset still contributing keeps its join key.
+ * dataset still contributing keeps its join key. The card's status set
+ * travels with it.
  */
 export function proposedCaseTypeToCreatedCaseType(
   draft: ChatProposedCaseType,
@@ -120,5 +121,9 @@ export function proposedCaseTypeToCreatedCaseType(
     identities: sourceDatasets,
     attributes: [...datasetAttributes, ...manualAttributes],
     ...(draft.description ? { description: draft.description } : {}),
+    ...(draft.statuses ? { statuses: draft.statuses } : {}),
+    ...(draft.defaultStatusName
+      ? { defaultStatusName: draft.defaultStatusName }
+      : {}),
   };
 }

@@ -1,6 +1,7 @@
 /**
  * CLI switch flow: default id from the branch, one switch per branch.
  */
+import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
 import { SupabaseLocalEnvironmentFakeIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { runSupabaseSwitch } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/runSupabaseSwitch/runSupabaseSwitch";
@@ -132,5 +133,27 @@ describe("runSupabaseSwitch", () => {
         confirmReuse: vi.fn(),
       }),
     ).rejects.toThrow("requires a named Git branch");
+  });
+
+  it("refuses a local switch while the branch points at a hosted project", async () => {
+    const fake = createFakeIo();
+    await SupabaseLocalEnvironment.switchRemote({
+      io: fake.io,
+      connection: {
+        projectId: "abcdefghijklmnopqrst",
+        apiUrl: "https://abcdefghijklmnopqrst.supabase.co",
+        databaseUrl: "postgresql://u:p@h:5432/postgres",
+        publishableKey: "sb_publishable_x",
+        secretKey: "sb_secret_x",
+      },
+    });
+    const confirmReuse = vi.fn();
+
+    await expect(
+      runSupabaseSwitch({ io: fake.io, confirmReuse }),
+    ).rejects.toThrow(
+      "switched to the hosted project abcdefghijklmnopqrst. Run `ava supabase restore` first",
+    );
+    expect(confirmReuse).not.toHaveBeenCalled();
   });
 });

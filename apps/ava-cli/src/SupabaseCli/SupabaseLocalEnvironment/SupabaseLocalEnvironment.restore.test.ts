@@ -13,7 +13,7 @@ import { describe, expect, it } from "vitest";
 
 const { create: createFakeIo, getResourceKeyFromResource: resourceKey } =
   SupabaseLocalEnvironmentFakeIo;
-const { makeBackupDirectory, seedActiveBackup } =
+const { makeBackupDirectory, seedActiveBackup, seedLegacyActiveBackup } =
   SupabaseLocalEnvironmentFixtures;
 
 describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () => {
@@ -23,7 +23,6 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
     await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
       "analytics-p2-temp requires manual cleanup",
     );
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
     expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
     await expect(fake.io.pathExists(makeBackupDirectory())).resolves.toBe(
       false,
@@ -54,7 +53,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
     await expect(
       SupabaseLocalEnvironment.restore(fake.io),
     ).resolves.toBeUndefined();
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
     expect(fake.files.get(EDGE_ENV_PATH)).toBe(ORIGINAL_EDGE_ENV);
     expect(fake.removedResources).toEqual([
       temporaryContainer,
@@ -92,7 +91,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
       "requires manual cleanup",
     );
     expect(fake.removedResources).toEqual([]);
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
   });
 
   it("refuses a non-canonical Docker identifier before deleting resources", async () => {
@@ -113,7 +112,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
       "unsafe Docker network identifier",
     );
     expect(fake.removedResources).toEqual([]);
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
   });
 
   it("continues cleanup in dependency order and aggregates partial failures", async () => {
@@ -158,7 +157,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
       `docker-remove:${resourceKey(volume)}`,
     ]);
     expect(fake.removedResources).toEqual([secondContainer, network, volume]);
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
   });
 
   it("safely ignores an already-absent enumerated temporary resource", async () => {
@@ -250,5 +249,34 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
         message: expect.stringContaining("Cannot remove"),
       }),
     ]);
+  });
+});
+
+describe("SupabaseLocalEnvironment.restore (switches made by an older ava)", () => {
+  it("puts back the supabase/config.toml a legacy switch rewrote", async () => {
+    const fake = createFakeIo();
+    seedLegacyActiveBackup(fake);
+
+    await expect(
+      SupabaseLocalEnvironment.restore(fake.io),
+    ).resolves.toBeUndefined();
+    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
+  });
+
+  it("restores every env file but leaves Docker cleanup to the user when a legacy config.toml was reverted by hand", async () => {
+    const fake = createFakeIo();
+    seedLegacyActiveBackup(fake);
+    fake.files.set(CONFIG_PATH, ORIGINAL_CONFIG);
+
+    await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
+      "supabase stop --project-id analytics-p2-temp --no-backup",
+    );
+    expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
+    expect(fake.files.get(EDGE_ENV_PATH)).toBe(ORIGINAL_EDGE_ENV);
+    expect(fake.removedResources).toEqual([]);
+    await expect(fake.io.pathExists(makeBackupDirectory())).resolves.toBe(
+      false,
+    );
   });
 });

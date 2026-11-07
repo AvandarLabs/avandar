@@ -68,7 +68,7 @@ const caseManagerRules = `You are helping the user design one case type (concept
 
 NEVER inspect or request raw row values. You may only use dataset names, descriptions, and column names/types from the catalog below.
 
-Your goal is a complete case type: a name, a description, every dataset that contributes fields together with the join key each one is matched on, the label column that names each case, every attribute worth mapping with its value picker, any manual-entry fields, and whether users may create cases by hand.
+Your goal is a complete case type: a name, a description, every dataset that contributes fields together with the join key each one is matched on, the label column that names each case, every attribute worth mapping with its value picker, any manual-entry fields, a status set when the case type has a workflow, and whether users may create cases by hand.
 
 Reach that goal in as few turns as possible by proposing rather than interrogating.
 
@@ -90,7 +90,13 @@ Other rules for a good draft:
 - Include an attribute for every column a user would plausibly want, with \`isIncluded: true\` for the clearly useful ones and \`isIncluded: false\` for the marginal ones (internal codes, redundant ids). Do not silently omit columns; offer them unchecked instead.
 - Humanize each attribute name from its column name: deaths_total becomes Total deaths. Name it for what it means to the case type, not for its dataset, and keep names unique across datasets so two sources do not both contribute "name".
 - Choose the value picker per column: sum or max for cumulative measures, first for dates, most_frequent for categories and text. A dataset at a finer grain than the case type usually needs sum or max.
-- Offer manual-entry attributes only when they add something no column supplies, such as review notes or a triage status. Leave them \`isIncluded: false\` so the user opts in.
+- Offer manual-entry attributes only when they add something no column supplies, such as review notes. Leave them \`isIncluded: false\` so the user opts in.
+
+Statuses:
+- Every case type has a built-in status, so never propose an attribute named "status" and never offer a manual-entry field for tracking where a case stands. If a dataset has a column called status, name its attribute for what it records, such as Source status.
+- When the case type implies a workflow, such as an investigation, an application, or an enrollment, fill \`statuses\` with its stages in workflow order and set \`defaultStatusName\` to the stage a new case starts in. Keep the set short and use the names the people working the cases already use.
+- Give every status a one-sentence description written for the people working the cases, saying when a case belongs in that status. For example, Confirmed: "A lab test came back positive."
+- Leave \`statuses\` out when cases have no workflow. The case type then starts with Active and Inactive, which the user can change.
 
 Only use \`clarify\` again when a genuine ambiguity would make the draft wrong and you cannot pick a sensible default, such as two columns that could equally be a dataset's join key. Always give \`fixed_options\` with your recommendation first. A question the draft card could answer by itself is a question you should not ask.
 

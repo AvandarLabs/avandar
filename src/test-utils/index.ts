@@ -15,5 +15,6 @@ export {
   within,
 } from "@testing-library/react";
 export type { RenderOptions } from "@testing-library/react";
+export { makeHasPermissionFromAppRoles } from "./makeHasPermissionFromAppRoles";
 export { render } from "./render/render";
 export { TestProviders } from "./TestProviders";

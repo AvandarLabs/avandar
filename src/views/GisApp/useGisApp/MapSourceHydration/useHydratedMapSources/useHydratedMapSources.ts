@@ -1,6 +1,6 @@
 import { where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { notifyWarning } from "@/utils/notifications/notify";
@@ -102,6 +102,60 @@ function useMissingFilterNotification(
 }
 
 /**
+ * Returns an `updateConfig` that hydrates the current config before applying
+ * an update. Its identity only changes with the editor's own `updateConfig`:
+ * map tool gestures re-attach whenever it changes, so a new function on every
+ * render would drop an area or polygon mid-draw. Called by
+ * `useHydratedMapSources`.
+ */
+function useHydratedUpdateConfig({
+  updateEditorConfig,
+  latestHydration,
+}: Readonly<{
+  updateEditorConfig: ReturnType<typeof useAvaMapEditor>["updateConfig"];
+  latestHydration: {
+    previousInput: AvaMapConfig.T;
+    previousConfig: AvaMapConfig.T;
+    readyColumns: readonly DatasetColumn.T[] | undefined;
+    readyAttributes: readonly ConceptAttribute.T[] | undefined;
+  };
+}>): ReturnType<typeof useAvaMapEditor>["updateConfig"] {
+  const { previousInput, previousConfig, readyColumns, readyAttributes } =
+    latestHydration;
+  // The callback reads the latest hydration inputs from this ref, so it does
+  // not need them as dependencies.
+  const hydrationRef = useRef(latestHydration);
+  useEffect(
+    function syncLatestHydration() {
+      hydrationRef.current = {
+        previousInput,
+        previousConfig,
+        readyColumns,
+        readyAttributes,
+      };
+    },
+    [previousInput, previousConfig, readyColumns, readyAttributes],
+  );
+  return useCallback(
+    (update: (current: AvaMapConfig.T) => AvaMapConfig.T) => {
+      return updateEditorConfig((config) => {
+        const hydrationInputs = hydrationRef.current;
+        const hydrated = MapSourceHydration.fromMetadata({
+          config,
+          previousInput: hydrationInputs.previousInput,
+          previousConfig: hydrationInputs.previousConfig,
+          datasetColumns: hydrationInputs.readyColumns,
+          conceptAttributes: hydrationInputs.readyAttributes,
+        }).config;
+        const updated = update(hydrated);
+        return updated === hydrated ? config : updated;
+      });
+    },
+    [updateEditorConfig],
+  );
+}
+
+/**
  * Wraps the map editor so its `mapConfig` carries every layer's source
  * columns and filters hydrated from the workspace's column metadata, and its
  * `updateConfig` edits that hydrated config. Map queries and the inspector
@@ -125,21 +179,14 @@ export function useHydratedMapSources({
     readyAttributes: readyAttributes,
   });
   useMissingFilterNotification(result.issues);
-  return {
-    ...editor,
-    mapConfig: result.config,
-    updateConfig: (update) => {
-      return editor.updateConfig((config) => {
-        const hydrated = MapSourceHydration.fromMetadata({
-          config,
-          previousInput: editor.mapConfig,
-          previousConfig: result.config,
-          datasetColumns: readyColumns,
-          conceptAttributes: readyAttributes,
-        }).config;
-        const updated = update(hydrated);
-        return updated === hydrated ? config : updated;
-      });
+  const updateConfig = useHydratedUpdateConfig({
+    updateEditorConfig: editor.updateConfig,
+    latestHydration: {
+      previousInput: editor.mapConfig,
+      previousConfig: result.config,
+      readyColumns,
+      readyAttributes,
     },
-  };
+  });
+  return { ...editor, mapConfig: result.config, updateConfig };
 }

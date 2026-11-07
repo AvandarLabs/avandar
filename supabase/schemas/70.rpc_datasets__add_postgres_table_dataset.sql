@@ -6,7 +6,7 @@
  * @param p_dataset_name The name of the dataset.
  * @param p_dataset_description The description of the dataset.
  * @param p_columns The columns of the dataset.
- * @param p_connection_id The saved `db_connections` row this dataset reads
+ * @param p_connection_id The saved `connections` row this dataset reads
  *   through.
  * @param p_schema_name The Postgres schema the table/view lives in.
  * @param p_table_name The Postgres table or view name.

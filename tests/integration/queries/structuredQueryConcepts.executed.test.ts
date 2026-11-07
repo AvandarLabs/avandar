@@ -6,6 +6,7 @@ const {
   it,
   _makeConcept,
   _makeConceptAttributeColumn,
+  _makeConceptStatusColumn,
   _makeQuery,
   _runQuery,
 } = StructuredQueryTestFixtures;
@@ -117,5 +118,67 @@ it("filters a Concept's attributes before aggregating", async () => {
   await expect(_runQuery(sql)).resolves.toEqual([
     { region: "North", "sum(headcount)": 7 },
     { region: "South", "sum(headcount)": 3 },
+  ]);
+});
+
+it("groups a Concept's records by status", async () => {
+  const status = _makeConceptStatusColumn({
+    id: "qc_1_status",
+    aggregation: "group_by",
+  });
+  const records = _makeConceptAttributeColumn({
+    id: "qc_2_region",
+    name: "region",
+    aggregation: "count",
+  });
+
+  const sql = structuredQueryToSql(
+    _makeQuery({
+      dataSource: _makeConcept(),
+      columns: [status, records],
+      orderByColumn: status.id,
+      orderByDirection: "asc",
+    }),
+  );
+
+  await expect(_runQuery(sql)).resolves.toEqual([
+    { status: "Confirmed", "count(region)": 2 },
+    { status: "Ruled out", "count(region)": 1 },
+    { status: "Suspected", "count(region)": 1 },
+  ]);
+});
+
+it("filters a Concept's records by status", async () => {
+  const externalId = _makeConceptAttributeColumn({
+    id: "qc_1_external_id",
+    name: "external_id",
+  });
+  const status = _makeConceptStatusColumn({ id: "qc_2_status" });
+
+  const sql = structuredQueryToSql(
+    _makeQuery({
+      dataSource: _makeConcept(),
+      columns: [externalId],
+      sourceColumns: [externalId, status],
+      filters: {
+        type: "group",
+        combinator: "AND",
+        rules: [
+          {
+            type: "rule",
+            columnId: status.id,
+            operator: "=",
+            value: "Confirmed",
+          },
+        ],
+      },
+      orderByColumn: externalId.id,
+      orderByDirection: "asc",
+    }),
+  );
+
+  await expect(_runQuery(sql)).resolves.toEqual([
+    { external_id: "p1" },
+    { external_id: "p3" },
   ]);
 });

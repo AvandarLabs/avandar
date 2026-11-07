@@ -32,9 +32,11 @@ Google Drive-style sharing layered on top of workspace membership.
 ## 2. Vocabulary
 
 **App (`app_type`)** - A product surface within a workspace whose access is
-granted independently. v1 values: `data_sources`, `data_explorer`,
-`dashboards`, `settings`. Example: a user can be `editor` in `dashboards` and
-`viewer` in `data_sources`.
+granted independently. Values: `data_sources`, `data_explorer`, `dashboards`,
+`gis` (Maps), `case_types` (the Case Manager, where case types are designed),
+`case_records` (the Records pages, where a case type's records are worked),
+and `settings`. Example: a user can be `editor` in `dashboards` and `viewer`
+in `data_sources`.
 
 **Role level (`role_level`)** - One of `viewer` < `editor` < `admin`. Ordered
 low→high in Postgres so enum comparison matches intent. Example: `editor` can
@@ -153,6 +155,19 @@ member who knew a dataset id could download its parquet directly, so the
 protection stopped at the database. When adding a new bucket or a new object
 path, gate it the same way or the guarantee silently weakens again: Storage is a
 separate read path and RLS on `public` tables does not reach it.
+
+A live source's rows are a third read path, and they are read with a
+credential the caller does not hold: the importer's Google grant for a Sheets
+dataset, or the workspace's saved connection for a Postgres one. Adding the
+dataset is consent for anyone who can see it to reuse that credential, so the
+edge function routes keyed by dataset (`connectors`'
+`/:connectorType/datasets/:datasetId/rows`, and `google-sheets`'
+`/datasets/:datasetId/csv` and `/version`) first ask
+`util__auth_user_may_select_dataset` with the caller's own client, the same
+rule as the `datasets` row's SELECT policy, and only then read with the
+service role. The credential never reaches the caller's browser. A Postgres
+dataset's satellite row names the table read, so only a `data_sources`
+editor may create one and nobody may repoint it afterwards.
 
 **Workspace owner** - `workspaces.owner_id`; effective `admin` on workspace
 settings and, for resources, via `util__can_manage_workspace_settings` in the
@@ -319,7 +334,8 @@ flowchart LR
 
 **Enums (planned)**
 
-- `app_type`: `data_sources`, `data_explorer`, `dashboards`, `settings`
+- `app_type`: `data_sources`, `data_explorer`, `dashboards`, `settings`,
+  `gis`, `case_types`, `case_records` (enum order; new values are appended)
 - `role_level`: `viewer`, `editor`, `admin` (ordered low→high)
 - `resource_type`: `dashboard`, `dataset`
 - `share_principal_type`: `user`, `user_group`, `workspace`
@@ -521,6 +537,32 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 
 - Add a **workspace** principal share at `viewer`; combine with stronger per-user
   or group shares via `max` as needed.
+
+**Someone designs case types but does not work their records**
+
+- Give them a role group with `case_types` at `editor` and no `case_records`
+  row. They can create case types, edit them, and refresh their records, but
+  cannot open a Records page. Refreshing writes records, which is why the
+  `individuals` INSERT and UPDATE policies accept a `case_types` editor as
+  well as a `case_records` editor. Deleting a case type needs `case_types` at
+  `admin`.
+
+**Someone works the records but cannot change case types**
+
+- Give them `case_records` at `editor` and `case_types` at `viewer`. They open
+  Records and can refresh a case type's records from its Case Manager page,
+  but cannot create, edit, or delete a case type. Without the `case_types`
+  row they lose the Case Manager entirely and reach Records from the
+  navigation only. Deleting a record needs `case_records` at `admin`.
+
+**Querying case types without a case role**
+
+- Nothing to set up. Every workspace member reads case types, their
+  attributes and mappings, and their records whatever their case roles,
+  because the Data Explorer and chat query them. The route guards and the
+  navigation, not RLS, keep the Case Manager and Records pages from members
+  without the matching role. Workspace owners pass every case-role check
+  through `util__auth_user_meets_min_app_role`.
 
 ---
 

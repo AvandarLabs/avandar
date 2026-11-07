@@ -50,6 +50,7 @@ function formatSchema(schema: OfflineChatSchema): string {
     aliases: aliasesFromSchema(schema),
     columns: schema.columns,
     conceptAttributes: schema.conceptAttributes ?? [],
+    conceptStatuses: schema.conceptStatuses ?? [],
   });
   return `Available datasets and concepts (SQL FROM must use the alias, never a label):\n${block}`;
 }

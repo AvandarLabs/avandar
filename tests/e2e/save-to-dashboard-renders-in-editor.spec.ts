@@ -1,6 +1,7 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { openDataExplorerDrawerTab } from "./helpers/dataExplorerFlow";
+import { parseDashboardIdFromEditorUrl } from "./helpers/parseDashboardIdFromEditorUrl";
 import { deleteDashboardsByIds } from "./helpers/seedDashboard";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
@@ -52,10 +53,7 @@ test.describe("Data Explorer: save viz to dashboard", () => {
         { timeout: MEDIUM_WAIT },
       );
 
-      const dashboardEditUrlMatch = page
-        .url()
-        .match(/dashboards\/edit\/([0-9a-f-]{36})/i);
-      const dashboardId = dashboardEditUrlMatch?.[1];
+      const dashboardId = parseDashboardIdFromEditorUrl(page.url());
       if (!dashboardId) {
         throw new Error(`Could not parse dashboard id from URL: ${page.url()}`);
       }

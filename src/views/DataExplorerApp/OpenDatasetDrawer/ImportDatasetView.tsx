@@ -5,9 +5,13 @@ import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissions
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DataImportTabId } from "@/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs";
 
 type Props = {
   onSaveSuccess: (dataset: Dataset.T) => void;
+
+  /** Fires when the user switches between import flows. */
+  onTabChange?: (tabId: DataImportTabId) => void;
 };
 
 /**
@@ -15,7 +19,10 @@ type Props = {
  * inside the Data Explorer's Open dataset modal. On successful save, the host
  * modal is notified instead of redirecting to the dataset detail page.
  */
-export function ImportDatasetView({ onSaveSuccess }: Props): JSX.Element {
+export function ImportDatasetView({
+  onSaveSuccess,
+  onTabChange,
+}: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [allDatasets = []] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
@@ -34,6 +41,10 @@ export function ImportDatasetView({ onSaveSuccess }: Props): JSX.Element {
     });
 
   return (
-    <DataImportTabs isAddAllowed={isAddAllowed} onSaveSuccess={onSaveSuccess} />
+    <DataImportTabs
+      isAddAllowed={isAddAllowed}
+      onSaveSuccess={onSaveSuccess}
+      onTabChange={onTabChange}
+    />
   );
 }

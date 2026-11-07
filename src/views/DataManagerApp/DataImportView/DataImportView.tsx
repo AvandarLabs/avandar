@@ -10,6 +10,7 @@ import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppVie
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs";
 import { DatasetLimitReachedModal } from "@/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal";
+import type { DataImportTabId } from "@/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs";
 
 export function DataImportView(): JSX.Element {
   const { t } = useLingui();
@@ -30,6 +31,8 @@ export function DataImportView(): JSX.Element {
       numDatasetsInWorkspace: allDatasets.length,
     });
   const [isLimitModalDismissed, setIsLimitModalDismissed] = useState(false);
+  const [activeTabId, setActiveTabId] =
+    useState<DataImportTabId>("upload-view");
 
   return (
     <AppView>
@@ -48,8 +51,16 @@ export function DataImportView(): JSX.Element {
         // properties to park beside it, and the review step below wants every
         // pixel of width for its preview grid.
       }
-      <AppViewBody>
-        <DataImportTabs isAddAllowed={isAddAllowed} />
+      {
+        // The open data catalog scrolls inside its own panes, so while it is
+        // showing the body is held to the visible height instead of growing
+        // with the catalog.
+      }
+      <AppViewBody isFillHeight={activeTabId === "open-data-catalog"}>
+        <DataImportTabs
+          isAddAllowed={isAddAllowed}
+          onTabChange={setActiveTabId}
+        />
       </AppViewBody>
 
       {

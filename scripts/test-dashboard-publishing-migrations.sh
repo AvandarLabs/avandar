@@ -48,6 +48,21 @@ run_migration_replay \
   "$repo_root/supabase/migrations/20261021211630_seed_pipeline_scope_keys_and_checkpoints.sql" \
   "$repo_root/supabase/migration-upgrade-tests/pipeline_scope_seed.assertions.sql"
 
+# Case app role backfill: re-seed built-in groups with both case apps, and
+# mirror each custom group's data_sources role into case_types and
+# case_records.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/case_app_roles_backfill.prelude.sql" \
+  "$repo_root/supabase/migrations/20261026105957_backfill_case_app_role_group_app_roles.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/case_app_roles_backfill.assertions.sql"
+
+# Case statuses backfill: give every existing case type Active, Inactive,
+# and its records' other status values, then point each record at its status.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/case_statuses_backfill.prelude.sql" \
+  "$repo_root/supabase/migrations/20261026115137_backfill_case_statuses.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/case_statuses_backfill.assertions.sql"
+
 # Catalog field mapping: renaming `external_organization_name` to
 # `organization1_name` keeps every listing's organization, and the rebuilt
 # search finds a listing by it.

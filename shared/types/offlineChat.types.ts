@@ -25,11 +25,18 @@ export type OfflineChatSchemaConceptAttribute = {
   name: string;
 };
 
+export type OfflineChatSchemaConceptStatus = {
+  concept_id: string;
+  name: string;
+  position: number;
+};
+
 export type OfflineChatSchema = {
   datasets: readonly OfflineChatSchemaDataset[];
   columns: readonly OfflineChatSchemaColumn[];
   concepts?: readonly OfflineChatSchemaConcept[];
   conceptAttributes?: readonly OfflineChatSchemaConceptAttribute[];
+  conceptStatuses?: readonly OfflineChatSchemaConceptStatus[];
 };
 
 export type OfflineChatMessage = {

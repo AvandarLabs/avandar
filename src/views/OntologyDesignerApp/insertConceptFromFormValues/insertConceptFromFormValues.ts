@@ -1,7 +1,13 @@
-import { isDefined, prop, propEq, where } from "@avandar/utils";
+import { Model } from "@avandar/models";
+import {
+  assertIsDefined,
+  isDefined,
+  prop,
+  propEq,
+  where,
+} from "@avandar/utils";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { AttributeMappingClient } from "@/clients/ontology/AttributeMappingClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { hasPropKeys } from "@/lib/utils/guards/guards";
@@ -13,6 +19,7 @@ import {
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
+import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
@@ -41,15 +48,37 @@ function _mappingsFromAttributes(
     .filter(isDefined);
 }
 
+/** The form's status drafts as insert rows, numbered by their order. */
+function _statusesFromFormValues(
+  conceptFormValues: ConceptFormSubmitValues,
+  workspaceId: Workspace.Id,
+): Array<ConceptStatus.T<"Insert">> {
+  return conceptFormValues.statuses.map((status, index) => {
+    return Model.make("ConceptStatus", {
+      id: status.id,
+      workspaceId,
+      conceptId: conceptFormValues.id,
+      name: status.name.trim(),
+      description: status.description.trim() || undefined,
+      color: status.color,
+      position: index,
+    });
+  });
+}
+
 /**
- * Re-fetches a freshly-inserted concept's attributes and mappings into the
+ * Fetches a freshly created concept with its attributes and mappings, in the
  * shape `generateIndividuals` needs. Mirrors `useHydratedConcept`, as a plain
  * async function rather than a hook, since there is no component here to
  * call a hook from.
  */
-async function _getFullConcept(concept: Concept.T): Promise<BuildableConcept> {
+async function _getFullConcept(
+  conceptId: Concept.Id,
+): Promise<BuildableConcept> {
+  const concept = await ConceptClient.getById({ id: conceptId });
+  assertIsDefined(concept, `Concept ${conceptId} was not found after creation`);
   const conceptAttributes = await ConceptAttributeClient.getAll(
-    where("concept_id", "eq", concept.id),
+    where("concept_id", "eq", conceptId),
   );
   const mappings = await ConceptAttributeClient.getAllAttributeMappings({
     attributes: conceptAttributes,
@@ -77,22 +106,23 @@ async function _getFullConcept(concept: Concept.T): Promise<BuildableConcept> {
 }
 
 /** Fires the new concept's first sync in the background; never throws. */
-function _syncNewConceptInBackground(concept: Concept.T): void {
-  _getFullConcept(concept)
+function _syncNewConceptInBackground(conceptId: Concept.Id): void {
+  _getFullConcept(conceptId)
     .then((fullConcept) => {
       return generateIndividuals(fullConcept);
     })
     .catch((error: unknown) => {
       Logger.error(error, {
         msg: "Failed to auto-sync records for a newly created concept",
-        conceptId: concept.id,
+        conceptId,
       });
     });
 }
 
 /**
- * Persists a concept, its attributes, and their mappings the same way the
- * concept creator form does, then triggers its first sync in the background.
+ * Persists a concept with its statuses, attributes, and mappings in one
+ * transaction, then triggers its first sync in the background. If creation
+ * fails, nothing was written.
  */
 export async function insertConceptFromFormValues(
   conceptFormValues: ConceptFormSubmitValues,
@@ -101,30 +131,15 @@ export async function insertConceptFromFormValues(
   if (!workspaceId) {
     throw new Error("Concept insert requires a workspace id");
   }
-  const concept = await ConceptClient.insert({
-    data: { workspaceId, ...conceptFormValues },
-  });
   const { attributes } = conceptFormValues;
-  await ConceptAttributeClient.bulkInsert({
-    data: attributes.map((attribute) => {
-      return { workspaceId, ...attribute };
+  const conceptId = await ConceptClient.create({
+    concept: { ...conceptFormValues, workspaceId },
+    statuses: _statusesFromFormValues(conceptFormValues, workspaceId),
+    attributes: attributes.map((attribute) => {
+      return { ...attribute, workspaceId };
     }),
-  });
-  await AttributeMappingClient.bulkInsert({
-    data: _mappingsFromAttributes(attributes, workspaceId),
+    mappings: _mappingsFromAttributes(attributes, workspaceId),
   });
 
-  _syncNewConceptInBackground(concept);
-}
-
-/** Deletes a concept and its attributes after a failed insert. */
-export async function rollbackConceptFormInsert(
-  conceptFormValues: ConceptFormSubmitValues,
-): Promise<void> {
-  await Promise.all([
-    ConceptClient.delete({ id: conceptFormValues.id }),
-    ConceptAttributeClient.bulkDelete({
-      ids: conceptFormValues.attributes.map(prop("id")),
-    }),
-  ]);
+  _syncNewConceptInBackground(conceptId);
 }

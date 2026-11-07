@@ -1,29 +1,52 @@
+/*
+ * Assistant replies sit flush on the panel ground, full width, the way the
+ * rest of the product sets prose: only the user's turns are boxed, so the
+ * transcript reads as an answer under a question rather than a stack of
+ * equal cards.
+ */
 .assistantMessageRow {
-  align-self: flex-start;
+  align-self: stretch;
+  animation: assistant-message-in var(--ava-animation-duration-normal)
+    var(--ava-animation-easing-out);
   display: flex;
   justify-content: flex-start;
-  max-width: 95%;
+  min-width: 0;
 }
 
 .assistantMessageStack {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--mantine-spacing-xxs);
+  min-width: 0;
 }
 
 .assistantMessageBubble {
-  background: var(--mantine-color-neutral-0);
-  border: 1px solid var(--ava-border-default);
-  border-radius: var(--mantine-radius-md);
   color: var(--mantine-color-neutral-9);
-  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  min-width: 0;
 }
 
 .assistantMessageActions {
   align-items: center;
   display: flex;
   gap: var(--mantine-spacing-xs);
-  padding: 0 4px;
+  margin-inline-start: -6px;
+}
+
+/*
+ * Only the latest reply shows its actions at rest. Earlier ones reveal them
+ * on hover or keyboard focus, and fade rather than unmount so the transcript
+ * never shifts under the pointer.
+ */
+.assistantMessageRow:not(:last-child) .assistantMessageActions {
+  opacity: 0;
+  transition: opacity var(--ava-animation-duration-fast)
+    var(--ava-animation-easing-out);
+}
+
+.assistantMessageRow:not(:last-child):hover .assistantMessageActions,
+.assistantMessageRow:not(:last-child):focus-within .assistantMessageActions {
+  opacity: 1;
 }
 
 .assistantMessageTryAgainButton {
@@ -34,9 +57,11 @@
   color: var(--mantine-color-neutral-6);
   cursor: pointer;
   display: inline-flex;
+  font-family: inherit;
   font-size: var(--mantine-font-size-xs);
   gap: 4px;
   padding: 2px 6px;
+  transition: var(--ava-transition-interactive);
 }
 
 .assistantMessageTryAgainButton:disabled {
@@ -44,7 +69,28 @@
   opacity: 0.5;
 }
 
+.assistantMessageTryAgainButton:focus-visible {
+  outline: 2px solid var(--mantine-color-primary-6);
+  outline-offset: 1px;
+}
+
 .assistantMessageTryAgainButton:hover:not(:disabled) {
   background: var(--mantine-color-neutral-1);
   color: var(--mantine-color-neutral-8);
+}
+
+@keyframes assistant-message-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assistantMessageRow {
+    animation: none;
+  }
 }

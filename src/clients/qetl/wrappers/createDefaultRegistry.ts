@@ -1,9 +1,6 @@
 import { where } from "@avandar/utils";
 import { match } from "ts-pattern";
-import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
-import { PostgresTableDatasetClient } from "@/clients/datasets/source-datasets/PostgresTableDatasetClient";
 import { createRelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import { createConceptWrapper } from "@/clients/qetl/wrappers/ConceptWrapper/ConceptWrapper";
 import { createDatasetParquetWrapper } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
@@ -14,17 +11,15 @@ import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { fetchOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
+  RelationCsvReader,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import type { FetchedApiOpenDataResource } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
-import type { GoogleSheetsWrapperOptions } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
-import type { PostgresTableWrapperOptions } from "@/clients/qetl/wrappers/PostgresTableWrapper/PostgresTableWrapper";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
@@ -63,20 +58,11 @@ export type DefaultRegistryOptions = {
    */
   getRawSql?: (ref: DatasetRef) => Promise<string>;
 
-  /** The stored Sheets row for one dataset. */
-  getGoogleSheetsSource?: GoogleSheetsWrapperOptions["getSheetSource"];
-
-  /** A live Google access token for the stored account. */
-  getGoogleAccessToken?: GoogleSheetsWrapperOptions["getAccessToken"];
-
-  /** Reads one Sheets tab under the caller's DuckDB lease. */
-  readGoogleSheetTabCsv?: GoogleSheetsWrapperOptions["readCsv"];
-
-  /** The stored Postgres table row for one dataset. */
-  getPostgresTableSource?: PostgresTableWrapperOptions["getPostgresTableSource"];
-
-  /** Reads one Postgres relation's CSV under the caller's DuckDB lease. */
-  readPostgresTableCsv?: PostgresTableWrapperOptions["readCsv"];
+  /**
+   * Reads a live source's acquired CSV under the caller's DuckDB lease, typing
+   * its columns the way the wrapper that acquired it says.
+   */
+  readRelationCsv?: RelationCsvReader;
 
   /** Fetches one API-backed catalog resource through the open-data proxy. */
   fetchApiOpenDataResource?: (
@@ -148,45 +134,6 @@ const DATASET_CAPABILITIES = {
   grantedScope: [],
 } satisfies RelationCapabilities;
 
-async function _getGoogleSheetsSource(id: Dataset.Id): Promise<{
-  googleDocumentId: string;
-  sheetName: string | null;
-  googleAccountId: string;
-}> {
-  const sources = await GoogleSheetsDatasetClient.withCache(AvaQueryClient)
-    .withEnsureQueryData()
-    .getAll(where("dataset_id", "in", [id]));
-  const source = sources[0];
-  if (!source) {
-    throw new Error(`No Google Sheets source record for dataset '${id}'`);
-  }
-  return source;
-}
-
-async function _getGoogleAccessToken(): Promise<string> {
-  const { tokens } = await APIClient.get({ route: "google-auth/tokens" });
-  const accessToken = tokens[0]?.access_token;
-  if (accessToken === undefined) {
-    throw new Error("No Google token is available for this user");
-  }
-  return accessToken;
-}
-
-async function _getPostgresTableSource(
-  id: Dataset.Id,
-): Promise<
-  Pick<PostgresTableDataset.T, "connectionId" | "schemaName" | "tableName">
-> {
-  const sources = await PostgresTableDatasetClient.withCache(AvaQueryClient)
-    .withEnsureQueryData()
-    .getAll(where("dataset_id", "in", [id]));
-  const source = sources[0];
-  if (!source) {
-    throw new Error(`No Postgres table source record for dataset '${id}'`);
-  }
-  return source;
-}
-
 async function _getDataset(id: Dataset.Id): Promise<Dataset.T> {
   const datasets = await DatasetClient.withCache(AvaQueryClient)
     .withEnsureQueryData()
@@ -217,7 +164,7 @@ function _createDatasetWrapper(
     getDataset: (id: Dataset.Id) => Promise<Dataset.T>;
   }>,
 ): SourceWrapper<DatasetRef> {
-  const delegateFor = async (
+  const getDelegateFromRef = async (
     ref: DatasetRef,
   ): Promise<SourceWrapper<DatasetRef>> => {
     const dataset = await delegates.getDataset(ref.id);
@@ -246,12 +193,12 @@ function _createDatasetWrapper(
     },
 
     describe: async (ref, ctx) => {
-      const delegate = await delegateFor(ref);
+      const delegate = await getDelegateFromRef(ref);
       return await delegate.describe(ref, ctx);
     },
 
     acquire: async (req, ctx): Promise<AcquiredRelation> => {
-      const delegate = await delegateFor(req.ref);
+      const delegate = await getDelegateFromRef(req.ref);
       if (!delegate.acquire) {
         throw new Error(
           `Wrapper '${delegate.name}' cannot acquire relation '${req.ref.id}'`,
@@ -288,14 +235,10 @@ export function createDefaultRegistry(
         getRawSql: options.getRawSql,
       }),
       googleSheets: createGoogleSheetsWrapper({
-        getSheetSource: options.getGoogleSheetsSource ?? _getGoogleSheetsSource,
-        getAccessToken: options.getGoogleAccessToken ?? _getGoogleAccessToken,
-        readCsv: options.readGoogleSheetTabCsv,
+        readCsv: options.readRelationCsv,
       }),
       postgres: createPostgresTableWrapper({
-        getPostgresTableSource:
-          options.getPostgresTableSource ?? _getPostgresTableSource,
-        readCsv: options.readPostgresTableCsv,
+        readCsv: options.readRelationCsv,
       }),
     }),
     createConceptWrapper(),

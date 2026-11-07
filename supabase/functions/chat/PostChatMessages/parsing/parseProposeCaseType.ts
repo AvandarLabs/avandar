@@ -1,3 +1,5 @@
+import { parseProposedCaseStatuses } from "@sbfn/chat/PostChatMessages/parsing/parseProposedCaseStatuses.ts";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
 import type {
   ChatCaseSourceDataset,
   ChatCaseValuePickerRuleType,
@@ -77,7 +79,9 @@ function _parseAttribute(raw: unknown): ChatProposedCaseAttribute | undefined {
   return {
     datasetId,
     columnId,
-    name,
+    // Every case type has a built-in `status`, and a dataset `status` column
+    // is common, so the attribute is renamed rather than dropped.
+    name: ConceptStatus.toNonReservedAttributeName(name),
     isIncluded: record.isIncluded !== false,
     valuePickerRuleType: _asValuePickerRuleType(record.valuePickerRuleType),
     ...(description ? { description } : {}),
@@ -97,7 +101,7 @@ function _parseManualEntryAttribute(
   }
   const description = _asTrimmedString(record.description);
   return {
-    name,
+    name: ConceptStatus.toNonReservedAttributeName(name),
     isIncluded: record.isIncluded === true,
     ...(description ? { description } : {}),
   };
@@ -134,13 +138,37 @@ function _dedupeSourceDatasets(
 }
 
 /**
+ * The proposed dataset attributes that read a declared source. An attribute
+ * naming a dataset with no join key would make the whole concept unqueryable,
+ * so it is dropped here instead of surfacing later as a failed query.
+ */
+function _parseSourceAttributes(
+  options: Readonly<{
+    rawAttributes: unknown;
+    sourceDatasets: readonly ChatCaseSourceDataset[];
+  }>,
+): ChatProposedCaseAttribute[] {
+  const sourceDatasetIds = new Set(
+    options.sourceDatasets.map((sourceDataset) => {
+      return sourceDataset.datasetId;
+    }),
+  );
+  return _parseList(options.rawAttributes, _parseAttribute).filter(
+    (attribute) => {
+      return sourceDatasetIds.has(attribute.datasetId);
+    },
+  );
+}
+
+/**
  * Parses a `proposeCaseType` tool call into the editable draft the client
  * renders. Missing optional fields are defaulted rather than rejected so a
  * partial proposal still reaches the card, where the user can finish it.
  *
- * Attributes are held to the declared sources: an attribute naming a dataset
- * with no join key would make the whole concept unqueryable, so it is dropped
- * here instead of surfacing later as a failed query.
+ * Attributes are held to the declared sources, and an attribute named like the
+ * built-in `status` is renamed. A status set is kept only when it is valid
+ * whole; otherwise the draft carries none and the client supplies the default
+ * set.
  */
 export function parseProposeCaseType(
   argsJson: string | undefined,
@@ -163,16 +191,10 @@ export function parseProposeCaseType(
     return undefined;
   }
 
-  const sourceDatasetIds = new Set(
-    sourceDatasets.map((sourceDataset) => {
-      return sourceDataset.datasetId;
-    }),
-  );
-  const attributes = _parseList(record.attributes, _parseAttribute).filter(
-    (attribute) => {
-      return sourceDatasetIds.has(attribute.datasetId);
-    },
-  );
+  const attributes = _parseSourceAttributes({
+    rawAttributes: record.attributes,
+    sourceDatasets,
+  });
   const labelColumnId = _asUuid(record.labelColumnId);
   const hasLabelAttribute = attributes.some((attribute) => {
     return attribute.columnId === labelColumnId;
@@ -190,6 +212,10 @@ export function parseProposeCaseType(
     ),
     ...(description ? { description } : {}),
     ...(labelColumnId && hasLabelAttribute ? { labelColumnId } : {}),
+    ...parseProposedCaseStatuses({
+      rawStatuses: record.statuses,
+      rawDefaultStatusName: record.defaultStatusName,
+    }),
   };
 }
 

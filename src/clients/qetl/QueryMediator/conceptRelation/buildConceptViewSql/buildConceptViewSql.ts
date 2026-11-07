@@ -1,4 +1,5 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import {
   getEntityKeyComparisonSql,
   getRowNumberedViewName,
@@ -7,9 +8,10 @@ import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClie
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 
-/** The spine's alias inside the view, and the column it exposes. */
+/** The spine's alias inside the view, and the columns it exposes. */
 const SPINE_ALIAS = "individuals";
 const EXTERNAL_ID_COLUMN = "external_id";
+const STATUS_COLUMN = ConceptStatusColumn.COLUMN_NAME;
 
 /** One column of the concept relation, already resolved to what it reads. */
 export type ConceptAttributeColumn =
@@ -75,11 +77,17 @@ export function buildConceptViewSql(
     // concepts share when their identifier attributes are named differently,
     // which the joined-concepts criterion needs.
     `${SPINE_ALIAS}.${quoteSqlIdentifier(EXTERNAL_ID_COLUMN)} AS ${quoteSqlIdentifier(EXTERNAL_ID_COLUMN)}`,
+    // Every record's status name: the case type's built-in `status` column.
+    `${SPINE_ALIAS}.${quoteSqlIdentifier(STATUS_COLUMN)} AS ${quoteSqlIdentifier(STATUS_COLUMN)}`,
     ...orderedColumns
       .filter((column) => {
-        // An attribute already named `external_id` would collide with the key
-        // column above. The key wins, because a join depends on it.
-        return column.attributeName !== EXTERNAL_ID_COLUMN;
+        // An attribute already named `external_id` or `status` would collide
+        // with a spine column above. The spine wins: a join depends on the
+        // key, and every case type's status is that column.
+        return (
+          column.attributeName !== EXTERNAL_ID_COLUMN &&
+          column.attributeName !== STATUS_COLUMN
+        );
       })
       .map(_buildColumnSelector),
   ];

@@ -210,7 +210,8 @@ export function useDataQuery(
 
   const queryResult = useQuery({
     enabled: options.enabled !== false && (!!dataSource || !!rawSql),
-    // `isWorkspaceRawSqlDataQueryKey` reads the first four positions.
+    // `isWorkspaceRawSqlDataQueryKey` reads the first four positions, and
+    // `isDataQueryKey` reads the marker's.
     queryKey: [
       queryAuth,
       query,

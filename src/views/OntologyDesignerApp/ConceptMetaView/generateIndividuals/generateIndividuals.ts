@@ -24,6 +24,7 @@ import { Logger } from "@/utils/Logger";
 import {
   diffStagedIndividualsPage,
   getNewlyStaleIndividuals,
+  makeBulkInsertRowsFromUpsertRows,
 } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
@@ -137,7 +138,7 @@ async function _diffAndUpsertPage(options: {
     return;
   }
   await IndividualClient.crudFunctions.bulkInsert({
-    data: diffResult.rowsToWrite,
+    data: makeBulkInsertRowsFromUpsertRows(diffResult.rowsToWrite),
     upsert: true,
     onConflict: {
       columnNames: ["external_id", "concept_id"],
@@ -371,7 +372,7 @@ async function _runGenerateIndividuals(
     });
     if (staleRows.length > 0) {
       await IndividualClient.crudFunctions.bulkInsert({
-        data: staleRows,
+        data: makeBulkInsertRowsFromUpsertRows(staleRows),
         upsert: true,
         onConflict: {
           columnNames: ["external_id", "concept_id"],

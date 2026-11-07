@@ -18,9 +18,9 @@
  * Today's split (every entry is a judgment call, review in the PR):
  *   - ACTIVE: dataset definitions and their per-format detail rows,
  *     catalog listings and their drives, dashboards, concepts + their
- *     attributes + attribute mappings, individuals, user profile, plus
- *     `workspaces` and `workspace_memberships` so the workspace picker
- *     renders offline.
+ *     statuses, attributes, and attribute mappings, individuals, user
+ *     profile, plus `workspaces` and `workspace_memberships` so the
+ *     workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
  *     billing, sensitive OAuth tokens, admin-only signups, legacy role
  *     tables, the web-only `dexie_dbs` tracker, web GIS `maps`, and case
@@ -47,6 +47,7 @@ const ACTIVE_TABLES = [
   "data_catalog_drives",
   "dashboards",
   "concepts",
+  "concept_statuses",
   "concept_attributes",
   "attribute_mappings__dataset_column",
   "attribute_mappings__manual_entry",
@@ -186,8 +187,8 @@ export const EXCLUDED_TABLES = [
   "comments",
   // A saved connection's secret pointer is meaningless offline, and the
   // desktop shell cannot proxy a live Postgres connection either.
-  "db_connections",
-  "db_connections__postgres",
+  "connections",
+  "connections__postgres",
   // Pipeline crawl state, written by the pipeline server with the service
   // role. Nothing the desktop renders.
   "pipeline_scope_checkpoints",

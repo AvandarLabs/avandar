@@ -1,0 +1,97 @@
+/**
+ * Postgres-specific connection details - the satellite half of the
+ * `connections` / `connections__postgres` split. Host/port/database/
+ * username are operational metadata visible to any workspace editor, same
+ * sensitivity tier as `datasets__google_sheets`'s plain `google_document_id`
+ * column; only the password lives behind Vault.
+ */
+create table public.connections__postgres (
+  -- One row per postgres connection, keyed to its generic `connections` row.
+  connection_id uuid primary key references public.connections (id) on update cascade on delete cascade,
+  -- Denormalized from `connections.workspace_id`, same reasoning as
+  -- `datasets__google_sheets.workspace_id`: lets RLS and indexes on this
+  -- table avoid a join back to the parent.
+  workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
+  host text not null,
+  port integer not null,
+  database_name text not null,
+  username text not null,
+  ssl_mode public.connections__postgres_ssl_mode not null default 'require',
+  -- Points at the Vault secret holding the password alone - never the
+  -- password itself. Deliberately not a foreign
+  -- key: `vault.secrets` is owned by the Vault extension, not this
+  -- application's schema, so this column trusts the single write path
+  -- (the `connectors` edge function via the security-definer
+  -- wrapper below) to keep it valid rather than coupling the declarative
+  -- schema to an extension-managed table. Unique because the secret is
+  -- deleted along with this row (see the trigger below), so a shared secret
+  -- would be deleted out from under its other connection.
+  vault_secret_id uuid not null unique,
+  -- Set on every successful test-and-save or table listing; drives
+  -- "last connected" UI copy.
+  last_verified_at timestamptz,
+  -- Timestamps
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Enable row level security
+alter table public.connections__postgres enable row level security;
+
+-- Data API privileges. `authenticated` is select-only, same reasoning as
+-- `connections` above: `vault_secret_id` has no way to verify which
+-- connection created the Vault secret it references, so every write must
+-- go through the edge function's `service_role` client, never a direct
+-- Data API insert/update/delete.
+grant
+select
+  on table public.connections__postgres to authenticated,
+  service_role;
+
+grant insert,
+update,
+delete on table public.connections__postgres to service_role;
+
+-- Policies
+create policy "User can select connections__postgres in their workspace" on public.connections__postgres for
+select
+  to authenticated using (
+    public.util__auth_user_meets_min_app_role (
+      public.connections__postgres.workspace_id,
+      'data_sources'::public.app_type,
+      'editor'::public.role_level
+    )
+  );
+
+create trigger tr_connections__postgres__set_updated_at before
+update on public.connections__postgres for each row
+execute function public.util__set_updated_at ();
+
+/**
+ * Deletes a Postgres connection's Vault secret when its row is deleted,
+ * including when a workspace delete cascades the row away, so a decryptable
+ * credential never outlives the connection that pointed at it.
+ *
+ * `security definer` because only the owner can delete from `vault.secrets`.
+ */
+create or replace function public.connections__postgres__delete_vault_secret () returns trigger language plpgsql security definer
+set
+  search_path = '' as $$
+begin
+  delete from vault.secrets where id = old.vault_secret_id;
+  return old;
+end;
+$$;
+
+-- A trigger function needs no `execute` grant: Postgres checks it when the
+-- trigger is created, not when it fires.
+revoke all on function public.connections__postgres__delete_vault_secret ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr__connections__postgres__delete_vault_secret
+after delete on public.connections__postgres for each row
+execute function public.connections__postgres__delete_vault_secret ();

@@ -21,6 +21,9 @@ export type CaseDetailsRow = {
 type Props = {
   /** The case's fields, or `undefined` while they load. */
   attributes: readonly CaseDetailsRow[] | undefined;
+
+  /** Further rail groups, shown under the case's fields. */
+  children?: ReactNode;
 };
 
 /**
@@ -52,7 +55,7 @@ function DetailsStatus({
 }
 
 /** The case's fields as reference material in the properties rail. */
-export function CaseDetailsRail({ attributes }: Props): ReactNode {
+export function CaseDetailsRail({ attributes, children }: Props): ReactNode {
   return (
     <AppViewRail>
       <div className={css.details}>
@@ -72,6 +75,7 @@ export function CaseDetailsRail({ attributes }: Props): ReactNode {
         </AppViewRail.Group>
         <DetailsStatus attributes={attributes} />
       </div>
+      {children}
     </AppViewRail>
   );
 }

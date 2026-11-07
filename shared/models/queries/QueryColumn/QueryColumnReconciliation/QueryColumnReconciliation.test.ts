@@ -1,11 +1,13 @@
 import { Model } from "@avandar/models";
 import { pickProps } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
+import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryColumnReconciliation/QueryColumnReconciliation.ts";
 /** Verifies stable source identities and unambiguous projection retention. */
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
+import type { Concept } from "$/models/ontology/Concept/Concept.ts";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.ts";
 
 function _createColumn(name: string = "revenue"): QueryColumn.T {
@@ -120,5 +122,32 @@ describe("QueryColumnReconciliation", () => {
       { id: previous.id, aggregation: "sum" },
       { id: additional.id, aggregation: undefined },
     ]);
+  });
+
+  // The status column is rebuilt every time a case type's columns load. Its
+  // projection id must carry over, or a selected `status` column would drop
+  // out of the query on every refetch.
+  it("keeps a case type's status column selected when its columns reload", () => {
+    const conceptId = "cccccccc-3333-4333-8333-cccccccccccc" as Concept.Id;
+    const sourceKey: QueryDataSource.TypedId = {
+      __type: "Concept",
+      id: conceptId,
+    };
+    const previous = QueryColumn.makeFromConceptStatusColumn(
+      ConceptStatusColumn.fromConceptId(conceptId),
+    );
+    const incoming = QueryColumn.makeFromConceptStatusColumn(
+      ConceptStatusColumn.fromConceptId(conceptId),
+    );
+
+    const columns = QueryColumnReconciliation.reconcileSourceColumns({
+      sourceKey,
+      previousSourceKey: { ...sourceKey },
+      previous: [previous],
+      incoming: [incoming],
+    });
+
+    expect(incoming.id).not.toBe(previous.id);
+    expect(columns[0]?.id).toBe(previous.id);
   });
 });

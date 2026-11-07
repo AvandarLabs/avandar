@@ -2,8 +2,6 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   margin: 0;
-  max-height: 16rem;
-  overflow: auto;
   row-gap: 2px;
 }
 
@@ -22,6 +20,6 @@
   color: var(--mantine-color-dimmed);
   font-size: var(--mantine-font-size-xs);
   margin: 0;
-  padding-left: var(--mantine-spacing-md);
-  text-align: right;
+  padding-inline-start: var(--mantine-spacing-md);
+  text-align: end;
 }

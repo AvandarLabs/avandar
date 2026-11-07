@@ -5,7 +5,7 @@
  * `generateIndividuals` (src/views/OntologyDesignerApp/ConceptMetaView/
  * generateIndividuals/index.ts).
  *
- * The application never includes `id`, `status`, or `assigned_to` in the
+ * The application never includes `id`, `status_id`, or `assigned_to` in the
  * upsert payload it sends to Postgres. This locks in that Postgres's
  * `ON CONFLICT ... DO UPDATE SET` genuinely leaves an omitted column alone,
  * rather than relying only on a mocked unit test for that guarantee.
@@ -22,18 +22,24 @@ insert into public.workspaces (id, owner_id, name, slug)
 values ('b4001001-0000-4000-8000-000000000001'::uuid, 'b4000001-0000-4000-8000-000000000001'::uuid, 'sync contract ws', 'sync-contract-ws')
 on conflict (id) do nothing;
 
-insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation)
-values ('b4002001-0000-4000-8000-000000000001'::uuid, 'b4000001-0000-4000-8000-000000000001'::uuid, 'b4001001-0000-4000-8000-000000000001'::uuid, 'sync contract concept', true)
+insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
+values ('b4002001-0000-4000-8000-000000000001'::uuid, 'b4000001-0000-4000-8000-000000000001'::uuid, 'b4001001-0000-4000-8000-000000000001'::uuid, 'sync contract concept', true, 'b4005001-0000-4000-8000-000000000001'::uuid)
 on conflict (id) do nothing;
 
-insert into public.individuals (id, workspace_id, concept_id, external_id, name, status, assigned_to)
+insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
+values
+  ('b4005001-0000-4000-8000-000000000001'::uuid, 'b4001001-0000-4000-8000-000000000001'::uuid, 'b4002001-0000-4000-8000-000000000001'::uuid, 'Active', '#40c057', 0),
+  ('b4005002-0000-4000-8000-000000000002'::uuid, 'b4001001-0000-4000-8000-000000000001'::uuid, 'b4002001-0000-4000-8000-000000000001'::uuid, 'Confirmed', '#fa5252', 1)
+on conflict (id) do nothing;
+
+insert into public.individuals (id, workspace_id, concept_id, external_id, name, status_id, assigned_to)
 values (
   'b4003001-0000-4000-8000-000000000001'::uuid,
   'b4001001-0000-4000-8000-000000000001'::uuid,
   'b4002001-0000-4000-8000-000000000001'::uuid,
   'ext-sync-contract-1',
   'Original Name',
-  'confirmed',
+  'b4005002-0000-4000-8000-000000000002'::uuid,
   'b4000001-0000-4000-8000-000000000001'::uuid
 )
 on conflict (id) do nothing;
@@ -61,8 +67,8 @@ select is(
 );
 
 select is(
-  (select status from public.individuals where external_id = 'ext-sync-contract-1'),
-  'confirmed',
+  (select status_id from public.individuals where external_id = 'ext-sync-contract-1'),
+  'b4005002-0000-4000-8000-000000000002'::uuid,
   'the upsert leaves an existing status untouched'
 );
 

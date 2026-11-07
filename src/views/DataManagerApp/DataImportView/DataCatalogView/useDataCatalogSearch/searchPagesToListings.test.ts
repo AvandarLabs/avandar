@@ -7,11 +7,11 @@ function _listing(id: string): DataCatalogListing.SearchResult {
     id: id as DataCatalogListing.Id,
     displayName: `Listing ${id}`,
     organization1Name: "City of New York",
-    organization2Name: undefined,
-    organization3Name: undefined,
-    organization4Name: undefined,
+    pipelineName: undefined,
     isWorkspaceLoadable: true,
     isInvalid: false,
+    fileFormat: "CSV",
+    lastUpdatedAt: undefined,
   };
 }
 
