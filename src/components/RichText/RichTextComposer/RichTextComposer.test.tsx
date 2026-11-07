@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { RICH_TEXT_MAX_TEXT_LENGTH } from "$/models/RichTextDocument/RichTextDocument";
 import { RichTextComposer } from "@/components/RichText/RichTextComposer/RichTextComposer";
 import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
@@ -48,6 +56,24 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
       };
     },
   };
+});
+
+// ProseMirror scrolls the selection into view on a later animation frame
+// after `focus()`, measuring it with `getClientRects`, which jsdom does not
+// implement on ranges or elements. A real browser always has both.
+beforeAll(() => {
+  const emptyRects = (): DOMRectList => {
+    const noRect = (): null => {
+      return null;
+    };
+    return Object.assign([], { item: noRect }) as unknown as DOMRectList;
+  };
+  const emptyRect = (): DOMRect => {
+    return new DOMRect(0, 0, 0, 0);
+  };
+  Range.prototype.getClientRects ??= emptyRects;
+  Range.prototype.getBoundingClientRect ??= emptyRect;
+  Element.prototype.getClientRects ??= emptyRects;
 });
 
 beforeEach(() => {
