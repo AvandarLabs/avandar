@@ -95,6 +95,32 @@ describe("DiscoveryBody", () => {
     });
   });
 
+  it("submits every named value of a multi-value lookup when each matches one stored value", async () => {
+    const onSubmit = vi.fn();
+    render(
+      <DiscoveryBody
+        {...DISCOVERY_PROPS}
+        multi
+        candidateValues={["California", "Texas"]}
+        candidateGroups={[
+          ["California", "CA"],
+          ["Texas", "TX"],
+        ]}
+        resolveDiscovery={vi.fn().mockResolvedValue({
+          values: ["California", "Nevada", "Texas"],
+        })}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        answer: { kind: "preset", value: ["California", "Texas"] },
+        isInternalDiscovery: true,
+      });
+    });
+  });
+
   it("shows the catalog when more than one stored value matches", async () => {
     const onSubmit = vi.fn();
     render(

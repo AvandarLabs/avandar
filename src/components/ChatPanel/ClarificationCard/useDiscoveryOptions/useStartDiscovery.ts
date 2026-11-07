@@ -25,9 +25,10 @@ type StartDiscoveryParameters = {
   column: string;
   resolveDiscovery: DiscoveryResolver | undefined;
   candidateValues: readonly string[];
+  candidateGroups: ReadonlyArray<readonly string[]>;
   multi: boolean;
   onUniqueMatch?: (
-    storedValue: string,
+    storedValue: string | string[],
   ) => boolean | void | Promise<boolean | void>;
   fallbackError: string;
   unavailableError: string;
@@ -69,18 +70,25 @@ function _getUniqueMatch(
     result: DiscoveryResult;
     startOptions: Readonly<StartDiscoveryParameters>;
   }>,
-): string | undefined {
-  return options.result.kind === "ready" && !options.startOptions.multi
-    ? DiscoveryCandidateValues.getUniqueMatch({
-        candidateValues: options.startOptions.candidateValues,
-        discoveredValues: options.result.values,
+): string | string[] | undefined {
+  const { result, startOptions } = options;
+  if (result.kind !== "ready") {
+    return undefined;
+  }
+  return startOptions.multi
+    ? DiscoveryCandidateValues.getGroupMatches({
+        candidateGroups: startOptions.candidateGroups,
+        discoveredValues: result.values,
       })
-    : undefined;
+    : DiscoveryCandidateValues.getUniqueMatch({
+        candidateValues: startOptions.candidateValues,
+        discoveredValues: result.values,
+      });
 }
 
 async function _submitUniqueMatch(
   options: Readonly<{
-    storedValue: string | undefined;
+    storedValue: string | string[] | undefined;
     startOptions: Readonly<StartDiscoveryParameters>;
   }>,
 ): Promise<boolean> {
@@ -112,6 +120,9 @@ function _startDiscovery(
   }
   void _queryWithRetries({
     ...options,
+    candidateValues: Array.from(
+      new Set([...options.candidateValues, ...options.candidateGroups.flat()]),
+    ),
     resolveDiscovery: options.resolveDiscovery,
     onAttempt: (attempt) => {
       if (!isCancelled) {
@@ -144,6 +155,7 @@ export function useStartDiscovery(
   options: Readonly<StartDiscoveryParameters & { retryVersion: number }>,
 ): void {
   const { query, column, resolveDiscovery, candidateValues, multi } = options;
+  const { candidateGroups } = options;
   const { onUniqueMatch, fallbackError, unavailableError } = options;
   const { retry, retryVersion, setDiscoveryState } = options;
   const startDiscoveryForCurrentInputs = () => {
@@ -152,6 +164,7 @@ export function useStartDiscovery(
       column,
       resolveDiscovery,
       candidateValues,
+      candidateGroups,
       multi,
       onUniqueMatch,
       fallbackError,
@@ -169,6 +182,7 @@ export function useStartDiscovery(
     fallbackError,
     unavailableError,
     candidateValues,
+    candidateGroups,
     multi,
     onUniqueMatch,
     setDiscoveryState,

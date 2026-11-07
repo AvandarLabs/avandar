@@ -10,6 +10,7 @@ type Props = {
   column: string;
   multi: boolean;
   candidateValues: readonly string[];
+  candidateGroups?: ReadonlyArray<readonly string[]>;
   resolveDiscovery: DiscoveryResolver | undefined;
   onRequestDifferentDiscovery?: () => void;
   onSubmit: ClarificationAnswerHandler;
@@ -22,12 +23,13 @@ export function DiscoveryBody({
   column,
   multi,
   candidateValues,
+  candidateGroups,
   resolveDiscovery,
   onRequestDifferentDiscovery,
   onSubmit,
 }: Readonly<Props>): React.ReactNode {
   const onUniqueMatch = useCallback(
-    (storedValue: string) => {
+    (storedValue: string | string[]) => {
       return onSubmit({
         answer: { kind: "preset", value: storedValue },
         isInternalDiscovery: true,
@@ -40,6 +42,7 @@ export function DiscoveryBody({
     column,
     resolveDiscovery,
     candidateValues,
+    candidateGroups,
     multi,
     onUniqueMatch,
   });

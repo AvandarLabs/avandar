@@ -46,7 +46,7 @@ export function ClarificationCardBody({
     })
     .with(
       { kind: "discovery" },
-      ({ query, column, multi, candidateValues }) => {
+      ({ query, column, multi, candidateValues, candidateGroups }) => {
         return (
           <DiscoveryBody
             header={discoveryHeader}
@@ -54,6 +54,7 @@ export function ClarificationCardBody({
             column={column}
             multi={multi}
             candidateValues={candidateValues}
+            candidateGroups={candidateGroups}
             resolveDiscovery={resolveDiscovery}
             onRequestDifferentDiscovery={onRequestDifferentDiscovery}
             onSubmit={onAnswer}

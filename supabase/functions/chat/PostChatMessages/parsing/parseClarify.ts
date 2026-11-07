@@ -1,4 +1,7 @@
-import { makeDiscoveryCandidateValuesFromModelOutput } from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
+import {
+  makeDiscoveryCandidateGroupsFromModelOutput,
+  makeDiscoveryCandidateValuesFromModelOutput,
+} from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
 import { match } from "ts-pattern";
 import { isReadOnlyDiscoveryQuery } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
 import type { ChatClarifyRequest } from "$/types/chat.types.ts";
@@ -17,6 +20,7 @@ type RawClarifyArgs = {
     query?: unknown;
     column?: unknown;
     candidateValues?: unknown;
+    candidateGroups?: unknown;
   };
 };
 
@@ -114,6 +118,9 @@ export function parseClarify(
       if (!isReadOnlyDiscoveryQuery(query) || column.length === 0) {
         return undefined;
       }
+      const candidateGroups = makeDiscoveryCandidateGroupsFromModelOutput(
+        shape.candidateGroups,
+      );
       return {
         question,
         rationale,
@@ -125,6 +132,7 @@ export function parseClarify(
           candidateValues: makeDiscoveryCandidateValuesFromModelOutput(
             shape.candidateValues,
           ),
+          ...(candidateGroups.length > 0 ? { candidateGroups } : {}),
         },
         turnNumber,
       };
