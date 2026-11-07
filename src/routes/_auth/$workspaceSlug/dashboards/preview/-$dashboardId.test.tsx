@@ -43,8 +43,17 @@ vi.mock("@/clients/UserClient", () => {
 // the thing being asserted.
 vi.mock("@/views/DashboardApp/DashboardViewerView/DashboardViewerView", () => {
   return {
-    DashboardViewerView: (): ReactNode => {
-      return <div data-testid="dashboard-viewer" />;
+    DashboardViewerView: ({
+      highlightedTileId,
+    }: {
+      highlightedTileId?: string;
+    }): ReactNode => {
+      return (
+        <div
+          data-testid="dashboard-viewer"
+          data-highlighted-tile-id={highlightedTileId ?? ""}
+        />
+      );
     },
   };
 });
@@ -113,9 +122,10 @@ function _createLoaderArgs(): LoaderArgs {
 
 /** Renders the route's own component with a loader result it would produce. */
 function _renderPreviewComponent(
-  options: Readonly<{ isAccessDenied: boolean }>,
+  options: Readonly<{ isAccessDenied: boolean; tile?: string }>,
 ): void {
   vi.spyOn(Route, "useParams").mockReturnValue({ workspaceSlug: "acme" });
+  vi.spyOn(Route, "useSearch").mockReturnValue({ tile: options.tile });
   vi.spyOn(Route, "useLoaderData").mockReturnValue({
     dashboard: _createDashboard(),
     canEdit: !options.isAccessDenied,
@@ -227,5 +237,14 @@ describe("/$workspaceSlug/dashboards/preview/$dashboardId", () => {
 
     expect(screen.getByTestId("dashboard-viewer")).toBeInTheDocument();
     expect(screen.queryByText("You need access")).toBeNull();
+  });
+
+  it("passes a linked tile id to the dashboard viewer", () => {
+    _renderPreviewComponent({ isAccessDenied: false, tile: "DataViz-1" });
+
+    expect(screen.getByTestId("dashboard-viewer")).toHaveAttribute(
+      "data-highlighted-tile-id",
+      "DataViz-1",
+    );
   });
 });
