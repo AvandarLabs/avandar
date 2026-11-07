@@ -7464,6 +7464,12 @@ msgstr "Latitude and longitude must both be numbers."
 msgid "Delete dataset"
 msgstr "Delete dataset"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I can only add that to a dashboard. Open a dashboard and ask me again "
+"there."
+msgstr "I can only add that to a dashboard. Open a dashboard and ask me again "
+"there."
+
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "Your plan does not allow sharing more dashboards."

@@ -7289,6 +7289,11 @@ msgstr "纬度和经度必须都是数字。"
 msgid "Delete dataset"
 msgstr "删除数据集"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I can only add that to a dashboard. Open a dashboard and ask me again "
+"there."
+msgstr "我只能将其添加到仪表板。请打开一个仪表板，然后在那里重新向我提出请求。"
+
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "您的套餐不允许再分享更多仪表板。"
