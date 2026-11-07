@@ -180,9 +180,9 @@ describe("GadgetChip", () => {
 });
 
 describe("UnknownGadgetChip", () => {
-  it("shows a node with a malformed ref as an unavailable gadget", () => {
+  it("shows a node with a malformed ref as an unavailable item", () => {
     render(<UnknownGadgetChip />);
-    expect(screen.getByText("Unavailable gadget")).toBeInTheDocument();
+    expect(screen.getByText("Unavailable item")).toBeInTheDocument();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 });

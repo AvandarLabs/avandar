@@ -31,7 +31,7 @@ type Props = {
 } & ChipButtonProps;
 
 /** The copy shown for a gadget node whose stored ref is malformed. */
-const UNKNOWN_GADGET_LABEL = msg`Unavailable gadget`;
+const UNKNOWN_GADGET_LABEL = msg`Unavailable item`;
 
 function GadgetChipBody({
   definition,
