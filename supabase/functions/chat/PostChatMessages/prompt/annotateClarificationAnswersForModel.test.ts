@@ -26,6 +26,11 @@ describe("annotateClarificationAnswersForModel", () => {
       },
       { role: "user", content: "Show deaths in Brazil" },
       { role: "assistant", content: "[Clarification answer: Brazil]" },
+      {
+        role: "user",
+        content:
+          "[Clarification answer: New York]\n(Matched automatically to your candidate values; the user has not seen or confirmed it.)",
+      },
     ];
     expect(annotateClarificationAnswersForModel(messages)).toEqual(messages);
   });
