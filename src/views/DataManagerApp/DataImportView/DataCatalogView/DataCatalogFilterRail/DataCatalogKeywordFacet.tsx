@@ -36,6 +36,7 @@ export function DataCatalogKeywordFacet({
             <Pill
               key={keyword}
               size="sm"
+              radius="sm"
               withRemoveButton
               // Pill hides its remove button from assistive tech and the tab
               // order, since inside an input Backspace removes a pill. Here

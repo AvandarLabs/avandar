@@ -59,6 +59,17 @@ describe("DataCatalogFilterRail", () => {
     ).toBeInTheDocument();
   });
 
+  it("hides the second level when a chosen publisher has no second level", () => {
+    _renderRail({
+      filters: { sources: ["City of New York"] },
+      facets: { ...FACETS_WITH_AGENCIES, organization2: [] },
+    });
+
+    expect(
+      screen.queryByRole("group", { name: "Agency or Department" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("names the second level Organization when the drives have no label", () => {
     _renderRail({
       filters: { sources: ["City of New York"] },
@@ -101,18 +112,20 @@ describe("DataCatalogFilterRail", () => {
     _renderRail({ filters: { tags: ["taxi", "fhv"] } });
 
     expect(
-      [
-        screen.getByRole("button", { name: "Remove keyword taxi" }),
-        screen.getByRole("button", { name: "Remove keyword fhv" }),
-      ].length,
-    ).toBe(2);
+      screen.getByRole("button", { name: "Remove keyword taxi" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Remove keyword fhv" }),
+    ).toBeInTheDocument();
   });
 
   it("drops a keyword from the filters when its chip is removed", () => {
     const onFiltersChange = vi.fn();
     _renderRail({ filters: { tags: ["taxi", "fhv"] }, onFiltersChange });
 
-    fireEvent.click(screen.getByRole("button", { name: "Remove keyword taxi" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Remove keyword taxi" }),
+    );
 
     expect(onFiltersChange).toHaveBeenCalledWith(
       expect.objectContaining({ tags: ["fhv"] }),

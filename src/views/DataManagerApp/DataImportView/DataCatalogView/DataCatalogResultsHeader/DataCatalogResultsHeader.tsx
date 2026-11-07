@@ -113,8 +113,13 @@ export function DataCatalogResultsHeader({
               <Pill
                 key={activeFilter.key}
                 withRemoveButton
+                // Pill hides its remove button from assistive tech and the
+                // tab order, since inside an input Backspace removes a pill.
+                // Here the button is the only way to remove one.
                 removeButtonProps={{
                   "aria-label": t`Remove filter: ${activeFilter.label}`,
+                  "aria-hidden": false,
+                  tabIndex: 0,
                 }}
                 onRemove={activeFilter.onRemove}
               >

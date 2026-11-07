@@ -89,7 +89,5 @@
  * is a filter, not an intent.
  */
 .dataCatalogFilterRailKeywordChip {
-  --pill-radius: var(--mantine-radius-sm);
-
   background-color: var(--mantine-color-neutral-1);
 }

@@ -8320,7 +8320,7 @@ msgstr "編輯者"
 msgid "Entered manually"
 msgstr "手動輸入"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
 msgid "Organization"
 msgstr ""
 

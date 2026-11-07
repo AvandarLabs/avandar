@@ -8509,7 +8509,7 @@ msgstr "محرر"
 msgid "Entered manually"
 msgstr "تم الإدخال يدويًا"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
 msgid "Organization"
 msgstr ""
 

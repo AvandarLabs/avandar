@@ -17,6 +17,7 @@ import {
 import { DataCatalogCheckboxFacet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.module.css";
 import { DataCatalogKeywordFacet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet";
+import { DataCatalogOrganization2Facet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet";
 import type {
   CatalogFacets,
   CatalogListingFilters,
@@ -45,7 +46,7 @@ export function DataCatalogFilterRail({
   facets,
   onFiltersChange,
 }: Props): ReactNode {
-  const { t, i18n } = useLingui();
+  const { t } = useLingui();
   const updatedWithinLabels: Record<CatalogUpdatedWithin, string> = {
     any: t`Any time`,
     pastMonth: t`Past month`,
@@ -86,27 +87,15 @@ export function DataCatalogFilterRail({
           }}
         />
 
-        {/*
-         * The second level only means something inside a chosen publisher,
-         * and its name comes from that publisher's portal ("Agency",
-         * "Department"), so it waits for a publisher to be chosen.
-         */}
-        {filters.sources.length > 0 ? (
-          <DataCatalogCheckboxFacet
-            label={
-              facets.organization2Labels.length > 0
-                ? new Intl.ListFormat(i18n.locale, {
-                    type: "disjunction",
-                  }).format(facets.organization2Labels)
-                : t`Organization`
-            }
-            options={facets.organization2}
-            chosenValues={filters.organization2Names}
-            onChange={(organization2Names) => {
-              onFiltersChange({ ...filters, organization2Names });
-            }}
-          />
-        ) : null}
+        <DataCatalogOrganization2Facet
+          isPublisherChosen={filters.sources.length > 0}
+          labels={facets.organization2Labels}
+          options={facets.organization2}
+          chosenValues={filters.organization2Names}
+          onChange={(organization2Names) => {
+            onFiltersChange({ ...filters, organization2Names });
+          }}
+        />
 
         <DataCatalogCheckboxFacet
           label={t`Topic`}
