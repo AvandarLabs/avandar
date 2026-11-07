@@ -160,11 +160,11 @@ async function _runSourceQuery({
 
 /**
  * Runs a structured query (or caller-supplied raw SQL) against the right QETL
- * client, resolving dataset and individual sources.
+ * client. Every data source, case types included, is compiled to SQL and run
+ * through the workspace query session.
  *
  * This is the single execution path shared by the Data Explorer and the GIS
- * app. Callers wrap it in their own caching hook rather than duplicating the
- * source-resolution branches.
+ * app. Callers wrap it in their own caching hook.
  */
 export async function runStructuredQueryWithMetadata(
   params: RunStructuredQueryParams,
