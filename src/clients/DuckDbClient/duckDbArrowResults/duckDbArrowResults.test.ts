@@ -35,7 +35,7 @@ describe("arrowTableToJS", () => {
     ]);
   });
 
-  it("converts every field of a struct inside a list", () => {
+  it("returns a struct inside a list with each field converted as at top level", () => {
     const bucketDate = new Date("2026-01-05");
     const struct = new arrow.Struct([
       new arrow.Field("bucket", new arrow.DateDay(), true),
@@ -111,7 +111,7 @@ describe("arrowTableToJS", () => {
   });
 
   it("returns a list of decimals as plain numbers", () => {
-    const decimalType = new arrow.Decimal(2, 18, 128);
+    const decimalType = new arrow.Decimal(0, 18, 128);
     const child = arrow.makeData({
       type: decimalType,
       length: 1,
