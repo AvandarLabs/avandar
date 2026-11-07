@@ -168,3 +168,64 @@ create trigger tr__comments__sync_mentions
 after insert or
 update on public.comments for each row
 execute function public.comments__sync_mentions ();
+
+/**
+ * Rebuilds a comment's `comment_gadget_refs` from the `gadgetLink` and
+ * `gadgetEmbed` nodes in its stored document, keeping only nodes with a
+ * known gadget type and a valid uuid id. A deleted comment references
+ * nothing. Fires on every update (no column list) for the same reason as
+ * `comments__sync_mentions`. It does not check that the gadget exists or
+ * that the author can see it: reading a reference goes through the reader's
+ * own access.
+ */
+create or replace function public.comments__sync_gadget_refs () returns trigger language plpgsql security definer
+set
+  search_path = '' as $$
+begin
+  if tg_op = 'UPDATE' and new.body is not distinct from old.body then
+    return null;
+  end if;
+
+  delete from public.comment_gadget_refs r where r.comment_id = new.id;
+
+  if new.body is null then
+    return null;
+  end if;
+
+  insert into public.comment_gadget_refs (comment_id, workspace_id, gadget_type, gadget_id, sub_id, display)
+  select distinct new.id, new.workspace_id, ref.gadget_type, ref.gadget_id, ref.sub_id, ref.display
+  from (
+    select
+      case
+        when (node -> 'attrs' ->> 'gadgetType') = any (enum_range(null::public.gadget_type)::text[])
+          then (node -> 'attrs' ->> 'gadgetType')::public.gadget_type
+      end as gadget_type,
+      case
+        when (node -> 'attrs' ->> 'gadgetId') ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          then (node -> 'attrs' ->> 'gadgetId')::uuid
+      end as gadget_id,
+      nullif(node -> 'attrs' ->> 'subId', '') as sub_id,
+      case when node ->> 'type' = 'gadgetEmbed' then 'embed' else 'link' end as display
+    from jsonb_path_query(
+      new.body,
+      'lax $.** ? (@.type == "gadgetLink" || @.type == "gadgetEmbed")'
+    ) as node
+  ) as ref
+  where ref.gadget_type is not null and ref.gadget_id is not null;
+
+  return null;
+end;
+$$;
+
+revoke
+execute on function public.comments__sync_gadget_refs ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr__comments__sync_gadget_refs
+after insert or
+update on public.comments for each row
+execute function public.comments__sync_gadget_refs ();

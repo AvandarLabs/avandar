@@ -31,6 +31,7 @@ with public_tables as (
   where
     table_name not in (
       'activity_events',
+      'comment_gadget_refs',
       'comment_mentions',
       'comment_revisions',
       'comments',
@@ -87,6 +88,7 @@ with public_tables as (
   where
     table_name in (
       'activity_events',
+      'comment_gadget_refs',
       'comment_mentions',
       'data_catalog_listings__relation_columns',
       'data_catalog_listings',

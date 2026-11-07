@@ -185,6 +185,54 @@ export type Database = {
           },
         ]
       }
+      comment_gadget_refs: {
+        Row: {
+          comment_id: string
+          created_at: string
+          display: string
+          gadget_id: string
+          gadget_type: Database["public"]["Enums"]["gadget_type"]
+          id: string
+          sub_id: string | null
+          workspace_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          display: string
+          gadget_id: string
+          gadget_type: Database["public"]["Enums"]["gadget_type"]
+          id?: string
+          sub_id?: string | null
+          workspace_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          display?: string
+          gadget_id?: string
+          gadget_type?: Database["public"]["Enums"]["gadget_type"]
+          id?: string
+          sub_id?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_gadget_refs_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comment_gadget_refs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comment_mentions: {
         Row: {
           comment_id: string
@@ -2952,6 +3000,19 @@ export type Database = {
         Args: { p_new_secret: string; p_secret_id: string }
         Returns: undefined
       }
+      rpc_gadgets__search: {
+        Args: { p_limit?: number; p_query: string; p_workspace_id: string }
+        Returns: {
+          gadget_id: string
+          gadget_type: Database["public"]["Enums"]["gadget_type"]
+          has_limited_audience: boolean
+          label: string
+          rank: number
+          sub_id: string
+          sub_label: string
+          updated_at: string
+        }[]
+      }
       rpc_pipeline_executions__finish: {
         Args: { p_execution_id: string; p_outcome: Json }
         Returns: undefined
@@ -3303,6 +3364,13 @@ export type Database = {
         | "postgres_table"
       db_connections__connection_type: "postgres"
       db_connections__postgres_ssl_mode: "disable" | "require"
+      gadget_type:
+        | "dashboard"
+        | "dashboard_tile"
+        | "dataset"
+        | "map"
+        | "concept"
+        | "individual"
       nux_status: "not_started" | "in_progress" | "completed" | "dismissed"
       pipeline_execution_scopes__status: "succeeded" | "failed" | "skipped"
       pipeline_executions__command: "run" | "reset" | "prune_retired_scopes"
@@ -3594,6 +3662,14 @@ export const Constants = {
       ],
       db_connections__connection_type: ["postgres"],
       db_connections__postgres_ssl_mode: ["disable", "require"],
+      gadget_type: [
+        "dashboard",
+        "dashboard_tile",
+        "dataset",
+        "map",
+        "concept",
+        "individual",
+      ],
       nux_status: ["not_started", "in_progress", "completed", "dismissed"],
       pipeline_execution_scopes__status: ["succeeded", "failed", "skipped"],
       pipeline_executions__command: ["run", "reset", "prune_retired_scopes"],
