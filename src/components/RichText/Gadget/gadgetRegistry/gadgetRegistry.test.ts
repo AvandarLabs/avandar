@@ -4,7 +4,12 @@ import { GADGET_REGISTRY } from "@/components/RichText/Gadget/gadgetRegistry/gad
 import { i18n } from "@/i18n/i18n";
 
 function _translateEach(
-  key: "label" | "loadingLabel" | "unavailableLabel" | "limitedAudienceHint",
+  key:
+    | "label"
+    | "openLabel"
+    | "loadingLabel"
+    | "unavailableLabel"
+    | "limitedAudienceHint",
 ): string[] {
   return GADGET_TYPES.map((gadgetType) => {
     return i18n._(GADGET_REGISTRY[gadgetType][key]);
@@ -31,6 +36,17 @@ describe("GADGET_REGISTRY", () => {
       "Unavailable map",
       "Unavailable case type",
       "Unavailable case",
+    ]);
+  });
+
+  it("phrases each type's open action as one whole message", () => {
+    expect(_translateEach("openLabel")).toEqual([
+      "Open dashboard",
+      "Open dashboard tile",
+      "Open dataset",
+      "Open map",
+      "Open case type",
+      "Open case",
     ]);
   });
 

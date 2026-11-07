@@ -1,0 +1,8 @@
+.linkActions {
+  display: inline;
+}
+
+.dropdown {
+  min-inline-size: 160px;
+  padding: 4px;
+}

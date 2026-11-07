@@ -56,6 +56,9 @@ export type GadgetDefinition = {
 
   /** The capitalized type name, such as beside a card's title. */
   label: MessageDescriptor;
+
+  /** The editor's action that opens the gadget, such as "Open dashboard". */
+  openLabel: MessageDescriptor;
   loadingLabel: MessageDescriptor;
   unavailableLabel: MessageDescriptor;
 
@@ -79,6 +82,7 @@ export const GADGET_REGISTRY: Readonly<Record<Gadget.Type, GadgetDefinition>> =
     dashboard: {
       Icon: IconLayoutDashboard,
       label: msg`Dashboard`,
+      openLabel: msg`Open dashboard`,
       loadingLabel: msg`Loading dashboard`,
       unavailableLabel: msg`Unavailable dashboard`,
       limitedAudienceHint: msg`Only some people can open this dashboard. Teammates on this case without access will see "Unavailable".`,
@@ -87,6 +91,7 @@ export const GADGET_REGISTRY: Readonly<Record<Gadget.Type, GadgetDefinition>> =
     dashboard_tile: {
       Icon: IconChartBar,
       label: msg`Dashboard tile`,
+      openLabel: msg`Open dashboard tile`,
       loadingLabel: msg`Loading dashboard tile`,
       unavailableLabel: msg`Unavailable dashboard tile`,
       limitedAudienceHint: msg`Only some people can open this dashboard tile. Teammates on this case without access will see "Unavailable".`,
@@ -95,6 +100,7 @@ export const GADGET_REGISTRY: Readonly<Record<Gadget.Type, GadgetDefinition>> =
     dataset: {
       Icon: IconDatabase,
       label: msg`Dataset`,
+      openLabel: msg`Open dataset`,
       loadingLabel: msg`Loading dataset`,
       unavailableLabel: msg`Unavailable dataset`,
       limitedAudienceHint: msg`Only some people can open this dataset. Teammates on this case without access will see "Unavailable".`,
@@ -103,6 +109,7 @@ export const GADGET_REGISTRY: Readonly<Record<Gadget.Type, GadgetDefinition>> =
     map: {
       Icon: IconMap2,
       label: msg`Map`,
+      openLabel: msg`Open map`,
       loadingLabel: msg`Loading map`,
       unavailableLabel: msg`Unavailable map`,
       limitedAudienceHint: msg`Only some people can open this map. Teammates on this case without access will see "Unavailable".`,
@@ -111,6 +118,7 @@ export const GADGET_REGISTRY: Readonly<Record<Gadget.Type, GadgetDefinition>> =
     concept: {
       Icon: IconFolders,
       label: msg`Case type`,
+      openLabel: msg`Open case type`,
       loadingLabel: msg`Loading case type`,
       unavailableLabel: msg`Unavailable case type`,
       limitedAudienceHint: msg`Only some people can open this case type. Teammates on this case without access will see "Unavailable".`,
@@ -119,6 +127,7 @@ export const GADGET_REGISTRY: Readonly<Record<Gadget.Type, GadgetDefinition>> =
     individual: {
       Icon: IconFileText,
       label: msg`Case`,
+      openLabel: msg`Open case`,
       loadingLabel: msg`Loading case`,
       unavailableLabel: msg`Unavailable case`,
       limitedAudienceHint: msg`Only some people can open this case. Teammates on this case without access will see "Unavailable".`,
