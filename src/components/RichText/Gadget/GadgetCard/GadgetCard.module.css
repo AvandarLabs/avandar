@@ -1,0 +1,124 @@
+/*
+ * The card sits inside a comment, which is already on the raised surface,
+ * so it takes a border and no shadow.
+ */
+.card {
+  background-color: var(--ava-surface-raised);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  overflow: hidden;
+}
+
+.header {
+  align-items: center;
+  background-color: var(--ava-surface-body);
+  border-block-end: 1px solid var(--ava-border-default);
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  padding-block: var(--mantine-spacing-xs);
+  padding-inline: var(--mantine-spacing-sm) var(--mantine-spacing-xs);
+}
+
+.iconTile {
+  background-color: var(--mantine-color-neutral-1);
+  block-size: 26px;
+  border-radius: var(--mantine-radius-sm);
+  color: var(--mantine-color-neutral-8);
+  display: grid;
+  flex: none;
+  inline-size: 26px;
+  place-items: center;
+}
+
+.titleGroup {
+  align-items: baseline;
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  min-inline-size: 0;
+}
+
+.name,
+.unavailableName {
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 600;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unavailableName {
+  color: var(--mantine-color-dimmed);
+}
+
+.nameSkeleton {
+  align-self: center;
+  block-size: 14px;
+  inline-size: 160px;
+}
+
+.kind {
+  color: var(--mantine-color-dimmed);
+  flex: none;
+  font-size: var(--mantine-font-size-xs);
+  white-space: nowrap;
+}
+
+.body {
+  padding-block: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  padding-inline: var(--mantine-spacing-sm);
+}
+
+.facts {
+  display: grid;
+  font-size: var(--mantine-font-size-sm);
+  gap: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.factLabel {
+  color: var(--mantine-color-dimmed);
+  font-size: var(--mantine-font-size-xs);
+}
+
+.factValue {
+  font-weight: 500;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.factSkeleton {
+  block-size: 34px;
+}
+
+.unavailableText {
+  color: var(--mantine-color-dimmed);
+  font-size: var(--mantine-font-size-sm);
+  margin: 0;
+}
+
+.openLink {
+  align-items: center;
+  border-radius: var(--mantine-radius-xs);
+  color: var(--mantine-color-primary-7);
+  display: inline-flex;
+  flex: none;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 500;
+  gap: 4px;
+  padding-block: 2px;
+  padding-inline: 6px;
+  text-decoration: none;
+  transition: var(--ava-transition-colors);
+}
+
+.openLink:hover {
+  background-color: var(--mantine-color-primary-0);
+}
+
+.openLink:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 1px;
+}
