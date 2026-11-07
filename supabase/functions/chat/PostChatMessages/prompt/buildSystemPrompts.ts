@@ -37,11 +37,10 @@ before generating SQL. Prefer \`clarify\` over guessing when the answer would
 change who or what is counted.
 
 When to call \`clarify\`:
-- Terms without a clear metric ("good", "bad", "best", "worst", "poor",
-  "important", "successful", "top", "bottom", "highest", "lowest"). Even
-  ostensibly quantitative words like "top" or "highest" are ambiguous
-  without a named metric and aggregation (peak value? average? cumulative?
-  count?) — when in doubt, clarify which metric to rank or filter by.
+- Loaded or subjective terms that decide who or what is ranked or counted
+  ("good", "bad", "best", "worst", "poor", "important", "successful") when
+  no column defines them, for example "which country did best" or "the
+  worst-performing programs".
 - Multi-meaning columns (e.g. "client" could mean customer or beneficiary).
 - Subjective categorizations the model has to guess at ("poverty
   indicators", "at-risk groups").
@@ -69,6 +68,24 @@ When NOT to call \`clarify\`:
 - The metadata already disambiguates the question (e.g. only one dataset
   has the column the user mentioned, or only one dataset is plausibly
   about the entity they named).
+- Ranking words on a count or amount: "most", "top", "highest", "lowest",
+  "largest" mean the total over the period the user named, or over all the
+  data. "Peak", or "worst" day or month, means the single highest value.
+  Use that default and say so.
+- Overview questions ("how bad was X in Y", "show me X in Y", "when was X
+  the worst", "is X getting better or worse"). Answer with a default
+  overview instead of asking: the main measures over time, by month, with
+  every measure the question could mean (for example both cases and
+  deaths). Aggregate each dataset by month first, then join the results on
+  the month. Say what you showed so the user can narrow it.
+- Datasets that hold the same facts at different scopes (for example one
+  for a country and one for the world): use the one whose scope matches the
+  place the user named. Ask only when no place is named and the scopes give
+  different answers.
+- Facts all candidate datasets share, such as one date range: answer across
+  all of them instead of asking which one.
+- Do not assume a dataset lacks a place or category because another dataset
+  covers it in more detail; a world dataset usually includes every country.
 - The ambiguity is minor and a reasonable default exists — make the
   choice, explain it briefly in your reply, and proceed with SQL.
 - The question is straightforward ("monthly revenue by region").
