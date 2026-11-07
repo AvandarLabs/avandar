@@ -1,4 +1,3 @@
-import { prop, sortObjList } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { match } from "ts-pattern";
@@ -16,11 +15,6 @@ import type {
   RunStructuredQueryResult,
   StructuredQueryAuth,
 } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
-
-/** A structured query's columns, in the stable order execution expects. */
-type SortedQueryColumns = ReadonlyArray<
-  StructuredQuery.Partial["queryColumns"][number]
->;
 
 /**
  * Resolves the SQL that should actually run: caller-supplied raw SQL takes
@@ -136,14 +130,14 @@ async function _runSourceQuery({
   workspaceId,
   dataSource,
   executionQuery,
-  sortedQueryColumns,
+  queryColumnCount,
 }: {
   workspaceId: Workspace.Id;
   dataSource: QueryDataSource.T | undefined;
   executionQuery: StructuredQuery.Partial;
-  sortedQueryColumns: SortedQueryColumns;
+  queryColumnCount: number;
 }): Promise<QueryResult.T<UnknownRow>> {
-  if (!dataSource || sortedQueryColumns.length === 0) {
+  if (!dataSource || queryColumnCount === 0) {
     return QueryResult.makeEmpty();
   }
 
@@ -175,7 +169,6 @@ export async function runStructuredQueryWithMetadata(
 
   const { query } = params;
   const { dataSource, queryColumns } = query;
-  const sortedQueryColumns = sortObjList(queryColumns, { sortBy: prop("id") });
 
   const { sqlToRun, executionQuery, didAutoLimit } =
     await _selectSqlForExecution(params);
@@ -193,7 +186,7 @@ export async function runStructuredQueryWithMetadata(
       workspaceId: _getWorkspaceAuthFromStructuredQuery(params).workspaceId,
       dataSource,
       executionQuery,
-      sortedQueryColumns,
+      queryColumnCount: queryColumns.length,
     }),
     didAutoLimit,
     executedSql: sqlToRun,

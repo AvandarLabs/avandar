@@ -85,8 +85,10 @@ export function buildConceptViewSql(
     `${SPINE_ALIAS}.${quoteSqlIdentifier(STATUS_COLUMN)} AS ${quoteSqlIdentifier(STATUS_COLUMN)}`,
     ...orderedColumns
       .filter((column) => {
-        // An attribute already named `external_id` or `status` would collide
-        // with a spine column above. The spine wins: a join depends on the
+        // `makeConceptAttributeColumnsFromMetadata` already suffixes an
+        // attribute named `external_id` or `status`, so this only guards a
+        // caller that builds columns by hand. Such a column would collide with
+        // a spine column above, and the spine must win: a join depends on the
         // key, and every case type's status is that column. Column names are
         // case-insensitive in DuckDB, so the comparison is too.
         const lowercasedName = column.attributeName.toLowerCase();
