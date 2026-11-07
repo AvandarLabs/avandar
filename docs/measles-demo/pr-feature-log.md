@@ -1050,6 +1050,7 @@ facet against every other filter. The list loads 50 at a time as it scrolls.
 | `c2055f851` | chore(data-catalog): translate the catalog browser copy and apply the pre-push formatter | MIXED: everything except the `DataManagerApp.tsx` reformat, which is F20. Regenerate the `.po` catalogs, then keep its hand-corrected `sw`, `zh-Hans`, `es`, `fr`, and `pt` strings. |
 | `c0f7b1954` | feat(catalog): filter, sort, and facet catalog search in Postgres | All of it. Regenerate the migration and types after F17's. |
 | `3440d68b6` | feat(data-catalog): run the catalog browser on server search | All of it. Regenerate the `.po` catalogs. |
+| `051a30ebf` | fix(catalog): hide datasets no workspace can add when loadable only is on | All of it, folded into this PR's search schema rather than a migration of its own. Needs F16's `is_workspace_loadable`. |
 
 **Files:** everything under
 `src/views/DataManagerApp/DataImportView/DataCatalogView/` except
@@ -1073,11 +1074,15 @@ and the signature in `rpc_data_catalog_listings__search.test.sql`,
 F17's three-argument search with the filtered one, and adds the facet RPC
 and its two helpers, `execute` for `authenticated` only). Regenerate it after
 F17's migration, rather than copying it.
+`20261107193803_catalog_loadable_filter_checks_workspace_loadable.sql` is a
+fix on top of it: loadable only, and the `unloadable` count, also leave out
+listings with `is_workspace_loadable` false. A PR built from the final schema
+files already has it.
 
 **Verification:**
 ```sh
 pnpm vitest run src/views/DataManagerApp src/views/DataExplorerApp src/components/layouts src/clients/data-catalog-listings
-supabase test db supabase/tests/database/rpc_data_catalog_listings__search.test.sql supabase/tests/database/rpc_data_catalog_listings__search_filters.test.sql
+supabase test db supabase/tests/database/rpc_data_catalog_listings__search.test.sql supabase/tests/database/rpc_data_catalog_listings__search_filters.test.sql supabase/tests/database/rpc_data_catalog_listings__search_loadable.test.sql
 pnpm test:db
 pnpm test:e2e csv-import.spec.ts
 pnpm test:e2e data-explorer-query-drawer.spec.ts
@@ -1385,10 +1390,6 @@ on the `NOT NULL` `organization1_name`. An old frontend's `DBReadSchema`
 rejects the new listing shape, so the catalog would not load.
 
 **Follow-ups found in review, not done here:**
-- `passes_loadable` in `51.data_catalog_listings__search_matches.sql` tests
-  `is_invalid`, not `is_workspace_loadable`, so "Hide datasets that can't be
-  loaded" still shows unsupported listings. This came from
-  `feat/catalog-filters` (F19).
 - `ava pipeline run --local` discards the runner's warnings on a successful
   run (`runPipelineLocal.ts` keeps stderr only for a failed run). Mapping
   warnings are invisible unless the runner is run directly. The pipeline
@@ -1554,6 +1555,9 @@ Its commits are covered by F19, not numbered here.
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full
 under F21 in the same way.
+
+`051a30ebf`, from `fix/catalog-loadable-filter`, fixes F19's loadable-only
+filter and is listed under F19.
 
 Commits that only update this log are branch-only and are not listed.
 

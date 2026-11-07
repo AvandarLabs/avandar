@@ -219,7 +219,10 @@ create or replace function public.rpc_data_catalog_listings__search_facets (
       from
         match
       where
-        match.is_invalid and
+        (
+          not match.is_workspace_loadable or
+          match.is_invalid
+        ) and
         match.passes_source and
         match.passes_format and
         match.passes_updated and
