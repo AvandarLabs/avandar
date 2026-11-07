@@ -12,7 +12,8 @@
 # listed here wins over a pipeline that calls an asset loadable.
 #
 # Supporting a format later: remove it here (or add it to a pipeline's
-# `loadableFormats`), then flip `is_workspace_loadable` on the matching
+# `workspaceLoadability.loadableFormats` in its `<pipeline>.pipeline.yaml`),
+# then flip `is_workspace_loadable` on the matching
 # listings with a data migration. No re-crawl is needed, because every
 # listing is already indexed.
 workspaceLoadability:
