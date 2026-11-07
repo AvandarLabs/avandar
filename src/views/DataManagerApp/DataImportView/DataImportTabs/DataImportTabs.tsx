@@ -49,7 +49,11 @@ export function DataImportTabs({
   return (
     <Tabs
       tabIds={["upload-view", "connectors-view", "open-data-catalog"] as const}
-      classNames={{ root: css.dataImportTabs, panel: css.dataImportTabsPanel }}
+      classNames={{
+        root: css.dataImportTabs,
+        list: css.dataImportTabsList,
+        panel: css.dataImportTabsPanel,
+      }}
       onTabChange={onTabChange}
       renderTabHeader={{
         "upload-view": t`Upload`,
@@ -58,11 +62,11 @@ export function DataImportTabs({
       }}
       renderTabPanel={{
         "upload-view": () => {
-          return <ManualUploadView pt="lg" onSaveSuccess={onSaveSuccess} />;
+          return <ManualUploadView onSaveSuccess={onSaveSuccess} />;
         },
         "connectors-view": () => {
           return (
-            <Stack gap="xl" pt="lg">
+            <Stack gap="xl">
               <GoogleSheetsImportView onSaveSuccess={onSaveSuccess} />
               <PostgresConnectorImportView onSaveSuccess={onSaveSuccess} />
               <ConnectorsAdvisory />
@@ -74,7 +78,6 @@ export function DataImportTabs({
             <DataCatalogView
               isAddAllowed={isAddAllowed}
               onSaveSuccess={onSaveSuccess}
-              pt="md"
             />
           );
         },
