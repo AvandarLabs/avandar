@@ -130,6 +130,7 @@ msgid "Start (e.g. 2024-01-01)"
 msgstr "Início (ex.: 2024-01-01)"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Keywords"
 msgstr ""
 
@@ -465,7 +466,7 @@ msgstr "Estilo"
 msgid "Square"
 msgstr "Quadrado"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Notes"
 msgstr "Notas"
 
@@ -879,6 +880,10 @@ msgstr "Escolha um status padrão desta lista."
 msgid "Layer name"
 msgstr "Nome da camada"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
+msgid "Show datasets in {topic}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
 msgstr "Melhor correspondência"
@@ -1059,7 +1064,7 @@ msgstr "Tabela"
 msgid "First tick value"
 msgstr "Valor da primeira marca"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Covers"
 msgstr "Cobertura"
 
@@ -1369,6 +1374,10 @@ msgstr "Limite de assentos alcançado"
 msgid "Could not unpublish dashboard"
 msgstr "Não foi possível cancelar a publicação do dashboard"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "Technical details"
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Where the fields come from"
 msgstr "De onde vêm os campos"
@@ -1419,6 +1428,10 @@ msgstr "Digite o e-mail"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
 msgstr "Mínimo do eixo X"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Show less"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
@@ -1565,10 +1578,6 @@ msgstr "Fechar chat (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "Falha ao criar"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-msgid "Raw metadata"
-msgstr "Metadados brutos"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
@@ -2092,6 +2101,10 @@ msgstr "Editor Global"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Manage seats in billing portal →"
 msgstr "Gerenciar assentos no portal de cobrança →"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "Source record"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations"
@@ -3063,6 +3076,10 @@ msgstr "Não foi possível publicar o dashboard"
 msgid "Measure"
 msgstr "Medir"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
+msgid "Published by"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
 msgstr "A cláusula HAVING usa um lado esquerdo que o formulário não pode "
@@ -3874,6 +3891,10 @@ msgstr "O registro requer uma conexão com a internet."
 msgid "There are no values"
 msgstr "Não há valores"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Show more"
+msgstr ""
+
 #: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "Esclarecimento {turnNumber} de 3"
@@ -4678,7 +4699,7 @@ msgstr "O conjunto de dados agora está apenas offline"
 msgid "{0} copy"
 msgstr "Cópia de {0}"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Original"
 msgstr "Original"
 
@@ -4924,7 +4945,7 @@ msgstr "Qualquer um no {app}"
 msgid "Failed to delete dataset"
 msgstr "Falha ao excluir o conjunto de dados"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "License"
 msgstr "Licença"
 
@@ -5030,6 +5051,10 @@ msgstr "[A pesquisa de descoberta local falhou. Tente outra coluna ou consulta "
 msgid "Offline model download failed"
 msgstr "Falha ao baixar o modelo offline"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
+msgid "File"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointInputControls.tsx
 msgid "Point geometry column"
@@ -5123,7 +5148,7 @@ msgstr "Colunas"
 msgid "Bright"
 msgstr "Brilhante"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Canonical"
 msgstr "Canônico"
 
@@ -6269,6 +6294,7 @@ msgid "Overlapping"
 msgstr "Sobreposto"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Download"
 msgstr "Baixar"
 
@@ -7336,7 +7362,7 @@ msgstr "Conectado"
 msgid "Only the owner can make this {resource} private."
 msgstr "Somente o proprietário pode tornar este {resource} privado."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Updates"
 msgstr "Atualizações"
 
@@ -7991,6 +8017,10 @@ msgstr "Conjunto de dados"
 msgid "All decisions"
 msgstr "Todas as decisões"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
+msgid "Topics"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Show labels"
 msgstr "Mostrar rótulos"
@@ -8166,6 +8196,10 @@ msgstr "{formattedNumResults} de {formattedNumCatalogListings} conjuntos de "
 msgid "Remove"
 msgstr "Remover"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.tsx
+msgid "+{numHidden} more"
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "1 dataset"
 msgstr "1 conjunto de dados"
@@ -8175,7 +8209,7 @@ msgstr "1 conjunto de dados"
 msgid "No numeric columns"
 msgstr "Sem colunas numéricas"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Service"
 msgstr "Serviço"
 
@@ -8349,6 +8383,10 @@ msgstr "Do Google Sheets"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Subscription updated successfully"
 msgstr "Assinatura atualizada com sucesso"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "Last indexed"
+msgstr ""
 
 #. placeholder {0}: columns.length
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
@@ -8634,6 +8672,7 @@ msgid "Entered manually"
 msgstr "Inserido manualmente"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
 msgid "Organization"
 msgstr ""
 
@@ -8828,6 +8867,10 @@ msgstr "Este conjunto de dados está sincronizado online. Clique para torná-lo 
 msgid "Published Date"
 msgstr "Data de publicação"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
+msgid "Level {levelNumber}"
+msgstr ""
+
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "This map has no layers yet"
 msgstr "Este mapa ainda não tem camadas"
@@ -8835,6 +8878,10 @@ msgstr "Este mapa ainda não tem camadas"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not blank"
 msgstr "não está em branco"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
+msgid "About"
+msgstr ""
 
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "No boundary layer on this map to look up a P-code."
@@ -9335,6 +9382,7 @@ msgid "Case type"
 msgstr "Tipo de caso"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -9364,6 +9412,10 @@ msgstr "Recomendado"
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Teal"
 msgstr "Verde-azulado"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "Indexed by"
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
@@ -9483,6 +9535,10 @@ msgstr "Adicione uma série para escolher qual coluna numérica controla o "
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "Coluna de geometria"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "Last run"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Keyword: {keyword}"
@@ -9638,6 +9694,10 @@ msgstr "Baixo a alto"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "Texto"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
+msgid "Show datasets tagged {keyword}"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group deleted"

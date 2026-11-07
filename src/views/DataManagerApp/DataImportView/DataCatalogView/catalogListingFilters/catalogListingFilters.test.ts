@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  addCatalogFilterValue,
   EMPTY_CATALOG_FACETS,
   EMPTY_CATALOG_LISTING_FILTERS,
   getCatalogListingFormat,
@@ -205,6 +206,28 @@ describe("settleCatalogListingFilters", () => {
     };
 
     expect(settleCatalogListingFilters(filters)).toBe(filters);
+  });
+});
+
+describe("addCatalogFilterValue", () => {
+  it("adds a topic after the topics already chosen", () => {
+    const filters: CatalogListingFilters = {
+      ...EMPTY_CATALOG_LISTING_FILTERS,
+      domains: ["Health"],
+    };
+
+    expect(
+      addCatalogFilterValue(filters, "domains", "Transportation").domains,
+    ).toEqual(["Health", "Transportation"]);
+  });
+
+  it("returns the same filters when the keyword is already chosen", () => {
+    const filters: CatalogListingFilters = {
+      ...EMPTY_CATALOG_LISTING_FILTERS,
+      tags: ["taxi"],
+    };
+
+    expect(addCatalogFilterValue(filters, "tags", "taxi")).toBe(filters);
   });
 });
 

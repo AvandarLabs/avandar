@@ -1,27 +1,41 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Anchor, Button, Collapse, Stack, Text, Title } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { IconArrowLeft, IconChevronDown, IconPlus } from "@tabler/icons-react";
+import { Button, Spoiler, Stack, Text, Title } from "@mantine/core";
+import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
-import {
-  getCatalogListingFormat,
-  getCatalogListingUpdatedDate,
-} from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
+import { buildOrganizationLine } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOrganizationLine/buildOrganizationLine";
+import { getCatalogListingUpdatedDate } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
 import { DataCatalogInvalidNotice } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice";
 import { DataCatalogListingColumns } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
+import { DataCatalogAboutGroup } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.module.css";
+import { DataCatalogPublishedByGroup } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup";
+import { DataCatalogSourceGroup } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup";
+import { DataCatalogTechnicalDetails } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails";
 import { DataCatalogUnsupportedNotice } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice";
 import { formatCatalogListingDate } from "@/views/DataManagerApp/DataImportView/DataCatalogView/formatCatalogListingDate";
+import type { DataCatalogDrive } from "$/models/data-catalog-listings/DataCatalogDrive/DataCatalogDrive";
 import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";
 import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
 import type { ReactNode } from "react";
 
+/**
+ * How tall the description runs before "Show more": about six lines of
+ * small text, enough to read what a dataset is without pushing its facts
+ * below the fold.
+ */
+const DESCRIPTION_MAX_HEIGHT = 130;
+
 type Props = {
   /** Selected catalog listing, or none when nothing is selected. */
   listing: DataCatalogListingRead | undefined;
+  /**
+   * The drive the selected listing came from, which names its organization
+   * levels. Undefined while it loads or when the listing has no drive.
+   */
+  drive: DataCatalogDrive.T | undefined;
   /** The selected listing's columns, as stored. */
   columns: readonly DataCatalogRelationColumn.T[];
   /** Whether the selected listing's column types are confirmed yet. */
@@ -49,35 +63,29 @@ type Props = {
    * decides.
    */
   onBack: () => void;
+  /** Narrows the catalog to one of the listing's topics. */
+  onSelectTopic: (domain: string) => void;
+  /** Narrows the catalog to one of the listing's keywords. */
+  onAddKeyword: (tag: string) => void;
 };
-
-/** The listing's coverage as a date range, or undefined when it has none. */
-function _formatCoverage(
-  listing: Readonly<DataCatalogListingRead>,
-): string | undefined {
-  const dates = [listing.coverageStartDate, listing.coverageEndDate]
-    .filter((isoDate) => {
-      return isoDate !== undefined;
-    })
-    .map((isoDate) => {
-      return formatCatalogListingDate(new Date(isoDate));
-    });
-  return dates.length === 0 ? undefined : dates.join(" – ");
-}
 
 /**
  * Everything the catalog knows about one listing, and the one action on it.
  *
  * The add action sits in a foot that never scrolls, so it stays in reach
- * however long the column list runs. Columns come before provenance because
- * for most listings they are the most telling thing the catalog has.
+ * however long the column list runs.
  *
- * The provenance fields read as a labelled fact list rather than as nine
- * bold-heading-plus-paragraph pairs, which turns a page of short values into
- * a page of headings. There is exactly one add button: a primary action
- * offered twice makes a user check whether the two do the same thing. A
- * listing whose dataset cannot be loaded, or that is a kind of dataset a
- * workspace cannot hold yet, says so and cannot be added.
+ * Values a user scans sit in the line under the title. Anything that needs a
+ * label sits in a labelled fact group (who published it, what it is about,
+ * where it comes from), each left out when it has nothing to show, rather
+ * than as bold-heading-plus-paragraph pairs that turn a page of short values
+ * into a page of headings. How the catalog indexed the listing is reference
+ * only an expert reads, so it waits behind a disclosure at the end.
+ *
+ * There is exactly one add button: a primary action offered twice makes a
+ * user check whether the two do the same thing. A listing whose dataset
+ * cannot be loaded, or that is a kind of dataset a workspace cannot hold
+ * yet, says so and cannot be added.
  */
 export function DataCatalogListingDetail({
   listing,
@@ -87,12 +95,14 @@ export function DataCatalogListingDetail({
   isAdding,
   isWaitingForColumnTypes,
   isLoadingColumnMetadata,
+  drive,
   onAddToWorkspace,
   onBack,
+  onSelectTopic,
+  onAddKeyword,
 }: Props): ReactNode {
   const { t } = useLingui();
   const offline = useOfflineGate();
-  const [isRawMetadataOpen, rawMetadata] = useDisclosure(false);
 
   if (!listing) {
     return (
@@ -107,10 +117,6 @@ export function DataCatalogListingDetail({
     );
   }
 
-  const metadataJson =
-    listing.metadata !== undefined
-      ? JSON.stringify(listing.metadata, undefined, 2)
-      : undefined;
   const isAddPending = isAdding || isWaitingForColumnTypes;
   const isAddBlocked =
     !listing.isWorkspaceLoadable ||
@@ -120,10 +126,8 @@ export function DataCatalogListingDetail({
     isLoadingColumnMetadata ||
     offline.isBlocked;
   const updatedDate = getCatalogListingUpdatedDate(listing);
-  const coverage = _formatCoverage(listing);
   const summaryFacts = [
-    listing.organization1Name,
-    getCatalogListingFormat(listing),
+    buildOrganizationLine(listing),
     updatedDate
       ? t`Updated ${formatCatalogListingDate(updatedDate)}`
       : undefined,
@@ -131,7 +135,15 @@ export function DataCatalogListingDetail({
 
   return (
     <div className={css.dataCatalogListingDetail}>
-      <Stack gap="md" className={css.dataCatalogListingDetailBody}>
+      {/*
+       * Keyed by listing so another listing opens scrolled to the top, with
+       * its description, keywords, and technical details folded again.
+       */}
+      <Stack
+        key={listing.id}
+        gap="md"
+        className={css.dataCatalogListingDetailBody}
+      >
         <Button
           variant="subtle"
           color="neutral"
@@ -177,94 +189,35 @@ export function DataCatalogListingDetail({
         ) : null}
 
         {listing.description ? (
-          <Text size="sm" maw="70ch">
-            {listing.description}
-          </Text>
+          <Spoiler
+            maxHeight={DESCRIPTION_MAX_HEIGHT}
+            showLabel={t`Show more`}
+            hideLabel={t`Show less`}
+            maw="70ch"
+            classNames={{ control: css.dataCatalogListingDetailSpoilerControl }}
+          >
+            <Text size="sm" className={css.dataCatalogListingDetailDescription}>
+              {listing.description}
+            </Text>
+          </Spoiler>
         ) : null}
+
+        <AppViewRail>
+          <DataCatalogPublishedByGroup listing={listing} drive={drive} />
+          <DataCatalogAboutGroup
+            listing={listing}
+            onSelectTopic={onSelectTopic}
+            onAddKeyword={onAddKeyword}
+          />
+          <DataCatalogSourceGroup listing={listing} />
+        </AppViewRail>
 
         <DataCatalogListingColumns
           columns={columns}
           columnTypeState={columnTypeState}
         />
 
-        <AppViewRail.Group>
-          {listing.externalServiceName ? (
-            <AppViewRail.Fact label={t`Service`}>
-              {listing.externalServiceName}
-            </AppViewRail.Fact>
-          ) : null}
-          {coverage ? (
-            <AppViewRail.Fact label={t`Covers`}>{coverage}</AppViewRail.Fact>
-          ) : null}
-          {listing.license ? (
-            <AppViewRail.Fact label={t`License`}>
-              {listing.license}
-            </AppViewRail.Fact>
-          ) : null}
-          {listing.updateFrequency ? (
-            <AppViewRail.Fact label={t`Updates`}>
-              {listing.updateFrequency}
-            </AppViewRail.Fact>
-          ) : null}
-          {listing.sourceUrl ? (
-            <AppViewRail.Fact label={t`Original`}>
-              <Anchor href={listing.sourceUrl} size="xs" target="_blank">
-                {listing.sourceUrl}
-              </Anchor>
-            </AppViewRail.Fact>
-          ) : null}
-          {listing.canonicalUrls && listing.canonicalUrls.length > 0 ? (
-            <AppViewRail.Fact label={t`Canonical`}>
-              <Stack gap={2}>
-                {listing.canonicalUrls.map((url) => {
-                  return (
-                    <Anchor key={url} href={url} size="xs" target="_blank">
-                      {url}
-                    </Anchor>
-                  );
-                })}
-              </Stack>
-            </AppViewRail.Fact>
-          ) : null}
-          {listing.notes ? (
-            <AppViewRail.Fact label={t`Notes`}>
-              {listing.notes}
-            </AppViewRail.Fact>
-          ) : null}
-        </AppViewRail.Group>
-
-        {metadataJson ? (
-          <Stack gap="xs" align="flex-start">
-            <Button
-              variant="subtle"
-              color="neutral"
-              size="compact-xs"
-              rightSection={
-                <IconChevronDown
-                  size={14}
-                  className={
-                    isRawMetadataOpen
-                      ? css.dataCatalogListingDetailChevronOpen
-                      : css.dataCatalogListingDetailChevronClosed
-                  }
-                />
-              }
-              aria-expanded={isRawMetadataOpen}
-              onClick={rawMetadata.toggle}
-            >
-              <Trans>Raw metadata</Trans>
-            </Button>
-            <Collapse expanded={isRawMetadataOpen} w="100%">
-              <Text
-                component="pre"
-                size="xs"
-                className={css.dataCatalogListingDetailRawMetadata}
-              >
-                {metadataJson}
-              </Text>
-            </Collapse>
-          </Stack>
-        ) : null}
+        <DataCatalogTechnicalDetails listing={listing} />
       </Stack>
 
       <div className={css.dataCatalogListingDetailFoot}>

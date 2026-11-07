@@ -90,6 +90,22 @@ export function settleCatalogListingFilters(
 }
 
 /**
+ * The filters with one more chosen value of `key`, such as a topic or keyword
+ * picked from a listing. Returns the same object when the value is already
+ * chosen, so picking it again changes nothing.
+ */
+export function addCatalogFilterValue(
+  filters: Readonly<CatalogListingFilters>,
+  key: CatalogValueFilterKey,
+  value: string,
+): CatalogListingFilters {
+  if (filters[key].includes(value)) {
+    return filters;
+  }
+  return { ...filters, [key]: [...filters[key], value] };
+}
+
+/**
  * The filters without one chosen value of `key`, settled so removing the last
  * publisher also clears the level-2 organizations.
  */

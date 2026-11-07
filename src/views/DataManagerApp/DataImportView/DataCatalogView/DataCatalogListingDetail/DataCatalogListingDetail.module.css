@@ -69,6 +69,39 @@
   transform: scaleX(-1);
 }
 
+/* Keep the paragraph breaks the source's HTML had. */
+.dataCatalogListingDetailDescription {
+  white-space: pre-line;
+}
+
+/*
+ * Neutral rather than blue: revealing the rest of a paragraph is reading,
+ * not an intent on the listing.
+ */
+.dataCatalogListingDetailSpoilerControl {
+  color: var(--mantine-color-neutral-7);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 500;
+  margin-top: var(--mantine-spacing-xxs);
+}
+
+.dataCatalogListingDetailSpoilerControl:hover {
+  color: var(--mantine-color-neutral-9);
+}
+
+.dataCatalogListingDetailSourceRecord {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xxs);
+  margin: 0;
+}
+
+.dataCatalogListingDetailSourceRecordLabel {
+  color: var(--mantine-color-neutral-6);
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.45;
+}
+
 .dataCatalogListingDetailRawMetadata {
   background-color: var(--ava-surface-body);
   border: 1px solid var(--ava-border-default);

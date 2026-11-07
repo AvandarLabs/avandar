@@ -16,6 +16,7 @@ import { IconWorldSearch } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useState } from "react";
 import { uuid } from "$/lib/uuid";
+import { DataCatalogDriveClient } from "@/clients/data-catalog-listings/DataCatalogDriveClient";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DataCatalogRelationColumnClient } from "@/clients/data-catalog-listings/DataCatalogRelationColumnClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -32,6 +33,7 @@ import { Logger } from "@/utils/Logger";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOpenDataDatasetColumnInputs";
 import {
+  addCatalogFilterValue,
   EMPTY_CATALOG_FACETS,
   EMPTY_CATALOG_LISTING_FILTERS,
   hasActiveCatalogFilters,
@@ -163,6 +165,12 @@ export function DataCatalogView({
   const selectedListing: DataCatalogListingRead | undefined = isSelectionShown
     ? fetchedListing
     : undefined;
+  const [selectedListingDrive] = DataCatalogDriveClient.useGetById({
+    id: selectedListing?.driveId,
+    useQueryOptions: {
+      enabled: selectedListing?.driveId !== undefined,
+    },
+  });
 
   useVerifyColumnTypesOnDwell({
     listing: selectedListing,
@@ -413,6 +421,7 @@ export function DataCatalogView({
             ) : (
               <DataCatalogListingDetail
                 listing={selectedListing}
+                drive={selectedListingDrive}
                 columns={catalogListingColumns}
                 columnTypeState={_toColumnTypeState(
                   selectedListing,
@@ -430,6 +439,14 @@ export function DataCatalogView({
                 }}
                 onBack={() => {
                   setSelectedId(undefined);
+                }}
+                onSelectTopic={(domain) => {
+                  changeFilters(
+                    addCatalogFilterValue(filters, "domains", domain),
+                  );
+                }}
+                onAddKeyword={(tag) => {
+                  changeFilters(addCatalogFilterValue(filters, "tags", tag));
                 }}
               />
             )}

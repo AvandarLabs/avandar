@@ -128,6 +128,7 @@ msgid "Start (e.g. 2024-01-01)"
 msgstr "ابدأ (مثل 2024-01-01)"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Keywords"
 msgstr ""
 
@@ -459,7 +460,7 @@ msgstr "النمط"
 msgid "Square"
 msgstr "مربع"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Notes"
 msgstr "ملاحظات"
 
@@ -864,6 +865,10 @@ msgstr "اختر حالة افتراضية من هذه القائمة."
 msgid "Layer name"
 msgstr "اسم الطبقة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
+msgid "Show datasets in {topic}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
 msgstr "أفضل تطابق"
@@ -1040,7 +1045,7 @@ msgstr "جدول"
 msgid "First tick value"
 msgstr "قيمة التدريج الأول"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Covers"
 msgstr "تغطي"
 
@@ -1345,6 +1350,10 @@ msgstr "تم الوصول إلى حد المقاعد"
 msgid "Could not unpublish dashboard"
 msgstr "تعذّر إلغاء نشر لوحة المعلومات"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "Technical details"
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Where the fields come from"
 msgstr "مصدر الحقول"
@@ -1393,6 +1402,10 @@ msgstr "أدخل البريد الإلكتروني"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
 msgstr "الحد الأدنى للمحور X"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Show less"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
@@ -1539,10 +1552,6 @@ msgstr "إغلاق الدردشة (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "فشل الإنشاء"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-msgid "Raw metadata"
-msgstr "بيانات وصفية أولية"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
@@ -2061,6 +2070,10 @@ msgstr "المحرر العالمي"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Manage seats in billing portal →"
 msgstr "إدارة المقاعد في بوابة الفوترة →"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "Source record"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations"
@@ -3018,6 +3031,10 @@ msgstr "تعذّر نشر لوحة المعلومات"
 msgid "Measure"
 msgstr "قياس"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
+msgid "Published by"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
 msgstr "تستخدم عبارة HAVING جانبًا أيسر لا يمكن للنموذج تمثيله."
@@ -3815,6 +3832,10 @@ msgstr "يتطلب التسجيل اتصالاً بالإنترنت."
 msgid "There are no values"
 msgstr "لا توجد قيم"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Show more"
+msgstr ""
+
 #: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "توضيح {turnNumber} من 3"
@@ -4609,7 +4630,7 @@ msgstr "مجموعة البيانات الآن متاحة فقط في وضع ع�
 msgid "{0} copy"
 msgstr "نسخة {0}"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Original"
 msgstr "الأصلية"
 
@@ -4855,7 +4876,7 @@ msgstr "أي شخص في {app}"
 msgid "Failed to delete dataset"
 msgstr "فشل في حذف مجموعة البيانات"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "License"
 msgstr "الرخصة"
 
@@ -4959,6 +4980,10 @@ msgstr "[فشل البحث في الاكتشاف المحلي. جرّب عمود
 msgid "Offline model download failed"
 msgstr "فشل تحميل النموذج غير المتصل"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
+msgid "File"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointInputControls.tsx
 msgid "Point geometry column"
@@ -5051,7 +5076,7 @@ msgstr "الأعمدة"
 msgid "Bright"
 msgstr "ساطع"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Canonical"
 msgstr "أساسي"
 
@@ -6180,6 +6205,7 @@ msgid "Overlapping"
 msgstr "متداخل"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Download"
 msgstr "تنزيل"
 
@@ -7230,7 +7256,7 @@ msgstr "متصل"
 msgid "Only the owner can make this {resource} private."
 msgstr "يمكن للمالك فقط جعل هذا {resource} خاصًا."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Updates"
 msgstr "التحديثات"
 
@@ -7875,6 +7901,10 @@ msgstr "مجموعة البيانات"
 msgid "All decisions"
 msgstr "جميع القرارات"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
+msgid "Topics"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Show labels"
 msgstr "عرض التسميات"
@@ -8049,6 +8079,10 @@ msgstr "{formattedNumResults} من أصل {formattedNumCatalogListings} مجمو
 msgid "Remove"
 msgstr "إزالة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogMetadataChips/DataCatalogMetadataChips.tsx
+msgid "+{numHidden} more"
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "1 dataset"
 msgstr "مجموعة بيانات واحدة"
@@ -8058,7 +8092,7 @@ msgstr "مجموعة بيانات واحدة"
 msgid "No numeric columns"
 msgstr "لا توجد أعمدة رقمية"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Service"
 msgstr "الخدمة"
 
@@ -8231,6 +8265,10 @@ msgstr "من Google Sheets"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Subscription updated successfully"
 msgstr "تم تحديث الاشتراك بنجاح"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "Last indexed"
+msgstr ""
 
 #. placeholder {0}: columns.length
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
@@ -8510,6 +8548,7 @@ msgid "Entered manually"
 msgstr "تم الإدخال يدويًا"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
 msgid "Organization"
 msgstr ""
 
@@ -8703,6 +8742,10 @@ msgstr "تم مزامنة مجموعة البيانات هذه عبر الإنت
 msgid "Published Date"
 msgstr "تاريخ النشر"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
+msgid "Level {levelNumber}"
+msgstr ""
+
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "This map has no layers yet"
 msgstr "لا تحتوي هذه الخريطة على طبقات بعد"
@@ -8710,6 +8753,10 @@ msgstr "لا تحتوي هذه الخريطة على طبقات بعد"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not blank"
 msgstr "ليس فارغًا"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
+msgid "About"
+msgstr ""
 
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "No boundary layer on this map to look up a P-code."
@@ -9202,6 +9249,7 @@ msgid "Case type"
 msgstr "نوع الحالة"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -9231,6 +9279,10 @@ msgstr "موصى به"
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Teal"
 msgstr "أخضر مزرق"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "Indexed by"
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
@@ -9349,6 +9401,10 @@ msgstr "أضف سلسلة لاختيار العمود الرقمي الذي يق
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "عمود الهندسة"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "Last run"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Keyword: {keyword}"
@@ -9503,6 +9559,10 @@ msgstr "منخفض إلى مرتفع"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "نص"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
+msgid "Show datasets tagged {keyword}"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group deleted"
