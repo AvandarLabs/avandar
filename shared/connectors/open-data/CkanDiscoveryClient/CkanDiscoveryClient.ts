@@ -135,13 +135,16 @@ function _buildSearchPage(
   const rows = rawResults.map((rawResult) => {
     return {
       sortKey: _readSortKey(rawResult),
+      rawResult,
       parsed: CkanPackageSchema.safeParse(rawResult),
     };
   });
   const lastSortKey = rows.at(-1)?.sortKey;
   return {
-    datasets: rows.flatMap(({ parsed }) => {
-      return parsed.success ? [createCkanPackageFromWire(parsed.data)] : [];
+    datasets: rows.flatMap(({ rawResult, parsed }) => {
+      return parsed.success
+        ? [createCkanPackageFromWire(parsed.data, rawResult)]
+        : [];
     }),
     skippedDatasets: rows.flatMap(({ sortKey, parsed }) => {
       return parsed.success

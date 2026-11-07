@@ -31,7 +31,7 @@ export function createCkanClient(http: Readonly<OpenDataHttp>): CkanClient {
         "package_show",
         await http.get(url),
       );
-      return createCkanPackageFromWire(CkanPackageSchema.parse(result));
+      return createCkanPackageFromWire(CkanPackageSchema.parse(result), result);
     },
 
     getResourceBytes: async ({ ckanResourceId, url }) => {

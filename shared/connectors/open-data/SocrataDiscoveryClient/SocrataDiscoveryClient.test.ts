@@ -77,6 +77,7 @@ describe("SocrataDiscoveryClient.search", () => {
     expect(page).toEqual({
       results: [
         {
+          sourceRecord: expect.anything(),
           datasetId: "akvg-8vrb",
           name: "CDC Wastewater Data for Measles",
           domain: "data.cdc.gov",
@@ -95,6 +96,19 @@ describe("SocrataDiscoveryClient.search", () => {
       resultSetSize: 1,
       skippedResults: [],
     });
+  });
+
+  it("keeps each result exactly as the API returned it", async () => {
+    const rawResult = _rawResult({ id: "raw-0001", extra_field: { a: 1 } });
+    const http = _http({
+      get: vi.fn(async () => {
+        return { results: [rawResult], resultSetSize: 1 };
+      }),
+    });
+
+    const page = await createSocrataDiscoveryClient(http).search({});
+
+    expect(page.results[0]?.sourceRecord).toEqual(rawResult);
   });
 
   it("reads each result's asset type and file MIME type", async () => {

@@ -70,6 +70,13 @@ export type CkanPackage = {
    */
   metadata_modified: string | undefined;
   resources: readonly CkanResource[];
+  /**
+   * The dataset exactly as `package_show` or `package_search` returned it,
+   * before any of it was narrowed to the fields above. A pipeline maps
+   * catalog metadata from it and stores it as the listing's
+   * `source_metadata`.
+   */
+  sourceRecord: unknown;
 };
 
 /** Reads CKAN metadata and resource bytes. Stateless. */
