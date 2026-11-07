@@ -1,4 +1,4 @@
-import { prop, propEq } from "@avandar/utils";
+import { prop } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
@@ -9,6 +9,7 @@ import {
   assumptionNeedsSignInOrApproval,
   buildSqlNotAppliedAssistantText,
 } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
+import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { shouldQueueDashboardBlock } from "@/components/ChatPanel/useAvandarChatRuntime/shouldQueueDashboardBlock/shouldQueueDashboardBlock";
 import { waitForAppliedSqlOutcome } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
@@ -93,9 +94,7 @@ async function reviewAndApplySql(
   if (options.isGenerationStale()) {
     return false;
   }
-  const prompt =
-    [...options.apiMessages].reverse().find(propEq("role", "user"))?.content ??
-    "";
+  const prompt = getLastQuestionFromMessages(options.apiMessages);
   options.dataExplorerDispatch.setRawSql(options.sql);
   options.dataExplorerDispatch.setNlPrompt(prompt);
   try {
