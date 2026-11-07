@@ -54,6 +54,21 @@ function _getHighlightedIndex(
   return index === -1 ? 0 : index;
 }
 
+/**
+ * Scrolls `list` just far enough to bring `row` inside it, and does nothing
+ * when the row is already in view. It moves only the list, where
+ * `scrollIntoView` would also scroll the page behind the menu.
+ */
+function _scrollListToRow(list: HTMLElement, row: HTMLElement): void {
+  const listBounds = list.getBoundingClientRect();
+  const rowBounds = row.getBoundingClientRect();
+  if (rowBounds.top < listBounds.top) {
+    list.scrollTop += rowBounds.top - listBounds.top;
+  } else if (rowBounds.bottom > listBounds.bottom) {
+    list.scrollTop += rowBounds.bottom - listBounds.bottom;
+  }
+}
+
 function _buildSelection(
   item: MentionMenuItem,
   display: "link" | "embed",
@@ -192,12 +207,15 @@ export function useMentionMenuNavigation(
   // Rerun on `items` too: groups arriving above the pinned row push it out
   // of view without the highlight itself changing.
   useEffect(() => {
-    if (highlightedOptionId !== undefined) {
-      document
-        .getElementById(highlightedOptionId)
-        ?.scrollIntoView({ block: "nearest" });
+    const list = document.getElementById(listboxId);
+    const row =
+      highlightedOptionId === undefined
+        ? null
+        : document.getElementById(highlightedOptionId);
+    if (list && row) {
+      _scrollListToRow(list, row);
     }
-  }, [highlightedOptionId, items]);
+  }, [listboxId, highlightedOptionId, items]);
   useEditingAreaComboboxAria(editingArea, listboxId, highlightedOptionId);
   useImperativeHandle(ref, () => {
     return {

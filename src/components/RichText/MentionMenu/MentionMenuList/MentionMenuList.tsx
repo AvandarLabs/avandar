@@ -81,6 +81,11 @@ export const MentionMenuList = forwardRef<
         position="bottom-start"
         width={300}
         withinPortal
+        // Mantine hands floating-ui's autoUpdate to the popover only when
+        // it is not kept mounted. Its fallback effect misses a list that is
+        // open from mount, so the position would be computed once, while the
+        // menu is still small, and never flip or resize as results arrive.
+        keepMounted={false}
         // The anchor is a zero-size point at the caret, which floating-ui
         // can report as detached. The list must show whenever it is mounted.
         hideDetached={false}
