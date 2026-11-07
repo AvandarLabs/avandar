@@ -88,6 +88,7 @@ export function parseOpenRouterResponse(options: {
     }
   }
 
+  let text = options.attemptText;
   if (
     !generatedSql &&
     !clarification &&
@@ -96,12 +97,13 @@ export function parseOpenRouterResponse(options: {
     !options.skipSqlExtraction &&
     options.attemptText.length > 0
   ) {
-    const extractedSql = extractSqlFromAssistantText(options.attemptText);
-    if (extractedSql) {
+    const extracted = extractSqlFromAssistantText(options.attemptText);
+    if (extracted) {
       generatedSql = {
-        sql: cleanLlmGeneratedSql(extractedSql),
+        sql: cleanLlmGeneratedSql(extracted.sql),
         prompt: options.lastUserPrompt,
       };
+      text = extracted.textWithoutSql;
     }
   }
 
@@ -121,7 +123,7 @@ export function parseOpenRouterResponse(options: {
 
   return applySqlTableAliasesToParsedAttempt(
     {
-      text: options.attemptText,
+      text,
       generatedSql,
       clarification,
       dashboardBlock,

@@ -33,6 +33,39 @@ describe("parseOpenRouterResponse", () => {
     expect(parsed.generatedSql?.sql).not.toContain('"t0"');
   });
 
+  it("keeps SQL written as plain text out of the reply the user reads", () => {
+    const parsed = parseOpenRouterResponse({
+      message: {
+        content: 'SELECT "Province_State", SUM("daily_new_deaths") FROM "t0" GROUP BY 1',
+      },
+      attemptText:
+        'SELECT "Province_State", SUM("daily_new_deaths") FROM "t0" GROUP BY 1',
+      lastUserPrompt: "deaths by state",
+      priorClarifications: 0,
+      datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
+    });
+
+    expect(parsed.generatedSql?.sql).toContain(`FROM "${CHOLERA_ID}"`);
+    expect(parsed.text).toBe("");
+  });
+
+  it("keeps the prose around a fenced SQL block and drops the block", () => {
+    const attemptText =
+      "Here are monthly deaths for both states.\n```sql\nSELECT 1 FROM \"t0\"\n```\nI grouped by month.";
+    const parsed = parseOpenRouterResponse({
+      message: { content: attemptText },
+      attemptText,
+      lastUserPrompt: "compare states",
+      priorClarifications: 0,
+      datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
+    });
+
+    expect(parsed.generatedSql?.sql).toContain(`FROM "${CHOLERA_ID}"`);
+    expect(parsed.text).toBe(
+      "Here are monthly deaths for both states.\n\nI grouped by month.",
+    );
+  });
+
   it("rewrites discovery query aliases to dataset ids", () => {
     const parsed = parseOpenRouterResponse({
       message: {
