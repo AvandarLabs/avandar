@@ -177,3 +177,93 @@ describe("isSafeLinkHref", () => {
     expect(isSafeLinkHref("/cases/1")).toBe(false);
   });
 });
+
+describe("gadget nodes", () => {
+  const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111";
+
+  it("accepts a gadget link and a gadget embed", () => {
+    expect(
+      isRichTextDocument({
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "gadgetLink",
+                attrs: {
+                  gadgetType: "dashboard",
+                  gadgetId: DASHBOARD_ID,
+                  subId: null,
+                },
+              },
+            ],
+          },
+          {
+            type: "gadgetEmbed",
+            attrs: {
+              gadgetType: "dashboard_tile",
+              gadgetId: DASHBOARD_ID,
+              subId: "DataViz-1",
+            },
+          },
+        ],
+      }),
+    ).toBe(true);
+  });
+
+  it("rejects a gadget node with bad attributes", () => {
+    expect(
+      isRichTextDocument({
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "gadgetLink",
+                attrs: {
+                  gadgetType: "dashboard",
+                  gadgetId: "nope",
+                  subId: null,
+                },
+              },
+            ],
+          },
+        ],
+      }),
+    ).toBe(false);
+  });
+
+  it("writes a gadget as its type noun in plain text, never its name", () => {
+    expect(
+      richTextToPlainText({
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              { type: "text", text: "See " },
+              {
+                type: "gadgetLink",
+                attrs: {
+                  gadgetType: "concept",
+                  gadgetId: DASHBOARD_ID,
+                  subId: null,
+                },
+              },
+            ],
+          },
+          {
+            type: "gadgetEmbed",
+            attrs: {
+              gadgetType: "dashboard_tile",
+              gadgetId: DASHBOARD_ID,
+              subId: "DataViz-1",
+            },
+          },
+        ],
+      }),
+    ).toBe("See [case type]\n[tile]");
+  });
+});
