@@ -86,12 +86,15 @@ The limit is enforced in four places:
 - Sources of different types in one non-identifier field (umbrella 3.3).
 - A source with its own rule. One rule reduces all of a field's rows.
 - Key normalization and crosswalks per source (G7) and removing the record
-  name from Sync (G6). Section 11 names the seams.
+  name from Sync (G6). Section 6.12 names the seams.
 - Reordering sources in the chat draft card (open question 3).
 - A schema-level marker for multi-source columns. A field's view column has
-  the same type and shape with one source or several, so
-  `QueryColumn.baseColumn`, `QueryResultColumn` and `RelationColumn` need
-  nothing from this gap.
+  the same type and shape with one source or several, so neither
+  `QueryColumn.baseColumn` nor `QueryResultColumn` needs one. G4's
+  `bucketGrain` on `QueryResultColumn` and `ProjectionDescriptor` comes from
+  the field (`QueryColumn.getBucketGrain`), which keeps its period with any
+  number of sources, so it needs no change either. `RelationColumn` has no
+  production consumer and is not touched.
 - Turning G3's `list_field_is_key_or_label` RPC check into a table
   constraint. It becomes expressible once the rule is on the field, but it is
   not needed for several sources.
@@ -159,7 +162,11 @@ measured. `UNION ALL` of a `BIGINT` key and a `VARCHAR` key resolves to
 | G1 | `buildAttributeValueSql(options: AttributeValueSqlOptions)` (`conceptRelation/buildAttributeValueSql/`) reads one source (`selectColumnName`, `primaryKeyColumnName`, `datasetId`) through a `rowFilter` that holds the key comparison and the NULL rule, for single values and lists. `buildConceptViewSql` and Sync's name call it. `ConceptAttributeColumn` arms carry `attributeId`. The record page builds `CaseDetailsRow.sourceNames: string[]` in `makeCaseDetailsRowsFromAttributes`, de-duplicated and sorted, one name per line in the rail. | Replaces the three one-source options with `sources` and `sharedSourceDuckDbDataType`, and its `FROM` with the stacked rows. Orders `sourceNames` by read order. |
 | G2 | `ValuePickerRule` (`getOutputDataType`, `isAllowedForColumnType`, `toAllowedRuleType`, `DEFAULT_RULE_TYPE`). `max`, `min`, `count` stop casting. `_assertRuleAllowedForColumn` in column resolution throws for a single-value field whose rule its column's type disallows. The chat parser takes catalog columns and replaces a disallowed rule. A hand-written migration corrects `data_type` and rewrites disallowed rules, with an upgrade replay (`value_rule_data_types.*`). | Moves the check onto the field's rule and its sources' shared type. Repeats the migration's correction while moving the rule. Patches G2's replay prelude so it still runs on the final schema. |
 | G3 | `ConceptAttribute.ValueShape`, `getValueShape`, `getOutputDataType({ valueShape, ruleType, columnDataType })`. The mapping's rule is nullable, and `rpc_concepts__create` refuses a rule on a list or none on a single field (`value_rule_mismatch`) and a list label or identifier (`list_field_is_key_or_label`). `ConceptAttributeColumn`'s `dataset_column` arm is `{ ...; selectColumnName; datasetId; primaryKeyColumnName } & ConceptAttributeValueRule`, with `ConceptAttributeValueRule = { valueShape: "single"; valuePickerRuleType } \| { valueShape: "list" }`, built by `_getValueRule({ attribute, mapping })`. The form uses `keepKeyAndLabelFieldsSingle` and G2's `withFieldDataTypes` at submit. | Builds the value rule from the field. Replaces `value_rule_mismatch` with the table constraint. Reads `withFieldDataTypes`' column from the first source. |
-| G4 | `concept_attributes.bucket_grain` (with `..._requires_array` and `..._dataset_value_only` checks), `attribute_mappings__dataset_column.bucket_column_id` checked per mapping row by `tr__attribute_mappings__dataset_column__validate_bucket_column`. `buildBucketedListValueSql` with internal `_buildSourceRowsSql` (`bucket, value, row_order`), `_buildPerBucketValuesSql`, and `DATE_TRUNC_PART_BY_GRAIN`. The `dataset_column` arm gains `bucketGrain` and `bucketColumnName`; `ConceptAttributeValueRule` gains a `"bucketed_list"` arm with a rule. `_resolveBucketColumnName({ attribute, mapping, metadata })` fails closed. Chat attributes carry `bucketGrain` and `bucketColumnId`. | Moves `bucketColumnName` into each source and `_buildSourceRowsSql` into the stacked module. Applies `_resolveBucketColumnName` per source. Moves the chat `bucketColumnId` into each source. |
+| G4 | `concept_attributes.bucket_grain` with two table checks: `concept_attributes__bucket_grain_requires_array`, and `concept_attributes__bucket_grain_dataset_value_only` (no per-period label, identifier or hand-entered field). `attribute_mappings__dataset_column.bucket_column_id`, checked both ways on every mapping insert and update by `tr__attribute_mappings__dataset_column__validate_bucket_column`: set exactly when the field has a period, and then a `date` or `timestamp` column of the mapping's own dataset. `rpc_concepts__create` writes both columns, and G3's `value_rule_mismatch` check becomes "a rule unless the field is a list with no period" (message `A dataset field has a value rule unless it keeps every value`). `buildBucketedListValueSql(options: BucketedListValueSqlOptions)` runs `_buildSourceRowsSql` (one dataset's `bucket, value, row_order`), then `_buildPerBucketValuesSql` (the rule per period, `AGGREGATE_SQL_BY_RULE`), then the list wrapper. `ConceptAttributeValueRule` gains `{ valueShape: "bucketed_list"; valuePickerRuleType; bucketGrain; bucketColumnName }`, which `_buildColumnSelector` matches; `_getValueRule({ attribute, mapping, metadata })` builds it through `_resolveBucket`, failing closed, and refuses a date column on a field without a period. `_getMappedDatasetColumns` (planning) fetches every mapping's date column and `_getConceptColumnsByDatasetId` (needed columns) loads it. `QueryColumn.getBucketGrain` carries the period to `ProjectionDescriptor` and `QueryResultColumn`. Chat attributes carry `bucketGrain` and `bucketColumnId`. | Moves `bucketColumnName` off the `bucketed_list` arm into each source; the arm keeps the rule and `bucketGrain`. Replaces `_buildSourceRowsSql`, and nothing else of the builder, with the stacked module; `first` adds `source_position` to its order. Narrows `_resolveBucket` to a per-source `_resolveBucketColumnName`, keeping every refusal. The needed-columns list loads every source's date column; planning already fetches it (one mapping row per source), and a test pins that. The shape check replaces the RPC rule check and keeps its rule. Moves the chat `bucketColumnId` into each source. Leaves both table checks, the trigger and `QueryResultColumn` unchanged. |
+
+G1 also deleted `ConceptWrapper` and `AttributeAssertionClient`; nothing in
+this design reads either. G6 may land before or after G5 (umbrella section
+4); section 6.7 says what Sync does in each order.
 
 Where a landed name differs, the plan keeps the landed name (plan Task 0).
 Where a landed decision differs, the executor stops and records it here.
@@ -216,7 +223,9 @@ author listed them.
   ((value_picker_rule_type is not null) = (mapping_type = 'dataset_column'
   and (not is_array or bucket_grain is not null)))`: required exactly on
   single and bucketed-list dataset-column fields, which is umbrella 3.1's
-  rule in one equality.
+  rule in one equality. For a dataset field it is G4's RPC rule word for
+  word ("a rule unless the field is a list with no period"); it adds that a
+  hand-entered field holds none.
 - `attribute_mappings__dataset_column`: `value_picker_rule_type` dropped,
   `concept_attribute_id` no longer `unique`,
   `attribute_mappings__dataset_column__attribute_column_unique` added, and
@@ -224,15 +233,21 @@ author listed them.
   `(concept_attribute_id, workspace_id)` still serves the foreign key.
 - `rpc_concepts__create` writes `value_picker_rule_type` with each attribute
   and `position` with each mapping (`coalesce(m.position, 0)`), stops reading
-  the mapping's rule, and drops G3's `value_rule_mismatch` block, which the
-  table constraint replaces. G3's `list_field_is_key_or_label` block stays.
-  A refused rule now fails the attribute insert with `23514` naming the
-  constraint, and the transaction rolls back as before.
+  the mapping's rule, and drops the `value_rule_mismatch` block (G3's, as G4
+  reworded it), which the table constraint replaces. G3's
+  `list_field_is_key_or_label` block stays. A refused rule now fails the
+  attribute insert with `23514` naming the constraint, and the transaction
+  rolls back as before.
 - Unchanged and still correct for several sources: the label and identifier
   trigger (`20.concept_attributes.sql:105-136`) counts identifier mapping rows
   per dataset, so one ID field with a source per dataset passes and two key
   columns of one dataset fail; G4's bucket column trigger checks each mapping
-  row against its own dataset; G4's two `bucket_grain` checks.
+  row, both ways, against its own field and its own dataset, so every source
+  of a per-period field needs a date column of its own dataset; G4's two
+  `bucket_grain` checks, so no per-period field is a label, an identifier or
+  hand-entered. None of the three migrations updates a mapping row (the move
+  updates `concept_attributes`, and dropping a column fires no row trigger),
+  so the bucket column trigger never runs during the move.
 
 ### 6.2 Models and parsers
 
@@ -283,15 +298,24 @@ The `dataset_column` arm keeps G3's `valueShape` discrimination and gains
     attributeName: string;
     sources: ConceptAttributeSource[];           // never empty, read order
     sharedSourceDuckDbDataType: DuckDbDataType | undefined;
-    bucketGrain: ConceptAttribute.BucketGrain | undefined;  // G4
-  } & ConceptAttributeValueRule)                 // G3, widened by G4
+  } & ConceptAttributeValueRule)
+
+type ConceptAttributeValueRule =                 // G3, widened by G4
+  | { valueShape: "single"; valuePickerRuleType: ValuePickerRuleType }
+  | { valueShape: "list" }
+  | {
+      valueShape: "bucketed_list";
+      valuePickerRuleType: ValuePickerRuleType;
+      bucketGrain: ConceptAttribute.BucketGrain;  // G4; bucketColumnName left
+    };
 ```
 
-`selectColumnName`, `datasetId`, `primaryKeyColumnName` and
-`bucketColumnName` move off the arm into `sources`. The `unmapped` arm is
-unchanged. `sharedSourceDuckDbDataType` is the type every source's value is
-cast to so the stacked rows share one type, and `undefined` for one source,
-which reads its column as stored (section 6.5).
+`selectColumnName`, `datasetId` and `primaryKeyColumnName` move off the arm,
+and `bucketColumnName` off G4's `bucketed_list` arm, into `sources`. The
+period and the rule stay with the field. The `unmapped` arm is unchanged.
+`sharedSourceDuckDbDataType` is the type every source's value is cast to so
+the stacked rows share one type, and `undefined` for one source, which reads
+its column as stored (section 6.5).
 
 ### 6.4 The value SQL
 
@@ -325,13 +349,16 @@ WHERE CAST("individuals"."external_id" AS VARCHAR) = CAST(dataset."patient_ref" 
   cast (G2).
 - **List** (`buildAttributeValueSql`): `COALESCE(list(value ORDER BY
   source_position, row_order), [])`.
-- **Bucketed list** (`buildBucketedListValueSql`, G4's
-  `_buildPerBucketValuesSql` and list wrapper over the same rows): `first`
-  orders by `source_position, row_order`; every other per-period expression
-  is unchanged.
+- **Bucketed list** (`buildBucketedListValueSql`): the stacked rows take the
+  place of G4's `_buildSourceRowsSql`, the one step G4 left for this gap.
+  `_buildPerBucketValuesSql` and the list wrapper read them unchanged, except
+  that `first` orders by `source_position, row_order`.
 
 `DATE_TRUNC_PART_BY_GRAIN` moves with the bucket expression into the stacked
 module. G4's `_buildSourceRowsSql` and G1's `ValueSqlParts` disappear.
+`BucketedListValueSqlOptions` replaces its four one-dataset fields with
+`sources` and `sharedSourceDuckDbDataType`, and its rule type, which G4 read
+off the mapping model, becomes `ConceptAttribute.ValuePickerRuleType`.
 
 ### 6.5 Column resolution, rules and types
 
@@ -346,15 +373,22 @@ module. G4's `_buildSourceRowsSql` and G1's `ValueSqlParts` disappear.
   as N identifier fields do.
 - Each mapping row becomes a `ConceptAttributeSource`, failing closed with
   the field named (umbrella principle 7) when the value column is missing,
-  when the source's dataset has no key, or when G4's
-  `_resolveBucketColumnName` (now called per source) refuses its date column.
+  when the source's dataset has no key, or when its date column is refused.
+  G4's `_resolveBucket` becomes `_resolveBucketColumnName({ attribute,
+  mapping, metadata })`, called once per source: on a per-period field it
+  returns that source's date column name after G4's checks (named, present,
+  of the source's own dataset, a date or timestamp); on any other field it
+  refuses a source that names a date column, as G4's `_getValueRule` did, and
+  returns `undefined`.
 - **Shared type.** The sources' Ava types come from the current
   `dataset_columns` rows. One source: no cast. Several of one type: cast to
   that type's DuckDB type. Several of different types: an identifier field is
   read as `varchar` (section 6.6); any other field throws, naming the types.
-- **Rule.** G3's `_getValueRule` reads `attribute.valuePickerRuleType`
-  instead of the mapping's: a list carries none, and a single or bucketed
-  field without one throws. G2's check moves with it: a single or bucketed
+- **Rule.** `_getValueRule(attribute)` (G3's, with G4's arm) reads
+  `attribute.valuePickerRuleType` instead of the mapping's and takes no
+  mapping: a list carries none, a single or bucketed field without one
+  throws, and the `bucketed_list` arm takes `bucketGrain` from the field.
+  G2's check moves with it: a single or bucketed
   field whose rule its sources' shared type disallows throws, with G2's
   message for one source (`applies 'sum' to dataset column 'tag', whose type
   'varchar' does not allow it`) and the list of columns for several.
@@ -362,8 +396,18 @@ module. G4's `_buildSourceRowsSql` and G1's `ValueSqlParts` disappear.
   allowlist (`getConceptRelationPlansFromSql.ts:200-204`) refuses a field
   whose second source is outside the workspace.
 
-`getNeededColumnsFromQuery` collects every source's value, key and bucket
-column into that source's dataset.
+G4 names the two places a date column must be fetched and loaded; with
+several sources, each must cover every source's:
+
+- **Planning's column fetch** (`_getMappedDatasetColumns`,
+  `getConceptRelationPlansFromSql.ts:119-130`) fetches the value and date
+  column of every mapping row of the case type. A field has one row per
+  source, so every source's date column is already fetched; G5 changes no
+  code there and adds a test with two dated sources in two datasets.
+- **The needed-columns list** (`_getConceptColumnsByDatasetId` in
+  `getNeededColumnsFromQuery`) collects every source's value, key and date
+  column into that source's own dataset, replacing G4's one
+  `bucketColumnName` per column.
 
 **How a stale `data_type` is kept out of the cast.** The cast target is
 computed at planning time from the sources' current column types, never from
@@ -415,22 +459,36 @@ replacing the form's per-dataset identifiers (`index.tsx:84-152`) and
 
 ### 6.7 Sync
 
-Sync keeps its job until G6 removes the name. It changes so that it reads
-several sources:
+G6 removes the record name from Sync and stages keys only, through
+`buildRecordKeyStagingSql` and `RecordKeySource = { datasetId;
+primaryKeyColumnName }`. Its key resolution (`_getRecordKeySources`) already
+reads `flatMap(prop("mappings"))` over the identifier fields, one key source
+per mapping row, which is every identifier source of either identifier
+shape. What G5 does depends on which lands first:
 
-- The external ids are every identifier source's key column (one `SELECT`
-  per source, `UNION ALL`). The selectors stay uncast: casting a key column
-  in DuckDB would re-key a record whose key is a number (`7.0` becomes
-  `'7.0'`), and DuckDB already unifies a mixed `BIGINT`/`VARCHAR` union to
-  `VARCHAR`.
-- The record name is the label field's column from
-  `makeConceptAttributeColumnsFromMetadata` (identifier and label fields
-  only), turned into SQL by `buildAttributeValueSql`, so a name read from two
-  sources matches the view.
-- `neededColumnsByDatasetId` lists every identifier source's key column and
-  every label source's value and key column.
-- `getAttributesWithMapping` becomes `getAttributesWithMappings` (a field with
-  at least one mapping row), for its two callers.
+- **G6 first.** Sync stages no name, so G5 changes only the key resolution:
+  if G6 used its fallback for running before G5 (`attribute.mapping`), G5
+  switches it to every mapping row, and adds a test with one ID field over
+  two datasets, asserting one `RecordKeySource` per dataset. No staging SQL
+  changes.
+- **G5 first.** Sync keeps its name until G6 deletes it, and G5 makes the
+  current staging read several sources, keeping the names G6 deletes
+  (`IndividualSourceMappings`, `_resolveIndividualSourceMappings`,
+  `_stageIndividuals`) so G6's instructions still apply:
+  - The external ids are every identifier source's key column (one `SELECT`
+    per source, `UNION ALL`), read as stored, as today. G6 later casts each
+    to `VARCHAR`; G5 does not change key types. DuckDB already unifies a
+    mixed `BIGINT`/`VARCHAR` union to `VARCHAR`.
+  - The record name is the label field's column from
+    `makeConceptAttributeColumnsFromMetadata` (identifier and label fields
+    only), turned into SQL by `buildAttributeValueSql`, so a name read from
+    two sources matches the view.
+  - `neededColumnsByDatasetId` lists every identifier source's key column
+    and every label source's value and key column.
+
+In either order, `getAttributesWithMapping` becomes
+`getAttributesWithMappings` (a field with at least one mapping row), for its
+two callers.
 
 ### 6.8 Provenance
 
@@ -473,7 +531,9 @@ joined by `Intl.ListFormat` in its one-line source slot.
 - **The draft card** groups fields by their first source's dataset, as
   today. Each included field lists its sources and offers "Add a source"
   (same-type columns of the declared datasets) and remove for every source
-  but the first. A bucketed field's sources each show a date column select.
+  but the first. A bucketed field's sources each show a date column select,
+  and G4's `setAttributeBucket` gives each source without one the first date
+  column of its own dataset.
   Sources keep the model's order (open question 3). A card with two or more
   datasets says the join keys become one ID field.
 
@@ -491,7 +551,9 @@ joined by `Intl.ListFormat` in its one-line source slot.
 - `transformValues`: flag the label, then G3's `keepKeyAndLabelFieldsSingle`,
   then G2's `withFieldDataTypes` (reading the field's first source and its
   attribute-level rule), then the ID fold, which sets the ID field's own type
-  last.
+  last. `keepKeyAndLabelFieldsSingle` drops the date column from every source
+  of a key or label field, and G4's submit rule refuses a per-period field
+  while any source lacks a date column.
 - `sourceDatasets` is recomputed from every field's sources by a pure helper
   (`makeSourceDatasetsFromAttributes`) after any source change, keeping each
   dataset's chosen key. It replaces the bookkeeping in
@@ -501,8 +563,12 @@ joined by `Intl.ListFormat` in its one-line source slot.
   selected field's settings. It lists each source as dataset and column, with
   move up, move down and remove (the last source cannot be removed), a date
   column select per source on a bucketed field (replacing G4's one field-level
-  select), and an "Add a source" select of same-type columns grouped by
-  dataset. Adding a column from a dataset not yet used adds that dataset to
+  select: G4's `PeriodControls` gains an optional date column and shows only
+  the period here and in the card), and an "Add a source" select of
+  same-type columns grouped by dataset. A field that gains a period starts
+  each source on its dataset's first date column; one that loses it drops
+  every source's. The form is uncontrolled, so the field's sources are
+  mirrored in state beside G4's shape state, as G4 mirrors the shape. Adding a column from a dataset not yet used adds that dataset to
   the join key block. It is a new surface, so its task loads `impeccable` and
   follows the Named Rules.
 - User-facing copy says "source", "field" and "column", never "mapping".
@@ -518,6 +584,21 @@ The names do not change; each now describes a field's rule:
 | `ChatCaseValuePickerRuleType` | Docstring: the rule that reduces a field's rows from every source |
 | `VALUE_PICKER_RULE_TYPES` (`parseProposeCaseType.ts:14-22`) | Unchanged list; docstring as above |
 | Tool schema (`makeChatToolConfigFromOptions.ts`) | `valuePickerRuleType` says it reduces every source's rows |
+
+### 6.12 Seams for G6 and G7
+
+- **G6 (record names off Sync).** Section 6.7. A hydrated attribute holds
+  `mappings: AttributeMapping[]`, and an ID field may hold one identifier
+  source per dataset, so Sync's key sources are one per identifier mapping
+  row, never one per identifier field.
+- **G7 (key matching).** Every record key comparison of the view happens in
+  one place: `_buildSourceRowsSql` in `buildStackedSourceRowsSql.ts`, once
+  per source, for all three value shapes. That file defines
+  `ConceptAttributeSource`, which G7 extends with `keyMatching`, filled per
+  dataset where column resolution builds `primaryKeyColumnName`
+  (`_getPrimaryKeyColumnNameByDatasetId`, the first identifier source of the
+  dataset). An ID field over keys of different types is `varchar`, which
+  G7's normalized keys already are.
 
 ## 7. Migration
 
@@ -587,6 +668,7 @@ two-column unique index.
 | --- | --- | --- |
 | Single or bucketed dataset-column field without a rule, or any other field with one | `concept_attributes__value_picker_rule_type_by_shape` | `23514` naming the constraint; creation rolls back whole |
 | One column twice in one field | `attribute_mappings__dataset_column__attribute_column_unique` | `23505`; creation rolls back whole |
+| A source of a per-period field without a date or timestamp column of its own dataset, or a date column on any other field's source | G4's mapping trigger, per row | `23514` with G4's hint; creation rolls back whole |
 | A source names a missing column, its dataset has no key, or G4 refuses its date column | Column resolution | Throws at planning time, naming the field |
 | Non-identifier sources of different types | Column resolution | Throws, naming the types; authoring never offers them |
 | A rule the sources' shared type disallows | Column resolution (G2's check, moved) | Throws with G2's message |
@@ -618,8 +700,10 @@ Value tests construct ties and NULLs (umbrella ground rule 5).
    a second source in an unkeyed dataset throws; a bucketed source without a
    date column throws; a rule the shared type disallows throws with G2's
    message.
-3. **Unit**: `AttributeSources`; `getNeededColumnsFromQuery`;
-   `getConceptRelationPlansFromSql`; `makeAttributesWithIdentifierFromKeyColumns`;
+3. **Unit**: `AttributeSources`; `getNeededColumnsFromQuery` (every
+   source's date column); `getConceptRelationPlansFromSql` (every source's
+   date column fetched, and a second source outside the workspace refused);
+   `makeAttributesWithIdentifierFromKeyColumns`;
    `makeSourceDatasetsFromAttributes`; `getAddableSourceColumns`;
    `FieldSourcesEditor`; `makeCaseDetailsRowsFromAttributes`;
    `generateIndividuals`; `insertConceptFromFormValues`;
@@ -632,8 +716,10 @@ Value tests construct ties and NULLs (umbrella ground rule 5).
    two sources, one column twice refused, one column in two fields);
    `rpc_concepts__create.test.sql` (a two-source case type; G3's rule
    assertions now refused by the constraint);
-   `concept_attributes__bucketed_list.test.sql` and the mapping RLS file move
-   off the mapping's rule.
+   `concept_attributes__bucketed_list.test.sql` (G4's) moves the rule onto
+   the field, and its per-period field without a rule is now refused by the
+   constraint instead of the RPC message; the mapping RLS file moves off the
+   mapping's rule.
 5. **Migration upgrade**: section 7.
 6. **E2E** (`tests/e2e/multi-source-fields.spec.ts`): through the create
    form, a field reading one column of each of two uploaded datasets. The
@@ -716,11 +802,12 @@ src/clients/qetl/QueryMediator/
   getNeededColumnsFromQuery/getNeededColumnsFromQuery{.ts,.test.ts}
   __tests__/QueryMediator.concepts.test.ts                 fixture shape
 src/components/caseFields/FieldSourcesEditor/              new component, helper, tests
+src/components/caseFields/PeriodControls/                  (G4's) date column optional
 src/components/ChatPanel/CaseTypeDraftBlock/               editor, card, source section, row
 src/views/OntologyDesignerApp/
   makeAttributesWithIdentifierFromKeyColumns/              new
   ConceptCreatorView/ (conceptFormTypes, index.tsx, DatasetColumnAttributesBlock/*,
-    makeSourceDatasetsFromAttributes/ new)
+    keepKeyAndLabelFieldsSingle/, makeSourceDatasetsFromAttributes/ new)
   createdCaseTypeToFormValues/, proposedCaseTypeToCreatedCaseType/, insertConceptFromFormValues/
   ConceptMetaView/ (useHydratedConcept, CaseTypeAttributesList, RefreshRecordsButton,
     CaseTypeActions.test.tsx, generateIndividuals/)

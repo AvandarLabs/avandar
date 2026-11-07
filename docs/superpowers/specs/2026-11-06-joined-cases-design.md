@@ -241,8 +241,9 @@ because another gap depends on them.
   source's date column is on its mapping.
 - Per-bucket rules have exactly the single-value rule's semantics,
   including tie-breaks and the NULL rule.
-- `RelationColumn` gains `bucketGrain` so every consumer can tell a
-  bucketed list from a plain list.
+- `QueryResultColumn` gains `bucketGrain` so every consumer can tell a
+  bucketed list from a plain list. (`RelationColumn` was the first choice,
+  but it has no production consumer; see section 10.)
 - The record page shows a bucketed list as a period and value table with
   period labels formatted for the grain. This is a new surface, so its
   plan loads the `impeccable` skill.
@@ -255,8 +256,8 @@ because another gap depends on them.
 - Schema per section 3.1. The rule moves to the field; sources gain
   `position`.
 - The view reads a field by stacking its sources (`UNION ALL`, each source
-  keyed by its own dataset's key column and cast to the field's type), then
-  applying the field's rule or list or bucket logic once.
+  keyed by its own dataset's key column and cast to the sources' shared
+  column type), then applying the field's rule or list or bucket logic once.
 - Every source dataset still needs a key (an identifier mapping), as today.
 - The chat contract, draft card, and concept creator form let a field name
   several sources.
@@ -281,8 +282,9 @@ because another gap depends on them.
 ### G7. Key matching
 
 - **Normalization:** each identifier mapping can apply any of `trim`,
-  `lowercase`, `strip_leading_zeros`, `alphanumeric_only`, always in that
-  canonical order whatever order they are stored in.
+  `lowercase`, `alphanumeric_only`, `strip_leading_zeros`, always in that
+  canonical order whatever order they are stored in. `alphanumeric_only`
+  runs before `strip_leading_zeros` so `#007` becomes `7`.
 - **Crosswalk:** an identifier mapping can translate its dataset's keys
   through a crosswalk dataset: the dataset key is looked up in
   `crosswalk_source_key_column_id` and replaced by
@@ -311,10 +313,11 @@ Later child specs and plans use these names exactly.
 | G2 | Module | `ValuePickerRule` in `shared/models/ontology/ValuePickerRule/ValuePickerRule.ts`, with `getOutputDataType({ ruleType, columnDataType })` and `isAllowedForColumnType({ ruleType, columnDataType })` |
 | G3 | Type | `ConceptAttribute.ValueShape = "single" \| "list" \| "bucketed_list"` (G3 ships the first two) |
 | G3 | Function | `ConceptAttribute.getValueShape(attribute)` |
+| G3 | Field | `valueShape` replaces `isArray` on `ConceptAttributeColumn` |
 | G3 | Chat type | `ChatCaseValueShape`, and `valueShape` on `ChatProposedCaseAttribute` and on the `dataset_column` arm of `ChatCreatedCaseAttribute` (optional there, default `"single"`) |
 | G4 | Enum | `public.concept_attributes__bucket_grain` with `'day', 'week', 'month', 'quarter', 'year'`; TS `ConceptAttribute.BucketGrain` |
 | G4 | Columns | `concept_attributes.bucket_grain`, `attribute_mappings__dataset_column.bucket_column_id`; TS `bucketGrain`, `bucketColumnId` |
-| G4 | Field | `bucketGrain` on `RelationColumn` |
+| G4 | Field | `bucketGrain` on `QueryResultColumn` |
 | G4 | SQL | Struct field names `bucket` and `value` |
 | G4 | Chat type | `ChatCaseBucketGrain`; `bucketGrain` and `bucketColumnId` on chat attributes |
 | G5 | Constraint | `attribute_mappings__dataset_column__attribute_column_unique` |
@@ -323,7 +326,9 @@ Later child specs and plans use these names exactly.
 | G5 | Type | `ConceptAttributeSource = { datasetId: string; selectColumnName: string; primaryKeyColumnName: string; bucketColumnName: string \| undefined; position: number }`; the `dataset_column` arm of `ConceptAttributeColumn` holds `sources: ConceptAttributeSource[]` instead of one dataset |
 | G5 | Chat type | `ChatCaseAttributeSource = { datasetId: string; columnId: string; bucketColumnId?: string }`; chat attributes hold `sources` instead of `datasetId` and `columnId` |
 | G6 | Removed column | `individuals.name` |
-| G7 | Enum | `public.attribute_mappings__key_normalization` with `'trim', 'lowercase', 'strip_leading_zeros', 'alphanumeric_only'`; TS `DatasetColumnMapping.KeyNormalization` |
+| G6 | Function | `buildRecordKeyStagingSql`, with `RecordKeySource = { datasetId; primaryKeyColumnName }`, builds Sync's staging SQL |
+| G7 | Enum | `public.attribute_mappings__key_normalization` with `'trim', 'lowercase', 'alphanumeric_only', 'strip_leading_zeros'` (the canonical order); TS `DatasetColumnMapping.KeyNormalization` |
+| G7 | Field | `keyMatching` on `ConceptAttributeSource` and on `RecordKeySource` |
 | G7 | Columns | `key_normalizations`, `crosswalk_dataset_id`, `crosswalk_source_key_column_id`, `crosswalk_record_key_column_id` on `attribute_mappings__dataset_column` |
 | G7 | Function | `buildRecordKeySql` in `src/clients/DuckDbClient/duckDbSqlText.ts`, replacing `getEntityKeyComparisonSql` |
 
@@ -366,3 +371,54 @@ Specs live in `docs/superpowers/specs/`, plans in `docs/superpowers/plans/`.
    migrations.
 3. `docs/ontology-architecture.md` describes the end state, and its
    section 16 no longer lists the limitations these gaps close.
+
+## 10. Amendments from the child specs
+
+The child specs found these against the code. Each is accepted, and the
+sections above already reflect the ones that change a shared name.
+
+| Gap | Amendment |
+| --- | --- |
+| G1 | `buildAttributeValueSql` also owns the list SQL, so `_buildArraySelector` goes away. |
+| G1 | The Arrow list decoding fix (`duckDbArrowResults.ts` threw on any non-empty list) lands in G1, because G1 is the first change that sends list columns to the record page. |
+| G1 | `_runConceptQuery`, `ConceptWrapper`, `AttributeAssertionClient`, and the `AttributeAssertion` model are all deleted. A shared column read, `getConceptAttributeColumnsFromConceptId`, serves the planner and the record values client. |
+| G1 | A field named `external_id` is emitted as `external_id_2` instead of being silently dropped. |
+| G1 | A spine restriction reads at most 50 keys per Postgres request and 500 per call. |
+| G2 | `ValuePickerRule` also exports `T`, `DEFAULT_RULE_TYPE`, `getAllowedRuleTypes`, and `toAllowedRuleType`. `count`, `max`, and `min` emit DuckDB's native type. The planner refuses a single-value field whose rule its column's current type does not allow. |
+| G2 | Chat parsing does not set `data_type`, because the chat contract has no type. `createdCaseTypeToFormValues` sets it for both chat tools. |
+| G2 | Principle 8 bends once: the data migration rewrites stored `max`, `min`, and `sum` rules on yes/no columns to `most_frequent`. |
+| G3 | The mapping's `value_picker_rule_type` becomes nullable in G3, before G5 moves it. `rpc_concepts__create` refuses a list with a rule and a single field without one. |
+| G3 | `ConceptAttributeColumn.isArray` becomes `valueShape`. A manual-entry list field reads as `[]`. List result columns are marked `{ dataType: "varchar", isArray: true }`, and dates inside lists arrive as ISO strings. |
+| G3, G4 | `RelationColumn` has no production consumer, so `bucketGrain` rides on `QueryResultColumn` instead. |
+| G4 | G3's `ConceptAttributeValueRule` gains a `bucketed_list` arm holding the rule and grain. A trigger checks the bucket date column, and a table check forbids a per-period label, key, or hand-entered field. |
+| G5 | Sources are cast to their shared column type, not to the field's stored type. A column type edited later fails at planning with the field named. |
+| G5 | A new case type has one ID field with one source per dataset. Mixed key types become text. The rule moves to the field in three migrations: generated add, hand-written move, generated drop. |
+| G5 | `bucketColumnName` moves into each `ConceptAttributeSource`. The grain stays on the field. |
+| G6 | `getPage` asks PostgREST for an inclusive range, so ordering alone does not fix duplicate rows. G6 fixes the range for every model and adds a `pageOrderColumns` option. |
+| G6 | Sync stages `CAST(key AS VARCHAR)`, which also fixes numeric keys being flagged missing after a second sync. |
+| G7 | Normalizations run in the order `trim`, `lowercase`, `alphanumeric_only`, `strip_leading_zeros`. |
+| G7 | ID lookup datasets count as contributing datasets, so they pass the workspace allowlist and get loaded and leased. Sync names the IDs it left out in a dismissible notice. |
+
+## 11. Open questions for Kristi
+
+Each has a default the specs already follow, so none of them blocks
+implementation.
+
+| # | Gap | Question | Default in the spec |
+| --- | --- | --- | --- |
+| 1 | G1 | Order record page fields by name, or by the order they were authored (needs a new `position` column on fields)? | By name |
+| 2 | G2 | Rewrite stored `max`, `min`, `sum` rules on yes/no columns to "most frequent"? | Yes |
+| 3 | G2 | When a column's type is edited in the Data Manager, block the edit, retype the fields that read it, or leave them? Decide before G5, whose casts make a stale type matter more. | Leave them until case type editing exists; a query fails with the field named when its rule becomes disallowed |
+| 4 | G3 | May chat propose list fields on its own judgement? | Yes, conservatively |
+| 5 | G3 | Add list filters such as "has any of" to the Data Explorer later? | Not in this work |
+| 6 | G4 | Let the query form split a per-period field into one row per period so it can be filtered? | Not in this work |
+| 7 | G4 | Label weeks "Week of Jan 5, 2026" or ISO "2026-W02", which epidemiological reporting often uses? | "Week of Jan 5, 2026" on the record page, `2026-01-05` in the grid |
+| 8 | G4 | Show a per-period field on the record page as a table or a small chart? | Table of the six most recent periods, with "Show all" |
+| 9 | G5 | One ID field per new case type, with one source per dataset? | Yes |
+| 10 | G5 | Mixed key types become text, so "10" sorts before "9". Acceptable, or refuse the combination until G7? | Text |
+| 11 | G5 | The chat draft card can add and remove a field's extra sources but not reorder them (order only matters for "first value" and list order; the create form can reorder). Acceptable? | Yes |
+| 12 | G6 | Records list in text order (`P-10` before `P-2`). Acceptable until the list gets sorting and search? | Yes |
+| 13 | G6 | Future emails name a record by case type plus ID, or by a name the browser captures? | Case type plus ID |
+| 14 | G7 | May chat propose an ID lookup table from catalog names alone? | Only when one dataset plainly pairs the two IDs |
+| 15 | G7 | Show how a case type's IDs are matched on its page after creation? | Not in this work |
+| 16 | G7 | Is a dismissible notice enough for IDs Sync left out, or should the count be stored (new state on `concepts`)? | Notice only |

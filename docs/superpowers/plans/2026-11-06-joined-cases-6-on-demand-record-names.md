@@ -23,7 +23,8 @@
 
   Expected (G1 spec §4.5 and §4.7): the client in `ConceptRecordValuesClient.ts`, the type in `ConceptRecordValuesClient.types.ts` (every code block below imports it from there), and `SingleIndividualView/useRecordFields/useRecordFields.ts` calling `useGetConceptRecordValues` with `{ workspaceId: individual.workspaceId, conceptId: concept.id, externalIds: [individual.externalId] }`. If the record page passes other parameters, stop and record the difference in spec §3 before Task 7.
 - Plan 1 left the record page header as `title={individual.name}` (`SingleIndividualView/index.tsx`) and removed "Loading case" from it. Task 7 replaces that title.
-- Plan 5 (G5 spec §6.2) made a hydrated attribute hold `mappings: AttributeMapping[]` instead of one `mapping`, moved `value_picker_rule_type` to `concept_attributes`, and added `position` to mappings. Task 9's Sync code and test fixtures and Task 10's seed helper use that shape. If this plan runs before plan 5 (umbrella §4 allows it): in Task 9 read `attribute.mapping` instead of `attribute.mappings`, and give the second dataset its own identifier attribute in the test; in Task 10 move `value_picker_rule_type: "first"` from each attribute row to its mapping rows, drop `position`, and give the visits key its own identifier field.
+- Plan 5 landed before this plan and took its "plan 6 not landed" path (G5 plan Task 10, Steps 1 to 5). So in `generateIndividuals.ts`, Sync still names records: `_resolveIndividualSourceMappings` resolves the identifier and label fields with `makeConceptAttributeColumnsFromMetadata` into an `IndividualSourceMappings` (`identifierSources`, a `LabelColumn`, `neededColumnsByDatasetId`, built by `_getMappedColumnIds` and `_getNeededColumnsByDatasetId`), and `_stageIndividuals` renders the name with `buildAttributeValueSql`. Task 9 deletes all six names. Plan 5 also renamed `getAttributesWithMapping` to `getAttributesWithMappings`, made a hydrated attribute hold `mappings: AttributeMapping[]`, moved `value_picker_rule_type` to `concept_attributes`, added `position` to mappings, and left `LABS_DATASET_ID`, `LABS_KEY_COLUMN_ID`, `LABS_NAME_COLUMN_ID`, `_makeTwoSourceConcept`, and a `describe("generateIndividuals over two sources")` block in `generateIndividuals.test.ts`. Task 9 builds on those.
+- New case types have one ID field with one source per dataset (G5 spec §6.6), and an ID field over keys of different types is `varchar`. Sync stages one key per identifier mapping row, cast to `VARCHAR`, so both identifier shapes and mixed key types stage the same text keys.
 - Read `CLAUDE.md`, `docs/rules/typescript.md`, `docs/rules/testing.md`, `docs/rules/e2e-testing.md`, `docs/rules/i18n.md`, `docs/rules/sql.md`, `docs/design/app-view-layout.md`, and the Named Rules in `DESIGN.md`. Nothing here is a new surface, so the `impeccable` skill is not needed.
 - Lint rules that shape every code block: `arrow-body-style: always`, `@typescript-eslint/array-type: array-simple`, explicit return types on exported functions, 80-column lines. The formatter has the final word on wrapping and import order: run `pnpm format` before every commit, then re-run the task's tests.
 - Never stage `supabase/config.toml`. Commit by path. End every commit message with the trailer `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` (the second `-m` below). Do not push.
@@ -2374,97 +2375,31 @@ describe("getNewlyStaleIndividuals", () => {
 });
 ```
 
-- [ ] **Step 3: Add the Sync tests that prove it reads keys only**
+- [ ] **Step 3: Change the Sync tests to prove it reads keys only**
 
 In `generateIndividuals.test.ts`:
 
-1. Add constants after `NAME_COLUMN_ID`:
+1. Delete plan 3's case `"refuses to sync a case type whose label names no value rule"` (plan 5 moved its rule onto the attribute). Sync no longer reads the label, so a label without a rule cannot fail it; the concept view's own refusal is tested by plan 3.
+
+2. In `describe("generateIndividuals over two sources")`, replace plan 5's case `"loads every identifier source's key and every name source's value and key"` with these two cases. The block's `beforeEach` already returns the four columns of `_makeTwoSourceConcept`, whose one ID field reads `person_id` and the labs dataset's `patient_ref`, and whose label reads `full_name` and `patient_name`.
 
    ```ts
-   const OTHER_DATASET_ID = uuid<Dataset.Id>();
-   const OTHER_KEY_COLUMN_ID = uuid<DatasetColumnId>();
-   ```
+     it("reads only each source's key column, never the label's", async () => {
+       await generateIndividuals(_makeTwoSourceConcept());
 
-2. Give `_makeDatasetColumn` a dataset parameter:
-
-   ```ts
-   function _makeDatasetColumn(
-     id: DatasetColumnId,
-     name: string,
-     datasetId: Dataset.Id = DATASET_ID,
-   ): DatasetColumnRead {
-   ```
-
-   and set `datasetId,` (instead of `datasetId: DATASET_ID,`) in its `Model.make` call.
-
-3. Give `_makeMapping` the same: add `datasetId?: Dataset.Id;` to its `args` type and set `datasetId: args.datasetId ?? DATASET_ID,`.
-
-4. Add, after `_makeConcept` (plan 5 left each attribute holding `mappings`, an array):
-
-   ```ts
-   /**
-    * A concept over two datasets. Its ID field reads the first dataset's
-    * `person_id` and the second's `patient_id`; its label reads the first
-    * dataset only, so a key only the second dataset has has no label value.
-    */
-   function _makeTwoDatasetConcept(): BuildableConcept {
-     const concept = _makeConcept();
-     return {
-       ...concept,
-       attributes: concept.attributes.map((attribute) => {
-         if (!attribute.isIdentifier) {
-           return attribute;
-         }
-         return {
-           ...attribute,
-           mappings: [
-             ...attribute.mappings,
-             _makeMapping({
-               conceptAttributeId: attribute.id,
-               datasetColumnId: OTHER_KEY_COLUMN_ID,
-               datasetId: OTHER_DATASET_ID,
-             }),
-           ],
-         };
-       }),
-     };
-   }
-
-   const TWO_DATASET_COLUMNS = [
-     _makeDatasetColumn(EXTERNAL_ID_COLUMN_ID, "person_id"),
-     _makeDatasetColumn(NAME_COLUMN_ID, "full_name"),
-     _makeDatasetColumn(OTHER_KEY_COLUMN_ID, "patient_id", OTHER_DATASET_ID),
-   ];
-   ```
-
-   If plan 5's `_makeMapping` takes a `position`, pass `position: 1` for the second source.
-
-5. Keep the existing tests as they are, apart from the fixture changes in item 6: one dataset, one ID field, and the analyzer test still describe this case type.
-
-6. Staged rows no longer have a name. In `_mockSinglePage` and in the determinate progress test, change every `Array<{ external_id: string; name: string }>` to `Array<{ external_id: string }>`, change each staged row literal such as `{ external_id: "ext-1", name: "Jane Doe" }` to `{ external_id: "ext-1" }`, and delete the `name:` line from each `getAllIndividualsMock` record.
-
-7. Add these tests at the end of the `describe` block:
-
-   ```ts
-     it("reads only each dataset's key column, never the label's", async () => {
-       getAllDatasetColumnsMock.mockResolvedValue(TWO_DATASET_COLUMNS);
-
-       await generateIndividuals(_makeTwoDatasetConcept());
-
-       const [{ neededColumnsByDatasetId }] = runQueryMock.mock.calls[0]! as [
-         { neededColumnsByDatasetId: unknown },
-       ];
-       expect(neededColumnsByDatasetId).toEqual({
+       const [stagingCall] = runQueryMock.mock.calls as Array<
+         [{ neededColumnsByDatasetId: Record<string, string[]> }]
+       >;
+       expect(stagingCall?.[0].neededColumnsByDatasetId).toEqual({
          [DATASET_ID]: ["person_id"],
-         [OTHER_DATASET_ID]: ["patient_id"],
+         [LABS_DATASET_ID]: ["patient_ref"],
        });
      });
 
-     it("upserts a key only the second dataset has, with no name that could be NULL", async () => {
-       getAllDatasetColumnsMock.mockResolvedValue(TWO_DATASET_COLUMNS);
+     it("upserts a key from the second dataset as a row with no name", async () => {
        _mockSinglePage([{ external_id: "P-003" }]);
 
-       await generateIndividuals(_makeTwoDatasetConcept());
+       await generateIndividuals(_makeTwoSourceConcept());
 
        expect(bulkInsertMock).toHaveBeenCalledTimes(1);
        const [{ data }] = bulkInsertMock.mock.calls[0]!;
@@ -2478,6 +2413,8 @@ In `generateIndividuals.test.ts`:
        ]);
      });
    ```
+
+3. Staged rows no longer have a name. In `_mockSinglePage` and in the determinate progress test, change every `Array<{ external_id: string; name: string }>` to `Array<{ external_id: string }>`, change each staged row literal such as `{ external_id: "ext-1", name: "Jane Doe" }` to `{ external_id: "ext-1" }`, and delete the `name:` line from each `getAllIndividualsMock` record.
 
 - [ ] **Step 4: Rewrite the upsert contract test**
 
@@ -2602,7 +2539,7 @@ rollback;
 - [ ] **Step 5: Run the new tests and watch them fail**
 
 Run: `pnpm test:frontend diffStagedIndividualsHelpers generateIndividuals.test`
-Expected: FAIL. Every diff row still carries `name`; `neededColumnsByDatasetId` for the first dataset is `["person_id", "full_name"]`; the second-dataset upsert row has a `name: undefined` property that `toStrictEqual` rejects.
+Expected: FAIL. Every diff row still carries `name`; the two-source case's `neededColumnsByDatasetId` still lists `full_name` and `patient_name`; the upsert row for `P-003` carries a `name` property (`undefined`) that `toStrictEqual` rejects.
 
 Run: `ava supabase status && pnpm test:db`
 Expected: FAIL in `individuals__sync_upsert_contract.test.sql` with `null value in column "name" of relation "individuals" violates not-null constraint`, from the setup insert that names no `name`.
@@ -2784,52 +2721,19 @@ export function getNewlyStaleIndividuals(options: {
 
 - [ ] **Step 9: Make Sync read keys only**
 
-Before editing, run `git diff 473e133c1 -- src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts`. Earlier plans may have changed the label staging (plan 1 renamed `getSQLSelectOfMapping` to `buildAttributeValueSql`, plan 5 made it multi-source); all of that is deleted below. Keep any change they made elsewhere in the file.
+Read `generateIndividuals.ts` first. It is plan 5's version (G5 plan Task 10, Steps 1 to 5): the record name is read through column resolution and `buildAttributeValueSql`, all of which goes. `getAttributesWithMappings`, `_getExistingIndividualsByExternalId`, `_diffAndUpsertPage`, the progress job, the diff, the stale sweep, and the `finally` that drops the staging table stay.
 
 In `generateIndividuals.ts`:
 
-1. Replace the import block above `getAttributesWithMapping` with:
+1. Fix the imports. Remove the ones only the deleted code reads: `quoteSqlIdentifier` (from `@avandar/utils/sql`), `makeConceptAttributeColumnsFromMetadata`, `removeDuplicates`, `buildAttributeValueSql`, `makeIdLookupRecord` (from `@avandar/utils`), and the types `ConceptAttributeColumn`, `ConceptAttributeSource`, and `DatasetColumnId`. Add:
 
    ```ts
-   import {
-     assertIsDefined,
-     hasDefinedProps,
-     makeBucketRecord,
-     makeMap,
-     makeObject,
-     objectValuesMap,
-     prop,
-     sqlTemplate,
-     where,
-   } from "@avandar/utils";
-   import { t } from "@lingui/core/macro";
-   import { Concept } from "$/models/ontology/Concept/Concept";
-   import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-   import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-   import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
-   import { IndividualClient } from "@/clients/ontology/IndividualClient";
-   import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
-   import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
-   import { Logger } from "@/utils/Logger";
    import { buildRecordKeyStagingSql } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql";
-   import {
-     diffStagedIndividualsPage,
-     getNewlyStaleIndividuals,
-     makeBulkInsertRowsFromUpsertRows,
-   } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers";
-   import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
    import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
-   import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
-   import type { Workspace } from "$/models/Workspace/Workspace";
-   import type { JobId } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
    import type { RecordKeySource } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql";
-   import type {
-     ExistingIndividual,
-     StagedIndividualRow,
-   } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers";
-   import type { SetDefined } from "@avandar/utils";
-   import type { SetRequired } from "type-fest";
    ```
+
+   and make sure the `@avandar/utils` import has `assertIsDefined`, `makeBucketRecord`, `makeObject`, `objectValuesMap`, `prop`, `sqlTemplate`, and `where`. `pnpm lint` reports any import left unused, and `pnpm type-check` any left missing.
 
 2. In `_getExistingIndividualsByExternalId`, replace the `valueFn` body with:
 
@@ -2842,13 +2746,17 @@ In `generateIndividuals.ts`:
        },
    ```
 
-3. Delete the `IndividualSourceMappings` type, `_resolveIndividualSourceMappings`, and `_stageIndividuals`, and put in their place:
+3. Delete what plan 5 left for this plan to delete (G5 plan Task 10, Step 3): the `LabelColumn` type, the `IndividualSourceMappings` type, `_getMappedColumnIds`, `_getNeededColumnsByDatasetId`, `_resolveIndividualSourceMappings`, and `_stageIndividuals`. Put in their place:
 
    ```ts
    /**
     * Resolves each identifier mapping of a concept to the dataset column that
     * keys its records. Sync reads these columns and nothing else: no field
     * value, the record's name included, is computed here.
+    *
+    * A field with several sources contributes one key source per mapping row,
+    * so one ID field with a source per dataset stages the same keys as one
+    * identifier field per dataset.
     */
    async function _getRecordKeySources(
      concept: BuildableConcept,
@@ -2906,9 +2814,7 @@ In `generateIndividuals.ts`:
    }
    ```
 
-   A field with several sources (plan 5) contributes one key source per mapping, so `flatMap` over `mappings` reads every identifier column, whether a case type has one ID field with a source per dataset or one identifier field per dataset.
-
-4. In `_runGenerateIndividuals`, replace:
+4. In `_runGenerateIndividuals`, replace plan 5's two calls. Replace:
 
    ```ts
      const mappings = await _resolveIndividualSourceMappings(concept);
@@ -3160,7 +3066,7 @@ In `tests/e2e/helpers/seedCaseRecord.ts`, replace the insert payload with:
     })
 ```
 
-In `tests/e2e/helpers/CaseTypeSeedHelpers.ts`, delete `            name: key,` from the records insert. The label is the key field, so each record is still named after its key.
+In `tests/e2e/helpers/CaseTypeSeedHelpers.ts`, delete `            name: key,` from both records inserts: `_seedCaseTypeOverDataset`'s and plan 4's `_seedCaseTypeWithPerMonthField`'s. In both the label is the key field, so each record is still named after its key.
 
 - [ ] **Step 14: Generate the desktop SQLite migration**
 
@@ -3187,13 +3093,17 @@ Expected: no errors. A remaining `individual.name` or `hydratedIndividual.name` 
 Run: `rg -n "individuals?\.name|hydratedIndividual\.name" src shared supabase/schemas supabase/functions`
 Expected: no output.
 
-Run each existing case spec on its own, after `ava supabase status`:
+Run each existing case spec on its own, after `ava supabase status`. The last four come from plans 1 to 5 and read seeded or synced records:
 
 ```bash
 pnpm test:e2e case-statuses-record.spec.ts
 pnpm test:e2e case-statuses-edit.spec.ts
 pnpm test:e2e case-statuses-data-explorer.spec.ts
 pnpm test:e2e case-activity.spec.ts
+pnpm test:e2e record-page-field-values.spec.ts
+pnpm test:e2e case-list-field.spec.ts
+pnpm test:e2e case-bucketed-fields.spec.ts
+pnpm test:e2e multi-source-fields.spec.ts
 ```
 
 Expected: each passes.
@@ -3855,7 +3765,7 @@ git commit -m "docs(joined-cases): record names are read, not stored" -m "Co-Aut
 - [ ] `pnpm type-check`, `pnpm lint`, `pnpm test:frontend`, `pnpm test:executed`, and `pnpm --filter @avandar/clients test` pass.
 - [ ] `ava supabase status` names `feat-joined-cases`, then `pnpm test:db` passes, including the `case_statuses_backfill` replay.
 - [ ] `pnpm desktop:sqlite:check-migrations` passes.
-- [ ] `case-record-names.spec.ts`, `case-statuses-record.spec.ts`, `case-statuses-edit.spec.ts`, `case-statuses-data-explorer.spec.ts`, and `case-activity.spec.ts` pass, each run on its own.
+- [ ] `case-record-names.spec.ts`, `case-statuses-record.spec.ts`, `case-statuses-edit.spec.ts`, `case-statuses-data-explorer.spec.ts`, `case-activity.spec.ts`, and the specs plans 1 to 5 added (`record-page-field-values.spec.ts`, `case-list-field.spec.ts`, `case-bucketed-fields.spec.ts`, `multi-source-fields.spec.ts`) pass, each run on its own.
 - [ ] `pnpm i18n:check` is clean.
 - [ ] `rg -n "individuals?\.name|hydratedIndividual\.name" src shared supabase/schemas supabase/functions` prints nothing.
 - [ ] `git status` shows only `supabase/config.toml` (and the switch's `.env.development` block) modified.

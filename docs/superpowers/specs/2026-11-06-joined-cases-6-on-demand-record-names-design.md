@@ -124,7 +124,7 @@ relies on the umbrella's shared names. It assumes:
 | G2 | Rules emit typed values (a date label arrives as a date, a `count` label as a number). |
 | G3 | A field may be a list. A list label arrives as an array, `[]` when empty. |
 | G4 | Bucketed lists exist; nothing here reads them. |
-| G5 | (G5 spec sections 6.2 and 6.6.) The rule lives on the field, and a hydrated attribute holds `mappings: AttributeMapping[]` instead of one `mapping`. Sync's label SQL, which G5 makes multi-source, is deleted here. `rpc_concepts__create` takes `value_picker_rule_type` on each attribute and `position` on each mapping. New case types get one ID field with one source per dataset; Sync reads every identifier mapping row either way. |
+| G5 | (G5 spec sections 6.2, 6.6, 6.7; G5 plan Task 10.) G5 lands first and takes its "G6 not landed" path. Sync then reads every identifier source and still names records: `_resolveIndividualSourceMappings` resolves the identifier and label fields with `makeConceptAttributeColumnsFromMetadata` into `IndividualSourceMappings` (`identifierSources`, a `LabelColumn`, and `neededColumnsByDatasetId` from `_getMappedColumnIds` and `_getNeededColumnsByDatasetId`), and `_stageIndividuals` renders the name with `buildAttributeValueSql`. G6 deletes those six names. A hydrated attribute holds `mappings: AttributeMapping[]`, and `getAttributesWithMapping` is `getAttributesWithMappings`. `rpc_concepts__create` takes `value_picker_rule_type` on each attribute and `position` on each mapping. New case types get one ID field with one source per dataset; an ID field over keys of different types is `varchar`, and the view casts each of its sources to `VARCHAR`. |
 
 If G1's record page query uses different parameters, the record page header
 still works but issues its own query instead of sharing G1's cache entry
@@ -226,11 +226,14 @@ flowchart TD
   A --> B --> C --> D --> E
 ```
 
-- `_resolveIndividualSourceMappings` becomes `_getRecordKeySources`, which
-  returns one `RecordKeySource` per identifier mapping row (every entry of
-  every identifier attribute's `mappings`). It no longer calls
-  `getLabelAttribute`, so a case type whose label is a manual-entry field
-  (section 16, "The form allows a manual-entry label") also syncs.
+- G5's `_resolveIndividualSourceMappings`, `IndividualSourceMappings`,
+  `LabelColumn`, `_getMappedColumnIds`, `_getNeededColumnsByDatasetId`, and
+  `_stageIndividuals` are deleted. `_getRecordKeySources` returns one
+  `RecordKeySource` per identifier mapping row (every entry of every
+  identifier attribute's `mappings`), so one ID field with a source per
+  dataset and one identifier field per dataset stage the same keys. It no
+  longer reads the label field, so a case type whose label is a manual-entry
+  field (section 16, "The form allows a manual-entry label") also syncs.
 - `neededColumnsByDatasetId` names only each dataset's key column.
 - `buildRecordKeyStagingSql` is pure and executed-tested:
 
@@ -253,8 +256,9 @@ flowchart TD
 - The diff helpers lose `name`. A staged key writes a row when it is new or
   was flagged missing, and nothing otherwise. The rename case is gone. Rows
   are `{ workspace_id, concept_id, external_id, missing_from_source_at }`.
-- `getSQLSelectOfMapping` (or, after G1, `buildAttributeValueSql`) is no
-  longer imported by Sync.
+- `buildAttributeValueSql` (G1's replacement for `getSQLSelectOfMapping`)
+  and `makeConceptAttributeColumnsFromMetadata` are no longer imported by
+  Sync.
 
 ### 6.3 Dropping `individuals.name`
 
@@ -452,6 +456,33 @@ G7 changes how Sync and the view compute a key. After G6:
   stale sweep flags an existing record with that key missing from source,
   which is what the G7 spec (section 5.6) expects.
 
+### 6.13 Under G5's one ID field and mixed key types
+
+G5 gives new case types one ID field with a source per dataset, and makes an
+ID field over keys of different types `varchar` (G5 spec section 6.6). Both
+hold for this design:
+
+- **Sync.** Every identifier mapping row is one `RecordKeySource`, whichever
+  identifier shape the case type has, and every arm casts its key to
+  `VARCHAR`. A `bigint` key in one dataset and a text key in another stage as
+  one text key set, the type G5's view uses for that field.
+- **Order.** `individuals.external_id` is Postgres `text` for every key type,
+  so the records list is in text order whatever the ID field's `data_type`.
+  A case type whose keys are all `bigint` shows `10` before `9` here while the
+  Data Explorer sorts its ID column numerically (open question 1).
+- **Label lookup.** Names are found by `external_id` text on both sides: the
+  list passes stored `external_id` values, G1's spine holds them as
+  `VARCHAR`, and `ConceptRecordValues.externalId` comes back as that text, so
+  the lookup matches for any key type. The label field is unaffected by the
+  ID field's shape, except in one case: when G5 folds a key-only label into
+  the ID field, the label is the ID field. Its value is then the key itself:
+  text for a `varchar` ID field, and a number for a `bigint` one, which
+  `buildRecordNameFromLabelValue` prints without separators (`12345`). That
+  equals `external_id` for every key up to 2^53. Past that, DuckDB's
+  conversion of `BIGINT` to a JavaScript number (`duckDbArrowResults.ts:10-12`)
+  loses digits, as it does in every QETL result; this design does not change
+  it.
+
 ## 7. Migration
 
 1. **Schema.** Declarative edit, then `pnpm db:reset` and
@@ -499,7 +530,7 @@ G7 changes how Sync and the view compute a key. After G6:
 | Package unit | `createSqliteCrudClient.test.ts` (add) | `order by "name", "id"` before `limit ? offset ?` |
 | Executed DuckDB | `buildRecordKeyStagingSql.executed.test.ts` | Each key once across datasets; NULL keys dropped; a `BIGINT` key staged as `VARCHAR`; only `external_id` staged |
 | Unit | `diffStagedIndividualsHelpers.test.ts` (rewrite) | Rows carry no name; new and reappeared keys write; present keys write nothing; stale rows carry no name |
-| Unit | `generateIndividuals.test.ts` (add) | Only key columns are read; **a key only the second dataset has is upserted with no name** |
+| Unit | `generateIndividuals.test.ts` (change) | G5's two-source case now expects key columns only; **a key from the second dataset is upserted with no name**; plan 3's "label names no value rule" case is deleted, since Sync no longer reads the label |
 | pgTAP | `individuals__sync_upsert_contract.test.sql` (rewrite) | `hasnt_column('individuals', 'name')`; the narrowed upsert leaves `id`, `status_id`, `assigned_to` alone; **a new key inserts with no name** |
 | pgTAP | The six other files in section 11 | Unchanged assertions, with `name` removed or replaced by `missing_from_source_at` as the probe column |
 | Unit | `buildRecordNameFromLabelValue.test.ts` | The section 6.1 table |
@@ -536,7 +567,9 @@ equal to the name they assert (`insertE2ECaseTypeWithRecords`,
    `pnpm test:executed`, `pnpm test:clients`, `pnpm test:db`,
    `pnpm desktop:sqlite:check-migrations`, and
    `pnpm test:e2e case-record-names.spec.ts` pass, and the existing case E2E
-   specs pass one at a time.
+   specs, including those plans 1 to 5 added (`record-page-field-values`,
+   `case-list-field`, `case-bucketed-fields`, `multi-source-fields`), pass one
+   at a time.
 7. `docs/ontology-architecture.md` sections 4, 6, 9, 10, 13, 15, and 16
    describe the result.
 
@@ -553,7 +586,7 @@ touches.
 | `shared/models/ontology/Individual/Individual.types.ts:17` | `name: string` | Removed |
 | `shared/models/ontology/Individual/IndividualParsers.ts:28` | `name: z.string()` | Removed |
 | `shared/models/ontology/Individual/IndividualParsers.test.ts:16,32` | Fixture names | Removed |
-| `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts:76-92,151-314` | Reads the label, stages `name` | Keys only, through `buildRecordKeyStagingSql` |
+| `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts:76-92,151-314` | Reads the label, stages `name`; after G5, through column resolution and `buildAttributeValueSql` | Keys only, through `_getRecordKeySources` and `buildRecordKeyStagingSql`; G5's six label-reading names deleted |
 | `.../generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers.ts` | `name` on staged, existing, and upsert rows | Removed; rename case gone |
 | `.../generateIndividuals/buildRecordKeyStagingSql/` | | New builder and executed test |
 | `.../generateIndividuals/generateIndividuals.test.ts`, `diffStagedIndividualsHelpers.test.ts` | Name fixtures | Rewritten |
@@ -595,7 +628,7 @@ touches.
 | `supabase/migration-upgrade-tests/case_statuses_backfill.prelude.sql:49-56` | Inserts `name` | Dropped |
 | `tests/e2e/helpers/insertE2ECaseTypeWithRecords.ts:98-111` | `name`, key `e2e-record-N` | Key is the record's name |
 | `tests/e2e/helpers/seedCaseRecord.ts:61-69` | `name`, key `e2e-<ms>` | Key is `recordName` |
-| `tests/e2e/helpers/CaseTypeSeedHelpers.ts:141-153` | `name: key` | Removed; adds `seedCaseTypeOverTwoDatasets` |
+| `tests/e2e/helpers/CaseTypeSeedHelpers.ts:141-153`, and plan 4's `_seedCaseTypeWithPerMonthField` | `name: key` in both records inserts | Removed from both; adds `seedCaseTypeOverTwoDatasets` (one ID field over both datasets, G5's shape) |
 | `tests/e2e/case-record-names.spec.ts`, `tests/data/record-names/*.csv`, `tests/e2e/helpers/constants.ts` | | New spec and fixtures |
 | `src/i18n/locales/*/messages.po`, `messages.ts` | | "Loading record name" added; "Loading case" back after G1 removed it |
 | `docs/ontology-architecture.md` | Stored name, unordered list, stale section 6 | Sections 4, 6, 9, 10, 13, 15, 16 |
@@ -620,8 +653,10 @@ No umbrella shared name changes.
 1. **Records are ordered by ID as text.** `P-10` lists before `P-2`, and `10`
    before `9`. A numeric-aware order needs a sort key computed in Postgres
    (and the same in SQLite) and an index on it. Recommendation: ship text
-   order now and revisit when the list gets sorting and search. Is text order
-   acceptable for the demo?
+   order now and revisit when the list gets sorting and search. This is the
+   same choice as G5's open question 2 (an ID field over mixed key types is
+   text); one answer should cover both. Is text order acceptable for the
+   demo?
 2. **What a future notification or mention email calls a record.** The
    server cannot compute a label, so the plan is "case type name plus ID"
    ("Measles case P-003"). The alternative is for the browser that posts a

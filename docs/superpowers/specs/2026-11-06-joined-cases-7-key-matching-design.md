@@ -29,6 +29,11 @@ dataset row's key against that record's key. Today the match is exact text:
   mapping, joined with `UNION ALL`
   (`generateIndividuals.ts:294-299`).
 
+Plans 1 to 6 keep both exact and gather them: the view compares keys in one
+function, plan 5's `_buildSourceRowsSql`, and Sync stages
+`CAST(<key> AS VARCHAR)` per identifier mapping row in plan 6's
+`buildRecordKeyStagingSql` (section 3).
+
 So `P-001` in one dataset never matches `p-001 ` in another, `00017` never
 matches the BIGINT `17`, and a dataset that identifies the same people with a
 different ID scheme (a lab's sample number, an old registry number) cannot
@@ -74,23 +79,22 @@ with the other.
   columns are inert on any other mapping, and the authoring paths never set
   them there.
 
-## 3. What plans 1 to 6 deliver (assumed)
+## 3. What plans 1 to 6 deliver
 
-Plans 1 to 6 are being written in parallel. This spec relies only on the
-umbrella's names and decisions:
+This section is reconciled with the final child specs and plans of plans 1
+to 6 (`docs/superpowers/specs/2026-11-06-joined-cases-{1..6}-*-design.md`).
 
-| Plan | What this spec assumes |
+| Plan | What this spec builds on |
 | --- | --- |
-| 1 | `buildAttributeValueSql` (`src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.ts`) is the only value implementation and still compares keys with `getEntityKeyComparisonSql`. The record page reads `concept_<id>`. |
+| 1 | `AttributeAssertionClient`, `ConceptWrapper`, the legacy extension, and `getSQLSelectOfMapping` are deleted. The rule SQL lives in `buildAttributeValueSql`. The record page reads `concept_<id>`. |
 | 2 | `ValuePickerRule`. Nothing in this spec depends on it. |
-| 3, 4 | List and bucketed list fields read sources through the same per-source key comparison as single values. |
-| 5 | `ConceptAttributeSource = { datasetId; selectColumnName; primaryKeyColumnName; bucketColumnName; position }`. The view stacks a field's sources with `UNION ALL`, each branch filtered by its own dataset's key comparison. `value_picker_rule_type` lives on `concept_attributes`. `rpc_concepts__create` writes `position` and `bucket_column_id`. Every source dataset still has exactly one identifier mapping, found per dataset the way `_getPrimaryKeyColumnNameByDatasetId` does today (`makeConceptAttributeColumnsFromMetadata.ts:129-158`). An identifier field's mapping for one dataset is still one `attribute_mappings__dataset_column` row. |
-| 6 | Sync stages and upserts only `external_id` (and membership columns). It reads only identifier mappings, so its key SQL is the `UNION ALL` of one key selector per identifier mapping, and it no longer calls any value rule. |
+| 3, 4 | List and bucketed list fields. Plan 5 moves their source rows into the one stacked module below. |
+| 5 | `ConceptAttributeSource = { datasetId; selectColumnName; primaryKeyColumnName; bucketColumnName; position }`, defined in `conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql.ts`. **Every key comparison of the view, for all three value shapes, happens in one function there, `_buildSourceRowsSql`**, once per source, through `getEntityKeyComparisonSql`. Each dataset's key column is its first identifier source (`_getPrimaryKeyColumnNameByDatasetId`, now over every mapping row through `AttributeSources.getSourceMappingsFromMappings`). New case types get **one ID field with one source per dataset** (`makeAttributesWithIdentifierFromKeyColumns`, used by the form's `transformValues` and by `createdCaseTypeToFormValues`); existing case types keep one identifier field per dataset. An ID field whose key columns differ in type is `varchar`. Hydrated attributes hold `mappings: AttributeMapping[]`; the form's `mappings.datasetColumn` is `AttributeSourceFormValues[]`; chat attributes hold `sources`, and `ChatCaseSourceDataset` still holds each dataset's key. `makeSourceDatasetsFromAttributes` keeps each existing `sourceDatasets` entry whole. `rpc_concepts__create` writes `position`; plan 5's pgTAP cases use the `ac…031` ids. |
+| 6 | Sync stages and upserts only `external_id` and `missing_from_source_at`, through `buildRecordKeyStagingSql({ stagingTableName, keySources })` with `RecordKeySource = { datasetId: Dataset.Id; primaryKeyColumnName: string }` (`generateIndividuals/buildRecordKeyStagingSql/`): one `SELECT CAST(<key> AS VARCHAR) AS external_id FROM <dataset>` arm per identifier mapping row, read by `_getRecordKeySources` and run by `_stageRecordKeys`. A record whose label value is empty is named by its `external_id`. |
 
-If plan 5 changed how the form or the draft card hold a field's sources, the
-form and card changes in section 5.8 attach to whatever holds "this source
-dataset and its key column", which plan 5 keeps per the umbrella (section 5,
-G5: "Every source dataset still needs a key").
+Key matching therefore lives on each identifier mapping row: for a new case
+type, on each source of its one ID field; for an existing one, on each
+identifier field's one mapping. Both are the same rows to the engine.
 
 ## 4. Approaches
 
@@ -283,30 +287,41 @@ Output, with identifiers quoted by `quoteSqlIdentifier`:
   The subquery reads the lookup's public view `"<C>"`, which needs no row
   order.
 
-Call sites compare `"individuals"."external_id" = <buildRecordKeySql(...)>`.
-The spine side drops today's cast: the spine is `VARCHAR` by construction
-(`loadConceptSpine.ts:114-120`, and the empty spine at `:91-96`), and Sync,
-whose `external_ids` column could be `BIGINT`, no longer compares keys after
-plan 6.
+**The output is always `VARCHAR`**: the plain cast, a `NULLIF` over string
+functions, or a `CASE` over normalized text. Plan 6 stages keys as `VARCHAR`
+and diffs them against the stored `external_id`; a key of any other type
+would stop matching its existing record, and the stale sweep would flag it
+missing. An executed test describes the staging table built with a lookup and
+asserts `VARCHAR`.
+
+The view's one call site (section 5.5) compares
+`CAST("individuals"."external_id" AS VARCHAR) = <buildRecordKeySql(...)>`,
+keeping plan 5's spine cast, so an exact source reads exactly as before. Sync
+selects the expression itself and compares nothing.
 
 ### 5.5 The view
 
-- `ConceptAttributeSource` (plan 5) gains `keyMatching: RecordKeyMatching`,
-  copied from its dataset's identifier mapping. Every source branch in
-  `buildAttributeValueSql` (single, list, and bucketed list) filters by
-  `"individuals"."external_id" = buildRecordKeySql({ datasetAlias: "dataset",
-  primaryKeyColumnName: source.primaryKeyColumnName, keyMatching:
-  source.keyMatching })`.
-- `makeConceptAttributeColumnsFromMetadata` replaces its per-dataset key
-  column lookup with a per-dataset `{ primaryKeyColumnName, keyMatching }`
-  lookup built from the same identifier mapping, by
+- `ConceptAttributeSource`, in `buildStackedSourceRowsSql.ts`, gains
+  `keyMatching: RecordKeyMatching`, filled from the same mapping row as
+  `primaryKeyColumnName`: its dataset's first identifier source.
+- `_buildSourceRowsSql`, plan 5's one key comparison for single values,
+  lists, and bucketed lists, replaces `getEntityKeyComparisonSql` with
+  `CAST("individuals"."external_id" AS VARCHAR) = buildRecordKeySql({
+  datasetAlias: "dataset", primaryKeyColumnName: source.primaryKeyColumnName,
+  keyMatching: source.keyMatching })`. Nothing else in the value SQL changes.
+- `makeConceptAttributeColumnsFromMetadata` replaces
+  `_getPrimaryKeyColumnNameByDatasetId` with `_getRecordKeyByDatasetId`,
+  which keeps its order (first identifier source per dataset) and returns
+  `{ primaryKeyColumnName, keyMatching }` built by
   `getRecordKeyMatchingFromMapping` (new,
   `src/clients/qetl/QueryMediator/conceptRelation/getRecordKeyMatchingFromMapping/`).
-  It resolves the lookup's column ids to names and throws when a lookup
-  column is missing or belongs to another dataset (umbrella principle 7).
-  Sync uses the same function.
-- `contributingDatasetIds` includes every lookup dataset id of every source a
-  column reads. That one change makes the lookup dataset:
+  That function resolves the lookup's column ids to names and throws when a
+  lookup column is missing or belongs to another dataset (umbrella principle
+  7). Sync uses the same function. Plan 5's `_buildSource` copies both fields
+  onto each source.
+- `_buildAttributeColumn` returns, with each source's dataset, the source's
+  lookup dataset, so `contributingDatasetIds` includes every lookup a column
+  reads. That one change makes the lookup dataset:
   - checked by `_assertContributorsAllowed`
     (`getConceptRelationPlansFromSql.ts:98-116`), so a lookup in another
     workspace throws;
@@ -315,44 +330,37 @@ plan 6.
     view is created.
 - The planner reads the lookup columns too: `_getMappedDatasetColumns`
   (`getConceptRelationPlansFromSql.ts:119-130`) fetches every id from
-  `DatasetColumnMapping.getKeyColumnIds(mapping)`.
-- Column projection: `_getConceptColumnsByDatasetId`
-  (`getNeededColumnsFromQuery.ts:78-93`) adds each lookup's source and record
-  key columns under the lookup dataset id. Without this a lookup that is also
-  a source would be projected to its field columns only and the view would
-  fail to bind.
+  `DatasetColumnMapping.getKeyColumnIds(mapping)`, beside plan 4's date
+  column.
+- Column projection: inside plan 5's per-source loop in
+  `_getConceptColumnsByDatasetId` (`getNeededColumnsFromQuery`), each
+  lookup's source and record key columns are added under the lookup dataset
+  id. Without this a lookup that is also a source would be projected to its
+  field columns only and the view would fail to bind.
 
 ### 5.6 Sync
 
-After plan 6, Sync stages distinct record keys and upserts membership. Key
-matching changes three things, in a new pure module
-`generateIndividuals/buildRecordKeyStagingSql/`:
+Plan 6's `buildRecordKeyStagingSql` is extended, not duplicated:
 
-1. **Staging.** Each identifier mapping becomes a `RecordKeySource =
-   { datasetId; primaryKeyColumnName; keyMatching }`. The staging statement:
+1. **Staging.** `RecordKeySource` gains `keyMatching: RecordKeyMatching`, and
+   `_getRecordKeySources` fills it with `getRecordKeyMatchingFromMapping` for
+   each identifier mapping row. Each arm becomes
+   `SELECT <buildRecordKeySql> AS external_id FROM "<dataset>" "dataset"`;
+   with no key matching that is `CAST("dataset"."<key>" AS VARCHAR)`, the
+   value plan 6 staged. Plan 6's throw on no key source, the `DISTINCT`, and
+   the NULL filter stay. Plan 6's executed cases pass with
+   `keyMatching: EXACT_RECORD_KEY_MATCHING` and nothing else changed.
 
-   ```sql
-   DROP TABLE IF EXISTS "<staging>";
-   CREATE TABLE "<staging>" AS (
-     SELECT DISTINCT external_id
-     FROM (
-       SELECT <buildRecordKeySql A> AS external_id FROM "<A>" "dataset"
-       UNION ALL
-       SELECT <buildRecordKeySql B> AS external_id FROM "<B>" "dataset"
-     )
-     WHERE external_id IS NOT NULL
-   );
-   ```
-
-2. **Excluded keys.** When at least one source's key matching is not exact,
-   Sync runs one more read:
+2. **Excluded keys.** A second builder in the same module,
+   `buildExcludedKeyCountsSql(keySources)`, returns the read Sync runs when at
+   least one source's key matching is not exact:
 
    ```sql
    SELECT source_index, count(DISTINCT dataset_key) AS excluded_key_count
    FROM (
-     SELECT 0 AS source_index, CAST("dataset"."<K>" AS VARCHAR) AS dataset_key,
-       <buildRecordKeySql A> AS external_id
-     FROM "<A>" "dataset"
+     SELECT 1 AS source_index, CAST("dataset"."<K>" AS VARCHAR) AS dataset_key,
+       <buildRecordKeySql B> AS external_id
+     FROM "<B>" "dataset"
      UNION ALL ...
    )
    WHERE external_id IS NULL AND dataset_key IS NOT NULL
@@ -360,17 +368,25 @@ matching changes three things, in a new pure module
    ```
 
    Only the sources whose matching is not exact appear in it, since an exact
-   key is NULL only when the raw key is. An existing case type therefore runs
-   no extra query. The source index is a literal integer, not a dataset id,
-   so nothing but quoted identifiers reaches the SQL.
+   key is NULL only when the raw key is. It returns `undefined` when none
+   does, so an existing case type runs no extra query. The source index is a
+   literal integer, not a dataset id, so nothing but quoted identifiers
+   reaches the SQL.
 
-3. **Columns read.** `neededColumnsByDatasetId` adds each lookup's two columns
-   under the lookup dataset id, so the `CREATE TABLE AS` does not acquire the
-   lookup dataset whole (`generateIndividuals.ts:264-272` explains why the
-   statement needs the explicit list).
+3. **Columns read.** `getNeededColumnsFromRecordKeySources(keySources)`, in
+   the same module, replaces plan 6's inline `neededColumnsByDatasetId` map in
+   `_stageRecordKeys`: each source's key column, plus each lookup's two
+   columns under the lookup dataset id, so the `CREATE TABLE AS` does not
+   acquire the lookup dataset whole.
 
 The workspace session already refuses a dataset outside the workspace, so a
 lookup in another workspace fails Sync the same way the view fails.
+
+The stored `external_id` is the normalized or translated key, which is what
+the records list orders by and what plan 6 names a record with no label
+value: with `lowercase`, such a record shows `p-001`, not the raw `P-001`,
+because the raw key is not stored. The spine holds the same stored keys, so
+the view's comparison sees them unchanged.
 
 A record whose key becomes excluded on a later sync (its lookup row was
 removed, or a second record key was added) is not seen in the staged set, so
@@ -405,7 +421,8 @@ and otherwise with `finishJobWithNotice`:
 
 **One set of normalizations per case type.** Every authoring surface asks once
 ("Match IDs that differ only in") and writes the same array to every
-identifier mapping of the case type. Storage stays per mapping (umbrella
+identifier mapping row of the case type: every source of plan 5's one ID
+field. Storage stays per mapping (umbrella
 section 3.1). The reason: a record key from dataset A and one from dataset B
 only meet if both went through the same normalization. A per-source choice
 lets a user tick "Upper and lower case" for one dataset and not the other,
@@ -454,15 +471,20 @@ Shared UI (`src/components/caseKeyMatching/`, mirroring
 Concept creator form:
 
 - `ConceptFormValues` gains `keyNormalizations` and, per `sourceDatasets`
-  entry, `keyCrosswalk?: KeyLookupDraft` (`conceptFormTypes.ts:65-68`).
+  entry, `keyCrosswalk?: DatasetColumnMapping.KeyCrosswalkDraft`
+  (`conceptFormTypes.ts:65-68`). Plan 5's `makeSourceDatasetsFromAttributes`
+  keeps an existing entry whole, so a chosen lookup survives field edits.
 - The checkbox group sits after the ID block, and a lookup row per source
   dataset under it.
 - Validation blocks submit while a started lookup is incomplete or uses one
   column twice.
-- `transformValues` writes both onto every identifier attribute's mapping
-  with `applyKeyMatchingToIdentifierAttributes` (new,
-  `src/views/OntologyDesignerApp/applyKeyMatchingToIdentifierAttributes/`),
-  which `createdCaseTypeToFormValues` also uses.
+- `transformValues` runs `applyKeyMatchingToIdentifierAttributes` (new,
+  `src/views/OntologyDesignerApp/applyKeyMatchingToIdentifierAttributes/`)
+  over the result of plan 5's `makeAttributesWithIdentifierFromKeyColumns`.
+  It writes the normalizations onto every source of every identifier field
+  (`mappings.datasetColumn` is a list of sources since plan 5), and each
+  source its own dataset's lookup. `createdCaseTypeToFormValues` does the
+  same after its fold.
 
 Draft card:
 
@@ -482,9 +504,8 @@ Conversion:
 - `createdCaseTypeToFormValues` resolves each source's lookup against the
   workspace's columns: both columns must exist, belong to the lookup dataset,
   and differ, or the lookup is dropped (the same treatment unknown column ids
-  get today). It applies the case type's normalizations to every identifier
-  attribute, including the ones it adds for a missing join key
-  (`createdCaseTypeToFormValues.ts:81-117`).
+  get today). It applies key matching after plan 5's fold has built the one
+  ID field, so every source of that field gets it.
 - `insertConceptFromFormValues` and `ConceptClient.create` need no change:
   the mapping drafts already pass through the parser.
 
@@ -590,8 +611,8 @@ correlated subquery for `first`, `sum`, and `list`.
 | pgTAP | new `supabase/tests/database/attribute_mappings__dataset_column__key_matching.test.sql` | `'{}'` default; all-or-none (0, 1, and 2 lookup columns set); unknown label rejected |
 | pgTAP | `rpc_concepts__create.test.sql` | The RPC stores normalizations (JSON array to enum array) and a lookup; a payload without them stores `'{}'` and NULLs |
 | Executed | new `src/clients/DuckDbClient/duckDbSqlText.executed.test.ts` | Each normalization; stored order does not matter; `#007`; empty becomes NULL; lookup unique, missing, ambiguous, NULL record key, padded lookup keys; **exact matching returns the same value as `CAST(key AS VARCHAR)` for every row of a mixed fixture (BIGINT, padded, mixed case)** |
-| Executed | `buildAttributeValueSql` or `buildConceptViewSql` executed test | A translated source attaches values only to matched records; an ambiguous key's rows contribute to no record; the existing exact-key cases pass unchanged |
-| Executed | new `buildRecordKeyStagingSql.executed.test.ts` | Staged keys and excluded counts per source; an all-exact case type stages its raw keys and builds no excluded-count query |
+| Executed | `buildConceptViewSql.executed.test.ts` (the view over plan 5's stacked rows) | A translated source attaches values only to matched records, as a single value and as a list; an ambiguous key's rows contribute to no record; plan 5's cases, the per-month ones included, pass unchanged with exact matching on every source |
+| Executed | plan 6's `buildRecordKeyStagingSql.executed.test.ts`, extended | Plan 6's cases unchanged with exact matching; staged keys with a lookup; the staged column is `VARCHAR` with normalization and a lookup; excluded counts per source; an all-exact case type builds no excluded-count query |
 | Unit | `getRecordKeyMatchingFromMapping.test.ts` | Names resolved; missing or foreign lookup column throws; defaults give exact matching |
 | Unit | `makeConceptAttributeColumnsFromMetadata` tests | Sources carry key matching; lookup datasets are contributors; default mappings produce exact matching and the same contributors as before |
 | Unit | `getConceptRelationPlansFromSql.test.ts` | Lookup columns are fetched; a lookup dataset outside the allowlist throws |
@@ -647,8 +668,8 @@ shared/types/chat.types.ts                   ChatCaseKeyNormalization, ChatCaseK
 src/clients/DuckDbClient/duckDbSqlText.ts    buildRecordKeySql replaces getEntityKeyComparisonSql
 src/clients/DuckDbClient/duckDbSqlText.executed.test.ts   new
 src/clients/qetl/QueryMediator/conceptRelation/
-  buildAttributeValueSql/buildAttributeValueSql.ts         per-source key filter
-  (the file plan 5 defines ConceptAttributeSource in)       + keyMatching
+  buildStackedSourceRowsSql/buildStackedSourceRowsSql.ts   ConceptAttributeSource + keyMatching; _buildSourceRowsSql key filter
+  buildConceptViewSql/buildConceptViewSql.executed.test.ts key matching cases
   makeConceptAttributeColumnsFromMetadata.ts                record key per dataset, lookup contributors
   getRecordKeyMatchingFromMapping/ (+ test)                 new
   getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts   lookup columns fetched
@@ -658,13 +679,14 @@ src/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQue
 src/lib/utils/state/JobProgressStore/JobProgressStore.ts   notice entry
 src/components/JobProgressPanel/JobProgressIndicator.tsx   notice arm
 src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/
-  generateIndividuals.ts                     record key sources, excluded counts, notice
-  buildRecordKeyStagingSql/ (+ executed test)   new
+  generateIndividuals.ts                     key matching on key sources, excluded counts, notice
+  buildRecordKeyStagingSql/ (+ executed test)   plan 6's: RecordKeySource.keyMatching, excluded counts, needed columns
 
 src/components/caseKeyMatching/              new: labels hook, checkbox group, lookup fields
 src/views/OntologyDesignerApp/
   applyKeyMatchingToIdentifierAttributes/ (+ test)   new
-  ConceptCreatorView/conceptFormTypes.ts, index.tsx, DatasetColumnAttributesBlock/index.tsx
+  ConceptCreatorView/conceptFormTypes.ts, index.tsx, DatasetColumnAttributesBlock/index.tsx,
+    DatasetColumnAttributesBlock/KeyMatchingBlock/ (new), makeSourceDatasetsFromAttributes test
   createdCaseTypeToFormValues/createdCaseTypeToFormValues.ts
   proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType.ts
 src/components/ChatPanel/CaseTypeDraftBlock/
@@ -689,9 +711,12 @@ docs/ontology-architecture.md
    of labels and every shared name are unchanged. Reason: with the
    umbrella's order a key like `#007` keeps its zeros (`007`), because the
    zeros only reach the start after the symbol is removed. Verified on DuckDB
-   1.5.5; no input was found where the umbrella's order is better.
-2. **Extension, not a change:** `ConceptAttributeSource` (plan 5) gains
-   `keyMatching: RecordKeyMatching`. No existing field is renamed.
+   1.5.5; no input was found where the umbrella's order is better. Accepted
+   by the coordinator on 2026-11-06, who is updating the umbrella to match.
+2. **Extensions, not changes:** `ConceptAttributeSource` (plan 5) and
+   `RecordKeySource` (plan 6) each gain `keyMatching: RecordKeyMatching`. No
+   existing field or function is renamed, and Sync keeps plan 6's one
+   staging builder.
 3. **Clarification:** `buildRecordKeySql` returns the record key expression,
    not a comparison, because Sync needs the key itself after plan 6. The view
    writes the comparison around it. It still replaces

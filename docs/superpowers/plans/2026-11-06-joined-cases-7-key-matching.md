@@ -14,11 +14,11 @@
 
 ```bash
 rg -n "getEntityKeyComparisonSql" src
-rg -n "export type ConceptAttributeSource" src
+rg -n "export type ConceptAttributeSource|export type RecordKeySource" src
 rg -n "name: string;" shared/models/ontology/Individual/Individual.types.ts
 ```
 
-Expected: the first lists `buildAttributeValueSql.ts` (and possibly a list or bucket helper beside it), the second finds plan 5's type, the third finds nothing (plan 6 dropped `individuals.name`). If the first lists `generateIndividuals.ts` or `getSQLSelectOfMapping.ts`, an earlier plan has not landed: stop.
+Expected: the first lists only `duckDbSqlText.ts` and `conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql.ts` (plan 5's `_buildSourceRowsSql`, the one place the view compares keys, for all three value shapes); the second finds `ConceptAttributeSource` in that same file and `RecordKeySource` in `generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql.ts` (plan 6); the third finds nothing (plan 6 dropped `individuals.name`). If the first lists `buildAttributeValueSql.ts`, `buildBucketedListValueSql.ts`, or `generateIndividuals.ts`, an earlier plan has not landed: stop. (Plan 1 deleted `AttributeAssertionClient`, `ConceptWrapper`, and `getSQLSelectOfMapping`; the rule SQL lives in `buildAttributeValueSql`, which no longer compares keys itself.)
 
 ---
 
@@ -63,18 +63,17 @@ Expected: the first line says this branch is on a switched local Supabase databa
 | `src/clients/qetl/QueryMediator/conceptRelation/getRecordKeyMatchingFromMapping/` (new, with test) | Mapping row to `RecordKeyMatching`, failing closed |
 | `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | Record key per dataset; lookup datasets contribute |
 | `src/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts` | Fetches lookup columns |
-| `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.ts` | Per-source key filter through `buildRecordKeySql` |
-| plan 5's `ConceptAttributeSource` file | `keyMatching` on each source |
+| `src/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql.ts` | `ConceptAttributeSource` gains `keyMatching`; `_buildSourceRowsSql` filters through `buildRecordKeySql` |
 | `src/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQuery.ts` | Lookup columns projected |
 | `src/clients/qetl/QueryMediator/conceptRelation/loadConceptSpine/loadConceptSpine.ts` | Docstring names `buildRecordKeySql` |
-| `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/` (new, with executed test) | Staging and left-out-ID SQL |
+| `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/` (plan 6's, with its executed test) | `RecordKeySource` gains `keyMatching`; staging arms use `buildRecordKeySql`; left-out-ID count and needed columns added |
 | `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts` | Record key sources, left-out counts, notice |
 | `src/lib/utils/state/JobProgressStore/JobProgressStore.ts`, `src/components/JobProgressPanel/JobProgressIndicator.tsx` | Notice entry |
 | `shared/types/chat.types.ts` | `ChatCaseKeyNormalization`, `ChatCaseKeyCrosswalk`, the two fields |
 | `supabase/functions/chat/PostChatMessages/parsing/parseCaseKeyMatching/` (new, with test) | Shared parsing of both fields |
 | `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts`, `parseCreateCaseTypes.ts` | Use it |
 | `supabase/functions/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts`, `buildCaseManagerSystemPrompt.ts` | Tool schemas and rules |
-| `src/views/OntologyDesignerApp/applyKeyMatchingToIdentifierAttributes/` (new, with test) | Writes key matching onto identifier mapping drafts |
+| `src/views/OntologyDesignerApp/applyKeyMatchingToIdentifierAttributes/` (new, with test) | Writes key matching onto every source of the ID field that plan 5's `makeAttributesWithIdentifierFromKeyColumns` builds |
 | `src/views/OntologyDesignerApp/createdCaseTypeToFormValues/createdCaseTypeToFormValues.ts`, `proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType.ts` | Carry and resolve key matching |
 | `src/components/caseKeyMatching/` (new) | Labels hook, issue message hook, checkbox group, lookup fields |
 | `src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.ts`, `CaseTypeDraftCard.tsx`, `CaseTypeDraftSourceSection.tsx` | Card editing |
@@ -116,46 +115,46 @@ begin;
 set search_path to extensions, public;
 
 insert into auth.users (id, email, aud, role)
-values ('ae000001-0000-4000-8000-000000000001'::uuid, 'key_matching@test.dev', 'authenticated', 'authenticated')
+values ('b7000001-0000-4000-8000-000000000001'::uuid, 'key_matching@test.dev', 'authenticated', 'authenticated')
 on conflict (id) do nothing;
 
 insert into public.workspaces (id, owner_id, name, slug)
-values ('ae001001-0000-4000-8000-000000000001'::uuid, 'ae000001-0000-4000-8000-000000000001'::uuid, 'key matching ws', 'key-matching-ws')
+values ('b7001001-0000-4000-8000-000000000001'::uuid, 'b7000001-0000-4000-8000-000000000001'::uuid, 'key matching ws', 'key-matching-ws')
 on conflict (id) do nothing;
 
 insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
-values ('ae002001-0000-4000-8000-000000000001'::uuid, 'ae000001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'key matching case type', false, 'ae003001-0000-4000-8000-000000000001'::uuid);
+values ('b7002001-0000-4000-8000-000000000001'::uuid, 'b7000001-0000-4000-8000-000000000001'::uuid, 'b7001001-0000-4000-8000-000000000001'::uuid, 'key matching case type', false, 'b7003001-0000-4000-8000-000000000001'::uuid);
 
 insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
-values ('ae003001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'Active', '#40c057', 0);
+values ('b7003001-0000-4000-8000-000000000001'::uuid, 'b7001001-0000-4000-8000-000000000001'::uuid, 'b7002001-0000-4000-8000-000000000001'::uuid, 'Active', '#40c057', 0);
 
 -- One statement, so the label trigger sees exactly one label. Each mapping
 -- below gets its own attribute, so no insert collides with another.
 insert into public.concept_attributes (id, workspace_id, concept_id, name, data_type, mapping_type, is_label, is_identifier, is_array, allow_manual_edit, value_picker_rule_type)
 values
-  ('ae004001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'key a', 'varchar', 'dataset_column', true, true, false, false, 'first'),
-  ('ae004002-0000-4000-8000-000000000002'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'key b', 'varchar', 'dataset_column', false, true, false, false, 'first'),
-  ('ae004003-0000-4000-8000-000000000003'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'key c', 'varchar', 'dataset_column', false, true, false, false, 'first'),
-  ('ae004004-0000-4000-8000-000000000004'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'key d', 'varchar', 'dataset_column', false, true, false, false, 'first'),
-  ('ae004005-0000-4000-8000-000000000005'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'key e', 'varchar', 'dataset_column', false, true, false, false, 'first'),
-  ('ae004006-0000-4000-8000-000000000006'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'key f', 'varchar', 'dataset_column', false, true, false, false, 'first');
+  ('b7004001-0000-4000-8000-000000000001'::uuid, 'b7001001-0000-4000-8000-000000000001'::uuid, 'b7002001-0000-4000-8000-000000000001'::uuid, 'key a', 'varchar', 'dataset_column', true, true, false, false, 'first'),
+  ('b7004002-0000-4000-8000-000000000002'::uuid, 'b7001001-0000-4000-8000-000000000001'::uuid, 'b7002001-0000-4000-8000-000000000001'::uuid, 'key b', 'varchar', 'dataset_column', false, true, false, false, 'first'),
+  ('b7004003-0000-4000-8000-000000000003'::uuid, 'b7001001-0000-4000-8000-000000000001'::uuid, 'b7002001-0000-4000-8000-000000000001'::uuid, 'key c', 'varchar', 'dataset_column', false, true, false, false, 'first'),
+  ('b7004004-0000-4000-8000-000000000004'::uuid, 'b7001001-0000-4000-8000-000000000001'::uuid, 'b7002001-0000-4000-8000-000000000001'::uuid, 'key d', 'varchar', 'dataset_column', false, true, false, false, 'first'),
+  ('b7004005-0000-4000-8000-000000000005'::uuid, 'b7001001-0000-4000-8000-000000000001'::uuid, 'b7002001-0000-4000-8000-000000000001'::uuid, 'key e', 'varchar', 'dataset_column', false, true, false, false, 'first'),
+  ('b7004006-0000-4000-8000-000000000006'::uuid, 'b7001001-0000-4000-8000-000000000001'::uuid, 'b7002001-0000-4000-8000-000000000001'::uuid, 'key f', 'varchar', 'dataset_column', false, true, false, false, 'first');
 
 -- A mapping written the way every mapping before key matching was.
 insert into public.attribute_mappings__dataset_column (workspace_id, concept_attribute_id, dataset_id, dataset_column_id)
-values ('ae001001-0000-4000-8000-000000000001'::uuid, 'ae004001-0000-4000-8000-000000000001'::uuid, 'ae005001-0000-4000-8000-000000000001'::uuid, 'ae006001-0000-4000-8000-000000000001'::uuid);
+values ('b7001001-0000-4000-8000-000000000001'::uuid, 'b7004001-0000-4000-8000-000000000001'::uuid, 'b7005001-0000-4000-8000-000000000001'::uuid, 'b7006001-0000-4000-8000-000000000001'::uuid);
 
 select plan (7);
 
 -- 1.
 select is (
-  (select key_normalizations from public.attribute_mappings__dataset_column where concept_attribute_id = 'ae004001-0000-4000-8000-000000000001'::uuid),
+  (select key_normalizations from public.attribute_mappings__dataset_column where concept_attribute_id = 'b7004001-0000-4000-8000-000000000001'::uuid),
   '{}'::public.attribute_mappings__key_normalization[],
   'a mapping that names no normalizations compares keys exactly'
 );
 
 -- 2.
 select is (
-  (select num_nulls(crosswalk_dataset_id, crosswalk_source_key_column_id, crosswalk_record_key_column_id) from public.attribute_mappings__dataset_column where concept_attribute_id = 'ae004001-0000-4000-8000-000000000001'::uuid),
+  (select num_nulls(crosswalk_dataset_id, crosswalk_source_key_column_id, crosswalk_record_key_column_id) from public.attribute_mappings__dataset_column where concept_attribute_id = 'b7004001-0000-4000-8000-000000000001'::uuid),
   3,
   'a mapping that names no ID lookup table has none'
 );
@@ -164,7 +163,7 @@ select is (
 select lives_ok (
   $t3$
   insert into public.attribute_mappings__dataset_column (workspace_id, concept_attribute_id, dataset_id, dataset_column_id, key_normalizations, crosswalk_dataset_id, crosswalk_source_key_column_id, crosswalk_record_key_column_id)
-  values ('ae001001-0000-4000-8000-000000000001'::uuid, 'ae004002-0000-4000-8000-000000000002'::uuid, 'ae005002-0000-4000-8000-000000000002'::uuid, 'ae006002-0000-4000-8000-000000000002'::uuid, array['trim', 'strip_leading_zeros']::public.attribute_mappings__key_normalization[], 'ae005001-0000-4000-8000-000000000001'::uuid, 'ae006003-0000-4000-8000-000000000003'::uuid, 'ae006004-0000-4000-8000-000000000004'::uuid);
+  values ('b7001001-0000-4000-8000-000000000001'::uuid, 'b7004002-0000-4000-8000-000000000002'::uuid, 'b7005002-0000-4000-8000-000000000002'::uuid, 'b7006002-0000-4000-8000-000000000002'::uuid, array['trim', 'strip_leading_zeros']::public.attribute_mappings__key_normalization[], 'b7005001-0000-4000-8000-000000000001'::uuid, 'b7006003-0000-4000-8000-000000000003'::uuid, 'b7006004-0000-4000-8000-000000000004'::uuid);
   $t3$,
   'a mapping can name normalizations and a whole ID lookup table'
 );
@@ -173,7 +172,7 @@ select lives_ok (
 select throws_ok (
   $t4$
   insert into public.attribute_mappings__dataset_column (workspace_id, concept_attribute_id, dataset_id, dataset_column_id, crosswalk_dataset_id)
-  values ('ae001001-0000-4000-8000-000000000001'::uuid, 'ae004003-0000-4000-8000-000000000003'::uuid, 'ae005002-0000-4000-8000-000000000002'::uuid, 'ae006002-0000-4000-8000-000000000002'::uuid, 'ae005001-0000-4000-8000-000000000001'::uuid);
+  values ('b7001001-0000-4000-8000-000000000001'::uuid, 'b7004003-0000-4000-8000-000000000003'::uuid, 'b7005002-0000-4000-8000-000000000002'::uuid, 'b7006002-0000-4000-8000-000000000002'::uuid, 'b7005001-0000-4000-8000-000000000001'::uuid);
   $t4$,
   '23514',
   null,
@@ -184,7 +183,7 @@ select throws_ok (
 select throws_ok (
   $t5$
   insert into public.attribute_mappings__dataset_column (workspace_id, concept_attribute_id, dataset_id, dataset_column_id, crosswalk_dataset_id, crosswalk_source_key_column_id)
-  values ('ae001001-0000-4000-8000-000000000001'::uuid, 'ae004004-0000-4000-8000-000000000004'::uuid, 'ae005002-0000-4000-8000-000000000002'::uuid, 'ae006002-0000-4000-8000-000000000002'::uuid, 'ae005001-0000-4000-8000-000000000001'::uuid, 'ae006003-0000-4000-8000-000000000003'::uuid);
+  values ('b7001001-0000-4000-8000-000000000001'::uuid, 'b7004004-0000-4000-8000-000000000004'::uuid, 'b7005002-0000-4000-8000-000000000002'::uuid, 'b7006002-0000-4000-8000-000000000002'::uuid, 'b7005001-0000-4000-8000-000000000001'::uuid, 'b7006003-0000-4000-8000-000000000003'::uuid);
   $t5$,
   '23514',
   null,
@@ -195,7 +194,7 @@ select throws_ok (
 select throws_ok (
   $t6$
   insert into public.attribute_mappings__dataset_column (workspace_id, concept_attribute_id, dataset_id, dataset_column_id, crosswalk_record_key_column_id)
-  values ('ae001001-0000-4000-8000-000000000001'::uuid, 'ae004005-0000-4000-8000-000000000005'::uuid, 'ae005002-0000-4000-8000-000000000002'::uuid, 'ae006002-0000-4000-8000-000000000002'::uuid, 'ae006004-0000-4000-8000-000000000004'::uuid);
+  values ('b7001001-0000-4000-8000-000000000001'::uuid, 'b7004005-0000-4000-8000-000000000005'::uuid, 'b7005002-0000-4000-8000-000000000002'::uuid, 'b7006002-0000-4000-8000-000000000002'::uuid, 'b7006004-0000-4000-8000-000000000004'::uuid);
   $t6$,
   '23514',
   null,
@@ -206,7 +205,7 @@ select throws_ok (
 select throws_ok (
   $t7$
   insert into public.attribute_mappings__dataset_column (workspace_id, concept_attribute_id, dataset_id, dataset_column_id, key_normalizations)
-  values ('ae001001-0000-4000-8000-000000000001'::uuid, 'ae004006-0000-4000-8000-000000000006'::uuid, 'ae005002-0000-4000-8000-000000000002'::uuid, 'ae006002-0000-4000-8000-000000000002'::uuid, array['uppercase']::public.attribute_mappings__key_normalization[]);
+  values ('b7001001-0000-4000-8000-000000000001'::uuid, 'b7004006-0000-4000-8000-000000000006'::uuid, 'b7005002-0000-4000-8000-000000000002'::uuid, 'b7006002-0000-4000-8000-000000000002'::uuid, array['uppercase']::public.attribute_mappings__key_normalization[]);
   $t7$,
   '22P02',
   null,
@@ -339,45 +338,47 @@ Expected: the first line names `feat-joined-cases`.
 In `supabase/tests/database/rpc_concepts__create.test.sql`, raise `select plan (N)` by 4, and add before `select * from finish ();`:
 
 ```sql
--- Key matching. An identifier mapping with normalizations and an ID lookup
--- table, beside one sent without either.
+-- Key matching, on the shape plan 5 gives new case types: one ID field with
+-- one source per dataset. The patients source compares keys exactly; the
+-- labs source cleans its keys and translates them through the patients
+-- dataset.
 select lives_ok (
   $tkm$
   set local role authenticated;
   select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
   select public.rpc_concepts__create (
-    '{"id":"ac004011-0000-4000-8000-000000000011","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"Key matching case type","description":null,"allow_manual_creation":false,"default_status_id":"ac005011-0000-4000-8000-000000000011"}'::jsonb,
-    '[{"id":"ac006011-0000-4000-8000-000000000011","name":"Patient","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":false,"allow_manual_edit":false,"value_picker_rule_type":"first"},{"id":"ac006012-0000-4000-8000-000000000012","name":"Lab number","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":false,"is_identifier":true,"is_array":false,"allow_manual_edit":false,"value_picker_rule_type":"first"}]'::jsonb,
-    '[{"concept_attribute_id":"ac006011-0000-4000-8000-000000000011","dataset_id":"ac007011-0000-4000-8000-000000000011","dataset_column_id":"ac008011-0000-4000-8000-000000000011","position":0},{"concept_attribute_id":"ac006012-0000-4000-8000-000000000012","dataset_id":"ac007012-0000-4000-8000-000000000012","dataset_column_id":"ac008012-0000-4000-8000-000000000012","position":0,"key_normalizations":["trim","strip_leading_zeros"],"crosswalk_dataset_id":"ac007011-0000-4000-8000-000000000011","crosswalk_source_key_column_id":"ac008013-0000-4000-8000-000000000013","crosswalk_record_key_column_id":"ac008011-0000-4000-8000-000000000011"}]'::jsonb,
+    '{"id":"ac004071-0000-4000-8000-000000000071","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"Key matching case type","description":null,"allow_manual_creation":false,"default_status_id":"ac005071-0000-4000-8000-000000000071"}'::jsonb,
+    '[{"id":"ac006071-0000-4000-8000-000000000071","name":"Patient ID","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":false,"allow_manual_edit":false,"value_picker_rule_type":"first"}]'::jsonb,
+    '[{"concept_attribute_id":"ac006071-0000-4000-8000-000000000071","dataset_id":"ac007071-0000-4000-8000-000000000071","dataset_column_id":"ac008071-0000-4000-8000-000000000071","position":0},{"concept_attribute_id":"ac006071-0000-4000-8000-000000000071","dataset_id":"ac007072-0000-4000-8000-000000000072","dataset_column_id":"ac008072-0000-4000-8000-000000000072","position":1,"key_normalizations":["trim","strip_leading_zeros"],"crosswalk_dataset_id":"ac007071-0000-4000-8000-000000000071","crosswalk_source_key_column_id":"ac008073-0000-4000-8000-000000000073","crosswalk_record_key_column_id":"ac008071-0000-4000-8000-000000000071"}]'::jsonb,
     '[]'::jsonb,
-    '[{"id":"ac005011-0000-4000-8000-000000000011","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+    '[{"id":"ac005071-0000-4000-8000-000000000071","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
   );
   $tkm$,
-  'a Case Types editor creates a case type whose identifiers carry key matching'
+  'a Case Types editor creates a case type whose ID sources carry key matching'
 );
 
 reset role;
 
 select is (
-  (select key_normalizations from public.attribute_mappings__dataset_column where concept_attribute_id = 'ac006012-0000-4000-8000-000000000012'::uuid),
+  (select key_normalizations from public.attribute_mappings__dataset_column where concept_attribute_id = 'ac006071-0000-4000-8000-000000000071'::uuid and dataset_id = 'ac007072-0000-4000-8000-000000000072'::uuid),
   array['trim', 'strip_leading_zeros']::public.attribute_mappings__key_normalization[],
   'the RPC stores the normalizations its payload names'
 );
 
 select is (
-  (select array[crosswalk_dataset_id, crosswalk_source_key_column_id, crosswalk_record_key_column_id] from public.attribute_mappings__dataset_column where concept_attribute_id = 'ac006012-0000-4000-8000-000000000012'::uuid),
-  array['ac007011-0000-4000-8000-000000000011', 'ac008013-0000-4000-8000-000000000013', 'ac008011-0000-4000-8000-000000000011']::uuid[],
+  (select array[crosswalk_dataset_id, crosswalk_source_key_column_id, crosswalk_record_key_column_id] from public.attribute_mappings__dataset_column where concept_attribute_id = 'ac006071-0000-4000-8000-000000000071'::uuid and dataset_id = 'ac007072-0000-4000-8000-000000000072'::uuid),
+  array['ac007071-0000-4000-8000-000000000071', 'ac008073-0000-4000-8000-000000000073', 'ac008071-0000-4000-8000-000000000071']::uuid[],
   'the RPC stores the ID lookup table its payload names'
 );
 
 select is (
-  (select key_normalizations from public.attribute_mappings__dataset_column where concept_attribute_id = 'ac006011-0000-4000-8000-000000000011'::uuid),
+  (select key_normalizations from public.attribute_mappings__dataset_column where concept_attribute_id = 'ac006071-0000-4000-8000-000000000071'::uuid and dataset_id = 'ac007071-0000-4000-8000-000000000071'::uuid),
   '{}'::public.attribute_mappings__key_normalization[],
-  'a mapping sent without normalizations compares keys exactly'
+  'a source sent without normalizations compares keys exactly'
 );
 ```
 
-If plan 5's payload keys differ from `position` and the attribute's `value_picker_rule_type`, copy them from the test's earlier dataset-column case; the four assertions do not change.
+The `ac…071` series is unused by plans 3 and 5, which add their own cases to this file. If plan 5's payload keys differ from `position` and the attribute's `value_picker_rule_type`, copy them from the test's earlier dataset-column case; the four assertions do not change.
 
 - [ ] **Step 3: Run the test to verify it fails**
 
@@ -1709,25 +1710,26 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ## Task 8: Planning: sources carry key matching, lookup datasets contribute
 
 **Files:**
-- Modify: the file plan 5 defines `ConceptAttributeSource` in (`rg -n "export type ConceptAttributeSource" src`)
-- Modify: `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts`
+- Modify: `src/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql.ts` (`ConceptAttributeSource`)
+- Modify: `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` (`_getPrimaryKeyColumnNameByDatasetId`, `_buildSource`, `_buildAttributeColumn`, `makeConceptAttributeColumnsFromMetadata`)
 - Modify: `src/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts`
 - Test: the `makeConceptAttributeColumnsFromMetadata` test (`rg -l "makeConceptAttributeColumnsFromMetadata" src --glob '*.test.ts'`; today `__tests__/conceptAttributeColumns.integration.executed.test.ts`)
 - Test: `src/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.test.ts`
 
 - [ ] **Step 1: Add `keyMatching` to the source type**
 
-In plan 5's `ConceptAttributeSource`, add:
+In `buildStackedSourceRowsSql.ts`, where plan 5 defines `ConceptAttributeSource`, add after `primaryKeyColumnName`:
 
 ```ts
   /**
-   * How this source's dataset keys become record keys: its identifier
-   * mapping's normalizations and ID lookup table.
+   * How this source's dataset keys become record keys: the normalizations
+   * and ID lookup table of its dataset's first identifier source, the same
+   * mapping row `primaryKeyColumnName` comes from.
    */
   keyMatching: RecordKeyMatching;
 ```
 
-with `import type { RecordKeyMatching } from "@/clients/DuckDbClient/duckDbSqlText";`.
+with `import type { RecordKeyMatching } from "@/clients/DuckDbClient/duckDbSqlText";`. Every other `ConceptAttributeSource` literal in the repo (plan 5's fixtures in `buildConceptViewSql.executed.test.ts`, `getNeededColumnsFromQuery.test.ts`, `QueryMediator.concepts.test.ts`, and the column-resolution test) now needs the field: run `pnpm type-check` and add `keyMatching: EXACT_RECORD_KEY_MATCHING` to each flagged source, nothing else. That also makes every existing view test a check that exact matching changes no value.
 
 - [ ] **Step 2: Write the failing column-resolution tests**
 
@@ -1789,7 +1791,7 @@ describe("key matching", () => {
 });
 ```
 
-Add the two fixture builders beside the file's existing ones. `_makeLabsMetadataWithLookup` returns a `ConceptRelationMetadata` with: an identifier attribute `lab_number` on `LABS_DATASET_ID` whose mapping has `keyNormalizations: ["strip_leading_zeros", "trim"]`, `crosswalkDatasetId: PATIENTS_DATASET_ID`, `crosswalkSourceKeyColumnId` (column `patient_lab_number`), `crosswalkRecordKeyColumnId` (column `patient_id`); a `lab_total` attribute reading `lab_result` on `LABS_DATASET_ID`; and `datasetColumnsById` holding all four columns, minus `patient_id` when `omitRecordKeyColumn` is true. `_makeLabsMetadataWithoutLookup` is the same with `keyNormalizations: []`, no `crosswalk*` ids, and only the labs columns.
+Add the two fixture builders beside the file's existing ones, in plan 5's shape (one ID field with one source per dataset). `_makeLabsMetadataWithLookup` returns a `ConceptRelationMetadata` with: an identifier attribute `Patient ID` with two mapping rows, `patient_id` on `PATIENTS_DATASET_ID` (position 0, no key matching) and `lab_number` on `LABS_DATASET_ID` (position 1) whose row has `keyNormalizations: ["strip_leading_zeros", "trim"]`, `crosswalkDatasetId: PATIENTS_DATASET_ID`, `crosswalkSourceKeyColumnId` (column `patient_lab_number`), `crosswalkRecordKeyColumnId` (column `patient_id`); a `lab_total` attribute reading `lab_result` on `LABS_DATASET_ID`; and `datasetColumnsById` holding all four columns, minus `patient_id` when `omitRecordKeyColumn` is true. `_makeLabsMetadataWithoutLookup` has the ID field with only its `lab_number` source, with `keyNormalizations: []` and no `crosswalk*` ids, the same `lab_total` field, and only the labs columns.
 
 - [ ] **Step 3: Run the tests to verify they fail**
 
@@ -1798,7 +1800,7 @@ Expected: FAIL: sources have no `keyMatching`, and the patients dataset is not a
 
 - [ ] **Step 4: Resolve a record key per dataset**
 
-In `makeConceptAttributeColumnsFromMetadata.ts`, replace the per-dataset key lookup (`PrimaryKeyColumnNameByDatasetId` and `_getPrimaryKeyColumnNameByDatasetId`, or plan 5's equivalent) with:
+In `makeConceptAttributeColumnsFromMetadata.ts`, replace `PrimaryKeyColumnNameByDatasetId` and plan 5's `_getPrimaryKeyColumnNameByDatasetId` with:
 
 ```ts
 /** One contributing dataset's key column and how its keys become record keys. */
@@ -1814,15 +1816,17 @@ type RecordKeyByDatasetId = Partial<
 
 /**
  * The key column, and the key matching, of each contributing dataset, both
- * read from its identifier mapping.
+ * read from the dataset's first identifier source.
  *
  * Getting this wrong is silent: a source filtered on the wrong key matches no
  * row and every value comes back NULL. So a dataset with no identifier
- * mapping is a throw where its source is built, and a broken ID lookup table
+ * source is a throw where its source is built, and a broken ID lookup table
  * throws here.
  *
- * A dataset reached by two identifier attributes is resolved by attribute
- * order, not by insertion order, so two runs pick the same key.
+ * A dataset reached by two identifier sources is resolved by attribute order,
+ * then by each attribute's read order, not by insertion order, so two runs
+ * pick the same key. One ID field with a source per dataset fills the map
+ * exactly as one identifier field per dataset does.
  */
 function _getRecordKeyByDatasetId(
   metadata: Readonly<ConceptRelationMetadata>,
@@ -1837,7 +1841,7 @@ function _getRecordKeyByDatasetId(
 
   const recordKeyByDatasetId: RecordKeyByDatasetId = {};
   identifierAttributes.forEach((attribute) => {
-    _getDatasetColumnMappingsForAttribute({
+    AttributeSources.getSourceMappingsFromMappings({
       attributeId: attribute.id,
       mappings: metadata.mappings,
     }).forEach((mapping) => {
@@ -1869,41 +1873,44 @@ import { getRecordKeyMatchingFromMapping } from "@/clients/qetl/QueryMediator/co
 import type { RecordKeyMatching } from "@/clients/DuckDbClient/duckDbSqlText";
 ```
 
-Then, where plan 5 builds each source of a dataset-column attribute, read the record key instead of the bare key column name, keep the existing throw for a dataset without one, and copy both fields onto the source:
+In plan 5's `_buildSource`, rename the option `primaryKeyColumnNameByDatasetId: PrimaryKeyColumnNameByDatasetId` to `recordKeyByDatasetId: RecordKeyByDatasetId`, and replace the `primaryKeyColumnName` lookup and its throw with:
 
 ```ts
-    const recordKey = options.recordKeyByDatasetId[mapping.datasetId];
-    if (recordKey === undefined) {
-      throw new Error(
-        `Concept attribute '${attribute.name}' (${attribute.id}) reads dataset ` +
-          `'${mapping.datasetId}', which has no identifier attribute mapped ` +
-          `into it, so its rows cannot be matched to an individual.`,
-      );
-    }
-    // ...plan 5's source object, with:
-    //   primaryKeyColumnName: recordKey.primaryKeyColumnName,
-    //   keyMatching: recordKey.keyMatching,
+  const recordKey = options.recordKeyByDatasetId[mapping.datasetId];
+  if (recordKey === undefined) {
+    throw new Error(
+      `Concept attribute '${attribute.name}' (${attribute.id}) reads dataset ` +
+        `'${mapping.datasetId}', which has no identifier attribute mapped ` +
+        `into it, so its rows cannot be matched to an individual.`,
+    );
+  }
 ```
 
-Rename the threaded option from `primaryKeyColumnNameByDatasetId` to `recordKeyByDatasetId` everywhere in the file, including in `makeConceptAttributeColumnsFromMetadata`'s first line.
+and in the returned `source`, replace `primaryKeyColumnName,` with:
+
+```ts
+      primaryKeyColumnName: recordKey.primaryKeyColumnName,
+      keyMatching: recordKey.keyMatching,
+```
+
+Rename the same option in `_buildAttributeColumn` and in `makeConceptAttributeColumnsFromMetadata` (whose first line becomes `const recordKeyByDatasetId = _getRecordKeyByDatasetId(metadata);`).
 
 - [ ] **Step 5: Make lookup datasets contributors**
 
-Where `makeConceptAttributeColumnsFromMetadata` adds an attribute's source dataset ids to `contributingDatasetIds`, also add each source's lookup dataset:
+In plan 5's `_buildAttributeColumn`, replace `contributingDatasetIds: builtSources.map(prop("datasetId")),` with:
 
 ```ts
-    sources.forEach((source) => {
-      contributingDatasetIds.add(source.datasetId);
-      // The view reads the ID lookup table inside the source's key filter, so
-      // it must be loaded, leased, and allowlisted like the source itself.
+    // The view reads each source's ID lookup table inside that source's key
+    // filter, so it is loaded, leased, and allowlisted like the source.
+    contributingDatasetIds: builtSources.flatMap(({ datasetId, source }) => {
       const lookupDatasetId = source.keyMatching.crosswalk?.datasetId;
-      if (lookupDatasetId !== undefined) {
-        contributingDatasetIds.add(lookupDatasetId);
-      }
-    });
+      return lookupDatasetId === undefined
+        ? [datasetId]
+        : [datasetId, lookupDatasetId];
+    }),
 ```
 
-(If plan 5 collects contributors through `BuiltAttributeColumn`, return the lookup ids from `_buildAttributeColumn` alongside the source ids instead; the contributors list must include them either way.) Update the `contributingDatasetIds` docstring on `ConceptAttributeColumns`: "The datasets the columns read, including every ID lookup table a source's key reads."
+`makeConceptAttributeColumnsFromMetadata` already adds every id `_buildAttributeColumn` returns to its set, which de-duplicates a lookup that is also a source. Update the `contributingDatasetIds` docstring on `ConceptAttributeColumns`: "The datasets the columns read, including every ID lookup table a source's key reads."
 
 - [ ] **Step 6: Run the column-resolution tests to verify they pass**
 
@@ -1986,14 +1993,14 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ## Task 9: The view filters every source through `buildRecordKeySql`
 
 **Files:**
-- Modify: `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.ts` (and any list or bucket helper beside it that `rg -n "getEntityKeyComparisonSql" src` lists)
+- Modify: `src/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql.ts` (`_buildSourceRowsSql`, plan 5's one key comparison for single values, lists, and bucketed lists)
 - Modify: `src/clients/DuckDbClient/duckDbSqlText.ts` (delete `getEntityKeyComparisonSql`)
 - Modify: `src/clients/qetl/QueryMediator/conceptRelation/loadConceptSpine/loadConceptSpine.ts:114-120` (docstring)
 - Test: `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.executed.test.ts`
 
 - [ ] **Step 1: Write the failing executed test**
 
-In `buildConceptViewSql.executed.test.ts`, add a describe block with its own world. The column objects use plan 5's dataset-column arm; `keyMatching` on each source is the new input. If plan 5's arm has a field this does not set, add it as that file's other fixtures do.
+In `buildConceptViewSql.executed.test.ts`, add a describe block with its own world. The column objects use plan 5's dataset-column arm (`sources`, `sharedSourceDuckDbDataType`, and plan 3's `valueShape` with its rule); `keyMatching` on each source is the new input.
 
 ```ts
 describe("key matching", () => {
@@ -2057,48 +2064,56 @@ describe("key matching", () => {
     },
   };
 
+  const LAB_SOURCES: ConceptAttributeSource[] = [
+    {
+      datasetId: LABS,
+      selectColumnName: "lab_result",
+      primaryKeyColumnName: "lab_number",
+      keyMatching: LAB_KEY_MATCHING,
+      bucketColumnName: undefined,
+      position: 0,
+    },
+  ];
+
   const LAB_TOTAL: ConceptAttributeColumn = {
     kind: "dataset_column",
     attributeId: uuid<ConceptAttribute.Id>(),
     attributeName: "lab_total",
+    sources: LAB_SOURCES,
+    sharedSourceDuckDbDataType: undefined,
+    valueShape: "single",
     valuePickerRuleType: "sum",
-    isArray: false,
-    sources: [
-      {
-        datasetId: LABS,
-        selectColumnName: "lab_result",
-        primaryKeyColumnName: "lab_number",
-        bucketColumnName: undefined,
-        position: 0,
-        keyMatching: LAB_KEY_MATCHING,
-      },
-    ],
   };
 
   const LAB_RESULTS: ConceptAttributeColumn = {
-    ...LAB_TOTAL,
+    kind: "dataset_column",
     attributeId: uuid<ConceptAttribute.Id>(),
     attributeName: "lab_results",
-    valuePickerRuleType: undefined,
-    isArray: true,
+    sources: LAB_SOURCES,
+    sharedSourceDuckDbDataType: undefined,
+    valueShape: "list",
   };
 
   const NAME: ConceptAttributeColumn = {
     kind: "dataset_column",
     attributeId: uuid<ConceptAttribute.Id>(),
     attributeName: "name",
-    valuePickerRuleType: "first",
-    isArray: false,
     sources: [
       {
         datasetId: PATIENTS,
         selectColumnName: "full_name",
         primaryKeyColumnName: "patient_id",
+        keyMatching: {
+          keyNormalizations: EVERY_NORMALIZATION,
+          crosswalk: undefined,
+        },
         bucketColumnName: undefined,
         position: 0,
-        keyMatching: { keyNormalizations: EVERY_NORMALIZATION, crosswalk: undefined },
       },
     ],
+    sharedSourceDuckDbDataType: undefined,
+    valueShape: "single",
+    valuePickerRuleType: "first",
   };
 
   async function _queryKeyMatchingView(): Promise<Array<Record<string, unknown>>> {
@@ -2134,7 +2149,7 @@ describe("key matching", () => {
 });
 ```
 
-Add the imports the block needs at the top of the file (`uuid` from `$/lib/uuid`, `RecordKeyMatching` from `@/clients/DuckDbClient/duckDbSqlText`, `DatasetColumnMapping` from `$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping`, `ConceptAttribute`, `Dataset`). The file's `_normalize` turns DuckDB numbers and lists into plain values; if the decimals arrive as strings, compare `Number(...)`.
+Add the imports the block needs at the top of the file (`uuid` from `$/lib/uuid`, `RecordKeyMatching` from `@/clients/DuckDbClient/duckDbSqlText`, `ConceptAttributeSource` from `@/clients/qetl/QueryMediator/conceptRelation/buildStackedSourceRowsSql/buildStackedSourceRowsSql`, `DatasetColumnMapping` from `$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping`, `ConceptAttribute`, `Dataset`). The file's `_normalize` turns DuckDB numbers and lists into plain values; if the decimals arrive as strings, compare `Number(...)`. A per-period field needs no case of its own: its rows come from the same `_buildSourceRowsSql`, and plan 5's per-month cases now run with `keyMatching: EXACT_RECORD_KEY_MATCHING` (Task 8, Step 1).
 
 - [ ] **Step 2: Run the test to verify it fails**
 
@@ -2143,14 +2158,15 @@ Expected: FAIL: `lab_total` is NULL for every record, because the source still c
 
 - [ ] **Step 3: Filter each source through `buildRecordKeySql`**
 
-In `buildAttributeValueSql.ts`, add:
+In `buildStackedSourceRowsSql.ts`, add:
 
 ```ts
 /**
  * The filter that keeps the rows of one source that belong to the outer
  * record: the record's key against the record key the row's own key becomes.
- * The record's key needs no cast, because the spine is `VARCHAR` by
- * construction (`loadConceptSpine`).
+ * The record's key is cast to `VARCHAR` as it always was; the spine is text
+ * already, so the cast changes nothing and an exact source reads exactly as
+ * it did before key matching.
  */
 function _buildSourceKeyFilterSql(
   options: Readonly<{
@@ -2164,11 +2180,31 @@ function _buildSourceKeyFilterSql(
     primaryKeyColumnName: options.source.primaryKeyColumnName,
     keyMatching: options.source.keyMatching,
   });
-  return `${quoteSqlIdentifier(options.externalIdsTable)}.${quoteSqlIdentifier(options.externalIdColumn)} = ${recordKeySql}`;
+  return `CAST(${quoteSqlIdentifier(options.externalIdsTable)}.${quoteSqlIdentifier(options.externalIdColumn)} AS VARCHAR) = ${recordKeySql}`;
 }
 ```
 
-with `import { buildRecordKeySql } from "@/clients/DuckDbClient/duckDbSqlText";`. Then replace every `getEntityKeyComparisonSql({ externalIdsTable, externalIdColumn, primaryKeyColumnName: source.primaryKeyColumnName })` call in this file (and in any helper beside it that the `rg` above listed) with `_buildSourceKeyFilterSql({ externalIdsTable, externalIdColumn, source })`, passing the same table and column the call passed before. Keep the source's `FROM ... dataset` alias as `dataset`.
+In `_buildSourceRowsSql`, replace the first entry of `conditions`:
+
+```ts
+    getEntityKeyComparisonSql({
+      externalIdsTable: options.externalIdsTable,
+      externalIdColumn: options.externalIdColumn,
+      primaryKeyColumnName: source.primaryKeyColumnName,
+    }),
+```
+
+with:
+
+```ts
+    _buildSourceKeyFilterSql({
+      externalIdsTable: options.externalIdsTable,
+      externalIdColumn: options.externalIdColumn,
+      source,
+    }),
+```
+
+and in the imports replace `getEntityKeyComparisonSql` with `buildRecordKeySql`. The source's `FROM ... dataset` alias stays `dataset`; `buildRecordKeySql` quotes it as `"dataset"`, which DuckDB resolves to the same alias.
 
 - [ ] **Step 4: Delete `getEntityKeyComparisonSql`**
 
@@ -2223,7 +2259,7 @@ it("needs an ID lookup table's two key columns, also when the lookup is itself a
 });
 ```
 
-`_makePlanWithLookupThroughSource` returns a `ConceptRelationPlan` whose `attributeColumns` are a `name` column with one source on patients (`full_name`, key `patient_id`, exact matching) and a `lab_total` column with one source on labs (`lab_result`, key `lab_number`, lookup `{ datasetId: PATIENTS_DATASET_ID, sourceKeyColumnName: "patient_lab_number", recordKeyColumnName: "patient_id" }`). If the function returns columns in another order than sorted, compare with the same normalization the file's other cases use.
+`_makePlanWithLookupThroughSource` returns a `ConceptRelationPlan` built like plan 5's cases in this file (each column with `sources`), whose `attributeColumns` are a `name` column with one source on patients (`full_name`, key `patient_id`, exact matching) and a `lab_total` column with one source on labs (`lab_result`, key `lab_number`, lookup `{ datasetId: PATIENTS_DATASET_ID, sourceKeyColumnName: "patient_lab_number", recordKeyColumnName: "patient_id" }`). If the function returns columns in another order than sorted, compare with the same normalization the file's other cases use.
 
 - [ ] **Step 2: Run the test to verify it fails**
 
@@ -2232,18 +2268,18 @@ Expected: FAIL: the patients dataset lacks `patient_lab_number`.
 
 - [ ] **Step 3: Add the lookup columns**
 
-In `_getConceptColumnsByDatasetId`, inside the loop over a column's sources (after the line that adds the source's select and key columns), add:
+In `_getConceptColumnsByDatasetId`, plan 5's inner callback runs `column.sources.forEach((source) => { ... })` and adds each source's select, key, and date column to its own dataset. Inside that `forEach`, after the existing `nextColumnsByDatasetId[source.datasetId] = unionColumnSets(...)` statement, add:
 
 ```ts
-        // The source's record key reads its ID lookup table, so the lookup
-        // dataset needs both key columns even when nothing else reads it.
-        const { crosswalk } = source.keyMatching;
-        if (crosswalk) {
-          nextColumnsByDatasetId[crosswalk.datasetId] = unionColumnSets(
-            nextColumnsByDatasetId[crosswalk.datasetId] ?? [],
-            [crosswalk.sourceKeyColumnName, crosswalk.recordKeyColumnName],
-          );
-        }
+          // The source's record key reads its ID lookup table, so the lookup
+          // dataset needs both key columns even when nothing else reads it.
+          const { crosswalk } = source.keyMatching;
+          if (crosswalk) {
+            nextColumnsByDatasetId[crosswalk.datasetId] = unionColumnSets(
+              nextColumnsByDatasetId[crosswalk.datasetId] ?? [],
+              [crosswalk.sourceKeyColumnName, crosswalk.recordKeyColumnName],
+            );
+          }
 ```
 
 - [ ] **Step 4: Run the test to verify it passes**
@@ -2262,37 +2298,25 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-## Task 11: Sync staging and left-out ID SQL
+## Task 11: Sync's staging reads record keys, and counts the IDs it leaves out
+
+Plan 6 built `buildRecordKeyStagingSql({ stagingTableName, keySources })` with `RecordKeySource = { datasetId; primaryKeyColumnName }`, one `SELECT CAST(<key> AS VARCHAR) AS external_id FROM <dataset>` arm per identifier mapping row. This task extends that module: it does not add a second staging builder.
 
 **Files:**
-- Create: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql.ts`
-- Create: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql.executed.test.ts`
+- Modify: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql.ts`
+- Modify: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql.executed.test.ts`
 
-- [ ] **Step 1: Write the failing executed test**
+- [ ] **Step 1: Give plan 6's cases exact matching**
+
+In the test file, import `EXACT_RECORD_KEY_MATCHING` from `@/clients/DuckDbClient/duckDbSqlText` and add `keyMatching: EXACT_RECORD_KEY_MATCHING` to every `RecordKeySource` plan 6's cases pass (`PEOPLE`, `VISITS`, `HOUSEHOLDS`). Change nothing else in them. They are now the proof that a case type without key matching stages exactly the keys it staged before, typed `VARCHAR`.
+
+- [ ] **Step 2: Write the failing key matching tests**
+
+Add to the same file:
 
 ```ts
-/**
- * Executed tests for the SQL Sync stages record keys with and counts the IDs
- * it leaves out. The fixture is the one the view test uses, so the keys Sync
- * stages are exactly the records the view gives values to.
- */
-import { describe, expect, it } from "vitest";
-import { uuid } from "$/lib/uuid";
-import { EXACT_RECORD_KEY_MATCHING } from "@/clients/DuckDbClient/duckDbSqlText";
-import {
-  buildExcludedKeyCountsSql,
-  buildStagedRecordKeysSql,
-  getNeededColumnsFromRecordKeySources,
-} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql";
-import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping";
-import type { RecordKeySource } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql";
-import type { DuckDBConnection } from "@duckdb/node-api";
-
-const PATIENTS = uuid<Dataset.Id>();
-const LABS = uuid<Dataset.Id>();
-const STAGING_TABLE = `ava_staging_individuals_${uuid()}`;
+const PATIENTS = "eeeeeeee-5555-4555-8555-eeeeeeeeeeee" as Dataset.Id;
+const LABS = "ffffffff-6666-4666-8666-ffffffffffff" as Dataset.Id;
 const EVERY_NORMALIZATION: DatasetColumnMapping.KeyNormalization[] = [
   "trim",
   "lowercase",
@@ -2300,13 +2324,14 @@ const EVERY_NORMALIZATION: DatasetColumnMapping.KeyNormalization[] = [
   "strip_leading_zeros",
 ];
 
-const PATIENT_SOURCE: RecordKeySource = {
+const PATIENT_KEY_SOURCE: RecordKeySource = {
   datasetId: PATIENTS,
   primaryKeyColumnName: "patient_id",
   keyMatching: { keyNormalizations: EVERY_NORMALIZATION, crosswalk: undefined },
 };
 
-const LAB_SOURCE: RecordKeySource = {
+/** Lab numbers translate to patients through the patients dataset itself. */
+const LAB_KEY_SOURCE: RecordKeySource = {
   datasetId: LABS,
   primaryKeyColumnName: "lab_number",
   keyMatching: {
@@ -2319,7 +2344,11 @@ const LAB_SOURCE: RecordKeySource = {
   },
 };
 
-async function _seed(connection: DuckDBConnection): Promise<void> {
+/**
+ * `LAB-9003` pairs with two patients, so it is ambiguous; `LAB-9004` pairs
+ * with none. One lab key is NULL, which is not a left-out ID.
+ */
+async function _seedKeyMatching(connection: DuckDBConnection): Promise<void> {
   await connection.run(`
     CREATE TABLE "${PATIENTS}" AS SELECT * FROM (VALUES
       ('0017A', 'LAB-9001'),
@@ -2333,46 +2362,56 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
   `);
 }
 
-async function _readStagedKeys(
-  connection: DuckDBConnection,
-  sources: readonly RecordKeySource[],
-): Promise<string[]> {
-  await connection.run(
-    buildStagedRecordKeysSql({ stagingTableName: STAGING_TABLE, sources }),
-  );
-  const reader = await connection.runAndReadAll(
-    `SELECT external_id FROM "${STAGING_TABLE}" ORDER BY external_id`,
-  );
-  return reader.getRowObjects().map((row) => {
-    return String(row.external_id);
+async function _stageWithKeyMatching(
+  keySources: readonly RecordKeySource[],
+): Promise<{ externalIds: string[]; columnTypes: string[] }> {
+  return await withDuckDb(async (connection) => {
+    await _seedKeyMatching(connection);
+    await connection.run(
+      buildRecordKeyStagingSql({ stagingTableName: STAGING_TABLE, keySources }),
+    );
+    const rows = (
+      await connection.runAndReadAll(
+        `SELECT external_id FROM "${STAGING_TABLE}" ORDER BY external_id`,
+      )
+    ).getRowObjects();
+    const described = (
+      await connection.runAndReadAll(`DESCRIBE "${STAGING_TABLE}"`)
+    ).getRowObjects();
+    return {
+      externalIds: rows.map((row) => {
+        return String(row.external_id);
+      }),
+      columnTypes: described.map((column) => {
+        return String(column.column_type);
+      }),
+    };
   });
 }
 
-describe("buildStagedRecordKeysSql", () => {
+describe("buildRecordKeyStagingSql with key matching", () => {
   it("stages one record key per matched key, leaving out unmatched and ambiguous keys", async () => {
-    const stagedKeys = await withDuckDb(async (connection) => {
-      await _seed(connection);
-      return await _readStagedKeys(connection, [PATIENT_SOURCE, LAB_SOURCE]);
-    });
-    expect(stagedKeys).toEqual(["17a", "18b", "19c"]);
+    const { externalIds } = await _stageWithKeyMatching([
+      PATIENT_KEY_SOURCE,
+      LAB_KEY_SOURCE,
+    ]);
+    expect(externalIds).toEqual(["17a", "18b", "19c"]);
   });
 
-  it("stages each raw key as text when every source matches keys exactly", async () => {
-    const stagedKeys = await withDuckDb(async (connection) => {
-      await _seed(connection);
-      return await _readStagedKeys(connection, [
-        { ...PATIENT_SOURCE, keyMatching: EXACT_RECORD_KEY_MATCHING },
-      ]);
-    });
-    expect(stagedKeys).toEqual(["0017A", "0018B", "0019C"]);
+  it("stages normalized and translated keys as VARCHAR, so existing records keep matching", async () => {
+    const { columnTypes } = await _stageWithKeyMatching([
+      PATIENT_KEY_SOURCE,
+      LAB_KEY_SOURCE,
+    ]);
+    expect(columnTypes).toEqual(["VARCHAR"]);
   });
 });
 
 describe("buildExcludedKeyCountsSql", () => {
   it("counts each source's distinct keys that matched no record, by source index", async () => {
-    const rawSql = buildExcludedKeyCountsSql([PATIENT_SOURCE, LAB_SOURCE]);
+    const rawSql = buildExcludedKeyCountsSql([PATIENT_KEY_SOURCE, LAB_KEY_SOURCE]);
     const rows = await withDuckDb(async (connection) => {
-      await _seed(connection);
+      await _seedKeyMatching(connection);
       const reader = await connection.runAndReadAll(rawSql ?? "");
       return reader.getRowObjects().map((row) => {
         return [Number(row.source_index), Number(row.excluded_key_count)];
@@ -2384,7 +2423,7 @@ describe("buildExcludedKeyCountsSql", () => {
   it("builds no query when every source matches keys exactly", () => {
     expect(
       buildExcludedKeyCountsSql([
-        { ...PATIENT_SOURCE, keyMatching: EXACT_RECORD_KEY_MATCHING },
+        { ...PATIENT_KEY_SOURCE, keyMatching: EXACT_RECORD_KEY_MATCHING },
       ]),
     ).toBeUndefined();
   });
@@ -2392,7 +2431,9 @@ describe("buildExcludedKeyCountsSql", () => {
 
 describe("getNeededColumnsFromRecordKeySources", () => {
   it("names each dataset's key column and each lookup's two columns once", () => {
-    expect(getNeededColumnsFromRecordKeySources([PATIENT_SOURCE, LAB_SOURCE])).toEqual({
+    expect(
+      getNeededColumnsFromRecordKeySources([PATIENT_KEY_SOURCE, LAB_KEY_SOURCE]),
+    ).toEqual({
       [PATIENTS]: ["patient_id", "patient_lab_number"],
       [LABS]: ["lab_number"],
     });
@@ -2400,12 +2441,16 @@ describe("getNeededColumnsFromRecordKeySources", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+Extend the file's imports: `buildExcludedKeyCountsSql` and `getNeededColumnsFromRecordKeySources` beside `buildRecordKeyStagingSql`, `DatasetColumnMapping` (type) from `$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping`, and `DuckDBConnection` (type) from `@duckdb/node-api`.
 
-Run: `pnpm test:executed src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql`
-Expected: FAIL: module not found.
+- [ ] **Step 3: Run the tests to verify they fail**
 
-- [ ] **Step 3: Write the module**
+Run: `pnpm test:executed buildRecordKeyStagingSql`
+Expected: FAIL: `buildExcludedKeyCountsSql` is not exported, and the key matching cases stage raw keys.
+
+- [ ] **Step 4: Extend the module**
+
+Replace the contents of `buildRecordKeyStagingSql.ts` with plan 6's module, extended (plan 6's docstrings, its throw, and its output shape are kept):
 
 ```ts
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
@@ -2416,17 +2461,21 @@ import {
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RecordKeyMatching } from "@/clients/DuckDbClient/duckDbSqlText";
 
-/** One identifier mapping, resolved to what its record key SQL needs. */
-export type RecordKeySource = Readonly<{
+/**
+ * The column that keys records in one contributing dataset: one identifier
+ * mapping's dataset and key column, and how its keys become record keys.
+ */
+export type RecordKeySource = {
   datasetId: Dataset.Id;
   primaryKeyColumnName: string;
+  /** The mapping's normalizations and ID lookup table. */
   keyMatching: RecordKeyMatching;
-}>;
+};
 
 /**
  * One row of the left-out ID count: a source, by its index in the list Sync
  * passed, and how many of its distinct keys matched no record. DuckDB returns
- * the count as a `BIGINT`.
+ * both as `BIGINT` or `INTEGER`.
  */
 export type ExcludedKeyCountRow = {
   source_index: number | bigint;
@@ -2435,46 +2484,70 @@ export type ExcludedKeyCountRow = {
 
 const DATASET_ALIAS = "dataset";
 
-function _buildRecordKeySqlForSource(source: RecordKeySource): string {
-  return buildRecordKeySql({
-    datasetAlias: DATASET_ALIAS,
-    primaryKeyColumnName: source.primaryKeyColumnName,
-    keyMatching: source.keyMatching,
-  });
+function _buildFromSql(keySource: RecordKeySource): string {
+  return `FROM ${quoteSqlIdentifier(keySource.datasetId)} ${quoteSqlIdentifier(DATASET_ALIAS)}`;
 }
 
-function _buildFromSql(source: RecordKeySource): string {
-  return `FROM ${quoteSqlIdentifier(source.datasetId)} ${quoteSqlIdentifier(DATASET_ALIAS)}`;
+function _buildRecordKeySqlForSource(keySource: RecordKeySource): string {
+  return buildRecordKeySql({
+    datasetAlias: DATASET_ALIAS,
+    primaryKeyColumnName: keySource.primaryKeyColumnName,
+    keyMatching: keySource.keyMatching,
+  });
 }
 
 /**
- * Drops and recreates the staging table with one row per distinct record key
- * across every source. A key that becomes no record key, because it
- * normalizes to nothing or its ID lookup table has no single match, is left
- * out here and counted by `buildExcludedKeyCountsSql`.
+ * The SQL that stages a case type's record keys for Sync: one row per
+ * distinct record key across every contributing dataset, as text, with NULL
+ * keys dropped. Sync reads no other column, so no field value is computed
+ * here.
+ *
+ * Each key is built by `buildRecordKeySql`, the expression the concept view
+ * filters by, so membership and values agree. It is always `VARCHAR`: a cast
+ * key with no key matching, a normalized key, or a translated one. That
+ * matters beyond typing, because a key staged as anything else would stop
+ * matching its existing record and the stale sweep would flag it. A key that
+ * becomes no record key (it normalizes to nothing, or its ID lookup table has
+ * no single match) is dropped with the NULL keys and counted by
+ * `buildExcludedKeyCountsSql`.
+ *
+ * @param options.stagingTableName The table to (re)create.
+ * @param options.keySources One key source per identifier mapping.
+ * @throws When there is no key source: a case type with no identifier field
+ *   has no keys to stage. Authoring always creates one.
  */
-export function buildStagedRecordKeysSql(
+export function buildRecordKeyStagingSql(
   options: Readonly<{
     stagingTableName: string;
-    sources: readonly RecordKeySource[];
+    keySources: readonly RecordKeySource[];
   }>,
 ): string {
-  const stagingTable = quoteSqlIdentifier(options.stagingTableName);
-  const sourceSelects = options.sources.map((source) => {
-    return `SELECT ${_buildRecordKeySqlForSource(source)} AS external_id ${_buildFromSql(source)}`;
-  });
+  const { stagingTableName, keySources } = options;
+  if (keySources.length === 0) {
+    throw new Error(
+      "Sync needs at least one identifier field to read record keys from.",
+    );
+  }
+  const stagingTable = quoteSqlIdentifier(stagingTableName);
+  const keySelects = keySources
+    .map((keySource) => {
+      return `SELECT ${_buildRecordKeySqlForSource(keySource)} AS external_id ${_buildFromSql(keySource)}`;
+    })
+    .join("\n    UNION ALL\n    ");
   return `DROP TABLE IF EXISTS ${stagingTable};
+
 CREATE TABLE ${stagingTable} AS (
   SELECT DISTINCT external_id
   FROM (
-    ${sourceSelects.join("\n    UNION ALL\n    ")}
+    ${keySelects}
   )
   WHERE external_id IS NOT NULL
 );`;
 }
 
 /**
- * Counts, per source, the distinct non-NULL keys that became no record key.
+ * Counts, per key source, the distinct non-NULL keys that became no record
+ * key.
  *
  * Only sources whose key matching changes something are counted: an exact
  * key is NULL only when the raw key is, so it can never be left out. With no
@@ -2483,16 +2556,16 @@ CREATE TABLE ${stagingTable} AS (
  * dataset id, so nothing but quoted identifiers reaches the SQL.
  */
 export function buildExcludedKeyCountsSql(
-  sources: readonly RecordKeySource[],
+  keySources: readonly RecordKeySource[],
 ): string | undefined {
-  const sourceSelects = sources.flatMap((source, sourceIndex) => {
-    if (isExactRecordKeyMatching(source.keyMatching)) {
+  const sourceSelects = keySources.flatMap((keySource, sourceIndex) => {
+    if (isExactRecordKeyMatching(keySource.keyMatching)) {
       return [];
     }
-    const datasetKeySql = `CAST(${quoteSqlIdentifier(DATASET_ALIAS)}.${quoteSqlIdentifier(source.primaryKeyColumnName)} AS VARCHAR)`;
+    const datasetKeySql = `CAST(${quoteSqlIdentifier(DATASET_ALIAS)}.${quoteSqlIdentifier(keySource.primaryKeyColumnName)} AS VARCHAR)`;
     return [
       `SELECT ${sourceIndex} AS source_index, ${datasetKeySql} AS dataset_key, ` +
-        `${_buildRecordKeySqlForSource(source)} AS external_id ${_buildFromSql(source)}`,
+        `${_buildRecordKeySqlForSource(keySource)} AS external_id ${_buildFromSql(keySource)}`,
     ];
   });
   if (sourceSelects.length === 0) {
@@ -2521,20 +2594,20 @@ function _withColumns(
 }
 
 /**
- * The columns the staging statement reads, so the mediator does not acquire
+ * The columns Sync's two statements read, so the mediator does not acquire
  * whole datasets: a `CREATE TABLE AS` has no top-level select list to infer
  * them from. Each source needs its key column, and its ID lookup table needs
  * both of its key columns.
  */
 export function getNeededColumnsFromRecordKeySources(
-  sources: readonly RecordKeySource[],
+  keySources: readonly RecordKeySource[],
 ): Partial<Record<Dataset.Id, string[]>> {
-  return sources.reduce<Partial<Record<Dataset.Id, string[]>>>(
-    (columnsByDatasetId, source) => {
-      const withKey = _withColumns(columnsByDatasetId, source.datasetId, [
-        source.primaryKeyColumnName,
+  return keySources.reduce<Partial<Record<Dataset.Id, string[]>>>(
+    (columnsByDatasetId, keySource) => {
+      const withKey = _withColumns(columnsByDatasetId, keySource.datasetId, [
+        keySource.primaryKeyColumnName,
       ]);
-      const { crosswalk } = source.keyMatching;
+      const { crosswalk } = keySource.keyMatching;
       return crosswalk
         ? _withColumns(withKey, crosswalk.datasetId, [
             crosswalk.sourceKeyColumnName,
@@ -2547,18 +2620,18 @@ export function getNeededColumnsFromRecordKeySources(
 }
 ```
 
-If `WorkspaceQuerySession.runQuery`'s `neededColumnsByDatasetId` is typed as a non-partial record, return that type instead; the values do not change.
+The exact arm is now `CAST("dataset"."person_id" AS VARCHAR)` over `FROM "<dataset>" "dataset"` instead of plan 6's unaliased `CAST("person_id" AS VARCHAR)`; the value is the same, which plan 6's cases (Step 1) check. If `WorkspaceQuerySession.runQuery`'s `neededColumnsByDatasetId` is typed as a non-partial record, return that type instead; the values do not change.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [ ] **Step 5: Run the tests to verify they pass**
 
-Run: `pnpm test:executed src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql`
-Expected: PASS (5 tests).
+Run: `pnpm test:executed buildRecordKeyStagingSql`
+Expected: PASS: plan 6's four cases unchanged, and the five new ones.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/
-git commit -m "feat(joined-cases): build Sync's record key staging and left-out ID count
+git commit -m "feat(joined-cases): stage record keys with key matching and count IDs left out
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
@@ -2743,20 +2816,23 @@ function _makeConceptWithLookup(): BuildableConcept {
         name: "Lab results",
       }) as unknown as BuildableConcept["datasets"][number],
     ],
+    // A hydrated attribute holds every mapping row (plan 5). Only the
+    // identifier's dataset-column rows carry key matching.
     attributes: concept.attributes.map((attribute) => {
-      // Narrowing on the mapping's type is what lets the key matching fields
-      // be added without touching a manual-entry mapping.
-      return attribute.isIdentifier &&
-        attribute.mapping.type === "dataset_column"
+      return attribute.isIdentifier
         ? {
             ...attribute,
-            mapping: {
-              ...attribute.mapping,
-              keyNormalizations: ["trim", "lowercase"],
-              crosswalkDatasetId: LOOKUP_DATASET_ID,
-              crosswalkSourceKeyColumnId: LOOKUP_LAB_COLUMN_ID,
-              crosswalkRecordKeyColumnId: LOOKUP_PATIENT_COLUMN_ID,
-            },
+            mappings: attribute.mappings.map((mapping) => {
+              return mapping.type === "dataset_column"
+                ? {
+                    ...mapping,
+                    keyNormalizations: ["trim", "lowercase"],
+                    crosswalkDatasetId: LOOKUP_DATASET_ID,
+                    crosswalkSourceKeyColumnId: LOOKUP_LAB_COLUMN_ID,
+                    crosswalkRecordKeyColumnId: LOOKUP_PATIENT_COLUMN_ID,
+                  }
+                : mapping;
+            }),
           }
         : attribute;
     }),
@@ -2852,98 +2928,68 @@ If plan 6 changed `_makeConcept` or the mocks' shapes, adapt these helpers to it
 Run: `pnpm test:frontend src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.test.ts`
 Expected: FAIL: the staging SQL does not read the lookup dataset, and no notice is left.
 
-- [ ] **Step 3: Resolve record key sources**
+- [ ] **Step 3: Give each key source its key matching**
 
-In `generateIndividuals.ts`, replace plan 6's identifier mapping resolution (the function that fetched each identifier mapping's column and built `neededColumnsByDatasetId`) with:
+In `generateIndividuals.ts`, plan 6's `_getRecordKeySources` reads every identifier mapping row (`flatMap(prop("mappings"))`), fetches each row's key column, and returns `{ datasetId, primaryKeyColumnName }`. Change three things in it:
+
+1. Narrow with the namespace type: `.filter((mapping): mapping is DatasetColumnMapping.T => { return mapping.type === "dataset_column"; })`, and replace the file's type import of `DatasetColumnMapping` from `DatasetColumnMapping.types` with `import { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping";` (both bind the same name; the value is needed below).
+2. Fetch every column a key reads, the lookup's included:
+
+   ```ts
+     const keyColumns = await DatasetColumnClient.getAll(
+       where(
+         "id",
+         "in",
+         identifierMappings.flatMap((mapping) => {
+           return DatasetColumnMapping.getKeyColumnIds(mapping);
+         }),
+       ),
+     );
+   ```
+
+3. Return the key matching with each source:
+
+   ```ts
+       return {
+         datasetId: keyColumn.datasetId,
+         primaryKeyColumnName: keyColumn.name,
+         keyMatching: getRecordKeyMatchingFromMapping({
+           mapping,
+           datasetColumnsById: keyColumnsById,
+         }),
+       };
+   ```
+
+Extend its docstring: "Each source carries its mapping's normalizations and ID lookup table, resolved by the same function the concept planner uses."
+
+- [ ] **Step 4: Read the lookup columns, and count left-out IDs**
+
+In plan 6's `_stageRecordKeys`, replace the inline `neededColumnsByDatasetId: objectValuesMap(makeBucketRecord(...), ...)` with:
 
 ```ts
-/**
- * Every identifier mapping of the concept, resolved to what its record key
- * SQL needs: its dataset, its key column's name, and its key matching.
- */
-async function _getRecordKeySources(
-  concept: BuildableConcept,
-): Promise<RecordKeySource[]> {
-  const identifierMappings = Concept.bind(concept)
-    .getIdentifierAttributes()
-    .map((attribute) => {
-      return attribute.mapping;
-    })
-    .filter((mapping): mapping is DatasetColumnMapping.T => {
-      return mapping.type === "dataset_column";
-    });
-  const keyColumns = await DatasetColumnClient.getAll(
-    where(
-      "id",
-      "in",
-      identifierMappings.flatMap((mapping) => {
-        return DatasetColumnMapping.getKeyColumnIds(mapping);
-      }),
-    ),
-  );
-  const datasetColumnsById = makeIdLookupRecord(keyColumns, { key: "id" });
-  return identifierMappings.map((mapping) => {
-    const keyColumn = datasetColumnsById[mapping.datasetColumnId];
-    assertIsDefined(
-      keyColumn,
-      `Could not find column "${mapping.datasetColumnId}"`,
-    );
-    return {
-      datasetId: mapping.datasetId,
-      primaryKeyColumnName: keyColumn.name,
-      keyMatching: getRecordKeyMatchingFromMapping({
-        mapping,
-        datasetColumnsById,
-      }),
-    };
-  });
-}
+    neededColumnsByDatasetId: getNeededColumnsFromRecordKeySources(keySources),
 ```
 
-- [ ] **Step 4: Stage record keys and count left-out IDs**
+and change its comment's last sentence to "Sync reads each contributing dataset's key column, and each ID lookup table's two key columns." Remove `objectValuesMap` and `makeBucketRecord` from the imports if nothing else uses them.
 
-Replace plan 6's staging function body with:
+Add:
 
 ```ts
-/**
- * Stages the concept's record keys into `stagingTableName`, one row per
- * distinct key. The column list is explicit because a `CREATE TABLE AS`
- * exposes no select list for the mediator to infer it from, so every dataset
- * it names would otherwise be acquired whole.
- */
-async function _stageRecordKeys(
-  options: Readonly<{
-    workspaceId: Workspace.Id;
-    stagingTableName: string;
-    sources: readonly RecordKeySource[];
-  }>,
-): Promise<void> {
-  await WorkspaceQuerySession.runQuery({
-    rawSql: buildStagedRecordKeysSql({
-      stagingTableName: options.stagingTableName,
-      sources: options.sources,
-    }),
-    workspaceId: options.workspaceId,
-    neededColumnsByDatasetId: getNeededColumnsFromRecordKeySources(
-      options.sources,
-    ),
-  });
-}
-
 /** How many of one source dataset's IDs matched no record. */
 type ExcludedKeyCount = { datasetId: Dataset.Id; excludedKeyCount: number };
 
 /**
- * Counts the IDs each source left out, for the sources whose key matching
- * can leave any out. An exact case type runs no query here.
+ * Counts the IDs each key source left out, for the sources whose key
+ * matching can leave any out. A case type without key matching runs no
+ * query here.
  */
 async function _getExcludedKeyCounts(
   options: Readonly<{
     workspaceId: Workspace.Id;
-    sources: readonly RecordKeySource[];
+    keySources: readonly RecordKeySource[];
   }>,
 ): Promise<ExcludedKeyCount[]> {
-  const rawSql = buildExcludedKeyCountsSql(options.sources);
+  const rawSql = buildExcludedKeyCountsSql(options.keySources);
   if (rawSql === undefined) {
     return [];
   }
@@ -2951,20 +2997,20 @@ async function _getExcludedKeyCounts(
     rawSql,
     workspaceId: options.workspaceId,
     neededColumnsByDatasetId: getNeededColumnsFromRecordKeySources(
-      options.sources,
+      options.keySources,
     ),
   });
   return result.data.flatMap((row) => {
-    const source = options.sources[Number(row.source_index)];
+    const keySource = options.keySources[Number(row.source_index)];
     const excludedKeyCount = Number(row.excluded_key_count);
-    return source && excludedKeyCount > 0
-      ? [{ datasetId: source.datasetId, excludedKeyCount }]
+    return keySource && excludedKeyCount > 0
+      ? [{ datasetId: keySource.datasetId, excludedKeyCount }]
       : [];
   });
 }
 ```
 
-In `_runGenerateIndividuals`: call `_getRecordKeySources(concept)` where plan 6 resolved mappings, call `_stageRecordKeys` where it staged, call `_getExcludedKeyCounts` as the first statement inside the `try` (so a failure still drops the staging table), and return its result at the end of the `try` after the stale sweep. Change the function's return type to `Promise<ExcludedKeyCount[]>`.
+In `_runGenerateIndividuals`, plan 6 already calls `_getRecordKeySources(concept)` and `_stageRecordKeys({ workspaceId, stagingTableName, keySources })`. Make `const excludedKeyCounts = await _getExcludedKeyCounts({ workspaceId: concept.workspaceId, keySources });` the first statement inside its `try` (so a failure still drops the staging table), return `excludedKeyCounts` at the end of the `try` after the stale sweep, and change the function's return type to `Promise<ExcludedKeyCount[]>`.
 
 - [ ] **Step 5: Finish with a notice**
 
@@ -3013,7 +3059,7 @@ and in `generateIndividuals`, replace `await _runGenerateIndividuals(concept, jo
     }
 ```
 
-Imports to add: `plural` beside `t` from `@lingui/core/macro`; `makeIdLookupRecord` from `@avandar/utils`; `DatasetColumnMapping` from `$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping`; `getRecordKeyMatchingFromMapping`; and `buildExcludedKeyCountsSql`, `buildStagedRecordKeysSql`, `getNeededColumnsFromRecordKeySources`, `ExcludedKeyCountRow`, `RecordKeySource` from `./buildRecordKeyStagingSql/buildRecordKeyStagingSql` (full `@/views/...` path). The file imports a `DatasetColumnMapping` type from `DatasetColumnMapping.types` today; replace that import with the namespace import above, since both bind the same name, and change any remaining `DatasetColumnMapping` type use in the file to `DatasetColumnMapping.T`. Remove imports plan 6's code used and this task replaced.
+Imports to add: `plural` beside `t` from `@lingui/core/macro`; `getRecordKeyMatchingFromMapping` from `@/clients/qetl/QueryMediator/conceptRelation/getRecordKeyMatchingFromMapping/getRecordKeyMatchingFromMapping`; `buildExcludedKeyCountsSql` and `getNeededColumnsFromRecordKeySources` beside plan 6's `buildRecordKeyStagingSql` import, and the type `ExcludedKeyCountRow` beside its `RecordKeySource`; and the type `Dataset` from `$/models/datasets/Dataset/Dataset`. Remove imports this task left unused.
 
 - [ ] **Step 6: Run the tests to verify they pass**
 
@@ -3516,78 +3562,92 @@ and to `ConceptFormValues`:
   keyNormalizations: DatasetColumnMapping.KeyNormalization[];
 ```
 
-Set `keyNormalizations: []` in `getDefaultConceptFormValues`. Import the namespace with `import type { DatasetColumnMapping as DatasetColumnMappingModel } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping";` if the file's existing `DatasetColumnMapping` import from `.types` is still needed for `AttributeFormValues`, and use that alias for the two new fields; otherwise switch the file to the namespace import.
+Set `keyNormalizations: []` in `getDefaultConceptFormValues`. Switch the file's `DatasetColumnMapping` import from `DatasetColumnMapping.types` to `import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping";`, and write `DatasetColumnMapping.T<"Insert">` where plan 5's `AttributeSourceFormValues` wrote `DatasetColumnMapping<"Insert">`. Each source draft then accepts `keyNormalizations` and the three `crosswalk*` ids, which Task 4 made optional on the insert type.
 
 - [ ] **Step 2: Write the failing test for the helper**
+
+New case types get one ID field with one source per dataset (plan 5's `makeAttributesWithIdentifierFromKeyColumns`), so the test builds that field the same way.
 
 ```ts
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { applyKeyMatchingToIdentifierAttributes } from "@/views/OntologyDesignerApp/applyKeyMatchingToIdentifierAttributes/applyKeyMatchingToIdentifierAttributes";
-import {
-  makeDefaultDatasetColumnAttribute,
-  makeDefaultManualEntryAttribute,
-} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import { makeDefaultManualEntryAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import { makeAttributesWithIdentifierFromKeyColumns } from "@/views/OntologyDesignerApp/makeAttributesWithIdentifierFromKeyColumns/makeAttributesWithIdentifierFromKeyColumns";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
+import type { KeyColumn } from "@/views/OntologyDesignerApp/makeAttributesWithIdentifierFromKeyColumns/makeAttributesWithIdentifierFromKeyColumns";
 
 const CONCEPT_ID = uuid<ConceptId>();
-const LABS_DATASET_ID = uuid<DatasetId>();
 const PATIENTS_DATASET_ID = uuid<DatasetId>();
+const LABS_DATASET_ID = uuid<DatasetId>();
 const LOOKUP = {
   datasetId: PATIENTS_DATASET_ID,
   sourceKeyColumnId: uuid<DatasetColumnId>(),
   recordKeyColumnId: uuid<DatasetColumnId>(),
 };
 
-function _makeDatasetAttribute(options: {
-  datasetId: DatasetId;
-  isIdentifier: boolean;
-}) {
-  const datasetColumnId = uuid<DatasetColumnId>();
-  return makeDefaultDatasetColumnAttribute({
+const KEY_COLUMNS: KeyColumn[] = [
+  {
+    id: uuid<DatasetColumnId>(),
+    datasetId: PATIENTS_DATASET_ID,
+    name: "patient_id",
+    dataType: "varchar",
+  },
+  {
+    id: uuid<DatasetColumnId>(),
+    datasetId: LABS_DATASET_ID,
+    name: "lab_number",
+    dataType: "varchar",
+  },
+];
+
+/** The one ID field plan 5 builds from the two datasets' join keys. */
+function _makeIdField() {
+  const [idField] = makeAttributesWithIdentifierFromKeyColumns({
     conceptId: CONCEPT_ID,
-    name: "column",
-    dataset: { id: options.datasetId } as Parameters<
-      typeof makeDefaultDatasetColumnAttribute
-    >[0]["dataset"],
-    datasetColumn: {
-      id: datasetColumnId,
-      dataType: "varchar",
-    } as Parameters<typeof makeDefaultDatasetColumnAttribute>[0]["datasetColumn"],
-    isIdentifier: options.isIdentifier,
+    keyColumns: KEY_COLUMNS,
+    attributes: [],
   });
+  if (!idField) {
+    throw new Error("The ID field was not built.");
+  }
+  return idField;
 }
 
 describe("applyKeyMatchingToIdentifierAttributes", () => {
-  it("writes the normalizations to every identifier and each dataset's own lookup", () => {
-    const [labsKey, patientsKey] = applyKeyMatchingToIdentifierAttributes({
-      attributes: [
-        _makeDatasetAttribute({ datasetId: LABS_DATASET_ID, isIdentifier: true }),
-        _makeDatasetAttribute({ datasetId: PATIENTS_DATASET_ID, isIdentifier: true }),
-      ],
+  it("writes the normalizations to every ID source and each dataset's own lookup", () => {
+    const [idField] = applyKeyMatchingToIdentifierAttributes({
+      attributes: [_makeIdField()],
       keyNormalizations: ["trim", "lowercase"],
       keyCrosswalksByDatasetId: new Map([[LABS_DATASET_ID, LOOKUP]]),
     });
 
-    expect(labsKey?.mappings.datasetColumn).toMatchObject({
-      keyNormalizations: ["trim", "lowercase"],
-      crosswalkDatasetId: LOOKUP.datasetId,
-      crosswalkSourceKeyColumnId: LOOKUP.sourceKeyColumnId,
-      crosswalkRecordKeyColumnId: LOOKUP.recordKeyColumnId,
-    });
-    expect(patientsKey?.mappings.datasetColumn).toMatchObject({
-      keyNormalizations: ["trim", "lowercase"],
-      crosswalkDatasetId: undefined,
-    });
+    expect(idField?.mappings.datasetColumn).toMatchObject([
+      {
+        datasetId: PATIENTS_DATASET_ID,
+        keyNormalizations: ["trim", "lowercase"],
+        crosswalkDatasetId: undefined,
+      },
+      {
+        datasetId: LABS_DATASET_ID,
+        keyNormalizations: ["trim", "lowercase"],
+        crosswalkDatasetId: LOOKUP.datasetId,
+        crosswalkSourceKeyColumnId: LOOKUP.sourceKeyColumnId,
+        crosswalkRecordKeyColumnId: LOOKUP.recordKeyColumnId,
+      },
+    ]);
   });
 
   it("leaves fields that are not identifiers unchanged", () => {
-    const valueField = _makeDatasetAttribute({
-      datasetId: LABS_DATASET_ID,
+    const idField = _makeIdField();
+    const valueField = {
+      ...idField,
+      id: uuid<typeof idField.id>(),
       isIdentifier: false,
-    });
+      isLabel: false,
+    };
     const manualField = makeDefaultManualEntryAttribute({
       conceptId: CONCEPT_ID,
       name: "Notes",
@@ -3604,7 +3664,7 @@ describe("applyKeyMatchingToIdentifierAttributes", () => {
 });
 ```
 
-(The two `as Parameters<...>` casts build partial catalog objects the helper never reads; if `conceptFormTypes.test.ts` already has dataset and column fixtures, use those instead.)
+(If plan 5 changed `makeDefaultManualEntryAttribute`'s options, build the manual field the way its tests do.)
 
 - [ ] **Step 3: Run the test to verify it fails**
 
@@ -3618,14 +3678,16 @@ import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/Da
 import type { AttributeFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
 /**
- * Writes a case type's key matching onto the mapping of every identifier
- * attribute: the same normalizations on all of them, and each dataset's own
- * ID lookup table. Other attributes come back unchanged, because key matching
- * only means something on the mapping that keys a dataset.
+ * Writes a case type's key matching onto every source of every identifier
+ * field: the same normalizations on all of them, and each source its own
+ * dataset's ID lookup table. Each source is one mapping row, so one ID field
+ * with a source per dataset and one identifier field per dataset come out
+ * the same. Other fields come back unchanged, because key matching only means
+ * something on a row that keys a dataset.
  *
- * The normalizations go on every identifier so two datasets' keys are cleaned
- * the same way before they meet. Different sets per dataset would split one
- * record into two without any error.
+ * The normalizations go on every identifier source so two datasets' keys are
+ * cleaned the same way before they meet. Different sets per dataset would
+ * split one record into two without any error.
  */
 export function applyKeyMatchingToIdentifierAttributes(
   options: Readonly<{
@@ -3641,29 +3703,27 @@ export function applyKeyMatchingToIdentifierAttributes(
     if (!attribute.isIdentifier || attribute.mappingType !== "dataset_column") {
       return attribute;
     }
-    const datasetColumnMapping = attribute.mappings.datasetColumn;
-    const keyCrosswalk =
-      datasetColumnMapping.datasetId === undefined
-        ? undefined
-        : options.keyCrosswalksByDatasetId.get(datasetColumnMapping.datasetId);
     return {
       ...attribute,
       mappings: {
         ...attribute.mappings,
-        datasetColumn: {
-          ...datasetColumnMapping,
-          keyNormalizations: [...options.keyNormalizations],
-          crosswalkDatasetId: keyCrosswalk?.datasetId,
-          crosswalkSourceKeyColumnId: keyCrosswalk?.sourceKeyColumnId,
-          crosswalkRecordKeyColumnId: keyCrosswalk?.recordKeyColumnId,
-        },
+        datasetColumn: attribute.mappings.datasetColumn.map((source) => {
+          const keyCrosswalk = options.keyCrosswalksByDatasetId.get(
+            source.datasetId,
+          );
+          return {
+            ...source,
+            keyNormalizations: [...options.keyNormalizations],
+            crosswalkDatasetId: keyCrosswalk?.datasetId,
+            crosswalkSourceKeyColumnId: keyCrosswalk?.sourceKeyColumnId,
+            crosswalkRecordKeyColumnId: keyCrosswalk?.recordKeyColumnId,
+          };
+        }),
       },
     };
   });
 }
 ```
-
-If plan 5 made `mappings.datasetColumn` a list of source drafts, apply the same update to every element of that list instead; each element is one dataset's mapping.
 
 - [ ] **Step 5: Run the test to verify it passes**
 
@@ -3720,18 +3780,24 @@ it("puts the normalizations and a resolvable lookup on the identifier mappings o
   const identifier = values.attributes.find((attribute) => {
     return attribute.isIdentifier;
   });
-  expect(identifier?.mappings.datasetColumn).toMatchObject({
-    keyNormalizations: ["trim", "lowercase"],
-    crosswalkDatasetId: PATIENTS_DATASET_ID,
-    crosswalkSourceKeyColumnId: PATIENT_LAB_COLUMN_ID,
-    crosswalkRecordKeyColumnId: PATIENT_ID_COLUMN_ID,
-  });
+  expect(identifier?.mappings.datasetColumn).toMatchObject([
+    {
+      datasetId: LABS_DATASET_ID,
+      keyNormalizations: ["trim", "lowercase"],
+      crosswalkDatasetId: PATIENTS_DATASET_ID,
+      crosswalkSourceKeyColumnId: PATIENT_LAB_COLUMN_ID,
+      crosswalkRecordKeyColumnId: PATIENT_ID_COLUMN_ID,
+    },
+  ]);
   values.attributes
     .filter((attribute) => {
       return !attribute.isIdentifier && attribute.mappingType === "dataset_column";
     })
-    .forEach((attribute) => {
-      expect(attribute.mappings.datasetColumn.keyNormalizations ?? []).toEqual([]);
+    .flatMap((attribute) => {
+      return attribute.mappings.datasetColumn;
+    })
+    .forEach((source) => {
+      expect(source.keyNormalizations ?? []).toEqual([]);
     });
 });
 
@@ -3758,11 +3824,11 @@ it("drops a lookup whose columns are not in the lookup dataset", () => {
   const identifier = values.attributes.find((attribute) => {
     return attribute.isIdentifier;
   });
-  expect(identifier?.mappings.datasetColumn.crosswalkDatasetId).toBeUndefined();
+  expect(identifier?.mappings.datasetColumn[0]?.crosswalkDatasetId).toBeUndefined();
 });
 ```
 
-`CATALOG_COLUMNS` holds `LAB_NUMBER_COLUMN_ID` and a value column on the labs dataset, and `PATIENT_LAB_COLUMN_ID` and `PATIENT_ID_COLUMN_ID` on the patients dataset; `_makeCaseType` is the file's existing case type fixture with one labs value attribute. Reuse the file's names where they exist.
+`CATALOG_COLUMNS` holds `LAB_NUMBER_COLUMN_ID` and a value column on the labs dataset, and `PATIENT_LAB_COLUMN_ID` and `PATIENT_ID_COLUMN_ID` on the patients dataset; `_makeCaseType` is the file's existing case type fixture with one labs value attribute (plan 5's `sources` shape). With one identity, the ID field has one source. Reuse the file's names where they exist.
 
 In `ConceptClient.test.ts`, add `keyNormalizations: ["lowercase", "trim"]` and the three `crosswalk*` ids to the dataset-column mapping of the existing "sends the case type..." test, and assert:
 
@@ -3855,8 +3921,8 @@ In `createdCaseTypeToFormValues`, replace `const attributes = _attributesFromCas
   const keyNormalizations = DatasetColumnMapping.toCanonicalKeyNormalizations(
     options.caseType.keyNormalizations ?? [],
   );
-  // Applied after every identifier exists, including the ones added for a
-  // join key that was not an attribute, so none is left comparing exactly.
+  // Applied after plan 5's fold (the end of `_attributesFromCaseType`) has
+  // built the one ID field, so every one of its sources gets it.
   const attributes = applyKeyMatchingToIdentifierAttributes({
     attributes: _attributesFromCaseType({
       caseType: options.caseType,
@@ -4573,6 +4639,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 - Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx` (after `IdentifierBlock`)
 - Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx` (validation and `transformValues`)
 - Create: `src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/KeyMatchingBlock/KeyMatchingBlock.test.tsx`
+- Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/makeSourceDatasetsFromAttributes/makeSourceDatasetsFromAttributes.test.ts` (plan 5's)
 
 - [ ] **Step 1: Write the failing block test**
 
@@ -4743,12 +4810,12 @@ In `ConceptCreatorView/index.tsx`, extend the `sourceDatasets` validation rule:
       },
 ```
 
-In `transformValues`, replace `return { ...values, attributes: allAttributes };` with:
+In `transformValues`, plan 5's body ends by returning `attributes: makeAttributesWithIdentifierFromKeyColumns({ conceptId: values.id, keyColumns, attributes: typedAttributes })`. Replace that `return` with:
 
 ```ts
-      // Every identifier gets the same normalizations and its own dataset's
-      // lookup table. Unfinished lookups never reach here: validation stops
-      // the submit first.
+      // Every source of the ID field gets the same normalizations and its
+      // own dataset's lookup table. Unfinished lookups never reach here:
+      // validation stops the submit first.
       const keyCrosswalksByDatasetId = new Map(
         values.sourceDatasets.flatMap(({ dataset, keyCrosswalk }) => {
           const resolvedKeyCrosswalk = keyCrosswalk
@@ -4762,12 +4829,38 @@ In `transformValues`, replace `return { ...values, attributes: allAttributes };`
       return {
         ...values,
         attributes: applyKeyMatchingToIdentifierAttributes({
-          attributes: allAttributes,
+          attributes: makeAttributesWithIdentifierFromKeyColumns({
+            conceptId: values.id,
+            keyColumns,
+            attributes: typedAttributes,
+          }),
           keyNormalizations: values.keyNormalizations,
           keyCrosswalksByDatasetId,
         }),
       };
 ```
+
+Plan 5's `makeSourceDatasetsFromAttributes` keeps each existing `sourceDatasets` entry whole when fields change, so a chosen `keyCrosswalk` survives adding or removing a field. Pin that in its test file:
+
+```ts
+  it("keeps a dataset's ID lookup table when the fields change", () => {
+    const keyCrosswalk = {
+      datasetId: PATIENTS_DATASET_ID,
+      sourceKeyColumnId: PATIENT_LAB_COLUMN_ID,
+    };
+    const [labs] = makeSourceDatasetsFromAttributes({
+      attributes: [_makeFieldReading(LABS_DATASET_ID)],
+      sourceDatasets: [
+        { dataset: LABS_DATASET, primaryKeyColumnId: undefined, keyCrosswalk },
+      ],
+      datasetsById: { [LABS_DATASET_ID]: LABS_DATASET },
+    });
+
+    expect(labs?.keyCrosswalk).toEqual(keyCrosswalk);
+  });
+```
+
+using that file's existing dataset and field builders (named here `LABS_DATASET` and `_makeFieldReading`).
 
 Imports: `matchLiteral` from `@avandar/utils`, `DatasetColumnMapping` (value) from `$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping`, `applyKeyMatchingToIdentifierAttributes`.
 
@@ -4935,10 +5028,17 @@ async function _pickOption(options: {
     .click();
 }
 
-/** Adds one dataset column as a field, through the form's column list. */
-async function _addField(page: Page, columnName: string): Promise<void> {
-  await page.getByRole("radio", { name: columnName, exact: true }).click();
+/** Adds one dataset column as a field, as plan 5's multi-source spec does. */
+async function _addColumnAsField(page: Page, columnName: string): Promise<void> {
+  await page.getByRole("radio", { name: columnName, exact: true }).check();
   await page.getByRole("button", { name: "Add column as a field" }).click();
+}
+
+/** The value the record page shows for one field (plan 5's locator). */
+function _factOf(page: Page, fieldName: string) {
+  return page
+    .locator("dt", { hasText: fieldName })
+    .locator("xpath=following-sibling::dd[1]");
 }
 
 test.describe("Case type ID matching", () => {
@@ -5037,9 +5137,9 @@ test.describe("Case type ID matching", () => {
     await page.getByRole("textbox", { name: "Case type name" }).fill(CASE_TYPE_NAME);
     await page
       .getByRole("switch", { name: "Some data should come from existing datasets" })
-      .click();
-    await _addField(page, "full_name");
-    await _addField(page, "lab_result");
+      .check();
+    await _addColumnAsField(page, "full_name");
+    await _addColumnAsField(page, "lab_result");
     await _pickOption({
       page,
       comboboxName: /^If there are multiple lab_result values/,
@@ -5095,15 +5195,20 @@ test.describe("Case type ID matching", () => {
       .throwOnError();
     expect(records.map((record) => record.external_id)).toEqual(["17a", "18b", "19c"]);
 
-    await page.getByRole("link", { name: CASE_TYPE_NAME, exact: true }).click();
+    await page.getByRole("link", { name: "View records" }).click();
     await page.getByRole("link", { name: /Ana Lima$/ }).click();
-    const labTotal = page.getByText("lab_result", { exact: true }).locator("..");
-    await expect(labTotal).toContainText(/12/, { timeout: MEDIUM_WAIT });
+    await expect(_factOf(page, "lab_result")).toContainText(/12/, {
+      timeout: MEDIUM_WAIT,
+    });
+    await page.getByRole("link", { name: /Ben Okafor$/ }).click();
+    await expect(_factOf(page, "lab_result")).toContainText(/4/, {
+      timeout: MEDIUM_WAIT,
+    });
   });
 });
 ```
 
-If plan 5 changed how the form adds a field or where a field's rule is chosen, change `_addField` and the rule pick to match plan 5's own e2e flow; the key matching steps and every assertion stay. If the field rows on the record page are labelled by the field name rather than the column name, use the field name the form gave `lab_result`.
+The form folds the two ID columns (`patient_id`, `lab_number`) into one ID field with a source per dataset (plan 5), and the key matching applies to both sources; the lookup is on the labs source. Check every locator against the running app on the first run, as plan 5's spec says (the rule select's label and the `View records` control in particular); adjust the locator, never the assertion.
 
 - [ ] **Step 3: Run the spec**
 
@@ -5156,7 +5261,8 @@ workspace dataset with a column of this dataset's IDs and a column of the
 shared ID, often another source. The form (`KeyMatchingBlock`) and the draft
 card (`KeyNormalizationCheckboxGroup`, `KeyLookupFields` in
 `src/components/caseKeyMatching/`) edit both; `applyKeyMatchingToIdentifierAttributes`
-writes them onto identifier mappings for both paths. Chat proposes
+writes them onto every source of the ID field (one mapping row per dataset)
+for both paths, after `makeAttributesWithIdentifierFromKeyColumns` builds it. Chat proposes
 normalizations only when the catalog gives a reason, and an ID lookup table
 only when one dataset plainly pairs the two IDs (`buildCaseManagerSystemPrompt`);
 `parseCaseKeyMatching` keeps a lookup only when it is whole.
@@ -5175,7 +5281,9 @@ has key matching, Sync counts those keys per source in one more read
 through `JobProgressStore.finishJobWithNotice`. A case type without key
 matching runs no extra query. A record whose key stops matching on a later
 sync is flagged `missing_from_source_at` like any key that left the data.
-`neededColumnsByDatasetId` names each lookup's two columns.
+`neededColumnsByDatasetId` names each lookup's two columns. The stored
+`external_id` is the normalized or translated key, so with `lowercase` a
+record whose label is empty is named `p-001`, not the raw `P-001`.
 ```
 
 - [ ] **Step 5: Section 7.1, Value pickers**
@@ -5183,7 +5291,9 @@ sync is flagged `missing_from_source_at` like any key that left the data.
 Replace the paragraph on key comparison with:
 
 ```markdown
-Every source filters its rows with `"individuals"."external_id" =
+Every source filters its rows in one place, `_buildSourceRowsSql`
+(`buildStackedSourceRowsSql.ts`), for single values, lists, and bucketed
+lists alike: `CAST("individuals"."external_id" AS VARCHAR) =
 buildRecordKeySql(...)` (`src/clients/DuckDbClient/duckDbSqlText.ts`).
 `buildRecordKeySql` casts the dataset key to `VARCHAR` (a dataset key is
 often `BIGINT`, and DuckDB would otherwise cast the text side to a number and
@@ -5205,7 +5315,7 @@ In the planning diagram's allowlist box, change "every contributing dataset" to 
 Replace the "Keys are compared as text" row with:
 
 ```markdown
-| A dataset row belongs to the record whose key `buildRecordKeySql` returns for it | `buildRecordKeySql`, `duckDbSqlText.ts`; used by `buildAttributeValueSql` and `buildRecordKeyStagingSql` | One function for Sync and the view; a key with no single lookup match joins nothing in both |
+| A dataset row belongs to the record whose key `buildRecordKeySql` returns for it | `buildRecordKeySql`, `duckDbSqlText.ts`; used by `_buildSourceRowsSql` (`buildStackedSourceRowsSql.ts`) and `buildRecordKeyStagingSql` | One function for Sync and the view; always `VARCHAR`; a key with no single lookup match joins nothing in both |
 | An ID lookup table is named whole or not at all | `attribute_mappings__dataset_column__crosswalk_all_or_none` | The edge parser and the client drop partial lookups before they reach it |
 | ID lookup tables are loaded, leased, projected, and allowlisted like sources | `makeConceptAttributeColumnsFromMetadata` (contributors), `getNeededColumnsFromQuery`, `getNeededColumnsFromRecordKeySources` | A lookup in another workspace throws |
 ```
