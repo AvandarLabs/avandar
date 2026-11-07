@@ -13,7 +13,11 @@ const explorerState = vi.hoisted(() => {
 vi.mock("@assistant-ui/react", () => {
   return {
     useAui: () => {
-      return { thread: () => {return { append: vi.fn() }} };
+      return {
+        thread: () => {
+          return { append: vi.fn() };
+        },
+      };
     },
   };
 });

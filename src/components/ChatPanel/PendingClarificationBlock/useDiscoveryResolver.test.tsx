@@ -61,7 +61,10 @@ describe("useDiscoveryResolver", () => {
   it("puts candidate matches first even when the lookup's own list cuts them off", async () => {
     runQueryMock
       .mockResolvedValueOnce({
-        data: [{ "Country/Region": "Afghanistan" }, { "Country/Region": "Albania" }],
+        data: [
+          { "Country/Region": "Afghanistan" },
+          { "Country/Region": "Albania" },
+        ],
       })
       .mockResolvedValueOnce({
         data: [{ "Country/Region": "United Kingdom" }],

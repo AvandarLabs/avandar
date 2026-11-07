@@ -33,8 +33,8 @@ import { getAreaStackingFromLayout } from "@/lib/ui/viz/axis/getAreaStackingFrom
 import { useAreaChartStyleProps } from "@/lib/ui/viz/axis/useAreaChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
 import { formatQueryResultDate } from "@/lib/ui/viz/formatQueryResultDate/formatQueryResultDate";
+import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
 import type { AreaSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";

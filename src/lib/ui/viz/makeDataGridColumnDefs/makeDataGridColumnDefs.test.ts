@@ -93,9 +93,7 @@ describe("makeDataGridColumnDefs", () => {
     expect(columnDefs[0]!.valueFormatter({ value: 1_123_836 })).toBe(
       "1,123,836",
     );
-    expect(columnDefs[1]!.valueFormatter({ value: 32.53952745 })).toBe(
-      "32.54",
-    );
+    expect(columnDefs[1]!.valueFormatter({ value: 32.53952745 })).toBe("32.54");
   });
 
   it("shows years, ids, and codes as plain digits", () => {

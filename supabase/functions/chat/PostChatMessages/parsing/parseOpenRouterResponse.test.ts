@@ -36,7 +36,8 @@ describe("parseOpenRouterResponse", () => {
   it("keeps SQL written as plain text out of the reply the user reads", () => {
     const parsed = parseOpenRouterResponse({
       message: {
-        content: 'SELECT "Province_State", SUM("daily_new_deaths") FROM "t0" GROUP BY 1',
+        content:
+          'SELECT "Province_State", SUM("daily_new_deaths") FROM "t0" GROUP BY 1',
       },
       attemptText:
         'SELECT "Province_State", SUM("daily_new_deaths") FROM "t0" GROUP BY 1',
@@ -51,7 +52,7 @@ describe("parseOpenRouterResponse", () => {
 
   it("keeps the prose around a fenced SQL block and drops the block", () => {
     const attemptText =
-      "Here are monthly deaths for both states.\n```sql\nSELECT 1 FROM \"t0\"\n```\nI grouped by month.";
+      'Here are monthly deaths for both states.\n```sql\nSELECT 1 FROM "t0"\n```\nI grouped by month.';
     const parsed = parseOpenRouterResponse({
       message: { content: attemptText },
       attemptText,

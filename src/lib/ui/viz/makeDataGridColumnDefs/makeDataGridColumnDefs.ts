@@ -74,13 +74,7 @@ export function makeDataGridColumnDefs(
     timezone?: FormattableTimezone;
   }>,
 ): DataGridColumnDef[] {
-  const {
-    columnNames,
-    data,
-    dateColumns,
-    dateFormat,
-    timezone,
-  } = options;
+  const { columnNames, data, dateColumns, dateFormat, timezone } = options;
   return columnNames.map((field) => {
     const isDate = dateColumns?.has(field) ?? false;
     const columnDateFormat =

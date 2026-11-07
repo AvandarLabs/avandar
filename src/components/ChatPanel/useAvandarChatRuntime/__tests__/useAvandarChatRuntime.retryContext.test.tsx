@@ -58,9 +58,7 @@ describe("useAvandarChatRuntime retry context", () => {
     respondWithSql(makeSqlFromDatasetId(DATASET_A_ID));
     const messages = harness.runtime!.thread.getState().messages;
     await act(async () => {
-      harness
-        .runtime!.thread.getMessageById(messages.at(-1)!.id)
-        .reload();
+      harness.runtime!.thread.getMessageById(messages.at(-1)!.id).reload();
     });
     await waitFor(() => {
       expect(apiPostMock).toHaveBeenCalledOnce();

@@ -13,9 +13,7 @@ function _parquetBlobWithType(parquetBlob: Blob): Blob {
     : new Blob([parquetBlob], { type: MIMEType.APPLICATION_PARQUET });
 }
 
-function _getNormalizedColumns(
-  columns: readonly string[],
-): readonly string[] {
+function _getNormalizedColumns(columns: readonly string[]): readonly string[] {
   const normalized = normalizeColumns(columns);
   if (normalized === "all" || normalized.length === 0) {
     throw new Error("projectParquetBlob requires at least one column");
