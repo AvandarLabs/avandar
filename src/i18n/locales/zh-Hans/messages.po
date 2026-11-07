@@ -139,6 +139,10 @@ msgstr "此查询编写不正确，因此无法读取。"
 msgid "Save the current view"
 msgstr "保存当前视图"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Review new permissions"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridBinControls.tsx
 msgid "Cell size (meters)"
 msgstr "单元格大小（米）"
@@ -314,6 +318,10 @@ msgstr "选择 {0}"
 msgid "Allow online syncing"
 msgstr "允许在线同步"
 
+#: src/lib/plugins/PluginErrorBoundary/PluginErrorBoundary.tsx
+msgid "Something went wrong in this plugin. Close this panel and try again."
+msgstr ""
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Works without an internet connection."
 msgstr "无需连接互联网即可使用。"
@@ -373,6 +381,10 @@ msgid "Enter your question or instructions in natural language to generate a "
 "SQL query"
 msgstr "以自然语言输入您的问题或指令以生成 SQL 查询"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
+msgid "Could not update {pluginName}"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H4"
 msgstr "H4"
@@ -430,6 +442,10 @@ msgstr "无法加载数据集的 SQL 查询。"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Avandar"
 msgstr "Avandar"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
+msgid "Needs review"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
 msgid "Disputed values"
@@ -1075,6 +1091,11 @@ msgstr "{shareClause} 将失去访问权限。"
 msgid "Orange"
 msgstr "橙色"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
+msgid "Plugins add features to this workspace. Installing or removing a plugin "
+"affects every member."
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
 msgstr "JOIN ON 子句使用“{operator}”：仅映射等值连接。"
@@ -1261,6 +1282,10 @@ msgstr "单选"
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "但是，我们目前不允许新的注册。"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
+msgid "Not installed"
+msgstr ""
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Open and being worked on."
@@ -1685,6 +1710,10 @@ msgstr "请让仪表板所有者与您共享该仪表板。"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "某些数据应来自现有数据集"
+
+#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
+msgid "The plugin may be out of date. Ask an admin to check Settings → Plugins."
+msgstr ""
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "Start of time range: {startLabel}"
@@ -2708,6 +2737,14 @@ msgstr "放弃"
 msgid "Two statuses have the same name. Give each one its own name."
 msgstr "两个状态名称相同。请分别为它们命名。"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Its features are removed from this workspace."
+msgstr ""
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
+msgid "Reads the query result you run it on"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "最近更新"
@@ -2732,6 +2769,10 @@ msgstr "案例"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles & Permissions"
 msgstr "角色与权限"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Uninstall {pluginName}?"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
@@ -2900,6 +2941,7 @@ msgid "Your workspace is on the Free plan, which lets you share or publish one "
 msgstr "您的工作区使用的是免费套餐，该套餐允许您分享或发布一个仪表板。升级到 Starter 或 Impact 套餐，即可随意分享任意数量的仪表板。"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Disable"
 msgstr "禁用"
 
@@ -3110,6 +3152,10 @@ msgstr "{usedSeats} / {maxSeats} 个座位已使用 · {remainingSeats} 个剩�
 msgid "Statuses"
 msgstr "状态"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
+msgid "{pluginName} uninstalled"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
 msgstr "输入此数据集的名称"
@@ -3193,6 +3239,7 @@ msgstr "几何功能正在下载。在网络较慢时可能需要稍等。"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActionButton.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
@@ -3408,6 +3455,10 @@ msgstr "工作表名称"
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "{layerName} returned no rows"
 msgstr "{layerName} 未返回任何行"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
+msgid "Disabled"
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at most"
@@ -3635,6 +3686,10 @@ msgstr "无法创建这些案例类型"
 msgid "Identity"
 msgstr "恒等"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
+msgid "Installed"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown.tsx
 msgid "Data source"
@@ -3692,6 +3747,10 @@ msgstr "选择了无效的 X 轴"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis maximum"
 msgstr "X 轴最大值"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "{pluginName} will be available to every member of this workspace."
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "ends with"
@@ -3863,6 +3922,10 @@ msgstr "澄清 {turnNumber} / 3"
 msgid "Fix the fields above, then save."
 msgstr "修正上面的字段，然后保存。"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Uninstall"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
 msgstr "返回编辑器"
@@ -3948,6 +4011,11 @@ msgstr "需要安全连接"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
 msgstr "X 轴刻度间隔"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
+msgid "You do not have permission to manage plugins. Ask a workspace admin to "
+"make changes."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -4428,6 +4496,10 @@ msgstr "预期几何图形"
 msgid "Untitled map"
 msgstr "未命名地图"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Approve new permissions for {pluginName}?"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "That region is not on a page we read. Kept the rule-based results."
 msgstr "该区域不在我们读取的页面上。已保留基于规则的结果。"
@@ -4447,6 +4519,10 @@ msgstr "源文件的格式不是 Avandar 可读取的表格格式。"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
 msgstr "图像"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
+msgid "Uses no workspace data."
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
@@ -4576,6 +4652,10 @@ msgstr "某些已发布的数据集无法加载。请稍后再试。"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "First point"
 msgstr "第一个点"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Enable {pluginName}?"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -5184,6 +5264,7 @@ msgid "Start with a spreadsheet"
 msgstr "从电子表格开始"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Unavailable"
 msgstr "不可用"
 
@@ -5301,6 +5382,10 @@ msgstr "Y 轴标签"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Quantile"
 msgstr "分位数"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabContent.tsx
+msgid "No plugins are available in this deployment."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
@@ -5529,6 +5614,11 @@ msgstr "<0>Enter</0> 链接"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Let AI decide (legacy)"
 msgstr "让 AI 决定（遗留）"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "This version asks for permissions listed on its card. It stays hidden "
+"until you approve them."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
@@ -6026,6 +6116,10 @@ msgstr "您未连接到互联网，因此聊天会使用此计算机上的离线
 msgid "What does this case type represent?"
 msgstr "此案例类型代表什么？"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginManifestSummary.tsx
+msgid "{publisher} · version {version}"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
 msgstr "第 4 列"
@@ -6064,6 +6158,10 @@ msgstr "图例"
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
 msgid "Show the layer {layerName}"
 msgstr "显示图层 {layerName}"
+
+#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
+msgid "{pluginName}: the command failed"
+msgstr ""
 
 #: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
@@ -6664,6 +6762,12 @@ msgstr "您提出的问题以及您的任何数据都不会离开此计算机。
 msgid "No fields have been configured yet"
 msgstr "尚未配置任何字段"
 
+#: src/lib/plugins/PluginMenuSlot/PluginOverflowMenu.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Plugins"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not contain"
 msgstr "不包含"
@@ -6807,6 +6911,10 @@ msgstr "获取值的平均值"
 msgid "{code} - UTM north zone {0}"
 msgstr "{code} - UTM 北带 {0}"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabContent.tsx
+msgid "Some plugins could not be loaded. Reload the page to try again."
+msgstr ""
+
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
 msgid "Finished syncing {0} records"
@@ -6900,6 +7008,10 @@ msgstr "无底图"
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Sign in again"
 msgstr "再次登录"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Enable"
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "The first value must not be greater than the second."
@@ -7098,6 +7210,10 @@ msgstr "SQL 的部分内容无法在手动表单中表示。"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Dark"
 msgstr "深色"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab.tsx
+msgid "Could not load this workspace's plugins. Reload to try again."
+msgstr ""
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Records"
@@ -7305,6 +7421,10 @@ msgstr "底图"
 msgid "Only workspace settings administrators can open workspace settings."
 msgstr "只有工作区设置管理员可以打开工作区设置。"
 
+#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
+msgid "Could not load {pluginName}"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Pick which global filters apply to this visualization."
 msgstr "选择适用于此可视化的全局过滤器。"
@@ -7440,6 +7560,10 @@ msgstr "账单"
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "This dataset now reflects the current contents of the sheet."
 msgstr "此数据集现已反映工作表的当前内容。"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Install {pluginName}?"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this text"
@@ -7618,6 +7742,10 @@ msgstr "手动断点"
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 msgid "Line"
 msgstr "行"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Its features disappear for every member until you enable it again."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
@@ -7889,6 +8017,10 @@ msgstr "此工作区没有有效的订阅。"
 msgid "Dataset"
 msgstr "数据集"
 
+#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
+msgid "Try again. If it keeps failing, contact the plugin's publisher."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
 msgstr "所有决策"
@@ -8085,6 +8217,10 @@ msgstr "服务"
 msgid "Loading author"
 msgstr "正在加载作者信息"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Disable {pluginName}?"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
 msgstr "已保留原始内容"
@@ -8247,6 +8383,10 @@ msgstr "{0, plural, one {将发布 # 列：} other {将发布 # 列：}}"
 msgid "The layer fetches exactly these fields, so adding one also makes it "
 "available to filter on."
 msgstr "该图层只获取这些字段，因此添加字段后也可以用于筛选。"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Install"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Require"
@@ -8713,6 +8853,10 @@ msgstr "添加至少一个 X / Y / 尺寸系列"
 msgid "Sidebar"
 msgstr "侧边栏"
 
+#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
+msgid "{pluginName}: this command is not available"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
 msgstr "此数据集已在线同步。点击以仅离线使用。"
@@ -8801,6 +8945,10 @@ msgstr "这是最后一步。发布后，工作区中的任何人都可以打开
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
 msgstr "添加过滤器"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab.tsx
+msgid "Loading plugins"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
@@ -9128,6 +9276,10 @@ msgstr "值分布"
 msgid "Could not read file"
 msgstr "无法读取文件"
 
+#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
+msgid "Check your connection and click the button again to retry."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 6"
 msgstr "第 6 列"
@@ -9180,6 +9332,10 @@ msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
 "Starter or Impact plan to increase the number of datasets you can add to "
 "your workspace."
 msgstr "您当前的计划仅支持最多 {0} 个数据集。升级到我们的入门或影响计划以增加您可以添加到工作区的数据集数量。"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Its features come back for every member."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
@@ -9703,6 +9859,11 @@ msgstr "探索您的数据"
 msgid "Mention a teammate"
 msgstr "提及队友"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginSettingsCard.tsx
+msgid "No longer included in this deployment. Uninstall to remove it from this "
+"workspace."
+msgstr ""
+
 #: src/routes/forgot-password.tsx
 msgid "Enter your email address"
 msgstr "输入您的电子邮件地址"
@@ -10111,6 +10272,8 @@ msgstr "大于"
 
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
+#: src/lib/plugins/makePluginApi/makePluginApi.tsx
+#: src/lib/plugins/PluginDrawerHost/PluginDrawerHost.tsx
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
 msgid "Close"
 msgstr "关闭"
@@ -10181,6 +10344,10 @@ msgstr "不可用的仪表板图块"
 msgid "Not reported"
 msgstr "未报告"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Approve"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
@@ -10230,6 +10397,11 @@ msgstr "开始使用"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom left"
 msgstr "左下方"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
+msgid "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
+"other {Adds # buttons to Data Explorer}}"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
@@ -10367,6 +10539,10 @@ msgstr "S"
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "https://example.org"
 msgstr "https://example.org"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
+msgid "{pluginName} installed"
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
