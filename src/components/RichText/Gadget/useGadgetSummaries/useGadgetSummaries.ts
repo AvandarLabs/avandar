@@ -2,7 +2,6 @@ import { formatDate } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { vizTypeLabel } from "$/copy/vizTypeLabel";
-import { VizTypes } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import {
   countDashboardTiles,
@@ -62,15 +61,12 @@ function _buildDashboardLink(options: {
   };
 }
 
-// A stored viz type is not checked when a dashboard is read, so one this
-// build does not know gets no Chart fact rather than a crash.
 function _buildChartFacts(
   vizType: AvaVizConfig.Type | undefined,
 ): GadgetFact[] {
-  if (vizType === undefined || !VizTypes.includes(vizType)) {
-    return [];
-  }
-  return [{ label: msg`Chart`, value: vizTypeLabel(vizType) }];
+  return vizType === undefined
+    ? []
+    : [{ label: msg`Chart`, value: vizTypeLabel(vizType) }];
 }
 
 /**

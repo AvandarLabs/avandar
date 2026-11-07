@@ -52,6 +52,18 @@ describe("findDashboardTile", () => {
     });
   });
 
+  it("reads a viz type this build does not know as undefined", () => {
+    const config = {
+      type: "DataViz",
+      props: { id: "DataViz-future", vizType: "sankey" },
+    };
+    expect(findDashboardTile(config, "DataViz-future")).toEqual({
+      id: "DataViz-future",
+      prompt: undefined,
+      vizType: undefined,
+    });
+  });
+
   it("returns undefined for a block id that is not in the config", () => {
     expect(findDashboardTile(CONFIG, "DataViz-gone")).toBeUndefined();
   });

@@ -1,4 +1,5 @@
 import { isPlainObject, isString, traverse } from "@avandar/utils";
+import { VizTypes } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 
 /**
@@ -19,6 +20,13 @@ function _readPrompt(nlQuery: unknown): string | undefined {
   return isString(prompt) && prompt.trim() !== "" ? prompt : undefined;
 }
 
+/** The viz type a stored value names, or undefined when this build has none. */
+function _readVizType(vizType: unknown): AvaVizConfig.Type | undefined {
+  return VizTypes.find((knownType) => {
+    return knownType === vizType;
+  });
+}
+
 function _collectTiles(dashboardConfig: unknown): DashboardTileSummary[] {
   const tiles: DashboardTileSummary[] = [];
   // `traverse` visits each object once, so a tile is never collected twice.
@@ -30,14 +38,10 @@ function _collectTiles(dashboardConfig: unknown): DashboardTileSummary[] {
     if (!isPlainObject(props) || !isString(props["id"])) {
       return;
     }
-    const vizType: unknown = props["vizType"];
     tiles.push({
       id: props["id"],
       prompt: _readPrompt(props["nlQuery"]),
-      // There is no runtime list of viz types to check against, so a stored
-      // value is trusted as is. Callers that branch on it must tolerate a
-      // type they do not know.
-      vizType: isString(vizType) ? (vizType as AvaVizConfig.Type) : undefined,
+      vizType: _readVizType(props["vizType"]),
     });
   });
   return tiles;
