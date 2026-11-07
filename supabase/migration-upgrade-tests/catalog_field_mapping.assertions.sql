@@ -6,14 +6,14 @@ begin
   if (
     select organization1_name from public.data_catalog_listings
     where external_dataset_id = 'pgtap-fixture-rename'
-  ) is distinct from 'City of New York' then
+  ) is distinct from 'Pgtap Fixture Rename City' then
     raise exception 'the API listing lost its organization in the rename';
   end if;
 
   if (
     select organization1_name from public.data_catalog_listings
     where parquet_file_name = 'pgtap-fixture-rename.parquet'
-  ) is distinct from 'World Bank' then
+  ) is distinct from 'Pgtap Fixture Rename Bank' then
     raise exception 'the parquet listing lost its organization in the rename';
   end if;
 
@@ -34,7 +34,7 @@ begin
   end if;
 
   if not exists (
-    select 1 from public.rpc_data_catalog_listings__search('"City of New York"', 50, 0)
+    select 1 from public.rpc_data_catalog_listings__search('"Pgtap Fixture Rename City"', 50, 0)
     where id = (
       select id from public.data_catalog_listings
       where external_dataset_id = 'pgtap-fixture-rename'
@@ -46,7 +46,7 @@ begin
   if not exists (
     select 1 from public.rpc_data_catalog_listings__search(
       p_query => 'pgtap-fixture',
-      p_sources => array['World Bank']
+      p_sources => array['Pgtap Fixture Rename Bank']
     )
     where id = (
       select id from public.data_catalog_listings
@@ -58,7 +58,7 @@ begin
 
   if not exists (
     select 1 from public.rpc_data_catalog_listings__search_facets(p_query => 'pgtap-fixture')
-    where facet = 'source' and value = 'City of New York' and listing_count >= 1
+    where facet = 'source' and value = 'Pgtap Fixture Rename City' and listing_count >= 1
   ) then
     raise exception 'the source facet did not count a listing by its renamed organization';
   end if;
