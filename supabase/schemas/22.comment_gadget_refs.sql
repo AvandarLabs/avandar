@@ -4,6 +4,9 @@
  * can find references without scanning bodies. Owned by that trigger.
  * `gadget_id` has no foreign key because it points at one of several tables;
  * a reference to a deleted gadget stays until the comment is edited.
+ * Nothing checks that the gadget is in the comment's workspace, so a
+ * reference may point at a gadget id from another workspace. Any backlink or
+ * notification reader must also filter by the gadget's own workspace.
  */
 create table public.comment_gadget_refs (
   -- Primary key

@@ -28,6 +28,8 @@ create table public.individuals (
   constraint individuals__concept_external_id_unique unique (concept_id, external_id)
 );
 
+create index idx_individuals__workspace_id on public.individuals (workspace_id);
+
 -- Enable row level security
 alter table public.individuals enable row level security;
 

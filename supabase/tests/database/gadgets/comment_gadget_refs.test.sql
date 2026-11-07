@@ -54,7 +54,7 @@ values (
   'See [dashboard]'
 );
 
-select plan (7);
+select plan (10);
 
 -- 1. One row per valid gadget node, invalid ones skipped.
 select is (
@@ -95,7 +95,7 @@ select is (
   'a deleted comment references no gadgets'
 );
 
--- 5. A member reads refs in their workspace (seed a fresh comment as the owner).
+-- A fresh comment, seeded as the owner, for the cases below.
 insert into public.comments (id, workspace_id, individual_id, author_user_id, body, body_text)
 values (
   'e3500002-0000-4000-8000-000000000002'::uuid,
@@ -106,6 +106,46 @@ values (
   '[case type]'
 );
 
+-- 5. An update that leaves the body unchanged keeps the same ref rows.
+create temp table refs_before_unchanged_update as
+select id from public.comment_gadget_refs where comment_id = 'e3500002-0000-4000-8000-000000000002'::uuid;
+
+update public.comments
+set body_text = '[case type] again'
+where id = 'e3500002-0000-4000-8000-000000000002'::uuid;
+
+select results_eq (
+  $$ select id from public.comment_gadget_refs where comment_id = 'e3500002-0000-4000-8000-000000000002'::uuid order by id $$,
+  $$ select id from refs_before_unchanged_update order by id $$,
+  'an update that leaves the body unchanged keeps the gadget rows'
+);
+
+-- 6. Identical duplicate nodes are stored once, and the insert succeeds.
+select lives_ok (
+  $t$
+  insert into public.comments (id, workspace_id, individual_id, author_user_id, body, body_text)
+  values (
+    'e3500003-0000-4000-8000-000000000003'::uuid,
+    'e3100001-0000-4000-8000-000000000001'::uuid,
+    'e3400001-0000-4000-8000-000000000001'::uuid,
+    'e3000001-0000-4000-8000-000000000001'::uuid,
+    '{"type":"doc","content":[{"type":"paragraph","content":[
+      {"type":"gadgetLink","attrs":{"gadgetType":"map","gadgetId":"e3600002-0000-4000-8000-000000000002","subId":null}},
+      {"type":"gadgetLink","attrs":{"gadgetType":"map","gadgetId":"e3600002-0000-4000-8000-000000000002","subId":null}}
+    ]}]}'::jsonb,
+    '[map] [map]'
+  )
+  $t$,
+  'a comment with identical duplicate gadget nodes is saved'
+);
+
+select is (
+  (select count(*)::int from public.comment_gadget_refs where comment_id = 'e3500003-0000-4000-8000-000000000003'::uuid),
+  1,
+  'identical duplicate gadget nodes produce one row'
+);
+
+-- 7. A member reads refs in their workspace.
 select lives_ok (
   $t$
   set local role authenticated;
@@ -120,7 +160,7 @@ select lives_ok (
   'a member reads gadget refs in their workspace'
 );
 
--- 6. An outsider reads none.
+-- 8. An outsider reads none.
 select lives_ok (
   $t$
   reset role;
@@ -136,7 +176,7 @@ select lives_ok (
   'an outsider reads no gadget refs'
 );
 
--- 7. The client cannot write the table.
+-- 9. The client cannot write the table.
 select throws_ok (
   $t$
   reset role;

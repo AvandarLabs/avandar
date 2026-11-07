@@ -52,7 +52,7 @@ where
   end;
 
 -- Each gadget gets its own `updated_at` so the blank-query order is known:
--- individual, concept, map, dataset, then the two dashboards.
+-- individual, concept, map, dataset, then the dashboards.
 insert into public.dashboards (
   id, workspace_id, owner_id, owner_profile_id, name, description, visibility, config, is_restricted, snapshot_revision, updated_at
 )
@@ -81,6 +81,24 @@ values
                   "vizType": "bar"
                 }
               }
+            ],
+            "r1c2": [
+              {
+                "type": "DataViz",
+                "props": {
+                  "id": "DataViz-blank",
+                  "nlQuery": { "prompt": "   ", "rawSql": "", "generations": [] },
+                  "vizType": "bar"
+                }
+              },
+              {
+                "type": "DataViz",
+                "props": {
+                  "id": "",
+                  "nlQuery": { "prompt": "Empty id tile", "rawSql": "", "generations": [] },
+                  "vizType": "bar"
+                }
+              }
             ]
           }
         }
@@ -100,10 +118,53 @@ values
     'Board briefing',
     '',
     'workspace',
-    '{}'::jsonb,
+    '{"content":[{"type":"DataViz","props":{"id":"DataViz-briefing","nlQuery":{"prompt":"Briefing summary chart","rawSql":"","generations":[]},"vizType":"bar"}}]}'::jsonb,
     true,
     'e45000a2-0000-4000-8000-000000000002'::uuid,
     now() - interval '6 minutes'
+  ),
+  (
+    -- Unrestricted but still a draft, so only its owner and editors can open it.
+    'e4500003-0000-4000-8000-000000000003'::uuid,
+    'e4100001-0000-4000-8000-000000000001'::uuid,
+    'e4000001-0000-4000-8000-000000000001'::uuid,
+    'e4300001-0000-4000-8000-000000000001'::uuid,
+    'Draft surveillance',
+    '',
+    'draft',
+    '{"content":[{"type":"DataViz","props":{"id":"DataViz-draft","nlQuery":{"prompt":"Draft outbreak trend","rawSql":"","generations":[]},"vizType":"line"}}]}'::jsonb,
+    false,
+    null,
+    now() - interval '7 minutes'
+  ),
+  (
+    -- Public, which RLS lets any signed-in user read.
+    'e4500004-0000-4000-8000-000000000004'::uuid,
+    'e4100001-0000-4000-8000-000000000001'::uuid,
+    'e4000001-0000-4000-8000-000000000001'::uuid,
+    'e4300001-0000-4000-8000-000000000001'::uuid,
+    'Open exposure summary',
+    '',
+    'public',
+    '{}'::jsonb,
+    false,
+    'e45000a4-0000-4000-8000-000000000004'::uuid,
+    now() - interval '8 minutes'
+  ),
+  (
+    -- Matches "okafor" only in the middle of its name, so it ranks below the
+    -- cases whose names start with it.
+    'e4500005-0000-4000-8000-000000000005'::uuid,
+    'e4100001-0000-4000-8000-000000000001'::uuid,
+    'e4000001-0000-4000-8000-000000000001'::uuid,
+    'e4300001-0000-4000-8000-000000000001'::uuid,
+    'Household outbreak: Okafor',
+    '',
+    'workspace',
+    '{}'::jsonb,
+    false,
+    'e45000a5-0000-4000-8000-000000000005'::uuid,
+    now() - interval '9 minutes'
   )
 on conflict (id) do nothing;
 
@@ -120,6 +181,18 @@ values (
   'csv_file'::public.datasets__source_type,
   true,
   now() - interval '4 minutes'
+),
+(
+  -- Unrestricted, so the member can read it.
+  'e4600002-0000-4000-8000-000000000002'::uuid,
+  'e4000001-0000-4000-8000-000000000001'::uuid,
+  'e4300001-0000-4000-8000-000000000001'::uuid,
+  'e4100001-0000-4000-8000-000000000001'::uuid,
+  'Vaccination clinics',
+  '',
+  'csv_file'::public.datasets__source_type,
+  false,
+  now() - interval '10 minutes'
 )
 on conflict (id) do nothing;
 
@@ -157,7 +230,20 @@ values (
 )
 on conflict (id) do nothing;
 
-select plan (10);
+-- Seven more cases whose names start with "Okafor", older than every other
+-- gadget so the blank-query order above is unchanged.
+insert into public.individuals (id, workspace_id, name, concept_id, external_id, updated_at)
+select
+  ('e490000' || n || '-0000-4000-8000-00000000000' || n)::uuid,
+  'e4100001-0000-4000-8000-000000000001'::uuid,
+  'Okafor household member ' || n,
+  'e4800001-0000-4000-8000-000000000001'::uuid,
+  'ext-okafor-' || n,
+  now() - interval '1 hour' - n * interval '1 minute'
+from generate_series(2, 8) as n
+on conflict (id) do nothing;
+
+select plan (16);
 
 -- 1. A name search spans gadget types.
 select lives_ok (
@@ -307,12 +393,15 @@ select lives_ok (
   select set_config('request.jwt.claims', '{"sub":"e4000003-0000-4000-8000-000000000003","role":"authenticated"}', true);
   do $chk$
   begin
+    if not exists (select 1 from public.dashboards where id = 'e4500004-0000-4000-8000-000000000004'::uuid) then
+      raise exception 'the outsider cannot read the public dashboard, so this case proves nothing';
+    end if;
     if (select count(*)::int from public.rpc_gadgets__search ('e4100001-0000-4000-8000-000000000001'::uuid, '', 20)) <> 0 then
       raise exception 'an outsider found gadgets in another workspace';
     end if;
   end $chk$;
   $t$,
-  'an outsider finds no gadgets in another workspace'
+  'an outsider finds no gadgets in another workspace, not even a public dashboard'
 );
 
 -- 8. A blank query returns the most recently updated gadgets, up to the limit.
@@ -337,15 +426,156 @@ select lives_ok (
   'a blank query returns the three most recently updated gadgets, newest first'
 );
 
+-- 9. A draft dashboard and its tiles are flagged even when unrestricted.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e4000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  do $chk$
+  declare
+    v_flags text;
+  begin
+    select string_agg(s.gadget_type::text || ':' || s.has_limited_audience::text, ',' order by s.gadget_type::text)
+    into v_flags
+    from public.rpc_gadgets__search ('e4100001-0000-4000-8000-000000000001'::uuid, 'draft', 20) s
+    where s.gadget_id = 'e4500003-0000-4000-8000-000000000003'::uuid;
+
+    if v_flags is distinct from 'dashboard:true,dashboard_tile:true' then
+      raise exception 'the draft dashboard and its tile returned %', v_flags;
+    end if;
+  end $chk$;
+  $t$,
+  'a draft dashboard and its tile are flagged as having a limited audience'
+);
+
+-- 10. A tile on a restricted dashboard inherits the flag.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e4000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  do $chk$
+  begin
+    if (
+      select s.has_limited_audience
+      from public.rpc_gadgets__search ('e4100001-0000-4000-8000-000000000001'::uuid, 'briefing summary', 20) s
+      where s.gadget_type = 'dashboard_tile' and s.sub_id = 'DataViz-briefing'
+    ) is distinct from true then
+      raise exception 'the tile on a restricted dashboard is not flagged as limited';
+    end if;
+  end $chk$;
+  $t$,
+  'a tile on a restricted dashboard is flagged as having a limited audience'
+);
+
+-- 11. Tiles with a blank prompt or a blank block id are skipped.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e4000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  do $chk$
+  begin
+    if exists (
+      select 1
+      from public.rpc_gadgets__search ('e4100001-0000-4000-8000-000000000001'::uuid, '', 100) s
+      where s.gadget_type = 'dashboard_tile' and s.sub_id = 'DataViz-blank'
+    ) then
+      raise exception 'a tile with a blank prompt was returned';
+    end if;
+    if exists (
+      select 1
+      from public.rpc_gadgets__search ('e4100001-0000-4000-8000-000000000001'::uuid, 'empty id tile', 20) s
+      where s.gadget_type = 'dashboard_tile'
+    ) then
+      raise exception 'a tile with a blank block id was returned';
+    end if;
+  end $chk$;
+  $t$,
+  'tiles with a blank prompt or a blank block id are skipped'
+);
+
+-- 12. No type crowds out the others: at most five rows per type.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e4000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  do $chk$
+  declare
+    v_individuals int;
+    v_has_dashboard boolean;
+  begin
+    select
+      count(*) filter (where s.gadget_type = 'individual')::int,
+      coalesce(bool_or(s.gadget_type = 'dashboard' and s.gadget_id = 'e4500005-0000-4000-8000-000000000005'::uuid), false)
+    into v_individuals, v_has_dashboard
+    from public.rpc_gadgets__search ('e4100001-0000-4000-8000-000000000001'::uuid, 'okafor', 6) s;
+
+    if v_individuals > 5 then
+      raise exception 'searching "okafor" returned % cases', v_individuals;
+    end if;
+    if not v_has_dashboard then
+      raise exception 'the matching dashboard was crowded out by cases';
+    end if;
+  end $chk$;
+  $t$,
+  'at most five cases come back and a matching dashboard still appears'
+);
+
+-- 13. LIKE wildcards in the query are matched literally.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e4000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  do $chk$
+  declare
+    v_count int;
+  begin
+    select count(*)::int into v_count
+    from public.rpc_gadgets__search ('e4100001-0000-4000-8000-000000000001'::uuid, '_', 100);
+
+    if v_count <> 0 then
+      raise exception 'searching "_" matched % gadgets whose names have no underscore', v_count;
+    end if;
+  end $chk$;
+  $t$,
+  'an underscore in the query does not match every gadget'
+);
+
+-- 14. A member with the viewer role group finds every gadget type.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e4000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  do $chk$
+  declare
+    v_types text;
+  begin
+    select string_agg(distinct s.gadget_type::text, ',' order by s.gadget_type::text)
+    into v_types
+    from public.rpc_gadgets__search ('e4100001-0000-4000-8000-000000000001'::uuid, '', 100) s;
+
+    if v_types is distinct from 'concept,dashboard,dashboard_tile,dataset,individual,map' then
+      raise exception 'the viewer found only %', v_types;
+    end if;
+  end $chk$;
+  $t$,
+  'a viewer finds dashboards, tiles, datasets, maps, case types, and cases'
+);
+
 reset role;
 
--- 9. Signed-in users can call it.
+-- 15. Signed-in users can call it.
 select ok (
   has_function_privilege('authenticated', 'public.rpc_gadgets__search(uuid, text, integer)', 'EXECUTE'),
   'authenticated can execute rpc_gadgets__search'
 );
 
--- 10. Anonymous users cannot.
+-- 16. Anonymous users cannot.
 select ok (
   not has_function_privilege('anon', 'public.rpc_gadgets__search(uuid, text, integer)', 'EXECUTE'),
   'anon cannot execute rpc_gadgets__search'

@@ -22,6 +22,8 @@ CREATE UNIQUE INDEX idx_comment_gadget_refs__unique_ref ON public.comment_gadget
 
 CREATE INDEX idx_comment_gadget_refs__workspace_id ON public.comment_gadget_refs USING btree (workspace_id);
 
+CREATE INDEX idx_individuals__workspace_id ON public.individuals USING btree (workspace_id);
+
 alter table "public"."comment_gadget_refs" add constraint "comment_gadget_refs_pkey" PRIMARY KEY using index "comment_gadget_refs_pkey";
 
 alter table "public"."comment_gadget_refs" add constraint "comment_gadget_refs__display_valid" CHECK ((display = ANY (ARRAY['link'::text, 'embed'::text]))) not valid;
@@ -91,64 +93,95 @@ AS $function$
   with
     params as (
       select
-        nullif(btrim(p_query), '') as q,
+        -- Null when the caller is not a member, which empties every branch.
+        case
+          when p_workspace_id = any (array(select public.util__get_auth_user_workspaces ()))
+            then p_workspace_id
+        end as workspace_id,
+        lower(nullif(btrim(p_query), '')) as q,
         least(greatest(coalesce(p_limit, 20), 1), 100) as row_limit
+    ),
+    visible_dashboards as materialized (
+      select
+        d.id,
+        d.name,
+        d.config,
+        d.updated_at,
+        d.is_restricted or d.visibility = 'draft' as has_limited_audience
+      from public.dashboards d
+      where d.workspace_id = (select workspace_id from params)
     ),
     candidates as (
       select 'dashboard'::public.gadget_type as gadget_type, d.id as gadget_id, null::text as sub_id,
-        d.name as label, null::text as sub_label, d.is_restricted as has_limited_audience, d.updated_at
-      from public.dashboards d
-      where d.workspace_id = p_workspace_id
+        d.name as label, null::text as sub_label, d.has_limited_audience, d.updated_at
+      from visible_dashboards d
       union all
-      select 'dashboard_tile', d.id, tile ->> 'id', tile -> 'nlQuery' ->> 'prompt', d.name, d.is_restricted, d.updated_at
-      from public.dashboards d
+      select 'dashboard_tile', d.id, tile ->> 'id', tile -> 'nlQuery' ->> 'prompt', d.name, d.has_limited_audience, d.updated_at
+      from visible_dashboards d
       -- `strict`, because lax `.**` yields every block inside an array twice.
       cross join lateral (
         select node -> 'props' as tile
         from jsonb_path_query(d.config, 'strict $.** ? (@.type == "DataViz")') as node
       ) as tiles
-      where d.workspace_id = p_workspace_id
-        and coalesce(btrim(tile -> 'nlQuery' ->> 'prompt'), '') <> ''
-        and tile ->> 'id' is not null
+      where coalesce(btrim(tile -> 'nlQuery' ->> 'prompt'), '') <> ''
+        and nullif(tile ->> 'id', '') is not null
       union all
       select 'dataset', ds.id, null, ds.name, null, ds.is_restricted, ds.updated_at
       from public.datasets ds
-      where ds.workspace_id = p_workspace_id
+      where ds.workspace_id = (select workspace_id from params)
       union all
       select 'map', m.id, null, m.name, null, m.is_restricted, m.updated_at
       from public.maps m
-      where m.workspace_id = p_workspace_id
+      where m.workspace_id = (select workspace_id from params)
       union all
       select 'concept', c.id, null, c.name, null, false, c.updated_at
       from public.concepts c
-      where c.workspace_id = p_workspace_id
+      where c.workspace_id = (select workspace_id from params)
       union all
       select 'individual', i.id, null, i.name, c.name, false, i.updated_at
       from public.individuals i
       join public.concepts c on c.id = i.concept_id
-      where i.workspace_id = p_workspace_id
+      where i.workspace_id = (select workspace_id from params)
+    ),
+    matches as (
+      select
+        candidate.*,
+        case
+          when params.q is null then 0::real
+          else (
+            -- `strpos` and `left` match the query literally, so `%`, `_`,
+            -- and `\` in it are not pattern characters.
+            case when left(lower(candidate.label), length(params.q)) = params.q then 1 else 0 end
+            + extensions.word_similarity(params.q, candidate.label)
+          )::real
+        end as rank
+      from candidates as candidate
+      cross join params
+      where params.q is null
+        or strpos(lower(candidate.label), params.q) > 0
+        or params.q operator(extensions.<%) candidate.label
+    ),
+    ranked as (
+      select
+        match.*,
+        row_number() over (
+          partition by match.gadget_type
+          order by match.rank desc, match.updated_at desc, match.label, match.gadget_id, match.sub_id
+        ) as type_position
+      from matches as match
     )
   select
-    candidate.gadget_type,
-    candidate.gadget_id,
-    candidate.sub_id,
-    candidate.label,
-    candidate.sub_label,
-    candidate.has_limited_audience,
-    candidate.updated_at,
-    case
-      when params.q is null then 0::real
-      else (
-        case when candidate.label ilike params.q || '%' then 1 else 0 end
-        + extensions.word_similarity(params.q, candidate.label)
-      )::real
-    end as rank
-  from candidates as candidate
-  cross join params
-  where params.q is null
-    or candidate.label ilike '%' || params.q || '%'
-    or params.q operator(extensions.<%) candidate.label
-  order by rank desc, candidate.updated_at desc, candidate.label, candidate.gadget_id
+    ranked.gadget_type,
+    ranked.gadget_id,
+    ranked.sub_id,
+    ranked.label,
+    ranked.sub_label,
+    ranked.has_limited_audience,
+    ranked.updated_at,
+    ranked.rank
+  from ranked
+  where ranked.type_position <= 5
+  order by ranked.rank desc, ranked.updated_at desc, ranked.label, ranked.gadget_id, ranked.sub_id
   limit (select row_limit from params);
 $function$
 ;
