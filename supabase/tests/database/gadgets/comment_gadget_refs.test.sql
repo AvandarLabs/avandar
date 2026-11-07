@@ -54,7 +54,7 @@ values (
   'See [dashboard]'
 );
 
-select plan (12);
+select plan (13);
 
 -- 1. One row per valid gadget node, invalid ones skipped.
 select is (
@@ -168,6 +168,26 @@ select is (
   (select count(*)::int from public.comment_gadget_refs where comment_id = 'e3500004-0000-4000-8000-000000000004'::uuid),
   0,
   'a tile without a sub id and a non-tile gadget with one produce no rows'
+);
+
+-- 7b. A tile whose sub id is an empty string is skipped: `nullif` reads it as
+-- no sub id, so it hits the same guard as a missing one.
+insert into public.comments (id, workspace_id, individual_id, author_user_id, body, body_text)
+values (
+  'e3500005-0000-4000-8000-000000000005'::uuid,
+  'e3100001-0000-4000-8000-000000000001'::uuid,
+  'e3400001-0000-4000-8000-000000000001'::uuid,
+  'e3000001-0000-4000-8000-000000000001'::uuid,
+  '{"type":"doc","content":[{"type":"paragraph","content":[
+    {"type":"gadgetLink","attrs":{"gadgetType":"dashboard_tile","gadgetId":"e3600003-0000-4000-8000-000000000003","subId":""}}
+  ]}]}'::jsonb,
+  '[tile]'
+);
+
+select is (
+  (select count(*)::int from public.comment_gadget_refs where comment_id = 'e3500005-0000-4000-8000-000000000005'::uuid),
+  0,
+  'a tile with an empty sub id produces no row'
 );
 
 -- 8. A member reads refs in their workspace.
