@@ -1460,10 +1460,6 @@ msgstr "Estes conjuntos de dados estão listados no seu espaço de trabalho, mas
 "local. Para continuar, você precisa re-enviar o conjunto de dados ou "
 "excluí-lo do seu espaço de trabalho."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show fewer"
-#~ msgstr "Mostrar menos"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "Metadados"
@@ -8292,11 +8288,6 @@ msgstr "Decimal"
 #: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "Erro"
-
-#. placeholder {0}: options.length
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show all {0}"
-#~ msgstr "Mostrar todos os {0}"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"

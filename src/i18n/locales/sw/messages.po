@@ -1454,10 +1454,6 @@ msgstr "Seti hizi za data zimeorodheshwa kwenye eneo lako la kazi, lakini data "
 "kuendelea, unahitaji ama kupakia tena seti ya data au kuifuta kutoka "
 "kwenye eneo lako la kazi."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show fewer"
-#~ msgstr "Onyesha chache"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "Metadata"
@@ -8281,11 +8277,6 @@ msgstr "Decimal"
 #: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "Kosa"
-
-#. placeholder {0}: options.length
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show all {0}"
-#~ msgstr "Onyesha zote {0}"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"

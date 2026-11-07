@@ -1472,10 +1472,6 @@ msgstr "Ces ensembles de données sont répertoriés dans votre espace de travai
 "stockage local. Pour continuer, vous devez soit re-télécharger "
 "l'ensemble de données, soit le supprimer de votre espace de travail."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show fewer"
-#~ msgstr "Afficher moins"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "Métadonnées"
@@ -8378,11 +8374,6 @@ msgstr "Décimal"
 #: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "Erreur"
-
-#. placeholder {0}: options.length
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show all {0}"
-#~ msgstr "Afficher les {0}"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"

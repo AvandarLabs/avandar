@@ -1436,10 +1436,6 @@ msgstr "These datasets are listed in your workspace, but their source data "
 "could not be found in your local storage. In order to continue, you "
 "need to either re-upload the dataset or delete it from your workspace."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show fewer"
-#~ msgstr "Show fewer"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "Metadata"
@@ -8191,11 +8187,6 @@ msgstr "Decimal"
 #: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "Error"
-
-#. placeholder {0}: options.length
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show all {0}"
-#~ msgstr "Show all {0}"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"

@@ -1434,10 +1434,6 @@ msgstr "تظهر هذه المجموعات في مساحة العمل الخاص
 "بيانات المصدر الخاصة بها في التخزين المحلي لديك. لمتابعة، تحتاج إلى "
 "إعادة تحميل مجموعة البيانات أو حذفها من مساحة العمل الخاصة بك."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show fewer"
-#~ msgstr "عرض عدد أقل"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "البيانات الوصفية"
@@ -8178,11 +8174,6 @@ msgstr "عشري"
 #: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "خطأ"
-
-#. placeholder {0}: options.length
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show all {0}"
-#~ msgstr "عرض الكل ({0})"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"

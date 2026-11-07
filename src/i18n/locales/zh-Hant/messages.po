@@ -1395,10 +1395,6 @@ msgid "These datasets are listed in your workspace, but their source data could 
 "either re-upload the dataset or delete it from your workspace."
 msgstr "這些數據集在您的工作區中列出，但其源數據在您的本地存儲中找不到。為了繼續，您需要重新上傳數據集或將其從工作區中刪除。"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show fewer"
-#~ msgstr "顯示較少"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "元數據"
@@ -7989,11 +7985,6 @@ msgstr "小數"
 #: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "錯誤"
-
-#. placeholder {0}: options.length
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogCheckboxFacet.tsx
-#~ msgid "Show all {0}"
-#~ msgstr "顯示全部 {0}"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
