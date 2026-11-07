@@ -43,3 +43,14 @@ export const CHART_COLORS = [
   "green.6",
   "pink.6",
 ] as const;
+
+/**
+ * Time zone that query-result dates and timestamps are displayed in.
+ *
+ * DuckDB `DATE` and `TIMESTAMP` values carry no time zone, and DuckDB-Wasm
+ * hands them to JavaScript as epoch milliseconds measured in UTC. Showing them
+ * in the browser's zone moves them: a user in New York saw `2022-01-01` as
+ * `2021-12-31 19:00`. Rendering in UTC shows the wall-clock value that is
+ * stored.
+ */
+export const QUERY_RESULT_TIMEZONE = "UTC";
