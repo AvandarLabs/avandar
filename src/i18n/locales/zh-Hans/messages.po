@@ -8416,6 +8416,15 @@ msgstr "导入您的第一个数据集"
 msgid "Left"
 msgstr "左对齐"
 
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: data.length
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so it shows an even sample of the "
+"{3} rows across the whole range."
+msgstr "{0}最多只能渲染 {1} 个{2}，因此会在整个范围内均匀显示这 {3} 行中的样本。"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
 msgstr "您需要拥有案件记录编辑者权限才能更改记录状态。"

@@ -8719,6 +8719,16 @@ msgstr "Leta mkusanyiko wako wa kwanza wa data"
 msgid "Left"
 msgstr "Kushoto"
 
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: data.length
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so it shows an even sample of the "
+"{3} rows across the whole range."
+msgstr "{0} inaweza kuonyesha hadi {1} {2} pekee, kwa hivyo huonyesha sampuli "
+"iliyosambazwa kwa usawa ya {3} safu mlalo katika masafa yote."
+
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
 msgstr "Unahitaji ufikiaji wa mhariri wa Rekodi za Kesi ili kubadilisha hali ya "

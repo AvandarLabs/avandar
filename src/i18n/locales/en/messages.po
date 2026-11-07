@@ -8626,6 +8626,16 @@ msgstr "Bring in your first dataset"
 msgid "Left"
 msgstr "Left"
 
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: data.length
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so it shows an even sample of the "
+"{3} rows across the whole range."
+msgstr "The {0} can only render up to {1} {2}, so it shows an even sample of "
+"the {3} rows across the whole range."
+
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "You need Case Records editor access to change a record's status."
 msgstr "You need Case Records editor access to change a record's status."
