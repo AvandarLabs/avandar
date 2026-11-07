@@ -1,0 +1,70 @@
+import { isPlainObject, isString, traverse } from "@avandar/utils";
+import { VizTypes } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
+
+/**
+ * The parts of a dashboard tile that describe it without running its query,
+ * for example on a card that references the tile from a comment.
+ */
+export type DashboardTileSummary = {
+  id: string;
+  prompt: string | undefined;
+  vizType: AvaVizConfig.Type | undefined;
+};
+
+function _readPrompt(nlQuery: unknown): string | undefined {
+  if (!isPlainObject(nlQuery)) {
+    return undefined;
+  }
+  const prompt: unknown = nlQuery["prompt"];
+  return isString(prompt) && prompt.trim() !== "" ? prompt : undefined;
+}
+
+/** The viz type a stored value names, or undefined when this build has none. */
+function _readVizType(vizType: unknown): AvaVizConfig.Type | undefined {
+  return VizTypes.find((knownType) => {
+    return knownType === vizType;
+  });
+}
+
+function _collectTiles(dashboardConfig: unknown): DashboardTileSummary[] {
+  const tiles: DashboardTileSummary[] = [];
+  // `traverse` visits each object once, so a tile is never collected twice.
+  traverse(dashboardConfig, (node) => {
+    if (!isPlainObject(node) || node["type"] !== "DataViz") {
+      return;
+    }
+    const props: unknown = node["props"];
+    if (!isPlainObject(props) || !isString(props["id"])) {
+      return;
+    }
+    tiles.push({
+      id: props["id"],
+      prompt: _readPrompt(props["nlQuery"]),
+      vizType: _readVizType(props["vizType"]),
+    });
+  });
+  return tiles;
+}
+
+/**
+ * Finds a DataViz block by its Puck id anywhere in a dashboard config,
+ * including inside layout slots. Use it to describe one tile of a dashboard,
+ * for example when a comment references that tile.
+ */
+export function findDashboardTile(
+  dashboardConfig: unknown,
+  tileId: string,
+): DashboardTileSummary | undefined {
+  return _collectTiles(dashboardConfig).find((tile) => {
+    return tile.id === tileId;
+  });
+}
+
+/**
+ * How many DataViz blocks a dashboard config holds, at any depth. Use it to
+ * summarize a dashboard, for example "4 tiles" on a dashboard card.
+ */
+export function countDashboardTiles(dashboardConfig: unknown): number {
+  return _collectTiles(dashboardConfig).length;
+}

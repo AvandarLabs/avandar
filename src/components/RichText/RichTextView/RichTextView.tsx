@@ -6,6 +6,12 @@ import {
   richTextToPlainText,
 } from "$/models/RichTextDocument/RichTextDocument";
 import { createRichTextExtensions } from "@/components/RichText/createRichTextExtensions";
+import { GadgetCard } from "@/components/RichText/Gadget/GadgetCard/GadgetCard";
+import {
+  GadgetChip,
+  UnknownGadgetChip,
+} from "@/components/RichText/Gadget/GadgetChip/GadgetChip";
+import { createGadgetRefFromAttrs } from "@/components/RichText/Gadget/GadgetNodes/createGadgetRefFromAttrs";
 import { useRichTextMembers } from "@/components/RichText/RichTextMembersContext";
 import classes from "@/components/RichText/RichTextView/RichTextView.module.css";
 import { UserMentionChip } from "@/components/RichText/UserMention/UserMentionChip";
@@ -44,6 +50,24 @@ export function RichTextView({
         nodeMapping: {
           userMention: ({ node }) => {
             return <UserMentionChip userId={String(node.attrs.id ?? "")} />;
+          },
+          gadgetLink: ({ node }) => {
+            const gadgetRef = createGadgetRefFromAttrs(node.attrs);
+            return gadgetRef ? (
+              <GadgetChip gadgetRef={gadgetRef} />
+            ) : (
+              <UnknownGadgetChip />
+            );
+          },
+          gadgetEmbed: ({ node }) => {
+            const gadgetRef = createGadgetRefFromAttrs(node.attrs);
+            return gadgetRef ? (
+              <div className={classes.gadgetEmbed}>
+                <GadgetCard gadgetRef={gadgetRef} />
+              </div>
+            ) : (
+              <UnknownGadgetChip />
+            );
           },
         },
       },

@@ -14,6 +14,11 @@ import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactElement } from "react";
 
 type Props = {
+  /**
+   * The block's Puck id, rendered as `data-tile-id` so a link to the tile can
+   * scroll to it. Absent when the chart is rendered outside a dashboard.
+   */
+  tileId?: string;
   prompt: string;
   rawSql: string;
   isLoading: boolean;
@@ -36,6 +41,7 @@ type Props = {
  * copy, because the fix differs: write a prompt, or run what you wrote.
  */
 export function DataVizContent({
+  tileId,
   prompt,
   rawSql,
   isLoading,
@@ -59,7 +65,7 @@ export function DataVizContent({
 
   if (emptyMessage !== undefined) {
     return (
-      <Paper withBorder p="md">
+      <Paper withBorder p="md" data-tile-id={tileId}>
         <Text c="dimmed" fz="sm">
           {emptyMessage}
         </Text>
@@ -69,6 +75,7 @@ export function DataVizContent({
 
   return (
     <Paper
+      data-tile-id={tileId}
       withBorder
       p="lg"
       radius="md"

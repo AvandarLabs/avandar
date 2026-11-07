@@ -11,9 +11,9 @@ import {
   richTextToPlainText,
 } from "$/models/RichTextDocument/RichTextDocument";
 import { createRichTextExtensions } from "@/components/RichText/createRichTextExtensions";
+import { createMentionMenuSuggestion } from "@/components/RichText/MentionMenu/createMentionMenuSuggestion";
 import classes from "@/components/RichText/RichTextComposer/RichTextComposer.module.css";
 import { RichTextMembersContext } from "@/components/RichText/RichTextMembersContext";
-import { createUserMentionSuggestion } from "@/components/RichText/UserMention/createUserMentionSuggestion";
 import type { RichTextDocument } from "$/models/RichTextDocument/RichTextDocument";
 import type { MentionCandidate } from "@/components/RichText/UserMention/filterMentionCandidates";
 import type { RichTextEditorLabels } from "@mantine/tiptap";
@@ -33,6 +33,12 @@ type Props = {
   placeholder: string;
   initialContent?: RichTextDocument.T;
   mentionCandidates: readonly MentionCandidate[];
+
+  /**
+   * The workspace to search for dashboards, datasets, and other gadgets
+   * from the `@` menu. Without it the menu offers only members.
+   */
+  workspaceId?: string;
   submitLabel: ReactNode;
   isSubmitting: boolean;
   /** Blocks submitting while keeping the text editable, for example offline. */
@@ -84,15 +90,16 @@ function _getPlainTextLength(
 
 /**
  * The rich text editor used to write and edit comments: markdown shortcuts,
- * markdown paste, `@` mentions of workspace members, and Mod-Enter to
- * submit. While a submit is in flight the text is read-only, so nothing
- * typed during the save is lost when it clears.
+ * markdown paste, an `@` menu of workspace members and gadgets to link or
+ * embed, and Mod-Enter to submit. While a submit is in flight the text is
+ * read-only, so nothing typed during the save is lost when it clears.
  */
 export function RichTextComposer({
   label,
   placeholder,
   initialContent,
   mentionCandidates,
+  workspaceId,
   submitLabel,
   isSubmitting,
   isSubmitBlocked = false,
@@ -103,8 +110,13 @@ export function RichTextComposer({
 }: Props): ReactNode {
   const { t } = useLingui();
   const labels = useEditorLabels();
+  const mentionControlLabel = workspaceId
+    ? t`Mention a teammate or link a dashboard, dataset, or case`
+    : t`Mention a teammate`;
   const candidatesRef = useRef(mentionCandidates);
   candidatesRef.current = mentionCandidates;
+  const workspaceIdRef = useRef(workspaceId);
+  workspaceIdRef.current = workspaceId;
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   const submitRef = useRef<() => void>(() => {});
@@ -132,8 +144,13 @@ export function RichTextComposer({
     return [
       ...createRichTextExtensions({
         placeholder,
-        mentionSuggestion: createUserMentionSuggestion(() => {
-          return candidatesRef.current;
+        mentionSuggestion: createMentionMenuSuggestion({
+          getCandidates: () => {
+            return candidatesRef.current;
+          },
+          getWorkspaceId: () => {
+            return workspaceIdRef.current;
+          },
         }),
       }),
       Extension.create({
@@ -257,8 +274,8 @@ export function RichTextComposer({
             <RichTextEditor.ControlsGroup>
               <RichTextEditor.Control
                 disabled={isSaving}
-                aria-label={t`Mention a teammate`}
-                title={t`Mention a teammate`}
+                aria-label={mentionControlLabel}
+                title={mentionControlLabel}
                 onClick={() => {
                   editor.chain().focus().insertContent("@").run();
                 }}

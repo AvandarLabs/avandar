@@ -5,23 +5,19 @@ export type MentionCandidate = {
   email: string;
 };
 
-const MAX_MENTION_CANDIDATES = 8;
-
 /**
- * Members whose name or email contains the typed query, ignoring case, at
- * most eight.
+ * Members whose name or email contains the typed query, ignoring case, in
+ * their original order. The `@` menu caps how many it shows.
  */
 export function filterMentionCandidates(
   candidates: readonly MentionCandidate[],
   query: string,
 ): MentionCandidate[] {
   const normalizedQuery = query.trim().toLowerCase();
-  return candidates
-    .filter((candidate) => {
-      return (
-        candidate.displayName.toLowerCase().includes(normalizedQuery) ||
-        candidate.email.toLowerCase().includes(normalizedQuery)
-      );
-    })
-    .slice(0, MAX_MENTION_CANDIDATES);
+  return candidates.filter((candidate) => {
+    return (
+      candidate.displayName.toLowerCase().includes(normalizedQuery) ||
+      candidate.email.toLowerCase().includes(normalizedQuery)
+    );
+  });
 }

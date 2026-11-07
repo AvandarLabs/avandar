@@ -34,6 +34,8 @@ create table public.individuals (
   constraint individuals__status_fkey foreign key (status_id, concept_id) references public.concept_statuses (id, concept_id)
 );
 
+create index idx_individuals__workspace_id on public.individuals (workspace_id);
+
 -- Enable row level security
 alter table public.individuals enable row level security;
 

@@ -104,15 +104,23 @@ adds `https://` to a bare domain and `mailto:` to a bare email address, and
 refuses any other scheme, so the editor never makes a link the save would
 reject.
 
-## Extension points for object references and embeds
+## Gadget references
 
-This is planned in the roadmap and not built.
+A comment can reference a dashboard, a dashboard tile, a dataset, a map, a
+case type, or another case, together called gadgets. The `@` menu searches
+teammates and gadgets at once: gadgets come from `rpc_gadgets__search`, which
+runs with the author's access. Enter inserts an inline link chip
+(`gadgetLink`) and Shift+Enter an embed card (`gadgetEmbed`); in the editor
+either can be switched to the other. Both nodes are in
+`createRichTextExtensions` and `RichTextView`'s `nodeMapping`.
 
-- Add `objectRef` (inline) and `objectEmbed` (block) nodes to
-  `createRichTextExtensions` with shared attributes, and map both in
-  `RichTextView`'s `nodeMapping`.
-- Extract references into a `comment_references` table with a trigger
-  modeled on `comments__sync_mentions`.
+The stored document holds only `{ gadgetType, gadgetId, subId }`, never a
+name, and `body_text` writes a gadget as `[noun]`. Each reader resolves a ref
+through `GADGET_REGISTRY` with their own access, so a gadget they cannot open
+shows as unavailable. `comments__sync_gadget_refs` mirrors references into
+`comment_gadget_refs`, modeled on `comments__sync_mentions`. See
+[gadgets.md](gadgets.md) for the gadget types, what is not a gadget, and how
+to add one.
 
 ## Future work
 

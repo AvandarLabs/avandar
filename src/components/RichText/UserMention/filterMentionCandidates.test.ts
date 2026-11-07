@@ -22,7 +22,7 @@ describe("filterMentionCandidates", () => {
     expect(filterMentionCandidates(CANDIDATES, "dana@")).toHaveLength(1);
   });
 
-  it("returns at most eight people", () => {
+  it("returns every matching person, leaving the cap to the menu", () => {
     const many = Array.from({ length: 12 }, (_, index) => {
       return {
         userId: String(index),
@@ -30,6 +30,6 @@ describe("filterMentionCandidates", () => {
         email: `p${index}@example.org`,
       };
     });
-    expect(filterMentionCandidates(many, "")).toHaveLength(8);
+    expect(filterMentionCandidates(many, "")).toHaveLength(12);
   });
 });

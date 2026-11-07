@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { z } from "zod";
+import {
+  GADGET_TYPES,
+  GadgetRefSchema,
+} from "$/models/gadgets/Gadget/Gadget.ts";
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget.ts";
 
 /** A mark on a text node, such as bold or a link. */
 type RichTextMark = {
@@ -38,6 +43,8 @@ export const RICH_TEXT_NODE_TYPES = [
   "bulletList",
   "codeBlock",
   "doc",
+  "gadgetEmbed",
+  "gadgetLink",
   "hardBreak",
   "heading",
   "horizontalRule",
@@ -66,6 +73,19 @@ const BLOCK_CONTAINER_TYPES: ReadonlySet<string> = new Set([
   "listItem",
   "orderedList",
 ]);
+
+/**
+ * How plain text names each gadget type. Stored in `body_text`, never
+ * displayed, so it is English like the "member" mention fallback.
+ */
+const GADGET_PLAIN_TEXT_NOUNS: Readonly<Record<Gadget.Type, string>> = {
+  dashboard: "dashboard",
+  dashboard_tile: "tile",
+  dataset: "dataset",
+  map: "map",
+  concept: "case type",
+  individual: "case",
+};
 
 /** Link targets a stored link may open: web pages and email addresses. */
 const SAFE_LINK_HREF_PATTERN = /^(https?:|mailto:)/i;
@@ -101,12 +121,23 @@ const NodeSchema: z.ZodType<RichTextNode> = z.lazy(() => {
       text: z.string(),
       marks: z.array(MarkSchema).optional(),
     }),
-    z.object({
+    // Mentions and gadget nodes are strict so a stored document can never
+    // carry a member's or a gadget's name, which every member could read.
+    z.strictObject({
       type: z.literal("userMention"),
-      attrs: z.object({ id: z.uuid() }).catchall(z.unknown()),
+      attrs: z.strictObject({ id: z.uuid() }),
+      marks: z.array(MarkSchema).optional(),
     }),
+    z.strictObject({
+      type: z.literal("gadgetLink"),
+      attrs: GadgetRefSchema,
+      marks: z.array(MarkSchema).optional(),
+    }),
+    z.strictObject({ type: z.literal("gadgetEmbed"), attrs: GadgetRefSchema }),
     z.object({
-      type: z.enum(RICH_TEXT_NODE_TYPES).exclude(["text", "userMention"]),
+      type: z
+        .enum(RICH_TEXT_NODE_TYPES)
+        .exclude(["text", "userMention", "gadgetLink", "gadgetEmbed"]),
       attrs: AttrsSchema.optional(),
       content: z.array(NodeSchema).optional(),
       marks: z.array(MarkSchema).optional(),
@@ -133,12 +164,15 @@ export function isRichTextDocument(value: unknown): value is RichTextDocumentT {
 }
 
 /**
- * Plain text of a document: one line per block, and `@name` for each
- * mention. `getMentionLabel` returns the member's current name, or
- * `undefined` to fall back to "member".
+ * Plain text of a document: one line per block, `@name` for each mention,
+ * and `[noun]` for each gadget, such as `[dashboard]`. `getMentionLabel`
+ * returns the member's current name, or `undefined` to fall back to
+ * "member".
  *
  * The output is stored for search and as the fallback text, never displayed
- * as is, so the "member" fallback is deliberately untranslated English.
+ * as is, so the fallbacks and gadget nouns are deliberately untranslated
+ * English. A gadget is never written by name because `body_text` is
+ * readable by every member, including those who cannot read the gadget.
  */
 export function richTextToPlainText(
   document: RichTextDocumentT | RichTextNode,
@@ -168,6 +202,9 @@ function _nodeToPlainText(
   if (nodeType === "userMention") {
     const userId = _readMentionUserId(node) ?? "";
     return `@${options.getMentionLabel?.(userId) ?? "member"}`;
+  }
+  if (nodeType === "gadgetLink" || nodeType === "gadgetEmbed") {
+    return `[${_readGadgetNoun(node)}]`;
   }
   const separator =
     nodeType !== undefined && BLOCK_CONTAINER_TYPES.has(nodeType) ? "\n" : "";
@@ -217,6 +254,16 @@ function _readNodeType(node: Record<string, unknown>): string | undefined {
 
 function _readChildren(node: Record<string, unknown>): readonly unknown[] {
   return Array.isArray(node.content) ? node.content : [];
+}
+
+function _readGadgetNoun(node: Record<string, unknown>): string {
+  const gadgetType = _isObject(node.attrs) ? node.attrs.gadgetType : undefined;
+  const knownType = GADGET_TYPES.find((type) => {
+    return type === gadgetType;
+  });
+  return knownType === undefined
+    ? "gadget"
+    : GADGET_PLAIN_TEXT_NOUNS[knownType];
 }
 
 function _readMentionUserId(node: Record<string, unknown>): string | undefined {
