@@ -117,6 +117,40 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
     }).toThrow(/dynamic/i);
   });
 
+  it("does not read the FROM inside EXTRACT, TRIM, SUBSTRING, or OVERLAY as a table", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
+        `SELECT date_trunc('month', "date") AS month, SUM("deaths")
+         FROM "${DATASET_ID}"
+         WHERE EXTRACT(year FROM "date") = 2022
+         GROUP BY 1`,
+      ),
+    ).toEqual([DATASET_ID]);
+    expect(
+      DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
+        `SELECT extract(MONTH FROM "date"), TRIM(BOTH ' ' FROM "county"),
+           SUBSTRING("county" FROM 1 FOR 3),
+           OVERLAY("county" PLACING 'x' FROM 2 FOR 1)
+         FROM "${DATASET_ID}"`,
+      ),
+    ).toEqual([DATASET_ID]);
+  });
+
+  it("still analyzes a subquery nested inside EXTRACT", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
+        `SELECT EXTRACT(year FROM (SELECT max("date") FROM "${JOINED_DATASET_ID}"))
+         FROM "${DATASET_ID}"`,
+      ),
+    ).toEqual([JOINED_DATASET_ID, DATASET_ID]);
+    expect(() => {
+      DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
+        `SELECT EXTRACT(year FROM (SELECT max("date") FROM read_csv('x.csv')))
+         FROM "${DATASET_ID}"`,
+      );
+    }).toThrow(/uninspectable-source/);
+  });
+
   it("treats json_each like unnest when exploding a UUID table's JSON", () => {
     expect(
       DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
