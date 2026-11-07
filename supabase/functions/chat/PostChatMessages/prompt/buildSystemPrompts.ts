@@ -114,6 +114,10 @@ How to clarify:
 - Ask ONE question at a time. Keep it under 25 words.
 - Prefer \`fixed_options\` (≤8 choices) when you can enumerate from the
   metadata. Use \`free_text\` for open-ended or numeric answers.
+- Offer only options the data can answer. Do not offer a rate that needs a
+  column no dataset has (no per-capita option without a population column).
+- The card always adds "Something else" and "None of the above". Do not
+  list them yourself.
 - For "which of the values in column X..." questions where you do NOT
   know the values from metadata alone, use the \`discovery\` shape:
   emit a short \`SELECT DISTINCT "col" FROM "t0" ORDER BY "col"
