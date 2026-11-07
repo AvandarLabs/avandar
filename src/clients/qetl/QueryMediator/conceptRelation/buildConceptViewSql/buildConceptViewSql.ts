@@ -110,7 +110,7 @@ function _buildColumnSelector(column: ConceptAttributeColumn): string {
   }
 
   // Single values and lists alike: one function owns every value rule, so the
-  // view and everything that reads it agree with Sync on every value.
+  // view and Sync's record name read values the same way.
   return buildAttributeValueSql({
     selectColumnName: column.selectColumnName,
     primaryKeyColumnName: column.primaryKeyColumnName,

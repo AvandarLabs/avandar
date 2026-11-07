@@ -186,8 +186,8 @@ function _normalize(row: Record<string, unknown>): Record<string, unknown> {
 describe("buildConceptViewSql", () => {
   // The grain claim. Three individuals in the spine must be three rows out,
   // even though `p1` has two rows in dataset A and `p2` has two in dataset B.
-  // Today's concatenating implementation emits an individual once per
-  // contributing dataset, which is the bug this shape removes.
+  // A join-based shape would return a record once per contributing dataset.
+  // The spine-plus-subquery shape prevents that.
   it("emits exactly one row per individual regardless of contributions", async () => {
     const rows = await _queryView([AGE, REGION]);
 
