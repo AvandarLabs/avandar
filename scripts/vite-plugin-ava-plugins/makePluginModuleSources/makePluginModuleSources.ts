@@ -67,6 +67,7 @@ function _getIconBindingsFromPlugin(plugin: PluginDirectory): IconBinding[] {
  * Source for `virtual:ava-plugin-index`: one entry per bundled plugin with
  * lazy `loadManifest` and `loadCode` loaders. It must contain no static
  * imports, so the main bundle carries only these few bytes per plugin.
+ * `vitePluginAvaPlugins`'s `load` hook calls it.
  */
 export function makeIndexModuleSourceFromPlugins(options: {
   plugins: readonly PluginDirectory[];
@@ -82,6 +83,7 @@ export function makeIndexModuleSourceFromPlugins(options: {
 /**
  * Source for `virtual:ava-plugin-manifest/<id>`: the compiled manifest, the
  * strings it references, and the Tabler icon components it names.
+ * `vitePluginAvaPlugins`'s `load` hook calls it.
  */
 export function makeManifestModuleSourceFromPlugin(
   plugin: PluginDirectory,
@@ -109,7 +111,10 @@ export function makeManifestModuleSourceFromPlugin(
   ].join("\n");
 }
 
-/** Source for `virtual:ava-plugin-locales/<id>`: every locale file. */
+/**
+ * Source for `virtual:ava-plugin-locales/<id>`: every locale file.
+ * `vitePluginAvaPlugins`'s `load` hook calls it.
+ */
 export function makeLocalesModuleSourceFromPlugin(
   plugin: PluginDirectory,
 ): string {

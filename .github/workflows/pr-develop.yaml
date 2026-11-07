@@ -92,6 +92,7 @@ jobs:
           version: 2.98.2
       - run: supabase start -x studio,imgproxy,mailpit,vector,logflare,supavisor
       - run: bash scripts/ci/prepare-envs/prepare-envs.sh
+      - run: pnpm check:plugin-bundle
       - run: pnpm db:reset
       - run: nohup pnpm fns:serve > /tmp/supabase-functions.log 2>&1 &
       - run: bash scripts/ci/verify-supabase-api-is-running.sh

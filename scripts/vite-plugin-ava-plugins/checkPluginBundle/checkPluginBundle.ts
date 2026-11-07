@@ -118,6 +118,10 @@ export function makeChunkSummariesFromBundle(
  * code, manifest, or locale module may be statically reachable from an entry
  * chunk, and the plugin host must stay within its byte budget. Returns one
  * message per violation.
+ *
+ * `pluginsDirectory` must be a real, forward-slash absolute path without a
+ * trailing slash, because Vite module ids are realpathed.
+ * `vitePluginAvaPlugins`'s `generateBundle` hook is the caller and builds it.
  */
 export function checkPluginBundle(options: {
   chunks: readonly ChunkSummary[];

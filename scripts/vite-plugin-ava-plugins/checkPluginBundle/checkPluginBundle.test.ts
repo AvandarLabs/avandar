@@ -16,6 +16,18 @@ function _chunk(
   return { isEntry: false, imports: [], moduleLengths: {}, ...overrides };
 }
 
+/**
+ * Builds a bundle fixture with only the fields `makeChunkSummariesFromBundle`
+ * reads. The `unknown` hop is required: a single `as` does not compile because
+ * the fixture omits the other `OutputChunk` fields (`code`, `map`, `exports`,
+ * and so on), so TypeScript rejects it as not sufficiently overlapping.
+ */
+function _makeBundleFromOutputs(
+  outputs: Record<string, object>,
+): Rollup.OutputBundle {
+  return outputs as unknown as Rollup.OutputBundle;
+}
+
 describe("checkPluginBundle", () => {
   it("passes when plugin code is only in lazy chunks", () => {
     const violations = checkPluginBundle({
@@ -145,11 +157,29 @@ describe("checkPluginBundle", () => {
     });
     expect(violations).toEqual([]);
   });
+
+  it("does not count host modules in chunks no entry reaches", () => {
+    const violations = checkPluginBundle({
+      pluginsDirectory: PLUGINS_DIRECTORY,
+      pluginCount: 0,
+      chunks: [
+        _chunk({ fileName: "index.js", isEntry: true }),
+        _chunk({
+          fileName: "lazy.js",
+          moduleLengths: {
+            "/repo/src/lib/plugins/PluginHost/PluginHost.tsx":
+              HOST_BUDGET_BYTES + 1,
+          },
+        }),
+      ],
+    });
+    expect(violations).toEqual([]);
+  });
 });
 
 describe("makeChunkSummariesFromBundle", () => {
   it("keeps chunks with their rendered module lengths and skips assets", () => {
-    const bundle = {
+    const bundle = _makeBundleFromOutputs({
       "index.js": {
         type: "chunk",
         fileName: "index.js",
@@ -158,7 +188,7 @@ describe("makeChunkSummariesFromBundle", () => {
         modules: { "/repo/src/main.tsx": { renderedLength: 120 } },
       },
       "logo.svg": { type: "asset", fileName: "logo.svg" },
-    } as unknown as Rollup.OutputBundle;
+    });
 
     expect(makeChunkSummariesFromBundle(bundle)).toEqual([
       {
@@ -167,6 +197,23 @@ describe("makeChunkSummariesFromBundle", () => {
         imports: ["shared.js"],
         moduleLengths: { "/repo/src/main.tsx": 120 },
       },
+    ]);
+  });
+
+  it("does not merge dynamicImports into imports", () => {
+    const bundle = _makeBundleFromOutputs({
+      "index.js": {
+        type: "chunk",
+        fileName: "index.js",
+        isEntry: true,
+        imports: ["shared.js"],
+        dynamicImports: ["epidemiology.js"],
+        modules: {},
+      },
+    });
+
+    expect(makeChunkSummariesFromBundle(bundle)[0]?.imports).toEqual([
+      "shared.js",
     ]);
   });
 });
