@@ -18,6 +18,10 @@ function _getFiniteNumberFromValue(value: unknown): number | undefined {
  * two columns and skips every row where either value is missing or not a
  * finite number, so the caller can pass a raw result as it came back from
  * `avandar.data.fetchRows`.
+ *
+ * Every value becomes a double, so a bigint above 2^53 loses precision. That
+ * is acceptable here because the regression itself computes in double
+ * precision.
  */
 export function makeRegressionPointsFromRows(options: {
   rows: ReadonlyArray<Readonly<Record<string, unknown>>>;

@@ -1,6 +1,12 @@
 import { AvandarProvider, makePluginTranslator } from "@avandar/plugin-sdk";
 import { MantineProvider } from "@mantine/core";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import englishMessages from "../../locales/en.json";
 import { RegressionModal } from "./RegressionModal";
@@ -30,6 +36,7 @@ function _makeRowsResult(options?: Partial<FetchRowsResult>): FetchRowsResult {
 function _renderModal(options: {
   columns?: readonly Column[];
   fetchRows?: AvandarApi["data"]["fetchRows"];
+  t?: AvandarApi["i18n"]["t"];
 }): { fetchRows: ReturnType<typeof vi.fn> } {
   const fetchRows = vi.fn(
     options.fetchRows ??
@@ -48,10 +55,12 @@ function _renderModal(options: {
     data: { fetchRows },
     ui: { openModal: vi.fn(), openDrawer: vi.fn(), notify: vi.fn() },
     i18n: {
-      t: makePluginTranslator({
-        locale: "en-US",
-        messages: { en: englishMessages },
-      }),
+      t:
+        options.t ??
+        makePluginTranslator({
+          locale: "en-US",
+          messages: { en: englishMessages },
+        }),
     },
   };
   render(
@@ -79,6 +88,46 @@ function _clickFit(): void {
   fireEvent.click(screen.getByRole("button", { name: "Fit regression" }));
 }
 
+function _makeRowsFromAges(
+  getWeight: (age: number) => number,
+): FetchRowsResult["rows"] {
+  return [1, 2, 3, 4, 5].map((age) => {
+    return { age, weight: getWeight(age) };
+  });
+}
+
+function _expectStatistic(label: string, value: string): void {
+  const group = screen.getByRole("group", { name: label });
+  expect(within(group).getByText(value)).toBeInTheDocument();
+}
+
+/**
+ * Runs `action` while collecting unhandled promise rejections instead of
+ * letting the test runner report them as failures.
+ */
+async function _collectUnhandledRejections(
+  action: () => Promise<void>,
+): Promise<unknown[]> {
+  const reasons: unknown[] = [];
+  const runnerListeners = process.listeners("unhandledRejection");
+  process.removeAllListeners("unhandledRejection");
+  process.on("unhandledRejection", (reason) => {
+    reasons.push(reason);
+  });
+  try {
+    await action();
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+  } finally {
+    process.removeAllListeners("unhandledRejection");
+    runnerListeners.forEach((listener) => {
+      process.on("unhandledRejection", listener);
+    });
+  }
+  return reasons;
+}
+
 describe("RegressionModal", () => {
   it("defaults X and Y to the first two numeric columns", () => {
     _renderModal({});
@@ -93,19 +142,138 @@ describe("RegressionModal", () => {
   it("fits the chosen columns and shows slope, intercept, R squared, and rows used", async () => {
     const { fetchRows } = _renderModal({});
     _clickFit();
-    expect(await screen.findByLabelText("Slope")).toHaveTextContent("2");
-    expect(screen.getByLabelText("Intercept")).toHaveTextContent("1");
-    expect(screen.getByLabelText("R²")).toHaveTextContent("1");
-    expect(screen.getByLabelText("Rows used")).toHaveTextContent("5");
+    await screen.findByRole("group", { name: "Slope" });
+    _expectStatistic("Slope", "2");
+    _expectStatistic("Intercept", "1");
+    _expectStatistic("R²", "1");
+    _expectStatistic("Rows used", "5");
     expect(fetchRows).toHaveBeenCalledWith(QUERY_HANDLE, {
       columns: ["age", "weight"],
     });
   });
 
+  it("shows the fitted statistics of noisy data", async () => {
+    _renderModal({
+      fetchRows: () => {
+        return Promise.resolve(
+          _makeRowsResult({
+            rows: [
+              { age: 1, weight: 1 },
+              { age: 2, weight: 3 },
+              { age: 3, weight: 2 },
+              { age: 4, weight: 5 },
+            ],
+          }),
+        );
+      },
+    });
+    _clickFit();
+    await screen.findByRole("group", { name: "Slope" });
+    _expectStatistic("Slope", "1.1");
+    _expectStatistic("Intercept", "0");
+    _expectStatistic("R²", "0.6914");
+    _expectStatistic("Rows used", "4");
+  });
+
+  it.each([
+    [0.00001, "0.00001"],
+    [-0.00001, "-0.00001"],
+  ])(
+    "shows a slope of %s as %s instead of rounding it to zero",
+    async (slope, text) => {
+      _renderModal({
+        fetchRows: () => {
+          return Promise.resolve(
+            _makeRowsResult({
+              rows: _makeRowsFromAges((age) => {
+                return slope * age;
+              }),
+            }),
+          );
+        },
+      });
+      _clickFit();
+      await screen.findByRole("group", { name: "Slope" });
+      _expectStatistic("Slope", text);
+    },
+  );
+
+  it("shows R squared as not available when Y never varies", async () => {
+    _renderModal({
+      fetchRows: () => {
+        return Promise.resolve(
+          _makeRowsResult({
+            rows: _makeRowsFromAges(() => {
+              return 5;
+            }),
+          }),
+        );
+      },
+    });
+    _clickFit();
+    await screen.findByRole("group", { name: "Slope" });
+    _expectStatistic("Slope", "0");
+    _expectStatistic("Intercept", "5");
+    _expectStatistic("R²", "Not available");
+    expect(document.body).not.toHaveTextContent("NaN");
+  });
+
+  it("shows the not-enough-data message when the slope and intercept overflow", async () => {
+    _renderModal({
+      fetchRows: () => {
+        return Promise.resolve(
+          _makeRowsResult({
+            rows: [
+              { age: 1e200, weight: 1e300 },
+              { age: 2e200, weight: 3e300 },
+              { age: 3e200, weight: 2e300 },
+            ],
+          }),
+        );
+      },
+    });
+    _clickFit();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "where X varies",
+    );
+    expect(screen.queryByRole("group", { name: "Slope" })).toBeNull();
+    expect(document.body).not.toHaveTextContent("NaN");
+  });
+
+  it("announces a fitted result through a polite live region", async () => {
+    _renderModal({});
+    const liveRegion = screen.getByRole("status");
+    expect(liveRegion).toBeEmptyDOMElement();
+    _clickFit();
+    const slope = await screen.findByRole("group", { name: "Slope" });
+    expect(liveRegion).toContainElement(slope);
+  });
+
+  it("disables both pickers and the button while a fit is running", async () => {
+    const pendingRows = Promise.withResolvers<FetchRowsResult>();
+    _renderModal({
+      fetchRows: () => {
+        return pendingRows.promise;
+      },
+    });
+    const xPicker = screen.getByRole("combobox", { name: "Predictor (X)" });
+    const yPicker = screen.getByRole("combobox", { name: "Outcome (Y)" });
+    const fitButton = screen.getByRole("button", { name: "Fit regression" });
+    _clickFit();
+    expect(xPicker).toBeDisabled();
+    expect(yPicker).toBeDisabled();
+    expect(fitButton).toBeDisabled();
+    pendingRows.resolve(_makeRowsResult());
+    await screen.findByRole("group", { name: "Slope" });
+    expect(xPicker).toBeEnabled();
+    expect(yPicker).toBeEnabled();
+    expect(fitButton).toBeEnabled();
+  });
+
   it("shows no truncation note when the result was complete", async () => {
     _renderModal({});
     _clickFit();
-    await screen.findByLabelText("Slope");
+    await screen.findByRole("group", { name: "Slope" });
     expect(screen.queryByText(/Fitted on the first/)).not.toBeInTheDocument();
   });
 
@@ -178,11 +346,44 @@ describe("RegressionModal", () => {
     );
   });
 
-  it("clears a fitted result when a column changes", async () => {
+  it("clears a fitted result when the X column changes", async () => {
     _renderModal({});
     _clickFit();
-    await screen.findByLabelText("Slope");
+    await screen.findByRole("group", { name: "Slope" });
+    _pickColumn("Predictor (X)", "height");
+    expect(screen.queryByRole("group", { name: "Slope" })).toBeNull();
+  });
+
+  it("clears a fitted result when the Y column changes", async () => {
+    _renderModal({});
+    _clickFit();
+    await screen.findByRole("group", { name: "Slope" });
     _pickColumn("Outcome (Y)", "height");
-    expect(screen.queryByLabelText("Slope")).not.toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Slope" })).toBeNull();
+  });
+
+  it("re-enables the pickers when a fit fails unexpectedly", async () => {
+    const translator = makePluginTranslator({
+      locale: "en-US",
+      messages: { en: englishMessages },
+    });
+    _renderModal({
+      t: (key, values) => {
+        if (key === "modal.notEnoughData") {
+          throw new Error("translator broke");
+        }
+        return translator(key, values);
+      },
+    });
+    _pickColumn("Outcome (Y)", "age");
+    const reasons = await _collectUnhandledRejections(async () => {
+      _clickFit();
+      await waitFor(() => {
+        expect(
+          screen.getByRole("combobox", { name: "Predictor (X)" }),
+        ).toBeEnabled();
+      });
+    });
+    expect(reasons).toEqual([new Error("translator broke")]);
   });
 });

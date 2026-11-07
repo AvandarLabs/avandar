@@ -36,6 +36,16 @@ describe("makeRegressionPointsFromRows", () => {
     ).toEqual([[4, 8]]);
   });
 
+  it("rounds a bigint above 2^53 to the nearest double", () => {
+    expect(
+      makeRegressionPointsFromRows({
+        rows: [{ x: 2n ** 53n + 1n, y: 1 }],
+        xColumn: "x",
+        yColumn: "y",
+      }),
+    ).toEqual([[2 ** 53, 1]]);
+  });
+
   it("reads only the named columns", () => {
     expect(
       makeRegressionPointsFromRows({

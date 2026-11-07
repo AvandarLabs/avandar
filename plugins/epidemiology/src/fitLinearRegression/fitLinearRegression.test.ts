@@ -13,15 +13,38 @@ describe("fitLinearRegression", () => {
     expect(fit?.n).toBe(5);
   });
 
-  it("reports an R squared below 1 for noisy data", () => {
+  it("fits the least-squares line and R squared of noisy data", () => {
     const fit = fitLinearRegression([
       [1, 1],
       [2, 3],
       [3, 2],
       [4, 5],
     ]);
-    expect(fit?.rSquared).toBeGreaterThan(0);
-    expect(fit?.rSquared).toBeLessThan(1);
+    expect(fit?.slope).toBeCloseTo(1.1);
+    expect(fit?.intercept).toBeCloseTo(0);
+    expect(fit?.rSquared).toBeCloseTo(0.6914, 4);
+    expect(fit?.n).toBe(4);
+  });
+
+  it("fits a flat line with an undefined R squared when Y never varies", () => {
+    const fit = fitLinearRegression([
+      [1, 5],
+      [2, 5],
+      [3, 5],
+    ]);
+    expect(fit?.slope).toBe(0);
+    expect(fit?.intercept).toBe(5);
+    expect(fit?.rSquared).toBeUndefined();
+  });
+
+  it("returns undefined when the slope and intercept overflow", () => {
+    expect(
+      fitLinearRegression([
+        [1e200, 1e300],
+        [2e200, 3e300],
+        [3e200, 2e300],
+      ]),
+    ).toBeUndefined();
   });
 
   it("returns undefined for fewer than two points", () => {
