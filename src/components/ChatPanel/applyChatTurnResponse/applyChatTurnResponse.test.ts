@@ -230,7 +230,8 @@ describe("applyChatTurnResponse", () => {
           sqlOutcome,
           handlers: _createHandlers(),
         });
-        return result.content[0]?.type === "text" ? result.content[0].text : "";
+        const [part] = result.content ?? [];
+        return part?.type === "text" ? part.text : "";
       }),
     );
 
