@@ -15,6 +15,7 @@ import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppV
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
+import { useDatasetSourceLabels } from "@/hooks/datasets/useDatasetSourceLabels";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
@@ -28,7 +29,6 @@ import { DatasetColumnOutline } from "@/views/DataManagerApp/DatasetMetaView/Dat
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { ReactNode } from "react";
 
 const DATASET_TAB_IDS = ["dataset-metadata", "dataset-summary"] as const;
@@ -52,20 +52,7 @@ type Props = {
 export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
   const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
-  // The user-facing name of every source type, keyed by the stored enum
-  // value. Inline because this view is the only thing that names a single
-  // dataset's origin.
-  const sourceLabels = useMemo((): Record<DatasetSource.SourceType, string> => {
-    return {
-      csv_file: t`CSV file`,
-      google_sheets: t`Google Sheets`,
-      open_data: t`Open data`,
-      pdf_file: t`PDF file`,
-      postgres_table: t`Database`,
-      virtual: t`Derived dataset`,
-      xlsx_file: t`Excel file`,
-    };
-  }, [t]);
+  const sourceLabels = useDatasetSourceLabels();
   const [appRoles] = useUserAppRoles();
   // True when the user has no data_sources app role; in that case the dataset
   // is visible only through a resource share. We mark it in the header; it
