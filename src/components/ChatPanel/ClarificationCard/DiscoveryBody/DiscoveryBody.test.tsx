@@ -144,4 +144,35 @@ describe("DiscoveryBody", () => {
     );
     expect(onRequestDifferentDiscovery).toHaveBeenCalledOnce();
   });
+
+  it("explains a failed lookup in plain words and keeps the raw error and SQL behind details", async () => {
+    const resolveDiscovery = vi.fn().mockResolvedValue({
+      error:
+        "Catalog Error: Table with name 8fc84d6a-f864-46fe-bd1c-7d7cb897a173 does not exist!",
+    });
+    render(
+      <DiscoveryBody
+        {...DISCOVERY_PROPS}
+        candidateValues={["California"]}
+        resolveDiscovery={resolveDiscovery}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByText(
+        "This query uses a dataset that isn't in this workspace or hasn't finished loading.",
+      ),
+    ).toBeVisible();
+    expect(screen.queryByText(/Catalog Error/)).toBeNull();
+    expect(screen.queryByText(DISCOVERY_PROPS.query)).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Show details" }));
+    expect(
+      screen.getByText(
+        "Catalog Error: Table with name <dataset> does not exist!",
+      ),
+    ).toBeVisible();
+    expect(screen.getByText(DISCOVERY_PROPS.query)).toBeVisible();
+  });
 });

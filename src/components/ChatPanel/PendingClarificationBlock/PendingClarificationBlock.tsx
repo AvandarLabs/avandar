@@ -14,7 +14,7 @@ export function PendingClarificationBlock(): React.ReactNode {
     .pendingClarification as ChatClarifyRequestWithAudit | undefined;
   const workspace = useCurrentWorkspace();
   const user = useCurrentUser();
-  const resolveDiscovery = useDiscoveryResolver();
+  const resolveDiscovery = useDiscoveryResolver(workspace.id);
   const onSubmit = useClarificationSubmission({
     request: pendingClarification,
     userId: user?.id,
