@@ -95,7 +95,8 @@ with
       public.plugin_installations.workspace_id
     ) and
     -- Pins the installer to the caller. Not enforced on UPDATE, because
-    -- deleting the user sets `installed_by` to null through an update.
+    -- settings admins must be able to update installs another admin created,
+    -- and the UPDATE policy checks only workspace settings access.
     public.plugin_installations.installed_by is not distinct from (
       select
         auth.uid ()

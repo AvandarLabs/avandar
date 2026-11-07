@@ -471,13 +471,22 @@ regression modal split into `RegressionModal/` with `ColumnPickers`,
   Vite plugin's `generateBundle` hook in the same build when
   `AVA_PLUGIN_BUNDLE_CHECK=1`. `pnpm check:plugin-bundle` sets it, and
   `pr-develop.yaml` runs that script.
-- **What it measures.** It walks the static `imports` of every entry chunk.
-  A `plugins/**` module, a plugin manifest module, or a plugin locale module
-  in any statically reachable chunk is a violation. It also sums the rendered
-  bytes of host modules in those chunks: `src/lib/plugins/`,
+- **What it measures.** It covers every non-plugin chunk: each chunk the app
+  can load without running a plugin loader, through static or dynamic imports.
+  The entry chunk has no static imports, so a walk of its static `imports`
+  alone would see nothing. A `plugins/**` module, a plugin manifest module, or
+  a plugin locale module in any of those chunks is a violation. It also sums
+  the rendered bytes of host modules in those chunks, leaving out the chunks
+  only the lazily loaded command runner reaches: `src/lib/plugins/`,
   `@avandar/plugin-manifest`, `@avandar/plugin-sdk`, and the virtual plugin
   index. The plugin SDK counts as host code. The budget is 24,000 bytes plus
   600 per bundled plugin.
+- **Load-time guarantee.** No plugin manifest, code, or locale module reaches
+  any chunk the app loads without running a plugin loader, and CI enforces
+  this over all non-plugin chunks. The plugin host (about 20 KB rendered,
+  spread across the workspace layout and Data Explorer chunks) and one
+  `plugin_installations` request load for every workspace, whether or not it
+  has a plugin installed.
 - **Lazy runner.** `runPluginCommand` loads at click time through
   `loadRunPluginCommand`, a dynamic `import()` cached after the first success.
   The runner reaches the SDK runtime and Lingui's message compiler, so loading
@@ -497,6 +506,10 @@ regression modal split into `RegressionModal/` with `ColumnPickers`,
 
 ### Runtime
 
+- **Chunk-load failure.** The "retry action" the failure table lists is a
+  notification that tells the user to click the button again. It has no retry
+  button. The failed load is evicted from the cache, so the next click loads
+  the chunk again.
 - **Settled per-plugin manifest loading.** `loadManifestModules` loads each
   manifest with `Promise.allSettled`, so one failing chunk does not hide the
   other plugins. Each failure is logged with its plugin id. The result carries
@@ -523,7 +536,9 @@ regression modal split into `RegressionModal/` with `ColumnPickers`,
   dedicated `plugin_installations__prevent_identity_change` trigger makes both
   `workspace_id` and `plugin_id` immutable, in place of the standard
   `prevent_workspace_id_change` trigger the spec named. `installed_by` is not
-  pinned on update, because deleting a user sets it to null through an update.
+  pinned on update, because settings admins must be able to update installs
+  another admin created, and the update policy checks only workspace settings
+  access.
 
 ### CLI
 

@@ -192,7 +192,7 @@ entry points: `@avandar/plugin-manifest` for build tools and the CLI,
 `@avandar/plugin-manifest/runtime` for browser code (no Zod or YAML at
 runtime), and `@avandar/plugin-manifest/node` for the folder readers.
 
-Private for now (`"private": true`), so it is not published to npm. Runtime
+Private (`"private": true`): not published to npm. Runtime
 dependencies are `yaml` and a `zod` peer.
 
 See [`packages/shared/plugin-manifest/README.md`](../packages/shared/plugin-manifest/README.md).
@@ -209,7 +209,7 @@ context, `QueryHandle`, `fetchRows` options and result), `PluginError`,
 `AvandarProvider`, `useAvandar`, and `useT` for plugin UI. Every call is async
 or fire-and-forget and passes serializable data.
 
-Private for now (`"private": true`), so it is not published to npm. It depends
+Private (`"private": true`): not published to npm. It depends
 on Lingui's core and message compiler, with `react` as a peer.
 
 See [`packages/web/plugin-sdk/README.md`](../packages/web/plugin-sdk/README.md).
@@ -224,14 +224,14 @@ components (`Alert`, `Badge`, `Button`, `Divider`, `Group`, `Loader`,
 `Title`). Plugins import UI only from this package, which keeps their code
 independent of the host's component library.
 
-Private for now (`"private": true`), so it is not published to npm. It has
+Private (`"private": true`): not published to npm. It has
 `@mantine/core` and `react` as peers.
 
 See [`packages/web/plugin-ui/README.md`](../packages/web/plugin-ui/README.md).
 
 ---
 
-## `@avandar/etl` - `packages/node/etl`
+## `@avandar/etl` — `packages/node/etl`
 
 Node.js ETL toolkit. Two units:
 

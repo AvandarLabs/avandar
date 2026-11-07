@@ -7,9 +7,10 @@ not).
 
 Bundled plugins live in `plugins/<name>/`, are listed in
 `plugins/bundled.yaml`, and are built into the app as lazy chunks. A workspace
-pays nothing for a plugin until a settings admin installs it in
-Settings → Plugins, and a plugin's code downloads only when someone first uses
-one of its commands.
+without a plugin installed downloads none of that plugin's manifest, code, or
+styles. Once a settings admin installs it in Settings → Plugins, its code
+downloads only when someone first uses one of its commands. The small plugin
+host and one installations request load for every workspace.
 
 Design background:
 `docs/superpowers/specs/2026-11-06-plugin-ecosystem-design.md` and
@@ -73,7 +74,11 @@ plugins/epidemiology/src/
   RegressionModal/
     RegressionModal.tsx
     RegressionModal.test.tsx
+    RegressionModal.constants.ts
+    RegressionModal.types.ts
     ColumnPickers.tsx
+    FitOutcome.tsx
+    FittedResult.tsx
     RegressionForm.tsx
     makeStatisticTextFromNumber/
       makeStatisticTextFromNumber.ts
@@ -130,7 +135,9 @@ start with `%` (YAML needs the quotes there).
 
 Edit `ava.yaml`, `locales/*.json`, or `plugins/bundled.yaml` while `pnpm dev`
 runs and the page reloads. An invalid file shows the error in the browser
-overlay and keeps the previous plugins.
+overlay and keeps the previous plugins. Adding a new npm dependency to a
+bundled plugin needs a dev server restart, because the dev server computes its
+`optimizeDeps` entries at startup.
 
 ## 4. Decide when a command shows
 
@@ -282,9 +289,8 @@ the approved list. The list is `APPROVED_PLUGIN_DEPENDENCIES` in
 Build plugin UI only from `@avandar/plugin-ui`: `Alert`, `Badge`, `Button`,
 `Divider`, `Group`, `Loader`, `NumberInput`, `Select`, `SimpleGrid`, `Stack`,
 `Table`, `Text`, `TextInput`, and `Title`. Every API call is async or
-fire-and-forget and passes serializable data, so a plugin keeps working when
-plugins later run in a sandbox. The two exceptions are the synchronous
-`i18n.t` and the React `content` of `openModal` and `openDrawer`.
+fire-and-forget and passes serializable data, with two exceptions: the
+synchronous `i18n.t` and the React `content` of `openModal` and `openDrawer`.
 
 ## 8. Validate
 
@@ -314,10 +320,10 @@ budget.
 ## Rules to keep in mind
 
 - **Permissions are declared, not enforced.** A manifest lists the permissions
-  it needs and Settings → Plugins shows them to admins, but bundled plugins run
-  in-process, so nothing blocks a call yet. Declare `data:context` whenever the
-  plugin calls `fetchRows`, so the plugin is already correct when enforcement
-  starts.
+  it needs and Settings → Plugins shows them to admins. The host does not
+  enforce them: bundled plugins run in-process. Declare `data:context`
+  whenever the plugin calls `fetchRows`, so the manifest states what the
+  plugin does.
 - **Never bundle a contract plugin.** This repository is public. A plugin that
   carries a customer's logic or data must wait for a distribution path that
   keeps it out of this repository.
