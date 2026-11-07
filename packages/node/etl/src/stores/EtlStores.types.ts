@@ -44,6 +44,15 @@ export type ListingRowValues = Readonly<{
   is_workspace_loadable: boolean;
   source_asset_type: string | null;
   source_download_url: string | null;
+  organization2_name: string | null;
+  organization3_name: string | null;
+  organization4_name: string | null;
+  domains: readonly string[] | null;
+  tags: readonly string[] | null;
+  /** The raw source record. Never counts as a change on its own. */
+  source_metadata: unknown;
+  /** The drive's `data_catalog_drives.id`, when the run has a drives store. */
+  drive_id: string | null;
 }>;
 
 /** A listing row as stored, with its primary key. */

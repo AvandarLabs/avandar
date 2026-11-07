@@ -49,6 +49,7 @@ function _context(
     pipelineRunId: RUN_ID,
     service: "socrata",
     driveKey: "https://data.cityofnewyork.us",
+    driveId: undefined,
     syncedAt: new Date("2026-10-20T12:00:00.000Z"),
     stores,
     bucket: undefined,

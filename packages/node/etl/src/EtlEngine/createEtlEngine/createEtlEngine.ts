@@ -217,6 +217,7 @@ async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
     config: args.config,
     drive: task.drive,
     driveKey: task.driveKey,
+    driveId: undefined,
     scope: task.scope,
     options: args.options,
     pipelineRunId: args.pipelineRunId,

@@ -143,6 +143,21 @@ export type RelationDescription = Readonly<{
   externalDatasetId: string;
   displayName: string;
   organization1Name: string;
+  /** Organization level 2, inside level 1, such as an agency. */
+  organization2Name?: string;
+  /** Organization level 3, inside level 2. */
+  organization3Name?: string;
+  /** Organization level 4, inside level 3. */
+  organization4Name?: string;
+  /** Subject areas the source files the dataset under. */
+  domains?: readonly string[];
+  /** The source's free-form keywords. */
+  tags?: readonly string[];
+  /**
+   * The source record the relation was built from, untouched, written to
+   * `source_metadata`. Must survive `JSON.stringify`.
+   */
+  sourceMetadata?: unknown;
   /**
    * The connection's source modification time, written to
    * `date_of_last_update`.

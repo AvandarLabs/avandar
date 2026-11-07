@@ -5,13 +5,16 @@ import type {
 } from "@etl/stores/EtlStores.types";
 
 /**
- * Columns that never count as a change: two change on every write, and the
- * app writes `date_column_type_last_verified` when it verifies a listing.
+ * Columns that never count as a change: two change on every write, the app
+ * writes `date_column_type_last_verified` when it verifies a listing, and
+ * `source_metadata` carries counters like Socrata's `page_views` that change
+ * daily, so it is written only alongside a change to another column.
  */
 const IGNORED_COLUMNS: ReadonlySet<keyof ListingRowValues> = new Set([
   "pipeline_run_id",
   "date_of_last_sync",
   "date_column_type_last_verified",
+  "source_metadata",
 ]);
 
 /** Columns compared as instants: Postgres returns `+00:00`, not `Z`. */
@@ -67,8 +70,9 @@ function _normalize(column: keyof ListingRowValues, value: unknown): string {
 /**
  * Whether writing `next` would change nothing that matters about `stored`.
  * Every contract column is compared except `pipeline_run_id`,
- * `date_of_last_sync`, and `date_column_type_last_verified`, so a change to
- * a pipeline's own mapping is caught even when the source did not change.
+ * `date_of_last_sync`, `date_column_type_last_verified`, and
+ * `source_metadata`, so a change to a pipeline's own mapping is caught even
+ * when the source did not change.
  *
  * @param args.stored - The row as the listings table holds it.
  * @param args.next - The row this run would write.

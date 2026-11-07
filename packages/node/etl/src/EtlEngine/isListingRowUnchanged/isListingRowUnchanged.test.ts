@@ -35,6 +35,13 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     is_workspace_loadable: true,
     source_asset_type: null,
     source_download_url: null,
+    organization2_name: null,
+    organization3_name: null,
+    organization4_name: null,
+    domains: null,
+    tags: null,
+    source_metadata: null,
+    drive_id: null,
     ...overrides,
   };
 }
@@ -44,6 +51,35 @@ function _stored(overrides: Partial<ListingRowValues> = {}): StoredListingRow {
 }
 
 describe("isListingRowUnchanged", () => {
+  it("ignores a change to source_metadata alone", () => {
+    // Socrata's record carries page_views and download_count, which change
+    // daily: counting them would rewrite every listing on every full run.
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ source_metadata: { page_views: 1 } }),
+        next: _row({ source_metadata: { page_views: 2 } }),
+      }),
+    ).toBe(true);
+  });
+
+  it("counts a change to a mapped column", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ tags: ["taxi"] }),
+        next: _row({ tags: ["taxi", "fhv"] }),
+      }),
+    ).toBe(false);
+  });
+
+  it("counts a change of drive", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ drive_id: null }),
+        next: _row({ drive_id: "6f7e2c1a-0000-4000-8000-000000000001" }),
+      }),
+    ).toBe(false);
+  });
+
   it("treats a row equal to the stored one as unchanged", () => {
     expect(isListingRowUnchanged({ stored: _stored(), next: _row() })).toBe(
       true,

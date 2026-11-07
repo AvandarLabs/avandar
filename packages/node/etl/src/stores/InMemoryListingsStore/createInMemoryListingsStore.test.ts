@@ -39,6 +39,13 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     is_workspace_loadable: true,
     source_asset_type: null,
     source_download_url: null,
+    organization2_name: null,
+    organization3_name: null,
+    organization4_name: null,
+    domains: null,
+    tags: null,
+    source_metadata: null,
+    drive_id: null,
     ...overrides,
   };
 }

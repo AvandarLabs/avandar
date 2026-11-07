@@ -36,4 +36,11 @@ export const LISTING_CONTRACT_COLUMNS = [
   "is_workspace_loadable",
   "source_asset_type",
   "source_download_url",
+  "organization2_name",
+  "organization3_name",
+  "organization4_name",
+  "domains",
+  "tags",
+  "source_metadata",
+  "drive_id",
 ] as const satisfies ReadonlyArray<keyof ListingRowValues>;
