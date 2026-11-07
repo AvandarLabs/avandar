@@ -19,7 +19,13 @@ afterEach(() => {
 });
 
 function _package(name: string, modified: string): CkanPackage {
-  return { id: name, name, metadata_modified: modified, resources: [] };
+  return {
+    id: name,
+    name,
+    metadata_modified: modified,
+    resources: [],
+    sourceRecord: {},
+  };
 }
 
 const CATALOG: readonly CkanPackage[] = [

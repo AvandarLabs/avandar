@@ -20,6 +20,7 @@ const OUTPUT = {
 
 function _package(name: string, day: number): CkanPackage {
   return {
+    sourceRecord: {},
     id: name,
     name,
     metadata_modified: `2026-10-${String(day).padStart(2, "0")}T00:00:00.000`,

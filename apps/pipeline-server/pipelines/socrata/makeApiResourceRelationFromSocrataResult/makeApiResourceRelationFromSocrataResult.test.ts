@@ -17,6 +17,7 @@ function _make(
   return makeApiResourceRelationFromSocrataResult({
     drive: DRIVE,
     result: {
+      sourceRecord: {},
       datasetId: "erm2-nwe9",
       name: "311 Service Requests",
       domain: "data.cityofnewyork.us",

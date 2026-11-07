@@ -14,6 +14,7 @@ function _packageWithOneCsv(
   overrides: Partial<CkanPackage["resources"][number]>,
 ): CkanPackage {
   return {
+    sourceRecord: {},
     id: "c3429f0e",
     name: "movement-range-maps",
     metadata_modified: "2025-11-19T10:29:46.280529",
@@ -71,6 +72,7 @@ function _metrics() {
 describe("makeApiResourceRelationsFromCkanPackage", () => {
   it("builds one relation per readable resource of the scope's format, dated by metadata_modified", async () => {
     const ckanPackage: CkanPackage = {
+      sourceRecord: {},
       id: "c3429f0e",
       name: "movement-range-maps",
       metadata_modified: "2025-11-19T10:29:46.280529",
@@ -246,6 +248,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
 
   it("returns no relations when the dataset has no resource in the scope's format", async () => {
     const ckanPackage: CkanPackage = {
+      sourceRecord: {},
       id: "c3429f0e",
       name: "docs-only-dataset",
       metadata_modified: undefined,
@@ -278,6 +281,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
 
   it("keeps only the scope's format, whatever the resource's case", async () => {
     const ckanPackage: CkanPackage = {
+      sourceRecord: {},
       id: "c3429f0e",
       name: "movement-range-maps",
       metadata_modified: "2025-11-19T10:29:46.280529",

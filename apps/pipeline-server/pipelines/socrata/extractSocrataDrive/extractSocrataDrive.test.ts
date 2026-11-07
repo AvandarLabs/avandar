@@ -27,6 +27,7 @@ function _at(minute: number): Date {
 function _catalog(size: number): SocrataDiscoveryResult[] {
   return Array.from({ length: size }, (_, index) => {
     return {
+      sourceRecord: {},
       datasetId: `ds-${index}`,
       name: `Dataset ${index}`,
       domain: "data.cityofnewyork.us",
