@@ -145,16 +145,29 @@ function _readPackageJson(directory: string): FileReadResult<PackageJson> {
     : { data: {}, issues: _getPackageJsonIssues(result.error) };
 }
 
+/**
+ * The exact-case file names in the Tabler icons directory. Membership is
+ * checked against this set instead of `existsSync`, because a
+ * case-insensitive filesystem (the macOS default) would accept `IconTrendingup`
+ * when only `IconTrendingUp.mjs` exists, and the later import would fail.
+ */
+function _readTablerIconFileNames(repoRoot: string): ReadonlySet<string> {
+  const iconsDirectory = join(
+    repoRoot,
+    "node_modules/@tabler/icons-react/dist/esm/icons",
+  );
+  return existsSync(iconsDirectory)
+    ? new Set(readdirSync(iconsDirectory))
+    : new Set();
+}
+
 function _getIconIssues(options: {
   repoRoot: string;
   compiled: CompiledPluginManifest;
 }): string[] {
   const { repoRoot, compiled } = options;
   const { manifest } = compiled;
-  const iconsDirectory = join(
-    repoRoot,
-    "node_modules/@tabler/icons-react/dist/esm/icons",
-  );
+  const iconFileNames = _readTablerIconFileNames(repoRoot);
   const iconNames = new Set([
     manifest.icon,
     ...manifest.contributes.commands.map((command) => {
@@ -163,7 +176,7 @@ function _getIconIssues(options: {
   ]);
   return [...iconNames].flatMap((iconName) => {
     const iconFile = `${makeTablerComponentNameFromIconName(iconName)}.mjs`;
-    return existsSync(join(iconsDirectory, iconFile))
+    return iconFileNames.has(iconFile)
       ? []
       : [`unknown Tabler icon "${iconName}"`];
   });

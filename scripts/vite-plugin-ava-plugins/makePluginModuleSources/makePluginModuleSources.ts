@@ -52,6 +52,17 @@ function _getDistinctIconNamesFromPlugin(plugin: PluginDirectory): string[] {
   ];
 }
 
+type IconBinding = { iconName: string; componentName: string };
+
+function _getIconBindingsFromPlugin(plugin: PluginDirectory): IconBinding[] {
+  return _getDistinctIconNamesFromPlugin(plugin).map((iconName) => {
+    return {
+      iconName,
+      componentName: makeTablerComponentNameFromIconName(iconName),
+    };
+  });
+}
+
 /**
  * Source for `virtual:ava-plugin-index`: one entry per bundled plugin with
  * lazy `loadManifest` and `loadCode` loaders. It must contain no static
@@ -76,13 +87,18 @@ export function makeManifestModuleSourceFromPlugin(
   plugin: PluginDirectory,
 ): string {
   const { manifest, strings } = plugin.compiled;
-  const iconNames = _getDistinctIconNamesFromPlugin(plugin);
-  const componentNames = iconNames.map((iconName) => {
-    return makeTablerComponentNameFromIconName(iconName);
-  });
-  const iconEntries = iconNames.map((iconName) => {
-    const componentName = makeTablerComponentNameFromIconName(iconName);
-    return `${JSON.stringify(iconName)}: ${componentName}`;
+  const iconBindings = _getIconBindingsFromPlugin(plugin);
+  // Different icon names can map to one component (`number-1` and `number1`),
+  // and importing the same binding twice is a syntax error.
+  const componentNames = [
+    ...new Set(
+      iconBindings.map((binding) => {
+        return binding.componentName;
+      }),
+    ),
+  ];
+  const iconEntries = iconBindings.map((binding) => {
+    return `${JSON.stringify(binding.iconName)}: ${binding.componentName}`;
   });
   return [
     `import { ${componentNames.join(", ")} } from "@tabler/icons-react";`,

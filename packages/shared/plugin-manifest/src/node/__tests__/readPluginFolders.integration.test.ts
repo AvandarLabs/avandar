@@ -25,6 +25,8 @@ contributes:
 
 let repoRoot: string;
 
+const ICONS_DIRECTORY_PATH = "node_modules/@tabler/icons-react/dist/esm/icons";
+
 function _writeFile(path: string, contents: string): void {
   mkdirSync(join(path, ".."), { recursive: true });
   writeFileSync(path, contents);
@@ -77,10 +79,7 @@ function _getError(run: () => unknown): PluginManifestError {
 
 beforeEach(() => {
   repoRoot = mkdtempSync(join(tmpdir(), "ava-plugins-"));
-  const iconsDirectory = join(
-    repoRoot,
-    "node_modules/@tabler/icons-react/dist/esm/icons",
-  );
+  const iconsDirectory = join(repoRoot, ICONS_DIRECTORY_PATH);
   mkdirSync(iconsDirectory, { recursive: true });
   writeFileSync(join(iconsDirectory, "IconPuzzle.mjs"), "");
   writeFileSync(join(iconsDirectory, "IconHandStop.mjs"), "");
@@ -114,6 +113,32 @@ describe("readPluginDirectory", () => {
     expect(issues).toContain('unknown Tabler icon "no-such-icon"');
     expect(issues).toContain("entry: src/missing.tsx does not exist");
     expect(issues).toContain('dependency "lodash" is not approved');
+  });
+
+  it("matches icon files by exact case, so an icon whose name differs only in case is unknown", () => {
+    writeFileSync(
+      join(repoRoot, ICONS_DIRECTORY_PATH, "IconTrendingUp.mjs"),
+      "",
+    );
+    const directory = _writePlugin("hello", {
+      yaml: MANIFEST_YAML.replace("icon: puzzle", "icon: trendingup"),
+    });
+    const issues = _getError(() => {
+      return readPluginDirectory({ directory, repoRoot });
+    }).issues;
+    expect(issues).toEqual(['unknown Tabler icon "trendingup"']);
+  });
+
+  it("reports every icon as unknown when the Tabler icons directory is missing", () => {
+    rmSync(join(repoRoot, "node_modules"), { recursive: true, force: true });
+    const directory = _writePlugin("hello");
+    const issues = _getError(() => {
+      return readPluginDirectory({ directory, repoRoot });
+    }).issues;
+    expect(issues).toEqual([
+      'unknown Tabler icon "puzzle"',
+      'unknown Tabler icon "hand-stop"',
+    ]);
   });
 
   it("reports ava.yaml not found for a plugin folder without one", () => {

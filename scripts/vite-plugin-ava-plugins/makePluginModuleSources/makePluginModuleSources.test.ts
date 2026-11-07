@@ -6,6 +6,8 @@ import {
 } from "./makePluginModuleSources";
 import type { PluginDirectory } from "@avandar/plugin-manifest/node";
 
+// A partial fixture: it carries only the fields the module sources read, so
+// the cast skips filling in the rest of the manifest and directory shape.
 const PLUGIN = {
   folderName: "epidemiology",
   directory: "/repo/plugins/epidemiology",
@@ -25,6 +27,37 @@ const PLUGIN = {
   },
   locales: { en: { t: "Linear regression", "modal.fit": "Fit regression" } },
 } as unknown as PluginDirectory;
+
+/** A copy of `PLUGIN` whose plugin icon and command icons are replaced. */
+function _makePluginWithIcons(options: {
+  pluginIcon: string;
+  commandIcons: string[];
+}): PluginDirectory {
+  const { manifest } = PLUGIN.compiled;
+  return {
+    ...PLUGIN,
+    compiled: {
+      ...PLUGIN.compiled,
+      manifest: {
+        ...manifest,
+        icon: options.pluginIcon,
+        contributes: {
+          ...manifest.contributes,
+          commands: options.commandIcons.map((icon, index) => {
+            return { id: `command.${index}`, title: "%t%", icon };
+          }),
+        },
+      },
+    },
+  } as unknown as PluginDirectory;
+}
+
+function _getIconImportBindings(code: string): string[] {
+  const importList = /^import \{ (.*) \} from "@tabler\/icons-react";$/m.exec(
+    code,
+  )?.[1];
+  return importList === undefined ? [] : importList.split(", ");
+}
 
 describe("makeIndexModuleSourceFromPlugins", () => {
   it("emits lazy loaders with root-relative entry paths and no eager imports", () => {
@@ -64,6 +97,34 @@ describe("makeManifestModuleSourceFromPlugin", () => {
     );
     expect(code).toContain(
       'export const icons = { "chart-dots": IconChartDots, "trending-up": IconTrendingUp };',
+    );
+  });
+});
+
+describe("makeManifestModuleSourceFromPlugin icon deduplication", () => {
+  it("imports one binding when a command reuses the plugin icon", () => {
+    const code = makeManifestModuleSourceFromPlugin(
+      _makePluginWithIcons({
+        pluginIcon: "chart-dots",
+        commandIcons: ["chart-dots"],
+      }),
+    );
+    expect(_getIconImportBindings(code)).toEqual(["IconChartDots"]);
+    expect(code).toContain(
+      'export const icons = { "chart-dots": IconChartDots };',
+    );
+  });
+
+  it("imports one binding for icon names that map to the same component", () => {
+    const code = makeManifestModuleSourceFromPlugin(
+      _makePluginWithIcons({
+        pluginIcon: "number-1",
+        commandIcons: ["number1"],
+      }),
+    );
+    expect(_getIconImportBindings(code)).toEqual(["IconNumber1"]);
+    expect(code).toContain(
+      'export const icons = { "number-1": IconNumber1, "number1": IconNumber1 };',
     );
   });
 });
