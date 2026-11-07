@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Combobox } from "@mantine/core";
-import classes from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList.module.css";
 import { MentionMenuGroupTitle } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle";
+import classes from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList.module.css";
 import { MentionMenuOption } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuOption";
 import type { MentionMenuGroup } from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
 import type { ReactNode } from "react";
