@@ -20,7 +20,15 @@ begin
   if exists (
     select 1 from public.data_catalog_listings
     where external_dataset_id = 'pgtap-fixture-rename'
-      and (drive_id is not null or domains is not null or source_metadata is not null)
+      and (
+        organization2_name is not null or
+        organization3_name is not null or
+        organization4_name is not null or
+        drive_id is not null or
+        domains is not null or
+        tags is not null or
+        source_metadata is not null
+      )
   ) then
     raise exception 'a new column was not empty after the migration';
   end if;
