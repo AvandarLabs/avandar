@@ -17,8 +17,14 @@ import type { SuggestionProps } from "@tiptap/suggestion";
 /** How long typing must pause before the gadget search runs. */
 const GADGET_SEARCH_DEBOUNCE_MS = 150;
 
-/** Rows asked of the search. The menu still shows at most five per group. */
-const GADGET_SEARCH_LIMIT = 20;
+/** Gadget types the search returns rows for, the `@` menu's gadget groups. */
+const GADGET_TYPE_COUNT = 6;
+
+/** The most rows the search returns for one gadget type. */
+const GADGET_SEARCH_ROWS_PER_TYPE = 5;
+
+/** Rows asked of the search: every type's rows, so none is cut off. */
+const GADGET_SEARCH_LIMIT = GADGET_SEARCH_ROWS_PER_TYPE * GADGET_TYPE_COUNT;
 
 type GadgetSearchState = {
   gadgets: GadgetSearchResult[];

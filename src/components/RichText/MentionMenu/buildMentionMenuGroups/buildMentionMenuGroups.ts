@@ -84,7 +84,7 @@ function _buildPersonItem(candidate: MentionCandidate): MentionMenuItem {
 
 /**
  * Sorts the `@` menu's people and gadget search results into its groups:
- * Dashboards (dashboards before their tiles), Datasets, Maps, Case types,
+ * Dashboards (with their tiles), Datasets, Maps, Case types,
  * Cases, then People. Keeps each group's search order, caps each group at
  * five rows, and leaves out empty groups. Used by the mention menu
  * suggestion every time its people or gadget results change.
@@ -95,15 +95,8 @@ export function buildMentionMenuGroups(
     people: readonly MentionCandidate[];
   }>,
 ): MentionMenuGroup[] {
-  // `sort` is stable, so this only moves tiles after whole dashboards.
-  const sortedGadgets = [...options.gadgets].sort((first, second) => {
-    return (
-      Number(first.ref.gadgetType === "dashboard_tile") -
-      Number(second.ref.gadgetType === "dashboard_tile")
-    );
-  });
   const items = [
-    ...sortedGadgets.map(_buildGadgetItem),
+    ...options.gadgets.map(_buildGadgetItem),
     ...options.people.map(_buildPersonItem),
   ];
   return GROUP_ORDER.map((key) => {

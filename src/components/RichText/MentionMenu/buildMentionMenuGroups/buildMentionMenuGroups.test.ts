@@ -38,8 +38,32 @@ describe("buildMentionMenuGroups", () => {
       groups[0]?.items.map((item) => {
         return item.label;
       }),
-    ).toEqual(["Measles", "Cases per week"]);
+    ).toEqual(["Cases per week", "Measles"]);
     expect(groups[1]?.items).toHaveLength(5);
+  });
+
+  it("keeps the search rank inside Dashboards, so tiles are not pushed below every dashboard", () => {
+    const groups = buildMentionMenuGroups({
+      gadgets: [
+        _gadget("dashboard", "Measles 1"),
+        _gadget("dashboard_tile", "Measles tile"),
+        ...Array.from({ length: 5 }, (_, index) => {
+          return _gadget("dashboard", `Measles ${index + 2}`);
+        }),
+      ],
+      people: [],
+    });
+    expect(
+      groups[0]?.items.map((item) => {
+        return item.label;
+      }),
+    ).toEqual([
+      "Measles 1",
+      "Measles tile",
+      "Measles 2",
+      "Measles 3",
+      "Measles 4",
+    ]);
   });
 
   it("shows a person's email and a gadget's sub-label as the detail line", () => {

@@ -578,7 +578,7 @@ describe("RichTextComposer gadget search", () => {
     expect(mocks.searchGadgets).toHaveBeenCalledWith({
       workspaceId: WORKSPACE_ID,
       query: "meas",
-      limit: 20,
+      limit: 30,
       signal: expect.any(AbortSignal),
     });
   });
