@@ -20,6 +20,7 @@ import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRun
 import { runOfflineChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatTurn";
 import { shouldSkipUserMessageConsent } from "@/components/ChatPanel/useAvandarChatRuntime/shouldSkipUserMessageConsent/shouldSkipUserMessageConsent";
 import { tryExecuteOfflineSql } from "@/components/ChatPanel/useAvandarChatRuntime/tryExecuteOfflineSql";
+import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
@@ -115,7 +116,11 @@ export function createChatModelAdapter(
             }),
             user: Model.make("ChatClientMessage", {
               role: "user" as const,
-              content,
+              content: DiscoveryContinuationMessage.isInternal(
+                threadMessage.metadata,
+              )
+                ? DiscoveryContinuationMessage.toModelContent(content)
+                : content,
             }),
           });
         })

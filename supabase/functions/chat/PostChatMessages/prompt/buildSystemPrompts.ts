@@ -74,6 +74,10 @@ When to call \`clarify\`:
     a state column, a full country name in a country column. Filter on it
     directly. Still look up abbreviations and short forms (NY, UK, US),
     codes, nicknames, misspellings, and labels you cannot know.
+  - Every candidate must mean exactly what the user named, never a broader,
+    narrower, or merely similar name. In a county column, "New York" is one
+    county (Manhattan), not New York City; a city that spans several
+    counties is several values, one group per county.
   - When the user names several values ("California and Texas"), use
     \`multi: true\` and give \`candidateGroups\`, one group per named value,
     so the client can answer on its own when each matches one stored value.
