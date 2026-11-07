@@ -13,6 +13,7 @@ type DiscoveryResult =
 type QueryWithRetriesParameters = {
   query: string;
   column: string;
+  candidateValues: readonly string[];
   resolveDiscovery: DiscoveryResolver;
   fallbackError: string;
   onAttempt: (attempt: number) => void;
@@ -43,6 +44,7 @@ async function _queryWithRetries(
     const result = await options.resolveDiscovery({
       query: options.query,
       column: options.column,
+      candidateValues: options.candidateValues,
     });
     if ("values" in result) {
       return result.values.length > 0
