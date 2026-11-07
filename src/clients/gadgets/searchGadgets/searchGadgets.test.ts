@@ -1,8 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { searchGadgets } from "@/clients/gadgets/searchGadgets/searchGadgets";
 
-const { rpcMock, throwOnErrorMock } = vi.hoisted(() => {
-  return { rpcMock: vi.fn(), throwOnErrorMock: vi.fn() };
+const { rpcMock, throwOnErrorMock, abortSignalMock } = vi.hoisted(() => {
+  return {
+    rpcMock: vi.fn(),
+    throwOnErrorMock: vi.fn(),
+    abortSignalMock: vi.fn(),
+  };
 });
 
 vi.mock("$/db/supabase/AvaSupabase.ts", () => {
@@ -33,7 +37,13 @@ function _mockRows(rows: unknown[]): void {
 beforeEach(() => {
   rpcMock.mockReset();
   throwOnErrorMock.mockReset();
-  rpcMock.mockReturnValue({ throwOnError: throwOnErrorMock });
+  abortSignalMock.mockReset();
+  const builder = {
+    throwOnError: throwOnErrorMock,
+    abortSignal: abortSignalMock,
+  };
+  abortSignalMock.mockReturnValue(builder);
+  rpcMock.mockReturnValue(builder);
 });
 
 describe("searchGadgets", () => {
@@ -45,6 +55,18 @@ describe("searchGadgets", () => {
       p_query: "cases",
       p_limit: 20,
     });
+  });
+
+  it("lets the caller abort the request with a signal", async () => {
+    _mockRows([]);
+    const controller = new AbortController();
+    await searchGadgets({
+      workspaceId: "w1",
+      query: "cases",
+      limit: 20,
+      signal: controller.signal,
+    });
+    expect(abortSignalMock).toHaveBeenCalledWith(controller.signal);
   });
 
   it("maps a tile row to a result with its ref and labels", async () => {

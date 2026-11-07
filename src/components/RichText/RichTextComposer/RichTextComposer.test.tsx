@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RICH_TEXT_MAX_TEXT_LENGTH } from "$/models/RichTextDocument/RichTextDocument";
 import { RichTextComposer } from "@/components/RichText/RichTextComposer/RichTextComposer";
 import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
@@ -33,9 +33,30 @@ vi.mock(
   },
 );
 
+// The gadget actions menu builds absolute links from the router, which a
+// composer rendered outside a `RouterProvider` does not have.
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@tanstack/react-router")>();
+  return {
+    ...actual,
+    useRouter: () => {
+      return {
+        buildLocation: () => {
+          return { href: "/nyc-doh/dashboards/preview/dashboard" };
+        },
+      };
+    },
+  };
+});
+
 beforeEach(() => {
   mocks.searchGadgets.mockReset();
   mocks.searchGadgets.mockResolvedValue([]);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 const DOCUMENT = {
@@ -532,6 +553,7 @@ describe("RichTextComposer gadget search", () => {
       workspaceId: WORKSPACE_ID,
       query: "meas",
       limit: 20,
+      signal: expect.any(AbortSignal),
     });
   });
 
@@ -576,20 +598,6 @@ describe("RichTextComposer gadget search", () => {
     expect(screen.getByText("Priya Natarajan")).toBeInTheDocument();
   });
 
-  it("never searches gadgets without a workspace", async () => {
-    _renderComposer({ initialContent: undefined });
-    act(() => {
-      _getEditor().commands.insertContent("@pri");
-    });
-    expect(await screen.findByText("Priya Natarajan")).toBeInTheDocument();
-    // Wait out the search pause so a scheduled search would have run.
-    await new Promise((resolve) => {
-      setTimeout(resolve, 300);
-    });
-    expect(mocks.searchGadgets).not.toHaveBeenCalled();
-    expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
-  });
-
   it("names the @ control for gadgets too when a workspace is given", () => {
     _renderComposer({ workspaceId: WORKSPACE_ID });
     expect(
@@ -597,5 +605,158 @@ describe("RichTextComposer gadget search", () => {
         name: "Mention a teammate or link a dashboard, dataset, or case",
       }),
     ).toBeInTheDocument();
+  });
+});
+
+type PendingSearch = {
+  params: { workspaceId: string; query: string; signal?: AbortSignal };
+  resolve: (results: GadgetSearchResult[]) => void;
+};
+
+const MEXICO_DASHBOARD: GadgetSearchResult = {
+  ...MEASLES_DASHBOARD,
+  ref: { ...MEASLES_DASHBOARD.ref, gadgetId: WORKSPACE_ID },
+  label: "Mexico imports",
+};
+
+/** Makes every gadget search wait until the test resolves it. */
+function _holdGadgetSearches(): PendingSearch[] {
+  const pendingSearches: PendingSearch[] = [];
+  mocks.searchGadgets.mockImplementation((params: PendingSearch["params"]) => {
+    return new Promise<GadgetSearchResult[]>((resolve) => {
+      pendingSearches.push({ params, resolve });
+    });
+  });
+  return pendingSearches;
+}
+
+/** Moves the faked clock and lets the editor and React settle. */
+async function _advanceTime(milliseconds: number): Promise<void> {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(milliseconds);
+  });
+}
+
+async function _type(text: string): Promise<void> {
+  act(() => {
+    _getEditor().commands.insertContent(text);
+  });
+  await _advanceTime(0);
+}
+
+/** Renders a composer with a workspace on a faked clock. */
+function _renderTimedComposer(
+  props: Partial<ComponentProps<typeof RichTextComposer>> = {},
+): void {
+  vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+  _renderComposer({
+    initialContent: undefined,
+    workspaceId: WORKSPACE_ID,
+    ...props,
+  });
+}
+
+describe("RichTextComposer gadget search timing", () => {
+  it("never searches gadgets without a workspace", async () => {
+    _renderTimedComposer({ workspaceId: undefined });
+    await _type("@pri");
+    expect(screen.getByText("Priya Natarajan")).toBeInTheDocument();
+    await _advanceTime(300);
+    expect(mocks.searchGadgets).not.toHaveBeenCalled();
+    expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+  });
+
+  it("searches once, for the last query, when typing faster than the pause", async () => {
+    _renderTimedComposer();
+    await _type("@m");
+    await _advanceTime(50);
+    await _type("e");
+    await _advanceTime(50);
+    await _type("a");
+    await _advanceTime(150);
+    expect(mocks.searchGadgets).toHaveBeenCalledTimes(1);
+    expect(mocks.searchGadgets).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, query: "mea" }),
+    );
+  });
+
+  it("keeps the last results shown while the next query is searched", async () => {
+    const pendingSearches = _holdGadgetSearches();
+    _renderTimedComposer();
+    await _type("@meas");
+    await _advanceTime(150);
+    await act(async () => {
+      pendingSearches[0]?.resolve([MEASLES_DASHBOARD]);
+    });
+    expect(screen.getByText("Measles by borough")).toBeInTheDocument();
+
+    await _type("l");
+    await _advanceTime(150);
+    expect(pendingSearches).toHaveLength(2);
+    expect(screen.getByText("Measles by borough")).toBeInTheDocument();
+    expect(screen.getByTestId("mention-menu-refreshing")).toBeInTheDocument();
+    expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+  });
+
+  it("ignores and aborts a search that a later query replaced", async () => {
+    const pendingSearches = _holdGadgetSearches();
+    _renderTimedComposer();
+    await _type("@me");
+    await _advanceTime(150);
+    await _type("a");
+    await _advanceTime(150);
+    const [staleSearch, latestSearch] = pendingSearches;
+    expect(staleSearch?.params.signal?.aborted).toBe(true);
+    await act(async () => {
+      latestSearch?.resolve([MEASLES_DASHBOARD]);
+    });
+    await act(async () => {
+      staleSearch?.resolve([MEXICO_DASHBOARD]);
+    });
+    expect(screen.getByText("Measles by borough")).toBeInTheDocument();
+    expect(screen.queryByText("Mexico imports")).not.toBeInTheDocument();
+  });
+
+  it("stays closed when a search finishes after Escape", async () => {
+    const consoleError = vi.spyOn(console, "error");
+    const pendingSearches = _holdGadgetSearches();
+    _renderTimedComposer();
+    await _type("@meas");
+    await _advanceTime(150);
+    fireEvent.keyDown(_getEditingArea(), { key: "Escape" });
+    await _advanceTime(0);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(pendingSearches[0]?.params.signal?.aborted).toBe(true);
+    await act(async () => {
+      pendingSearches[0]?.resolve([MEASLES_DASHBOARD]);
+    });
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.queryByText("Measles by borough")).not.toBeInTheDocument();
+    expect(consoleError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+});
+
+describe("RichTextComposer gadget insertion", () => {
+  it("swallows a space already after the query when linking", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(true);
+    mocks.searchGadgets.mockResolvedValue([MEASLES_DASHBOARD]);
+    _renderComposer({
+      onSubmit,
+      initialContent: _paragraphDocument("@meas more"),
+      workspaceId: WORKSPACE_ID,
+    });
+    act(() => {
+      // Put the caret right after "@meas", before the existing space.
+      _getEditor().commands.setTextSelection(6);
+    });
+    expect(await screen.findByText("Measles by borough")).toBeInTheDocument();
+    window.getSelection()?.selectAllChildren(_getEditingArea());
+    fireEvent.keyDown(_getEditingArea(), { key: "Enter" });
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    });
+    const [, plainText] = await _postAndGetCall(onSubmit);
+    expect(plainText).toBe("[dashboard] more");
   });
 });

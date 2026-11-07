@@ -3,6 +3,7 @@ import { forwardRef, useId } from "react";
 import { MentionMenuFooter } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter";
 import { MentionMenuGroups } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroups";
 import classes from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList.module.css";
+import { MentionMenuSearchStatus } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus";
 import { useMentionMenuNavigation } from "@/components/RichText/MentionMenu/MentionMenuList/useMentionMenuNavigation";
 import type { GadgetSearchResult } from "@/clients/gadgets/searchGadgets/searchGadgets";
 import type { MentionMenuGroup } from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
@@ -25,10 +26,13 @@ export type MentionMenuSelection =
 export type MentionMenuListProps = {
   groups: readonly MentionMenuGroup[];
 
-  /** The gadget search is in flight, so gadget groups show one status row. */
+  /**
+   * A gadget search is in flight. Gadgets from the last search stay shown
+   * meanwhile, or a searching row shows when there are none.
+   */
   isSearching: boolean;
 
-  /** The gadget search failed, so gadget groups show a retry message. */
+  /** The gadget search failed, so a retry message replaces the gadgets. */
   searchFailed: boolean;
   clientRect: (() => DOMRect | null) | null | undefined;
   command: (selection: MentionMenuSelection) => void;
@@ -57,6 +61,9 @@ export const MentionMenuList = forwardRef<
   const { visibleGroups, highlightedItem, buildOptionId, chooseItemById } =
     useMentionMenuNavigation(ref, { ...props, listboxId });
   const rect = props.clientRect?.() ?? null;
+  const hasGadgetGroups = visibleGroups.some((group) => {
+    return group.key !== "people";
+  });
 
   return (
     <div
@@ -77,11 +84,16 @@ export const MentionMenuList = forwardRef<
           <div />
         </Combobox.Target>
         <Combobox.Dropdown>
+          <MentionMenuSearchStatus
+            isSearching={props.isSearching}
+            searchFailed={props.searchFailed}
+            hasGadgetGroups={hasGadgetGroups}
+          />
           <MentionMenuGroups
             listboxId={listboxId}
             groups={visibleGroups}
             isSearching={props.isSearching}
-            searchFailed={props.searchFailed}
+            hasSearchStatus={props.isSearching || props.searchFailed}
             highlightedItemId={highlightedItem?.id}
             buildOptionId={buildOptionId}
           />

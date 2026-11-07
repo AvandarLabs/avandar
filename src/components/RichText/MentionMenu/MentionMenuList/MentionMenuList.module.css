@@ -49,6 +49,12 @@
   place-items: center;
 }
 
+.groupTitle {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+
 .status {
   color: var(--mantine-color-dimmed);
   font-size: var(--mantine-font-size-sm);

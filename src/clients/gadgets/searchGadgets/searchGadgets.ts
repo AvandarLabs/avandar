@@ -51,22 +51,25 @@ function _rowToResult(row: unknown): GadgetSearchResult | undefined {
  * Searches the workspace's gadgets the current user can read, most relevant
  * first. Use it to suggest gadgets to reference, for example while typing
  * after `@` in a comment. Rows that do not form a valid ref are dropped
- * rather than shown.
+ * rather than shown. Aborting `signal` cancels the request, for example
+ * when a newer query replaces it.
  */
 export async function searchGadgets(
   params: Readonly<{
     workspaceId: string;
     query: string;
     limit: number;
+    signal?: AbortSignal;
   }>,
 ): Promise<GadgetSearchResult[]> {
-  const { data } = await AvaSupabase.db()
-    .rpc("rpc_gadgets__search", {
-      p_workspace_id: params.workspaceId,
-      p_query: params.query,
-      p_limit: params.limit,
-    })
-    .throwOnError();
+  const request = AvaSupabase.db().rpc("rpc_gadgets__search", {
+    p_workspace_id: params.workspaceId,
+    p_query: params.query,
+    p_limit: params.limit,
+  });
+  const { data } = await (
+    params.signal ? request.abortSignal(params.signal) : request
+  ).throwOnError();
   return data.flatMap((row) => {
     const result = _rowToResult(row);
     return result === undefined ? [] : [result];

@@ -1,63 +1,44 @@
-import { msg } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import { Combobox } from "@mantine/core";
-import classes from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList.module.css";
+import { MentionMenuGroupTitle } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle";
 import { MentionMenuOption } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuOption";
-import type {
-  MentionMenuGroup,
-  MentionMenuGroupKey,
-} from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
-import type { MessageDescriptor } from "@lingui/core";
+import type { MentionMenuGroup } from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
 import type { ReactNode } from "react";
 
 type Props = {
   listboxId: string;
 
-  /** The groups to show, already without gadgets while a status shows. */
+  /** The groups to show, already without gadgets when the search failed. */
   groups: readonly MentionMenuGroup[];
+
+  /** A gadget search is in flight, so the listbox is busy. */
   isSearching: boolean;
-  searchFailed: boolean;
+
+  /** Some search status shows, so an empty list does not mean no matches. */
+  hasSearchStatus: boolean;
   highlightedItemId: string | undefined;
 
   /** Builds a row's DOM id, which the editing area points at. */
   buildOptionId: (itemId: string) => string;
 };
 
-const GROUP_TITLES: Readonly<Record<MentionMenuGroupKey, MessageDescriptor>> = {
-  dashboards: msg`Dashboards`,
-  datasets: msg`Datasets`,
-  maps: msg`Maps`,
-  caseTypes: msg`Case types`,
-  cases: msg`Cases`,
-  people: msg`People`,
-};
-
 /**
- * The listbox of `MentionMenuList`: one status row in place of the gadget
- * groups while the gadget search is in flight or has failed, then each
- * titled group of rows, or a note when nothing matches at all.
+ * The listbox of `MentionMenuList`: each titled group of rows, or a note
+ * when nothing matches at all. While a gadget search is in flight the
+ * listbox is busy and a small spinner sits beside the first gadget title.
  */
 export function MentionMenuGroups({
   listboxId,
   groups,
   isSearching,
-  searchFailed,
+  hasSearchStatus,
   highlightedItemId,
   buildOptionId,
 }: Props): ReactNode {
-  const { i18n } = useLingui();
-  const hasSearchStatus = isSearching || searchFailed;
+  const refreshingGroupKey =
+    isSearching && groups[0]?.key !== "people" ? groups[0]?.key : undefined;
   return (
-    <Combobox.Options id={listboxId}>
-      {hasSearchStatus ? (
-        <div className={classes.status} role="status">
-          {isSearching ? (
-            <Trans>Searching...</Trans>
-          ) : (
-            <Trans>Couldn't search. Keep typing to retry.</Trans>
-          )}
-        </div>
-      ) : null}
+    <Combobox.Options id={listboxId} aria-busy={isSearching}>
       {groups.length === 0 && !hasSearchStatus ? (
         <Combobox.Empty>
           <Trans>No matches</Trans>
@@ -67,7 +48,12 @@ export function MentionMenuGroups({
         return (
           <Combobox.Group
             key={group.key}
-            label={i18n._(GROUP_TITLES[group.key])}
+            label={
+              <MentionMenuGroupTitle
+                groupKey={group.key}
+                isRefreshing={group.key === refreshingGroupKey}
+              />
+            }
           >
             {group.items.map((item) => {
               return (

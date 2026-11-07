@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -20,14 +19,14 @@ import type { Ref } from "react";
 
 type KeyDownContext = {
   items: readonly MentionMenuItem[];
-  currentIndex: number;
-  highlightIndex: (index: number) => void;
+  highlightedId: string | undefined;
+  highlightId: (itemId: string) => void;
   command: (selection: MentionMenuSelection) => void;
 };
 
 type NavigationOptions = Pick<
   MentionMenuListProps,
-  "groups" | "isSearching" | "searchFailed" | "command" | "editingArea"
+  "groups" | "searchFailed" | "command" | "editingArea"
 > & { listboxId: string };
 
 type MentionMenuNavigation = {
@@ -39,6 +38,20 @@ type MentionMenuNavigation = {
   /** Inserts the row the author clicked, as a link when it is a gadget. */
   chooseItemById: (itemId: string) => void;
 };
+
+/**
+ * The index of the highlighted row: the row with `highlightedId`, or the
+ * first row when nothing is highlighted yet or that row went away.
+ */
+function _getHighlightedIndex(
+  items: readonly MentionMenuItem[],
+  highlightedId: string | undefined,
+): number {
+  const index = items.findIndex((item) => {
+    return item.id === highlightedId;
+  });
+  return index === -1 ? 0 : index;
+}
 
 function _buildSelection(
   item: MentionMenuItem,
@@ -81,8 +94,9 @@ function _onListKeyDown(
   event: KeyboardEvent,
   context: KeyDownContext,
 ): boolean {
-  const { items, currentIndex } = context;
+  const { items } = context;
   const isArrowKey = event.key === "ArrowDown" || event.key === "ArrowUp";
+  const currentIndex = _getHighlightedIndex(items, context.highlightedId);
   const currentItem = items[currentIndex];
   if (!currentItem) {
     // Nothing to move through, but the caret must not move either.
@@ -90,7 +104,10 @@ function _onListKeyDown(
   }
   if (isArrowKey) {
     const step = event.key === "ArrowDown" ? 1 : -1;
-    context.highlightIndex((items.length + currentIndex + step) % items.length);
+    const nextItem = items[(items.length + currentIndex + step) % items.length];
+    if (nextItem) {
+      context.highlightId(nextItem.id);
+    }
     return true;
   }
   const selection = _getSelectionFromKey(event, currentItem);
@@ -101,33 +118,34 @@ function _onListKeyDown(
 }
 
 /**
- * Keeps the highlight in React state rather than in the Combobox store's
- * DOM-based selection, which misses options the portal has not rendered
- * yet. The ref mirrors it so key presses arriving before a re-render still
- * see the latest index. The highlight goes back to the top when rows change.
+ * Keeps the highlight as a row id in React state rather than in the
+ * Combobox store's DOM-based selection, which misses options the portal has
+ * not rendered yet. Keying it by id keeps the author's row highlighted when
+ * gadget results arrive above it. The ref mirrors it so key presses arriving
+ * before a re-render still see the latest row.
  */
-function useHighlightedIndex(items: readonly MentionMenuItem[]) {
-  const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const highlightedIndexRef = useRef(0);
-  const highlightIndex = useCallback((index: number) => {
-    highlightedIndexRef.current = index;
-    setHighlightedIndex(index);
+function useHighlightedItem(items: readonly MentionMenuItem[]) {
+  const [highlightedId, setHighlightedId] = useState<string>();
+  const highlightedIdRef = useRef<string | undefined>(undefined);
+  const highlightId = useCallback((itemId: string) => {
+    highlightedIdRef.current = itemId;
+    setHighlightedId(itemId);
   }, []);
-  useEffect(() => {
-    highlightIndex(0);
-  }, [items, highlightIndex]);
-  return { highlightedIndex, highlightedIndexRef, highlightIndex };
+  const highlightedItem = items[_getHighlightedIndex(items, highlightedId)];
+  return { highlightedItem, highlightedIdRef, highlightId };
 }
 
 function useVisibleGroups(
-  options: Pick<NavigationOptions, "groups" | "isSearching" | "searchFailed">,
+  options: Pick<NavigationOptions, "groups" | "searchFailed">,
 ) {
-  const { groups, isSearching, searchFailed } = options;
+  const { groups, searchFailed } = options;
   const visibleGroups = useMemo(() => {
+    // A search in flight keeps the last gadgets on screen. Only a failed
+    // search hides them, behind its retry message.
     return groups.filter((group) => {
-      return group.key === "people" || !(isSearching || searchFailed);
+      return group.key === "people" || !searchFailed;
     });
-  }, [groups, isSearching, searchFailed]);
+  }, [groups, searchFailed]);
   const items = useMemo(() => {
     return visibleGroups.flatMap((group) => {
       return group.items;
@@ -147,9 +165,8 @@ export function useMentionMenuNavigation(
 ): MentionMenuNavigation {
   const { command, editingArea, listboxId } = options;
   const { visibleGroups, items } = useVisibleGroups(options);
-  const { highlightedIndex, highlightedIndexRef, highlightIndex } =
-    useHighlightedIndex(items);
-  const highlightedItem = items[highlightedIndex];
+  const { highlightedItem, highlightedIdRef, highlightId } =
+    useHighlightedItem(items);
   const buildOptionId = (itemId: string) => {
     return `${listboxId}-${itemId}`;
   };
@@ -163,13 +180,13 @@ export function useMentionMenuNavigation(
       onKeyDown: (event) => {
         return _onListKeyDown(event, {
           items,
-          currentIndex: highlightedIndexRef.current,
-          highlightIndex,
+          highlightedId: highlightedIdRef.current,
+          highlightId,
           command,
         });
       },
     };
-  }, [command, items, highlightIndex, highlightedIndexRef]);
+  }, [command, items, highlightId, highlightedIdRef]);
   const chooseItemById = (itemId: string) => {
     const chosenItem = items.find((item) => {
       return item.id === itemId;

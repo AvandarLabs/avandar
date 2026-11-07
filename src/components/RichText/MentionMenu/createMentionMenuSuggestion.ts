@@ -33,6 +33,18 @@ const IDLE_SEARCH: GadgetSearchState = {
 };
 
 /**
+ * The typed `@` query's range, plus the space right after it when there is
+ * one, so the space an insert adds is not doubled. TipTap's own mention
+ * command does the same.
+ */
+function _getQueryRangeWithSpace(editor: Editor, range: Range): Range {
+  const nodeAfter = editor.view.state.selection.$to.nodeAfter;
+  return nodeAfter?.text?.startsWith(" ")
+    ? { from: range.from, to: range.to + 1 }
+    : range;
+}
+
+/**
  * Inserts what the author chose, in place of the typed `@` query: a member
  * as a mention followed by a space, or a gadget as a link or an embed. An
  * embed that cannot go at the cursor is inserted as a link instead.
@@ -44,15 +56,13 @@ function _insertSelection(
     selection: MentionMenuSelection;
   }>,
 ): void {
-  const { editor, range, selection } = options;
+  const { editor, selection } = options;
+  const queryRange = _getQueryRangeWithSpace(editor, options.range);
   if (selection.kind === "person") {
-    // Swallow a space already after the query, as TipTap's mention does.
-    const nodeAfter = editor.view.state.selection.$to.nodeAfter;
-    const to = nodeAfter?.text?.startsWith(" ") ? range.to + 1 : range.to;
     editor
       .chain()
       .focus()
-      .insertContentAt({ from: range.from, to }, [
+      .insertContentAt(queryRange, [
         { type: "userMention", attrs: { id: selection.candidate.userId } },
         { type: "text", text: " " },
       ])
@@ -61,44 +71,62 @@ function _insertSelection(
     return;
   }
   const { ref } = selection.result;
-  const canEmbed =
-    selection.display === "embed" &&
-    editor.can().chain().deleteRange(range).insertGadgetEmbed(ref).run();
-  const chain = editor.chain().focus().deleteRange(range);
-  (canEmbed ? chain.insertGadgetEmbed(ref) : chain.insertGadgetLink(ref)).run();
+  editor
+    .chain()
+    .focus()
+    .deleteRange(queryRange)
+    .command(({ commands }) => {
+      return selection.display === "embed"
+        ? commands.insertGadgetEmbed(ref) || commands.insertGadgetLink(ref)
+        : commands.insertGadgetLink(ref);
+    })
+    .run();
 }
 
 /**
  * Runs one gadget search for `query` after the debounce pause, reporting
- * each state through `onChange`: searching at once, then the results or a
- * failure. Returns a cancel function, after which nothing more is reported.
+ * each state through `onChange`: searching at once, keeping `previous`
+ * results on screen meanwhile, then the new results or a failure. Returns a
+ * cancel function that aborts the request, after which nothing more is
+ * reported.
  */
 function _startGadgetSearch(
   options: Readonly<{
     workspaceId: string;
     query: string;
+    previous: GadgetSearchState;
     onChange: (state: GadgetSearchState) => void;
   }>,
 ): () => void {
   const { workspaceId, query, onChange } = options;
-  let isCancelled = false;
-  onChange({ gadgets: [], isSearching: true, searchFailed: false });
+  const controller = new AbortController();
+  // A failed search carries no gadgets, so nothing stale comes back here.
+  onChange({
+    gadgets: options.previous.gadgets,
+    isSearching: true,
+    searchFailed: false,
+  });
   const timeoutId = setTimeout(() => {
-    searchGadgets({ workspaceId, query, limit: GADGET_SEARCH_LIMIT }).then(
+    void searchGadgets({
+      workspaceId,
+      query,
+      limit: GADGET_SEARCH_LIMIT,
+      signal: controller.signal,
+    }).then(
       (gadgets) => {
-        if (!isCancelled) {
+        if (!controller.signal.aborted) {
           onChange({ gadgets, isSearching: false, searchFailed: false });
         }
       },
       () => {
-        if (!isCancelled) {
+        if (!controller.signal.aborted) {
           onChange({ gadgets: [], isSearching: false, searchFailed: true });
         }
       },
     );
   }, GADGET_SEARCH_DEBOUNCE_MS);
   return () => {
-    isCancelled = true;
+    controller.abort();
     clearTimeout(timeoutId);
   };
 }
@@ -123,27 +151,53 @@ function _buildListProps(
 }
 
 /**
- * The gadget search behind one open `@` menu. `restart` cancels any search
- * in flight and starts one for the new query, or reports idle when no
- * workspace is known. `cancel` stops reporting, for when the menu closes.
+ * The gadget search behind the `@` menu. `restart` searches for a new query,
+ * cancelling any search in flight, and does nothing when neither the query
+ * nor the workspace changed (the caret only moved). Without a workspace it
+ * reports idle. `cancel` aborts and forgets everything, for when the menu
+ * closes.
  */
 function _createGadgetSearchSession(
   getWorkspaceId: () => string | undefined,
   onChange: (state: GadgetSearchState) => void,
 ) {
+  let state = IDLE_SEARCH;
+  let lastSearch: { workspaceId?: string; query?: string } = {};
   let cancelSearch = () => {};
+  const report = (nextState: GadgetSearchState) => {
+    state = nextState;
+    onChange(nextState);
+  };
   return {
+    getState: () => {
+      return state;
+    },
     restart: (query: string) => {
-      cancelSearch();
       const workspaceId = getWorkspaceId();
-      if (workspaceId) {
-        cancelSearch = _startGadgetSearch({ workspaceId, query, onChange });
-      } else {
-        onChange(IDLE_SEARCH);
+      if (
+        workspaceId === lastSearch.workspaceId &&
+        query === lastSearch.query
+      ) {
+        return;
       }
+      lastSearch = { workspaceId, query };
+      cancelSearch();
+      cancelSearch = () => {};
+      if (!workspaceId) {
+        report(IDLE_SEARCH);
+        return;
+      }
+      cancelSearch = _startGadgetSearch({
+        workspaceId,
+        query,
+        previous: state,
+        onChange: report,
+      });
     },
     cancel: () => {
       cancelSearch();
+      lastSearch = {};
+      state = IDLE_SEARCH;
     },
   };
 }
@@ -158,19 +212,20 @@ function _createMentionMenuRenderer(getWorkspaceId: () => string | undefined) {
     | ReactRenderer<MentionMenuListHandle, MentionMenuListProps>
     | undefined;
   let latestProps: SuggestionProps<MentionCandidate> | undefined;
-  let search = IDLE_SEARCH;
-  const gadgetSearch = _createGadgetSearchSession(getWorkspaceId, (state) => {
-    search = state;
+  const rerender = () => {
     if (latestProps) {
-      renderer?.updateProps(_buildListProps(latestProps, search));
+      renderer?.updateProps(
+        _buildListProps(latestProps, gadgetSearch.getState()),
+      );
     }
-  });
+  };
+  const gadgetSearch = _createGadgetSearchSession(getWorkspaceId, rerender);
 
   return {
     onStart: (props: SuggestionProps<MentionCandidate>) => {
       latestProps = props;
       renderer = new ReactRenderer(MentionMenuList, {
-        props: _buildListProps(props, search),
+        props: _buildListProps(props, gadgetSearch.getState()),
         editor: props.editor,
       });
       document.body.appendChild(renderer.element);
@@ -178,6 +233,7 @@ function _createMentionMenuRenderer(getWorkspaceId: () => string | undefined) {
     },
     onUpdate: (props: SuggestionProps<MentionCandidate>) => {
       latestProps = props;
+      rerender();
       gadgetSearch.restart(props.query);
     },
     // The suggestion plugin closes the list on Escape itself, by calling
@@ -187,7 +243,6 @@ function _createMentionMenuRenderer(getWorkspaceId: () => string | undefined) {
     },
     onExit: () => {
       gadgetSearch.cancel();
-      search = IDLE_SEARCH;
       latestProps = undefined;
       renderer?.element.remove();
       renderer?.destroy();

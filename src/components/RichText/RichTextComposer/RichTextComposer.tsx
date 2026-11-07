@@ -91,9 +91,8 @@ function _getPlainTextLength(
 /**
  * The rich text editor used to write and edit comments: markdown shortcuts,
  * markdown paste, an `@` menu of workspace members and gadgets to link or
- * embed, and Mod-Enter to
- * submit. While a submit is in flight the text is read-only, so nothing
- * typed during the save is lost when it clears.
+ * embed, and Mod-Enter to submit. While a submit is in flight the text is
+ * read-only, so nothing typed during the save is lost when it clears.
  */
 export function RichTextComposer({
   label,

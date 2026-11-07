@@ -81,6 +81,18 @@ describe("buildMentionMenuGroups", () => {
     expect(new Set(ids).size).toBe(3);
   });
 
+  it("shows at most five people", () => {
+    const people = Array.from({ length: 8 }, (_, index) => {
+      return {
+        userId: String(index),
+        displayName: `Person ${index}`,
+        email: `p${index}@example.org`,
+      };
+    });
+    const [peopleGroup] = buildMentionMenuGroups({ gadgets: [], people });
+    expect(peopleGroup?.items).toHaveLength(5);
+  });
+
   it("returns no groups when nothing matches", () => {
     expect(buildMentionMenuGroups({ gadgets: [], people: [] })).toEqual([]);
   });
