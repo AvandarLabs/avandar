@@ -30,7 +30,7 @@ async function _createEngine(): Promise<EtlEngineInstance> {
     createHdxHttpClient({ baseUrl: HDX_BASE_URL }),
   );
   return createHdxEtlEngine({
-    ...getPipelineEtlDestination(),
+    ...getPipelineEtlDestination({ isRecordingDrives: true }),
     discovery,
     drives: listHdxDrives(config),
     mapper,

@@ -33,7 +33,7 @@ async function _createEngine(): Promise<EtlEngineInstance> {
     }),
   );
   return createSocrataEtlEngine({
-    ...getPipelineEtlDestination(),
+    ...getPipelineEtlDestination({ isRecordingDrives: true }),
     discovery,
     drives: listConfiguredDrives(config),
     mapper,
