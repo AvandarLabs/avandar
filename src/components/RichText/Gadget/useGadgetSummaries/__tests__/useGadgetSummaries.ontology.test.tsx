@@ -3,7 +3,7 @@
  * so each case controls exactly what the lookups return.
  */
 import { describe, expect, it } from "vitest";
-import { useGadgetSummariesTestFixtures } from "./useGadgetSummariesTestFixtures";
+import { GadgetSummariesTestFixtures } from "./useGadgetSummariesTestFixtures";
 
 const {
   useConceptSummary,
@@ -19,7 +19,7 @@ const {
   _ref,
   _renderSummary,
   _factPairs,
-} = useGadgetSummariesTestFixtures;
+} = GadgetSummariesTestFixtures;
 
 describe("useConceptSummary", () => {
   it("summarizes a case type with its record and field counts", () => {
@@ -53,6 +53,18 @@ describe("useConceptSummary", () => {
     expect(mocks.useConceptAttributeCount).toHaveBeenCalledWith(
       expect.objectContaining({ where: { concept_id: { eq: CONCEPT_ID } } }),
     );
+  });
+
+  it("is unavailable for a case type in another workspace", () => {
+    mocks.useConceptById.mockReturnValue([
+      { id: CONCEPT_ID, workspaceId: OTHER_WORKSPACE_ID, name: "Measles case" },
+      false,
+    ]);
+    mocks.useIndividualCount.mockReturnValue([38, false]);
+    mocks.useConceptAttributeCount.mockReturnValue([6, false]);
+    expect(
+      _renderSummary(useConceptSummary, _ref("concept", CONCEPT_ID)),
+    ).toEqual({ status: "unavailable" });
   });
 
   it("is loading while the record count is fetched", () => {

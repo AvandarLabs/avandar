@@ -3,7 +3,7 @@
  * so each case controls exactly what the lookups return.
  */
 import { describe, expect, it } from "vitest";
-import { useGadgetSummariesTestFixtures } from "./useGadgetSummariesTestFixtures";
+import { GadgetSummariesTestFixtures } from "./useGadgetSummariesTestFixtures";
 
 const {
   useDatasetSummary,
@@ -19,7 +19,7 @@ const {
   _ref,
   _renderSummary,
   _factPairs,
-} = useGadgetSummariesTestFixtures;
+} = GadgetSummariesTestFixtures;
 
 describe("useDatasetSummary", () => {
   it("summarizes a dataset with its source and column count", () => {
@@ -147,5 +147,21 @@ describe("useMapSummary", () => {
       ["Layers", "3"],
       ["Updated", UPDATED_LABEL],
     ]);
+  });
+
+  it("is unavailable for a map in another workspace", () => {
+    mocks.useMapById.mockReturnValue([
+      {
+        id: MAP_ID,
+        workspaceId: OTHER_WORKSPACE_ID,
+        name: "Exposure sites",
+        updatedAt: UPDATED_AT,
+        config: { layers: [{}, {}, {}] },
+      },
+      false,
+    ]);
+    expect(_renderSummary(useMapSummary, _ref("map", MAP_ID))).toEqual({
+      status: "unavailable",
+    });
   });
 });

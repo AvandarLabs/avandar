@@ -1,6 +1,8 @@
 /**
- * Tests for the per-type gadget summary hooks. Every client hook is mocked,
- * so each case controls exactly what the lookups return.
+ * Shared fixtures for the gadget summary hook tests: the mocked client
+ * hooks, the ids and sample dashboard they return, and helpers that render a
+ * summary hook and read its facts. Importing this file also resets the
+ * mocks before each test.
  */
 import { formatDate } from "@avandar/utils";
 import { beforeEach, vi } from "vitest";
@@ -162,7 +164,7 @@ beforeEach(() => {
   });
 });
 
-export const useGadgetSummariesTestFixtures = {
+export const GadgetSummariesTestFixtures = {
   useConceptSummary,
   useDashboardSummary,
   useDashboardTileSummary,

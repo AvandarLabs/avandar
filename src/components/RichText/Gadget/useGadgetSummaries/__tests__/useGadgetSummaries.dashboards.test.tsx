@@ -3,7 +3,7 @@
  * so each case controls exactly what the lookups return.
  */
 import { describe, expect, it } from "vitest";
-import { useGadgetSummariesTestFixtures } from "./useGadgetSummariesTestFixtures";
+import { GadgetSummariesTestFixtures } from "./useGadgetSummariesTestFixtures";
 
 const {
   useDashboardSummary,
@@ -16,7 +16,7 @@ const {
   _ref,
   _renderSummary,
   _factPairs,
-} = useGadgetSummariesTestFixtures;
+} = GadgetSummariesTestFixtures;
 
 describe("useDashboardSummary", () => {
   it("summarizes a dashboard that the reader can open", () => {
