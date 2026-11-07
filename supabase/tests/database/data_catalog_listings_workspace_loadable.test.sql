@@ -79,7 +79,7 @@ select col_is_null(
 
 select lives_ok(
   $$insert into public.data_catalog_listings
-      (id, display_name, external_organization_name, access_kind, api_service,
+      (id, display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format,
        is_workspace_loadable, source_asset_type, source_url,
        date_column_type_last_verified)
@@ -93,7 +93,7 @@ select lives_ok(
 
 select throws_ok(
   $$insert into public.data_catalog_listings
-      (display_name, external_organization_name, access_kind, api_service,
+      (display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format,
        is_workspace_loadable)
     values ('no format', 'Fixture Org', 'api_resource', 'socrata',
@@ -130,7 +130,7 @@ select lives_ok(
           'pipeline_name', 'pgtap-fixture-pipeline',
           'pipeline_run_id', 'run-1',
           'display_name', 'a pdf',
-          'external_organization_name', 'Fixture Org',
+          'organization1_name', 'Fixture Org',
           'external_dataset_id', 'pgtap-fixture-pdf',
           'date_of_last_sync', '2026-10-22T00:00:00Z',
           'api_service', 'socrata',
@@ -164,7 +164,7 @@ select lives_ok(
           'pipeline_name', 'pgtap-fixture-pipeline',
           'pipeline_run_id', 'run-2',
           'display_name', 'a pdf',
-          'external_organization_name', 'Fixture Org',
+          'organization1_name', 'Fixture Org',
           'external_dataset_id', 'pgtap-fixture-pdf',
           'date_of_last_sync', '2026-10-23T00:00:00Z',
           'api_service', 'socrata',

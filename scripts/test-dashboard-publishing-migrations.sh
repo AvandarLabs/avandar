@@ -47,3 +47,11 @@ run_migration_replay \
   "$repo_root/supabase/migration-upgrade-tests/pipeline_scope_seed.prelude.sql" \
   "$repo_root/supabase/migrations/20261021211630_seed_pipeline_scope_keys_and_checkpoints.sql" \
   "$repo_root/supabase/migration-upgrade-tests/pipeline_scope_seed.assertions.sql"
+
+# Catalog field mapping: renaming `external_organization_name` to
+# `organization1_name` keeps every listing's organization, and the rebuilt
+# search finds a listing by it.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/catalog_field_mapping.prelude.sql" \
+  "$repo_root/supabase/migrations/20261107000129_catalog_field_mapping.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/catalog_field_mapping.assertions.sql"

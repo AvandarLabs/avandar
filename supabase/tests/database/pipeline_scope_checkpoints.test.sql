@@ -80,7 +80,7 @@ select trigger_is(
 -- ---------------------------------------------------------------------------
 
 insert into public.data_catalog_listings
-  (display_name, external_organization_name, access_kind, api_service,
+  (display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format)
 values
   ('pgtap-fixture scope keys', 'Fixture Org', 'api_resource', 'ckan',

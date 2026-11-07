@@ -9,7 +9,7 @@ begin;
 set search_path to extensions, public;
 
 insert into public.data_catalog_listings
-  (id, display_name, external_organization_name, access_kind, api_service,
+  (id, display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format,
    pipeline_name, pipeline_run_id, pipeline_scope_keys, cached_object_path,
    cached_source_version, cached_at)
@@ -39,7 +39,7 @@ create function pg_temp.api_listing (
       'pipeline_name', 'pgtap-fixture-pipeline',
       'pipeline_run_id', 'run-2',
       'display_name', p_display_name,
-      'external_organization_name', 'Fixture Org',
+      'organization1_name', 'Fixture Org',
       'external_dataset_id', p_dataset_id,
       'date_of_last_sync', '2026-10-22T00:00:00Z',
       'api_service', 'ckan',
@@ -205,7 +205,7 @@ select is(
           'pipeline_name', 'pgtap-fixture-pipeline',
           'pipeline_run_id', 'run-2',
           'display_name', 'parquet',
-          'external_organization_name', 'Fixture Org',
+          'organization1_name', 'Fixture Org',
           'parquet_file_name', 'pgtap-fixture.parquet'
         ),
         'relation_columns', pg_temp.one_column('p')

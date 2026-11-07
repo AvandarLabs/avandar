@@ -47,7 +47,7 @@ values (
 );
 
 insert into public.data_catalog_listings
-  (id, display_name, external_organization_name, access_kind, api_service,
+  (id, display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format,
    pipeline_name, pipeline_run_id, pipeline_scope_keys)
 values
@@ -87,7 +87,7 @@ values
 -- A `pipeline_parquet` listing has no `api_base_url`, so it belongs to no
 -- drive: only a prune of every drive reaches it, and it is never listed.
 insert into public.data_catalog_listings
-  (id, display_name, external_organization_name, access_kind,
+  (id, display_name, organization1_name, access_kind,
    parquet_file_name, pipeline_name, pipeline_run_id, pipeline_scope_keys)
 values
   ('e7004008-0000-4000-8000-000000000008'::uuid, 'parquet', 'Fixture Org',

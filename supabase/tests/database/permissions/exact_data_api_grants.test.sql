@@ -34,6 +34,7 @@ with public_tables as (
       'comment_mentions',
       'comment_revisions',
       'comments',
+      'data_catalog_drives',
       'data_catalog_listings__relation_columns',
       'data_catalog_listings',
       'db_connections',
@@ -88,6 +89,7 @@ with public_tables as (
     table_name in (
       'activity_events',
       'comment_mentions',
+      'data_catalog_drives',
       'data_catalog_listings__relation_columns',
       'data_catalog_listings',
       'db_connections',

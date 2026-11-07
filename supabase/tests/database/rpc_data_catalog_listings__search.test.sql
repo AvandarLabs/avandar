@@ -8,7 +8,7 @@ begin;
 set search_path to extensions, public;
 
 insert into public.data_catalog_listings
-  (id, display_name, external_organization_name, description,
+  (id, display_name, organization1_name, description,
    parquet_file_name, pipeline_name, pipeline_run_id)
 values
   ('e9006001-0000-4000-8000-000000000001'::uuid,
@@ -101,7 +101,7 @@ select results_eq(
 select ok(
   has_function_privilege(
     'authenticated',
-    'public.rpc_data_catalog_listings__search(text, integer, integer)',
+    'public.rpc_data_catalog_listings__search(text, integer, integer, text[], text[], text[], text[])',
     'execute'
   ),
   'a signed-in user may search the catalog'
@@ -110,7 +110,7 @@ select ok(
 select ok(
   not has_function_privilege(
     'anon',
-    'public.rpc_data_catalog_listings__search(text, integer, integer)',
+    'public.rpc_data_catalog_listings__search(text, integer, integer, text[], text[], text[], text[])',
     'execute'
   ),
   'a signed-out visitor may not search the catalog'

@@ -349,7 +349,7 @@ select results_eq(
 -- The pipeline's catalog: two prebuilt listings (one with two columns) and
 -- one API listing with unverified column types.
 insert into public.data_catalog_listings
-  (id, display_name, external_organization_name, access_kind,
+  (id, display_name, organization1_name, access_kind,
    parquet_file_name, pipeline_name, pipeline_run_id,
    date_column_type_last_verified)
 values
@@ -361,7 +361,7 @@ values
    now());
 
 insert into public.data_catalog_listings
-  (id, display_name, external_organization_name, access_kind, api_service,
+  (id, display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format,
    pipeline_name)
 values

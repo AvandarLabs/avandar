@@ -5,7 +5,7 @@
 begin;
 
 insert into public.data_catalog_listings
-  (display_name, external_organization_name, access_kind, api_service,
+  (display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format)
 values
   ('pgtap-fixture socrata', 'City of New York', 'api_resource', 'socrata',
@@ -21,7 +21,7 @@ values
 -- A Socrata API listing a pipeline already claimed: the backfill must keep its
 -- `pipeline_name` instead of overwriting it.
 insert into public.data_catalog_listings
-  (display_name, external_organization_name, access_kind, api_service,
+  (display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format,
    pipeline_name, pipeline_run_id)
 values
@@ -31,7 +31,7 @@ values
    'run-1');
 
 insert into public.data_catalog_listings
-  (display_name, external_organization_name, parquet_file_name,
+  (display_name, organization1_name, parquet_file_name,
    pipeline_name, pipeline_run_id)
 values
   ('pgtap-fixture parquet', 'World Bank', 'pgtap-fixture-backfill.parquet',
