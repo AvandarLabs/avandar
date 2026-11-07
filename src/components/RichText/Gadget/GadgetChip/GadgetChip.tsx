@@ -10,18 +10,11 @@ import type { ReactNode } from "react";
 
 type Props = { gadgetRef: Gadget.Ref };
 
-/**
- * An inline reference to a gadget inside rich text: the gadget's icon and
- * name, linking to it. Shows a skeleton while the gadget loads and a locked
- * "Unavailable" chip when the reader cannot open it. Use it wherever a
- * gadget link node is drawn, such as a comment being written or read.
- */
-export function GadgetChip({ gadgetRef }: Props): ReactNode {
-  const { i18n, t } = useLingui();
-  const { Icon, noun, useGadgetSummary } =
-    GADGET_REGISTRY[gadgetRef.gadgetType];
-  const summary = useGadgetSummary(gadgetRef);
-  const nounLabel = i18n._(noun);
+function GadgetChipContent({ gadgetRef }: Props): ReactNode {
+  const { i18n } = useLingui();
+  const definition = GADGET_REGISTRY[gadgetRef.gadgetType];
+  const summary = definition.useGadgetSummary(gadgetRef, { withFacts: false });
+  const { Icon } = definition;
   // The editor parses a chip back into a node from these attributes.
   const refAttributes = {
     "data-type": "gadgetLink",
@@ -45,7 +38,9 @@ export function GadgetChip({ gadgetRef }: Props): ReactNode {
         className={clsx(classes.chip, classes.unavailable)}
       >
         <IconLock size={13} aria-hidden className={classes.icon} />
-        <span className={classes.label}>{t`Unavailable ${nounLabel}`}</span>
+        <span className={classes.label}>
+          {i18n._(definition.unavailableLabel)}
+        </span>
       </span>
     );
   }
@@ -53,7 +48,18 @@ export function GadgetChip({ gadgetRef }: Props): ReactNode {
     <span {...refAttributes} className={classes.chip} aria-busy="true">
       <Icon size={13} aria-hidden className={classes.icon} />
       <span className={classes.skeleton} aria-hidden />
-      <VisuallyHidden>{t`Loading ${nounLabel}`}</VisuallyHidden>
+      <VisuallyHidden>{i18n._(definition.loadingLabel)}</VisuallyHidden>
     </span>
   );
+}
+
+/**
+ * An inline reference to a gadget inside rich text: the gadget's icon and
+ * name, linking to it. Shows a skeleton while the gadget loads and a locked
+ * "Unavailable" chip when the reader cannot open it. Use it wherever a
+ * gadget link node is drawn, such as a comment being written or read.
+ */
+export function GadgetChip({ gadgetRef }: Props): ReactNode {
+  // Each type calls different hooks, so a type change in place remounts.
+  return <GadgetChipContent key={gadgetRef.gadgetType} gadgetRef={gadgetRef} />;
 }

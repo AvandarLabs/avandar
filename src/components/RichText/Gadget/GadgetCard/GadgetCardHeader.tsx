@@ -13,7 +13,7 @@ type Props = {
   definition: GadgetDefinition;
   summary: GadgetSummary;
 
-  /** The id the card's region is labelled by, set on the title. */
+  /** The id the card's group is labelled by, set on the title. */
   titleId: string;
   menu: ReactNode;
 };
@@ -23,12 +23,11 @@ function GadgetCardTitle({
   summary,
   titleId,
 }: Omit<Props, "menu">): ReactNode {
-  const { i18n, t } = useLingui();
-  const nounLabel = i18n._(definition.noun);
+  const { i18n } = useLingui();
   if (summary.status === "unavailable") {
     return (
       <span id={titleId} className={classes.unavailableName}>
-        {t`Unavailable ${nounLabel}`}
+        {i18n._(definition.unavailableLabel)}
       </span>
     );
   }
@@ -40,10 +39,10 @@ function GadgetCardTitle({
         </span>
       ) : (
         <>
-          <VisuallyHidden
-            id={titleId}
-          >{t`Loading ${nounLabel}`}</VisuallyHidden>
-          <Skeleton className={classes.nameSkeleton} />
+          <VisuallyHidden id={titleId}>
+            {i18n._(definition.loadingLabel)}
+          </VisuallyHidden>
+          <Skeleton h={14} w={160} className={classes.nameSkeleton} />
         </>
       )}
       <span className={classes.kind}>{i18n._(definition.label)}</span>
@@ -83,7 +82,7 @@ export function GadgetCardHeader({
           className={classes.openLink}
         >
           {t`Open`}
-          <IconArrowRight size={13} aria-hidden />
+          <IconArrowRight size={13} aria-hidden className={classes.openArrow} />
         </Link>
       ) : null}
     </div>

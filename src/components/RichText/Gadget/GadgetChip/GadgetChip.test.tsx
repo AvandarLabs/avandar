@@ -5,7 +5,7 @@ import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { ReactNode } from "react";
 
 const mocks = vi.hoisted(() => {
-  return { useDashboardSummary: vi.fn() };
+  return { useDashboardSummary: vi.fn(), useDashboardTileSummary: vi.fn() };
 });
 
 vi.mock(
@@ -16,7 +16,7 @@ vi.mock(
     };
     return {
       useDashboardSummary: mocks.useDashboardSummary,
-      useDashboardTileSummary: unavailable,
+      useDashboardTileSummary: mocks.useDashboardTileSummary,
       useDatasetSummary: unavailable,
       useMapSummary: unavailable,
       useConceptSummary: unavailable,
@@ -25,6 +25,8 @@ vi.mock(
   },
 );
 
+// Renders the link target into `href`, so a test can assert params and
+// search without a router.
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const { createElement } = await import("react");
   const actual =
@@ -34,32 +36,45 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
     Link: ({
       children,
       to,
-      params: _params,
-      search: _search,
+      params = {},
+      search,
       ...rest
     }: {
       children: ReactNode;
       to: string;
-      params?: unknown;
-      search?: unknown;
+      params?: Record<string, string>;
+      search?: Record<string, string>;
     }) => {
-      return createElement("a", { href: to, ...rest }, children);
+      const path = Object.entries(params).reduce((href, [name, value]) => {
+        return href.replace(`$${name}`, value);
+      }, to);
+      const query = search ? `?${new URLSearchParams(search).toString()}` : "";
+      return createElement("a", { href: `${path}${query}`, ...rest }, children);
     },
   };
 });
 
+const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111";
+
 const DASHBOARD_REF: Gadget.Ref = {
   gadgetType: "dashboard",
-  gadgetId: "11111111-1111-4111-8111-111111111111",
+  gadgetId: DASHBOARD_ID,
   subId: null,
+};
+
+const TILE_REF: Gadget.Ref = {
+  gadgetType: "dashboard_tile",
+  gadgetId: DASHBOARD_ID,
+  subId: "DataViz-top",
 };
 
 beforeEach(() => {
   mocks.useDashboardSummary.mockReset();
+  mocks.useDashboardTileSummary.mockReset();
 });
 
 describe("GadgetChip", () => {
-  it("labels the loading skeleton with the gadget's noun", () => {
+  it("labels the loading skeleton with the gadget's type", () => {
     mocks.useDashboardSummary.mockReturnValue({ status: "loading" });
     render(<GadgetChip gadgetRef={DASHBOARD_REF} />);
     expect(
@@ -75,19 +90,42 @@ describe("GadgetChip", () => {
       facts: [],
       link: {
         to: "/$workspaceSlug/dashboards/preview/$dashboardId",
-        params: {
-          workspaceSlug: "nyc-doh",
-          dashboardId: DASHBOARD_REF.gadgetId,
-        },
+        params: { workspaceSlug: "nyc-doh", dashboardId: DASHBOARD_ID },
       },
     });
     render(<GadgetChip gadgetRef={DASHBOARD_REF} />);
     const link = screen.getByRole("link", { name: "Measles by borough" });
     expect(link).toHaveAttribute(
       "href",
-      "/$workspaceSlug/dashboards/preview/$dashboardId",
+      `/nyc-doh/dashboards/preview/${DASHBOARD_ID}`,
     );
     expect(link.querySelector(".tabler-icon-layout-dashboard")).not.toBeNull();
+  });
+
+  it("links a tile chip to its tile on the dashboard", () => {
+    mocks.useDashboardTileSummary.mockReturnValue({
+      status: "available",
+      name: "Weekly cases",
+      facts: [],
+      link: {
+        to: "/$workspaceSlug/dashboards/preview/$dashboardId",
+        params: { workspaceSlug: "nyc-doh", dashboardId: DASHBOARD_ID },
+        search: { tile: "DataViz-top" },
+      },
+    });
+    render(<GadgetChip gadgetRef={TILE_REF} />);
+    expect(screen.getByRole("link", { name: "Weekly cases" })).toHaveAttribute(
+      "href",
+      `/nyc-doh/dashboards/preview/${DASHBOARD_ID}?tile=DataViz-top`,
+    );
+  });
+
+  it("asks for a summary without facts", () => {
+    mocks.useDashboardSummary.mockReturnValue({ status: "loading" });
+    render(<GadgetChip gadgetRef={DASHBOARD_REF} />);
+    expect(mocks.useDashboardSummary).toHaveBeenCalledWith(DASHBOARD_REF, {
+      withFacts: false,
+    });
   });
 
   it("shows an unavailable gadget as locked text without a link", () => {
@@ -101,13 +139,14 @@ describe("GadgetChip", () => {
   });
 
   it("carries the ref as data attributes for the editor to parse", () => {
-    mocks.useDashboardSummary.mockReturnValue({ status: "unavailable" });
-    render(<GadgetChip gadgetRef={DASHBOARD_REF} />);
+    mocks.useDashboardTileSummary.mockReturnValue({ status: "unavailable" });
+    render(<GadgetChip gadgetRef={TILE_REF} />);
     const chip = screen
-      .getByText("Unavailable dashboard")
+      .getByText("Unavailable dashboard tile")
       .closest("[data-type]");
     expect(chip).toHaveAttribute("data-type", "gadgetLink");
-    expect(chip).toHaveAttribute("data-gadget-type", "dashboard");
-    expect(chip).toHaveAttribute("data-gadget-id", DASHBOARD_REF.gadgetId);
+    expect(chip).toHaveAttribute("data-gadget-type", "dashboard_tile");
+    expect(chip).toHaveAttribute("data-gadget-id", DASHBOARD_ID);
+    expect(chip).toHaveAttribute("data-sub-id", "DataViz-top");
   });
 });

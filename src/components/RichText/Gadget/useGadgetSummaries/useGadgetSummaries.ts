@@ -28,6 +28,7 @@ import type {
   GadgetFact,
   GadgetLinkTarget,
   GadgetSummary,
+  GadgetSummaryOptions,
 } from "@/components/RichText/Gadget/gadgetRegistry/gadgetRegistry";
 import type { MessageDescriptor } from "@lingui/core";
 
@@ -76,7 +77,10 @@ function _buildChartFacts(
  * Summarizes a dashboard for a gadget chip or card: its tile count, who can
  * see it, and when it last changed. Opens in the dashboard preview.
  */
-export function useDashboardSummary(ref: Gadget.Ref): GadgetSummary {
+export function useDashboardSummary(
+  ref: Gadget.Ref,
+  { withFacts }: GadgetSummaryOptions,
+): GadgetSummary {
   const { i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const [dashboard, isLoading] = DashboardClient.useGetById({
@@ -91,17 +95,19 @@ export function useDashboardSummary(ref: Gadget.Ref): GadgetSummary {
   return {
     status: "available",
     name: dashboard.name,
-    facts: [
-      {
-        label: msg`Tiles`,
-        value: String(countDashboardTiles(dashboard.config)),
-      },
-      {
-        label: msg`Audience`,
-        value: i18n._(AUDIENCE_LABELS[dashboard.visibility]),
-      },
-      _buildUpdatedFact(dashboard.updatedAt),
-    ],
+    facts: withFacts
+      ? [
+          {
+            label: msg`Tiles`,
+            value: String(countDashboardTiles(dashboard.config)),
+          },
+          {
+            label: msg`Audience`,
+            value: i18n._(AUDIENCE_LABELS[dashboard.visibility]),
+          },
+          _buildUpdatedFact(dashboard.updatedAt),
+        ]
+      : [],
     link: _buildDashboardLink({
       workspaceSlug: workspace.slug,
       dashboardId: dashboard.id,
@@ -114,7 +120,10 @@ export function useDashboardSummary(ref: Gadget.Ref): GadgetSummary {
  * its prompt. Unavailable when the dashboard no longer holds the tile. Opens
  * the dashboard preview scrolled to the tile.
  */
-export function useDashboardTileSummary(ref: Gadget.Ref): GadgetSummary {
+export function useDashboardTileSummary(
+  ref: Gadget.Ref,
+  { withFacts }: GadgetSummaryOptions,
+): GadgetSummary {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [dashboard, isLoading] = DashboardClient.useGetById({
@@ -133,11 +142,13 @@ export function useDashboardTileSummary(ref: Gadget.Ref): GadgetSummary {
   return {
     status: "available",
     name: tile.prompt ?? t`Untitled chart`,
-    facts: [
-      { label: msg`Dashboard`, value: dashboard.name },
-      ..._buildChartFacts(tile.vizType),
-      _buildUpdatedFact(dashboard.updatedAt),
-    ],
+    facts: withFacts
+      ? [
+          { label: msg`Dashboard`, value: dashboard.name },
+          ..._buildChartFacts(tile.vizType),
+          _buildUpdatedFact(dashboard.updatedAt),
+        ]
+      : [],
     link: _buildDashboardLink({
       workspaceSlug: workspace.slug,
       dashboardId: dashboard.id,
@@ -150,7 +161,10 @@ export function useDashboardTileSummary(ref: Gadget.Ref): GadgetSummary {
  * Summarizes a dataset for a gadget chip or card: where it came from, how
  * many columns it has, and when it last changed. Opens in Data Sources.
  */
-export function useDatasetSummary(ref: Gadget.Ref): GadgetSummary {
+export function useDatasetSummary(
+  ref: Gadget.Ref,
+  { withFacts }: GadgetSummaryOptions,
+): GadgetSummary {
   const workspace = useCurrentWorkspace();
   const sourceLabels = useDatasetSourceLabels();
   const [dataset, isLoadingDataset] = DatasetClient.useGetById({
@@ -158,6 +172,7 @@ export function useDatasetSummary(ref: Gadget.Ref): GadgetSummary {
   });
   const [columnCount, isLoadingColumns] = DatasetColumnClient.useGetCount({
     where: { dataset_id: { eq: ref.gadgetId } },
+    useQueryOptions: { enabled: withFacts },
   });
   if (isLoadingDataset || isLoadingColumns) {
     return { status: "loading" };
@@ -173,11 +188,13 @@ export function useDatasetSummary(ref: Gadget.Ref): GadgetSummary {
   return {
     status: "available",
     name: dataset.name,
-    facts: [
-      { label: msg`Source`, value: sourceLabels[dataset.sourceType] },
-      { label: msg`Columns`, value: String(columnCount ?? 0) },
-      _buildUpdatedFact(dataset.updatedAt),
-    ],
+    facts: withFacts
+      ? [
+          { label: msg`Source`, value: sourceLabels[dataset.sourceType] },
+          { label: msg`Columns`, value: String(columnCount ?? 0) },
+          _buildUpdatedFact(dataset.updatedAt),
+        ]
+      : [],
     link: { to: appLink.to, params: appLink.params },
   };
 }
@@ -186,7 +203,10 @@ export function useDatasetSummary(ref: Gadget.Ref): GadgetSummary {
  * Summarizes a map for a gadget chip or card: its layer count and when it
  * last changed. Opens in the map editor.
  */
-export function useMapSummary(ref: Gadget.Ref): GadgetSummary {
+export function useMapSummary(
+  ref: Gadget.Ref,
+  { withFacts }: GadgetSummaryOptions,
+): GadgetSummary {
   const workspace = useCurrentWorkspace();
   const [map, isLoading] = AvaMapClient.useGetById({
     id: ref.gadgetId as AvaMap.Id,
@@ -204,10 +224,12 @@ export function useMapSummary(ref: Gadget.Ref): GadgetSummary {
   return {
     status: "available",
     name: map.name,
-    facts: [
-      { label: msg`Layers`, value: String(map.config.layers.length) },
-      _buildUpdatedFact(map.updatedAt),
-    ],
+    facts: withFacts
+      ? [
+          { label: msg`Layers`, value: String(map.config.layers.length) },
+          _buildUpdatedFact(map.updatedAt),
+        ]
+      : [],
     link: { to: appLink.to, params: appLink.params },
   };
 }
@@ -216,16 +238,21 @@ export function useMapSummary(ref: Gadget.Ref): GadgetSummary {
  * Summarizes a case type for a gadget chip or card: how many cases and how
  * many fields it has. Opens the case type's list of cases.
  */
-export function useConceptSummary(ref: Gadget.Ref): GadgetSummary {
+export function useConceptSummary(
+  ref: Gadget.Ref,
+  { withFacts }: GadgetSummaryOptions,
+): GadgetSummary {
   const workspace = useCurrentWorkspace();
   const [concept, isLoadingConcept] = ConceptClient.useGetById({
     id: ref.gadgetId as Concept.Id,
   });
   const [recordCount, isLoadingRecords] = IndividualClient.useGetCount({
     where: { concept_id: { eq: ref.gadgetId } },
+    useQueryOptions: { enabled: withFacts },
   });
   const [fieldCount, isLoadingFields] = ConceptAttributeClient.useGetCount({
     where: { concept_id: { eq: ref.gadgetId } },
+    useQueryOptions: { enabled: withFacts },
   });
   if (isLoadingConcept || isLoadingRecords || isLoadingFields) {
     return { status: "loading" };
@@ -241,26 +268,31 @@ export function useConceptSummary(ref: Gadget.Ref): GadgetSummary {
   return {
     status: "available",
     name: concept.name,
-    facts: [
-      { label: msg`Records`, value: String(recordCount ?? 0) },
-      { label: msg`Fields`, value: String(fieldCount ?? 0) },
-    ],
+    facts: withFacts
+      ? [
+          { label: msg`Records`, value: String(recordCount ?? 0) },
+          { label: msg`Fields`, value: String(fieldCount ?? 0) },
+        ]
+      : [],
     link: { to: appLink.to, params: appLink.params },
   };
 }
 
 /**
- * Summarizes a case for a gadget chip or card: its status, its case type,
- * and when it last changed. Opens the case's page.
+ * Summarizes a case for a gadget chip or card: its case type and when it
+ * last changed. Opens the case's page.
  */
-export function useIndividualSummary(ref: Gadget.Ref): GadgetSummary {
+export function useIndividualSummary(
+  ref: Gadget.Ref,
+  { withFacts }: GadgetSummaryOptions,
+): GadgetSummary {
   const workspace = useCurrentWorkspace();
   const [individual, isLoadingIndividual] = IndividualClient.useGetById({
     id: ref.gadgetId as Individual.Id,
   });
   const [concept, isLoadingConcept] = ConceptClient.useGetById({
     id: individual?.conceptId,
-    useQueryOptions: { enabled: individual !== undefined },
+    useQueryOptions: { enabled: withFacts && individual !== undefined },
   });
   if (isLoadingIndividual || isLoadingConcept) {
     return { status: "loading" };
@@ -277,11 +309,12 @@ export function useIndividualSummary(ref: Gadget.Ref): GadgetSummary {
   return {
     status: "available",
     name: individual.name,
-    facts: [
-      { label: msg`Status`, value: individual.status },
-      ...(concept ? [{ label: msg`Case type`, value: concept.name }] : []),
-      _buildUpdatedFact(individual.updatedAt),
-    ],
+    facts: withFacts
+      ? [
+          ...(concept ? [{ label: msg`Case type`, value: concept.name }] : []),
+          _buildUpdatedFact(individual.updatedAt),
+        ]
+      : [],
     link: { to: appLink.to, params: appLink.params },
   };
 }

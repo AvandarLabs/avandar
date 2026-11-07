@@ -29,7 +29,7 @@ export function GadgetCardBody({ summary }: Props): ReactNode {
       <div className={classes.body}>
         <div className={classes.facts}>
           {SKELETON_FACT_KEYS.map((key) => {
-            return <Skeleton key={key} className={classes.factSkeleton} />;
+            return <Skeleton key={key} h={34} />;
           })}
         </div>
       </div>

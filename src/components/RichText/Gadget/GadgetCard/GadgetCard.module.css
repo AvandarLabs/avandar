@@ -54,8 +54,6 @@
 
 .nameSkeleton {
   align-self: center;
-  block-size: 14px;
-  inline-size: 160px;
 }
 
 .kind {
@@ -89,10 +87,6 @@
   overflow-wrap: anywhere;
 }
 
-.factSkeleton {
-  block-size: 34px;
-}
-
 .unavailableText {
   color: var(--mantine-color-dimmed);
   font-size: var(--mantine-font-size-sm);
@@ -116,6 +110,10 @@
 
 .openLink:hover {
   background-color: var(--mantine-color-primary-0);
+}
+
+.openArrow:dir(rtl) {
+  transform: scaleX(-1);
 }
 
 .openLink:focus-visible {

@@ -17,6 +17,7 @@ import { i18n } from "@/i18n/i18n";
 import { renderHook, TestProviders } from "@/test-utils";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type {
+  GadgetDefinition,
   GadgetFact,
   GadgetSummary,
 } from "@/components/RichText/Gadget/gadgetRegistry/gadgetRegistry";
@@ -98,6 +99,10 @@ const DASHBOARD_CONFIG = {
             type: "DataViz",
             props: { id: "DataViz-nested", nlQuery: {}, vizType: "bar" },
           },
+          {
+            type: "DataViz",
+            props: { id: "DataViz-future", vizType: "sankey" },
+          },
         ],
       },
     },
@@ -122,12 +127,13 @@ function _ref(
 }
 
 function _renderSummary(
-  useSummary: (ref: Gadget.Ref) => GadgetSummary,
+  useSummary: GadgetDefinition["useGadgetSummary"],
   ref: Gadget.Ref,
+  options: { withFacts: boolean } = { withFacts: true },
 ): GadgetSummary {
   return renderHook(
     () => {
-      return useSummary(ref);
+      return useSummary(ref, options);
     },
     { wrapper: TestProviders },
   ).result.current;
@@ -166,7 +172,7 @@ describe("useDashboardSummary", () => {
       },
     });
     expect(_factPairs(summary)).toEqual([
-      ["Tiles", "2"],
+      ["Tiles", "3"],
       ["Audience", "Workspace"],
       ["Updated", UPDATED_LABEL],
     ]);
@@ -222,6 +228,28 @@ describe("useDashboardTileSummary", () => {
     });
   });
 
+  it("omits the Chart fact for a viz type this build does not know", () => {
+    mocks.useDashboardById.mockReturnValue([DASHBOARD, false]);
+    const summary = _renderSummary(
+      useDashboardTileSummary,
+      _ref("dashboard_tile", DASHBOARD_ID, "DataViz-future"),
+    );
+    expect(_factPairs(summary)).toEqual([
+      ["Dashboard", "Measles by borough"],
+      ["Updated", UPDATED_LABEL],
+    ]);
+  });
+
+  it("is unavailable when the ref names no tile", () => {
+    mocks.useDashboardById.mockReturnValue([DASHBOARD, false]);
+    expect(
+      _renderSummary(
+        useDashboardTileSummary,
+        _ref("dashboard_tile", DASHBOARD_ID, null),
+      ),
+    ).toEqual({ status: "unavailable" });
+  });
+
   it("is unavailable when the dashboard no longer holds the tile", () => {
     mocks.useDashboardById.mockReturnValue([DASHBOARD, false]);
     expect(
@@ -266,6 +294,34 @@ describe("useDatasetSummary", () => {
     ]);
     expect(mocks.useDatasetColumnCount).toHaveBeenCalledWith(
       expect.objectContaining({ where: { dataset_id: { eq: DATASET_ID } } }),
+    );
+  });
+
+  it("is unavailable when no dataset row comes back", () => {
+    mocks.useDatasetColumnCount.mockReturnValue([0, false]);
+    expect(
+      _renderSummary(useDatasetSummary, _ref("dataset", DATASET_ID)),
+    ).toEqual({ status: "unavailable" });
+  });
+
+  it("skips the column count when facts are not needed", () => {
+    mocks.useDatasetById.mockReturnValue([
+      {
+        id: DATASET_ID,
+        name: "Borough boundaries",
+        sourceType: "csv_file",
+        updatedAt: UPDATED_AT,
+      },
+      false,
+    ]);
+    const summary = _renderSummary(
+      useDatasetSummary,
+      _ref("dataset", DATASET_ID),
+      { withFacts: false },
+    );
+    expect(summary).toMatchObject({ status: "available", facts: [] });
+    expect(mocks.useDatasetColumnCount).toHaveBeenCalledWith(
+      expect.objectContaining({ useQueryOptions: { enabled: false } }),
     );
   });
 
@@ -342,15 +398,44 @@ describe("useConceptSummary", () => {
       expect.objectContaining({ where: { concept_id: { eq: CONCEPT_ID } } }),
     );
   });
+
+  it("is loading while the record count is fetched", () => {
+    mocks.useConceptById.mockReturnValue([
+      { id: CONCEPT_ID, name: "Measles case" },
+      false,
+    ]);
+    mocks.useIndividualCount.mockReturnValue([undefined, true]);
+    expect(
+      _renderSummary(useConceptSummary, _ref("concept", CONCEPT_ID)),
+    ).toEqual({ status: "loading" });
+  });
+
+  it("skips both counts when facts are not needed", () => {
+    mocks.useConceptById.mockReturnValue([
+      { id: CONCEPT_ID, name: "Measles case" },
+      false,
+    ]);
+    const summary = _renderSummary(
+      useConceptSummary,
+      _ref("concept", CONCEPT_ID),
+      { withFacts: false },
+    );
+    expect(summary).toMatchObject({ status: "available", facts: [] });
+    expect(mocks.useIndividualCount).toHaveBeenCalledWith(
+      expect.objectContaining({ useQueryOptions: { enabled: false } }),
+    );
+    expect(mocks.useConceptAttributeCount).toHaveBeenCalledWith(
+      expect.objectContaining({ useQueryOptions: { enabled: false } }),
+    );
+  });
 });
 
 describe("useIndividualSummary", () => {
-  it("summarizes a case with its status and case type", () => {
+  it("summarizes a case with its case type", () => {
     mocks.useIndividualById.mockReturnValue([
       {
         id: INDIVIDUAL_ID,
         name: "Amara Okafor",
-        status: "Suspected",
         conceptId: CONCEPT_ID,
         updatedAt: UPDATED_AT,
       },
@@ -376,10 +461,60 @@ describe("useIndividualSummary", () => {
       link: { to: appLink.to, params: appLink.params },
     });
     expect(_factPairs(summary)).toEqual([
-      ["Status", "Suspected"],
       ["Case type", "Measles case"],
       ["Updated", UPDATED_LABEL],
     ]);
+  });
+
+  it("omits the Case type fact when the case type cannot be read", () => {
+    mocks.useIndividualById.mockReturnValue([
+      {
+        id: INDIVIDUAL_ID,
+        name: "Amara Okafor",
+        conceptId: CONCEPT_ID,
+        updatedAt: UPDATED_AT,
+      },
+      false,
+    ]);
+    const summary = _renderSummary(
+      useIndividualSummary,
+      _ref("individual", INDIVIDUAL_ID),
+    );
+    expect(_factPairs(summary)).toEqual([["Updated", UPDATED_LABEL]]);
+  });
+
+  it("is loading while the case's case type is fetched", () => {
+    mocks.useIndividualById.mockReturnValue([
+      {
+        id: INDIVIDUAL_ID,
+        name: "Amara Okafor",
+        conceptId: CONCEPT_ID,
+        updatedAt: UPDATED_AT,
+      },
+      false,
+    ]);
+    mocks.useConceptById.mockReturnValue([undefined, true]);
+    expect(
+      _renderSummary(useIndividualSummary, _ref("individual", INDIVIDUAL_ID)),
+    ).toEqual({ status: "loading" });
+  });
+
+  it("skips the case type lookup when facts are not needed", () => {
+    mocks.useIndividualById.mockReturnValue([
+      {
+        id: INDIVIDUAL_ID,
+        name: "Amara Okafor",
+        conceptId: CONCEPT_ID,
+        updatedAt: UPDATED_AT,
+      },
+      false,
+    ]);
+    _renderSummary(useIndividualSummary, _ref("individual", INDIVIDUAL_ID), {
+      withFacts: false,
+    });
+    expect(mocks.useConceptById).toHaveBeenCalledWith(
+      expect.objectContaining({ useQueryOptions: { enabled: false } }),
+    );
   });
 
   it("is unavailable when no case row comes back", () => {

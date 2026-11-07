@@ -26,6 +26,8 @@ vi.mock(
   },
 );
 
+// Renders the link target into `href`, so a test can assert params and
+// search without a router.
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const { createElement } = await import("react");
   const actual =
@@ -35,16 +37,20 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
     Link: ({
       children,
       to,
-      params: _params,
-      search: _search,
+      params = {},
+      search,
       ...rest
     }: {
       children: ReactNode;
       to: string;
-      params?: unknown;
-      search?: unknown;
+      params?: Record<string, string>;
+      search?: Record<string, string>;
     }) => {
-      return createElement("a", { href: to, ...rest }, children);
+      const path = Object.entries(params).reduce((href, [name, value]) => {
+        return href.replace(`$${name}`, value);
+      }, to);
+      const query = search ? `?${new URLSearchParams(search).toString()}` : "";
+      return createElement("a", { href: `${path}${query}`, ...rest }, children);
     },
   };
 });
@@ -84,7 +90,7 @@ describe("GadgetCard", () => {
   it("titles an available card with the gadget's name and type", () => {
     mocks.useDashboardSummary.mockReturnValue(AVAILABLE_DASHBOARD);
     render(<GadgetCard gadgetRef={DASHBOARD_REF} />);
-    const card = screen.getByRole("region", { name: "Measles by borough" });
+    const card = screen.getByRole("group", { name: "Measles by borough" });
     expect(within(card).getByText("Dashboard")).toBeInTheDocument();
     expect(card.querySelector(".tabler-icon-layout-dashboard")).not.toBeNull();
   });
@@ -98,7 +104,7 @@ describe("GadgetCard", () => {
     expect(openLink).toHaveTextContent("Open");
     expect(openLink).toHaveAttribute(
       "href",
-      "/$workspaceSlug/dashboards/preview/$dashboardId",
+      `/nyc-doh/dashboards/preview/${DASHBOARD_REF.gadgetId}`,
     );
   });
 
@@ -118,7 +124,7 @@ describe("GadgetCard", () => {
   it("explains an unavailable gadget without naming or linking it", () => {
     mocks.useDatasetSummary.mockReturnValue({ status: "unavailable" });
     render(<GadgetCard gadgetRef={DATASET_REF} />);
-    const card = screen.getByRole("region", { name: "Unavailable dataset" });
+    const card = screen.getByRole("group", { name: "Unavailable dataset" });
     expect(
       within(card).getByText(
         "It may have been deleted, or you don't have access. Ask the comment's author to share it.",
@@ -131,12 +137,20 @@ describe("GadgetCard", () => {
   it("shows header and fact skeletons while the gadget loads", () => {
     mocks.useDashboardSummary.mockReturnValue({ status: "loading" });
     const { container } = render(<GadgetCard gadgetRef={DASHBOARD_REF} />);
-    const card = screen.getByRole("region", { name: "Loading dashboard" });
+    const card = screen.getByRole("group", { name: "Loading dashboard" });
     expect(card).toHaveAttribute("aria-busy", "true");
     expect(container.querySelectorAll(".mantine-Skeleton-root")).toHaveLength(
       4,
     );
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
+
+  it("asks for a summary with facts", () => {
+    mocks.useDashboardSummary.mockReturnValue({ status: "loading" });
+    render(<GadgetCard gadgetRef={DASHBOARD_REF} />);
+    expect(mocks.useDashboardSummary).toHaveBeenCalledWith(DASHBOARD_REF, {
+      withFacts: true,
+    });
   });
 
   it("renders the menu it is given in the header", () => {

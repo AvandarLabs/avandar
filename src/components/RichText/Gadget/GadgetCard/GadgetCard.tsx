@@ -13,19 +13,14 @@ type Props = {
   menu?: ReactNode;
 };
 
-/**
- * A gadget embedded in rich text as a framed card: a header band with the
- * gadget's icon, name, type, and an Open link, over a body of key facts.
- * Shows skeletons while the gadget loads and an explanation when the reader
- * cannot open it. Use it wherever a gadget embed node is drawn, such as a
- * comment being written or read.
- */
-export function GadgetCard({ gadgetRef, menu }: Props): ReactNode {
+function GadgetCardContent({ gadgetRef, menu }: Props): ReactNode {
   const definition = GADGET_REGISTRY[gadgetRef.gadgetType];
-  const summary = definition.useGadgetSummary(gadgetRef);
+  const summary = definition.useGadgetSummary(gadgetRef, { withFacts: true });
   const titleId = useId();
+  // A group rather than a section, so a feed of cards is not a landmark each.
   return (
-    <section
+    <div
+      role="group"
       aria-labelledby={titleId}
       aria-busy={summary.status === "loading" ? true : undefined}
       className={classes.card}
@@ -37,6 +32,24 @@ export function GadgetCard({ gadgetRef, menu }: Props): ReactNode {
         menu={menu}
       />
       <GadgetCardBody summary={summary} />
-    </section>
+    </div>
+  );
+}
+
+/**
+ * A gadget embedded in rich text as a framed card: a header band with the
+ * gadget's icon, name, type, and an Open link, over a body of key facts.
+ * Shows skeletons while the gadget loads and an explanation when the reader
+ * cannot open it. Use it wherever a gadget embed node is drawn, such as a
+ * comment being written or read.
+ */
+export function GadgetCard({ gadgetRef, menu }: Props): ReactNode {
+  // Each type calls different hooks, so a type change in place remounts.
+  return (
+    <GadgetCardContent
+      key={gadgetRef.gadgetType}
+      gadgetRef={gadgetRef}
+      menu={menu}
+    />
   );
 }
