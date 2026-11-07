@@ -1,4 +1,4 @@
-import { formatDate, propEq } from "@avandar/utils";
+import { propEq } from "@avandar/utils";
 import { BarChart as MantineBarChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { Label } from "recharts";
@@ -6,6 +6,7 @@ import { useBarChartStyleProps } from "@/lib/ui/viz/axis/useBarChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
+import { formatQueryResultDate } from "@/lib/ui/viz/formatQueryResultDate/formatQueryResultDate";
 import type { BarSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { BarProps } from "recharts";
@@ -48,7 +49,7 @@ export function BarChart({
     return {
       padding: X_AXIS_PADDING,
       tickFormatter: (value: unknown) => {
-        return formatDate(value, { format: dateFormat, zone: timezone });
+        return formatQueryResultDate(value, { format: dateFormat, timezone });
       },
     };
   }, [isDateAxis, dateFormat, timezone]);
@@ -59,7 +60,7 @@ export function BarChart({
     }
     return {
       labelFormatter: (label: unknown) => {
-        return formatDate(label, { format: dateFormat, zone: timezone });
+        return formatQueryResultDate(label, { format: dateFormat, timezone });
       },
     };
   }, [isDateAxis, dateFormat, timezone]);
