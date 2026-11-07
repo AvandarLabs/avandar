@@ -10,12 +10,19 @@ const NAMED_ENTITIES: Readonly<Record<string, string>> = {
 const LINK_PATTERN =
   /<a\b[^>]*\bhref\s*=\s*["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi;
 
+/** The code point as text, or `entity` as written when it is no character. */
+function _fromCodePoint(codePoint: number, entity: string): string {
+  const isCharacter =
+    Number.isInteger(codePoint) && codePoint >= 0 && codePoint <= 0x10ffff;
+  return isCharacter ? String.fromCodePoint(codePoint) : entity;
+}
+
 function _decodeEntity(entity: string, code: string): string {
   if (/^#x/i.test(code)) {
-    return String.fromCodePoint(Number.parseInt(code.slice(2), 16));
+    return _fromCodePoint(Number.parseInt(code.slice(2), 16), entity);
   }
   if (code.startsWith("#")) {
-    return String.fromCodePoint(Number(code.slice(1)));
+    return _fromCodePoint(Number(code.slice(1)), entity);
   }
   return NAMED_ENTITIES[code.toLowerCase()] ?? entity;
 }
@@ -23,7 +30,9 @@ function _decodeEntity(entity: string, code: string): string {
 function _replaceLinks(html: string): string {
   return html.replace(LINK_PATTERN, (_link, href: string, inner: string) => {
     const linkText = inner.replace(/<[^>]*>/g, "").trim();
-    return linkText === "" || linkText === href ? href : `${linkText} (${href})`;
+    return linkText === "" || linkText === href
+      ? href
+      : `${linkText} (${href})`;
   });
 }
 

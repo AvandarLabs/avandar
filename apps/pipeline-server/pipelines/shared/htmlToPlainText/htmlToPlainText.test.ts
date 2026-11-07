@@ -26,4 +26,11 @@ describe("htmlToPlainText", () => {
       htmlToPlainText("Already plain."),
     ]).toEqual(["Fish & Chips' <menu> now", "Already plain."]);
   });
+
+  it("leaves an out-of-range numeric entity as written", () => {
+    expect([
+      htmlToPlainText("Bad &#99999999; and &#x110000; stay"),
+      htmlToPlainText("Fine &#65; &#x42;"),
+    ]).toEqual(["Bad &#99999999; and &#x110000; stay", "Fine A B"]);
+  });
 });

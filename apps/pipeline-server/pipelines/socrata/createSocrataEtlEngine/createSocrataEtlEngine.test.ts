@@ -333,33 +333,36 @@ describe("createSocrataEtlEngine", () => {
 
   it("skips a result whose organization1_name maps to nothing, with a warning", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const listings = createInMemoryListingsStore();
-    const engine = createSocrataEtlEngine({
-      output: OUTPUT,
-      discovery: _discoveryOver(_catalog(1)),
-      drives: [DRIVE],
-      mapper: await loadCatalogFieldMapper({
-        config: {
-          fields: { organization1_name: { from: "missing.path" } },
-          drives: [{ baseUrl: DRIVE.baseUrl }],
+    try {
+      const listings = createInMemoryListingsStore();
+      const engine = createSocrataEtlEngine({
+        output: OUTPUT,
+        discovery: _discoveryOver(_catalog(1)),
+        drives: [DRIVE],
+        mapper: await loadCatalogFieldMapper({
+          config: {
+            fields: { organization1_name: { from: "missing.path" } },
+            drives: [{ baseUrl: DRIVE.baseUrl }],
+          },
+          configDir: "/",
+        }),
+        stores: {
+          listings,
+          objects: undefined,
+          checkpoints: createInMemoryCheckpointStore(),
         },
-        configDir: "/",
-      }),
-      stores: {
-        listings,
-        objects: undefined,
-        checkpoints: createInMemoryCheckpointStore(),
-      },
-    });
+      });
 
-    await engine.run({ mode: "full" });
+      await engine.run({ mode: "full" });
 
-    expect(listings.getRows()).toEqual([]);
-    expect(warn).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "skipped ds-0: organization1_name mapped to nothing",
-      ),
-    );
-    warn.mockRestore();
+      expect(listings.getRows()).toEqual([]);
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "skipped ds-0: organization1_name mapped to nothing",
+        ),
+      );
+    } finally {
+      warn.mockRestore();
+    }
   });
 });
