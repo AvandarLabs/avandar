@@ -6,10 +6,12 @@ import {
   Button,
   Drawer,
   Group,
+  Loader,
   Skeleton,
   Stack,
   Text,
 } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
 import { IconWorldSearch } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useState } from "react";
@@ -29,14 +31,19 @@ import { isColumnTypeVerificationDue } from "@/lib/openData/verifyOpenDataColumn
 import { Logger } from "@/utils/Logger";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOpenDataDatasetColumnInputs";
-import { EMPTY_CATALOG_LISTING_FILTERS } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
+import {
+  EMPTY_CATALOG_FACETS,
+  EMPTY_CATALOG_LISTING_FILTERS,
+  resolveCatalogSortBy,
+} from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
 import { DataCatalogFilterRail } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail";
 import { DataCatalogListingDetail } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail";
 import { DataCatalogListingList } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList";
 import { DataCatalogResultsHeader } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
 import { readCatalogColumnsForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/readCatalogColumnsForAdding/readCatalogColumnsForAdding";
-import { useDisplayedCatalogListings } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDisplayedCatalogListings";
+import { useDataCatalogFacets } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogFacets";
+import { useDataCatalogSearch } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogSearch";
 import {
   useColumnTypeVerificationStatus,
   useVerifyColumnTypesOnDwell,
@@ -143,7 +150,8 @@ type Props = BoxProps & {
 
 /**
  * Browse the public open-data catalog, narrow it, inspect a dataset, and add
- * it to the current workspace.
+ * it to the current workspace. Postgres searches, filters, sorts, and counts
+ * the catalog, and the results load a page at a time as the list scrolls.
  *
  * Three panes fill whatever height the host gives the catalog: filters,
  * results, and the selected dataset. They are regions of one surface split
@@ -166,10 +174,20 @@ export function DataCatalogView({
   );
   const [chosenSortBy, setChosenSortBy] = useState<CatalogSortBy>();
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | undefined>();
+  const [selectedId, setSelectedId] = useState<
+    DataCatalogListing.Id | undefined
+  >();
+  const [debouncedSearch] = useDebouncedValue(search.trim(), 150);
+  const isSearching = debouncedSearch !== "";
+  const sortBy = resolveCatalogSortBy({ chosenSortBy, isSearching });
 
-  const [catalogListings = [], isLoadingCatalog] =
-    DataCatalogListingClient.useGetAll({});
+  const catalogSearch = useDataCatalogSearch({
+    query: debouncedSearch,
+    filters,
+    sortBy,
+  });
+  const facets = useDataCatalogFacets({ query: debouncedSearch, filters });
+  const isLoadingCatalog = catalogSearch.isLoading;
 
   const [catalogListingColumns = [], isLoadingCatalogColumns] =
     DataCatalogRelationColumnClient.useGetAll({
@@ -179,22 +197,23 @@ export function DataCatalogView({
       },
     });
 
-  const { displayedListings, facets, sortBy, isSearching } =
-    useDisplayedCatalogListings({
-      listings: catalogListings,
-      search,
-      filters,
-      chosenSortBy,
+  // A selection the current results do not show is not shown, so the detail
+  // never describes a dataset the list no longer contains.
+  const isSelectionShown =
+    selectedId !== undefined &&
+    catalogSearch.listings.some((listing) => {
+      return listing.id === selectedId;
     });
-
-  // A selection the current filters hide is not shown, so the detail never
-  // describes a dataset the results no longer contain.
-  const selectedListing: DataCatalogListingRead | undefined =
-    selectedId === undefined
-      ? undefined
-      : displayedListings.find((listing) => {
-          return listing.id === selectedId;
-        });
+  const [fetchedListing, isLoadingSelectedListing] =
+    DataCatalogListingClient.useGetById({
+      id: selectedId,
+      useQueryOptions: {
+        enabled: selectedId !== undefined,
+      },
+    });
+  const selectedListing: DataCatalogListingRead | undefined = isSelectionShown
+    ? fetchedListing
+    : undefined;
 
   useVerifyColumnTypesOnDwell({
     listing: selectedListing,
@@ -306,7 +325,7 @@ export function DataCatalogView({
   // asks the user to pick from an empty list. The activation state replaces
   // all of it and carries the one move that does something, which is telling
   // us what to publish next. Same rule the no-datasets route follows.
-  if (!isLoadingCatalog && catalogListings.length === 0) {
+  if (facets !== undefined && facets.numCatalogListings === 0) {
     return (
       <Box {...boxProps}>
         <AppSlateEmptyState
@@ -339,13 +358,13 @@ export function DataCatalogView({
       showingUnloadable: t`Including datasets that can't be loaded`,
     },
   });
-  const hasNoMatches = !isLoadingCatalog && displayedListings.length === 0;
+  const hasNoMatches = !isLoadingCatalog && catalogSearch.listings.length === 0;
   const filterRail = (
     <DataCatalogFilterRail
       search={search}
       onSearchChange={setSearch}
       filters={filters}
-      facets={facets}
+      facets={facets ?? EMPTY_CATALOG_FACETS}
       onFiltersChange={setFilters}
     />
   );
@@ -355,7 +374,7 @@ export function DataCatalogView({
       <div
         className={clsx(
           css.dataCatalogViewBrowser,
-          selectedListing && css.dataCatalogViewBrowserIsDetailOpen,
+          isSelectionShown && css.dataCatalogViewBrowserIsDetailOpen,
           hasNoMatches && css.dataCatalogViewBrowserHasNoMatches,
         )}
       >
@@ -365,9 +384,13 @@ export function DataCatalogView({
 
         <section className={css.dataCatalogViewResults} aria-label={t`Results`}>
           <DataCatalogResultsHeader
-            numResults={displayedListings.length}
-            numCatalogListings={catalogListings.length}
-            isNarrowed={isSearching || activeFilters.length > 0}
+            numResults={catalogSearch.totalCount}
+            numCatalogListings={facets?.numCatalogListings ?? 0}
+            // "X of Y" waits for the catalog's size, which the facet counts
+            // carry, rather than reading "X of 0" for a moment.
+            isNarrowed={
+              (isSearching || activeFilters.length > 0) && facets !== undefined
+            }
             activeFilters={activeFilters}
             onClearAll={() => {
               setFilters(EMPTY_CATALOG_LISTING_FILTERS);
@@ -431,9 +454,13 @@ export function DataCatalogView({
             </div>
           ) : (
             <DataCatalogListingList
-              displayedListings={displayedListings}
-              selectedId={selectedListing?.id}
+              displayedListings={catalogSearch.listings}
+              totalCount={catalogSearch.totalCount}
+              selectedId={isSelectionShown ? selectedId : undefined}
               onSelect={setSelectedId}
+              hasNextPage={catalogSearch.hasNextPage}
+              isFetchingNextPage={catalogSearch.isFetchingNextPage}
+              fetchNextPage={catalogSearch.fetchNextPage}
             />
           )}
         </section>
@@ -443,27 +470,33 @@ export function DataCatalogView({
             className={css.dataCatalogViewDetail}
             aria-label={t`Dataset details`}
           >
-            <DataCatalogListingDetail
-              listing={selectedListing}
-              columns={catalogListingColumns}
-              columnTypeState={_toColumnTypeState(
-                selectedListing,
-                columnTypeVerificationStatus,
-              )}
-              isAddAllowed={isAddAllowed}
-              isAdding={isInsertPending}
-              isWaitingForColumnTypes={
-                waitingToAddListingId !== undefined &&
-                waitingToAddListingId === selectedListing?.id
-              }
-              isLoadingColumnMetadata={isLoadingCatalogColumns}
-              onAddToWorkspace={() => {
-                void onAddToWorkspace();
-              }}
-              onBack={() => {
-                setSelectedId(undefined);
-              }}
-            />
+            {isSelectionShown && isLoadingSelectedListing ? (
+              <Group justify="center" py="xl">
+                <Loader size="sm" aria-label={t`Loading dataset`} />
+              </Group>
+            ) : (
+              <DataCatalogListingDetail
+                listing={selectedListing}
+                columns={catalogListingColumns}
+                columnTypeState={_toColumnTypeState(
+                  selectedListing,
+                  columnTypeVerificationStatus,
+                )}
+                isAddAllowed={isAddAllowed}
+                isAdding={isInsertPending}
+                isWaitingForColumnTypes={
+                  waitingToAddListingId !== undefined &&
+                  waitingToAddListingId === selectedListing?.id
+                }
+                isLoadingColumnMetadata={isLoadingCatalogColumns}
+                onAddToWorkspace={() => {
+                  void onAddToWorkspace();
+                }}
+                onBack={() => {
+                  setSelectedId(undefined);
+                }}
+              />
+            )}
           </section>
         )}
       </div>

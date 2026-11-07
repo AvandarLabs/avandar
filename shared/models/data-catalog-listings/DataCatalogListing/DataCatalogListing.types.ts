@@ -158,7 +158,68 @@ export type DataCatalogListingSearchResult = Pick<
   | "pipelineName"
   | "isWorkspaceLoadable"
   | "isInvalid"
->;
+> & {
+  /** The file format upper-cased, `PARQUET` for a pipeline file. */
+  fileFormat: string | undefined;
+
+  /**
+   * When the listing last changed: the source's own update date, otherwise
+   * Avandar's last sync. What the update filter and sort read.
+   */
+  lastUpdatedAt: string | undefined;
+};
+
+/**
+ * How recently a listing must have changed. The windows are cumulative: a
+ * listing updated last week is also within the past year.
+ */
+export type DataCatalogListingUpdatedWithin =
+  | "any"
+  | "pastMonth"
+  | "pastYear"
+  | "overAYear";
+
+/** The order catalog search lists its results in. */
+export type DataCatalogListingSortBy = "relevance" | "updated" | "name";
+
+/**
+ * The narrowing applied to a catalog search. Values inside one facet are
+ * alternatives; separate facets must all match.
+ */
+export type DataCatalogListingSearchFilters = {
+  /** External organizations to keep. Empty keeps every source. */
+  sources: string[];
+
+  /** Upper-cased file formats to keep. Empty keeps every format. */
+  formats: string[];
+
+  updatedWithin: DataCatalogListingUpdatedWithin;
+
+  /** Whether listings whose dataset cannot be loaded are hidden. */
+  isLoadableOnly: boolean;
+};
+
+/** One choosable value of a facet and how many listings it would keep. */
+export type DataCatalogListingFacetOption = {
+  value: string;
+  count: number;
+};
+
+/**
+ * What each search filter would keep, each counted against every other
+ * filter but not itself.
+ */
+export type DataCatalogListingSearchFacets = {
+  sources: DataCatalogListingFacetOption[];
+  formats: DataCatalogListingFacetOption[];
+  updatedWithin: Record<DataCatalogListingUpdatedWithin, number>;
+
+  /** Unloadable listings that match everything except loadable-only. */
+  numUnloadable: number;
+
+  /** Every listing in the catalog, unsearched and unfiltered. */
+  numCatalogListings: number;
+};
 
 /**
  * Why an entry's dataset cannot be loaded. Mirrors the database enum

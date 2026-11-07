@@ -7,6 +7,11 @@ import type {
   DataCatalogListingId,
   DataCatalogListingModel,
   DataCatalogListingSearchResult,
+  DataCatalogListingUpdatedWithin,
+  DataCatalogListingSortBy,
+  DataCatalogListingSearchFilters,
+  DataCatalogListingFacetOption,
+  DataCatalogListingSearchFacets,
 } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 
 export { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts";
@@ -31,4 +36,19 @@ export namespace DataCatalogListing {
 
   /** One listing as catalog search returns it, with only the list's columns. */
   export type SearchResult = DataCatalogListingSearchResult;
+
+  /** How recently a listing must have changed to pass the update filter. */
+  export type UpdatedWithin = DataCatalogListingUpdatedWithin;
+
+  /** The order catalog search lists its results in. */
+  export type SortBy = DataCatalogListingSortBy;
+
+  /** The narrowing applied to a catalog search. */
+  export type SearchFilters = DataCatalogListingSearchFilters;
+
+  /** One choosable value of a facet and how many listings it would keep. */
+  export type FacetOption = DataCatalogListingFacetOption;
+
+  /** What each search filter would keep. */
+  export type SearchFacets = DataCatalogListingSearchFacets;
 }

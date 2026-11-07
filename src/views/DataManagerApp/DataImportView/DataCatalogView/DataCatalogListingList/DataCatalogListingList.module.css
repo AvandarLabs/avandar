@@ -54,3 +54,10 @@
 .dataCatalogListingListRowSelected:hover {
   background-color: var(--mantine-color-primary-0);
 }
+
+/* Under the last loaded row while the next page loads. */
+.dataCatalogListingListMoreLoader {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--mantine-spacing-xs);
+}
