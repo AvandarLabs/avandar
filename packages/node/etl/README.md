@@ -209,8 +209,16 @@ The engine writes only these listings-table columns
 | `date_column_type_last_verified` | every row, `null` when the column types are not verified |
 | `is_workspace_loadable` | every row (see "Workspace loadability") |
 | `external_service_name`, `source_url`, `source_download_url`, `source_asset_type`, `canonical_urls`, `license`, `update_frequency`, `description`, `notes`, `metadata`, `coverage_start_date`, `coverage_end_date` | every row, `null` when unset |
+| `organization2_name` ... `organization4_name`, `domains`, `tags`, `source_metadata` | every row, `null` when unset |
+| `drive_id` | every row, `null` with no drives store |
 | `api_service`, `api_base_url`, `api_resource_id`, `api_resource_format` | `api_resource` rows |
 | `parquet_file_name` | `pipeline_parquet` rows |
+
+`source_metadata` holds a relation's `sourceMetadata`: the source's own
+record (a JSON value). It never counts as a change: it carries counters
+that change daily, so it is written only alongside a change to another
+column. `drive_id` links a row to its drive in the drives table (see
+"Stores").
 
 Conflict targets: `(api_service, api_base_url, external_dataset_id,
 api_resource_id)` and `(parquet_file_name, pipeline_name)`. Any other column,
@@ -313,6 +321,164 @@ the service-role key must be able to write to it.
   is not uploaded again while its hash matches. `ava pipeline reset` deletes
   the pipeline's rows, so the next run uploads every object.
 
+## Pipeline config and field mapping
+
+Each pipeline keeps its drives, and how a source record becomes catalog
+metadata, in one YAML file beside it, such as `socrata.pipeline.yaml`. The
+file replaces hard-coded drive lists and per-pipeline metadata code. Read it
+with `readPipelineConfigFile` (or `parsePipelineConfig` for text you already
+have). The parse is strict: an unknown key, a field with zero or two
+mapping kinds, or an unknown field name fails with the file and the key.
+
+```yaml
+# apps/pipeline-server/pipelines/socrata/socrata.pipeline.yaml
+organizationLabels:
+  1: City
+  2: Agency
+
+fields:
+  description: { script: ./mappers/socrataDescription/socrataDescription.ts }
+  organization2_name: { from: resource.attribution }
+  domains: { script: ./mappers/socrataDomains/socrataDomains.ts }
+  tags: { from: classification.domain_tags }
+  update_frequency: { script: ./mappers/socrataUpdateFrequency/socrataUpdateFrequency.ts }
+
+drives:
+  - baseUrl: https://data.cityofnewyork.us
+    fields:
+      organization1_name: { value: City of New York }
+
+  - baseUrl: https://data.ny.gov
+    organizationLabels: { 1: State, 2: Agency }
+    fields:
+      organization1_name: { value: State of New York }
+
+  - baseUrl: https://health.data.ny.gov
+    organizationLabels: { 1: State, 2: Department, 3: Office }
+    fields:
+      organization1_name: { value: State of New York }
+      organization2_name: { value: Department of Health }
+      organization3_name: { script: ./mappers/socrataOfficeDivision/socrataOfficeDivision.ts }
+```
+
+| Top-level key | Required | Meaning |
+| --- | --- | --- |
+| `organizationLabels` | No | Default labels by level number (1-4) |
+| `fields` | No | Field mappings every drive uses |
+| `drives` | Yes | The drives to crawl, in order. An empty list switches the pipeline off |
+| `workspaceLoadability` | No | This pipeline's `loadableFormats` and `unloadableFormats` (see "Workspace loadability") |
+
+| Drive key | Required | Meaning |
+| --- | --- | --- |
+| `baseUrl` | Yes | `https://`, no trailing slash. Also the drive's key |
+| `organizationLabels` | No | Replaces the default labels for this drive. A level it omits has no label, it is not inherited |
+| `fields` | No | Merged over the pipeline's `fields`, key by key |
+| `scopes` | No | Left unparsed: each pipeline validates its own scopes |
+
+**Mapping kinds.** Each entry under `fields` has exactly one of:
+
+| Kind | Example | Result |
+| --- | --- | --- |
+| `from` | `{ from: classification.domain_tags }` | The value at that dotted path in the source record. A missing path is `undefined`. Numeric segments index arrays (`groups.0.title`). There is no wildcard |
+| `value` | `{ value: City of New York }` | That constant (a string, or a list of strings) |
+| `script` | `{ script: ./mappers/socrataDomains/socrataDomains.ts }` | What the script's default export returns for the record. The path is relative to the YAML file |
+
+A script default-exports one synchronous function:
+
+```ts
+export default function socrataDomains(
+  record: unknown,
+  context: CatalogFieldScriptContext,
+): unknown;
+```
+
+`context` carries the drive's `driveKey` and the target `field`. A script
+that throws fails that field for that record only: the field is left out and
+the result lists a problem.
+
+**Mappable fields.** `fields` accepts only the names in
+`CATALOG_MAPPABLE_FIELDS`: `description`, `notes`, `license`,
+`update_frequency`, `canonical_urls`, `coverage_start_date`,
+`coverage_end_date`, `organization1_name` through `organization4_name`,
+`domains`, and `tags`. Anything else fails the parse. `display_name` is not
+mappable. `organization1_name` is required: every drive must map it, through
+its own `fields` or the pipeline's, or the config fails to load.
+
+**Coercion.** A mapped value is coerced to the field's kind:
+
+| Field kind | Accepts | Otherwise |
+| --- | --- | --- |
+| Text | A string. Blank becomes null | Left out, with a problem |
+| Text array (`domains`, `tags`, `canonical_urls`) | A string (wrapped) or an array of strings. Blanks and duplicates are dropped. An empty result is null | Left out, with a problem |
+| Date (`coverage_*`) | An ISO 8601 string | Left out, with a problem |
+
+Coercion does not clean markup: a source whose text carries HTML maps it
+through a script.
+
+**Loading once per run.** `loadCatalogFieldMapper` compiles a config,
+`async`, once at the start of a run. It splits each `from` path, merges each
+drive's fields over the pipeline's, and imports each distinct script once by
+`file://` URL (so Bun and `vite-node` resolve it the same way), however
+many fields use it. A script that is missing, fails to load, or has no
+function default export rejects here, before any network call. The returned
+`CatalogFieldMapper.mapFields(record, driveKey)` is synchronous, touches no
+file, and throws when `driveKey` is not a drive in the config. It returns
+`{ fields, problems }`, where `fields` is named as `RelationDescription`
+names them (`organization1Name`, `updateFrequency`, `canonicalUrls`, ...), so
+a pipeline spreads it into a relation.
+
+```ts
+import {
+  getOrganizationLabelsFromDrive,
+  loadCatalogFieldMapper,
+  readPipelineConfigFile,
+} from "@avandar/etl";
+
+const config = readPipelineConfigFile(configPath);
+const mapper = await loadCatalogFieldMapper({ config, configDir });
+const { fields, problems } = mapper.mapFields(record, drive.baseUrl);
+const organizationLabels = getOrganizationLabelsFromDrive({ config, drive });
+```
+
+| Export | Description |
+| --- | --- |
+| `parsePipelineConfig` | `({ yamlText, sourceName })`: validates YAML text and returns a `PipelineConfig`. Throws naming `sourceName` and the key |
+| `readPipelineConfigFile` | `(filePath)`: reads and parses one pipeline config file |
+| `loadCatalogFieldMapper` | `({ config, configDir, importScript? })`: compiles a config into a `CatalogFieldMapper`. `importScript` replaces the module import in tests |
+| `getOrganizationLabelsFromDrive` | `({ config, drive })`: a drive's own organization labels, else the pipeline's, else `{}`. Pass the result as `EtlDriveDescription.organizationLabels` |
+| `CATALOG_MAPPABLE_FIELDS` | The listing fields a config can map, as the listings table names them |
+| `PipelineConfig`, `PipelineDriveConfig` | A parsed config file, and one of its drives |
+| `CatalogFieldMappings`, `CatalogFieldSource`, `CatalogMappableField` | A set of mappings, one `from` / `value` / `script` entry, and one mappable field name |
+| `CatalogFieldMapper`, `CatalogFieldMapResult`, `CatalogFieldMapProblem`, `CatalogMappedFields` | The compiled mapper, one record's `{ fields, problems }`, a field left out and why, and the mapped fields in `RelationDescription` names |
+| `CatalogFieldScript`, `CatalogFieldScriptContext` | A script's default export, and its `{ driveKey, field }` context |
+| `EtlOrganizationLevel`, `EtlOrganizationLabels` | A level (`1` to `4`, broadest first), and the label each level has on a drive, such as `City` for level 1 |
+
+## Stores
+
+The engine reads and writes through stores. It builds Supabase ones from
+`supabase` and `output`, and `stores` replaces them (see "Testing a
+pipeline").
+
+| Export | Description |
+| --- | --- |
+| `createSupabaseListingsStore`, `createInMemoryListingsStore` | The listings table |
+| `createSupabaseCheckpointStore`, `createInMemoryCheckpointStore` | The checkpoints table |
+| `createSupabaseObjectStore`, `createInMemoryObjectStore` | Parquet objects in a bucket |
+| `createSupabaseDrivesStore` | `({ client, drivesTable })`: writes the drives table, with `pipeline_name`, `drive_key`, and `organization1_label` through `organization4_label`, unique on the first two. Needs a service-role client. Throws with the table name and Supabase's message when a write fails |
+| `createInMemoryDrivesStore` | Keeps drives in memory. Adds `getDrives()` and `getUpsertCount()` for assertions |
+| `DrivesStore` | `{ upsert(drive): Promise<string> }`: inserts a drive or replaces its labels, and resolves to its id |
+| `DriveRow` | One drive: `pipelineName`, `driveKey`, `organizationLabels` |
+| `InMemoryDrivesStore`, `StoredDriveRow`, `SupabaseDrivesStoreOptions` | The in-memory store's type, a `DriveRow` with its `id`, and the Supabase store's options |
+
+**Drives.** Set `output.drivesTable` (such as `data_catalog_drives`) to
+record each crawled drive and link its listing rows to it through
+`drive_id`. A drive is written only for a crawl that runs. Omit the table
+and no drive and no `drive_id` is written. `EtlEngineConfig.describeDrive`
+returns an `EtlDriveDescription` (`{ organizationLabels }`) for a drive,
+usually from `getOrganizationLabelsFromDrive`. Omit it to record each drive
+with no labels. `EtlOutput.drivesTable` is the `output.drivesTable` option. Pass
+`stores.drives` to replace the Supabase drives store.
+
 ## Execution recording
 
 A run is recorded when its options carry an `invocation` (how it was started)
@@ -349,6 +515,7 @@ Pass `stores` to replace Supabase:
 ```ts
 import {
   createInMemoryCheckpointStore,
+  createInMemoryDrivesStore,
   createInMemoryListingsStore,
   createInMemoryObjectStore,
 } from "@avandar/etl";
@@ -361,6 +528,7 @@ const testEngine = EtlEngine.create({
     listings,
     objects: createInMemoryObjectStore(),
     checkpoints: createInMemoryCheckpointStore(),
+    drives: createInMemoryDrivesStore(),
   },
 });
 await testEngine.run({ mode: "full" });
