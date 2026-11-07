@@ -19,6 +19,14 @@ has run, and each category is addressed in
 | NI-009 | I04, I07 | Both | Boundary effects are silent: a 7-day average restarts at Jan 1, and a partial first week (Dec 28 to Jan 3) is shown as a full week |
 | NI-010 | B07 | ChatGPT | Asked which dataset's date range to show, when all three share one range |
 | NI-011 | I07 | Both | "The UK" silently includes 14 overseas territories, and the US comes from a different dataset than the UK, with neither choice stated |
+| NI-012 | I10 | ChatGPT | Asked whether to "include the United States using the separate U.S. deaths dataset"; the global dataset already holds the US |
+| NI-013 | H06 | ChatGPT | **Wrong answer.** Summed `Population` across every daily row: Oklahoma 4.5 billion people, 0.22 deaths per 100k (truth 3,956,971 and 250.9) |
+| NI-014 | H07 | ChatGPT | "Does the US total match?" answered with 1,143 daily rows instead of the two totals |
+| NI-015 | H09 | ChatGPT | **Wrong answer.** "Which 5 states had the highest single-day death count" ranked state-days, listing Florida twice and dropping New York |
+| NI-016 | N01, N02, N09, N11 | Both | Overview questions ("how bad was covid in florida", "when was covid the worst?", "is covid getting better or worse?", "show me covid in new york city") all start with a measure question |
+| NI-017 | N04 | Claude | A clarification offered its own "Something else" (the card already has one) and "deaths per capita (if population data available)" for a dataset with no population |
+| NI-018 | N10 | Claude | A chart of 1,143 daily points hits the line chart's render cap, so the chart stops at 2021-06-04 |
+| NI-019 | H03 | ChatGPT | `RANK()` over American Samoa's all-null months returned 286 rows for "which month had the most cases" |
 
 ---
 
@@ -142,3 +150,102 @@ Counts of people should display as `63,437`.
   defensible; neither is said.
 - **What should happen:** one short line naming the datasets and any
   inclusion choice, for example "UK includes overseas territories".
+
+## NI-012: assumed the global dataset lacks the US
+
+- **Question:** I10, "Which countries had the most covid deaths in 2020?"
+  **Model:** ChatGPT.
+- **What happened:** "Should the ranking include the United States using the
+  separate U.S. deaths dataset?" The global file has a `US` row like every
+  other country. The model inferred contents from dataset names.
+
+## NI-013: summed a per-place attribute across days (wrong answer)
+
+- **Question:** H06, "Top 10 states by covid deaths per capita in 2021".
+  **Model:** ChatGPT. Claude took population once per county and was right.
+- **What happened:** `SUM("Population")` over every daily row, about 1,143
+  times each county's population. The ranking came out right by chance
+  (every state inflated by the same factor), but every number shown was
+  wrong, with no warning.
+- **Why it matters:** this is the most common trap in long time-series data,
+  and nothing in the schema tells the model that `Population` repeats.
+
+## NI-014: did not answer the yes/no question asked
+
+- **Question:** H07. **Model:** ChatGPT.
+- **What happened:** a daily comparison of 1,143 rows; the first row reads
+  "Different" (the two files split one death differently across the first
+  two days) although the totals match exactly (1,123,836). Claude returned
+  the two totals and their difference, which answers the question.
+
+## NI-015: "top 5 states" ranked state-days (wrong answer)
+
+- **Question:** H09. **Model:** ChatGPT.
+- **What happened:** `ROW_NUMBER() OVER (ORDER BY single_day_deaths DESC)`
+  across all state-days, so Florida appears twice and New York (2020-04-07,
+  1,271) is missing. Claude ranked each state's best day first.
+
+## NI-016: overview questions start with a measure question
+
+- **Questions:** N01, N02, N09, N11. **Models:** both.
+- **What happened:** every one asked "cases or deaths?" (sometimes plus "US
+  or global?") before showing anything. These are overview questions; a
+  sensible default (cases and deaths over time, by month) answers them and
+  the user can narrow from there. The system prompt lists "bad", "best" and
+  "worst" as loaded terms that always need a question, which is right for
+  ranking people or programs and wrong for "how bad was covid in florida".
+- **Not wasteful (kept as is):** B04 "the most covid" (cases or deaths
+  ranks states differently), N03 "how many people died" (US or worldwide),
+  N04 "which country did best" (what "best" means), N06 "georgia" (state or
+  country).
+
+## NI-017: clarification options that duplicate the card or cannot be met
+
+- **Question:** N04. **Model:** Claude.
+- **What happened:** options included "Something else" (the card always adds
+  "Something else…" and "None of the above", so it showed twice) and "Lowest
+  deaths per capita (if population data available)", which the global file
+  cannot compute.
+
+## NI-018: long daily series overflow the chart
+
+- **Question:** N10. **Model:** Claude (after BUG-012).
+- **What happened:** 1,143 daily points, truncated by the line chart's render
+  cap with a toast. The visible chart ends in June 2021, so it looks like the
+  pandemic ended there. A weekly or monthly series shows the whole range.
+
+## NI-019: rank ties over all-null groups
+
+- **Question:** H03. **Model:** ChatGPT.
+- **What happened:** American Samoa has no case counts at all, so every month
+  ties at null and `RANK() = 1` returns all of them. `ROW_NUMBER()` (Claude)
+  or `NULLS LAST` with a filter on non-null totals avoids it.
+
+---
+
+## Permission prompts
+
+No consent prompt appeared in any of the 95 recorded turns, and none should
+have: the three datasets hold no personal data. The browser's consent audit
+log (`ConsentAuditEntry`, IndexedDB) recorded 19 decisions, all
+`discovery_clarification` approved in `clean` mode: the place names a user
+picked from a lookup, or that matched automatically, which are the only
+values that left the browser. User questions mentioning "covid" and
+"deaths" did not trip the health-data detector. No row data was ever sent to
+the model. The lookups themselves run locally, and BUG-009's candidate
+lookup also runs locally, so no harness change was needed here.
+
+---
+
+## Categories
+
+| Category | Entries | Improvement |
+|---|---|---|
+| C1. Needless clarification | NI-005, NI-010, NI-012, NI-016 | Clarification policy in the system prompt |
+| C2. Silent answers and unstated choices | NI-003, NI-011, BUG-011's "say which period" | A one-line `summary` on `generateSql`, shown as the reply |
+| C3. Lookup friction | NI-004, NI-007, NI-008 | Skip lookups for full conventional names, plain wording, grouped candidates so multi-value lookups continue on their own |
+| C4. Analytic rigor (incl. wrong answers) | NI-009, NI-013, NI-014, NI-015, NI-018, NI-019 | Analyst rules in the system prompt for long time-series data and charts |
+| C5. Clarification option hygiene | NI-017 | Drop options that repeat the card's own choices |
+| C6. New chat inherits old explorer state | NI-006 | Label the explorer's SQL and error as possibly from before this conversation |
+| C7. First-run suggestions | NI-001 | Suggest questions built from measure and date columns |
+| C8. Number display | NI-002 | Fixed with BUG-007 |

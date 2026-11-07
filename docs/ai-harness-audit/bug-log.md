@@ -16,6 +16,10 @@ listed here with what a reviewer needs to rebuild it as a PR to `develop`.
 | BUG-007 | Years shown as `2,020.00` and counts as `63,437.00` in the data grid | fixed | `ca509aae7` |
 | BUG-008 | SQL a model wrote as plain text was shown in the chat bubble, with internal `t0` aliases | fixed | `d6e67b293` |
 | BUG-009 | A discovery lookup missed the user's value when it sorted past the first 100 values | fixed | `18ae7b452` |
+| BUG-010 | ChatGPT asked the same lookup again after every answer | fixed | `4d796bff5` |
+| BUG-011 | "Last year" ran for a guessed year with no data, and a blank total was called "results" | fixed | `81506f673`, `c0c08b571` |
+| BUG-012 | A chart request in the Data Explorer was claimed as "added to your dashboard" and showed nothing | fixed | `39264bcfb` |
+| BUG-013 | Chart blocks added to dashboards kept the model's `t0` aliases and could not run | fixed | `394bec76d` |
 
 ---
 
@@ -257,3 +261,94 @@ listed here with what a reviewer needs to rebuild it as a PR to `develop`.
   and returns ground-truth weekly totals.
 - **Branch:** `fix/discovery-candidate-lookup`, merged as `b02679c3f`.
 - **PR title for develop:** `fix(chat): find the named value even past a discovery's first 100 rows`
+
+## BUG-010: the same lookup asked again after every answer
+
+- **Question:** I09, "Covid deaths by year for Brazil, India and Mexico".
+  **Model:** ChatGPT.
+- **What happened:** a multi-value lookup for the three countries. After the
+  user picked Brazil, India and Mexico, ChatGPT asked the identical lookup
+  again, and again after the second answer. The user never got an answer
+  short of the three-question cap.
+- **Root cause:** the thread records the answer as
+  `[Clarification answer: Brazil, India, Mexico]`. The model never sees the
+  lookup's results (they stay in the browser by design), so it had no sign
+  that these were checked against the column, and its rule "look up any
+  filter value you do not know" fired again.
+- **Fix:** `annotateClarificationAnswersForModel` adds a note to each picked
+  answer in the copy of the thread sent to OpenRouter: it came from the
+  options the model offered, and for a column lookup these are the stored
+  values exactly, so filter on them and do not look them up again. Consent
+  verification and the clarification count still read the thread as the
+  client sent it.
+- **Tests:** `annotateClarificationAnswersForModel.test.ts`.
+- **Verified in the app:** one answer now produces the SQL, with ground-truth
+  yearly totals.
+- **Branch:** `fix/clarification-answer-loop`, merged as `97356315b`.
+- **PR title for develop:** `fix(chat): stop re-asking a lookup the user already answered`
+
+## BUG-011: relative periods guessed, and a blank total called "results"
+
+- **Question:** N05, "covid deaths last year". **Model:** ChatGPT.
+- **What happened:** the SQL filtered 2024 (a guessed year; today is
+  2026-11-06 and the data ends 2023-03-09). `SUM` over no rows returned one
+  blank cell, and the chat said "I ran the query. Your results are ready."
+  Before that, both models also asked the user which year "last year" meant.
+- **Root cause:** the model is never told today's date or where the data
+  ends, and the system prompt told it to clarify "this year" when the data
+  spans several years. On the client, `waitForAppliedSqlOutcome` counted any
+  row as "rows", including a row of nulls.
+- **Fix:** the turn context carries today's date. The system prompt's new
+  RELATIVE DATES section tells the model to count relative periods from the
+  dataset's own latest date with a subquery (for "last year",
+  `year("date") = (SELECT year(max("date")) - 1 FROM "t0")`), not to ask
+  which year, and to say which period it used. On the client a result whose
+  every value is blank is `empty`, and the empty reply reads "I ran the
+  query, but no data matched it." A follow-up commit (`c0c08b571`) keeps
+  count columns named like `total_deaths_last_year` grouped ("267,296"),
+  which BUG-007's year rule had shown as "267296".
+- **Tests:** `waitForAppliedSqlOutcome.test.ts` (blank row is empty; a row with
+  one value is rows), `makeChatTurnSuffixFromOptions.test.ts` (today's date),
+  `makeDataGridColumnDefs.test.ts` (count named like a year).
+- **Verified in the app:** both models now ask only "US or global?" and then
+  answer 2022 (267,296 US deaths), the last full year in the data.
+- **Branches:** `fix/relative-dates-empty-results` (`19cb6e978`) and
+  `fix/grid-year-heuristic` (`946e7aa5d`).
+- **PR titles for develop:** `fix(chat): answer relative periods from the data, and call blank totals empty`;
+  `fix(viz): group the digits of counts in columns named like a year`
+
+## BUG-012: a chart request in the Data Explorer claimed a dashboard block
+
+- **Question:** N10, "make me a chart of us deaths over time". **Model:**
+  Claude.
+- **What happened:** the reply read 'Added "US daily new deaths over time" to
+  your dashboard as a line.' No dashboard was open, nothing was added, no
+  query ran, and the explorer stayed empty.
+- **Root cause:** the dashboard tool is offered on every page by design (one
+  stable tool list), and the client only queues a dashboard block when a
+  dashboard is open. Nothing handled a chart block in the explorer, and the
+  edge function's fallback text described a dashboard add.
+- **Fix:** `dashboardBlockToExplorerResponse` adapts a response in the Data
+  Explorer: a DataViz block becomes generated SQL that the explorer runs,
+  and the explorer switches to the block's chart type (`setActiveVizType`).
+  Any other block kind gets "I can only add that to a dashboard. Open a
+  dashboard and ask me again there."
+- **Tests:** `dashboardBlockToExplorerResponse.test.ts` and
+  `useAvandarChatRuntime.explorerChart.test.tsx` (both red without the
+  wiring).
+- **Verified in the app:** N10 on Claude draws a line chart of US daily
+  deaths in the explorer.
+- **Branch:** `fix/explorer-chart-blocks`, merged as `26f31b195`.
+- **PR title for develop:** `fix(chat): show a chart request in the Data Explorer instead of a dashboard claim`
+
+## BUG-013: chart blocks kept the model's table aliases
+
+- **Found while fixing:** BUG-012. The block's SQL read `FROM "t0"`.
+- **Root cause:** `parseOpenRouterResponse` rewrites aliases to dataset ids
+  for generated SQL and discovery queries, but not for a DataViz block's SQL,
+  so a chart the chat added to a real dashboard queried a relation that does
+  not exist.
+- **Fix:** DataViz block SQL gets the same rewrite.
+- **Tests:** a new case in `parseOpenRouterResponse.test.ts`.
+- **Branch:** `fix/dashboard-block-aliases`, merged as `94ae480cc`.
+- **PR title for develop:** `fix(chat): resolve table aliases in charts the chat adds to dashboards`
