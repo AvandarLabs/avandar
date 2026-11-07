@@ -2,6 +2,7 @@ import { useQuery } from "@avandar/query-hooks";
 import { where } from "@avandar/utils";
 import { useMemo } from "react";
 import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { getActivePluginsFromLoadablePlugins } from "@/lib/plugins/getActivePluginsFromLoadablePlugins/getActivePluginsFromLoadablePlugins";
 import { getLoadablePluginsFromInstallations } from "@/lib/plugins/getLoadablePluginsFromInstallations/getLoadablePluginsFromInstallations";
@@ -76,8 +77,14 @@ function useLoadedManifests(
  */
 export function PluginHost({ children }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
+  // Refetched on mount, because a reload right after an install restores the
+  // pre-install snapshot from the persisted cache, which would otherwise
+  // count as fresh and hide the new plugin until it goes stale.
   const [installations = NO_INSTALLATIONS] = PluginInstallationClient.useGetAll(
-    where("workspace_id", "eq", workspace.id),
+    {
+      ...where("workspace_id", "eq", workspace.id),
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    },
   );
   const loadable = useMemo(() => {
     return getLoadablePluginsFromInstallations({

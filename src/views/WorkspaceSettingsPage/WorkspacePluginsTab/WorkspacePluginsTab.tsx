@@ -3,6 +3,7 @@ import { where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Loader, Stack } from "@mantine/core";
 import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { PluginsTabContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabContent";
@@ -24,13 +25,17 @@ export function WorkspacePluginsTab(): JSX.Element {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const canManage = useHasPermission("settings__can_manage_plugins");
+  // Refetched on mount, because a reload right after an install restores the
+  // pre-install snapshot from the persisted cache, which would otherwise
+  // count as fresh and show the plugin as not installed.
   const [
     installations = NO_INSTALLATIONS,
     isLoadingInstallations,
     installationsQuery,
-  ] = PluginInstallationClient.useGetAll(
-    where("workspace_id", "eq", workspace.id),
-  );
+  ] = PluginInstallationClient.useGetAll({
+    ...where("workspace_id", "eq", workspace.id),
+    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+  });
   const [loadedManifests, isLoadingManifests] = useBundledPluginManifests();
   if (isLoadingInstallations || isLoadingManifests) {
     return <Loader role="status" aria-label={t`Loading plugins`} />;

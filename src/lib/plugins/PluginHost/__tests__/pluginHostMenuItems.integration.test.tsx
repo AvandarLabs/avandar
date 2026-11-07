@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { PluginHost } from "@/lib/plugins/PluginHost/PluginHost";
 import { usePluginMenuItems } from "@/lib/plugins/PluginHost/usePluginMenuItems";
 import { cleanup, render, screen, waitFor } from "@/test-utils";
@@ -14,6 +15,7 @@ import type { ReactNode } from "react";
 const mocks = vi.hoisted(() => {
   return {
     installations: [] as unknown[],
+    getAllArguments: [] as unknown[],
     loadManifest: vi.fn(),
   };
 });
@@ -30,7 +32,8 @@ vi.mock(
   () => {
     return {
       PluginInstallationClient: {
-        useGetAll: () => {
+        useGetAll: (argument: unknown) => {
+          mocks.getAllArguments.push(argument);
           return [mocks.installations];
         },
       },
@@ -122,6 +125,7 @@ describe("PluginHost with usePluginMenuItems", () => {
       defaultOptions: { queries: { retry: false } },
     });
     lastItems = [];
+    mocks.getAllArguments = [];
     mocks.loadManifest.mockReset();
     mocks.loadManifest.mockImplementation((entry: PluginIndexEntry) => {
       return Promise.resolve(_makeManifestModule(entry.id));
@@ -245,5 +249,14 @@ describe("PluginHost with usePluginMenuItems", () => {
     const queries = queryClient.getQueryCache().getAll();
     expect(queries).toHaveLength(1);
     expect(queries[0]?.meta).toEqual({ persist: false });
+  });
+
+  it("refetches the installs of this workspace every time the host mounts", () => {
+    _renderHost();
+
+    expect(mocks.getAllArguments[0]).toEqual({
+      where: { workspace_id: { eq: "workspace-id" } },
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    });
   });
 });

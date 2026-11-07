@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { cleanup, render, screen, within } from "@/test-utils";
 import { WorkspacePluginsTab } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
@@ -13,6 +14,7 @@ const mocks = vi.hoisted(() => {
   return {
     entries: [] as unknown[],
     installations: [] as unknown[],
+    getAllArguments: [] as unknown[],
     canManage: true,
     isLoadingInstallations: false,
     hasInstallationsError: false,
@@ -46,7 +48,8 @@ vi.mock(
             return ["PluginInstallationClient", "getAll"];
           },
         },
-        useGetAll: () => {
+        useGetAll: (argument: unknown) => {
+          mocks.getAllArguments.push(argument);
           return [
             mocks.hasInstallationsError ? undefined : mocks.installations,
             mocks.isLoadingInstallations,
@@ -157,6 +160,7 @@ describe("WorkspacePluginsTab", () => {
     });
     mocks.entries = [];
     mocks.installations = [];
+    mocks.getAllArguments = [];
     mocks.canManage = true;
     mocks.isLoadingInstallations = false;
     mocks.hasInstallationsError = false;
@@ -354,5 +358,17 @@ describe("WorkspacePluginsTab", () => {
     const queries = queryClient.getQueryCache().getAll();
     expect(queries).toHaveLength(1);
     expect(queries[0]?.meta).toEqual({ persist: false });
+  });
+
+  it("refetches the installs of this workspace every time the tab mounts", async () => {
+    _addBundledPlugin();
+
+    _renderTab();
+    await screen.findByRole("region", { name: "Epidemiology" });
+
+    expect(mocks.getAllArguments[0]).toEqual({
+      where: { workspace_id: { eq: "workspace-id" } },
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    });
   });
 });
