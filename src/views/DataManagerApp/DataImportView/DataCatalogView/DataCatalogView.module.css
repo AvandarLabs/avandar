@@ -124,3 +124,34 @@
     grid-area: results;
   }
 }
+
+/*
+ * The full-screen dataset: nearly the whole viewport, so the preview grid
+ * and the description get room the pane cannot give them. The body is a
+ * height-bound column so the detail's own body scrolls and its add action
+ * stays pinned to the bottom, as it does in the pane.
+ */
+.dataCatalogViewExpandedContent {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 4rem);
+  max-height: none;
+}
+
+.dataCatalogViewExpandedTitle {
+  font-size: var(--mantine-h3-font-size);
+  font-weight: 600;
+}
+
+.dataCatalogViewExpandedBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0;
+}
+
+.dataCatalogViewExpandedBody > * {
+  flex: 1;
+  min-height: 0;
+}

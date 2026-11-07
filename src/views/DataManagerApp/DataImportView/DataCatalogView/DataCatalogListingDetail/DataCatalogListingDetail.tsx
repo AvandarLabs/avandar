@@ -1,6 +1,14 @@
+import { ActionIcon } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Spoiler, Stack, Text, Title } from "@mantine/core";
-import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
+import { Button, Group, Spoiler, Stack, Text, Title } from "@mantine/core";
+import {
+  IconArrowLeft,
+  IconArrowsMaximize,
+  IconPlus,
+} from "@tabler/icons-react";
+import clsx from "clsx";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
+import { DatasetPreviewSection } from "@/components/DatasetPreviewSection/DatasetPreviewSection";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
@@ -19,6 +27,7 @@ import type { DataCatalogDrive } from "$/models/data-catalog-listings/DataCatalo
 import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";
 import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
+import type { CatalogListingPreviewState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingPreview/useCatalogListingPreview";
 import type { ReactNode } from "react";
 
 /**
@@ -27,6 +36,12 @@ import type { ReactNode } from "react";
  * below the fold.
  */
 const DESCRIPTION_MAX_HEIGHT = 130;
+
+/**
+ * The preview grid's height in the narrow pane: tall enough for a dozen rows
+ * without burying the facts below it. Full screen gives it the default.
+ */
+const PANE_PREVIEW_GRID_HEIGHT = 360;
 
 type Props = {
   /** Selected catalog listing, or none when nothing is selected. */
@@ -67,7 +82,52 @@ type Props = {
   onSelectTopic: (domain: string) => void;
   /** Narrows the catalog to one of the listing's keywords. */
   onAddKeyword: (tag: string) => void;
+  /** The first rows of the listing's data. */
+  preview: CatalogListingPreviewState;
+  /**
+   * True when the detail fills the full-screen modal: the facts move into a
+   * rail beside the content, and the modal's header carries the title.
+   */
+  isExpanded?: boolean;
+  /**
+   * Opens the detail in full screen. The expand button is shown only when
+   * this is set and the detail is not already expanded.
+   */
+  onExpand?: () => void;
 };
+
+/**
+ * The listing's description. In the pane it folds after a few lines so the
+ * facts stay above the fold. Full screen has the room to show all of it.
+ */
+function ListingDescription({
+  description,
+  isExpanded,
+}: {
+  description: string;
+  isExpanded: boolean;
+}): ReactNode {
+  const { t } = useLingui();
+  const text = (
+    <Text size="sm" className={css.dataCatalogListingDetailDescription}>
+      {description}
+    </Text>
+  );
+  if (isExpanded) {
+    return <Stack maw="70ch">{text}</Stack>;
+  }
+  return (
+    <Spoiler
+      maxHeight={DESCRIPTION_MAX_HEIGHT}
+      showLabel={t`Show more`}
+      hideLabel={t`Show less`}
+      maw="70ch"
+      classNames={{ control: css.dataCatalogListingDetailSpoilerControl }}
+    >
+      {text}
+    </Spoiler>
+  );
+}
 
 /**
  * Everything the catalog knows about one listing, and the one action on it.
@@ -81,6 +141,11 @@ type Props = {
  * than as bold-heading-plus-paragraph pairs that turn a page of short values
  * into a page of headings. How the catalog indexed the listing is reference
  * only an expert reads, so it waits behind a disclosure at the end.
+ *
+ * Under the columns sits a preview of the listing's first rows, read without
+ * adding it to the workspace. The pane is narrow, so the expand button opens
+ * the same detail in a full-screen modal, where the facts move into a rail
+ * beside the description, columns, and preview.
  *
  * There is exactly one add button: a primary action offered twice makes a
  * user check whether the two do the same thing. A listing whose dataset
@@ -100,6 +165,9 @@ export function DataCatalogListingDetail({
   onBack,
   onSelectTopic,
   onAddKeyword,
+  preview,
+  isExpanded = false,
+  onExpand,
 }: Props): ReactNode {
   const { t } = useLingui();
   const offline = useOfflineGate();
@@ -133,6 +201,18 @@ export function DataCatalogListingDetail({
       : undefined,
   ].filter(Boolean);
 
+  const factsRail = (
+    <AppViewRail>
+      <DataCatalogPublishedByGroup listing={listing} drive={drive} />
+      <DataCatalogAboutGroup
+        listing={listing}
+        onSelectTopic={onSelectTopic}
+        onAddKeyword={onAddKeyword}
+      />
+      <DataCatalogSourceGroup listing={listing} />
+    </AppViewRail>
+  );
+
   return (
     <div className={css.dataCatalogListingDetail}>
       {/*
@@ -161,14 +241,29 @@ export function DataCatalogListingDetail({
           <Trans>All results</Trans>
         </Button>
 
-        <Stack gap={4}>
-          <Title order={3} size="h4" lineClamp={3}>
-            {listing.displayName}
-          </Title>
-          <Text size="sm" c="dimmed">
-            {summaryFacts.join(" · ")}
-          </Text>
-        </Stack>
+        <Group gap="sm" align="flex-start" wrap="nowrap">
+          <Stack gap={4} flex={1} miw={0}>
+            {isExpanded ? null : (
+              <Title order={3} size="h4" lineClamp={3}>
+                {listing.displayName}
+              </Title>
+            )}
+            <Text size="sm" c="dimmed">
+              {summaryFacts.join(" · ")}
+            </Text>
+          </Stack>
+          {onExpand && !isExpanded ? (
+            <ActionIcon
+              variant="subtle"
+              color="neutral"
+              tooltip={t`Open in full screen`}
+              aria-label={t`Open in full screen`}
+              onClick={onExpand}
+            >
+              <IconArrowsMaximize size={16} aria-hidden />
+            </ActionIcon>
+          ) : null}
+        </Group>
 
         {!listing.isWorkspaceLoadable ? (
           <DataCatalogUnsupportedNotice
@@ -188,36 +283,50 @@ export function DataCatalogListingDetail({
           />
         ) : null}
 
-        {listing.description ? (
-          <Spoiler
-            maxHeight={DESCRIPTION_MAX_HEIGHT}
-            showLabel={t`Show more`}
-            hideLabel={t`Show less`}
-            maw="70ch"
-            classNames={{ control: css.dataCatalogListingDetailSpoilerControl }}
+        <div
+          className={clsx(
+            css.dataCatalogListingDetailLayout,
+            isExpanded && css.dataCatalogListingDetailLayoutIsExpanded,
+          )}
+        >
+          <Stack
+            gap={isExpanded ? "xl" : "md"}
+            className={css.dataCatalogListingDetailMain}
           >
-            <Text size="sm" className={css.dataCatalogListingDetailDescription}>
-              {listing.description}
-            </Text>
-          </Spoiler>
-        ) : null}
+            {listing.description ? (
+              <ListingDescription
+                description={listing.description}
+                isExpanded={isExpanded}
+              />
+            ) : null}
 
-        <AppViewRail>
-          <DataCatalogPublishedByGroup listing={listing} drive={drive} />
-          <DataCatalogAboutGroup
-            listing={listing}
-            onSelectTopic={onSelectTopic}
-            onAddKeyword={onAddKeyword}
-          />
-          <DataCatalogSourceGroup listing={listing} />
-        </AppViewRail>
+            {isExpanded ? null : factsRail}
 
-        <DataCatalogListingColumns
-          columns={columns}
-          columnTypeState={columnTypeState}
-        />
+            <DataCatalogListingColumns
+              columns={columns}
+              columnTypeState={columnTypeState}
+            />
 
-        <DataCatalogTechnicalDetails listing={listing} />
+            {preview.isAvailable ? (
+              <DatasetPreviewSection
+                columnNames={preview.preview?.columnNames ?? []}
+                rows={preview.preview?.rows}
+                maxPreviewRows={GlobalAppConfig.dataManagerApp.maxPreviewRows}
+                dateColumnNames={preview.preview?.dateColumnNames}
+                isLoading={preview.isLoading}
+                isError={preview.isError}
+                gridHeight={isExpanded ? undefined : PANE_PREVIEW_GRID_HEIGHT}
+              />
+            ) : null}
+
+            <DataCatalogTechnicalDetails listing={listing} />
+          </Stack>
+          {isExpanded ? (
+            <aside className={css.dataCatalogListingDetailRail}>
+              {factsRail}
+            </aside>
+          ) : null}
+        </div>
       </Stack>
 
       <div className={css.dataCatalogListingDetailFoot}>

@@ -7,6 +7,7 @@ import {
   Drawer,
   Group,
   Loader,
+  Modal,
   Skeleton,
   Stack,
   Text,
@@ -47,6 +48,7 @@ import { DataCatalogResultsHeader } from "@/views/DataManagerApp/DataImportView/
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
 import { readCatalogColumnsForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/readCatalogColumnsForAdding/readCatalogColumnsForAdding";
 import { useActiveCatalogFilters } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters";
+import { useCatalogListingPreview } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingPreview/useCatalogListingPreview";
 import { useDataCatalogFacets } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogFacets";
 import { useDataCatalogSearch } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogSearch";
 import {
@@ -118,6 +120,7 @@ export function DataCatalogView({
   );
   const [chosenSortBy, setChosenSortBy] = useState<CatalogSortBy>();
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isDetailExpanded, setIsDetailExpanded] = useState(false);
   const [selectedId, setSelectedId] = useState<
     DataCatalogListing.Id | undefined
   >();
@@ -171,6 +174,8 @@ export function DataCatalogView({
       enabled: selectedListing?.driveId !== undefined,
     },
   });
+
+  const selectedListingPreview = useCatalogListingPreview(selectedListing);
 
   useVerifyColumnTypesOnDwell({
     listing: selectedListing,
@@ -302,6 +307,38 @@ export function DataCatalogView({
   }
 
   const hasNoMatches = !isLoadingCatalog && catalogSearch.listings.length === 0;
+  // One set of props for the pane and the full-screen modal, so the two
+  // never describe the same listing differently.
+  const detailProps = {
+    listing: selectedListing,
+    drive: selectedListingDrive,
+    columns: catalogListingColumns,
+    columnTypeState: _toColumnTypeState(
+      selectedListing,
+      columnTypeVerificationStatus,
+    ),
+    isAddAllowed,
+    isAdding: isInsertPending,
+    isWaitingForColumnTypes:
+      waitingToAddListingId !== undefined &&
+      waitingToAddListingId === selectedListing?.id,
+    isLoadingColumnMetadata: isLoadingCatalogColumns,
+    preview: selectedListingPreview,
+    onAddToWorkspace: () => {
+      void onAddToWorkspace();
+    },
+    onBack: () => {
+      setSelectedId(undefined);
+    },
+    onSelectTopic: (domain: string) => {
+      setIsDetailExpanded(false);
+      changeFilters(addCatalogFilterValue(filters, "domains", domain));
+    },
+    onAddKeyword: (tag: string) => {
+      setIsDetailExpanded(false);
+      changeFilters(addCatalogFilterValue(filters, "tags", tag));
+    },
+  };
   const filterRail = (
     <DataCatalogFilterRail
       search={search}
@@ -420,39 +457,35 @@ export function DataCatalogView({
               </Group>
             ) : (
               <DataCatalogListingDetail
-                listing={selectedListing}
-                drive={selectedListingDrive}
-                columns={catalogListingColumns}
-                columnTypeState={_toColumnTypeState(
-                  selectedListing,
-                  columnTypeVerificationStatus,
-                )}
-                isAddAllowed={isAddAllowed}
-                isAdding={isInsertPending}
-                isWaitingForColumnTypes={
-                  waitingToAddListingId !== undefined &&
-                  waitingToAddListingId === selectedListing?.id
-                }
-                isLoadingColumnMetadata={isLoadingCatalogColumns}
-                onAddToWorkspace={() => {
-                  void onAddToWorkspace();
-                }}
-                onBack={() => {
-                  setSelectedId(undefined);
-                }}
-                onSelectTopic={(domain) => {
-                  changeFilters(
-                    addCatalogFilterValue(filters, "domains", domain),
-                  );
-                }}
-                onAddKeyword={(tag) => {
-                  changeFilters(addCatalogFilterValue(filters, "tags", tag));
+                {...detailProps}
+                onExpand={() => {
+                  setIsDetailExpanded(true);
                 }}
               />
             )}
           </section>
         )}
       </div>
+
+      <Modal
+        opened={isDetailExpanded && selectedListing !== undefined}
+        onClose={() => {
+          setIsDetailExpanded(false);
+        }}
+        title={selectedListing?.displayName}
+        size="calc(100vw - 4rem)"
+        yOffset="2rem"
+        // Above the Data Explorer's Open dataset modal, which hosts this
+        // view too.
+        zIndex={MODAL_ABOVE_NUX_TOUR_Z_INDEX}
+        classNames={{
+          content: css.dataCatalogViewExpandedContent,
+          title: css.dataCatalogViewExpandedTitle,
+          body: css.dataCatalogViewExpandedBody,
+        }}
+      >
+        <DataCatalogListingDetail {...detailProps} isExpanded />
+      </Modal>
 
       <Drawer
         opened={isFilterDrawerOpen}
