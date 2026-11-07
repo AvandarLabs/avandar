@@ -292,4 +292,85 @@ describe("getConceptRelationPlansFromSql", () => {
       }),
     ).rejects.toThrow(/is not one of the concept's statuses/);
   });
+
+  // A record page asks for one record. Its spine must hold that record alone,
+  // so the view computes one row instead of the whole case type.
+  it("loads only the restricted records into the spine", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+    individualGetAllMock.mockResolvedValue([
+      { id: "ind-2", externalId: "p2", statusId: RULED_OUT_STATUS_ID },
+    ]);
+
+    const plans = await getConceptRelationPlansFromSql({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      allowlist: _permissiveAllowlist(),
+      conceptSpineRestrictions: [
+        { conceptId: CONCEPT_ID, externalIds: ["p2"] },
+      ],
+    });
+
+    expect(individualGetAllMock).toHaveBeenCalledWith({
+      where: { concept_id: { eq: CONCEPT_ID }, external_id: { in: ["p2"] } },
+    });
+    expect(plans[0]?.spineRows).toEqual([
+      { externalId: "p2", statusName: "Ruled out" },
+    ]);
+  });
+
+  // A restriction on a concept the statement does not read restricts
+  // nothing, while its caller believes the records are narrowed.
+  it("refuses a restriction on a concept the statement does not read", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+        allowlist: _permissiveAllowlist(),
+        conceptSpineRestrictions: [
+          { conceptId: OTHER_CONCEPT_ID, externalIds: ["p1"] },
+        ],
+      }),
+    ).rejects.toThrow(/which this query does not read/);
+    expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
+  });
+
+  it("refuses two restrictions on one concept", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+        allowlist: _permissiveAllowlist(),
+        conceptSpineRestrictions: [
+          { conceptId: CONCEPT_ID, externalIds: ["p1"] },
+          { conceptId: CONCEPT_ID, externalIds: ["p2"] },
+        ],
+      }),
+    ).rejects.toThrow(/more than one spine restriction/);
+    expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
+  });
+
+  // One restriction costs one Postgres read per 50 keys, so it is bounded.
+  it("refuses a restriction naming more records than one query may read", async () => {
+    const { getConceptRelationPlansFromSql, MAX_RESTRICTED_EXTERNAL_IDS } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+    const externalIds = Array.from(
+      { length: MAX_RESTRICTED_EXTERNAL_IDS + 1 },
+      (_, index) => {
+        return `p${index}`;
+      },
+    );
+
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+        allowlist: _permissiveAllowlist(),
+        conceptSpineRestrictions: [{ conceptId: CONCEPT_ID, externalIds }],
+      }),
+    ).rejects.toThrow(/at most 500 may be named/);
+    expect(individualGetAllMock).not.toHaveBeenCalled();
+  });
 });

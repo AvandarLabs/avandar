@@ -1,19 +1,17 @@
 import { makeIdLookupRecord, prop, where } from "@avandar/utils";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
-import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
+import { getConceptAttributeColumnsFromConceptId } from "@/clients/qetl/QueryMediator/conceptRelation/getConceptAttributeColumnsFromConceptId";
+import { getIndividualsByExternalIds } from "@/clients/qetl/QueryMediator/conceptRelation/getIndividualsByExternalIds/getIndividualsByExternalIds";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 import { Logger } from "@/utils/Logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptRelationRef } from "$/models/relations/RelationRef/RelationRef.types";
 import type {
   ConceptRelationPlan,
+  ConceptSpineRestriction,
   ConceptSpineRow,
 } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 
@@ -34,6 +32,13 @@ export type ConceptRelationAllowlist = {
   /** Every dataset id the caller may load. */
   getAllowedDatasetIds: () => Promise<readonly Dataset.Id[]>;
 };
+
+/**
+ * The most records one spine restriction may name. A restricted spine is read
+ * from Postgres in batches of 50 keys, so this bounds one query to ten reads;
+ * a caller needing more records reads the view unrestricted.
+ */
+export const MAX_RESTRICTED_EXTERNAL_IDS = 500;
 
 /** The concept relations one statement names, without duplicates. */
 function _getConceptRefsFromSql(rawSql: string): ConceptRelationRef[] {
@@ -57,6 +62,56 @@ function _getConceptRefsFromSql(rawSql: string): ConceptRelationRef[] {
     }),
     { hashFn: prop("id") },
   );
+}
+
+/**
+ * Checks the caller's spine restrictions against the concepts the statement
+ * reads, and indexes them by concept.
+ *
+ * Every check fails closed, before any read. A restriction on a concept the
+ * statement does not read would restrict nothing while its caller believes
+ * the records are narrowed; two restrictions on one concept have no single
+ * meaning; and an unbounded restriction would make one query an unbounded
+ * number of Postgres reads.
+ */
+function _getRestrictionsByConceptId(
+  options: Readonly<{
+    conceptRefs: readonly ConceptRelationRef[];
+    conceptSpineRestrictions: readonly ConceptSpineRestriction[];
+  }>,
+): Map<Concept.Id, ConceptSpineRestriction> {
+  const namedConceptIds = new Set<string>(
+    options.conceptRefs.map((ref) => {
+      return ref.id;
+    }),
+  );
+  const restrictionsByConceptId = new Map<
+    Concept.Id,
+    ConceptSpineRestriction
+  >();
+  options.conceptSpineRestrictions.forEach((restriction) => {
+    const { conceptId, externalIds } = restriction;
+    if (!namedConceptIds.has(conceptId)) {
+      throw new Error(
+        `A spine restriction names concept '${conceptId}', which this query ` +
+          `does not read.`,
+      );
+    }
+    if (restrictionsByConceptId.has(conceptId)) {
+      throw new Error(
+        `Concept '${conceptId}' has more than one spine restriction.`,
+      );
+    }
+    if (externalIds.length > MAX_RESTRICTED_EXTERNAL_IDS) {
+      throw new Error(
+        `The spine restriction on concept '${conceptId}' names ` +
+          `${externalIds.length} records; at most ` +
+          `${MAX_RESTRICTED_EXTERNAL_IDS} may be named.`,
+      );
+    }
+    restrictionsByConceptId.set(conceptId, restriction);
+  });
+  return restrictionsByConceptId;
 }
 
 /**
@@ -115,22 +170,9 @@ function _assertContributorsAllowed(
   }
 }
 
-/** Every dataset column the given mappings name, keyed by id. */
-async function _getMappedDatasetColumns(
-  mappings: readonly AttributeMapping[],
-): Promise<DatasetColumn.T[]> {
-  const datasetColumnIds = removeDuplicates(
-    mappings.flatMap((mapping) => {
-      return mapping.type === "dataset_column" ? [mapping.datasetColumnId] : [];
-    }),
-  );
-  return datasetColumnIds.length === 0
-    ? []
-    : await DatasetColumnClient.getAll(where("id", "in", datasetColumnIds));
-}
-
 /**
- * One concept's records as spine rows, each carrying its status name.
+ * One concept's records as spine rows, each carrying its status name: every
+ * record, or only those a restriction names.
  *
  * The statuses are read once and matched to records in memory. A record
  * whose status is not among them fails the query rather than loading a NULL
@@ -138,14 +180,23 @@ async function _getMappedDatasetColumns(
  * it means the status set was saved between the two reads, and a retry sees
  * both agree.
  *
- * Both reads are plain `getAll` calls, so a status renamed a moment ago shows
- * in the next query.
+ * Both reads are plain reads, so a status renamed a moment ago shows in the
+ * next query.
  */
 async function _getSpineRows(
-  conceptId: Concept.Id,
+  options: Readonly<{
+    conceptId: Concept.Id;
+    restriction: ConceptSpineRestriction | undefined;
+  }>,
 ): Promise<ConceptSpineRow[]> {
+  const { conceptId, restriction } = options;
   const [individuals, statuses] = await Promise.all([
-    IndividualClient.getAll(where("concept_id", "eq", conceptId)),
+    restriction === undefined
+      ? IndividualClient.getAll(where("concept_id", "eq", conceptId))
+      : getIndividualsByExternalIds({
+          conceptId,
+          externalIds: restriction.externalIds,
+        }),
     ConceptStatusClient.getAll(where("concept_id", "eq", conceptId)),
   ]);
   const statusesById = makeIdLookupRecord(statuses, { key: "id" });
@@ -163,31 +214,20 @@ async function _getSpineRows(
 }
 
 /**
- * Reads one concept's ontology rows and individuals into a plan.
+ * Reads one concept's ontology rows and records into a plan.
  *
- * The reads mirror `getDatasetColumnAssertions`: attributes, then the mappings
- * that populate them, then the dataset columns those mappings name. The
- * identifier attribute per contributing dataset comes out of the same rows, so
- * no extra query is needed for it.
+ * The columns come from `getConceptAttributeColumnsFromConceptId`, the same
+ * read `ConceptRecordValuesClient` uses to map result columns back to their
+ * attributes, so the two agree on every column's name.
  */
 async function _getConceptRelationPlan(
   options: Readonly<{
     ref: ConceptRelationRef;
     allowedDatasetIds: readonly Dataset.Id[];
+    restriction: ConceptSpineRestriction | undefined;
   }>,
 ): Promise<ConceptRelationPlan> {
-  const attributes = await ConceptAttributeClient.getAll(
-    where("concept_id", "eq", options.ref.id),
-  );
-  const mappings = await ConceptAttributeClient.getAllAttributeMappings({
-    attributes,
-  });
-  const datasetColumns = await _getMappedDatasetColumns(mappings);
-  const columns = makeConceptAttributeColumnsFromMetadata({
-    attributes,
-    mappings,
-    datasetColumnsById: makeIdLookupRecord(datasetColumns, { key: "id" }),
-  });
+  const columns = await getConceptAttributeColumnsFromConceptId(options.ref.id);
 
   columns.renamedColumns.forEach((renamed) => {
     Logger.warn(
@@ -206,7 +246,10 @@ async function _getConceptRelationPlan(
   return {
     ref: options.ref,
     contributingDatasetIds: columns.contributingDatasetIds,
-    spineRows: await _getSpineRows(options.ref.id),
+    spineRows: await _getSpineRows({
+      conceptId: options.ref.id,
+      restriction: options.restriction,
+    }),
     attributeColumns: columns.attributeColumns,
   };
 }
@@ -219,14 +262,22 @@ async function _getConceptRelationPlan(
  * executes, including the ones a dashboard fires per column summary, and a
  * cutover that added a Postgres read to dataset-only queries would be a
  * regression the old dispatch never had.
+ *
+ * `conceptSpineRestrictions` narrows a named concept's spine to the records it
+ * lists, for example to read one record's values.
  */
 export async function getConceptRelationPlansFromSql(
   options: Readonly<{
     rawSql: string;
     allowlist: ConceptRelationAllowlist;
+    conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
   }>,
 ): Promise<ConceptRelationPlan[]> {
   const conceptRefs = _getConceptRefsFromSql(options.rawSql);
+  const restrictionsByConceptId = _getRestrictionsByConceptId({
+    conceptRefs,
+    conceptSpineRestrictions: options.conceptSpineRestrictions ?? [],
+  });
   if (conceptRefs.length === 0) {
     return [];
   }
@@ -238,14 +289,17 @@ export async function getConceptRelationPlansFromSql(
   const allowedDatasetIds = await options.allowlist.getAllowedDatasetIds();
 
   // Sequential rather than concurrent: two concepts commonly share a
-  // contributing dataset, and these reads go through the shared query cache, so
-  // racing them would duplicate the fetches instead of reusing them.
+  // contributing dataset, so racing their reads would duplicate fetches.
   return await conceptRefs.reduce<Promise<ConceptRelationPlan[]>>(
     async (priorPlansPromise, ref) => {
       // react-doctor-disable-next-line
       const priorPlans = await priorPlansPromise;
       // react-doctor-disable-next-line
-      const plan = await _getConceptRelationPlan({ ref, allowedDatasetIds });
+      const plan = await _getConceptRelationPlan({
+        ref,
+        allowedDatasetIds,
+        restriction: restrictionsByConceptId.get(ref.id),
+      });
       return priorPlans.concat(plan);
     },
     Promise.resolve([]),
