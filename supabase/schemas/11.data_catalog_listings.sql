@@ -155,14 +155,7 @@ create table public.data_catalog_listings (
     ) || setweight(
       to_tsvector(
         'english'::regconfig,
-        coalesce(organization1_name, '') || ' ' ||
-        coalesce(organization2_name, '') || ' ' ||
-        coalesce(organization3_name, '') || ' ' ||
-        coalesce(organization4_name, '') || ' ' ||
-        public.util__text_array_to_text(domains) || ' ' ||
-        public.util__text_array_to_text(tags) || ' ' ||
-        coalesce(external_service_name, '') || ' ' ||
-        coalesce(pipeline_name, '')
+        coalesce(organization1_name, '') || ' ' || coalesce(organization2_name, '') || ' ' || coalesce(organization3_name, '') || ' ' || coalesce(organization4_name, '') || ' ' || public.util__text_array_to_text (domains) || ' ' || public.util__text_array_to_text (tags) || ' ' || coalesce(external_service_name, '') || ' ' || coalesce(pipeline_name, '')
       ),
       'B'
     ) || setweight(

@@ -20,7 +20,10 @@ describe("getOrganizationLabelsFromDrive", () => {
     expect(
       getOrganizationLabelsFromDrive({
         config: CONFIG,
-        drive: { baseUrl: "https://a.example.gov", organizationLabels: { 1: "State" } },
+        drive: {
+          baseUrl: "https://a.example.gov",
+          organizationLabels: { 1: "State" },
+        },
       }),
     ).toEqual({ 1: "State" });
   });

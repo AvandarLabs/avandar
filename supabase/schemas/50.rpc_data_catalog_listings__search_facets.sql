@@ -36,7 +36,11 @@ create or replace function public.rpc_data_catalog_listings__search_facets (
   p_organization2_names text[] default null,
   p_domains text[] default null,
   p_tags text[] default null
-) returns table (facet text, value text, listing_count bigint) as $$
+) returns table (
+  facet text,
+  value text,
+  listing_count bigint
+) as $$
 declare
   v_query text := nullif(btrim(p_query), '');
   v_organization1_names text[] := nullif(p_organization1_names, '{}'::text[]);

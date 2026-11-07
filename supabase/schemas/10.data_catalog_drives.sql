@@ -21,10 +21,7 @@ create table public.data_catalog_drives (
   organization2_label text,
   organization3_label text,
   organization4_label text,
-  constraint data_catalog_drives__pipeline_drive_unique unique (
-    pipeline_name,
-    drive_key
-  )
+  constraint data_catalog_drives__pipeline_drive_unique unique (pipeline_name, drive_key)
 );
 
 alter table public.data_catalog_drives enable row level security;
