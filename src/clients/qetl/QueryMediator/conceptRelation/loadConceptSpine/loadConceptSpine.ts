@@ -129,7 +129,9 @@ async function _createEmptyConceptSpine(
  * Reloading the whole spine on every query is right at demo scale (thousands of
  * individuals) and becomes the dominant cost in the tens of thousands. Caching
  * it belongs to the relation cache, keyed on the concept plus the
- * `modified-time` freshness signal `ConceptWrapper` already declares.
+ * `modified-time` freshness signal `ConceptWrapper` already declares. Any such
+ * key must also include the spine restriction, because a restricted spine must
+ * never answer an unrestricted query.
  */
 export async function loadConceptSpine(
   options: Readonly<{

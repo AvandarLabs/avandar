@@ -34,9 +34,10 @@ export type ConceptRelationAllowlist = {
 };
 
 /**
- * The most records one spine restriction may name. A restricted spine is read
- * from Postgres in batches of 50 keys, so this bounds one query to ten reads;
- * a caller needing more records reads the view unrestricted.
+ * The most distinct records one spine restriction may name. A restricted
+ * spine is read from Postgres in batches of 50 keys, so this bounds the
+ * batched reads to ten, plus one read for each key that cannot travel in a
+ * batch. A caller needing more records reads the view unrestricted.
  */
 export const MAX_RESTRICTED_EXTERNAL_IDS = 500;
 
@@ -102,10 +103,11 @@ function _getRestrictionsByConceptId(
         `Concept '${conceptId}' has more than one spine restriction.`,
       );
     }
-    if (externalIds.length > MAX_RESTRICTED_EXTERNAL_IDS) {
+    const uniqueExternalIdCount = removeDuplicates(externalIds).length;
+    if (uniqueExternalIdCount > MAX_RESTRICTED_EXTERNAL_IDS) {
       throw new Error(
         `The spine restriction on concept '${conceptId}' names ` +
-          `${externalIds.length} records; at most ` +
+          `${uniqueExternalIdCount} records; at most ` +
           `${MAX_RESTRICTED_EXTERNAL_IDS} may be named.`,
       );
     }
@@ -288,8 +290,9 @@ export async function getConceptRelationPlansFromSql(
   });
   const allowedDatasetIds = await options.allowlist.getAllowedDatasetIds();
 
-  // Sequential rather than concurrent: two concepts commonly share a
-  // contributing dataset, so racing their reads would duplicate fetches.
+  // Sequential rather than concurrent, so each concept's reads happen in a
+  // predictable order. A statement names one or two concepts, so running them
+  // at once would gain little.
   return await conceptRefs.reduce<Promise<ConceptRelationPlan[]>>(
     async (priorPlansPromise, ref) => {
       // react-doctor-disable-next-line
