@@ -70,7 +70,7 @@ There is no reasoning: no subsumption between concepts and no roles
 | Field | Concept attribute | `concept_attributes` | `ConceptAttribute` |
 | Where a field comes from | Attribute mapping | `attribute_mappings__dataset_column`, `attribute_mappings__manual_entry` | `AttributeMapping` |
 | Record, case | Individual | `individuals` | `Individual` |
-| A field's value on a record | Attribute assertion | none (computed) | `AttributeAssertion` |
+| A field's value on a record | Attribute assertion | none (computed) | none; read as `ConceptRecordValues` |
 | Record's display name | Label attribute (`is_label`) | `concept_attributes` | |
 | Join key of a dataset | Identifier attribute (`is_identifier`) | `concept_attributes` | |
 | The key value | `external_id` | `individuals` | |
@@ -86,8 +86,9 @@ names. Do not put DL terms in UI strings.
 - **RLS tests**: `supabase/tests/database/permissions/rls_{concepts,concept_attributes,individuals,attribute_mappings__dataset_column,attribute_mappings__manual_entry}.test.sql`
 - **Shared models and parsers**: `shared/models/ontology/`
 - **CRUD clients and mapping dispatch**: `src/clients/ontology/`
-- **Virtual assertions and value pickers**: `src/clients/ontology/AttributeAssertionClient/`
-- **Concepts as QETL relations**: `src/clients/qetl/QueryMediator/conceptRelation/`, `src/clients/qetl/wrappers/ConceptWrapper/`
+- **Value rules (the only value implementation)**: `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/`
+- **Record values for screens**: `src/clients/ontology/ConceptRecordValuesClient/`
+- **Concepts as QETL relations**: `src/clients/qetl/QueryMediator/conceptRelation/`
 - **Data Explorer status column**: `shared/models/queries/ConceptStatusColumn/`, `src/views/DataExplorerApp/makeQueryColumnsFromConcept/`
 - **Case Manager (TBox authoring, Sync)**: `src/views/OntologyDesignerApp/`
 - **Records screens (ABox browsing)**: `src/views/IndividualManagerApp/`
@@ -105,29 +106,29 @@ flowchart TD
   RT["src/routes:<br/>ontology-designer/*<br/>and individual-manager/*"]
   VW["src/views:<br/>OntologyDesignerApp<br/>(designer, converters,<br/>insert, Sync)<br/>and IndividualManagerApp"]
   CP["src/components/ChatPanel:<br/>CaseTypeDraftBlock,<br/>CaseDesignKickoff"]
-  OC["src/clients/ontology:<br/>CRUD clients,<br/>AttributeAssertionClient,<br/>getSQLSelectOfMapping"]
-  QE["src/clients/qetl:<br/>WorkspaceQuerySession,<br/>QueryMediator,<br/>conceptRelation,<br/>ConceptWrapper"]
+  OC["src/clients/ontology:<br/>CRUD clients,<br/>ConceptRecordValuesClient"]
+  QE["src/clients/qetl:<br/>WorkspaceQuerySession,<br/>QueryMediator,<br/>conceptRelation"]
   SM["shared/models/ontology and<br/>shared/types/chat.types"]
   EF["supabase/functions/chat:<br/>case-manager prompt<br/>and parsers"]
   RT -- "render" --> VW
   CP -- "imports applyCreatedCaseTypes and<br/>proposedCaseTypeToCreatedCaseType" --> VW
-  VW -- "CRUD and assertion reads" --> OC
+  VW -- "CRUD and record<br/>value reads" --> OC
   VW -- "generateIndividuals<br/>runs SQL" --> QE
-  OC -- "AttributeAssertionClient<br/>runs SQL" --> QE
-  QE -- "planner reads ontology<br/>rows, view uses<br/>getSQLSelectOfMapping,<br/>ConceptWrapper imports<br/>AttributeAssertionClient" --> OC
+  OC -- "ConceptRecordValuesClient<br/>runs SQL" --> QE
+  QE -- "planner reads<br/>ontology rows" --> OC
   OC -- "types and parsers" --> SM
   CP -- "chat draft types" --> SM
   EF -- "chat.types and<br/>the ConceptStatus model" --> SM
 ```
 
-_The two-way edge between the ontology clients and QETL is a module import
-cycle; keep the cyclic imports out of module top-level code, or loading can
-break, depending on which module in the cycle is evaluated first._
+_Edges run both ways between the ontology clients and QETL, but no module
+imports one that imports it: `ConceptRecordValuesClient` imports QETL, and
+QETL imports only the ontology CRUD clients, which import nothing from QETL.
+Keep it that way; a QETL module importing `ConceptRecordValuesClient` would
+make a cycle._
 
-The cycle runs `AttributeAssertionClient` → `WorkspaceQuerySession` →
-`QueryMediator` → `queryRunner` → `relationLoading` → `createDefaultRegistry` →
-`ConceptWrapper` → `AttributeAssertionClient`. The chat component layer also
-imports from the views layer (`useCaseTypeDraftCreation`).
+The chat component layer imports from the views layer
+(`useCaseTypeDraftCreation`).
 
 ## 4. Data model and row-level security
 
@@ -186,9 +187,9 @@ names. Every table also carries `workspace_id`, which the policies test. `concep
 | `attribute_mappings__manual_entry` | "This field is typed by hand" | Holds no value; no table stores entered values yet |
 | `individuals` | A record: one key of one case type | `unique (concept_id, external_id)`; `name` is `not null`; `status_id` and `assigned_to` are the only per-case state |
 
-Attribute assertions have no table. The `AttributeAssertion` model's `id`,
-`createdAt` and `updatedAt` are generated at read time and identify nothing;
-`datasetId` is its only provenance field. (An `entity_field_values` table once
+Field values have no table and no model. Screens read them as
+`ConceptRecordValues` (section 7.2), keyed by attribute id, and take a value's
+provenance from its field's mappings. (An `entity_field_values` table once
 stored values; migration `20250929162612` dropped it.)
 
 **RLS model.** Reads on all six tables test workspace membership
@@ -377,7 +378,7 @@ The draft card converts to the insert payload in two steps that do no I/O:
 ## 6. Generating records (Sync records)
 
 `generateIndividuals`
-(`src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index.ts`),
+(`src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts`),
 triggered by **Sync records** on the case type detail page. It recomputes the
 full set of individuals for one concept in browser DuckDB and upserts them. It
 computes no attribute values.
@@ -404,6 +405,8 @@ Design points:
   plus the label column), so the mediator does not acquire whole datasets for a
   `CREATE TABLE AS`, which has no top-level select list to infer from.
 - The label must be a `dataset_column` attribute; Sync reads no other kind.
+- The name is `buildAttributeValueSql` over the label mapping (section 7.1),
+  so it is the label's first, or most frequent, non-NULL value.
 
 **Current overwrite behaviour (as of 2026-10-09).** Each staged row carries a
 fresh `gen_random_uuid()` id, `NOW()` timestamps, `status = 'active'` and
@@ -425,58 +428,63 @@ names and new rows take defaults. See section 13.
 
 ## 7. Reading attribute values
 
-Attribute values are computed per read. There are two implementations of the
-value semantics:
-
-- `getSQLSelectOfMapping`
-  (`src/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping.ts`),
-  shared by the QETL concept view, Sync's name, and the legacy extension.
-- An inline copy in `AttributeAssertionClient.getAttributeAssertions`, used only
-  by the record page.
+Attribute values are computed per read, by one function.
+`buildAttributeValueSql`
+(`src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.ts`)
+turns one dataset-column mapping into a correlated subquery over one dataset,
+keyed by the outer row's record key. The concept view uses it for every
+dataset-backed attribute and Sync uses it for each record's name. Every other
+reader, the record page included, reads the view.
 
 ```mermaid
 %%{init: {'themeVariables': {'fontSize': '14px'}}}%%
 flowchart TD
-  S["getSQLSelectOfMapping:<br/>most_frequent counts<br/>NULL as a value"]
+  B["buildAttributeValueSql:<br/>every rule skips NULL"]
   V["QETL concept view<br/>(buildConceptViewSql)"]
   N["Sync records: each<br/>individual's name<br/>(generateIndividuals)"]
-  X["Legacy extension:<br/>getConceptExtension through<br/>getDatasetColumnAssertions"]
-  I["Inline copy in<br/>AttributeAssertionClient<br/>.getAttributeAssertions:<br/>most_frequent skips NULL"]
-  R["Record page Details panel<br/>(SingleIndividualView)"]
-  S -- "used by" --> V
-  S -- "used by" --> N
-  S -- "used by" --> X
-  X ~~~ I
-  I -- "used only by" --> R
+  R["Record page Details rail<br/>(ConceptRecordValuesClient,<br/>restricted spine)"]
+  Q["Data Explorer, chat,<br/>dashboards"]
+  B -- "used by" --> V
+  B -- "used by" --> N
+  V -- "read by" --> R
+  V -- "read by" --> Q
 ```
 
 Where:
 
-- **Legacy extension** - `getConceptExtension`, the older whole-concept read
-  path (section 7.3).
+- **Restricted spine** - a spine holding only the records a caller named
+  (section 7.3).
 
-_Changing a value rule means changing both copies until the record page reads
-the concept view; they already disagree on NULL under `most_frequent` (as of
-2026-10-09)._
+_Changing a value rule means changing `buildAttributeValueSql`. The record
+page, the Data Explorer, chat, dashboards, and Sync's names all follow._
 
 ### 7.1 Value pickers
 
 A dataset is usually finer-grained than the case type, so each dataset-column
 mapping names one of seven rules (a Postgres enum,
-`attribute_mappings__value_picker_rule_type`). Each renders as a correlated
-scalar subquery over one dataset, filtered by the outer row's key.
+`attribute_mappings__value_picker_rule_type`), and an `is_array` attribute
+keeps every value instead. Each renders as a correlated scalar subquery over
+one dataset, filtered by the outer row's key and by `IS NOT NULL` on the
+value.
 
-| Rule | SQL shape | Determinism |
+| Shape | SQL shape | Determinism |
 | --- | --- | --- |
-| `first` | Reads the `ava_rows_<datasetId>` view, `ORDER BY file_row_number LIMIT 1` | Total order within a parquet file |
+| `first` | Reads `ava_rows_<datasetId>`, `ORDER BY file_row_number LIMIT 1` | Total order within a parquet file |
 | `most_frequent` | `GROUP BY col ORDER BY COUNT(*) DESC, col LIMIT 1` | Ties broken by value |
 | `sum`, `avg`, `count`, `max`, `min` | `CAST(<agg>(col) AS DOUBLE)` | Floating-point; see limitations for `max`/`min` |
+| List (`is_array`) | Reads `ava_rows_<datasetId>`, `COALESCE(list(col ORDER BY file_row_number), [])` | Row order; `[]` when there is no value |
 
-In `getSQLSelectOfMapping`, key comparison is always
-`CAST(outer.external_id AS VARCHAR) = CAST(dataset."<key>" AS VARCHAR)`
+**NULL means "no value".** No rule reads a NULL cell: `first` returns the
+first non-NULL value, `most_frequent` the most frequent non-NULL value, a list
+leaves NULL out, and the aggregates skip NULL as they always have.
+
+Key comparison is always
+`CAST(outer."external_id" AS VARCHAR) = CAST(dataset."<key>" AS VARCHAR)`
 (`getEntityKeyComparisonSql` in `src/clients/DuckDbClient/duckDbSqlText.ts`),
 because `external_id` is Postgres `text` and a dataset key is often `BIGINT`.
-The record page's inline copy does not cast (section 7.2).
+Every identifier is quoted with `quoteSqlIdentifier`, and every value column is
+qualified with the `dataset` alias, so a column name may contain `"` and a
+value column named like a spine column cannot bind to the outer row.
 
 The rule names are hand-written in five places: the database enum,
 `DatasetColumnMappings.ValuePickerTypes`, `ChatCaseValuePickerRuleType` in
@@ -486,24 +494,64 @@ The rule names are hand-written in five places: the database enum,
 
 ### 7.2 Record page read path
 
-`AttributeAssertionClient.getAttributeAssertions` loads the individual, the
-identifier attributes and all requested mappings, then runs one statement per
-contributing dataset over `ava_rows_<datasetId>` filtered by the individual's
-`external_id`, and merges the results by attribute id. Each attribute reads
-exactly one dataset. **(as of 2026-10-09)** it throws for any manual-entry
-mapping, splices `external_id` into SQL as an unescaped, uncast literal, and the
-page renders any error as a Loader that never stops.
+`useRecordFields`
+(`src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/`) reads
+the case type's attributes, their mappings, the datasets those mappings name,
+and `ConceptRecordValuesClient.getConceptRecordValues({ workspaceId,
+conceptId, externalIds: [externalId] })`.
 
-### 7.3 Concept extension (legacy)
+The client accepts at most 500 distinct keys and checks that before any read.
+It then runs two reads side by side: the view's columns, through
+`getConceptAttributeColumnsFromConceptId` (the read the planner uses), and
+`SELECT * FROM "concept_<id>"` with `conceptSpineRestrictions` naming the
+requested keys. It throws when the result's column names differ from the ones
+the column read named, which happens when fields are edited between the two
+reads; a retry recovers. Otherwise it maps each result column back to its
+attribute through the column's `attributeId`, so two attributes with one name
+never swap values, and returns `ConceptRecordValues` (`{ externalId,
+valuesByAttributeId }`) for each key that names a record, in request order.
 
-`AttributeAssertionClient.getConceptExtension` returns every individual's
-values but runs one statement per dataset and concatenates the results, so an
-individual in two datasets comes back as two partial rows. It survives as the
-`_runConceptQuery` fallback in
-`src/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata.ts`
-(used when a structured query on a concept has no SQL) and behind
-`ConceptWrapper.pushDown`, which nothing calls. New code should read the
-concept view.
+Rows reach JavaScript through `arrowTableToJS`
+(`src/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults.ts`), which
+turns lists into plain arrays and converts the fields of structs and maps, list
+items included, the way it converts a top-level value.
+
+The rail shows every field of the case type in name order:
+
+- a NULL value (a manual-entry field is always one) as "No value";
+- under each value, the names of the datasets the field's mappings read;
+- on a failed read of the fields or the values, a callout with Try again
+  instead of placeholder rows.
+
+The rows stay loading until the values and the source reads have both
+arrived. A failed source read is not an error: the fields show without source
+names. A case type with no fields reads no values. Record values are cached
+under `["ConceptRecordValuesClient", "getConceptRecordValues", params]`, and
+`invalidateDatasetRowQueries` marks every case type's values stale after a
+Google Sheets or Postgres dataset refresh.
+
+### 7.3 Restricted reads
+
+`conceptSpineRestrictions` (`ConceptSpineRestriction[]`, each `{ conceptId,
+externalIds }`) is an option on `WorkspaceQuerySession.runQuery`. It travels
+through the mediator to the planner hook unchanged, never into the SQL. A
+session without a planner (the public session) refuses a non-empty one. A
+virtual dataset's nested query never receives the outer statement's
+restrictions, because its bytes are cached without them.
+
+`getConceptRelationPlansFromSql` checks each restriction before any read: it
+must name a concept the statement reads, at most once, with at most 500
+distinct keys. A restriction on SQL that reads no such concept, a dataset-only
+statement included, is refused. For a restricted concept the spine holds only
+the named records, read by `getIndividualsByExternalIds`: 50 keys per
+PostgREST `in` filter, and a key holding `"` or `\`, or starting with a space
+or tab, alone with an `eq` filter, because `postgrest-js` does not escape those
+inside a list and PostgREST trims leading whitespace there. A key that names no
+record has no spine row, and an empty restriction gives an empty spine.
+
+The spine and the view keep their usual names. Every query that names the
+concept rebuilds both inside its own lease, so a restricted view never answers
+another workspace query (see section 16 for the public session).
 
 ## 8. Concepts as QETL relations
 
@@ -544,10 +592,10 @@ defined, so the datasets and the spine must already exist._
 
 | Piece | File | What it guarantees |
 | --- | --- | --- |
-| Planning | `conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts` | No Postgres read for SQL that names no concept; foreign concepts and contributors throw (fail closed); statuses are read once per concept and matched to each record by `statusId`, and a record whose status is missing throws |
-| Column resolution | `conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | One column per attribute; one key column per dataset; `status` is taken before any attribute, and duplicate names (including an attribute named `status`) are suffixed `_2`, `_3`; manual-entry and unmapped attributes become typed NULL columns; a missing dataset column or key column throws |
+| Planning | `conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts` | No Postgres read for SQL that names no concept; foreign concepts and contributors throw (fail closed); statuses are read once per concept and matched to each record by `statusId`, and a record whose status is missing throws; a caller's `conceptSpineRestrictions` narrow a spine to the named records (section 7.3) |
+| Column resolution | `conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | One column per attribute; one key column per dataset; `status` and `external_id` are taken before any attribute, and duplicate names (including an attribute named `status` or `external_id`) are suffixed `_2`, `_3`, ignoring case as DuckDB does (`EXTERNAL_ID` becomes `EXTERNAL_ID_2`; `age` and `Age` become `age` and `Age_2`); each column carries its attribute's id (`attributeId`); manual-entry and unmapped attributes become typed NULL columns; a missing dataset column or key column throws |
 | Spine | `conceptRelation/loadConceptSpine/loadConceptSpine.ts`, `conceptRelation/toCsvRows/toCsvRows.ts` | Keys and status names travel as RFC 4180 CSV, never spliced into SQL; both columns pinned to `VARCHAR`; empty `external_id` refused; empty concept gets an empty table with both typed columns |
-| View | `conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | `FROM` is the spine alone, every attribute a correlated subquery, so the grain is one row per individual and a missing contribution is NULL; `external_id` and `status` come from the spine and win over an attribute of the same name; attribute columns sorted by name for byte-stable SQL; array attributes as `list(... ORDER BY file_row_number)` |
+| View | `conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | `FROM` is the spine alone, every attribute a correlated subquery, so the grain is one row per individual and a missing contribution is NULL; `external_id` and `status` come from the spine and win over an attribute of the same name, compared ignoring case; attribute columns sorted by name for byte-stable SQL; every dataset-backed value from `buildAttributeValueSql` |
 | Ordering and lease | `src/clients/qetl/QueryMediator/queryRunner.ts`, `conceptRelation/loadConceptRelations.ts` | Datasets, then spine, then view, then user SQL; spine names included in the lease |
 
 **Naming.** `concept_<id>` is the view; `concept_<id>__individuals` is the
@@ -556,7 +604,8 @@ aliases (`c0`, `c1`) that `SqlTableAlias` rewrites to `"concept_<uuid>"` on the
 edge function; see
 [2026-08-19-chat-concept-aliases-design.md](superpowers/specs/2026-08-19-chat-concept-aliases-design.md).
 Structured queries reach the view through `structuredQueryToSql`, which emits
-`concept_<id>` for a concept data source.
+`concept_<id>` for a concept data source, including a form that is out of
+sync with its SQL.
 
 **The status column.** Every concept view has a `status` column holding each
 record's status name. The Data Explorer offers it after the attributes as a
@@ -565,18 +614,12 @@ record's status name. The Data Explorer offers it after the attributes as a
 status column survives a refetch of the column list or a restore from the URL
 (`makeQueryColumnsFromConcept`, used by `useQueryColumnsForDataSource` and
 `getRestoredColumnsFromUrl`). Filters, grouping and aggregation need nothing
-special, because they read only a base column's `name` and `dataType`. The
-legacy `_runConceptQuery` path reads attribute values only and leaves the
-status column out. Filters match the status name, so renaming a status changes
+special, because they read only a base column's `name` and `dataType`.
+Filters match the status name, so renaming a status changes
 what a saved `status = '...'` filter matches. Chat's schema line lists each
 case type's statuses in position order (`- c0: Cholera case (age, status:
 Suspected | Confirmed)`), online through `fetchWorkspaceSchema` and offline
 through `fetchOfflineChatSchema`.
-
-**ConceptWrapper.** `src/clients/qetl/wrappers/ConceptWrapper/` is registered
-in `createDefaultRegistry` but the registry is only resolved for dataset refs,
-so it is not on any live path. Its `pushDown` delegates to the legacy
-extension.
 
 ## 9. UI map
 
@@ -589,7 +632,7 @@ extension.
 | `individual-manager/index.tsx` | Redirect to Case Manager home | |
 | `individual-manager/$conceptId/route.tsx` | Records slate: an `AppListPane` with a status filter and the count of records it matches, each row marked with its status color, plus the outlet | `src/views/IndividualManagerApp/index.tsx`, `IndividualNavbar/` (`StatusFilter/`), `makeRecordsWhereFromStatusFilter/`, `useConceptIndividuals.ts`, `useVirtualIndividualLinks.tsx`, `EditCaseTypeButton.tsx` |
 | `individual-manager/$conceptId/index.tsx` | Select-a-record or sync-first empty state | `src/views/IndividualManagerApp/IndividualSelectionEmptyState/` |
-| `individual-manager/$conceptId/$individualId.tsx` | Record page (`AppView`): the status beside the name (a menu for a Case Records editor, a badge for everyone else, each status's description on hover and focus), the activity feed and composer, and a rail of the case's fields and record facts | `src/views/IndividualManagerApp/SingleIndividualView/` (`RecordStatusControl/`, `useRecordStatusChange/`, `CaseActivityFeed/`, `CaseDetailsRail.tsx`, `RecordFactsGroup/`) |
+| `individual-manager/$conceptId/$individualId.tsx` | Record page (`AppView`): the status beside the name (a menu for a Case Records editor, a badge for everyone else, each status's description on hover and focus), the activity feed and composer, and a rail of the case's fields (each with the datasets it reads, "No value" when empty, and a retry on failure) and record facts | `src/views/IndividualManagerApp/SingleIndividualView/` (`RecordStatusControl/`, `useRecordStatusChange/`, `CaseActivityFeed/`, `CaseDetailsRail.tsx`, `useRecordFields/`, `RecordFactsGroup/`) |
 
 Outside the routes:
 
@@ -604,6 +647,11 @@ Outside the routes:
   place a record's status change or a status set save marks queries stale:
   the case type's record lists and counts, its statuses, every Data Explorer
   query, and the route loader.
+- **Record value invalidation**: `invalidateDatasetRowQueries`
+  (`src/views/DataManagerApp/DatasetMetaView/invalidateDatasetRowQueries/`)
+  marks every `ConceptRecordValuesClient` query stale after a Google Sheets or
+  Postgres dataset refresh. A status change or a Sync changes no value, so
+  neither touches them.
 - **Sidebar**: `WorkspaceLayout` adds one link per case type to its records
   screen.
 - **Spotlight**: `SpotlightLinks.ontologyDesignerCreatorView` opens the form.
@@ -624,10 +672,13 @@ Outside the routes:
 | Concept delete removes its whole subtree | `on delete cascade` foreign keys | Individuals and statuses included |
 | A record's status is one of its own case type's statuses | `individuals__status_fkey` | `concepts__default_status_fkey` has the same shape for the default |
 | A bare UUID DuckDB table name means a dataset | `RelationRef.fromTableName` (`shared/models/relations/RelationRef/`) | Hence `concept_`, `ava_rows_`, `ava_staging_individuals_` prefixes and the `__individuals` suffix (`src/clients/DuckDbClient/duckDbSqlText.ts`, `loadConceptSpine.ts`) |
-| Keys are compared as text | `getEntityKeyComparisonSql`, `duckDbSqlText.ts` | Applies to the view and Sync; the record page does not yet follow it |
-| No user data spliced into concept SQL | `loadConceptSpine` loads keys and status names as CSV through `toCsvRows` | The record page does not yet follow it |
+| Keys are compared as text | `getEntityKeyComparisonSql`, `duckDbSqlText.ts` | Applies to every value read: the view and Sync |
+| No user data spliced into concept SQL | `loadConceptSpine` loads keys and status names as CSV through `toCsvRows`; spine restrictions travel as data to `getIndividualsByExternalIds` | A restricted read narrows the spine, never the SQL |
+| No value rule reads a NULL cell | `buildAttributeValueSql` | NULL means "no value": `first` and `most_frequent` skip it, lists leave it out |
+| Identifiers in value SQL are quoted | `buildAttributeValueSql`, `getEntityKeyComparisonSql` (`quoteSqlIdentifier`) | A column name may contain `"` |
+| A spine restriction names a concept the query reads, once, with at most 500 distinct keys | `getConceptRelationPlansFromSql` | Fails closed before any read |
 | A concept view's `status` is the record's status | `makeConceptAttributeColumnsFromMetadata` reserves the name; `buildConceptViewSql` drops an attribute column of that name | Behind the `concept_attributes__name_not_reserved` check |
-| `first` and arrays order by `file_row_number` | `getSQLSelectOfMapping`, `buildConceptViewSql`; the `ava_rows_` view is created by `src/clients/DuckDbClient/duckDbParquetLoad.ts` | Never use `row_number() OVER ()`; parallel scan order is unstable |
+| `first` and arrays order by `file_row_number` | `buildAttributeValueSql`; the `ava_rows_` view is created by `src/clients/DuckDbClient/duckDbParquetLoad.ts` | Never use `row_number() OVER ()`; parallel scan order is unstable |
 | Concept refs and contributors outside the workspace throw | `getConceptRelationPlansFromSql` | Do not change this to dropping the reference: a stale view could answer |
 | Datasets and the spine before the view | `queryRunner._runLeasedQuery`, `loadConceptRelations` | DuckDB binds a view's sources when it is defined; the code loads datasets, then the spine, then the view. The lease must include each spine name (`_getLeaseNames`) |
 | Chat prompt sees catalog metadata only | `buildCaseManagerSystemPrompt` | Never add row values |
@@ -638,15 +689,15 @@ Outside the routes:
 | Pattern | Where | Caveat |
 | --- | --- | --- |
 | Description Logic TBox/ABox split [1] | Tables, models, clients, apps | No reasoning: no subsumption, no roles |
-| OBDA with global-as-view mappings [2], [3] | Mappings, `getSQLSelectOfMapping`, `buildConceptViewSql` | Concept membership is materialized; the unfolding exists twice |
-| Mediator with wrappers | `QueryMediator`; `ConceptWrapper` | Concepts use a planner hook, not the wrapper; the wrapper is unused |
-| Table Data Gateway plus Data Mapper | `createRdbCrudClient`, `makeParserRegistry` | `AttributeAssertionClient` is named a client but has no table |
+| OBDA with global-as-view mappings [2], [3] | Mappings, `buildAttributeValueSql`, `buildConceptViewSql` | Concept membership is materialized |
+| Mediator with wrappers | `QueryMediator` | Concepts use a planner hook, not a wrapper |
+| Table Data Gateway plus Data Mapper | `createRdbCrudClient`, `makeParserRegistry` | `ConceptRecordValuesClient` is a service client with no table |
 | Tagged union with exhaustive `match` | Five `match(mappingType)` sites | No runtime registry of per-kind behaviour; `AttributeMappingModelRegistry` is a type only |
 | Adapter chain onto one writer | `proposedCaseTypeToCreatedCaseType`, `createdCaseTypeToFormValues` | The chat path fabricates form-only fields |
 | Single-transaction RPC | `rpc_concepts__create`, `rpc_concept_statuses__save` | The save RPC is `SECURITY DEFINER` and checks Case Types editor itself, because it moves records |
 | Staging table then merge | `generateIndividuals` | The merge overwrites every column and never deletes (as of 2026-10-09) |
-| Fail-safe defaults | Concept allowlist, column resolution, spine loader | The record page swallows its errors; a `dataset_column` attribute with no mapping row becomes a typed NULL column rather than a throw |
-| Injected reads around a pure core | `ConceptWrapperDependencies`, `ConceptRelationAllowlist`, `makeConceptAttributeColumnsFromMetadata` | Older code calls singleton clients directly and is harder to test |
+| Fail-safe defaults | Concept allowlist, column resolution, spine loader | A `dataset_column` attribute with no mapping row becomes a typed NULL column rather than a throw |
+| Injected reads around a pure core | `ConceptRelationAllowlist`, `makeConceptAttributeColumnsFromMetadata` | Older code calls singleton clients directly and is harder to test |
 | Reducer stores | `ChatPanelStateManager`, `ConceptCreatorStore` | `ConceptCreatorStore` holds only derived strings |
 
 ## 12. How to add a new attribute source
@@ -671,49 +722,45 @@ means TypeScript lists the site once the database enum gains the value;
 | 7 | `shared/models/ontology/AttributeMapping/AttributeMapping.types.ts` | `AttributeMappingModelRegistry` key | Compile |
 | 8 | `shared/models/ontology/ConceptAttribute/ConceptAttributeParsers.ts` | Hard-coded `z.enum` | Compile (zod type test) |
 | 9 | `shared/models/ontology/ConceptAttribute/ConceptAttributes.ts` | Metadata entry (no readers) | Compile |
-| 10 | `shared/models/ontology/AttributeAssertion/AttributeAssertion.types.ts` | Provenance beyond `datasetId`, if shown | Inherent |
-| 11 | New `src/clients/ontology/ComputedMappingClient.ts` | `createRdbCrudClient` call | Inherent |
-| 12 | `src/clients/ontology/AttributeMappingClient.ts` | `bulkInsert` arm | Compile |
-| 13 | `src/clients/ontology/ConceptAttributeClient.ts` | `getAllAttributeMappings` arm | Compile |
-| 14 | `src/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes.ts` | `mappings.computed` draft in both factories | Compile |
-| 15 | `src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx` | Per-kind list, its block, and the `.concat` in `transformValues` | **Silent** (a missing `.concat` drops the attributes) |
-| 16 | New `ConceptCreatorView/ComputedAttributesBlock.tsx` | Form block | Inherent |
-| 17 | `insertConceptFromFormValues.ts`, `supabase/schemas/50.rpc_concepts__create.sql`, and `ConceptClient.create` | `_mappingsFromAttributes` arm, plus a parameter and an insert for the new mapping table | Compile for the arm; **Silent** for the RPC (the new kind's mappings are never written) |
-| 18 | `shared/types/chat.types.ts` | `ChatCreatedCaseAttribute` arm, proposal list | Inherent |
-| 19 | `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts` | Parse the list | Inherent |
-| 20 | `supabase/functions/chat/PostChatMessages/parsing/parseCreateCaseTypes.ts` | `kind` branch | **Silent** (unknown kinds dropped) |
-| 21 | `supabase/functions/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts` | Both tool schemas | Inherent |
-| 22 | `supabase/functions/chat/PostChatMessages/prompt/buildCaseManagerSystemPrompt.ts` | When to propose it | Inherent |
-| 23, 24, 25 | `src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.ts`, `CaseTypeDraftCard.tsx`, new section component | Draft card editing | Inherent |
-| 26 | `src/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType.ts` | Carry the list | **Silent** |
-| 27 | `src/views/OntologyDesignerApp/createdCaseTypeToFormValues/createdCaseTypeToFormValues.ts` | Kind branch and `_makeMappedAttribute` draft | Compile |
-| 28 | `src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx` | Badge ternary labels every non-dataset kind "Entered manually" | **Silent** |
-| 29 | `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index.ts` | Only if the kind may be the label | **Silent** (crash) |
-| 30 | `src/clients/ontology/AttributeAssertionClient/AttributeAssertionClient.ts` | Record page arm | Compile |
-| 31 | `src/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getAttributeAssertions.ts` | Legacy extension arm | Compile |
-| 32 | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | Column kind and selector; a computed column needs an outer `SELECT`, since DuckDB cannot reuse an alias whose expression is a subquery | Inherent |
-| 33 | `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | Otherwise the kind becomes a typed NULL column | **Silent** |
-| 34 | `src/views/IndividualManagerApp/SingleIndividualView/index.tsx` | Provenance display, if wanted | Inherent |
+| 10 | New `src/clients/ontology/ComputedMappingClient.ts` | `createRdbCrudClient` call | Inherent |
+| 11 | `src/clients/ontology/AttributeMappingClient.ts` | `bulkInsert` arm | Compile |
+| 12 | `src/clients/ontology/ConceptAttributeClient.ts` | `getAllAttributeMappings` arm | Compile |
+| 13 | `src/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes.ts` | `mappings.computed` draft in both factories | Compile |
+| 14 | `src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx` | Per-kind list, its block, and the `.concat` in `transformValues` | **Silent** (a missing `.concat` drops the attributes) |
+| 15 | New `ConceptCreatorView/ComputedAttributesBlock.tsx` | Form block | Inherent |
+| 16 | `insertConceptFromFormValues.ts`, `supabase/schemas/50.rpc_concepts__create.sql`, and `ConceptClient.create` | `_mappingsFromAttributes` arm, plus a parameter and an insert for the new mapping table | Compile for the arm; **Silent** for the RPC (the new kind's mappings are never written) |
+| 17 | `shared/types/chat.types.ts` | `ChatCreatedCaseAttribute` arm, proposal list | Inherent |
+| 18 | `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts` | Parse the list | Inherent |
+| 19 | `supabase/functions/chat/PostChatMessages/parsing/parseCreateCaseTypes.ts` | `kind` branch | **Silent** (unknown kinds dropped) |
+| 20 | `supabase/functions/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts` | Both tool schemas | Inherent |
+| 21 | `supabase/functions/chat/PostChatMessages/prompt/buildCaseManagerSystemPrompt.ts` | When to propose it | Inherent |
+| 22, 23, 24 | `src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.ts`, `CaseTypeDraftCard.tsx`, new section component | Draft card editing | Inherent |
+| 25 | `src/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType.ts` | Carry the list | **Silent** |
+| 26 | `src/views/OntologyDesignerApp/createdCaseTypeToFormValues/createdCaseTypeToFormValues.ts` | Kind branch and `_makeMappedAttribute` draft | Compile |
+| 27 | `src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx` | Badge ternary labels every non-dataset kind "Entered manually" | **Silent** |
+| 28 | `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts` | Only if the kind may be the label | **Silent** (crash) |
+| 29 | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | Column kind and selector; a computed column needs an outer `SELECT`, since DuckDB cannot reuse an alias whose expression is a subquery | Inherent |
+| 30 | `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | Otherwise the kind becomes a typed NULL column | **Silent** |
+| 31 | `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes.ts` | Source names for the new kind, if shown | Inherent |
 
 Generated afterwards: the migration (`pnpm db:new-migration`, after the
 Supabase switch checks in `CLAUDE.md`), `shared/types/database.types.ts`, and
-`apps/desktop/migrations/*.gen.sql`. No change is needed in `ConceptWrapper`,
-the routes, `useHydratedConcept`, `getConceptRelationPlansFromSql` or
-`getNeededColumnsFromQuery`.
+`apps/desktop/migrations/*.gen.sql`. No change is needed in
+`ConceptRecordValuesClient`, the routes, `useHydratedConcept`,
+`getConceptRelationPlansFromSql` or `getNeededColumnsFromQuery`.
 
 ```mermaid
 %%{init: {'flowchart': {'rankSpacing': 15}}}%%
 flowchart TD
   L1["Database, 4 files<br/>inherent: 1, 2, 3, 4"]:::inherent
-  L2["Shared models, 6 files<br/>inherent: 5, 6, 10<br/>compile: 7, 8, 9"]:::compile
-  L3["Clients, 3 files<br/>inherent: 11<br/>compile: 12, 13"]:::compile
-  L4["Authoring, form: 4 files<br/>inherent: 16<br/>compile: 14, 17<br/>silent: 15"]:::silent
-  L5["Authoring, chat: 10 files<br/>inherent: 18, 19, 21 to 25<br/>compile: 27<br/>silent: 20, 26"]:::silent
-  L6["Designer views and Sync,<br/>2 files<br/>silent: 28, 29"]:::silent
-  L7["Reading values, 2 files<br/>compile: 30, 31"]:::compile
-  L8["QETL, 2 files<br/>inherent: 32<br/>silent: 33"]:::silent
-  L9["Record page, 1 file<br/>inherent: 34"]:::inherent
-  L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7 --> L8 --> L9
+  L2["Shared models, 5 files<br/>inherent: 5, 6<br/>compile: 7, 8, 9"]:::compile
+  L3["Clients, 3 files<br/>inherent: 10<br/>compile: 11, 12"]:::compile
+  L4["Authoring, form: 4 files<br/>inherent: 15<br/>compile: 13, 16<br/>silent: 14"]:::silent
+  L5["Authoring, chat: 10 files<br/>inherent: 17, 18, 20 to 24<br/>compile: 26<br/>silent: 19, 25"]:::silent
+  L6["Designer views and Sync,<br/>2 files<br/>silent: 27, 28"]:::silent
+  L7["QETL, 2 files<br/>inherent: 29<br/>silent: 30"]:::silent
+  L8["Record page, 1 file<br/>inherent: 31"]:::inherent
+  L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7 --> L8
   classDef inherent fill:#e6f4ea,stroke:#2e7d32
   classDef compile fill:#e3f2fd,stroke:#1565c0
   classDef silent fill:#fff3e0,stroke:#e65100,stroke-width:3px
@@ -725,18 +772,16 @@ Where:
 - **Green** - only inherent edits; **blue** - incidental edits, all caught by
   the compiler; **orange, thick border** - at least one silent edit.
 
-_34 files: 18 inherent, 10 compile-enforced, 6 silent. Search for the silent
+_31 files: 17 inherent, 8 compile-enforced, 6 silent. Search for the silent
 sites by name before declaring a new kind done._
 
 Why it is scattered, and what would consolidate it:
 
 - Per-kind behaviour is a `match` repeated at each call site; a runtime
   registry (client, record reader, view-column builder, form block) per kind
-  would collapse items 7, 8, 9, 12, 13, 17, 28 and 33.
-- Values are read by two implementations plus a legacy one; moving the record
-  page onto the concept view removes items 30 and 31.
+  would collapse items 7, 8, 9, 11, 12, 16, 27 and 30.
 - Form state and the chat contract keep one list per kind; a single attribute
-  list with a discriminated mapping removes items 14, 15, 26 and 27.
+  list with a discriminated mapping removes items 13, 14, 25 and 26.
 
 ## 13. How to add a per-case capability
 
@@ -807,8 +852,7 @@ and the dataset wrapper's own rule in `createDefaultRegistry.ts` is that a new
 source type is "an entry in this match plus a wrapper". Two conditions, both
 needed by the Data Explorer anyway: `dataset_columns.name` must equal the parquet
 column names, because ontology SQL quotes `datasetColumn.name`; and keys may be
-of any type for the concept view, which compares them as text, while the record
-page compares without casts (section 16).
+of any type, because every value read compares them as text (section 7.1).
 
 ## 15. Testing
 
@@ -818,16 +862,18 @@ Follow [rules/testing.md](rules/testing.md). Existing coverage:
 | --- | --- | --- |
 | RLS (pgTAP) | `supabase/tests/database/permissions/rls_concepts.test.sql` and the four peers | `pnpm test:db`, only after `ava supabase status` reports the right project for the current branch (on any branch other than `develop`, that means its own switched project; see `CLAUDE.md`) |
 | Concept view and column resolution against real DuckDB | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/__tests__/conceptAttributeColumns.integration.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/toCsvColumn/toCsvColumn.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/toCsvRows/toCsvRows.executed.test.ts`, `tests/integration/queries/structuredQueryConcepts.executed.test.ts` | `pnpm vitest run --config vitest.executed.config.ts <files>` (or `pnpm test:executed`) |
-| QETL planning, spine, ordering | `src/clients/qetl/QueryMediator/conceptRelation/**/*.test.ts`, `src/clients/qetl/QueryMediator/__tests__/QueryMediator.concepts.test.ts`, `src/clients/qetl/wrappers/ConceptWrapper/ConceptWrapper.test.ts` | `pnpm vitest run <paths>` |
+| Value rules (NULL, ties, quoting) against real DuckDB | `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.executed.test.ts` | `pnpm test:executed <file>` |
+| QETL planning, spine, ordering | `src/clients/qetl/QueryMediator/conceptRelation/**/*.test.ts`, `src/clients/qetl/QueryMediator/__tests__/QueryMediator.concepts.test.ts`, `src/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession.membership.test.ts` | `pnpm vitest run <paths>` |
 | Authoring conversion and draft card | `src/views/OntologyDesignerApp/**/*.test.ts(x)`, `src/components/ChatPanel/CaseTypeDraftBlock/*.test.ts(x)`, `src/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff.test.ts` | `pnpm vitest run <paths>` |
 | Edge function parsing and prompt | `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.test.ts`, `parseCreateCaseTypes.test.ts`, `prompt/buildCaseManagerSystemPrompt.test.ts` | `pnpm vitest run <paths>` |
 | Records UI | `src/views/IndividualManagerApp/**/*.test.tsx` | `pnpm vitest run <paths>` |
+| Record values and the record page rail | `src/clients/ontology/ConceptRecordValuesClient/**/*.test.ts`, `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/**/*.test.ts`, `tests/e2e/record-page-field-values.spec.ts` | `pnpm vitest run <paths>`; the spec with `pnpm test:e2e record-page-field-values.spec.ts`, on its own |
 | Status column end to end | `tests/e2e/case-statuses-data-explorer.spec.ts` | `pnpm test:e2e case-statuses-data-explorer.spec.ts`, on its own |
 
 Gaps to close when touching the code: no test covers
-`AttributeAssertionClient`, `insertConceptFromFormValues`, or Sync's upsert
-semantics (its tests assert the staging SQL text), and no pgTAP case checks
-that a workspace member can update a row. Value-picker tests must construct
+`insertConceptFromFormValues` or Sync's upsert semantics (its tests assert the
+staging SQL text), and no pgTAP case checks that a workspace member can update
+a row. Value-picker tests must construct
 ties, since a rule deterministic only without ties is not deterministic.
 
 ## 16. Known limitations (as of 2026-10-09)
@@ -838,19 +884,19 @@ means established from the code.
 | Limitation | Effect | Status |
 | --- | --- | --- |
 | Sync takes keys from every dataset but the name from one | A multi-dataset case type with an uncovered key fails to sync, after partial writes | Read |
-| Record page throws on any manual-entry mapping; chat offers manual fields regardless of `DisableManualData` | The Details panel never loads for such case types | Verified (app) |
+| Chat offers manual-entry fields regardless of `DisableManualData` | Such fields always show "No value", since nothing stores entered values | Read |
 | `max`/`min` cast to `DOUBLE`, which fails for non-numeric columns | Date or text attributes with those rules fail their record pages and any concept query that reads the column; numeric columns are unaffected | Verified (DuckDB CLI 1.3.2; the app's DuckDB-wasm build not tested) |
-| Record page splices `external_id` unescaped and uncast | A key with a quote, or a text key against a numeric key column, fails the record page | Verified (DuckDB CLI) |
 | Sync never deletes individuals | Records whose keys left the data stay | Read |
 | `getPage` in `createSupabaseCrudClient` uses an inclusive range with no order | Duplicate rows in the records list; duplicate spine keys past 500 individuals | Verified (duplicate-key warnings; rolled-back replay) |
-| Two `most_frequent` copies disagree on NULL | Record page and queries can show different values | Verified (DuckDB CLI) |
 | Identifier-per-dataset trigger check runs before mappings exist | The database never enforces one key per dataset | Read |
 | No foreign key from mappings to datasets or columns | Deleting a dataset breaks every concept that reads it | Read |
 | `createCaseTypes` still offered to the model | A call creates case types with no confirmation and default pickers | Read |
 | Composer disabled in Case Manager | The prompt's "revise the draft" turn is unreachable, and a kickoff that fails (shown with no error, a separate gap) can be retried only through New chat or New case type | Verified (app) |
 | Draft card join key options are the proposed attributes only | A key column the model did not list cannot be chosen | Read |
 | The form allows a manual-entry label | Sync then fails with a TypeError | Read |
-| Value-picker SQL quotes names without escaping | A name containing `"` breaks the concept view | Read |
+| A restricted read leaves a view covering only its records in the tab's DuckDB catalog | A session that does not rebuild views (a public session reading a `concept_<id>` a workspace query left behind) would see that subset | Read |
+| Only a Google Sheets or Postgres refresh marks record values stale | Re-uploading a CSV or XLSX, deleting a dataset, or a live source going stale leaves an open record page on its cached values | Read |
+| Structured queries select a concept column by the attribute's name, not its emitted column name | A query on an attribute whose column was suffixed (one named `status` or `external_id`, or a duplicate name) reads the spine's column or the other attribute instead; the Data Explorer builds such queries | Read |
 
 Not built: roles between concepts, subsumption, status change history,
 assignment, activity log, manual entry storage, editing a case type, manual
@@ -868,8 +914,9 @@ and the auto-limit guard for large concepts.
   workflow, list view). Its note that concept delete does not cascade is out of
   date; the schema cascades.
 - [superpowers/specs/2026-08-18-qetl-concept-relations-design.md](superpowers/specs/2026-08-18-qetl-concept-relations-design.md):
-  the concept view, spine, determinism rules, and the planned consolidation of
-  the record page and removal of `_runConceptQuery`.
+  the concept view, spine, and determinism rules. The consolidation of the
+  record page onto the view and the removal of `_runConceptQuery` it describes
+  are both done.
 - [superpowers/specs/2026-08-19-chat-concept-aliases-design.md](superpowers/specs/2026-08-19-chat-concept-aliases-design.md):
   `cN` aliases in chat SQL.
 - [description-logic-nomenclature.md](description-logic-nomenclature.md): the

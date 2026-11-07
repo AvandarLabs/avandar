@@ -145,8 +145,11 @@ run before any lock; steps 4 to 13 run inside one coordinated operation.
    intersects the SQL's references with the snapshot's dataset list.
 2. **`planConceptRelations`** (workspace session only). Reads attributes,
    mappings, dataset columns, and individuals for each `concept_<uuid>` the SQL
-   names; returns `[]` with no read when there is none
+   names (only the named records when the caller passes
+   `conceptSpineRestrictions`); returns `[]` with no read when there is none
    ([getConceptRelationPlansFromSql.ts](../src/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts)).
+   A session without this hook refuses a non-empty `conceptSpineRestrictions`
+   (`queryRunner.ts`).
 3. **`_getExpandedQueryDependencies`**. Adds each concept's contributing
    datasets, sorted and de-duplicated (`expandRelationRefs`).
 4. **`runCoordinatedDatasetDuckDbOperation`**. Takes the lease on
@@ -185,7 +188,8 @@ run before any lock; steps 4 to 13 run inside one coordinated operation.
 A virtual dataset is acquired at step 10 by running its defining SQL through the
 same `runQuery` with the outer lease (`runParquetQuery` in
 `_createRegistryForFetch`). The nested query repeats steps 1 to 13 without
-taking locks.
+taking locks, and without the outer statement's `conceptSpineRestrictions`,
+because its parquet bytes are cached without them.
 
 ## 5. Components, their paths, and their dependencies
 
@@ -199,7 +203,7 @@ taking locks.
 | Column inference | `QueryMediator/getNeededColumnsFromQuery/`, `getParquetColumnNamesFromNeeded/`, `QueryableRelationColumns/` | Infer and map needed columns; the sidecar | analyzer tokens |
 | Concepts | `QueryMediator/conceptRelation/` | Plan, spine, view | ontology CRUD clients, `DuckDbClient` |
 | Registry | [`src/clients/qetl/RelationRegistry/`](../src/clients/qetl/RelationRegistry/) | One wrapper per kind; registration checks | wrapper types |
-| Wrappers | [`src/clients/qetl/wrappers/`](../src/clients/qetl/wrappers/) | `createDefaultRegistry` (dataset dispatcher on `sourceType`), Parquet, virtual, Sheets, concept wrappers | connector clients, CRUD clients |
+| Wrappers | [`src/clients/qetl/wrappers/`](../src/clients/qetl/wrappers/) | `createDefaultRegistry` (dataset dispatcher on `sourceType`), Parquet, virtual, Sheets, and Postgres wrappers | connector clients, CRUD clients |
 | Cache adapters | [`src/clients/qetl/RelationCache/`](../src/clients/qetl/RelationCache/) | Workspace and public `RelationCachePort` implementations | `AvaDexie`, relation key helpers |
 | Relation models | [`shared/models/relations/`](../shared/models/relations/) | `RelationRef`, capabilities, schema, wrapper types, cache key and port | none in `src/` (Deno-reachable) |
 | SQL analyzer | [`src/lib/sql/DuckDbSqlAnalyzer/`](../src/lib/sql/DuckDbSqlAnalyzer/) | Fail-closed read, mutating, or unsafe verdict with the relations involved | `RelationRef`, `duckDbSqlText` |
@@ -641,7 +645,7 @@ pnpm vitest run src/clients/qetl src/clients/DuckDbClient src/lib/sql src/client
 | Lock order, nesting, release on throw, no-locks fallback | `DatasetDuckDbCoordinator.test.ts` |
 | Leases across loads, poisoning, public versus workspace reads | `DuckDbClient/__tests__/*.test.ts` |
 | Analyzer verdicts | `DuckDbSqlAnalyzer.test.ts` |
-| Concept view grain and value pickers in real DuckDB | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/__tests__/conceptAttributeColumns.integration.executed.test.ts` |
+| Concept view grain and value pickers in real DuckDB | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/__tests__/conceptAttributeColumns.integration.executed.test.ts` |
 | Sheets CSV read through a real DuckDB reader | `acquireGoogleSheetRelation.executed.test.ts` |
 | CKAN resource selection and refusals | `shared/open-data/*.test.ts`, `statusFromOpenDataFailure.test.ts` |
 
@@ -670,8 +674,7 @@ means traced through the source but not run.
 | A CKAN resource in Parquet format is wrapped in an untyped Blob and fails `registerParquetFile` when the query needs all columns; the bad entry is cached first. Latent: in-repo registrations are CSV and XLSX | by reading | `DatasetParquetWrapper.ts` |
 | The sidecar is never cleared; a stale narrow entry can make a public query reload a snapshot table and then fail the ownership check | by reading | `QueryableRelationColumns.ts` |
 | Snapshot publishing of an `all_columns` slice fails over API-backed open data without a ready `LocalDataset` row (no `.parquet` canonical URL exists). Google Sheets and Postgres tables keep no parquet in Storage, so every slice of theirs is read through the workspace query instead. An uploaded file's `all_columns` slice copies the stored parquet, which keeps the original column names and detected types, so a column renamed or retyped after import does not match the widget SQL a published viewer runs | by reading | `dashboardPublishSnapshots.ts`, `LocalPublicDatasetRawDataClient.ts` |
-| `_runConceptQuery` fallback ignores filters, grouping, aggregation, and sort | by reading | `runStructuredQueryWithMetadata.ts` |
-| `ConceptWrapper` is registered but never resolved; `extractReferencedRelations`, `buildCsvFromDatastoreRecords`, `RelationRegistry.resolveAll` and `wrappers` have no production caller | by reading | as named |
+| `extractReferencedRelations`, `buildCsvFromDatastoreRecords`, `RelationRegistry.resolveAll` and `wrappers` have no production caller | by reading | as named |
 | Concept attributes mapped from two datasets read only the first mapping | by reading | `makeConceptAttributeColumnsFromMetadata.ts` |
 | An `ava_rows_` view outlives its dataset when the dataset is dropped and not reloaded | documented in code | `duckDbParquetLoad.ts` |
 | Planned and absent: the 14-day offline authorization window, sorted materialization by entity key, publish-time concept materialization | by reading | design specs below |
