@@ -27,6 +27,13 @@ describe("hdxUpdateFrequency", () => {
     expect(hdxUpdateFrequency({ data_update_frequency: "45" })).toBe("45");
   });
 
+  it("does not read inherited object properties as codes", () => {
+    expect([
+      hdxUpdateFrequency({ data_update_frequency: "constructor" }),
+      hdxUpdateFrequency({ data_update_frequency: "toString" }),
+    ]).toEqual(["constructor", "toString"]);
+  });
+
   it("returns undefined when the record has no update frequency", () => {
     expect([hdxUpdateFrequency({}), hdxUpdateFrequency(null)]).toEqual([
       undefined,

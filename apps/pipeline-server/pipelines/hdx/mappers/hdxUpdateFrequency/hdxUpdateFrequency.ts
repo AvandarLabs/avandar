@@ -26,5 +26,7 @@ export default function hdxUpdateFrequency(record: unknown): unknown {
   if (typeof code !== "string") {
     return undefined;
   }
-  return UPDATE_FREQUENCY_BY_CODE[code] ?? code;
+  return Object.hasOwn(UPDATE_FREQUENCY_BY_CODE, code)
+    ? UPDATE_FREQUENCY_BY_CODE[code]
+    : code;
 }

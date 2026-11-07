@@ -70,4 +70,36 @@ describe("loadPipelineDefinition", () => {
       updateFrequency: "Monthly",
     });
   });
+
+  it("loads the shipped HDX config and maps a recorded CKAN package", async () => {
+    const { config, mapper } = await loadPipelineDefinition(
+      fileURLToPath(new URL("../../hdx/hdx.pipeline.yaml", import.meta.url)),
+    );
+
+    expect(
+      config.drives.map((drive) => {
+        return drive.baseUrl;
+      }),
+    ).toEqual(["https://data.humdata.org"]);
+    expect(
+      mapper.mapFields(
+        {
+          organization: { title: "World Health Organization" },
+          notes: "Measles cases by week.",
+          license_title: "Creative Commons Attribution for IGOs (CC BY-IGO)",
+          groups: [{ title: "Burkina Faso" }, { title: "Mali" }],
+          tags: [{ name: "measles" }, { name: "health" }],
+          data_update_frequency: "7",
+        },
+        "https://data.humdata.org",
+      ).fields,
+    ).toMatchObject({
+      organization1Name: "World Health Organization",
+      description: "Measles cases by week.",
+      license: "Creative Commons Attribution for IGOs (CC BY-IGO)",
+      domains: ["Burkina Faso", "Mali"],
+      tags: ["measles", "health"],
+      updateFrequency: "Every week",
+    });
+  });
 });
