@@ -78,12 +78,16 @@ export const MentionMenuList = forwardRef<
         // The anchor is a zero-size point at the caret, which floating-ui
         // can report as detached. The list must show whenever it is mounted.
         hideDetached={false}
+        // Near the bottom of the window the menu flips above the caret, and
+        // `size` caps its height to the room left so the groups scroll
+        // while the status row and footer stay visible.
+        middlewares={{ flip: true, shift: true, size: { padding: 8 } }}
         onOptionSubmit={chooseItemById}
       >
         <Combobox.Target>
           <div />
         </Combobox.Target>
-        <Combobox.Dropdown>
+        <Combobox.Dropdown className={classes.dropdown}>
           <MentionMenuSearchStatus
             isSearching={props.isSearching}
             searchFailed={props.searchFailed}

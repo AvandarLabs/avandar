@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Combobox, Text } from "@mantine/core";
+import { useEffect, useRef } from "react";
 import { GADGET_REGISTRY } from "@/components/RichText/Gadget/gadgetRegistry/gadgetRegistry";
 import classes from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList.module.css";
 import type { MentionMenuItem } from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
@@ -26,6 +27,8 @@ function _buildInitials(name: string): string {
 /**
  * One row of `MentionMenuList`: a member's initials, name, and email, or a
  * gadget's type icon, name, and sub-label (its type name when it has none).
+ * The highlighted row scrolls into view when the list is taller than the
+ * menu.
  */
 export function MentionMenuOption({
   item,
@@ -37,8 +40,16 @@ export function MentionMenuOption({
     item.kind === "gadget" ? GADGET_REGISTRY[item.result.ref.gadgetType] : null;
   const detail =
     item.detail ?? (definition ? i18n._(definition.label) : undefined);
+  const optionRef = useRef<HTMLDivElement>(null);
+  // The editor keeps focus, so the browser never scrolls to the highlight.
+  useEffect(() => {
+    if (isHighlighted) {
+      optionRef.current?.scrollIntoView({ block: "nearest" });
+    }
+  }, [isHighlighted]);
   return (
     <Combobox.Option
+      ref={optionRef}
       id={optionId}
       value={item.id}
       className={classes.optionRow}

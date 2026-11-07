@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Combobox } from "@mantine/core";
+import classes from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList.module.css";
 import { MentionMenuGroupTitle } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle";
 import { MentionMenuOption } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuOption";
 import type { MentionMenuGroup } from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
@@ -38,7 +39,11 @@ export function MentionMenuGroups({
   const refreshingGroupKey =
     isSearching && groups[0]?.key !== "people" ? groups[0]?.key : undefined;
   return (
-    <Combobox.Options id={listboxId} aria-busy={isSearching}>
+    <Combobox.Options
+      id={listboxId}
+      className={classes.groups}
+      aria-busy={isSearching}
+    >
       {groups.length === 0 && !hasSearchStatus ? (
         <Combobox.Empty>
           <Trans>No matches</Trans>

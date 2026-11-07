@@ -417,6 +417,22 @@ describe("MentionMenuList highlight", () => {
   });
 });
 
+describe("MentionMenuList scrolling", () => {
+  it("scrolls the highlighted row into view when the arrow keys move to it", async () => {
+    const scrollIntoView = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+    const ref = createRef<MentionMenuListHandle>();
+    _renderList({ ref });
+    await screen.findByText("Priya Natarajan");
+    scrollIntoView.mockClear();
+    _pressKey(ref, { key: "ArrowDown" });
+    const priscillaOption = screen.getAllByRole("option")[1];
+    await waitFor(() => {
+      expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest" });
+    });
+    expect(scrollIntoView.mock.contexts).toContain(priscillaOption);
+  });
+});
+
 describe("MentionMenuList accessibility", () => {
   it("makes the editing area a combobox pointing at the highlighted option", async () => {
     const editingArea = _createEditingArea();
