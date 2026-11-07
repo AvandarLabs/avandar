@@ -8,6 +8,7 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
+import type { DataCatalogDriveId } from "$/models/data-catalog-listings/DataCatalogDrive/DataCatalogDrive.types.ts";
 import type {
   DataCatalogListingId,
   DataCatalogListingModel,
@@ -88,6 +89,7 @@ export const DataCatalogListingParsers =
         return {
           ...obj,
           id: obj.id as DataCatalogListingId,
+          driveId: obj.driveId as DataCatalogDriveId | undefined,
           metadata: obj.metadata as Json | undefined,
           sourceMetadata: obj.sourceMetadata as Json | undefined,
         };

@@ -1,3 +1,4 @@
+import type { DataCatalogDriveId } from "$/models/data-catalog-listings/DataCatalogDrive/DataCatalogDrive.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Json } from "$/types/database.types.ts";
 import type { UUID } from "@avandar/utils";
@@ -160,7 +161,7 @@ export type DataCatalogListingRead = {
   sourceMetadata: Json | undefined;
 
   /** The drive that produced the listing. */
-  driveId: string | undefined;
+  driveId: DataCatalogDriveId | undefined;
 };
 
 /**
