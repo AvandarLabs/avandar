@@ -1,4 +1,5 @@
 # Plugin folders under plugins/ that this deployment bundles into the app.
 # Each listed plugin becomes its own lazy chunk. Installing it per workspace
 # happens in Settings → Plugins.
-plugins: []
+plugins:
+  - epidemiology

@@ -1,0 +1,22 @@
+# The epidemiology plugin: statistical tools for public-health data.
+id: avandar.epidemiology
+name: "%plugin.name%"
+description: "%plugin.description%"
+version: "0.1.0"
+license: MIT
+engines:
+  avandar: "^1"
+entry: src/index.tsx
+icon: chart-dots
+permissions:
+  - data:context
+contributes:
+  commands:
+    - id: regression.linear
+      title: "%regression.linear.title%"
+      icon: trending-up
+  menus:
+    dataExplorer.toolbar:
+      - command: regression.linear
+        when:
+          numericColumnCount: { gte: 2 }
