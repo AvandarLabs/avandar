@@ -305,8 +305,9 @@ plugin fails, so CI can use it. The same manifest checks run on every
 `vite build` and `pnpm dev`, and an invalid manifest fails the build.
 
 Before you open a pull request, also run `pnpm check:plugin-bundle`. It builds
-the app and fails if plugin code is statically reachable from the main bundle,
-or if the plugin host outgrows its size budget.
+the app and fails if plugin code lands in any chunk the app can load without a
+plugin, including lazily loaded routes, or if the plugin host outgrows its size
+budget.
 
 ## Rules to keep in mind
 

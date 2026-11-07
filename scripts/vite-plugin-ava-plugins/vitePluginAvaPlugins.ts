@@ -205,8 +205,8 @@ function _watchPluginSourceFiles(options: {
 }
 
 /**
- * Fails the build through `context.error` if plugin code reaches the main
- * bundle.
+ * Fails the build through `context.error` if plugin code reaches a chunk the
+ * app can load without any plugin, or the plugin host outgrows its budget.
  */
 function _failOnPluginBundleViolations(options: {
   bundle: Rollup.OutputBundle;
@@ -231,8 +231,9 @@ function _failOnPluginBundleViolations(options: {
  * plugin, points Vite's dependency scan at each plugin's entry file so their
  * npm packages are pre-bundled at server start, reloads the dev server when a
  * manifest or locale file is added, removed, or changed, and when
- * `isBundleCheckEnabled` is set fails the build if plugin code reaches the
- * main bundle. The repo root is Vite's resolved `root`.
+ * `isBundleCheckEnabled` is set fails the build if plugin code reaches a chunk
+ * the app can load without any plugin. The repo root is Vite's resolved
+ * `root`.
  */
 export function vitePluginAvaPlugins(options: {
   isBundleCheckEnabled: boolean;
