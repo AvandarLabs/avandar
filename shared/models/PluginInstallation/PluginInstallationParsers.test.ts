@@ -42,4 +42,66 @@ describe("PluginInstallationParsers", () => {
     });
     expect(insert).not.toHaveProperty("installed_by");
   });
+
+  describe("inserting a model with explicit undefined fields", () => {
+    const insert = () => {
+      return PluginInstallationParsers.fromModelInsertToDBInsert(
+        Model.make("PluginInstallation", {
+          grantedPermissions: ["data:context"],
+          installedBy: undefined,
+          installedVersion: "0.1.0",
+          isEnabled: undefined,
+          pluginId: "avandar.epidemiology",
+          workspaceId: DB_ROW.workspace_id as Workspace.Id,
+        }) as PluginInstallation.T<"Insert">,
+      );
+    };
+
+    it("sends no installed_by key when installedBy is undefined", () => {
+      expect(insert()).not.toHaveProperty("installed_by");
+    });
+
+    it("sends no is_enabled key when isEnabled is undefined", () => {
+      expect(insert()).not.toHaveProperty("is_enabled");
+    });
+
+    it("sends no null value for any column", () => {
+      expect(Object.values(insert())).not.toContain(null);
+    });
+
+    it("sends no __type key", () => {
+      expect(insert()).not.toHaveProperty("__type");
+    });
+  });
+
+  describe("updating a model", () => {
+    it("sends an empty granted_permissions array when every permission is revoked", () => {
+      const update = PluginInstallationParsers.fromModelUpdateToDBUpdate({
+        grantedPermissions: [],
+      });
+      expect(update).toEqual({ granted_permissions: [] });
+    });
+
+    it("sends is_enabled false when a plugin is disabled", () => {
+      const update = PluginInstallationParsers.fromModelUpdateToDBUpdate({
+        isEnabled: false,
+      });
+      expect(update).toEqual({ is_enabled: false });
+    });
+
+    it("sends no installed_by key when installedBy is undefined", () => {
+      const update = PluginInstallationParsers.fromModelUpdateToDBUpdate({
+        installedBy: undefined,
+        isEnabled: true,
+      });
+      expect(update).toEqual({ is_enabled: true });
+    });
+
+    it("sends no __type key", () => {
+      const update = PluginInstallationParsers.fromModelUpdateToDBUpdate(
+        Model.make("PluginInstallation", { isEnabled: true }),
+      );
+      expect(update).not.toHaveProperty("__type");
+    });
+  });
 });

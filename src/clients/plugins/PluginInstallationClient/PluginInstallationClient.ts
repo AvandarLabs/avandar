@@ -10,7 +10,4 @@ export const PluginInstallationClient = createUsableServiceClient(
     dbTablePrimaryKey: "id",
     parsers: PluginInstallationParsers,
   }),
-  {
-    mutationFns: ["insert", "update", "delete"],
-  },
 );

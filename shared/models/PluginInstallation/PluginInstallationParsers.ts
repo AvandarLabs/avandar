@@ -2,8 +2,9 @@ import { makeParserRegistry } from "@avandar/clients";
 import { Model } from "@avandar/models";
 import {
   camelCaseKeysDeep,
-  excludeNullsExceptInProps,
+  excludeNullsDeep,
   nullsToUndefinedDeep,
+  pipe,
   snakeCaseKeysDeep,
   undefinedsToNullsDeep,
 } from "@avandar/utils";
@@ -29,7 +30,11 @@ const DBReadSchema = z.object({
   workspace_id: z.uuid(),
 });
 
-/** Parses `public.plugin_installations` rows. */
+/**
+ * Converts `public.plugin_installations` rows to and from the
+ * `PluginInstallation` model. `PluginInstallationClient` uses it to read and
+ * write the plugins installed in a workspace.
+ */
 export const PluginInstallationParsers =
   makeParserRegistry<PluginInstallationModel>().build({
     modelName: "PluginInstallation",
@@ -47,18 +52,16 @@ export const PluginInstallationParsers =
         workspaceId: modelRow.workspaceId as Workspace.Id,
       });
     },
-    fromModelInsertToDBInsert: (model) => {
-      const nullableRow = undefinedsToNullsDeep(snakeCaseKeysDeep(model));
-      return excludeNullsExceptInProps([])(
-        nullableRow,
-      ) as PluginInstallationModel["DBInsert"];
-    },
-    fromModelUpdateToDBUpdate: (model) => {
-      const nullableRow = undefinedsToNullsDeep(snakeCaseKeysDeep(model));
-      return excludeNullsExceptInProps([])(
-        nullableRow,
-      ) as PluginInstallationModel["DBUpdate"];
-    },
+    fromModelInsertToDBInsert: pipe(
+      snakeCaseKeysDeep,
+      undefinedsToNullsDeep,
+      excludeNullsDeep,
+    ),
+    fromModelUpdateToDBUpdate: pipe(
+      snakeCaseKeysDeep,
+      undefinedsToNullsDeep,
+      excludeNullsDeep,
+    ),
   });
 
 /** Keeps the database schema and CRUD row types aligned. */
