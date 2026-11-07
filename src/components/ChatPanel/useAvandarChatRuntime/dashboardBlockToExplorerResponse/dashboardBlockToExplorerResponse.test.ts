@@ -28,6 +28,22 @@ describe("dashboardBlockToExplorerResponse", () => {
     });
   });
 
+  it("uses the chart's label as the reply when the model wrote no text", () => {
+    const converted = dashboardBlockToExplorerResponse(
+      Model.make("ChatResponse", {
+        assistantText: "",
+        dashboardBlock: {
+          kind: "DataViz",
+          prompt: "US deaths by month",
+          sql: SQL,
+          vizType: "line",
+        },
+      }),
+    );
+
+    expect(converted.response.assistantText).toBe("US deaths by month");
+  });
+
   it("flags a non-chart block, which only a dashboard can hold", () => {
     expect(
       dashboardBlockToExplorerResponse(
