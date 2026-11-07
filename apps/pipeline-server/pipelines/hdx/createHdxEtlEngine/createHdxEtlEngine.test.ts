@@ -1,22 +1,37 @@
 import {
   createInMemoryCheckpointStore,
+  createInMemoryDrivesStore,
   createInMemoryListingsStore,
+  loadCatalogFieldMapper,
 } from "@avandar/etl";
 import { createHdxEtlEngine } from "@pipelines/hdx/createHdxEtlEngine/createHdxEtlEngine";
 import { describe, expect, it, vi } from "vitest";
 import { parseCkanTimestamp } from "$/connectors/open-data/parseCkanTimestamp/parseCkanTimestamp";
 import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type { CkanDiscoveryClient } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.types";
+import type { CatalogFieldMapper, PipelineConfig } from "@avandar/etl";
 
 const DRIVE = {
   baseUrl: "https://data.humdata.org",
-  organizationName: "Humanitarian Data Exchange",
+  organizationLabels: { 1: "Organization" },
 };
 const OUTPUT = {
   listingsTable: "data_catalog_listings",
   upsertListingsFunction:
     "rpc_data_catalog_listings__upsert_with_relation_columns",
 };
+
+async function _mapper(
+  fields: PipelineConfig["fields"] = {},
+): Promise<CatalogFieldMapper> {
+  return await loadCatalogFieldMapper({
+    config: {
+      fields: { organization1_name: { value: "Test Org" }, ...fields },
+      drives: [{ baseUrl: DRIVE.baseUrl }],
+    },
+    configDir: "/",
+  });
+}
 
 function _package(name: string, day: number): CkanPackage {
   return {
@@ -106,7 +121,8 @@ describe("createHdxEtlEngine", () => {
     await createHdxEtlEngine({
       output: OUTPUT,
       discovery: _discovery([_package("a", 1), _package("b", 2)]),
-      drive: DRIVE,
+      drives: [DRIVE],
+      mapper: await _mapper(),
       stores: {
         listings,
         objects: undefined,
@@ -133,7 +149,8 @@ describe("createHdxEtlEngine", () => {
     const listings = createInMemoryListingsStore();
     const engineArgs = {
       output: OUTPUT,
-      drive: DRIVE,
+      drives: [DRIVE],
+      mapper: await _mapper(),
       stores: {
         listings,
         objects: undefined,
@@ -160,13 +177,14 @@ describe("createHdxEtlEngine", () => {
     ]).toEqual([new Date("2026-10-02T00:00:00.000Z"), 1]);
   });
 
-  it("crawls nothing when no HDX drive is configured", async () => {
+  it("crawls nothing when the config lists no HDX drive", async () => {
     const discovery = _discovery([_package("a", 1)]);
 
     const report = await createHdxEtlEngine({
       output: OUTPUT,
       discovery,
-      drive: undefined,
+      drives: [],
+      mapper: await _mapper(),
       stores: {
         listings: createInMemoryListingsStore(),
         objects: undefined,
@@ -187,7 +205,8 @@ describe("createHdxEtlEngine", () => {
     await createHdxEtlEngine({
       output: OUTPUT,
       discovery,
-      drive: DRIVE,
+      drives: [DRIVE],
+      mapper: await _mapper(),
       stores: {
         listings,
         objects: undefined,
@@ -241,7 +260,8 @@ describe("createHdxEtlEngine", () => {
           ],
         },
       ]),
-      drive: DRIVE,
+      drives: [DRIVE],
+      mapper: await _mapper(),
       stores: {
         listings,
         objects: undefined,
@@ -272,7 +292,8 @@ describe("createHdxEtlEngine", () => {
     const scopes = await createHdxEtlEngine({
       output: OUTPUT,
       discovery: _discovery([]),
-      drive: DRIVE,
+      drives: [DRIVE],
+      mapper: await _mapper(),
     }).listScopes();
 
     expect(scopes).toEqual([
@@ -281,5 +302,70 @@ describe("createHdxEtlEngine", () => {
         scopeKeys: ["format:csv", "format:parquet", "format:other"],
       },
     ]);
+  });
+
+  it("maps each package's metadata and records the drive's labels", async () => {
+    const listings = createInMemoryListingsStore();
+    const drives = createInMemoryDrivesStore();
+    const sourceRecord = {
+      organization: { title: "World Health Organization" },
+      notes: "Measles cases by week.",
+    };
+
+    await createHdxEtlEngine({
+      output: OUTPUT,
+      discovery: _discovery([{ ..._package("a", 1), sourceRecord }]),
+      drives: [DRIVE],
+      mapper: await _mapper({
+        organization1_name: { from: "organization.title" },
+        description: { from: "notes" },
+      }),
+      stores: {
+        listings,
+        objects: undefined,
+        checkpoints: createInMemoryCheckpointStore(),
+        drives,
+      },
+    }).run({ mode: "full" });
+
+    expect(listings.getRows()[0]).toMatchObject({
+      organization1_name: "World Health Organization",
+      description: "Measles cases by week.",
+      source_metadata: sourceRecord,
+      drive_id: drives.getDrives()[0]?.id,
+    });
+    expect(drives.getDrives()[0]?.organizationLabels).toEqual({
+      1: "Organization",
+    });
+  });
+
+  it("skips a package whose organization1_name maps to nothing, with a warning", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const listings = createInMemoryListingsStore();
+
+      await createHdxEtlEngine({
+        output: OUTPUT,
+        discovery: _discovery([_package("a", 1)]),
+        drives: [DRIVE],
+        mapper: await _mapper({
+          organization1_name: { from: "organization.title" },
+        }),
+        stores: {
+          listings,
+          objects: undefined,
+          checkpoints: createInMemoryCheckpointStore(),
+        },
+      }).run({ mode: "full" });
+
+      expect(listings.getRows()).toEqual([]);
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "[hdx] skipped a: organization1_name mapped to nothing",
+        ),
+      );
+    } finally {
+      warn.mockRestore();
+    }
   });
 });

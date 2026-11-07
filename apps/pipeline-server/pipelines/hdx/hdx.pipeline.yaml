@@ -1,0 +1,22 @@
+# The HDX pipeline's one drive, and how each CKAN package becomes catalog
+# metadata. Read once per run by `run.ts`. Every mapping reads the raw
+# package; each of its resource listings shares the result. See
+# socrata.pipeline.yaml for the mapping kinds, and
+# docs/measles-demo/catalog-field-mapping-design.md.
+
+organizationLabels:
+  1: Organization
+
+fields:
+  organization1_name: { from: organization.title }
+  description: { from: notes }
+  license: { from: license_title }
+  domains: { script: ./mappers/hdxGroupTitles/hdxGroupTitles.ts }
+  tags: { script: ./mappers/hdxTagNames/hdxTagNames.ts }
+  update_frequency:
+    { script: ./mappers/hdxUpdateFrequency/hdxUpdateFrequency.ts }
+
+# HDX is one CKAN deployment, so this lists one drive. An empty list switches
+# the pipeline off.
+drives:
+  - baseUrl: https://data.humdata.org

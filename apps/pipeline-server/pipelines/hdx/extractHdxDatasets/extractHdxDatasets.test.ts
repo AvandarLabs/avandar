@@ -10,7 +10,7 @@ import type { EtlRunWindow } from "@avandar/etl";
 
 const DRIVE = {
   baseUrl: "https://data.humdata.org",
-  organizationName: "Humanitarian Data Exchange",
+  organizationLabels: { 1: "Organization" },
 };
 const OPEN_WINDOW: EtlRunWindow = { since: undefined, until: undefined };
 

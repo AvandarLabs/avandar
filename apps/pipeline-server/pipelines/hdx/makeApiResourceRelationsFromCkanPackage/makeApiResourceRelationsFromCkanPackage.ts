@@ -8,6 +8,7 @@ import type {
 } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type {
   ApiResourceRelation,
+  CatalogMappedFields,
   EtlPipelineMetrics,
   RelationColumn,
 } from "@avandar/etl";
@@ -71,16 +72,18 @@ function _toRelation(params: {
   resource: Readonly<CkanResource>;
   sourceUpdatedAt: Date;
   readability: _ResourceReadability;
+  mappedFields: CatalogMappedFields & Readonly<{ organization1Name: string }>;
 }): ApiResourceRelation {
   const { drive, ckanPackage, resource, readability } = params;
   return {
+    ...params.mappedFields,
+    sourceMetadata: ckanPackage.sourceRecord,
     kind: "api_resource",
     externalDatasetId: ckanPackage.name,
     apiResourceId: resource.id,
     apiResourceFormat:
       resource.format === "" ? undefined : resource.format.toUpperCase(),
     displayName: resource.name,
-    organization1Name: drive.organizationName,
     sourceUpdatedAt: params.sourceUpdatedAt,
     ...(resource.url_type === "" ? {} : { sourceAssetType: resource.url_type }),
     sourceUrl: `${drive.baseUrl}/dataset/${ckanPackage.name}/resource/${resource.id}`,
@@ -105,6 +108,14 @@ function _toRelation(params: {
  * file, and reports the resource's `size` as `sourceSizeBytes` when CKAN
  * records one.
  *
+ * The catalog metadata (organizations, description, domains, tags, and the
+ * rest) comes from the pipeline config's field mapping, and the raw CKAN
+ * package is kept as `sourceMetadata`. Every resource of a package shares
+ * both. The mapped fields are spread first, so a mapping can never
+ * overwrite a field computed here.
+ *
+ * @param params.mappedFields - The package's mapped catalog metadata, which
+ *   must name its level 1 organization.
  * @param params.scope - The scope being crawled. Only its resources become
  *   relations.
  * @param params.readFileColumns - Reads a resource's columns from its file
@@ -117,6 +128,7 @@ function _toRelation(params: {
 export async function makeApiResourceRelationsFromCkanPackage(params: {
   drive: Readonly<HdxDrive>;
   ckanPackage: Readonly<CkanPackage>;
+  mappedFields: CatalogMappedFields & Readonly<{ organization1Name: string }>;
   scope: HdxScope;
   readFileColumns: HdxFileColumnReader;
   metrics: EtlPipelineMetrics;
@@ -143,6 +155,7 @@ export async function makeApiResourceRelationsFromCkanPackage(params: {
         resource,
         sourceUpdatedAt,
         readability,
+        mappedFields: params.mappedFields,
       });
     },
   );
