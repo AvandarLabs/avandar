@@ -9,8 +9,11 @@ import type {
   PublicSnapshotDuckDbOwner,
 } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
-import type { NeededColumnsByDatasetId } from "@/clients/qetl/QueryMediator/QueryMediator.types";
+import type { ConceptSpineRestriction } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type {
+  NeededColumnsByDatasetId,
+  QetlRunnerOptions,
+} from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { BuilderModule, Module, StateOfModule } from "@avandar/modules";
 
 export type IQueryMediator = Module<
@@ -22,7 +25,7 @@ export type IQueryMediator = Module<
      * Plan the concept relations the query names, refusing any the caller may
      * not read. Optional: a session with no ontology access supplies none.
      */
-    planConceptRelations?: (rawSql: string) => Promise<ConceptRelationPlan[]>;
+    planConceptRelations?: QetlRunnerOptions["planConceptRelations"];
     /** Expand direct dependencies to every dataset lease the query may need. */
     getDuckDbLeaseDatasetIds?: (
       queryDependencies: readonly Dataset.Id[],
@@ -55,12 +58,14 @@ export type IQueryMediator = Module<
         returnType?: "js";
         signal?: AbortSignal;
         neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+        conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
       }): Promise<QueryResult.T<RowObject>>;
       (params: {
         rawSql: string;
         returnType: "parquet";
         signal?: AbortSignal;
         neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+        conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
       }): Promise<Blob>;
     };
   }

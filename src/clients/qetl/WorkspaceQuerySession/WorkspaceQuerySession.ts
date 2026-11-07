@@ -18,6 +18,7 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { ConceptSpineRestriction } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { NeededColumnsByDatasetId } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { Module } from "@avandar/modules";
@@ -35,6 +36,7 @@ export type IWorkspaceQetlClient = Module<
           returnType?: "js";
           signal?: AbortSignal;
           neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+          conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
         }>,
       ): Promise<QueryResult.T<RowObject>>;
       (
@@ -44,6 +46,7 @@ export type IWorkspaceQetlClient = Module<
           returnType: "parquet";
           signal?: AbortSignal;
           neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+          conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
         }>,
       ): Promise<Blob>;
     };
@@ -130,9 +133,10 @@ function _createWorkspaceQetlClient(
             DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(rawSql),
         });
       },
-      planConceptRelations: async (rawSql) => {
+      planConceptRelations: async ({ rawSql, conceptSpineRestrictions }) => {
         return await getConceptRelationPlansFromSql({
           rawSql,
+          conceptSpineRestrictions,
           allowlist: {
             getAllowedConceptIds: async () => {
               return await _getAllWorkspaceConceptIds(options.workspaceId);
@@ -185,12 +189,14 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
         returnType = "js",
         signal,
         neededColumnsByDatasetId,
+        conceptSpineRestrictions,
       }: Readonly<{
         rawSql: string;
         workspaceId: Workspace.Id;
         returnType?: "js" | "parquet";
         signal?: AbortSignal;
         neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+        conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
       }>): Promise<QueryResult.T<RowObject> | Blob> => {
         // The assertion owns the session read and hands back the principal it
         // verified, so a query costs one session read rather than two. That
@@ -206,6 +212,7 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
             returnType: "parquet",
             signal,
             neededColumnsByDatasetId,
+            conceptSpineRestrictions,
           });
         }
 
@@ -214,6 +221,7 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
           returnType: "js",
           signal,
           neededColumnsByDatasetId,
+          conceptSpineRestrictions,
         });
       },
     };

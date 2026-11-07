@@ -320,4 +320,51 @@ describe("QueryMediator concept relations", () => {
     expect(callLog).toEqual(["loadParquet", "query"]);
     expect(loadCsvMock).not.toHaveBeenCalled();
   });
+
+  // The restriction travels as data beside the SQL; only the planner can turn
+  // it into a narrower spine.
+  it("hands the caller's spine restrictions to the concept planner", async () => {
+    const planConceptRelations = vi.fn(async () => {
+      return [CONCEPT_PLAN];
+    });
+    const qetlClient = await _createQetlClient({
+      getQueryDependencies: async () => {
+        return [];
+      },
+      planConceptRelations,
+    });
+    const conceptSpineRestrictions = [
+      { conceptId: CONCEPT_ID, externalIds: ["p1"] },
+    ];
+
+    await qetlClient.runQuery({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      conceptSpineRestrictions,
+    });
+
+    expect(planConceptRelations).toHaveBeenCalledWith({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      conceptSpineRestrictions,
+    });
+  });
+
+  // A session with no planner cannot narrow a spine, and answering anyway
+  // would hand the caller rows it asked to exclude.
+  it("refuses spine restrictions in a session that cannot plan concepts", async () => {
+    const qetlClient = await _createQetlClient({
+      getQueryDependencies: async () => {
+        return [DATASET_ID];
+      },
+    });
+
+    await expect(
+      qetlClient.runQuery({
+        rawSql: `SELECT * FROM "${DATASET_ID}"`,
+        conceptSpineRestrictions: [
+          { conceptId: CONCEPT_ID, externalIds: ["p1"] },
+        ],
+      }),
+    ).rejects.toThrow(/cannot restrict a concept's records/);
+    expect(loadParquetMock).not.toHaveBeenCalled();
+  });
 });

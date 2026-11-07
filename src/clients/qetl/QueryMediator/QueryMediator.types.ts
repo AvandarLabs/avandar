@@ -15,7 +15,10 @@ import type {
   PublicSnapshotDuckDbOwner,
 } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type {
+  ConceptRelationPlan,
+  ConceptSpineRestriction,
+} from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { UnknownObject } from "@avandar/utils";
 
 /** A column whose stored name or type differs from the source data. */
@@ -100,8 +103,16 @@ export type QetlRunnerOptions = {
    * interpret) leaves a concept reference unresolved, so the query fails on a
    * missing table rather than answering from whatever happens to be in the
    * catalog.
+   *
+   * `conceptSpineRestrictions` is the caller's, passed through unchanged:
+   * empty unless the caller narrowed a concept to some of its records.
    */
-  planConceptRelations?: (rawSql: string) => Promise<ConceptRelationPlan[]>;
+  planConceptRelations?: (
+    options: Readonly<{
+      rawSql: string;
+      conceptSpineRestrictions: readonly ConceptSpineRestriction[];
+    }>,
+  ) => Promise<ConceptRelationPlan[]>;
   getDuckDbLeaseDatasetIds?: (
     queryDependencies: readonly Dataset.Id[],
   ) => Promise<Dataset.Id[]>;
@@ -157,6 +168,12 @@ export type RunQetlQueryOptions = {
    * answering from partial data, so this is a caller assertion and not a hint.
    */
   neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+  /**
+   * Narrows the spine of each concept the statement names to the records
+   * listed, so the query computes values for those records only. Travels as
+   * data to the concept planner, never into the SQL.
+   */
+  conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
 };
 
 /** The overloaded `runQuery` a Qetl client exposes. */
