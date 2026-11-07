@@ -154,7 +154,14 @@ function applySqlTableAliasesToParsedAttempt(
     parsed.clarification,
     aliases,
   );
-  return { ...parsed, generatedSql, clarification };
+  const dashboardBlock =
+    parsed.dashboardBlock?.kind === "DataViz"
+      ? {
+          ...parsed.dashboardBlock,
+          sql: SqlTableAlias.applyToSql(parsed.dashboardBlock.sql, aliases),
+        }
+      : parsed.dashboardBlock;
+  return { ...parsed, generatedSql, clarification, dashboardBlock };
 }
 
 function applySqlTableAliasesToClarification(

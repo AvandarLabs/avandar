@@ -67,6 +67,35 @@ describe("parseOpenRouterResponse", () => {
     );
   });
 
+  it("rewrites DataViz dashboard block aliases to dataset ids", () => {
+    const parsed = parseOpenRouterResponse({
+      message: {
+        tool_calls: [
+          {
+            function: {
+              name: "addDashboardBlock",
+              arguments: JSON.stringify({
+                kind: "DataViz",
+                prompt: "Cases over time",
+                sql: 'SELECT "date", COUNT(*) FROM "t0" GROUP BY 1',
+                vizType: "line",
+              }),
+            },
+          },
+        ],
+      },
+      attemptText: "",
+      lastUserPrompt: "chart cases",
+      priorClarifications: 0,
+      datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
+    });
+
+    expect(parsed.dashboardBlock).toMatchObject({
+      kind: "DataViz",
+      sql: `SELECT "date", COUNT(*) FROM "${CHOLERA_ID}" GROUP BY 1`,
+    });
+  });
+
   it("rewrites discovery query aliases to dataset ids", () => {
     const parsed = parseOpenRouterResponse({
       message: {
