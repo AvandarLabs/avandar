@@ -123,6 +123,10 @@ msgstr "قم بتشغيل استعلام لرؤية النتائج."
 msgid "Start (e.g. 2024-01-01)"
 msgstr "ابدأ (مثل 2024-01-01)"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query isn't written correctly, so it couldn't be read."
+msgstr "هذا الاستعلام غير مكتوب بشكل صحيح، لذا تعذّرت قراءته."
+
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
 msgstr "حفظ العرض الحالي"
@@ -138,6 +142,11 @@ msgstr "فتح مجموعة البيانات"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Delete comment?"
 msgstr "هل تريد حذف التعليق؟"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a function, {functionName}, that the query engine "
+"doesn't support."
+msgstr "يستخدم هذا الاستعلام دالة ({functionName}) لا يدعمها محرّك الاستعلامات."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
@@ -851,6 +860,12 @@ msgstr "اختر حالة افتراضية من هذه القائمة."
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
 msgstr "اسم الطبقة"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Avandar couldn't confirm that this query only reads your datasets, so it "
+"didn't run it."
+msgstr "تعذّر على Avandar التأكد من أن هذا الاستعلام يقرأ مجموعات بياناتك فقط، "
+"لذا لم يتم تشغيله."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
@@ -1856,6 +1871,12 @@ msgstr "الدعوة التي تحاول قبولها غير صالحة. يرج�
 msgid "Normalize by"
 msgstr "التطبيع حسب"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a dataset that isn't in this workspace or hasn't "
+"finished loading."
+msgstr "يستخدم هذا الاستعلام مجموعة بيانات غير موجودة في مساحة العمل هذه أو لم "
+"يكتمل تحميلها بعد."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Annual billing)"
 msgstr "(الفوترة السنوية)"
@@ -2196,6 +2217,10 @@ msgstr "إضافة مجموعة بيانات جديدة"
 msgid "Switch to Free plan"
 msgstr "التحويل إلى خطة مجانية"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Something went wrong while running this query."
+msgstr "حدث خطأ ما أثناء تشغيل هذا الاستعلام."
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "يمكن أن يحتوي عنوان URL المخصص على أحرف صغيرة وأرقام وواصلات فقط"
@@ -2495,6 +2520,7 @@ msgid "{0} / 3"
 msgstr "{0} / 3"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Show details"
 msgstr "عرض التفاصيل"
@@ -3195,6 +3221,10 @@ msgstr "هذا العنوان غير مسموح به"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Your Google connection expired"
 msgstr "انتهت صلاحية اتصالك بـ Google"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query was stopped before it finished."
+msgstr "تم إيقاف هذا الاستعلام قبل اكتماله."
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
@@ -8368,6 +8398,11 @@ msgstr "رسم حر"
 msgid "Settings"
 msgstr "الإعدادات"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a column named \"{columnName}\" that isn't in the data."
+msgstr "يستخدم هذا الاستعلام عمودًا باسم \"{columnName}\" غير موجود في "
+"البيانات."
+
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "Go to home"
 msgstr "الانتقال إلى الصفحة الرئيسية"
@@ -8895,6 +8930,7 @@ msgid "Green"
 msgstr "أخضر"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide details"
 msgstr "إخفاء التفاصيل"
 
@@ -9435,6 +9471,11 @@ msgstr "القراءات فقط"
 msgid "Display name updated"
 msgstr "تم تحديث اسم العرض"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query mixes totals with individual rows in a way that can't be "
+"calculated."
+msgstr "يجمع هذا الاستعلام بين الإجماليات والصفوف الفردية بطريقة يتعذّر حسابها."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
@@ -9515,6 +9556,12 @@ msgstr "متابعة"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "البحث في لوحات المعلومات"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query treats one kind of value as another, such as text as a number "
+"or a date, so it couldn't run."
+msgstr "يتعامل هذا الاستعلام مع نوع من القيم على أنه نوع آخر، مثل التعامل مع "
+"النص كرقم أو كتاريخ، لذا تعذّر تشغيله."
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -9971,6 +10018,12 @@ msgstr "تتطلب هذه الخيارات دعم الأشكال الهندسي�
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
 msgstr "مرتفع"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query needs more memory than your browser has available. Try a "
+"narrower question, such as a shorter date range or fewer places."
+msgstr "يحتاج هذا الاستعلام إلى ذاكرة أكبر من المتاحة في متصفحك. جرّب سؤالًا "
+"أضيق نطاقًا، مثل تحديد نطاق زمني أقصر أو عدد أقل من الأماكن."
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."

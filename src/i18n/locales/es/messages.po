@@ -124,6 +124,11 @@ msgstr "Ejecuta una consulta para ver los resultados."
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Inicio (por ejemplo, 2024-01-01)"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query isn't written correctly, so it couldn't be read."
+msgstr "Esta consulta no está escrita correctamente, por lo que no se pudo "
+"leer."
+
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
 msgstr "Guardar la vista actual"
@@ -139,6 +144,12 @@ msgstr "Abrir conjunto de datos"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Delete comment?"
 msgstr "¿Eliminar comentario?"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a function, {functionName}, that the query engine "
+"doesn't support."
+msgstr "Esta consulta usa una función, {functionName}, que el motor de "
+"consultas no admite."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
@@ -862,6 +873,12 @@ msgstr "Elija un estado predeterminado de esta lista."
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
 msgstr "Nombre de la capa"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Avandar couldn't confirm that this query only reads your datasets, so it "
+"didn't run it."
+msgstr "Avandar no pudo confirmar que esta consulta solo lee sus conjuntos de "
+"datos, por lo que no se ejecutó."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
@@ -1886,6 +1903,12 @@ msgstr "La invitación que estás intentando aceptar no es válida. Por favor, "
 msgid "Normalize by"
 msgstr "Normalizar por"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a dataset that isn't in this workspace or hasn't "
+"finished loading."
+msgstr "Esta consulta usa un conjunto de datos que no está en este espacio de "
+"trabajo o que aún no termina de cargarse."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Annual billing)"
 msgstr "(Facturación anual)"
@@ -2231,6 +2254,10 @@ msgstr "Agregar nuevo conjunto de datos"
 msgid "Switch to Free plan"
 msgstr "Cambiar a plan gratuito"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Something went wrong while running this query."
+msgstr "Algo salió mal al ejecutar esta consulta."
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "La URL personalizada solo puede contener letras minúsculas, números y "
@@ -2535,6 +2562,7 @@ msgid "{0} / 3"
 msgstr "{0} / 3"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Show details"
 msgstr "Mostrar detalles"
@@ -3248,6 +3276,10 @@ msgstr "Esta dirección no está permitida"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Your Google connection expired"
 msgstr "Su conexión de Google expiró"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query was stopped before it finished."
+msgstr "Esta consulta se detuvo antes de terminar."
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
@@ -8509,6 +8541,11 @@ msgstr "A mano alzada"
 msgid "Settings"
 msgstr "Configuraciones"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a column named \"{columnName}\" that isn't in the data."
+msgstr "Esta consulta usa una columna llamada \"{columnName}\" que no está en "
+"los datos."
+
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "Go to home"
 msgstr "Ir al inicio"
@@ -9046,6 +9083,7 @@ msgid "Green"
 msgstr "Verde"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide details"
 msgstr "Ocultar detalles"
 
@@ -9593,6 +9631,12 @@ msgstr "Solo lecturas"
 msgid "Display name updated"
 msgstr "Nombre para mostrar actualizado"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query mixes totals with individual rows in a way that can't be "
+"calculated."
+msgstr "Esta consulta combina totales con filas individuales de una manera que "
+"no se puede calcular."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
@@ -9674,6 +9718,12 @@ msgstr "Continuar"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "Buscar paneles"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query treats one kind of value as another, such as text as a number "
+"or a date, so it couldn't run."
+msgstr "Esta consulta trata un tipo de valor como otro, por ejemplo, texto como "
+"número o fecha, por lo que no se pudo ejecutar."
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10138,6 +10188,13 @@ msgstr "Estas opciones necesitan el soporte de geometría, que no se pudo "
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
 msgstr "Alto"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query needs more memory than your browser has available. Try a "
+"narrower question, such as a shorter date range or fewer places."
+msgstr "Esta consulta necesita más memoria de la disponible en su navegador. "
+"Intente hacer una pregunta más específica, como usar un intervalo de "
+"fechas más corto o menos lugares."
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."

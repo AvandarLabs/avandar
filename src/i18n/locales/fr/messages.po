@@ -127,6 +127,10 @@ msgstr "Exécutez une requête pour voir les résultats."
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Début (par ex. 2024-01-01)"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query isn't written correctly, so it couldn't be read."
+msgstr "Cette requête n’est pas correctement rédigée et n’a pas pu être lue."
+
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
 msgstr "Enregistrer la vue actuelle"
@@ -142,6 +146,12 @@ msgstr "Ouvrir l'ensemble de données"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Delete comment?"
 msgstr "Supprimer le commentairef"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a function, {functionName}, that the query engine "
+"doesn't support."
+msgstr "Cette requête utilise une fonction, {functionName}, qui n’est pas prise "
+"en charge par le moteur de requêtes."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
@@ -870,6 +880,12 @@ msgstr "Choisissez un statut par défaut dans cette liste."
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
 msgstr "Nom de la couche"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Avandar couldn't confirm that this query only reads your datasets, so it "
+"didn't run it."
+msgstr "Avandar n’a pas pu confirmer que cette requête se limite à la lecture "
+"de vos jeux de données. Elle n’a donc pas été exécutée."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
@@ -1900,6 +1916,12 @@ msgstr "L'invitation que vous essayez d'accepter n'est pas valide. Veuillez "
 msgid "Normalize by"
 msgstr "Normaliser par"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a dataset that isn't in this workspace or hasn't "
+"finished loading."
+msgstr "Cette requête utilise un jeu de données qui n’est pas présent dans cet "
+"espace de travail ou dont le chargement n’est pas terminé."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Annual billing)"
 msgstr "(Facturation annuelle)"
@@ -2247,6 +2269,10 @@ msgstr "Ajouter un nouveau jeu de données"
 msgid "Switch to Free plan"
 msgstr "Passer au plan gratuit"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "Something went wrong while running this query."
+msgstr "Un problème est survenu lors de l’exécution de cette requête."
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "L’URL personnalisée ne peut contenir que des lettres minuscules, des "
@@ -2554,6 +2580,7 @@ msgid "{0} / 3"
 msgstr "{0} / 3"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Show details"
 msgstr "Afficher les détails"
@@ -3274,6 +3301,10 @@ msgstr "Cette adresse n’est pas autorisée"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Your Google connection expired"
 msgstr "Votre connexion Google a expiré"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query was stopped before it finished."
+msgstr "Cette requête a été arrêtée avant d’être terminée."
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
@@ -8571,6 +8602,11 @@ msgstr "Dessin libre"
 msgid "Settings"
 msgstr "Paramètres"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query uses a column named \"{columnName}\" that isn't in the data."
+msgstr "Cette requête utilise une colonne nommée « {columnName} » qui n’existe "
+"pas dans les données."
+
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "Go to home"
 msgstr "Accéder à l’accueil"
@@ -9108,6 +9144,7 @@ msgid "Green"
 msgstr "Vert"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide details"
 msgstr "Masquer les détails"
 
@@ -9662,6 +9699,12 @@ msgstr "Relevés uniquement"
 msgid "Display name updated"
 msgstr "Nom d'affichage mis à jour"
 
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query mixes totals with individual rows in a way that can't be "
+"calculated."
+msgstr "Cette requête mélange des totaux et des lignes individuelles d’une "
+"manière qui ne peut pas être calculée."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
@@ -9743,6 +9786,12 @@ msgstr "Continuer"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "Rechercher des tableaux de bord"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query treats one kind of value as another, such as text as a number "
+"or a date, so it couldn't run."
+msgstr "Cette requête traite un type de valeur comme un autre, par exemple du "
+"texte comme un nombre ou une date, et n’a donc pas pu être exécutée."
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10212,6 +10261,13 @@ msgstr "Ces options nécessitent la prise en charge de la géométrie, qui n'a p
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
 msgstr "Élevé"
+
+#: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
+msgid "This query needs more memory than your browser has available. Try a "
+"narrower question, such as a shorter date range or fewer places."
+msgstr "Cette requête nécessite plus de mémoire que votre navigateur n’en "
+"dispose. Essayez de poser une question plus ciblée, par exemple en "
+"choisissant une période plus courte ou moins de lieux."
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
