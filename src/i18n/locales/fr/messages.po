@@ -9136,7 +9136,7 @@ msgstr "Supprimer la vue {0}"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "This record's fields failed to load"
-msgstr ""
+msgstr "Les champs de cet enregistrement n'ont pas pu être chargés"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx

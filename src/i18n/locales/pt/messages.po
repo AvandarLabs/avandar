@@ -9045,7 +9045,7 @@ msgstr "Excluir a visualização {0}"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "This record's fields failed to load"
-msgstr ""
+msgstr "Não foi possível carregar os campos deste registro"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx

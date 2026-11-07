@@ -24,9 +24,9 @@ type ConceptRecordValuesClientQueries = {
    * concept view, one entry per key that names a record, in request order.
    * Accepts at most `MAX_RESTRICTED_EXTERNAL_IDS` distinct keys, and rejects
    * with an error when the case type's fields change while the values are
-   * read, which a retry recovers from. The query key holds the whole parameter object,
-   * `externalIds` included, so a cached result never answers a request for a
-   * different set of records.
+   * read, which a retry recovers from. The query key holds the whole
+   * parameter object, `externalIds` included, so a cached result never
+   * answers a request for a different set of records.
    */
   getConceptRecordValues: (params: {
     workspaceId: Workspace.Id;

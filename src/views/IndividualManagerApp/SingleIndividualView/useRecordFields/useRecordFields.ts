@@ -42,7 +42,7 @@ type RetryableRead = {
  * while either read is in flight, so the source lines arrive with the values.
  * A failed read gives empty lists, and the fields then show without sources.
  */
-function _useSourceDatasets(
+function useSourceDatasets(
   attributes: readonly ConceptAttribute.T[] | undefined,
 ): SourceDatasets | undefined {
   const [mappings, , mappingsQuery] =
@@ -108,7 +108,7 @@ export function useRecordFields(
   const [attributes, , attributesQuery] = ConceptAttributeClient.useGetAll(
     where("concept_id", "eq", concept.id),
   );
-  const sourceDatasets = _useSourceDatasets(attributes);
+  const sourceDatasets = useSourceDatasets(attributes);
   // A case type with no fields has nothing to compute, so it starts no
   // DuckDB query.
   const [recordValues, , valuesQuery] =

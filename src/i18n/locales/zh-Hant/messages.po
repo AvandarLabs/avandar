@@ -8717,7 +8717,7 @@ msgstr "刪除檢視 {0}"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "This record's fields failed to load"
-msgstr ""
+msgstr "此記錄的欄位載入失敗"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx

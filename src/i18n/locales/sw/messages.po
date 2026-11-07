@@ -9030,7 +9030,7 @@ msgstr "Futa mwonekano {0}"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "This record's fields failed to load"
-msgstr ""
+msgstr "Imeshindwa kupakia sehemu za rekodi hii"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
