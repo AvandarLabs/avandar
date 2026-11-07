@@ -60,7 +60,7 @@ export function createRunQueryTool(
     name: "run_query",
     label: "Run query",
     description:
-      "Runs one DuckDB query and shows the result to the user as a table or chart. Returns only the row count and column names.",
+      "Runs the one DuckDB query that answers the question and shows its result to the user as a table or chart. Returns only the row count and column names. A result ends your turn.",
     parameters: RUN_QUERY_PARAMETERS,
     executionMode: "sequential",
     execute: async (_toolCallId, params) => {

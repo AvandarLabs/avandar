@@ -10,6 +10,10 @@ const MAX_QUESTIONS_PER_ANSWER = 2;
 const CARD_BUILT_IN_OPTION_PATTERN =
   /^(something else|none of (the above|these)|other)\b/i;
 
+/** What the model reads when the question card waits for the user. */
+export const DEFERRED_ANSWER_TEXT =
+  "The question is on the user's screen. Their answer will be their next message.";
+
 const ASK_USER_PARAMETERS = obj({
   question: str({ description: "One neutral question, under 20 words." }),
   options: arr(str(), {
@@ -52,6 +56,14 @@ export function createAskUserTool(
         isMulti: params.multi ?? false,
         kind: "choice",
       });
+      if (answer.kind === "deferred") {
+        options.state.questions.push({ kind: "choice", question: params.question, answer: "(on screen)", isAutomatic: false });
+        return {
+          content: [{ type: "text", text: DEFERRED_ANSWER_TEXT }],
+          details: undefined,
+          terminate: true,
+        };
+      }
       const answerText =
         answer.kind === "picked"
           ? answer.values.join(", ")

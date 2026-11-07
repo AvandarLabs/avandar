@@ -7,11 +7,16 @@ export type DataAgentQueryOutcome =
     }
   | { kind: "failed"; error: string };
 
-/** What the user submitted on a question card. */
+/**
+ * What the user submitted on a question card. `deferred` means the card is on
+ * screen and the answer will arrive as the user's next chat message, which
+ * is how the browser asks: the agent's turn ends instead of waiting.
+ */
 export type DataAgentUserAnswer =
   | { kind: "picked"; values: readonly string[] }
   | { kind: "typed"; text: string }
-  | { kind: "dismissed" };
+  | { kind: "dismissed" }
+  | { kind: "deferred" };
 
 /**
  * Everything the data agent's tools need from the place they run: the browser
@@ -39,6 +44,15 @@ export type DataAgentHost = {
       options: readonly string[];
       isMulti: boolean;
       kind: "choice" | "values";
+      /**
+       * For a values card, the column the values come from, so the browser
+       * can show its searchable list of stored values.
+       */
+      lookup?: Readonly<{
+        listQuery: string;
+        column: string;
+        candidateValues: readonly string[];
+      }>;
     }>,
   ) => Promise<DataAgentUserAnswer>;
   /**

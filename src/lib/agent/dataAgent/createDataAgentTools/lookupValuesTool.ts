@@ -2,6 +2,7 @@ import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { arr, obj, str } from "@earendil-works/pi-schema";
 import { DiscoveryCandidateValues } from "@/components/ChatPanel/ClarificationCard/DiscoveryCandidateValues/DiscoveryCandidateValues";
 import { buildCandidateLookupSqlFromDiscovery } from "@/components/ChatPanel/PendingClarificationBlock/buildCandidateLookupSqlFromDiscovery/buildCandidateLookupSqlFromDiscovery";
+import { DEFERRED_ANSWER_TEXT } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
 import type { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
@@ -57,11 +58,16 @@ async function _findStoredValue(
   };
 }
 
-async function _listValues(context: LookupContext): Promise<string[]> {
+function _buildListQuery(context: LookupContext): string {
   const column = quoteSqlIdentifier(context.column);
-  const values = await context.host.readColumnValues(
-    `SELECT DISTINCT ${column} FROM ${quoteSqlIdentifier(context.tableName)} WHERE ${column} IS NOT NULL ORDER BY 1 LIMIT ${MAX_LISTED_VALUES}`,
-  );
+  return `SELECT DISTINCT ${column} FROM ${quoteSqlIdentifier(context.tableName)} WHERE ${column} IS NOT NULL ORDER BY 1 LIMIT ${MAX_LISTED_VALUES}`;
+}
+
+async function _listValues(
+  context: LookupContext,
+  listQuery: string,
+): Promise<string[]> {
+  const values = await context.host.readColumnValues(listQuery);
   return Array.isArray(values) ? values : [];
 }
 
@@ -71,12 +77,23 @@ async function _askUserToPick(
   unmatched: readonly LookupMatch[],
   question: string,
 ): Promise<string> {
+  const listQuery = _buildListQuery(context);
   const answer = await context.host.askUser({
     question,
-    options: await _listValues(context),
+    options: await _listValues(context, listQuery),
     isMulti: unmatched.length > 1,
     kind: "values",
+    lookup: {
+      listQuery,
+      column: context.column,
+      candidateValues: unmatched.map((lookup) => lookup.named),
+    },
   });
+  if (answer.kind === "deferred") {
+    context.state.questions.push({ kind: "values", question, answer: "(on screen)", isAutomatic: false });
+    context.state.isWaitingForUser = true;
+    return DEFERRED_ANSWER_TEXT;
+  }
   if (answer.kind === "dismissed") {
     context.state.questions.push({ kind: "values", question, answer: "(dismissed)", isAutomatic: false });
     return "The user dismissed the lookup. Do not filter on those values; say so in the summary.";
@@ -122,7 +139,11 @@ async function _execute(
   if (unmatched.length > 0) {
     parts.push(await _askUserToPick(context, unmatched, params.question));
   }
-  return { content: [{ type: "text", text: parts.join("\n") || "No matching values." }], details: undefined };
+  return {
+    content: [{ type: "text", text: parts.join("\n") || "No matching values." }],
+    details: undefined,
+    terminate: context.state.isWaitingForUser,
+  };
 }
 
 /**

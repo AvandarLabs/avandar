@@ -1,5 +1,6 @@
 import { defineRoutes } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { GetChatSessionSecret } from "@sbfn/chat/GetChatSessionSecret.ts";
+import { PostAgentStream } from "@sbfn/chat/PostAgentStream/PostAgentStream.ts";
 import { PostChatMessages } from "@sbfn/chat/PostChatMessages/PostChatMessages.ts";
 import type { ChatAPI } from "@sbfn/chat/ChatRoutes.types.ts";
 
@@ -7,4 +8,5 @@ import type { ChatAPI } from "@sbfn/chat/ChatRoutes.types.ts";
 export const ChatRoutes = defineRoutes<ChatAPI>("chat", {
   "/:workspaceId/messages": { POST: PostChatMessages },
   "/:workspaceId/session-secret": { GET: GetChatSessionSecret },
+  "/:workspaceId/agent/api/stream": { POST: PostAgentStream },
 });

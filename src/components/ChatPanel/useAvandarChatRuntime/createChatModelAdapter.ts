@@ -21,6 +21,7 @@ import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRun
 import { runOfflineChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatTurn";
 import { shouldSkipUserMessageConsent } from "@/components/ChatPanel/useAvandarChatRuntime/shouldSkipUserMessageConsent/shouldSkipUserMessageConsent";
 import { tryExecuteOfflineSql } from "@/components/ChatPanel/useAvandarChatRuntime/tryExecuteOfflineSql";
+import { DataAgentFeature } from "@/lib/agent/dataAgent/browser/DataAgentFeature";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
@@ -326,6 +327,27 @@ export function createChatModelAdapter(
 
       if (initialRuntimeMode.kind === "local") {
         return runOfflineTurn(initialRuntimeMode.localChatModelId);
+      }
+
+      if (
+        currentPageContext.app === "data-explorer" &&
+        DataAgentFeature.isEnabled()
+      ) {
+        // Loaded on first use so the agent stays out of the main bundle.
+        const { runDataAgentTurn } = await import(
+          "@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn"
+        );
+        return finishIfCurrent(
+          await runDataAgentTurn({
+            apiMessages,
+            workspaceId,
+            currentUser,
+            chatGeneration: generation,
+            parseSqlRef,
+            dataExplorerDispatch,
+            chatPanelDispatch,
+          }),
+        );
       }
 
       const cloudModelId =

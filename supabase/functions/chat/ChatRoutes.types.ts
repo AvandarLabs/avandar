@@ -10,7 +10,11 @@ import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
 export type ChatAPI = APITypeDef<
   "chat",
-  ["/:workspaceId/messages", "/:workspaceId/session-secret"],
+  [
+    "/:workspaceId/messages",
+    "/:workspaceId/session-secret",
+    "/:workspaceId/agent/api/stream",
+  ],
   {
     "/:workspaceId/messages": {
       POST: {
@@ -25,6 +29,24 @@ export type ChatAPI = APITypeDef<
           retryContext?: ChatRetryContext;
         };
         returnType: ChatResponse.T;
+      };
+    };
+    "/:workspaceId/agent/api/stream": {
+      POST: {
+        pathParams: {
+          workspaceId: string;
+        };
+        body: {
+          model: { id: string };
+          context: { messages: unknown[] };
+          options?: {
+            reasoning?: "minimal" | "low" | "medium";
+            sessionId?: string;
+            temperature?: number;
+            maxTokens?: number;
+          };
+        };
+        returnType: Response;
       };
     };
     "/:workspaceId/session-secret": {

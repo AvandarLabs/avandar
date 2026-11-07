@@ -25,6 +25,8 @@ export type DataAgentRunState = {
     outcome: DataAgentQueryOutcome;
   };
   questions: DataAgentQuestionRecord[];
+  /** A question card is on screen, so the turn ends until the user answers. */
+  isWaitingForUser: boolean;
   /** Stored data values that were sent to the model (matched or picked). */
   valuesSentToModel: string[];
 };
@@ -35,6 +37,7 @@ export function createDataAgentRunState(): DataAgentRunState {
     queryRuns: 0,
     needsEscalation: false,
     questions: [],
+    isWaitingForUser: false,
     valuesSentToModel: [],
   };
 }
