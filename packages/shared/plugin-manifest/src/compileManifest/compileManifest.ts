@@ -1,7 +1,7 @@
 import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError.ts";
 import { PluginManifestSchema } from "@plugin-manifest/PluginManifest/PluginManifestSchema.ts";
 import { getMessageKeyFromManifestString } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
-import { parseDocument } from "yaml";
+import { parseStrictYaml } from "@plugin-manifest/yaml/parseStrictYaml/parseStrictYaml.ts";
 import type { PluginManifest } from "@plugin-manifest/PluginManifest/PluginManifestSchema.ts";
 import type { PluginLocaleMessages } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
 
@@ -17,47 +17,14 @@ function _isPlainObject(value: unknown): value is RawLocales {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function _readDocumentValue(options: {
-  document: ReturnType<typeof parseDocument>;
-  sourcePath: string;
-}): unknown {
-  try {
-    // `maxAliasCount: 0` rejects every alias: manifests have no use for
-    // them, and they enable exponential expansion.
-    return options.document.toJS({ maxAliasCount: 0 });
-  } catch (error) {
-    throw new PluginManifestError({
-      sourcePath: options.sourcePath,
-      issues: [error instanceof Error ? error.message : String(error)],
-    });
-  }
-}
-
 function _parseYaml(options: {
   yamlText: string;
   sourcePath: string;
 }): unknown {
-  const { yamlText, sourcePath } = options;
-  const document = parseDocument(yamlText, {
-    version: "1.2",
-    schema: "core",
-    uniqueKeys: true,
-  });
-  // A YAML warning, such as an unresolved tag, means the parser guessed what
-  // the author meant. A manifest should never be built from a guess.
-  const problems = [...document.errors, ...document.warnings];
-  if (problems.length > 0) {
+  const value = parseStrictYaml(options);
+  if (value === null) {
     throw new PluginManifestError({
-      sourcePath,
-      issues: problems.map((problem) => {
-        return problem.message;
-      }),
-    });
-  }
-  const value = _readDocumentValue({ document, sourcePath });
-  if (value === null || value === undefined) {
-    throw new PluginManifestError({
-      sourcePath,
+      sourcePath: options.sourcePath,
       issues: ["ava.yaml is empty"],
     });
   }

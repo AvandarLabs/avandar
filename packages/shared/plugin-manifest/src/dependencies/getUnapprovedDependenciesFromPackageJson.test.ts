@@ -1,4 +1,4 @@
-import { getUnapprovedDependenciesFromPackageJson } from "@plugin-manifest/dependencies/approvedDependencies.ts";
+import { getUnapprovedDependenciesFromPackageJson } from "@plugin-manifest/dependencies/getUnapprovedDependenciesFromPackageJson.ts";
 import { describe, expect, it } from "vitest";
 
 describe("getUnapprovedDependenciesFromPackageJson", () => {

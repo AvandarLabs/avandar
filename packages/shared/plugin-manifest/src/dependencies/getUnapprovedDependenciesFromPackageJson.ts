@@ -11,7 +11,14 @@ export const APPROVED_PLUGIN_DEPENDENCIES = [
   "date-fns",
 ] as const;
 
-/** Names in a plugin's `package.json` dependencies that are not approved. */
+/**
+ * Gets the names in a plugin's `package.json` `dependencies` that are not
+ * approved, so a plugin cannot pull in npm packages nobody has vetted for it.
+ *
+ * Use it wherever a plugin's `package.json` is checked, for example when
+ * validating a plugin folder before it is bundled. Only `dependencies` is
+ * read.
+ */
 export function getUnapprovedDependenciesFromPackageJson(
   packageJson: Readonly<{ dependencies?: Readonly<Record<string, string>> }>,
 ): string[] {
