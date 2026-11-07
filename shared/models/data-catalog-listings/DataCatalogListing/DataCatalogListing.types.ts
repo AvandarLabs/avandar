@@ -214,6 +214,18 @@ export type DataCatalogListingSearchFilters = {
    */
   sources: string[];
 
+  /**
+   * Level-2 organizations (`organization2Name`) to keep. Empty keeps every
+   * listing.
+   */
+  organization2Names: string[];
+
+  /** Subject areas (`domains`) to keep. Empty keeps every listing. */
+  domains: string[];
+
+  /** Keywords (`tags`) to keep. Empty keeps every listing. */
+  tags: string[];
+
   /** Upper-cased file formats to keep. Empty keeps every format. */
   formats: string[];
 
@@ -235,6 +247,18 @@ export type DataCatalogListingFacetOption = {
  */
 export type DataCatalogListingSearchFacets = {
   sources: DataCatalogListingFacetOption[];
+
+  /** Level-2 organizations the listings in view belong to. */
+  organization2: DataCatalogListingFacetOption[];
+
+  /**
+   * What the drives call the level-2 organizations in view (such as
+   * "Agency"), the label with the most listings first.
+   */
+  organization2Labels: string[];
+
+  /** Subject areas the listings in view are filed under. */
+  domains: DataCatalogListingFacetOption[];
   formats: DataCatalogListingFacetOption[];
   updatedWithin: Record<DataCatalogListingUpdatedWithin, number>;
 

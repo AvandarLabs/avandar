@@ -29,6 +29,36 @@ describe("createDataCatalogSearchFacets", () => {
     ]);
   });
 
+  it("reads the second organization level, its labels, and the topics", () => {
+    const facets = createDataCatalogSearchFacets([
+      _row("organization2", "Taxi and Limousine Commission", 80),
+      _row("organization2", "Department of Health", 12),
+      _row("organization2_label", "Agency", 90),
+      _row("organization2_label", "Department", 2),
+      _row("domain", "Transportation", 95),
+      _row("domain", "Health", 12),
+    ]);
+
+    expect(facets.organization2).toEqual([
+      { value: "Taxi and Limousine Commission", count: 80 },
+      { value: "Department of Health", count: 12 },
+    ]);
+    expect(facets.organization2Labels).toEqual(["Agency", "Department"]);
+    expect(facets.domains).toEqual([
+      { value: "Transportation", count: 95 },
+      { value: "Health", count: 12 },
+    ]);
+  });
+
+  it("lists the labels with the most listings first", () => {
+    const facets = createDataCatalogSearchFacets([
+      _row("organization2_label", "Department", 2),
+      _row("organization2_label", "Agency", 90),
+    ]);
+
+    expect(facets.organization2Labels).toEqual(["Agency", "Department"]);
+  });
+
   it("reads the update windows into the camel-cased names the filters use", () => {
     const facets = createDataCatalogSearchFacets([
       _row("updated_within", "any", 52),
@@ -60,6 +90,9 @@ describe("createDataCatalogSearchFacets", () => {
 
     expect(facets).toEqual({
       sources: [],
+      organization2: [],
+      organization2Labels: [],
+      domains: [],
       formats: [],
       updatedWithin: { any: 0, pastMonth: 0, pastYear: 0, overAYear: 0 },
       numUnloadable: 0,
