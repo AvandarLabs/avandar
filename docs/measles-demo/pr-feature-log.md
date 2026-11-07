@@ -115,13 +115,13 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/functions/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts` | F3, F6 | F6: Socrata failure codes (`d9f488ff1`). |
 | `shared/connectors/open-data/openDataErrors.ts` | F3, F6 | F6: Socrata failure codes. |
 | `shared/connectors/open-data/CkanClient/CkanClient.ts` | F3, F2, F7 | F2: `get`. F7: `ckanActionApiHelpers` refactor. |
-| `shared/models/data-catalog-listings/DataCatalogListing/*` | F3, F4, F6, F8, F17 | F3: `OpenDataAccess` field rename (`65b4cc8ad`). F4: the rename itself. F6: the `socrata` `api_service` arm. F8: cache fields. F17: `search_vector` in `DBReadSchema` and dropped by `fromDBReadToModelRead`, and the `SearchResult` type. |
+| `shared/models/data-catalog-listings/DataCatalogListing/*` | F3, F4, F6, F8, F17, F19 | F3: `OpenDataAccess` field rename (`65b4cc8ad`). F4: the rename itself. F6: the `socrata` `api_service` arm. F8: cache fields. F17: `search_vector` in `DBReadSchema` and dropped by `fromDBReadToModelRead`, and the `SearchResult` type. F19: `SearchResult`'s `fileFormat` and `lastUpdatedAt`, and the `SearchFilters`, `SortBy`, `UpdatedWithin`, `FacetOption`, and `SearchFacets` types. |
 | `src/views/DataManagerApp/DataImportView/DataCatalogView/{DataCatalogView,DataCatalogListingList/DataCatalogListingList}.tsx` and their CSS modules | F12, F16, F17, F19 | F12 and F16: see their sections. F17: server search through `useDataCatalogSearch`, the infinite-scroll list, and the by-id detail fetch. F19: the full-height three-pane layout, filters, facets, sort, and the filter drawer, all on F17's search. |
 | `supabase/schemas/00.enum.data_catalog_listings__api_service.sql` | F4, F6 | F4: rename. F6: the `socrata` value. |
 | `supabase/schemas/10.data_catalog_listings.sql` | F4, F8, F17 | F4: rename and the non-partial `api_resource` unique index. F8: cache columns and their CHECK clauses. F17: the `search_vector` column and its two GIN indexes. |
 | `supabase/tests/database/data_catalog_listings_access.test.sql` | F4, F8 | F4: rename and the index test. F8: cache-column and `pipeline_access_complete` tests. |
 | `apps/pipeline-server/pipelines/world-bank__wdi/run.ts` | F1, F4, F10 | F1: `EtlEngine.create(name, { state })`. F4: `createSupabaseAdminClient` import from `pipelines/shared`. F10: `run(options)` rejecting `--limit`. |
-| `shared/types/database.types.ts` | F4, F6, F8, F17 | Generated: regenerate in each. |
+| `shared/types/database.types.ts` | F4, F6, F8, F17, F19 | Generated: regenerate in each. |
 | `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx` | F12, F16, F19 | F12: `DataCatalogInvalidNotice`. F16: `DataCatalogUnsupportedNotice`, the `isWorkspaceLoadable` guard on the invalid notice, and `!listing.isWorkspaceLoadable` in `isAddBlocked`. F19: the scrolling body, pinned foot, back button, and fact list. |
 
 ---
@@ -962,6 +962,11 @@ feature's work.
 | `bf85931e0` | chore(comments): format the review fixes and fix their lint |
 | `3b1f51e55` | chore(i18n): extract the comment loading and member messages |
 | `72484297d` | fix(video): render the cases record detail with the new record page components |
+| `14cd6eed9` | test(comments): give the case activity tests' case types a default status |
+
+`14cd6eed9` only matters where case types require a default status, which
+the case statuses work adds. If F18 lands first, drop it and apply it with
+case statuses instead.
 
 **Files:** `supabase/schemas/00.enum.{activity_events__kind,activity_events__source,comment_reactions__kind,comment_revisions__reason}.sql`,
 `21.comments.sql`, `22.{comment_revisions,comment_reactions,comment_mentions,activity_events}.sql`,
@@ -1016,6 +1021,12 @@ the catalog shows. **Value:** A catalog of thousands is searchable and
 narrowable instead of a scroll, and its size and every filter's effect are
 visible at a glance.
 
+It runs on F17's server search. Postgres filters, sorts, and counts the
+facets: `data_catalog_listings__search_matches` says whether each match
+passes each filter, `rpc_data_catalog_listings__search` keeps the rows that
+pass all of them, and `rpc_data_catalog_listings__search_facets` counts each
+facet against every other filter. The list loads 50 at a time as it scrolls.
+
 **PR title:** `feat(data-catalog): full-height catalog browser with filters and sort`
 
 **Commits to read:**
@@ -1027,6 +1038,8 @@ visible at a glance.
 | `61499d842` | fix(data-catalog): show one pane at a time on phones | MIXED: only the three `DataCatalogView` stylesheets. The rest is F20. |
 | `76c3de1ab` | Merge branch 'demo/measles' of https://github.com/AvandarLabs/avandar into demo/measles | The F16 hunks it carried into `DataCatalogListingList.tsx` and `DataCatalogListingDetail.tsx`, which go with F16 or F19, whichever lands second. |
 | `c2055f851` | chore(data-catalog): translate the catalog browser copy and apply the pre-push formatter | MIXED: everything except the `DataManagerApp.tsx` reformat, which is F20. Regenerate the `.po` catalogs, then keep its hand-corrected `sw`, `zh-Hans`, `es`, `fr`, and `pt` strings. |
+| `c0f7b1954` | feat(catalog): filter, sort, and facet catalog search in Postgres | All of it. Regenerate the migration and types after F17's. |
+| `3440d68b6` | feat(data-catalog): run the catalog browser on server search | All of it. Regenerate the `.po` catalogs. |
 
 **Files:** everything under
 `src/views/DataManagerApp/DataImportView/DataCatalogView/` except
@@ -1036,11 +1049,26 @@ visible at a glance.
 `DataImportView.tsx`; `AppViewBody.tsx` and its stylesheet (the
 `isFillHeight` prop and the `--ava-content-gutter` property);
 `OpenDatasetDrawer/OpenDatasetModal.tsx`, its stylesheet, and
-`ImportDatasetView.tsx`.
+`ImportDatasetView.tsx`. From the server search: `supabase/schemas/`
+`50.data_catalog_listings__is_updated_within.sql`,
+`51.data_catalog_listings__search_matches.sql`, and the two `52.rpc_*`
+search files (F17's `50.rpc_data_catalog_listings__search.sql` moves to
+`52.`), the pgTAP test `rpc_data_catalog_listings__search_filters.test.sql`
+and the signature in `rpc_data_catalog_listings__search.test.sql`,
+`src/clients/data-catalog-listings/` (`buildDataCatalogSearchFilterArgs/`,
+`createDataCatalogSearchFacets/`, and the client's `search` and
+`searchFacets`), and `useDataCatalogSearch/useDataCatalogFacets.ts`.
+
+**Schema:** `20261106235455_add_catalog_listing_search_filters.sql` (replaces
+F17's three-argument search with the filtered one, and adds the facet RPC
+and its two helpers, `execute` for `authenticated` only). Regenerate it after
+F17's migration, rather than copying it.
 
 **Verification:**
 ```sh
-pnpm vitest run src/views/DataManagerApp src/views/DataExplorerApp src/components/layouts
+pnpm vitest run src/views/DataManagerApp src/views/DataExplorerApp src/components/layouts src/clients/data-catalog-listings
+supabase test db supabase/tests/database/rpc_data_catalog_listings__search.test.sql supabase/tests/database/rpc_data_catalog_listings__search_filters.test.sql
+pnpm test:db
 pnpm test:e2e csv-import.spec.ts
 pnpm test:e2e data-explorer-query-drawer.spec.ts
 pnpm test:e2e nux-first-milestone.spec.ts

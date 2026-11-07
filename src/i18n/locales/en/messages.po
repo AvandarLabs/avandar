@@ -8079,6 +8079,10 @@ msgstr "{lengthValue} km"
 msgid "Source line"
 msgstr "Source line"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Loading more datasets"
+msgstr "Loading more datasets"
+
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "Could not make private"
@@ -8546,6 +8550,10 @@ msgstr "Case Records"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
 msgstr "Purchase {seatsToAdd} seats"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Loading dataset"
+msgstr "Loading dataset"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "

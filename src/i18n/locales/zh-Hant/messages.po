@@ -7885,6 +7885,10 @@ msgstr "{lengthValue} km"
 msgid "Source line"
 msgstr "來源行"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+msgid "Loading more datasets"
+msgstr "正在載入更多資料集"
+
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "無法設為私人"
@@ -8340,6 +8344,10 @@ msgstr "案件記錄"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
 msgstr "購買 {seatsToAdd} 個席位"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Loading dataset"
+msgstr "正在載入資料集"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "

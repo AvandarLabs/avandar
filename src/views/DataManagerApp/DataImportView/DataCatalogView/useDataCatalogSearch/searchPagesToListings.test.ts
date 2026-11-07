@@ -10,6 +10,8 @@ function _listing(id: string): DataCatalogListing.SearchResult {
     pipelineName: undefined,
     isWorkspaceLoadable: true,
     isInvalid: false,
+    fileFormat: "CSV",
+    lastUpdatedAt: undefined,
   };
 }
 

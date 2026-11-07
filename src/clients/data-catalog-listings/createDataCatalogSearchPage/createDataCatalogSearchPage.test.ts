@@ -12,6 +12,8 @@ function _dbRow(
     pipeline_name: null,
     is_workspace_loadable: true,
     is_invalid: false,
+    file_format: "CSV",
+    last_updated_at: null,
     total_count: 120,
     ...overrides,
   };
@@ -33,6 +35,8 @@ describe("createDataCatalogSearchPage", () => {
         pipelineName: undefined,
         isWorkspaceLoadable: true,
         isInvalid: false,
+        fileFormat: "CSV",
+        lastUpdatedAt: undefined,
       },
     ]);
   });

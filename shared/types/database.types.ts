@@ -2506,6 +2506,34 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      data_catalog_listings__is_updated_within: {
+        Args: { p_last_updated_at: string; p_updated_within: string }
+        Returns: boolean
+      }
+      data_catalog_listings__search_matches: {
+        Args: {
+          p_formats: string[]
+          p_is_loadable_only: boolean
+          p_query: string
+          p_sources: string[]
+          p_updated_within: string
+        }
+        Returns: {
+          display_name: string
+          external_organization_name: string
+          file_format: string
+          id: string
+          is_invalid: boolean
+          is_workspace_loadable: boolean
+          last_updated_at: string
+          passes_format: boolean
+          passes_loadable: boolean
+          passes_source: boolean
+          passes_updated: boolean
+          pipeline_name: string
+          score: number
+        }[]
+      }
       datasets__auth_user_may_add_column: {
         Args: { p_dataset_id: string }
         Returns: boolean
@@ -2676,15 +2704,40 @@ export type Database = {
         }[]
       }
       rpc_data_catalog_listings__search: {
-        Args: { p_limit?: number; p_offset?: number; p_query: string }
+        Args: {
+          p_formats?: string[]
+          p_is_loadable_only?: boolean
+          p_limit?: number
+          p_offset?: number
+          p_query: string
+          p_sort_by?: string
+          p_sources?: string[]
+          p_updated_within?: string
+        }
         Returns: {
           display_name: string
           external_organization_name: string
+          file_format: string
           id: string
           is_invalid: boolean
           is_workspace_loadable: boolean
+          last_updated_at: string
           pipeline_name: string
           total_count: number
+        }[]
+      }
+      rpc_data_catalog_listings__search_facets: {
+        Args: {
+          p_formats?: string[]
+          p_is_loadable_only?: boolean
+          p_query: string
+          p_sources?: string[]
+          p_updated_within?: string
+        }
+        Returns: {
+          facet: string
+          listing_count: number
+          value: string
         }[]
       }
       rpc_data_catalog_listings__upsert_with_relation_columns: {

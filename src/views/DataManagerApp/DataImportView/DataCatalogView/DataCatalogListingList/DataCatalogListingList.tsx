@@ -1,28 +1,32 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Text } from "@mantine/core";
+import { Loader, Text } from "@mantine/core";
 import { useId } from "@mantine/hooks";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import clsx from "clsx";
-import { useRef, useState } from "react";
-import {
-  getCatalogListingFormat,
-  getCatalogListingUpdatedDate,
-} from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
+import { useEffect, useRef, useState } from "react";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.module.css";
 import { formatCatalogListingDate } from "@/views/DataManagerApp/DataImportView/DataCatalogView/formatCatalogListingDate";
-import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { KeyboardEvent, ReactNode } from "react";
 
 /** A first guess at a row's height, corrected once the row is measured. */
 const ESTIMATED_ROW_HEIGHT_PX = 60;
 
 type Props = {
-  /** Listings after search, filters, and sorting. */
-  displayedListings: readonly DataCatalogListingRead[];
+  /** Every result page loaded so far, in the order search sorted them. */
+  displayedListings: readonly DataCatalogListing.SearchResult[];
+  /** How many listings the search and filters match, loaded or not. */
+  totalCount: number;
   /** Currently highlighted catalog listing id. */
   selectedId: string | undefined;
   /** Called when the user picks a row. */
-  onSelect: (id: string) => void;
+  onSelect: (id: DataCatalogListing.Id) => void;
+  /** Whether another page of results remains to load. */
+  hasNextPage: boolean;
+  /** Whether the next page is loading now. */
+  isFetchingNextPage: boolean;
+  /** Loads the next page of results. */
+  fetchNextPage: () => unknown;
 };
 
 /** Where an arrow, Home, or End key moves the active row, if anywhere. */
@@ -48,7 +52,8 @@ function _getNextActiveIndex(options: {
 
 /**
  * The catalog's results as one keyboard listbox. Only the rows in view are
- * rendered, so a catalog of thousands scrolls as lightly as one of thirty.
+ * rendered, and the next page loads as the last loaded row scrolls into view,
+ * so a catalog of thousands scrolls as lightly as one of thirty.
  *
  * Arrow keys move the active row and Enter selects it, following the ARIA
  * listbox pattern: the list is one tab stop, not one per row. Each row reads
@@ -57,8 +62,12 @@ function _getNextActiveIndex(options: {
  */
 export function DataCatalogListingList({
   displayedListings,
+  totalCount,
   selectedId,
   onSelect,
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
 }: Props): ReactNode {
   const { t } = useLingui();
   const optionIdPrefix = useId();
@@ -80,6 +89,24 @@ export function DataCatalogListingList({
     },
     overscan: 8,
   });
+  const lastRenderedIndex = rowVirtualizer.getVirtualItems().at(-1)?.index;
+
+  useEffect(() => {
+    if (
+      lastRenderedIndex !== undefined &&
+      lastRenderedIndex >= displayedListings.length - 1 &&
+      hasNextPage &&
+      !isFetchingNextPage
+    ) {
+      fetchNextPage();
+    }
+  }, [
+    lastRenderedIndex,
+    displayedListings.length,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  ]);
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if ((event.key === "Enter" || event.key === " ") && activeListing) {
@@ -118,8 +145,10 @@ export function DataCatalogListingList({
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
           const listing = displayedListings[virtualRow.index]!;
           const isSelected = listing.id === selectedId;
-          const format = getCatalogListingFormat(listing);
-          const updatedDate = getCatalogListingUpdatedDate(listing);
+          const updatedDate =
+            listing.lastUpdatedAt === undefined
+              ? undefined
+              : new Date(listing.lastUpdatedAt);
           return (
             <div
               key={listing.id}
@@ -128,7 +157,7 @@ export function DataCatalogListingList({
               data-index={virtualRow.index}
               role="option"
               aria-selected={isSelected}
-              aria-setsize={displayedListings.length}
+              aria-setsize={totalCount}
               aria-posinset={virtualRow.index + 1}
               className={clsx(
                 css.dataCatalogListingListRow,
@@ -148,7 +177,7 @@ export function DataCatalogListingList({
               <Text c="dimmed" lineClamp={1} size="xs">
                 {[
                   listing.externalOrganizationName,
-                  format,
+                  listing.fileFormat,
                   updatedDate
                     ? t`Updated ${formatCatalogListingDate(updatedDate)}`
                     : undefined,
@@ -169,6 +198,11 @@ export function DataCatalogListingList({
           );
         })}
       </div>
+      {isFetchingNextPage ? (
+        <div className={css.dataCatalogListingListMoreLoader}>
+          <Loader size="xs" aria-label={t`Loading more datasets`} />
+        </div>
+      ) : null}
     </div>
   );
 }
