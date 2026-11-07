@@ -983,13 +983,6 @@ msgstr " registros"
 msgid "Something else…"
 msgstr "Algo más…"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "The catalog is still in <0/> and grows as people tell us what they need. "
-#~ "Missing a dataset? <1>tell us</1>."
-#~ msgstr "El catálogo aún está en <0/> y crece a medida que las personas nos "
-#~ "indican lo que necesitan. ¿No encuentra un conjunto de datos? "
-#~ "<1>Cuéntenos</1>."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "Cambiando el plan a {newPlanName} ({newPlanSubType})"
@@ -1356,10 +1349,6 @@ msgstr "Ejecute una consulta primero."
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
 msgstr "Límite de asientos alcanzado"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Pipeline"
-#~ msgstr "Canalización"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
@@ -2796,10 +2785,6 @@ msgstr "Permitir que se creen nuevos {pluralConceptName} manualmente"
 msgid "Welcome to Avandar"
 msgstr "Bienvenido a Avandar"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Tell us which open dataset you want via feedback"
-#~ msgstr "Díganos qué conjunto de datos abierto desea a través de comentarios"
-
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
@@ -2991,12 +2976,6 @@ msgstr "{0}, {1} y {2} son fijos para cada espacio de trabajo."
 msgid "Synced to the cloud"
 msgstr "Sincronizado con la nube"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
-#~ "how often it updates."
-#~ msgstr "Seleccione un conjunto de datos a la izquierda para consultar su "
-#~ "contenido, quién lo publica y con qué frecuencia se actualiza."
-
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
 msgstr "Sin color para los datos"
@@ -3084,10 +3063,6 @@ msgstr "La cláusula HAVING usa un lado izquierdo que el formulario no puede "
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "has no value"
 msgstr "no tiene valor"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
-#~ msgid "Catalog datasets"
-#~ msgstr "Catalogar conjuntos de datos"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -3372,10 +3347,6 @@ msgstr "Actualmente estás en el plan <0>{currentFeaturePlanName}</0>."
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Result size"
 msgstr "Tamaño del resultado"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Search open data catalog"
-#~ msgstr "Buscar en el catálogo de datos abiertos"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
@@ -3711,10 +3682,6 @@ msgstr "Duplicar"
 msgid "Outcome"
 msgstr "Resultado"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Searching the catalog"
-#~ msgstr "Buscando en el catálogo"
-
 #: src/components/RichText/UserMention/UserMentionList.tsx
 msgid "No teammates match"
 msgstr "Ningún compañero de equipo coincide"
@@ -3805,10 +3772,6 @@ msgstr "Confirmar acción"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "No hay dashboards para mostrar"
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-#~ msgid "A type of record you manage"
-#~ msgstr "Un tipo de registro que administra"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -4550,10 +4513,6 @@ msgstr "Ubicaciones exactas"
 msgid "New chat"
 msgstr "Nuevo chat"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Search by name, organization, pipeline…"
-#~ msgstr "Buscar por nombre, organización, canal…"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Data"
@@ -5223,11 +5182,6 @@ msgstr "Asientos comprados con éxito"
 msgid "Open chat (⌘/)"
 msgstr "Abrir chat (⌘/)"
 
-#. placeholder {0}: catalogSearch.totalCount
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Catalog ({0})"
-#~ msgstr "Catálogo ({0})"
-
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "Enviar"
@@ -5756,11 +5710,6 @@ msgstr "Consentimiento"
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "Cuéntanos de dónde debería provenir la información de "
 "{singularConceptName}..."
-
-#. placeholder {0}: debouncedSearch.trim()
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "No catalog dataset matches “{0}”."
-#~ msgstr "Ningún conjunto de datos del catálogo coincide con “{0}”."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -6719,12 +6668,6 @@ msgstr "Correo electrónico"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick color"
 msgstr "Color de las marcas del eje Y"
-
-#. placeholder {0}: listing.pipelineName
-#. placeholder {1}: listing.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "{0} · run {1}"
-#~ msgstr "{0} · ejecutar {1}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
@@ -8255,14 +8198,6 @@ msgstr "{lengthValue} km"
 msgid "Source line"
 msgstr "Línea de origen"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
-#~ msgid "Loading more datasets"
-#~ msgstr "Cargando más conjuntos de datos"
-
-#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
-#~ msgid "Nothing more to load"
-#~ msgstr "No hay nada más que cargar"
-
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "No se pudo hacer privado"
@@ -8692,10 +8627,6 @@ msgstr "Editor"
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Entered manually"
 msgstr "Ingresado manualmente"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Organization"
-#~ msgstr "Organización"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
@@ -9601,10 +9532,6 @@ msgstr "Eliminar el mapa {0}"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Read as"
 msgstr "Leer como"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Try one of these"
-#~ msgstr "Prueba una de estas opciones"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"

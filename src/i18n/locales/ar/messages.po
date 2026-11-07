@@ -968,12 +968,6 @@ msgstr " سجلات"
 msgid "Something else…"
 msgstr "شيء آخر…"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "The catalog is still in <0/> and grows as people tell us what they need. "
-#~ "Missing a dataset? <1>tell us</1>."
-#~ msgstr "لا يزال الكتالوج في <0/>، وينمو مع إخبارنا باحتياجات المستخدمين. هل "
-#~ "تفتقد مجموعة بيانات؟ <1>أخبرنا</1>."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "تغيير الخطة إلى {newPlanName} ({newPlanSubType})"
@@ -1334,10 +1328,6 @@ msgstr "شغّل استعلامًا أولًا."
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
 msgstr "تم الوصول إلى حد المقاعد"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Pipeline"
-#~ msgstr "خط الأنابيب"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
@@ -2749,10 +2739,6 @@ msgstr "السماح بإنشاء {pluralConceptName} جديدة يدويًا"
 msgid "Welcome to Avandar"
 msgstr "مرحبًا بك في Avandar"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Tell us which open dataset you want via feedback"
-#~ msgstr "أخبرنا أي مجموعة بيانات مفتوحة تريدها عبر التعليقات"
-
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
@@ -2941,12 +2927,6 @@ msgstr "{0} و {1} و {2} ثابتة لكل مساحة عمل."
 msgid "Synced to the cloud"
 msgstr "تمت المزامنة مع السحابة"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
-#~ "how often it updates."
-#~ msgstr "اختر مجموعة بيانات من اليسار لقراءة ما تغطيه، ومن ينشرها، ومدى تكرار "
-#~ "تحديثها."
-
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
 msgstr "لا لون للبيانات"
@@ -3033,10 +3013,6 @@ msgstr "تستخدم عبارة HAVING جانبًا أيسر لا يمكن لل�
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "has no value"
 msgstr "ليس له قيمة"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
-#~ msgid "Catalog datasets"
-#~ msgstr "فهرسة مجموعات البيانات"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -3317,10 +3293,6 @@ msgstr "أنت حاليًا على خطة <0>{currentFeaturePlanName}</0>."
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Result size"
 msgstr "حجم النتيجة"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Search open data catalog"
-#~ msgstr "ابحث في كتالوج البيانات المفتوحة"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
@@ -3649,10 +3621,6 @@ msgstr "تكرار"
 msgid "Outcome"
 msgstr "النتيجة"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Searching the catalog"
-#~ msgstr "جارٍ البحث في الكتالوج"
-
 #: src/components/RichText/UserMention/UserMentionList.tsx
 msgid "No teammates match"
 msgstr "لا يوجد زملاء مطابقون"
@@ -3743,10 +3711,6 @@ msgstr "تأكيد الإجراء"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "لا توجد لوحات معلومات لعرضها"
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-#~ msgid "A type of record you manage"
-#~ msgstr "نوع من السجلات التي تديرها"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -4474,10 +4438,6 @@ msgstr "المواقع الدقيقة"
 msgid "New chat"
 msgstr "محادثة جديدة"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Search by name, organization, pipeline…"
-#~ msgstr "البحث بالاسم، المنظمة، خط الأنابيب…"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Data"
@@ -5139,11 +5099,6 @@ msgstr "تم شراء المقاعد بنجاح"
 msgid "Open chat (⌘/)"
 msgstr "فتح الدردشة (⌘/)"
 
-#. placeholder {0}: catalogSearch.totalCount
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Catalog ({0})"
-#~ msgstr "الفهرس ({0})"
-
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "إرسال"
@@ -5660,11 +5615,6 @@ msgstr "موافقة"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "أخبرنا عن مصدر بيانات {singularConceptName}..."
-
-#. placeholder {0}: debouncedSearch.trim()
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "No catalog dataset matches “{0}”."
-#~ msgstr "لا تتطابق أي مجموعة بيانات في الكتالوج مع «{0}»."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -6611,12 +6561,6 @@ msgstr "البريد الإلكتروني"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick color"
 msgstr "لون تدريجات المحور Y"
-
-#. placeholder {0}: listing.pipelineName
-#. placeholder {1}: listing.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "{0} · run {1}"
-#~ msgstr "{0} · تشغيل {1}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
@@ -8120,14 +8064,6 @@ msgstr "{lengthValue} كم"
 msgid "Source line"
 msgstr "سطر المصدر"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
-#~ msgid "Loading more datasets"
-#~ msgstr "جارٍ تحميل المزيد من مجموعات البيانات"
-
-#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
-#~ msgid "Nothing more to load"
-#~ msgstr "لا يوجد المزيد لتحميله"
-
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "تعذّر جعله خاصًا"
@@ -8548,10 +8484,6 @@ msgstr "محرر"
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Entered manually"
 msgstr "تم الإدخال يدويًا"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Organization"
-#~ msgstr "المنظمة"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
@@ -9443,10 +9375,6 @@ msgstr "حذف الخريطة {0}"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Read as"
 msgstr "يُقرأ كـ"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Try one of these"
-#~ msgstr "جرّب أحد هذه"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"

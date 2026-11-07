@@ -947,11 +947,6 @@ msgstr " 筆資料"
 msgid "Something else…"
 msgstr "其他…"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "The catalog is still in <0/> and grows as people tell us what they need. "
-#~ "Missing a dataset? <1>tell us</1>."
-#~ msgstr "目錄仍在 <0/>，並會隨著大家告訴我們需求而擴充。找不到需要的資料集？<1>告訴我們</1>。"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "將計劃更改為 {newPlanName} ({newPlanSubType})"
@@ -1300,10 +1295,6 @@ msgstr "請先執行查詢。"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
 msgstr "已達到座位限制"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Pipeline"
-#~ msgstr "管道"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
@@ -2681,10 +2672,6 @@ msgstr "允許手動創建新的 {pluralConceptName}"
 msgid "Welcome to Avandar"
 msgstr "歡迎使用 Avandar"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Tell us which open dataset you want via feedback"
-#~ msgstr "通過反饋告訴我們您想要的開放資料集"
-
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
@@ -2867,11 +2854,6 @@ msgstr "{0}、{1} 和 {2} 對每個工作區都是固定的。"
 msgid "Synced to the cloud"
 msgstr "已同步至雲端"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
-#~ "how often it updates."
-#~ msgstr "選取左側的資料集，以查看其涵蓋內容、發佈者及更新頻率。"
-
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
 msgstr "無資料顏色"
@@ -2956,10 +2938,6 @@ msgstr "HAVING 子句使用了表單無法表示的左側運算式。"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "has no value"
 msgstr "沒有值"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
-#~ msgid "Catalog datasets"
-#~ msgstr "編目資料集"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -3233,10 +3211,6 @@ msgstr "您目前在<0>{currentFeaturePlanName}</0>計劃中。"
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Result size"
 msgstr "結果大小"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Search open data catalog"
-#~ msgstr "搜索開放數據目錄"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
@@ -3551,10 +3525,6 @@ msgstr "複製"
 msgid "Outcome"
 msgstr "結果"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Searching the catalog"
-#~ msgstr "正在搜尋目錄"
-
 #: src/components/RichText/UserMention/UserMentionList.tsx
 msgid "No teammates match"
 msgstr "沒有符合條件的隊友"
@@ -3645,10 +3615,6 @@ msgstr "確認操作"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "沒有可顯示的儀表板"
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-#~ msgid "A type of record you manage"
-#~ msgstr "您管理的一種記錄"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -4360,10 +4326,6 @@ msgstr "精確位置"
 msgid "New chat"
 msgstr "新聊天"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Search by name, organization, pipeline…"
-#~ msgstr "按名稱、組織、管道等搜索…"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Data"
@@ -5012,11 +4974,6 @@ msgstr "座位購買成功"
 msgid "Open chat (⌘/)"
 msgstr "打開聊天 (⌘/)"
 
-#. placeholder {0}: catalogSearch.totalCount
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "Catalog ({0})"
-#~ msgstr "目錄 ({0})"
-
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "發送"
@@ -5525,11 +5482,6 @@ msgstr "同意"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "告訴我們 {singularConceptName} 數據應該來自哪裡..."
-
-#. placeholder {0}: debouncedSearch.trim()
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
-#~ msgid "No catalog dataset matches “{0}”."
-#~ msgstr "目錄中沒有符合「{0}」的資料集。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -6461,12 +6413,6 @@ msgstr "電子郵件"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick color"
 msgstr "Y 軸刻度顏色"
-
-#. placeholder {0}: listing.pipelineName
-#. placeholder {1}: listing.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "{0} · run {1}"
-#~ msgstr "{0} · 執行 {1}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
@@ -7939,14 +7885,6 @@ msgstr "{lengthValue} km"
 msgid "Source line"
 msgstr "來源行"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
-#~ msgid "Loading more datasets"
-#~ msgstr "正在載入更多資料集"
-
-#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
-#~ msgid "Nothing more to load"
-#~ msgstr "沒有更多內容可加載"
-
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "無法設為私人"
@@ -8357,10 +8295,6 @@ msgstr "編輯者"
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Entered manually"
 msgstr "手動輸入"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
-#~ msgid "Organization"
-#~ msgstr "組織"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
@@ -9233,10 +9167,6 @@ msgstr "刪除地圖 {0}"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Read as"
 msgstr "讀取為"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Try one of these"
-#~ msgstr "嘗試這些"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
