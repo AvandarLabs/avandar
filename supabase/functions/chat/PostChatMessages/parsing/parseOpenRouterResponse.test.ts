@@ -96,6 +96,33 @@ describe("parseOpenRouterResponse", () => {
     });
   });
 
+  it("uses generateSql's summary as the reply when the model wrote no text", () => {
+    const parsed = parseOpenRouterResponse({
+      message: {
+        tool_calls: [
+          {
+            function: {
+              name: "generateSql",
+              arguments: JSON.stringify({
+                sql: 'SELECT 1 FROM "t0"',
+                summary:
+                  "Monthly US deaths in 2022, from the US deaths dataset.",
+              }),
+            },
+          },
+        ],
+      },
+      attemptText: "",
+      lastUserPrompt: "monthly deaths 2022",
+      priorClarifications: 0,
+      datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
+    });
+
+    expect(parsed.text).toBe(
+      "Monthly US deaths in 2022, from the US deaths dataset.",
+    );
+  });
+
   it("rewrites discovery query aliases to dataset ids", () => {
     const parsed = parseOpenRouterResponse({
       message: {

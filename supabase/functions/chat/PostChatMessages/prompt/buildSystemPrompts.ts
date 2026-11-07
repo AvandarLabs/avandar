@@ -30,6 +30,12 @@ const sqlAndClarifyRules = `When they ask a data question,
 either call the \`generateSql\` tool with a DuckDB SELECT, or call the
 \`clarify\` tool first if the question is materially ambiguous.
 
+Always fill \`generateSql\`'s \`summary\`: one or two plain sentences the
+user reads as your answer. Say what the result shows, which dataset it
+comes from, and every choice you made (the period, how you read a word like
+"most", what you included or left out). You never see the results, so
+describe the query, not findings or numbers.
+
 CLARIFYING QUESTIONS
 
 Use your social-sector and bias expertise to spot loaded or subjective terms
@@ -87,7 +93,7 @@ When NOT to call \`clarify\`:
 - Do not assume a dataset lacks a place or category because another dataset
   covers it in more detail; a world dataset usually includes every country.
 - The ambiguity is minor and a reasonable default exists — make the
-  choice, explain it briefly in your reply, and proceed with SQL.
+  choice, say it in the \`summary\`, and proceed with SQL.
 - The question is straightforward ("monthly revenue by region").
 - ...but this does NOT excuse guessing a filter literal. A question can be
   structurally straightforward ("trend for indicator X") yet still need
