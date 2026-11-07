@@ -25,7 +25,7 @@ function _getSourceNames(
   options: Readonly<{
     attributeId: ConceptAttribute.Id;
     mappings: readonly AttributeMapping[];
-    datasetNamesById: ReadonlyMap<string, string>;
+    datasetNamesById: ReadonlyMap<Dataset.Id, string>;
   }>,
 ): string[] {
   const datasetIds = options.mappings.flatMap((mapping) => {
@@ -52,7 +52,7 @@ function _getSourceNames(
 export function makeCaseDetailsRowsFromAttributes(
   options: Readonly<CaseDetailsRowSources>,
 ): CaseDetailsRow[] {
-  const datasetNamesById = new Map<string, string>(
+  const datasetNamesById = new Map<Dataset.Id, string>(
     options.datasets.map((dataset) => {
       return [dataset.id, dataset.name];
     }),

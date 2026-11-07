@@ -6,6 +6,7 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type { ManualEntryMapping } from "$/models/ontology/AttributeMapping/ManualEntryMapping/ManualEntryMapping.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { User } from "$/models/User/User";
@@ -151,5 +152,60 @@ describe("makeCaseDetailsRowsFromAttributes", () => {
     });
 
     expect(rows[0]?.sourceNames).toEqual(["Line list", "Line list"]);
+  });
+
+  it("lists a field's datasets in name order, not mapping order", () => {
+    const region = _makeAttribute({ name: "region" });
+    const zeta = _makeDataset("Zeta");
+    const alpha = _makeDataset("Alpha");
+
+    const rows = makeCaseDetailsRowsFromAttributes({
+      attributes: [region],
+      valuesByAttributeId: {},
+      mappings: [
+        _makeMapping({ attribute: region, dataset: zeta }),
+        _makeMapping({ attribute: region, dataset: alpha }),
+      ],
+      datasets: [zeta, alpha],
+    });
+
+    expect(rows[0]?.sourceNames).toEqual(["Alpha", "Zeta"]);
+  });
+
+  it("names no source for a mapping whose dataset is not in the list", () => {
+    const region = _makeAttribute({ name: "region" });
+    const missingDataset = _makeDataset("Missing");
+
+    const rows = makeCaseDetailsRowsFromAttributes({
+      attributes: [region],
+      valuesByAttributeId: {},
+      mappings: [_makeMapping({ attribute: region, dataset: missingDataset })],
+      datasets: [],
+    });
+
+    expect(rows[0]?.sourceNames).toEqual([]);
+  });
+
+  it("names no source for a manual-entry mapping", () => {
+    const note = _makeAttribute({ name: "note", mappingType: "manual_entry" });
+    const lineList = _makeDataset("Line list");
+
+    const rows = makeCaseDetailsRowsFromAttributes({
+      attributes: [note],
+      valuesByAttributeId: {},
+      mappings: [
+        {
+          id: uuid<ManualEntryMapping["id"]>(),
+          workspaceId: WORKSPACE_ID,
+          type: "manual_entry",
+          conceptAttributeId: note.id,
+          createdAt: NOW,
+          updatedAt: NOW,
+        },
+      ],
+      datasets: [lineList],
+    });
+
+    expect(rows[0]?.sourceNames).toEqual([]);
   });
 });
