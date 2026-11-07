@@ -2235,7 +2235,6 @@ msgid "Medium"
 msgstr "Wastani"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
 msgstr "Inapakia kesi"
 
@@ -10550,8 +10549,8 @@ msgid "This dashboard is published publicly."
 msgstr "Dashibodi hii imechapishwa hadharani."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
-msgid "Loading..."
-msgstr "Inapakia..."
+#~ msgid "Loading..."
+#~ msgstr "Inapakia..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"

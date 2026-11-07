@@ -2206,7 +2206,6 @@ msgid "Medium"
 msgstr "متوسط"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
 msgstr "جارٍ تحميل الحالة"
 
@@ -10428,8 +10427,8 @@ msgid "This dashboard is published publicly."
 msgstr "تم نشر هذه اللوحة للجمهور."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
-msgid "Loading..."
-msgstr "جارٍ التحميل..."
+#~ msgid "Loading..."
+#~ msgstr "جارٍ التحميل..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"

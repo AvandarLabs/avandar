@@ -2146,7 +2146,6 @@ msgid "Medium"
 msgstr "中"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
 msgstr "正在載入案件"
 
@@ -10185,8 +10184,8 @@ msgid "This dashboard is published publicly."
 msgstr "此儀表板已公開發佈。"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
-msgid "Loading..."
-msgstr "載入中..."
+#~ msgid "Loading..."
+#~ msgstr "載入中..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"

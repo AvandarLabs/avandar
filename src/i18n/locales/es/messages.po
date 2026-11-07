@@ -2244,7 +2244,6 @@ msgid "Medium"
 msgstr "Mediano"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
 msgstr "Cargando caso"
 
@@ -10601,8 +10600,8 @@ msgid "This dashboard is published publicly."
 msgstr "Este panel está publicado públicamente."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
-msgid "Loading..."
-msgstr "Cargando..."
+#~ msgid "Loading..."
+#~ msgstr "Cargando..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"
