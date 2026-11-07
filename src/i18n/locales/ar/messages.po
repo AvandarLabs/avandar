@@ -3879,11 +3879,6 @@ msgstr "جارٍ معالجة مجموعة البيانات…"
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "نموذج الدردشة دون اتصال جاهز. انقر للتبديل أو إعادة التنزيل."
 
-#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload a file, connect an external source, or browse the open data "
-"catalog."
-msgstr "حمّل ملفًا، أو صِل مصدرًا خارجيًا، أو استعرض كتالوج البيانات المفتوحة."
-
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
 msgstr "تهانينا"
