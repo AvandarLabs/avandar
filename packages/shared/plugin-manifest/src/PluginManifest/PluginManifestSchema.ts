@@ -1,8 +1,9 @@
-import { collectWhenConditionIssues } from "@plugin-manifest/PluginManifest/collectWhenConditionIssues.ts";
+import { getIssuesFromWhenCondition } from "@plugin-manifest/PluginManifest/getIssuesFromWhenCondition.ts";
 import {
   SLOT_IDS,
   SlotFactRegistry,
 } from "@plugin-manifest/SlotFacts/SlotFactRegistry.ts";
+import { LOCALIZED_KEY_PATTERN } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
 import { z } from "zod";
 import type {
   WhenCondition,
@@ -11,7 +12,6 @@ import type {
 
 const PLUGIN_ID_PATTERN = /^[a-z0-9-]+\.[a-z0-9-]+$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
-const LOCALIZED_KEY_PATTERN = /^%[A-Za-z0-9_.-]+%$/;
 const COMMAND_ID_PATTERN = /^[a-z0-9-]+(?:\.[a-z0-9-]+)*$/;
 const ICON_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ENTRY_PATTERN = /^(?!\/)(?!.*\.\.)[A-Za-z0-9_./-]+\.tsx?$/;
@@ -168,7 +168,7 @@ function _refineMenus(
         });
       }
       if (item.when !== undefined) {
-        collectWhenConditionIssues({
+        getIssuesFromWhenCondition({
           condition: item.when,
           slotFacts: SlotFactRegistry[slotId],
           path: [...path, "when"],

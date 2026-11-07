@@ -126,7 +126,7 @@ function _collectChildIssues(options: {
 }): WhenConditionIssue[] {
   const { children, slotFacts, path } = options;
   return children.flatMap((child, index) => {
-    return collectWhenConditionIssues({
+    return getIssuesFromWhenCondition({
       condition: child,
       slotFacts,
       path: [...path, index],
@@ -135,10 +135,11 @@ function _collectChildIssues(options: {
 }
 
 /**
- * Checks a `when` condition against the facts its slot declares: every fact
- * must exist, and every operator and value must fit the fact's type.
+ * Gets the problems in a `when` condition by checking it against the facts
+ * its slot declares: every fact must exist, and every operator and value
+ * must fit the fact's type. The manifest schema reports them as Zod issues.
  */
-export function collectWhenConditionIssues(options: {
+export function getIssuesFromWhenCondition(options: {
   condition: WhenCondition;
   slotFacts: Readonly<Record<string, FactType>>;
   path: ReadonlyArray<string | number>;
@@ -159,7 +160,7 @@ export function collectWhenConditionIssues(options: {
     });
   }
   if (isNotCondition(condition)) {
-    return collectWhenConditionIssues({
+    return getIssuesFromWhenCondition({
       condition: condition.not,
       slotFacts,
       path: [...path, "not"],
