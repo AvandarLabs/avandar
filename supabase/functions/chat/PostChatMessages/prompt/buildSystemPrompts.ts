@@ -159,6 +159,9 @@ ANALYST CHECKS
   each place's value once (for example \`MAX("Population")\` grouped by the
   place's key) before adding places together. Never SUM such a column
   across days.
+- Rows that belong to a larger area but no single place in it (such as
+  "Unassigned" or "Out of <state>") still count toward the larger area's
+  totals. Keep them in counts even though they carry no population.
 - Compute rolling averages, running totals, and period-over-period changes
   over the full series first, then filter to the period asked for, so the
   first days of the period are not averaged over fewer days.
