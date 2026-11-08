@@ -62,6 +62,16 @@ enough:
 ava pipeline run socrata --local --env demo
 ```
 
+Without `--local`, the pipeline server runs it, and loads into the project
+the env file names: the CLI sends its `VITE_SUPABASE_API_URL` and
+`SUPABASE_SERVICE_ROLE_KEY` with the request, and the server keeps no
+Supabase credentials of its own. One server serves every environment:
+
+```bash
+ava pipeline run socrata --env demo        # loads into demo
+ava pipeline run socrata --env production  # loads into production
+```
+
 ### Reading env vars in a command
 
 Use `AvaEnv.requireVar` from `@ava-cli/AvaEnv/AvaEnv`, never `process.env`

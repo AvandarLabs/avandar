@@ -206,8 +206,15 @@ Set the server's secrets on the app before the first deploy:
 
 ```bash
 fly secrets set --app <app> AVA_PIPELINE_SERVER_SECRET=your-secret \
-  SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=...
+  SOCRATA_APP_TOKEN=...
 ```
+
+The server keeps no Supabase credentials. Every run names the project to
+load into, in the `X-Ava-Supabase-Url` and `X-Ava-Supabase-Service-Role-Key`
+headers, so one server loads into demo, production, or a local stack,
+whichever its caller holds the key for. `ava pipeline run` sends the
+`VITE_SUPABASE_API_URL` and `SUPABASE_SERVICE_ROLE_KEY` of the env file it
+loaded. The key is never logged or recorded with the run.
 
 Deploy with:
 

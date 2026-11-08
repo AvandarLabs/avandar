@@ -27,7 +27,7 @@ export async function run(options: RunPipelineOptions): Promise<EtlRunReport> {
     );
   }
 
-  const { mode, since, until, limit, scopes, invocation } = options;
+  const { mode, since, until, limit, scopes, invocation, supabase } = options;
   return await (pipelineModule as PipelineRunModule).run({
     mode,
     since,
@@ -35,5 +35,6 @@ export async function run(options: RunPipelineOptions): Promise<EtlRunReport> {
     limit,
     ...(scopes === undefined ? {} : { scopes }),
     ...(invocation === undefined ? {} : { invocation }),
+    ...(supabase === undefined ? {} : { supabase }),
   });
 }
