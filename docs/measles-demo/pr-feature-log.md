@@ -1477,9 +1477,10 @@ workspace dataset's Metadata tab still shows its preview.
 
 ## F25: Cached Parquet copies of ODC listings
 
-Status: in progress. The pipeline server builds and uploads copies; nothing
-requests or reads them yet (the build route, the edge route, and the app's
-readers are still to come, see the spec's slices).
+Status: in progress. The pipeline server builds copies on request through
+`POST /open-data-cache/:catalogListingId/build`; nothing requests or reads
+them yet (the edge route and the app's readers are still to come, see the
+spec's slices).
 
 **Purpose:** An API-backed Open Data Catalog (ODC) listing is relayed whole
 through the `open-data` edge function, capped at 25 MB, on every load. The
@@ -1517,6 +1518,8 @@ added to a workspace and load from Storage instead of the source.
 | `5685fb84c` | chore: keep env files and installed modules out of Docker build contexts | All of it. |
 | `d3dd08b56` | fix(pipeline-server): make the Docker image start and run DuckDB | All of it. |
 | `513873f61` | fix(pipeline-server): hoist DuckDB in the image, and fail the build if it cannot resolve | All of it. Merged in `7e428d400`. |
+| `3ca228aae` | feat(pipeline-server): build ODC listings' Parquet copies on request | All of it. Merged in `42754c16c`. |
+| `e86a92b21` | feat(pipeline-server): keep a listing's columns when its copy shares none of them | All of it, including the P6.11 roadmap item. Merged in `42754c16c`. |
 
 **Files:** `apps/pipeline-server/src/openDataParquetCache/`,
 `apps/pipeline-server/pipelines/socrata/download/`,
