@@ -137,6 +137,19 @@ function TwoRowCrashingChart({ rows }: PluginVizComponentProps): ReactNode {
   return <div data-testid="case-dots" />;
 }
 
+function CaseRings(): ReactNode {
+  return <div data-testid="case-rings" />;
+}
+
+function UnlabelledCrashingRings({
+  settings,
+}: PluginVizComponentProps): ReactNode {
+  if (settings.labelColumn === undefined) {
+    throw new Error("chart crashed");
+  }
+  return <div data-testid="case-rings" />;
+}
+
 const CASE_CHARTS = definePlugin({
   vizTypes: {
     "case-bars": { transform: _makeCaseBarsFromRows },
@@ -172,6 +185,19 @@ function _makeManifestModule(pluginId: string): PluginManifestModule {
             render: "component",
             settings: [],
           },
+          {
+            id: "case-rings",
+            title: "%viz.caseRings.title%",
+            icon: "chart-donut",
+            render: "component",
+            settings: [
+              {
+                key: "labelColumn",
+                label: "%viz.labelColumn%",
+                control: { kind: "columnPicker", dataType: "text" },
+              },
+            ],
+          },
         ],
       },
     },
@@ -180,6 +206,7 @@ function _makeManifestModule(pluginId: string): PluginManifestModule {
         name: "Case charts",
         "viz.caseBars.title": "Case bars",
         "viz.caseDots.title": "Case dots",
+        "viz.caseRings.title": "Case rings",
         "viz.labelColumn": "Label column",
       },
     },
@@ -242,6 +269,13 @@ function _makeDotsConfig(pluginId: string): AvaVizConfig.Plugin {
   });
 }
 
+function _makeRingsConfig(
+  pluginId: string,
+  columnSettings: AvaVizConfig.Plugin["columnSettings"] = {},
+): AvaVizConfig.Plugin {
+  return _makeConfig({ pluginId, pluginVizId: "case-rings", columnSettings });
+}
+
 function _makeRows(rowCount: number): UnknownDataFrame {
   return Array.from({ length: rowCount }, (_row, index) => {
     return { region: `Region ${index}`, cases: index };
@@ -254,20 +288,26 @@ function QueryWrapper({ children }: { children: ReactNode }): JSX.Element {
   );
 }
 
-function _renderChart(options: {
+type ChartOptions = {
   vizConfig: AvaVizConfig.Plugin;
+  columns?: readonly QueryResult.ColumnWithId[];
   data?: UnknownDataFrame;
   isTruncated?: boolean;
-}): ReturnType<typeof render> {
-  return render(
+};
+
+function _makeChartElement(options: ChartOptions): JSX.Element {
+  return (
     <PluginVizRenderer
-      columns={COLUMNS}
+      columns={options.columns ?? COLUMNS}
       data={options.data ?? DATA}
       vizConfig={options.vizConfig}
       isTruncated={options.isTruncated}
-    />,
-    { wrapper: QueryWrapper },
+    />
   );
+}
+
+function _renderChart(options: ChartOptions): ReturnType<typeof render> {
+  return render(_makeChartElement(options), { wrapper: QueryWrapper });
 }
 
 describe("PluginVizRenderer", () => {
@@ -410,6 +450,24 @@ describe("PluginVizRenderer", () => {
     expect(
       await screen.findByText("Choose a Label column"),
     ).toBeInTheDocument();
+  });
+
+  it("does not ask for a required column setting before the result has columns", async () => {
+    const loadCode = vi.fn(() => {
+      return Promise.resolve({ definition: CASE_CHARTS, messages: MESSAGES });
+    });
+    const pluginId = _addBundledPlugin({ loadCode });
+
+    _renderChart({
+      vizConfig: _makeConfig({ pluginId }),
+      columns: [],
+      data: [],
+    });
+    await waitFor(() => {
+      expect(loadCode).toHaveBeenCalled();
+    });
+
+    expect(screen.queryByText("Choose a Label column")).toBeNull();
   });
 
   it("does not load the plugin code while a required setting is unset", async () => {
@@ -559,15 +617,49 @@ describe("PluginVizRenderer", () => {
     const { rerender } = _renderChart({ vizConfig });
     await screen.findByText("Case dots couldn't render");
 
-    rerender(
-      <PluginVizRenderer
-        columns={COLUMNS}
-        data={_makeRows(3)}
-        vizConfig={vizConfig}
-      />,
-    );
+    rerender(_makeChartElement({ vizConfig, data: _makeRows(3) }));
 
     expect(await screen.findByTestId("case-dots")).toBeInTheDocument();
+  });
+
+  it("draws a crashed component chart again once its settings change", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const pluginId = _addBundledPlugin({
+      definition: definePlugin({
+        vizTypes: { "case-rings": { Component: UnlabelledCrashingRings } },
+      }),
+    });
+    const { rerender } = _renderChart({
+      vizConfig: _makeRingsConfig(pluginId),
+    });
+    await screen.findByText("Case rings couldn't render");
+
+    rerender(
+      _makeChartElement({
+        vizConfig: _makeRingsConfig(pluginId, { labelColumn: REGION_ID }),
+      }),
+    );
+
+    expect(await screen.findByTestId("case-rings")).toBeInTheDocument();
+  });
+
+  it("draws another chart type in place of a crashed one with the same settings", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const pluginId = _addBundledPlugin({
+      definition: definePlugin({
+        vizTypes: {
+          "case-dots": { Component: CrashingChart },
+          "case-rings": { Component: CaseRings },
+        },
+      }),
+    });
+    // Neither chart type has a setting with a value, so both read `{}`.
+    const { rerender } = _renderChart({ vizConfig: _makeDotsConfig(pluginId) });
+    await screen.findByText("Case dots couldn't render");
+
+    rerender(_makeChartElement({ vizConfig: _makeRingsConfig(pluginId) }));
+
+    expect(await screen.findByTestId("case-rings")).toBeInTheDocument();
   });
 
   it("shows that the chart couldn't render when the plugin code declares no such chart", async () => {
@@ -590,6 +682,18 @@ describe("PluginVizRenderer", () => {
 
     expect(
       await screen.findByText("Built from the first 2 rows of the result."),
+    ).toBeInTheDocument();
+  });
+
+  it("notes a truncated result's chart built from one row in the singular", async () => {
+    _renderChart({
+      vizConfig: _makeConfig({ pluginId: _addBundledPlugin() }),
+      data: _makeRows(1),
+      isTruncated: true,
+    });
+
+    expect(
+      await screen.findByText("Built from the first row of the result."),
     ).toBeInTheDocument();
   });
 

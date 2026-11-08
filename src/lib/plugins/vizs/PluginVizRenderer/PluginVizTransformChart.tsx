@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Plural } from "@lingui/react/macro";
 import { Box, Stack, Text } from "@mantine/core";
 import { useEffect, useMemo } from "react";
 import { UiVizConfigRenderer } from "@/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer";
@@ -75,7 +75,11 @@ export function PluginVizTransformChart({
       </Box>
       {input.isTruncated ? (
         <Text size="xs" c="dimmed" ta="center">
-          <Trans>Built from the first {rowCount} rows of the result.</Trans>
+          <Plural
+            value={rowCount}
+            one="Built from the first row of the result."
+            other="Built from the first # rows of the result."
+          />
         </Text>
       ) : null}
     </Stack>

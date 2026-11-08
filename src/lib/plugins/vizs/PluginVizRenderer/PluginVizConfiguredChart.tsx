@@ -36,10 +36,11 @@ const dataKeys = new WeakMap<UnknownDataFrame, number>();
 let lastDataKey = 0;
 
 function _getChartKeyFromInput(options: {
+  lookup: Props["lookup"];
   data: UnknownDataFrame;
   settings: PluginVizInput["settings"];
 }): string {
-  const { data, settings } = options;
+  const { lookup, data, settings } = options;
   // A caller can pass a fresh empty array on every render, so every empty
   // result shares one key instead of remounting the chart each time.
   let dataKey = data.length === 0 ? 0 : dataKeys.get(data);
@@ -48,7 +49,29 @@ function _getChartKeyFromInput(options: {
     dataKey = lastDataKey;
     dataKeys.set(data, dataKey);
   }
-  return `${dataKey}:${JSON.stringify(settings)}`;
+  return JSON.stringify([
+    lookup.entry.id,
+    lookup.vizType.id,
+    dataKey,
+    settings,
+  ]);
+}
+
+function _getMissingRequiredKeys(options: {
+  vizType: PluginVizType;
+  vizConfig: AvaVizConfig.Plugin;
+  uiConfig: UiPluginVizConfig;
+  rawColumns: readonly QueryResult.Column[];
+}): string[] {
+  const { vizType, vizConfig, uiConfig, rawColumns } = options;
+  // Before the query has returned any columns, no stored column can be found
+  // by name, so only settings that were never set count as missing.
+  const hasResultColumns = rawColumns.length > 0;
+  return AvaPluginVizConfigs.getMissingRequiredKeys({
+    config: hasResultColumns ? uiConfig : vizConfig,
+    settings: vizType.settings,
+    columnNames: hasResultColumns ? rawColumns.map(prop("name")) : undefined,
+  });
 }
 
 function _getUiPluginVizConfig(options: {
@@ -102,11 +125,13 @@ function _makeInputFromSource(source: Readonly<InputSource>): PluginVizInput {
 
 /**
  * A plugin chart whose type was found: it reads the stored config by column
- * name, asks for any required setting that has no value, and otherwise
+ * name, asks for any required setting that has no value (a column setting
+ * also counts as missing when the result's columns lack it), and otherwise
  * builds the chart's input (column settings as column names, and at most
  * `PLUGIN_VIZ_COMPONENT_ROW_LIMIT` rows for a component chart) and loads the
- * chart. The chart remounts when its settings or its result rows change, so
- * a chart that crashed draws again instead of keeping its error state.
+ * chart. The chart remounts when its plugin, chart type, settings, or result
+ * rows change, so a chart that crashed draws again instead of keeping its
+ * error state.
  * `PluginVizRenderer` renders it.
  */
 export function PluginVizConfiguredChart({
@@ -130,10 +155,11 @@ export function PluginVizConfiguredChart({
       isTruncated,
     });
   }, [vizType, uiConfig, data, rawColumns, isTruncated]);
-  const missingKeys = AvaPluginVizConfigs.getMissingRequiredKeys({
-    config: uiConfig,
-    settings: vizType.settings,
-    columnNames: rawColumns.map(prop("name")),
+  const missingKeys = _getMissingRequiredKeys({
+    vizType,
+    vizConfig,
+    uiConfig,
+    rawColumns,
   });
   if (missingKeys.length > 0) {
     return (
@@ -147,7 +173,7 @@ export function PluginVizConfiguredChart({
   }
   return (
     <PluginVizCodeLoader
-      key={_getChartKeyFromInput({ data, settings: input.settings })}
+      key={_getChartKeyFromInput({ lookup, data, settings: input.settings })}
       lookup={lookup}
       input={input}
     />
