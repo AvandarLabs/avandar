@@ -2011,7 +2011,8 @@ msgstr "كل نوع حالة لديه حالة بالفعل. اختر اسمًا
 #. placeholder {0}: values.length
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
 msgid "{0, plural, one {Show all # value} other {Show all # values}}"
-msgstr "{0, plural, one {عرض القيمة #} other {عرض كل # قيم}}"
+msgstr "{0, plural, zero {عرض كل القيم} one {عرض القيمة #} two {عرض القيمتين} "
+"few {عرض كل # قيم} many {عرض كل # قيمة} other {عرض كل # قيمة}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
@@ -4409,6 +4410,11 @@ msgstr "هل أنت متأكد أنك تريد حذف {0}؟"
 #: src/views/GisApp/panels/MapStatusCard/MapLoadingStatus.tsx
 msgid "Running the layer's query."
 msgstr "جارٍ تشغيل استعلام الطبقة."
+
+#. placeholder {0}: attribute.name
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "Sources of {0}"
+msgstr "مصادر {0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
@@ -8268,8 +8274,8 @@ msgid "Enter dataset name"
 msgstr "أدخل اسم مجموعة البيانات"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
-msgid "Sources"
-msgstr "المصادر"
+#~ msgid "Sources"
+#~ msgstr "المصادر"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."

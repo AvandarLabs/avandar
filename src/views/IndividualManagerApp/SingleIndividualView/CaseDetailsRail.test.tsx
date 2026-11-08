@@ -62,7 +62,7 @@ describe("CaseDetailsRail", () => {
     );
 
     expect(
-      within(screen.getByRole("list", { name: "Sources" }))
+      within(screen.getByRole("list", { name: "Sources of Borough" }))
         .getAllByRole("listitem")
         .map((item) => {
           return item.textContent;
@@ -86,7 +86,7 @@ describe("CaseDetailsRail", () => {
       />,
     );
 
-    expect(screen.queryByRole("list", { name: "Sources" })).toBeNull();
+    expect(screen.queryByRole("list", { name: "Sources of Notes" })).toBeNull();
   });
 
   // The rail group's label is an h4, so the failure under it is an h5.
@@ -254,7 +254,7 @@ describe("CaseDetailsRail", () => {
       />,
     );
 
-    // The field's own list, not its "Sources" list.
+    // The field's own list, not its "Sources of Daily new cases" list.
     expect(
       within(screen.getByRole("list", { name: "Daily new cases" }))
         .getAllByRole("listitem")

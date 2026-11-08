@@ -4297,6 +4297,11 @@ msgstr "您确定要删除 {0} 吗？"
 msgid "Running the layer's query."
 msgstr "正在运行图层查询。"
 
+#. placeholder {0}: attribute.name
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "Sources of {0}"
+msgstr "{0} 的来源"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "输入工作区名称以确认"
@@ -8082,8 +8087,8 @@ msgid "Enter dataset name"
 msgstr "输入数据集名称"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
-msgid "Sources"
-msgstr "来源"
+#~ msgid "Sources"
+#~ msgstr "来源"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."

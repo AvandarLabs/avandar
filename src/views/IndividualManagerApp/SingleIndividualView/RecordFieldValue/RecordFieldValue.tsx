@@ -18,21 +18,23 @@ type Props = {
   value: unknown;
 };
 
+/** Whether a value has anything to show: not a NULL and not empty text. */
+function _hasValue(value: unknown): boolean {
+  return !isNullish(value) && value !== "";
+}
+
 /** The items of a list value that hold a value, in order. */
 function _getListItems(value: unknown): unknown[] {
   const items = Array.isArray(value) ? value : [value];
-  return items.filter((item) => {
-    return !isNullish(item);
-  });
+  return items.filter(_hasValue);
 }
 
 /**
  * One field's value on the record page, shaped by the field and read by its
  * type: one value as text, every value of a list field as a list, and a
  * dimmed "No value" when there is none (a NULL, a record missing from the
- * view, or a list with nothing in it). A NULL item inside a list is left
- * out, as the data grid leaves it out. Rendered by the record page's details
- * rail.
+ * view, empty text, or a list with nothing in it). A NULL or empty item
+ * inside a list is left out. Rendered by the record page's details rail.
  */
 export function RecordFieldValue({
   fieldName,
@@ -46,7 +48,7 @@ export function RecordFieldValue({
       <Trans>No value</Trans>
     </Text>
   );
-  if (isNullish(value)) {
+  if (!_hasValue(value)) {
     return noValue;
   }
   return match(valueShape)

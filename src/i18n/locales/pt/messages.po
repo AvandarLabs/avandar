@@ -4474,6 +4474,11 @@ msgstr "Você tem certeza de que deseja excluir {0}?"
 msgid "Running the layer's query."
 msgstr "Executando a consulta da camada."
 
+#. placeholder {0}: attribute.name
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "Sources of {0}"
+msgstr "Fontes de {0}"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "Digite o nome do workspace para confirmar"
@@ -8383,8 +8388,8 @@ msgid "Enter dataset name"
 msgstr "Digite o nome do conjunto de dados"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
-msgid "Sources"
-msgstr "Fontes"
+#~ msgid "Sources"
+#~ msgstr "Fontes"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."

@@ -25,7 +25,10 @@ type Props = {
  * placeholders, or the empty state. Rendered beside the fact list, never in
  * it, so the list only ever holds terms and values.
  */
-export function DetailsStatus({ attributes, loadError }: Props): ReactNode {
+export function DetailsStatus({
+  attributes,
+  loadError,
+}: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   if (loadError) {
     return (

@@ -1,13 +1,13 @@
 .valueList {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--mantine-spacing-xxs);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .toggle {
-  margin-top: 2px;
+  margin-top: var(--mantine-spacing-xxs);
   padding-inline: 0;
 }

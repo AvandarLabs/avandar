@@ -48,6 +48,11 @@ describe("createFieldValueFormatter", () => {
     ["time", "14:30:00.250000", "2:30 PM"],
     ["bigint", 1_234_567, "1,234,567"],
     ["double", 38.456, "38.456"],
+    ["double", 40.712776, "40.712776"],
+    ["bigint", 9_007_199_254_740_993n, "9,007,199,254,740,993"],
+    ["timestamp", "2026-01-05T10:30:00", "Jan 5, 2026, 10:30 AM"],
+    ["timestamp", "2026-01-05 10:30:00", "Jan 5, 2026, 10:30 AM"],
+    ["timestamp", "2026-01-05T10:30:00+02:00", "Jan 5, 2026, 8:30 AM"],
     ["varchar", "Alameda", "Alameda"],
     ["boolean", true, "true"],
   ] as const)("reads a %s value %s as %s", (dataType, value, expected) => {
@@ -57,6 +62,22 @@ describe("createFieldValueFormatter", () => {
   it("reads a missing value as empty", () => {
     expect(_format("date", null)).toBe("");
     expect(_format("varchar", undefined)).toBe("");
+  });
+
+  // `unknownToString` would answer an English "Empty text".
+  it("reads empty text as empty", () => {
+    expect(_format("varchar", "")).toBe("");
+  });
+
+  it("reads a boolean in the words it is given", () => {
+    const format = createFieldValueFormatter({
+      dataType: "boolean",
+      locale: "es",
+      booleanLabels: { yes: "Sí", no: "No" },
+    });
+
+    expect(format(true)).toBe("Sí");
+    expect(format(false)).toBe("No");
   });
 
   it("leaves a value of the wrong kind as it is", () => {
@@ -87,6 +108,17 @@ describe("createFieldValueFormatter", () => {
       const timestamps = arrow.vectorFromArray(
         [Date.UTC(2026, 0, 5, 10, 30)],
         new arrow.TimestampMillisecond(),
+      );
+
+      expect(_format("timestamp", _readArrowValue(timestamps))).toBe(
+        "Jan 5, 2026, 10:30 AM",
+      );
+    });
+
+    it("reads a microsecond TIMESTAMP as the instant it holds, in UTC", () => {
+      const timestamps = arrow.vectorFromArray(
+        [new Date(Date.UTC(2026, 0, 5, 10, 30))],
+        new arrow.TimestampMicrosecond(),
       );
 
       expect(_format("timestamp", _readArrowValue(timestamps))).toBe(

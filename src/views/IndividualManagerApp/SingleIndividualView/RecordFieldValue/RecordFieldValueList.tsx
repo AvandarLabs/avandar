@@ -2,7 +2,7 @@ import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { useId, useState } from "react";
-import css from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.module.css";
+import css from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.module.css";
 import type { ReactNode } from "react";
 
 /** How many values of a list show before the rest are tucked away. */
@@ -38,7 +38,12 @@ export function RecordFieldValueList({
       : values;
   return (
     <>
-      <ul id={listId} aria-label={fieldName} className={css.valueList}>
+      <ul
+        id={listId}
+        role="list"
+        aria-label={fieldName}
+        className={css.valueList}
+      >
         {shownValues.map((value, index) => {
           // Values repeat (the same symptom at two visits), and the list
           // only grows or shrinks at its end, so the position is the key.

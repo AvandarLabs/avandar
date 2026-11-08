@@ -147,11 +147,24 @@ describe("RecordFieldValue", () => {
       "40",
     ]);
 
-    fireEvent.click(screen.getByRole("button", { name: "Show all 7 values" }));
+    const showAll = screen.getByRole("button", { name: "Show all 7 values" });
+    const list = screen.getByRole("list", { name: "Daily new cases" });
+    expect(showAll).toHaveAttribute("aria-expanded", "false");
+    expect(showAll).toHaveAttribute("aria-controls", list.id);
+
+    fireEvent.click(showAll);
     expect(_getListItems("Daily new cases")).toHaveLength(7);
 
-    fireEvent.click(screen.getByRole("button", { name: "Show fewer" }));
+    const showFewer = screen.getByRole("button", { name: "Show fewer" });
+    showFewer.focus();
+    expect(showFewer).toHaveAttribute("aria-expanded", "true");
+    expect(showFewer).toHaveAttribute("aria-controls", list.id);
+
+    fireEvent.click(showFewer);
     expect(_getListItems("Daily new cases")).toHaveLength(5);
+    expect(screen.getByRole("button", { name: "Show all 7 values" })).toBe(
+      document.activeElement,
+    );
   });
 
   it("offers no toggle for a list of five or fewer", () => {
@@ -165,6 +178,33 @@ describe("RecordFieldValue", () => {
     );
 
     expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("says a field holding empty text has no value", () => {
+    render(
+      <RecordFieldValue
+        fieldName="Notes"
+        valueShape="single"
+        dataType="varchar"
+        value=""
+      />,
+    );
+
+    expect(screen.getByText("No value")).toBeInTheDocument();
+    expect(screen.queryByText("Empty text")).toBeNull();
+  });
+
+  it("leaves the empty text items out of a list", () => {
+    render(
+      <RecordFieldValue
+        fieldName="Symptoms"
+        valueShape="list"
+        dataType="varchar"
+        value={["Rash", "", "Fever"]}
+      />,
+    );
+
+    expect(_getListItems("Symptoms")).toEqual(["Rash", "Fever"]);
   });
 
   it("says a list field with no values has no value", () => {

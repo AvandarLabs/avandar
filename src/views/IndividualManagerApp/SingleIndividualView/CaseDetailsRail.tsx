@@ -61,7 +61,11 @@ export function CaseDetailsRail({
                   value={attribute.value}
                 />
                 {attribute.sourceNames.length > 0 ? (
-                  <ul aria-label={t`Sources`} className={css.sourceList}>
+                  <ul
+                    role="list"
+                    aria-label={t`Sources of ${attribute.name}`}
+                    className={css.sourceList}
+                  >
                     {attribute.sourceNames.map((sourceName, index) => {
                       return (
                         <Text

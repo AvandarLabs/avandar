@@ -4413,6 +4413,11 @@ msgstr "Are you sure you want to delete {0}?"
 msgid "Running the layer's query."
 msgstr "Running the layer's query."
 
+#. placeholder {0}: attribute.name
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "Sources of {0}"
+msgstr "Sources of {0}"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "Type the workspace name to confirm"
@@ -8289,8 +8294,8 @@ msgid "Enter dataset name"
 msgstr "Enter dataset name"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
-msgid "Sources"
-msgstr "Sources"
+#~ msgid "Sources"
+#~ msgstr "Sources"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."

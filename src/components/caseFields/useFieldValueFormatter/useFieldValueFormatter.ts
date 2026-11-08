@@ -16,15 +16,10 @@ export function useFieldValueFormatter(
   const yesLabel = t`Yes`;
   const noLabel = t`No`;
   return useMemo(() => {
-    const formatValue = createFieldValueFormatter({
+    return createFieldValueFormatter({
       dataType,
       locale: i18n.locale,
+      booleanLabels: { yes: yesLabel, no: noLabel },
     });
-    return (value: unknown): string => {
-      if (typeof value === "boolean") {
-        return value ? yesLabel : noLabel;
-      }
-      return formatValue(value);
-    };
   }, [dataType, i18n.locale, yesLabel, noLabel]);
 }

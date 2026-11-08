@@ -4469,6 +4469,11 @@ msgstr "Je, uko tayari kufuta {0}?"
 msgid "Running the layer's query."
 msgstr "Inaendesha hoja ya safu."
 
+#. placeholder {0}: attribute.name
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "Sources of {0}"
+msgstr "Vyanzo vya {0}"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "Andika jina la workspace ili kuthibitisha"
@@ -8370,8 +8375,8 @@ msgid "Enter dataset name"
 msgstr "Ingiza jina la seti ya data"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
-msgid "Sources"
-msgstr "Vyanzo"
+#~ msgid "Sources"
+#~ msgstr "Vyanzo"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."
