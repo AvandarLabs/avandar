@@ -132,4 +132,44 @@ describe("arrowTableToJS", () => {
       arrowTableToJS(createTableFromColumn("prices", prices)).data,
     ).toEqual([{ prices: [12345] }]);
   });
+
+  it("returns a top-level decimal with its scale applied", () => {
+    // 2.25 stored as the unscaled integer 225 under scale 2.
+    const price = arrow.makeVector(
+      arrow.makeData({
+        type: new arrow.Decimal(2, 4, 128),
+        length: 2,
+        nullCount: 0,
+        data: new Uint32Array([225, 0, 0, 0, 5, 0, 0, 0]),
+      }),
+    );
+
+    expect(arrowTableToJS(createTableFromColumn("price", price)).data).toEqual([
+      { price: 2.25 },
+      { price: 0.05 },
+    ]);
+  });
+
+  it("returns a decimal inside a list with its scale applied", () => {
+    const decimalType = new arrow.Decimal(2, 4, 128);
+    const child = arrow.makeData({
+      type: decimalType,
+      length: 1,
+      nullCount: 0,
+      data: new Uint32Array([225, 0, 0, 0]),
+    });
+    const prices = arrow.makeVector(
+      arrow.makeData({
+        type: new arrow.List(new arrow.Field("item", decimalType, true)),
+        length: 1,
+        nullCount: 0,
+        valueOffsets: new Int32Array([0, 1]),
+        child,
+      }),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("prices", prices)).data,
+    ).toEqual([{ prices: [2.25] }]);
+  });
 });
