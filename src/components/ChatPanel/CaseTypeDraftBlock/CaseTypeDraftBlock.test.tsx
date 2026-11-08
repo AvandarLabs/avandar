@@ -266,6 +266,24 @@ describe("CaseTypeDraftBlock", () => {
     }
   });
 
+  it("says why the label and each join key keep one value", () => {
+    render(<CaseTypeDraftBlock />);
+
+    for (const fieldName of ["State", "County code", "Census county code"]) {
+      expect(_getValueShapeControl(fieldName)).toHaveAccessibleDescription(
+        "Join keys and the label keep one value.",
+      );
+    }
+  });
+
+  it("gives a field that can keep every value no note", () => {
+    render(<CaseTypeDraftBlock />);
+
+    expect(
+      _getValueShapeControl("Population"),
+    ).not.toHaveAccessibleDescription();
+  });
+
   it("renders nothing when no draft is pending", () => {
     useChatPanelStateMock.mockReturnValue({
       pendingCaseTypeDraft: undefined,

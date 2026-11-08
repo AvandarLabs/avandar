@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Group, Select, Stack, Text, Tooltip } from "@mantine/core";
 import { IconDatabase, IconTrash } from "@tabler/icons-react";
-import { CaseTypeDraftAttributeRow } from "./CaseTypeDraftAttributeRow";
+import { CaseTypeDraftAttributeRow } from "./CaseTypeDraftAttributeRow/CaseTypeDraftAttributeRow";
 import css from "./CaseTypeDraftCard.module.css";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type {

@@ -73,11 +73,17 @@ function useMappingTargets(
   frame: number,
 ) {
   useLayoutEffect(() => {
-    const checkboxes = root.current?.querySelectorAll('input[type="checkbox"]');
-    checkboxes?.[1]?.setAttribute("data-video-target", "mapping-single-value");
+    // The switch's "One value" segment: the label that names its radio input.
+    const singleValueInput = root.current?.querySelector<HTMLInputElement>(
+      'input[type="radio"][value="single"]',
+    );
+    singleValueInput?.labels?.[0]?.setAttribute(
+      "data-video-target",
+      "mapping-single-value",
+    );
     root.current
       ?.querySelector(
-        '[data-video-target="mapping-dataset-controls"] input:not([type="checkbox"]):not([type="hidden"])',
+        '[data-video-target="mapping-dataset-controls"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"])',
       )
       ?.setAttribute("data-video-target", "mapping-value-rule");
     root.current

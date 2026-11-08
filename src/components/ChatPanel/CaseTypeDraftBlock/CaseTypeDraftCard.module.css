@@ -18,7 +18,7 @@
 
 /* Lines the checkbox up with the name input beside it */
 .includeCheckbox {
-  margin-top: 5px;
+  margin-top: rem(5px);
 }
 
 .valueControls {

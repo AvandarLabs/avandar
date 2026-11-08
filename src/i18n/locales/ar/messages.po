@@ -414,7 +414,7 @@ msgstr "إخفاء مجموعات البيانات التي يتعذّر تحم�
 msgid "Join key"
 msgstr "مفتاح الربط"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "label"
 msgstr "التسمية"
 
@@ -538,7 +538,7 @@ msgstr "العروض"
 msgid "Second point"
 msgstr "النقطة الثانية"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the value that comes first alphabetically"
 msgstr "اختر القيمة التي تأتي أولًا أبجديًا"
 
@@ -1017,7 +1017,7 @@ msgstr "تغيير حجم نص التعليق التوضيحي"
 msgid "stddev"
 msgstr "الانحراف المعياري"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get a count of how many values there are"
 msgstr "احصل على عدد القيم الموجودة"
 
@@ -1997,7 +1997,7 @@ msgstr "يستخدم هذا الاستعلام مجموعة بيانات غير 
 msgid "(Annual billing)"
 msgstr "(الفوترة السنوية)"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Every case type already has a status. Choose another name."
@@ -3834,7 +3834,7 @@ msgstr "الهوية"
 msgid "Data source"
 msgstr "مصدر البيانات"
 
-#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+#: src/components/caseFields/ValueShapeControl.tsx
 msgid "One value"
 msgstr "قيمة واحدة"
 
@@ -4131,7 +4131,8 @@ msgid "Processing dataset…"
 msgstr "جارٍ معالجة مجموعة البيانات…"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueShapeFields.tsx
 msgid "ID fields keep their value as is."
 msgstr "تحتفظ حقول المعرّف بقيمتها كما هي."
 
@@ -4165,7 +4166,7 @@ msgstr "الفاصل بين تدريجات المحور X"
 msgid "Please try again."
 msgstr "يرجى المحاولة مرة أخرى."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the value that comes last alphabetically"
 msgstr "اختر القيمة التي تأتي أخيرًا أبجديًا"
 
@@ -4446,7 +4447,7 @@ msgstr "المزيد من إجراءات مجموعة البيانات"
 msgid "Delete dashboard?"
 msgstr "حذف اللوحة؟"
 
-#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+#: src/components/caseFields/ValueShapeControl.tsx
 msgid "Every value"
 msgstr "كل القيم"
 
@@ -4662,6 +4663,10 @@ msgstr "خريطة جديدة"
 #: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
 msgid "Current version"
 msgstr "الإصدار الحالي"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeValueControls.tsx
+msgid "Join keys and the label keep one value."
+msgstr "مفاتيح الربط والعنوان تحتفظ بقيمة واحدة."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
@@ -4910,7 +4915,7 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 msgstr "{offlineOnlyTitle}: ستبقى على هذا الكمبيوتر فقط، ولن يتمكن أي شخص آخر "
 "في فريقك من فتحها."
 
-#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+#: src/components/caseFields/ValueShapeControl.tsx
 msgid "One value or every value for {fieldName}"
 msgstr "قيمة واحدة أو كل القيم لـ {fieldName}"
 
@@ -5079,7 +5084,7 @@ msgstr "قائمة نقطية"
 msgid "Annotate the map"
 msgstr "إضافة تعليقات توضيحية إلى الخريطة"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the maximum value"
 msgstr "اختر القيمة القصوى"
 
@@ -5360,6 +5365,10 @@ msgid "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
 msgstr "يمكن لأي شخص لديه الرابط عرض هذا {resource}. يظل الأشخاص والمجموعات "
 "أدناه يتحكمون في من يمكنه تحريره."
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueShapeFields.tsx
+msgid "The title field keeps one value."
+msgstr "حقل العنوان يحتفظ بقيمة واحدة."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "The person who added this sheet needs to reconnect their Google account. "
@@ -5912,7 +5921,7 @@ msgstr "ارسم مساحة للتصفية حسبها"
 msgid "Pick a dashboard, or create a new one."
 msgstr "اختر لوحة تحكم، أو أنشئ واحدة جديدة."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get a sum of the values"
 msgstr "احصل على مجموع القيم"
 
@@ -5981,7 +5990,7 @@ msgstr "دعم الأشكال الهندسية غير متاح"
 msgid "X column"
 msgstr "عمود X"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the most frequent value"
 msgstr "اختر القيمة الأكثر تكرارًا"
 
@@ -7161,7 +7170,7 @@ msgid "Unmapped rows are still counted in this layer's totals. They are "
 msgstr "لا تزال الصفوف غير المُعيّنة محتسبة ضمن إجماليات هذه الطبقة. ويتم "
 "استبعادها من الخريطة فقط."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get an average of the values"
 msgstr "احصل على متوسط القيم"
 
@@ -8155,7 +8164,7 @@ msgstr "جارٍ تحديث سجلات {conceptName}…"
 msgid "Loading private resources"
 msgstr "جارٍ تحميل الموارد الخاصة"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the first value we see"
 msgstr "اختر القيمة الأولى التي نراها"
 
@@ -8177,7 +8186,7 @@ msgstr "تم رفض الوصول"
 msgid "Refresh {0} records"
 msgstr "تحديث {0} من السجلات"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "join key"
 msgstr "مفتاح الربط"
 
@@ -8572,7 +8581,7 @@ msgid "None of the selected regions produced any rows yet, so there are no "
 msgstr "لم تنتج أي من المناطق المحددة صفوفًا بعد، لذا لا توجد أعمدة مطبوعة "
 "للاحتفاظ بها."
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "Name for {columnLabel}"
 msgstr "اسم {columnLabel}"
 
@@ -8750,7 +8759,7 @@ msgstr "يساوي على الأقل"
 msgid "Stack group"
 msgstr "مجموعة التكديس"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "اختر قاعدة (مثل الأكثر تكرارًا)"
 
@@ -9212,7 +9221,7 @@ msgid "contains"
 msgstr "يحتوي على"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "إذا كانت هناك قيم متعددة لـ {attributeName} لواحد {0}، فـ..."
 
@@ -9325,7 +9334,7 @@ msgstr "ما يمكن أن يفعله هذا الشخص أو المجموعة. �
 "تعديل المحتوى، المسؤول = التحكم الكامل بما في ذلك المشاركة."
 
 #. placeholder {0}: attribute.name
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/CaseTypeDraftAttributeRow.tsx
 msgid "Include {0}"
 msgstr "تضمين {0}"
 
@@ -10906,7 +10915,7 @@ msgstr "عرض رمز QR"
 msgid "Past year"
 msgstr "العام الماضي"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the minimum value"
 msgstr "اختر القيمة الدنيا"
 

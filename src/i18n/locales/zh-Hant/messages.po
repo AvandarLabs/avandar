@@ -403,7 +403,7 @@ msgstr "隱藏無法載入的資料集"
 msgid "Join key"
 msgstr "連接鍵"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "label"
 msgstr "標籤"
 
@@ -526,7 +526,7 @@ msgstr "檢視"
 msgid "Second point"
 msgstr "第二點"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the value that comes first alphabetically"
 msgstr "選擇依字母順序排在最前的值"
 
@@ -994,7 +994,7 @@ msgstr "調整註解文字大小"
 msgid "stddev"
 msgstr "標準差"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get a count of how many values there are"
 msgstr "獲取值的數量"
 
@@ -1941,7 +1941,7 @@ msgstr "此查詢使用的資料集不在此工作區中，或尚未完成載入
 msgid "(Annual billing)"
 msgstr "(年度計費)"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Every case type already has a status. Choose another name."
@@ -3731,7 +3731,7 @@ msgstr "識別"
 msgid "Data source"
 msgstr "數據來源"
 
-#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+#: src/components/caseFields/ValueShapeControl.tsx
 msgid "One value"
 msgstr "一個值"
 
@@ -4020,7 +4020,8 @@ msgid "Processing dataset…"
 msgstr "處理數據集中…"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueShapeFields.tsx
 msgid "ID fields keep their value as is."
 msgstr "ID 欄位保持其原值。"
 
@@ -4054,7 +4055,7 @@ msgstr "X 軸刻度間隔"
 msgid "Please try again."
 msgstr "請再試一次。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the value that comes last alphabetically"
 msgstr "選擇依字母順序排在最後的值"
 
@@ -4332,7 +4333,7 @@ msgstr "更多資料集動作"
 msgid "Delete dashboard?"
 msgstr "刪除儀表板？"
 
-#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+#: src/components/caseFields/ValueShapeControl.tsx
 msgid "Every value"
 msgstr "所有值"
 
@@ -4543,6 +4544,10 @@ msgstr "新地圖"
 #: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
 msgid "Current version"
 msgstr "目前版本"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeValueControls.tsx
+msgid "Join keys and the label keep one value."
+msgstr "關聯鍵和標籤只保留一個值。"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
@@ -4787,7 +4792,7 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}：此資料集只會存在於這台電腦上，團隊中的其他人都無法開啟。"
 
-#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+#: src/components/caseFields/ValueShapeControl.tsx
 msgid "One value or every value for {fieldName}"
 msgstr "{fieldName} 的一個值或所有值"
 
@@ -4951,7 +4956,7 @@ msgstr "項目符號清單"
 msgid "Annotate the map"
 msgstr "註記地圖"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the maximum value"
 msgstr "選擇最大值"
 
@@ -5227,6 +5232,10 @@ msgstr "標準"
 msgid "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
 msgstr "任何取得連結的人都能查看此{resource}。下方的人員和群組仍可控制誰能編輯。"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueShapeFields.tsx
+msgid "The title field keeps one value."
+msgstr "標題欄位只保留一個值。"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "The person who added this sheet needs to reconnect their Google account. "
@@ -5770,7 +5779,7 @@ msgstr "繪製要篩選的區域"
 msgid "Pick a dashboard, or create a new one."
 msgstr "選擇一個儀表板，或創建一個新儀表板。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get a sum of the values"
 msgstr "獲取數值總和"
 
@@ -5838,7 +5847,7 @@ msgstr "幾何功能不可用"
 msgid "X column"
 msgstr "X 欄"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the most frequent value"
 msgstr "選擇最常見的值"
 
@@ -6999,7 +7008,7 @@ msgid "Unmapped rows are still counted in this layer's totals. They are "
 "excluded from the map only."
 msgstr "未對應的資料列仍會計入此圖層的總數。它們只會從地圖中排除。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get an average of the values"
 msgstr "獲取值的平均值"
 
@@ -7972,7 +7981,7 @@ msgstr "正在重新整理 {conceptName} 筆記錄…"
 msgid "Loading private resources"
 msgstr "正在載入私人資源"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the first value we see"
 msgstr "選擇我們看到的第一個值"
 
@@ -7994,7 +8003,7 @@ msgstr "訪問被拒"
 msgid "Refresh {0} records"
 msgstr "重新整理 {0} 筆記錄"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "join key"
 msgstr "連接鍵"
 
@@ -8380,7 +8389,7 @@ msgid "None of the selected regions produced any rows yet, so there are no "
 "printed columns to keep."
 msgstr "目前選取的區域尚未產生任何列，因此沒有可保留的列印欄位。"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "Name for {columnLabel}"
 msgstr "{columnLabel} 的名稱"
 
@@ -8553,7 +8562,7 @@ msgstr "至少為"
 msgid "Stack group"
 msgstr "堆疊群組"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "選擇規則（例如：最常見）"
 
@@ -9005,7 +9014,7 @@ msgid "contains"
 msgstr "包含"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "如果一個 {0} 有多個 {attributeName} 值，那麼..."
 
@@ -9113,7 +9122,7 @@ msgid "What this person or group can do. Viewer = read only, Editor = edit "
 msgstr "此人或群組可以做什麼。查看者 = 只讀，編輯者 = 編輯內容，管理員 = 完全控制，包括共享。"
 
 #. placeholder {0}: attribute.name
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/CaseTypeDraftAttributeRow.tsx
 msgid "Include {0}"
 msgstr "包含 {0}"
 
@@ -10661,7 +10670,7 @@ msgstr "顯示 QR 碼"
 msgid "Past year"
 msgstr "過去一年"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the minimum value"
 msgstr "選擇最小值"
 

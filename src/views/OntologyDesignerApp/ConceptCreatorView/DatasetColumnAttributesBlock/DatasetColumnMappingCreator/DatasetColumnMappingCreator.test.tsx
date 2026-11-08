@@ -2,7 +2,10 @@ import { useForm } from "@avandar/ui/hooks";
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { fireEvent, render, screen, within } from "@/test-utils";
-import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
+import {
+  getMantineSelectDropdown,
+  pickMantineSelectOption,
+} from "@/test-utils/pickMantineSelectOption";
 import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/index";
 import {
   getDefaultConceptFormValues,
@@ -22,10 +25,13 @@ const DATASET = { id: uuid<Dataset.Id>() } as Dataset.T;
 function CreatorHarness({
   columnDataType,
   isIdentifierColumn = false,
+  isLabelColumn = false,
 }: Readonly<{
   columnDataType: AvaDataType.T;
   /** Whether the dataset's ID column is the one this field reads. */
   isIdentifierColumn?: boolean;
+  /** Whether the case type's title is the field this one reads. */
+  isLabelColumn?: boolean;
 }>): React.ReactNode {
   const defaults = getDefaultConceptFormValues();
   const column = {
@@ -66,6 +72,7 @@ function CreatorHarness({
         attributeName="district"
         columnDataType={columnDataType}
         isIdentifierColumn={isIdentifierColumn}
+        isLabelColumn={isLabelColumn}
       />
     </ConceptCreatorStore.Provider>
   );
@@ -189,5 +196,55 @@ describe("DatasetColumnMappingCreator", () => {
 
     expect(screen.getByRole("radio", { name: "One value" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Every value" })).toBeDisabled();
+  });
+
+  it("says why the switch is locked for the dataset's ID column", () => {
+    render(<CreatorHarness columnDataType="varchar" isIdentifierColumn />);
+
+    expect(
+      screen.getByRole("radiogroup", {
+        name: "One value or every value for district",
+      }),
+    ).toHaveAccessibleDescription("ID fields keep their value as is.");
+  });
+
+  it("locks the switch to one value for the title field", () => {
+    render(<CreatorHarness columnDataType="varchar" isLabelColumn />);
+
+    expect(screen.getByRole("radio", { name: "One value" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Every value" })).toBeDisabled();
+    expect(
+      screen.getByRole("radiogroup", {
+        name: "One value or every value for district",
+      }),
+    ).toHaveAccessibleDescription("The title field keeps one value.");
+  });
+
+  it("leaves the switch open and unexplained for any other field", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    expect(screen.getByRole("radio", { name: "Every value" })).toBeEnabled();
+    expect(
+      screen.getByRole("radiogroup", {
+        name: "One value or every value for district",
+      }),
+    ).not.toHaveAccessibleDescription();
+  });
+
+  it("keeps the picked rule when the field switches to every value and back", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    pickMantineSelectOption(
+      /If there are multiple district values/,
+      "Choose the first value we see",
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Every value" }));
+    fireEvent.click(screen.getByRole("radio", { name: "One value" }));
+
+    expect(
+      screen.getByRole("combobox", {
+        name: /If there are multiple district values/,
+      }),
+    ).toHaveValue("Choose the first value we see");
   });
 });
