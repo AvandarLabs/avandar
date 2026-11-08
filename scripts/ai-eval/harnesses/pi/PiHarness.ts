@@ -10,7 +10,10 @@ import type { EvalQuestion } from "../../EvalQuestion";
 import type { EvalDatabase, EvalQueryResult } from "../../runtime/EvalDatabase";
 import type { EvalAnswer, EvalConversation, EvalHarness } from "../EvalHarness";
 import type { PiEvalModelSpec } from "./piEvalConfigs";
-import type { DataAgentModelPolicy } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import type {
+  DataAgent,
+  DataAgentModelPolicy,
+} from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type {
   DataAgentHost,
   DataAgentUserAnswer,
@@ -53,6 +56,9 @@ function _createEvalHost(
         kind: outcome.kind,
         columns: outcome.result.columns,
         rowCount: outcome.result.rows.length,
+        previewRows: request.previewRowCount
+          ? outcome.result.rows.slice(0, request.previewRowCount)
+          : undefined,
       };
     },
     readColumnValues: async (sql) => {
@@ -102,22 +108,20 @@ function _createPolicy(
   };
 }
 
-function _createConversation(
+/**
+ * One eval conversation with a data agent built by `createAgent` over a host
+ * backed by DuckDB and the simulated user.
+ */
+export function createPiConversation(
   options: Readonly<{
     database: EvalDatabase;
-    policy: DataAgentModelPolicy;
-    streamFn: StreamFn;
+    createAgent: (host: DataAgentHost) => DataAgent;
   }>,
 ): EvalConversation {
   const recorder: QuestionRecorder = { consentPrompts: 0 };
-  const dataAgent = createDataAgent({
-    datasets: COVID_DATASETS,
-    host: _createEvalHost(options.database, recorder),
-    policy: options.policy,
-    streamFn: options.streamFn,
-    today: new Date().toISOString().slice(0, 10),
-    sessionId: crypto.randomUUID(),
-  });
+  const dataAgent = options.createAgent(
+    _createEvalHost(options.database, recorder),
+  );
   return {
     ask: async (question) => {
       Object.assign(recorder, {
@@ -208,10 +212,18 @@ export function createPiHarness(
   return {
     label,
     startConversation: () => {
-      return _createConversation({
+      return createPiConversation({
         database: options.database,
-        policy,
-        streamFn,
+        createAgent: (host) => {
+          return createDataAgent({
+            datasets: COVID_DATASETS,
+            host,
+            policy,
+            streamFn,
+            today: new Date().toISOString().slice(0, 10),
+            sessionId: crypto.randomUUID(),
+          });
+        },
       });
     },
     close: async () => {},

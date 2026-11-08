@@ -8,6 +8,9 @@
  *     [--questions B01,B02]
  *     [--concurrency 4]
  *
+ * `--harness pi-local --model <WebLLM id>` runs the offline agent on WebLLM
+ * in a headless Chromium instead of calling OpenRouter.
+ *
  * Needs `~/cleaned-test-data` (the JHU long-format CSVs) and
  * `OPEN_ROUTER_API_KEY` (read from `.env.development.edge` when not set).
  * Writes `results.jsonl` and `summary.md` under `.temp/ai-eval/runs/`.
@@ -18,6 +21,7 @@ import { parseArgs } from "node:util";
 import { COVID_QUESTIONS } from "./covid/covidQuestions";
 import { createBaselineHarness } from "./harnesses/baseline/BaselineHarness";
 import { createPiHarness } from "./harnesses/pi/PiHarness";
+import { createPiLocalHarness } from "./harnesses/pi/PiLocalHarness";
 import { EvalDatabase } from "./runtime/EvalDatabase";
 import { gradeEvalAnswer } from "./runtime/gradeEvalAnswer";
 import {
@@ -150,10 +154,18 @@ function _selectQuestions(ids: string): readonly EvalQuestion[] {
   });
 }
 
-function _createHarness(
+async function _createHarness(
   options: ReturnType<typeof _parseOptions>,
   database: EvalDatabase,
-): EvalHarness {
+): Promise<EvalHarness> {
+  if (options.harness === "pi-local") {
+    return createPiLocalHarness({
+      repoRoot: REPO_ROOT,
+      database,
+      configName: options.config || "default",
+      model: options.model,
+    });
+  }
   const openRouterApiKey = _readOpenRouterApiKey();
   if (options.harness === "pi") {
     return createPiHarness({
@@ -203,7 +215,7 @@ async function main(): Promise<void> {
   const database = await EvalDatabase.open({
     databasePath: join(REPO_ROOT, ".temp/ai-eval/covid.duckdb"),
   });
-  const harness = _createHarness(options, database);
+  const harness = await _createHarness(options, database);
   const label = options.label || harness.label;
   const graded: GradedAnswer[] = [];
   await _runAll(

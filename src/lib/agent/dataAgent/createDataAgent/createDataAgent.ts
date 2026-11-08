@@ -119,7 +119,12 @@ function _createAgent(
       model: primary.model,
       thinkingLevel: primary.thinkingLevel,
       tools: [
-        createRunQueryTool({ host: options.host, aliases, state }),
+        createRunQueryTool({
+          host: options.host,
+          aliases,
+          state,
+          previewRowCount: options.previewRowCount,
+        }),
         createLookupValuesTool({ host: options.host, aliases, state }),
         createAskUserTool({ host: options.host, state }),
       ],
@@ -150,6 +155,11 @@ export type CreateDataAgentOptions = {
   today: string;
   /** Lets providers route a conversation's calls to one prompt cache. */
   sessionId?: string;
+  /**
+   * Rows the model sees after each query, to check its answer. Only for a
+   * model on the user's device; a hosted model never sees rows.
+   */
+  previewRowCount?: number;
 };
 
 /**

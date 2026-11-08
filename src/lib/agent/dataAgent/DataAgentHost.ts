@@ -4,6 +4,11 @@ export type DataAgentQueryOutcome =
       kind: "rows" | "empty";
       columns: ReadonlyArray<{ name: string; type: string }>;
       rowCount: number;
+      /**
+       * The first rows, only when the request asked for a preview. Only an
+       * agent whose model runs on the user's device asks for one.
+       */
+      previewRows?: ReadonlyArray<readonly unknown[]>;
     }
   | { kind: "failed"; error: string };
 
@@ -26,10 +31,17 @@ export type DataAgentUserAnswer =
 export type DataAgentHost = {
   /**
    * Runs SQL (table names already resolved) and shows the result to the user
-   * as a table or chart. Resolves with the result's shape, never its rows.
+   * as a table or chart. Resolves with the result's shape, and with its first
+   * rows only when `previewRowCount` asks for them.
    */
   showQuery: (
-    request: Readonly<{ sql: string; summary: string; chart?: string }>,
+    request: Readonly<{
+      sql: string;
+      summary: string;
+      chart?: string;
+      /** Rows to return in `previewRows`. Omitted: return no rows. */
+      previewRowCount?: number;
+    }>,
   ) => Promise<DataAgentQueryOutcome>;
   /**
    * Runs a read-only query locally and returns the first column's distinct
