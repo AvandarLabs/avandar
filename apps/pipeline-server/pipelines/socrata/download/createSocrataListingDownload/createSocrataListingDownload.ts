@@ -1,12 +1,12 @@
-import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata/makeSourceVersionFromSocrataViewMetadata";
 import { z } from "zod";
+import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata/makeSourceVersionFromSocrataViewMetadata";
+import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type {
   DownloadableListing,
   DuckDbSniffableDataType,
   ListingDownloadColumn,
   ListingDownloadScript,
 } from "@avandar/etl";
-import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types";
 
 /** Socrata's row id, which every dataset has and pages are ordered by. */
 const ROW_ID_COLUMN = ":id";

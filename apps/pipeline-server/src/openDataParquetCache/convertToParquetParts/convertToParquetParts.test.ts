@@ -24,7 +24,9 @@ async function _readRows(
     .join(", ");
   const db = new NodeDuckDb();
   try {
-    return await db.runRawQuery(sql.replace("$parts", `read_parquet([${list}])`));
+    return await db.runRawQuery(
+      sql.replace("$parts", `read_parquet([${list}])`),
+    );
   } finally {
     await db.close();
   }

@@ -3,8 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { NodeDuckDb } from "@avandar/etl";
 import { Constants } from "$/types/database.types";
-import type { ListingDownloadColumn } from "@avandar/etl";
 import type { Enums } from "$/types/database.types";
+import type { ListingDownloadColumn } from "@avandar/etl";
 
 /** One column of a Parquet copy: its name and DuckDB type. */
 export type ParquetCacheColumn = Readonly<{

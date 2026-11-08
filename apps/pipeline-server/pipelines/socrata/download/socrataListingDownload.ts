@@ -1,6 +1,6 @@
 import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
-import { createSocrataListingDownload } from "@pipelines/socrata/download/createSocrataListingDownload/createSocrataListingDownload";
 import { createSocrataHttpClient } from "@pipelines/socrata/createSocrataHttpClient/createSocrataHttpClient";
+import { createSocrataListingDownload } from "@pipelines/socrata/download/createSocrataListingDownload/createSocrataListingDownload";
 
 /**
  * The download script `socrata.pipeline.yaml` names: how the pipeline server

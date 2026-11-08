@@ -1,9 +1,15 @@
 import { existsSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadListingDownloadScript, readPipelineConfigFile } from "@avandar/etl";
+import {
+  loadListingDownloadScript,
+  readPipelineConfigFile,
+} from "@avandar/etl";
 import { assertValidPipelineName } from "@pipeline-server/routes/pipeline-name/buildPipelineModuleUrl/buildPipelineModuleUrl";
-import type { ListingDownloadScript, PipelineDownloadConfig } from "@avandar/etl";
+import type {
+  ListingDownloadScript,
+  PipelineDownloadConfig,
+} from "@avandar/etl";
 
 /**
  * Loads a pipeline's `download` config and its download script from

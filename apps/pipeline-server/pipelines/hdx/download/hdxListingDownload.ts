@@ -1,5 +1,5 @@
-import { createHdxListingDownload } from "@pipelines/hdx/download/createHdxListingDownload/createHdxListingDownload";
 import { createHdxHttpClient } from "@pipelines/hdx/createHdxHttpClient/createHdxHttpClient";
+import { createHdxListingDownload } from "@pipelines/hdx/download/createHdxListingDownload/createHdxListingDownload";
 
 /**
  * The download script `hdx.pipeline.yaml` names: how the pipeline server

@@ -2,8 +2,8 @@ import { buildCkanSourceVersion } from "$/connectors/open-data/buildCkanSourceVe
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient";
 import { formatToContentKind } from "$/connectors/open-data/formatToContentKind";
 import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResourceFromPackage";
-import type { ListingDownloadScript } from "@avandar/etl";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types";
+import type { ListingDownloadScript } from "@avandar/etl";
 
 /**
  * Creates the HDX pipeline's download script. CKAN serves a resource only

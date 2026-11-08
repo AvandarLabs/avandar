@@ -57,7 +57,10 @@ describe("render-fly-config.sh", () => {
   });
 
   it("keeps no deployment's details in the template", () => {
-    const template = readFileSync(join(DEPLOY_DIR, "fly.toml.template"), "utf8");
+    const template = readFileSync(
+      join(DEPLOY_DIR, "fly.toml.template"),
+      "utf8",
+    );
 
     expect(template).not.toMatch(/avandar/i);
   });
@@ -81,7 +84,9 @@ describe("deploy-pipeline-server.sh", () => {
 
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain("❌");
-    expect(result.stderr).toMatch(/\n {2}⚠️ .*\.env\.pipeline-server\.prod\.example/);
+    expect(result.stderr).toMatch(
+      /\n {2}⚠️ .*\.env\.pipeline-server\.prod\.example/,
+    );
   });
 
   it("refuses an unknown argument with its usage", () => {
