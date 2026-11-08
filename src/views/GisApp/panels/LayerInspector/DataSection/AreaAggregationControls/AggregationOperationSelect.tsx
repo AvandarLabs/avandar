@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
@@ -35,7 +35,7 @@ function _applyAggregationOperation(options: {
     });
     return;
   }
-  const measureColumn = sourceColumns?.[0];
+  const measureColumn = sourceColumns?.find(QueryColumn.isNumeric);
   if (!_isMeasureOperation(operation) || !measureColumn) {
     return;
   }

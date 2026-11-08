@@ -1,5 +1,6 @@
 import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { ProportionalSizeControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls";
@@ -12,6 +13,11 @@ type Props = {
   symbology: Extract<MapLayer.Symbology, { type: "proportionalSymbol" }>;
   onLayerChange: LayerChangeHandler;
 };
+
+/** A list of values cannot size a symbol. */
+function _isNotList(column: QueryColumn.T): boolean {
+  return !QueryColumn.isList(column);
+}
 
 /** Edits the value column, radius range, and scale for sized symbols. */
 export function ProportionalSymbolControls({
@@ -29,6 +35,7 @@ export function ProportionalSymbolControls({
         label={t`Size by`}
         placeholder={t`Select a column`}
         dataSourceId={dataSourceId}
+        isColumnSelectable={_isNotList}
         value={
           MapLayerUpdates.getQueryColumnFromLayer({
             layer,

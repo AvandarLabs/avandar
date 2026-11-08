@@ -7,6 +7,7 @@ import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 function _column(dataType: AvaDataType.T): QueryColumn.T {
@@ -44,5 +45,27 @@ describe("isMapTimeColumn", () => {
   it("rejects double and boolean columns", () => {
     expect(isMapTimeColumn(_column("double"))).toBe(false);
     expect(isMapTimeColumn(_column("boolean"))).toBe(false);
+  });
+
+  it("rejects a case type field that keeps every value", () => {
+    const [listField] = QueryColumn.makeFromConceptAttributes([
+      Model.make("ConceptAttribute", {
+        id: "attr_symptoms",
+        conceptId: "concept_1",
+        workspaceId: "workspace_1",
+        name: "Symptoms",
+        description: undefined,
+        createdAt: "2026-11-06T00:00:00Z",
+        updatedAt: "2026-11-06T00:00:00Z",
+        dataType: "varchar",
+        mappingType: "dataset_column",
+        isLabel: false,
+        isIdentifier: false,
+        allowManualEdit: false,
+        isArray: true,
+      }) as ConceptAttribute.T,
+    ]);
+
+    expect(isMapTimeColumn(listField!)).toBe(false);
   });
 });

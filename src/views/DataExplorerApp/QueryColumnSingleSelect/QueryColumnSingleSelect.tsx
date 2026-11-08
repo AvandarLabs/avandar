@@ -22,6 +22,11 @@ type Props = {
   value?: QueryColumnRead | null;
   defaultValue?: QueryColumnRead | null;
   onChange?: (field: QueryColumnRead | null) => void;
+  /**
+   * Whether a column can be picked. Omit it to offer every column. Use it to
+   * keep out a column an operation fails on, for example a list.
+   */
+  isColumnSelectable?: (column: QueryColumnRead) => boolean;
 } & Omit<SelectProps<QueryColumnId>, "value" | "defaultValue" | "onChange">;
 
 export function QueryColumnSingleSelect({
@@ -31,6 +36,7 @@ export function QueryColumnSingleSelect({
   value,
   defaultValue,
   onChange,
+  isColumnSelectable,
   ...selectProps
 }: Props): JSX.Element {
   const { t } = useLingui();
@@ -65,7 +71,7 @@ export function QueryColumnSingleSelect({
   const { selectableOptions, queryColumnLookup } = useMemo(() => {
     // TODO(jpsyx): this conversion to QueryColumn should happen in the clients
     // and there should be a global cache
-    const queryColumns = [
+    const allQueryColumns = [
       ...(datasetColumns ?? []).map((col) => {
         if (col.id === currentSelectedColumn?.baseColumn.id) {
           return currentSelectedColumn;
@@ -83,6 +89,9 @@ export function QueryColumnSingleSelect({
           : column;
       }),
     ];
+    const queryColumns = isColumnSelectable
+      ? allQueryColumns.filter(isColumnSelectable)
+      : allQueryColumns;
 
     return {
       selectableOptions: makeSelectOptions(queryColumns, {
@@ -91,7 +100,12 @@ export function QueryColumnSingleSelect({
       }),
       queryColumnLookup: makeIdLookupMap(queryColumns),
     };
-  }, [currentSelectedColumn, datasetColumns, conceptAttributes]);
+  }, [
+    currentSelectedColumn,
+    datasetColumns,
+    conceptAttributes,
+    isColumnSelectable,
+  ]);
 
   // If the available columns change (e.g. if the `dataSourceId` changed)
   // we should drop the selection if it's no longer valid.
