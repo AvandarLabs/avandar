@@ -183,6 +183,13 @@ function _getRuleInput(fieldName: string): HTMLElement {
   return input;
 }
 
+/** The One value / Every value control of a field's row. */
+function _getValueShapeControl(fieldName: string): HTMLElement {
+  return screen.getByRole("radiogroup", {
+    name: `One value or every value for ${fieldName}`,
+  });
+}
+
 /** The option labels a row's value rule select offers, in order. */
 function _offeredRules(selectLabel: string): string[] {
   return within(getMantineSelectDropdown(selectLabel))
@@ -205,6 +212,58 @@ describe("CaseTypeDraftBlock", () => {
     useChatPanelStateMock.mockReturnValue({
       pendingCaseTypeDraft: makeDraft(),
     });
+  });
+
+  it("persists a field switched to every value as a list without a value rule", async () => {
+    render(<CaseTypeDraftBlock />);
+
+    fireEvent.click(
+      within(_getValueShapeControl("Population")).getByRole("radio", {
+        name: "Every value",
+      }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Create case type" }));
+
+    await waitFor(() => {
+      expect(applyCreatedCaseTypesMock).toHaveBeenCalled();
+    });
+    const [call] = applyCreatedCaseTypesMock.mock.calls;
+    const population = call?.[0].caseTypes[0].attributes.find(
+      (attribute: { name: string }) => {
+        return attribute.name === "Population";
+      },
+    );
+    expect(population).toMatchObject({ valueShape: "list" });
+    expect(population).not.toHaveProperty("valuePickerRuleType");
+  });
+
+  it("hides the value picker of a field that keeps every value", () => {
+    render(<CaseTypeDraftBlock />);
+    expect(
+      screen.queryAllByLabelText("Value to keep for Population"),
+    ).not.toHaveLength(0);
+
+    fireEvent.click(
+      within(_getValueShapeControl("Population")).getByRole("radio", {
+        name: "Every value",
+      }),
+    );
+
+    expect(
+      screen.queryAllByLabelText("Value to keep for Population"),
+    ).toHaveLength(0);
+  });
+
+  it("locks the label and each join key to one value", () => {
+    render(<CaseTypeDraftBlock />);
+
+    for (const fieldName of ["State", "County code", "Census county code"]) {
+      expect(
+        within(_getValueShapeControl(fieldName)).getByRole("radio", {
+          name: "Every value",
+        }),
+      ).toBeDisabled();
+    }
   });
 
   it("renders nothing when no draft is pending", () => {

@@ -3834,6 +3834,10 @@ msgstr "الهوية"
 msgid "Data source"
 msgstr "مصدر البيانات"
 
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "One value"
+msgstr "قيمة واحدة"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Last synced"
 msgstr "آخر مزامنة"
@@ -4442,6 +4446,10 @@ msgstr "المزيد من إجراءات مجموعة البيانات"
 msgid "Delete dashboard?"
 msgstr "حذف اللوحة؟"
 
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "Every value"
+msgstr "كل القيم"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
 msgstr "أعجبني جدًا"
@@ -4901,6 +4909,10 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}: ستبقى على هذا الكمبيوتر فقط، ولن يتمكن أي شخص آخر "
 "في فريقك من فتحها."
+
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "One value or every value for {fieldName}"
+msgstr "قيمة واحدة أو كل القيم لـ {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"

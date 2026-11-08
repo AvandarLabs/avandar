@@ -6,14 +6,31 @@
 }
 
 .attributeRow {
-  align-items: center;
+  align-items: start;
   display: grid;
   gap: var(--mantine-spacing-xs);
-  grid-template-columns: auto minmax(0, 1fr) 8.5rem;
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .attributeRowExcluded {
   opacity: 0.55;
+}
+
+/* Lines the checkbox up with the name input beside it */
+.includeCheckbox {
+  margin-top: 5px;
+}
+
+.valueControls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mantine-spacing-xs);
+  margin-top: var(--mantine-spacing-xs);
+}
+
+.ruleSelect {
+  width: 8.5rem;
 }
 
 .columnHint {

@@ -3,6 +3,7 @@ import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { makeStatusSetValueFromChatStatuses } from "@/views/OntologyDesignerApp/makeStatusSetValueFromChatStatuses/makeStatusSetValueFromChatStatuses";
 import type {
   ChatCaseValuePickerRuleType,
+  ChatCaseValueShape,
   ChatProposedCaseAttribute,
   ChatProposedCaseType,
 } from "$/types/chat.types";
@@ -34,6 +35,10 @@ export type CaseTypeDraftEditor = {
     columnId: string,
     valuePickerRuleType: ChatCaseValuePickerRuleType,
   ) => void;
+  setAttributeValueShape: (
+    columnId: string,
+    valueShape: ChatCaseValueShape,
+  ) => void;
   toggleAttribute: (columnId: string) => void;
   toggleManualEntryAttribute: (name: string) => void;
   addManualEntryAttribute: (name: string) => void;
@@ -53,17 +58,30 @@ function _mapAttribute(
 }
 
 /**
- * Forces a column into the mapped set. A join key is what matches its dataset's
- * rows to a case, and the label names the case, so neither can point at an
- * excluded column.
+ * Forces a column into the mapped set as one value. A join key is what
+ * matches its dataset's rows to a case, and the label names the case, so
+ * neither can point at an excluded column or at one that keeps every value.
  */
-function _withIncludedColumn(
+function _withKeyOrLabelColumn(
   draft: ChatProposedCaseType,
   columnId: string,
 ): ChatProposedCaseType {
   return _mapAttribute(draft, columnId, (attribute) => {
-    return { ...attribute, isIncluded: true };
+    return { ...attribute, isIncluded: true, valueShape: "single" };
   });
+}
+
+/** Whether a column is the draft's label or one of its join keys. */
+function _isKeyOrLabelColumn(
+  draft: ChatProposedCaseType,
+  columnId: string,
+): boolean {
+  return (
+    draft.labelColumnId === columnId ||
+    draft.sourceDatasets.some((sourceDataset) => {
+      return sourceDataset.primaryKeyColumnId === columnId;
+    })
+  );
 }
 
 /**
@@ -171,7 +189,7 @@ export function useCaseTypeDraftEditor(
     setPrimaryKeyColumnId: (datasetId, columnId) => {
       setDraft((current) => {
         return {
-          ..._withIncludedColumn(current, columnId),
+          ..._withKeyOrLabelColumn(current, columnId),
           sourceDatasets: current.sourceDatasets.map((sourceDataset) => {
             return sourceDataset.datasetId === datasetId
               ? { ...sourceDataset, primaryKeyColumnId: columnId }
@@ -198,7 +216,7 @@ export function useCaseTypeDraftEditor(
     setLabelColumnId: (columnId) => {
       setDraft((current) => {
         return {
-          ..._withIncludedColumn(current, columnId),
+          ..._withKeyOrLabelColumn(current, columnId),
           labelColumnId: columnId,
         };
       });
@@ -214,6 +232,18 @@ export function useCaseTypeDraftEditor(
       setDraft((current) => {
         return _mapAttribute(current, columnId, (attribute) => {
           return { ...attribute, valuePickerRuleType };
+        });
+      });
+    },
+    setAttributeValueShape: (columnId, valueShape) => {
+      setDraft((current) => {
+        // The card locks these columns. This keeps the draft right even if a
+        // caller does not.
+        if (valueShape !== "single" && _isKeyOrLabelColumn(current, columnId)) {
+          return current;
+        }
+        return _mapAttribute(current, columnId, (attribute) => {
+          return { ...attribute, valueShape };
         });
       });
     },

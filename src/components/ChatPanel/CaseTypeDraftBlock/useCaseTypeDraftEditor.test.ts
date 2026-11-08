@@ -68,6 +68,88 @@ function makeDraft(): ChatProposedCaseType {
 }
 
 describe("useCaseTypeDraftEditor", () => {
+  it("switches a field to every value and back, keeping its value picker", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setAttributeValueShape(POPULATION_COLUMN_ID, "list");
+    });
+    const listed = result.current.draft.attributes.find((attribute) => {
+      return attribute.columnId === POPULATION_COLUMN_ID;
+    });
+    expect(listed?.valueShape).toBe("list");
+
+    act(() => {
+      result.current.setAttributeValueShape(POPULATION_COLUMN_ID, "single");
+    });
+    const single = result.current.draft.attributes.find((attribute) => {
+      return attribute.columnId === POPULATION_COLUMN_ID;
+    });
+    expect(single).toMatchObject({
+      valueShape: "single",
+      valuePickerRuleType: "max",
+    });
+  });
+
+  it("keeps a field to one value once it becomes the label", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setAttributeValueShape(POPULATION_COLUMN_ID, "list");
+    });
+    act(() => {
+      result.current.setLabelColumnId(POPULATION_COLUMN_ID);
+    });
+
+    expect(
+      result.current.draft.attributes.find((attribute) => {
+        return attribute.columnId === POPULATION_COLUMN_ID;
+      })?.valueShape,
+    ).toBe("single");
+  });
+
+  it("keeps a field to one value once it becomes a join key", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setAttributeValueShape(POPULATION_COLUMN_ID, "list");
+    });
+    act(() => {
+      result.current.setPrimaryKeyColumnId(
+        CENSUS_DATASET_ID,
+        POPULATION_COLUMN_ID,
+      );
+    });
+
+    expect(
+      result.current.draft.attributes.find((attribute) => {
+        return attribute.columnId === POPULATION_COLUMN_ID;
+      })?.valueShape,
+    ).toBe("single");
+  });
+
+  it("refuses to make the label keep every value", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setAttributeValueShape(STATE_COLUMN_ID, "list");
+    });
+
+    expect(
+      result.current.draft.attributes.find((attribute) => {
+        return attribute.columnId === STATE_COLUMN_ID;
+      })?.valueShape,
+    ).toBe("single");
+  });
+
   it("toggles an attribute's inclusion without touching the others", () => {
     const { result } = renderHook(() => {
       return useCaseTypeDraftEditor(makeDraft());

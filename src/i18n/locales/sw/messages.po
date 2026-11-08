@@ -3887,6 +3887,10 @@ msgstr "Utambulisho"
 msgid "Data source"
 msgstr "Chanzo cha data"
 
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "One value"
+msgstr "Thamani moja"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Last synced"
 msgstr "Ilisawazishwa mara ya mwisho"
@@ -4501,6 +4505,10 @@ msgstr "Vitendo zaidi vya seti ya data"
 msgid "Delete dashboard?"
 msgstr "Futa dashibodi?"
 
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "Every value"
+msgstr "Thamani zote"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
 msgstr "Napenda"
@@ -4965,6 +4973,10 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}: itaishi kwenye kompyuta hii pekee, na hakuna mtu "
 "mwingine kwenye timu yako atakayeweza kuifungua."
+
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "One value or every value for {fieldName}"
+msgstr "Thamani moja au thamani zote za {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"

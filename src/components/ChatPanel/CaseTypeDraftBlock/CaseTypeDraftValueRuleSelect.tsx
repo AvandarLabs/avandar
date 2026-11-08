@@ -10,6 +10,8 @@ import type {
 import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 
 type Props = {
+  /** Classes for the select's root, for its width in the row. */
+  className?: string;
   attribute: ChatProposedCaseAttribute;
   /** The column's type, once the catalog has loaded. */
   columnDataType: AvaDataType.T | undefined;
@@ -33,6 +35,7 @@ type Props = {
  * anyway.
  */
 export function CaseTypeDraftValueRuleSelect({
+  className,
   attribute,
   columnDataType,
   isPrimaryKey,
@@ -49,6 +52,7 @@ export function CaseTypeDraftValueRuleSelect({
 
   return (
     <Select
+      className={className}
       size="xs"
       data={valuePickerOptions}
       value={isPrimaryKey ? ValuePickerRule.DEFAULT_RULE_TYPE : allowedRuleType}

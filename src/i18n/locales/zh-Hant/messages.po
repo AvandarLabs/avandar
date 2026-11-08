@@ -3731,6 +3731,10 @@ msgstr "識別"
 msgid "Data source"
 msgstr "數據來源"
 
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "One value"
+msgstr "一個值"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Last synced"
 msgstr "上次同步時間"
@@ -4328,6 +4332,10 @@ msgstr "更多資料集動作"
 msgid "Delete dashboard?"
 msgstr "刪除儀表板？"
 
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "Every value"
+msgstr "所有值"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
 msgstr "喜愛"
@@ -4778,6 +4786,10 @@ msgstr "和"
 msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}：此資料集只會存在於這台電腦上，團隊中的其他人都無法開啟。"
+
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "One value or every value for {fieldName}"
+msgstr "{fieldName} 的一個值或所有值"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"

@@ -3930,6 +3930,10 @@ msgstr "Identité"
 msgid "Data source"
 msgstr "Source de données"
 
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "One value"
+msgstr "Une valeur"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Last synced"
 msgstr "Dernière synchronisation"
@@ -4554,6 +4558,10 @@ msgstr "Plus d’actions sur le jeu de données"
 msgid "Delete dashboard?"
 msgstr "Supprimer le tableau de bord ?"
 
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "Every value"
+msgstr "Toutes les valeurs"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
 msgstr "J’adore"
@@ -5022,6 +5030,10 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle} : il sera disponible uniquement sur cet ordinateur, "
 "et personne d’autre de votre équipe ne pourra l’ouvrir."
+
+#: src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx
+msgid "One value or every value for {fieldName}"
+msgstr "Une valeur ou toutes les valeurs pour {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
