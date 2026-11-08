@@ -67,6 +67,19 @@ export function ConceptCreatorView(): JSX.Element {
             : null;
         },
       },
+      datasetColumnAttributes: {
+        // The field's period controls already say "This dataset has no date
+        // column" beside it. This rule only stops the submit while one is
+        // missing, as the statuses rule does for its editor.
+        bucketGrain: (bucketGrain, values, path) => {
+          const attribute =
+            values.datasetColumnAttributes[Number(path.split(".")[1])];
+          return bucketGrain !== undefined &&
+            attribute?.mappings.datasetColumn.bucketColumnId === undefined
+            ? t`Choose the date column for this field`
+            : null;
+        },
+      },
       // The editor shows each problem beside the status it belongs to. This
       // rule only stops the submit while any problem remains.
       statuses: (statuses, values) => {

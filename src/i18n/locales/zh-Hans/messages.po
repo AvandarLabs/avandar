@@ -4635,7 +4635,7 @@ msgstr "新建地图"
 msgid "Current version"
 msgstr "当前版本"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeValueControls.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeValueShapeControl.tsx
 msgid "Join keys and the label keep one value."
 msgstr "关联键和标签只保留一个值。"
 
@@ -10457,6 +10457,10 @@ msgstr "在页面上显示标题"
 msgid "Pick one from the list to review its columns, preview its rows, and read "
 "a summary of what is in it."
 msgstr "从列表中选择一个，以查看其列、预览其行，并阅读其中内容的摘要。"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Choose the date column for this field"
+msgstr "请为此字段选择日期列"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
