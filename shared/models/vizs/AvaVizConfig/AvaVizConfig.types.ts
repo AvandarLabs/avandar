@@ -10,7 +10,8 @@ import type { AvaTableVizConfig } from "$/models/vizs/AvaTableVizConfig/AvaTable
 import type { IAvaVizConfigModule } from "$/models/vizs/AvaVizConfig/IAvaVizConfigModule.ts";
 import type { ObjectRegistry } from "@avandar/utils";
 
-export type AvaVizConfig =
+/** The configs of the chart and table types Avandar draws itself. */
+export type BuiltInAvaVizConfig =
   | AvaTableVizConfig
   | AvaBarChartVizConfig
   | AvaLineChartVizConfig
@@ -21,10 +22,14 @@ export type AvaVizConfig =
   | AvaRadarChartVizConfig
   | AvaBubbleChartVizConfig;
 
+export type AvaVizConfig = BuiltInAvaVizConfig;
+
+/** The viz types of the charts and table Avandar draws itself. */
+export type BuiltInVizType = BuiltInAvaVizConfig["vizType"];
 export type VizType = AvaVizConfig["vizType"];
 export type AvaVizConfigRegistry = ObjectRegistry<AvaVizConfig, "vizType">;
 export type AvaVizConfigType<K extends VizType> = AvaVizConfigRegistry[K];
 
 export type AvaVizConfigUtilRegistry = {
-  [K in VizType]: IAvaVizConfigModule<K, AvaVizConfigType<K>>;
+  [K in BuiltInVizType]: IAvaVizConfigModule<K, AvaVizConfigType<K>>;
 };

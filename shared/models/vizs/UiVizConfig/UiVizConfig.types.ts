@@ -81,19 +81,8 @@ type AreaSeriesShape = {
   withDots?: boolean;
 };
 
-/**
- * The conventional chart config a renderer takes, with no business logic: an
- * `AvaVizConfig.T` with each column ID replaced by its `QueryResult` column
- * name, the key each result row is read by. `makeUiVizConfigFromAvaVizConfig`
- * builds one. Chart renderers consume it. It also holds charts where there
- * are no column IDs yet, for example in Explorer URLs and in dashboards saved
- * before column IDs, until they bind.
- *
- * A `QueryResult` column name is not always the source column's name. An
- * aggregate is emitted as `sum(revenue)` rather than `revenue`, and an
- * explicit alias replaces the name entirely.
- */
-export type UiVizConfig =
+/** The `UiVizConfig` of a chart or table type Avandar draws itself. */
+export type BuiltInUiVizConfig =
   | { vizType: "table" }
   | UiVizConfigBar
   | UiVizConfigLine
@@ -111,6 +100,20 @@ export type UiVizConfig =
   | UiVizConfigRadar
   | UiVizConfigPie
   | UiVizConfigFunnel;
+
+/**
+ * The conventional chart config a renderer takes, with no business logic: an
+ * `AvaVizConfig.T` with each column ID replaced by its `QueryResult` column
+ * name, the key each result row is read by. `makeUiVizConfigFromAvaVizConfig`
+ * builds one. Chart renderers consume it. It also holds charts where there
+ * are no column IDs yet, for example in Explorer URLs and in dashboards saved
+ * before column IDs, until they bind.
+ *
+ * A `QueryResult` column name is not always the source column's name. An
+ * aggregate is emitted as `sum(revenue)` rather than `revenue`, and an
+ * explicit alias replaces the name entirely.
+ */
+export type UiVizConfig = BuiltInUiVizConfig;
 
 /** Mark settings for mixed XY charts, keyed by `QueryResult` column name. */
 export type XYSeries = BarSeriesShape | LineSeriesShape | AreaSeriesShape;

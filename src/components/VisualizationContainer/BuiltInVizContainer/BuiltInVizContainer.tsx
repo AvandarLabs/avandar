@@ -19,7 +19,7 @@ type Props = {
   data: UnknownDataFrame;
 
   /** The built-in chart or table config that drives what is rendered. */
-  vizConfig: AvaVizConfig.T;
+  vizConfig: AvaVizConfig.BuiltIn;
 };
 
 /**

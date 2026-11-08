@@ -12,6 +12,7 @@ import {
   AvaVizConfig,
   AvaVizConfigType,
   AvaVizConfigUtilRegistry,
+  BuiltInVizType,
   VizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/AvaVizConfig/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig.ts";
@@ -33,7 +34,7 @@ const AvaVizConfigModulesRegistry = {
   bubble: AvaBubbleChartVizConfigs,
 } as const satisfies AvaVizConfigUtilRegistry;
 
-export const VizTypes = registry<VizType>().keys(
+export const VizTypes = registry<BuiltInVizType>().keys(
   "table",
   "bar",
   "line",
@@ -49,7 +50,7 @@ export const VizTypes = registry<VizType>().keys(
  * Looks up the `IAvaVizConfigModule` for a viz type, so each `AvaVizConfigs`
  * method can dispatch to that type's implementation.
  */
-function _getVizTypeModule<VType extends VizType>(
+function _getVizTypeModule<VType extends BuiltInVizType>(
   type: VType,
 ): IAvaVizConfigModule<VType, AvaVizConfigType<VType>> {
   return AvaVizConfigModulesRegistry[type] as unknown as IAvaVizConfigModule<
@@ -65,13 +66,13 @@ export const AvaVizConfigs = {
    * series-level controls (including from foreign viz types when a
    * series's `renderAs` differs from the host).
    */
-  getDescriptors: <VType extends VizType>(
+  getDescriptors: <VType extends BuiltInVizType>(
     type: VType,
   ): IAvaVizConfigModule<VType, AvaVizConfigType<VType>>["descriptors"] => {
     return _getVizTypeModule(type).descriptors;
   },
 
-  makeEmptyConfig: <VType extends VizType>(
+  makeEmptyConfig: <VType extends BuiltInVizType>(
     type: VType,
   ): AvaVizConfigType<VType> => {
     return _getVizTypeModule(type).makeEmptyConfig();
@@ -85,7 +86,7 @@ export const AvaVizConfigs = {
    * @param newVizType The viz type we are converting to
    * @returns The new viz config
    */
-  convertVizConfig: <NewVType extends VizType>(
+  convertVizConfig: <NewVType extends BuiltInVizType>(
     currentConfig: AvaVizConfig,
     newVizType: NewVType,
   ): AvaVizConfigType<NewVType> => {

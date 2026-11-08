@@ -16,11 +16,11 @@ import { LineChart } from "@/lib/ui/viz/LineChart/LineChart";
 import { PieChart } from "@/lib/ui/viz/PieChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart/ScatterChart";
-import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
+import type { BuiltInUiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = Readonly<{
-  uiVizConfig: UiVizConfig;
+  uiVizConfig: BuiltInUiVizConfig;
   data: UnknownDataFrame;
   dateColumns: ReadonlySet<string>;
   /** Column names the table view lists, in order. */
@@ -106,12 +106,13 @@ function useVizConfigSchemas() {
 }
 
 /** What each chart branch reads: its own config plus the shared inputs. */
-type ChartRenderOptions<VType extends UiVizConfig["vizType"]> = Readonly<{
-  config: Extract<UiVizConfig, { vizType: VType }>;
-  schemas: ReturnType<typeof useVizConfigSchemas>;
-  limitedData: UnknownDataFrame;
-  dateColumns: ReadonlySet<string>;
-}>;
+type ChartRenderOptions<VType extends BuiltInUiVizConfig["vizType"]> =
+  Readonly<{
+    config: Extract<BuiltInUiVizConfig, { vizType: VType }>;
+    schemas: ReturnType<typeof useVizConfigSchemas>;
+    limitedData: UnknownDataFrame;
+    dateColumns: ReadonlySet<string>;
+  }>;
 
 function _renderDataGrid(
   options: Readonly<{
