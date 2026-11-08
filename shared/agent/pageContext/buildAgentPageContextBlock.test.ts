@@ -241,4 +241,14 @@ describe("buildAgentPageContextBlock", () => {
     expect(block).toContain("Query on screen: SELECT 1 FROM x WHERE y");
     expect(block).toContain("Result columns: a b int");
   });
+
+  it("escapes line separators inside quoted names", () => {
+    const block = _block({
+      app: "dataset",
+      dataset: { id: DATASET_ID, name: "a\u2028b\u2029c" },
+    });
+
+    expect(block).not.toMatch(/[\u2028\u2029]/);
+    expect(block).toContain('"a\\u2028b\\u2029c"');
+  });
 });

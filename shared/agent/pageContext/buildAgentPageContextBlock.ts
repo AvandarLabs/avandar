@@ -31,11 +31,15 @@ const PAGE_TAG_START = /<(?=\/?current_page)/gi;
 type Aliases = readonly SqlTableAlias.T[];
 
 /**
- * A name as a JSON string literal, so quotes and line breaks are escaped. Every
- * `<` becomes `\u003c`, so a name can never spell out `</current_page>`.
+ * A name as a JSON string literal, so quotes and line breaks are escaped,
+ * including the line and paragraph separators JSON leaves raw. Every `<`
+ * becomes `\u003c`, so a name can never spell out `</current_page>`.
  */
 function _quote(name: string): string {
-  return JSON.stringify(name).replace(/</g, "\\u003c");
+  return JSON.stringify(name)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
 }
 
 /**
