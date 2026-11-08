@@ -20,6 +20,7 @@ import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelatio
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import type { DuckDBConnection } from "@duckdb/node-api";
 
@@ -422,5 +423,199 @@ describe("buildConceptViewSql", () => {
         return row.nicknames;
       }),
     ).toEqual([["Ada"], ["Bo"], []]);
+  });
+});
+
+const DATASET_TYPED = "ffffffff-6666-4666-8666-ffffffffffff";
+const TYPED_VIEW = "concept_eeeeeeee-5555-4555-8555-eeeeeeeeeeee";
+const TYPED_SPINE = `${TYPED_VIEW}__individuals`;
+
+/**
+ * One dataset with a column of every type a rule can keep, for checking the
+ * type each rule emits.
+ *
+ * `p1` ties at the maximum twice (two rows share the latest `seen_on`, and
+ * two share the most `visits`) and has a row of NULLs, so a rule that counted
+ * or compared NULL would show it. `p2` has only a NULL row. `p3` has no row.
+ */
+async function _seedTyped(connection: DuckDBConnection): Promise<void> {
+  const path = join(tmpdir(), "ava-concept-typed.parquet");
+  await connection.run(`
+    COPY (
+      SELECT * FROM (VALUES
+        ('p1', '9', 3::BIGINT, 1.5::DOUBLE, DATE '2024-03-01', TIME '08:00', TIMESTAMP '2024-03-01 08:00'),
+        ('p1', '10', 3::BIGINT, NULL::DOUBLE, DATE '2024-03-01', TIME '17:30', TIMESTAMP '2024-03-09 17:30'),
+        ('p1', NULL, NULL::BIGINT, 2.5::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP),
+        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP)
+      ) AS t(person_id, code, visits, weight, seen_on, seen_time, seen_at)
+    ) TO '${path}' (FORMAT parquet)
+  `);
+  await connection.run(`
+    CREATE VIEW "${DATASET_TYPED}" AS SELECT * FROM read_parquet('${path}');
+    CREATE VIEW "${getRowNumberedViewName(DATASET_TYPED)}" AS
+      SELECT * FROM read_parquet('${path}', file_row_number = true);
+    CREATE TABLE "${TYPED_SPINE}" AS
+      SELECT * FROM (VALUES ('p1', 'Active'), ('p2', 'Active'), ('p3', 'Active'))
+        AS t(external_id, status);
+  `);
+}
+
+/** One single-value field over the typed dataset. */
+function _typedColumn(
+  options: Readonly<{
+    attributeName: string;
+    selectColumnName: string;
+    ruleType: ValuePickerRule.T;
+  }>,
+): ConceptAttributeColumn {
+  return {
+    kind: "dataset_column",
+    attributeId: `attr-${options.attributeName}` as ConceptAttribute.Id,
+    attributeName: options.attributeName,
+    selectColumnName: options.selectColumnName,
+    datasetId: DATASET_TYPED,
+    primaryKeyColumnName: "person_id",
+    valuePickerRuleType: options.ruleType,
+    isArray: false,
+  };
+}
+
+const TYPED_COLUMNS: readonly ConceptAttributeColumn[] = [
+  _typedColumn({
+    attributeName: "latest_seen",
+    selectColumnName: "seen_on",
+    ruleType: "max",
+  }),
+  _typedColumn({
+    attributeName: "earliest_time",
+    selectColumnName: "seen_time",
+    ruleType: "min",
+  }),
+  _typedColumn({
+    attributeName: "latest_seen_at",
+    selectColumnName: "seen_at",
+    ruleType: "max",
+  }),
+  _typedColumn({
+    attributeName: "last_code",
+    selectColumnName: "code",
+    ruleType: "max",
+  }),
+  _typedColumn({
+    attributeName: "first_code",
+    selectColumnName: "code",
+    ruleType: "min",
+  }),
+  _typedColumn({
+    attributeName: "most_visits",
+    selectColumnName: "visits",
+    ruleType: "max",
+  }),
+  _typedColumn({
+    attributeName: "code_count",
+    selectColumnName: "code",
+    ruleType: "count",
+  }),
+  _typedColumn({
+    attributeName: "total_visits",
+    selectColumnName: "visits",
+    ruleType: "sum",
+  }),
+  _typedColumn({
+    attributeName: "average_weight",
+    selectColumnName: "weight",
+    ruleType: "avg",
+  }),
+];
+
+async function _createTypedView(connection: DuckDBConnection): Promise<void> {
+  await _seedTyped(connection);
+  await connection.run(
+    buildConceptViewSql({
+      viewName: TYPED_VIEW,
+      spineTableName: TYPED_SPINE,
+      attributeColumns: TYPED_COLUMNS,
+    }),
+  );
+}
+
+/** The typed view's DuckDB column types, by column name. */
+async function _describeTypedView(): Promise<Record<string, string>> {
+  return await withDuckDb(async (connection) => {
+    await _createTypedView(connection);
+    const reader = await connection.runAndReadAll(`DESCRIBE "${TYPED_VIEW}"`);
+    return Object.fromEntries(
+      reader.getRowObjectsJson().map((row) => {
+        return [String(row.column_name), String(row.column_type)];
+      }),
+    );
+  });
+}
+
+/**
+ * The typed view's rows in DuckDB's JSON form: dates and times as text,
+ * `BIGINT` as a string, `DOUBLE` as a number.
+ */
+async function _queryTypedView(): Promise<Array<Record<string, unknown>>> {
+  return await withDuckDb(async (connection) => {
+    await _createTypedView(connection);
+    const reader = await connection.runAndReadAll(
+      `SELECT * FROM "${TYPED_VIEW}" ORDER BY external_id`,
+    );
+    return reader.getRowObjectsJson();
+  });
+}
+
+describe("buildConceptViewSql value rule output types", () => {
+  it("emits each rule's output type as the view column's type", async () => {
+    expect(await _describeTypedView()).toMatchObject({
+      latest_seen: "DATE",
+      earliest_time: "TIME",
+      latest_seen_at: "TIMESTAMP",
+      last_code: "VARCHAR",
+      first_code: "VARCHAR",
+      most_visits: "BIGINT",
+      code_count: "BIGINT",
+      total_visits: "DOUBLE",
+      average_weight: "DOUBLE",
+    });
+  });
+
+  it("takes the latest date and time when two rows tie and one is NULL", async () => {
+    const [p1, p2, p3] = await _queryTypedView();
+
+    expect([p1?.latest_seen, p1?.latest_seen_at, p1?.earliest_time]).toEqual([
+      "2024-03-01",
+      "2024-03-09 17:30:00",
+      "08:00:00",
+    ]);
+    expect([p2?.latest_seen, p3?.latest_seen]).toEqual([null, null]);
+  });
+
+  it("orders text alphabetically under max and min, so '9' beats '10'", async () => {
+    const [p1] = await _queryTypedView();
+
+    expect([p1?.last_code, p1?.first_code]).toEqual(["9", "10"]);
+  });
+
+  it("counts the non-NULL values, and zero for a record no row matches", async () => {
+    const rows = await _queryTypedView();
+
+    expect(
+      rows.map((row) => {
+        return row.code_count;
+      }),
+    ).toEqual(["2", "0", "0"]);
+  });
+
+  it("sums whole numbers into a decimal and skips NULLs", async () => {
+    const [p1, p2] = await _queryTypedView();
+
+    expect([p1?.total_visits, p1?.average_weight, p1?.most_visits]).toEqual([
+      6,
+      2,
+      "3",
+    ]);
+    expect(p2?.total_visits).toBeNull();
   });
 });

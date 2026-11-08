@@ -55,8 +55,13 @@ function _buildReducedValueSql(
   }>,
 ): string {
   const { value, rowFilter, datasetView, rowsView } = options.parts;
-  const aggregateSql = (aggregate: string): string => {
-    return `SELECT CAST(${aggregate}(${value}) AS DOUBLE) FROM ${datasetView} ${DATASET_ALIAS} WHERE ${rowFilter}`;
+  // Each rule passes its aggregate in the rule's output type
+  // (`ValuePickerRule.getOutputDataType`). COUNT is already BIGINT, and is 0,
+  // not NULL, over no rows. MAX and MIN keep the column's type, so dates,
+  // times, and text work as well as numbers. Text compares by bytes, so '10'
+  // sorts before '9'.
+  const aggregateSql = (aggregateExpression: string): string => {
+    return `SELECT ${aggregateExpression} FROM ${datasetView} ${DATASET_ALIAS} WHERE ${rowFilter}`;
   };
   return match(options.valuePickerRuleType)
     .with("first", () => {
@@ -69,19 +74,19 @@ function _buildReducedValueSql(
       return `SELECT ${value} FROM ${datasetView} ${DATASET_ALIAS} WHERE ${rowFilter} GROUP BY ${value} ORDER BY COUNT(*) DESC, ${value} LIMIT 1`;
     })
     .with("sum", () => {
-      return aggregateSql("SUM");
+      return aggregateSql(`CAST(SUM(${value}) AS DOUBLE)`);
     })
     .with("avg", () => {
-      return aggregateSql("AVG");
+      return aggregateSql(`CAST(AVG(${value}) AS DOUBLE)`);
     })
     .with("count", () => {
-      return aggregateSql("COUNT");
+      return aggregateSql(`COUNT(${value})`);
     })
     .with("max", () => {
-      return aggregateSql("MAX");
+      return aggregateSql(`MAX(${value})`);
     })
     .with("min", () => {
-      return aggregateSql("MIN");
+      return aggregateSql(`MIN(${value})`);
     })
     .exhaustive();
 }
