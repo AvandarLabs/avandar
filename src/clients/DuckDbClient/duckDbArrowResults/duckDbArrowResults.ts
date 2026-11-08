@@ -58,9 +58,15 @@ function _toJsValueFromArrowValue(
   if (constructorName !== "DecimalBigNum" && constructorName !== "BigNum") {
     return value;
   }
-  const primitive = (value as { valueOf: (scale?: number) => unknown }).valueOf(
-    _getDecimalScale(dataType),
-  );
+  const scale = _getDecimalScale(dataType);
+  if (scale !== undefined) {
+    // `String` gives the exact signed integer. `valueOf(scale)` adds the
+    // integer's halves as floats, which can come back a float step off, and
+    // throws when the whole part exceeds 2^53. Parsing the decimal text
+    // rounds once, to the nearest double.
+    return Number(`${String(value)}e-${scale}`);
+  }
+  const primitive = (value as { valueOf: () => unknown }).valueOf();
   return typeof primitive === "bigint" ? Number(primitive) : primitive;
 }
 

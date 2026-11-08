@@ -192,14 +192,13 @@ async function _withConceptView<Result>(
 /** Creates the view from the given columns and returns its rows. */
 async function _queryView(
   attributeColumns: readonly ConceptAttributeColumn[],
-  world: ViewWorld = DEFAULT_WORLD,
 ): Promise<Array<Record<string, unknown>>> {
   return await _withConceptView({
-    world,
+    world: DEFAULT_WORLD,
     attributeColumns,
     run: async (connection) => {
       const reader = await connection.runAndReadAll(
-        `SELECT * FROM "${world.viewName}" ORDER BY external_id`,
+        `SELECT * FROM "${DEFAULT_WORLD.viewName}" ORDER BY external_id`,
       );
       return reader.getRowObjects().map(_normalize);
     },
@@ -506,6 +505,7 @@ const TYPED_WORLD: ViewWorld = {
 /** One single-value field over the typed dataset, and the type it reads. */
 type TypedField = Readonly<{
   column: ConceptAttributeColumn;
+  ruleType: ValuePickerRule.T;
   sourceDuckDbType: DuckDbDataType;
 }>;
 
@@ -518,6 +518,7 @@ function _typedField(
   }>,
 ): TypedField {
   return {
+    ruleType: options.ruleType,
     sourceDuckDbType: options.sourceDuckDbType,
     column: {
       kind: "dataset_column",
@@ -664,12 +665,7 @@ describe("buildConceptViewSql value rule output types", () => {
         return [
           field.column.attributeName,
           ValuePickerRule.getOutputDataType({
-            ruleType: (
-              field.column as Extract<
-                ConceptAttributeColumn,
-                { kind: "dataset_column" }
-              >
-            ).valuePickerRuleType,
+            ruleType: field.ruleType,
             columnDataType: DuckDbDataTypeUtils.toAvaDataType(
               field.sourceDuckDbType,
             ),
