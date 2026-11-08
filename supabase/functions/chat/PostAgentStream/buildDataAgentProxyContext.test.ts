@@ -62,7 +62,28 @@ describe("buildDataAgentProxyContext", () => {
         ],
         datasets: DATASETS,
         today: "2026-11-08",
+        promptId: "data-agent-v1",
       });
     }).toThrow("send_email");
+  });
+
+  it("builds the prompt for the version the path names", () => {
+    const options = {
+      clientMessages: [USER],
+      datasets: DATASETS,
+      today: "2026-11-08",
+    };
+
+    const v1 = buildDataAgentProxyContext({
+      ...options,
+      promptId: "data-agent-v1",
+    });
+    const v2 = buildDataAgentProxyContext({
+      ...options,
+      promptId: "data-agent-v2",
+    });
+
+    expect(v1.systemPrompt).not.toContain("CURRENT PAGE");
+    expect(v2.systemPrompt).toContain("CURRENT PAGE");
   });
 });

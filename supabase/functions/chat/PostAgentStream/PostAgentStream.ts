@@ -9,7 +9,7 @@ import { buildDataAgentProxyContext } from "@sbfn/chat/PostAgentStream/buildData
 import { loadDataAgentDatasets } from "@sbfn/chat/PostAgentStream/loadDataAgentDatasets.ts";
 import { toProxyEvent } from "@sbfn/chat/PostAgentStream/toProxyEvent.ts";
 import { z } from "zod";
-import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools.ts";
+import { isDataAgentPromptId } from "$/agent/dataAgent/dataAgentTools.ts";
 import {
   DATA_AGENT_PROXY_MAX_OUTPUT_TOKENS,
   DATA_AGENT_PROXY_MODEL_IDS,
@@ -72,8 +72,9 @@ function _toSseResponse(
  * workspace, and enforces the model allowlist and output cap.
  *
  * The prompt and tools are the server's (decision D04): the path names the
- * prompt version, the system prompt is built from the workspace's datasets,
- * and the browser contributes only the conversation. That keeps the prompt
+ * prompt version (every version in `DATA_AGENT_PROMPT_IDS` is served), the
+ * system prompt is built from the workspace's datasets, and the browser
+ * contributes only the conversation. That keeps the prompt
  * private and stops the proxy from serving as a general-purpose model
  * endpoint. Only the options that change the answer pass through.
  */
@@ -97,9 +98,10 @@ export const PostAgentStream = POST({
     if (!openRouterApiKey) {
       throw new Error("OPEN_ROUTER_API_KEY environment variable is not set");
     }
-    if (pathParams.promptId !== DATA_AGENT_PROMPT_ID) {
+    const { promptId } = pathParams;
+    if (!isDataAgentPromptId(promptId)) {
       throw new AvaHTTPError(
-        `Unknown agent prompt "${pathParams.promptId}". Reload the page.`,
+        `Unknown agent prompt "${promptId}". Reload the page.`,
         BAD_REQUEST,
       );
     }
@@ -120,6 +122,7 @@ export const PostAgentStream = POST({
         workspaceId: pathParams.workspaceId,
       }),
       today: new Date().toISOString().slice(0, 10),
+      promptId,
     });
     const stream = models.streamSimple(_resolveModel(body.model.id), context, {
       apiKey: openRouterApiKey,
