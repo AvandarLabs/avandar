@@ -30,6 +30,10 @@ msgstr "建议的状态"
 msgid "{0} rows"
 msgstr "{0} 行"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "We couldn't load a preview of this dataset."
+msgstr "无法加载此数据集的预览。"
+
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "关闭聊天面板"
@@ -55,6 +59,10 @@ msgstr "返回在线以查看或使页面可离线使用。"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The link could not be copied."
 msgstr "无法复制链接。"
+
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "First {numRows} rows"
+msgstr "前 {numRows} 行"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -1504,6 +1512,10 @@ msgstr "工作区名称"
 msgid "Your dashboard is published at:"
 msgstr "您的仪表板已发布在："
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "This preview shows only the first {numRows} rows of the dataset."
+msgstr "此预览仅显示数据集的前 {numRows} 行。"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "The catalog is in <0/> and grows from what people ask for. Missing a "
 "dataset? <1>Request one</1>"
@@ -2413,6 +2425,10 @@ msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
 "unshare another dashboard, and come back to this."
 msgstr "你的方案不允许再共享一个仪表板。你可以升级方案，或取消共享另一个仪表板，然后返回此处。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Open in full screen"
+msgstr "全屏打开"
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "检测到偏见："
@@ -3228,7 +3244,7 @@ msgid "Data scope"
 msgstr "数据范围"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
 msgid "Data preview"
 msgstr "数据预览"
 
@@ -7415,11 +7431,9 @@ msgid "Phi 3.5 Mini (offline)"
 msgstr "Phi 3.5 Mini（离线）"
 
 #. placeholder {0}: options.numPreviewRows
-#. placeholder {0}: previewData.length
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "First {0} rows"
 msgstr "前 {0} 行"
 

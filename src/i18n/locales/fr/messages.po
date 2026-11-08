@@ -31,6 +31,10 @@ msgstr "Statuts proposés"
 msgid "{0} rows"
 msgstr "{0} lignes"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "We couldn't load a preview of this dataset."
+msgstr "Nous n’avons pas pu charger un aperçu de ce jeu de données."
+
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "Fermer le panneau de discussion"
@@ -59,6 +63,10 @@ msgstr "Retour en ligne pour visualiser ou rendre la page disponible hors "
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The link could not be copied."
 msgstr "Le lien n’a pas pu être copié."
+
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "First {numRows} rows"
+msgstr "Premières lignes : {numRows}"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -1587,6 +1595,11 @@ msgstr "Nom de l'espace de travail"
 msgid "Your dashboard is published at:"
 msgstr "Votre tableau de bord est publié à l'adresse :"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "This preview shows only the first {numRows} rows of the dataset."
+msgstr "Cet aperçu affiche uniquement les {numRows} premières lignes du jeu de "
+"données."
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "The catalog is in <0/> and grows from what people ask for. Missing a "
 "dataset? <1>Request one</1>"
@@ -2538,6 +2551,10 @@ msgstr "Votre forfait ne permet pas de partager un autre tableau de bord. Vous "
 "pouvez passer à un forfait supérieur ou annuler le partage d’un autre "
 "tableau de bord, puis revenir ici."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Open in full screen"
+msgstr "Ouvrir en plein écran"
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Biais détecté :"
@@ -3400,7 +3417,7 @@ msgid "Data scope"
 msgstr "Portée des données"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
 msgid "Data preview"
 msgstr "Aperçu des données"
 
@@ -7768,11 +7785,9 @@ msgid "Phi 3.5 Mini (offline)"
 msgstr "Phi 3.5 Mini (hors ligne)"
 
 #. placeholder {0}: options.numPreviewRows
-#. placeholder {0}: previewData.length
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "First {0} rows"
 msgstr "Premières {0} lignes"
 
