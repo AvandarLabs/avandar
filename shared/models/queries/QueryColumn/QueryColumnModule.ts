@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { match } from "ts-pattern";
 import { uuid } from "$/lib/uuid.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
@@ -7,6 +8,28 @@ import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetC
 import type { ConceptAttributeModel } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
 import type { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+
+function _isList(column: QueryColumn.T): boolean {
+  const { baseColumn } = column;
+  if (baseColumn.__type !== "ConceptAttribute") {
+    return false;
+  }
+  return match(ConceptAttribute.getValueShape(baseColumn))
+    .with("single", () => {
+      return false;
+    })
+    .with("list", () => {
+      return true;
+    })
+    .exhaustive();
+}
+
+/** Grouping and counting work on a whole list; number aggregates do not. */
+const LIST_AGGREGATIONS: readonly QueryAggregationType.T[] = [
+  "none",
+  "group_by",
+  "count",
+];
 
 export const QueryColumnModule = {
   /**
@@ -136,6 +159,28 @@ export const QueryColumnModule = {
   },
 
   isNumeric: (column: QueryColumn.T): boolean => {
-    return AvaDataType.isNumeric(column.baseColumn.dataType);
+    // A list of numbers is not a number: summing or charting it fails.
+    return (
+      !_isList(column) && AvaDataType.isNumeric(column.baseColumn.dataType)
+    );
+  },
+
+  /**
+   * Whether the column is a case type field that keeps every value, which a
+   * query reads as a DuckDB list. Use it to keep a list out of an operation
+   * that fails on one, for example a filter.
+   */
+  isList: _isList,
+
+  /**
+   * The aggregations a column can take in a query: a list's are grouping and
+   * counting, any other column's follow its data type.
+   */
+  getValidAggregations: (
+    column: QueryColumn.T,
+  ): readonly QueryAggregationType.T[] => {
+    return _isList(column)
+      ? LIST_AGGREGATIONS
+      : AvaDataType.getValidQueryAggregations(column.baseColumn.dataType);
   },
 };

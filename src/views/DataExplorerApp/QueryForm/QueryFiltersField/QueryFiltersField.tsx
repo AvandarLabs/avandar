@@ -64,21 +64,29 @@ export function QueryFiltersField({
     };
   }, [t]);
 
-  const columnTypes: QueryFilterColumnTypes = useMemo(() => {
-    return makeObject(columns, {
-      keyFn: prop("id"),
-      valueFn: prop("baseColumn.dataType"),
+  // Every filter operator fails on a list in DuckDB, so a field that keeps
+  // every value cannot be filtered on here.
+  const filterableColumns = useMemo(() => {
+    return columns.filter((column) => {
+      return !QueryColumn.isList(column);
     });
   }, [columns]);
 
+  const columnTypes: QueryFilterColumnTypes = useMemo(() => {
+    return makeObject(filterableColumns, {
+      keyFn: prop("id"),
+      valueFn: prop("baseColumn.dataType"),
+    });
+  }, [filterableColumns]);
+
   const fields: Field[] = useMemo(() => {
-    return columns.map((column) => {
+    return filterableColumns.map((column) => {
       return {
         name: column.id,
         label: column.baseColumn.name,
       };
     });
-  }, [columns]);
+  }, [filterableColumns]);
 
   const { query, matchCaseById, onQueryChange, commitNow, setMatchCase } =
     useFilterTreeState({ value, columnTypes, onChange });

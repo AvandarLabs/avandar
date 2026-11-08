@@ -68,9 +68,14 @@ export function LocalFilterEditor({
         <Select
           size="xs"
           label={t`Column`}
-          data={columns.map((column) => {
-            return { value: column.id, label: column.name };
-          })}
+          // A local filter's IN, ILIKE, or = fails on a list column.
+          data={columns
+            .filter((column) => {
+              return !column.isArray;
+            })
+            .map((column) => {
+              return { value: column.id, label: column.name };
+            })}
           value={
             "columnId" in filter
               ? filter.columnId

@@ -88,7 +88,9 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
   };
 
   const addFilter = (): void => {
-    const firstColumn = columns[0];
+    const firstColumn = columns.find((column) => {
+      return !column.isArray;
+    });
     if (firstColumn) {
       onChange([...filters, createLocalFilter(firstColumn.id)]);
     }

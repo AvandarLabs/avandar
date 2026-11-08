@@ -121,4 +121,16 @@ describe("makeDataGridColumnDefs", () => {
       }),
     ).toEqual(["2020", "84001001", "1001", "840", "2021"]);
   });
+
+  it("shows a list cell's values separated by semicolons and an empty list as blank", () => {
+    const [columnDef] = makeDataGridColumnDefs({
+      columnNames: ["Daily new cases"],
+      data: [{ "Daily new cases": [31, 1234] }],
+      dateColumns: undefined,
+      dateFormat: "YYYY-MM-DD",
+    });
+
+    expect(columnDef!.valueFormatter({ value: [31, 1234] })).toBe("31; 1,234");
+    expect(columnDef!.valueFormatter({ value: [] })).toBe("");
+  });
 });

@@ -46,6 +46,25 @@ function _formatGridNumber(value: number, columnName: string): string {
 }
 
 /**
+ * The text of one non-date cell. A list, such as a case type field that
+ * keeps every value, shows its values separated by semicolons, which never
+ * collide with a number's thousands separator. An empty list is blank.
+ */
+function _formatCellValue(value: unknown, columnName: string): string {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        return _formatCellValue(item, columnName);
+      })
+      .join("; ");
+  }
+  if (typeof value === "number") {
+    return _formatGridNumber(value, columnName);
+  }
+  return value == null ? "" : String(value);
+}
+
+/**
  * Whether every value in a date column falls on midnight UTC, which is how a
  * `DATE` or a day, month, or year bucket from `date_trunc` arrives. Those
  * columns show only the date, since a `00:00:00` on every row says nothing.
@@ -102,11 +121,7 @@ export function makeDataGridColumnDefs(
             });
           }
         : (params: { value: unknown }) => {
-            return typeof params.value === "number"
-              ? _formatGridNumber(params.value, field)
-              : params.value == null
-                ? ""
-                : String(params.value);
+            return _formatCellValue(params.value, field);
           },
     };
   });

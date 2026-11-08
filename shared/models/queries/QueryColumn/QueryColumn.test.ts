@@ -5,6 +5,7 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 
@@ -134,5 +135,67 @@ describe("QueryColumn.refreshFromSourceColumn", () => {
     });
 
     expect(QueryColumn.getDerivedColumnName(refreshed)).toBe("Age_2");
+  });
+});
+
+function _fieldColumn(
+  options: Readonly<{
+    name: string;
+    dataType: AvaDataType.T;
+    isArray: boolean;
+  }>,
+): QueryColumn.T {
+  return QueryColumn.makeFromConceptAttributes([
+    {
+      ...Model.make("ConceptAttribute", {
+        id: `attr_${options.name}`,
+        conceptId: "concept_1",
+        workspaceId: "workspace_1",
+        name: options.name,
+        description: undefined,
+        createdAt: "2026-11-06T00:00:00Z",
+        updatedAt: "2026-11-06T00:00:00Z",
+        dataType: options.dataType,
+        mappingType: "dataset_column",
+        isLabel: false,
+        isIdentifier: false,
+        allowManualEdit: false,
+        isArray: options.isArray,
+      }),
+    } as ConceptAttribute.T,
+  ])[0]!;
+}
+
+const DAILY_CASES_LIST = _fieldColumn({
+  name: "Daily new cases",
+  dataType: "bigint",
+  isArray: true,
+});
+const DAILY_CASES_TOTAL = _fieldColumn({
+  name: "Total cases",
+  dataType: "bigint",
+  isArray: false,
+});
+
+describe("QueryColumn and list fields", () => {
+  it("offers a list field only grouping and counting", () => {
+    expect(QueryColumn.getValidAggregations(DAILY_CASES_LIST)).toEqual([
+      "none",
+      "group_by",
+      "count",
+    ]);
+    expect(QueryColumn.getValidAggregations(DAILY_CASES_TOTAL)).toContain(
+      "sum",
+    );
+  });
+
+  it("never treats a list of numbers as numeric", () => {
+    expect(QueryColumn.isNumeric(DAILY_CASES_LIST)).toBe(false);
+    expect(QueryColumn.isNumeric(DAILY_CASES_TOTAL)).toBe(true);
+  });
+
+  it("treats only a field that keeps every value as a list", () => {
+    expect(QueryColumn.isList(DAILY_CASES_LIST)).toBe(true);
+    expect(QueryColumn.isList(DAILY_CASES_TOTAL)).toBe(false);
   });
 });
