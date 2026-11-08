@@ -22,6 +22,12 @@ const APP_LABELS: Record<AgentPageApp, string> = {
   other: "Other",
 };
 
+/** A run of line breaks (CR, LF, line and paragraph separators) and spaces. */
+const LINE_BREAKS = /\s*[\r\n\u2028\u2029]+\s*/g;
+
+/** A `<` that would start `<current_page>` or `</current_page>`. */
+const PAGE_TAG_START = /<(?=\/?current_page)/gi;
+
 type Aliases = readonly SqlTableAlias.T[];
 
 /**
@@ -38,12 +44,20 @@ function _quote(name: string): string {
  * neither start a new line nor spell out `</current_page>`.
  */
 function _inline(text: string): string {
-  return text.replace(/\s*\n\s*/g, " ").replace(/</g, "\\u003c");
+  return text.replace(LINE_BREAKS, " ").replace(/</g, "\\u003c");
 }
 
+/**
+ * One SQL statement on a single line, with table names shown as aliases and
+ * cut at the cap. Only a `<` that would start a page tag is escaped, so
+ * comparisons such as `a < b` stay readable.
+ */
 function _formatSql(sql: string, aliases: Aliases): string {
-  const singleLine = sql.trim().replace(/\s*\n\s*/g, " ");
-  const aliased = SqlTableAlias.toAliasedSql(singleLine, aliases);
+  const singleLine = sql.trim().replace(LINE_BREAKS, " ");
+  const aliased = SqlTableAlias.toAliasedSql(singleLine, aliases).replace(
+    PAGE_TAG_START,
+    "\\u003c",
+  );
   return aliased.length > MAX_PAGE_SQL_CHARACTERS
     ? `${aliased.slice(0, MAX_PAGE_SQL_CHARACTERS)} ...`
     : aliased;
