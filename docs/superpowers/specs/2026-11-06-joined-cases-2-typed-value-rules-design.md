@@ -305,6 +305,13 @@ Decision: **no warning; the option names the behaviour.** On a text column:
 Other column types keep "Max"/"Min" and "Choose the maximum value"/"Choose
 the minimum value".
 
+The labels are made true in SQL (Kristi's decision, section 11): on a text
+column, `max` and `min` compare `lower(strip_accents(CAST(v AS VARCHAR)))`
+and return the original value, through `arg_max(v, {k: key, v: v})` and
+`arg_min`. The struct breaks a tie between case variants ("apple" and
+"Apple") by the value itself, so the result is deterministic. Accented Latin
+letters sort with their base letter; ß, æ, ø, and ł are not folded.
+
 Why: a label is read every time someone picks a rule, while a warning is read
 once and then ignored. "Alphabetically last" makes "10 before 9" predictable
 without one. Detecting numbers stored as text would need row values, which
@@ -319,8 +326,8 @@ After its value-picker bullet (`:92`) it gains:
 
 > sum and avg only work on bigint and double columns. max and min work on
 > every column type except boolean, and on a varchar column they compare
-> text character by character, so "10" comes before "9" and "Zebra" before
-> "apple": never use them for numbers stored as text. count, first, and most_frequent work on every column.
+> alphabetically, ignoring case and accents, so "10" comes before "9": never
+> use them for numbers stored as text. count, first, and most_frequent work on every column.
 
 The `valuePickerRuleType` description in the `proposeCaseType` schema
 (`makeChatToolConfigFromOptions.ts:209-210`) gains "sum and avg need a bigint
@@ -566,11 +573,16 @@ from the plan text.
      fields keep their value as is." as its accessible description. A
      `useFieldWatch("sourceDatasets")` re-render makes the lock follow the
      ID pick at once;
-   - the data migration (section 4.8).
-2. **Text compares by byte order.** `max` and `min` on text put "10" before
-   "9" and uppercase before lowercase. Comments and the model prompt say so
-   (section 4.6). The user-facing labels still say "alphabetically" (open
-   question 3).
+   - the data migration (section 4.8), which Kristi confirmed should fix
+     identifier fields already stored with another rule.
+2. **Text compares alphabetically.** Kristi chose to make the
+   "Alphabetically first/last" labels true. `max` and `min` on a text column
+   compare `lower(strip_accents(CAST(v AS VARCHAR)))` with `arg_max` and
+   `arg_min` over a `{k, v}` struct, and return the original value. The cast
+   keeps UUID, JSON, and other columns the app treats as text from failing to
+   bind, and the struct form is about as fast as `MAX` in duckdb-wasm. The
+   column's Ava type reaches `buildAttributeValueSql` through
+   `ConceptAttributeColumn` and Sync's `generateIndividuals` (section 4.5).
 3. **Decimals keep their scale.** Dropping the DOUBLE cast exposed
    `arrowTableToJS` reading a DECIMAL without its scale (2.25 read as 225).
    It now converts through the exact decimal string, at top level and inside
@@ -619,9 +631,8 @@ from the plan text.
    `DatasetColumnAttributesBlock` (about 280) and `_buildAttributeColumn` (56)
    exceed the 45-line limit, as they did before.
 
-### Open question 3 (new)
+### Open question 3 (resolved)
 
-3. **"Alphabetically first/last" is not quite true.** Text compares by byte
-   order, so "Zebra" sorts before "apple" and "Ángel" after "zoe". Keep the
-   copy, reword it (for example "Last in A to Z order (case-sensitive)"), or
-   make `max` and `min` on text ignore case in SQL so the copy becomes true.
+3. **"Alphabetically first/last" was not quite true** under byte order.
+   Kristi chose to make text comparison ignore case and accents, so the copy
+   is now true (section 4.5, implementation note 2).
