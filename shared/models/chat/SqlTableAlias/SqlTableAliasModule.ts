@@ -182,6 +182,11 @@ function _escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/**
+ * Rewrites DuckDB table names to quoted aliases, ignoring case. A table name
+ * inside a string literal is rewritten too, which is fine because the result
+ * is only ever shown in prompts, never run.
+ */
 function _toAliasedSql(
   sql: string,
   aliases: readonly SqlTableAliasT[],
@@ -191,8 +196,8 @@ function _toAliasedSql(
   });
   return longestFirst.reduce((current, entry) => {
     const name = _escapeRegExp(entry.tableName);
-    const quoted = new RegExp(`"${name}"`, "g");
-    const unquoted = new RegExp(`(?<![\\w"])${name}(?![\\w"])`, "g");
+    const quoted = new RegExp(`"${name}"`, "gi");
+    const unquoted = new RegExp(`(?<![\\w"])${name}(?![\\w"])`, "gi");
     return current
       .replace(quoted, `"${entry.alias}"`)
       .replace(unquoted, `"${entry.alias}"`);

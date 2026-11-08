@@ -6,6 +6,8 @@ export const PAGE_UNCHANGED_BLOCK =
  * The text of one agent turn: the page block, then the user's message. A
  * block identical to the previous turn's becomes one short line, so a long
  * conversation on one page does not resend the same charts every turn.
+ * `previousPageBlock` is the full block built for the previous turn, not the
+ * text that was sent for it.
  */
 export function buildAgentTurnText(
   options: Readonly<{

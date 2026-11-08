@@ -26,4 +26,16 @@ describe("buildAgentTurnText", () => {
   it("sends the message alone when there is no page block", () => {
     expect(buildAgentTurnText({ message: "Hi" })).toBe("Hi");
   });
+
+  it("sends the new full block when the page changed", () => {
+    const changed = "<current_page>\nPage: Dashboard\n</current_page>";
+
+    expect(
+      buildAgentTurnText({
+        message: "Next",
+        pageBlock: changed,
+        previousPageBlock: BLOCK,
+      }),
+    ).toBe(`${changed}\n\nNext`);
+  });
 });

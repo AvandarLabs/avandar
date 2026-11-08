@@ -227,4 +227,33 @@ describe("SqlTableAlias.applyToSql", () => {
       'SELECT 1 FROM "t0"',
     );
   });
+
+  it("does not rewrite a longer name that starts with a table name", () => {
+    const aliases = SqlTableAlias.fromDatasets([
+      { id: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa", name: "a.csv" },
+    ]);
+    const sql = `SELECT 1 FROM "${aliases[0]!.tableName}_old"`;
+
+    expect(SqlTableAlias.toAliasedSql(sql, aliases)).toBe(sql);
+  });
+
+  it("rewrites concept table names to concept aliases", () => {
+    const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
+    const resolved = SqlTableAlias.applyToSql('SELECT 1 FROM "c0"', aliases);
+
+    expect(SqlTableAlias.toAliasedSql(resolved, aliases)).toBe(
+      'SELECT 1 FROM "c0"',
+    );
+  });
+
+  it("matches table names case-insensitively", () => {
+    const aliases = SqlTableAlias.fromDatasets([
+      { id: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa", name: "a.csv" },
+    ]);
+    const upper = `SELECT 1 FROM ${aliases[0]!.tableName.toUpperCase()}`;
+
+    expect(SqlTableAlias.toAliasedSql(upper, aliases)).toBe(
+      'SELECT 1 FROM "t0"',
+    );
+  });
 });

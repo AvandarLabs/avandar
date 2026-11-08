@@ -1,7 +1,7 @@
 /**
  * Where the user is in the app, as the agent sees it. `case-manager` is the
- * case designer, which still uses today's chat; it is listed so a route
- * always maps to something.
+ * case designer, which has its own case-design chat; it is listed so a
+ * route always maps to something.
  */
 export type AgentPageApp =
   | "data-explorer"
