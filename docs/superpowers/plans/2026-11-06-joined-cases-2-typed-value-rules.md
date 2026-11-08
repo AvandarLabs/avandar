@@ -2357,17 +2357,18 @@ psql "$(supabase status -o json | jq -er '.DB_URL')" -c "
   from public.concept_attributes a
   join public.attribute_mappings__dataset_column m on m.concept_attribute_id = a.id
   join public.dataset_columns c on c.id = m.dataset_column_id and c.dataset_id = m.dataset_id
-  where
+  where a.mapping_type = 'dataset_column' and (
     (m.value_picker_rule_type in ('sum', 'avg') and c.data_type not in ('bigint', 'double'))
     or (m.value_picker_rule_type in ('max', 'min') and c.data_type = 'boolean')
+    or (a.is_identifier and m.value_picker_rule_type <> 'most_frequent')
     or a.data_type is distinct from (
       case
-        when a.is_array then c.data_type
+        when a.is_array or a.is_identifier then c.data_type
         when m.value_picker_rule_type in ('sum', 'avg') then 'double'::public.datasets__ava_data_type
         when m.value_picker_rule_type = 'count' then 'bigint'::public.datasets__ava_data_type
         else c.data_type
       end
-    );"
+    ));"
 ```
 
 Expected: `0`.

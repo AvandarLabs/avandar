@@ -139,6 +139,45 @@ begin
   ) is distinct from 'O' then
     raise exception 'the label and identifier trigger was left disabled';
   end if;
+
+  -- The read-only check run against a database after this migration. It
+  -- skips what the migration leaves alone, so it must find nothing here,
+  -- where those rows exist on purpose.
+  if (
+    select
+      count(*)
+    from
+      public.concept_attributes a
+      join public.attribute_mappings__dataset_column m on m.concept_attribute_id = a.id
+      join public.dataset_columns c on c.id = m.dataset_column_id and
+        c.dataset_id = m.dataset_id
+    where
+      a.mapping_type = 'dataset_column' and
+      (
+        (
+          m.value_picker_rule_type in ('sum', 'avg') and
+          c.data_type not in ('bigint', 'double')
+        ) or
+        (
+          m.value_picker_rule_type in ('max', 'min') and
+          c.data_type = 'boolean'
+        ) or
+        (
+          a.is_identifier and
+          m.value_picker_rule_type <> 'most_frequent'
+        ) or
+        a.data_type is distinct from (
+          case
+            when a.is_array or a.is_identifier then c.data_type
+            when m.value_picker_rule_type in ('sum', 'avg') then 'double'::public.datasets__ava_data_type
+            when m.value_picker_rule_type = 'count' then 'bigint'::public.datasets__ava_data_type
+            else c.data_type
+          end
+        )
+      )
+  ) <> 0 then
+    raise exception 'the post-migration check found fields the migration should have corrected';
+  end if;
 end;
 $$;
 

@@ -292,7 +292,7 @@ to it; it is reached from Spotlight or by URL.
   type for a field that keeps every value and the rule's output type
   otherwise. An identifier field always uses `most_frequent`: the select is
   disabled with the note "ID fields keep their value as is.", and
-  `withDefaultValueRule` resets the rule when a field becomes the identifier.
+  `withDefaultValueRule` resets an identifier's rule to the default on submit.
 
 ### 5.3 Chat path (design session and draft card)
 
@@ -503,11 +503,10 @@ Every identifier is quoted with `quoteSqlIdentifier`, and every value column is
 qualified with the `dataset` alias, so a column name may contain `"` and a
 value column named like a spine column cannot bind to the outer row.
 
-The rule names are hand-written in five places: the database enum,
-`DatasetColumnMappings.ValuePickerTypes`, `ChatCaseValuePickerRuleType` in
-`shared/types/chat.types.ts`, `VALUE_PICKER_RULE_TYPES` in
-`parseProposeCaseType.ts`, and the tool's JSON schema in
-`makeChatToolConfigFromOptions.ts`.
+The rule names are hand-written in four places: the database enum,
+`DatasetColumnMappings.ValuePickerTypes` (which `parseProposeCaseType.ts` also
+reads), `ChatCaseValuePickerRuleType` in `shared/types/chat.types.ts`, and the
+tool's JSON schema in `makeChatToolConfigFromOptions.ts`.
 `ValuePickerRule` matches the rules exhaustively, so a new enum value does not
 compile until its output type and allowed column types are declared. The
 correction migration also lists them, once, in SQL.

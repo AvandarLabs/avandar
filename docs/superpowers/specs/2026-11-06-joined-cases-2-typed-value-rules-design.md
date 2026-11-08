@@ -204,7 +204,7 @@ the way `parseProposeCaseType.ts:2` imports `ConceptStatus`.
 one of the column's values and its `data_type` is the column's type (umbrella
 section 3.2). `getOutputDataType` describes single-value fields only. The
 form, the one path that can create a list field today, applies this in
-`getDatasetColumnAttributeDataType` (section 4.4).
+the output type logic inlined in `withFieldDataTypes` (section 4.4).
 
 ### 4.2 The concept view
 
@@ -279,7 +279,7 @@ field. It affects only the Data Explorer's menus (open question 2).
 | `proposedCaseTypeToCreatedCaseType` | `src/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType.ts` | None. It does no I/O and has no catalog. It carries the card's rule, which the next step checks |
 | `createdCaseTypeToFormValues` | `createdCaseTypeToFormValues.ts` | `_makeMappedAttribute` stores `toAllowedRuleType(...)` as the rule and `getOutputDataType(...)` as `dataType`. It already has each column's type (`:23-26`) and serves both chat tools (`applyCreatedCaseTypes.ts:21-28`) |
 | Concept creator form | `DatasetColumnMappingCreator.tsx`, `DatasetColumnAttributesBlock/index.tsx` | The parent passes the selected field's column type from its `datasetColumnLookup`, and the form's `useValuePickerOptions(columnDataType)` offers only allowed rules |
-| Concept creator form submit | `conceptFormTypes.ts`, `ConceptCreatorView/index.tsx` | `transformValues` (`index.tsx:84-152`) runs every field through `withFieldDataTypes`, which sets each dataset-column field's `dataType` from its column (found in `sourceDatasets`), its rule, and `isArray`, using `getDatasetColumnAttributeDataType` |
+| Concept creator form submit | `conceptFormTypes.ts`, `ConceptCreatorView/index.tsx` | `transformValues` (`index.tsx:84-152`) runs every field through `withFieldDataTypes`, which sets each dataset-column field's `dataType` from its column (found in `sourceDatasets`), its rule, and `isArray`, with the output type logic inlined |
 | Insert | `insertConceptFromFormValues.ts`, `rpc_concepts__create` | None. They write what they are given |
 
 **Why the form computes `dataType` at submit.** While the user edits, the
@@ -444,7 +444,9 @@ task drives the running app once, headless, and takes screenshots.
 4. The planner refuses a disallowed stored rule with a message naming the
    field and rule.
 5. After the migration, this read-only query returns `0` on any database it
-   has run against:
+   has run against. It skips what the migration leaves alone: manual-entry
+   fields and mappings whose column is missing or in another dataset. The
+   replay test asserts it.
 
    ```sql
    select count(*)
@@ -452,15 +454,18 @@ task drives the running app once, headless, and takes screenshots.
    join public.attribute_mappings__dataset_column m on m.concept_attribute_id = a.id
    join public.dataset_columns c on c.id = m.dataset_column_id and c.dataset_id = m.dataset_id
    where
-     (m.value_picker_rule_type in ('sum', 'avg') and c.data_type not in ('bigint', 'double'))
-     or (m.value_picker_rule_type in ('max', 'min') and c.data_type = 'boolean')
-     or a.data_type is distinct from (
-       case
-         when a.is_array then c.data_type
-         when m.value_picker_rule_type in ('sum', 'avg') then 'double'::public.datasets__ava_data_type
-         when m.value_picker_rule_type = 'count' then 'bigint'::public.datasets__ava_data_type
-         else c.data_type
-       end
+     a.mapping_type = 'dataset_column' and (
+       (m.value_picker_rule_type in ('sum', 'avg') and c.data_type not in ('bigint', 'double'))
+       or (m.value_picker_rule_type in ('max', 'min') and c.data_type = 'boolean')
+       or (a.is_identifier and m.value_picker_rule_type <> 'most_frequent')
+       or a.data_type is distinct from (
+         case
+           when a.is_array or a.is_identifier then c.data_type
+           when m.value_picker_rule_type in ('sum', 'avg') then 'double'::public.datasets__ava_data_type
+           when m.value_picker_rule_type = 'count' then 'bigint'::public.datasets__ava_data_type
+           else c.data_type
+         end
+       )
      );
    ```
 
@@ -583,11 +588,15 @@ from the plan text.
    unchanged. The mapping pane reads the field's own `dataType` rather than
    looking its column up, and is keyed by field id, which fixes a stale select
    after a field is removed. `DatasetColumnMappingCreator` moved to its own
-   folder and takes an `isIdentifierColumn` prop.
+   folder and takes an `isIdentifierColumn` prop. There is no separate
+   `getDatasetColumnAttributeDataType`: its logic is inlined in
+   `withFieldDataTypes`.
 7. **The migration** (`20261108031541_correct_value_rule_data_types.sql`)
    also covers identifiers, skips leftover mappings on manual-entry fields,
    and locks `concept_attributes` first (section 4.8). Its replay test covers
-   every guard, and each guard was shown to fail the replay when removed.
+   every guard, and each guard was shown to fail the replay when removed. The
+   exit criterion 5 query gained the identifier rule and the manual-entry
+   filter, so it agrees with the migration.
 
 ### Follow-ups
 
