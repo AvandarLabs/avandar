@@ -403,6 +403,10 @@ msgstr "隱藏無法載入的資料集"
 msgid "Join key"
 msgstr "連接鍵"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per year"
+msgstr "{fieldName}（每年）"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "label"
 msgstr "標籤"
@@ -794,6 +798,10 @@ msgstr "表格視覺化沒有額外的設置。"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "關於您"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per quarter"
+msgstr "{fieldName}（每季）"
 
 #: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
 msgid "Unable to sync dataset online"
@@ -1426,6 +1434,7 @@ msgid "These datasets are listed in your workspace, but their source data could 
 "either re-upload the dataset or delete it from your workspace."
 msgstr "這些數據集在您的工作區中列出，但其源數據在您的本地存儲中找不到。為了繼續，您需要重新上傳數據集或將其從工作區中刪除。"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTableToggle.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
 msgid "Show fewer"
 msgstr "顯示較少"
@@ -1454,6 +1463,10 @@ msgstr "搜尋資料集"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "輸入電子郵件"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per week"
+msgstr "{fieldName}（每週）"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
@@ -1609,6 +1622,10 @@ msgstr "關閉聊天 (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "創建失敗"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per month"
+msgstr "{fieldName}（每月）"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
@@ -2377,6 +2394,10 @@ msgstr "要永久刪除 <0>{openDatasetName}</0> 嗎？"
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "The offline models could not be removed"
 msgstr ""
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # day} other {Show all # days}}"
+msgstr "{periodCount, plural, one {顯示全部 # 天} other {顯示全部 # 天}}"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
@@ -6181,6 +6202,11 @@ msgstr "保存資料集時出錯：{0}"
 msgid "No columns yet"
 msgstr "尚無欄位"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # quarter} other {Show all # "
+"quarters}}"
+msgstr "{periodCount, plural, one {顯示全部 # 個季度} other {顯示全部 # 個季度}}"
+
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
 msgstr "清除註解"
@@ -6543,6 +6569,10 @@ msgstr "Google Sheet"
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "您寫道："
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per day"
+msgstr "{fieldName}（每天）"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
@@ -7761,6 +7791,10 @@ msgstr "當啟用時，該組的成員僅在他們已經在工作區中擁有 {a
 msgid "Divider"
 msgstr "分隔線"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # week} other {Show all # weeks}}"
+msgstr "{periodCount, plural, one {顯示全部 # 週} other {顯示全部 # 週}}"
+
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
 msgstr "下限"
@@ -7945,6 +7979,10 @@ msgstr "連結 URL"
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Send feedback"
 msgstr "發送反饋"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # year} other {Show all # years}}"
+msgstr "{periodCount, plural, one {顯示全部 # 年} other {顯示全部 # 年}}"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Loading dashboard datasets"
@@ -9357,6 +9395,10 @@ msgstr "色階"
 msgid "Over a year ago"
 msgstr "一年多以前"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # month} other {Show all # months}}"
+msgstr "{periodCount, plural, one {顯示全部 # 個月} other {顯示全部 # 個月}}"
+
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
 msgstr "從 Case Manager 同步此案件類型，以便從您的資料建立記錄。"
@@ -9618,6 +9660,7 @@ msgid "Show as link"
 msgstr "顯示為連結"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
 msgid "No value"
 msgstr "無值"
@@ -9657,6 +9700,7 @@ msgstr "讓我們將這些結果移至儀表板"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTable.tsx
 msgid "Value"
 msgstr "值"
 

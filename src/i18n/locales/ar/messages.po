@@ -414,6 +414,10 @@ msgstr "إخفاء مجموعات البيانات التي يتعذّر تحم�
 msgid "Join key"
 msgstr "مفتاح الربط"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per year"
+msgstr "{fieldName} لكل سنة"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "label"
 msgstr "التسمية"
@@ -809,6 +813,10 @@ msgstr "لا تحتوي تصور الجدول على إعدادات إضافية
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "حولك"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per quarter"
+msgstr "{fieldName} لكل ربع سنة"
 
 #: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
 msgid "Unable to sync dataset online"
@@ -1465,6 +1473,7 @@ msgstr "تظهر هذه المجموعات في مساحة العمل الخاص
 "بيانات المصدر الخاصة بها في التخزين المحلي لديك. لمتابعة، تحتاج إلى "
 "إعادة تحميل مجموعة البيانات أو حذفها من مساحة العمل الخاصة بك."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTableToggle.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
 msgid "Show fewer"
 msgstr "عرض أقل"
@@ -1493,6 +1502,10 @@ msgstr "البحث في مجموعات البيانات"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "أدخل البريد الإلكتروني"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per week"
+msgstr "{fieldName} لكل أسبوع"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
@@ -1655,6 +1668,10 @@ msgstr "إغلاق الدردشة (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "فشل الإنشاء"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per month"
+msgstr "{fieldName} لكل شهر"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
@@ -2438,6 +2455,11 @@ msgstr "هل تريد حذف <0>{openDatasetName}</0> نهائيًا؟"
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "The offline models could not be removed"
 msgstr ""
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # day} other {Show all # days}}"
+msgstr "{periodCount, plural, zero {عرض كل الأيام} one {عرض # يوم} two {عرض "
+"يومين} few {عرض كل # أيام} many {عرض كل # يومًا} other {عرض كل # يوم}}"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
@@ -6328,6 +6350,13 @@ msgstr "خطأ في حفظ مجموعة البيانات: {0}"
 msgid "No columns yet"
 msgstr "لا توجد أعمدة بعد"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # quarter} other {Show all # "
+"quarters}}"
+msgstr "{periodCount, plural, zero {عرض كل الأرباع السنوية} one {عرض # ربع "
+"سنوي} two {عرض ربعين سنويين} few {عرض كل # أرباع سنوية} many {عرض كل # "
+"ربعًا سنويًا} other {عرض كل # ربع سنوي}}"
+
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
 msgstr "مسح التعليقات التوضيحية"
@@ -6697,6 +6726,10 @@ msgstr "جدول Google"
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "لقد كتبت:"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per day"
+msgstr "{fieldName} لكل يوم"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
@@ -7934,6 +7967,12 @@ msgstr "عند التشغيل، يحصل أعضاء هذه المجموعة عل
 msgid "Divider"
 msgstr "فاصل"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # week} other {Show all # weeks}}"
+msgstr "{periodCount, plural, zero {عرض كل الأسابيع} one {عرض # أسبوع} two {عرض "
+"أسبوعين} few {عرض كل # أسابيع} many {عرض كل # أسبوعًا} other {عرض كل # "
+"أسبوع}}"
+
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
 msgstr "الحد الأدنى"
@@ -8125,6 +8164,11 @@ msgstr "عنوان URL للرابط"
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Send feedback"
 msgstr "إرسال ملاحظات"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # year} other {Show all # years}}"
+msgstr "{periodCount, plural, zero {عرض كل السنوات} one {عرض # سنة} two {عرض "
+"سنتين} few {عرض كل # سنوات} many {عرض كل # سنة} other {عرض كل # سنة}}"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Loading dashboard datasets"
@@ -9572,6 +9616,11 @@ msgstr "تدرج الألوان"
 msgid "Over a year ago"
 msgstr "منذ أكثر من عام"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # month} other {Show all # months}}"
+msgstr "{periodCount, plural, zero {عرض كل الأشهر} one {عرض # شهر} two {عرض "
+"شهرين} few {عرض كل # أشهر} many {عرض كل # شهرًا} other {عرض كل # شهر}}"
+
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
 msgstr "زامن نوع الحالة هذا من Case Manager لإنشاء سجلات من بياناتك."
@@ -9839,6 +9888,7 @@ msgid "Show as link"
 msgstr "عرض كرابط"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
 msgid "No value"
 msgstr "لا قيمة"
@@ -9878,6 +9928,7 @@ msgstr "لننقل هذه النتائج إلى لوحة معلومات"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTable.tsx
 msgid "Value"
 msgstr "قيمة"
 
