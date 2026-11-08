@@ -9,6 +9,7 @@ import type {
   ChatProposedCaseAttribute,
   ChatProposedCaseType,
 } from "$/types/chat.types";
+import type { DateColumnOption } from "@/components/caseFields/makeDateColumnOptions/makeDateColumnOptions";
 
 /** One contributing dataset's attributes, for rendering the card per source. */
 export type CaseTypeDraftSourceGroup = {
@@ -144,16 +145,28 @@ function _hasReservedAttributeName(draft: ChatProposedCaseType): boolean {
 }
 
 /**
- * Whether an included per-period field still has no date column, which the
- * card shows on the row and refuses to create.
+ * Whether an included per-period field still has no date column of its own
+ * dataset, which the card shows on the row and refuses to create. A date
+ * column the dataset does not offer counts as none: creation would drop the
+ * field.
  */
-function _hasPeriodWithoutDateColumn(draft: ChatProposedCaseType): boolean {
-  return draft.attributes.some((attribute) => {
-    return (
-      attribute.isIncluded &&
-      attribute.valueShape === "bucketed_list" &&
-      attribute.bucketColumnId === undefined
-    );
+function _hasPeriodWithoutDateColumn(
+  options: Readonly<{
+    draft: ChatProposedCaseType;
+    dateColumnOptionsByDatasetId: Readonly<
+      Record<string, readonly DateColumnOption[]>
+    >;
+  }>,
+): boolean {
+  return options.draft.attributes.some((attribute) => {
+    if (!attribute.isIncluded || attribute.valueShape !== "bucketed_list") {
+      return false;
+    }
+    const dateColumnOptions =
+      options.dateColumnOptionsByDatasetId[attribute.datasetId] ?? [];
+    return !dateColumnOptions.some((option) => {
+      return option.value === attribute.bucketColumnId;
+    });
   });
 }
 
@@ -171,8 +184,18 @@ function _hasPeriodWithoutDateColumn(draft: ChatProposedCaseType): boolean {
  * is how chat and the create path describe statuses.
  */
 export function useCaseTypeDraftEditor(
-  proposedDraft: ChatProposedCaseType,
+  options: Readonly<{
+    proposedDraft: ChatProposedCaseType;
+    /**
+     * Each source dataset's date and timestamp columns. A per-period field
+     * may only group its rows by one of its own dataset's.
+     */
+    dateColumnOptionsByDatasetId: Readonly<
+      Record<string, readonly DateColumnOption[]>
+    >;
+  }>,
 ): CaseTypeDraftEditor {
+  const { proposedDraft } = options;
   const proposalKey = JSON.stringify(proposedDraft);
   const [draft, setDraft] = useState(proposedDraft);
   const [statusSet, setStatusSet] = useState<ConceptStatus.SetValue>(() => {
@@ -203,7 +226,10 @@ export function useCaseTypeDraftEditor(
       draft.name.trim().length > 0 &&
       draft.sourceDatasets.length > 0 &&
       !_hasReservedAttributeName(draft) &&
-      !_hasPeriodWithoutDateColumn(draft) &&
+      !_hasPeriodWithoutDateColumn({
+        draft,
+        dateColumnOptionsByDatasetId: options.dateColumnOptionsByDatasetId,
+      }) &&
       ConceptStatus.findSetIssues({ value: statusSet }).length === 0,
     setName: (name) => {
       setDraft((current) => {

@@ -46,9 +46,10 @@ function _getIdentifierColumnIds(
 }
 
 /**
- * Sets every field that is an ID column or the title to keep one value. The
- * form stores a field's choice even while its switch is locked, and the ID
- * and the title are keys the case type reads one value from.
+ * Sets every field that is an ID column or the title to keep one value, with
+ * no period or date column. The form stores a field's choice even while its
+ * switch is locked, and the ID and the title are keys the case type reads
+ * one value from.
  */
 function _keepKeyFieldsSingle(conceptForm: ConceptFormType): void {
   const { datasetColumnAttributes, sourceDatasets, labelAttributeId } =
@@ -60,10 +61,13 @@ function _keepKeyFieldsSingle(conceptForm: ConceptFormType): void {
       attribute.id === labelAttributeId ||
       (datasetColumnId !== undefined &&
         identifierColumnIds.has(datasetColumnId));
-    if (isKey && attribute.isArray) {
+    if (isKey && (attribute.isArray || attribute.bucketGrain !== undefined)) {
+      const path = `datasetColumnAttributes.${attributeIdx}` as const;
+      conceptForm.setFieldValue(`${path}.isArray`, false);
+      conceptForm.setFieldValue(`${path}.bucketGrain`, undefined);
       conceptForm.setFieldValue(
-        `datasetColumnAttributes.${attributeIdx}.isArray`,
-        false,
+        `${path}.mappings.datasetColumn.bucketColumnId`,
+        undefined,
       );
     }
   });

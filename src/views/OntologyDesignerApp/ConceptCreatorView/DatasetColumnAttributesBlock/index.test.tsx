@@ -221,6 +221,36 @@ describe("DatasetColumnAttributesBlock", () => {
       ).toBe(false);
     });
 
+    it("drops its field's period and date column when it becomes the title", () => {
+      _addDistrictAndCounty();
+      fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+      const districtIdx = conceptForm
+        .getValues()
+        .datasetColumnAttributes.findIndex((attribute) => {
+          return attribute.name === "district";
+        });
+      act(() => {
+        conceptForm.setFieldValue(
+          `datasetColumnAttributes.${districtIdx}.mappings.datasetColumn.bucketColumnId`,
+          uuid<DatasetColumn.Id>(),
+        );
+      });
+      expect(
+        conceptForm.getValues().datasetColumnAttributes[districtIdx]
+          ?.bucketGrain,
+      ).toBe("month");
+
+      act(() => {
+        conceptForm.setFieldValue("labelAttributeId", _getFieldId("district"));
+      });
+
+      const district =
+        conceptForm.getValues().datasetColumnAttributes[districtIdx];
+      expect(district?.isArray).toBe(false);
+      expect(district?.bucketGrain).toBeUndefined();
+      expect(district?.mappings.datasetColumn.bucketColumnId).toBeUndefined();
+    });
+
     it("stores a field as one value when its column becomes the ID", () => {
       _addDistrictAndCounty();
       fireEvent.click(screen.getByRole("radio", { name: "Every value" }));

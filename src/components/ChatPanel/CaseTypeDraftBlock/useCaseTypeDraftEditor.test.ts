@@ -16,6 +16,8 @@ const STATE_COLUMN_ID = "2b3c4d5e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_KEY_COLUMN_ID = "3c4d5e6f-aaaa-4bbb-8ccc-ddddeeeeffff";
 const POPULATION_COLUMN_ID = "4d5e6f70-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_DATE_COLUMN_ID = "5e6f7081-bbbb-4bbb-8ccc-ddddeeeeffff";
+/** A catalog with no date columns, for tests that set no period. */
+const NO_DATE_COLUMNS = {};
 
 function makeDraft(): ChatProposedCaseType {
   return {
@@ -71,7 +73,10 @@ function makeDraft(): ChatProposedCaseType {
 describe("useCaseTypeDraftEditor", () => {
   it("switches a field to every value and back, keeping its value picker", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -96,7 +101,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("keeps a field to one value once it becomes the label", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -115,7 +123,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("keeps a field to one value once it becomes a join key", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -137,7 +148,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("refuses to make the label keep every value", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -153,7 +167,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("toggles an attribute's inclusion without touching the others", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -170,7 +187,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("renames a single attribute", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -183,7 +203,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("changes one attribute's value picker", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -195,7 +218,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("changes one dataset's join key and leaves the other alone", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -218,7 +244,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("groups attributes by the dataset each one reads", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     expect(
@@ -238,7 +267,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("removes a source dataset with its attributes", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -258,7 +290,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("blocks creation once every source dataset is removed", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -273,7 +308,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("includes a newly chosen label column", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -288,7 +326,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("adds a manual entry attribute already included", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -303,7 +344,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("ignores a blank or duplicate manual entry attribute", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -318,7 +362,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("toggles a manual entry attribute by name", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -332,7 +379,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("blocks creation while the name is blank", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     expect(result.current.canCreate).toBe(true);
@@ -347,7 +397,10 @@ describe("useCaseTypeDraftEditor", () => {
   it("re-initializes when the model proposes a revised draft", () => {
     const { result, rerender } = renderHook(
       ({ draft }: { draft: ChatProposedCaseType }) => {
-        return useCaseTypeDraftEditor(draft);
+        return useCaseTypeDraftEditor({
+          proposedDraft: draft,
+          dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+        });
       },
       { initialProps: { draft: makeDraft() } },
     );
@@ -363,12 +416,15 @@ describe("useCaseTypeDraftEditor", () => {
   it("starts from the proposed statuses with the named default", () => {
     const { result } = renderHook(() => {
       return useCaseTypeDraftEditor({
-        ...makeDraft(),
-        statuses: [
-          { name: "Suspected", description: "", color: "#fab005" },
-          { name: "Confirmed", description: "", color: "#fa5252" },
-        ],
-        defaultStatusName: "Confirmed",
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+        proposedDraft: {
+          ...makeDraft(),
+          statuses: [
+            { name: "Suspected", description: "", color: "#fab005" },
+            { name: "Confirmed", description: "", color: "#fa5252" },
+          ],
+          defaultStatusName: "Confirmed",
+        },
       });
     });
 
@@ -383,7 +439,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("starts from the default statuses when the proposal has none", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     expect(
@@ -395,7 +454,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("carries an edited status set into the draft it creates", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
     const [active, inactive] = result.current.statusSet.statuses;
     const edited: ConceptStatus.SetValue = {
@@ -417,7 +479,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("blocks creation while the status set has a problem", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -429,7 +494,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("blocks creation while an included attribute is named status", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -441,7 +509,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("refuses a hand-filled field named status", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -457,7 +528,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("keeps a column's value per month by the date column chosen", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -481,7 +555,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("drops the period when a column goes back to one value", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -504,7 +581,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("keeps a join key at one value when asked for a period", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -523,7 +603,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("drops a column's period when it becomes the label", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -545,7 +628,10 @@ describe("useCaseTypeDraftEditor", () => {
 
   it("cannot create while an included per-period field has no date column", () => {
     const { result } = renderHook(() => {
-      return useCaseTypeDraftEditor(makeDraft());
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
     });
 
     act(() => {
@@ -556,5 +642,49 @@ describe("useCaseTypeDraftEditor", () => {
     });
 
     expect(result.current.canCreate).toBe(false);
+  });
+
+  it("cannot create while a per-period field names a date column its dataset does not offer", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: {
+          [CENSUS_DATASET_ID]: [
+            { value: CENSUS_DATE_COLUMN_ID, label: "census_date" },
+          ],
+        },
+      });
+    });
+
+    act(() => {
+      result.current.setAttributeBucket(POPULATION_COLUMN_ID, {
+        bucketGrain: "month",
+        bucketColumnId: "6f708192-dddd-4bbb-8ccc-ddddeeeeffff",
+      });
+    });
+
+    expect(result.current.canCreate).toBe(false);
+  });
+
+  it("can create once the per-period field names one of its dataset's date columns", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: {
+          [CENSUS_DATASET_ID]: [
+            { value: CENSUS_DATE_COLUMN_ID, label: "census_date" },
+          ],
+        },
+      });
+    });
+
+    act(() => {
+      result.current.setAttributeBucket(POPULATION_COLUMN_ID, {
+        bucketGrain: "month",
+        bucketColumnId: CENSUS_DATE_COLUMN_ID,
+      });
+    });
+
+    expect(result.current.canCreate).toBe(true);
   });
 });

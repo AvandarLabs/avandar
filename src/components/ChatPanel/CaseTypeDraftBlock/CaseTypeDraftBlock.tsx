@@ -54,24 +54,18 @@ function _makeDateColumnOptionsByDatasetId(
 }
 
 /**
- * Renders the draft once one exists. Split from the block so the editor and
- * catalog hooks only run for a real draft, rather than behind a conditional.
+ * The catalog the card reads for its source datasets: names, column types,
+ * and each dataset's date columns.
+ *
+ * Names are read from the catalog rather than the proposal, so a dataset or
+ * column the model mislabelled still displays what it really is. Every source
+ * dataset is fetched, not just the first, because the card shows them all.
+ * The proposal's datasets are fetched rather than the edited draft's: the
+ * card can only remove a dataset, and the editor needs the date columns
+ * before it exists.
  */
-function CaseTypeDraftCardContainer({
-  draft,
-}: Readonly<CardProps>): React.ReactNode {
-  const workspace = useCurrentWorkspace();
-  const dispatch = ChatPanelStateManager.useDispatch();
-  const editor = useCaseTypeDraftEditor(draft);
-  const { isCreating, createCaseType } = useCaseTypeDraftCreation(workspace.id);
-  const canCreateCaseType = useHasPermission(
-    "case_types__can_create_case_type",
-  );
-
-  // Names are read from the catalog rather than the proposal, so a dataset or
-  // column the model mislabelled still displays what it really is. Every source
-  // dataset is fetched, not just the first, because the card shows them all.
-  const sourceDatasetIds = editor.draft.sourceDatasets.map((sourceDataset) => {
+function useDraftCatalog(draft: ChatProposedCaseType) {
+  const sourceDatasetIds = draft.sourceDatasets.map((sourceDataset) => {
     return sourceDataset.datasetId;
   });
   const [datasetColumns] = DatasetColumnClient.useGetAll(
@@ -80,23 +74,44 @@ function CaseTypeDraftCardContainer({
   const [datasets] = DatasetClient.useGetAll(
     where("id", "in", sourceDatasetIds),
   );
+  return useMemo(() => {
+    return {
+      columnNamesById: _makeNamesById(datasetColumns),
+      columnDataTypesById: Object.fromEntries(
+        (datasetColumns ?? []).map((column) => {
+          return [column.id, column.dataType];
+        }),
+      ),
+      dateColumnOptionsByDatasetId:
+        _makeDateColumnOptionsByDatasetId(datasetColumns),
+      datasetNamesById: _makeNamesById(datasets),
+    };
+  }, [datasetColumns, datasets]);
+}
 
-  const columnNamesById = useMemo(() => {
-    return _makeNamesById(datasetColumns);
-  }, [datasetColumns]);
-  const columnDataTypesById = useMemo(() => {
-    return Object.fromEntries(
-      (datasetColumns ?? []).map((column) => {
-        return [column.id, column.dataType];
-      }),
-    );
-  }, [datasetColumns]);
-  const dateColumnOptionsByDatasetId = useMemo(() => {
-    return _makeDateColumnOptionsByDatasetId(datasetColumns);
-  }, [datasetColumns]);
-  const datasetNamesById = useMemo(() => {
-    return _makeNamesById(datasets);
-  }, [datasets]);
+/**
+ * Renders the draft once one exists. Split from the block so the editor and
+ * catalog hooks only run for a real draft, rather than behind a conditional.
+ */
+function CaseTypeDraftCardContainer({
+  draft,
+}: Readonly<CardProps>): React.ReactNode {
+  const workspace = useCurrentWorkspace();
+  const dispatch = ChatPanelStateManager.useDispatch();
+  const {
+    columnNamesById,
+    columnDataTypesById,
+    dateColumnOptionsByDatasetId,
+    datasetNamesById,
+  } = useDraftCatalog(draft);
+  const editor = useCaseTypeDraftEditor({
+    proposedDraft: draft,
+    dateColumnOptionsByDatasetId,
+  });
+  const { isCreating, createCaseType } = useCaseTypeDraftCreation(workspace.id);
+  const canCreateCaseType = useHasPermission(
+    "case_types__can_create_case_type",
+  );
 
   return (
     <Box px="md" pb="xs">

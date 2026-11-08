@@ -7,6 +7,7 @@ import { uuid } from "$/lib/uuid";
 import { makeDefaultDatasetColumnAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { keepKeyAndLabelFieldsSingle } from "@/views/OntologyDesignerApp/ConceptCreatorView/keepKeyAndLabelFieldsSingle/keepKeyAndLabelFieldsSingle";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
 
@@ -56,5 +57,37 @@ describe("keepKeyAndLabelFieldsSingle", () => {
     });
 
     expect(fields[0]?.isArray).toBe(true);
+  });
+
+  it("drops the period and date column from a key or label field that had one", () => {
+    const key = _listField({ name: "County", isIdentifier: true });
+    const label = _listField({ name: "Name" });
+    const withPeriod = (field: typeof key): typeof key => {
+      return {
+        ...field,
+        bucketGrain: "month",
+        mappings: {
+          ...field.mappings,
+          datasetColumn: {
+            ...field.mappings.datasetColumn,
+            bucketColumnId: uuid<DatasetColumn.Id>(),
+          },
+        },
+      };
+    };
+
+    const fields = keepKeyAndLabelFieldsSingle({
+      attributes: [withPeriod(key), withPeriod(label)],
+      labelAttributeId: label.id,
+    });
+
+    expect(
+      fields.map((field) => {
+        return [field.bucketGrain, field.mappings.datasetColumn.bucketColumnId];
+      }),
+    ).toEqual([
+      [undefined, undefined],
+      [undefined, undefined],
+    ]);
   });
 });
