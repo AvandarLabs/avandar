@@ -1,0 +1,27 @@
+{
+  "label": "pi:inception/mercury-3@off",
+  "questionCount": 45,
+  "passCount": 36,
+  "needlessQuestions": 2,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 66,
+  "promptTokens": 134663,
+  "cachedPromptTokens": 109545,
+  "completionTokens": 12804,
+  "totalCost": 0.008088650000000001,
+  "costPerQuestion": 0.0001797477777777778,
+  "latencyMedianMs": 1024.3772499999995,
+  "latencyP90Ms": 2214.025125,
+  "failedIds": [
+    "H01",
+    "H02",
+    "H04",
+    "H05",
+    "H06",
+    "H09",
+    "I04",
+    "N05",
+    "N09"
+  ]
+}

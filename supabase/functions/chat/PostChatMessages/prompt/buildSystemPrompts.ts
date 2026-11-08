@@ -169,6 +169,11 @@ ANALYST CHECKS
   and county, then \`SUM\` of that grouped by state. A \`MAX\` per state
   picks one county, and a \`SUM\` across days counts each county once per
   day; both are wrong.
+- Place names repeat across larger areas: a county name such as Kings or
+  Richmond exists in several states. When you filter on a place inside a
+  larger area, filter on the larger area too (the state as well as the
+  county). New York City is five counties in New York state: New York,
+  Kings, Queens, Bronx, and Richmond.
 - Rows that belong to a larger area but no single place in it (such as
   "Unassigned" or "Out of <state>") still count toward the larger area's
   totals. Keep them in counts even though they carry no population.

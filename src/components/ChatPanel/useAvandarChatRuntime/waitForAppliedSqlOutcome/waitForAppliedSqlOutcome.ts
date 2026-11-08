@@ -141,3 +141,23 @@ export async function waitForAppliedSqlOutcome(
     }, timeoutMs);
   });
 }
+
+/**
+ * The result or error of the query the Data Explorer is showing for
+ * `rawSql`, read after {@link waitForAppliedSqlOutcome} settles. Undefined
+ * fields mean the explorer is not showing that query.
+ */
+export function readAppliedSqlResult(
+  options: Readonly<{
+    queryCache: QueryCache;
+    workspaceId: string;
+    rawSql: string;
+  }>,
+): { result?: QueryResult.T; errorMessage?: string } {
+  const query = _findDisplayedQuery(options);
+  const error = query?.state.error;
+  return {
+    result: query?.state.data as QueryResult.T | undefined,
+    errorMessage: error instanceof Error ? error.message : undefined,
+  };
+}

@@ -1,0 +1,17 @@
+{
+  "label": "d31:today-haiku-5.5#2",
+  "questionCount": 45,
+  "passCount": 45,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 54,
+  "promptTokens": 446577,
+  "cachedPromptTokens": 0,
+  "completionTokens": 40788,
+  "totalCost": 0.0650517,
+  "costPerQuestion": 0.0014455933333333334,
+  "latencyMedianMs": 4141.381667,
+  "latencyP90Ms": 6265.186125,
+  "failedIds": []
+}

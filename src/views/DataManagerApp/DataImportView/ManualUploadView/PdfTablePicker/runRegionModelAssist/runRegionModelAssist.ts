@@ -2,7 +2,6 @@ import { Model } from "@avandar/models";
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { APIClient } from "@/clients/APIClient";
-import { ChatModelStorage } from "@/components/ChatPanel/ChatModelStorage/ChatModelStorage";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
 import { clipToRegion } from "@/workers/pdfSniff/clipToRegion/clipToRegion";
@@ -164,20 +163,6 @@ export function mergeModelRows(options: {
 }
 
 /**
- * The cloud model this assist asks for, honouring the user's chat model
- * choice when it is one the workspace is allowed to spend on. An `offline:`
- * picker id is not in the catalog and so falls back to the default, which is
- * correct: this path is a cloud request or nothing.
- */
-function _getCloudModelId(): string {
-  const storedModelId = ChatModelStorage.readStoredChatModelId();
-  return storedModelId !== undefined &&
-    ChatModelOption.Catalog.isValidId(storedModelId)
-    ? storedModelId
-    : ChatModelOption.Catalog.defaultId;
-}
-
-/**
  * Asks the assistant to finish what the rules could not read in one region.
  *
  * This is the only route from PDF import to a model, and it goes through
@@ -237,7 +222,9 @@ export async function runRegionModelAssist(
   // rewritten, so the message we post has to be that same text.
   const content = consent.payload.text ?? prompt;
   const ackToken = await PendingAcks.consumeAckForText(content);
-  const llmModel = _getCloudModelId();
+  // The `chat` edge function always answers with its default model, so that
+  // is the model to record on the merged table.
+  const llmModel = ChatModelOption.Catalog.defaultId;
   const response = await APIClient.post({
     route: "chat/:workspaceId/messages",
     pathParams: { workspaceId: params.workspaceId },
@@ -246,7 +233,6 @@ export async function runRegionModelAssist(
         Model.make("ChatClientMessage", { role: "user" as const, content }),
       ],
       context: ChatPageContext.createDataSourcesViewContext(),
-      model: llmModel,
       ...(ackToken
         ? {
             consentAcks: [

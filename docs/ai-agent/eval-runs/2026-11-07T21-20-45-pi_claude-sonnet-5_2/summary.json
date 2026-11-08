@@ -1,0 +1,17 @@
+{
+  "label": "pi:claude-sonnet-5#2",
+  "questionCount": 45,
+  "passCount": 45,
+  "needlessQuestions": 2,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 54,
+  "promptTokens": 153448,
+  "cachedPromptTokens": 135845,
+  "completionTokens": 15281,
+  "totalCost": 0.2239325,
+  "costPerQuestion": 0.004976277777777778,
+  "latencyMedianMs": 3718.7338340000006,
+  "latencyP90Ms": 5943.280208,
+  "failedIds": []
+}

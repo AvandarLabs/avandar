@@ -1,0 +1,19 @@
+{
+  "label": "capcheck",
+  "questionCount": 5,
+  "passCount": 4,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 6,
+  "promptTokens": 16625,
+  "cachedPromptTokens": 7893,
+  "completionTokens": 1859,
+  "totalCost": 0.00209938,
+  "costPerQuestion": 0.000419876,
+  "latencyMedianMs": 2572.05475,
+  "latencyP90Ms": 4707.437334,
+  "failedIds": [
+    "F01"
+  ]
+}

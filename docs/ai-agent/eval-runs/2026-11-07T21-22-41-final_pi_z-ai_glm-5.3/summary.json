@@ -1,0 +1,19 @@
+{
+  "label": "final:pi:z-ai/glm-5.3",
+  "questionCount": 45,
+  "passCount": 44,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 58,
+  "promptTokens": 114028,
+  "cachedPromptTokens": 85423,
+  "completionTokens": 19024,
+  "totalCost": 0.0943735938,
+  "costPerQuestion": 0.0020971909733333333,
+  "latencyMedianMs": 2070.9530410000007,
+  "latencyP90Ms": 7364.883082999997,
+  "failedIds": [
+    "H09"
+  ]
+}

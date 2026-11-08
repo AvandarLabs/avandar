@@ -1,0 +1,19 @@
+{
+  "label": "baseline:gpt-5.6-terra#2",
+  "questionCount": 45,
+  "passCount": 44,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 56,
+  "promptTokens": 251414,
+  "cachedPromptTokens": 248882,
+  "completionTokens": 14712,
+  "totalCost": 0.23256640000000003,
+  "costPerQuestion": 0.005168142222222223,
+  "latencyMedianMs": 3829.1293330000008,
+  "latencyP90Ms": 7504.5190830000065,
+  "failedIds": [
+    "H07"
+  ]
+}

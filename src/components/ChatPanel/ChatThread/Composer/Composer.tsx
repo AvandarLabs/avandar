@@ -4,17 +4,17 @@ import { ActionIcon } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useRef } from "react";
-import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { OfflineModeControl } from "@/components/ChatPanel/OfflineModeControl/OfflineModeControl";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/useChatPanelComposerAutoFocus";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import css from "./Composer.module.css";
 
 /**
- * The message input at the bottom of the thread: a text input, the model
- * picker, and the send button. Input and actions are disabled outside the Data
- * Explorer app, where chat actions are not yet available.
+ * The message input at the bottom of the thread: a text input, the offline
+ * mode control, and the send button. Input and actions are disabled outside
+ * the Data Explorer app, where chat actions are not yet available.
  */
 export function Composer(): React.ReactNode {
   const { isOpen } = ChatPanelStateManager.useState();
@@ -60,7 +60,7 @@ export function Composer(): React.ReactNode {
           unstable_focusOnThreadSwitched={false}
         />
         <div className={css.composerActions}>
-          <ChatModelPicker disabled={chatDisabled} />
+          <OfflineModeControl disabled={chatDisabled} />
           <ComposerPrimitive.Send asChild>
             <ActionIcon
               variant="filled"

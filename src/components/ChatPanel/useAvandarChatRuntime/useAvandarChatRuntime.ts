@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThreadStore } from "@/components/ChatPanel/ChatThreadStore/ChatThreadStore";
-import { createChatModelAdapter } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter";
+import { createChatModelAdapter } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/createChatModelAdapter";
 import { shouldPersistThreadOnRunEnd } from "@/components/ChatPanel/useAvandarChatRuntime/shouldPersistThreadOnRunEnd/shouldPersistThreadOnRunEnd";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { makeNewChatThreadMessagesFromPageContext } from "@/components/ChatPanel/useChatViewTranscript/makeThreadMessagesFromSnapshot";
@@ -66,7 +66,7 @@ export function useAvandarChatRuntime(): {
   const chatGenerationRef = useRef(0);
   const copyRef = useRef<ChatRuntimeCopy>({
     messageNotSent: t`(Message not sent.)`,
-    offlineModelRequired: t`You are offline. Download an offline chat model using the cloud icon next to the composer before asking data questions.`,
+    offlineModelRequired: t`Offline mode needs the offline models. Download them from the Offline button under the message box, or turn offline mode off.`,
     sqlApprovalRequired: t`SQL was not applied. Approve the assumed filter values to run this query.`,
     sqlSignInRequired: t`SQL was not applied. Sign in to approve filter values.`,
     sqlResultsReady: t`I ran the query. Your results are ready.`,
@@ -75,7 +75,8 @@ export function useAvandarChatRuntime(): {
     sqlQueryApplied: t`I applied the query in the Data Explorer.`,
     dashboardOnlyBlock: t`I can only add that to a dashboard. Open a dashboard and ask me again there.`,
     fallbackTitle: t`Chat request failed`,
-    fallbackMessage: t`The cloud assistant is unreachable. Use your downloaded on-device model for this message?`,
+    fallbackMessage: t`The online assistant is unreachable. Answer this message with the offline models on this computer instead?`,
+    fallbackAction: t`Answer offline`,
     replying: t`Replying…`,
     understandingQuestion: t`Understanding your question…`,
     writingQuery: t`Writing query…`,
@@ -84,7 +85,7 @@ export function useAvandarChatRuntime(): {
     fixingQuery: t`Fixing query…`,
     noSql: t`I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.`,
     metadataQuery: t`Here is a query based on your workspace metadata.`,
-    contextWindowExceeded: t`This question is too large for the on-device model. Try a shorter question, or reconnect to use cloud chat.`,
+    contextWindowExceeded: t`This question is too long for the offline models. Try a shorter question, or turn offline mode off to use online chat.`,
   });
   const [initialMessages] = useState(() => {
     return user && workspace.id
@@ -104,7 +105,7 @@ export function useAvandarChatRuntime(): {
       workspaceRef.current = workspace;
       copyRef.current = {
         messageNotSent: t`(Message not sent.)`,
-        offlineModelRequired: t`You are offline. Download an offline chat model using the cloud icon next to the composer before asking data questions.`,
+        offlineModelRequired: t`Offline mode needs the offline models. Download them from the Offline button under the message box, or turn offline mode off.`,
         sqlApprovalRequired: t`SQL was not applied. Approve the assumed filter values to run this query.`,
         sqlSignInRequired: t`SQL was not applied. Sign in to approve filter values.`,
         sqlResultsReady: t`I ran the query. Your results are ready.`,
@@ -113,7 +114,8 @@ export function useAvandarChatRuntime(): {
         sqlQueryApplied: t`I applied the query in the Data Explorer.`,
         dashboardOnlyBlock: t`I can only add that to a dashboard. Open a dashboard and ask me again there.`,
         fallbackTitle: t`Chat request failed`,
-        fallbackMessage: t`The cloud assistant is unreachable. Use your downloaded on-device model for this message?`,
+        fallbackMessage: t`The online assistant is unreachable. Answer this message with the offline models on this computer instead?`,
+        fallbackAction: t`Answer offline`,
         replying: t`Replying…`,
         understandingQuestion: t`Understanding your question…`,
         writingQuery: t`Writing query…`,
@@ -122,7 +124,7 @@ export function useAvandarChatRuntime(): {
         fixingQuery: t`Fixing query…`,
         noSql: t`I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.`,
         metadataQuery: t`Here is a query based on your workspace metadata.`,
-        contextWindowExceeded: t`This question is too large for the on-device model. Try a shorter question, or reconnect to use cloud chat.`,
+        contextWindowExceeded: t`This question is too long for the offline models. Try a shorter question, or turn offline mode off to use online chat.`,
       };
     },
     [dashboardEditorState, pageContext, pathname, parseSql, t, user, workspace],

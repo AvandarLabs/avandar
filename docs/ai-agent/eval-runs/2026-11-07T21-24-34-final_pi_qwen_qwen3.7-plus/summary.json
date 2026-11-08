@@ -1,0 +1,23 @@
+{
+  "label": "final:pi:qwen/qwen3.7-plus",
+  "questionCount": 45,
+  "passCount": 40,
+  "needlessQuestions": 2,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 58,
+  "promptTokens": 120141,
+  "cachedPromptTokens": 87168,
+  "completionTokens": 12211,
+  "totalCost": 0.03176019199999999,
+  "costPerQuestion": 0.0007057820444444443,
+  "latencyMedianMs": 5562.917999999998,
+  "latencyP90Ms": 8648.553541999994,
+  "failedIds": [
+    "H01",
+    "H06",
+    "H09",
+    "I04",
+    "N11"
+  ]
+}

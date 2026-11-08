@@ -1,0 +1,21 @@
+{
+  "label": "d21:sonnet-5:full",
+  "questionCount": 45,
+  "passCount": 42,
+  "needlessQuestions": 1,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 53,
+  "promptTokens": 411698,
+  "cachedPromptTokens": 0,
+  "completionTokens": 24538,
+  "totalCost": 1.068776,
+  "costPerQuestion": 0.023750577777777778,
+  "latencyMedianMs": 4709.946250000001,
+  "latencyP90Ms": 11748.240709000005,
+  "failedIds": [
+    "F01",
+    "F02",
+    "F03"
+  ]
+}

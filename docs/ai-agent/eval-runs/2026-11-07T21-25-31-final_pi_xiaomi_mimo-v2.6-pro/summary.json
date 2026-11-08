@@ -1,0 +1,23 @@
+{
+  "label": "final:pi:xiaomi/mimo-v2.6-pro",
+  "questionCount": 45,
+  "passCount": 40,
+  "needlessQuestions": 0,
+  "missedQuestions": 1,
+  "consentPrompts": 0,
+  "modelCalls": 55,
+  "promptTokens": 102339,
+  "cachedPromptTokens": 82544,
+  "completionTokens": 8991,
+  "totalCost": 0.015755187539999996,
+  "costPerQuestion": 0.0003501152786666666,
+  "latencyMedianMs": 4178.081875,
+  "latencyP90Ms": 12709.199792,
+  "failedIds": [
+    "H01",
+    "H03",
+    "H07",
+    "I04",
+    "N04"
+  ]
+}

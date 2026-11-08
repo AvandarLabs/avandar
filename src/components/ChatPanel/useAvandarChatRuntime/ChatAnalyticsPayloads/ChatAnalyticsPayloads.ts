@@ -8,7 +8,6 @@ import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEdit
 type FromMessageOptions = {
   content: string;
   pageContext: ChatPageContext.T;
-  selectedModelId?: string;
   runtimeMode: ChatRuntimeMode;
 };
 
@@ -18,7 +17,6 @@ function _fromMessage(
   return excludeUndefinedShallow({
     promptChars: options.content.length,
     pageApp: options.pageContext.app,
-    modelId: options.selectedModelId || undefined,
     runtimeMode: options.runtimeMode.kind === "local" ? "local" : "cloud",
     hasOpenDataset: options.pageContext.openDatasetId !== undefined,
   });

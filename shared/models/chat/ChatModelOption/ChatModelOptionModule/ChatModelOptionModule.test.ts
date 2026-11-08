@@ -5,14 +5,14 @@ import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.t
 const { Catalog } = ChatModelOption;
 
 describe("ChatModelOption.Catalog", () => {
-  it("offers exactly six models, three per license tier", () => {
-    expect(Catalog.values).toHaveLength(6);
+  it("lists seven models: four proprietary, three open", () => {
+    expect(Catalog.values).toHaveLength(7);
 
     const proprietary = Catalog.values.filter(
       propEq("licenseTier", "proprietary"),
     );
     const open = Catalog.values.filter(propEq("licenseTier", "open"));
-    expect(proprietary).toHaveLength(3);
+    expect(proprietary).toHaveLength(4);
     expect(open).toHaveLength(3);
   });
 
@@ -52,6 +52,7 @@ describe("ChatModelOption.Catalog", () => {
 
   it("uses compact picker labels for each model family", () => {
     expect(Catalog.values).toMatchObject([
+      { id: "anthropic/claude-haiku-5.5", pickerLabel: "Claude Haiku" },
       { id: "anthropic/claude-sonnet-5", pickerLabel: "Claude" },
       { id: "openai/gpt-5.6-terra", pickerLabel: "ChatGPT" },
       { id: "google/gemini-3.6-flash", pickerLabel: "Gemini" },
@@ -65,6 +66,10 @@ describe("ChatModelOption.Catalog", () => {
     Catalog.values.forEach((model) => {
       expect(model.supportsTools).toBe(true);
     });
+  });
+
+  it("answers chat with Claude Haiku 5.5, the eval's cheapest match", () => {
+    expect(Catalog.defaultId).toBe("anthropic/claude-haiku-5.5");
   });
 
   it("includes the default model id in the catalog", () => {

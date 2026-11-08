@@ -69,11 +69,11 @@ msgid "First {numRows} rows"
 msgstr "Premières lignes : {numRows}"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "You are offline. Download an offline chat model using the cloud icon "
-"next to the composer before asking data questions."
-msgstr "Vous êtes hors ligne. Téléchargez un modèle de chat hors ligne à l’aide "
-"de l’icône de nuage à côté de la zone de rédaction avant de poser des "
-"questions sur les données."
+#~ msgid "You are offline. Download an offline chat model using the cloud icon "
+#~ "next to the composer before asking data questions."
+#~ msgstr "Vous êtes hors ligne. Téléchargez un modèle de chat hors ligne à l’aide "
+#~ "de l’icône de nuage à côté de la zone de rédaction avant de poser des "
+#~ "questions sur les données."
 
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
@@ -275,8 +275,8 @@ msgstr "Faites glisser pour réorganiser, ou maintenez Alt et appuyez sur la "
 "flèche vers le haut ou vers le bas"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Choose chat model"
-msgstr "Choisir le modèle de discussion"
+#~ msgid "Choose chat model"
+#~ msgstr "Choisir le modèle de discussion"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedCard.tsx
 msgid "Skip this step"
@@ -328,8 +328,8 @@ msgstr " accès"
 
 #. placeholder {0}: model.minRamGb
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "{0} GB RAM"
-msgstr "{0} Go de RAM"
+#~ msgid "{0} GB RAM"
+#~ msgstr "{0} Go de RAM"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
@@ -343,6 +343,10 @@ msgstr "Sélectionnez {0}"
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
 msgstr "Autoriser la synchronisation en ligne"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Works without an internet connection."
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING compares \"{columnName}\" against a non-literal expression."
@@ -520,8 +524,8 @@ msgid "Connected as {0}"
 msgstr "Connecté en tant que {0}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Llama 3.2 1B"
-msgstr "Llama 3.2 1B"
+#~ msgid "Llama 3.2 1B"
+#~ msgstr "Llama 3.2 1B"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -743,8 +747,8 @@ msgid "For example, County or Household"
 msgstr "Par exemple, comté ou foyer"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Offline chat model"
-msgstr "Modèle de chat hors ligne"
+#~ msgid "Offline chat model"
+#~ msgstr "Modèle de chat hors ligne"
 
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "{statusName} color: {colorName}"
@@ -841,9 +845,9 @@ msgid "Monospace headlines"
 msgstr "Titres en monospace"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have 4 GB RAM or need the lightest download."
-msgstr "Recommandé si vous disposez de 4 Go de RAM ou si vous avez besoin du "
-"téléchargement le plus léger."
+#~ msgid "Recommended if you have 4 GB RAM or need the lightest download."
+#~ msgstr "Recommandé si vous disposez de 4 Go de RAM ou si vous avez besoin du "
+#~ "téléchargement le plus léger."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 person"
@@ -894,8 +898,8 @@ msgid "Replying…"
 msgstr "Réponse en cours…"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Re-download"
-msgstr "Télécharger à nouveau"
+#~ msgid "Re-download"
+#~ msgstr "Télécharger à nouveau"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
@@ -909,8 +913,8 @@ msgstr "Seules certaines personnes peuvent ouvrir ce tableau de bord. Les "
 "« Indisponible »."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Llama 3.1 8B (offline)"
-msgstr "Llama 3.1 8B (hors ligne)"
+#~ msgid "Llama 3.1 8B (offline)"
+#~ msgstr "Llama 3.1 8B (hors ligne)"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Hide the tutorial?"
@@ -937,6 +941,10 @@ msgid "Avandar couldn't confirm that this query only reads your datasets, so it 
 "didn't run it."
 msgstr "Avandar n’a pas pu confirmer que cette requête se limite à la lecture "
 "de vos jeux de données. Elle n’a donc pas été exécutée."
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
+msgid "Removing offline models"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Show datasets in {topic}"
@@ -1321,8 +1329,8 @@ msgstr "Veuillez vérifier votre e-mail pour un lien de confirmation. Cela peut 
 "prendre quelques minutes pour arriver."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "Remove offline chat model?"
-msgstr "Supprimer le modèle de chat hors ligne ?"
+#~ msgid "Remove offline chat model?"
+#~ msgstr "Supprimer le modèle de chat hors ligne ?"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
@@ -1424,8 +1432,8 @@ msgid "Close sidebar"
 msgstr "Fermer la barre latérale"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "Unable to delete the offline chat model from cache."
-msgstr "Impossible de supprimer le modèle de chat hors ligne du cache."
+#~ msgid "Unable to delete the offline chat model from cache."
+#~ msgstr "Impossible de supprimer le modèle de chat hors ligne du cache."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/makeDisplaySharesFromSharingState.ts
@@ -1467,6 +1475,8 @@ msgstr "Seules certaines personnes peuvent ouvrir cette carte. Les membres de "
 msgid "Where the fields come from"
 msgstr "Origine des champs"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Offline"
 msgstr "Hors ligne"
@@ -1541,9 +1551,9 @@ msgstr "Ajoutez un graphique à barres de {datasetName} regroupé par "
 "{groupByColumn}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
-msgstr "Recommandé si vous disposez de 16 Go de RAM et exécutez Avandar avec "
-"d’autres applications."
+#~ msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
+#~ msgstr "Recommandé si vous disposez de 16 Go de RAM et exécutez Avandar avec "
+#~ "d’autres applications."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/EditStatusesForm.tsx
 msgid "Save statuses"
@@ -1642,15 +1652,19 @@ msgstr "Cette carte inclut {0}, une couche définie sur Aggregate uniquement. "
 "supprimées, jamais comme ayant une valeur nulle."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
-"for this message?"
-msgstr "L’assistant cloud est inaccessible. Utiliser votre modèle téléchargé "
-"sur l’appareil pour ce message ?"
+#~ msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
+#~ "for this message?"
+#~ msgstr "L’assistant cloud est inaccessible. Utiliser votre modèle téléchargé "
+#~ "sur l’appareil pour ce message ?"
 
 #. placeholder {0}: currentStatus.name
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Status: {0}"
 msgstr "Statut : {0}"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answer offline"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
@@ -1703,6 +1717,10 @@ msgstr "Aperçu de l’export"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide title"
 msgstr "Masquer le titre"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
+#~ msgid "Offline mode needs a recent version of Chrome or Edge with WebGPU."
+#~ msgstr ""
 
 #. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
@@ -1895,6 +1913,10 @@ msgstr "Colonne 12"
 msgid "North arrow"
 msgstr "Flèche indiquant le nord"
 
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "The offline models did not download"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
@@ -2046,8 +2068,8 @@ msgid "Welcome back"
 msgstr "Content de vous revoir"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Phi 3.5 Mini"
-msgstr "Phi 3.5 Mini"
+#~ msgid "Phi 3.5 Mini"
+#~ msgstr "Phi 3.5 Mini"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published to "
@@ -2153,9 +2175,9 @@ msgid "One dataset is one tab."
 msgstr "Un jeu de données correspond à un onglet."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have about 8 GB RAM (default for most users)."
-msgstr "Recommandé si vous disposez d’environ 8 Go de RAM (paramètre par défaut "
-"pour la plupart des utilisateurs)."
+#~ msgid "Recommended if you have about 8 GB RAM (default for most users)."
+#~ msgstr "Recommandé si vous disposez d’environ 8 Go de RAM (paramètre par défaut "
+#~ "pour la plupart des utilisateurs)."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -2219,6 +2241,10 @@ msgstr "Gérer les sièges dans le portail de facturation →"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Source record"
 msgstr "Enregistrement source"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Download offline models"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations"
@@ -2351,6 +2377,10 @@ msgstr "Opacité"
 msgid "Open Data"
 msgstr "Données ouvertes"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
+msgid "Removing…"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/CircleRadiusControl.tsx
 msgid "Radius"
 msgstr "Rayon"
@@ -2403,6 +2433,12 @@ msgstr "Sélectionner le plan"
 msgid "Delete case type"
 msgstr "Supprimer le type de dossier"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "Offline mode"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
 msgstr "Valeur par défaut (facultatif)"
@@ -2422,9 +2458,17 @@ msgstr "Somme"
 msgid "Top right"
 msgstr "En haut à droite"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
+msgid "Set up offline mode to chat without an internet connection."
+msgstr ""
+
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Permanently delete <0>{openDatasetName}</0>?"
 msgstr "Supprimer définitivement <0>{openDatasetName}</0> ?"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "The offline models could not be removed"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
@@ -2433,6 +2477,10 @@ msgstr "WMS"
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "No attributes yet"
 msgstr "Aucun attribut pour le moment"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Remove offline models"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
@@ -2653,6 +2701,10 @@ msgstr "Aucune valeur n'a été retournée depuis {column}. Décrivez ce dont vo
 msgid "Open map"
 msgstr "Ouvrir la carte"
 
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "Offline models removed"
+msgstr ""
+
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? ( <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> ) : ( "." )
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
@@ -2765,6 +2817,11 @@ msgstr "Demandez-moi d'ajouter un graphique à ce tableau de bord..."
 #: src/utils/notifications/notifyNotImplemented.ts
 msgid "Not implemented yet"
 msgstr "Pas encore implémenté"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The online assistant is unreachable. Answer this message with the "
+"offline models on this computer instead?"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below. Your workspace will be billed per member."
@@ -3016,14 +3073,18 @@ msgstr "Importer des données"
 msgid "Descending"
 msgstr "Descendant"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
+msgid "Offline {percent}%"
+msgstr ""
+
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Category axis"
 msgstr "Axe des catégories"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Balanced offline model for everyday SQL questions on typical laptops."
-msgstr "Modèle hors ligne équilibré pour les questions SQL du quotidien sur les "
-"ordinateurs portables courants."
+#~ msgid "Balanced offline model for everyday SQL questions on typical laptops."
+#~ msgstr "Modèle hors ligne équilibré pour les questions SQL du quotidien sur les "
+#~ "ordinateurs portables courants."
 
 #: src/components/AppShell/AppShell.tsx
 msgid "Nothing found..."
@@ -3283,11 +3344,11 @@ msgid "Statuses"
 msgstr "Statuts"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Largest catalog option. Maximum offline capability when RAM and download "
-"size are not constraints."
-msgstr "Option de catalogue la plus complète. Capacité hors ligne maximale "
-"lorsque la RAM et la taille du téléchargement ne sont pas des "
-"contraintes."
+#~ msgid "Largest catalog option. Maximum offline capability when RAM and download "
+#~ "size are not constraints."
+#~ msgstr "Option de catalogue la plus complète. Capacité hors ligne maximale "
+#~ "lorsque la RAM et la taille du téléchargement ne sont pas des "
+#~ "contraintes."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
@@ -3343,8 +3404,7 @@ msgstr "La prise en charge de la géométrie est en cours de téléchargement. C
 "peut prendre un moment avec une connexion lente."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 #: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
@@ -3469,13 +3529,14 @@ msgid "to"
 msgstr "à"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Download offline chat model (WebLLM)"
-msgstr "Télécharger le modèle de chat hors ligne (WebLLM)"
+#~ msgid "Download offline chat model (WebLLM)"
+#~ msgstr "Télécharger le modèle de chat hors ligne (WebLLM)"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "Examiner les correspondances"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
@@ -3624,13 +3685,17 @@ msgstr "Aucune colonne dans {0} n’a été reconnue comme une coordonnée d’a
 msgid "Reassign private resources first"
 msgstr "Réattribuez d’abord les ressources privées"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "The offline models are on this computer."
+msgstr ""
+
 #. placeholder {0}: modelCopy.displayName
 #. placeholder {1}: model.approxSizeMb
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
-"download it again later."
-msgstr "{0} (~{1} Mo) sera supprimé de ce navigateur pour libérer de l'espace. "
-"Vous pourrez le télécharger à nouveau plus tard."
+#~ msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
+#~ "download it again later."
+#~ msgstr "{0} (~{1} Mo) sera supprimé de ce navigateur pour libérer de l'espace. "
+#~ "Vous pourrez le télécharger à nouveau plus tard."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
 msgid "All organizations"
@@ -3647,6 +3712,11 @@ msgstr "Aller à l'Explorateur de données"
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
 msgstr "Graphique radar"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Offline mode needs the offline models. Download them from the Offline "
+"button under the message box, or turn offline mode off."
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Comment actions"
@@ -3714,8 +3784,8 @@ msgstr "Lignes {rowIndexes}."
 
 #. placeholder {0}: selectedModel.name
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Using {0}"
-msgstr "Utilisation de {0}"
+#~ msgid "Using {0}"
+#~ msgstr "Utilisation de {0}"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
@@ -3823,10 +3893,10 @@ msgid "Show dots"
 msgstr "Afficher les points"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Microsoft's compact instruct model. Solid structure and instruction "
-"following for dashboards."
-msgstr "Modèle instruct compact de Microsoft. Structure solide et bonne "
-"capacité à suivre les instructions pour les tableaux de bord."
+#~ msgid "Microsoft's compact instruct model. Solid structure and instruction "
+#~ "following for dashboards."
+#~ msgstr "Modèle instruct compact de Microsoft. Structure solide et bonne "
+#~ "capacité à suivre les instructions pour les tableaux de bord."
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Try asking"
@@ -4157,9 +4227,9 @@ msgid "Processing dataset…"
 msgstr "Traitement du jeu de données…"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Offline chat model ready. Click to switch or re-download."
-msgstr "Modèle de chat hors ligne prêt. Cliquez pour changer ou télécharger à "
-"nouveau."
+#~ msgid "Offline chat model ready. Click to switch or re-download."
+#~ msgstr "Modèle de chat hors ligne prêt. Cliquez pour changer ou télécharger à "
+#~ "nouveau."
 
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
@@ -4271,6 +4341,10 @@ msgstr "La clause WHERE utilise « {operator} » sur « {columnName} » avec
 msgid "Distance (meters)"
 msgstr "Distance (mètres)"
 
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Preparing offline models"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr "Modèle d’URL"
@@ -4292,8 +4366,8 @@ msgid "Start your journey with us"
 msgstr "Commencez votre parcours avec nous"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 7B (offline)"
-msgstr "Qwen 2.5 7B (hors ligne)"
+#~ msgid "Qwen 2.5 7B (offline)"
+#~ msgstr "Qwen 2.5 7B (hors ligne)"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
@@ -4318,10 +4392,10 @@ msgid "Topic: {topic}"
 msgstr "Thème : {topic}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
-"analytics work."
-msgstr "Recommandé si vous disposez de 32 Go de RAM et d’une machine puissante "
-"principalement utilisée pour les tâches d’analyse."
+#~ msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
+#~ "analytics work."
+#~ msgstr "Recommandé si vous disposez de 32 Go de RAM et d’une machine puissante "
+#~ "principalement utilisée pour les tâches d’analyse."
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
@@ -4343,8 +4417,8 @@ msgid "column {0}"
 msgstr "colonne {0}"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
-msgid "Open models"
-msgstr "Modèles ouverts"
+#~ msgid "Open models"
+#~ msgstr "Modèles ouverts"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -4551,9 +4625,9 @@ msgid "Re-run query"
 msgstr "Relancer la requête"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
-msgstr "Modèle de conversation hors ligne le plus compact. Moins performant "
-"pour les requêtes SQL complexes, mais rapide à télécharger."
+#~ msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
+#~ msgstr "Modèle de conversation hors ligne le plus compact. Moins performant "
+#~ "pour les requêtes SQL complexes, mais rapide à télécharger."
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Move the pointer over the map to read a coordinate"
@@ -4591,8 +4665,8 @@ msgid "Dashboard not ready"
 msgstr "Tableau de bord non prêt"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/DownloadedModelList.tsx
-msgid "Downloaded on this browser"
-msgstr "Téléchargé sur ce navigateur"
+#~ msgid "Downloaded on this browser"
+#~ msgstr "Téléchargé sur ce navigateur"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay monthly"
@@ -4627,8 +4701,8 @@ msgid "Can't be loaded"
 msgstr "Impossible de charger"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Choose a model"
-msgstr "Choisir un modèle"
+#~ msgid "Choose a model"
+#~ msgstr "Choisir un modèle"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -4821,8 +4895,8 @@ msgstr "Une nouvelle version est disponible. Mettez à jour maintenant ou fermez
 
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "{0} was deleted from this browser."
-msgstr "{0} a été supprimé de ce navigateur."
+#~ msgid "{0} was deleted from this browser."
+#~ msgstr "{0} a été supprimé de ce navigateur."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Tab to import"
@@ -4834,9 +4908,9 @@ msgstr "Impossible d’effectuer la recherche. Continuez à saisir du texte pour
 "réessayer."
 
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
-msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
-msgstr "{description} {recommendedIf} (téléchargement d’environ {approxSizeMb} "
-"Mo)."
+#~ msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+#~ msgstr "{description} {recommendedIf} (téléchargement d’environ {approxSizeMb} "
+#~ "Mo)."
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
@@ -5238,6 +5312,11 @@ msgstr "Les filtres et tableaux de bord enregistrés recherchent les "
 "{renamedList} ne trouveront plus d’enregistrements une fois que vous "
 "aurez enregistré."
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "About {sizeGb} GB to download, once. Needs a recent version of Chrome or "
+"Edge, and a computer with at least 16 GB of memory."
+msgstr ""
+
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr "Revoyez la création et le partage d’un tableau de bord, depuis le "
@@ -5264,8 +5343,8 @@ msgstr "[La recherche de découverte locale a échoué. Essayez une autre colonn
 "élément dans le catalogue qui a échoué.]"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Offline model download failed"
-msgstr "Échec du téléchargement du modèle hors ligne"
+#~ msgid "Offline model download failed"
+#~ msgstr "Échec du téléchargement du modèle hors ligne"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "File"
@@ -5344,10 +5423,10 @@ msgid "Horizontal gridlines"
 msgstr "Lignes de grille horizontales"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
-"the 8 GB tier."
-msgstr "Un raisonnement plus avancé que le modèle 1.5B, avec un téléchargement "
-"modéré. Une bonne amélioration par rapport à la gamme de 8 Go."
+#~ msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
+#~ "the 8 GB tier."
+#~ msgstr "Un raisonnement plus avancé que le modèle 1.5B, avec un téléchargement "
+#~ "modéré. Une bonne amélioration par rapport à la gamme de 8 Go."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
@@ -5461,10 +5540,10 @@ msgid "Allowed"
 msgstr "Autorisé"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
-"SQL offline."
-msgstr "Modèle instruct 7B haute qualité. Idéal pour les schémas difficiles et "
-"les requêtes SQL complexes hors ligne."
+#~ msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
+#~ "SQL offline."
+#~ msgstr "Modèle instruct 7B haute qualité. Idéal pour les schémas difficiles et "
+#~ "les requêtes SQL complexes hors ligne."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{numResults, plural, one {# dataset} other {# datasets}}"
@@ -5529,6 +5608,10 @@ msgstr "{layerCount} couches"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove failed"
 msgstr "Suppression échouée"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "Try again, or clear this site's data in your browser settings."
+msgstr ""
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
@@ -5620,6 +5703,10 @@ msgstr "Quantile"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
 msgstr "Sélectionner une colonne"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "Check your internet connection and try again."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "1"
@@ -5715,9 +5802,9 @@ msgid "Upgrade plan"
 msgstr "Passer à un forfait supérieur"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
-msgid "Do not refresh or close this tab or else the download will be canceled."
-msgstr "Ne rafraîchissez pas et ne fermez pas cet onglet, sinon le "
-"téléchargement sera annulé."
+#~ msgid "Do not refresh or close this tab or else the download will be canceled."
+#~ msgstr "Ne rafraîchissez pas et ne fermez pas cet onglet, sinon le "
+#~ "téléchargement sera annulé."
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Forest"
@@ -5761,8 +5848,8 @@ msgid "Dates: {0}"
 msgstr "Dates : {0}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Llama 3.2 1B (offline)"
-msgstr "Llama 3.2 1B (hors ligne)"
+#~ msgid "Llama 3.2 1B (offline)"
+#~ msgstr "Llama 3.2 1B (hors ligne)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
@@ -5978,14 +6065,14 @@ msgid "Edit user group"
 msgstr "Modifier le groupe d'utilisateurs"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
-"device."
-msgstr "Recommandé si vous disposez de 24 Go de RAM et souhaitez une qualité "
-"proche du cloud, entièrement sur votre appareil."
+#~ msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
+#~ "device."
+#~ msgstr "Recommandé si vous disposez de 24 Go de RAM et souhaitez une qualité "
+#~ "proche du cloud, entièrement sur votre appareil."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 1.5B"
-msgstr "Qwen 2.5 1.5B"
+#~ msgid "Qwen 2.5 1.5B"
+#~ msgstr "Qwen 2.5 1.5B"
 
 #: src/components/layouts/AuthLayout/AuthFooter.tsx
 msgid "Privacy Policy"
@@ -6039,6 +6126,11 @@ msgstr "est faux"
 #: shared/copy/vizTypeLabel.ts
 msgid "Bar Chart"
 msgstr "Graphique à barres"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Offline mode answers your questions with models that run on this "
+"computer instead of on Avandar's servers."
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is none of"
@@ -6180,8 +6272,8 @@ msgstr "Aucune clarification pour le moment. Le journal se remplit au fur et à 
 "mesure que le chat pose des questions de clarification."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Llama 3.1 8B"
-msgstr "Llama 3.1 8B"
+#~ msgid "Llama 3.1 8B"
+#~ msgstr "Llama 3.1 8B"
 
 #. placeholder {0}: outcome.addedRowCount
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
@@ -6190,8 +6282,8 @@ msgstr "{0} lignes ont été ajoutées par l’assistant. Vérifiez-les avant "
 "d’enregistrer."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "Offline chat model removed"
-msgstr "Modèle de chat hors ligne supprimé"
+#~ msgid "Offline chat model removed"
+#~ msgstr "Modèle de chat hors ligne supprimé"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/OptionsDropdown.tsx
 msgid "Create \"{trimmedSearch}\""
@@ -6380,6 +6472,11 @@ msgstr "Aucun jeu de données ne correspond à votre filtre"
 msgid "Curve"
 msgstr "Courbe"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "You are not connected to the internet, so chat runs on this computer "
+"with the offline models."
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What does this case type represent?"
 msgstr "Que représente ce type de dossier\n"
@@ -6410,8 +6507,8 @@ msgid "Time to answer"
 msgstr "Temps de réponse"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "Could not remove offline chat model"
-msgstr "Impossible de supprimer le modèle de chat hors ligne"
+#~ msgid "Could not remove offline chat model"
+#~ msgstr "Impossible de supprimer le modèle de chat hors ligne"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Maximum"
@@ -6537,7 +6634,6 @@ msgstr "Saisissez un entier positif pour tout CRS non répertorié ci-dessus."
 msgid "Overlapping"
 msgstr "Chevauchantes"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Download"
 msgstr "Télécharger"
@@ -6590,8 +6686,12 @@ msgid "All"
 msgstr "Tous"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
-msgid "Downloading offline chat model"
-msgstr "Téléchargement du modèle de chat hors ligne"
+#~ msgid "Downloading offline chat model"
+#~ msgstr "Téléchargement du modèle de chat hors ligne"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "Offline models downloaded"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -6613,6 +6713,11 @@ msgid "We couldn't read a sample of this dataset, so its columns and their "
 msgstr "Nous n’avons pas pu lire un échantillon de ce jeu de données. Ses "
 "colonnes et leurs types ne sont donc pas confirmés. Une nouvelle "
 "tentative sera effectuée lors de son ajout."
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "Turn on offline mode to chat on this computer, without sending anything "
+"online."
+msgstr ""
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -6671,8 +6776,8 @@ msgid "No description has been added yet."
 msgstr "Aucune description n'a encore été ajoutée."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 3B"
-msgstr "Qwen 2.5 3B"
+#~ msgid "Qwen 2.5 3B"
+#~ msgstr "Qwen 2.5 3B"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
@@ -6803,6 +6908,10 @@ msgstr "tous les membres de "
 msgid "Some data should be manually entered"
 msgstr "Certaines données doivent être saisies manuellement"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "Running offline"
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
 msgstr "Nom du champ"
@@ -6822,9 +6931,9 @@ msgstr "Chaque série est une colonne numérique tracée sur l'axe Y. Choisissez
 "l'axe X ci-dessous."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Pick a model to download. You can switch models or re-download later."
-msgstr "Choisissez un modèle à télécharger. Vous pouvez changer de modèle ou le "
-"re-télécharger plus tard."
+#~ msgid "Pick a model to download. You can switch models or re-download later."
+#~ msgstr "Choisissez un modèle à télécharger. Vous pouvez changer de modèle ou le "
+#~ "re-télécharger plus tard."
 
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename layer"
@@ -7004,6 +7113,10 @@ msgstr "US Letter"
 msgid "Level"
 msgstr "Niveau"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "Manage offline models"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{operator}\" is not an operator this form understands."
 msgstr "« {operator} » n’est pas un opérateur compris par ce formulaire."
@@ -7032,6 +7145,10 @@ msgstr "Zone"
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
 msgid "Mark not done"
 msgstr "Marquer comme non terminé"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Nothing you ask, and none of your data, leaves this computer."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
@@ -7123,6 +7240,11 @@ msgstr "L’échelle varie sur cette carte"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let's let others see your dashboard"
 msgstr "Permettons aux autres de voir votre tableau de bord"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "They were deleted from this computer. You can download them again at any "
+"time."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Records added by hand"
@@ -7239,6 +7361,10 @@ msgstr "Types de colonnes mis à jour"
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Partially offline"
 msgstr "Partiellement hors ligne"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
+msgid "Downloading offline models: {percent}%"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The comment is removed from the case for everyone."
@@ -7443,8 +7569,8 @@ msgstr "L’utilisateur de la base de données devrait idéalement disposer d’
 "d’importer."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 7B"
-msgstr "Qwen 2.5 7B"
+#~ msgid "Qwen 2.5 7B"
+#~ msgstr "Qwen 2.5 7B"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Neutral"
@@ -7616,6 +7742,10 @@ msgid "Could not reach the assistant. Kept the rule-based results."
 msgstr "Impossible de joindre l’assistant. Les résultats basés sur des règles "
 "ont été conservés."
 
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Downloading offline models"
+msgstr ""
+
 #. placeholder {0}: formatColumnShare(missingShare, i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "{0} missing"
@@ -7720,8 +7850,8 @@ msgid "Add layer"
 msgstr "Ajouter une couche"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Offline chat model ready"
-msgstr "Modèle de chat hors ligne prêt"
+#~ msgid "Offline chat model ready"
+#~ msgstr "Modèle de chat hors ligne prêt"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column description updated successfully!"
@@ -7782,8 +7912,8 @@ msgid "Visualization Settings"
 msgstr "Paramètres de visualisation"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Phi 3.5 Mini (offline)"
-msgstr "Phi 3.5 Mini (hors ligne)"
+#~ msgid "Phi 3.5 Mini (offline)"
+#~ msgstr "Phi 3.5 Mini (hors ligne)"
 
 #. placeholder {0}: options.numPreviewRows
 #. placeholder {0}: previewRows.length
@@ -8045,8 +8175,8 @@ msgstr "Rendre uniquement hors ligne"
 
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "{0} is available when you are offline."
-msgstr "{0} est disponible lorsque vous êtes hors ligne."
+#~ msgid "{0} is available when you are offline."
+#~ msgstr "{0} est disponible lorsque vous êtes hors ligne."
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
@@ -8141,6 +8271,11 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "Je n’ai pas pu générer de SQL hors ligne. Reformulez votre demande ou "
 "reconnectez-vous pour utiliser le chat cloud."
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "This question is too long for the offline models. Try a shorter "
+"question, or turn offline mode off to use online chat."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
@@ -8305,8 +8440,8 @@ msgstr "Modifications non enregistrées"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Model"
-msgstr "Modèle"
+#~ msgid "Model"
+#~ msgstr "Modèle"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "I will propose case types from your dataset names and columns. Pick from "
@@ -8342,8 +8477,8 @@ msgid "Show labels"
 msgstr "Afficher les étiquettes"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 1.5B (offline)"
-msgstr "Qwen 2.5 1.5B (hors ligne)"
+#~ msgid "Qwen 2.5 1.5B (offline)"
+#~ msgstr "Qwen 2.5 1.5B (hors ligne)"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "X axis"
@@ -8484,6 +8619,10 @@ msgstr "Choisissez les éléments à lire"
 msgid "Suggested rewrite:"
 msgstr "Réécriture suggérée :"
 
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "The offline models could not be loaded."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source no longer has this dataset."
 msgstr "La source ne contient plus ce jeu de données."
@@ -8503,7 +8642,6 @@ msgstr "Premier"
 msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
 msgstr "{formattedNumResults} sur {formattedNumCatalogListings} jeux de données"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "Supprimer"
@@ -8530,11 +8668,11 @@ msgid "Loading author"
 msgstr "Chargement de l’auteur"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "This question is too large for the on-device model. Try a shorter "
-"question, or reconnect to use cloud chat."
-msgstr "Cette question est trop volumineuse pour le modèle sur l’appareil. "
-"Essayez une question plus courte ou reconnectez-vous pour utiliser le "
-"chat cloud."
+#~ msgid "This question is too large for the on-device model. Try a shorter "
+#~ "question, or reconnect to use cloud chat."
+#~ msgstr "Cette question est trop volumineuse pour le modèle sur l’appareil. "
+#~ "Essayez une question plus courte ou reconnectez-vous pour utiliser le "
+#~ "chat cloud."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
@@ -8615,8 +8753,8 @@ msgstr "Cet ensemble de données ne sera plus stocké en ligne et ne pourra êtr
 "uniquement pour des données très sensibles."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Download a different offline chat model"
-msgstr "Télécharger un autre modèle de chat hors ligne"
+#~ msgid "Download a different offline chat model"
+#~ msgstr "Télécharger un autre modèle de chat hors ligne"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
@@ -8641,8 +8779,8 @@ msgid "{conceptName} fields"
 msgstr "Champs {conceptName}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 3B (offline)"
-msgstr "Qwen 2.5 3B (hors ligne)"
+#~ msgid "Qwen 2.5 3B (offline)"
+#~ msgstr "Qwen 2.5 3B (hors ligne)"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx
 msgid "Collapse the legend"
@@ -8927,10 +9065,10 @@ msgid "Filters (Where)"
 msgstr "Filtres (Où)"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
-"offline."
-msgstr "Recommandé si vous disposez de 12 Go de RAM et souhaitez obtenir des "
-"réponses SQL hors ligne sensiblement meilleures."
+#~ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
+#~ "offline."
+#~ msgstr "Recommandé si vous disposez de 12 Go de RAM et souhaitez obtenir des "
+#~ "réponses SQL hors ligne sensiblement meilleures."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Avandar can't add this kind of dataset yet."
@@ -9146,8 +9284,8 @@ msgid "Details"
 msgstr "Détails"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Could not prepare the offline chat model."
-msgstr "Impossible de préparer le modèle de chat hors ligne."
+#~ msgid "Could not prepare the offline chat model."
+#~ msgstr "Impossible de préparer le modèle de chat hors ligne."
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -9293,8 +9431,8 @@ msgid "Add filter"
 msgstr "Ajouter un filtre"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
-msgid "Offline models"
-msgstr "Modèles hors ligne"
+#~ msgid "Offline models"
+#~ msgstr "Modèles hors ligne"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
@@ -9389,6 +9527,11 @@ msgstr "Aucune colonne disponible"
 msgid "Size by"
 msgstr "Dimensionner selon"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "Offline mode is on. Chat runs on this computer and nothing leaves it. "
+"Click to go back online."
+msgstr ""
+
 #: src/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.tsx
 msgid "Resize drawer"
 msgstr "Redimensionner le panneau"
@@ -9443,6 +9586,11 @@ msgstr "Vert"
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide details"
 msgstr "Masquer les détails"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
+msgid "This browser cannot run the offline models. Use a recent version of "
+"Chrome or Edge."
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Choose a case type from the sidebar to see its records."
@@ -9526,8 +9674,8 @@ msgid "Center"
 msgstr "Centrer"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid " · downloaded"
-msgstr " · téléchargé"
+#~ msgid " · downloaded"
+#~ msgstr " · téléchargé"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
@@ -9582,6 +9730,11 @@ msgstr "Langue"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close panel (⌘/)"
 msgstr "Fermer le panneau (⌘/)"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "Click Offline under the message box to use them. Chat also uses them on "
+"its own when you lose your connection."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
@@ -9640,9 +9793,7 @@ msgstr "Une erreur inattendue s’est produite."
 msgid "Pay what you want"
 msgstr "Payez ce que vous voulez"
 
-#. placeholder {0}: modelCopy.displayName
 #. placeholder {0}: region.label
-#: src/components/ChatPanel/OfflineChatDownloadControl/DownloadedModelList.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Remove {0}"
 msgstr "Supprimer {0}"
@@ -9826,6 +9977,10 @@ msgstr "Forme"
 msgid "This comment was deleted."
 msgstr "Ce commentaire a été supprimé."
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Answers are slower and less accurate than online chat."
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on"
 msgstr "est le"
@@ -9950,6 +10105,10 @@ msgstr "Haut"
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "De votre invite :"
+
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Keep this tab open until it finishes."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
@@ -10769,8 +10928,8 @@ msgid "Get started"
 msgstr "Commencer"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
-msgid "Frontier models"
-msgstr "Modèles Frontier"
+#~ msgid "Frontier models"
+#~ msgstr "Modèles Frontier"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
