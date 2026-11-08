@@ -119,6 +119,20 @@ describe("offline prompt", () => {
     expect(message).toContain("ask the user which one they mean");
     expect(message).toMatch(/QUESTION\nCases in Georgia$/);
   });
+
+  it("does not flag a value stored in similar columns as ambiguous", () => {
+    const message = buildOfflineQuestionMessage({
+      question: "Deaths in the US",
+      matches: [
+        { term: "US", datasetId: US.id, column: "iso2", storedValue: "US" },
+        { term: "US", datasetId: US.id, column: "Country_Region", storedValue: "US" },
+        { term: "US", datasetId: WORLD.id, column: "Country/Region", storedValue: "US" },
+      ],
+      datasets: [US, WORLD],
+    });
+
+    expect(message).not.toContain("ask the user");
+  });
 });
 
 describe("createOfflineDataAgent", () => {

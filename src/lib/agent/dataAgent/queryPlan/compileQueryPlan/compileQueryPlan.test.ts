@@ -212,4 +212,28 @@ describe("compileQueryPlan", () => {
         't0."date" is not a number column, so it cannot be added up. Number columns in t0: population, daily_deaths.',
     });
   });
+
+  it("keeps every value of two filters on one column, not none", async () => {
+    const rows = await _rows(
+      _plan({
+        filters: [
+          { column: "state", values: ["Ohio"] },
+          { column: "state", values: ["Utah"] },
+        ],
+        groupBy: ["state"],
+        order: "highest",
+      }),
+    );
+
+    expect(rows).toEqual([
+      ["Ohio", 15],
+      ["Utah", 6],
+    ]);
+  });
+
+  it("reads a period ending on the data's last date as including it", async () => {
+    const rows = await _rows(_plan({ from: "2021-01-01", to: "2021-01-02" }));
+
+    expect(rows).toEqual([[20]]);
+  });
 });

@@ -93,6 +93,18 @@ describe("localActionFormat", () => {
     ).toEqual({ kind: "tool", name: "echo", args: { word: "hi" } });
   });
 
+  it("reads a tool call the model wrapped in a reply as the tool call", () => {
+    expect(
+      parseLocalAction(
+        JSON.stringify({
+          action: "reply",
+          text: '{"action": "echo", "args": {"word": "hi"}}',
+        }),
+        ["echo"],
+      ),
+    ).toEqual({ kind: "tool", name: "echo", args: { word: "hi" } });
+  });
+
   it("treats output that is not an action as a reply", () => {
     expect(parseLocalAction("Hello there", ["echo"])).toEqual({
       kind: "reply",

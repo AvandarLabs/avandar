@@ -16,7 +16,7 @@ export type ResolvedMeasure = {
 };
 
 /** A filter after validation, with its real column name. */
-export type ResolvedFilter = { column: string; values: readonly string[] };
+export type ResolvedFilter = { column: string; values: string[] };
 
 const TEXT_TYPES = new Set(["varchar", "text", "string"]);
 const DATE_TYPES = new Set(["date", "timestamp", "timestamp_s", "datetime"]);
@@ -117,7 +117,13 @@ export function buildPeriodConditions(
         ...(options.from
           ? [`${target} >= ${quoteSqlLiteral(options.from)}`]
           : []),
-        ...(options.to ? [`${target} < ${quoteSqlLiteral(options.to)}`] : []),
+        // A period ending on the data's last date includes it: models copy
+        // the last date into `to`, which is exclusive.
+        ...(options.to
+          ? [
+              `(${target} < ${quoteSqlLiteral(options.to)} OR DATE ${quoteSqlLiteral(options.to)} >= ${latest})`,
+            ]
+          : []),
       ];
   }
 }

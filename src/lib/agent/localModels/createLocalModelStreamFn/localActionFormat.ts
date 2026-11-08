@@ -134,8 +134,10 @@ export function parseLocalAction(
       args: _isRecord(parsed.args) ? parsed.args : {},
     };
   }
-  return {
-    kind: "reply",
-    text: typeof parsed.text === "string" ? parsed.text : text.trim(),
-  };
+  const replyText = typeof parsed.text === "string" ? parsed.text : text.trim();
+  // A small model sometimes writes its tool call inside a reply; run it.
+  const nested = replyText.trim().startsWith("{")
+    ? parseLocalAction(replyText, toolNames)
+    : undefined;
+  return nested?.kind === "tool" ? nested : { kind: "reply", text: replyText };
 }

@@ -174,8 +174,17 @@ function _resolveFilters(
       };
     }
     for (const { table, column } of matches) {
+      // Two filters on one column mean "either": merged, not ANDed into
+      // a filter nothing can pass.
       const list = filtersByAlias.get(table.alias) ?? [];
-      list.push({ column, values: filter.values });
+      const existing = list.find((entry) => {
+        return entry.column === column;
+      });
+      if (existing) {
+        existing.values = [...new Set([...existing.values, ...filter.values])];
+      } else {
+        list.push({ column, values: filter.values });
+      }
       filtersByAlias.set(table.alias, list);
     }
   }

@@ -60,14 +60,13 @@ function _formatColumn(column: Readonly<OfflineColumnProfile>): string {
   if (column.range) {
     return `${column.name} ${type}, ${column.range.min} to ${column.range.max}`;
   }
-  if (column.values === undefined) {
-    return `${column.name} ${type}`;
-  }
-  const count = column.distinctCount ?? column.values.length;
-  if (count <= column.values.length) {
+  if (column.values !== undefined) {
     return `${column.name} text, values: ${_quoteValues(column.values)}`;
   }
-  return `${column.name} text, about ${count} values, e.g. ${_quoteValues(column.values)}`;
+  if (column.distinctCount !== undefined) {
+    return `${column.name} text, about ${column.distinctCount} values`;
+  }
+  return `${column.name} ${type}`;
 }
 
 function _formatDatasets(
@@ -95,6 +94,33 @@ function _formatDatasets(
       ];
     })
     .join("\n");
+}
+
+function _normalizeColumnName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+/**
+ * True when a value is stored under unrelated columns in different datasets,
+ * such as Georgia in a state column and in a country column. The same value
+ * in similarly named columns (Country_Region and Country/Region), or in
+ * several columns of one dataset, means the same thing.
+ */
+function _isAmbiguousAcrossDatasets(
+  places: readonly QuestionValueMatch[],
+): boolean {
+  const columnsByDataset = new Map<string, Set<string>>();
+  for (const place of places) {
+    const columns = columnsByDataset.get(place.datasetId) ?? new Set();
+    columns.add(_normalizeColumnName(place.column));
+    columnsByDataset.set(place.datasetId, columns);
+  }
+  const columnSets = [...columnsByDataset.values()];
+  return columnSets.some((left, index) => {
+    return columnSets.slice(index + 1).some((right) => {
+      return [...left].every((column) => {return !right.has(column)});
+    });
+  });
 }
 
 /** Lists matched values and flags names that mean different things. */
@@ -127,15 +153,9 @@ export function formatQuestionValues(
           return `${aliasOf(match.datasetId)}."${match.column}"`;
         })
         .join(", ");
-      const columns = new Set(
-        places.map((match) => {
-          return match.column;
-        }),
-      );
-      const note =
-        columns.size > 1
-          ? " This name means different things in different columns: ask the user which one they mean."
-          : "";
+      const note = _isAmbiguousAcrossDatasets(places)
+        ? " This name means different things in different datasets: ask the user which one they mean."
+        : "";
       return `- "${value}" is stored in ${where}.${note}`;
     })
     .join("\n");

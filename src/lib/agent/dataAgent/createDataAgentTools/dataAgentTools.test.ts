@@ -1,12 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
+import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/planQueryTool";
 import { createRunQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
 import { createDataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type {
   DataAgentHost,
   DataAgentQueryOutcome,
 } from "@/lib/agent/dataAgent/DataAgentHost";
+import type { QueryPlan } from "@/lib/agent/dataAgent/queryPlan/QueryPlan";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa";
 const ALIASES = SqlTableAlias.fromSchema({
@@ -143,5 +145,73 @@ describe("lookup_values", () => {
         question: "Which is the UK?",
       }),
     ).rejects.toThrow('Unknown table alias "t9"');
+  });
+});
+
+describe("plan_query", () => {
+  const DATASETS = [
+    {
+      id: DATASET_ID,
+      name: "deaths.csv",
+      columns: [
+        { name: "state", dataType: "varchar" },
+        { name: "deaths", dataType: "bigint" },
+      ],
+    },
+  ];
+  const PLAN: QueryPlan = {
+    measures: [{ table: "t0", column: "deaths", name: "deaths" }],
+    filters: [{ column: "state", values: ["Ohio", "All states"] }],
+    from: "",
+    to: "",
+    relativePeriod: "none",
+    timeGrain: "none",
+    groupBy: [],
+    calculation: "none",
+    populationColumn: "",
+    order: "time",
+    limit: 0,
+    onePerGroup: false,
+    summary: "Deaths in Ohio.",
+  };
+
+  it("refuses filter values the data does not hold, before running", async () => {
+    const host = _createHost({
+      readColumnValues: vi.fn().mockResolvedValue(["Ohio"]),
+    });
+    const tool = createPlanQueryTool(
+      { host, aliases: ALIASES, state: createDataAgentRunState() },
+      DATASETS,
+    );
+
+    const result = await tool.execute("call-1", PLAN);
+
+    expect(host.showQuery).not.toHaveBeenCalled();
+    expect(_textOf(result)).toContain(
+      '"All states" is not stored in t0."state"',
+    );
+  });
+
+  it("runs the compiled SQL when every filter value is stored", async () => {
+    const host = _createHost({
+      readColumnValues: vi.fn().mockResolvedValue(["Ohio", "All states"]),
+      showQuery: vi.fn().mockResolvedValue({
+        kind: "rows",
+        columns: [{ name: "deaths", type: "BIGINT" }],
+        rowCount: 1,
+      }),
+    });
+    const tool = createPlanQueryTool(
+      { host, aliases: ALIASES, state: createDataAgentRunState() },
+      DATASETS,
+    );
+
+    await tool.execute("call-1", PLAN);
+
+    expect(host.showQuery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sql: expect.stringContaining(`FROM "${DATASET_ID}"`),
+      }),
+    );
   });
 });
