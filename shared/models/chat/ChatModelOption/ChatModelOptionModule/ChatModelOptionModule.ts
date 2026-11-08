@@ -74,9 +74,10 @@ const CHAT_MODEL_OPTIONS = [
 ] as const satisfies readonly ChatModelOption.T[];
 
 /**
- * Model used when the client sends no selection, or sends one that is not in
- * the catalog. Tool-calling into the Data Explorer is the chat panel's core
- * job, so the default favors reliability there over per-token price.
+ * The model the `chat` edge function answers every chat turn with. Users do
+ * not choose a model, and the server ignores one a client sends. Tool-calling
+ * into the Data Explorer is the chat panel's core job, so the default favors
+ * reliability there over per-token price.
  */
 const DEFAULT_CHAT_MODEL_ID: (typeof CHAT_MODEL_OPTIONS)[number]["id"] =
   "anthropic/claude-sonnet-5";
@@ -101,7 +102,7 @@ export const ChatModelOptionModule = {
     /** Cloud models available to clients and edge-function validation. */
     values: CHAT_MODEL_OPTIONS,
 
-    /** Model used when a client has no valid catalog selection. */
+    /** The model the `chat` edge function uses for every chat turn. */
     defaultId: DEFAULT_CHAT_MODEL_ID,
 
     /** Returns whether an id belongs to the cloud model catalog. */

@@ -24,6 +24,7 @@ export type ChatAPI = APITypeDef<
         body: {
           messages: ChatClientMessage.T[];
           context: ChatPageContext.T;
+          /** Ignored. Kept so older clients that send one still validate. */
           model?: string;
           consentAcks?: ConsentAck[];
           retryContext?: ChatRetryContext;

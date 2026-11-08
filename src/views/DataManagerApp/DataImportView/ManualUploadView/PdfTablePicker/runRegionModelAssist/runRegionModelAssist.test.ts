@@ -169,12 +169,20 @@ describe("runRegionModelAssist", () => {
     const body = vi.mocked(APIClient.post).mock.calls[0]![0]
       .body as unknown as {
       consentAcks?: ReadonlyArray<{ ackToken: string }>;
-      model?: string;
     };
     expect(body.consentAcks).toEqual([
       { ackToken: "ack-1", scope: { kind: "message_index", index: 0 } },
     ]);
-    expect(body.model).toBe(ChatModelOption.Catalog.defaultId);
+  });
+
+  it("leaves the model to the server", async () => {
+    _approve();
+    _respondWith("[]");
+
+    await _run();
+
+    const body = vi.mocked(APIClient.post).mock.calls[0]![0].body;
+    expect(body).not.toHaveProperty("model");
   });
 
   it("appends the model's rows after the rule-based ones", async () => {

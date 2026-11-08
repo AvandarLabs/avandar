@@ -2,11 +2,11 @@ import { AvaModelSchema } from "@models/zod/index.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { emitChatTurnAnalytics } from "@sbfn/chat/PostChatMessages/analytics/emitChatTurnAnalytics/emitChatTurnAnalytics.ts";
 import { verifyChatConsentAcks } from "@sbfn/chat/PostChatMessages/consent/verifyChatConsentAcks.ts";
-import { enforceChatModelAllowlist } from "@sbfn/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts";
 import { runChatTurn } from "@sbfn/chat/PostChatMessages/runChatTurn/runChatTurn.ts";
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { z } from "zod";
 import { getAppURL } from "$/env/getAppURL.ts";
+import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 if (!openRouterApiKey) {
@@ -49,6 +49,8 @@ export const PostChatMessages = POST({
         dashboardId: z.string().optional(),
       },
     }),
+    // Accepted so older clients that still send a picked model keep working,
+    // and ignored: Avandar chooses the model for every chat turn.
     model: z.string().optional(),
     consentAcks: z
       .array(
@@ -79,14 +81,8 @@ export const PostChatMessages = POST({
   .action(
     async ({ pathParams, body, supabaseClient, supabaseAdminClient, user }) => {
       const { workspaceId } = pathParams;
-      const {
-        messages,
-        context,
-        model: requestedModel,
-        consentAcks,
-        retryContext,
-      } = body;
-      const model = enforceChatModelAllowlist(requestedModel);
+      const { messages, context, consentAcks, retryContext } = body;
+      const model = ChatModelOption.Catalog.defaultId;
 
       await verifyChatConsentAcks({
         consentAcks,
