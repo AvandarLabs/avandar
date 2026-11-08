@@ -20,6 +20,13 @@ const CASES_COLUMN = "cases";
 /** The output column of the series that sums every value past the top 8. */
 const OTHER_COLUMN = "series_other";
 
+/**
+ * The most buckets a curve keeps, counted back from the latest one. It
+ * matches the host's limit on bars in a bar chart, so a stray early date
+ * cannot fill the chart with empty buckets and push the real outbreak out.
+ */
+const MAX_EPICURVE_BUCKETS = 200;
+
 /** How many stack-by values get a series of their own. */
 const MAX_NAMED_SERIES = 8;
 
@@ -40,12 +47,8 @@ type EpicurveSettings = Readonly<{
   stackByColumn: string | undefined;
 }>;
 
-type EpicurveCounts = Readonly<{
-  /** Cases per bucket start, then per stack-by value. */
-  countsByBucket: Map<string, Map<StackValue, number>>;
-  /** Cases per stack-by value, over every bucket. */
-  totalsByStackValue: Map<StackValue, number>;
-}>;
+/** Cases per bucket start, then per stack-by value. */
+type CountsByBucket = Map<string, Map<StackValue, number>>;
 
 type EpicurveSeries = Readonly<{
   column: string;
@@ -97,12 +100,9 @@ function _addCount(options: {
 function _countRows(options: {
   rows: PluginVizInput["rows"];
   settings: EpicurveSettings;
-}): EpicurveCounts {
+}): CountsByBucket {
   const { rows, settings } = options;
-  const counts: EpicurveCounts = {
-    countsByBucket: new Map(),
-    totalsByStackValue: new Map(),
-  };
+  const countsByBucket: CountsByBucket = new Map();
   rows.forEach((row) => {
     const date = getDateFromCellValue(row[settings.dateColumn]);
     if (date === undefined) {
@@ -121,12 +121,26 @@ function _countRows(options: {
         ? undefined
         : _getStackValueFromCell(row[settings.stackByColumn]);
     const bucketCounts =
-      counts.countsByBucket.get(bucketStart) ?? new Map<StackValue, number>();
+      countsByBucket.get(bucketStart) ?? new Map<StackValue, number>();
     _addCount({ counts: bucketCounts, stackValue, caseCount });
-    counts.countsByBucket.set(bucketStart, bucketCounts);
-    _addCount({ counts: counts.totalsByStackValue, stackValue, caseCount });
+    countsByBucket.set(bucketStart, bucketCounts);
   });
-  return counts;
+  return countsByBucket;
+}
+
+/** Adds up the cases per stack-by value over the buckets that are kept. */
+function _getTotalsFromCounts(options: {
+  bucketStarts: readonly string[];
+  countsByBucket: ReadonlyMap<string, ReadonlyMap<StackValue, number>>;
+}): Map<StackValue, number> {
+  const { bucketStarts, countsByBucket } = options;
+  const totals = new Map<StackValue, number>();
+  bucketStarts.forEach((bucketStart) => {
+    countsByBucket.get(bucketStart)?.forEach((caseCount, stackValue) => {
+      _addCount({ counts: totals, stackValue, caseCount });
+    });
+  });
+  return totals;
 }
 
 /** Orders values by text, with the missing value last. */
@@ -140,11 +154,17 @@ function _compareStackValues(valueA: StackValue, valueB: StackValue): number {
   return valueA < valueB ? -1 : 1;
 }
 
-/** Orders stack-by values from the most cases to the fewest. */
+/**
+ * Orders stack-by values from the most cases to the fewest. A value with no
+ * cases at all is left out, so it never takes one of the series.
+ */
 function _getRankedStackValues(
   totals: ReadonlyMap<StackValue, number>,
 ): StackValue[] {
   return [...totals.entries()]
+    .filter(([, total]) => {
+      return total !== 0;
+    })
     .sort(([valueA, totalA], [valueB, totalB]) => {
       return totalB - totalA || _compareStackValues(valueA, valueB);
     })
@@ -167,7 +187,7 @@ function _getSeriesFromTotals(options: {
   const rankedValues = _getRankedStackValues(totals);
   if (!hasStackByColumn || rankedValues.length === 0) {
     const label = t("viz.epicurve.cases");
-    return [{ column: CASES_COLUMN, label, stackValues: rankedValues }];
+    return [{ column: CASES_COLUMN, label, stackValues: [undefined] }];
   }
   const namedSeries = rankedValues
     .slice(0, MAX_NAMED_SERIES)
@@ -228,7 +248,8 @@ function _getNthBucketStart(options: {
 
 /**
  * Every bucket start from the first counted bucket to the last, so a bucket
- * with no cases still gets a bar of zero.
+ * with no cases still gets a bar of zero. At most the latest
+ * `MAX_EPICURVE_BUCKETS` are kept, and no bucket before them is generated.
  */
 function _getBucketStartsFromCounts(options: {
   countsByBucket: ReadonlyMap<string, unknown>;
@@ -241,8 +262,15 @@ function _getBucketStartsFromCounts(options: {
   if (firstStart === undefined || lastStart === undefined) {
     return [];
   }
-  const first = _getDateFromBucketStart(firstStart);
   const last = _getDateFromBucketStart(lastStart);
+  const earliestStart = _getNthBucketStart({
+    first: last,
+    index: 1 - MAX_EPICURVE_BUCKETS,
+    interval,
+  });
+  const first = _getDateFromBucketStart(
+    firstStart > earliestStart ? firstStart : earliestStart,
+  );
   return Array.from(
     { length: _getBucketCount({ first, last, interval }) },
     (_value, index) => {
@@ -251,21 +279,40 @@ function _getBucketStartsFromCounts(options: {
   );
 }
 
+/** Maps each stack-by value to the column of the series that adds it up. */
+function _makeColumnsFromSeries(
+  series: readonly EpicurveSeries[],
+): Map<StackValue, string> {
+  const columns = new Map<StackValue, string>();
+  series.forEach((oneSeries) => {
+    oneSeries.stackValues.forEach((stackValue) => {
+      columns.set(stackValue, oneSeries.column);
+    });
+  });
+  return columns;
+}
+
 function _makeRowsFromCounts(options: {
   bucketStarts: readonly string[];
   countsByBucket: ReadonlyMap<string, ReadonlyMap<StackValue, number>>;
   series: readonly EpicurveSeries[];
 }): Array<Record<string, string | number>> {
   const { bucketStarts, countsByBucket, series } = options;
+  const columns = _makeColumnsFromSeries(series);
   return bucketStarts.map((bucketStart) => {
-    const bucketCounts = countsByBucket.get(bucketStart);
-    const seriesEntries = series.map((oneSeries) => {
-      const caseCount = oneSeries.stackValues.reduce((sum, stackValue) => {
-        return sum + (bucketCounts?.get(stackValue) ?? 0);
-      }, 0);
-      return [oneSeries.column, caseCount] as const;
+    const row: Record<string, string | number> = {
+      [BUCKET_COLUMN]: bucketStart,
+    };
+    series.forEach((oneSeries) => {
+      row[oneSeries.column] = 0;
     });
-    return Object.fromEntries([[BUCKET_COLUMN, bucketStart], ...seriesEntries]);
+    countsByBucket.get(bucketStart)?.forEach((caseCount, stackValue) => {
+      const column = columns.get(stackValue);
+      if (column !== undefined) {
+        row[column] = Number(row[column]) + caseCount;
+      }
+    });
+    return row;
   });
 }
 
@@ -296,18 +343,15 @@ export function makeEpicurveFromRows(
   context: PluginVizContext,
 ): PluginVizTransformResult {
   const settings = _getSettingsFromInput(input.settings);
-  const { countsByBucket, totalsByStackValue } = _countRows({
-    rows: input.rows,
-    settings,
-  });
-  const series = _getSeriesFromTotals({
-    totals: totalsByStackValue,
-    hasStackByColumn: settings.stackByColumn !== undefined,
-    t: context.i18n.t,
-  });
+  const countsByBucket = _countRows({ rows: input.rows, settings });
   const bucketStarts = _getBucketStartsFromCounts({
     countsByBucket,
     interval: settings.interval,
+  });
+  const series = _getSeriesFromTotals({
+    totals: _getTotalsFromCounts({ bucketStarts, countsByBucket }),
+    hasStackByColumn: settings.stackByColumn !== undefined,
+    t: context.i18n.t,
   });
   return {
     rows: _makeRowsFromCounts({ bucketStarts, countsByBucket, series }),

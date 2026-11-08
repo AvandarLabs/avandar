@@ -256,6 +256,77 @@ describe("makeEpicurveFromRows", () => {
     expect(result.chart.series).toEqual([{ column: "cases", label: "Cases" }]);
   });
 
+  it("keeps only the latest 200 days when an early date is an outlier", () => {
+    const startedAt = performance.now();
+    const { rows } = _makeEpicurve({
+      rows: _makeOnsetRows(["0020-01-01", "2021-01-04", "2021-09-01"]),
+    });
+    expect(rows).toHaveLength(200);
+    expect(rows[199]).toEqual({ bucket: "2021-09-01", cases: 1 });
+    expect(rows[0]).toEqual({ bucket: "2021-02-14", cases: 0 });
+    expect(performance.now() - startedAt).toBeLessThan(500);
+  });
+
+  it("keeps only the latest 200 epi weeks and months", () => {
+    const weekRows = _makeEpicurve({
+      rows: _makeOnsetRows(["0020-01-01", "2021-09-01"]),
+      settings: { interval: "epiWeek" },
+    }).rows;
+    const monthRows = _makeEpicurve({
+      rows: _makeOnsetRows(["0020-01-01", "2021-09-15"]),
+      settings: { interval: "month" },
+    }).rows;
+    expect(weekRows).toHaveLength(200);
+    expect(weekRows[199]).toEqual({ bucket: "2021-08-29", cases: 1 });
+    expect(monthRows).toHaveLength(200);
+    expect(monthRows[0]).toEqual({ bucket: "2005-02-01", cases: 0 });
+    expect(monthRows[199]).toEqual({ bucket: "2021-09-01", cases: 1 });
+  });
+
+  it("keeps every bucket of a span of exactly 200 days", () => {
+    const { rows } = _makeEpicurve({
+      rows: _makeOnsetRows(["2021-01-01", "2021-07-19"]),
+    });
+    expect(rows).toHaveLength(200);
+    expect(rows[0]).toEqual({ bucket: "2021-01-01", cases: 1 });
+  });
+
+  it("ranks stack-by values over the kept buckets only", () => {
+    const { chart } = _makeEpicurve({
+      rows: [
+        { onset: "0020-01-01", status: "Old" },
+        { onset: "2021-09-01", status: "Recent" },
+      ],
+      settings: { stackByColumn: "status" },
+    });
+    expect(chart.series).toEqual([{ column: "series_0", label: "Recent" }]);
+  });
+
+  it("gives a stack-by value with no cases no series", () => {
+    const { rows, chart } = _makeEpicurve({
+      rows: [
+        { onset: "2021-01-04", status: "Counted", cases: 2 },
+        { onset: "2021-01-04", status: "Empty", cases: null },
+      ],
+      settings: { stackByColumn: "status", countColumn: "cases" },
+    });
+    expect(chart.series).toEqual([{ column: "series_0", label: "Counted" }]);
+    expect(rows).toEqual([{ bucket: "2021-01-04", series_0: 2 }]);
+  });
+
+  it("keeps the top 8 slots for values with cases", () => {
+    const { chart } = _makeEpicurve({
+      rows: [
+        ...Array.from({ length: 8 }, (_value, index) => {
+          return { onset: "2021-01-04", status: `s${index}`, cases: 1 };
+        }),
+        { onset: "2021-01-04", status: "Empty", cases: null },
+      ],
+      settings: { stackByColumn: "status", countColumn: "cases" },
+    });
+    expect(chart.series).toHaveLength(8);
+  });
+
   it("throws when the date column setting is unset", () => {
     expect(() => {
       return _makeEpicurve({
