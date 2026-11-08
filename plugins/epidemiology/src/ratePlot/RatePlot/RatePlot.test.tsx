@@ -113,7 +113,10 @@ describe("RatePlot", () => {
       .querySelector(".recharts-scatter-symbol path")
       ?.getAttribute("cx");
     const stem = _getWhiskers()[0]?.querySelectorAll("line")[1];
-    expect(stem?.getAttribute("x1")).toBe(dotX);
+    const stemX = stem?.getAttribute("x1");
+    expect(dotX).toMatch(/\S/);
+    expect(stemX).toMatch(/\S/);
+    expect(stemX).toBe(dotX);
   });
 
   it("formats the rate axis ticks in the translator's locale", () => {
