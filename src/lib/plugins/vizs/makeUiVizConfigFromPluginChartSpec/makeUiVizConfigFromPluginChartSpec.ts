@@ -20,7 +20,7 @@ export type PluginChartUiVizConfig = {
   dateColumns: Set<string>;
 };
 
-function _buildSeriesFields(
+function _makeSeriesFields(
   chart: PluginChartSpec,
 ): Array<{ key: string; label?: string }> {
   return chart.series.map((series) => {
@@ -30,8 +30,8 @@ function _buildSeriesFields(
   });
 }
 
-function _buildBarConfig(chart: PluginChartSpec): BarConfig {
-  const series = _buildSeriesFields(chart).map((field) => {
+function _makeBarConfig(chart: PluginChartSpec): BarConfig {
+  const series = _makeSeriesFields(chart).map((field) => {
     return { ...field, renderAs: "bar" as const };
   });
   return {
@@ -44,8 +44,8 @@ function _buildBarConfig(chart: PluginChartSpec): BarConfig {
   };
 }
 
-function _buildLineConfig(chart: PluginChartSpec): LineConfig {
-  const series = _buildSeriesFields(chart).map((field) => {
+function _makeLineConfig(chart: PluginChartSpec): LineConfig {
+  const series = _makeSeriesFields(chart).map((field) => {
     return { ...field, renderAs: "line" as const };
   });
   return {
@@ -56,8 +56,8 @@ function _buildLineConfig(chart: PluginChartSpec): LineConfig {
   };
 }
 
-function _buildAreaConfig(chart: PluginChartSpec): AreaConfig {
-  const series = _buildSeriesFields(chart).map((field) => {
+function _makeAreaConfig(chart: PluginChartSpec): AreaConfig {
+  const series = _makeSeriesFields(chart).map((field) => {
     return { ...field, renderAs: "area" as const };
   });
   return {
@@ -115,13 +115,13 @@ export function makeUiVizConfigFromPluginChartSpec(options: {
   return {
     uiVizConfig: matchLiteral(chart.kind, {
       bar: () => {
-        return _buildBarConfig(chart);
+        return _makeBarConfig(chart);
       },
       line: () => {
-        return _buildLineConfig(chart);
+        return _makeLineConfig(chart);
       },
       area: () => {
-        return _buildAreaConfig(chart);
+        return _makeAreaConfig(chart);
       },
     }),
     columnNames: _getColumnNamesFromChart(chart),
