@@ -67,6 +67,17 @@ listings it wrote or left unchanged. When every crawl fails, the report is still
 command exits with an error. `ava pipeline reset` selects listings by their
 `pipeline_name`.
 
+A run paces its writes to how the database is keeping up, and retries a
+request that fails transiently (a timeout, a 5xx, a dropped connection)
+instead of failing the crawl, so a slow database slows a run down rather
+than stopping it. While it does, `ava pipeline run` prints warnings such as
+`writes slowed: 1 MiB batches, pausing 4.2 s` and
+`write failed (2 of 8 in a row), retrying in 4.0 s with 256 KiB batches`.
+Only the 8th transient failure in a row fails a crawl, and its checkpoint
+still holds every page it finished, so `--incremental` continues from
+there. See
+[`etl-adaptive-write-throttle.md`](../../docs/measles-demo/etl-adaptive-write-throttle.md).
+
 A scope is a slice of a drive that is crawled and resumed on its own: `hdx`
 has `format:csv`, `format:parquet`, and `format:other` (every other
 format), and a Socrata drive has `all` unless `socrata.pipeline.yaml` gives
