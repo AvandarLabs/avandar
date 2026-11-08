@@ -14,12 +14,17 @@ COPY packages/node/etl/package.json packages/node/etl/package.json
 COPY packages/shared/utils/package.json packages/shared/utils/package.json
 
 # DuckDB is a peer of @avandar/etl, installed through the server's own
-# dependency. Hoisting it lets the etl source resolve it from the root.
-RUN echo "public-hoist-pattern[]=duckdb" >> .npmrc
+# dependency. Hoisting it lets the etl source resolve it from the root. The
+# leading newline matters: `.npmrc` does not end with one.
+RUN printf '\npublic-hoist-pattern[]=duckdb\n' >> .npmrc
 
 # Install scripts run only for the root package.json's
 # `pnpm.onlyBuiltDependencies` (duckdb, which downloads its native binary).
 RUN pnpm install --frozen-lockfile --prod
+
+# Fails the build, rather than every machine start, when the etl source
+# cannot resolve DuckDB.
+RUN node -e "require.resolve('duckdb', { paths: ['packages/node/etl'] })"
 
 # --- Stage 2: run with bun ---
 FROM oven/bun:1.3.11-slim AS runner
