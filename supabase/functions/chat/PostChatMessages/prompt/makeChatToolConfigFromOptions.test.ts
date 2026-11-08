@@ -194,4 +194,37 @@ describe("makeChatToolConfigFromOptions", () => {
       "max and min never apply to a boolean column",
     );
   });
+
+  it("lets proposeCaseType mark a field as keeping every value", () => {
+    const config = makeChatToolConfigFromOptions({
+      clarificationCapReached: false,
+      app: "case-manager",
+    });
+    const tools = config.tools as Array<{
+      function: {
+        name: string;
+        parameters: {
+          properties: {
+            attributes?: {
+              items: {
+                properties: Record<string, { enum?: readonly string[] }>;
+                required: readonly string[];
+              };
+            };
+          };
+        };
+      };
+    }>;
+    const propose = tools.find((tool) => {
+      return tool.function.name === "proposeCaseType";
+    });
+    const attributeSchema =
+      propose?.function.parameters.properties.attributes?.items;
+
+    expect(attributeSchema?.properties.valueShape?.enum).toEqual([
+      "single",
+      "list",
+    ]);
+    expect(attributeSchema?.required).toContain("valueShape");
+  });
 });

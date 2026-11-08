@@ -115,4 +115,15 @@ describe("buildCaseManagerSystemPrompt", () => {
       "compare alphabetically, ignoring case and accents",
     );
   });
+
+  it("tells the model when a field should keep every value", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain("Set `valueShape` to `list` only when");
+    expect(prompt).toContain("always for the label column and every join key");
+  });
 });

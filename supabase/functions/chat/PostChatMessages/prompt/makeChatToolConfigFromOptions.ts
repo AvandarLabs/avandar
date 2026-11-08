@@ -195,6 +195,12 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                   type: "boolean",
                   description: "Whether the card preselects this attribute.",
                 },
+                valueShape: {
+                  type: "string",
+                  enum: ["single", "list"],
+                  description:
+                    "single keeps one value per case, chosen by valuePickerRuleType. list keeps every value the case has, in dataset order. Use list only when one case genuinely has several values of this column and each one matters, such as symptoms recorded at several visits. Never list the label column or a join key.",
+                },
                 valuePickerRuleType: {
                   type: "string",
                   enum: [
@@ -207,7 +213,7 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                     "min",
                   ],
                   description:
-                    "Which value to keep when a dataset holds several rows per case. Use sum or max for cumulative measures, first for dates, most_frequent for categories. sum and avg need a bigint or double column; max and min never apply to a boolean column.",
+                    "Which value to keep when a dataset holds several rows per case. Use sum or max for cumulative measures, first for dates, most_frequent for categories. sum and avg need a bigint or double column; max and min never apply to a boolean column. For a list, still give the rule the field would use with one value, so the user can switch it back.",
                 },
               },
               required: [
@@ -215,6 +221,7 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                 "columnId",
                 "name",
                 "isIncluded",
+                "valueShape",
                 "valuePickerRuleType",
               ],
               additionalProperties: false,
@@ -336,6 +343,10 @@ const CREATE_CASE_TYPES_TOOL_DEFINITIONS = [
                       datasetId: { type: "string" },
                       columnId: { type: "string" },
                       isLabel: { type: "boolean" },
+                      valueShape: {
+                        type: "string",
+                        enum: ["single", "list"],
+                      },
                     },
                     required: ["name", "kind"],
                   },
