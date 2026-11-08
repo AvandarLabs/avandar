@@ -1,20 +1,22 @@
 # How to author a bundled plugin
 
 This guide shows how to add a bundled plugin that puts a command in the Data
-Explorer toolbar. It assumes a checkout of this repository with dependencies
-installed, and the `ava` CLI on your `PATH` (run `pnpm build:ava-cli` if it is
-not).
+Explorer toolbar or adds a chart type. It assumes a checkout of this repository
+with dependencies installed, and the `ava` CLI on your `PATH` (run
+`pnpm build:ava-cli` if it is not).
 
 Bundled plugins live in `plugins/<name>/`, are listed in
 `plugins/bundled.yaml`, and are built into the app as lazy chunks. A workspace
 without a plugin installed downloads none of that plugin's manifest, code, or
-styles. Once a settings admin installs it in Settings → Plugins, its code
-downloads only when someone first uses one of its commands. The small plugin
+styles, unless a page shows a chart saved from that plugin. Once a settings
+admin installs it in Settings → Plugins, its code downloads only when someone
+first uses one of its commands or views one of its charts. The small plugin
 host and one installations request load for every workspace.
 
 Design background:
-`docs/superpowers/specs/2026-11-06-plugin-ecosystem-design.md` and
-`docs/superpowers/specs/2026-11-06-plugins-1a-core-commands-design.md`. Package
+`docs/superpowers/specs/2026-11-06-plugin-ecosystem-design.md`,
+`docs/superpowers/specs/2026-11-06-plugins-1a-core-commands-design.md`, and
+`docs/superpowers/specs/2026-11-07-plugins-1b-viz-types-design.md`. Package
 exports: the READMEs of `@avandar/plugin-manifest`, `@avandar/plugin-sdk`, and
 `@avandar/plugin-ui` (see `docs/avandar-packages.md`).
 
@@ -53,7 +55,7 @@ plugins/<name>/
   package.json        approved dependencies only
   tsconfig.json       extends the repo's base config
   locales/en.json     every user-visible string (other locales optional)
-  src/index.tsx       export default definePlugin({ commands: { ... } })
+  src/index.tsx       export default definePlugin({ commands, vizTypes })
 ```
 
 Plugin code follows the same repository rules as app code. Put each module in
@@ -65,12 +67,38 @@ holds at most one `*.test.ts(x)` file outside a `__tests__/` directory (see
 plugins/epidemiology/src/
   index.tsx                                  the plugin entry
   index.test.tsx
+  epicurve/                                  the epicurve chart type
+    getBucketStartFromDate/
+      getBucketStartFromDate.ts
+      getBucketStartFromDate.test.ts
+    getDateFromCellValue/
+      getDateFromCellValue.ts
+      getDateFromCellValue.test.ts
+    makeEpicurveFromRows/
+      makeEpicurveFromRows.ts                its transform
+      makeEpicurveFromRows.test.ts
   fitLinearRegression/
     fitLinearRegression.ts
     fitLinearRegression.test.ts
+  getNumberFromCellValue/
+    getNumberFromCellValue.ts
+    getNumberFromCellValue.test.ts
   makeRegressionPointsFromRows/
     makeRegressionPointsFromRows.ts
     makeRegressionPointsFromRows.test.ts
+  ratePlot/                                  the rate plot chart type
+    makeRatePlotPointsFromRows/
+      makeRatePlotPointsFromRows.ts
+      makeRatePlotPointsFromRows.test.ts
+    makeRateTextFromPoint/
+      makeRateTextFromPoint.ts
+      makeRateTextFromPoint.test.ts
+    RatePlot/
+      RatePlot.tsx                           its component
+      RatePlot.test.tsx
+      RatePlot.types.ts
+      RatePlotChart.tsx
+      RatePlotTooltip.tsx
   RegressionModal/
     RegressionModal.tsx
     RegressionModal.test.tsx
@@ -244,7 +272,233 @@ function RowCount() {
 }
 ```
 
-## 6. Translate plugin strings
+## 6. Declare a chart type
+
+A chart type adds an entry to the chart type pickers of the Data Explorer and
+the dashboard editor, in a "Plugins" group that lists the chart types of
+installed, enabled, and approved plugins. Declare it under
+`contributes.vizTypes` in `ava.yaml`. Avandar draws its settings form from the
+manifest, so the picker and the form never load plugin code.
+
+```yaml
+contributes:
+  vizTypes:
+    - id: epicurve
+      title: "%viz.epicurve.title%"
+      icon: chart-histogram
+      render: transform
+      settings:
+        - key: dateColumn
+          label: "%viz.epicurve.dateColumn%"
+          control: { kind: columnPicker, dataType: temporal }
+          required: true
+        - key: interval
+          label: "%viz.epicurve.interval%"
+          control:
+            kind: segmented
+            options:
+              - { value: day, label: "%viz.epicurve.interval.day%" }
+              - { value: epiWeek, label: "%viz.epicurve.interval.epiWeek%" }
+              - { value: month, label: "%viz.epicurve.interval.month%" }
+          default: epiWeek
+```
+
+| Key | Rule |
+| --- | --- |
+| `id` | Lowercase letters, digits, and hyphens in dot-separated words, like a command id. Unique within the plugin. Its code in `definePlugin` uses the same key |
+| `title` | A `%key%` reference. It names the chart in the picker and in its error messages |
+| `icon` | A Tabler icon name, checked like command icons |
+| `render` | `transform` or `component` (see the next section) |
+| `settings[].key` | A letter, then letters and digits. Unique within the chart type |
+| `settings[].label` | A `%key%` reference |
+| `settings[].control` | One of the controls below |
+| `settings[].required` | Optional, `false` by default. Until every required setting has a value, the chart area asks for each one ("Choose a Date column") instead of drawing the chart |
+| `settings[].default` | Optional. It must fit the control, as the table below says |
+
+Settings render in the order they are declared, in one group. When someone
+picks the chart type, each setting starts at its `default`, and each required
+column picker starts at the first result column of its data type. Optional
+column pickers start unset, so one column is never bound to several roles,
+such as a rate and its bounds, at once.
+
+| `kind` | Options | The chart receives | `default` |
+| --- | --- | --- | --- |
+| `columnPicker` | `dataType`: `numeric`, `temporal`, `text`, or `any`. Omitted means `any` | The column's name | Not allowed |
+| `select` | `options`: one or more `{ value, label }`, each `label` a `%key%` | The chosen `value` | One of the `value`s |
+| `segmented` | `options`: two or more `{ value, label }` | The chosen `value` | One of the `value`s |
+| `switch` | None | `true` or `false` | A boolean |
+| `number` | `min`, `max`, `step`, and `unit` (a `%key%`), all optional | A number | A number from `min` to `max` |
+| `text` | `placeholder` (a `%key%`), optional | The text | A string |
+| `color` | None | A color, as text | A string |
+
+Duplicate ids, setting keys, or option values, a `default` that does not fit
+its control, and a `number` whose `min` is above its `max` all fail
+validation. Chart types need no permission: a chart receives only rows its
+viewer can already see.
+
+## 7. Draw a chart type
+
+Give each chart type its code under `vizTypes` in `definePlugin`, keyed by its
+manifest `id`. A `transform` chart type provides `transform`, and a
+`component` chart type provides `Component`:
+
+```tsx
+import { definePlugin } from "@avandar/plugin-sdk";
+import { makeEpicurveFromRows } from "./epicurve/makeEpicurveFromRows/makeEpicurveFromRows";
+import { RatePlot } from "./ratePlot/RatePlot/RatePlot";
+
+// eslint-disable-next-line react-refresh/only-export-components
+export default definePlugin({
+  vizTypes: {
+    epicurve: { transform: makeEpicurveFromRows },
+    "rate-plot": { Component: RatePlot },
+  },
+});
+```
+
+Both receive a `PluginVizInput`:
+
+| Field | Meaning |
+| --- | --- |
+| `rows` | The query result, as rows keyed by column name |
+| `columns` | `[{ name, dataType }]`, the result's columns |
+| `settings` | The chart's settings, keyed by `key`. A column setting holds the column's name. An unset setting is `undefined` |
+| `isTruncated` | True when `rows` holds only the first part of the result. A component's rows are cut at 1,000, which sets it. The host can also set it for a result it cut short, and no caller does today |
+
+A **transform** is a pure, synchronous function that turns the input into new
+rows and a `PluginChartSpec`, and Avandar draws the result with its own bar,
+line, or area chart. It suits charts that aggregate, so it receives every row
+of the fetched result, and Avandar runs it again only when its input or the
+locale changes. Avandar calls it as `transform(input, { i18n, locale })`:
+`i18n.t` translates labels such as "Other", and `locale` is the viewer's
+locale.
+
+```ts
+import type {
+  PluginVizContext,
+  PluginVizInput,
+  PluginVizTransformResult,
+} from "@avandar/plugin-sdk";
+
+export function makeCountsFromRows(
+  input: PluginVizInput,
+  context: PluginVizContext,
+): PluginVizTransformResult {
+  const groupColumn = String(input.settings.groupColumn);
+  const counts = new Map<string, number>();
+  input.rows.forEach((row) => {
+    const group = String(row[groupColumn]);
+    counts.set(group, (counts.get(group) ?? 0) + 1);
+  });
+  return {
+    rows: [...counts].map(([group, count]) => {
+      return { group, count };
+    }),
+    chart: {
+      kind: "bar",
+      xColumn: "group",
+      series: [{ column: "count", label: context.i18n.t("chart.count") }],
+    },
+  };
+}
+```
+
+| `PluginChartSpec` field | Meaning |
+| --- | --- |
+| `kind` | `bar`, `line`, or `area` |
+| `xColumn` | The output column on the x axis |
+| `xColumnType` | Optional. `date` formats the x values as dates in the viewer's locale. Write dates as `YYYY-MM-DD` |
+| `series` | One `{ column, label }` per series. `label` is plain text, so translate it with `context.i18n.t` |
+| `layout` | Optional. `stack` stacks the series, and `group` sets them side by side |
+| `barGap` | Optional. `none` removes the space between bars, as an epicurve or a histogram needs |
+
+Name output columns yourself, such as `series_0`, rather than after data
+values: a value such as `a.b` would be read as a nested path, and a value
+could collide with another column. Avandar checks the returned spec, and that
+`xColumn` and every series column exist in the returned rows.
+
+Avandar draws at most as many rows as its own chart of that kind: 200 for
+`bar`, and 500 for `line` and `area`. A transform that returns more should
+aggregate further. The epicurve does: it keeps at most the latest 200 buckets,
+to match the 200-bar limit, so a longer span drops the earliest buckets. When
+an epicurve's span holds more than 200 buckets at its interval, such as more
+than 200 days at the day interval, choose a coarser one: epi week or month.
+
+A **component** draws the chart itself, at the width and height Avandar
+measured, from the Recharts building blocks in `@avandar/plugin-ui/charts`.
+It suits charts Avandar's own charts cannot draw, such as error bars. It
+receives the input plus `width` and `height`, and at most 1,000 rows:
+
+```tsx
+import { useT } from "@avandar/plugin-sdk";
+import {
+  ComposedChart,
+  Scatter,
+  useChartTheme,
+  XAxis,
+  YAxis,
+} from "@avandar/plugin-ui/charts";
+import type { PluginVizComponentProps } from "@avandar/plugin-sdk";
+import type { ReactNode } from "react";
+
+export function DotPlot(props: PluginVizComponentProps): ReactNode {
+  const t = useT();
+  const theme = useChartTheme();
+  return (
+    <ComposedChart
+      width={props.width}
+      height={props.height}
+      data={props.rows}
+      role="img"
+      title={t("chart.title")}
+    >
+      <XAxis type="number" dataKey={String(props.settings.xColumn)} />
+      <YAxis type="number" dataKey={String(props.settings.yColumn)} />
+      <Scatter fill={theme.colors[0]} />
+    </ComposedChart>
+  );
+}
+```
+
+Inside a chart component, `useT()` works as it does in command UI.
+`useAvandar()` is not available: it throws an error naming the chart type,
+because a chart has no workspace and no invocation, and public dashboard links
+show charts to people outside any workspace. Give the chart an accessible
+name, as `role="img"` and `title` do above.
+
+`@avandar/plugin-ui/charts` exports:
+
+| Export | Purpose |
+| --- | --- |
+| `ComposedChart`, `Scatter`, `ErrorBar`, `XAxis`, `YAxis`, `CartesianGrid`, `Tooltip`, `ReferenceLine`, `Legend` | Recharts building blocks |
+| `useChartTheme()` | `{ colors, textColor, gridColor }`: Avandar's chart colors, text color, and grid color for the current color scheme, dark mode included |
+
+Recharts already ships in the app, so these exports add no bytes to its
+chunks.
+
+A saved chart renders from the plugin code this deployment bundles, wherever
+it is shown: the Data Explorer, the dashboard editor, a workspace dashboard,
+and a public dashboard link. Avandar does not check that the plugin is
+installed. Installing only decides whether a plugin's chart types appear in
+the pickers, so a chart saved before an uninstall keeps rendering.
+
+Until the query result has columns, a plugin chart's area stays empty, with no
+loader, because its settings name columns that cannot be found yet. Callers
+show their own loading state while a query runs. After that, when something
+goes wrong, the chart area shows what, and the rest of the page is unaffected:
+
+| Failure | The chart area shows |
+| --- | --- |
+| The plugin or chart type is not bundled | "Plugin not available", naming the plugin. The stored chart is kept |
+| The stored settings fail validation | "Invalid chart settings". The stored chart is kept |
+| A required setting is unset, or its column is not in the result | "Choose a *setting label*", one line per such setting, such as "Choose a Date column" |
+| The plugin code fails to load | "This chart couldn't load", with a "Retry" button |
+| The transform throws or returns an invalid spec, or the component throws | "*Title* couldn't render". The error is logged with the plugin and chart ids |
+
+A chart that crashed draws again when its settings, its data, or its chart type
+change, so fixing a setting clears the error without a reload.
+
+## 8. Translate plugin strings
 
 Every user-visible string lives in `locales/<lang>.json`, as a flat map of key
 to text. `en.json` is required and must define every `%key%` the manifest uses.
@@ -268,12 +522,12 @@ avandar.i18n.t("modal.truncated", { count: 50000 });
 A message that cannot be compiled or formatted is returned as written instead
 of throwing.
 
-## 7. Stay within the import allowlist
+## 9. Stay within the import allowlist
 
 Plugin code may import only:
 
 - relative files inside the plugin
-- `@avandar/plugin-sdk` and `@avandar/plugin-ui`
+- `@avandar/plugin-sdk`, `@avandar/plugin-ui`, and `@avandar/plugin-ui/charts`
 - `react` and `react/jsx-runtime`
 - the approved npm packages: `simple-statistics`, `d3-array`, and `date-fns`
   (including its subpaths)
@@ -288,11 +542,13 @@ the approved list. The list is `APPROVED_PLUGIN_DEPENDENCIES` in
 
 Build plugin UI only from `@avandar/plugin-ui`: `Alert`, `Badge`, `Button`,
 `Divider`, `Group`, `Loader`, `NumberInput`, `Select`, `SimpleGrid`, `Stack`,
-`Table`, `Text`, `TextInput`, and `Title`. Every API call is async or
-fire-and-forget and passes serializable data, with two exceptions: the
-synchronous `i18n.t` and the React `content` of `openModal` and `openDrawer`.
+`Table`, `Text`, `TextInput`, and `Title`, and draw component charts only from
+`@avandar/plugin-ui/charts`. Every API call is async or fire-and-forget and
+passes serializable data, with three exceptions: the synchronous `i18n.t`, the
+React `content` of `openModal` and `openDrawer`, and chart components, which
+are React components too.
 
-## 8. Validate
+## 10. Validate
 
 ```bash
 ava plugin validate case-tools
@@ -327,3 +583,7 @@ budget.
 - **Never bundle a contract plugin.** This repository is public. A plugin that
   carries a customer's logic or data must wait for a distribution path that
   keeps it out of this repository.
+- **Keep chart type ids and setting keys stable.** Dashboards and Data
+  Explorer links store them. A renamed chart type id shows the missing-plugin
+  placeholder wherever the old one was saved, and a renamed setting key loses
+  that setting's value.
