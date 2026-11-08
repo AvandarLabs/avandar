@@ -179,8 +179,8 @@ where pipeline_name = 'socrata'
 order by drive_key, started_at desc;
 ```
 
-Deploys should pass the commit, so server runs record it:
-`fly deploy --config apps/pipeline-server/fly.production.toml --build-arg AVA_CODE_VERSION=$(git rev-parse HEAD)`.
+`pnpm deploy:pipeline-server` passes the commit as `AVA_CODE_VERSION`, so
+server runs record it.
 
 ## Local development
 
@@ -196,19 +196,34 @@ pnpm --filter @avandar/pipeline-server test
 
 ## Fly.io setup
 
-Set the required secret before deploying:
+No deployment's Fly details live in this repository.
+`deploy/fly.toml.template` is filled from `.env.pipeline-server.prod` at the
+repository root (gitignored; copy `.env.pipeline-server.prod.example`), and
+deploying needs Fly credentials with access to that app. To self-host, point
+the env file at a Fly app of your own.
+
+Set the server's secrets on the app before the first deploy:
 
 ```bash
-fly secrets set AVA_PIPELINE_SERVER_SECRET=your-secret \
-  --config apps/pipeline-server/fly.production.toml
+fly secrets set --app <app> AVA_PIPELINE_SERVER_SECRET=your-secret \
+  SOCRATA_APP_TOKEN=...
 ```
+
+The server keeps no Supabase credentials. Every run names the project to
+load into, in the `X-Ava-Supabase-Url` and `X-Ava-Supabase-Service-Role-Key`
+headers, so one server loads into demo, production, or a local stack,
+whichever its caller holds the key for. `ava pipeline run` sends the
+`VITE_SUPABASE_API_URL` and `SUPABASE_SERVICE_ROLE_KEY` of the env file it
+loaded. The key is never logged or recorded with the run.
 
 Deploy with:
 
 ```bash
-fly deploy --config apps/pipeline-server/fly.production.toml \
-  --build-arg AVA_CODE_VERSION=$(git rev-parse HEAD)
+pnpm deploy:pipeline-server
 ```
+
+`docs/measles-demo/pipeline-server-fly-runbook.md` walks through creating the
+app, its volume, and its secrets.
 
 Deploy order for crawl scopes (`pipeline_scope_checkpoints`): run the
 migrations before deploying the new pipeline server, and run no pipeline

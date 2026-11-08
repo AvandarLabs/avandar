@@ -34,6 +34,16 @@ const REPORT: EtlRunReport = {
 
 const SECRET = "test-secret";
 const AUTH_HEADER = `Bearer ${SECRET}`;
+const SUPABASE_TARGET = {
+  url: "https://abcd.supabase.co",
+  serviceRoleKey: "service-role-key",
+};
+/** What a caller sends with every run: the server secret and its target. */
+const RUN_HEADERS = {
+  authorization: AUTH_HEADER,
+  "x-ava-supabase-url": SUPABASE_TARGET.url,
+  "x-ava-supabase-service-role-key": SUPABASE_TARGET.serviceRoleKey,
+};
 
 async function _createServer(): Promise<FastifyInstance> {
   const server: FastifyInstance = Fastify({
@@ -121,7 +131,7 @@ describe("registerRunPipelineRoutes", () => {
     const res = await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
     });
 
     expect([res.statusCode, res.headers["content-type"], res.json()]).toEqual([
@@ -132,9 +142,42 @@ describe("registerRunPipelineRoutes", () => {
     ]);
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
+      supabase: SUPABASE_TARGET,
       invocation: expect.objectContaining({ invokedVia: "http" }),
       mode: "full",
     });
+  });
+
+  it("returns 400 and skips the run when no Supabase project is sent", async () => {
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+    });
+
+    expect([
+      res.statusCode,
+      res.json().error,
+      vi.mocked(run).mock.calls.length,
+    ]).toEqual([400, expect.stringContaining("x-ava-supabase-url"), 0]);
+  });
+
+  it("never records the service role key with the run", async () => {
+    server = await _createServer();
+
+    await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: RUN_HEADERS,
+      payload: { limit: 5 },
+    });
+
+    const { invocation } = vi.mocked(run).mock.calls[0]![0];
+    expect(JSON.stringify(invocation)).not.toContain(
+      SUPABASE_TARGET.serviceRoleKey,
+    );
   });
 
   it("passes the CLI's invocation and the request body to the run", async () => {
@@ -144,7 +187,7 @@ describe("registerRunPipelineRoutes", () => {
       method: "POST",
       url: "/example-pipeline/run",
       headers: {
-        authorization: AUTH_HEADER,
+        ...RUN_HEADERS,
         "x-ava-invocation": JSON.stringify({
           cliArgv: ["pipeline", "run", "example-pipeline"],
           actor: "pablo@laptop",
@@ -167,12 +210,13 @@ describe("registerRunPipelineRoutes", () => {
     await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
       payload: { limit: 5 },
     });
 
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
+      supabase: SUPABASE_TARGET,
       invocation: expect.objectContaining({ invokedVia: "http" }),
       mode: "full",
       limit: 5,
@@ -185,12 +229,13 @@ describe("registerRunPipelineRoutes", () => {
     await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
       payload: { incremental: true, until: "2026-10-15T00:00:00Z", limit: 5 },
     });
 
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
+      supabase: SUPABASE_TARGET,
       invocation: expect.objectContaining({ invokedVia: "http" }),
       mode: "incremental",
       until: new Date("2026-10-15T00:00:00Z"),
@@ -204,7 +249,7 @@ describe("registerRunPipelineRoutes", () => {
     const res = await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
       payload: { incremental: true, since: "2026-10-01T00:00:00Z" },
     });
 
@@ -219,7 +264,7 @@ describe("registerRunPipelineRoutes", () => {
     const res = await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
       payload: { since: "2026-10-01" },
     });
 
@@ -234,7 +279,7 @@ describe("registerRunPipelineRoutes", () => {
     const res = await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
       payload: { limit: 0 },
     });
 
@@ -248,12 +293,13 @@ describe("registerRunPipelineRoutes", () => {
     await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
       payload: { scopes: ["format:csv"] },
     });
 
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
+      supabase: SUPABASE_TARGET,
       invocation: expect.objectContaining({ invokedVia: "http" }),
       mode: "full",
       scopes: ["format:csv"],
@@ -266,7 +312,7 @@ describe("registerRunPipelineRoutes", () => {
     const res = await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
       payload: { scopes: ["Not Valid"] },
     });
 
@@ -281,7 +327,7 @@ describe("registerRunPipelineRoutes", () => {
     const res = await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
       payload: { incremntal: true },
     });
 
@@ -321,7 +367,7 @@ describe("registerRunPipelineRoutes", () => {
     const res = await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
       payload: { incremental: true },
     });
 
@@ -341,7 +387,7 @@ describe("registerRunPipelineRoutes", () => {
     const res = await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
     });
 
     expect([res.statusCode, res.json()]).toEqual([
@@ -381,7 +427,7 @@ describe("registerRunPipelineRoutes", () => {
     const res = await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
     });
 
     expect([res.statusCode, res.json()]).toEqual([
@@ -400,7 +446,7 @@ describe("registerRunPipelineRoutes", () => {
     const res = await server.inject({
       method: "POST",
       url: "/..%2Fhdx/run",
-      headers: { authorization: AUTH_HEADER },
+      headers: RUN_HEADERS,
     });
 
     expect([
@@ -417,7 +463,7 @@ describe("registerRunPipelineRoutes", () => {
       const res = await server.inject({
         method: "GET",
         url: "/HDX/scopes",
-        headers: { authorization: AUTH_HEADER },
+        headers: RUN_HEADERS,
       });
 
       expect([
@@ -457,7 +503,7 @@ describe("registerRunPipelineRoutes", () => {
       const res = await server.inject({
         method: "GET",
         url: "/hdx/scopes",
-        headers: { authorization: AUTH_HEADER },
+        headers: RUN_HEADERS,
       });
 
       expect([
@@ -487,7 +533,7 @@ describe("registerRunPipelineRoutes", () => {
       const res = await server.inject({
         method: "GET",
         url: "/hdx/scopes",
-        headers: { authorization: AUTH_HEADER },
+        headers: RUN_HEADERS,
       });
 
       expect([res.statusCode, res.json()]).toEqual([

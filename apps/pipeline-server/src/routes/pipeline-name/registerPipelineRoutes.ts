@@ -9,6 +9,10 @@ import {
   INVOCATION_HEADER,
 } from "@pipeline-server/routes/pipeline-name/buildServerRunInvocation/buildServerRunInvocation";
 import { listScopes } from "@pipeline-server/routes/pipeline-name/listScopes/listScopes";
+import {
+  readSupabaseTarget,
+  SUPABASE_TARGET_ERROR_NAME,
+} from "@pipeline-server/routes/pipeline-name/readSupabaseTarget/readSupabaseTarget";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import { getEtlRunFailedReport } from "@pipelines/shared/getEtlRunFailedReport/getEtlRunFailedReport";
 import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
@@ -98,6 +102,7 @@ const RUN_BODY_SCHEMA = {
 const _CLIENT_ERROR_NAMES: ReadonlySet<string> = new Set([
   ETL_RUN_OPTIONS_ERROR_NAME,
   INVALID_PIPELINE_NAME_ERROR_NAME,
+  SUPABASE_TARGET_ERROR_NAME,
 ]);
 
 function _getErrorStatus(error: unknown): 400 | 500 {
@@ -131,6 +136,7 @@ async function _runPipeline(
     const report = await run({
       pipelineName: request.params.pipelineName,
       ...options,
+      supabase: readSupabaseTarget(request.headers),
       invocation: buildServerRunInvocation({
         invocationHeader: request.headers[INVOCATION_HEADER],
         requestBody: request.body ?? {},
@@ -175,7 +181,11 @@ async function _listPipelineScopes(
  * as JSON. Auth is checked before the body is validated, so an
  * unauthenticated caller gets 401 whatever it sends. Invalid options answer
  * 400, and the pipeline does not run. So does a pipeline name that is not a
- * plain folder name of lowercase letters, digits, `_` and `-`. A run where
+ * plain folder name of lowercase letters, digits, `_` and `-`, and a run that
+ * does not name the Supabase project to load into: the server keeps no
+ * Supabase credentials, so each run sends its project's URL and service role
+ * key in the `X-Ava-Supabase-Url` and `X-Ava-Supabase-Service-Role-Key`
+ * headers (see `readSupabaseTarget`). A run where
  * every crawl failed answers 500 with the error and the report. Each run is
  * recorded with the request body, the CLI's `X-Ava-Invocation` header when
  * present, and the server's host and `AVA_CODE_VERSION`.

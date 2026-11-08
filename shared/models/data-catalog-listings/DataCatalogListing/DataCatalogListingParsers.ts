@@ -70,6 +70,16 @@ const DBReadSchema = z.object({
   tags: z.array(z.string()).nullable(),
   source_metadata: supabaseJSONSchema.nullable(),
   drive_id: z.uuid().nullable(),
+  parquet_cache_status: z.enum(["building", "ready", "failed"]).nullable(),
+  parquet_cache_build_id: z.uuid().nullable(),
+  parquet_cache_build_started_at: z.iso.datetime({ offset: true }).nullable(),
+  parquet_cache_failure_code: z.string().nullable(),
+  parquet_cache_folder_path: z.string().nullable(),
+  parquet_cache_part_count: z.number().nullable(),
+  parquet_cache_source_version: z.string().nullable(),
+  parquet_cache_built_at: z.iso.datetime({ offset: true }).nullable(),
+  parquet_cache_row_count: z.number().nullable(),
+  parquet_cache_byte_size: z.number().nullable(),
   search_vector: z.unknown(),
 });
 

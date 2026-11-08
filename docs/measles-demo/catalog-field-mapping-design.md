@@ -519,20 +519,25 @@ the data and are not translated.
 
 | Field | Socrata | HDX (CKAN) |
 |---|---|---|
-| Labels | NYC: City, Agency. NY State: State, Agency. NYS Health: State, Department, Office. | Organization |
+| Labels | NYC: City, Agency. NY State: State, Agency. NYS Health: State, Department, Office. | Organization, Data source |
 | `organization1_name` | `value` per drive | `organization.title`, such as "World Health Organization" |
-| `organization2_name` | `resource.attribution` (NYC, NY State); `value` "Department of Health" (NYS Health) | None |
+| `organization2_name` | `resource.attribution` (NYC, NY State); `value` "Department of Health" (NYS Health) | Script: `dataset_source`, the organization the data comes from, unless it repeats `organization.title`. Not a part of the publisher, as a Socrata agency is |
 | `organization3_name` | Script (NYS Health only, where `resource.attribution` is the department itself): the `Dataset-Summary_Office/Division` entry in `classification.domain_metadata`, else its `Dataset-Summary_Organization` entry (older datasets) unless that names the department itself | None |
 | `description` | Script: `resource.description` as plain text | `notes` |
-| `domains` | Script: `classification.domain_category` plus `classification.categories` (the latter is empty on NYC today) | Script: `groups[].title` (countries on HDX) |
-| `tags` | `classification.domain_tags` | Script: `tags[].name` |
+| `notes` | None | `caveats` |
+| `coverage_start_date`, `coverage_end_date` | None | Script: each end of `dataset_date` (`[start TO end]`, UTC without a timezone). An open end (`*`) is null |
+| `domains` | Script: `classification.domain_category` plus `classification.categories` (the latter is empty on NYC today) | Script: each `tags[].name` mapped to a broad topic, named as Socrata's topics where they overlap ("Health", "Education"). HDX's tags are a fixed 150-term vocabulary; a region or format tag has no topic |
+| `tags` | `classification.domain_tags` | Script: `tags[].name`, then `groups[].title` (HDX's groups are countries) |
 | `update_frequency` | Script: the first of `Update_Update-Frequency` (NYC) or `Dataset-Summary_Posting-Frequency` (NY State portals) in `classification.domain_metadata` | Script: `data_update_frequency` is a code (`"1"` is every day), translated to words |
 | `license` | `metadata.license`, when present (rare on NYC) | `license_title` |
 
 HDX lists one listing per resource, but every mapped field describes the
-dataset, so its record is the raw CKAN package (`package_search`'s result),
-and each of a package's resource listings stores that same package as its
-`source_metadata`. HDX's `display_name` stays in code because it comes from
+dataset, so its record is the raw CKAN package (`package_search`'s result).
+Each of a package's resource listings stores that package as its
+`source_metadata`, with `resources` narrowed to the listing's own raw
+resource: a package lists every resource, so storing it whole on every
+listing grows a package's write with the square of its resource count (a
+WHO country package with 73 CSVs wrote 42 MB). HDX's `display_name` stays in code because it comes from
 the resource. The CKAN package schema does not need to widen: the mapper
 reads the raw package, not the narrowed `CkanPackage`. HDX's `notes` are
 Markdown; they show as plain text for now.

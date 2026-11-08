@@ -1315,6 +1315,9 @@ commits belong to the features that own them, not here.
 | `bcac141e7` | feat(hdx): map catalog metadata from hdx.pipeline.yaml | All of it |
 | `79dc85076` | fix(hdx): read only HDX's own update frequency codes | All of it |
 | `d50583f7e` | fix(socrata): read a health dataset's office from either metadata key | All of it |
+| `7f2d6dc8e` | fix(hdx): map topics, data source, coverage dates, and caveats | All of it. Supersedes `bcac141e7`'s `domains` mapping: HDX's groups (countries) become keywords, and topics come from `hdxTopics`' tag-to-topic table. |
+| `d9c3bf6c0` | fix(hdx): store each listing's package with only its own resource | All of it. Without it, a package's write grows with the square of its resource count (each listing stored every resource), which ran the demo database out of memory on WHO's country packages. |
+| `62ffe547a` | fix(etl): cap each listings write at 4 MiB of JSON | All of it (`loadRelationsPage` and its test, and the `@avandar/etl` README's **Writes** paragraph). It edits a file F4 owns: apply it on top of F4's final `loadRelationsPage.ts`. |
 
 *The app reads the renamed column, the drives, and the new filters:*
 
@@ -1403,7 +1406,13 @@ rejects the new listing shape, so the catalog would not load.
   deploying.
 - Backfill the demo instance with one full (non-incremental) run of each
   pipeline. Incremental runs only touch datasets that changed, so unchanged
-  listings keep empty new columns.
+  listings keep empty new columns. Socrata was backfilled on 2026-11-07.
+  HDX's first demo run (2026-11-08) failed partway, before `d9c3bf6c0`, and
+  left 11,983 listings storing whole packages. Change detection ignores
+  `source_metadata`, so a later run does not shrink them: reset HDX on demo
+  (`ava pipeline reset hdx --env demo`) before its next full run.
+- `hdxTopics`' tag-to-topic table covers HDX's 150-tag vocabulary as of
+  2026-11-08. A tag HDX adds later gets no topic until it is added there.
 - Removing one of two chosen publishers leaves the agencies chosen under it
   selected, which can empty the list.
 - No automated test runs the mapper loader under Bun. It was verified
@@ -1463,6 +1472,125 @@ Then open the Open data tab, select a loadable listing, and check that the
 pane shows "Data preview, First 200 rows" with the cap note, that the expand
 button opens the modal with the rail beside the content, and that a
 workspace dataset's Metadata tab still shows its preview.
+
+---
+
+## F25: Cached Parquet copies of ODC listings
+
+Status: in progress. The pipeline server builds and uploads copies; nothing
+requests or reads them yet (the build route, the edge route, and the app's
+readers are still to come, see the spec's slices).
+
+**Purpose:** An API-backed Open Data Catalog (ODC) listing is relayed whole
+through the `open-data` edge function, capped at 25 MB, on every load. The
+pipeline server now builds a Parquet copy of a listing's whole source into
+the public `opendata` bucket, as a folder of parts of about 32 MB, with no
+size limit of its own. It knows no API: each pipeline's manifest has a
+`download` block saying whether its API pages and naming a download script
+in the pipeline's folder. Socrata pages by row id with its declared column
+types, so a copy needs about one part of disk. CKAN files are gzipped on disk
+and split. The database claims one build per listing and records the copy.
+The server deploys from a template filled by a gitignored
+`.env.pipeline-server.prod`, and its Docker image now starts.
+**Value:** Large listings, such as NYC's DOB Violations (2.48M rows), can be
+added to a workspace and load from Storage instead of the source.
+
+**PR title:** `feat(open-data): build cached Parquet copies of ODC listings on the pipeline server`
+
+**Commits to read** (all from `feat/odc-parquet-cache`, merged in
+`a9d2ec770`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `250bb9ff4` | docs: spec cached Parquet copies of ODC listings and track retesting unreachable ones | All of it. |
+| `ff8a6b290` | feat(pipeline-server): build a Parquet copy of an API-backed ODC listing's whole source | All of it, as reworked by the commits below. |
+| `1c0e71558` | fix(storage): let only the service role write to the opendata bucket | All of it. Its own PR if it should ship first. |
+| `3eb5699bf` | fix(pipeline-server): read an ODC source in DuckDB's strict mode with a pinned dialect | All of it. |
+| `f9be62403` | feat(db): record ODC listings' Parquet copies and claim their builds | All of it. Its migration was replaced by `f08646466`'s. |
+| `4de621ec7` | docs: record the ODC Parquet cache's CSV reading rules, build claims, and DOB measurements | All of it. |
+| `a8c892a97` | chore(pipeline-server): keep one machine always running | All of it, superseded by `2c4fa5ec8`'s template. |
+| `5520abf86` | feat(etl): let a pipeline manifest declare how its listings are downloaded | All of it. Bumps `@avandar/etl` (minor). |
+| `f08646466` | refactor(db): store an ODC Parquet copy as a folder of parts | All of it. |
+| `0211408e1` | feat(pipeline-server): copy ODC listings page by page, as each manifest says | All of it. |
+| `2c4fa5ec8` | chore(pipeline-server): deploy from a template filled by a gitignored env file | All of it. |
+| `d74b62ca8` | docs: record the paged ODC copy design and add the pipeline server Fly runbook | All of it. |
+| `5685fb84c` | chore: keep env files and installed modules out of Docker build contexts | All of it. |
+| `d3dd08b56` | fix(pipeline-server): make the Docker image start and run DuckDB | All of it. |
+| `513873f61` | fix(pipeline-server): hoist DuckDB in the image, and fail the build if it cannot resolve | All of it. Merged in `7e428d400`. |
+
+**Files:** `apps/pipeline-server/src/openDataParquetCache/`,
+`apps/pipeline-server/pipelines/socrata/download/`,
+`apps/pipeline-server/pipelines/hdx/download/`, the `download` blocks in
+`socrata.pipeline.yaml` and `hdx.pipeline.yaml`,
+`packages/node/etl/src/ListingDownload/`, the `download` field in
+`PipelineConfig.types.ts` and `parsePipelineConfig.ts`,
+`apps/pipeline-server/deploy/`, `apps/pipeline-server/Dockerfile`, the
+`duckdb` dependency in `apps/pipeline-server/package.json` and its lockfile
+entry, `.dockerignore`, `.env.pipeline-server.prod.example` and its
+`.gitignore` exception, the `deploy:pipeline-server` script in
+`package.json`, the deleted `apps/pipeline-server/fly.production.toml`, the
+Fly section of `apps/pipeline-server/README.md`, the `parquetCache*` fields
+in `DataCatalogListing.types.ts` and `DataCatalogListingParsers.ts` and the
+fixtures that list them, `docs/measles-demo/odc-parquet-cache-spec.md`,
+`docs/measles-demo/pipeline-server-fly-runbook.md`, and the P6.9 and P6.10
+bullets in `production-plan-world-humanitarian-day.md`.
+
+**Schema:** `00.enum.data_catalog_listings__parquet_cache_status.sql`, the
+`parquet_cache_*` columns and constraints in `11.data_catalog_listings.sql`,
+the three `50.rpc_data_catalog_listings__*_parquet_cache.sql` RPCs,
+migrations `20261107220000_STORAGE-opendata-service-role-writes-only.sql`
+(hand-written, in `[db.seed] sql_paths`, mirrored in `99.storage.sql`) and
+`20261108195431_odc_parquet_cache.sql`, and
+`supabase/tests/database/rpc_data_catalog_listings__parquet_cache.test.sql`.
+
+**Verification:**
+```sh
+pnpm --filter @avandar/pipeline-server test
+pnpm --filter @avandar/etl test
+supabase test db supabase/tests/database/rpc_data_catalog_listings__parquet_cache.test.sql
+```
+Then build the image (`docker build -f apps/pipeline-server/Dockerfile .`),
+run it, and check `/healthz` answers `{"ok":true}`.
+
+---
+
+## F26: The pipeline server loads into the Supabase project each run names
+
+**Purpose:** The pipeline server read one Supabase project from its own
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, so a server could only ever
+load into that project. It now keeps no Supabase credentials. Every run
+sends its project's URL and service role key in the `X-Ava-Supabase-Url` and
+`X-Ava-Supabase-Service-Role-Key` headers (headers, because a run records its
+body), and a run without them is refused with 400. `ava pipeline run` sends
+the loaded env file's `VITE_SUPABASE_API_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+**Value:** One deployed server loads into demo, production, or a local
+stack, whichever its caller holds the key for.
+
+**PR title:** `feat(pipeline-server): load into the Supabase project each run names`
+
+**Commits to read** (from `feat/pipeline-supabase-target`, merged in
+`d0af42ce6`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `38ab31ad4` | feat(pipeline-server): load into the Supabase project each run names | All of it. The `odc-parquet-cache-spec.md` and runbook hunks go with F25. |
+
+**Files:** `apps/pipeline-server/src/routes/pipeline-name/readSupabaseTarget/`,
+`registerPipelineRoutes.ts` and its test, `run/run.ts` and its test,
+`pipelines/shared/PipelineRunOptions.types.ts`,
+`getPipelineEtlDestination.ts` and its test, each pipeline's `run.ts` and
+its new `run.test.ts`, `apps/ava-cli/src/PipelineCli/sendRunPipelineRequest.ts`
+and its test, `RunPipelineCli.test.ts`, and the Supabase paragraphs in
+`apps/pipeline-server/README.md`, `apps/ava-cli/README.md`, and
+`.env.pipeline-server.prod.example`.
+
+**Schema:** none.
+
+**Verification:**
+```sh
+pnpm --filter @avandar/pipeline-server test
+pnpm --filter @avandar/ava-cli test
+```
 
 ---
 
@@ -1608,10 +1736,14 @@ Its commits are covered by F19, not numbered here.
 | 124 | `d7fd436a8` | F23 |
 | 125 | `bc4baf853` | F23 |
 | 126 | `d50583f7e` | F23 |
+| 127 | `7f2d6dc8e` | F23 |
+| 128 | `d9c3bf6c0` | F23 |
+| 129 | `62ffe547a` | F23 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full
-under F21 in the same way.
+under F21 in the same way, F25's (merged in `a9d2ec770`) under F25, and
+F26's (merged in `d0af42ce6`) under F26.
 
 `051a30ebf`, from `fix/catalog-loadable-filter`, fixes F19's loadable-only
 filter and is listed under F19.

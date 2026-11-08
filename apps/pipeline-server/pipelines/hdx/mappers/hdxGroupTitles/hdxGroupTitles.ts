@@ -1,6 +1,6 @@
 /**
- * Mapper script for `domains`: the title of each group a CKAN package is
- * in. On HDX, groups are mostly countries.
+ * The title of each group a CKAN package is in. On HDX, groups are mostly
+ * countries. `hdxKeywords` lists them after the package's tags.
  */
 export default function hdxGroupTitles(record: unknown): readonly string[] {
   const groups = (record as { groups?: unknown } | null)?.groups;
