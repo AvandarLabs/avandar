@@ -125,6 +125,13 @@ export type ChatCaseValuePickerRuleType =
   | "max"
   | "min";
 
+/**
+ * How many values a chat-drafted field keeps for one case: `single` reduces
+ * the dataset's rows with a value picker, `list` keeps every value. Mirrors
+ * `ConceptAttribute.ValueShape`.
+ */
+export type ChatCaseValueShape = "single" | "list";
+
 /** One attribute the case-manager model wants stored on a new concept. */
 export type ChatCreatedCaseAttribute =
   | {
@@ -134,6 +141,9 @@ export type ChatCreatedCaseAttribute =
       datasetId: string;
       columnId: string;
       isLabel?: boolean;
+      /** Absent means `single`. A join key or the label is always `single`. */
+      valueShape?: ChatCaseValueShape;
+      /** Absent for a list, which keeps every value. */
       valuePickerRuleType?: ChatCaseValuePickerRuleType;
     }
   | {
@@ -203,6 +213,12 @@ export type ChatProposedCaseAttribute = {
   name: string;
   description?: string;
   isIncluded: boolean;
+  /** Whether the field keeps one value or every value. */
+  valueShape: ChatCaseValueShape;
+  /**
+   * The rule that picks one value. Kept for a list too, so the card can
+   * switch the field back to one value without asking for a rule.
+   */
   valuePickerRuleType: ChatCaseValuePickerRuleType;
 };
 

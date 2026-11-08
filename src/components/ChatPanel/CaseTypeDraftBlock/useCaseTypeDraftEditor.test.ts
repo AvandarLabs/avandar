@@ -35,6 +35,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: PK_COLUMN_ID,
         name: "Row id",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "first",
       },
       {
@@ -42,6 +43,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: STATE_COLUMN_ID,
         name: "State",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "most_frequent",
       },
       {
@@ -49,6 +51,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: CENSUS_KEY_COLUMN_ID,
         name: "Census county code",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "first",
       },
       {
@@ -56,6 +59,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: POPULATION_COLUMN_ID,
         name: "Population",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "max",
       },
     ],

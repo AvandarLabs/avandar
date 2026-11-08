@@ -35,6 +35,10 @@ function _parseDatasetColumnAttribute(
     ...(_asTrimmedString(raw.description)
       ? { description: _asTrimmedString(raw.description) }
       : {}),
+    // A label names a case, so it never keeps every value.
+    ...(raw.valueShape === "list" && raw.isLabel !== true
+      ? { valueShape: "list" as const }
+      : {}),
     ...(raw.isLabel === true ? { isLabel: true } : {}),
   };
 }
@@ -93,6 +97,31 @@ function _parseIdentities(raw: unknown): ChatCaseSourceDataset[] {
     });
 }
 
+/**
+ * A join key matches rows to a case, so a dataset column that is one keeps
+ * one value whatever the model sent.
+ */
+function _withoutListJoinKeys(
+  attributes: readonly ChatCreatedCaseAttribute[],
+  identities: readonly ChatCaseSourceDataset[],
+): ChatCreatedCaseAttribute[] {
+  const joinKeyColumnIds = new Set(
+    identities.map((identity) => {
+      return identity.primaryKeyColumnId;
+    }),
+  );
+  return attributes.map((attribute) => {
+    if (
+      attribute.kind !== "dataset_column" ||
+      !joinKeyColumnIds.has(attribute.columnId)
+    ) {
+      return attribute;
+    }
+    const { valueShape: _valueShape, ...singleAttribute } = attribute;
+    return singleAttribute;
+  });
+}
+
 function _parseCaseType(raw: unknown): ChatCreatedCaseType | undefined {
   if (!raw || typeof raw !== "object") {
     return undefined;
@@ -125,7 +154,7 @@ function _parseCaseType(raw: unknown): ChatCreatedCaseType | undefined {
     name,
     allowManualCreation: record.allowManualCreation === true,
     identities,
-    attributes,
+    attributes: _withoutListJoinKeys(attributes, identities),
     ...(_asTrimmedString(record.description)
       ? { description: _asTrimmedString(record.description) }
       : {}),

@@ -130,6 +130,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: FIPS_COLUMN_ID,
         name: "County code",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "first",
       },
       {
@@ -137,6 +138,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: STATE_COLUMN_ID,
         name: "State",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "most_frequent",
       },
       {
@@ -144,6 +146,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: DEATHS_COLUMN_ID,
         name: "Total deaths",
         isIncluded: false,
+        valueShape: "single",
         valuePickerRuleType: "sum",
       },
       {
@@ -151,6 +154,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: CENSUS_FIPS_COLUMN_ID,
         name: "Census county code",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "first",
       },
       {
@@ -158,6 +162,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: POPULATION_COLUMN_ID,
         name: "Population",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "max",
       },
     ],

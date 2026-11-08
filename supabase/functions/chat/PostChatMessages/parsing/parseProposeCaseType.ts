@@ -6,6 +6,7 @@ import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRu
 import type {
   ChatCaseSourceDataset,
   ChatCaseValuePickerRuleType,
+  ChatCaseValueShape,
   ChatProposedCaseAttribute,
   ChatProposedCaseType,
   ChatProposedManualEntryAttribute,
@@ -57,6 +58,14 @@ function _asValuePickerRuleType(value: unknown): ChatCaseValuePickerRuleType {
       return rule === text;
     }) ?? ValuePickerRule.DEFAULT_RULE_TYPE
   );
+}
+
+/**
+ * Anything but an explicit list keeps one value, which is the safe reading
+ * of a malformed proposal: the user can still switch it in the card.
+ */
+function _asValueShape(value: unknown): ChatCaseValueShape {
+  return value === "list" ? "list" : "single";
 }
 
 /**
@@ -116,6 +125,7 @@ function _parseAttribute(
     // is common, so the attribute is renamed rather than dropped.
     name: ConceptStatus.toNonReservedAttributeName(name),
     isIncluded: record.isIncluded !== false,
+    valueShape: _asValueShape(record.valueShape),
     valuePickerRuleType: _toCatalogAllowedRuleType({
       rawRuleType: record.valuePickerRuleType,
       columnDataType: columnDataTypesById.get(columnId),
@@ -197,6 +207,30 @@ function _parseSourceAttributes(
   });
 }
 
+/**
+ * A join key matches rows to a case and the label names it, and neither can
+ * be a list, so those columns keep one value whatever the model proposed.
+ */
+function _withKeyAndLabelColumnsSingle(
+  options: Readonly<{
+    attributes: readonly ChatProposedCaseAttribute[];
+    sourceDatasets: readonly ChatCaseSourceDataset[];
+    labelColumnId: string | undefined;
+  }>,
+): ChatProposedCaseAttribute[] {
+  const singleColumnIds = new Set([
+    ...options.sourceDatasets.map((sourceDataset) => {
+      return sourceDataset.primaryKeyColumnId;
+    }),
+    ...(options.labelColumnId ? [options.labelColumnId] : []),
+  ]);
+  return options.attributes.map((attribute) => {
+    return singleColumnIds.has(attribute.columnId)
+      ? { ...attribute, valueShape: "single" }
+      : attribute;
+  });
+}
+
 /** The tool call's arguments as a record, or undefined when not valid JSON. */
 function _parseArgsRecord(
   argsJson: string | undefined,
@@ -222,7 +256,9 @@ function _parseArgsRecord(
  * set.
  *
  * A value rule its column's catalog type does not allow becomes
- * `most_frequent`.
+ * `most_frequent`. A list field keeps its rule too, so the card can switch
+ * it back to one value. A join key and the label column always keep one
+ * value.
  */
 export function parseProposeCaseType(
   argsJson: string | undefined,
@@ -256,7 +292,11 @@ export function parseProposeCaseType(
     name,
     allowManualCreation: record.allowManualCreation === true,
     sourceDatasets,
-    attributes,
+    attributes: _withKeyAndLabelColumnsSingle({
+      attributes,
+      sourceDatasets,
+      labelColumnId,
+    }),
     manualEntryAttributes: _parseList(
       record.manualEntryAttributes,
       _parseManualEntryAttribute,

@@ -15,12 +15,44 @@ const DEATHS_KEY_COLUMN_ID = "1a2b3c4d-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_KEY_COLUMN_ID = "1a2b3c4d-bbbb-4bbb-8ccc-ddddeeeeffff";
 const STATE_COLUMN_ID = "2b3c4d5e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const POPULATION_COLUMN_ID = "2b3c4d5e-bbbb-4bbb-8ccc-ddddeeeeffff";
+const SYMPTOMS_COLUMN_ID = "3c4d5e6f-aaaa-4bbb-8ccc-ddddeeeeffff";
 
 /** Parses a draft against a catalog that lists no columns. */
 function _parse(
   argsJson: string | undefined,
 ): ReturnType<typeof parseProposeCaseType> {
   return parseProposeCaseType(argsJson, { columns: [] });
+}
+
+/** A one-dataset proposal: the join key is the deaths key, the label State. */
+function _proposeWithAttributes(attributes: readonly unknown[]): string {
+  return JSON.stringify({
+    name: "Measles case",
+    sourceDatasets: [
+      {
+        datasetId: DEATHS_DATASET_ID,
+        primaryKeyColumnId: DEATHS_KEY_COLUMN_ID,
+      },
+    ],
+    labelColumnId: STATE_COLUMN_ID,
+    attributes,
+    manualEntryAttributes: [],
+  });
+}
+
+function _attribute(
+  columnId: string,
+  name: string,
+  valueShape?: unknown,
+): Record<string, unknown> {
+  return {
+    datasetId: DEATHS_DATASET_ID,
+    columnId,
+    name,
+    isIncluded: true,
+    valuePickerRuleType: "first",
+    ...(valueShape === undefined ? {} : { valueShape }),
+  };
 }
 
 describe("parseProposeCaseType", () => {
@@ -139,7 +171,62 @@ describe("parseProposeCaseType", () => {
     ]);
   });
 
-  it("includes attributes by default and falls back to most_frequent", () => {
+  it("reads a proposed list field as keeping every value", () => {
+    const parsed = _parse(
+      _proposeWithAttributes([
+        _attribute(STATE_COLUMN_ID, "State"),
+        _attribute(SYMPTOMS_COLUMN_ID, "Symptoms", "list"),
+      ]),
+    );
+
+    expect(parsed?.attributes[1]?.valueShape).toBe("list");
+  });
+
+  it("keeps a list field's value rule so the card can switch it back", () => {
+    const parsed = _parse(
+      _proposeWithAttributes([
+        _attribute(SYMPTOMS_COLUMN_ID, "Symptoms", "list"),
+      ]),
+    );
+
+    expect(parsed?.attributes[0]).toMatchObject({
+      valueShape: "list",
+      valuePickerRuleType: "first",
+    });
+  });
+
+  it("reads a field with no value shape, or an unknown one, as keeping one value", () => {
+    const parsed = _parse(
+      _proposeWithAttributes([
+        _attribute(STATE_COLUMN_ID, "State"),
+        _attribute(SYMPTOMS_COLUMN_ID, "Symptoms", "many"),
+      ]),
+    );
+
+    expect(
+      parsed?.attributes.map((attribute) => {
+        return attribute.valueShape;
+      }),
+    ).toEqual(["single", "single"]);
+  });
+
+  it("keeps the label column and every join key to one value even when proposed as lists", () => {
+    const parsed = _parse(
+      _proposeWithAttributes([
+        _attribute(DEATHS_KEY_COLUMN_ID, "County code", "list"),
+        _attribute(STATE_COLUMN_ID, "State", "list"),
+        _attribute(SYMPTOMS_COLUMN_ID, "Symptoms", "list"),
+      ]),
+    );
+
+    expect(
+      parsed?.attributes.map((attribute) => {
+        return attribute.valueShape;
+      }),
+    ).toEqual(["single", "single", "list"]);
+  });
+
+  it("includes attributes by default as one value and falls back to most_frequent", () => {
     const parsed = _parse(
       JSON.stringify({
         name: "Doctor",
@@ -165,6 +252,7 @@ describe("parseProposeCaseType", () => {
         columnId: STATE_COLUMN_ID,
         name: "Specialty",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "most_frequent",
       },
     ]);
