@@ -6,11 +6,23 @@ the requested pipeline.
 The current placeholder implementation returns the pipeline name as a plain text
 response.
 
-## Endpoint
+## Endpoints
 
-- `POST /:pipelineName/run`
-- Header: `Authorization: Bearer $AVA_PIPELINE_SERVER_SECRET`
-- Example: `POST /daily-sync/run`
+Every endpoint needs `Authorization: Bearer $AVA_PIPELINE_SERVER_SECRET`. One
+that writes to Supabase also needs the project to write to, in
+`X-Ava-Supabase-Url` and `X-Ava-Supabase-Service-Role-Key`: the server keeps
+no Supabase credentials.
+
+- `POST /:pipelineName/run`, such as `POST /socrata/run`: runs a pipeline and
+  answers with its report once it ends.
+- `GET /:pipelineName/scopes`: lists each drive's live scope keys.
+- `POST /open-data-cache/:catalogListingId/build` with `{ "buildId": "<uuid>" }`:
+  queues a build of an API-backed catalog listing's Parquet copy and answers
+  202 straight away. The build id comes from
+  `rpc_data_catalog_listings__request_parquet_cache`, which the caller runs
+  first. The server builds one copy at a time, records the copy or the
+  failure on the listing, and deletes the copy it replaced. See
+  `docs/measles-demo/odc-parquet-cache-spec.md`.
 
 ## Environment variables
 
@@ -18,6 +30,11 @@ response.
   pipeline run.
 - `HOST` (optional): Defaults to `0.0.0.0`.
 - `PORT` (optional): For localhost only, defaults to `4611`.
+- `AVA_DUCKDB_MEMORY_LIMIT` (optional): How much memory one Parquet copy's
+  DuckDB conversion uses before it spills to the temp directory. Defaults to
+  `1GB`.
+- `TMPDIR` (optional): Where Parquet copy builds stream their sources. On
+  Fly it is the data volume.
 - `SOCRATA_APP_TOKEN` (optional): App token for the `socrata` pipeline, which
   raises the Socrata API's rate limit. Locally, copy `.env.pipelines.example`
   at the repo root to `.env.pipelines.local` and fill it in. In production,

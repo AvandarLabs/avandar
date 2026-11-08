@@ -244,7 +244,7 @@ and its cache columns are removed.
 |---|---|---|
 | S1 | Drop the `opendata` authenticated write policies. **Done.** | none |
 | S2 | Pipeline server: the cache builder, driven by each pipeline's `download` manifest block. Paged sources are copied one part at a time; one-file sources are gzipped on disk. **Done.** | none |
-| S3 | Pipeline server: the build route, its auth, and one-build-per-listing. On start, it deletes temp folders a killed build left behind. The always-on Fly config and the templated deploy are **done**. | S2 |
+| S3 | Pipeline server: the build route, its auth, and one-build-per-listing. Builds run one at a time; a build whose claim was taken over is skipped, and one superseded while it ran deletes its copy. On start, it deletes temp folders a killed build left behind. **Done.** | S2 |
 | S4 | Schema: the cache columns, constraints, and the three RPCs. **Done.** | none |
 | S5 | Edge function: the `parquet-cache` route (freshness check, lost-build rule, triggering S3) | S3, S4 |
 | S6 | App: `DatasetParquetWrapper` and "Add to workspace" read the copy and show its preparing state | S5 |
