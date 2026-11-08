@@ -1,0 +1,8 @@
+/*
+ * The chart body inside a result card in the chat. The chat column is
+ * narrow, so the chart takes a fixed height and the full width.
+ */
+.body {
+  block-size: 260px;
+  padding: var(--mantine-spacing-xs);
+}

@@ -25,11 +25,15 @@ export type DbAnalyticsEventName = (typeof DB_ANALYTICS_EVENT_NAMES)[number];
 /** Every analytics event name accepted by the platform. */
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
 
-/** Which surface executed a query. Recorded on failures from every surface. */
+/**
+ * Which surface executed a query. Recorded on failures from every surface.
+ * `chat_result`: an agent result re-run in the chat.
+ */
 export type QueryAnalyticsSurface =
   | "data_explorer"
   | "dashboard_block"
-  | "viz_config";
+  | "viz_config"
+  | "chat_result";
 
 /**
  * What caused a query to run.

@@ -10,7 +10,11 @@ import type {
 import type { ReactNode } from "react";
 
 type Props = {
-  definition: GadgetDefinition;
+  /** The parts of a gadget type the header draws. */
+  definition: Pick<
+    GadgetDefinition,
+    "Icon" | "label" | "loadingLabel" | "unavailableLabel"
+  >;
   summary: GadgetSummary;
 
   /** The id the card's group is labelled by, set on the title. */
