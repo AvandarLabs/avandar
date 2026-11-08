@@ -1,3 +1,4 @@
+import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { Verdict } from "./grading/ResultMatchers";
 import type { EvalQueryResult } from "./runtime/EvalDatabase";
 
@@ -23,7 +24,13 @@ export type GradeContext = {
 /** One question in the eval, with its ground truth and grader. */
 export type EvalQuestion = {
   id: string;
-  category: "basic" | "intermediate" | "hard" | "non_technical" | "follow_up";
+  category:
+    | "basic"
+    | "intermediate"
+    | "hard"
+    | "non_technical"
+    | "follow_up"
+    | "page_context";
   prompt: string;
   /** The question this one follows in the same conversation. */
   followsId?: string;
@@ -39,6 +46,12 @@ export type EvalQuestion = {
    */
   truth: Readonly<Record<string, string>>;
   grade: (context: GradeContext) => Verdict;
+  /**
+   * What is on screen when the user asks. The Pi harness renders it with
+   * the app's `buildAgentPageContextBlock`. The baseline harness passes the
+   * Data Explorer part as today's chat's page context.
+   */
+  pageContext?: AgentPageContext;
   /** The user asked for a chart, so a table alone is a miss. */
   expectsChart?: boolean;
 };

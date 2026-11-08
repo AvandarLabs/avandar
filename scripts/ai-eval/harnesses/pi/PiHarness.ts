@@ -1,5 +1,8 @@
 import { createModels } from "@earendil-works/pi-ai/models";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
+import { buildAgentPageContextBlock } from "$/agent/pageContext/buildAgentPageContextBlock";
+import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import { COVID_DATASETS } from "../../covid/covidWorkspace";
@@ -119,6 +122,7 @@ export function createPiConversation(
   }>,
 ): EvalConversation {
   const recorder: QuestionRecorder = { consentPrompts: 0 };
+  let lastPageBlock: string | undefined;
   const dataAgent = options.createAgent(
     _createEvalHost(options.database, recorder),
   );
@@ -132,7 +136,20 @@ export function createPiConversation(
         consentPrompts: 0,
       });
       const startedAt = performance.now();
-      const reply = await dataAgent.ask(question.prompt);
+      const pageBlock = question.pageContext
+        ? buildAgentPageContextBlock({
+            context: question.pageContext,
+            aliases: SqlTableAlias.fromDatasets(COVID_DATASETS),
+          })
+        : undefined;
+      const reply = await dataAgent.ask(
+        buildAgentTurnText({
+          message: question.prompt,
+          pageBlock,
+          previousPageBlock: lastPageBlock,
+        }),
+      );
+      lastPageBlock = pageBlock ?? lastPageBlock;
       const lastQuery = reply.state.lastQuery;
       const answer: EvalAnswer = {
         finalSql: lastQuery?.sql,
