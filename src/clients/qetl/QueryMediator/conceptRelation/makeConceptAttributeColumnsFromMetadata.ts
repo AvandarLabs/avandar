@@ -148,7 +148,7 @@ function _getPrimaryKeyColumnNameByDatasetId(
 
 /**
  * The typed column an attribute with nothing to read becomes: a NULL, or an
- * empty list for a list attribute.
+ * empty list for a list or per-period attribute.
  */
 function _buildUnmappedColumn(
   attribute: Readonly<ConceptAttribute.T>,
@@ -165,23 +165,105 @@ function _buildUnmappedColumn(
 }
 
 /**
+ * Whether a date column loads as a `TIMESTAMP WITH TIME ZONE`. It keeps the
+ * zoned type its file was detected with only while its stored type is still
+ * `timestamp`. A column retyped to `timestamp` from another detected type is
+ * cast to a plain `TIMESTAMP` on load, which has no zone.
+ */
+function _isZonedTimestampColumn(column: DatasetColumn.T): boolean {
+  return (
+    column.dataType === "timestamp" &&
+    (column.detectedDataType === "TIMESTAMP_TZ" ||
+      column.detectedDataType === "TIMESTAMP WITH TIME ZONE")
+  );
+}
+
+/**
+ * A per-period field's period and the date column it groups its rows by.
+ *
+ * Fails closed, like the value column: a period with no readable date column
+ * would answer every record with an empty list, which reads as "no data"
+ * for data that may well exist.
+ */
+function _buildBucket(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    metadata: ConceptRelationMetadata;
+  }>,
+): Pick<
+  Extract<ConceptAttributeValueRule, { valueShape: "bucketed_list" }>,
+  "bucketGrain" | "bucketColumnName" | "isBucketColumnZoned"
+> {
+  const { attribute, mapping, metadata } = options;
+  const field = `Concept attribute '${attribute.name}' (${attribute.id})`;
+  // `getValueShape` is per-period only for a field with a period; this
+  // restates that for the compiler.
+  if (attribute.bucketGrain === undefined) {
+    throw new Error(`${field} has no period.`);
+  }
+  if (mapping.bucketColumnId === undefined) {
+    throw new Error(
+      `${field} keeps one value per ${attribute.bucketGrain}, but its ` +
+        `mapping names no date column.`,
+    );
+  }
+  const bucketColumn = metadata.datasetColumnsById[mapping.bucketColumnId];
+  if (!bucketColumn) {
+    throw new Error(
+      `${field} groups its rows by date column '${mapping.bucketColumnId}', ` +
+        `which does not exist.`,
+    );
+  }
+  if (bucketColumn.datasetId !== mapping.datasetId) {
+    throw new Error(
+      `${field} groups its rows by column '${bucketColumn.name}' of dataset ` +
+        `'${bucketColumn.datasetId}', not of the dataset it reads ` +
+        `('${mapping.datasetId}').`,
+    );
+  }
+  if (!ConceptAttribute.isBucketDateColumnType(bucketColumn.dataType)) {
+    throw new Error(
+      `${field} groups its rows by column '${bucketColumn.name}', which is ` +
+        `'${bucketColumn.dataType}', not a date or timestamp.`,
+    );
+  }
+  return {
+    bucketGrain: attribute.bucketGrain,
+    bucketColumnName: bucketColumn.name,
+    isBucketColumnZoned: _isZonedTimestampColumn(bucketColumn),
+  };
+}
+
+/**
  * How one dataset-column attribute's rows become its value, from the
  * attribute's value shape. A list keeps every value and drops any rule its
  * mapping still stores. A single value needs a rule, and an attribute without
  * one is a broken ontology: guessing a rule would answer with a value nobody
- * chose, so it throws, naming the attribute.
+ * chose, so it throws, naming the attribute. A per-period field needs a rule
+ * and a date column of its own dataset.
  */
 function _getValueRule(
   options: Readonly<{
     attribute: ConceptAttribute.T;
     mapping: DatasetColumnMapping;
+    metadata: ConceptRelationMetadata;
   }>,
 ): ConceptAttributeValueRule {
-  const { attribute } = options;
-  return match(ConceptAttribute.getValueShape(attribute))
+  const { attribute, mapping } = options;
+  const ruleType = mapping.valuePickerRuleType;
+  const valueShape = ConceptAttribute.getValueShape(attribute);
+  // A date column means something only to a per-period field; anywhere else
+  // the ontology is inconsistent, and ignoring it would hide that.
+  if (valueShape !== "bucketed_list" && mapping.bucketColumnId !== undefined) {
+    throw new Error(
+      `Concept attribute '${attribute.name}' (${attribute.id}) has no ` +
+        `period, but its mapping names date column '${mapping.bucketColumnId}'.`,
+    );
+  }
+  return match(valueShape)
     .returnType<ConceptAttributeValueRule>()
     .with("single", () => {
-      const ruleType = options.mapping.valuePickerRuleType;
       if (ruleType === undefined) {
         throw new Error(
           `Concept attribute '${attribute.name}' (${attribute.id}) keeps one ` +
@@ -193,6 +275,19 @@ function _getValueRule(
     .with("list", () => {
       return { valueShape: "list" };
     })
+    .with("bucketed_list", () => {
+      if (ruleType === undefined) {
+        throw new Error(
+          `Concept attribute '${attribute.name}' (${attribute.id}) keeps ` +
+            `one value per period, but its mapping names no value rule.`,
+        );
+      }
+      return {
+        valueShape: "bucketed_list",
+        valuePickerRuleType: ruleType,
+        ..._buildBucket(options),
+      };
+    })
     .exhaustive();
 }
 
@@ -202,8 +297,9 @@ function _getValueRule(
  * the column's type, or when the column's type changed afterwards. DuckDB
  * would otherwise refuse the whole view (`sum(VARCHAR)` does not bind), or
  * answer `max` over a yes/no column with a value the rule table calls
- * meaningless, and neither names the field.
- * A list attribute applies no rule, so it is not checked.
+ * meaningless, and neither names the field. A per-period attribute applies
+ * its rule to each period, so it is checked the same way. A list attribute
+ * applies no rule, so it is not checked.
  */
 function _assertRuleAllowedForColumn(
   options: Readonly<{
@@ -301,7 +397,7 @@ function _buildMappedAttributeColumn(
     mapping,
     metadata,
   });
-  const valueRule = _getValueRule({ attribute, mapping });
+  const valueRule = _getValueRule({ attribute, mapping, metadata });
   _assertRuleAllowedForColumn({ attribute, valueRule, datasetColumn });
 
   return {
@@ -324,10 +420,11 @@ function _buildMappedAttributeColumn(
  * Turns one attribute into the column the concept's view emits for it.
  *
  * A `manual_entry` attribute, and an attribute with no mapping row at all,
- * become a typed NULL, or an empty list for a list attribute, rather than an
- * error. Do not throw for them instead: one manually entered attribute would
- * make the whole concept unqueryable, while a typed column keeps the
- * relation's schema complete and is honest, because no value is stored for it.
+ * become a typed NULL, or an empty list for a list or per-period attribute,
+ * rather than an error. Do not throw for them instead: one manually entered
+ * attribute would make the whole concept unqueryable, while a typed column
+ * keeps the relation's schema complete and is honest, because no value is
+ * stored for it.
  */
 function _buildAttributeColumn(
   options: Readonly<{

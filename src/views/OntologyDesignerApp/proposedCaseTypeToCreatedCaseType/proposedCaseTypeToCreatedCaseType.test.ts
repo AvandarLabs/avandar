@@ -294,4 +294,32 @@ describe("proposedCaseTypeToCreatedCaseType", () => {
     expect(created).not.toHaveProperty("statuses");
     expect(created).not.toHaveProperty("defaultStatusName");
   });
+
+  it("carries a per-year field's rule, period, and date column", () => {
+    const draft = makeDraft();
+    const created = proposedCaseTypeToCreatedCaseType({
+      ...draft,
+      attributes: draft.attributes.map((attribute) => {
+        return attribute.name === "Population"
+          ? {
+              ...attribute,
+              valueShape: "bucketed_list",
+              bucketGrain: "year",
+              bucketColumnId: "6f708192-cccc-4bbb-8ccc-ddddeeeeffff",
+            }
+          : attribute;
+      }),
+    });
+
+    expect(
+      created.attributes.find((attribute) => {
+        return attribute.name === "Population";
+      }),
+    ).toMatchObject({
+      valueShape: "bucketed_list",
+      bucketGrain: "year",
+      bucketColumnId: "6f708192-cccc-4bbb-8ccc-ddddeeeeffff",
+      valuePickerRuleType: "max",
+    });
+  });
 });

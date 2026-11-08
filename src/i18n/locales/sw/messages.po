@@ -1751,6 +1751,10 @@ msgstr "Shiriki kwenye workspace yako"
 msgid "Enter your email to get a reset link"
 msgstr "Ingiza barua yako ya pepe kupata kiungo cha kurekebisha"
 
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "Per period"
+msgstr "Kwa kila kipindi"
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.tsx
 msgid "Select a layer to edit how it is queried and drawn."
 msgstr "Chagua tabaka ili kuhariri jinsi linavyoulizwa na kuchorwa."
@@ -5065,8 +5069,8 @@ msgstr "{offlineOnlyTitle}: itaishi kwenye kompyuta hii pekee, na hakuna mtu "
 "mwingine kwenye timu yako atakayeweza kuifungua."
 
 #: src/components/caseFields/ValueShapeControl.tsx
-msgid "One value or every value for {fieldName}"
-msgstr "Thamani moja au thamani zote za {fieldName}"
+#~ msgid "One value or every value for {fieldName}"
+#~ msgstr "Thamani moja au thamani zote za {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -6844,6 +6848,11 @@ msgstr "Maelezo hayajajumuishwa bado."
 #~ msgid "Qwen 2.5 3B"
 #~ msgstr "Qwen 2.5 3B"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+msgid "In each period, if there are multiple {attributeName} values, then..."
+msgstr "Katika kila kipindi, ikiwa kuna thamani nyingi za {attributeName}, "
+"basi..."
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "Kunja paneli ya pembeni"
@@ -8204,6 +8213,10 @@ msgstr "Acha wazi wakati jiometri tayari ni WGS 84."
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Chart settings appear once the query returns some columns."
 msgstr "Mipangilio ya chati huonekana baada ya hoja kurejesha baadhi ya safu."
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "How many values {fieldName} keeps"
+msgstr "Idadi ya thamani ambazo {fieldName} huhifadhi"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx

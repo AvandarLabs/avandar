@@ -15,6 +15,7 @@ const PK_COLUMN_ID = "1a2b3c4d-aaaa-4bbb-8ccc-ddddeeeeffff";
 const STATE_COLUMN_ID = "2b3c4d5e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_KEY_COLUMN_ID = "3c4d5e6f-aaaa-4bbb-8ccc-ddddeeeeffff";
 const POPULATION_COLUMN_ID = "4d5e6f70-aaaa-4bbb-8ccc-ddddeeeeffff";
+const CENSUS_DATE_COLUMN_ID = "5e6f7081-bbbb-4bbb-8ccc-ddddeeeeffff";
 
 function makeDraft(): ChatProposedCaseType {
   return {
@@ -452,5 +453,108 @@ describe("useCaseTypeDraftEditor", () => {
         return attribute.name;
       }),
     ).toEqual(["Review notes"]);
+  });
+
+  it("keeps a column's value per month by the date column chosen", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setAttributeBucket(POPULATION_COLUMN_ID, {
+        bucketGrain: "month",
+        bucketColumnId: CENSUS_DATE_COLUMN_ID,
+      });
+    });
+
+    expect(
+      result.current.draft.attributes.find((attribute) => {
+        return attribute.columnId === POPULATION_COLUMN_ID;
+      }),
+    ).toMatchObject({
+      valueShape: "bucketed_list",
+      bucketGrain: "month",
+      bucketColumnId: CENSUS_DATE_COLUMN_ID,
+      valuePickerRuleType: "max",
+    });
+  });
+
+  it("drops the period when a column goes back to one value", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setAttributeBucket(POPULATION_COLUMN_ID, {
+        bucketGrain: "month",
+        bucketColumnId: CENSUS_DATE_COLUMN_ID,
+      });
+    });
+    act(() => {
+      result.current.setAttributeValueShape(POPULATION_COLUMN_ID, "single");
+    });
+
+    const population = result.current.draft.attributes.find((attribute) => {
+      return attribute.columnId === POPULATION_COLUMN_ID;
+    });
+    expect(population?.valueShape).toBe("single");
+    expect(population).not.toHaveProperty("bucketGrain");
+    expect(population).not.toHaveProperty("bucketColumnId");
+  });
+
+  it("keeps a join key at one value when asked for a period", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setAttributeBucket(PK_COLUMN_ID, {
+        bucketGrain: "month",
+        bucketColumnId: CENSUS_DATE_COLUMN_ID,
+      });
+    });
+
+    expect(
+      result.current.draft.attributes.find((attribute) => {
+        return attribute.columnId === PK_COLUMN_ID;
+      })?.valueShape,
+    ).toBe("single");
+  });
+
+  it("drops a column's period when it becomes the label", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setAttributeBucket(POPULATION_COLUMN_ID, {
+        bucketGrain: "month",
+        bucketColumnId: CENSUS_DATE_COLUMN_ID,
+      });
+    });
+    act(() => {
+      result.current.setLabelColumnId(POPULATION_COLUMN_ID);
+    });
+
+    const population = result.current.draft.attributes.find((attribute) => {
+      return attribute.columnId === POPULATION_COLUMN_ID;
+    });
+    expect(population?.valueShape).toBe("single");
+    expect(population).not.toHaveProperty("bucketGrain");
+  });
+
+  it("cannot create while an included per-period field has no date column", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor(makeDraft());
+    });
+
+    act(() => {
+      result.current.setAttributeBucket(POPULATION_COLUMN_ID, {
+        bucketGrain: "month",
+        bucketColumnId: undefined,
+      });
+    });
+
+    expect(result.current.canCreate).toBe(false);
   });
 });

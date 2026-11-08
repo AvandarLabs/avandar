@@ -6,6 +6,7 @@ import { AttributeNameFields } from "./AttributeNameFields";
 import { AttributeValueControls } from "./AttributeValueControls";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { ChatProposedCaseAttribute } from "$/types/chat.types";
+import type { DateColumnOption } from "@/components/caseFields/makeDateColumnOptions/makeDateColumnOptions";
 import type { CaseTypeDraftEditor } from "@/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor";
 
 type Props = {
@@ -15,12 +16,15 @@ type Props = {
   columnDataType: AvaDataType.T | undefined;
   isPrimaryKey: boolean;
   isLabelColumn: boolean;
+  /** The date and timestamp columns of the attribute's dataset. */
+  dateColumnOptions: readonly DateColumnOption[];
   editor: CaseTypeDraftEditor;
 };
 
 /**
  * One attribute in the draft card: whether to map it, what to call it, whether
- * it keeps one value or every value, and for one value, which to keep.
+ * it keeps one value, every value, or one value per period, and for one value
+ * or a period, which value to keep.
  */
 export function CaseTypeDraftAttributeRow(
   props: Readonly<Props>,
@@ -56,6 +60,7 @@ export function CaseTypeDraftAttributeRow(
           columnDataType={props.columnDataType}
           isPrimaryKey={isPrimaryKey}
           isLabelColumn={props.isLabelColumn}
+          dateColumnOptions={props.dateColumnOptions}
           editor={editor}
         />
       </div>

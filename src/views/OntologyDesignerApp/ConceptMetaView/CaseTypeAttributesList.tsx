@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { Badge, Group, Stack, Text } from "@mantine/core";
 import { match } from "ts-pattern";
 import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import { useBucketGrainLabels } from "@/components/caseFields/useBucketGrainLabels/useBucketGrainLabels";
 import css from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.module.css";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
@@ -84,6 +85,7 @@ function AttributeChips({
   attribute: Attribute;
   sourceName: string | undefined;
 }): ReactNode {
+  const grainLabels = useBucketGrainLabels();
   return (
     <Group gap="xs" wrap="nowrap">
       {attribute.isIdentifier ? (
@@ -106,6 +108,13 @@ function AttributeChips({
               <Trans>Every value</Trans>
             </Badge>
           );
+        })
+        .with("bucketed_list", () => {
+          return attribute.bucketGrain ? (
+            <Badge variant="light" color="neutral" size="sm">
+              {grainLabels[attribute.bucketGrain].perPeriod}
+            </Badge>
+          ) : null;
         })
         .exhaustive()}
       {sourceName ? (

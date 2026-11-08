@@ -3,13 +3,16 @@ import { Box } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { makeDateColumnOptions } from "@/components/caseFields/makeDateColumnOptions/makeDateColumnOptions";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { CaseTypeDraftCard } from "./CaseTypeDraftCard";
 import { useCaseTypeDraftCreation } from "./useCaseTypeDraftCreation";
 import { useCaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ChatProposedCaseType } from "$/types/chat.types";
+import type { DateColumnOption } from "@/components/caseFields/makeDateColumnOptions/makeDateColumnOptions";
 
 type CardProps = {
   draft: ChatProposedCaseType;
@@ -21,6 +24,31 @@ function _makeNamesById(
   return Object.fromEntries(
     (records ?? []).map((record) => {
       return [record.id, record.name];
+    }),
+  );
+}
+
+/** Each source dataset's date and timestamp columns, as picker options. */
+function _makeDateColumnOptionsByDatasetId(
+  columns: readonly DatasetColumn.T[] | undefined,
+): Readonly<Record<string, DateColumnOption[]>> {
+  const datasetIds = [
+    ...new Set(
+      (columns ?? []).map((column) => {
+        return column.datasetId;
+      }),
+    ),
+  ];
+  return Object.fromEntries(
+    datasetIds.map((datasetId) => {
+      return [
+        datasetId,
+        makeDateColumnOptions(
+          (columns ?? []).filter((column) => {
+            return column.datasetId === datasetId;
+          }),
+        ),
+      ];
     }),
   );
 }
@@ -63,6 +91,9 @@ function CaseTypeDraftCardContainer({
       }),
     );
   }, [datasetColumns]);
+  const dateColumnOptionsByDatasetId = useMemo(() => {
+    return _makeDateColumnOptionsByDatasetId(datasetColumns);
+  }, [datasetColumns]);
   const datasetNamesById = useMemo(() => {
     return _makeNamesById(datasets);
   }, [datasets]);
@@ -74,6 +105,7 @@ function CaseTypeDraftCardContainer({
         datasetNamesById={datasetNamesById}
         columnNamesById={columnNamesById}
         columnDataTypesById={columnDataTypesById}
+        dateColumnOptionsByDatasetId={dateColumnOptionsByDatasetId}
         isCreating={isCreating}
         onCreate={
           canCreateCaseType

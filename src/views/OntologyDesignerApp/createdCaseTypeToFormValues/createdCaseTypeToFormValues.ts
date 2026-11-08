@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { match } from "ts-pattern";
 import { uuid } from "$/lib/uuid";
 import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
@@ -11,6 +12,7 @@ import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/Conc
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
   ChatCaseSourceDataset,
+  ChatCreatedCaseAttribute,
   ChatCreatedCaseType,
 } from "$/types/chat.types";
 import type {
@@ -32,11 +34,64 @@ function _findColumn(
   });
 }
 
+/**
+ * How a mapped attribute keeps its values. A per-period attribute carries
+ * its period and its date column, already checked against the catalog.
+ */
+type MappedAttributeShape =
+  | { valueShape: "single" | "list" }
+  | {
+      valueShape: "bucketed_list";
+      bucketGrain: ConceptAttribute.BucketGrain;
+      bucketColumnId: DatasetColumn.Id;
+    };
+
+/**
+ * A chat attribute's shape, checked against the catalog, or `undefined` for
+ * a per-period attribute whose date column is unknown, belongs to another
+ * dataset, or is not a date or timestamp. Such an attribute is dropped, the
+ * way an unknown column id is.
+ */
+function _getShapeFromCatalog(
+  options: Readonly<{
+    attribute: Extract<ChatCreatedCaseAttribute, { kind: "dataset_column" }>;
+    column: CatalogColumn;
+    columns: readonly CatalogColumn[];
+  }>,
+): MappedAttributeShape | undefined {
+  const { attribute, column, columns } = options;
+  return match(attribute.valueShape ?? "single")
+    .with("single", "list", (valueShape): MappedAttributeShape => {
+      return { valueShape };
+    })
+    .with("bucketed_list", (): MappedAttributeShape | undefined => {
+      const bucketColumn =
+        attribute.bucketColumnId === undefined
+          ? undefined
+          : _findColumn(columns, attribute.bucketColumnId);
+      if (
+        attribute.bucketGrain === undefined ||
+        bucketColumn === undefined ||
+        bucketColumn.datasetId !== column.datasetId ||
+        !ConceptAttribute.isBucketDateColumnType(bucketColumn.dataType)
+      ) {
+        return undefined;
+      }
+      return {
+        valueShape: "bucketed_list",
+        bucketGrain: attribute.bucketGrain,
+        bucketColumnId: bucketColumn.id,
+      };
+    })
+    .exhaustive();
+}
+
 /** The mappings of a field that reads one dataset column. */
 function _createMappingsFromColumn(options: {
   conceptAttributeId: ConceptAttributeId;
   ruleType: ValuePickerRule.T;
   column: CatalogColumn;
+  bucketColumnId: DatasetColumn.Id | undefined;
 }): AttributeFormValues["mappings"] {
   const { conceptAttributeId, ruleType, column } = options;
   return {
@@ -50,6 +105,7 @@ function _createMappingsFromColumn(options: {
       valuePickerRuleType: ruleType,
       datasetId: column.datasetId,
       datasetColumnId: column.id,
+      bucketColumnId: options.bucketColumnId,
     },
   };
 }
@@ -61,14 +117,18 @@ function _makeMappedAttribute(options: {
   column: CatalogColumn;
   isIdentifier: boolean;
   isLabel: boolean;
-  valueShape: ConceptAttribute.ValueShape;
+  shape: MappedAttributeShape;
   valuePickerRuleType: ValuePickerRule.T;
 }): AttributeFormValues {
   const conceptAttributeId = uuid<ConceptAttributeId>();
-  // An identifier matches rows to a record and the label names it, so neither
-  // is ever a list.
-  const valueShape: ConceptAttribute.ValueShape =
-    options.isIdentifier || options.isLabel ? "single" : options.valueShape;
+  // An identifier matches rows to a record and the label names it, so
+  // neither is ever a list of either kind.
+  const shape: MappedAttributeShape =
+    options.isIdentifier || options.isLabel
+      ? { valueShape: "single" }
+      : options.shape;
+  const { valueShape } = shape;
+  const bucket = shape.valueShape === "bucketed_list" ? shape : undefined;
   const columnDataType = options.column.dataType;
   // An identifier shows the key itself, so it never reduces the column. Any
   // other field's rule is replaced when the column's type does not allow it.
@@ -93,10 +153,12 @@ function _makeMappedAttribute(options: {
     isLabel: options.isLabel,
     allowManualEdit: false,
     isArray: ConceptAttribute.valueShapeToIsArray(valueShape),
+    bucketGrain: bucket?.bucketGrain,
     mappings: _createMappingsFromColumn({
       conceptAttributeId,
       ruleType,
       column: options.column,
+      bucketColumnId: bucket?.bucketColumnId,
     }),
   } as const);
 }
@@ -140,7 +202,7 @@ function _makeMissingIdentifierAttributes(options: {
         column,
         isIdentifier: true,
         isLabel: false,
-        valueShape: "single",
+        shape: { valueShape: "single" },
         valuePickerRuleType: ValuePickerRule.DEFAULT_RULE_TYPE,
       }),
     ];
@@ -171,15 +233,25 @@ function _attributesFromCaseType(options: {
     if (!column) {
       return [];
     }
+    const isIdentifier = primaryKeyColumnIds.has(column.id);
+    // A join key and the label resolve no date column, so a bad period
+    // never drops them.
+    const shape: MappedAttributeShape | undefined =
+      isIdentifier || attribute.isLabel === true
+        ? { valueShape: "single" }
+        : _getShapeFromCatalog({ attribute, column, columns });
+    if (shape === undefined) {
+      return [];
+    }
     return [
       _makeMappedAttribute({
         conceptId,
         name: attribute.name,
         description: attribute.description,
         column,
-        isIdentifier: primaryKeyColumnIds.has(column.id),
+        isIdentifier,
         isLabel: attribute.isLabel === true,
-        valueShape: attribute.valueShape ?? "single",
+        shape,
         valuePickerRuleType:
           attribute.valuePickerRuleType ?? ValuePickerRule.DEFAULT_RULE_TYPE,
       }),

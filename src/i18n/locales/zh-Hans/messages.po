@@ -1682,6 +1682,10 @@ msgstr "与工作区共享"
 msgid "Enter your email to get a reset link"
 msgstr "输入您的电子邮件以获取重置链接"
 
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "Per period"
+msgstr "按时段"
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.tsx
 msgid "Select a layer to edit how it is queried and drawn."
 msgstr "选择一个图层，以编辑其查询和绘制方式。"
@@ -4879,8 +4883,8 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 msgstr "{offlineOnlyTitle}：它只会存储在此电脑上，团队中的其他人将无法打开它。"
 
 #: src/components/caseFields/ValueShapeControl.tsx
-msgid "One value or every value for {fieldName}"
-msgstr "{fieldName} 的一个值或所有值"
+#~ msgid "One value or every value for {fieldName}"
+#~ msgstr "{fieldName} 的一个值或所有值"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -6608,6 +6612,10 @@ msgstr "尚未添加描述。"
 #~ msgid "Qwen 2.5 3B"
 #~ msgstr "Qwen 2.5 3B"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+msgid "In each period, if there are multiple {attributeName} values, then..."
+msgstr "在每个时段中，如果有多个 {attributeName} 值，则..."
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "收起抽屉"
@@ -7926,6 +7934,10 @@ msgstr "如果几何图形已经是 WGS 84，请留空。"
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Chart settings appear once the query returns some columns."
 msgstr "查询返回一些列后，图表设置才会显示。"
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "How many values {fieldName} keeps"
+msgstr "{fieldName} 保留多少个值"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx

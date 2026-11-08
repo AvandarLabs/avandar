@@ -17,9 +17,9 @@ type Props = {
 };
 
 /**
- * Chooses whether a case type field keeps one value per record or every
- * value. Use it wherever a field is designed, for example the chat draft
- * card or the case type form.
+ * Chooses whether a case type field keeps one value per record, every value,
+ * or one value per period. Use it wherever a field is designed, for example
+ * the chat draft card or the case type form.
  */
 export function ValueShapeControl({
   fieldName,
@@ -33,12 +33,13 @@ export function ValueShapeControl({
   const labelsByValueShape: Record<ConceptAttribute.ValueShape, string> = {
     single: t`One value`,
     list: t`Every value`,
+    bucketed_list: t`Per period`,
   };
   return (
     <Stack gap={4} align="flex-start">
       <SegmentedControl
         size="xs"
-        aria-label={t`One value or every value for ${fieldName}`}
+        aria-label={t`How many values ${fieldName} keeps`}
         aria-describedby={description ? descriptionId : undefined}
         data={objectKeys(labelsByValueShape).map((valueShape) => {
           return { value: valueShape, label: labelsByValueShape[valueShape] };

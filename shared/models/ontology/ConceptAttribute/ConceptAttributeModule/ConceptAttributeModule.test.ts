@@ -218,3 +218,25 @@ describe("toBucketedListEntries", () => {
     expect(ConceptAttribute.toBucketedListEntries(value)).toBeUndefined();
   });
 });
+
+describe("per-period fields", () => {
+  it("reads a field with a period as a per-period list", () => {
+    expect(
+      ConceptAttribute.getValueShape({ isArray: true, bucketGrain: "month" }),
+    ).toBe("bucketed_list");
+  });
+
+  it("stores a per-period field as an array", () => {
+    expect(ConceptAttribute.valueShapeToIsArray("bucketed_list")).toBe(true);
+  });
+
+  it("types a per-period field as its rule's output, the type of each period's value", () => {
+    expect(
+      ConceptAttribute.getOutputDataType({
+        valueShape: "bucketed_list",
+        ruleType: "count",
+        columnDataType: "varchar",
+      }),
+    ).toBe("bigint");
+  });
+});

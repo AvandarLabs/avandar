@@ -171,6 +171,82 @@ const TAGS_MAPPING = _mapping({
   columnName: "tag",
 });
 
+/** `_metadata` plus dataset columns no mapping reads as its value. */
+function _metadataWithColumns(
+  options: Readonly<{
+    attributes: readonly ConceptAttribute.T[];
+    mappings: readonly MappedColumn[];
+    extraColumns: readonly DatasetColumn.T[];
+  }>,
+): ConceptRelationMetadata {
+  const metadata = _metadata(options);
+  return {
+    ...metadata,
+    datasetColumnsById: {
+      ...metadata.datasetColumnsById,
+      ...Object.fromEntries(
+        options.extraColumns.map((column) => {
+          return [column.id, column];
+        }),
+      ),
+    },
+  };
+}
+
+/** A dataset column with a type, which column resolution checks. */
+function _typedColumn(
+  options: Readonly<{
+    datasetId: Dataset.Id;
+    columnName: string;
+    dataType: DatasetColumn.T["dataType"];
+  }>,
+): DatasetColumn.T {
+  return {
+    id: `col-${options.datasetId}-${options.columnName}` as DatasetColumn.Id,
+    name: options.columnName,
+    datasetId: options.datasetId,
+    dataType: options.dataType,
+  } as DatasetColumn.T;
+}
+
+const AGE_PER_MONTH = _attribute({
+  name: "age per month",
+  dataType: "bigint",
+  isArray: true,
+  bucketGrain: "month",
+});
+const SEEN_ON = _typedColumn({
+  datasetId: DATASET_A,
+  columnName: "seen_on",
+  dataType: "date",
+});
+const TAG_COLUMN = _typedColumn({
+  datasetId: DATASET_A,
+  columnName: "tag",
+  dataType: "varchar",
+});
+const OTHER_DATASET_DATE = _typedColumn({
+  datasetId: DATASET_B,
+  columnName: "seen_on",
+  dataType: "date",
+});
+
+/** The per-month field's mapping: the monthly max of `age_years`. */
+function _agePerMonthMapping(
+  dateColumn: DatasetColumn.T | undefined,
+): MappedColumn {
+  const mapped = _mapping({
+    attributeName: "age per month",
+    datasetId: DATASET_A,
+    columnName: "age_years",
+    ruleType: "max",
+  });
+  return {
+    ...mapped,
+    mapping: { ...mapped.mapping, bucketColumnId: dateColumn?.id },
+  };
+}
+
 /**
  * Builds the fixture world: two contributing datasets as parquet with their
  * `ava_rows_` views, plus the spine.
@@ -187,10 +263,10 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
   await connection.run(`
     COPY (
       SELECT * FROM (VALUES
-        (101, 41, 'blue'),
-        (101, 42, 'green'),
-        (102, 50, 'red')
-      ) AS t(person_id, age_years, tag)
+        (101, 41, 'blue', DATE '2026-01-05'),
+        (101, 42, 'green', DATE '2026-02-10'),
+        (102, 50, 'red', DATE '2026-01-20')
+      ) AS t(person_id, age_years, tag, seen_on)
     ) TO '${pathA}' (FORMAT parquet)
   `);
   await connection.run(`
@@ -252,6 +328,40 @@ async function _queryConcept(
       `SELECT * FROM "${CONCEPT_VIEW}" ORDER BY external_id`,
     );
     return reader.getRowObjects().map(_normalize);
+  });
+}
+
+/** Builds the view from metadata and reads one field as JSON per record. */
+async function _queryFieldAsJson(
+  options: Readonly<{ metadata: ConceptRelationMetadata; fieldName: string }>,
+): Promise<Array<{ externalId: string; value: unknown; typeName: string }>> {
+  const { attributeColumns } = makeConceptAttributeColumnsFromMetadata(
+    options.metadata,
+  );
+  return await withDuckDb(async (connection) => {
+    await _seed(connection);
+    await connection.run(
+      buildConceptViewSql({
+        viewName: CONCEPT_VIEW,
+        spineTableName: SPINE,
+        attributeColumns,
+      }),
+    );
+    const reader = await connection.runAndReadAll(`
+      SELECT
+        external_id,
+        CAST(to_json("${options.fieldName}") AS VARCHAR) AS field_json,
+        typeof("${options.fieldName}") AS type_name
+      FROM "${CONCEPT_VIEW}"
+      ORDER BY external_id
+    `);
+    return reader.getRowObjectsJson().map((row) => {
+      return {
+        externalId: String(row.external_id),
+        value: JSON.parse(String(row.field_json)),
+        typeName: String(row.type_name),
+      };
+    });
   });
 }
 
@@ -722,5 +832,96 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
         return row.tags;
       }),
     ).toEqual([["blue", "green"], ["red"], []]);
+  });
+  it("reads a per-month field through its date column", async () => {
+    const rows = await _queryFieldAsJson({
+      metadata: _metadataWithColumns({
+        attributes: [PERSON_ID, AGE_PER_MONTH],
+        mappings: [PERSON_ID_MAPPING, _agePerMonthMapping(SEEN_ON)],
+        extraColumns: [SEEN_ON],
+      }),
+      fieldName: "age per month",
+    });
+
+    expect(
+      rows.map((row) => {
+        return [row.externalId, row.value];
+      }),
+    ).toEqual([
+      [
+        "101",
+        [
+          { bucket: "2026-01-01", value: 41 },
+          { bucket: "2026-02-01", value: 42 },
+        ],
+      ],
+      ["102", [{ bucket: "2026-01-01", value: 50 }]],
+      ["103", []],
+    ]);
+  });
+
+  // The relation's schema must not change shape when a mapping is missing.
+  it("emits a per-month field with no mapping as a typed empty list", async () => {
+    const rows = await _queryFieldAsJson({
+      metadata: _metadata({
+        attributes: [PERSON_ID, AGE_PER_MONTH],
+        mappings: [PERSON_ID_MAPPING],
+      }),
+      fieldName: "age per month",
+    });
+
+    expect(rows[0]).toEqual({
+      externalId: "101",
+      value: [],
+      typeName: 'STRUCT(bucket DATE, "value" BIGINT)[]',
+    });
+  });
+
+  it.each([
+    ["names no date column", undefined, [], /names no date column/],
+    ["names a date column that does not exist", SEEN_ON, [], /does not exist/],
+    [
+      "names a date column of another dataset",
+      OTHER_DATASET_DATE,
+      [OTHER_DATASET_DATE],
+      /not of the dataset it reads/,
+    ],
+    [
+      "names a column that is not a date or timestamp",
+      TAG_COLUMN,
+      [TAG_COLUMN],
+      /not a date or timestamp/,
+    ],
+  ] as const)(
+    "refuses a per-month field whose mapping %s",
+    (_label, dateColumn, extraColumns, message) => {
+      const metadata = _metadataWithColumns({
+        attributes: [PERSON_ID, AGE_PER_MONTH],
+        mappings: [PERSON_ID_MAPPING, _agePerMonthMapping(dateColumn)],
+        extraColumns,
+      });
+
+      expect(() => {
+        return makeConceptAttributeColumnsFromMetadata(metadata);
+      }).toThrow(message);
+    },
+  );
+
+  it("refuses a date column on a field without a period", () => {
+    const metadata = _metadataWithColumns({
+      attributes: [PERSON_ID, AGE],
+      mappings: [
+        PERSON_ID_MAPPING,
+        {
+          ...AGE_MAPPING,
+          mapping: { ...AGE_MAPPING.mapping, bucketColumnId: SEEN_ON.id },
+        },
+      ],
+      extraColumns: [SEEN_ON],
+    });
+
+    expect(() => {
+      return makeConceptAttributeColumnsFromMetadata(metadata);
+    }).toThrow(/has no period/);
   });
 });

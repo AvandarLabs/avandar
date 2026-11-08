@@ -1,7 +1,9 @@
+import { omit } from "@avandar/utils";
 import { useState } from "react";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { makeStatusSetValueFromChatStatuses } from "@/views/OntologyDesignerApp/makeStatusSetValueFromChatStatuses/makeStatusSetValueFromChatStatuses";
 import type {
+  ChatCaseBucketGrain,
   ChatCaseValuePickerRuleType,
   ChatCaseValueShape,
   ChatProposedCaseAttribute,
@@ -37,7 +39,19 @@ export type CaseTypeDraftEditor = {
   ) => void;
   setAttributeValueShape: (
     columnId: string,
-    valueShape: ChatCaseValueShape,
+    valueShape: Exclude<ChatCaseValueShape, "bucketed_list">,
+  ) => void;
+  /**
+   * Keeps one value per period for a column: sets its shape, its period,
+   * and the date column that places each row in a period. A join key and
+   * the label keep one value.
+   */
+  setAttributeBucket: (
+    columnId: string,
+    bucket: Readonly<{
+      bucketGrain: ChatCaseBucketGrain;
+      bucketColumnId: string | undefined;
+    }>,
   ) => void;
   toggleAttribute: (columnId: string) => void;
   toggleManualEntryAttribute: (name: string) => void;
@@ -60,14 +74,19 @@ function _mapAttribute(
 /**
  * Forces a column into the mapped set as one value. A join key is what
  * matches its dataset's rows to a case, and the label names the case, so
- * neither can point at an excluded column or at one that keeps every value.
+ * neither can point at an excluded column or at one that keeps more than
+ * one value.
  */
 function _withKeyOrLabelColumn(
   draft: ChatProposedCaseType,
   columnId: string,
 ): ChatProposedCaseType {
   return _mapAttribute(draft, columnId, (attribute) => {
-    return { ...attribute, isIncluded: true, valueShape: "single" };
+    return {
+      ...omit(attribute, ["bucketGrain", "bucketColumnId"]),
+      isIncluded: true,
+      valueShape: "single",
+    };
   });
 }
 
@@ -125,6 +144,20 @@ function _hasReservedAttributeName(draft: ChatProposedCaseType): boolean {
 }
 
 /**
+ * Whether an included per-period field still has no date column, which the
+ * card shows on the row and refuses to create.
+ */
+function _hasPeriodWithoutDateColumn(draft: ChatProposedCaseType): boolean {
+  return draft.attributes.some((attribute) => {
+    return (
+      attribute.isIncluded &&
+      attribute.valueShape === "bucketed_list" &&
+      attribute.bucketColumnId === undefined
+    );
+  });
+}
+
+/**
  * Holds the user's edits to a proposed case type draft. Re-initializes when the
  * model proposes a revised draft, so a fresh proposal replaces stale local
  * edits rather than silently merging with them.
@@ -170,6 +203,7 @@ export function useCaseTypeDraftEditor(
       draft.name.trim().length > 0 &&
       draft.sourceDatasets.length > 0 &&
       !_hasReservedAttributeName(draft) &&
+      !_hasPeriodWithoutDateColumn(draft) &&
       ConceptStatus.findSetIssues({ value: statusSet }).length === 0,
     setName: (name) => {
       setDraft((current) => {
@@ -243,7 +277,25 @@ export function useCaseTypeDraftEditor(
           return current;
         }
         return _mapAttribute(current, columnId, (attribute) => {
-          return { ...attribute, valueShape };
+          return {
+            ...omit(attribute, ["bucketGrain", "bucketColumnId"]),
+            valueShape,
+          };
+        });
+      });
+    },
+    setAttributeBucket: (columnId, bucket) => {
+      setDraft((current) => {
+        if (_isKeyOrLabelColumn(current, columnId)) {
+          return current;
+        }
+        return _mapAttribute(current, columnId, (attribute) => {
+          return {
+            ...attribute,
+            valueShape: "bucketed_list",
+            bucketGrain: bucket.bucketGrain,
+            bucketColumnId: bucket.bucketColumnId,
+          };
         });
       });
     },

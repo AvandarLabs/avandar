@@ -25,7 +25,7 @@ function _isList(column: QueryColumn.T): boolean {
     .with("single", () => {
       return false;
     })
-    .with("list", () => {
+    .with("list", "bucketed_list", () => {
       return true;
     })
     .exhaustive();
@@ -166,9 +166,10 @@ export const QueryColumnModule = {
   },
 
   /**
-   * Whether the column is a case type field that keeps every value, which a
-   * query reads as a DuckDB list. Use it to keep a list out of an operation
-   * that fails on one, for example a filter.
+   * Whether the column is a case type field that holds more than one value
+   * (every value, or one per period), which a query reads as a DuckDB list.
+   * Use it to keep a list out of an operation that fails on one, for example
+   * a filter.
    */
   isList: _isList,
 

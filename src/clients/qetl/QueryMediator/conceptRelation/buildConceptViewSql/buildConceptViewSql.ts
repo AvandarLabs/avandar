@@ -3,6 +3,10 @@ import { match } from "ts-pattern";
 import { Concept } from "$/models/ontology/Concept/Concept";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { buildAttributeValueSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
+import {
+  buildBucketedListTypeSql,
+  buildBucketedListValueSql,
+} from "@/clients/qetl/QueryMediator/conceptRelation/buildBucketedListValueSql/buildBucketedListValueSql";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
@@ -16,13 +20,23 @@ const STATUS_COLUMN = ConceptStatusColumn.COLUMN_NAME;
 
 /**
  * How a dataset-column attribute's rows become its value: reduced to one
- * value by a rule, or kept whole as a list. Built from the attribute's value
- * shape by `makeConceptAttributeColumnsFromMetadata` and read by the view's
+ * value by a rule, kept whole as a list, or reduced by the rule once per
+ * period of a date column. Built from the attribute's value shape by
+ * `makeConceptAttributeColumnsFromMetadata` and read by the view's
  * selectors.
  */
 export type ConceptAttributeValueRule =
   | { valueShape: "single"; valuePickerRuleType: ValuePickerRule.T }
-  | { valueShape: "list" };
+  | { valueShape: "list" }
+  | {
+      valueShape: "bucketed_list";
+      valuePickerRuleType: ValuePickerRule.T;
+      bucketGrain: ConceptAttribute.BucketGrain;
+      /** The dataset column that places each row in a period. */
+      bucketColumnName: string;
+      /** Whether that column is a `TIMESTAMP WITH TIME ZONE`. */
+      isBucketColumnZoned: boolean;
+    };
 
 /** One column of the concept relation, already resolved to what it reads. */
 export type ConceptAttributeColumn =
@@ -50,9 +64,9 @@ export type ConceptAttributeColumn =
       /**
        * An attribute with no dataset contribution to read, which today means a
        * manual-entry mapping. It becomes a typed NULL, or an empty list for a
-       * list attribute, so the relation's schema is stable whether or not a
-       * value exists, rather than the column vanishing and breaking a saved
-       * query.
+       * list or per-period attribute, so the relation's schema is stable
+       * whether or not a value exists, rather than the column vanishing and
+       * breaking a saved query.
        */
       kind: "unmapped";
       /** The attribute this column holds, as on the other arm. */
@@ -128,6 +142,20 @@ function _buildColumnSelector(column: ConceptAttributeColumn): string {
   if (column.kind === "unmapped") {
     return _buildUnmappedSelector(column);
   }
+  if (column.valueShape === "bucketed_list") {
+    return `${buildBucketedListValueSql({
+      datasetId: column.datasetId,
+      selectColumnName: column.selectColumnName,
+      columnDataType: column.columnDataType,
+      primaryKeyColumnName: column.primaryKeyColumnName,
+      bucketColumnName: column.bucketColumnName,
+      isBucketColumnZoned: column.isBucketColumnZoned,
+      bucketGrain: column.bucketGrain,
+      ruleType: column.valuePickerRuleType,
+      externalIdsTable: SPINE_ALIAS,
+      externalIdColumn: EXTERNAL_ID_COLUMN,
+    })} AS ${quoteSqlIdentifier(column.attributeName)}`;
+  }
 
   // Single values and lists alike: one function owns every value rule, so the
   // view and Sync's record name read values the same way.
@@ -147,9 +175,10 @@ function _buildColumnSelector(column: ConceptAttributeColumn): string {
 }
 
 /**
- * The typed column for an attribute with nothing to read. A list attribute
- * is an empty list of its type rather than NULL, which is what every list
- * holds when no value exists, so SQL that reads it as a list still binds.
+ * The typed column for an attribute with nothing to read. A list or
+ * per-period attribute is an empty list of its type rather than NULL, which
+ * is what every list holds when no value exists, so SQL that reads it as a
+ * list still binds.
  */
 function _buildUnmappedSelector(
   column: Extract<ConceptAttributeColumn, { kind: "unmapped" }>,
@@ -161,6 +190,9 @@ function _buildUnmappedSelector(
     })
     .with("list", () => {
       return `CAST([] AS ${column.duckDbDataType}[]) AS ${alias}`;
+    })
+    .with("bucketed_list", () => {
+      return `CAST([] AS ${buildBucketedListTypeSql(column.duckDbDataType)}) AS ${alias}`;
     })
     .exhaustive();
 }

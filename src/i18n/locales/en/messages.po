@@ -1729,6 +1729,10 @@ msgstr "Share it with your workspace"
 msgid "Enter your email to get a reset link"
 msgstr "Enter your email to get a reset link"
 
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "Per period"
+msgstr "Per period"
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.tsx
 msgid "Select a layer to edit how it is queried and drawn."
 msgstr "Select a layer to edit how it is queried and drawn."
@@ -5003,8 +5007,8 @@ msgstr "{offlineOnlyTitle}: it will live only on this computer, and nobody else 
 "on your team will be able to open it."
 
 #: src/components/caseFields/ValueShapeControl.tsx
-msgid "One value or every value for {fieldName}"
-msgstr "One value or every value for {fieldName}"
+#~ msgid "One value or every value for {fieldName}"
+#~ msgstr "One value or every value for {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -6772,6 +6776,10 @@ msgstr "No description has been added yet."
 #~ msgid "Qwen 2.5 3B"
 #~ msgstr "Qwen 2.5 3B"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+msgid "In each period, if there are multiple {attributeName} values, then..."
+msgstr "In each period, if there are multiple {attributeName} values, then..."
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "Collapse drawer"
@@ -8123,6 +8131,10 @@ msgstr "Leave empty when the geometry is already WGS 84."
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Chart settings appear once the query returns some columns."
 msgstr "Chart settings appear once the query returns some columns."
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "How many values {fieldName} keeps"
+msgstr "How many values {fieldName} keeps"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx

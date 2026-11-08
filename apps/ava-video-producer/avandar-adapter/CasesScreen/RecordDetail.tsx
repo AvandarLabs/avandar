@@ -28,6 +28,7 @@ export function RecordDetail({ frame, caseLabel, fields }: Props) {
       name: field.name,
       dataType: "varchar",
       valueShape: "single",
+      bucketGrain: undefined,
       value: field.value,
       sourceNames: [field.sourceName],
     };

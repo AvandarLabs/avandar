@@ -24,6 +24,7 @@ function _makeAttribute(
     mappingType?: ConceptAttribute.T["mappingType"];
     dataType?: AvaDataType.T;
     isArray?: boolean;
+    bucketGrain?: ConceptAttribute.BucketGrain;
   }>,
 ): ConceptAttribute.T {
   return Model.make("ConceptAttribute", {
@@ -40,7 +41,7 @@ function _makeAttribute(
     isIdentifier: false,
     allowManualEdit: false,
     isArray: options.isArray ?? false,
-    bucketGrain: undefined,
+    bucketGrain: options.bucketGrain,
   });
 }
 
@@ -134,6 +135,30 @@ describe("makeCaseDetailsRowsFromAttributes", () => {
       ["county", "single"],
       ["daily cases", "list"],
     ]);
+  });
+
+  it("gives a per-month field's row its period and the type of each value", () => {
+    const temperature = _makeAttribute({
+      name: "temperature",
+      dataType: "double",
+      isArray: true,
+      bucketGrain: "month",
+    });
+
+    const rows = makeCaseDetailsRowsFromAttributes({
+      attributes: [temperature],
+      valuesByAttributeId: {
+        [temperature.id]: [{ bucket: "2026-01-01", value: 38.5 }],
+      },
+      mappings: [],
+      datasets: [],
+    });
+
+    expect(rows[0]).toMatchObject({
+      valueShape: "bucketed_list",
+      bucketGrain: "month",
+      dataType: "double",
+    });
   });
 
   it("names the dataset each of a field's mappings reads, and none for a manual-entry field", () => {

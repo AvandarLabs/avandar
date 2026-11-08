@@ -1759,6 +1759,10 @@ msgid "Enter your email to get a reset link"
 msgstr "Ingresa tu correo electrónico para obtener un enlace de "
 "restablecimiento"
 
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "Per period"
+msgstr "Por período"
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.tsx
 msgid "Select a layer to edit how it is queried and drawn."
 msgstr "Seleccione una capa para editar cómo se consulta y se dibuja."
@@ -5083,8 +5087,8 @@ msgstr "{offlineOnlyTitle}: solo estará disponible en esta computadora y nadie 
 "más de su equipo podrá abrirlo."
 
 #: src/components/caseFields/ValueShapeControl.tsx
-msgid "One value or every value for {fieldName}"
-msgstr "Un valor o todos los valores de {fieldName}"
+#~ msgid "One value or every value for {fieldName}"
+#~ msgstr "Un valor o todos los valores de {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -6870,6 +6874,10 @@ msgstr "No se ha añadido ninguna descripción aún."
 #~ msgid "Qwen 2.5 3B"
 #~ msgstr "Qwen 2.5 3B"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+msgid "In each period, if there are multiple {attributeName} values, then..."
+msgstr "En cada período, si hay varios valores de {attributeName}, entonces..."
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "Contraer panel"
@@ -8239,6 +8247,10 @@ msgstr "Déjelo vacío cuando la geometría ya esté en WGS 84."
 msgid "Chart settings appear once the query returns some columns."
 msgstr "La configuración del gráfico aparece cuando la consulta devuelve "
 "algunas columnas."
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "How many values {fieldName} keeps"
+msgstr "Cuántos valores guarda {fieldName}"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx

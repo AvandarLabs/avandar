@@ -1773,6 +1773,10 @@ msgstr "Partager avec votre espace de travail"
 msgid "Enter your email to get a reset link"
 msgstr "Entrez votre email pour obtenir un lien de réinitialisation"
 
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "Per period"
+msgstr "Par période"
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.tsx
 msgid "Select a layer to edit how it is queried and drawn."
 msgstr "Sélectionnez un calque pour modifier la façon dont il est interrogé et "
@@ -5123,8 +5127,8 @@ msgstr "{offlineOnlyTitle} : il sera disponible uniquement sur cet ordinateur, "
 "et personne d’autre de votre équipe ne pourra l’ouvrir."
 
 #: src/components/caseFields/ValueShapeControl.tsx
-msgid "One value or every value for {fieldName}"
-msgstr "Une valeur ou toutes les valeurs pour {fieldName}"
+#~ msgid "One value or every value for {fieldName}"
+#~ msgstr "Une valeur ou toutes les valeurs pour {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -6924,6 +6928,11 @@ msgstr "Aucune description n'a encore été ajoutée."
 #~ msgid "Qwen 2.5 3B"
 #~ msgstr "Qwen 2.5 3B"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+msgid "In each period, if there are multiple {attributeName} values, then..."
+msgstr "Pour chaque période, s'il y a plusieurs valeurs de {attributeName}, "
+"alors..."
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "Réduire le panneau"
@@ -8300,6 +8309,10 @@ msgstr "Laissez ce champ vide lorsque la géométrie est déjà en WGS 84."
 msgid "Chart settings appear once the query returns some columns."
 msgstr "Les paramètres du graphique apparaissent une fois que la requête "
 "renvoie des colonnes."
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "How many values {fieldName} keeps"
+msgstr "Nombre de valeurs que garde {fieldName}"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx

@@ -220,4 +220,21 @@ describe("RecordFieldValue", () => {
     expect(screen.getByText("No value")).toBeInTheDocument();
     expect(screen.queryByRole("list")).toBeNull();
   });
+
+  it("shows a per-month field as a table of months and values", () => {
+    render(
+      <RecordFieldValue
+        fieldName="Temperature"
+        valueShape="bucketed_list"
+        bucketGrain="month"
+        dataType="double"
+        value={[{ bucket: Date.UTC(2026, 0, 1), value: 38.5 }]}
+      />,
+    );
+
+    const table = screen.getByRole("table", { name: "Temperature per month" });
+    expect(
+      within(table).getByRole("rowheader", { name: "Jan 2026" }),
+    ).toBeInTheDocument();
+  });
 });

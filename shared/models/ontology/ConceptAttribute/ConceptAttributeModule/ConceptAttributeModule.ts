@@ -58,7 +58,7 @@ function _valueShapeToIsArray(valueShape: ConceptAttributeValueShape): boolean {
     .with("single", () => {
       return false;
     })
-    .with("list", () => {
+    .with("list", "bucketed_list", () => {
       return true;
     })
     .exhaustive();
@@ -72,7 +72,8 @@ function _getOutputDataType(
   }>,
 ): AvaDataType.T {
   return match(options.valueShape)
-    .with("single", () => {
+    .with("single", "bucketed_list", () => {
+      // A per-period field's value is the rule's output for each period.
       return ValuePickerRule.getOutputDataType({
         ruleType: options.ruleType,
         columnDataType: options.columnDataType,
@@ -210,10 +211,21 @@ export const ConceptAttributeModule = {
     return entries.every(isDefined) ? entries : undefined;
   },
 
-  /** A field's value shape, read from its stored columns. */
+  /**
+   * A field's value shape, read from its stored columns: a period makes it
+   * per-period.
+   */
   getValueShape: (
-    attribute: Readonly<Pick<ConceptAttributeModel["Read"], "isArray">>,
+    attribute: Readonly<
+      Pick<ConceptAttributeModel["Read"], "isArray"> & {
+        // Optional, so form values (an insert shape) are read the same way.
+        bucketGrain?: ConceptAttributeBucketGrain | undefined;
+      }
+    >,
   ): ConceptAttributeValueShape => {
+    if (attribute.bucketGrain !== undefined) {
+      return "bucketed_list";
+    }
     return attribute.isArray ? "list" : "single";
   },
 
@@ -222,8 +234,9 @@ export const ConceptAttributeModule = {
 
   /**
    * The `data_type` a dataset-column field stores: the type of one value as
-   * the concept view emits it. `ruleType` is what the field's draft holds;
-   * a list ignores it.
+   * the concept view emits it, for a per-period field the type of each
+   * period's value. `ruleType` is what the field's draft holds; a list
+   * ignores it.
    */
   getOutputDataType: _getOutputDataType,
 

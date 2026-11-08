@@ -127,10 +127,17 @@ export type ChatCaseValuePickerRuleType =
 
 /**
  * How many values a chat-drafted field keeps for one case: `single` reduces
- * the dataset's rows with a value picker, `list` keeps every value. Mirrors
- * `ConceptAttribute.ValueShape`.
+ * the dataset's rows with a value picker, `list` keeps every value, and
+ * `bucketed_list` keeps one picked value per period of a date column.
+ * Mirrors `ConceptAttribute.ValueShape`.
  */
-export type ChatCaseValueShape = "single" | "list";
+export type ChatCaseValueShape = "single" | "list" | "bucketed_list";
+
+/**
+ * The period a per-period attribute keeps one value for. Mirrors
+ * `ConceptAttribute.BucketGrain`.
+ */
+export type ChatCaseBucketGrain = "day" | "week" | "month" | "quarter" | "year";
 
 /** One attribute the case-manager model wants stored on a new concept. */
 export type ChatCreatedCaseAttribute =
@@ -148,6 +155,10 @@ export type ChatCreatedCaseAttribute =
        * applies.
        */
       valuePickerRuleType?: ChatCaseValuePickerRuleType;
+      /** The period, exactly when `valueShape` is `"bucketed_list"`. */
+      bucketGrain?: ChatCaseBucketGrain;
+      /** The date column, exactly when `valueShape` is `"bucketed_list"`. */
+      bucketColumnId?: string;
     }
   | {
       name: string;
@@ -216,8 +227,20 @@ export type ChatProposedCaseAttribute = {
   name: string;
   description?: string;
   isIncluded: boolean;
-  /** Whether the field keeps one value or every value. */
+  /** Whether the field keeps one value, every value, or one per period. */
   valueShape: ChatCaseValueShape;
+  /**
+   * The period this attribute keeps one value for. Present when
+   * `valueShape` is `"bucketed_list"`, and only then.
+   */
+  bucketGrain?: ChatCaseBucketGrain;
+  /**
+   * The date or timestamp column of `datasetId` that places each row in a
+   * period. Present when `valueShape` is `"bucketed_list"`, and only then,
+   * except in a card whose dataset has no date column, which refuses to
+   * create it.
+   */
+  bucketColumnId?: string;
   /**
    * The rule that picks one value. Kept for a list too, so the card can
    * switch the field back to one value without asking for a rule.

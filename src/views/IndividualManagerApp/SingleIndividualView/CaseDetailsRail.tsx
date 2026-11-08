@@ -15,8 +15,10 @@ export type CaseDetailsRow = {
   name: string;
   /** The field's `data_type`, which decides how its value reads. */
   dataType: AvaDataType.T;
-  /** Whether the field keeps one value or every value. */
+  /** Whether the field keeps one value, every value, or one per period. */
   valueShape: ConceptAttribute.ValueShape;
+  /** The field's period, when it keeps one value per period. */
+  bucketGrain: ConceptAttribute.BucketGrain | undefined;
   /** The record's value, or `null` or `undefined` when it has none. */
   value: unknown;
   /** The names of the datasets the field reads, each on its own line. */
@@ -57,6 +59,7 @@ export function CaseDetailsRail({
                 <RecordFieldValue
                   fieldName={attribute.name}
                   valueShape={attribute.valueShape}
+                  bucketGrain={attribute.bucketGrain}
                   dataType={attribute.dataType}
                   value={attribute.value}
                 />

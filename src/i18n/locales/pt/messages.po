@@ -1758,6 +1758,10 @@ msgstr "Compartilhe com seu workspace"
 msgid "Enter your email to get a reset link"
 msgstr "Digite seu e-mail para receber um link de redefinição"
 
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "Per period"
+msgstr "Por período"
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.tsx
 msgid "Select a layer to edit how it is queried and drawn."
 msgstr "Selecione uma camada para editar como ela é consultada e desenhada."
@@ -5071,8 +5075,8 @@ msgstr "{offlineOnlyTitle}: ele ficará disponível somente neste computador, e 
 "ninguém mais da sua equipe poderá abri-lo."
 
 #: src/components/caseFields/ValueShapeControl.tsx
-msgid "One value or every value for {fieldName}"
-msgstr "Um valor ou todos os valores de {fieldName}"
+#~ msgid "One value or every value for {fieldName}"
+#~ msgstr "Um valor ou todos os valores de {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -6853,6 +6857,10 @@ msgstr "Nenhuma descrição foi adicionada ainda."
 #~ msgid "Qwen 2.5 3B"
 #~ msgstr "Qwen 2.5 3B"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+msgid "In each period, if there are multiple {attributeName} values, then..."
+msgstr "Em cada período, se houver vários valores de {attributeName}, então..."
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "Recolher painel"
@@ -8219,6 +8227,10 @@ msgstr "Deixe vazio quando a geometria já estiver em WGS 84."
 msgid "Chart settings appear once the query returns some columns."
 msgstr "As configurações do gráfico aparecem quando a consulta retorna algumas "
 "colunas."
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "How many values {fieldName} keeps"
+msgstr "Quantos valores {fieldName} guarda"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx

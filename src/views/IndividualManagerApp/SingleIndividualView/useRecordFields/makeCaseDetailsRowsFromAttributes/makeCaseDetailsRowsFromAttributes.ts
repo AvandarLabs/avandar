@@ -65,6 +65,7 @@ export function makeCaseDetailsRowsFromAttributes(
         name: attribute.name,
         dataType: attribute.dataType,
         valueShape: ConceptAttribute.getValueShape(attribute),
+        bucketGrain: attribute.bucketGrain,
         value: options.valuesByAttributeId[attribute.id],
         sourceNames: _getSourceNames({
           attributeId: attribute.id,

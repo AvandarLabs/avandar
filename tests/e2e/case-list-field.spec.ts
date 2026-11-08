@@ -263,7 +263,7 @@ test.describe("Case list fields", () => {
     await page.getByRole("button", { name: "New case type" }).first().click();
 
     const valueShape = page.getByRole("radiogroup", {
-      name: `One value or every value for ${LIST_FIELD_NAME}`,
+      name: `How many values ${LIST_FIELD_NAME} keeps`,
     });
     await expect(valueShape).toBeVisible({ timeout: MEDIUM_WAIT });
     await valueShape.getByText("Every value", { exact: true }).click();

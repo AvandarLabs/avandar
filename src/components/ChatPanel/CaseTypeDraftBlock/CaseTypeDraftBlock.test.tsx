@@ -27,6 +27,7 @@ const DEATHS_COLUMN_ID = "3c4d5e6f-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_FIPS_COLUMN_ID = "5e6f7081-aaaa-4bbb-8ccc-ddddeeeeffff";
 const POPULATION_COLUMN_ID = "6f708192-aaaa-4bbb-8ccc-ddddeeeeffff";
 const UNLISTED_COLUMN_ID = "7a8b9cad-aaaa-4bbb-8ccc-ddddeeeeffff";
+const REPORT_DATE_COLUMN_ID = "7a8b9c0d-aaaa-4bbb-8ccc-ddddeeeeffff";
 const WORKSPACE_ID = "4d5e6f70-aaaa-4bbb-8ccc-ddddeeeeffff" as Workspace.Id;
 
 const {
@@ -88,6 +89,12 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
               id: POPULATION_COLUMN_ID,
               name: "population",
               dataType: "bigint",
+            },
+            {
+              id: REPORT_DATE_COLUMN_ID,
+              name: "report_date",
+              datasetId: DEATHS_DATASET_ID,
+              dataType: "date",
             },
           ],
         ];
@@ -186,7 +193,7 @@ function _getRuleInput(fieldName: string): HTMLElement {
 /** The One value / Every value control of a field's row. */
 function _getValueShapeControl(fieldName: string): HTMLElement {
   return screen.getByRole("radiogroup", {
-    name: `One value or every value for ${fieldName}`,
+    name: `How many values ${fieldName} keeps`,
   });
 }
 
@@ -684,5 +691,39 @@ describe("CaseTypeDraftBlock", () => {
       "Max",
       "Min",
     ]);
+  });
+
+  it("creates a per-month field with its dataset's first date column", async () => {
+    render(<CaseTypeDraftBlock />);
+
+    fireEvent.click(screen.getByLabelText("Include Total deaths"));
+    fireEvent.click(
+      within(_getValueShapeControl("Total deaths")).getByRole("radio", {
+        name: "Per period",
+      }),
+    );
+    const dateColumnInput = screen
+      .getAllByLabelText("Date column for Total deaths")
+      .find((element) => {
+        return element.tagName === "INPUT";
+      });
+    expect(dateColumnInput).toHaveValue("report_date");
+    fireEvent.click(screen.getByRole("button", { name: "Create case type" }));
+
+    await waitFor(() => {
+      expect(applyCreatedCaseTypesMock).toHaveBeenCalled();
+    });
+    const [call] = applyCreatedCaseTypesMock.mock.calls;
+    const totalDeaths = call?.[0].caseTypes[0].attributes.find(
+      (attribute: { name: string }) => {
+        return attribute.name === "Total deaths";
+      },
+    );
+    expect(totalDeaths).toMatchObject({
+      valueShape: "bucketed_list",
+      valuePickerRuleType: "sum",
+      bucketGrain: "month",
+      bucketColumnId: REPORT_DATE_COLUMN_ID,
+    });
   });
 });

@@ -27,7 +27,8 @@ import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/Concep
 /**
  * The mapping row of one dataset-column field, or undefined when the field
  * has no column yet. A field that keeps every value stores no rule: its
- * draft holds one only so the user can switch it back to one value.
+ * draft holds one only so the user can switch it back to one value. A
+ * per-period field keeps its rule, which it applies once per period.
  */
 function _datasetColumnMappingFromAttribute(options: {
   attribute: ConceptFormSubmitValues["attributes"][number];
@@ -39,7 +40,7 @@ function _datasetColumnMappingFromAttribute(options: {
     return undefined;
   }
   return match(ConceptAttribute.getValueShape(attribute))
-    .with("single", () => {
+    .with("single", "bucketed_list", () => {
       return { ...datasetColumnMapping, workspaceId };
     })
     .with("list", () => {

@@ -77,11 +77,11 @@ export type ConceptAttributeModel = SupabaseCrudModelSpec<
 /**
  * How many values a field holds for one record. `single` reduces the field's
  * rows to one value with its value rule; `list` keeps every non-NULL value
- * in source order. Authoring, the concept view, the query form, and the
- * record page each branch on it, for example to hide the value rule of a
- * list.
+ * in source order; `bucketed_list` keeps one value per period of a date
+ * column, each reduced with the value rule. Authoring, the concept view, the
+ * query form, and the record page each branch on it.
  */
-export type ConceptAttributeValueShape = "single" | "list";
+export type ConceptAttributeValueShape = "single" | "list" | "bucketed_list";
 
 /**
  * The names a case type's view gives one field. `columnName` is the column

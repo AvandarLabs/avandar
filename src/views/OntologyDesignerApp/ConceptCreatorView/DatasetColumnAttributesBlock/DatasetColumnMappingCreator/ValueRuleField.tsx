@@ -18,6 +18,8 @@ type Props = {
    * never reduces its rows, so its rule is locked to the default.
    */
   isIdentifierColumn: boolean;
+  /** Whether the field keeps one value per period, which the label says. */
+  isPerPeriod: boolean;
 };
 
 /**
@@ -56,9 +58,9 @@ function useValuePickerOptions(
 }
 
 /**
- * The select for which value to keep when several rows share one case. The
- * dataset's ID column never reduces its rows, so its select is locked to the
- * default rule and a note says why.
+ * The select for which value to keep when several rows share one case, or
+ * one period of a per-period field. The dataset's ID column never reduces
+ * its rows, so its select is locked to the default rule and a note says why.
  */
 export function ValueRuleField({
   conceptForm,
@@ -66,6 +68,7 @@ export function ValueRuleField({
   attributeName,
   columnDataType,
   isIdentifierColumn,
+  isPerPeriod,
 }: Readonly<Props>): JSX.Element {
   const { t } = useLingui();
   const [state] = ConceptCreatorStore.useContext();
@@ -79,7 +82,11 @@ export function ValueRuleField({
     <Select
       key={mappingKeys.valuePickerRuleType}
       data={valuePickerOptions}
-      label={t`If there are multiple ${attributeName} values for one ${state.singularConceptName}, then...`}
+      label={
+        isPerPeriod
+          ? t`In each period, if there are multiple ${attributeName} values, then...`
+          : t`If there are multiple ${attributeName} values for one ${state.singularConceptName}, then...`
+      }
       description={
         isIdentifierColumn ? t`ID fields keep their value as is.` : undefined
       }

@@ -30,7 +30,11 @@ it("uses an explicit output alias for an aggregate projection", () => {
 function _conceptAttribute(
   id: string,
   name: string,
-  options: Readonly<{ dataType?: AvaDataType.T; isArray?: boolean }> = {},
+  options: Readonly<{
+    dataType?: AvaDataType.T;
+    isArray?: boolean;
+    bucketGrain?: ConceptAttribute.BucketGrain;
+  }> = {},
 ): ConceptAttribute.T {
   return Model.make("ConceptAttribute", {
     id,
@@ -46,6 +50,7 @@ function _conceptAttribute(
     isIdentifier: false,
     allowManualEdit: false,
     isArray: options.isArray ?? false,
+    bucketGrain: options.bucketGrain,
   }) as ConceptAttribute.T;
 }
 
@@ -144,7 +149,11 @@ describe("QueryColumn.refreshFromSourceColumn", () => {
 });
 
 function _fieldColumn(
-  options: Readonly<{ dataType: AvaDataType.T; isArray: boolean }>,
+  options: Readonly<{
+    dataType: AvaDataType.T;
+    isArray: boolean;
+    bucketGrain?: ConceptAttribute.BucketGrain;
+  }>,
 ): QueryColumn.T {
   return QueryColumn.makeFromConceptAttributes([
     _conceptAttribute("attr_cases", "Cases", options),
@@ -153,6 +162,11 @@ function _fieldColumn(
 
 const DAILY_CASES_LIST = _fieldColumn({ dataType: "bigint", isArray: true });
 const TOTAL_CASES = _fieldColumn({ dataType: "bigint", isArray: false });
+const TEMPERATURE_PER_MONTH = _fieldColumn({
+  dataType: "double",
+  isArray: true,
+  bucketGrain: "month",
+});
 
 describe("QueryColumn and list fields", () => {
   it("offers a list field only grouping and counting", () => {
@@ -186,5 +200,17 @@ describe("QueryColumn and list fields", () => {
   it("treats only a single-value field as not a list", () => {
     expect(QueryColumn.isNotList(TOTAL_CASES)).toBe(true);
     expect(QueryColumn.isNotList(DAILY_CASES_LIST)).toBe(false);
+  });
+
+  // Sort, group by, and count work on a list of periods in DuckDB; sum,
+  // filters, and charts do not.
+  it("gives a per-month field exactly a list's operations", () => {
+    expect(QueryColumn.isList(TEMPERATURE_PER_MONTH)).toBe(true);
+    expect(QueryColumn.getValidAggregations(TEMPERATURE_PER_MONTH)).toEqual([
+      "none",
+      "group_by",
+      "count",
+    ]);
+    expect(QueryColumn.isNumeric(TEMPERATURE_PER_MONTH)).toBe(false);
   });
 });

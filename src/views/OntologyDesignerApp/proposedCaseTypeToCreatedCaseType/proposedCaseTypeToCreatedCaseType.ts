@@ -16,7 +16,7 @@ function _toDatasetColumnAttribute(options: {
 }): ChatCreatedCaseAttribute {
   const { attribute, isLabel, isJoinKey } = options;
   // A join key matches rows to a case and the label names it, so neither is
-  // ever a list, whatever the card held.
+  // ever a list of either kind, whatever the card held.
   const valueShape: ChatCaseValueShape =
     isLabel || isJoinKey ? "single" : attribute.valueShape;
   return {
@@ -25,13 +25,25 @@ function _toDatasetColumnAttribute(options: {
     datasetId: attribute.datasetId,
     columnId: attribute.columnId,
     valueShape,
-    // A list keeps every value, so the rule the card held is not stored.
+    // A list keeps every value, so the rule the card held is not stored. A
+    // per-period field applies its rule once per period of its date column.
     ...match(valueShape)
       .with("single", () => {
         return { valuePickerRuleType: attribute.valuePickerRuleType };
       })
       .with("list", () => {
         return {};
+      })
+      .with("bucketed_list", () => {
+        return {
+          valuePickerRuleType: attribute.valuePickerRuleType,
+          ...(attribute.bucketGrain
+            ? { bucketGrain: attribute.bucketGrain }
+            : {}),
+          ...(attribute.bucketColumnId
+            ? { bucketColumnId: attribute.bucketColumnId }
+            : {}),
+        };
       })
       .exhaustive(),
     ...(attribute.description ? { description: attribute.description } : {}),

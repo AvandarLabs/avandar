@@ -26,8 +26,11 @@ export type AttributeValueSqlOptions = {
    * compare a text column alphabetically instead of by byte order.
    */
   columnDataType: AvaDataType.T;
-  /** Keep one value, picked by the rule, or every value as a list. */
-  valueShape: ConceptAttribute.ValueShape;
+  /**
+   * Keep one value, picked by the rule, or every value as a list. A
+   * per-period field reads through `buildBucketedListValueSql` instead.
+   */
+  valueShape: Exclude<ConceptAttribute.ValueShape, "bucketed_list">;
   /**
    * How one record's rows reduce to one value. Required for one value. A list
    * ignores it.

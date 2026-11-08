@@ -296,4 +296,39 @@ describe("insertConceptFromFormValues", () => {
       valuePickerRuleType: "sum",
     });
   });
+
+  it("keeps a per-month field's rule and date column on its mapping", async () => {
+    generateIndividualsMock.mockResolvedValue(undefined);
+    const formValues = _makeFormValues();
+    const listAttribute = _makeDatasetColumnAttribute({
+      baseAttribute: formValues.attributes[0]!,
+      name: "Average visits",
+      isArray: true,
+    });
+    const bucketColumnId = uuid<DatasetColumn.Id>();
+    const perMonthAttribute: ConceptFormSubmitValues["attributes"][number] = {
+      ...listAttribute,
+      bucketGrain: "month",
+      mappings: {
+        ...listAttribute.mappings,
+        datasetColumn: {
+          ...listAttribute.mappings.datasetColumn,
+          valuePickerRuleType: "avg",
+          bucketColumnId,
+        },
+      },
+    };
+
+    await insertConceptFromFormValues({
+      ...formValues,
+      attributes: [...formValues.attributes, perMonthAttribute],
+    });
+
+    const [{ mappings }] = conceptCreateMock.mock.calls[0]!;
+    expect(
+      mappings.find((mapping: { conceptAttributeId: string }) => {
+        return mapping.conceptAttributeId === perMonthAttribute.id;
+      }),
+    ).toMatchObject({ valuePickerRuleType: "avg", bucketColumnId });
+  });
 });

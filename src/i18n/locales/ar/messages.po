@@ -1729,6 +1729,10 @@ msgstr "شاركه مع مساحة عملك"
 msgid "Enter your email to get a reset link"
 msgstr "أدخل بريدك الإلكتروني للحصول على رابط إعادة تعيين"
 
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "Per period"
+msgstr "لكل فترة"
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.tsx
 msgid "Select a layer to edit how it is queried and drawn."
 msgstr "حدّد طبقة لتحرير طريقة الاستعلام عنها ورسمها."
@@ -5003,8 +5007,8 @@ msgstr "{offlineOnlyTitle}: ستبقى على هذا الكمبيوتر فقط،
 "في فريقك من فتحها."
 
 #: src/components/caseFields/ValueShapeControl.tsx
-msgid "One value or every value for {fieldName}"
-msgstr "قيمة واحدة أو كل القيم لـ {fieldName}"
+#~ msgid "One value or every value for {fieldName}"
+#~ msgstr "قيمة واحدة أو كل القيم لـ {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -6764,6 +6768,10 @@ msgstr "لم يتم إضافة أي وصف بعد."
 #~ msgid "Qwen 2.5 3B"
 #~ msgstr "Qwen 2.5 3B"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+msgid "In each period, if there are multiple {attributeName} values, then..."
+msgstr "في كل فترة، إذا كانت هناك عدة قيم لـ {attributeName}، فعندئذٍ..."
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "طي لوحة السحب"
@@ -8110,6 +8118,10 @@ msgstr "اتركه فارغًا عندما تكون الأشكال الهندس�
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Chart settings appear once the query returns some columns."
 msgstr "تظهر إعدادات المخطط بعد أن يعرض الاستعلام بعض الأعمدة."
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "How many values {fieldName} keeps"
+msgstr "عدد القيم التي يحتفظ بها {fieldName}"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
