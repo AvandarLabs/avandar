@@ -1553,6 +1553,46 @@ run it, and check `/healthz` answers `{"ok":true}`.
 
 ---
 
+## F26: The pipeline server loads into the Supabase project each run names
+
+**Purpose:** The pipeline server read one Supabase project from its own
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, so a server could only ever
+load into that project. It now keeps no Supabase credentials. Every run
+sends its project's URL and service role key in the `X-Ava-Supabase-Url` and
+`X-Ava-Supabase-Service-Role-Key` headers (headers, because a run records its
+body), and a run without them is refused with 400. `ava pipeline run` sends
+the loaded env file's `VITE_SUPABASE_API_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+**Value:** One deployed server loads into demo, production, or a local
+stack, whichever its caller holds the key for.
+
+**PR title:** `feat(pipeline-server): load into the Supabase project each run names`
+
+**Commits to read** (from `feat/pipeline-supabase-target`, merged in
+`d0af42ce6`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `38ab31ad4` | feat(pipeline-server): load into the Supabase project each run names | All of it. The `odc-parquet-cache-spec.md` and runbook hunks go with F25. |
+
+**Files:** `apps/pipeline-server/src/routes/pipeline-name/readSupabaseTarget/`,
+`registerPipelineRoutes.ts` and its test, `run/run.ts` and its test,
+`pipelines/shared/PipelineRunOptions.types.ts`,
+`getPipelineEtlDestination.ts` and its test, each pipeline's `run.ts` and
+its new `run.test.ts`, `apps/ava-cli/src/PipelineCli/sendRunPipelineRequest.ts`
+and its test, `RunPipelineCli.test.ts`, and the Supabase paragraphs in
+`apps/pipeline-server/README.md`, `apps/ava-cli/README.md`, and
+`.env.pipeline-server.prod.example`.
+
+**Schema:** none.
+
+**Verification:**
+```sh
+pnpm --filter @avandar/pipeline-server test
+pnpm --filter @avandar/ava-cli test
+```
+
+---
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -1701,7 +1741,8 @@ Its commits are covered by F19, not numbered here.
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full
-under F21 in the same way, and F25's (merged in `a9d2ec770`) under F25.
+under F21 in the same way, F25's (merged in `a9d2ec770`) under F25, and
+F26's (merged in `d0af42ce6`) under F26.
 
 `051a30ebf`, from `fix/catalog-loadable-filter`, fixes F19's loadable-only
 filter and is listed under F19.
