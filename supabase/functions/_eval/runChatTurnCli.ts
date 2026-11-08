@@ -7,8 +7,10 @@
  * Requests run concurrently. This directory has no `index.ts`, so it is never
  * deployed as a function.
  *
- * Usage: deno run --allow-env --allow-net --allow-read --config supabase/functions/chat/deno.json
- *   supabase/functions/_eval/runChatTurnCli.ts
+ * Usage:
+ *   deno run --allow-env --allow-net --allow-read \
+ *     --config supabase/functions/chat/deno.json \
+ *     supabase/functions/_eval/runChatTurnCli.ts
  */
 import { runChatTurn } from "@sbfn/chat/PostChatMessages/runChatTurn/runChatTurn.ts";
 import type { RunChatTurnOptions } from "@sbfn/chat/PostChatMessages/runChatTurn/runChatTurn.ts";
