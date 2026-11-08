@@ -1,5 +1,5 @@
 import { makeSegmentedControlItems, SegmentedControl } from "@avandar/ui";
-import { identity, makeObject, prop, propEq } from "@avandar/utils";
+import { identity, isDefined, makeObject, prop, propEq } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -20,6 +20,7 @@ import { useMap } from "@/lib/hooks/state/useMap";
 import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere/removeItemWhere";
 import {
   ConceptFormType,
+  ConceptFormValues,
   makeDefaultDatasetColumnAttribute,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator";
@@ -34,6 +35,15 @@ type Props = {
   conceptId: ConceptId;
   conceptName: string;
 };
+
+/** The ids of the columns picked as the ID of their dataset. */
+function _getIdentifierColumnIds(
+  sourceDatasets: ConceptFormValues["sourceDatasets"],
+): ReadonlySet<DatasetColumnId> {
+  return new Set(
+    sourceDatasets.map(prop("primaryKeyColumnId")).filter(isDefined),
+  );
+}
 
 export function DatasetColumnAttributesBlock({
   conceptForm,
@@ -181,11 +191,23 @@ export function DatasetColumnAttributesBlock({
 
   const { sourceDatasets } = conceptForm.getValues();
 
+  // The dataset columns picked as an ID. The ID selects are uncontrolled, so a
+  // pick does not re-render this block by itself, and the watch keeps the
+  // lock on the selected field current.
+  const [identifierColumnIds, setIdentifierColumnIds] = useState(() => {
+    return _getIdentifierColumnIds(sourceDatasets);
+  });
+  conceptForm.useFieldWatch("sourceDatasets", ({ value }) => {
+    setIdentifierColumnIds(_getIdentifierColumnIds(value));
+  });
+
   // The field being configured. Until submit its `dataType` is its column's
   // type, which decides the value rules it may use.
   const selectedAttribute = addedAttributes.find((attribute) => {
     return attribute.id === selectedAttributeId;
   });
+  const selectedColumnId =
+    selectedAttribute?.mappings.datasetColumn.datasetColumnId;
 
   return (
     <Fieldset legend={t`Fields that come from datasets`}>
@@ -265,6 +287,10 @@ export function DatasetColumnAttributesBlock({
                 )}
                 attributeName={selectedAttribute.name}
                 columnDataType={selectedAttribute.dataType}
+                isIdentifierColumn={
+                  selectedColumnId !== undefined &&
+                  identifierColumnIds.has(selectedColumnId)
+                }
               />
             </Box>
           ) : null}

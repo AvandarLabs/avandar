@@ -33,8 +33,6 @@ function CreatorHarness({
     name: "district",
     dataType: columnDataType,
   } as DatasetColumn.T;
-  // `readonly`, matching `Dataset.WithColumns.columns`, so one `as` suffices.
-  const columns: readonly DatasetColumn.T[] = [column];
   const attribute = makeDefaultDatasetColumnAttribute({
     conceptId: defaults.id,
     name: "district",
@@ -58,12 +56,6 @@ function CreatorHarness({
           },
         },
       ],
-      sourceDatasets: [
-        {
-          dataset: { id: DATASET.id, columns } as Dataset.WithColumns,
-          primaryKeyColumnId: isIdentifierColumn ? column.id : undefined,
-        },
-      ],
     },
   });
   return (
@@ -73,6 +65,7 @@ function CreatorHarness({
         attributeIdx={0}
         attributeName="district"
         columnDataType={columnDataType}
+        isIdentifierColumn={isIdentifierColumn}
       />
     </ConceptCreatorStore.Provider>
   );
@@ -138,17 +131,18 @@ describe("DatasetColumnMappingCreator", () => {
     });
     expect(select).toBeDisabled();
     expect(select).toHaveValue("Choose the most frequent value");
-    expect(screen.getByText("ID fields keep their value as is.")).toBeTruthy();
+    expect(select).toHaveAccessibleDescription(
+      "ID fields keep their value as is.",
+    );
   });
 
   it("leaves the rule select open for any other column", () => {
     render(<CreatorHarness columnDataType="varchar" />);
 
-    expect(
-      screen.getByRole("combobox", {
-        name: /If there are multiple district values/,
-      }),
-    ).toBeEnabled();
-    expect(screen.queryByText("ID fields keep their value as is.")).toBeNull();
+    const select = screen.getByRole("combobox", {
+      name: /If there are multiple district values/,
+    });
+    expect(select).toBeEnabled();
+    expect(select).not.toHaveAccessibleDescription();
   });
 });
