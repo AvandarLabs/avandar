@@ -11,8 +11,11 @@ import type {
 export type BrowserDataAgentHostOptions = {
   workspaceId: Workspace.Id;
   userId: string | undefined;
-  /** Applies SQL to the Data Explorer, which runs it and shows the result. */
-  showQueryInExplorer: (
+  /**
+   * Runs SQL and shows the result: in the Data Explorer or in the chat, as
+   * the caller decides.
+   */
+  showQuery: (
     request: Readonly<{ sql: string; summary: string; chart?: string }>,
   ) => Promise<DataAgentQueryOutcome>;
   /** Shows a question card in the chat panel. */
@@ -40,17 +43,17 @@ async function _readColumnValues(
 }
 
 /**
- * The data agent's host in the app. Queries run in the Data Explorer
- * (DuckDB-Wasm, in the browser), lookups run locally through the workspace
- * query session, question cards appear in the chat panel and are answered as
- * the user's next message, and values pass the privacy check before they
- * reach the model.
+ * The data agent's host in the app. Queries run where the caller's
+ * `showQuery` sends them (DuckDB-Wasm, in the browser), lookups run locally
+ * through the workspace query session, question cards appear in the chat
+ * panel and are answered as the user's next message, and values pass the
+ * privacy check before they reach the model.
  */
 export function createBrowserDataAgentHost(
   options: Readonly<BrowserDataAgentHostOptions>,
 ): DataAgentHost {
   return {
-    showQuery: options.showQueryInExplorer,
+    showQuery: options.showQuery,
     readColumnValues: (sql) => {
       return _readColumnValues(options.workspaceId, sql);
     },

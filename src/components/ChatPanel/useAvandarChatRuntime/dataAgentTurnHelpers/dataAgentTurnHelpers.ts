@@ -9,6 +9,7 @@ import {
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { createBrowserDataAgentHost } from "@/lib/agent/dataAgent/browser/createBrowserDataAgentHost";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -36,6 +37,12 @@ export type DataAgentTurnOptions = {
   >;
   dataExplorerDispatch: ReturnType<typeof DataExplorerStateManager.useDispatch>;
   chatPanelDispatch: ReturnType<typeof ChatPanelStateManager.useDispatch>;
+  /**
+   * What is on screen for this turn. Decides where a query's result goes:
+   * the Data Explorer when the user is on it, the chat everywhere else.
+   * Absent for offline turns, which run only in the Data Explorer.
+   */
+  pageContext?: AgentPageContext;
 };
 
 /** The query request the explorer host answers, as the agent sends it. */
@@ -139,7 +146,7 @@ export function createExplorerDataAgentHost(
   return createBrowserDataAgentHost({
     workspaceId: options.workspaceId,
     userId: options.currentUser?.id,
-    showQueryInExplorer: createExplorerShowQuery(options),
+    showQuery: createExplorerShowQuery(options),
     showQuestionCard: (clarification) => {
       options.chatPanelDispatch.setPendingClarification(clarification);
     },
