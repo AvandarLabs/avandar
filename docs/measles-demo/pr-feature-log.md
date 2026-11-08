@@ -1315,6 +1315,7 @@ commits belong to the features that own them, not here.
 | `bcac141e7` | feat(hdx): map catalog metadata from hdx.pipeline.yaml | All of it |
 | `79dc85076` | fix(hdx): read only HDX's own update frequency codes | All of it |
 | `d50583f7e` | fix(socrata): read a health dataset's office from either metadata key | All of it |
+| `7f2d6dc8e` | fix(hdx): map topics, data source, coverage dates, and caveats | All of it. Supersedes `bcac141e7`'s `domains` mapping: HDX's groups (countries) become keywords, and topics come from `hdxTopics`' tag-to-topic table. |
 
 *The app reads the renamed column, the drives, and the new filters:*
 
@@ -1403,7 +1404,10 @@ rejects the new listing shape, so the catalog would not load.
   deploying.
 - Backfill the demo instance with one full (non-incremental) run of each
   pipeline. Incremental runs only touch datasets that changed, so unchanged
-  listings keep empty new columns.
+  listings keep empty new columns. Socrata was backfilled on 2026-11-07.
+  HDX has never run on demo, so its first run fills every field.
+- `hdxTopics`' tag-to-topic table covers HDX's 150-tag vocabulary as of
+  2026-11-08. A tag HDX adds later gets no topic until it is added there.
 - Removing one of two chosen publishers leaves the agencies chosen under it
   selected, which can empty the list.
 - No automated test runs the mapper loader under Bun. It was verified
@@ -1686,6 +1690,7 @@ Its commits are covered by F19, not numbered here.
 | 124 | `d7fd436a8` | F23 |
 | 125 | `bc4baf853` | F23 |
 | 126 | `d50583f7e` | F23 |
+| 127 | `7f2d6dc8e` | F23 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full

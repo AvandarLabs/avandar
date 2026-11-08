@@ -519,13 +519,15 @@ the data and are not translated.
 
 | Field | Socrata | HDX (CKAN) |
 |---|---|---|
-| Labels | NYC: City, Agency. NY State: State, Agency. NYS Health: State, Department, Office. | Organization |
+| Labels | NYC: City, Agency. NY State: State, Agency. NYS Health: State, Department, Office. | Organization, Data source |
 | `organization1_name` | `value` per drive | `organization.title`, such as "World Health Organization" |
-| `organization2_name` | `resource.attribution` (NYC, NY State); `value` "Department of Health" (NYS Health) | None |
+| `organization2_name` | `resource.attribution` (NYC, NY State); `value` "Department of Health" (NYS Health) | Script: `dataset_source`, the organization the data comes from, unless it repeats `organization.title`. Not a part of the publisher, as a Socrata agency is |
 | `organization3_name` | Script (NYS Health only, where `resource.attribution` is the department itself): the `Dataset-Summary_Office/Division` entry in `classification.domain_metadata`, else its `Dataset-Summary_Organization` entry (older datasets) unless that names the department itself | None |
 | `description` | Script: `resource.description` as plain text | `notes` |
-| `domains` | Script: `classification.domain_category` plus `classification.categories` (the latter is empty on NYC today) | Script: `groups[].title` (countries on HDX) |
-| `tags` | `classification.domain_tags` | Script: `tags[].name` |
+| `notes` | None | `caveats` |
+| `coverage_start_date`, `coverage_end_date` | None | Script: each end of `dataset_date` (`[start TO end]`, UTC without a timezone). An open end (`*`) is null |
+| `domains` | Script: `classification.domain_category` plus `classification.categories` (the latter is empty on NYC today) | Script: each `tags[].name` mapped to a broad topic, named as Socrata's topics where they overlap ("Health", "Education"). HDX's tags are a fixed 150-term vocabulary; a region or format tag has no topic |
+| `tags` | `classification.domain_tags` | Script: `tags[].name`, then `groups[].title` (HDX's groups are countries) |
 | `update_frequency` | Script: the first of `Update_Update-Frequency` (NYC) or `Dataset-Summary_Posting-Frequency` (NY State portals) in `classification.domain_metadata` | Script: `data_update_frequency` is a code (`"1"` is every day), translated to words |
 | `license` | `metadata.license`, when present (rare on NYC) | `license_title` |
 
