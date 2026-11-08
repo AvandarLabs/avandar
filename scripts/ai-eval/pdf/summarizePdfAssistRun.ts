@@ -1,4 +1,16 @@
-import type { PdfAssistResult } from "./runPdfAssistEval";
+import type { ExtractedFigure, PdfAssistGrade } from "./gradePdfAssist";
+
+/** One graded region, as written to `results.jsonl`. */
+export type PdfAssistResult = {
+  id: string;
+  attempt: number;
+  grade: PdfAssistGrade;
+  modelRows: ExtractedFigure[];
+  responseText: string;
+  cost: number;
+  latencyMs: number;
+  error?: string;
+};
 
 /** A whole run's totals. */
 export type PdfAssistRunSummary = {

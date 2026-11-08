@@ -8,7 +8,7 @@ before it merges to `demo/measles`, and later `develop`.
 | Doc | What it holds |
 |---|---|
 | [architecture.md](architecture.md) | The target design: agent loop in the browser, metered proxy, tools, privacy boundary, model policy, cost model, and the path to the full agent. |
-| [decisions.md](decisions.md) | Every decision made (D01 to D31), with alternatives and costs. |
+| [decisions.md](decisions.md) | Every decision made (D01 to D32), with alternatives and costs. |
 | [roadmap.md](roadmap.md) | What is left before the agent is the default, including metering (D18), and the offline work. |
 | [eval.md](eval.md) | The eval: results, model sweeps (online and offline), the method in detail (data checksums, graders, metrics, versions), and the command behind every number. |
 | [eval-runs/](eval-runs/README.md) | Every eval run with all of its answers, for checking any number. |
@@ -25,6 +25,12 @@ OpenRouter billed.
 | Today, GPT-5.6 Terra | 44, 44 | $0.0052 | 3.7 to 3.8 s | about 380 |
 | **Today, Claude Haiku 5.5 (the default since D31)** | 44, 45 | $0.0013 to $0.0015 | 4.1 s | about 1,400 |
 | **Pi agent, Claude Haiku 5.5 with Sonnet 5.5 escalation** | **45, 45, 45, 45, 44** | **$0.0003** | **2.2 to 2.4 s** | **about 6,600** |
+
+**PDF table assistant** (reads the figures PDF import's rules miss): it had
+been returning nothing because of a routing bug; on its own route with a
+tuned prompt, Haiku 5.5 finds every required figure in the eval (63/63)
+with no fabricated ones, against Sonnet 5's 59/63, at $0.0005 a region
+([eval.md](eval.md#pdf-table-assistant), D32).
 
 **Offline mode** (models in the browser, nothing leaves the computer):
 Qwen3 4B answers **26 of 45** correctly with no needless questions, in a
@@ -50,6 +56,6 @@ in about 6,600, which leaves room for multi-step agent work and a free tier.
 
 ## Open decisions for Pablo
 
-1. **D04:** approve moving the agent's prompt to the proxy before the agent
-   is on by default (recommended; matters more now that metering, D18, is
-   deferred).
+None. D04 (server-held prompts) and D31 (Haiku 5.5) are done; D18
+(metering and the free-tier cap) is deferred and tracked in
+[roadmap.md](roadmap.md).

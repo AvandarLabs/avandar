@@ -1,4 +1,5 @@
 import type { ExpectedFigure, PdfAssistCase } from "./pdfAssistCases";
+import type { ExtractedTable } from "@/workers/pdfSniff/pdfSniff.types";
 
 /** One extracted figure, from the rules or the model. */
 export type ExtractedFigure = {
@@ -194,4 +195,21 @@ export function gradePdfAssist(input: GradeInput): PdfAssistGrade {
     requiredTotal: input.testCase.required.length,
     ...counts,
   };
+}
+
+/** The rows of a rule or model table, as figures. */
+export function tableToFigures(table: ExtractedTable): ExtractedFigure[] {
+  return table.cells.slice(table.headerRows).flatMap((row) => {
+    const value = Number(row[2]);
+    return Number.isFinite(value)
+      ? [
+          {
+            subject: row[0] ?? "",
+            metric: row[1] ?? "",
+            value,
+            unit: row[3] ?? "",
+          },
+        ]
+      : [];
+  });
 }

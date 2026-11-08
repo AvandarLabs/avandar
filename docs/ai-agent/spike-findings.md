@@ -61,7 +61,8 @@ cost, compatibility flags) that Pi keeps current.
 - `pi-ai` imports and streams from Deno with `npm:` specifiers (tested on
   the local Deno and through the edge runtime). The only warning is about
   `@google/genai`'s install script, which the proxy never loads.
-- The route `POST /chat/:workspaceId/agent/api/stream` returns server-sent
+- The route `POST /chat/:workspaceId/agent/data-agent-v1/api/stream` (the
+  prompt version joined the path with D04) returns server-sent
   events in Pi's proxy format. `toProxyEvent.test.ts` streams scripted
   model output through it over HTTP and reads it back with Pi's own
   `streamProxy` client, so both sides of the wire format are checked.

@@ -9,7 +9,7 @@ the rest can follow. Decisions are in [decisions.md](decisions.md).
 | # | Item | Why it is required | Decision |
 |---|---|---|---|
 | R1 | **Metering and plan budgets in the proxy** | Without it, AI spend per user has no ceiling. Records billed cost per user, workspace, and plan; refuses requests past the monthly budget ($2 basic, $7.50 premium, a free-tier cap still to be set) with a readable message. Deferred from the demo by Pablo on 2026-11-07. | D18 |
-| R2 | **Server-held prompts** | Closes the "free model endpoint" hole while R1 is not built, and keeps prompts private. | D04 |
+| R2 | ~~Server-held prompts~~ **Done 2026-11-08** | Closes the "free model endpoint" hole while R1 is not built, and keeps prompts private. | D04 |
 | R3 | **Dashboards and "Try again" in the agent** | Today's chat does both; the agent does neither yet, so turning it on would remove features. | |
 | R4 | **End-to-end test of the agent in the Data Explorer** | The browser path is only checked by hand today. | |
 | R5 | **Set the free-tier monthly cap** | Needed by R1. | D18 |

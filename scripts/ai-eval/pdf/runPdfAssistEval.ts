@@ -20,47 +20,17 @@ import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { parseRegionResponse } from "@/workers/pdfSniff/llm/parseRegionResponse/parseRegionResponse";
 import { readOpenRouterApiKey } from "../runtime/readOpenRouterApiKey";
-import { gradePdfAssist } from "./gradePdfAssist";
+import { gradePdfAssist, tableToFigures } from "./gradePdfAssist";
 import { PDF_ASSIST_CASES } from "./pdfAssistCases";
 import holdoutRegions from "./pdfAssistHoldoutRegions.json";
 import { createPdfAssistSetup } from "./pdfAssistSetups";
 import { preparePdfAssistCase } from "./preparePdfAssistCase";
 import { summarizePdfAssistRun } from "./summarizePdfAssistRun";
-import type { ExtractedFigure, PdfAssistGrade } from "./gradePdfAssist";
 import type { PdfAssistCase } from "./pdfAssistCases";
 import type { PdfAssistSetup } from "./pdfAssistSetups";
-import type { ExtractedTable } from "@/workers/pdfSniff/pdfSniff.types";
+import type { PdfAssistResult } from "./summarizePdfAssistRun";
 
 const REPO_ROOT = resolve(import.meta.dirname, "../../..");
-
-/** One graded region, as written to `results.jsonl`. */
-export type PdfAssistResult = {
-  id: string;
-  attempt: number;
-  grade: PdfAssistGrade;
-  modelRows: ExtractedFigure[];
-  responseText: string;
-  cost: number;
-  latencyMs: number;
-  error?: string;
-};
-
-/** The rows of a rule or model table, as figures. */
-export function tableToFigures(table: ExtractedTable): ExtractedFigure[] {
-  return table.cells.slice(table.headerRows).flatMap((row) => {
-    const value = Number(row[2]);
-    return Number.isFinite(value)
-      ? [
-          {
-            subject: row[0] ?? "",
-            metric: row[1] ?? "",
-            value,
-            unit: row[3] ?? "",
-          },
-        ]
-      : [];
-  });
-}
 
 async function _runCase(
   setup: PdfAssistSetup,
