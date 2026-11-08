@@ -4195,6 +4195,7 @@ msgstr "No se pudo capturar el panel"
 msgid "Processing dataset…"
 msgstr "Procesando conjunto de datos…"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "ID fields keep their value as is."
 msgstr "Los campos de ID conservan su valor tal cual."

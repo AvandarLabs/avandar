@@ -83,6 +83,7 @@ export function CaseTypeDraftAttributeRow({
       <CaseTypeDraftValueRuleSelect
         attribute={attribute}
         columnDataType={columnDataType}
+        isPrimaryKey={isPrimaryKey}
         editor={editor}
       />
     </div>

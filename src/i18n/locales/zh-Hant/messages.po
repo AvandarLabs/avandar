@@ -4015,6 +4015,7 @@ msgstr "無法捕捉儀表板"
 msgid "Processing dataset…"
 msgstr "處理數據集中…"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "ID fields keep their value as is."
 msgstr "ID 欄位保持其原值。"

@@ -4230,6 +4230,7 @@ msgstr "Impossible de capturer le tableau de bord"
 msgid "Processing dataset…"
 msgstr "Traitement du jeu de données…"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "ID fields keep their value as is."
 msgstr "Les champs d'identifiant conservent leur valeur telle quelle."

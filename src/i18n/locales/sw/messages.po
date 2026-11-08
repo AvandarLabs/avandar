@@ -4181,6 +4181,7 @@ msgstr "Haiwezi kunasa dashibodi"
 msgid "Processing dataset…"
 msgstr "Inashughulikia seti ya data…"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "ID fields keep their value as is."
 msgstr "Sehemu za kitambulisho huhifadhi thamani yake kama ilivyo."
