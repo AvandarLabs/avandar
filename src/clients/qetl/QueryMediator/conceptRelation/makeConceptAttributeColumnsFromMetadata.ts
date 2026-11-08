@@ -175,10 +175,11 @@ function _buildUnmappedColumn(
 
 /**
  * Throws when a single-value attribute applies a rule its column's current
- * type does not allow, which happens only when the column's type is edited
- * after the attribute was made. DuckDB would otherwise refuse the whole view
- * (`sum(VARCHAR)` does not bind), or answer `max` over a yes/no column with
- * a value the rule table calls meaningless, and neither names the field.
+ * type does not allow, which happens when the rule was saved without checking
+ * the column's type, or when the column's type changed afterwards. DuckDB
+ * would otherwise refuse the whole view (`sum(VARCHAR)` does not bind), or
+ * answer `max` over a yes/no column with a value the rule table calls
+ * meaningless, and neither names the field.
  * A list attribute applies no rule, so it is not checked.
  */
 function _assertRuleAllowedForColumn(

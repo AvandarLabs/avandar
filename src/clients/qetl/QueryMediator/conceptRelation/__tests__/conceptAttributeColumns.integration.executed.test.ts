@@ -647,13 +647,13 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     expect(() => {
       return makeConceptAttributeColumnsFromMetadata(metadata);
     }).toThrow(
-      /applies 'sum' to dataset column 'tag', whose type 'varchar' does not allow it/,
+      /Concept attribute 'total' .* applies 'sum' to dataset column 'tag', whose type 'varchar' does not allow it/,
     );
   });
 
   // A list field keeps every value and applies no rule, so the rule its
   // mapping happens to store cannot break it.
-  it("reads a list field whatever rule its mapping stores", async () => {
+  it("reads a list field whose mapping stores a rule its column type does not allow", async () => {
     const metadata = _metadata({
       attributes: [PERSON_ID, TAGS],
       mappings: [
