@@ -100,4 +100,17 @@ describe("buildCaseManagerSystemPrompt", () => {
 
     expect(prompt).not.toContain("triage status");
   });
+
+  it("tells the model which column types each value rule needs", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain(
+      "sum and avg only work on bigint and double columns",
+    );
+    expect(prompt).toContain("compare text character by character");
+  });
 });

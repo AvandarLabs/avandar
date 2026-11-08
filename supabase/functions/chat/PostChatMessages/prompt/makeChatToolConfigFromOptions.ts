@@ -207,7 +207,7 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                     "min",
                   ],
                   description:
-                    "Which value to keep when a dataset holds several rows per case. Use sum or max for cumulative measures, first for dates, most_frequent for categories.",
+                    "Which value to keep when a dataset holds several rows per case. Use sum or max for cumulative measures, first for dates, most_frequent for categories. sum and avg need a bigint or double column; max and min never apply to a boolean column.",
                 },
               },
               required: [
