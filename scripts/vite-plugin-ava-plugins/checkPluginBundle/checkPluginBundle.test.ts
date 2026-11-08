@@ -14,6 +14,8 @@ const PLUGIN_HOST_MODULE = "/repo/src/lib/plugins/PluginHost/PluginHost.tsx";
 const RUNNER_MODULE =
   "/repo/src/lib/plugins/runPluginCommand/runPluginCommand.ts";
 const SDK_MODULE = "/repo/packages/web/plugin-sdk/definePlugin.ts";
+const VIZ_RUNTIME_MODULE =
+  "/repo/src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.tsx";
 
 function _chunk(
   overrides: Partial<ChunkSummary> & { fileName: string },
@@ -289,7 +291,9 @@ describe("checkPluginBundle", () => {
     );
 
     expect(violations).toEqual([
-      expect.stringMatching(/plugin host adds 28300 bytes/),
+      expect.stringMatching(
+        `plugin host adds ${HOST_BUDGET_BYTES + 4_300} bytes`,
+      ),
     ]);
   });
 
@@ -331,7 +335,9 @@ describe("checkPluginBundle", () => {
     );
 
     expect(violations).toEqual([
-      expect.stringMatching(/plugin host adds 28300 bytes/),
+      expect.stringMatching(
+        `plugin host adds ${HOST_BUDGET_BYTES + 4_300} bytes`,
+      ),
     ]);
   });
 
@@ -353,7 +359,9 @@ describe("checkPluginBundle", () => {
     );
 
     expect(violations).toEqual([
-      expect.stringMatching(/plugin host adds 29300 bytes/),
+      expect.stringMatching(
+        `plugin host adds ${HOST_BUDGET_BYTES + 5_300} bytes`,
+      ),
     ]);
   });
 
@@ -368,6 +376,112 @@ describe("checkPluginBundle", () => {
         _chunk({
           fileName: "plugin-sdk.js",
           moduleLengths: { [SDK_MODULE]: HOST_BUDGET_BYTES },
+        }),
+      ]),
+    );
+
+    expect(violations).toEqual([]);
+  });
+
+  it("leaves the lazily loaded plugin chart runtime out of the host budget", () => {
+    const violations = _checkChunks(
+      _makeCorrectChunks([
+        _chunk({
+          fileName: "explorer.js",
+          imports: ["index.js"],
+          dynamicImports: ["viz-runtime.js"],
+        }),
+        _chunk({
+          fileName: "viz-runtime.js",
+          imports: ["sdk.js", "viz-runtime-only.js"],
+          moduleLengths: { [VIZ_RUNTIME_MODULE]: HOST_BUDGET_BYTES },
+        }),
+        _chunk({
+          fileName: "viz-runtime-only.js",
+          moduleLengths: {
+            "/repo/src/lib/plugins/vizs/PluginVizRuntime/PluginVizComponentView.tsx":
+              HOST_BUDGET_BYTES,
+          },
+        }),
+      ]),
+    );
+
+    expect(violations).toEqual([]);
+  });
+
+  it("counts the plugin chart runtime when a route imports it statically", () => {
+    const violations = _checkChunks(
+      _makeCorrectChunks([
+        _chunk({
+          fileName: "explorer.js",
+          imports: ["index.js", "viz-runtime.js"],
+        }),
+        _chunk({
+          fileName: "viz-runtime.js",
+          imports: ["sdk.js"],
+          moduleLengths: { [VIZ_RUNTIME_MODULE]: HOST_BUDGET_BYTES },
+        }),
+      ]),
+    );
+
+    expect(violations).toEqual([
+      expect.stringMatching(
+        `plugin host adds ${HOST_BUDGET_BYTES + 5_300} bytes`,
+      ),
+    ]);
+  });
+
+  it("counts a chunk the plugin chart runtime shares with a route", () => {
+    const violations = _checkChunks(
+      _makeCorrectChunks([
+        _chunk({
+          fileName: "explorer.js",
+          imports: ["index.js", "viz-shared.js"],
+          dynamicImports: ["viz-runtime.js"],
+        }),
+        _chunk({
+          fileName: "viz-runtime.js",
+          imports: ["sdk.js", "viz-shared.js"],
+          moduleLengths: { [VIZ_RUNTIME_MODULE]: 6_000 },
+        }),
+        _chunk({
+          fileName: "viz-shared.js",
+          moduleLengths: { [PLUGIN_HOST_MODULE]: HOST_BUDGET_BYTES },
+        }),
+      ]),
+    );
+
+    expect(violations).toEqual([
+      expect.stringMatching(
+        `plugin host adds ${HOST_BUDGET_BYTES + 4_300} bytes`,
+      ),
+    ]);
+  });
+
+  it("leaves a chunk only the command runner and the chart runtime share out of the host budget", () => {
+    const violations = _checkChunks(
+      _makeCorrectChunks([
+        _chunk({
+          fileName: "explorer.js",
+          imports: ["index.js"],
+          dynamicImports: ["viz-runtime.js"],
+        }),
+        _chunk({
+          fileName: "viz-runtime.js",
+          imports: ["sdk.js", "runtime-shared.js"],
+          moduleLengths: { [VIZ_RUNTIME_MODULE]: 6_000 },
+        }),
+        _chunk({
+          fileName: "runner.js",
+          imports: ["sdk.js", "runtime-shared.js"],
+          moduleLengths: { [RUNNER_MODULE]: 6_000 },
+        }),
+        _chunk({
+          fileName: "runtime-shared.js",
+          moduleLengths: {
+            "/repo/packages/web/plugin-sdk/makePluginTranslator.ts":
+              HOST_BUDGET_BYTES,
+          },
         }),
       ]),
     );
