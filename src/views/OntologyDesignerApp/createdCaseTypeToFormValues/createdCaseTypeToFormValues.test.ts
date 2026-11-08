@@ -72,9 +72,11 @@ function _covidCase(
 /** Converts a case type with one field, "Field", reading `columnId`. */
 function _convertField(options: {
   columnId: string;
-  datasetId: string;
   valuePickerRuleType: ValuePickerRule.T;
 }): AttributeFormValues | undefined {
+  const column = COLUMNS.find((candidate) => {
+    return candidate.id === options.columnId;
+  });
   const formValues = createdCaseTypeToFormValues({
     caseType: _covidCase({
       identities: [
@@ -88,7 +90,7 @@ function _convertField(options: {
         {
           name: "Field",
           kind: "dataset_column",
-          datasetId: options.datasetId,
+          datasetId: column?.datasetId ?? DATASET_ID,
           columnId: options.columnId,
           valuePickerRuleType: options.valuePickerRuleType,
         },
@@ -362,7 +364,6 @@ describe("createdCaseTypeToFormValues", () => {
   it("stores a count over a text column as a whole number", () => {
     const field = _convertField({
       columnId: STATUS_COLUMN_ID,
-      datasetId: DATASET_ID,
       valuePickerRuleType: "count",
     });
 
@@ -372,30 +373,40 @@ describe("createdCaseTypeToFormValues", () => {
   it("stores a sum of whole numbers as a decimal", () => {
     const field = _convertField({
       columnId: POPULATION_COLUMN_ID,
-      datasetId: CENSUS_DATASET_ID,
       valuePickerRuleType: "sum",
     });
 
     expect(field?.dataType).toBe("double");
   });
 
-  it("keeps a text column's type under max", () => {
+  it("keeps a text column's type when the rule is max", () => {
     const field = _convertField({
       columnId: STATUS_COLUMN_ID,
-      datasetId: DATASET_ID,
       valuePickerRuleType: "max",
     });
 
     expect(field?.dataType).toBe("varchar");
   });
 
-  it("replaces a sum over a text column with most_frequent", () => {
+  it("falls back to most_frequent and keeps the text type for a sum over a text column", () => {
     const field = _convertField({
       columnId: STATUS_COLUMN_ID,
-      datasetId: DATASET_ID,
       valuePickerRuleType: "sum",
     });
 
+    expect(field?.mappings.datasetColumn.valuePickerRuleType).toBe(
+      "most_frequent",
+    );
+    expect(field?.dataType).toBe("varchar");
+  });
+
+  it("keeps the key column's type for an identifier given a count", () => {
+    const field = _convertField({
+      columnId: PK_COLUMN_ID,
+      valuePickerRuleType: "count",
+    });
+
+    expect(field?.isIdentifier).toBe(true);
     expect(field?.mappings.datasetColumn.valuePickerRuleType).toBe(
       "most_frequent",
     );

@@ -5,7 +5,6 @@ import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRu
 import { makeDefaultManualEntryAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { makeStatusSetValueFromChatStatuses } from "@/views/OntologyDesignerApp/makeStatusSetValueFromChatStatuses/makeStatusSetValueFromChatStatuses";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -17,9 +16,6 @@ import type {
   AttributeFormValues,
   ConceptFormSubmitValues,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-
-/** Matches the concept creator form's default for a new mapped attribute. */
-const DEFAULT_VALUE_PICKER_RULE_TYPE: ValuePickerRuleType = "most_frequent";
 
 type CatalogColumn = Pick<
   DatasetColumn.T,
@@ -35,29 +31,6 @@ function _findColumn(
   });
 }
 
-/**
- * Holds chat's rule to the column's type, because every chat-created case type
- * passes through this step. A rule the column's type does not allow becomes
- * the default rule. Also returns the type that rule emits, which is the type
- * the field stores.
- */
-function _resolveRule(options: {
-  valuePickerRuleType: ValuePickerRuleType;
-  column: CatalogColumn;
-}): { ruleType: ValuePickerRuleType; dataType: CatalogColumn["dataType"] } {
-  const ruleOnColumn = {
-    ruleType: ValuePickerRule.toAllowedRuleType({
-      ruleType: options.valuePickerRuleType,
-      columnDataType: options.column.dataType,
-    }),
-    columnDataType: options.column.dataType,
-  };
-  return {
-    ruleType: ruleOnColumn.ruleType,
-    dataType: ValuePickerRule.getOutputDataType(ruleOnColumn),
-  };
-}
-
 function _makeMappedAttribute(options: {
   conceptId: ConceptId;
   name: string;
@@ -65,16 +38,24 @@ function _makeMappedAttribute(options: {
   column: CatalogColumn;
   isIdentifier: boolean;
   isLabel: boolean;
-  valuePickerRuleType: ValuePickerRuleType;
+  valuePickerRuleType: ValuePickerRule.T;
 }): AttributeFormValues {
   const conceptAttributeId = uuid<ConceptAttributeId>();
-  const rule = _resolveRule(options);
+  const columnDataType = options.column.dataType;
+  // An identifier shows the key itself, so it never reduces the column. Any
+  // other field's rule is replaced when the column's type does not allow it.
+  const ruleType = options.isIdentifier
+    ? ValuePickerRule.DEFAULT_RULE_TYPE
+    : ValuePickerRule.toAllowedRuleType({
+        ruleType: options.valuePickerRuleType,
+        columnDataType,
+      });
   return Model.make("ConceptAttribute", {
     id: conceptAttributeId,
     conceptId: options.conceptId,
     name: ConceptStatus.toNonReservedAttributeName(options.name),
     description: options.description,
-    dataType: rule.dataType,
+    dataType: ValuePickerRule.getOutputDataType({ ruleType, columnDataType }),
     mappingType: "dataset_column",
     isIdentifier: options.isIdentifier,
     isLabel: options.isLabel,
@@ -88,7 +69,7 @@ function _makeMappedAttribute(options: {
       datasetColumn: {
         type: "dataset_column",
         conceptAttributeId,
-        valuePickerRuleType: rule.ruleType,
+        valuePickerRuleType: ruleType,
         datasetId: options.column.datasetId,
         datasetColumnId: options.column.id,
       },
@@ -135,7 +116,7 @@ function _makeMissingIdentifierAttributes(options: {
         column,
         isIdentifier: true,
         isLabel: false,
-        valuePickerRuleType: DEFAULT_VALUE_PICKER_RULE_TYPE,
+        valuePickerRuleType: ValuePickerRule.DEFAULT_RULE_TYPE,
       }),
     ];
   });
@@ -174,7 +155,7 @@ function _attributesFromCaseType(options: {
         isIdentifier: primaryKeyColumnIds.has(column.id),
         isLabel: attribute.isLabel === true,
         valuePickerRuleType:
-          attribute.valuePickerRuleType ?? DEFAULT_VALUE_PICKER_RULE_TYPE,
+          attribute.valuePickerRuleType ?? ValuePickerRule.DEFAULT_RULE_TYPE,
       }),
     ];
   });
