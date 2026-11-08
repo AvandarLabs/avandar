@@ -14,6 +14,7 @@ export type ChatAPI = APITypeDef<
     "/:workspaceId/messages",
     "/:workspaceId/session-secret",
     "/:workspaceId/agent/api/stream",
+    "/:workspaceId/extract-measurements",
   ],
   {
     "/:workspaceId/messages": {
@@ -48,6 +49,22 @@ export type ChatAPI = APITypeDef<
           };
         };
         returnType: Response;
+      };
+    };
+    "/:workspaceId/extract-measurements": {
+      POST: {
+        pathParams: {
+          workspaceId: string;
+        };
+        body: {
+          /** The text of the region the user drew, as consented to. */
+          regionText: string;
+          /** Figures the rules already read, so the model adds the rest. */
+          alreadyExtracted: Array<{ metric: string; value: number }>;
+          /** Proof the user agreed to send `regionText`. */
+          ackToken: string;
+        };
+        returnType: { responseText: string; model: string };
       };
     };
     "/:workspaceId/session-secret": {
