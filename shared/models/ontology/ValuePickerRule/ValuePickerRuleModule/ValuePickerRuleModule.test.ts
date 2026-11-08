@@ -3,9 +3,8 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule.ts";
 
 /**
- * The rule table that the authoring paths, the query planner, and the data
- * migration all agree on. Cases run every column type, because a table that
- * is right only for the types someone thought of is not the table.
+ * Covers every column type, so a type added to `AvaDataType.Types` without a
+ * rule decision fails here.
  */
 describe("ValuePickerRule.getOutputDataType", () => {
   it.each(AvaDataType.Types)(

@@ -4,6 +4,6 @@ import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/Dat
 export { ValuePickerRuleModule as ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRuleModule/ValuePickerRuleModule.ts";
 
 export namespace ValuePickerRule {
-  /** One of the seven rules that reduce a field's rows to one value. */
+  /** One of the rules that reduce a field's rows to one value. */
   export type T = ValuePickerRuleType;
 }
