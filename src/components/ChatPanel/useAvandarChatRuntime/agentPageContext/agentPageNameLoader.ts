@@ -7,10 +7,15 @@ import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AgentPageNameLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/createAgentPageContext";
 
+const UUID_SHAPED =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
+
 /**
- * Loads page names with the user's own session, so RLS decides what the
- * agent may name. A row from another workspace counts as missing, as in the
- * gadget summaries: a route can name any uuid.
+ * Loads the dashboard, map, and case type names that the chat runtime's
+ * per-turn page block shows, with the user's own session, so RLS decides
+ * what the agent may name. A row from another workspace counts as missing,
+ * as in the gadget summaries: a route can name any uuid or slug. A dashboard
+ * route segment that is not a uuid is a slug, looked up in this workspace.
  */
 export function createAgentPageNameLoader(
   workspaceId: Workspace.Id,
@@ -21,12 +26,24 @@ export function createAgentPageNameLoader(
     return row?.workspaceId === workspaceId ? row : undefined;
   };
   return {
-    getDashboard: async (id) => {
-      const dashboard = inWorkspace(
-        await DashboardClient.getById({ id: id as Dashboard.Id }),
-      );
+    getDashboard: async (idOrSlug) => {
+      const row = UUID_SHAPED.test(idOrSlug)
+        ? await DashboardClient.getById({ id: idOrSlug as Dashboard.Id })
+        : (
+            await DashboardClient.getAll({
+              where: {
+                slug: { eq: idOrSlug },
+                workspace_id: { eq: workspaceId },
+              },
+            })
+          )[0];
+      const dashboard = inWorkspace(row);
       return dashboard
-        ? { name: dashboard.name, config: dashboard.config }
+        ? {
+            id: dashboard.id,
+            name: dashboard.name,
+            config: dashboard.config,
+          }
         : undefined;
     },
     getMapName: async (id) => {

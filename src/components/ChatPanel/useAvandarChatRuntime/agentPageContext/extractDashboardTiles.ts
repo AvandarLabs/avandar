@@ -1,63 +1,34 @@
+import { isPlainObject, isString } from "@avandar/utils";
+import { collectDataVizNodes } from "@/clients/dashboards/findDashboardTile/findDashboardTile";
 import type { AgentPageTile } from "$/agent/pageContext/AgentPageContext";
+import type { DataVizNode } from "@/clients/dashboards/findDashboardTile/findDashboardTile";
 
-/** Deep enough for any layout block nesting a dashboard uses. */
-const MAX_DEPTH = 8;
-
-type DataVizLike = {
-  type?: unknown;
-  props?: {
-    vizType?: unknown;
-    nlQuery?: { prompt?: unknown; rawSql?: unknown };
-  };
-};
-
-function _toTile(item: DataVizLike): AgentPageTile | undefined {
-  const sql = item.props?.nlQuery?.rawSql;
-  if (typeof sql !== "string" || sql.trim().length === 0) {
+function _toTile({ props }: DataVizNode): AgentPageTile | undefined {
+  const nlQuery = isPlainObject(props["nlQuery"]) ? props["nlQuery"] : {};
+  const sql = nlQuery["rawSql"];
+  if (!isString(sql) || sql.trim().length === 0) {
     return undefined;
   }
-  const prompt = item.props?.nlQuery?.prompt;
-  const title = typeof prompt === "string" ? prompt.trim() : "";
-  const vizType = item.props?.vizType;
+  const prompt = nlQuery["prompt"];
+  const title = isString(prompt) ? prompt.trim() : "";
+  const vizType = props["vizType"];
   return {
     title: title || "Untitled chart",
-    chartType: typeof vizType === "string" ? vizType : "table",
+    chartType: isString(vizType) ? vizType : "table",
     sql,
   };
 }
 
-function _collect(value: unknown, depth: number, tiles: AgentPageTile[]): void {
-  if (depth > MAX_DEPTH || value === null || typeof value !== "object") {
-    return;
-  }
-  if (Array.isArray(value)) {
-    value.forEach((item) => {
-      _collect(item, depth + 1, tiles);
-    });
-    return;
-  }
-  const item = value as DataVizLike;
-  const tile = item.type === "DataViz" ? _toTile(item) : undefined;
-  if (tile) {
-    tiles.push(tile);
-    return;
-  }
-  Object.values(value).forEach((child) => {
-    _collect(child, depth + 1, tiles);
-  });
-}
-
 /**
  * The charts on a dashboard, in page order, from its Puck data (the editor's
- * live data or a saved config). Reads defensively: a saved config is JSON
- * of any age.
+ * live data or a saved config), at any nesting depth and in legacy zones.
+ * The chat runtime's per-turn page block lists these so the agent knows what
+ * the open dashboard shows. Reads defensively: a saved config is JSON of any
+ * age, so upgrade it first if it may predate the current schema.
  */
 export function extractDashboardTiles(data: unknown): AgentPageTile[] {
-  const content = (data as { content?: unknown } | undefined)?.content;
-  if (!Array.isArray(content)) {
-    return [];
-  }
-  const tiles: AgentPageTile[] = [];
-  _collect(content, 0, tiles);
-  return tiles;
+  return collectDataVizNodes(data).flatMap((node) => {
+    const tile = _toTile(node);
+    return tile ? [tile] : [];
+  });
 }

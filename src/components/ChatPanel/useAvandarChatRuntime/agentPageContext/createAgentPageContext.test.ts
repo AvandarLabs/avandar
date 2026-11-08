@@ -125,4 +125,67 @@ describe("createAgentPageContext", () => {
 
     expect(context).toEqual({ app: "map" });
   });
+
+  it("reads a slugged dashboard under its real id", async () => {
+    const getDashboard = vi.fn().mockResolvedValue({
+      id: DASHBOARD_ID,
+      name: "Measles 2026",
+      config: TILE_DATA,
+    });
+    const context = await _create("/acme/d/measles-2026", {
+      loader: _loader({ getDashboard }),
+    });
+
+    expect(getDashboard).toHaveBeenCalledWith("measles-2026");
+    expect(context.dashboard?.id).toBe(DASHBOARD_ID);
+    expect(context.dashboard?.name).toBe("Measles 2026");
+  });
+
+  it("reads a saved dashboard that predates nlQuery props", async () => {
+    const context = await _create(`/acme/d/${DASHBOARD_ID}`, {
+      loader: _loader({
+        getDashboard: vi.fn().mockResolvedValue({
+          name: "Old",
+          config: {
+            root: { props: { title: "Old" } },
+            content: [
+              {
+                type: "DataViz",
+                props: {
+                  id: "DataViz-1",
+                  vizType: "bar",
+                  prompt: "Old chart",
+                  sql: "SELECT 9",
+                },
+              },
+            ],
+          },
+        }),
+      }),
+    });
+
+    expect(context.dashboard?.tiles).toEqual([
+      { title: "Old chart", chartType: "table", sql: "SELECT 9" },
+    ]);
+  });
+
+  it("takes the saved name when the editor's title is blank", async () => {
+    const context = await _create(`/acme/dashboards/edit/${DASHBOARD_ID}`, {
+      dashboardEditorState: {
+        activeDashboardId: DASHBOARD_ID,
+        editorData: {
+          ...TILE_DATA,
+          root: { props: { title: "  " } },
+        } as never,
+      },
+      loader: _loader({
+        getDashboard: vi
+          .fn()
+          .mockResolvedValue({ name: "Saved name", config: {} }),
+      }),
+    });
+
+    expect(context.dashboard?.name).toBe("Saved name");
+    expect(context.dashboard?.tiles).toHaveLength(1);
+  });
 });

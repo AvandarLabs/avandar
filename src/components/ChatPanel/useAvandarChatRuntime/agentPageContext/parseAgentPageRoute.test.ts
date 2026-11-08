@@ -10,6 +10,7 @@ describe("parseAgentPageRoute", () => {
     [`/acme/dashboards/edit/${ID}`, { app: "dashboard", id: ID }],
     [`/acme/dashboards/preview/${ID}`, { app: "dashboard", id: ID }],
     [`/acme/d/${ID}`, { app: "dashboard", id: ID }],
+    ["/acme/d/measles-2026", { app: "dashboard", id: "measles-2026" }],
     ["/acme/dashboards", { app: "dashboards" }],
     [`/acme/data-manager/${ID}`, { app: "dataset", id: ID }],
     ["/acme/data-manager/data-import", { app: "data-sources" }],
@@ -24,5 +25,11 @@ describe("parseAgentPageRoute", () => {
     ["/acme/settings", { app: "other" }],
   ])("reads %s", (pathname, expected) => {
     expect(parseAgentPageRoute(pathname)).toEqual(expected);
+  });
+
+  it("does not read a uuid followed by more characters", () => {
+    expect(parseAgentPageRoute(`/acme/map/${ID}extra`)).toEqual({
+      app: "other",
+    });
   });
 });

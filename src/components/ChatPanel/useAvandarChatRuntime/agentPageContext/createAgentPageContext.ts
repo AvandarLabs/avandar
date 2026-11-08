@@ -1,16 +1,24 @@
 import { extractDashboardTiles } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/extractDashboardTiles";
 import { parseAgentPageRoute } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/parseAgentPageRoute";
+import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { AgentPageRoute } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/parseAgentPageRoute";
+import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 
-/** Loads names the page state does not hold, with the user's own access. */
+/**
+ * Loads names the page state does not hold, with the user's own access. The
+ * chat runtime builds one per workspace and passes it in on every turn, so
+ * the agent's page block can name the dashboard, map, or case type on
+ * screen. `getDashboard` takes a dashboard's id or its slug, since
+ * published dashboards open at `/d/<slug>`, and may return the real id.
+ */
 export type AgentPageNameLoader = {
   getDashboard: (
-    id: string,
-  ) => Promise<{ name: string; config: unknown } | undefined>;
+    idOrSlug: string,
+  ) => Promise<{ id?: string; name: string; config: unknown } | undefined>;
   getMapName: (id: string) => Promise<string | undefined>;
   getCaseTypeName: (id: string) => Promise<string | undefined>;
 };
@@ -45,24 +53,48 @@ function _findDataset(
   return dataset ? { id: dataset.id, name: dataset.name } : undefined;
 }
 
+/** Shown when neither the editor nor the saved dashboard has a name. */
+const UNTITLED_DASHBOARD_NAME = "Untitled dashboard";
+
+async function _loadSavedDashboard(
+  idOrSlug: string,
+  loader: AgentPageNameLoader,
+): Promise<AgentPageContext["dashboard"]> {
+  return await _tryLoad(async () => {
+    const dashboard = await loader.getDashboard(idOrSlug);
+    return dashboard
+      ? {
+          id: dashboard.id ?? idOrSlug,
+          name: dashboard.name,
+          tiles: extractDashboardTiles(
+            upgradeAvaPageData(dashboard.config as AvaPageGenericData),
+          ),
+        }
+      : undefined;
+  });
+}
+
 async function _readDashboard(
-  id: string,
+  idOrSlug: string,
   options: Readonly<CreateAgentPageContextOptions>,
 ): Promise<AgentPageContext["dashboard"]> {
   const { activeDashboardId, editorData } = options.dashboardEditorState;
-  if (activeDashboardId === id && editorData) {
-    return {
-      id,
-      name: String(editorData.root?.props?.title ?? ""),
-      tiles: extractDashboardTiles(editorData),
-    };
+  if (activeDashboardId !== idOrSlug || !editorData) {
+    return await _loadSavedDashboard(idOrSlug, options.loader);
   }
-  const saved = await _tryLoad(() => {
-    return options.loader.getDashboard(id);
-  });
-  return saved
-    ? { id, name: saved.name, tiles: extractDashboardTiles(saved.config) }
-    : undefined;
+  const editorTitle = String(editorData.root?.props?.title ?? "").trim();
+  const savedName = editorTitle
+    ? undefined
+    : (
+        await _tryLoad(() => {
+          return options.loader.getDashboard(idOrSlug);
+        })
+      )?.name;
+  return {
+    id: idOrSlug,
+    name: editorTitle || savedName || UNTITLED_DASHBOARD_NAME,
+    tiles: extractDashboardTiles(editorData),
+  };
 }
 
 async function _readNamed(
@@ -76,6 +108,15 @@ async function _readNamed(
     return load(id);
   });
   return name ? { id, name } : undefined;
+}
+
+function _readCaseType(
+  caseTypeId: string,
+  loader: AgentPageNameLoader,
+): Promise<AgentPageContext["caseType"]> {
+  return _readNamed(caseTypeId, (id) => {
+    return loader.getCaseTypeName(id);
+  });
 }
 
 function _readExplorer(
@@ -101,7 +142,7 @@ async function _readPageParts(
     case "dataset":
       return { dataset: _findDataset(datasets, route.id) };
     case "dashboard":
-      return { dashboard: await _readDashboard(route.id!, options) };
+      return { dashboard: await _readDashboard(route.id, options) };
     case "map":
       return {
         map: await _readNamed(route.id, (id) => {
@@ -109,12 +150,9 @@ async function _readPageParts(
         }),
       };
     case "case-type":
+      return { caseType: await _readCaseType(route.id, loader) };
     case "case":
-      return {
-        caseType: await _readNamed(route.parentId ?? route.id, (id) => {
-          return loader.getCaseTypeName(id);
-        }),
-      };
+      return { caseType: await _readCaseType(route.parentId, loader) };
     default:
       return {};
   }
