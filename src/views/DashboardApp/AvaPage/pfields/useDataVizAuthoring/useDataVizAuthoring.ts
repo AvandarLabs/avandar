@@ -20,9 +20,11 @@ type Authoring = ReturnType<typeof useDataVizRuntimeColumnBindings> & {
 
   /**
    * Writes a chart type together with its config, such as a picked plugin
-   * chart. Merged over the block's bound props once its columns are known,
-   * written as given before its query has run, and skipped on a version 0
-   * block whose column names do not all bind.
+   * chart. On a block that stores column IDs, it is merged over the block's
+   * bound props once its columns are known, and written as given before its
+   * query has run. On a version 0 block that stores column names, it is
+   * skipped until the query has run and every name binds to a column, then
+   * written over the bound props.
    */
   replaceVizConfig: (
     changes: Pick<

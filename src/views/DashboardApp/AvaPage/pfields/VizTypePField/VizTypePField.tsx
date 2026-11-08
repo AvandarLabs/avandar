@@ -24,7 +24,9 @@ type Props = {
  * plugin chart types beside the built-in ones. A built-in type goes through
  * Puck's field change, so `resolveData` converts the config as for any type
  * change. A plugin chart type is written with the config built for it, since
- * only this field has the plugin chart's settings. Use it as the `vizType`
+ * only this field has the plugin chart's settings. That write bypasses
+ * `resolveData` on purpose, so each plugin pick builds a fresh config instead
+ * of restoring the block's per-type config memory. Use it as the `vizType`
  * field of a chart block, for example the dashboard's DataViz block.
  */
 export function VizTypePField({
