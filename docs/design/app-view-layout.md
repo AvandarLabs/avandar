@@ -150,6 +150,11 @@ Structure that labels nothing is noise. Three rules, all live in
   in Data Sources is eight.
 - **A fact with no value is omitted, not shown empty.** "Quote char: empty
   text" tells a user nothing they did not already know.
+  - **Exception: a record's fields.** A case type's fields are a schema the
+    user defined, so every record is expected to have each one. A blank there
+    is information: the data is missing. The record page's Details rail lists
+    every field and shows a dimmed "No value" for an empty one, rather than
+    dropping the row. See `CaseDetailsRail`.
 
 ## Actions
 

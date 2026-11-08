@@ -692,6 +692,7 @@ from the plan text.
    SQL now runs.
 6. **Shared comparator.** The rail and the view copy the same field-order
    comparator. Export it once.
-7. **Layout doc exception.** `docs/design/app-view-layout.md` says a fact with
-   no value is omitted. The record page shows "No value" on purpose. Add the
-   exception to the layout doc, or change this design.
+7. **Layout doc exception (resolved).** `docs/design/app-view-layout.md` says a
+   fact with no value is omitted. The record page shows "No value" on purpose,
+   because a blank field means the data is missing. The layout doc now lists
+   a record's fields as an exception.
