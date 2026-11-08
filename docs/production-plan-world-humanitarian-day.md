@@ -354,6 +354,25 @@ Postgres/direct-DB source type.** Open-data catalog is generic + Beta with
   relation, not a dataset: `docs/measles-demo/connector-nomenclature.md`),
   how much of it a query may read, and what a chat session that cites it
   keeps once the listing is never added. Needs P10's app-wide chat.
+- P6.9 `[NEW]` **Cached Parquet copies of API-backed ODC listings**: the
+  pipeline server streams a listing's source into a Parquet copy in the
+  public `opendata` bucket the first time a workspace adds it, and rebuilds
+  it when the source changes. Workspaces read the copy straight from
+  Storage, which removes the 25 MB ceiling of the edge function relay, so an
+  ODC listing is limited only by the Storage upload limit manual uploads
+  already have. Starts by dropping the policies that let any signed-in user
+  write to `opendata`. Spec: `docs/measles-demo/odc-parquet-cache-spec.md`.
+  In progress.
+- P6.10 `[NEW]` **Retest ODC listings marked unreachable**: a file host that
+  does not answer marks a listing `unreachable_dataset`, even when the
+  outage is temporary, and the mark only clears when the pipeline sees the
+  source change or a sample is later verified. Add (a) a scheduled job that
+  re-reads each `unreachable_dataset` listing's sample with backoff (daily
+  at first, weekly after repeated failures) and clears the mark on success,
+  and (b) a "Try again" button on the ODC listing's invalid notice that
+  re-reads the sample at once. Other invalid reasons (`dataset_not_found`,
+  `unsupported_format`, `external_host`) are not temporary and are not
+  retried on a schedule, though "Try again" works for all of them.
 - `[Depends on: P0 (live-source extractors P0.8) for Sheets/Postgres; pipeline
   framework already exists for HDX]`
 
