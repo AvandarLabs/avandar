@@ -53,6 +53,32 @@ function _makePluginWithIcons(options: {
   } as unknown as PluginDirectory;
 }
 
+/** A copy of `PLUGIN` that declares one viz type per icon name. */
+function _makePluginWithVizTypeIcons(vizTypeIcons: string[]): PluginDirectory {
+  const { manifest } = PLUGIN.compiled;
+  return {
+    ...PLUGIN,
+    compiled: {
+      ...PLUGIN.compiled,
+      manifest: {
+        ...manifest,
+        contributes: {
+          ...manifest.contributes,
+          vizTypes: vizTypeIcons.map((icon, index) => {
+            return {
+              id: `chart-${index}`,
+              title: "%t%",
+              icon,
+              render: "transform" as const,
+              settings: [],
+            };
+          }),
+        },
+      },
+    },
+  };
+}
+
 function _getIconImportBindings(code: string): string[] {
   const importList = /^import \{ (.*) \} from "@tabler\/icons-react";$/m.exec(
     code,
@@ -99,6 +125,17 @@ describe("makeManifestModuleSourceFromPlugin", () => {
     expect(code).toContain(
       'export const icons = { "chart-dots": IconChartDots, "trending-up": IconTrendingUp };',
     );
+  });
+
+  it("imports the icon each viz type names", () => {
+    const code = makeManifestModuleSourceFromPlugin(
+      _makePluginWithVizTypeIcons(["chart-histogram"]),
+    );
+    expect(_getIconImportBindings(code)).toEqual([
+      "IconChartDots",
+      "IconTrendingUp",
+      "IconChartHistogram",
+    ]);
   });
 });
 

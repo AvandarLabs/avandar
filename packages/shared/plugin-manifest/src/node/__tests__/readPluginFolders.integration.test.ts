@@ -77,6 +77,26 @@ function _getError(run: () => unknown): PluginManifestError {
   return expect.unreachable();
 }
 
+function _writePluginWithVizTypeIcon(iconName: string): string {
+  const vizTypeYaml = [
+    "  vizTypes:",
+    "    - id: hello-chart",
+    '      title: "%viz.title%"',
+    `      icon: ${iconName}`,
+    "      render: transform",
+    "",
+  ].join("\n");
+  return _writePlugin("hello", {
+    yaml: `${MANIFEST_YAML}${vizTypeYaml}`,
+    localeFiles: {
+      "en.json": JSON.stringify({
+        ...DEFAULT_LOCALE_MESSAGES,
+        "viz.title": "Hello chart",
+      }),
+    },
+  });
+}
+
 beforeEach(() => {
   repoRoot = mkdtempSync(join(tmpdir(), "ava-plugins-"));
   const iconsDirectory = join(repoRoot, ICONS_DIRECTORY_PATH);
@@ -139,6 +159,29 @@ describe("readPluginDirectory", () => {
       'unknown Tabler icon "puzzle"',
       'unknown Tabler icon "hand-stop"',
     ]);
+  });
+
+  it("reports an unknown viz type icon", () => {
+    const directory = _writePluginWithVizTypeIcon("no-such-chart");
+    expect(
+      _getError(() => {
+        return readPluginDirectory({ directory, repoRoot });
+      }).issues,
+    ).toEqual(['unknown Tabler icon "no-such-chart"']);
+  });
+
+  it("accepts a viz type icon that exists in the Tabler icons directory", () => {
+    writeFileSync(
+      join(repoRoot, ICONS_DIRECTORY_PATH, "IconChartHistogram.mjs"),
+      "",
+    );
+    const directory = _writePluginWithVizTypeIcon("chart-histogram");
+    const plugin = readPluginDirectory({ directory, repoRoot });
+    expect(
+      plugin.compiled.manifest.contributes.vizTypes.map((vizType) => {
+        return vizType.icon;
+      }),
+    ).toEqual(["chart-histogram"]);
   });
 
   it("reports ava.yaml not found for a plugin folder without one", () => {
