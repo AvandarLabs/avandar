@@ -188,4 +188,18 @@ describe("createAgentPageContext", () => {
     expect(context.dashboard?.name).toBe("Saved name");
     expect(context.dashboard?.tiles).toHaveLength(1);
   });
+
+  it("keeps the dashboard without charts when its config cannot upgrade", async () => {
+    const context = await _create(`/acme/d/${DASHBOARD_ID}`, {
+      loader: _loader({
+        getDashboard: vi.fn().mockResolvedValue({ name: "Broken", config: {} }),
+      }),
+    });
+
+    expect(context.dashboard).toEqual({
+      id: DASHBOARD_ID,
+      name: "Broken",
+      tiles: [],
+    });
+  });
 });

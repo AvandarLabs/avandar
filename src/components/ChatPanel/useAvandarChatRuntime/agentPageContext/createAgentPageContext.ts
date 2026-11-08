@@ -2,7 +2,10 @@ import { extractDashboardTiles } from "@/components/ChatPanel/useAvandarChatRunt
 import { parseAgentPageRoute } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/parseAgentPageRoute";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
-import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
+import type {
+  AgentPageContext,
+  AgentPageTile,
+} from "$/agent/pageContext/AgentPageContext";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { AgentPageRoute } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/parseAgentPageRoute";
 import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
@@ -56,6 +59,17 @@ function _findDataset(
 /** Shown when neither the editor nor the saved dashboard has a name. */
 const UNTITLED_DASHBOARD_NAME = "Untitled dashboard";
 
+/** Tiles of a saved config, or none when it cannot be upgraded. */
+function _extractSavedTiles(config: unknown): readonly AgentPageTile[] {
+  try {
+    return extractDashboardTiles(
+      upgradeAvaPageData(config as AvaPageGenericData),
+    );
+  } catch {
+    return [];
+  }
+}
+
 async function _loadSavedDashboard(
   idOrSlug: string,
   loader: AgentPageNameLoader,
@@ -66,9 +80,7 @@ async function _loadSavedDashboard(
       ? {
           id: dashboard.id ?? idOrSlug,
           name: dashboard.name,
-          tiles: extractDashboardTiles(
-            upgradeAvaPageData(dashboard.config as AvaPageGenericData),
-          ),
+          tiles: _extractSavedTiles(dashboard.config),
         }
       : undefined;
   });

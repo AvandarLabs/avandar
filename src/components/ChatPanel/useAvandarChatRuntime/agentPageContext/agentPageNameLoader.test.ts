@@ -72,6 +72,7 @@ describe("createAgentPageNameLoader", () => {
     expect(dashboardClient.getAll).toHaveBeenCalledWith({
       where: {
         slug: { eq: "measles-2026" },
+        visibility: { eq: "workspace" },
         workspace_id: { eq: WORKSPACE_ID },
       },
     });

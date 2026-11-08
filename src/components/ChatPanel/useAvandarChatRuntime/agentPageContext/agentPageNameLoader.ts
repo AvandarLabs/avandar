@@ -15,7 +15,9 @@ const UUID_SHAPED =
  * per-turn page block shows, with the user's own session, so RLS decides
  * what the agent may name. A row from another workspace counts as missing,
  * as in the gadget summaries: a route can name any uuid or slug. A dashboard
- * route segment that is not a uuid is a slug, looked up in this workspace.
+ * route segment that is not a uuid is a slug, looked up among this
+ * workspace's workspace-visibility dashboards, the only ones the `/d/` route
+ * renders by slug.
  */
 export function createAgentPageNameLoader(
   workspaceId: Workspace.Id,
@@ -33,6 +35,7 @@ export function createAgentPageNameLoader(
             await DashboardClient.getAll({
               where: {
                 slug: { eq: idOrSlug },
+                visibility: { eq: "workspace" },
                 workspace_id: { eq: workspaceId },
               },
             })
