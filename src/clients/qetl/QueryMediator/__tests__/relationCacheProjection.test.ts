@@ -395,3 +395,80 @@ describe("QueryMediator relation cache projection", () => {
     expect(await _heldColumns()).toEqual(["a"]);
   });
 });
+
+/** A catalog row that renames the stored column `region_raw` to `region`. */
+const RENAMED_COLUMN = {
+  datasetId: DATASET_ID,
+  originalName: "region_raw",
+  name: "region",
+  detectedDataType: "VARCHAR",
+  dataType: "varchar",
+};
+
+async function _runRegionSelect(
+  datasetColumnSource: "catalog" | "stored" | undefined,
+): Promise<void> {
+  const mediator = QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      getQueryDependencies: async () => {
+        return [DATASET_ID];
+      },
+      getDuckDbLeaseDatasetIds: async () => {
+        return [DATASET_ID];
+      },
+      relationCache,
+      principalKey: PRINCIPAL_KEY,
+      datasetColumnSource,
+    },
+  });
+  await mediator.runQuery({
+    rawSql: `SELECT "region", COUNT(*) FROM "${DATASET_ID}" GROUP BY 1`,
+  });
+}
+
+describe("QueryMediator dataset column source", () => {
+  it("renames a stored relation's columns from the catalog by default", async () => {
+    datasetColumnGetAllMock.mockResolvedValue([RENAMED_COLUMN]);
+    await _seedCache("all");
+
+    await _runRegionSelect(undefined);
+
+    expect(loadParquetMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        columnReplacements: {
+          region_raw: expect.objectContaining({ alias: "region" }),
+        },
+      }),
+    );
+  });
+
+  it("serves a preloaded table without reading dataset columns when columns are stored", async () => {
+    // A public snapshot table is loaded whole before any tile queries it, so
+    // DuckDB already holds every column the query names.
+    getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
+
+    await _runRegionSelect("stored");
+
+    expect(datasetColumnGetAllMock).not.toHaveBeenCalled();
+    expect(runRawQueryMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("loads a cached relation as stored when the catalog is unreadable", async () => {
+    // An anonymous visitor has no grant on `dataset_columns`, so any read of
+    // it rejects. The table is missing from DuckDB, so the relation comes
+    // from the storage tier instead of the snapshot preload.
+    datasetColumnGetAllMock.mockRejectedValue(
+      new Error("permission denied for table dataset_columns"),
+    );
+    await _seedCache("all");
+
+    await _runRegionSelect("stored");
+
+    expect(datasetColumnGetAllMock).not.toHaveBeenCalled();
+    expect(loadParquetMock).toHaveBeenCalledTimes(1);
+    expect(loadParquetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ columnReplacements: {} }),
+    );
+    expect(runRawQueryMock).toHaveBeenCalledTimes(1);
+  });
+});

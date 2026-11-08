@@ -11,6 +11,7 @@ import type {
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { ConceptSpineRestriction } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type {
+  DatasetColumnSource,
   NeededColumnsByDatasetId,
   QetlRunnerOptions,
 } from "@/clients/qetl/QueryMediator/QueryMediator.types";
@@ -34,6 +35,11 @@ export type IQueryMediator = Module<
     duckDbReadMode?: "public" | "workspace";
     /** Identifies the public snapshot expected to own final read tables. */
     publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
+    /**
+     * Where a relation's column names and types come from: the dataset column
+     * catalog (the default), or the relation's own Parquet.
+     */
+    datasetColumnSource?: DatasetColumnSource;
 
     /** The storage tier this session reads and writes. */
     relationCache: RelationCachePort;
@@ -98,6 +104,7 @@ export const QueryMediatorFactory = createModuleFactory("QueryMediator", {
     getDuckDbLeaseDatasetIds: undefined,
     duckDbReadMode: undefined,
     publicSnapshotDuckDbOwner: undefined,
+    datasetColumnSource: undefined,
     prepareDuckDbDatasets: undefined,
   },
   builder: (

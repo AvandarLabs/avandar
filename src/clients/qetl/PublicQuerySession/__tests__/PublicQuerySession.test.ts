@@ -198,6 +198,26 @@ describe("PublicQuerySession.runQuery", () => {
     expect(createMock).toHaveBeenCalledTimes(3);
   });
 
+  it("loads snapshot relations as stored, without the dataset column catalog", async () => {
+    // A snapshot's visitor may have no grant on `dataset_columns`, and the
+    // snapshot Parquet is already written with the names its queries use.
+    vi.resetModules();
+    const { PublicQuerySession } =
+      await import("@/clients/qetl/PublicQuerySession/PublicQuerySession");
+
+    await PublicQuerySession.runQuery({
+      rawSql: `select * from ${DATASET_ID}`,
+      dashboardId: DASHBOARD_ID,
+      visibility: "public",
+      snapshotRevision: THIRD_REVISION,
+    });
+
+    const qetlOptions = createMock.mock.calls.at(-1)?.[1]?.state as {
+      datasetColumnSource: unknown;
+    };
+    expect(qetlOptions.datasetColumnSource).toBe("stored");
+  });
+
   it("scopes its storage tier to the committed snapshot revision", async () => {
     // The session used to carry the revision in an `insertToStorageCache`
     // callback that only wrote. It now carries it in the principal every cache

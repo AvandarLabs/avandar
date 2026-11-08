@@ -87,6 +87,7 @@ describe("RelationLoading.loadRelationBytes", () => {
     // is gated by RLS, so reading it anyway fails for a visitor who may not
     // read any dataset's columns.
     await RelationLoading.loadRelationBytes({
+      datasetColumnSource: "catalog",
       datasetDuckDbLease: {} as DatasetDuckDbLease,
       principalKey: PRINCIPAL_KEY,
       relationCache: createInMemoryRelationCache(),

@@ -30,6 +30,7 @@ import type {
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
   AcquiredRelationBytes,
+  DatasetColumnSource,
   NeededColumnsByDatasetId,
   QetlRunQuery,
   RelationSource,
@@ -65,6 +66,8 @@ type FetchRelationBytesOptions = {
 
 /** Input to {@link RelationLoading.loadRelationBytes}. */
 type LoadRelationBytesOptions = {
+  /** `stored` loads each relation as its Parquet holds it, unrenamed. */
+  datasetColumnSource: DatasetColumnSource;
   relations: readonly AcquiredRelationBytes[];
   relationsToStore: readonly AcquiredRelationBytes[];
   datasetDuckDbLease: DatasetDuckDbLease;
@@ -391,7 +394,8 @@ async function _writeStoredRelationBytes(
  * A query that names no dataset, or whose datasets are all already in the
  * queryable tier, needs no column replacements, and the catalog is gated by
  * RLS, so reading it would fail for a caller who may read no dataset's
- * columns, such as an anonymous visitor to a public dashboard.
+ * columns, such as an anonymous visitor to a public dashboard. A `stored`
+ * session never reads it either: its relations load with no replacements.
  */
 async function _loadRelationBytes(
   options: Readonly<LoadRelationBytesOptions>,
@@ -400,11 +404,14 @@ async function _loadRelationBytes(
   if (options.relations.length === 0) {
     return;
   }
-  const columns = await DatasetColumnClient.withCache(AvaQueryClient)
-    .withEnsureQueryData()
-    .getAll(
-      where("dataset_id", "in", options.relations.map(prop("datasetId"))),
-    );
+  const columns =
+    options.datasetColumnSource === "stored"
+      ? []
+      : await DatasetColumnClient.withCache(AvaQueryClient)
+          .withEnsureQueryData()
+          .getAll(
+            where("dataset_id", "in", options.relations.map(prop("datasetId"))),
+          );
   const columnsByDatasetId = makeBucketRecord(columns, { key: "datasetId" });
   await promiseMap(options.relations, async (relation) => {
     await DuckDbClient.loadParquet({

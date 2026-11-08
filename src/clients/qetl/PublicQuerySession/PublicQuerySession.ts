@@ -81,6 +81,10 @@ function _createQetlClient(
     state: {
       duckDbReadMode: "public",
       publicSnapshotDuckDbOwner: owner,
+      // The snapshot Parquet is written with the names its queries use, the
+      // same shape `LocalPublicDatasetRawDataClient` preloads unrenamed. The
+      // dataset column catalog is also unreadable to an anonymous visitor.
+      datasetColumnSource: "stored",
       getQueryDependencies: async (rawSql) => {
         return _getReferencedPublishedDatasetIds({
           publishedDatasetIds,
