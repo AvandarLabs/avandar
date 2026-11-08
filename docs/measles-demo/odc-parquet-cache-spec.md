@@ -52,7 +52,16 @@ isolate memory ceiling, so it can stream a source of any size:
    is read from its CSV export with no row limit.
 3. `COPY (SELECT * FROM read_csv(...)) TO '<file>.parquet' (FORMAT PARQUET,
    COMPRESSION ZSTD)`. DuckDB streams this, so memory stays flat. A source
-   that is already Parquet is uploaded unchanged.
+   that is already Parquet is uploaded unchanged. How the CSV is read
+   matters, and was settled against the real DOB Violations file:
+   - Column types are detected from every row (`sample_size=-1`), since a
+     column that looks numeric for its first 20,000 rows often is not.
+   - The dialect (delimiter, quote, escape) is detected from the start of
+     the file and pinned. Detected from every row, DuckDB reads a file with
+     one malformed row as a single text column, without an error.
+   - Strict mode, never `strict_mode=false`. The lenient mode merged two DOB
+     rows into one where a quoted value ends in an apostrophe, without an
+     error. A malformed row now fails the build, naming its line.
 4. Upload the file to
    `opendata/catalog-cache/<listingId>/<sourceVersionHash>.parquet`.
    Naming the object after the source version means a reader holding an
@@ -68,9 +77,19 @@ dataset itself cannot be loaded marks the listing invalid through
 
 **Entry point:** `POST /open-data-cache/:catalogListingId/build` on the
 pipeline server, authorized with `AVA_PIPELINE_SERVER_SECRET` like the
-existing run route. It answers `202` straight away and builds in the
-background. One machine builds one listing at a time: a second request for
-a listing already `building` is a no-op.
+existing run route, carrying the build id the edge function claimed. It
+answers `202` straight away and builds in the background.
+
+**One build per listing** is enforced in the database, not in a machine's
+memory, so it holds across Fly machines:
+`rpc_data_catalog_listings__request_parquet_cache` claims a build under a
+new build id, or returns null when one is already running. A build records
+its result only while its build id is still current, so a build given up
+as lost cannot overwrite the one that replaced it.
+
+**Measured on DOB Violations** (2,477,724 rows, 18 columns): the CSV is
+790 MB and took 264 s to stream from Socrata. Converting it took 2 s and
+produced a 79.7 MB ZSTD Parquet file.
 
 ### 2. When a copy is built: on first use, refreshed when stale
 
@@ -113,18 +132,28 @@ columns (`cached_object_path`, `cached_source_version`, `cached_at`):
 | Column | Meaning |
 |---|---|
 | `parquet_cache_status` | enum: `building`, `ready`, `failed`. Null when no build was ever requested. |
+| `parquet_cache_build_id` | The running build's id. Null when no build runs. |
+| `parquet_cache_build_started_at` | When the running or last build started. Drives the lost-build rule. |
+| `parquet_cache_failure_code` | The last build's failure code. Set exactly when the status is `failed`. |
 | `parquet_cache_object_path` | Object path in `opendata`. Set exactly when a copy exists. |
 | `parquet_cache_source_version` | The freshness token the copy was built from. |
 | `parquet_cache_built_at` | When the current copy was written. |
-| `parquet_cache_build_started_at` | When the running or last build started. Drives the 30-minute lost-build rule. |
-| `parquet_cache_failure_code` | The last build's failure code, when it failed. |
 | `parquet_cache_row_count`, `parquet_cache_byte_size` | What was written, for the catalog and for monitoring. |
 
-A check constraint keeps them consistent, as `data_catalog_listings__cache_complete`
-does today. Only the service role writes them, through
-`rpc_data_catalog_listings__write_parquet_cache` (pipeline server) and
-`rpc_data_catalog_listings__request_parquet_cache` (edge function). A
-`pipeline_parquet` listing never has a cache.
+Two check constraints keep them consistent: the copy columns are set
+together or not at all, and each status carries exactly what it means (a
+`building` listing has a build id, a `ready` one has a copy, a `failed` one
+says why; `building` and `failed` keep any earlier copy). Only the service
+role writes them, through three RPCs:
+
+| RPC | Caller | Does |
+|---|---|---|
+| `rpc_data_catalog_listings__request_parquet_cache` | edge function | Claims a build and returns its id, or null when one runs |
+| `rpc_data_catalog_listings__write_parquet_cache` | pipeline server | Records a ready copy; returns the copy it replaced, for deletion |
+| `rpc_data_catalog_listings__fail_parquet_cache` | pipeline server | Records a failure; keeps the earlier copy |
+
+A `pipeline_parquet` listing never has a cache. The raw-bytes cache columns
+(`cached_*`) stay until S7 removes the relay that writes them.
 
 ### 5. Security prerequisite: lock down `opendata` writes
 
@@ -146,10 +175,10 @@ and its cache columns are removed.
 
 | # | Slice | Depends on |
 |---|---|---|
-| S1 | Drop the `opendata` authenticated write policies | none |
-| S2 | Pipeline server: the cache builder (stream source to disk, DuckDB to Parquet, upload, record) with every dependency injected | none |
+| S1 | Drop the `opendata` authenticated write policies. **Done.** | none |
+| S2 | Pipeline server: the cache builder (stream source to disk, DuckDB to Parquet, upload) with every dependency injected. **Done.** | none |
 | S3 | Pipeline server: the build route, its auth, and one-build-per-listing | S2 |
-| S4 | Schema: the cache columns, constraint, and both RPCs | none |
+| S4 | Schema: the cache columns, constraints, and the three RPCs. **Done.** | none |
 | S5 | Edge function: the `parquet-cache` route (freshness check, lost-build rule, triggering S3) | S3, S4 |
 | S6 | App: `DatasetParquetWrapper` and "Add to workspace" read the copy and show its preparing state | S5 |
 | S7 | Remove the 25 MB relay, the private bucket cache, and its columns | S6 |
@@ -158,9 +187,9 @@ and its cache columns are removed.
 ## Open questions
 
 1. **Production Storage upload limit.** Large ODC sources only fit if
-   production's limit allows them. DOB Violations is about 750 MB of CSV,
-   probably 60 to 120 MB as ZSTD Parquet. Manual uploads already depend on
-   this same number.
+   production's limit allows them. DOB Violations is 79.7 MB as ZSTD
+   Parquet, which the 50 MB local limit in `supabase/config.toml` would
+   already refuse. Manual uploads already depend on this same number.
 2. **Fly machine sizing.** The builder needs disk for the source CSV plus
    the Parquet. The pipeline server's volume and memory size should be
    checked against the largest listing we expect to cache.
