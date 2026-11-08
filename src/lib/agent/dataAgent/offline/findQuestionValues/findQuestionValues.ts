@@ -92,6 +92,28 @@ async function _searchColumn(
 }
 
 /**
+ * Keeps the longest matches: "York" (a county) inside a matched "New York"
+ * is part of that name, not a second place the user named.
+ */
+function _keepLongestMatches(
+  matches: readonly QuestionValueMatch[],
+): QuestionValueMatch[] {
+  const terms = [
+    ...new Set(
+      matches.map((match) => {
+        return match.term.toLowerCase();
+      }),
+    ),
+  ];
+  return matches.filter((match) => {
+    const term = match.term.toLowerCase();
+    return !terms.some((other) => {
+      return other !== term && ` ${other} `.includes(` ${term} `);
+    });
+  });
+}
+
+/**
  * Finds which words in the question are stored values, and in which text
  * columns, by searching the data on the device. An offline model then uses
  * the exact stored spelling instead of guessing it.
@@ -124,5 +146,5 @@ export async function findQuestionValues(
       );
     }
   }
-  return matches;
+  return _keepLongestMatches(matches);
 }

@@ -90,6 +90,45 @@ describe("extractQuestionTerms", () => {
   });
 });
 
+describe("findQuestionValues", () => {
+  it("drops a shorter match inside a longer one, such as York in New York", async () => {
+    const host = _createHost({
+      readColumnValues: vi.fn(async (sql: string) => {
+        if (sql.includes("concat_ws")) {
+          return ["10|50|60"];
+        }
+        if (!sql.includes("lower(")) {
+          return [];
+        }
+        return sql.includes('"state"') ? ["New York"] : ["York"];
+      }),
+    });
+    const datasets = [
+      {
+        id: US.id,
+        name: "us.csv",
+        columns: [
+          { name: "state", dataType: "varchar" },
+          { name: "county", dataType: "varchar" },
+        ],
+      },
+    ];
+    const profiles = await profileOfflineDatasets(host, datasets);
+
+    const matches = await findQuestionValues(host, {
+      datasets,
+      profiles,
+      question: "Cases in New York",
+    });
+
+    expect(
+      matches.map((match) => {
+        return match.storedValue;
+      }),
+    ).toEqual(["New York"]);
+  });
+});
+
 describe("offline prompt", () => {
   it("lists profiled values and flags a name stored in two kinds of column", async () => {
     const host = _createHost();
@@ -125,8 +164,18 @@ describe("offline prompt", () => {
       question: "Deaths in the US",
       matches: [
         { term: "US", datasetId: US.id, column: "iso2", storedValue: "US" },
-        { term: "US", datasetId: US.id, column: "Country_Region", storedValue: "US" },
-        { term: "US", datasetId: WORLD.id, column: "Country/Region", storedValue: "US" },
+        {
+          term: "US",
+          datasetId: US.id,
+          column: "Country_Region",
+          storedValue: "US",
+        },
+        {
+          term: "US",
+          datasetId: WORLD.id,
+          column: "Country/Region",
+          storedValue: "US",
+        },
       ],
       datasets: [US, WORLD],
     });

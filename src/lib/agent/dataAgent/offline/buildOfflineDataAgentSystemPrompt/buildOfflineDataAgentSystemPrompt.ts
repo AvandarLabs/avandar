@@ -118,7 +118,9 @@ function _isAmbiguousAcrossDatasets(
   const columnSets = [...columnsByDataset.values()];
   return columnSets.some((left, index) => {
     return columnSets.slice(index + 1).some((right) => {
-      return [...left].every((column) => {return !right.has(column)});
+      return [...left].every((column) => {
+        return !right.has(column);
+      });
     });
   });
 }
