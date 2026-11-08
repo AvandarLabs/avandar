@@ -15,7 +15,9 @@ create table public.attribute_mappings__dataset_column (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   concept_attribute_id uuid not null unique references concept_attributes (id) on update cascade on delete cascade,
-  value_picker_rule_type public.attribute_mappings__value_picker_rule_type not null,
+  -- The rule that reduces the field's rows to one value. Null for a field
+  -- that keeps every value; `rpc_concepts__create` enforces which is which.
+  value_picker_rule_type public.attribute_mappings__value_picker_rule_type,
   dataset_id uuid not null,
   dataset_column_id uuid not null
 );

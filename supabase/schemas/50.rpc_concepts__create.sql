@@ -9,6 +9,11 @@
  * parsers. Child rows take the case type's id and workspace from the
  * inserted case type, never from their own payloads.
  *
+ * A field that keeps every value (`is_array`) stores no value rule, every
+ * other dataset field stores one, and a list is never the label or an
+ * identifier. Each is refused with errcode `23514` and the hint
+ * `value_rule_mismatch` or `list_field_is_key_or_label`.
+ *
  * A signed-in caller always owns the new case type. `owner_id` in the
  * payload is read only when there is no signed-in user, which is the
  * service role seeding a workspace.
@@ -157,6 +162,35 @@ begin
   from jsonb_to_recordset(p_manual_entry_mappings) as m (
     concept_attribute_id uuid
   );
+
+  -- A list field keeps every value, so its mapping names no rule, and every
+  -- other dataset field reduces its rows with exactly one. The rule and
+  -- `is_array` live in different tables, so no constraint can say this.
+  if exists (
+    select 1
+    from public.attribute_mappings__dataset_column m
+    join public.concept_attributes a on a.id = m.concept_attribute_id
+    where
+      a.concept_id = v_concept_id
+      and a.is_array = (m.value_picker_rule_type is not null)
+  ) then
+    raise exception 'A dataset field has a value rule exactly when it keeps one value'
+      using errcode = '23514', hint = 'value_rule_mismatch';
+  end if;
+
+  -- The label names a record and an identifier matches rows to it, so
+  -- neither can hold a list.
+  if exists (
+    select 1
+    from public.concept_attributes a
+    where
+      a.concept_id = v_concept_id
+      and a.is_array
+      and (a.is_label or a.is_identifier)
+  ) then
+    raise exception 'A list field cannot be the label or an identifier'
+      using errcode = '23514', hint = 'list_field_is_key_or_label';
+  end if;
 
   return v_concept_id;
 end;
