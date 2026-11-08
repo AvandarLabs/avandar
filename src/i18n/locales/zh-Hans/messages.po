@@ -514,6 +514,10 @@ msgstr "视图"
 msgid "Second point"
 msgstr "第二点"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes first alphabetically"
+msgstr "选择按字母顺序排在最前的值"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude and longitude look swapped"
 msgstr "纬度和经度似乎颠倒了"
@@ -3955,6 +3959,10 @@ msgstr "X 轴刻度间隔"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Please try again."
 msgstr "请再试一次。"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes last alphabetically"
+msgstr "选择按字母顺序排在最后的值"
 
 #: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"

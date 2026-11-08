@@ -534,6 +534,10 @@ msgstr "Visualizações"
 msgid "Second point"
 msgstr "Segundo ponto"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes first alphabetically"
+msgstr "Escolha o valor que vem primeiro em ordem alfabética"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude and longitude look swapped"
 msgstr "A latitude e a longitude parecem estar invertidas"
@@ -4125,6 +4129,10 @@ msgstr "Intervalo das marcações do eixo X"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Please try again."
 msgstr "Por favor, tente novamente."
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes last alphabetically"
+msgstr "Escolha o valor que vem por último em ordem alfabética"
 
 #: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"

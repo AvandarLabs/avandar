@@ -29,6 +29,8 @@ export function MappingFields({ frame }: Props) {
           conceptForm={conceptForm}
           attributeIdx={0}
           attributeName="supply_kits_delivered"
+          // A numeric column, so the authored "sum" rule is one it offers.
+          columnDataType="bigint"
         />
       </div>
       <div data-video-target="mapping-manual-controls">

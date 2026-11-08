@@ -532,6 +532,10 @@ msgstr "Mionekano"
 msgid "Second point"
 msgstr "Kipengele cha pili"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes first alphabetically"
+msgstr "Chagua thamani inayokuja kwanza kialfabeti"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude and longitude look swapped"
 msgstr "Latitudo na longitudo zinaonekana kubadilishana"
@@ -4120,6 +4124,10 @@ msgstr "Muda wa alama za mhimili wa X"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Please try again."
 msgstr "Tafadhali jaribu tena."
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes last alphabetically"
+msgstr "Chagua thamani inayokuja mwisho kialfabeti"
 
 #: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"

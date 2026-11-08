@@ -526,6 +526,10 @@ msgstr "العروض"
 msgid "Second point"
 msgstr "النقطة الثانية"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes first alphabetically"
+msgstr "اختر القيمة التي تأتي أولًا أبجديًا"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude and longitude look swapped"
 msgstr "يبدو أن خط العرض وخط الطول متبادلان"
@@ -4065,6 +4069,10 @@ msgstr "الفاصل بين تدريجات المحور X"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Please try again."
 msgstr "يرجى المحاولة مرة أخرى."
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes last alphabetically"
+msgstr "اختر القيمة التي تأتي أخيرًا أبجديًا"
 
 #: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"

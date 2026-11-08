@@ -4,7 +4,9 @@ import { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/Att
 import { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import { ManualEntryMapping } from "$/models/ontology/AttributeMapping/ManualEntryMapping/ManualEntryMapping.types";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
+import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import { makeDefaultStatusDrafts } from "@/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type {
@@ -183,4 +185,90 @@ export function makeDefaultManualEntryAttribute({
       },
     },
   } as const);
+}
+
+/**
+ * The type a dataset-column field stores. A field that keeps every value
+ * stores its column's type, because each element is one of the column's
+ * values. A field that keeps one value stores its rule's output type.
+ */
+export function getDatasetColumnAttributeDataType(
+  options: Readonly<{
+    isArray: boolean;
+    ruleType: ValuePickerRule.T;
+    columnDataType: AvaDataType.T;
+  }>,
+): AvaDataType.T {
+  return options.isArray
+    ? options.columnDataType
+    : ValuePickerRule.getOutputDataType({
+        ruleType: options.ruleType,
+        columnDataType: options.columnDataType,
+      });
+}
+
+/**
+ * Returns the attributes with each dataset-column field's `dataType` set to
+ * the type it stores, reading each column's type from `sourceDatasets`.
+ *
+ * While the user edits, the form keeps `dataType` as the column's type, and
+ * the rule select and "Only allow one value" both change what the field
+ * stores, so the stored type is set once, on submit. A field whose column is
+ * not among `sourceDatasets` keeps its `dataType`.
+ */
+export function withFieldDataTypes(
+  options: Readonly<{
+    attributes: readonly AttributeFormValues[];
+    sourceDatasets: ConceptFormValues["sourceDatasets"];
+  }>,
+): AttributeFormValues[] {
+  const columnDataTypesById = new Map<string, AvaDataType.T>(
+    options.sourceDatasets.flatMap(({ dataset }) => {
+      return dataset.columns.map((column) => {
+        return [column.id, column.dataType] as const;
+      });
+    }),
+  );
+  return options.attributes.map((attribute) => {
+    const { datasetColumnId, valuePickerRuleType } =
+      attribute.mappings.datasetColumn;
+    const columnDataType = datasetColumnId
+      ? columnDataTypesById.get(datasetColumnId)
+      : undefined;
+    if (
+      attribute.mappingType !== "dataset_column" ||
+      columnDataType === undefined
+    ) {
+      return attribute;
+    }
+    return {
+      ...attribute,
+      dataType: getDatasetColumnAttributeDataType({
+        isArray: attribute.isArray,
+        ruleType: valuePickerRuleType,
+        columnDataType,
+      }),
+    };
+  });
+}
+
+/**
+ * Returns the attribute with its value rule set to the default rule. An
+ * identifier shows the key itself, so it never reduces its column, and the
+ * default rule is the one every column type allows and that keeps the
+ * column's type.
+ */
+export function withDefaultValueRule(
+  attribute: AttributeFormValues,
+): AttributeFormValues {
+  return {
+    ...attribute,
+    mappings: {
+      ...attribute.mappings,
+      datasetColumn: {
+        ...attribute.mappings.datasetColumn,
+        valuePickerRuleType: ValuePickerRule.DEFAULT_RULE_TYPE,
+      },
+    },
+  };
 }
