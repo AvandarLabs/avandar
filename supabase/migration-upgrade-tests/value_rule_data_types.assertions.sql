@@ -1,7 +1,8 @@
 -- Verify every field stores its rule's output type, every disallowed rule
 -- became most_frequent, rows the migration cannot judge were left alone, the
--- case type that breaks the identifier rule was corrected anyway, and the
--- label-and-identifier trigger is enabled again.
+-- case type that breaks the identifier rule was corrected anyway, an
+-- identifier keeps its key column's values, and the label-and-identifier
+-- trigger is enabled again.
 do $$
 declare
   mismatch record;
@@ -25,7 +26,8 @@ begin
           ('ae003009-0000-4000-8000-000000000009'::uuid, 'varchar'),
           ('ae003010-0000-4000-8000-000000000010'::uuid, 'varchar'),
           ('ae003011-0000-4000-8000-000000000011'::uuid, 'varchar'),
-          ('ae003103-0000-4000-8000-000000000103'::uuid, 'bigint')
+          ('ae003103-0000-4000-8000-000000000103'::uuid, 'bigint'),
+          ('ae003201-0000-4000-8000-000000000201'::uuid, 'varchar')
       ) as expected (attribute_id, data_type)
       join public.concept_attributes ca on ca.id = expected.attribute_id
     where
@@ -50,7 +52,8 @@ begin
           ('ae004007-0000-4000-8000-000000000007'::uuid, 'most_frequent'),
           ('ae004008-0000-4000-8000-000000000008'::uuid, 'most_frequent'),
           ('ae004009-0000-4000-8000-000000000009'::uuid, 'most_frequent'),
-          ('ae004010-0000-4000-8000-000000000010'::uuid, 'count')
+          ('ae004010-0000-4000-8000-000000000010'::uuid, 'count'),
+          ('ae004201-0000-4000-8000-000000000201'::uuid, 'most_frequent')
       ) as expected (mapping_id, rule_type)
       join public.attribute_mappings__dataset_column dcm on dcm.id = expected.mapping_id
     where

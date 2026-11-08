@@ -3,7 +3,8 @@
 -- rules are ones the column's type no longer allows. The schema did not
 -- change, so nothing is lifted. The second case type maps two identifier
 -- fields into one dataset, which the label-and-identifier trigger refuses on
--- any update. Every fixture id starts with `ae`.
+-- any update. The third case type's identifier was stored with `count`, so
+-- it shows a number instead of the key. Every fixture id starts with `ae`.
 begin;
 
 insert into auth.users (id, email, aud, role)
@@ -41,12 +42,14 @@ values
 insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
 values
   ('ae002001-0000-4000-8000-000000000001'::uuid, 'ae000001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'value rule case type', false, 'ae007001-0000-4000-8000-000000000001'::uuid),
-  ('ae002002-0000-4000-8000-000000000002'::uuid, 'ae000001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'case type with two keys in one dataset', false, 'ae007002-0000-4000-8000-000000000002'::uuid);
+  ('ae002002-0000-4000-8000-000000000002'::uuid, 'ae000001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'case type with two keys in one dataset', false, 'ae007002-0000-4000-8000-000000000002'::uuid),
+  ('ae002003-0000-4000-8000-000000000003'::uuid, 'ae000001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'case type with a counted identifier', false, 'ae007003-0000-4000-8000-000000000003'::uuid);
 
 insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
 values
   ('ae007001-0000-4000-8000-000000000001'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002001-0000-4000-8000-000000000001'::uuid, 'Active', '#40c057', 0),
-  ('ae007002-0000-4000-8000-000000000002'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002002-0000-4000-8000-000000000002'::uuid, 'Active', '#40c057', 0);
+  ('ae007002-0000-4000-8000-000000000002'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002002-0000-4000-8000-000000000002'::uuid, 'Active', '#40c057', 0),
+  ('ae007003-0000-4000-8000-000000000003'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002003-0000-4000-8000-000000000003'::uuid, 'Active', '#40c057', 0);
 
 -- Every field's `data_type` is its column's type, as authoring stored it.
 -- Attributes go in before mappings, as `rpc_concepts__create` inserts them,
@@ -75,7 +78,8 @@ insert into public.concept_attributes (
 values
   ('ae003101-0000-4000-8000-000000000101'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002002-0000-4000-8000-000000000002'::uuid, 'Key A', 'varchar', 'dataset_column', true, true, false, false),
   ('ae003102-0000-4000-8000-000000000102'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002002-0000-4000-8000-000000000002'::uuid, 'Key B', 'varchar', 'dataset_column', false, true, false, false),
-  ('ae003103-0000-4000-8000-000000000103'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002002-0000-4000-8000-000000000002'::uuid, 'District count', 'varchar', 'dataset_column', false, false, false, false);
+  ('ae003103-0000-4000-8000-000000000103'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002002-0000-4000-8000-000000000002'::uuid, 'District count', 'varchar', 'dataset_column', false, false, false, false),
+  ('ae003201-0000-4000-8000-000000000201'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae002003-0000-4000-8000-000000000003'::uuid, 'Case ID', 'varchar', 'dataset_column', true, true, false, false);
 
 -- Mapping `ae004010` names a column that no longer exists.
 insert into public.attribute_mappings__dataset_column (
@@ -94,4 +98,5 @@ values
   ('ae004010-0000-4000-8000-000000000010'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae003010-0000-4000-8000-000000000010'::uuid, 'count', 'ae005001-0000-4000-8000-000000000001'::uuid, 'ae006099-0000-4000-8000-000000000099'::uuid),
   ('ae004101-0000-4000-8000-000000000101'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae003101-0000-4000-8000-000000000101'::uuid, 'most_frequent', 'ae005001-0000-4000-8000-000000000001'::uuid, 'ae006001-0000-4000-8000-000000000001'::uuid),
   ('ae004102-0000-4000-8000-000000000102'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae003102-0000-4000-8000-000000000102'::uuid, 'most_frequent', 'ae005001-0000-4000-8000-000000000001'::uuid, 'ae006002-0000-4000-8000-000000000002'::uuid),
-  ('ae004103-0000-4000-8000-000000000103'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae003103-0000-4000-8000-000000000103'::uuid, 'count', 'ae005001-0000-4000-8000-000000000001'::uuid, 'ae006002-0000-4000-8000-000000000002'::uuid);
+  ('ae004103-0000-4000-8000-000000000103'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae003103-0000-4000-8000-000000000103'::uuid, 'count', 'ae005001-0000-4000-8000-000000000001'::uuid, 'ae006002-0000-4000-8000-000000000002'::uuid),
+  ('ae004201-0000-4000-8000-000000000201'::uuid, 'ae001001-0000-4000-8000-000000000001'::uuid, 'ae003201-0000-4000-8000-000000000201'::uuid, 'count', 'ae005001-0000-4000-8000-000000000001'::uuid, 'ae006001-0000-4000-8000-000000000001'::uuid);

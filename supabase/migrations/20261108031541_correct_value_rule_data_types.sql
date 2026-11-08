@@ -2,8 +2,14 @@
 -- in `shared/models/ontology/ValuePickerRule/`. A rule its column's type does
 -- not allow becomes `most_frequent`, which every type allows. Each
 -- dataset-column field's `data_type` becomes the type the concept view emits
--- for it: the column's type for a list field, `double` for `sum` and `avg`,
--- `bigint` for `count`, and the column's type for every other rule.
+-- for it: the column's type for a list field or an identifier, `double` for
+-- `sum` and `avg`, `bigint` for `count`, and the column's type for every other
+-- rule.
+--
+-- An identifier field's rule also becomes `most_frequent`, whatever it was.
+-- An identifier shows the record's key, so reducing its column with `count` or
+-- `sum` would show a number instead, and so would a label that falls back to
+-- the identifier. Authoring already saves every identifier this way.
 --
 -- Hand-written because `db diff` never emits DML. A mapping whose column no
 -- longer exists, or belongs to another dataset, is left alone: there is no
@@ -18,11 +24,17 @@ begin
   set
     value_picker_rule_type = 'most_frequent'
   from
-    public.dataset_columns dc
+    public.dataset_columns dc,
+    public.concept_attributes ca
   where
     dc.id = dcm.dataset_column_id and
     dc.dataset_id = dcm.dataset_id and
+    ca.id = dcm.concept_attribute_id and
     (
+      (
+        ca.is_identifier and
+        dcm.value_picker_rule_type <> 'most_frequent'
+      ) or
       (
         dcm.value_picker_rule_type in ('sum', 'avg') and
         dc.data_type not in ('bigint', 'double')
@@ -46,7 +58,7 @@ begin
       select
         ca.id,
         case
-          when ca.is_array then dc.data_type
+          when ca.is_array or ca.is_identifier then dc.data_type
           when dcm.value_picker_rule_type in ('sum', 'avg') then 'double'::public.datasets__ava_data_type
           when dcm.value_picker_rule_type = 'count' then 'bigint'::public.datasets__ava_data_type
           else dc.data_type
