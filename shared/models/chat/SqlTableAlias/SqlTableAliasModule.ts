@@ -130,6 +130,27 @@ function _buildStatusFields(
   return [`status: ${names.join(" | ")}`];
 }
 
+/** How a concept field appears in the schema block; a list says so. */
+function _formatConceptAttributeName(
+  attribute: SqlTableAliasConceptAttribute,
+): string {
+  return attribute.is_array === true
+    ? `${attribute.name} (list)`
+    : attribute.name;
+}
+
+const LIST_FIELD_NOTE = `- A field marked (list) holds every value one record has, as a DuckDB list, and is [] when it has none. Filter with list_contains("field", 'value'), count values with len("field"), and use UNNEST("field") for one row per value. Never compare a list with =, IN, or LIKE.`;
+
+function _formatListFieldNote(
+  conceptAttributes: readonly SqlTableAliasConceptAttribute[],
+): string {
+  return conceptAttributes.some((attribute) => {
+    return attribute.is_array === true;
+  })
+    ? LIST_FIELD_NOTE
+    : "";
+}
+
 function _formatSchemaBlock(
   args: Readonly<{
     aliases: readonly SqlTableAliasT[];
@@ -142,10 +163,15 @@ function _formatSchemaBlock(
     key: "dataset_id",
     valueKey: "name",
   });
-  const namesByConceptId = makeBucketMap(args.conceptAttributes ?? [], {
-    key: "concept_id",
-    valueKey: "name",
-  });
+  const namesByConceptId = makeBucketMap(
+    (args.conceptAttributes ?? []).map((attribute) => {
+      return {
+        concept_id: attribute.concept_id,
+        name: _formatConceptAttributeName(attribute),
+      };
+    }),
+    { key: "concept_id", valueKey: "name" },
+  );
   const statusesByConceptId = makeBucketMap(args.conceptStatuses ?? [], {
     key: "concept_id",
   });
@@ -199,6 +225,11 @@ export const SqlTableAliasModule = {
    * allowed statuses.
    */
   formatSchemaBlock: _formatSchemaBlock,
+  /**
+   * The prompt note that explains list SQL, or an empty string when no
+   * field is a list, so a prompt only pays for it when it applies.
+   */
+  formatListFieldNote: _formatListFieldNote,
   /** Rewrites aliases to quoted DuckDB table names. */
   applyToSql: _applyToSql,
 };

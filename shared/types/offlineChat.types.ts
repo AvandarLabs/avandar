@@ -22,6 +22,8 @@ export type OfflineChatSchemaConcept = {
 export type OfflineChatSchemaConceptAttribute = {
   concept_id: string;
   name: string;
+  /** True for a field that keeps every value. Absent in an older cache. */
+  is_array?: boolean;
 };
 
 export type OfflineChatSchemaConceptStatus = {

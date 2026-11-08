@@ -53,7 +53,11 @@ function _mapConcepts(
       return { id: concept.id, name: concept.name };
     }),
     conceptAttributes: options.attributes.map((attribute) => {
-      return { concept_id: attribute.conceptId, name: attribute.name };
+      return {
+        concept_id: attribute.conceptId,
+        name: attribute.name,
+        is_array: attribute.isArray,
+      };
     }),
     conceptStatuses: options.statuses.map((status) => {
       return {

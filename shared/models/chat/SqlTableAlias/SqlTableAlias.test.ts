@@ -127,6 +127,22 @@ describe("SqlTableAlias.formatSchemaBlock", () => {
     expect(block).not.toContain(CONCEPT_B.id);
   });
 
+  it("marks a field that keeps every value as a list", () => {
+    const aliases = SqlTableAlias.fromConcepts([
+      { id: CONCEPT_B.id, name: "Measles case" },
+    ]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [
+        { concept_id: CONCEPT_B.id, name: "age" },
+        { concept_id: CONCEPT_B.id, name: "Symptoms", is_array: true },
+      ],
+    });
+
+    expect(block).toBe("- c0: Measles case (age, Symptoms (list))");
+  });
+
   it("lists a case type's statuses in position order after its attributes", () => {
     const aliases = SqlTableAlias.fromConcepts([
       { id: CONCEPT_B.id, name: "Cholera case" },
@@ -203,5 +219,20 @@ describe("SqlTableAlias.applyToSql", () => {
 
     expect(sql).toBe(`SELECT 1 FROM "concept_${sorted[10]!.id}"`);
     expect(sql).not.toContain(`concept_${sorted[1]!.id}`);
+  });
+});
+
+describe("SqlTableAlias.formatListFieldNote", () => {
+  it("explains list SQL only when a field is a list", () => {
+    expect(
+      SqlTableAlias.formatListFieldNote([
+        { concept_id: CONCEPT_B.id, name: "Symptoms", is_array: true },
+      ]),
+    ).toContain("list_contains(\"field\", 'value')");
+    expect(
+      SqlTableAlias.formatListFieldNote([
+        { concept_id: CONCEPT_B.id, name: "age" },
+      ]),
+    ).toBe("");
   });
 });

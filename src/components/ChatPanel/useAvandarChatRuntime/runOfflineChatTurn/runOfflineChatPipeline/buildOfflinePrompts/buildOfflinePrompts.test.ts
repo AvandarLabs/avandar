@@ -86,6 +86,24 @@ describe("buildOfflineSqlPrompt", () => {
       "- c0: Case (district, status: Suspected | Confirmed)",
     );
   });
+
+  it("marks a list field and explains list SQL offline", () => {
+    const prompt = buildOfflineSqlPrompt({
+      schema: {
+        ...SCHEMA,
+        concepts: [{ id: CONCEPT_ID, name: "Case" }],
+        conceptAttributes: [
+          { concept_id: CONCEPT_ID, name: "Symptoms", is_array: true },
+        ],
+      },
+      pageContext: ChatPageContext.createDataExplorerViewContext(),
+      analysisSummary: "Find cases with a rash",
+      lastUserPrompt: "which cases had a rash",
+    });
+
+    expect(prompt).toContain("- c0: Case (Symptoms (list))");
+    expect(prompt).toContain("list_contains");
+  });
 });
 
 describe("buildOfflineFixSqlPrompt", () => {

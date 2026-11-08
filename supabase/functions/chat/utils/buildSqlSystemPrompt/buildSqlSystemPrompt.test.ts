@@ -108,4 +108,33 @@ describe("buildSqlSystemPrompt", () => {
       "- c0: Cholera case (district, status: Suspected | Confirmed)",
     );
   });
+
+  it("marks a list field and explains list SQL", () => {
+    const conceptId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    const prompt = buildSqlSystemPrompt({
+      prompt: "which cases had a rash",
+      datasets: [],
+      columns: [],
+      concepts: [{ id: conceptId, name: "Measles case" }],
+      conceptAttributes: [
+        { concept_id: conceptId, name: "Symptoms", is_array: true },
+      ],
+    });
+
+    expect(prompt).toContain("- c0: Measles case (Symptoms (list))");
+    expect(prompt).toContain('UNNEST("field")');
+  });
+
+  it("leaves the list note out when no field is a list", () => {
+    const conceptId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    const prompt = buildSqlSystemPrompt({
+      prompt: "how many cases",
+      datasets: [],
+      columns: [],
+      concepts: [{ id: conceptId, name: "Case" }],
+      conceptAttributes: [{ concept_id: conceptId, name: "age" }],
+    });
+
+    expect(prompt).not.toContain("list_contains");
+  });
 });

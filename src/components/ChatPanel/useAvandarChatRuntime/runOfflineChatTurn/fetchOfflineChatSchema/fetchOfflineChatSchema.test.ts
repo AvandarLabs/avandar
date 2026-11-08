@@ -74,4 +74,19 @@ describe("fetchOfflineChatSchema", () => {
     expect(schema.conceptStatuses).toEqual([]);
     expect(conceptStatusGetAllMock).not.toHaveBeenCalled();
   });
+
+  it("carries whether each field keeps every value into the offline schema", async () => {
+    conceptAttributeGetAllMock.mockResolvedValue([
+      { conceptId: CONCEPT_ID, name: "Symptoms", isArray: true },
+    ]);
+
+    const schema = await fetchOfflineChatSchema({
+      workspace: { id: WORKSPACE_ID } as Workspace.T,
+      navigatorOnLine: true,
+    });
+
+    expect(schema.conceptAttributes).toEqual([
+      { concept_id: CONCEPT_ID, name: "Symptoms", is_array: true },
+    ]);
+  });
 });

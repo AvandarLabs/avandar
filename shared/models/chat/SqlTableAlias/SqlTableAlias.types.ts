@@ -28,6 +28,11 @@ export type SqlTableAliasConcept = {
 export type SqlTableAliasConceptAttribute = {
   concept_id: string;
   name: string;
+  /**
+   * True for a field that keeps every value, which SQL reads as a list.
+   * Optional, so a schema cached before fields could be lists still reads.
+   */
+  is_array?: boolean;
 };
 
 /** One status of a concept, listed after its attributes in the schema block. */
