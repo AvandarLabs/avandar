@@ -112,9 +112,14 @@ execute function public.util__set_updated_at ();
  * `rpc_concepts__create` inserts a case type's fields before their mappings,
  * so the field is always there when its mapping arrives.
  *
- * SECURITY DEFINER so the check sees the column whatever the caller may
- * read: it validates the mapping's shape, not the caller's access to the
- * dataset, and it returns nothing but pass or fail.
+ * SECURITY DEFINER so the check reads the field and the column whatever the
+ * caller's RLS allows: it validates the mapping's shape, not the caller's
+ * access to the dataset. A BEFORE trigger runs ahead of the RLS `with check`
+ * on this table, so any signed-in user can reach it. Both lookups are
+ * therefore scoped to the mapping's own workspace, and its errors name only
+ * the ids the caller supplied, so a refusal reveals nothing about another
+ * workspace's fields or columns. A field or column outside the workspace
+ * reads as missing.
  */
 create or replace function public.attribute_mappings__dataset_column__validate_bucket_column () returns trigger language plpgsql security definer
 set
@@ -127,7 +132,9 @@ begin
   select attribute.bucket_grain
   into v_bucket_grain
   from public.concept_attributes attribute
-  where attribute.id = new.concept_attribute_id;
+  where
+    attribute.id = new.concept_attribute_id
+    and attribute.workspace_id = new.workspace_id;
 
   if v_bucket_grain is null then
     if new.bucket_column_id is not null then
@@ -151,10 +158,12 @@ begin
   select dataset_column.dataset_id, dataset_column.data_type
   into v_column_dataset_id, v_column_data_type
   from public.dataset_columns dataset_column
-  where dataset_column.id = new.bucket_column_id;
+  where
+    dataset_column.id = new.bucket_column_id
+    and dataset_column.workspace_id = new.workspace_id;
 
-  -- A column that does not exist leaves both variables null, which lands
-  -- here too.
+  -- A column that does not exist, or that belongs to another workspace,
+  -- leaves both variables null, which lands here too.
   if v_column_dataset_id is distinct from new.dataset_id then
     raise exception 'bucket_column_id must be a column of the mapping''s dataset'
       using
@@ -172,11 +181,7 @@ begin
       using
         errcode = '23514',
         hint = 'bucket_column_not_a_date',
-        detail = format(
-          'bucket_column_id %s is %s',
-          new.bucket_column_id,
-          v_column_data_type
-        );
+        detail = format('bucket_column_id %s', new.bucket_column_id);
   end if;
 
   return new;
@@ -194,9 +199,13 @@ from
   service_role;
 
 -- `before`, so a refused mapping never reaches the unique or foreign key
--- checks and the error names the real problem.
+-- checks and the error names the real problem. Updates are checked only when
+-- they change a column the check reads, so retyping a date column later does
+-- not lock every other edit to its mapping.
 create trigger tr__attribute_mappings__dataset_column__validate_bucket_column before insert or
-update on public.attribute_mappings__dataset_column for each row
+update of concept_attribute_id,
+dataset_id,
+bucket_column_id on public.attribute_mappings__dataset_column for each row
 execute function public.attribute_mappings__dataset_column__validate_bucket_column ();
 
 -- Index for concept attribute + workspace filtering. The name omits the `_id`

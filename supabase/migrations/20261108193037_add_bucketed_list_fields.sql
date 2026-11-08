@@ -28,7 +28,9 @@ begin
   select attribute.bucket_grain
   into v_bucket_grain
   from public.concept_attributes attribute
-  where attribute.id = new.concept_attribute_id;
+  where
+    attribute.id = new.concept_attribute_id
+    and attribute.workspace_id = new.workspace_id;
 
   if v_bucket_grain is null then
     if new.bucket_column_id is not null then
@@ -52,10 +54,12 @@ begin
   select dataset_column.dataset_id, dataset_column.data_type
   into v_column_dataset_id, v_column_data_type
   from public.dataset_columns dataset_column
-  where dataset_column.id = new.bucket_column_id;
+  where
+    dataset_column.id = new.bucket_column_id
+    and dataset_column.workspace_id = new.workspace_id;
 
-  -- A column that does not exist leaves both variables null, which lands
-  -- here too.
+  -- A column that does not exist, or that belongs to another workspace,
+  -- leaves both variables null, which lands here too.
   if v_column_dataset_id is distinct from new.dataset_id then
     raise exception 'bucket_column_id must be a column of the mapping''s dataset'
       using
@@ -73,11 +77,7 @@ begin
       using
         errcode = '23514',
         hint = 'bucket_column_not_a_date',
-        detail = format(
-          'bucket_column_id %s is %s',
-          new.bucket_column_id,
-          v_column_data_type
-        );
+        detail = format('bucket_column_id %s', new.bucket_column_id);
   end if;
 
   return new;
@@ -85,7 +85,7 @@ end;
 $function$
 ;
 
-CREATE TRIGGER tr__attribute_mappings__dataset_column__validate_bucket_column BEFORE INSERT OR UPDATE ON public.attribute_mappings__dataset_column FOR EACH ROW EXECUTE FUNCTION public.attribute_mappings__dataset_column__validate_bucket_column();
+CREATE TRIGGER tr__attribute_mappings__dataset_column__validate_bucket_column BEFORE INSERT OR UPDATE OF concept_attribute_id, dataset_id, bucket_column_id ON public.attribute_mappings__dataset_column FOR EACH ROW EXECUTE FUNCTION public.attribute_mappings__dataset_column__validate_bucket_column();
 
 
 

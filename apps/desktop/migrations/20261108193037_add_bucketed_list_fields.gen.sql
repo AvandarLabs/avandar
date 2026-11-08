@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20261108191738_add_bucketed_list_fields.sql by
+-- Generated from supabase/migrations/20261108193037_add_bucketed_list_fields.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 2
