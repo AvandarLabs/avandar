@@ -1,8 +1,8 @@
 import { prop } from "@avandar/utils";
+import { Box } from "@mantine/core";
 import { useMemo } from "react";
 import { AvaPluginVizConfigs } from "$/models/vizs/AvaPluginVizConfig/AvaPluginVizConfigs";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
-import { PluginVizChartLoader } from "@/lib/plugins/vizs/PluginVizRenderer/PluginVizChartLoader";
 import { PluginVizCodeLoader } from "@/lib/plugins/vizs/PluginVizRenderer/PluginVizCodeLoader";
 import { PluginVizMissingSettings } from "@/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings";
 import { PLUGIN_VIZ_COMPONENT_ROW_LIMIT } from "@/lib/plugins/vizs/PluginVizRenderer/PluginVizRenderer.constants";
@@ -130,10 +130,12 @@ function _makeInputFromSource(source: Readonly<InputSource>): PluginVizInput {
  * builds the chart's input (column settings as column names, and at most
  * `PLUGIN_VIZ_COMPONENT_ROW_LIMIT` rows for a component chart) and loads the
  * chart. Until the result has columns, no stored column can be found by
- * name, so it shows the chart loader instead of asking for settings or
- * running plugin code. The chart remounts when its plugin, chart type,
- * settings, or result rows change, so a chart that crashed draws again
- * instead of keeping its error state. `PluginVizRenderer` renders it.
+ * name, so it leaves the chart area empty instead of asking for settings or
+ * running plugin code. It shows no loader there, because a failed query
+ * also leaves no columns, and callers show their own while a query runs.
+ * The chart remounts when its plugin, chart type, settings, or result rows
+ * change, so a chart that crashed draws again instead of keeping its error
+ * state. `PluginVizRenderer` renders it.
  */
 export function PluginVizConfiguredChart({
   lookup,
@@ -157,7 +159,7 @@ export function PluginVizConfiguredChart({
     });
   }, [vizType, uiConfig, data, rawColumns, isTruncated]);
   if (rawColumns.length === 0) {
-    return <PluginVizChartLoader />;
+    return <Box h="100%" w="100%" />;
   }
   const missingSettings = _getMissingSettings({
     vizType,

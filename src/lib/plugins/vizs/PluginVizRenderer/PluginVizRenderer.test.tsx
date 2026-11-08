@@ -476,12 +476,10 @@ describe("PluginVizRenderer", () => {
     expect(screen.queryByText("Choose a Label column")).toBeNull();
   });
 
-  it("shows the chart loader before the result has columns", async () => {
+  it("shows no loading status before the result has columns", async () => {
     await _renderChartWithoutColumns(_addBundledPlugin());
 
-    expect(
-      screen.getByRole("status", { name: "Loading chart" }),
-    ).toBeInTheDocument();
+    expect(screen.queryByRole("status")).toBeNull();
   });
 
   it("does not run the plugin's transform before the result has columns", async () => {
