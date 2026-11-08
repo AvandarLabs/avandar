@@ -66,6 +66,32 @@ async function _readResource(params: {
   return { isWorkspaceLoadable: true, ...resourceColumns };
 }
 
+/**
+ * The raw CKAN package with only one resource left in its `resources`. A
+ * package lists every resource, so storing it whole on each resource's
+ * listing grows a package's write with the square of its resource count: a
+ * WHO country package's 73 listings carried 42 MB. A record whose resource
+ * list cannot be read is kept as it is.
+ */
+function _keepOneRawResource(
+  sourceRecord: unknown,
+  resourceId: string,
+): unknown {
+  if (typeof sourceRecord !== "object" || sourceRecord === null) {
+    return sourceRecord;
+  }
+  const { resources } = sourceRecord as { resources?: unknown };
+  if (!Array.isArray(resources)) {
+    return sourceRecord;
+  }
+  return {
+    ...sourceRecord,
+    resources: resources.filter((rawResource: unknown) => {
+      return (rawResource as { id?: unknown } | null)?.id === resourceId;
+    }),
+  };
+}
+
 function _toRelation(params: {
   drive: Readonly<HdxDrive>;
   ckanPackage: Readonly<CkanPackage>;
@@ -77,7 +103,7 @@ function _toRelation(params: {
   const { drive, ckanPackage, resource, readability } = params;
   return {
     ...params.mappedFields,
-    sourceMetadata: ckanPackage.sourceRecord,
+    sourceMetadata: _keepOneRawResource(ckanPackage.sourceRecord, resource.id),
     kind: "api_resource",
     externalDatasetId: ckanPackage.name,
     apiResourceId: resource.id,
@@ -109,9 +135,10 @@ function _toRelation(params: {
  * records one.
  *
  * The catalog metadata (organizations, description, domains, tags, and the
- * rest) comes from the pipeline config's field mapping, and the raw CKAN
- * package is kept as `sourceMetadata`. Every resource of a package shares
- * both. The mapped fields are spread first, so a mapping can never
+ * rest) comes from the pipeline config's field mapping, which every
+ * resource of a package shares. Each relation keeps the raw CKAN package as
+ * `sourceMetadata`, with its `resources` narrowed to the relation's own raw
+ * resource. The mapped fields are spread first, so a mapping can never
  * overwrite a field computed here.
  *
  * @param params.mappedFields - The package's mapped catalog metadata, which
