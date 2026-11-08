@@ -21,10 +21,11 @@
   rg -n "getConceptRecordValues" src/views/IndividualManagerApp
   ```
 
-  Expected (G1 spec §4.5 and §4.7): the client in `ConceptRecordValuesClient.ts`, the type in `ConceptRecordValuesClient.types.ts` (every code block below imports it from there), and `SingleIndividualView/useRecordFields/useRecordFields.ts` calling `useGetConceptRecordValues` with `{ workspaceId: individual.workspaceId, conceptId: concept.id, externalIds: [individual.externalId] }`. If the record page passes other parameters, stop and record the difference in spec §3 before Task 7.
-- Plan 1 left the record page header as `title={individual.name}` (`SingleIndividualView/index.tsx`) and removed "Loading case" from it. Task 7 replaces that title.
-- Plan 5 landed before this plan and took its "plan 6 not landed" path (G5 plan Task 10, Steps 1 to 5). So in `generateIndividuals.ts`, Sync still names records: `_resolveIndividualSourceMappings` resolves the identifier and label fields with `makeConceptAttributeColumnsFromMetadata` into an `IndividualSourceMappings` (`identifierSources`, a `LabelColumn`, `neededColumnsByDatasetId`, built by `_getMappedColumnIds` and `_getNeededColumnsByDatasetId`), and `_stageIndividuals` renders the name with `buildAttributeValueSql`. Task 9 deletes all six names. Plan 5 also renamed `getAttributesWithMapping` to `getAttributesWithMappings`, made a hydrated attribute hold `mappings: AttributeMapping[]`, moved `value_picker_rule_type` to `concept_attributes`, added `position` to mappings, and left `LABS_DATASET_ID`, `LABS_KEY_COLUMN_ID`, `LABS_NAME_COLUMN_ID`, `_makeTwoSourceConcept`, and a `describe("generateIndividuals over two sources")` block in `generateIndividuals.test.ts`. Task 9 builds on those.
+  Expected (G1 spec §4.5 and §4.7): the client in `ConceptRecordValuesClient.ts`, the type in `ConceptRecordValuesClient.types.ts` (every code block below imports it from there), and `SingleIndividualView/useRecordFields/useRecordFields.ts` calling `useGetConceptRecordValues` with `{ workspaceId: individual.workspaceId, conceptId: concept.id, externalIds: [individual.externalId] }`. If the record page passes other parameters, stop and record the difference in spec §3 before Task 9.
+- Plan 1 left the record page header as `title={individual.name}` (`SingleIndividualView/index.tsx`) and removed "Loading case" from it. Task 9 replaces that title.
+- Plan 5 landed before this plan and took its "plan 6 not landed" path (G5 plan Task 10, Steps 1 to 5). So in `generateIndividuals.ts`, Sync still names records: `_resolveIndividualSourceMappings` resolves the identifier and label fields with `makeConceptAttributeColumnsFromMetadata` into an `IndividualSourceMappings` (`identifierSources`, a `LabelColumn`, `neededColumnsByDatasetId`, built by `_getMappedColumnIds` and `_getNeededColumnsByDatasetId`), and `_stageIndividuals` renders the name with `buildAttributeValueSql`. Task 11 deletes all six names. Plan 5 also renamed `getAttributesWithMapping` to `getAttributesWithMappings`, made a hydrated attribute hold `mappings: AttributeMapping[]`, moved `value_picker_rule_type` to `concept_attributes`, added `position` to mappings, and left `LABS_DATASET_ID`, `LABS_KEY_COLUMN_ID`, `LABS_NAME_COLUMN_ID`, `_makeTwoSourceConcept`, and a `describe("generateIndividuals over two sources")` block in `generateIndividuals.test.ts`. Task 11 builds on those.
 - New case types have one ID field with one source per dataset (G5 spec §6.6), and an ID field over keys of different types is `varchar`. Sync stages one key per identifier mapping row, cast to `VARCHAR`, so both identifier shapes and mixed key types stage the same text keys.
+- Plan 3 added the record page's type formatter, `createFieldValueFormatter({ dataType, locale })` in `src/components/caseFields/createFieldValueFormatter/` (with the hook `useFieldValueFormatter`). Task 3 builds record names from non-text labels on it, and its Step 1 checks the name.
 - Read `CLAUDE.md`, `docs/rules/typescript.md`, `docs/rules/testing.md`, `docs/rules/e2e-testing.md`, `docs/rules/i18n.md`, `docs/rules/sql.md`, `docs/design/app-view-layout.md`, and the Named Rules in `DESIGN.md`. Nothing here is a new surface, so the `impeccable` skill is not needed.
 - Lint rules that shape every code block: `arrow-body-style: always`, `@typescript-eslint/array-type: array-simple`, explicit return types on exported functions, 80-column lines. The formatter has the final word on wrapping and import order: run `pnpm format` before every commit, then re-run the task's tests.
 - Never stage `supabase/config.toml`. Commit by path. End every commit message with the trailer `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` (the second `-m` below). Do not push.
@@ -60,10 +61,13 @@
 | Loading row | `RecordNameSkeleton` as the label and `aria-busy` on the link; the row is already a link with its status dot | Fixed 50px rows and Postgres order mean nothing moves when names arrive |
 | No label field | Every record is named by its `external_id` and no values query runs | Several E2E specs seed case types with no fields |
 | Header | `useRecordName` asks with the record page's own parameters | One shared DuckDB read for the header and the rail (§6.7) |
-| Refresh | No change: a refresh does not invalidate record values | G1 invalidates them when a dataset's rows change, and Sync changes membership only (§6.8) |
+| Refresh | No change: a refresh does not invalidate record values | Sync changes membership only (§6.8); a dataset change marks values stale instead (next row) |
+| Record values after a dataset change | Stale after a refresh (G1's `invalidateDatasetRowQueries`), a re-upload of an offline CSV or XLSX, a delete, or a live source's rows aging out (`markRecordValuesStale`, Task 4) | Names are read through record values, so a stale value is a stale name, and Task 5's placeholders spread it to every page |
+| Non-text label names | Dates, times, and timestamps through plan 3's `createFieldValueFormatter` (`createLabelValueFormatter`, Task 3); numbers stay plain digits | The view returns temporal values as epoch numbers; a numeric label is usually a code a user searches for |
 | Staged key type | `CAST(<key> AS VARCHAR)` | A `BIGINT` key comes back as a JS number and never matches its text `external_id` (§1, item 5) |
 | Staging module | `generateIndividuals/buildRecordKeyStagingSql/`, taking `RecordKeySource = { datasetId; primaryKeyColumnName }` | The G7 spec (§5.6) names this module and type; G7 adds `keyMatching` instead of writing a second builder |
 | E2E helpers | Seed `external_id` equal to the name a spec looks a record up by | Their case types have no fields, so the app names records by key |
+| Overlapping Syncs | A second Sync of a case type waits for the first; the diff compares staged keys as text (Task 12) | Every Sync of a case type stages into one DuckDB table, and a numeric key flagged records missing on every second Sync |
 
 ## File structure
 
@@ -76,6 +80,13 @@
 | Modify `shared/RdbCrudClient/RdbCrudClient.types.ts` | Pass `pageOrderColumns` through |
 | Modify `src/clients/ontology/IndividualClient.ts` | Order records by `external_id` |
 | Create `src/views/IndividualManagerApp/buildRecordNameFromLabelValue/buildRecordNameFromLabelValue.ts` and test | The name rule (§6.1) |
+| Create `src/views/IndividualManagerApp/createLabelValueFormatter/createLabelValueFormatter.ts` and test | A label value as name text, by the label's type |
+| Create `src/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale.ts` and test | Mark record values stale without importing the client |
+| Modify `src/clients/ontology/ConceptRecordValuesClient/ConceptRecordValuesClient.ts` | Client name from the shared constant |
+| Modify `src/clients/datasets/DatasetClient/createDatasetMutations.ts` and test | A delete marks record values stale |
+| Modify `src/clients/qetl/QueryMediator/relationLoading/RelationLoading.ts` and test | A live source acquired again marks record values stale |
+| Create `src/views/DataManagerApp/ResyncDatasetsBlock/resyncOfflineDataset/resyncOfflineDataset.ts` and test | Re-upload an offline file, then mark its rows stale |
+| Modify `src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx` | Use `resyncOfflineDataset`; Back marks rows stale |
 | Create `src/views/IndividualManagerApp/getCachedRecordValues/getCachedRecordValues.ts` and test | Cached values as placeholders |
 | Create `src/views/IndividualManagerApp/makeRecordNamesFromPages/makeRecordNamesFromPages.ts` and test | Page results to names |
 | Create `src/views/IndividualManagerApp/useRecordNames/useRecordNames.ts` and test | The per-page names hook |
@@ -89,8 +100,8 @@
 | Create `src/views/IndividualManagerApp/SingleIndividualView/useRecordName/useRecordName.ts` and test | The header's name |
 | Modify `src/views/IndividualManagerApp/SingleIndividualView/index.tsx` | Header from `useRecordName` |
 | Create `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql.ts` and `.executed.test.ts` | Key-only staging SQL |
-| Modify `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts` and test | Sync reads keys only |
-| Modify `.../generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers.ts` and test | No name |
+| Modify `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts` and test | Sync reads keys only, one Sync per case type at a time |
+| Modify `.../generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers.ts` and test | No name; staged keys compared as text |
 | Modify `supabase/schemas/20.individuals.sql`; create the generated migration | Drop `name` |
 | Modify `shared/types/database.types.ts` (generated) | Regenerated |
 | Modify `shared/models/ontology/Individual/Individual.types.ts`, `IndividualParsers.ts`, `IndividualParsers.test.ts` | No `name` |
@@ -101,7 +112,7 @@
 | Create `tests/data/record-names/record-names-people.csv`, `record-names-visits.csv`; modify `tests/e2e/helpers/constants.ts` | E2E fixtures |
 | Create `tests/e2e/case-record-names.spec.ts` | The E2E spec |
 | Modify `src/i18n/locales/*/messages.po` and `messages.ts` | Regenerated catalogs |
-| Modify `docs/ontology-architecture.md` | Sections 4, 6, 9, 10, 13, 15, 16 |
+| Modify `docs/ontology-architecture.md` | Sections 4, 6, 7, 9, 10, 13, 15, 16 |
 
 ---
 
@@ -540,7 +551,946 @@ git commit -m "feat(joined-cases): name a record by its label value or its ID" -
 
 ---
 
-## Task 3: Cached record values as placeholders
+## Task 3: Record names from numbers, dates, times, and timestamps
+
+**Files:**
+- Create: `src/views/IndividualManagerApp/createLabelValueFormatter/createLabelValueFormatter.ts`
+- Test: `src/views/IndividualManagerApp/createLabelValueFormatter/createLabelValueFormatter.test.ts`
+- Modify: `src/views/IndividualManagerApp/buildRecordNameFromLabelValue/buildRecordNameFromLabelValue.ts`
+- Test: `src/views/IndividualManagerApp/buildRecordNameFromLabelValue/buildRecordNameFromLabelValue.test.ts`
+
+Today Sync stages a numeric label as a JS number although `name` is typed `string`, so every Sync rewrites those rows, and a TIME label fails Sync outright (`TIME::TIMESTAMP`). Task 11 stops storing names, which removes both. What remains is how a name reads once it is computed: the concept view returns a DATE or TIMESTAMP label as epoch milliseconds and a TIME label as microseconds since midnight, so Task 2's rule would name a record `1709596800000`. This task formats dates, times, and timestamps through plan 3's `createFieldValueFormatter`, the formatter the record page uses, and keeps numbers as plain digits: a numeric label is usually a code or a number a user searches for, and Task 2 already pins "no thousands separators". Tasks 6 and 7 pass the formatter through.
+
+- [ ] **Step 1: Check plan 3's formatter**
+
+```bash
+rg -n "export function createFieldValueFormatter" src/components/caseFields/createFieldValueFormatter/createFieldValueFormatter.ts
+```
+
+Expected: one hit, `createFieldValueFormatter(options: Readonly<{ dataType: AvaDataType.T; locale: string }>): (value: unknown) => string`. If it landed under another name or path, use the landed one in every code block below and record the difference in spec §3.
+
+- [ ] **Step 2: Write the failing formatter test**
+
+Create `createLabelValueFormatter.test.ts`:
+
+```ts
+/**
+ * A record's name reads its label value as a person would write it: a date
+ * as a day, a time as a clock time, and a number as its plain digits.
+ */
+import { describe, expect, it } from "vitest";
+import { createLabelValueFormatter } from "@/views/IndividualManagerApp/createLabelValueFormatter/createLabelValueFormatter";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+
+function _format(labelDataType: AvaDataType.T, value: unknown): string {
+  // Some ICU versions put a narrow no-break space before AM and PM.
+  return createLabelValueFormatter({ labelDataType, locale: "en" })(
+    value,
+  ).replace(/\s/g, " ");
+}
+
+describe("createLabelValueFormatter", () => {
+  it.each([
+    ["date", 1709596800000, "Mar 5, 2024"],
+    ["date", "2026-01-05", "Jan 5, 2026"],
+    ["timestamp", Date.UTC(2026, 0, 5, 10, 30), "Jan 5, 2026, 10:30 AM"],
+    ["time", 52_200_000_000, "2:30 PM"],
+  ] as const)("writes a %s label value %s as %s", (labelDataType, value, name) => {
+    expect(_format(labelDataType, value)).toBe(name);
+  });
+
+  it("writes a whole number label without thousands separators", () => {
+    expect(_format("bigint", 1234567)).toBe("1234567");
+  });
+
+  it("writes a decimal label as its digits", () => {
+    expect(_format("double", 2.5)).toBe("2.5");
+  });
+
+  it("writes a text label as it is", () => {
+    expect(_format("varchar", "Ada Lovelace")).toBe("Ada Lovelace");
+  });
+
+  it("writes a missing value as empty text, so the name falls back to the ID", () => {
+    expect(_format("varchar", null)).toBe("");
+    expect(_format("date", null)).toBe("");
+  });
+});
+```
+
+- [ ] **Step 3: Add the type cases to the name rule's test**
+
+Replace the top of `buildRecordNameFromLabelValue.test.ts`, from the imports to the end of `_nameOf`, with:
+
+```ts
+import { describe, expect, it } from "vitest";
+import { buildRecordNameFromLabelValue } from "@/views/IndividualManagerApp/buildRecordNameFromLabelValue/buildRecordNameFromLabelValue";
+import { createLabelValueFormatter } from "@/views/IndividualManagerApp/createLabelValueFormatter/createLabelValueFormatter";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+
+function _nameOfType(labelDataType: AvaDataType.T, labelValue: unknown): string {
+  return buildRecordNameFromLabelValue({
+    labelValue,
+    externalId: "P-001",
+    formatLabelValue: createLabelValueFormatter({
+      labelDataType,
+      locale: "en",
+    }),
+  });
+}
+
+function _nameOf(labelValue: unknown): string {
+  return _nameOfType("varchar", labelValue);
+}
+```
+
+Change the body of `"writes a numeric label without thousands separators"` to `expect(_nameOfType("bigint", 12345)).toBe("12345");`, and add inside the `describe`:
+
+```ts
+  it("names a record by a date label as the day it holds", () => {
+    expect(_nameOfType("date", 1709596800000)).toBe("Mar 5, 2024");
+  });
+
+  it("joins a list label's dates as days", () => {
+    expect(_nameOfType("date", ["2026-01-05", "2026-02-01"])).toBe(
+      "Jan 5, 2026, Feb 1, 2026",
+    );
+  });
+
+  it("names a record by its ID when every value of its list label is empty", () => {
+    expect(_nameOf([null, "  "])).toBe("P-001");
+  });
+```
+
+- [ ] **Step 4: Run them and watch them fail**
+
+Run: `pnpm test:frontend createLabelValueFormatter buildRecordNameFromLabelValue`
+Expected: FAIL, `Failed to resolve import "@/views/IndividualManagerApp/createLabelValueFormatter/createLabelValueFormatter"` in both files.
+
+- [ ] **Step 5: Write the formatter**
+
+Create `createLabelValueFormatter.ts`:
+
+```ts
+import { unknownToString } from "@avandar/utils";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { createFieldValueFormatter } from "@/components/caseFields/createFieldValueFormatter/createFieldValueFormatter";
+
+/**
+ * Builds the function that writes one value of a case type's label field as
+ * the text of a record's name. Dates, times, and timestamps read as the
+ * record page shows them, because the concept view returns them as epoch
+ * numbers. Every other value keeps its plain text: a numeric label is
+ * usually a code or a number a user searches for, so it shows no thousands
+ * separators. A NULL value is empty text, which the name rule replaces with
+ * the record's ID.
+ *
+ * @param options.labelDataType The label field's `data_type`.
+ * @param options.locale The reader's locale, for dates and times.
+ * @returns A function that formats one label value. A list label's items
+ *   are formatted one at a time by `buildRecordNameFromLabelValue`.
+ */
+export function createLabelValueFormatter(
+  options: Readonly<{ labelDataType: AvaDataType.T; locale: string }>,
+): (value: unknown) => string {
+  const { labelDataType, locale } = options;
+  if (AvaDataType.isTemporal(labelDataType)) {
+    return createFieldValueFormatter({ dataType: labelDataType, locale });
+  }
+  return (value: unknown): string => {
+    return unknownToString(value, {
+      nullString: "",
+      undefinedString: "",
+      emptyString: "",
+      formatNumbers: false,
+    });
+  };
+}
+```
+
+- [ ] **Step 6: Make the name rule take the formatter**
+
+Replace the whole of `buildRecordNameFromLabelValue.ts` with:
+
+```ts
+/**
+ * A record's name: its label field's value as text, or its `external_id`
+ * when the value is NULL, blank, or a list with no non-blank value. The
+ * fallback is data, not copy, so it is never translated.
+ *
+ * @param options.labelValue The label field's value from the concept view.
+ *   `undefined` when the record has none, including a case type with no
+ *   label field.
+ * @param options.externalId The record's key in its source data.
+ * @param options.formatLabelValue Writes one label value as text, from
+ *   `createLabelValueFormatter` for the label field's type. A list label's
+ *   values are each written with it and joined with commas.
+ * @returns The name to show for the record.
+ */
+export function buildRecordNameFromLabelValue(
+  options: Readonly<{
+    labelValue: unknown;
+    externalId: string;
+    formatLabelValue: (value: unknown) => string;
+  }>,
+): string {
+  const { labelValue, externalId, formatLabelValue } = options;
+  if (labelValue === null || labelValue === undefined) {
+    return externalId;
+  }
+  const name = Array.isArray(labelValue)
+    ? labelValue
+        .map(formatLabelValue)
+        .filter((item) => {
+          return item.trim() !== "";
+        })
+        .join(", ")
+    : formatLabelValue(labelValue);
+  return name.trim() === "" ? externalId : name;
+}
+```
+
+- [ ] **Step 7: Run them and watch them pass**
+
+Run: `pnpm test:frontend createLabelValueFormatter buildRecordNameFromLabelValue`
+Expected: PASS, 8 formatter tests and 10 name rule tests.
+
+Run: `pnpm type-check`
+Expected: no errors. Nothing calls `buildRecordNameFromLabelValue` yet; Task 6 is its first caller and passes `formatLabelValue`.
+
+- [ ] **Step 8: Commit**
+
+```bash
+pnpm format
+git add src/views/IndividualManagerApp/createLabelValueFormatter src/views/IndividualManagerApp/buildRecordNameFromLabelValue
+git commit -m "feat(joined-cases): name a record by a date, time, or number label as it reads" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+## Task 4: Record values go stale with every dataset change
+
+**Files:**
+- Create: `src/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale.ts`
+- Test: `src/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale.test.ts`
+- Modify: `src/clients/ontology/ConceptRecordValuesClient/ConceptRecordValuesClient.ts`
+- Modify: `src/clients/datasets/DatasetClient/createDatasetMutations.ts`
+- Test: `src/clients/datasets/DatasetClient/createDatasetMutations.test.ts`
+- Modify: `src/clients/qetl/QueryMediator/relationLoading/RelationLoading.ts`
+- Test: `src/clients/qetl/QueryMediator/relationLoading/RelationLoading.test.ts`
+- Create: `src/views/DataManagerApp/ResyncDatasetsBlock/resyncOfflineDataset/resyncOfflineDataset.ts`
+- Test: `src/views/DataManagerApp/ResyncDatasetsBlock/resyncOfflineDataset/resyncOfflineDataset.test.ts`
+- Modify: `src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx`
+
+Plan 1 made a Google Sheets or Postgres refresh mark record values stale (`invalidateDatasetRowQueries`). Three other dataset changes do not: re-uploading an offline CSV or XLSX (`ResyncDatasetCard.tsx`), deleting a dataset (`DatasetClient.fullDelete`, called from four screens), and a live source's rows aging out, which QETL notices on the next query (`probeRelationCache` reads `QueryableRelationColumns.isStale`) and acquires again (`RelationLoading.loadRelationBytes`). An open record page then keeps its old values, and from Task 7 on, the records list names records through the same cached values, so a stale value becomes a stale name, and Task 5's placeholders spread it to every page that reads the record.
+
+This task covers the three. A delete and a re-acquired live source happen inside clients, which cannot import `ConceptRecordValuesClient` (it imports QETL, which imports `DatasetClient`), so a leaf module names the client's queries and marks them stale. It does not change what Refresh records does (decision "Refresh" above): Sync changes which records exist, never a value.
+
+- [ ] **Step 1: Write the failing test for the shared marker**
+
+Create `markRecordValuesStale/markRecordValuesStale.test.ts`:
+
+```ts
+/**
+ * Clients that change a dataset's rows mark record values stale without
+ * importing the record values client, so the name they use must be the
+ * client's own.
+ */
+import { QueryClient, QueryObserver } from "@tanstack/react-query";
+import { describe, expect, it, vi } from "vitest";
+import { ConceptRecordValuesClient } from "@/clients/ontology/ConceptRecordValuesClient/ConceptRecordValuesClient";
+import {
+  CONCEPT_RECORD_VALUES_CLIENT_NAME,
+  markRecordValuesStale,
+} from "@/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ConceptRecordValues } from "@/clients/ontology/ConceptRecordValuesClient/ConceptRecordValuesClient.types";
+
+const WORKSPACE_ID = "eeeeeeee-5555-4555-8555-eeeeeeeeeeee" as Workspace.Id;
+const KEY = ConceptRecordValuesClient.QueryKeys.getConceptRecordValues({
+  workspaceId: WORKSPACE_ID,
+  conceptId: "cccccccc-3333-4333-8333-cccccccccccc" as Concept.Id,
+  externalIds: ["p1"],
+});
+
+describe("markRecordValuesStale", () => {
+  it("names the record values client's queries by the client's own name", () => {
+    expect(CONCEPT_RECORD_VALUES_CLIENT_NAME).toBe(
+      ConceptRecordValuesClient.getClientName(),
+    );
+  });
+
+  it("marks every case type's record values stale", async () => {
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(KEY, []);
+
+    await markRecordValuesStale(queryClient);
+
+    expect(queryClient.getQueryState(KEY)?.isInvalidated).toBe(true);
+  });
+
+  // The read already in flight may be the query that noticed the change, and
+  // restarting it would read the same rows twice.
+  it("lets a read already in flight finish instead of starting it again", async () => {
+    const queryClient = new QueryClient();
+    const queryFn = vi.fn((): Promise<ConceptRecordValues[]> => {
+      return new Promise(() => {});
+    });
+    const observer = new QueryObserver(queryClient, { queryKey: KEY, queryFn });
+    const unsubscribe = observer.subscribe(() => {});
+    await vi.waitFor(() => {
+      expect(queryFn).toHaveBeenCalledTimes(1);
+    });
+
+    void markRecordValuesStale(queryClient);
+    await Promise.resolve();
+
+    expect(queryFn).toHaveBeenCalledTimes(1);
+    unsubscribe();
+  });
+});
+```
+
+- [ ] **Step 2: Run it and watch it fail**
+
+Run: `pnpm test:frontend markRecordValuesStale`
+Expected: FAIL, `Failed to resolve import "@/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale"`.
+
+- [ ] **Step 3: Write the marker and name the client by it**
+
+Create `markRecordValuesStale/markRecordValuesStale.ts`:
+
+```ts
+import type { QueryClient } from "@tanstack/react-query";
+
+/**
+ * The name `ConceptRecordValuesClient` registers its queries under. Code that
+ * the client itself depends on, such as QETL and `DatasetClient`, names the
+ * client's queries through this rather than importing the client.
+ */
+export const CONCEPT_RECORD_VALUES_CLIENT_NAME = "ConceptRecordValuesClient";
+
+/**
+ * Marks every case type record's field values stale, so the ones on screen
+ * read again. A read already in flight is left to finish rather than
+ * restarted: it may be the read whose query noticed the change.
+ *
+ * Call it wherever a dataset's rows change outside a screen that already
+ * calls `invalidateDatasetRowQueries`: a dataset delete, or a live source's
+ * rows acquired again after they aged out.
+ */
+export async function markRecordValuesStale(
+  queryClient: QueryClient,
+): Promise<void> {
+  await queryClient.invalidateQueries(
+    { queryKey: [CONCEPT_RECORD_VALUES_CLIENT_NAME] },
+    { cancelRefetch: false },
+  );
+}
+```
+
+In `ConceptRecordValuesClient.ts`, add:
+
+```ts
+import { CONCEPT_RECORD_VALUES_CLIENT_NAME } from "@/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale";
+```
+
+and replace `createServiceClient("ConceptRecordValuesClient")` with `createServiceClient(CONCEPT_RECORD_VALUES_CLIENT_NAME)`.
+
+Run: `pnpm test:frontend markRecordValuesStale ConceptRecordValuesClient invalidateDatasetRowQueries`
+Expected: PASS.
+
+- [ ] **Step 4: Write the failing delete tests**
+
+In `createDatasetMutations.test.ts`:
+
+1. Add `markRecordValuesStaleMock` and `AVA_QUERY_CLIENT` to the hoisted values:
+
+   ```ts
+   const { rpcMock, markRecordValuesStaleMock, AVA_QUERY_CLIENT } = vi.hoisted(
+     () => {
+       return {
+         rpcMock: vi.fn(),
+         markRecordValuesStaleMock: vi.fn(),
+         AVA_QUERY_CLIENT: { name: "AvaQueryClient" },
+       };
+     },
+   );
+   ```
+
+2. Replace the `LocalDatasetClient` and `DuckDbClient` mocks, and add two more:
+
+   ```ts
+   vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
+     return {
+       LocalDatasetClient: {
+         dropLocalDataset: vi.fn(),
+         getById: vi.fn(),
+         delete: vi.fn(),
+       },
+     };
+   });
+
+   vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
+     return {
+       DuckDbClient: { dropTable: vi.fn(), dropTableViewAndFile: vi.fn() },
+     };
+   });
+
+   vi.mock("@/config/AvaQueryClient", () => {
+     return { AvaQueryClient: AVA_QUERY_CLIENT };
+   });
+
+   vi.mock(
+     "@/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale",
+     () => {
+       return { markRecordValuesStale: markRecordValuesStaleMock };
+     },
+   );
+   ```
+
+3. Append:
+
+   ```ts
+   describe("fullDelete", () => {
+     beforeEach(() => {
+       markRecordValuesStaleMock.mockReset();
+     });
+
+     async function _fullDelete(deleteRow: () => Promise<void>): Promise<void> {
+       const { createDatasetMutations } =
+         await import("@/clients/datasets/DatasetClient/createDatasetMutations");
+       await createDatasetMutations({
+         ...CONFIG,
+         client: {
+           getById: vi.fn(async () => {
+             return undefined;
+           }),
+           delete: deleteRow,
+         },
+       } as unknown as DatasetMutationConfig).fullDelete({
+         id: BASE_PARAMS.datasetId,
+       });
+     }
+
+     // A case type that read the dataset now computes its values without it.
+     it("marks every case type's record values stale once the dataset is gone", async () => {
+       const deleteRow = vi.fn(async () => {
+         return undefined;
+       });
+
+       await _fullDelete(deleteRow);
+
+       expect(markRecordValuesStaleMock).toHaveBeenCalledWith(AVA_QUERY_CLIENT);
+       expect(deleteRow.mock.invocationCallOrder[0]).toBeLessThan(
+         markRecordValuesStaleMock.mock.invocationCallOrder[0]!,
+       );
+     });
+
+     it("leaves record values alone when the delete fails", async () => {
+       await expect(
+         _fullDelete(async () => {
+           throw new Error("delete refused");
+         }),
+       ).rejects.toThrow("delete refused");
+
+       expect(markRecordValuesStaleMock).not.toHaveBeenCalled();
+     });
+   });
+   ```
+
+- [ ] **Step 5: Write the failing live source tests**
+
+In `RelationLoading.test.ts`:
+
+1. Change the imports and mocks at the top to:
+
+   ```ts
+   import { MIMEType } from "@avandar/utils";
+   import { afterEach, describe, expect, it, vi } from "vitest";
+   import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
+   import { RelationLoading } from "@/clients/qetl/QueryMediator/relationLoading/RelationLoading";
+   import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
+   import { AvaQueryClient } from "@/config/AvaQueryClient";
+   import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+   import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+   import type { AcquiredRelationBytes } from "@/clients/qetl/QueryMediator/QueryMediator.types";
+
+   const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
+   const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";
+
+   const { markRecordValuesStaleMock } = vi.hoisted(() => {
+     return { markRecordValuesStaleMock: vi.fn() };
+   });
+
+   vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
+     return { DuckDbClient: { loadParquet: vi.fn() } };
+   });
+
+   vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+     return {
+       DatasetColumnClient: {
+         withCache: () => {
+           return {
+             withEnsureQueryData: () => {
+               return {
+                 getAll: async () => {
+                   return [];
+                 },
+               };
+             },
+           };
+         },
+       },
+     };
+   });
+
+   vi.mock(
+     "@/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale",
+     () => {
+       return { markRecordValuesStale: markRecordValuesStaleMock };
+     },
+   );
+
+   vi.mock(
+     "@/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch",
+     () => {
+       return { createRegistryForFetch: vi.fn() };
+     },
+   );
+   ```
+
+   Keep the existing `describe("RelationLoading.probeStorageRelationCache", ...)` unchanged.
+
+2. Append:
+
+   ```ts
+   describe("RelationLoading.loadRelationBytes", () => {
+     /** `DuckDbClient.loadParquet` is mocked, so the lease is never read. */
+     const LEASE = {
+       datasetIds: new Set([DATASET_ID]),
+     } as unknown as DatasetDuckDbLease;
+
+     afterEach(() => {
+       QueryableRelationColumns.clear();
+       markRecordValuesStaleMock.mockReset();
+     });
+
+     function _makeRelation(): AcquiredRelationBytes {
+       return {
+         columns: "all",
+         datasetId: DATASET_ID,
+         parquetBlob: new Blob(["parquet-bytes"], {
+           type: MIMEType.APPLICATION_PARQUET,
+         }),
+         staleAt: undefined,
+       };
+     }
+
+     async function _loadAcquired(): Promise<void> {
+       const relation = _makeRelation();
+       await RelationLoading.loadRelationBytes({
+         datasetDuckDbLease: LEASE,
+         principalKey: PRINCIPAL_KEY,
+         relationCache: createInMemoryRelationCache(),
+         relations: [relation],
+         relationsToStore: [relation],
+       });
+     }
+
+     it("marks record values stale when a live source's aged-out rows are acquired again", async () => {
+       QueryableRelationColumns.remember({
+         datasetId: DATASET_ID,
+         columns: "all",
+         staleAt: 1,
+       });
+
+       await _loadAcquired();
+
+       expect(markRecordValuesStaleMock).toHaveBeenCalledWith(AvaQueryClient);
+     });
+
+     it("leaves record values alone on a dataset's first load", async () => {
+       await _loadAcquired();
+
+       expect(markRecordValuesStaleMock).not.toHaveBeenCalled();
+     });
+
+     // Fresh rows acquired again for a wider column set hold the same values.
+     it("leaves record values alone when fresh rows are acquired for more columns", async () => {
+       QueryableRelationColumns.remember({
+         datasetId: DATASET_ID,
+         columns: ["person_id"],
+         staleAt: undefined,
+       });
+
+       await _loadAcquired();
+
+       expect(markRecordValuesStaleMock).not.toHaveBeenCalled();
+     });
+   });
+   ```
+
+- [ ] **Step 6: Write the failing re-upload test**
+
+Create `resyncOfflineDataset/resyncOfflineDataset.test.ts`:
+
+```ts
+/**
+ * A re-uploaded offline file replaces a dataset's rows, so everything that
+ * shows those rows, record values included, must read them again.
+ */
+import { QueryClient } from "@tanstack/react-query";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { resyncOfflineDataset } from "@/views/DataManagerApp/ResyncDatasetsBlock/resyncOfflineDataset/resyncOfflineDataset";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { UserId } from "$/models/User/User.types";
+
+const {
+  startCsvImportMock,
+  startXlsxImportMock,
+  getCsvOptionsMock,
+  getXlsxOptionsMock,
+  invalidateDatasetRowQueriesMock,
+} = vi.hoisted(() => {
+  return {
+    startCsvImportMock: vi.fn(),
+    startXlsxImportMock: vi.fn(),
+    getCsvOptionsMock: vi.fn(),
+    getXlsxOptionsMock: vi.fn(),
+    invalidateDatasetRowQueriesMock: vi.fn(),
+  };
+});
+
+vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
+  return {
+    LocalDatasetClient: {
+      startCsvImport: startCsvImportMock,
+      startXlsxImport: startXlsxImportMock,
+    },
+  };
+});
+vi.mock("@/clients/datasets/source-datasets/CsvFileDatasetClient", () => {
+  return { CsvFileDatasetClient: { getOne: getCsvOptionsMock } };
+});
+vi.mock("@/clients/datasets/source-datasets/XlsxFileDatasetClient", () => {
+  return { XlsxFileDatasetClient: { getOne: getXlsxOptionsMock } };
+});
+vi.mock(
+  "@/views/DataManagerApp/DatasetMetaView/invalidateDatasetRowQueries/invalidateDatasetRowQueries",
+  () => {
+    return { invalidateDatasetRowQueries: invalidateDatasetRowQueriesMock };
+  },
+);
+
+const USER_ID = "99999999-9999-4999-8999-999999999999" as UserId;
+
+/** The function reads only a dataset's `id`, `workspaceId`, and `sourceType`. */
+function _makeDataset(sourceType: Dataset.T["sourceType"]): Dataset.T {
+  return {
+    id: "11111111-1111-4111-8111-111111111111",
+    workspaceId: "33333333-3333-4333-8333-333333333333",
+    sourceType,
+  } as unknown as Dataset.T;
+}
+
+describe("resyncOfflineDataset", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    getCsvOptionsMock.mockResolvedValue({ rowsToSkip: 0, delimiter: "," });
+    getXlsxOptionsMock.mockResolvedValue({
+      sheetName: "Sheet1",
+      hasHeader: true,
+      rowsToSkip: 0,
+    });
+  });
+
+  it.each([
+    ["csv_file", startCsvImportMock],
+    ["xlsx_file", startXlsxImportMock],
+  ] as const)(
+    "marks every view of the rows stale once a re-uploaded %s is loaded",
+    async (sourceType, startImportMock) => {
+      const queryClient = new QueryClient();
+
+      await resyncOfflineDataset({
+        file: new File(["id\n1"], "people"),
+        dataset: _makeDataset(sourceType),
+        userId: USER_ID,
+        queryClient,
+      });
+
+      expect(invalidateDatasetRowQueriesMock).toHaveBeenCalledWith(
+        queryClient,
+      );
+      expect(startImportMock.mock.invocationCallOrder[0]).toBeLessThan(
+        invalidateDatasetRowQueriesMock.mock.invocationCallOrder[0]!,
+      );
+    },
+  );
+
+  it("leaves every view alone when the re-upload fails", async () => {
+    startCsvImportMock.mockRejectedValue(new Error("schema mismatch"));
+
+    await expect(
+      resyncOfflineDataset({
+        file: new File(["id\n1"], "people.csv"),
+        dataset: _makeDataset("csv_file"),
+        userId: USER_ID,
+        queryClient: new QueryClient(),
+      }),
+    ).rejects.toThrow("schema mismatch");
+
+    expect(invalidateDatasetRowQueriesMock).not.toHaveBeenCalled();
+  });
+});
+```
+
+- [ ] **Step 7: Run them and watch them fail**
+
+Run: `pnpm test:frontend createDatasetMutations RelationLoading resyncOfflineDataset`
+Expected: FAIL. `fullDelete` never calls `markRecordValuesStale`, nor does `loadRelationBytes` for the aged-out source, and `resyncOfflineDataset` does not resolve. The first-load and wider-columns tests already pass; they guard against a fix that marks values stale on every load.
+
+- [ ] **Step 8: A delete marks record values stale**
+
+In `createDatasetMutations.ts`, add:
+
+```ts
+import { markRecordValuesStale } from "@/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
+```
+
+(and `import type { Dataset } from "$/models/datasets/Dataset/Dataset";` if the file has no `Dataset` import). Add above `_makeFullDelete`:
+
+```ts
+/** Removes a deleted dataset's local copy and its DuckDB table, if any. */
+async function _dropLocalCopy(datasetId: Dataset.Id): Promise<void> {
+  const localDataset = await LocalDatasetClient.getById({ id: datasetId });
+  if (!localDataset) {
+    return;
+  }
+  await LocalDatasetClient.delete({ id: localDataset.datasetId });
+  await DuckDbClient.dropTableViewAndFile({
+    tableOrViewName: localDataset.datasetId,
+  });
+}
+```
+
+and in `_makeFullDelete`, replace everything from `await options.client.delete(params);` to the end of the returned function with:
+
+```ts
+    await options.client.delete(params);
+    await _dropLocalCopy(params.id);
+    // A case type that read this dataset now computes its values without
+    // it. Not awaited: the delete is done, and the reads this starts again
+    // need nothing from it.
+    void markRecordValuesStale(AvaQueryClient);
+  };
+```
+
+- [ ] **Step 9: A live source acquired again marks record values stale**
+
+In `RelationLoading.ts`, add:
+
+```ts
+import { markRecordValuesStale } from "@/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale";
+import { getRelationFreshnessNow } from "@/clients/qetl/RelationCache/getRelationFreshnessNow/getRelationFreshnessNow";
+```
+
+Add above `_loadRelationBytes`:
+
+```ts
+/**
+ * The datasets among `relations` whose rows this process had loaded and that
+ * have gone stale: a live source acquired again because its rows aged out.
+ * Read before the new rows are recorded, which resets their freshness.
+ */
+function _getStaleLoadedDatasetIds(
+  relations: readonly AcquiredRelationBytes[],
+): Dataset.Id[] {
+  const freshnessNow = getRelationFreshnessNow();
+  return relations.flatMap((relation) => {
+    const wasLoaded =
+      QueryableRelationColumns.getColumns(relation.datasetId) !== undefined;
+    return wasLoaded &&
+      QueryableRelationColumns.isStale({
+        datasetId: relation.datasetId,
+        now: freshnessNow,
+      })
+      ? [relation.datasetId]
+      : [];
+  });
+}
+```
+
+In `_loadRelationBytes`, make the first line:
+
+```ts
+  const replacedDatasetIds = _getStaleLoadedDatasetIds(
+    options.relationsToStore,
+  );
+```
+
+and append after the `promiseMap` that loads each relation:
+
+```ts
+  if (replacedDatasetIds.length > 0) {
+    // Not awaited: the record value reads this starts again need the lease
+    // this query holds until it returns, so waiting for them would deadlock.
+    void markRecordValuesStale(AvaQueryClient);
+  }
+```
+
+- [ ] **Step 10: A re-upload marks every view of the rows stale**
+
+Create `resyncOfflineDataset/resyncOfflineDataset.ts`:
+
+```ts
+import { assertIsDefined, where } from "@avandar/utils";
+import { match } from "ts-pattern";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
+import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
+import { invalidateDatasetRowQueries } from "@/views/DataManagerApp/DatasetMetaView/invalidateDatasetRowQueries/invalidateDatasetRowQueries";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { UserId } from "$/models/User/User.types";
+import type { QueryClient } from "@tanstack/react-query";
+
+/** What a re-upload loads: the file, the dataset it replaces, and who. */
+type ResyncSource = {
+  file: File;
+  dataset: Dataset.T;
+  userId: UserId;
+};
+
+async function _resyncCsvDataset(options: ResyncSource): Promise<void> {
+  const { file, dataset, userId } = options;
+  const csvParseOptions = await CsvFileDatasetClient.getOne(
+    where("dataset_id", "eq", dataset.id),
+  );
+  assertIsDefined(
+    csvParseOptions,
+    `CSV parse options could not be found for dataset (ID: ${dataset.id})`,
+  );
+  await LocalDatasetClient.startCsvImport({
+    datasetId: dataset.id,
+    workspaceId: dataset.workspaceId,
+    userId,
+    file,
+    parseOptions: {
+      numRowsToSkip: csvParseOptions.rowsToSkip,
+      delimiter: csvParseOptions.delimiter,
+    },
+  });
+}
+
+async function _resyncXlsxDataset(options: ResyncSource): Promise<void> {
+  const { file, dataset, userId } = options;
+  const xlsxParseOptions = await XlsxFileDatasetClient.getOne(
+    where("dataset_id", "eq", dataset.id),
+  );
+  assertIsDefined(
+    xlsxParseOptions,
+    `Excel parse options could not be found for dataset (ID: ${dataset.id})`,
+  );
+  await LocalDatasetClient.startXlsxImport({
+    datasetId: dataset.id,
+    workspaceId: dataset.workspaceId,
+    userId,
+    file,
+    parseOptions: {
+      sheet: xlsxParseOptions.sheetName,
+      hasHeader: xlsxParseOptions.hasHeader,
+      rowsToSkip: xlsxParseOptions.rowsToSkip,
+    },
+  });
+}
+
+/**
+ * Loads a re-uploaded file as an offline CSV or Excel dataset's rows, with
+ * the parse options the dataset was created with, then marks every query
+ * that shows the dataset's rows stale: the dataset page, data queries, and
+ * every case type record's field values. Throws for any other source type,
+ * and marks nothing when the load fails.
+ */
+export async function resyncOfflineDataset(
+  options: Readonly<ResyncSource & { queryClient: QueryClient }>,
+): Promise<void> {
+  const { queryClient, ...source } = options;
+  await match(source.dataset.sourceType)
+    .with("csv_file", async () => {
+      await _resyncCsvDataset(source);
+    })
+    .with("xlsx_file", async () => {
+      await _resyncXlsxDataset(source);
+    })
+    .otherwise(() => {
+      throw new Error(
+        `Resync is not supported for dataset source type ` +
+          `'${source.dataset.sourceType}'`,
+      );
+    });
+  await invalidateDatasetRowQueries(queryClient);
+}
+```
+
+The two helpers are `ResyncDatasetCard.tsx`'s, moved with their bodies unchanged; only their parameter type is now `ResyncSource`.
+
+In `ResyncDatasetCard.tsx`:
+
+1. Delete `_resyncCsvDataset` and `_resyncXlsxDataset`, and the imports only they used: `assertIsDefined`, `CsvFileDatasetClient`, `XlsxFileDatasetClient`. Keep `where` (the preview reads columns with it), `match` (`useUploadControlConfig` uses it), and `LocalDatasetClient` (Back drops the local copy).
+2. Add:
+
+   ```tsx
+   import { useQueryClient } from "@tanstack/react-query";
+   import { invalidateDatasetRowQueries } from "@/views/DataManagerApp/DatasetMetaView/invalidateDatasetRowQueries/invalidateDatasetRowQueries";
+   import { resyncOfflineDataset } from "@/views/DataManagerApp/ResyncDatasetsBlock/resyncOfflineDataset/resyncOfflineDataset";
+   ```
+
+   and `const queryClient = useQueryClient();` after `const user = useCurrentUser();`.
+3. Replace the `resyncDataset` mutation's `mutationFn` with:
+
+   ```tsx
+       mutationFn: async (file: File) => {
+         await resyncOfflineDataset({
+           file,
+           dataset,
+           userId: user!.id as UserId,
+           queryClient,
+         });
+       },
+   ```
+
+4. In `deleteDatasetLocally`'s `mutationFn`, after `await LocalDatasetClient.dropLocalDataset({ datasetId });`, add:
+
+   ```tsx
+         // Back drops the rows the re-upload loaded, so every view of them
+         // reads again.
+         await invalidateDatasetRowQueries(queryClient);
+   ```
+
+- [ ] **Step 11: Run them and watch them pass**
+
+Run: `pnpm test:frontend markRecordValuesStale createDatasetMutations RelationLoading resyncOfflineDataset invalidateDatasetRowQueries`
+Expected: PASS.
+
+Run: `pnpm type-check && pnpm lint`
+Expected: no errors. `pnpm lint` reports any import the move left unused in `ResyncDatasetCard.tsx`.
+
+- [ ] **Step 12: Commit**
+
+No user-facing string changed, so the catalogs need no update.
+
+```bash
+pnpm format
+git add src/clients/ontology/ConceptRecordValuesClient src/clients/datasets/DatasetClient/createDatasetMutations.ts src/clients/datasets/DatasetClient/createDatasetMutations.test.ts src/clients/qetl/QueryMediator/relationLoading/RelationLoading.ts src/clients/qetl/QueryMediator/relationLoading/RelationLoading.test.ts src/views/DataManagerApp/ResyncDatasetsBlock
+git commit -m "fix(joined-cases): mark record values stale on every dataset change" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+## Task 5: Cached record values as placeholders
 
 **Files:**
 - Create: `src/views/IndividualManagerApp/getCachedRecordValues/getCachedRecordValues.ts`
@@ -791,7 +1741,7 @@ git commit -m "feat(joined-cases): find a case type's cached record values" -m "
 
 ---
 
-## Task 4: Record names from page results
+## Task 6: Record names from page results
 
 **Files:**
 - Create: `src/views/IndividualManagerApp/makeRecordNamesFromPages/makeRecordNamesFromPages.ts`
@@ -801,11 +1751,16 @@ git commit -m "feat(joined-cases): find a case type's cached record values" -m "
 
 ```ts
 import { describe, expect, it } from "vitest";
+import { createLabelValueFormatter } from "@/views/IndividualManagerApp/createLabelValueFormatter/createLabelValueFormatter";
 import { makeRecordNamesFromPages } from "@/views/IndividualManagerApp/makeRecordNamesFromPages/makeRecordNamesFromPages";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ConceptRecordValues } from "@/clients/ontology/ConceptRecordValuesClient/ConceptRecordValuesClient.types";
 
 const LABEL_ID = "00000000-0000-4000-8000-0000000000b1" as ConceptAttribute.Id;
+const FORMAT_TEXT = createLabelValueFormatter({
+  labelDataType: "varchar",
+  locale: "en",
+});
 
 function _makeValues(externalId: string, name: string): ConceptRecordValues {
   return { externalId, valuesByAttributeId: { [LABEL_ID]: name } };
@@ -814,6 +1769,7 @@ function _makeValues(externalId: string, name: string): ConceptRecordValues {
 describe("makeRecordNamesFromPages", () => {
   it("names a record by its label value", () => {
     const recordNames = makeRecordNamesFromPages({
+      formatLabelValue: FORMAT_TEXT,
       labelAttributeId: LABEL_ID,
       pages: [
         {
@@ -829,6 +1785,7 @@ describe("makeRecordNamesFromPages", () => {
 
   it("names a record of a settled page by its ID when the values hold none for it", () => {
     const recordNames = makeRecordNamesFromPages({
+      formatLabelValue: FORMAT_TEXT,
       labelAttributeId: LABEL_ID,
       pages: [
         {
@@ -844,6 +1801,7 @@ describe("makeRecordNamesFromPages", () => {
 
   it("leaves out a record whose page is still being read", () => {
     const recordNames = makeRecordNamesFromPages({
+      formatLabelValue: FORMAT_TEXT,
       labelAttributeId: LABEL_ID,
       pages: [
         { externalIds: ["P-001"], recordValues: undefined, isSettled: false },
@@ -855,6 +1813,7 @@ describe("makeRecordNamesFromPages", () => {
 
   it("names a record from cached values while its page is still being read", () => {
     const recordNames = makeRecordNamesFromPages({
+      formatLabelValue: FORMAT_TEXT,
       labelAttributeId: LABEL_ID,
       pages: [
         {
@@ -868,8 +1827,33 @@ describe("makeRecordNamesFromPages", () => {
     expect([...recordNames.entries()]).toEqual([["P-001", "Ada Lovelace"]]);
   });
 
+  it("names a record by its date label through the label formatter", () => {
+    const recordNames = makeRecordNamesFromPages({
+      formatLabelValue: createLabelValueFormatter({
+        labelDataType: "date",
+        locale: "en",
+      }),
+      labelAttributeId: LABEL_ID,
+      pages: [
+        {
+          externalIds: ["P-001"],
+          recordValues: [
+            {
+              externalId: "P-001",
+              valuesByAttributeId: { [LABEL_ID]: 1709596800000 },
+            },
+          ],
+          isSettled: true,
+        },
+      ],
+    });
+
+    expect(recordNames.get("P-001")).toBe("Mar 5, 2024");
+  });
+
   it("names every record by its ID when the case type has no label field", () => {
     const recordNames = makeRecordNamesFromPages({
+      formatLabelValue: FORMAT_TEXT,
       labelAttributeId: undefined,
       pages: [
         {
@@ -929,14 +1913,17 @@ export type RecordValuesPage = {
  *
  * @param options.labelAttributeId The case type's label field, `undefined`
  *   when it has none.
+ * @param options.formatLabelValue Formats one label value as name text, from
+ *   `createLabelValueFormatter` for the label field's type.
  */
 export function makeRecordNamesFromPages(
   options: Readonly<{
     pages: readonly RecordValuesPage[];
     labelAttributeId: ConceptAttribute.Id | undefined;
+    formatLabelValue: (value: unknown) => string;
   }>,
 ): Map<string, string> {
-  const { pages, labelAttributeId } = options;
+  const { pages, labelAttributeId, formatLabelValue } = options;
   const recordNames = new Map<string, string>();
   pages.forEach((page) => {
     page.recordValues?.forEach((recordValues) => {
@@ -948,6 +1935,7 @@ export function makeRecordNamesFromPages(
               ? undefined
               : recordValues.valuesByAttributeId[labelAttributeId],
           externalId: recordValues.externalId,
+          formatLabelValue,
         }),
       );
     });
@@ -966,7 +1954,7 @@ export function makeRecordNamesFromPages(
 - [ ] **Step 4: Run it and watch it pass**
 
 Run: `pnpm test:frontend makeRecordNamesFromPages`
-Expected: PASS, 5 tests.
+Expected: PASS, 6 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -978,23 +1966,26 @@ git commit -m "feat(joined-cases): turn record value pages into record names" -m
 
 ---
 
-## Task 5: `useRecordNames`
+## Task 7: `useRecordNames`
 
 **Files:**
 - Create: `src/views/IndividualManagerApp/useRecordNames/useRecordNames.ts`
 - Test: `src/views/IndividualManagerApp/useRecordNames/useRecordNames.test.ts`
 
-`useQueries` has no wrapper in `@avandar/query-hooks`; import it from `@tanstack/react-query`, as `src/views/GisApp/layers/useMapLayersData/useMapLayersData.ts` does.
+`useQueries` has no wrapper in `@avandar/query-hooks`; import it from `@tanstack/react-query`, as `src/views/GisApp/layers/useMapLayersData/useMapLayersData.ts` does. The hook formats the label through Task 3's `createLabelValueFormatter` for the reader's locale, which it reads with `useLingui`, so the test wrapper adds an `I18nProvider`.
 
 - [ ] **Step 1: Write the failing test**
 
 ```ts
+import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ConceptRecordValuesClient } from "@/clients/ontology/ConceptRecordValuesClient/ConceptRecordValuesClient";
+import { i18n } from "@/i18n/i18n";
 import { renderHook, waitFor } from "@/test-utils";
 import { useRecordNames } from "@/views/IndividualManagerApp/useRecordNames/useRecordNames";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -1045,12 +2036,13 @@ const CONCEPT_ID = "00000000-0000-4000-8000-0000000000c1" as Concept.Id;
 const LABEL_ID = "00000000-0000-4000-8000-0000000000b1" as ConceptAttribute.Id;
 const KEY_ID = "00000000-0000-4000-8000-0000000000b2" as ConceptAttribute.Id;
 
-/** The hook reads only a field's `id` and `isLabel`. */
+/** The hook reads only a field's `id`, `isLabel`, and `dataType`. */
 function _makeAttribute(
   id: ConceptAttribute.Id,
   isLabel: boolean,
+  dataType: AvaDataType.T = "varchar",
 ): ConceptAttribute.T {
-  return { id, isLabel } as unknown as ConceptAttribute.T;
+  return { id, isLabel, dataType } as unknown as ConceptAttribute.T;
 }
 
 function _makeQueryClient(): QueryClient {
@@ -1074,9 +2066,13 @@ function _renderRecordNames(
     {
       wrapper: ({ children }: { children: ReactNode }) => {
         return createElement(
-          QueryClientProvider,
-          { client: options.queryClient },
-          children,
+          I18nProvider,
+          { i18n },
+          createElement(
+            QueryClientProvider,
+            { client: options.queryClient },
+            children,
+          ),
         );
       },
     },
@@ -1108,6 +2104,28 @@ describe("useRecordNames", () => {
         ["P-001", "Ada"],
         ["P-002", "P-002"],
       ]);
+    });
+  });
+
+  it("names a record by its date label as the day it holds", async () => {
+    attributesRef.current = [
+      _makeAttribute(KEY_ID, false),
+      _makeAttribute(LABEL_ID, true, "date"),
+    ];
+    getRecordValuesMock.mockResolvedValue([
+      {
+        externalId: "P-001",
+        valuesByAttributeId: { [LABEL_ID]: 1709596800000 },
+      },
+    ]);
+
+    const result = _renderRecordNames({
+      queryClient: _makeQueryClient(),
+      externalIdPages: [["P-001"]],
+    });
+
+    await waitFor(() => {
+      expect(result.current.get("P-001")).toBe("Mar 5, 2024");
     });
   });
 
@@ -1187,12 +2205,15 @@ Expected: FAIL, `Failed to resolve import "@/views/IndividualManagerApp/useRecor
 
 ```ts
 import { propEq, where } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { ConceptRecordValuesClient } from "@/clients/ontology/ConceptRecordValuesClient/ConceptRecordValuesClient";
+import { createLabelValueFormatter } from "@/views/IndividualManagerApp/createLabelValueFormatter/createLabelValueFormatter";
 import { getCachedRecordValues } from "@/views/IndividualManagerApp/getCachedRecordValues/getCachedRecordValues";
 import { makeRecordNamesFromPages } from "@/views/IndividualManagerApp/makeRecordNamesFromPages/makeRecordNamesFromPages";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -1204,7 +2225,11 @@ import type { UseQueryResult } from "@tanstack/react-query";
 type LabelLookup =
   | { status: "loading" }
   | { status: "none" }
-  | { status: "found"; labelAttributeId: ConceptAttribute.Id };
+  | {
+      status: "found";
+      labelAttributeId: ConceptAttribute.Id;
+      labelDataType: AvaDataType.T;
+    };
 
 function _getLabelLookup(
   attributes: readonly ConceptAttribute.T[] | undefined,
@@ -1214,8 +2239,30 @@ function _getLabelLookup(
   }
   const labelAttribute = attributes.find(propEq("isLabel", true));
   return labelAttribute
-    ? { status: "found", labelAttributeId: labelAttribute.id }
+    ? {
+        status: "found",
+        labelAttributeId: labelAttribute.id,
+        labelDataType: labelAttribute.dataType,
+      }
     : { status: "none" };
+}
+
+/**
+ * Formats one label value as name text for the reader's locale. Until the
+ * label field is known no value is formatted, so the text formatter stands
+ * in.
+ */
+function useLabelValueFormatter(
+  labelLookup: LabelLookup,
+): (value: unknown) => string {
+  const { i18n } = useLingui();
+  return useMemo(() => {
+    return createLabelValueFormatter({
+      labelDataType:
+        labelLookup.status === "found" ? labelLookup.labelDataType : "varchar",
+      locale: i18n.locale,
+    });
+  }, [labelLookup, i18n.locale]);
 }
 
 function _toRecordValuesPage(
@@ -1271,12 +2318,14 @@ export function useRecordNames(
   const labelLookup = useMemo(() => {
     return _getLabelLookup(attributes);
   }, [attributes]);
+  const formatLabelValue = useLabelValueFormatter(labelLookup);
 
   const combineRecordNames = useCallback(
     (
       results: Array<UseQueryResult<ConceptRecordValues[]>>,
     ): Map<string, string> => {
       return makeRecordNamesFromPages({
+        formatLabelValue,
         labelAttributeId:
           labelLookup.status === "found"
             ? labelLookup.labelAttributeId
@@ -1290,7 +2339,7 @@ export function useRecordNames(
         }),
       });
     },
-    [externalIdPages, labelLookup],
+    [externalIdPages, labelLookup, formatLabelValue],
   );
 
   return useQueries({
@@ -1316,7 +2365,7 @@ export function useRecordNames(
 - [ ] **Step 4: Run it and watch it pass**
 
 Run: `pnpm test:frontend useRecordNames`
-Expected: PASS, 5 tests.
+Expected: PASS, 6 tests.
 
 - [ ] **Step 5: Type check and commit**
 
@@ -1331,7 +2380,7 @@ git commit -m "feat(joined-cases): read record names page by page" -m "Co-Author
 
 ---
 
-## Task 6: Records list rows named on demand
+## Task 8: Records list rows named on demand
 
 **Files:**
 - Create: `src/views/IndividualManagerApp/makeVirtualIndividualLink/makeVirtualIndividualLink.tsx`
@@ -1783,7 +2832,7 @@ git commit -m "feat(joined-cases): name records list rows from their label field
 
 ---
 
-## Task 7: The record page header
+## Task 9: The record page header
 
 **Files:**
 - Create: `src/views/IndividualManagerApp/SingleIndividualView/useRecordName/useRecordName.ts`
@@ -1793,9 +2842,11 @@ git commit -m "feat(joined-cases): name records list rows from their label field
 - [ ] **Step 1: Write the failing test**
 
 ```ts
+import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { i18n } from "@/i18n/i18n";
 import { renderHook, waitFor } from "@/test-utils";
 import { useRecordName } from "@/views/IndividualManagerApp/SingleIndividualView/useRecordName/useRecordName";
 import type { Concept } from "$/models/ontology/Concept/Concept";
@@ -1818,6 +2869,7 @@ vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
             {
               id: "00000000-0000-4000-8000-0000000000b1",
               isLabel: true,
+              dataType: "varchar",
             },
           ],
           false,
@@ -1867,9 +2919,9 @@ function _renderRecordName(): { current: string | undefined } {
     {
       wrapper: ({ children }: { children: ReactNode }) => {
         return createElement(
-          QueryClientProvider,
-          { client: queryClient },
-          children,
+          I18nProvider,
+          { i18n },
+          createElement(QueryClientProvider, { client: queryClient }, children),
         );
       },
     },
@@ -1995,7 +3047,7 @@ In `src/views/IndividualManagerApp/SingleIndividualView/index.tsx`:
 
 4. Make sure the file imports `Skeleton` and `VisuallyHidden` from `@mantine/core`, and that the component has `const { t } = useLingui();` (with `import { useLingui } from "@lingui/react/macro";`). Plan 1 removed the header skeleton, so some of these may be gone.
 
-The header's behaviour end to end is asserted by Task 10's E2E spec.
+The header's behaviour end to end is asserted by Task 13's E2E spec.
 
 - [ ] **Step 6: Regenerate the catalogs**
 
@@ -2018,13 +3070,13 @@ git commit -m "feat(joined-cases): name the record page from its label field" -m
 
 ---
 
-## Task 8: Key-only staging SQL
+## Task 10: Key-only staging SQL
 
 **Files:**
 - Create: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql.ts`
 - Test: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql.executed.test.ts`
 
-The builder is not wired into Sync until Task 9, which drops the name in the same commit.
+The builder is not wired into Sync until Task 11, which drops the name in the same commit.
 
 - [ ] **Step 1: Write the failing executed test**
 
@@ -2208,7 +3260,7 @@ git commit -m "feat(joined-cases): build Sync's key-only staging SQL" -m "Co-Aut
 
 ---
 
-## Task 9: Stop storing record names
+## Task 11: Stop storing record names
 
 This task changes Sync, the schema, the model, and every fixture that writes `name` in one commit: Sync without names cannot insert into a `not null` column, and the model without `name` cannot compile while Sync still reads it.
 
@@ -3118,7 +4170,245 @@ git commit -m "feat(joined-cases): stop storing record names and sync record key
 
 ---
 
-## Task 10: E2E, a record only the second dataset has is synced and named by its ID
+## Task 12: Records stay found when Refresh follows creation
+
+**Files:**
+- Modify: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers.ts`
+- Test: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers.test.ts`
+- Modify: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts`
+- Test: `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.test.ts`
+
+In the browser, creating a case type and clicking Refresh at once marked every record "Missing from source" about 8 seconds after they were created, and a second Refresh cleared the flags. Reading the code gives two causes, and this task closes both:
+
+1. **Numeric keys alternate** (spec §1 item 5). The automatic first Sync (`insertConceptFromFormValues`'s `_syncNewConceptInBackground`) inserts every record. A `BIGINT` key comes back from DuckDB as a JS number, while `existingByExternalId` is keyed by the stored text, so on the next Sync (the Refresh) no staged key matches: `diffStagedIndividualsPage` returns no `matchedExternalIds`, `externalIdsSeenInSync` stays empty, and `getNewlyStaleIndividuals` flags every record. The Sync after that writes every staged key again as a new row, and the upsert on `(external_id, concept_id)` clears the flag. That is the observed flag-then-clear. Task 10 casts every staged key to `VARCHAR`, which removes the cause at its source; this task makes the diff compare keys as text as well, so a staging change that drops the cast (key matching extends this SQL next) cannot bring it back.
+2. **Overlapping Syncs.** Nothing stops a Refresh from starting while the automatic first Sync runs, and both stage into the one table `getStagingIndividualsTableName(concept.id)` names. Each Sync runs `DROP TABLE IF EXISTS` before staging and again in its `finally`, so either can drop the table the other is reading, and the second Sync's snapshot of existing records races the first one's inserts. This task makes a second Sync of a case type wait for the first.
+
+This task builds on Task 11's Sync: staged rows carry only `external_id`, and `diffStagedIndividualsHelpers.test.ts` is the file Task 11 rewrote.
+
+- [ ] **Step 1: Reproduce it in the browser**
+
+Check `ava supabase status` names `feat-joined-cases`, start the app (`pnpm dev`), and sign in headless through the Playwright MCP with `TEST_USER_EMAIL` and `TEST_USER_PASSWORD` from `seed/SeedData.ts`. Save these two files under `.temp/feat-joined-cases/`:
+
+`numeric-keys.csv`:
+
+```csv
+case_number,full_name
+1001,Ada Lovelace
+1002,Grace Hopper
+1003,Katherine Johnson
+```
+
+`text-keys.csv`:
+
+```csv
+case_id,full_name
+P-001,Ada Lovelace
+P-002,Grace Hopper
+P-003,Katherine Johnson
+```
+
+For each file: upload it as a dataset, create a case type from it with the key column as the ID and `full_name` as the label, and on the case type page click "Refresh ... records" as soon as it appears. Wait 10 seconds, open its records, and take a screenshot into `.temp/feat-joined-cases/`. Click Refresh again, wait, and screenshot again.
+
+Expected, with Tasks 10 and 11 landed: no record of either case type shows "Missing from source". If one does, note which case type, and whether the second Refresh cleared it, in spec §1 item 5. Either way, Steps 2 to 7 close both causes.
+
+- [ ] **Step 2: Write the failing diff test**
+
+In `diffStagedIndividualsHelpers.test.ts`, add inside `describe("diffStagedIndividualsPage", ...)`:
+
+```ts
+  // DuckDB returns a BIGINT key as a JS number, and every stored key is text.
+  // Staging casts keys to VARCHAR. This holds if a number slips through.
+  it("matches a key staged as a number to its record's text key", () => {
+    const { rowsToWrite, matchedExternalIds } = diffStagedIndividualsPage({
+      stagedRows: [{ external_id: 1001 as unknown as string }],
+      existingByExternalId: new Map([["1001", _makeExisting()]]),
+      workspaceId: WORKSPACE_ID,
+      conceptId: CONCEPT_ID,
+    });
+
+    expect(rowsToWrite).toEqual([]);
+    expect(matchedExternalIds).toEqual(["1001"]);
+  });
+```
+
+- [ ] **Step 3: Write the failing Sync tests**
+
+In `generateIndividuals.test.ts`, add inside `describe("generateIndividuals", ...)`:
+
+```ts
+  // Creating a case type starts its first Sync in the background, and Refresh
+  // can start a second before that one ends. Both stage into one table.
+  it("starts a second Sync of a case type only once the first has finished", async () => {
+    let finishFirstStaging = (): void => {};
+    runQueryMock.mockImplementationOnce(() => {
+      return new Promise((resolve) => {
+        finishFirstStaging = () => {
+          resolve({ data: [], columns: [], numRows: 0 });
+        };
+      });
+    });
+
+    const firstSync = generateIndividuals(_makeConcept());
+    const secondSync = generateIndividuals(_makeConcept());
+    await vi.waitFor(() => {
+      expect(runQueryMock).toHaveBeenCalledTimes(1);
+    });
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+
+    expect(runQueryMock).toHaveBeenCalledTimes(1);
+    expect(getAllIndividualsMock).toHaveBeenCalledTimes(1);
+
+    finishFirstStaging();
+    await Promise.all([firstSync, secondSync]);
+
+    expect(
+      _getRunSqlStatements().map((sql) => {
+        return sql.includes("CREATE TABLE") ? "stage" : "drop";
+      }),
+    ).toEqual(["stage", "drop", "stage", "drop"]);
+  });
+
+  it("runs a second Sync of a case type after the first one fails", async () => {
+    runQueryMock.mockRejectedValueOnce(new Error("staging failed"));
+
+    const firstSync = generateIndividuals(_makeConcept());
+    const secondSync = generateIndividuals(_makeConcept());
+
+    await expect(firstSync).rejects.toThrow("staging failed");
+    await expect(secondSync).resolves.toBeUndefined();
+  });
+```
+
+- [ ] **Step 4: Run them and watch them fail**
+
+Run: `pnpm test:frontend diffStagedIndividualsHelpers generateIndividuals`
+Expected: FAIL. The diff test gets `matchedExternalIds` `[]` and one row to write, and the first Sync test sees `runQueryMock` called twice (the second Sync stages while the first is still staging). The failure test may already pass; it guards the fix against a queue that stops at the first rejection.
+
+- [ ] **Step 5: Compare staged keys as text**
+
+In `diffStagedIndividualsHelpers.ts`, replace the body of `diffStagedIndividualsPage` with:
+
+```ts
+  const { stagedRows, existingByExternalId, workspaceId, conceptId } = options;
+  // DuckDB returns a BIGINT key as a JS number, and every stored key is
+  // text, so each staged key is compared as text.
+  const stagedExternalIds = stagedRows.map((row) => {
+    return String(row.external_id);
+  });
+
+  const matchedExternalIds = stagedExternalIds.filter((externalId) => {
+    return existingByExternalId.has(externalId);
+  });
+
+  const rowsToWrite = stagedExternalIds
+    .map((externalId) => {
+      const existing = existingByExternalId.get(externalId);
+      const isUnchanged =
+        existing !== undefined && existing.missingFromSourceAt === undefined;
+      if (isUnchanged) {
+        return undefined;
+      }
+      return _buildUpsertRow({
+        workspaceId,
+        conceptId,
+        externalId,
+        missingFromSourceAt: null,
+      });
+    })
+    .filter(isDefined);
+
+  return { rowsToWrite, matchedExternalIds };
+```
+
+- [ ] **Step 6: One Sync per case type at a time**
+
+In `generateIndividuals.ts`, replace the exported `generateIndividuals` (its docstring included) with:
+
+```ts
+/**
+ * The Sync running or queued last for each case type. Every Sync of a case
+ * type stages into the same DuckDB table, so a second one waits for the
+ * first: run side by side, either can drop the table the other is reading.
+ */
+const lastSyncByConceptId = new Map<Concept.Id, Promise<void>>();
+
+/** Runs one Sync, reporting progress through {@link JobProgressStore}. */
+async function _runSyncWithProgress(
+  concept: BuildableConcept,
+): Promise<void> {
+  const jobId = JobProgressStore.startJob(
+    t`Refreshing ${concept.name} records…`,
+  );
+
+  try {
+    await _runGenerateIndividuals(concept, jobId);
+    JobProgressStore.finishJob(jobId);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    JobProgressStore.failJob(jobId, message);
+    throw error;
+  }
+}
+
+/**
+ * Runs the QETL pipeline to generate individuals for a concept, reporting
+ * progress through {@link JobProgressStore} for the lifetime of the call.
+ *
+ * A Sync of a case type that already has one running starts once that one
+ * has finished, whether it succeeded or failed, and reads the records the
+ * first one wrote.
+ */
+export async function generateIndividuals(
+  concept: BuildableConcept,
+): Promise<void> {
+  const previousSync =
+    lastSyncByConceptId.get(concept.id) ?? Promise.resolve();
+  const sync = previousSync
+    .catch(() => {
+      return undefined;
+    })
+    .then(() => {
+      return _runSyncWithProgress(concept);
+    });
+  lastSyncByConceptId.set(concept.id, sync);
+  try {
+    await sync;
+  } finally {
+    if (lastSyncByConceptId.get(concept.id) === sync) {
+      lastSyncByConceptId.delete(concept.id);
+    }
+  }
+}
+```
+
+The progress job starts when a Sync actually runs, so a queued Refresh shows no progress bar until the first Sync ends. The job label is the existing message, so the catalogs do not change.
+
+- [ ] **Step 7: Run them and watch them pass**
+
+Run: `pnpm test:frontend diffStagedIndividualsHelpers generateIndividuals insertConceptFromFormValues`
+Expected: PASS.
+
+Run: `pnpm type-check && pnpm lint`
+Expected: no errors.
+
+- [ ] **Step 8: Check it in the browser**
+
+Repeat Step 1 with two new case types (one per file, named differently from Step 1's), screenshots included.
+Expected: no record shows "Missing from source" after the first or the second Refresh.
+
+- [ ] **Step 9: Commit**
+
+```bash
+pnpm format
+git add src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals
+git commit -m "fix(joined-cases): keep records found when Refresh follows creation" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+## Task 13: E2E, a record only the second dataset has is synced and named by its ID
 
 **Files:**
 - Create: `tests/data/record-names/record-names-people.csv`
@@ -3548,9 +4838,9 @@ test.describe("record names", () => {
 - [ ] **Step 4: Run it**
 
 Run: `ava supabase status` and confirm the project, then `pnpm test:e2e case-record-names.spec.ts`
-Expected: PASS. If the list shows `P-002` as an empty row or "Empty text", the CSV import kept the blank as `""` and the name rule's trim is not applied: check `buildRecordNameFromLabelValue`. If the refresh fails with a not-null error on `name`, Task 9's migration is not applied: run `pnpm db:reset`.
+Expected: PASS. If the list shows `P-002` as an empty row or "Empty text", the CSV import kept the blank as `""` and the name rule's trim is not applied: check `buildRecordNameFromLabelValue`. If the refresh fails with a not-null error on `name`, Task 11's migration is not applied: run `pnpm db:reset`.
 
-This spec is written after the fix, so it has no red run of its own. The red for the missing-key failure is Task 9 Step 5: the generateIndividuals test that upserts `P-003`, and the pgTAP contract test that inserts a key with no name.
+This spec is written after the fix, so it has no red run of its own. The red for the missing-key failure is Task 11 Step 5: the generateIndividuals test that upserts `P-003`, and the pgTAP contract test that inserts a key with no name.
 
 - [ ] **Step 5: Commit**
 
@@ -3562,7 +4852,7 @@ git commit -m "test(joined-cases): e2e for records named on demand" -m "Co-Autho
 
 ---
 
-## Task 11: Update the ontology architecture doc
+## Task 14: Update the ontology architecture doc
 
 **Files:**
 - Modify: `docs/ontology-architecture.md`
@@ -3618,7 +4908,11 @@ Design points:
   bare UUID in a DuckDB table name always means a dataset to
   `RelationRef.fromTableName`.
 - `buildRecordKeyStagingSql` casts every key to `VARCHAR`, so a numeric key
-  matches its record's text `external_id` in the diff.
+  matches its record's text `external_id` in the diff, and the diff compares
+  every staged key as text in case one arrives as a number.
+- One Sync of a case type runs at a time: a second one, such as a Refresh
+  pressed while the first Sync after creation runs, waits for the first,
+  because every Sync of a case type stages into the same table.
 - `neededColumnsByDatasetId` names only each dataset's key column, so the
   mediator does not acquire whole datasets for a `CREATE TABLE AS`, which has
   no top-level select list to infer from.
@@ -3633,7 +4927,46 @@ Design points:
   value exists.
 ````
 
-- [ ] **Step 3: Section 9, UI map**
+- [ ] **Step 3: Section 7.2, when record values go stale**
+
+In section 7.2, replace:
+
+```md
+`invalidateDatasetRowQueries` marks every case type's values stale after a
+Google Sheets or Postgres dataset refresh.
+```
+
+with:
+
+```md
+`invalidateDatasetRowQueries` marks every case type's values stale after a
+Google Sheets or Postgres dataset refresh, and after an offline CSV or XLSX
+is re-uploaded (`resyncOfflineDataset`) or its re-upload is backed out.
+`markRecordValuesStale`
+(`src/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/`)
+does the same from inside clients: `DatasetClient.fullDelete` calls it once
+a dataset is deleted, and `RelationLoading.loadRelationBytes` calls it when
+it acquires a live source again because its loaded rows aged out. It leaves
+a read already in flight to finish.
+```
+
+In the "Record value invalidation" bullet further down, replace:
+
+```md
+  marks every `ConceptRecordValuesClient` query stale after a Google Sheets or
+  Postgres dataset refresh.
+```
+
+with:
+
+```md
+  marks every `ConceptRecordValuesClient` query stale after a Google Sheets or
+  Postgres dataset refresh or an offline file re-upload, and
+  `markRecordValuesStale` after a dataset delete or a live source's rows
+  aging out (section 7.2).
+```
+
+- [ ] **Step 4: Section 9, UI map**
 
 In the `individual-manager/$conceptId/route.tsx` row, replace its "Renders" cell with:
 
@@ -3665,12 +4998,13 @@ Add this bullet to the "Outside the routes" list:
   query per page keyed by its `external_id`s, and uses cached values of the
   same case type as each page's placeholder (`getCachedRecordValues`), so a
   known name never flashes. `buildRecordNameFromLabelValue` names a record by
-  its `external_id` when the label value is NULL, blank, or an empty list.
-  Names go stale with the record values they come from: a dataset refresh
-  invalidates them, and Refresh records does not need to.
+  its `external_id` when the label value is NULL, blank, or an empty list,
+  and writes a date, time, or timestamp label as it reads
+  (`createLabelValueFormatter`). Names go stale with the record values they
+  come from (section 7.2), so Refresh records does not need to touch them.
 ```
 
-- [ ] **Step 4: Section 10, invariants**
+- [ ] **Step 5: Section 10, invariants**
 
 Add this row to the table:
 
@@ -3678,7 +5012,7 @@ Add this row to the table:
 | A record's name is never stored | `individuals` has no name column; `useRecordNames` and `useRecordName` read the label field | Server code cannot run DuckDB, so it names a record by its case type's name and its `external_id` ("Measles case P-003") |
 ```
 
-- [ ] **Step 5: Section 13, per-case capabilities**
+- [ ] **Step 6: Section 13, per-case capabilities**
 
 In the italic paragraph under the flowchart, replace:
 
@@ -3707,14 +5041,15 @@ The pane orders records by `external_id` (`IndividualClient`'s
 `pageOrderColumns`) and has no search.
 ```
 
-- [ ] **Step 6: Section 15, testing**
+- [ ] **Step 7: Section 15, testing**
 
 Add these rows to the table:
 
 ```md
 | Sync staging against real DuckDB | `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/buildRecordKeyStagingSql/buildRecordKeyStagingSql.executed.test.ts` | `pnpm test:executed buildRecordKeyStagingSql` |
-| Record names | `src/views/IndividualManagerApp/{buildRecordNameFromLabelValue,getCachedRecordValues,makeRecordNamesFromPages,useRecordNames}/*.test.ts`, `SingleIndividualView/useRecordName/useRecordName.test.ts` | `pnpm test:frontend <path>` |
+| Record names | `src/views/IndividualManagerApp/{buildRecordNameFromLabelValue,createLabelValueFormatter,getCachedRecordValues,makeRecordNamesFromPages,useRecordNames}/*.test.ts`, `SingleIndividualView/useRecordName/useRecordName.test.ts` | `pnpm test:frontend <path>` |
 | Paging order and range | `packages/shared/clients/src/SupabaseCrudClient/createSupabaseCrudClient.test.ts`, `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.test.ts` | `pnpm --filter @avandar/clients test` |
+| Record values going stale | `src/clients/ontology/ConceptRecordValuesClient/markRecordValuesStale/markRecordValuesStale.test.ts`, `src/clients/datasets/DatasetClient/createDatasetMutations.test.ts`, `src/clients/qetl/QueryMediator/relationLoading/RelationLoading.test.ts`, `src/views/DataManagerApp/ResyncDatasetsBlock/resyncOfflineDataset/resyncOfflineDataset.test.ts` | `pnpm test:frontend <path>` |
 | Record names end to end | `tests/e2e/case-record-names.spec.ts` | `pnpm test:e2e case-record-names.spec.ts`, on its own |
 ```
 
@@ -3731,13 +5066,14 @@ how the virtualized records list renders rows beyond
 `makeVirtualIndividualLink`
 ```
 
-- [ ] **Step 7: Section 16, known limitations**
+- [ ] **Step 8: Section 16, known limitations**
 
 Delete these rows, which this work closes:
 
 - `Sync takes keys from every dataset but the name from one`
 - `` `getPage` in `createSupabaseCrudClient` uses an inclusive range with no order ``
 - `The form allows a manual-entry label` (Sync no longer reads the label, and the record page reads a manual-entry field as no value)
+- `Only a Google Sheets or Postgres refresh marks record values stale` (a re-upload, a delete, and a live source's aged-out rows now mark them stale too)
 
 Add this row:
 
@@ -3745,7 +5081,7 @@ Add this row:
 | Records list names need DuckDB | The first list page loads every contributing dataset's mapped columns before names show; rows show at once with a placeholder name | Read |
 ```
 
-- [ ] **Step 8: Check and commit**
+- [ ] **Step 9: Check and commit**
 
 Run: `rg -n "individuals\.name|name text not null|\bname\b is .not null" docs/ontology-architecture.md`
 Expected: no output.
@@ -3766,6 +5102,9 @@ git commit -m "docs(joined-cases): record names are read, not stored" -m "Co-Aut
 - [ ] `ava supabase status` names `feat-joined-cases`, then `pnpm test:db` passes, including the `case_statuses_backfill` replay.
 - [ ] `pnpm desktop:sqlite:check-migrations` passes.
 - [ ] `case-record-names.spec.ts`, `case-statuses-record.spec.ts`, `case-statuses-edit.spec.ts`, `case-statuses-data-explorer.spec.ts`, `case-activity.spec.ts`, and the specs plans 1 to 5 added (`record-page-field-values.spec.ts`, `case-list-field.spec.ts`, `case-bucketed-fields.spec.ts`, `multi-source-fields.spec.ts`) pass, each run on its own.
+- [ ] A date, time, or timestamp label names its record as it reads (`pnpm test:frontend createLabelValueFormatter buildRecordNameFromLabelValue`, Task 3).
+- [ ] A re-upload, a delete, and a live source's aged-out rows each mark record values stale (`pnpm test:frontend markRecordValuesStale createDatasetMutations RelationLoading resyncOfflineDataset`, Task 4).
+- [ ] Creating a case type and clicking Refresh at once leaves no record "Missing from source", for a numeric and a text ID column (Task 12, Steps 1 and 8).
 - [ ] `pnpm i18n:check` is clean.
 - [ ] `rg -n "individuals?\.name|hydratedIndividual\.name" src shared supabase/schemas supabase/functions` prints nothing.
 - [ ] `git status` shows only `supabase/config.toml` (and the switch's `.env.development` block) modified.

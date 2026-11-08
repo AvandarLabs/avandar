@@ -23,8 +23,9 @@
   - Tasks 13 to 15: `AttributeAssertionClient`, the `AttributeAssertion` model, `_runConceptQuery`, and `ConceptWrapper` are deleted. No task here edits them.
 - From plan 2: `createdCaseTypeToFormValues.ts`, the concept creator's submit transform (`ConceptCreatorView/index.tsx`), and the draft card's value-picker options set `dataType` from `ValuePickerRule.getOutputDataType` and offer rules per column type.
 - Read the overview's ground rules. They apply to every task: switch check before any database command, commit by path, never `git add -A`, never stage `supabase/config.toml`, Lingui for every user-facing string, no em dashes, comments describe the code and never this plan, the spec, or a gap.
-- Load the `supabase-declarative-schema` skill before Task 2.
-- Task 13 needs the switched local stack and a running dev server. Check `ava supabase status` names `feat-joined-cases` first.
+- Tasks 1, 5, 6, 12, 15, and 16 carry follow-ups found while plans 1 and 2 ran (§11 of each of their child specs). Task 1 is a security fix and stands alone. Tasks 7 and 19 also close the `Unhandleable arrow type` console error plan 2's browser check saw. Task 15 edits a package, `@avandar/ui` (`Callout`).
+- Load the `supabase-declarative-schema` skill before Task 3.
+- Task 19 needs the switched local stack and a running dev server. Check `ava supabase status` names `feat-joined-cases` first.
 - Every commit command below ends with the `Co-Authored-By` trailer this session uses. If your session specifies a different trailer, use yours.
 
 ### Decisions this plan locks in
@@ -46,6 +47,10 @@
 | Draft card control | Mantine `SegmentedControl` (**One value** / **Every value**) in a shared `ValueShapeControl`; rule select only for one value | The same control serves the card and the form |
 | Record page long lists | First five values, then `Show all <n> values` / `Show fewer` | §4.10 |
 | Chat schema marker | `<name> (list)` plus one note when any field is a list | A marker the model cannot mistake for part of the column name |
+| Public snapshot reads | Refuse any relation but a dataset | A public session builds no concept view, so one left in DuckDB belongs to a workspace query |
+| A field's view column name | `ConceptAttribute.getViewColumnNames`, called by the view and by `QueryColumn.makeFromConceptAttributes`; a renamed field's query column carries `sourceColumnName` | One naming rule, so a structured query never reads the record key or another field |
+| A draft join key's value rule | Shown as the default rule, locked, with the form's note | Creation saves the default for every identifier |
+| Record page value text | `createFieldValueFormatter` and `useFieldValueFormatter`, by the field's `data_type`; dates and timestamps in UTC | Dates arrived as epoch numbers. The same rules read list items, plan 4's period values, and plan 6's record names |
 
 ## File structure
 
@@ -53,7 +58,8 @@
 | --- | --- | --- |
 | `shared/models/ontology/ConceptAttribute/ConceptAttribute.types.ts` | Modify | `ConceptAttributeValueShape` |
 | `shared/models/ontology/ConceptAttribute/ConceptAttribute.ts` | Modify | Namespace `ValueShape`, merged with the module |
-| `shared/models/ontology/ConceptAttribute/ConceptAttributeModule/ConceptAttributeModule.ts` (+ test) | Create | `getValueShape`, `valueShapeToIsArray`, `getOutputDataType` |
+| `src/clients/DuckDbClient/duckDbRawQuery.ts`, `src/clients/DuckDbClient/__tests__/DuckDbClient.publicSnapshotReads.test.ts` | Modify | Public reads refuse concept views |
+| `shared/models/ontology/ConceptAttribute/ConceptAttributeModule/ConceptAttributeModule.ts` (+ test) | Create | `getValueShape`, `valueShapeToIsArray`, `getOutputDataType`, `compareInViewOrder`, `getViewColumnNames` |
 | `supabase/schemas/30.attribute_mappings__dataset_column.sql` | Modify | Nullable rule |
 | `supabase/schemas/50.rpc_concepts__create.sql` | Modify | Two checks |
 | `supabase/migrations/<timestamp>_list_field_value_rules.sql` | Generate | |
@@ -65,14 +71,18 @@
 | `src/clients/ontology/ConceptClient.test.ts` | Modify | No rule sent for none |
 | `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.ts` (+ executed test) | Modify | `valueShape` option |
 | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` (+ executed test) | Modify | Columns by shape |
-| `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | Modify | Value rule from the shape |
+| `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | Modify | Value rule from the shape; column names from `getViewColumnNames` |
 | `src/clients/qetl/QueryMediator/conceptRelation/__tests__/conceptAttributeColumns.integration.executed.test.ts` | Modify | Fail closed, list ignores rule |
 | `src/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQuery.test.ts`, `src/clients/qetl/QueryMediator/__tests__/QueryMediator.concepts.test.ts` | Modify | Fixtures |
 | `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts` (+ test) | Modify | Label read as one value |
 | `src/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults.ts` (+ plan 1's test) | Modify | List dates as ISO strings |
 | `src/clients/DuckDbClient/arrowFieldToQueryResultField.ts` | Modify | List columns |
 | `shared/models/queries/QueryResult/QueryResult.types.ts` | Modify | `isArray` |
-| `shared/models/queries/QueryColumn/QueryColumnModule.ts` (+ test) | Modify | `isList`, `getValidAggregations`, `isNumeric` |
+| `shared/models/queries/QueryColumn/QueryColumn.types.ts` | Modify | `sourceColumnName` |
+| `shared/models/queries/StructuredQuery/structuredQueryToSql/makeSqlExpressionFromQueryColumn.ts`, `structuredQueryToSql.ts` | Modify | Read and group by the source column |
+| `src/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata.ts`, `runStructuredQuery.types.ts` (+ test) | Modify | Return the SQL that ran |
+| `src/views/DataExplorerApp/makeQueryColumnsFromConcept/makeQueryColumnsFromConcept.ts` (+ test), `getRestoredColumnsFromUrl/getRestoredColumnsFromUrl.ts`, `QueryColumnSingleSelect/QueryColumnSingleSelect.tsx`, `src/views/GisApp/panels/LayerInspector/useLayerSourceColumns.ts` | Modify | Case type query columns from `makeFromConceptAttributes` |
+| `shared/models/queries/QueryColumn/QueryColumnModule.ts` (+ test) | Modify | `makeFromConceptAttributes`, `getSourceColumnName`, `isList`, `getValidAggregations`, `isNumeric` |
 | `src/views/DataExplorerApp/AggregationSelect.tsx`, `src/views/DataExplorerApp/QueryForm/ManualQueryForm/AggregationFields.tsx` | Modify | Aggregations per column |
 | `src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx` (+ test) | Modify | No list filters |
 | `src/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs.ts` (+ test) | Modify | List cells |
@@ -85,12 +95,18 @@
 | `src/views/OntologyDesignerApp/createdCaseTypeToFormValues/createdCaseTypeToFormValues.ts` (+ test) | Modify | Shape, type, coercion |
 | `src/views/OntologyDesignerApp/insertConceptFromFormValues/insertConceptFromFormValues.ts` (+ test) | Modify | Drop a list's rule |
 | `src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx` | Create | The switch |
-| `src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.ts`, `CaseTypeDraftAttributeRow.tsx`, `CaseTypeDraftCard.module.css` | Modify | Card switch |
+| `src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.ts`, `CaseTypeDraftAttributeRow.tsx`, `CaseTypeDraftValueRuleSelect.tsx`, `CaseTypeDraftCard.module.css` | Modify | Card switch; join key rule locked |
 | `src/views/OntologyDesignerApp/ConceptCreatorView/keepKeyAndLabelFieldsSingle/keepKeyAndLabelFieldsSingle.ts` (+ test) | Create | Form coercion |
 | `src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx`, `ConceptCreatorView/index.tsx` | Modify | Form switch |
+| `src/components/caseFields/createFieldValueFormatter/createFieldValueFormatter.ts` (+ test) | Create | A field's value as text, by type |
+| `src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts` (+ test) | Create | The same in components, in the active locale |
 | `src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx`, `RecordFieldValueList.tsx`, `RecordFieldValue.module.css` (+ test) | Create | Field values on the record page |
-| `src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx` (+ test) | Modify | Use it |
-| `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes.ts` (+ test) | Modify | `valueShape` on each row |
+| `src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx`, `DetailsStatus.module.css` | Create | The rail's load failure, placeholders, and empty state |
+| `packages/web/ui/src/Callout/Callout.tsx` | Modify | `titleOrder` |
+| `src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx`, `CaseDetailsRail.module.css` (+ test) | Modify | Use it; sources as a named list |
+| `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/useRecordFields.test.ts` | Modify | Datasets read loading and failed; row shape |
+| `apps/ava-video-producer/avandar-adapter/CasesScreen/RecordDetail.tsx` | Modify | `dataType`, `valueShape` |
+| `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes.ts` (+ test) | Modify | `dataType` and `valueShape` on each row; the view's order |
 | `src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx` | Modify | `Every value` badge |
 | `shared/models/chat/SqlTableAlias/SqlTableAlias.types.ts`, `SqlTableAliasModule.ts` (+ test) | Modify | Marker and note |
 | `supabase/functions/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts` (+ test) | Modify | `is_array` |
@@ -104,7 +120,171 @@
 
 ---
 
-### Task 1: A field's value shape
+### Task 1: Public snapshot reads refuse case type views
+
+**Files:**
+- Modify: `src/clients/DuckDbClient/duckDbRawQuery.ts`
+- Test: `src/clients/DuckDbClient/__tests__/DuckDbClient.publicSnapshotReads.test.ts`
+
+A data-exposure fix, first because it is a security gap (plan 1 follow-up). In public read mode `_prepareRawQueryDatasetTables` checks only that each dataset table the SQL reads belongs to the snapshot. A public session has no ontology and builds no `concept_<id>` view, but the browser's one DuckDB instance keeps the views earlier workspace queries built. So public SQL naming `concept_<id>` would read a view this snapshot never built, from another workspace's data. The analyzer already reports such a name as a `concept` relation, so public mode refuses any relation that is not a dataset before the query runs. Spine tables (`concept_<id>__individuals`) are already refused: the analyzer reports them as `uninspectable-source`.
+
+No task below touches `duckDbRawQuery.ts`, so this task stands alone.
+
+- [ ] **Step 1: Write the failing tests**
+
+In `DuckDbClient.publicSnapshotReads.test.ts`, add `importDuckDbModules` and `stubWorker` to the fixtures import, add below the imports:
+
+```ts
+/** A case type whose view a workspace query left in DuckDB. */
+const CONCEPT_ID = "44444444-4444-4444-8444-444444444444";
+```
+
+and add inside `describe("DuckDbClient public snapshot reads", ...)`:
+
+```ts
+  // A public snapshot builds no case type view, so a `concept_<id>` view in
+  // DuckDB was built by a workspace query and belongs to no snapshot.
+  it("rejects a public read of a case type's view", async () => {
+    vi.resetModules();
+    stubWorker();
+    const { DuckDbClient } = await importDuckDbModules();
+
+    await expect(
+      DuckDbClient.runRawQuery(`SELECT * FROM "concept_${CONCEPT_ID}"`, {
+        datasetTableReadMode: "public",
+        publicSnapshotDuckDbOwner: PUBLIC_OWNER,
+      }),
+    ).rejects.toThrow(/only read published datasets/i);
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a public read that joins a published dataset to a case type's view", async () => {
+    vi.resetModules();
+    stubWorker();
+    const { DuckDbClient, DatasetDuckDbCoordinator } =
+      await importDuckDbModules();
+    DatasetDuckDbCoordinator.setPublicSnapshotDatasetOwner({
+      datasetId: DATASET_ID,
+      owner: PUBLIC_OWNER,
+    });
+
+    await expect(
+      DuckDbClient.runRawQuery(
+        `SELECT * FROM "${DATASET_ID}" JOIN "concept_${CONCEPT_ID}" ON true`,
+        {
+          datasetTableReadMode: "public",
+          publicSnapshotDuckDbOwner: PUBLIC_OWNER,
+        },
+      ),
+    ).rejects.toThrow(/only read published datasets/i);
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  // Workspace reads build and read case type views on purpose.
+  it("still lets a workspace read name a case type's view", async () => {
+    vi.resetModules();
+    stubWorker();
+    queryMock.mockResolvedValue({
+      schema: { fields: [] },
+      toArray: () => {
+        return [];
+      },
+    });
+    const { DuckDbClient } = await importDuckDbModules();
+
+    await expect(
+      DuckDbClient.runRawQuery(`SELECT * FROM "concept_${CONCEPT_ID}"`),
+    ).resolves.toMatchObject({ data: [] });
+  });
+```
+
+- [ ] **Step 2: Run them to see them fail**
+
+Run: `pnpm test:frontend DuckDbClient.publicSnapshotReads`
+Expected: FAIL. The two public tests reject with a different message or resolve: `queryMock` returns `undefined`, so the read fails inside `arrowTableToJS` (or `queryMock` was called), not on "only read published datasets". The workspace test passes.
+
+- [ ] **Step 3: Refuse every relation but a dataset in public mode**
+
+In `duckDbRawQuery.ts`, add to the imports:
+
+```ts
+import type { DuckDbSqlAnalysis } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
+```
+
+and add above `_getRawQueryExecutionPlan`:
+
+```ts
+/**
+ * Refuses what a public snapshot query may not do: write, run without the
+ * snapshot it reads, or read anything but a dataset. A snapshot is
+ * authorized by the datasets it published and builds no case type view, so
+ * a `concept_<id>` view in this DuckDB instance was built by a workspace
+ * query and belongs to no snapshot.
+ */
+function _assertPublicReadAnalysis(
+  input: Readonly<{ options: RawQueryOptions; analysis: DuckDbSqlAnalysis }>,
+): void {
+  const { options, analysis } = input;
+  if (options.datasetTableReadMode !== "public") {
+    return;
+  }
+  if (analysis.kind !== "read") {
+    throw new Error("Public DuckDB queries must be read-only");
+  }
+  if (options.publicSnapshotDuckDbOwner === undefined) {
+    throw new Error("Public DuckDB queries require an expected snapshot owner");
+  }
+  const isDatasetOnlyRead = analysis.relations.every((relation) => {
+    return relation.kind === "dataset";
+  });
+  if (!isDatasetOnlyRead) {
+    throw new Error("Public DuckDB queries can only read published datasets");
+  }
+}
+```
+
+In `_getRawQueryExecutionPlan`, replace the two public checks:
+
+```ts
+  if (options.datasetTableReadMode === "public" && analysis.kind !== "read") {
+    throw new Error("Public DuckDB queries must be read-only");
+  }
+  const publicSnapshotDuckDbOwner = options.publicSnapshotDuckDbOwner;
+  if (
+    options.datasetTableReadMode === "public" &&
+    publicSnapshotDuckDbOwner === undefined
+  ) {
+    throw new Error("Public DuckDB queries require an expected snapshot owner");
+  }
+```
+
+with:
+
+```ts
+  _assertPublicReadAnalysis({ options, analysis });
+  const publicSnapshotDuckDbOwner = options.publicSnapshotDuckDbOwner;
+```
+
+The messages of the two moved checks are unchanged, so the existing "requires the expected owner" and "rejects mutations" tests keep passing.
+
+- [ ] **Step 4: Run the tests and the type-check**
+
+Run: `pnpm test:frontend DuckDbClient PublicQuerySession`
+Expected: PASS, the three new tests included.
+
+Run: `pnpm type-check`
+Expected: PASS.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add src/clients/DuckDbClient/duckDbRawQuery.ts src/clients/DuckDbClient/__tests__/DuckDbClient.publicSnapshotReads.test.ts
+git commit -m "fix(joined-cases): refuse case type views in public snapshot reads" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 2: A field's value shape
 
 **Files:**
 - Modify: `shared/models/ontology/ConceptAttribute/ConceptAttribute.types.ts`
@@ -295,7 +475,7 @@ git commit -m "feat(joined-cases): give case type fields a value shape" -m "Co-A
 
 ---
 
-### Task 2: A list field's mapping stores no rule
+### Task 3: A list field's mapping stores no rule
 
 **Files:**
 - Modify: `supabase/schemas/30.attribute_mappings__dataset_column.sql`
@@ -304,7 +484,7 @@ git commit -m "feat(joined-cases): give case type fields a value shape" -m "Co-A
 - Test: `supabase/tests/database/rpc_concepts__create.test.sql`
 - Generate: `apps/desktop/migrations/*.gen.sql`
 
-Load the `supabase-declarative-schema` skill now. This task does not regenerate `shared/types/database.types.ts`; Task 3 does, together with the model it changes.
+Load the `supabase-declarative-schema` skill now. This task does not regenerate `shared/types/database.types.ts`; Task 4 does, together with the model it changes.
 
 - [ ] **Step 1: Check the switch**
 
@@ -517,7 +697,7 @@ git commit -m "feat(joined-cases): store no value rule for a field that keeps ev
 
 ---
 
-### Task 3: The client reads a missing rule as missing, and the view reads fields by shape
+### Task 4: The client reads a missing rule as missing, and the view reads fields by shape
 
 **Files:**
 - Generate: `shared/types/database.types.ts`
@@ -1007,7 +1187,7 @@ function _getValueRule(
 
 - [ ] **Step 11: Name Sync's label read as one value**
 
-In `generateIndividuals.ts`, in plan 1's `buildAttributeValueSql({ ... })` call for the record name, replace `isArray: false,` with `valueShape: "single",`. Its `valuePickerRuleType: labelMapping.valuePickerRuleType` now has the type `ValuePickerRuleType | undefined`, and `buildAttributeValueSql` throws when it is undefined, which is the refusal the Step 4 test expects. Creation already refuses a list label (Task 2).
+In `generateIndividuals.ts`, in plan 1's `buildAttributeValueSql({ ... })` call for the record name, replace `isArray: false,` with `valueShape: "single",`. Its `valuePickerRuleType: labelMapping.valuePickerRuleType` now has the type `ValuePickerRuleType | undefined`, and `buildAttributeValueSql` throws when it is undefined, which is the refusal the Step 4 test expects. Creation already refuses a list label (Task 3).
 
 - [ ] **Step 12: Run the type-check**
 
@@ -1031,7 +1211,582 @@ git commit -m "feat(joined-cases): read each case type field by its value shape"
 
 ---
 
-### Task 4: List result columns are marked, and list dates read as days
+### Task 5: Structured queries read a field from its own view column
+
+**Files:**
+- Modify: `shared/models/ontology/ConceptAttribute/ConceptAttributeModule/ConceptAttributeModule.ts`
+- Test: `shared/models/ontology/ConceptAttribute/ConceptAttributeModule/ConceptAttributeModule.test.ts`
+- Modify: `shared/models/queries/QueryColumn/QueryColumn.types.ts`
+- Modify: `shared/models/queries/QueryColumn/QueryColumnModule.ts`
+- Test: `shared/models/queries/QueryColumn/QueryColumn.test.ts`
+- Modify: `shared/models/queries/StructuredQuery/structuredQueryToSql/makeSqlExpressionFromQueryColumn.ts`
+- Modify: `shared/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.ts`
+- Test: `src/clients/queries/runStructuredQuery/runStructuredQuery.test.ts`
+- Modify: `src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts`
+- Modify: `src/views/DataExplorerApp/makeQueryColumnsFromConcept/makeQueryColumnsFromConcept.ts`
+- Test: `src/views/DataExplorerApp/makeQueryColumnsFromConcept/makeQueryColumnsFromConcept.test.ts`
+- Modify: `src/views/DataExplorerApp/getRestoredColumnsFromUrl/getRestoredColumnsFromUrl.ts`
+- Modify: `src/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect.tsx`
+- Modify: `src/views/GisApp/panels/LayerInspector/useLayerSourceColumns.ts`
+
+Plan 1 made the concept view suffix a field's column when its name is taken: `external_id` (the record key), `status`, or an earlier field of the same name, compared without case (`external_id_2`, `Age_2`). Structured queries and the Data Explorer still select a field by `baseColumn.name`, so such a field reads the spine's key, the status, or the other field (plan 1 follow-up). This task moves the naming into `ConceptAttribute.getViewColumnNames`, which the view and the query columns both call, and gives a renamed field's query column a `sourceColumnName`. The SQL reads that column and still names the result column after the field, so results, charts, and bookmarked column names keep the name the user sees.
+
+Task 2's `ConceptAttributeModule` is where the naming goes. Task 4 edits `makeConceptAttributeColumnsFromMetadata.ts` too, in `_getValueRule` and the column arms; this task changes only its naming. Task 15 reuses `ConceptAttribute.compareInViewOrder` for the record page's field order. SQL parsed back into a structured query (`sqlToStructuredQuery`) maps onto dataset columns only, so it needs no change.
+
+- [ ] **Step 1: Write the failing naming tests**
+
+Append to `ConceptAttributeModule.test.ts`, adding `import type { ConceptAttribute as ConceptAttributeTypes } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";` to the imports:
+
+```ts
+describe("ConceptAttribute.getViewColumnNames", () => {
+  function _names(
+    fields: ReadonlyArray<readonly [id: string, name: string]>,
+  ): Record<string, string> {
+    return Object.fromEntries(
+      ConceptAttribute.getViewColumnNames(
+        fields.map(([id, name]) => {
+          return { id: id as ConceptAttributeTypes.Id, name };
+        }),
+      ),
+    );
+  }
+
+  it("names each field's view column after the field", () => {
+    expect(
+      _names([
+        ["b", "County"],
+        ["a", "Age"],
+      ]),
+    ).toEqual({ a: "Age", b: "County" });
+  });
+
+  it("suffixes a field named like the record key or the status", () => {
+    expect(
+      _names([
+        ["a", "external_id"],
+        ["b", "Status"],
+      ]),
+    ).toEqual({ a: "external_id_2", b: "Status_2" });
+  });
+
+  // DuckDB compares column names without case, and the view orders fields by
+  // name and then id, so the same field keeps the plain name every run.
+  it("suffixes the later of two fields whose names match without case", () => {
+    expect(
+      _names([
+        ["b", "age"],
+        ["a", "age"],
+        ["c", "REGION"],
+        ["d", "Region"],
+      ]),
+    ).toEqual({ a: "age", b: "age_2", d: "Region", c: "REGION_2" });
+  });
+});
+```
+
+- [ ] **Step 2: Write the failing query column and SQL tests**
+
+Append to `shared/models/queries/QueryColumn/QueryColumn.test.ts`, adding `describe` to the `vitest` import and `import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";` to the imports:
+
+```ts
+function _conceptAttribute(id: string, name: string): ConceptAttribute.T {
+  return Model.make("ConceptAttribute", {
+    id,
+    conceptId: "concept_1",
+    workspaceId: "workspace_1",
+    name,
+    description: undefined,
+    createdAt: "2026-11-06T00:00:00Z",
+    updatedAt: "2026-11-06T00:00:00Z",
+    dataType: "varchar",
+    mappingType: "dataset_column",
+    isLabel: false,
+    isIdentifier: false,
+    allowManualEdit: false,
+    isArray: false,
+  }) as ConceptAttribute.T;
+}
+
+describe("QueryColumn.makeFromConceptAttributes", () => {
+  it("reads a renamed field from its view column and keeps its name in the result", () => {
+    const [county, keyNamed] = QueryColumn.makeFromConceptAttributes([
+      _conceptAttribute("attr_county", "County"),
+      _conceptAttribute("attr_key", "external_id"),
+    ]);
+
+    expect(county?.sourceColumnName).toBeUndefined();
+    expect(QueryColumn.getSourceColumnName(county!)).toBe("County");
+    expect(QueryColumn.getSourceColumnName(keyNamed!)).toBe("external_id_2");
+    expect(QueryColumn.getDerivedColumnName(keyNamed!)).toBe("external_id");
+  });
+});
+```
+
+Task 8 appends more tests to this file and adds the same `describe` and `ConceptAttribute` imports: keep one of each.
+
+In `runStructuredQuery.test.ts`, add inside `describe("runStructuredQuery", ...)`:
+
+```ts
+  // A field named like the record key has the view column `external_id_2`.
+  // Reading `external_id` would read every record's key instead.
+  it("reads a renamed case type field from the column the view emits for it", async () => {
+    const concept = _createConcept();
+    const [keyNamedColumn, ageColumn] = QueryColumn.makeFromConceptAttributes([
+      _createConceptAttribute(concept.id, "external_id"),
+      _createConceptAttribute(concept.id, "age"),
+    ]);
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    await runStructuredQuery({
+      auth: "workspace",
+      workspaceId,
+      query: {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: concept,
+        queryColumns: [keyNamedColumn!, ageColumn!],
+        aggregations: {
+          [keyNamedColumn!.id]: "group_by",
+          [ageColumn!.id]: "count",
+        },
+      },
+      rawSql: undefined,
+      isStructuredQueryInSync: false,
+    });
+
+    const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
+    expect(rawSql).toContain('"external_id_2" as "external_id"');
+    expect(rawSql).toContain('group by "external_id_2"');
+  });
+```
+
+In `makeQueryColumnsFromConcept.test.ts`, add:
+
+```ts
+  it("reads a field named like the record key from its suffixed view column", () => {
+    const columns = makeQueryColumnsFromConcept({
+      conceptId: CONCEPT_ID,
+      attributes: [_makeAttribute("external_id")],
+    });
+
+    expect(columns.map(prop("sourceColumnName"))).toEqual([
+      "external_id_2",
+      undefined,
+    ]);
+  });
+```
+
+- [ ] **Step 3: Run them to see them fail**
+
+Run: `pnpm test:frontend ConceptAttributeModule QueryColumn runStructuredQuery makeQueryColumnsFromConcept`
+Expected: FAIL. `ConceptAttribute.getViewColumnNames` and `QueryColumn.makeFromConceptAttributes` are not functions, and the case type columns have no `sourceColumnName`.
+
+- [ ] **Step 4: Name the view columns in the shared module**
+
+In `ConceptAttributeModule.ts`, add to the imports:
+
+```ts
+import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn.ts";
+import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
+```
+
+(merge `ConceptAttributeId` into the existing `ConceptAttribute.types.ts` type import), and add below `_getOutputDataType`:
+
+```ts
+/**
+ * The columns a case type's view emits besides its fields: the record key
+ * and the status. Lowercased, because DuckDB compares column names without
+ * case.
+ */
+const RESERVED_VIEW_COLUMN_NAMES: readonly string[] = [
+  "external_id",
+  ConceptStatusColumn.COLUMN_NAME.toLowerCase(),
+];
+
+type NamedField = Readonly<
+  Pick<ConceptAttributeModel["Read"], "id" | "name">
+>;
+
+function _compareInViewOrder(left: NamedField, right: NamedField): number {
+  return left.name.localeCompare(right.name) || left.id.localeCompare(right.id);
+}
+
+/**
+ * `<name>`, or `<name>_2`, `<name>_3`, and so on when an earlier column took
+ * it. `takenNames` holds lowercased names; the result keeps the field's
+ * casing.
+ */
+function _getUniqueColumnName(
+  options: Readonly<{ requestedName: string; takenNames: ReadonlySet<string> }>,
+): string {
+  if (!options.takenNames.has(options.requestedName.toLowerCase())) {
+    return options.requestedName;
+  }
+  let suffix = 2;
+  while (
+    options.takenNames.has(`${options.requestedName}_${suffix}`.toLowerCase())
+  ) {
+    suffix += 1;
+  }
+  return `${options.requestedName}_${suffix}`;
+}
+
+function _getViewColumnNames(
+  attributes: readonly NamedField[],
+): Map<ConceptAttributeId, string> {
+  const takenNames = new Set(RESERVED_VIEW_COLUMN_NAMES);
+  const columnNamesById = new Map<ConceptAttributeId, string>();
+  [...attributes].sort(_compareInViewOrder).forEach((attribute) => {
+    const columnName = _getUniqueColumnName({
+      requestedName: attribute.name,
+      takenNames,
+    });
+    takenNames.add(columnName.toLowerCase());
+    columnNamesById.set(attribute.id, columnName);
+  });
+  return columnNamesById;
+}
+```
+
+and add to `ConceptAttributeModule`:
+
+```ts
+  /**
+   * Orders fields the way a case type's view orders its columns: by name,
+   * then by id. Use it wherever fields are listed in column order, for
+   * example on the record page.
+   */
+  compareInViewOrder: _compareInViewOrder,
+
+  /**
+   * The column a case type's view emits for each field, by field id. A
+   * field's column is its name, suffixed (`_2`, `_3`) when the record key,
+   * the status, or an earlier field in view order already took that name
+   * without regard to case. Use it wherever SQL reads a field's column, for
+   * example when the view is built or a structured query selects a field.
+   */
+  getViewColumnNames: _getViewColumnNames,
+```
+
+- [ ] **Step 5: Build the view's column names with it**
+
+In `makeConceptAttributeColumnsFromMetadata.ts`, change `import type { ConceptAttribute } ...` to a value import (`import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";`), delete `_compareAttributes` and `_getUniqueColumnName`, and remove the now unused `ConceptStatusColumn` and `EXTERNAL_ID_COLUMN` imports if nothing else in the file uses them. In `makeConceptAttributeColumnsFromMetadata`, replace
+
+```ts
+  const orderedAttributes = [...metadata.attributes].sort(_compareAttributes);
+```
+
+with
+
+```ts
+  const orderedAttributes = [...metadata.attributes].sort(
+    ConceptAttribute.compareInViewOrder,
+  );
+  const viewColumnNames = ConceptAttribute.getViewColumnNames(
+    metadata.attributes,
+  );
+```
+
+delete the `takenNames` set and its comment, and in the `forEach` replace
+
+```ts
+    const emittedName = _getUniqueColumnName({
+      requestedName: column.attributeName,
+      takenNames,
+    });
+```
+
+with
+
+```ts
+    const emittedName =
+      viewColumnNames.get(attribute.id) ?? column.attributeName;
+```
+
+and delete `takenNames.add(emittedName.toLowerCase());`. Update the `renamedColumns` docstring if it names `_compareAttributes`: the order is now `ConceptAttribute.compareInViewOrder`.
+
+- [ ] **Step 6: Give a renamed field's query column its view column**
+
+In `QueryColumn.types.ts`, add to `QueryColumnRead` after `outputAlias`:
+
+```ts
+    /**
+     * The column the SQL reads, when it is not `baseColumn.name`: a case
+     * type field whose view column was suffixed because the record key, the
+     * status, or another field already had that name. The result column is
+     * still named after the field.
+     */
+    sourceColumnName?: string;
+```
+
+In `QueryColumnModule.ts`, add `import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";`, and add to `QueryColumnModule` after `makeFromConceptAttribute`:
+
+```ts
+  /**
+   * One query column per field of a case type, each reading the column the
+   * case type's view emits for it. Pass every field of the case type: a
+   * field's column name depends on the others' names.
+   */
+  makeFromConceptAttributes: (
+    attributes: ReadonlyArray<ConceptAttributeModel["Read"]>,
+  ): QueryColumn.T[] => {
+    const viewColumnNames = ConceptAttribute.getViewColumnNames(attributes);
+    return attributes.map((attribute) => {
+      const viewColumnName = viewColumnNames.get(attribute.id);
+      return Model.make("QueryColumn", {
+        id: uuid<QueryColumn.Id>(),
+        baseColumn: attribute,
+        aggregation: undefined,
+        ...(viewColumnName === undefined || viewColumnName === attribute.name
+          ? {}
+          : { sourceColumnName: viewColumnName }),
+      });
+    });
+  },
+
+  /**
+   * The column SQL reads for this query column: its `sourceColumnName`, or
+   * its base column's name. Use it wherever SQL refers to the source column,
+   * for example in a SELECT expression, a WHERE filter, or a GROUP BY.
+   */
+  getSourceColumnName: (column: QueryColumn.T): string => {
+    return column.sourceColumnName ?? column.baseColumn.name;
+  },
+```
+
+In `makeSqlExpressionFromQueryColumn.ts`, change `import type { QueryColumn } ...` to `import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";` and replace
+
+```ts
+  const sourceSql = quoteSqlIdentifier(column.baseColumn.name);
+```
+
+with
+
+```ts
+  const sourceSql = quoteSqlIdentifier(QueryColumn.getSourceColumnName(column));
+```
+
+and say "its quoted source column name" instead of "its quoted base column name" in its docstring.
+
+In `structuredQueryToSql.ts`, replace `groupByColumnNames.push(column.baseColumn.name);` with:
+
+```ts
+      // The source column, not the result name: on a case type a renamed
+      // field's name is also the record key's or another field's column.
+      groupByColumnNames.push(QueryColumn.getSourceColumnName(column));
+```
+
+`getDerivedColumnName` is unchanged, so `SELECT "external_id_2" as "external_id"` names the result after the field, and ORDER BY keeps using that result name.
+
+- [ ] **Step 7: Build every case type query column with the view's names**
+
+In `makeQueryColumnsFromConcept.ts`, replace the attribute spread with:
+
+```ts
+    ...QueryColumn.makeFromConceptAttributes(options.attributes),
+```
+
+In `getRestoredColumnsFromUrl.ts`, replace the fallback
+
+```ts
+      : (conceptAttributes ?? []).map((col) => {
+          return QueryColumn.makeFromConceptAttribute(col);
+        });
+```
+
+with
+
+```ts
+      : QueryColumn.makeFromConceptAttributes(conceptAttributes ?? []);
+```
+
+In `QueryColumnSingleSelect.tsx`, replace the `conceptAttributes` spread with:
+
+```ts
+      ...QueryColumnModule.makeFromConceptAttributes(
+        conceptAttributes ?? [],
+      ).map((column) => {
+        return column.baseColumn.id === currentSelectedColumn?.baseColumn.id
+          ? currentSelectedColumn
+          : column;
+      }),
+```
+
+In `useLayerSourceColumns.ts`, replace the `conceptAttributes` spread with:
+
+```ts
+      ...QueryColumn.makeFromConceptAttributes(conceptAttributes ?? []),
+```
+
+Then confirm nothing else builds a case type's query columns one field at a time:
+
+Run: `rg -n "makeFromConceptAttribute\(" src shared --glob '!*.test.*'`
+Expected: no output. The definition reads `makeFromConceptAttribute: (`, and only tests still call it.
+
+- [ ] **Step 8: Run the tests and the type-check**
+
+Run: `pnpm test:frontend ConceptAttributeModule QueryColumn runStructuredQuery makeQueryColumnsFromConcept getRestoredColumnsFromUrl structuredQueryToSql`
+Expected: PASS.
+
+Run: `pnpm test:executed conceptAttributeColumns`
+Expected: PASS. Its `external_id_2` and `status_2` cases still hold with the naming in the shared module.
+
+Run: `pnpm type-check`
+Expected: PASS, including `deno check`.
+
+- [ ] **Step 9: Commit**
+
+```bash
+git add shared/models/ontology/ConceptAttribute shared/models/queries/QueryColumn shared/models/queries/StructuredQuery/structuredQueryToSql src/clients/queries/runStructuredQuery src/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata.ts src/views/DataExplorerApp/makeQueryColumnsFromConcept src/views/DataExplorerApp/getRestoredColumnsFromUrl src/views/DataExplorerApp/QueryColumnSingleSelect src/views/GisApp/panels/LayerInspector/useLayerSourceColumns.ts
+git commit -m "fix(joined-cases): read a renamed case type field from its own view column" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 6: A structured query run reports the SQL it ran
+
+**Files:**
+- Modify: `src/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata.ts`
+- Modify: `src/clients/queries/runStructuredQuery/runStructuredQuery.types.ts`
+- Test: `src/clients/queries/runStructuredQuery/runStructuredQuery.test.ts`
+
+When the form is out of sync with its SQL, `runStructuredQueryWithMetadata` compiles the structured query in `_runSourceQuery` and runs it, but still returns `executedSql: sqlToRun`, which is `undefined` on that path (plan 1 follow-up). Since plan 1 every data source runs as SQL, so the result can always say what ran.
+
+Nothing reads a defined `executedSql` differently on this path today: the Data Explorer compares it with `selectSqlToExecute`'s SQL, which is `undefined` while the form is out of sync, so its column bindings still wait for in-sync SQL.
+
+- [ ] **Step 1: Write the failing tests**
+
+In `runStructuredQuery.test.ts`, add inside `describe("runStructuredQueryWithMetadata", ...)`:
+
+```ts
+  it("returns the SQL it compiled and ran for an out-of-sync query", async () => {
+    const concept = _createConcept();
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    const run = await runStructuredQueryWithMetadata({
+      auth: "workspace",
+      workspaceId: uuid<Workspace.Id>(),
+      query: {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: concept,
+        queryColumns: [
+          QueryColumn.makeFromConceptAttribute(
+            _createConceptAttribute(concept.id, "age"),
+          ),
+        ],
+      },
+      rawSql: undefined,
+      isStructuredQueryInSync: false,
+    });
+
+    const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
+    expect(run.executedSql).toBe(rawSql);
+  });
+
+  it("reports no SQL when there is nothing to run", async () => {
+    const run = await runStructuredQueryWithMetadata({
+      auth: "workspace",
+      workspaceId: uuid<Workspace.Id>(),
+      query: StructuredQuery.makeEmpty(),
+      rawSql: undefined,
+    });
+
+    expect(runQueryMock).not.toHaveBeenCalled();
+    expect(run.executedSql).toBeUndefined();
+  });
+```
+
+- [ ] **Step 2: Run them to see them fail**
+
+Run: `pnpm test:frontend runStructuredQuery`
+Expected: FAIL. The first test receives `executedSql: undefined`; the second passes.
+
+- [ ] **Step 3: Return the SQL `_runSourceQuery` runs**
+
+In `runStructuredQueryWithMetadata.ts`, replace `_runSourceQuery` with:
+
+```ts
+/**
+ * Runs a structured query against its data source, and returns the SQL it
+ * ran. A dataset and a case type both compile to SQL: a case type's SQL
+ * names its `concept_<id>` view, which QETL builds inside the query's lease.
+ * Nothing runs, and no SQL is returned, without a data source or a column.
+ */
+async function _runSourceQuery({
+  workspaceId,
+  dataSource,
+  executionQuery,
+  queryColumnCount,
+}: {
+  workspaceId: Workspace.Id;
+  dataSource: QueryDataSource.T | undefined;
+  executionQuery: StructuredQuery.Partial;
+  queryColumnCount: number;
+}): Promise<Pick<RunStructuredQueryResult, "result" | "executedSql">> {
+  if (!dataSource || queryColumnCount === 0) {
+    return { result: QueryResult.makeEmpty(), executedSql: undefined };
+  }
+  const rawSql = StructuredQuery.toRawDuckDbQuery({
+    ...executionQuery,
+    dataSource,
+  } as StructuredQuery.T);
+  return {
+    result: await WorkspaceQuerySession.runQuery({ rawSql, workspaceId }),
+    executedSql: rawSql,
+  };
+}
+```
+
+and replace the last `return` of `runStructuredQueryWithMetadata` with:
+
+```ts
+  const sourceRun = await _runSourceQuery({
+    workspaceId: _getWorkspaceAuthFromStructuredQuery(params).workspaceId,
+    dataSource,
+    executionQuery,
+    queryColumnCount: queryColumns.length,
+  });
+  return { ...sourceRun, didAutoLimit };
+```
+
+In `runStructuredQuery.types.ts`, replace the `executedSql` docstring with:
+
+```ts
+  /**
+   * The SQL that ran, including any automatic row limit, or undefined when
+   * nothing ran because the query has no data source or no column. Compare
+   * it with the SQL a caller expects, for example to tell whether a result's
+   * columns belong to a chart's current SQL.
+   */
+```
+
+- [ ] **Step 4: Run the tests and the type-check**
+
+Run: `pnpm test:frontend runStructuredQuery useDataQuery DataExplorerApp`
+Expected: PASS.
+
+Run: `pnpm type-check`
+Expected: PASS.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add src/clients/queries/runStructuredQuery
+git commit -m "fix(joined-cases): return the SQL an out-of-sync structured query ran" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 7: List result columns are marked, and list dates read as days
 
 **Files:**
 - Modify: `src/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults.ts`
@@ -1040,6 +1795,10 @@ git commit -m "feat(joined-cases): read each case type field by its value shape"
 - Modify: `shared/models/queries/QueryResult/QueryResult.types.ts`
 
 Plan 1 Task 7 moved `duckDbArrowResults.ts` into its own directory and made every list cell a plain array. This task adds the two things it does not do: a list result column is described as one, and a list's dates and timestamps arrive as ISO strings.
+
+This task also closes the console error plan 2's browser check saw on a case type page, `Unhandleable arrow type {typeId: 12}` (plan 2 follow-up). It is not a logger serializer: `arrowFieldToQueryResultField` logs it for every result column whose Arrow type it has no data type for, and type id 12 is `arrow.Type.List`. A case type with a list field returns a LIST column on every query, so the error fires on each page that reads one. Step 4 gives LIST columns a description, and the third test below pins that no error is logged. Task 19's E2E spec checks the browser console for it.
+
+Plan 1 replaced `_hasToJson` with recursion on `arrow.StructRow` and `arrow.MapRow`, and gave `_toJsValueFromArrowValue` a second argument, the cell's Arrow type (so a decimal keeps its scale). Where Step 3 below calls `_toJsValueFromArrowValue`, pass the item type: end `_toJsListItem` with `return _toJsValueFromArrowValue(item, itemType);`, and add `_toJsListItem` below `_getDecimalScale` instead of below `_hasToJson`.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1167,6 +1926,9 @@ In `arrowFieldToQueryResultField.ts`, delete `arrow.Type.List,` from the "Unhand
 Run: `pnpm test:frontend duckDbArrowResults DuckDbClient`
 Expected: PASS, plan 1's list tests included.
 
+Run: `rg -n "arrow.Type.List" src/clients/DuckDbClient/arrowFieldToQueryResultField.ts`
+Expected: one hit, the early return. The "Unhandleable arrow type" arm no longer lists it.
+
 Run: `pnpm type-check`
 Expected: PASS.
 
@@ -1179,7 +1941,7 @@ git commit -m "feat(joined-cases): mark list result columns and read list dates 
 
 ---
 
-### Task 5: The Data Explorer and dashboards offer only what works on a list
+### Task 8: The Data Explorer and dashboards offer only what works on a list
 
 **Files:**
 - Modify: `shared/models/queries/QueryColumn/QueryColumnModule.ts`
@@ -1196,7 +1958,7 @@ git commit -m "feat(joined-cases): mark list result columns and read list dates 
 
 - [ ] **Step 1: Write the failing query column tests**
 
-Append to `shared/models/queries/QueryColumn/QueryColumn.test.ts`, adding `describe` to the `vitest` import and these imports:
+Append to `shared/models/queries/QueryColumn/QueryColumn.test.ts`, adding `describe` to the `vitest` import and these imports (Task 5 already added `describe` and the `ConceptAttribute` import; keep one of each):
 
 ```ts
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
@@ -1556,7 +2318,7 @@ git commit -m "feat(joined-cases): offer list fields only the explorer operation
 
 ---
 
-### Task 6: The chat contract carries a value shape
+### Task 9: The chat contract carries a value shape
 
 **Files:**
 - Modify: `shared/types/chat.types.ts`
@@ -1875,7 +2637,7 @@ git commit -m "feat(joined-cases): let chat drafts say a field keeps every value
 
 ---
 
-### Task 7: Chat proposes list fields
+### Task 10: Chat proposes list fields
 
 **Files:**
 - Modify: `supabase/functions/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts`
@@ -1991,7 +2753,7 @@ git commit -m "feat(joined-cases): ask chat to propose list fields where a case 
 
 ---
 
-### Task 8: Chat's list fields reach the insert
+### Task 11: Chat's list fields reach the insert
 
 **Files:**
 - Modify: `src/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType.ts`
@@ -2334,13 +3096,173 @@ git commit -m "feat(joined-cases): create chat's list fields with no value rule"
 
 ---
 
-### Task 9: The draft card switches a field between one value and every value
+### Task 12: The draft card shows a join key keeping its value as is
+
+**Files:**
+- Modify: `src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx`
+- Modify: `src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx`
+- Test: `src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftBlock.test.tsx`
+- Generate: `src/i18n/locales/*`
+
+A join key row shows the rule chat proposed, which can be "Sum" on a numeric key, but creation always saves `most_frequent` for an identifier (plan 2 follow-up). The case type form already shows the default rule on its ID column, locked, with the note "ID fields keep their value as is." (`ValueRuleField` in `DatasetColumnMappingCreator.tsx`). This task does the same on the draft card. It is display only: `proposedCaseTypeToCreatedCaseType` already replaces a join key's rule.
+
+Task 13 next replaces the row's body with the one-value and every-value switch. Its single-value arm renders this task's `CaseTypeDraftValueRuleSelect` with `isPrimaryKey`, so the lock survives it.
+
+- [ ] **Step 1: Write the failing tests**
+
+In `CaseTypeDraftBlock.test.tsx`, add below `makeDraft`:
+
+```ts
+/** The input of a row's "Value to keep" select, not its dropdown list. */
+function _getRuleInput(fieldName: string): HTMLElement {
+  const input = screen
+    .getAllByLabelText(`Value to keep for ${fieldName}`)
+    .find((element) => {
+      return element.tagName === "INPUT";
+    });
+  if (!input) {
+    throw new Error(`No value to keep select for ${fieldName}`);
+  }
+  return input;
+}
+```
+
+and these tests:
+
+```tsx
+  // Creation saves `most_frequent` for every join key, so the row shows that
+  // rule rather than the one chat proposed ("first" in this draft).
+  it("shows each join key keeping its value as is, whatever rule chat proposed", () => {
+    render(<CaseTypeDraftBlock />);
+
+    for (const fieldName of ["County code", "Census county code"]) {
+      const ruleInput = _getRuleInput(fieldName);
+      expect(ruleInput).toHaveValue("Most frequent");
+      expect(ruleInput).toBeDisabled();
+      expect(ruleInput).toHaveAccessibleDescription(
+        "ID fields keep their value as is.",
+      );
+    }
+  });
+
+  it("leaves the value to keep editable on a field that is not a join key", () => {
+    render(<CaseTypeDraftBlock />);
+
+    const ruleInput = _getRuleInput("Population");
+    expect(ruleInput).toBeEnabled();
+    expect(ruleInput).toHaveValue("Max");
+  });
+```
+
+- [ ] **Step 2: Run them to see them fail**
+
+Run: `pnpm test:frontend CaseTypeDraftBlock`
+Expected: FAIL. "County code" shows `First` and is enabled. The Population test passes.
+
+- [ ] **Step 3: Lock the select on a join key**
+
+In `CaseTypeDraftValueRuleSelect.tsx`, add to `Props` after `columnDataType`:
+
+```ts
+  /**
+   * Whether the field is its dataset's join key. Creation saves the default
+   * rule for every join key, so the select shows that rule, locked.
+   */
+  isPrimaryKey: boolean;
+```
+
+and replace the component with:
+
+```tsx
+/**
+ * The select for which value to keep when a dataset holds several rows per
+ * case, offering only the rules the column's type allows.
+ *
+ * A join key never reduces its rows: it shows the default rule, locked, with
+ * a note saying why. A proposed rule the column's type refuses is saved as
+ * the default rule, so the select shows that one rather than a value missing
+ * from its options. The draft itself keeps the proposed rule until the user
+ * picks another, and creation replaces a join key's or a disallowed rule
+ * anyway.
+ */
+export function CaseTypeDraftValueRuleSelect({
+  attribute,
+  columnDataType,
+  isPrimaryKey,
+  editor,
+}: Readonly<Props>): React.ReactNode {
+  const { t } = useLingui();
+  const valuePickerOptions = useValuePickerOptions(columnDataType);
+  const allowedRuleType = columnDataType
+    ? ValuePickerRule.toAllowedRuleType({
+        ruleType: attribute.valuePickerRuleType,
+        columnDataType,
+      })
+    : attribute.valuePickerRuleType;
+
+  return (
+    <Select
+      size="xs"
+      data={valuePickerOptions}
+      value={isPrimaryKey ? ValuePickerRule.DEFAULT_RULE_TYPE : allowedRuleType}
+      disabled={isPrimaryKey}
+      description={isPrimaryKey ? t`ID fields keep their value as is.` : undefined}
+      allowDeselect={false}
+      aria-label={t`Value to keep for ${attribute.name}`}
+      onChange={(value) => {
+        if (value) {
+          editor.setAttributeValuePicker(
+            attribute.columnId,
+            value as ChatCaseValuePickerRuleType,
+          );
+        }
+      }}
+    />
+  );
+}
+```
+
+In `CaseTypeDraftAttributeRow.tsx`, pass the row's `isPrimaryKey` to it:
+
+```tsx
+      <CaseTypeDraftValueRuleSelect
+        attribute={attribute}
+        columnDataType={columnDataType}
+        isPrimaryKey={isPrimaryKey}
+        editor={editor}
+      />
+```
+
+- [ ] **Step 4: Run the tests**
+
+Run: `pnpm test:frontend CaseTypeDraftBlock useCaseTypeDraftEditor`
+Expected: PASS.
+
+Run: `pnpm type-check`
+Expected: PASS.
+
+- [ ] **Step 5: Extract and compile the catalogs**
+
+Run: `pnpm i18n:extract && pnpm i18n:compile`
+Expected: no new message. `ID fields keep their value as is.` gains a `#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx` reference beside the form's, so its translations carry over.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/components/ChatPanel/CaseTypeDraftBlock src/i18n/locales
+git commit -m "fix(joined-cases): show a draft join key keeping its value as is" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 13: The draft card switches a field between one value and every value
 
 **Files:**
 - Create: `src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx`
 - Modify: `src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.ts`
 - Test: `src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftEditor.test.ts`
 - Modify: `src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx`
+- Modify: `src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx`
 - Modify: `src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.module.css`
 - Test: `src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftBlock.test.tsx`
 - Generate: `src/i18n/locales/*`
@@ -2686,21 +3608,12 @@ Replace the body of `CaseTypeDraftAttributeRow` from `return (` to the end with 
           {match(attribute.valueShape)
             .with("single", () => {
               return (
-                <Select
+                <CaseTypeDraftValueRuleSelect
                   className={css.ruleSelect}
-                  size="xs"
-                  data={valuePickerOptions}
-                  value={attribute.valuePickerRuleType}
-                  allowDeselect={false}
-                  aria-label={t`Value to keep for ${attribute.name}`}
-                  onChange={(value) => {
-                    if (value) {
-                      editor.setAttributeValuePicker(
-                        attribute.columnId,
-                        value as ChatCaseValuePickerRuleType,
-                      );
-                    }
-                  }}
+                  attribute={attribute}
+                  columnDataType={columnDataType}
+                  isPrimaryKey={isPrimaryKey}
+                  editor={editor}
                 />
               );
             })
@@ -2714,7 +3627,7 @@ Replace the body of `CaseTypeDraftAttributeRow` from `return (` to the end with 
   );
 ```
 
-If plan 2 changed the `Select`'s `data` (rule options per column type), keep its expression.
+The single-value arm renders plan 2's `CaseTypeDraftValueRuleSelect`, which offers only the rules the column's type allows, and Task 12's `isPrimaryKey` keeps a join key's rule locked to the default. Give that component an optional `className?: string` prop (documented as "Classes for the select's root, for its width in the row") and pass it to its `Select`, so the row can size it. The row no longer builds its own rule options or imports `Select`.
 
 In `CaseTypeDraftCard.module.css`, replace `.attributeRow` with the rules below and add the three new classes after `.attributeRowExcluded`:
 
@@ -2763,7 +3676,7 @@ git commit -m "feat(joined-cases): switch a draft field between one value and ev
 
 ---
 
-### Task 10: The case type form uses the same switch
+### Task 14: The case type form uses the same switch
 
 **Files:**
 - Create: `src/views/OntologyDesignerApp/ConceptCreatorView/keepKeyAndLabelFieldsSingle/keepKeyAndLabelFieldsSingle.ts`
@@ -2956,10 +3869,818 @@ git commit -m "feat(joined-cases): use the one value or every value switch in th
 
 ---
 
-### Task 11: The record page lists every value
+### Task 15: Record page rail leftovers
 
 **Files:**
+- Create: `src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx`
+- Create: `src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.module.css`
+- Modify: `src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx`
+- Modify: `src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.module.css`
+- Test: `src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.test.tsx`
+- Modify: `packages/web/ui/src/Callout/Callout.tsx`
+- Modify: `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes.ts`
+- Test: `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/useRecordFields.test.ts`
+- Generate: `src/i18n/locales/*`
+
+Five gaps plan 1's reviews left in the record page rail (plan 1 follow-up), closed before Tasks 16 and 17 change how values render:
+
+- The rail's field order copies the view's comparator. It now calls `ConceptAttribute.compareInViewOrder` (Task 5).
+- `Callout` always renders its title as an `h2`, so the load failure's heading sits above the rail group's `h4`. `Callout` gains `titleOrder`, and the rail passes `5`.
+- A field's source lines carry no label, so a screen reader reads "Borough Brooklyn Lab results" as one run. They become a list named "Sources".
+- `DetailsStatus` is a second component in `CaseDetailsRail.tsx`. It moves to its own folder.
+- `useRecordFields` has no tests for the datasets read while it loads or after it fails (`useSourceDatasets`, the `datasetsQuery.isError` and `datasets === undefined` branches).
+
+`CaseDetailsRail.tsx` and `CaseDetailsRail.module.css` stay where they are: the video producer's manifest (`apps/ava-video-producer/tests/avandar-scenes.test.ts`) lists both as product surfaces. Task 17 edits the value rendering inside the fact this task leaves; its rail test must look for list items inside the field's own list, because the sources list also holds list items.
+
+- [ ] **Step 1: Write the failing rail tests**
+
+In `CaseDetailsRail.test.tsx`, add `within` to the `@/test-utils` import and add inside `describe("CaseDetailsRail", ...)`:
+
+```tsx
+  it("names a field's source lines as its sources for assistive technology", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Borough",
+            value: "Brooklyn",
+            sourceNames: ["Lab results", "Measles line list"],
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      within(screen.getByRole("list", { name: "Sources" }))
+        .getAllByRole("listitem")
+        .map((item) => {
+          return item.textContent;
+        }),
+    ).toEqual(["Lab results", "Measles line list"]);
+  });
+
+  it("lists no sources for a field that reads none", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Notes",
+            value: "Called twice",
+            sourceNames: [],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByRole("list", { name: "Sources" })).toBeNull();
+  });
+
+  // The rail group's label is an h4, so the failure under it is an h5.
+  it("titles the load failure below the rail group's heading", () => {
+    render(
+      <CaseDetailsRail
+        attributes={undefined}
+        loadError={{ isRetrying: false, onRetry: vi.fn() }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: "This record's fields failed to load",
+        level: 5,
+      }),
+    ).toBeInTheDocument();
+  });
+```
+
+- [ ] **Step 2: Write the datasets read tests**
+
+In `useRecordFields.test.ts`, add below `_makeLoadedValuesResult`:
+
+```ts
+/** A mappings read that has returned one mapping of the age field. */
+function _makeLoadedMappingsResult(): unknown[] {
+  return [
+    [
+      {
+        type: "dataset_column",
+        conceptAttributeId: AGE.id,
+        datasetId: "dataset-lab-results",
+      },
+    ],
+    false,
+    _makeQueryState(false),
+  ];
+}
+```
+
+and add inside `describe("useRecordFields", ...)`:
+
+```ts
+  // The source names would otherwise arrive after the values and shift the
+  // rail.
+  it("keeps the fields loading until the datasets their sources name arrive", () => {
+    mappingsResultRef.current = _makeLoadedMappingsResult();
+    datasetsResultRef.current = [undefined, true, _makeQueryState(false)];
+    valuesResultRef.current = _makeLoadedValuesResult();
+
+    const { result } = _renderRecordFields();
+
+    expect(result.current.rows).toBeUndefined();
+  });
+
+  it("shows the fields without source names when the datasets fail to load", () => {
+    mappingsResultRef.current = _makeLoadedMappingsResult();
+    datasetsResultRef.current = [undefined, false, _makeQueryState(true)];
+    valuesResultRef.current = _makeLoadedValuesResult();
+
+    const { result } = _renderRecordFields();
+
+    expect(result.current.rows).toEqual([
+      { id: AGE.id, name: "age", value: 41, sourceNames: [] },
+    ]);
+    expect(result.current.isLoadError).toBe(false);
+  });
+```
+
+- [ ] **Step 3: Run them to see which fail**
+
+Run: `pnpm test:frontend CaseDetailsRail useRecordFields`
+Expected: the three rail tests FAIL: there is no list named `Sources` (the "lists no sources" test passes), and the failure's heading is level 2. The two `useRecordFields` tests PASS at once, because they cover branches that already exist.
+
+Check that the two `useRecordFields` tests can fail. In `useRecordFields.ts`, temporarily change `return { mappings, datasets: [] };` (the `datasetsQuery.isError` branch) to `return undefined;` and rerun: "shows the fields without source names..." FAILS with `rows` undefined. Restore it, then temporarily change `return datasets === undefined ? undefined : { mappings, datasets };` to `return { mappings, datasets: datasets ?? [] };` and rerun: "keeps the fields loading..." FAILS with rows present. Restore it.
+
+- [ ] **Step 4: Let `Callout` set its title's heading level**
+
+In `packages/web/ui/src/Callout/Callout.tsx`, add `TitleOrder` to the `@mantine/core` type import, add to `Props` after `titleSize`:
+
+```ts
+  /**
+   * The title's heading level, so it fits the page's outline: for example
+   * 5 under a rail group's `h4`. Defaults to 2.
+   */
+  titleOrder?: TitleOrder;
+```
+
+destructure `titleOrder = 2` in `Callout`, and render the title as `<Title order={titleOrder} size={titleSize}>`.
+
+- [ ] **Step 5: Move `DetailsStatus` into its own folder**
+
+Create `DetailsStatus/DetailsStatus.module.css` with the two rules that only the status uses, moved from `CaseDetailsRail.module.css`:
+
+```css
+.placeholderRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+}
+
+/* The callout stacks its children stretched. Keep the button its own width. */
+.retry {
+  align-self: flex-start;
+}
+```
+
+and delete `.placeholderRows` and `.retry` from `CaseDetailsRail.module.css`.
+
+Create `DetailsStatus/DetailsStatus.tsx`:
+
+```tsx
+import { Callout } from "@avandar/ui";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Button, Skeleton, Text } from "@mantine/core";
+import { IconAlertCircle } from "@tabler/icons-react";
+import css from "@/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.module.css";
+import type {
+  CaseDetailsLoadError,
+  CaseDetailsRow,
+} from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
+import type { ReactNode } from "react";
+
+/** How many placeholder rows stand in for the fields while they load. */
+const PLACEHOLDER_ROW_COUNT = 4;
+
+type Props = {
+  /** The case's fields, or `undefined` while they load. */
+  attributes: readonly CaseDetailsRow[] | undefined;
+  /** Set when the fields failed to load. */
+  loadError: CaseDetailsLoadError | undefined;
+};
+
+/**
+ * What stands in for the facts when there are none to list: the load failure,
+ * placeholders, or the empty state. `CaseDetailsRail` renders it beside the
+ * fact list, never in it, so the list only ever holds terms and values.
+ */
+export function DetailsStatus({
+  attributes,
+  loadError,
+}: Readonly<Props>): ReactNode {
+  const { t } = useLingui();
+  if (loadError) {
+    return (
+      <Callout
+        title={t`This record's fields failed to load`}
+        titleSize="sm"
+        titleOrder={5}
+        message={t`Try again in a moment, or reach out to support if it keeps happening.`}
+        messageSize="sm"
+        icon={<IconAlertCircle size={20} aria-hidden />}
+      >
+        <Button
+          variant="default"
+          size="compact-sm"
+          className={css.retry}
+          loading={loadError.isRetrying}
+          onClick={loadError.onRetry}
+        >
+          <Trans>Try again</Trans>
+        </Button>
+      </Callout>
+    );
+  }
+  if (attributes === undefined) {
+    return (
+      <div className={css.placeholderRows} aria-hidden>
+        {Array.from({ length: PLACEHOLDER_ROW_COUNT }, (_, index) => {
+          return <Skeleton key={index} height={14} />;
+        })}
+      </div>
+    );
+  }
+  if (attributes.length === 0) {
+    return (
+      <Text size="sm" c="dimmed">
+        <Trans>No fields yet</Trans>
+      </Text>
+    );
+  }
+  return null;
+}
+```
+
+The type import from `CaseDetailsRail` is type-only, so the two files do not import each other at runtime.
+
+- [ ] **Step 6: Name the source lines, and render the status from its module**
+
+In `CaseDetailsRail.tsx`, delete `PLACEHOLDER_ROW_COUNT` and `DetailsStatus`, change the imports to:
+
+```tsx
+import { isNullish, unknownToString } from "@avandar/utils";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Text } from "@mantine/core";
+import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
+import css from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.module.css";
+import { DetailsStatus } from "@/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ReactNode } from "react";
+```
+
+and replace `CaseDetailsRail` with:
+
+```tsx
+/** The case's fields as reference material in the properties rail. */
+export function CaseDetailsRail({
+  attributes,
+  loadError,
+  children,
+}: Props): ReactNode {
+  const { t } = useLingui();
+  return (
+    <AppViewRail>
+      <div className={css.details}>
+        <AppViewRail.Group title={<Trans>Details</Trans>}>
+          {attributes?.map((attribute) => {
+            return (
+              <AppViewRail.Fact key={attribute.id} label={attribute.name}>
+                {isNullish(attribute.value) ? (
+                  <Text span c="dimmed">
+                    <Trans>No value</Trans>
+                  </Text>
+                ) : (
+                  unknownToString(attribute.value)
+                )}
+                {attribute.sourceNames.length > 0 ? (
+                  <ul aria-label={t`Sources`} className={css.sourceList}>
+                    {attribute.sourceNames.map((sourceName, index) => {
+                      return (
+                        <Text
+                          component="li"
+                          key={`${index}-${sourceName}`}
+                          size="xs"
+                          c="dimmed"
+                        >
+                          {sourceName}
+                        </Text>
+                      );
+                    })}
+                  </ul>
+                ) : null}
+              </AppViewRail.Fact>
+            );
+          })}
+        </AppViewRail.Group>
+        <DetailsStatus attributes={attributes} loadError={loadError} />
+      </div>
+      {children}
+    </AppViewRail>
+  );
+}
+```
+
+Add to `CaseDetailsRail.module.css`:
+
+```css
+/* Source lines read as plain dimmed lines, one per dataset. */
+.sourceList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+```
+
+- [ ] **Step 7: Order the rail's rows with the view's comparator**
+
+In `makeCaseDetailsRowsFromAttributes.ts`, change the `ConceptAttribute` type import to a value import (`import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";`), and replace
+
+```ts
+    .sort((left, right) => {
+      return (
+        left.name.localeCompare(right.name) || left.id.localeCompare(right.id)
+      );
+    })
+```
+
+with
+
+```ts
+    .sort(ConceptAttribute.compareInViewOrder)
+```
+
+Its docstring already says the rows follow the view's column order; it now says so by calling the same comparator.
+
+- [ ] **Step 8: Run the tests, the type-check, and the design detector**
+
+Run: `pnpm test:frontend CaseDetailsRail useRecordFields makeCaseDetailsRowsFromAttributes SingleIndividualView`
+Expected: PASS.
+
+Run: `pnpm type-check`
+Expected: PASS.
+
+Run: `.claude/skills/impeccable/scripts/impeccable detect --json src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus`
+Expected: no findings. Fix any it reports.
+
+- [ ] **Step 9: Extract and compile the catalogs**
+
+Run: `pnpm i18n:extract && pnpm i18n:compile`
+Expected: `Sources` appears with a `CaseDetailsRail.tsx` reference; `This record's fields failed to load`, its message, `Try again`, and `No fields yet` move their references to `DetailsStatus/DetailsStatus.tsx`.
+
+- [ ] **Step 10: Commit**
+
+```bash
+git add src/views/IndividualManagerApp/SingleIndividualView packages/web/ui/src/Callout/Callout.tsx src/i18n/locales
+git commit -m "fix(joined-cases): name the record page's sources and fix its heading order" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 16: Record page values read by their field's type
+
+**Files:**
+- Create: `src/components/caseFields/createFieldValueFormatter/createFieldValueFormatter.ts`
+- Test: `src/components/caseFields/createFieldValueFormatter/createFieldValueFormatter.test.ts`
+- Create: `src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts`
+- Test: `src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.test.ts`
 - Create: `src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx`
+- Test: `src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.test.tsx`
+- Modify: `src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx`
+- Test: `src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.test.tsx`
+- Modify: `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes.ts`
+- Test: `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes.test.ts`
+- Test: `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/useRecordFields.test.ts`
+- Modify: `apps/ava-video-producer/avandar-adapter/CasesScreen/RecordDetail.tsx`
+- Generate: `src/i18n/locales/*`
+
+DATE and TIMESTAMP values reach the rail as epoch milliseconds and TIME values as microseconds since midnight, and `unknownToString` prints them as numbers: the browser showed a date as `1,709,596,800,000` (plan 2 follow-up). This task formats a value by its field's `data_type` and moves the rail's value rendering into `RecordFieldValue`, so Task 17 adds the list arm there and formats each item of a list field the same way. Task 7 already turns a list's dates and timestamps into ISO strings, and the formatter reads both forms.
+
+Two entry points share one set of rules. `createFieldValueFormatter` is pure, for code outside React, such as plan 6's record names. `useFieldValueFormatter` wraps it for components, follows the active locale, and says `Yes` or `No` for a boolean. Plan 4's period table reuses the hook.
+
+| Data type | Arrives as | Reads as (locale `en`) |
+| --- | --- | --- |
+| `date` | epoch milliseconds, or `YYYY-MM-DD` inside a list | `Mar 5, 2024` |
+| `timestamp` | epoch milliseconds, or an ISO string inside a list | `Jan 5, 2026, 10:30 AM` |
+| `time` | microseconds since midnight | `2:30 PM` |
+| `bigint`, `double` | a number | `1,234,567`, `38.456` |
+| `boolean` | `true` or `false` | `Yes` or `No` (the hook) |
+| `varchar`, or a value of the wrong kind | anything | as `unknownToString` reads it |
+
+Dates and timestamps are formatted in UTC: DuckDB's `DATE` and `TIMESTAMP` hold a wall clock with no zone, and formatting their epoch number in the reader's zone shows the day before for anyone west of UTC (the Data Explorer does the same with `QUERY_RESULT_TIMEZONE`).
+
+- [ ] **Step 1: Write the failing formatter tests**
+
+Create `createFieldValueFormatter/createFieldValueFormatter.test.ts`:
+
+```ts
+/**
+ * A field's value reads by its type, the same for every reader whatever
+ * their time zone, and never as the raw number DuckDB returns for a date.
+ */
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { createFieldValueFormatter } from "@/components/caseFields/createFieldValueFormatter/createFieldValueFormatter";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+
+function _format(dataType: AvaDataType.T, value: unknown): string {
+  return createFieldValueFormatter({ dataType, locale: "en" })(value);
+}
+
+describe("createFieldValueFormatter", () => {
+  const originalTimezone = process.env.TZ;
+
+  beforeAll(() => {
+    // West of UTC is where a UTC-midnight date slips to the day before.
+    process.env.TZ = "America/Los_Angeles";
+  });
+
+  afterAll(() => {
+    process.env.TZ = originalTimezone;
+  });
+
+  it.each([
+    ["date", 1_709_596_800_000, "Mar 5, 2024"],
+    ["date", "2026-01-05", "Jan 5, 2026"],
+    ["timestamp", Date.UTC(2026, 0, 5, 10, 30), "Jan 5, 2026, 10:30 AM"],
+    ["timestamp", "2026-01-05T10:30:00.000Z", "Jan 5, 2026, 10:30 AM"],
+    ["time", 52_200_000_000, "2:30 PM"],
+    ["bigint", 1_234_567, "1,234,567"],
+    ["double", 38.456, "38.456"],
+    ["varchar", "Alameda", "Alameda"],
+    ["boolean", true, "true"],
+  ] as const)("reads a %s value %s as %s", (dataType, value, expected) => {
+    expect(_format(dataType, value)).toBe(expected);
+  });
+
+  it("reads a missing value as empty", () => {
+    expect(_format("date", null)).toBe("");
+    expect(_format("varchar", undefined)).toBe("");
+  });
+
+  // A time can arrive as text from another path; it already reads well.
+  it("leaves a value of the wrong kind as it is", () => {
+    expect(_format("time", "14:30:00")).toBe("14:30:00");
+    expect(_format("date", "not a date")).toBe("not a date");
+  });
+});
+```
+
+Create `useFieldValueFormatter/useFieldValueFormatter.test.ts`:
+
+```ts
+/** Components read a field's value in the active locale, and a yes or no in words. */
+import { describe, expect, it } from "vitest";
+import { renderHook, TestProviders } from "@/test-utils";
+import { useFieldValueFormatter } from "@/components/caseFields/useFieldValueFormatter/useFieldValueFormatter";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+
+function _format(dataType: AvaDataType.T, value: unknown): string {
+  const { result } = renderHook(
+    () => {
+      return useFieldValueFormatter(dataType);
+    },
+    { wrapper: TestProviders },
+  );
+  return result.current(value);
+}
+
+describe("useFieldValueFormatter", () => {
+  it("reads a boolean as yes or no", () => {
+    expect(_format("boolean", true)).toBe("Yes");
+    expect(_format("boolean", false)).toBe("No");
+  });
+
+  it("reads a date by the shared rules", () => {
+    expect(_format("date", 1_709_596_800_000)).toBe("Mar 5, 2024");
+  });
+});
+```
+
+- [ ] **Step 2: Write the failing record page tests**
+
+Create `RecordFieldValue/RecordFieldValue.test.tsx`:
+
+```tsx
+/** A field's value on the record page reads by the field's type. */
+import { describe, expect, it } from "vitest";
+import { render, screen } from "@/test-utils";
+import { RecordFieldValue } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue";
+
+describe("RecordFieldValue", () => {
+  it("shows a date field's value as the day it holds, not as a number", () => {
+    render(<RecordFieldValue dataType="date" value={1_709_596_800_000} />);
+
+    expect(screen.getByText("Mar 5, 2024")).toBeInTheDocument();
+    expect(screen.queryByText("1,709,596,800,000")).toBeNull();
+  });
+
+  it("shows a yes or no field's value in words", () => {
+    render(<RecordFieldValue dataType="boolean" value={false} />);
+
+    expect(screen.getByText("No")).toBeInTheDocument();
+  });
+
+  it("says a field with nothing to show has no value", () => {
+    render(<RecordFieldValue dataType="varchar" value={null} />);
+
+    expect(screen.getByText("No value")).toBeInTheDocument();
+  });
+});
+```
+
+In `CaseDetailsRail.test.tsx`, add `dataType: "varchar",` after `name` in every row the existing tests pass, and add:
+
+```tsx
+  it("shows a date field's value as a date", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Rash onset",
+            dataType: "date",
+            value: 1_709_596_800_000,
+            sourceNames: [],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Mar 5, 2024")).toBeInTheDocument();
+  });
+```
+
+In `makeCaseDetailsRowsFromAttributes.test.ts`, give `_makeAttribute` a `dataType?: AvaDataType.T` option (passed as `dataType: options.dataType ?? "varchar"`, with `import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";`), and add:
+
+```ts
+  it("gives each row its field's data type", () => {
+    const onset = _makeAttribute({ name: "rash onset", dataType: "date" });
+
+    const [row] = makeCaseDetailsRowsFromAttributes({
+      attributes: [onset],
+      valuesByAttributeId: { [onset.id]: 1_709_596_800_000 },
+      mappings: [],
+      datasets: [],
+    });
+
+    expect(row?.dataType).toBe("date");
+  });
+```
+
+In `useRecordFields.test.ts`, add `dataType: "bigint",` after `name: "age",` in each expected row (three `toEqual` calls, Task 15's included).
+
+- [ ] **Step 3: Run them to see them fail**
+
+Run: `pnpm test:frontend createFieldValueFormatter useFieldValueFormatter RecordFieldValue CaseDetailsRail makeCaseDetailsRowsFromAttributes useRecordFields`
+Expected: FAIL. Vitest cannot resolve the two formatter modules or `RecordFieldValue`; the rail shows `1,709,596,800,000`; the rows have no `dataType`.
+
+- [ ] **Step 4: Write the pure formatter**
+
+Create `createFieldValueFormatter/createFieldValueFormatter.ts`:
+
+```ts
+import { unknownToString } from "@avandar/utils";
+import { match } from "ts-pattern";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+
+const MICROSECONDS_PER_MILLISECOND = 1000;
+
+const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+  dateStyle: "medium",
+  timeZone: "UTC",
+};
+const TIMESTAMP_OPTIONS: Intl.DateTimeFormatOptions = {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "UTC",
+};
+const TIME_OPTIONS: Intl.DateTimeFormatOptions = {
+  timeStyle: "short",
+  timeZone: "UTC",
+};
+
+/** Reads one value of a known type, or `undefined` if it is of another kind. */
+type TypedValueFormatter = (value: unknown) => string | undefined;
+
+/** Formats an epoch-millisecond number or date text, or gives `undefined`. */
+function _formatDateValue(
+  options: Readonly<{ value: unknown; format: Intl.DateTimeFormat }>,
+): string | undefined {
+  const { value, format } = options;
+  if (typeof value !== "number" && typeof value !== "string") {
+    return undefined;
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : format.format(date);
+}
+
+function _createTypedValueFormatter(
+  options: Readonly<{ dataType: AvaDataType.T; locale: string }>,
+): TypedValueFormatter {
+  const { locale } = options;
+  return match(options.dataType)
+    .with("bigint", "double", (): TypedValueFormatter => {
+      const numberFormat = new Intl.NumberFormat(locale);
+      return (value) => {
+        return typeof value === "number" ? numberFormat.format(value) : undefined;
+      };
+    })
+    .with("date", "timestamp", (dataType): TypedValueFormatter => {
+      const format = new Intl.DateTimeFormat(
+        locale,
+        dataType === "date" ? DATE_OPTIONS : TIMESTAMP_OPTIONS,
+      );
+      return (value) => {
+        return _formatDateValue({ value, format });
+      };
+    })
+    .with("time", (): TypedValueFormatter => {
+      const timeFormat = new Intl.DateTimeFormat(locale, TIME_OPTIONS);
+      return (value) => {
+        return typeof value === "number"
+          ? timeFormat.format(value / MICROSECONDS_PER_MILLISECOND)
+          : undefined;
+      };
+    })
+    .with("varchar", "boolean", (): TypedValueFormatter => {
+      return () => {
+        return undefined;
+      };
+    })
+    .exhaustive();
+}
+
+/**
+ * Builds a function that reads one value of a case type field as text, by
+ * the field's `data_type`: numbers grouped for the locale, dates and
+ * timestamps as a medium date (and time) in UTC, a time (microseconds since
+ * midnight, as DuckDB returns it) as a short time. A missing value reads as
+ * empty, and anything else as `unknownToString` reads it. Pure, so code
+ * outside React can call it, for example to name a record by its label;
+ * components use `useFieldValueFormatter`.
+ */
+export function createFieldValueFormatter(
+  options: Readonly<{ dataType: AvaDataType.T; locale: string }>,
+): (value: unknown) => string {
+  const formatTypedValue = _createTypedValueFormatter(options);
+  return (value) => {
+    if (value === null || value === undefined) {
+      return "";
+    }
+    return formatTypedValue(value) ?? unknownToString(value);
+  };
+}
+```
+
+- [ ] **Step 5: Write the hook**
+
+Create `useFieldValueFormatter/useFieldValueFormatter.ts`:
+
+```ts
+import { useLingui } from "@lingui/react/macro";
+import { useMemo } from "react";
+import { createFieldValueFormatter } from "@/components/caseFields/createFieldValueFormatter/createFieldValueFormatter";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+
+/**
+ * A function that reads one value of a case type field as text in the
+ * active locale, by the field's `data_type`, with a yes or no in words. Use
+ * it wherever a component shows a field's value, for example on the record
+ * page. Rules live in `createFieldValueFormatter`.
+ */
+export function useFieldValueFormatter(
+  dataType: AvaDataType.T,
+): (value: unknown) => string {
+  const { t, i18n } = useLingui();
+  const yesLabel = t`Yes`;
+  const noLabel = t`No`;
+  return useMemo(() => {
+    const formatValue = createFieldValueFormatter({
+      dataType,
+      locale: i18n.locale,
+    });
+    return (value: unknown): string => {
+      if (typeof value === "boolean") {
+        return value ? yesLabel : noLabel;
+      }
+      return formatValue(value);
+    };
+  }, [dataType, i18n.locale, yesLabel, noLabel]);
+}
+```
+
+- [ ] **Step 6: Render the rail's values through `RecordFieldValue`**
+
+Create `RecordFieldValue/RecordFieldValue.tsx`:
+
+```tsx
+import { isNullish } from "@avandar/utils";
+import { Trans } from "@lingui/react/macro";
+import { Text } from "@mantine/core";
+import { useFieldValueFormatter } from "@/components/caseFields/useFieldValueFormatter/useFieldValueFormatter";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { ReactNode } from "react";
+
+type Props = {
+  /** The field's `data_type`, which decides how its value reads. */
+  dataType: AvaDataType.T;
+  value: unknown;
+};
+
+/**
+ * One field's value on the record page, read by the field's type, or a
+ * dimmed "No value" when there is none (a NULL, or a record missing from the
+ * view). Rendered by the record page's details rail.
+ */
+export function RecordFieldValue({
+  dataType,
+  value,
+}: Readonly<Props>): ReactNode {
+  const formatValue = useFieldValueFormatter(dataType);
+  if (isNullish(value)) {
+    return (
+      <Text span c="dimmed">
+        <Trans>No value</Trans>
+      </Text>
+    );
+  }
+  return formatValue(value);
+}
+```
+
+In `CaseDetailsRail.tsx`, add to `CaseDetailsRow` after `name`:
+
+```ts
+  /** The field's `data_type`, which decides how its value reads. */
+  dataType: AvaDataType.T;
+```
+
+add `import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";` and `import { RecordFieldValue } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue";`, and replace
+
+```tsx
+                {isNullish(attribute.value) ? (
+                  <Text span c="dimmed">
+                    <Trans>No value</Trans>
+                  </Text>
+                ) : (
+                  unknownToString(attribute.value)
+                )}
+```
+
+with
+
+```tsx
+                <RecordFieldValue
+                  dataType={attribute.dataType}
+                  value={attribute.value}
+                />
+```
+
+Remove the `@avandar/utils` import and `Text` from the `@mantine/core` import if nothing else in the file uses them (the source list still uses `Text`).
+
+In `makeCaseDetailsRowsFromAttributes.ts`, add to each returned row, after `name`:
+
+```ts
+        dataType: attribute.dataType,
+```
+
+In `apps/ava-video-producer/avandar-adapter/CasesScreen/RecordDetail.tsx`, add `dataType: "varchar",` after `name: field.name,`: the video's fields are text.
+
+- [ ] **Step 7: Run the tests and the type-check**
+
+Run: `pnpm test:frontend createFieldValueFormatter useFieldValueFormatter RecordFieldValue CaseDetailsRail makeCaseDetailsRowsFromAttributes useRecordFields SingleIndividualView`
+Expected: PASS.
+
+Run: `pnpm type-check`
+Expected: PASS, the video producer included.
+
+- [ ] **Step 8: Extract and compile the catalogs**
+
+Run: `pnpm i18n:extract && pnpm i18n:compile`
+Expected: `Yes` and `No`, which the catalogs already translate, gain a `useFieldValueFormatter.ts` reference; `No value` moves its reference from `CaseDetailsRail.tsx` to `RecordFieldValue/RecordFieldValue.tsx`.
+
+- [ ] **Step 9: Commit**
+
+```bash
+git add src/components/caseFields src/views/IndividualManagerApp/SingleIndividualView apps/ava-video-producer/avandar-adapter/CasesScreen/RecordDetail.tsx src/i18n/locales
+git commit -m "fix(joined-cases): show record page values by their field's type" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 17: The record page lists every value
+
+**Files:**
+- Modify: `src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx`
 - Create: `src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx`
 - Create: `src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.module.css`
 - Test: `src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.test.tsx`
@@ -2967,19 +4688,22 @@ git commit -m "feat(joined-cases): use the one value or every value switch in th
 - Test: `src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.test.tsx`
 - Modify: `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes.ts`
 - Test: `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes.test.ts`
+- Test: `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/useRecordFields.test.ts`
 - Modify: `src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx`
+- Modify: `apps/ava-video-producer/avandar-adapter/CasesScreen/RecordDetail.tsx`
 - Generate: `src/i18n/locales/*`
 
-Plan 1 Tasks 10 to 12 left the rail rendering each `CaseDetailsRow` (`id`, `name`, `value`, `sourceNames`) with a dimmed "No value" for a NULL or missing value and `unknownToString` otherwise, the rows built by `makeCaseDetailsRowsFromAttributes` inside `useRecordFields`. This task gives each row its field's shape and moves the value rendering into `RecordFieldValue`, which keeps plan 1's "No value" and adds the list.
+Plan 1 Tasks 10 to 12 left the rail's rows (`id`, `name`, `value`, `sourceNames`) built by `makeCaseDetailsRowsFromAttributes` inside `useRecordFields`. Task 15 named each field's source lines as a list called "Sources", and Task 16 gave each row its `dataType` and moved the value rendering into `RecordFieldValue`, which shows a dimmed "No value" or the value read by `useFieldValueFormatter`. This task gives each row its field's shape and adds the list to `RecordFieldValue`, formatting each item of a list field by the field's type just as a single value is.
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `RecordFieldValue/RecordFieldValue.test.tsx`:
+Replace `RecordFieldValue/RecordFieldValue.test.tsx` (Task 16's three tests are kept, with the new props) with:
 
 ```tsx
 /**
- * A field that keeps every value shows each one on the record page, and a
- * long list starts collapsed so it does not push the other facts away.
+ * A field's value on the record page reads by the field's type. A field that
+ * keeps every value shows each one, and a long list starts collapsed so it
+ * does not push the other facts away.
  */
 import { describe, expect, it } from "vitest";
 import { fireEvent, render, screen, within } from "@/test-utils";
@@ -2998,11 +4722,56 @@ function _getListItems(fieldName: string): string[] {
 describe("RecordFieldValue", () => {
   it("shows a single value as text", () => {
     render(
-      <RecordFieldValue fieldName="County" valueShape="single" value="Alameda" />,
+      <RecordFieldValue
+        fieldName="County"
+        valueShape="single"
+        dataType="varchar"
+        value="Alameda"
+      />,
     );
 
     expect(screen.getByText("Alameda")).toBeInTheDocument();
     expect(screen.queryByRole("list")).toBeNull();
+  });
+
+  it("shows a date field's value as the day it holds, not as a number", () => {
+    render(
+      <RecordFieldValue
+        fieldName="Rash onset"
+        valueShape="single"
+        dataType="date"
+        value={1_709_596_800_000}
+      />,
+    );
+
+    expect(screen.getByText("Mar 5, 2024")).toBeInTheDocument();
+    expect(screen.queryByText("1,709,596,800,000")).toBeNull();
+  });
+
+  it("shows a yes or no field's value in words", () => {
+    render(
+      <RecordFieldValue
+        fieldName="Vaccinated"
+        valueShape="single"
+        dataType="boolean"
+        value={false}
+      />,
+    );
+
+    expect(screen.getByText("No")).toBeInTheDocument();
+  });
+
+  it("says a field with nothing to show has no value", () => {
+    render(
+      <RecordFieldValue
+        fieldName="Notes"
+        valueShape="single"
+        dataType="varchar"
+        value={null}
+      />,
+    );
+
+    expect(screen.getByText("No value")).toBeInTheDocument();
   });
 
   it("lists each value of a field that keeps every value, in order", () => {
@@ -3010,6 +4779,7 @@ describe("RecordFieldValue", () => {
       <RecordFieldValue
         fieldName="Daily new cases"
         valueShape="list"
+        dataType="bigint"
         value={[31, 48]}
       />,
     );
@@ -3017,11 +4787,29 @@ describe("RecordFieldValue", () => {
     expect(_getListItems("Daily new cases")).toEqual(["31", "48"]);
   });
 
+  // A list's dates arrive as `YYYY-MM-DD` text, and read like a single date.
+  it("formats each date of a list field as a date", () => {
+    render(
+      <RecordFieldValue
+        fieldName="Visit dates"
+        valueShape="list"
+        dataType="date"
+        value={["2026-01-05", "2026-02-01"]}
+      />,
+    );
+
+    expect(_getListItems("Visit dates")).toEqual([
+      "Jan 5, 2026",
+      "Feb 1, 2026",
+    ]);
+  });
+
   it("shows the first five values of a long list until asked for all", () => {
     render(
       <RecordFieldValue
         fieldName="Daily new cases"
         valueShape="list"
+        dataType="bigint"
         value={DAILY_CASES}
       />,
     );
@@ -3042,7 +4830,12 @@ describe("RecordFieldValue", () => {
 
   it("says a list field with no values has no value", () => {
     render(
-      <RecordFieldValue fieldName="Symptoms" valueShape="list" value={[]} />,
+      <RecordFieldValue
+        fieldName="Symptoms"
+        valueShape="list"
+        dataType="varchar"
+        value={[]}
+      />,
     );
 
     expect(screen.getByText("No value")).toBeInTheDocument();
@@ -3051,7 +4844,7 @@ describe("RecordFieldValue", () => {
 });
 ```
 
-In `CaseDetailsRail.test.tsx`, add `valueShape: "single",` to every row plan 1's tests pass, and add:
+In `CaseDetailsRail.test.tsx`, add `valueShape: "single",` after `dataType` in every row the existing tests pass, and add:
 
 ```tsx
   it("lists every value of a field that keeps every value", () => {
@@ -3061,6 +4854,7 @@ In `CaseDetailsRail.test.tsx`, add `valueShape: "single",` to every row plan 1's
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Daily new cases",
+            dataType: "bigint",
             valueShape: "list",
             value: [31, 48],
             sourceNames: ["County cases"],
@@ -3069,15 +4863,18 @@ In `CaseDetailsRail.test.tsx`, add `valueShape: "single",` to every row plan 1's
       />,
     );
 
+    // The field's own list, not its "Sources" list.
     expect(
-      screen.getAllByRole("listitem").map((item) => {
-        return item.textContent;
-      }),
+      within(screen.getByRole("list", { name: "Daily new cases" }))
+        .getAllByRole("listitem")
+        .map((item) => {
+          return item.textContent;
+        }),
     ).toEqual(["31", "48"]);
   });
 ```
 
-In `makeCaseDetailsRowsFromAttributes.test.ts`, give plan 1's `_makeAttribute` an `isArray?: boolean` option (passed as `isArray: options.isArray ?? false`), and add:
+In `makeCaseDetailsRowsFromAttributes.test.ts`, give `_makeAttribute` an `isArray?: boolean` option (passed as `isArray: options.isArray ?? false`, beside Task 16's `dataType` option), and add:
 
 ```ts
   it("gives each row its field's value shape", () => {
@@ -3105,12 +4902,12 @@ In `makeCaseDetailsRowsFromAttributes.test.ts`, give plan 1's `_makeAttribute` a
   });
 ```
 
-If plan 1's `makeCaseDetailsRowsFromAttributes` options differ from these four, match the existing tests' call.
+In `useRecordFields.test.ts`, add `valueShape: "single",` after `dataType: "bigint",` in each expected row.
 
 - [ ] **Step 2: Run them to see them fail**
 
-Run: `pnpm test:frontend RecordFieldValue CaseDetailsRail makeCaseDetailsRowsFromAttributes`
-Expected: FAIL. Vitest cannot resolve `RecordFieldValue`; the rail renders `[31, 48]` as one line (`31;48`); rows have no `valueShape`.
+Run: `pnpm test:frontend RecordFieldValue CaseDetailsRail makeCaseDetailsRowsFromAttributes useRecordFields`
+Expected: FAIL. `RecordFieldValue` renders `[31, 48]` as one line (`31;48`) and has no list; the rail has no list named `Daily new cases`; rows have no `valueShape`.
 
 - [ ] **Step 3: Write the list**
 
@@ -3135,7 +4932,6 @@ Create `RecordFieldValue/RecordFieldValue.module.css`:
 Create `RecordFieldValue/RecordFieldValueList.tsx`:
 
 ```tsx
-import { unknownToString } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { useId, useState } from "react";
@@ -3150,6 +4946,8 @@ type Props = {
   fieldName: string;
   /** At least one value; `RecordFieldValue` handles an empty list. */
   values: readonly unknown[];
+  /** Reads one value as text, by the field's type. */
+  formatValue: (value: unknown) => string;
 };
 
 /**
@@ -3161,6 +4959,7 @@ type Props = {
 export function RecordFieldValueList({
   fieldName,
   values,
+  formatValue,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const listId = useId();
@@ -3176,7 +4975,7 @@ export function RecordFieldValueList({
         {shownValues.map((value, index) => {
           // Values repeat (the same symptom at two visits), and the list
           // only grows or shrinks at its end, so the position is the key.
-          return <li key={index}>{unknownToString(value)}</li>;
+          return <li key={index}>{formatValue(value)}</li>;
         })}
       </ul>
       {isCollapsible ? (
@@ -3199,36 +4998,42 @@ export function RecordFieldValueList({
 }
 ```
 
-- [ ] **Step 4: Write the field value**
+- [ ] **Step 4: Shape the field value**
 
-Create `RecordFieldValue/RecordFieldValue.tsx`:
+Replace `RecordFieldValue/RecordFieldValue.tsx` with:
 
 ```tsx
-import { isNullish, unknownToString } from "@avandar/utils";
+import { isNullish } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { match } from "ts-pattern";
+import { useFieldValueFormatter } from "@/components/caseFields/useFieldValueFormatter/useFieldValueFormatter";
 import { RecordFieldValueList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ReactNode } from "react";
 
 type Props = {
   fieldName: string;
   valueShape: ConceptAttribute.ValueShape;
+  /** The field's `data_type`: the type of its one value or of each item. */
+  dataType: AvaDataType.T;
   value: unknown;
 };
 
 /**
- * One field's value on the record page, shaped by the field: one value as
- * text, every value of a list field as a list, and a dimmed "No value" when
- * there is none (a NULL, a record missing from the view, or an empty list).
- * Rendered by the record page's details rail.
+ * One field's value on the record page, shaped by the field and read by its
+ * type: one value as text, every value of a list field as a list, and a
+ * dimmed "No value" when there is none (a NULL, a record missing from the
+ * view, or an empty list). Rendered by the record page's details rail.
  */
 export function RecordFieldValue({
   fieldName,
   valueShape,
+  dataType,
   value,
 }: Readonly<Props>): ReactNode {
+  const formatValue = useFieldValueFormatter(dataType);
   if (isNullish(value) || (Array.isArray(value) && value.length === 0)) {
     return (
       <Text span c="dimmed">
@@ -3238,13 +5043,14 @@ export function RecordFieldValue({
   }
   return match(valueShape)
     .with("single", () => {
-      return unknownToString(value);
+      return formatValue(value);
     })
     .with("list", () => {
       return (
         <RecordFieldValueList
           fieldName={fieldName}
           values={Array.isArray(value) ? value : [value]}
+          formatValue={formatValue}
         />
       );
     })
@@ -3252,25 +5058,22 @@ export function RecordFieldValue({
 }
 ```
 
-- [ ] **Step 5: Give each row its shape, and render it in the rail**
+- [ ] **Step 5: Give each row its shape, and pass it to the value**
 
-In `CaseDetailsRail.tsx`, add to `CaseDetailsRow`, after `value`:
+In `CaseDetailsRail.tsx`, add to `CaseDetailsRow`, after `dataType`:
 
 ```ts
   /** Whether the field keeps one value or every value. */
   valueShape: ConceptAttribute.ValueShape;
 ```
 
-import `RecordFieldValue`, and in `CaseDetailsRail` replace plan 1's
+and replace Task 16's
 
 ```tsx
-                {isNullish(attribute.value) ? (
-                  <Text span c="dimmed">
-                    <Trans>No value</Trans>
-                  </Text>
-                ) : (
-                  unknownToString(attribute.value)
-                )}
+                <RecordFieldValue
+                  dataType={attribute.dataType}
+                  value={attribute.value}
+                />
 ```
 
 with
@@ -3279,17 +5082,18 @@ with
                 <RecordFieldValue
                   fieldName={attribute.name}
                   valueShape={attribute.valueShape}
+                  dataType={attribute.dataType}
                   value={attribute.value}
                 />
 ```
 
-Remove `isNullish` and `unknownToString` from the `@avandar/utils` import if nothing else in the file uses them.
-
-In `makeCaseDetailsRowsFromAttributes.ts`, add `import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";` (a value import; change the type import if there is one) and add to each returned row, after `value`:
+In `makeCaseDetailsRowsFromAttributes.ts` (whose `ConceptAttribute` import Task 15 made a value import), add to each returned row, after `dataType`:
 
 ```ts
         valueShape: ConceptAttribute.getValueShape(attribute),
 ```
+
+In `apps/ava-video-producer/avandar-adapter/CasesScreen/RecordDetail.tsx`, add `valueShape: "single",` after Task 16's `dataType: "varchar",`.
 
 - [ ] **Step 6: Mark list fields on the case type page**
 
@@ -3316,23 +5120,23 @@ Run: `pnpm test:frontend RecordFieldValue CaseDetailsRail makeCaseDetailsRowsFro
 Expected: PASS.
 
 Run: `pnpm type-check`
-Expected: PASS.
+Expected: PASS, the video producer included.
 
 - [ ] **Step 8: Extract and compile the catalogs**
 
 Run: `pnpm i18n:extract && pnpm i18n:compile`
-Expected: `Show fewer` and `Show all {0} values` appear with references to `RecordFieldValueList.tsx`; `No value` gains a reference to `RecordFieldValue.tsx` (and loses `CaseDetailsRail.tsx`); `Every value` gains a reference to `CaseTypeAttributesList.tsx`.
+Expected: `Show fewer` and `Show all {0} values` appear with references to `RecordFieldValueList.tsx`; `Every value` gains a reference to `CaseTypeAttributesList.tsx`.
 
 - [ ] **Step 9: Commit**
 
 ```bash
-git add src/views/IndividualManagerApp/SingleIndividualView src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx src/i18n/locales
+git add src/views/IndividualManagerApp/SingleIndividualView src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx apps/ava-video-producer/avandar-adapter/CasesScreen/RecordDetail.tsx src/i18n/locales
 git commit -m "feat(joined-cases): list every value of a list field on the record page" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 
 ---
 
-### Task 12: Chat's SQL context marks list fields
+### Task 18: Chat's SQL context marks list fields
 
 **Files:**
 - Modify: `shared/models/chat/SqlTableAlias/SqlTableAlias.types.ts`
@@ -3639,12 +5443,14 @@ git commit -m "feat(joined-cases): mark list fields in chat's SQL schema context
 
 ---
 
-### Task 13: E2E: a list field from the chat draft on the record page
+### Task 19: E2E: a list field from the chat draft on the record page
 
 **Files:**
 - Create: `tests/e2e/case-list-field.spec.ts`
 
 The spec stubs chat: the first turn answers with a proposal that names the imported dataset's real column ids, so the spec drives the card rather than a model (as `chat-interactive-workflows.spec.ts` does). It switches **Daily new cases** to **Every value**, creates the case type, waits for the first sync through an oracle read, and opens Alameda, whose two rows in the small California CSV are `31` then `48`.
+
+It also listens to the browser console for `Unhandleable arrow type`, the error a LIST result column logged before Task 7, and fails if the case type pages log it.
 
 - [ ] **Step 1: Write the spec**
 
@@ -3881,6 +5687,16 @@ test.describe("Case list fields", () => {
     e2eWorkerDb,
   }) => {
     const admin = createSupabaseAdminClient();
+    // A LIST result column used to log this on every page that read one.
+    const arrowTypeErrors: string[] = [];
+    page.on("console", (message) => {
+      if (
+        message.type() === "error" &&
+        message.text().includes("Unhandleable arrow type")
+      ) {
+        arrowTypeErrors.push(message.text());
+      }
+    });
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const { workspaceId, datasetId, columnIdsByName } = seededWorld;
     if (!workspaceId || !datasetId || !columnIdsByName) {
@@ -3939,13 +5755,14 @@ test.describe("Case list fields", () => {
         .getByRole("list", { name: LIST_FIELD_NAME })
         .getByRole("listitem"),
     ).toHaveText(RECORD_VALUES, { timeout: MEDIUM_WAIT });
+    expect(arrowTypeErrors).toEqual([]);
   });
 });
 ```
 
 - [ ] **Step 2: See it fail on the claim it makes**
 
-The features it covers already exist (Tasks 6 to 11 went red first in their unit tests), so check instead that its final assertion can fail. Temporarily set `RECORD_VALUES` to `["48", "31"]`, check `ava supabase status` names `feat-joined-cases` and the dev server is running, then:
+The features it covers already exist (Tasks 9 to 17 went red first in their unit tests), so check instead that its final assertion can fail. Temporarily set `RECORD_VALUES` to `["48", "31"]`, check `ava supabase status` names `feat-joined-cases` and the dev server is running, then:
 
 Run: `pnpm test:e2e case-list-field.spec.ts`
 Expected: FAIL at the last assertion, which receives `["31", "48"]`: the record page lists Alameda's values in file order. Restore `RECORD_VALUES` to `["31", "48"]`.
@@ -3968,7 +5785,7 @@ git commit -m "test(joined-cases): a list field from the chat draft shows every 
 
 ---
 
-### Task 14: Documentation
+### Task 20: Documentation
 
 **Files:**
 - Modify: `docs/ontology-architecture.md`
@@ -4022,7 +5839,7 @@ In 7.1, after the rule-names paragraph, add: "Value shapes are hand-written in f
 
 - [ ] **Step 4: Section 8, concepts as relations**
 
-Plan 1's documentation task rewrote this section around `buildAttributeValueSql`. In the table's "View" row, make the list wording say: a list attribute reads every non-NULL value through `buildAttributeValueSql` and ignores any value picker its mapping still stores; an unmapped list attribute is `CAST([] AS <type>[])`; a single attribute with no value picker throws at planning (`makeConceptAttributeColumnsFromMetadata`) and when its SQL is built (`buildAttributeValueSql`). After the status-column paragraph, add:
+Plan 1's documentation task rewrote this section around `buildAttributeValueSql`. In the "Column resolution" row, say the names come from `ConceptAttribute.getViewColumnNames` (Task 5), which `QueryColumn.makeFromConceptAttributes` also calls, so a structured query reads a suffixed field from its own column (`QueryColumn.sourceColumnName`) and still names the result column after the field. In the paragraph that ends "(see section 16 for the public session)", replace that parenthesis with: "A public snapshot query never reads a concept view: `runDuckDbRawQuery` refuses any relation but a dataset in public mode (Task 1)." In the table's "View" row, make the list wording say: a list attribute reads every non-NULL value through `buildAttributeValueSql` and ignores any value picker its mapping still stores; an unmapped list attribute is `CAST([] AS <type>[])`; a single attribute with no value picker throws at planning (`makeConceptAttributeColumnsFromMetadata`) and when its SQL is built (`buildAttributeValueSql`). After the status-column paragraph, add:
 
 ```markdown
 **List columns in the explorer and dashboards.** List cells reach JavaScript
@@ -4039,7 +5856,7 @@ grid joins a list's values with `; `. Chat's schema line marks a list field
 
 - [ ] **Step 5: Section 9, UI map**
 
-In the record page row, add `RecordFieldValue/` to the key files and append to its description: "A list field shows every value, the first five then a Show all toggle". In the case type page row, append "list fields carry an Every value badge". Under "Outside the routes", add: "- **Field value shape control**: `src/components/caseFields/ValueShapeControl/`, used by the draft card and the case type form."
+In the record page row, add `RecordFieldValue/`, `DetailsStatus/`, and `src/components/caseFields/useFieldValueFormatter/` to the key files and append to its description: "Each value reads by its field's type (`createFieldValueFormatter`: dates and timestamps as dates in UTC, times as times, numbers grouped, yes or no in words). A list field shows every value, formatted the same way, the first five then a Show all toggle. Each field's sources are a list named Sources". In the case type page row, append "list fields carry an Every value badge". Under "Outside the routes", add: "- **Field value shape control**: `src/components/caseFields/ValueShapeControl/`, used by the draft card and the case type form."
 
 - [ ] **Step 6: Section 10, invariants**
 
@@ -4053,6 +5870,8 @@ Add rows:
 In the row about `file_row_number` ordering, call them lists rather than arrays.
 
 - [ ] **Step 7: Section 16, limitations**
+
+Delete the two rows Tasks 1 and 5 fixed: "A restricted read leaves a view covering only its records in the tab's DuckDB catalog" (a public session now refuses every `concept_<id>` view, and workspace queries rebuild the view in their lease) and "Structured queries select a concept column by the attribute's name, not its emitted column name". In the "Not built" paragraph, change "concepts on public dashboards (`PublicQuerySession` has no concept planner)" to "concepts on public dashboards (`PublicQuerySession` has no concept planner, and public reads refuse concept views)".
 
 Add rows:
 
@@ -4087,7 +5906,13 @@ git commit -m "docs(joined-cases): describe list fields in the ontology architec
 - [ ] `pnpm test:executed` passes.
 - [ ] `ava supabase status` names `feat-joined-cases`, then `pnpm test:db` passes, including the migration upgrade tests.
 - [ ] `pnpm desktop:sqlite:check-migrations` passes.
-- [ ] `pnpm test:e2e case-list-field.spec.ts` passes on its own.
+- [ ] `pnpm test:e2e case-list-field.spec.ts` passes on its own, with no `Unhandleable arrow type` in the browser console (Tasks 7 and 19).
+- [ ] Task 1: `pnpm test:frontend DuckDbClient.publicSnapshotReads` passes, and a public read naming `concept_<id>` is refused.
+- [ ] Task 5: `rg -n "makeFromConceptAttribute\(" src shared --glob '!*.test.*'` prints nothing, and `pnpm test:executed conceptAttributeColumns` passes.
+- [ ] Task 6: `pnpm test:frontend runStructuredQuery` passes, including "returns the SQL it compiled and ran for an out-of-sync query".
+- [ ] Task 12: a draft join key's "Value to keep" shows the default rule, disabled, with "ID fields keep their value as is." (`pnpm test:frontend CaseTypeDraftBlock`).
+- [ ] Task 15: `rg -n "function DetailsStatus" src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx` returns nothing, and `pnpm test:frontend CaseDetailsRail useRecordFields` passes.
+- [ ] Task 16: `pnpm test:frontend createFieldValueFormatter useFieldValueFormatter RecordFieldValue` passes, and the record page shows a date field as a date, not an epoch number.
 - [ ] `pnpm i18n:check` is clean.
 - [ ] `rg -n "isArray: false" src/views/OntologyDesignerApp/createdCaseTypeToFormValues/createdCaseTypeToFormValues.ts` returns nothing.
 - [ ] `git status` shows only `supabase/config.toml` modified.

@@ -48,6 +48,15 @@ These come from `CLAUDE.md` and `docs/rules/`. Every task in every plan obeys th
 10. **Copy names what the user does:** "case type", "record", "field", "source", "every value", "per month". Never "concept", "individual", "attribute", "mapping", "spine", or "crosswalk" in the UI. The child spec picks the user-facing word for a crosswalk.
 11. **Keep `docs/ontology-architecture.md` true.** Each plan's last task updates the sections its gap changes, including section 16.
 12. **Use the umbrella's shared names exactly** (umbrella §6). If a name proves impossible against the code, stop and record the deviation in the child spec before continuing.
+13. **Run `pnpm test:db` before merging a plan with a migration into `demo/measles`.** `pnpm test:db` (pgTAP and the migration upgrade replays) runs only in PR CI to `develop`, and a merge to `demo/measles` runs `supabase db push --include-all` with no gate. So before any plan that adds a migration is merged into `demo/measles`, run `ava supabase status`, confirm it names `feat-joined-cases`, run `pnpm test:db` on that switched local Supabase, and record the result (pass, or the failures and their fix) in the plan's child spec or in the merge request.
+
+## Out-of-scope findings
+
+Problems seen while executing these plans that are not joined-cases work. They are recorded here so they are not lost. No plan fixes them.
+
+| Finding | Where it was seen | Notes |
+| --- | --- | --- |
+| React warns that the `isAvailableOffline` prop reaches a DOM element | The browser console on the case type pages, during plan 2's browser check | `isAvailableOffline` is a field of each app link in `src/config/AppLinks/AppLinks.tsx`. Some component spreads a link's fields onto a DOM element without removing it |
 
 ## Commands
 

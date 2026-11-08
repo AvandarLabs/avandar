@@ -18,9 +18,9 @@
 
 - **`supabase-declarative-schema`** before Tasks 1 and 2. Edit `supabase/schemas/`, run `pnpm db:reset` and then immediately `pnpm db:new-migration <name>`, and never hand-edit what it generates. This plan has no hand-written migration: no existing row changes, and the enum is new rather than extended.
 - **`test-driven-development`** throughout.
-- **`impeccable`** before Task 7. The record page's period table is a new surface (overview ground rule 9).
-- **`duckdb-docs`** if a DuckDB construct in Task 5 behaves unexpectedly. Every construct used was probed against `@duckdb/node-api` 1.5.5 while writing this plan.
-- **`playwright-best-practices`** before Task 15.
+- **`impeccable`** before Task 8. The record page's period table is a new surface (overview ground rule 9).
+- **`duckdb-docs`** if a DuckDB construct in Task 6 behaves unexpectedly. Every construct used was probed against `@duckdb/node-api` 1.5.5 while writing this plan.
+- **`playwright-best-practices`** before Task 16.
 
 ## Database command rule
 
@@ -41,7 +41,7 @@ Expected: the first line says this branch is on a switched local Supabase databa
 
 ## Order of the tasks
 
-Tasks 1 to 8 build everything a per-period field needs without touching plan 3's shape union: storage, models, the SQL, and the record page's leaf components. Task 9 widens both shape unions; `pnpm type-check` then lists every exhaustive branch, and Task 9 gives each one its arm from the pieces already built. Tasks 10 to 14 are the sites no compiler finds (spec §5.9). Between Task 9 and Task 10 a per-period field fails at planning in the app (its date column is not fetched yet): do not stop between them.
+Tasks 1 to 9 build everything a per-period field needs without touching plan 3's shape union: storage, models, the result reader, the SQL, and the record page's leaf components. Task 10 widens both shape unions; `pnpm type-check` then lists every exhaustive branch, and Task 10 gives each one its arm from the pieces already built. Tasks 11 to 15 are the sites no compiler finds (spec §5.9). Between Task 10 and Task 11 a per-period field fails at planning in the app (its date column is not fetched yet): do not stop between them.
 
 ## Names this plan adds
 
@@ -80,7 +80,8 @@ Shared names come from umbrella §6. The rest are local to this gap.
 | `buildConceptViewSql.ts`, `makeConceptAttributeColumnsFromMetadata.ts` | The `bucketed_list` rule arm, selectors, resolution, fail-closed throws |
 | `getConceptRelationPlansFromSql.ts`, `getNeededColumnsFromQuery.ts` | Fetch and load the date column |
 | `src/components/caseFields/` | Period labels, `PeriodControls`, the third `ValueShapeControl` segment |
-| `src/views/IndividualManagerApp/SingleIndividualView/` | `CaseDetailsRow`, the row builder, `RecordFieldValue`, `RecordFieldPeriodTable` |
+| `src/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults.ts` (+ test) | Decimals inside a map or union keep their scale |
+| `src/views/IndividualManagerApp/SingleIndividualView/` | `CaseDetailsRow`, the row builder, `RecordFieldValue`, `RecordFieldPeriodTable` (its values through plan 3's `useFieldValueFormatter`) |
 | `src/components/ChatPanel/CaseTypeDraftBlock/` | Draft card period and date column |
 | `proposedCaseTypeToCreatedCaseType/`, `createdCaseTypeToFormValues/`, `insertConceptFromFormValues/` | Conversions and the insert |
 | `src/views/OntologyDesignerApp/ConceptCreatorView/` | Form controls, validation, `keepKeyAndLabelFieldsSingle` |
@@ -111,6 +112,7 @@ rg -n "ChatCaseValueShape" shared/types/chat.types.ts
 rg -n "value_rule_mismatch|list_field_is_key_or_label" supabase/schemas/50.rpc_concepts__create.sql
 rg -ln "ValueShapeControl" src
 rg -n "export function RecordFieldValue|export function makeCaseDetailsRowsFromAttributes|export function keepKeyAndLabelFieldsSingle" src
+rg -n "export function useFieldValueFormatter|export function createFieldValueFormatter" src/components/caseFields
 rg -n "isList|getValidAggregations" shared/models/queries/QueryColumn/QueryColumnModule.ts
 rg -n "StructRow|isArray: true" src/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults.ts src/clients/DuckDbClient/arrowFieldToQueryResultField.ts
 rg -n "formatListFieldNote|_formatConceptAttributeName" shared/models/chat/SqlTableAlias/SqlTableAliasModule.ts
@@ -123,6 +125,7 @@ Expected: every `rg` finds its name, and `ConceptWrapper` no longer exists (plan
 - `ValueShapeControl` is in `src/components/caseFields/ValueShapeControl/ValueShapeControl.tsx`, labels each shape through a `Record<ConceptAttribute.ValueShape, string>`, and the draft card row (`CaseTypeDraftAttributeRow.tsx`) and the form (`DatasetColumnMappingCreator.tsx`) both use it.
 - `RecordFieldValue` is in `src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx`, and renders plan 1's "No value" for a missing value before it matches on the shape.
 - `_toJsValueFromArrowValue` converts an `arrow.StructRow` by mapping its fields through itself, and `arrowFieldToQueryResultField` reports a LIST column as `{ dataType: "varchar", isArray: true }`.
+- `useFieldValueFormatter` is in `src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts` and takes a field's `data_type`; `createFieldValueFormatter` is its pure core beside it. Task 8's period table formats its values through it.
 
 - [ ] **Step 2: Note the string checks plan 3 left**
 
@@ -130,11 +133,11 @@ Expected: every `rg` finds its name, and `ConceptWrapper` no longer exists (plan
 rg -n '=== "list"|!== "list"|=== "single"|!== "single"|is_array === true' src shared supabase --type ts
 ```
 
-These are the comparisons the compiler cannot find. Tasks 9 to 13 handle the ones in their files. The rule for every hit: a test meaning "does this field hold more than one value?" must be true for `"bucketed_list"` (`!== "single"`), and a list marker or list note must not describe a per-period field.
+These are the comparisons the compiler cannot find. Tasks 10 to 14 handle the ones in their files. The rule for every hit: a test meaning "does this field hold more than one value?" must be true for `"bucketed_list"` (`!== "single"`), and a list marker or list note must not describe a per-period field.
 
 - [ ] **Step 3: Reconcile names**
 
-If any name or path differs from what Step 1 expects, use the landed one everywhere this plan uses the planned one, and add a row for it to the child spec's "Deviations" section in Task 17.
+If any name or path differs from what Step 1 expects, use the landed one everywhere this plan uses the planned one, and add a row for it to the child spec's "Deviations" section in Task 18.
 
 ---
 
@@ -1341,7 +1344,281 @@ git commit -m "feat(joined-cases): read per-period values and date column types"
 
 ---
 
-## Task 5: The per-period value SQL
+## Task 5: Decimals inside a map or union keep their scale
+
+**Files:**
+- Modify: `src/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults.ts`
+- Test: `src/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults.test.ts`
+
+A per-period value reaches the browser as a list of `STRUCT(bucket, value)`, and Task 4's `toBucketedListEntries` reads each `value` exactly as `arrowTableToJS` hands it over. `arrowTableToJS` already applies a DECIMAL's scale at the top level, inside a list, and inside a struct: plan 1 made struct items inside lists convert field by field, plan 2 applied the scale, and plan 3's Task 7 (list cells) turns a list's dates into ISO strings on the same path. Two containers still lose the scale:
+
+- **A map.** `_toJsValueFromArrowValue` treats an `arrow.MapRow` like a struct and looks each key up among `dataType.children`. A map's only child is its `entries` struct (`key`, `value`), so no key is ever found and `MAP {'a': 2.25}` reads `{ a: 225 }`.
+- **A union.** A union cell arrives as its member's value alone, and the union's type is passed down in place of the member's, so a `DECIMAL(4,2)` member reads `225`.
+
+Neither shape is a per-period value, but chat SQL and the Data Explorer return whatever DuckDB computes, and this task closes the reader before the per-period work builds on it. Nothing in Tasks 1 to 4 changes.
+
+- [ ] **Step 1: Write the failing tests**
+
+In `duckDbArrowResults.test.ts`, add these two builders below `createDecimalTable`:
+
+```ts
+/** `DECIMAL(4,2)`, the type of every decimal these tests store. */
+const PRICE_TYPE = new arrow.Decimal(2, 4, 128);
+
+/**
+ * Builds a one-row column holding `MAP {'a': 2.25, 'b': 0.05}`, as DuckDB
+ * exports a `MAP(VARCHAR, DECIMAL(4,2))`: one `entries` struct of `key` and
+ * `value`.
+ */
+function createPriceMapColumn(): arrow.Vector {
+  const entriesType = new arrow.Struct([
+    new arrow.Field("key", new arrow.Utf8(), false),
+    new arrow.Field("value", PRICE_TYPE, true),
+  ]);
+  const keys = arrow.makeData({
+    type: new arrow.Utf8(),
+    length: 2,
+    nullCount: 0,
+    valueOffsets: new Int32Array([0, 1, 2]),
+    data: new TextEncoder().encode("ab"),
+  });
+  const values = arrow.makeData({
+    type: PRICE_TYPE,
+    length: 2,
+    nullCount: 0,
+    data: new Uint32Array([225, 0, 0, 0, 5, 0, 0, 0]),
+  });
+  const entries = arrow.makeData({
+    type: entriesType,
+    length: 2,
+    nullCount: 0,
+    children: [keys, values],
+  });
+  return arrow.makeVector(
+    arrow.makeData({
+      type: new arrow.Map_(new arrow.Field("entries", entriesType, false)),
+      length: 1,
+      nullCount: 0,
+      valueOffsets: new Int32Array([0, 2]),
+      child: entries,
+    }),
+  );
+}
+
+/**
+ * Builds a two-row column of `UNION(amount DECIMAL(4,2), note VARCHAR)`, as
+ * DuckDB exports a union: a sparse union whose first row is the amount 2.25
+ * and whose second is the note `pending`.
+ */
+function createAmountOrNoteColumn(): arrow.Vector {
+  const amounts = arrow.makeData({
+    type: PRICE_TYPE,
+    length: 2,
+    nullCount: 0,
+    data: new Uint32Array([225, 0, 0, 0, 0, 0, 0, 0]),
+  });
+  const notes = arrow.makeData({
+    type: new arrow.Utf8(),
+    length: 2,
+    nullCount: 0,
+    valueOffsets: new Int32Array([0, 0, 7]),
+    data: new TextEncoder().encode("pending"),
+  });
+  return arrow.makeVector(
+    arrow.makeData({
+      type: new arrow.SparseUnion(
+        [0, 1],
+        [
+          new arrow.Field("amount", PRICE_TYPE, true),
+          new arrow.Field("note", new arrow.Utf8(), true),
+        ],
+      ),
+      length: 2,
+      nullCount: 0,
+      typeIds: new Int8Array([0, 1]),
+      children: [amounts, notes],
+    }),
+  );
+}
+```
+
+and these tests inside `describe("arrowTableToJS", ...)`:
+
+```ts
+  it("returns the decimals in a map with their scale applied", () => {
+    const prices = createPriceMapColumn();
+
+    expect(
+      arrowTableToJS(createTableFromColumn("prices", prices)).data,
+    ).toEqual([{ prices: { a: 2.25, b: 0.05 } }]);
+  });
+
+  it("returns the decimals in a map inside a list with their scale applied", () => {
+    const prices = createPriceMapColumn();
+    const priceLists = arrow.makeVector(
+      arrow.makeData({
+        type: new arrow.List(new arrow.Field("item", prices.type, true)),
+        length: 1,
+        nullCount: 0,
+        valueOffsets: new Int32Array([0, 1]),
+        child: prices.data[0]!,
+      }),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("priceLists", priceLists)).data,
+    ).toEqual([{ priceLists: [{ a: 2.25, b: 0.05 }] }]);
+  });
+
+  it("returns a union's decimal member with its scale applied and its other members as they are", () => {
+    const amountOrNote = createAmountOrNoteColumn();
+
+    expect(
+      arrowTableToJS(createTableFromColumn("amountOrNote", amountOrNote)).data,
+    ).toEqual([{ amountOrNote: 2.25 }, { amountOrNote: "pending" }]);
+  });
+```
+
+- [ ] **Step 2: Run them and watch them fail**
+
+Run: `pnpm test:frontend duckDbArrowResults`
+Expected: FAIL. The map tests receive `{ a: 225, b: 5 }`, and the union test receives `225` for its first row. Every earlier test in the file still passes.
+
+- [ ] **Step 3: Read a map's values and a union's member by their own types**
+
+In `duckDbArrowResults.ts`, add below `_getDecimalScale`:
+
+```ts
+/**
+ * Whether a value is a decimal as Arrow hands it over: a big number object
+ * holding the unscaled integer.
+ */
+function _isBigNum(value: unknown): value is object {
+  if (value === null || typeof value !== "object") {
+    return false;
+  }
+  const constructorName = (value as { constructor?: { name?: string } })
+    .constructor?.name;
+  return constructorName === "DecimalBigNum" || constructorName === "BigNum";
+}
+
+/**
+ * Whether a union member of `memberType` can have produced `value`. A union
+ * cell arrives as its member's value with no tag, so the member is told by
+ * the value's kind: a list for a vector, a map for a map row, a struct for a
+ * struct row, and a decimal for a big number.
+ */
+function _isUnionMemberOfValue(
+  options: Readonly<{ memberType: arrow.DataType; value: unknown }>,
+): boolean {
+  const { memberType, value } = options;
+  if (value instanceof arrow.Vector) {
+    return memberType instanceof arrow.List;
+  }
+  if (value instanceof arrow.MapRow) {
+    return memberType instanceof arrow.Map_;
+  }
+  if (value instanceof arrow.StructRow) {
+    return memberType instanceof arrow.Struct;
+  }
+  return _isBigNum(value) && memberType instanceof arrow.Decimal;
+}
+
+/**
+ * The type of the union member a value came from, or `undefined` when no
+ * member or more than one member of its kind could have produced it. Two
+ * decimal members are told apart only by the row's type id, which a cell
+ * does not carry, so such a value reads as it arrives.
+ */
+function _getUnionMemberType(
+  options: Readonly<{ unionType: arrow.Union; value: unknown }>,
+): arrow.DataType | undefined {
+  const memberTypes = options.unionType.children
+    .map((field) => {
+      return field.type;
+    })
+    .filter((memberType) => {
+      return _isUnionMemberOfValue({ memberType, value: options.value });
+    });
+  return memberTypes.length === 1 ? memberTypes[0] : undefined;
+}
+
+/**
+ * Converts every entry of a map cell. All of a map's values share one type,
+ * held by the `value` field of its `entries` struct rather than by a field
+ * named for each key.
+ */
+function _toJsObjectFromMapRow(
+  options: Readonly<{ mapRow: arrow.MapRow; dataType?: arrow.DataType }>,
+): Record<string, unknown> {
+  const valueType =
+    options.dataType instanceof arrow.Map_
+      ? options.dataType.valueType
+      : undefined;
+  return Object.fromEntries(
+    Object.entries(options.mapRow.toJSON()).map(([key, entryValue]) => {
+      return [key, _toJsValueFromArrowValue(entryValue, valueType)];
+    }),
+  );
+}
+```
+
+Then in `_toJsValueFromArrowValue`:
+
+1. Add as the first statement of the body:
+
+   ```ts
+   if (dataType instanceof arrow.Union) {
+     // A union cell is its member's value, so it converts as that member.
+     return _toJsValueFromArrowValue(
+       value,
+       _getUnionMemberType({ unionType: dataType, value }),
+     );
+   }
+   ```
+
+2. Replace the branch that starts `if (value instanceof arrow.StructRow || value instanceof arrow.MapRow) {` with a map branch followed by a struct-only branch:
+
+   ```ts
+   if (value instanceof arrow.MapRow) {
+     return _toJsObjectFromMapRow({ mapRow: value, dataType });
+   }
+   if (value instanceof arrow.StructRow) {
+   ```
+
+   and keep the struct branch's body as it is.
+
+3. Replace the decimal guard from `if (value === null || typeof value !== "object") {` down to its `return value;` after the `constructorName` check with:
+
+   ```ts
+   if (!_isBigNum(value)) {
+     return value;
+   }
+   ```
+
+   keeping everything below it (the scale and the `valueOf` fallback) unchanged.
+
+Read the function once more after the edit: it should be under 45 lines (`CLAUDE.md`). If the edit pushes it over, move the struct branch into a `_toJsObjectFromStructRow` helper shaped like `_toJsObjectFromMapRow`.
+
+- [ ] **Step 4: Run them and watch them pass**
+
+Run: `pnpm test:frontend duckDbArrowResults DuckDbClient`
+Expected: PASS, the three new tests and every list, struct, and decimal test before them.
+
+Run: `pnpm type-check`
+Expected: PASS.
+
+- [ ] **Step 5: Commit**
+
+```bash
+pnpm format
+git add src/clients/DuckDbClient/duckDbArrowResults
+git commit -m "fix(joined-cases): keep the scale of decimals inside a map or union"
+```
+
+---
+
+## Task 6: The per-period value SQL
 
 **Files:**
 - Create: `src/clients/qetl/QueryMediator/conceptRelation/buildBucketedListValueSql/buildBucketedListValueSql.ts`
@@ -1887,7 +2164,7 @@ git commit -m "feat(joined-cases): compute a per-period field's values in DuckDB
 
 ---
 
-## Task 6: Period names and period labels
+## Task 7: Period names and period labels
 
 **Files:**
 - Create: `src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts`
@@ -2077,12 +2354,12 @@ git commit -m "feat(joined-cases): name and label periods in the reader's langua
 
 ---
 
-## Task 7: The record page's period table
+## Task 8: The record page's period table
 
 **Files:**
 - Create: `src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable.tsx`
 - Create: `.../RecordFieldPeriodTable/RecordFieldPeriodTable.module.css`
-- Create: `.../RecordFieldPeriodTable/useBucketValueFormatter.ts`
+- Create: `.../RecordFieldPeriodTable/useBucketValueFormatter.ts` (wraps plan 3's `useFieldValueFormatter`)
 - Test: `.../RecordFieldPeriodTable/RecordFieldPeriodTable.test.tsx`
 
 This is a new surface: load the `impeccable` skill before Step 3, and read `docs/design/app-view-layout.md` ("The rail") and the Named Rules in `DESIGN.md`. The table lives in a rail fact (`AppViewRail.Fact`), whose value column is narrow; plan 3's `RecordFieldValueList` beside it is the closest precedent. Keep it a real table: a per-period value is two-dimensional, and a screen reader should announce the period and the value of each row.
@@ -2229,6 +2506,22 @@ describe("RecordFieldPeriodTable", () => {
       ["Week of Jan 5, 2026", "Jan 7, 2026"],
     ]);
   });
+
+  // A TIME value arrives as microseconds since midnight.
+  it("shows a time value as a time of day", () => {
+    render(
+      <RecordFieldPeriodTable
+        fieldName="Usual visit time"
+        bucketGrain="month"
+        valueDataType="time"
+        entries={[{ bucket: "2026-01-01", value: 52_200_000_000 }]}
+      />,
+    );
+
+    expect(_readRows(screen.getByRole("table"))).toEqual([
+      ["Jan 2026", "2:30 PM"],
+    ]);
+  });
 });
 ```
 
@@ -2239,72 +2532,41 @@ Expected: FAIL, the module does not exist.
 
 - [ ] **Step 3: Write the value formatter**
 
+Plan 3's Task 16 already formats a record page value by its field's `data_type`: `useFieldValueFormatter` in `src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts` (dates and timestamps in UTC, a time of day from its microseconds, booleans as `Yes` or `No`, numbers through `Intl.NumberFormat`). The period table reuses it rather than formatting dates a second way. The one difference spec §5.6 asks for is numbers: at most two fraction digits, because a period's value is usually an average. So this hook wraps the shared one and changes numbers only.
+
 Create `useBucketValueFormatter.ts`:
 
 ```ts
 import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
-import { match } from "ts-pattern";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { useFieldValueFormatter } from "@/components/caseFields/useFieldValueFormatter/useFieldValueFormatter";
 
 const NUMBER_OPTIONS: Intl.NumberFormatOptions = { maximumFractionDigits: 2 };
-const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
-  dateStyle: "medium",
-  timeZone: "UTC",
-};
-const TIMESTAMP_OPTIONS: Intl.DateTimeFormatOptions = {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "UTC",
-};
 
 /**
  * A function that formats one period's value for `RecordFieldPeriodTable`,
- * by the field's data type. Dates and timestamps arrive as epoch
- * milliseconds of the stored wall clock, so they are formatted in UTC.
+ * by the field's data type. Every type reads as it does elsewhere on the
+ * record page, except that numbers keep at most two fraction digits: a
+ * period's value is usually an average, and a long tail of digits makes the
+ * column hard to scan.
  */
 export function useBucketValueFormatter(
   valueDataType: AvaDataType.T,
 ): (value: unknown) => string {
-  const { t, i18n } = useLingui();
+  const { i18n } = useLingui();
+  const formatFieldValue = useFieldValueFormatter(valueDataType);
   return useMemo(() => {
+    if (!AvaDataType.isNumeric(valueDataType)) {
+      return formatFieldValue;
+    }
     const numberFormat = new Intl.NumberFormat(i18n.locale, NUMBER_OPTIONS);
-    const dateFormat = new Intl.DateTimeFormat(i18n.locale, DATE_OPTIONS);
-    const timestampFormat = new Intl.DateTimeFormat(
-      i18n.locale,
-      TIMESTAMP_OPTIONS,
-    );
-    const yes = t`Yes`;
-    const no = t`No`;
     return (value: unknown): string => {
-      if (value === null || value === undefined) {
-        return "";
-      }
-      return match(valueDataType)
-        .with("bigint", "double", () => {
-          return typeof value === "number"
-            ? numberFormat.format(value)
-            : String(value);
-        })
-        .with("date", () => {
-          return typeof value === "number"
-            ? dateFormat.format(value)
-            : String(value);
-        })
-        .with("timestamp", () => {
-          return typeof value === "number"
-            ? timestampFormat.format(value)
-            : String(value);
-        })
-        .with("boolean", () => {
-          return value === true ? yes : value === false ? no : String(value);
-        })
-        .with("varchar", "time", () => {
-          return String(value);
-        })
-        .exhaustive();
+      return typeof value === "number"
+        ? numberFormat.format(value)
+        : formatFieldValue(value);
     };
-  }, [i18n.locale, t, valueDataType]);
+  }, [formatFieldValue, i18n.locale, valueDataType]);
 }
 ```
 
@@ -2567,7 +2829,7 @@ pnpm test:frontend RecordFieldPeriodTable
 .claude/skills/impeccable/scripts/impeccable detect --json src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable
 ```
 
-Expected: PASS, six tests; the detector reports no findings (no `Paper` in the slate, no stock `gray`, token borders, no second accent). Fix any it reports.
+Expected: PASS, seven tests; the detector reports no findings (no `Paper` in the slate, no stock `gray`, token borders, no second accent). Fix any it reports.
 
 - [ ] **Step 6: Commit**
 
@@ -2580,7 +2842,7 @@ git commit -m "feat(joined-cases): show a per-period field as a period and value
 
 ---
 
-## Task 8: The period and date column controls
+## Task 9: The period and date column controls
 
 **Files:**
 - Create: `src/components/caseFields/PeriodControls/PeriodControls.tsx`
@@ -2819,7 +3081,7 @@ git commit -m "feat(joined-cases): add the period and date column pickers"
 
 ---
 
-## Task 9: Widen the value shape, and give every branch on it a per-period arm
+## Task 10: Widen the value shape, and give every branch on it a per-period arm
 
 **Files:**
 - Modify: `shared/models/ontology/ConceptAttribute/ConceptAttribute.types.ts`, `ConceptAttributeModule/ConceptAttributeModule.ts` (+ test)
@@ -2835,7 +3097,7 @@ git commit -m "feat(joined-cases): add the period and date column pickers"
 - Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx`
 - Modify: every test that names plan 3's control `One value or every value for <field>`
 
-Plan 3 branches on a shape with `match(...).exhaustive()` or an exhaustive `Record`, so widening the unions first turns every branch into a compile error, and the error list is the checklist (`docs/rules/typescript.md`, "Widening a string literal union"). `ValueShapeControl` is typed by `ConceptAttribute.ValueShape` and feeds the draft card's `ChatCaseValueShape`, so both unions widen together. The pieces every arm needs already exist (Tasks 4 to 8). Vitest does not type-check, so each step's tests run red and green while the tree still has other errors; the task commits once `pnpm type-check` is clean.
+Plan 3 branches on a shape with `match(...).exhaustive()` or an exhaustive `Record`, so widening the unions first turns every branch into a compile error, and the error list is the checklist (`docs/rules/typescript.md`, "Widening a string literal union"). `ValueShapeControl` is typed by `ConceptAttribute.ValueShape` and feeds the draft card's `ChatCaseValueShape`, so both unions widen together. The pieces every arm needs already exist (Tasks 4 to 9). Vitest does not type-check, so each step's tests run red and green while the tree still has other errors; the task commits once `pnpm type-check` is clean.
 
 - [ ] **Step 1: Widen both unions**
 
@@ -3377,7 +3639,7 @@ Add to `RecordFieldValue.test.tsx`:
         fieldName="Temperature"
         valueShape="bucketed_list"
         bucketGrain="month"
-        valueDataType="double"
+        dataType="double"
         value={[{ bucket: Date.UTC(2026, 0, 1), value: 38.5 }]}
       />,
     );
@@ -3395,7 +3657,7 @@ and to `makeCaseDetailsRowsFromAttributes.test.ts`, beside plan 3's case for `va
     expect(rows[0]).toMatchObject({
       valueShape: "bucketed_list",
       bucketGrain: "month",
-      valueDataType: "double",
+      dataType: "double",
     });
 ```
 
@@ -3407,15 +3669,12 @@ In `CaseDetailsRail.tsx`, add to `CaseDetailsRow` after plan 3's `valueShape`:
 ```ts
   /** The field's period, when it keeps one value per period. */
   bucketGrain: ConceptAttribute.BucketGrain | undefined;
-  /** The field's `data_type`: the type of one value, or of each period's. */
-  valueDataType: AvaDataType.T;
 ```
 
-and pass `bucketGrain={attribute.bucketGrain}` and `valueDataType={attribute.valueDataType}` to `RecordFieldValue`. In `makeCaseDetailsRowsFromAttributes.ts`, add to each row, beside plan 3's `valueShape`:
+and pass `bucketGrain={attribute.bucketGrain}` to `RecordFieldValue`, beside the `dataType={attribute.dataType}` plan 3 passes. Plan 3's `dataType` (the field's `data_type`) is already the type of each period's value, so the row needs no second type. Spec §5.6 says `CaseDetailsRow` gains `valueDataType`; record in Task 18's "Deviations" row that plan 3's `dataType` serves instead. In `makeCaseDetailsRowsFromAttributes.ts`, add to each row, beside plan 3's `valueShape`:
 
 ```ts
         bucketGrain: attribute.bucketGrain,
-        valueDataType: attribute.dataType,
 ```
 
 In `RecordFieldValue.tsx`, add to `Props`:
@@ -3423,31 +3682,29 @@ In `RecordFieldValue.tsx`, add to `Props`:
 ```ts
   /** The field's period; read only for a per-period field. */
   bucketGrain?: ConceptAttribute.BucketGrain;
-  /** The type of one value, or of each period's value. */
-  valueDataType?: AvaDataType.T;
 ```
 
-(optional, so plan 3's tests keep rendering without them), destructure `bucketGrain` and `valueDataType = "varchar"`, import `ConceptAttribute` as a value and `RecordFieldPeriodTable`, and add the arm:
+(optional, so plan 3's tests keep rendering without it), destructure `bucketGrain`, import `ConceptAttribute` as a value and `RecordFieldPeriodTable`, and add the arm. Plan 3's required `dataType` prop is each period's value type, and `formatValue` is the component's `useFieldValueFormatter(dataType)` result:
 
 ```tsx
     .with("bucketed_list", () => {
       const entries = ConceptAttribute.toBucketedListEntries(value);
       // Anything else is a broken value; show it rather than fail the page.
       if (!entries || bucketGrain === undefined) {
-        return unknownToString(value);
+        return formatValue(value);
       }
       return (
         <RecordFieldPeriodTable
           fieldName={fieldName}
           bucketGrain={bucketGrain}
-          valueDataType={valueDataType}
+          valueDataType={dataType}
           entries={entries}
         />
       );
     })
 ```
 
-Plan 1's "No value" still renders first for a missing value. Add to `CaseDetailsRail.test.tsx`'s row fixtures `bucketGrain: undefined, valueDataType: "varchar",` where the compiler asks.
+Plan 1's "No value" still renders first for a missing value. Add to `CaseDetailsRail.test.tsx`'s row fixtures `bucketGrain: undefined,` where the compiler asks (plan 3's fixtures already carry `dataType` and `valueShape`). The rail's source lines are a list labelled `Sources`, so a rail test that reads a field's rows scopes to that field's table (`getByRole("table", { name: ... })`), never to every `row` or `listitem` in the rail.
 
 Run: `pnpm test:frontend RecordFieldValue makeCaseDetailsRowsFromAttributes CaseDetailsRail`
 Expected: PASS.
@@ -3466,7 +3723,7 @@ In `CaseTypeAttributesList.tsx`'s `AttributeChips`, add `const grainLabels = use
         })
 ```
 
-`ConceptMetaView/` already holds a test beside its modules, so this badge is checked by hand in Task 16 rather than in a second test file there (`docs/rules/testing.md`).
+`ConceptMetaView/` already holds a test beside its modules, so this badge is checked by hand in Task 17 rather than in a second test file there (`docs/rules/testing.md`).
 
 - [ ] **Step 8: A third segment in the shape control**
 
@@ -4157,7 +4414,7 @@ hoist plan 3's rule `Select` into `const renderRuleSelect = (label: string) => {
           .exhaustive()}
 ```
 
-Task 12 adds the form's validation; Task 16 checks the form by hand.
+Task 13 adds the form's validation; Task 17 checks the form by hand.
 
 - [ ] **Step 12: Clear the rest of the compiler's list**
 
@@ -4187,7 +4444,7 @@ git commit -m "feat(joined-cases): add per-period fields to every place a field'
 
 ---
 
-## Task 10: Planning fetches, and the load keeps, the date column
+## Task 11: Planning fetches, and the load keeps, the date column
 
 **Files:**
 - Modify: `src/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts:119-130`
@@ -4386,7 +4643,7 @@ git commit -m "fix(joined-cases): fetch and load the date column a per-period fi
 
 ---
 
-## Task 11: Chat proposes per-period fields
+## Task 12: Chat proposes per-period fields
 
 **Files:**
 - Modify: `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.ts` (+ test)
@@ -4679,7 +4936,7 @@ git commit -m "feat(joined-cases): let chat propose a field per month or another
 
 ---
 
-## Task 12: The case type form refuses an incomplete per-period field
+## Task 13: The case type form refuses an incomplete per-period field
 
 **Files:**
 - Modify: `src/views/OntologyDesignerApp/ConceptCreatorView/keepKeyAndLabelFieldsSingle/keepKeyAndLabelFieldsSingle.ts` (+ test)
@@ -4788,7 +5045,7 @@ git commit -m "fix(joined-cases): keep the case type form from saving an incompl
 
 ---
 
-## Task 13: Chat's SQL context describes per-period fields
+## Task 14: Chat's SQL context describes per-period fields
 
 **Files:**
 - Modify: `shared/models/chat/SqlTableAlias/SqlTableAlias.types.ts`, `SqlTableAliasModule.ts` (+ `SqlTableAlias.test.ts`)
@@ -5130,7 +5387,7 @@ git commit -m "feat(joined-cases): tell chat how to read a per-period field"
 
 ---
 
-## Task 14: The Data Explorer labels each period
+## Task 15: The Data Explorer labels each period
 
 **Files:**
 - Test: `src/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults.test.ts` (plan 3's)
@@ -5165,11 +5422,11 @@ Add to plan 3's `duckDbArrowResults.test.ts`:
 ```
 
 Run: `pnpm test:frontend duckDbArrowResults`
-Expected: PASS at once. If it fails, plan 3's struct branch is missing: add it as plan 3's Task 4 Step 4 shows (`objectValuesMap(value.toJSON(), _toJsValueFromArrowValue)` for an `arrow.StructRow`).
+Expected: PASS at once. If it fails, plan 3's struct branch is missing: add it as plan 3's Task 7 Step 4 shows (`objectValuesMap(value.toJSON(), _toJsValueFromArrowValue)` for an `arrow.StructRow`).
 
 - [ ] **Step 2: Write the failing tests**
 
-Add to `QueryColumn.test.ts`, using Task 9's `TEMPERATURE_PER_MONTH`:
+Add to `QueryColumn.test.ts`, using Task 10's `TEMPERATURE_PER_MONTH`:
 
 ```ts
   it("gives a per-month column its period when read whole, and none when counted", () => {
@@ -5487,7 +5744,7 @@ git commit -m "feat(joined-cases): label a per-period field's periods in the Dat
 
 ---
 
-## Task 15: E2E: a per-month field on the record page and in the Data Explorer
+## Task 16: E2E: a per-month field on the record page and in the Data Explorer
 
 **Files:**
 - Create: `tests/data/case-bucketed-visits/case-bucketed-visits.csv`, `tests/data/case-bucketed-visits/README.md`
@@ -5495,7 +5752,7 @@ git commit -m "feat(joined-cases): label a per-period field's periods in the Dat
 - Modify: `tests/e2e/helpers/CaseTypeSeedHelpers.ts`
 - Create: `tests/e2e/case-bucketed-fields.spec.ts`
 
-The spec seeds its preconditions (the dataset through the import UI, the case type and its records through `rpc_concepts__create`, as `case-statuses-data-explorer.spec.ts` does) and drives the behavior under test, reading the field, through the UI. Creating a per-period field through the form and the draft card is covered by Task 9's component tests and checked by hand in Task 16.
+The spec seeds its preconditions (the dataset through the import UI, the case type and its records through `rpc_concepts__create`, as `case-statuses-data-explorer.spec.ts` does) and drives the behavior under test, reading the field, through the UI. Creating a per-period field through the form and the draft card is covered by Task 10's component tests and checked by hand in Task 17.
 
 - [ ] **Step 1: Add the fixture data**
 
@@ -5935,7 +6192,7 @@ git commit -m "test(joined-cases): show a per-month field on the record page and
 
 ---
 
-## Task 16: Translations and full verification
+## Task 17: Translations and full verification
 
 **Files:**
 - Modify: `src/i18n/locales/*` (generated)
@@ -5947,7 +6204,7 @@ git commit -m "test(joined-cases): show a per-month field on the record page and
 rg -n '=== "list"|!== "list"|=== "single"|!== "single"|is_array === true' src shared supabase --type ts
 ```
 
-Expected: every hit treats a per-period field as Tasks 9 to 13 decided: more than one value wherever the question is "a list?", its own marker and note in chat's schema context. Fix any hit that does not, with a test beside it.
+Expected: every hit treats a per-period field as Tasks 10 to 14 decided: more than one value wherever the question is "a list?", its own marker and note in chat's schema context. Fix any hit that does not, with a test beside it.
 
 - [ ] **Step 2: Extract and compile the catalogs**
 
@@ -5956,7 +6213,7 @@ pnpm i18n:extract && pnpm i18n:compile
 pnpm i18n:check
 ```
 
-Expected: the catalogs carry every message Tasks 6 to 12 added, with no unreferenced strings; `i18n:check` is clean after the commit in Step 5.
+Expected: the catalogs carry every message Tasks 7 to 13 added, with no unreferenced strings; `i18n:check` is clean after the commit in Step 5.
 
 - [ ] **Step 3: Run every automated suite**
 
@@ -5972,7 +6229,7 @@ pnpm test:e2e case-bucketed-fields.spec.ts
 pnpm test:e2e case-list-field.spec.ts
 ```
 
-Expected: PASS. Run the two E2E specs one at a time; the second is plan 3's, whose control name Task 9 changed.
+Expected: PASS. Run the two E2E specs one at a time; the second is plan 3's, whose control name Task 10 changed.
 
 - [ ] **Step 4: Check the authoring paths in the running app**
 
@@ -5992,7 +6249,7 @@ git commit -m "chore(joined-cases): extract and compile the per-period field mes
 
 ---
 
-## Task 17: Update the ontology architecture doc
+## Task 18: Update the ontology architecture doc
 
 **Files:**
 - Modify: `docs/ontology-architecture.md`
@@ -6112,9 +6369,11 @@ git commit -m "docs(joined-cases): describe per-period fields in the ontology ar
 - [ ] `pnpm test:db` passes, including the 22 assertions of `concept_attributes__bucketed_list.test.sql` and the migration upgrade tests.
 - [ ] `pnpm test:executed` passes, including every rule per period in `buildBucketedListValueSql.executed.test.ts`.
 - [ ] `pnpm test:frontend`, `pnpm type-check`, and `pnpm lint` pass.
+- [ ] `pnpm test:frontend duckDbArrowResults` passes, including the map, map-in-a-list, and union decimals Task 5 added.
+- [ ] `RecordFieldPeriodTable` formats its values through `useFieldValueFormatter` (`rg -n "useFieldValueFormatter" src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable` finds `useBucketValueFormatter.ts`).
 - [ ] `pnpm test:e2e case-bucketed-fields.spec.ts` and `pnpm test:e2e case-list-field.spec.ts` pass, each run on its own.
 - [ ] `pnpm i18n:check` and `pnpm desktop:sqlite:check-migrations` are clean.
-- [ ] The Task 16 screenshots show the form's period controls, the case type page's badge, and the record page's table.
+- [ ] The Task 17 screenshots show the form's period controls, the case type page's badge, and the record page's table.
 - [ ] `git status` shows only `supabase/config.toml` modified.
 - [ ] Nothing was run against production.
 
