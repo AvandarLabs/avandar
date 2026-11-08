@@ -4,6 +4,8 @@ import { themeMaterial } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { makeDataGridColumnDefs } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { DataGridPeriodFormatters } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
 import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
 import type {
   GridReadyEvent,
@@ -26,6 +28,12 @@ type Props = {
   dateColumns?: ReadonlySet<string>;
   dateFormat?: string;
   timezone?: FormattableTimezone;
+
+  /** The period of each per-period column, by column name. */
+  bucketGrains?: Readonly<Record<string, ConceptAttribute.BucketGrain>>;
+
+  /** How to read a per-period cell, together with `bucketGrains`. */
+  periodFormatters?: DataGridPeriodFormatters;
   style?: React.CSSProperties;
   onRowDataUpdated?: (params: RowDataUpdatedEvent) => void;
   onGridReady?: (params: GridReadyEvent) => void;
@@ -48,6 +56,8 @@ export function DataGrid({
   height = 500,
   dateFormat = "YYYY-MM-DD HH:mm:ss",
   timezone,
+  bucketGrains,
+  periodFormatters,
   style,
   pagination = true,
   onRowDataUpdated,
@@ -61,8 +71,18 @@ export function DataGrid({
       dateColumns,
       dateFormat,
       timezone,
+      bucketGrains,
+      periodFormatters,
     });
-  }, [columnNames, data, dateColumns, dateFormat, timezone]);
+  }, [
+    columnNames,
+    data,
+    dateColumns,
+    dateFormat,
+    timezone,
+    bucketGrains,
+    periodFormatters,
+  ]);
 
   // AgGrid will fill the size of the parent container
   return (

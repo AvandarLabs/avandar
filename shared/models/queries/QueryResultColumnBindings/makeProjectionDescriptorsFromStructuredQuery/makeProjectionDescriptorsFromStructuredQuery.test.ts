@@ -123,4 +123,23 @@ describe("makeProjectionDescriptorsFromStructuredQuery", () => {
     })[0];
     expect(descriptor?.sqlExpressionKey).toBe(sql?.expressionKey);
   });
+  it("predicts a per-month column's period for its result", () => {
+    const [temperature] = QueryColumn.makeFromConceptAttributes([
+      Model.make("ConceptAttribute", {
+        id: "temperature-id",
+        name: "Temperature",
+        dataType: "double",
+        isArray: true,
+        bucketGrain: "month",
+      }) as ConceptAttribute.T,
+    ]);
+
+    const [descriptor] = makeProjectionDescriptorsFromStructuredQuery({
+      ..._query(),
+      queryColumns: [temperature!],
+      aggregations: {},
+    });
+
+    expect(descriptor?.bucketGrain).toBe("month");
+  });
 });

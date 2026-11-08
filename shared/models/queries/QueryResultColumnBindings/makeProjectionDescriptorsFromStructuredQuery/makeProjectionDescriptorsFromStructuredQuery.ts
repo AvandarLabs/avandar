@@ -28,6 +28,7 @@ export function makeProjectionDescriptorsFromStructuredQuery(
   return query.queryColumns.map((column) => {
     const base = Model.getTypedId(column.baseColumn);
     const aggregation = query.aggregations[column.id];
+    const bucketGrain = QueryColumn.getBucketGrain({ column, aggregation });
     return {
       id: column.id,
       identity: "structured",
@@ -46,6 +47,7 @@ export function makeProjectionDescriptorsFromStructuredQuery(
         ...column,
         aggregation,
       }),
+      ...(bucketGrain ? { bucketGrain } : {}),
     };
   });
 }

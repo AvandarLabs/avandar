@@ -174,6 +174,29 @@ export const QueryColumnModule = {
   isList: _isList,
 
   /**
+   * The period of a per-period field this column reads whole, or `undefined`
+   * for any other column. A count of a per-period field is a number, so it
+   * has no period. Grouping keeps the list. Use it to label a result's
+   * periods, for example in a results grid.
+   */
+  getBucketGrain: (
+    options: Readonly<{
+      column: QueryColumn.T;
+      aggregation: QueryAggregationType.T | undefined;
+    }>,
+  ): ConceptAttribute.BucketGrain | undefined => {
+    const { baseColumn } = options.column;
+    if (baseColumn.__type !== "ConceptAttribute") {
+      return undefined;
+    }
+    const isReadWhole =
+      options.aggregation === undefined ||
+      options.aggregation === "none" ||
+      options.aggregation === "group_by";
+    return isReadWhole ? baseColumn.bucketGrain : undefined;
+  },
+
+  /**
    * The negation of {@link QueryColumnModule.isList}. Use it as a predicate
    * to keep a list out of a picker, for example
    * `filter(QueryColumn.isNotList)`.

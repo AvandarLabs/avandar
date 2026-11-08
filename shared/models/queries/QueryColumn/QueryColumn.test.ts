@@ -213,4 +213,34 @@ describe("QueryColumn and list fields", () => {
     ]);
     expect(QueryColumn.isNumeric(TEMPERATURE_PER_MONTH)).toBe(false);
   });
+
+  it("gives a per-month column its period when read whole, and none when counted", () => {
+    expect(
+      QueryColumn.getBucketGrain({
+        column: TEMPERATURE_PER_MONTH,
+        aggregation: undefined,
+      }),
+    ).toBe("month");
+    expect(
+      QueryColumn.getBucketGrain({
+        column: TEMPERATURE_PER_MONTH,
+        aggregation: "group_by",
+      }),
+    ).toBe("month");
+    expect(
+      QueryColumn.getBucketGrain({
+        column: TEMPERATURE_PER_MONTH,
+        aggregation: "count",
+      }),
+    ).toBeUndefined();
+  });
+
+  it("gives a column that is not a per-period field no period", () => {
+    expect(
+      QueryColumn.getBucketGrain({
+        column: DAILY_CASES_LIST,
+        aggregation: undefined,
+      }),
+    ).toBeUndefined();
+  });
 });
