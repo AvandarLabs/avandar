@@ -12,14 +12,24 @@
 -- the identifier. Authoring already saves every identifier this way.
 --
 -- Hand-written because `db diff` never emits DML. A mapping whose column no
--- longer exists, or belongs to another dataset, is left alone: there is no
--- type to judge it by, and the query planner already refuses it. Each
--- statement skips rows that are already right, so a re-run changes nothing.
+-- longer exists, or belongs to another dataset, is left alone, and so is its
+-- field. The concept planner refuses a mapping whose column is gone, and a
+-- mapping whose column belongs to another dataset has no type that applies
+-- to it. Such a mapping keeps its rule even on an identifier. Manual-entry
+-- fields, and any dataset-column mapping left over on one, are left alone
+-- too. Each statement skips rows that are already right, so a re-run changes
+-- nothing.
 do $$
 declare
   replaced_rule_count integer;
   corrected_type_count integer;
 begin
+  -- Step 1 locks mapping rows before it touches `concept_attributes`, and
+  -- turning its trigger off later takes a share row exclusive lock on that
+  -- table. Taking that lock first, rather than upgrading to it midway, keeps
+  -- a session writing both tables from deadlocking against this migration.
+  lock table public.concept_attributes in share row exclusive mode;
+
   update public.attribute_mappings__dataset_column dcm
   set
     value_picker_rule_type = 'most_frequent'
@@ -30,6 +40,7 @@ begin
     dc.id = dcm.dataset_column_id and
     dc.dataset_id = dcm.dataset_id and
     ca.id = dcm.concept_attribute_id and
+    ca.mapping_type = 'dataset_column' and
     (
       (
         ca.is_identifier and
@@ -67,7 +78,7 @@ begin
         public.concept_attributes ca
         join public.attribute_mappings__dataset_column dcm on dcm.concept_attribute_id = ca.id
         join public.dataset_columns dc on dc.id = dcm.dataset_column_id and
-        dc.dataset_id = dcm.dataset_id
+          dc.dataset_id = dcm.dataset_id
       where
         ca.mapping_type = 'dataset_column'
     )
