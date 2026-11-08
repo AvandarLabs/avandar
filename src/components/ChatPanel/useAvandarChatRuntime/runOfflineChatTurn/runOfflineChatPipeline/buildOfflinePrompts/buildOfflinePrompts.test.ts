@@ -104,6 +104,29 @@ describe("buildOfflineSqlPrompt", () => {
     expect(prompt).toContain("- c0: Case (Symptoms (list))");
     expect(prompt).toContain("list_contains");
   });
+
+  it("lists a field under the column name SQL must use offline", () => {
+    const prompt = buildOfflineSqlPrompt({
+      schema: {
+        ...SCHEMA,
+        concepts: [{ id: CONCEPT_ID, name: "Case" }],
+        conceptAttributes: [
+          {
+            id: "11111111-1111-4111-8111-111111111111",
+            concept_id: CONCEPT_ID,
+            name: "external_id",
+          },
+        ],
+      },
+      pageContext: ChatPageContext.createDataExplorerViewContext(),
+      analysisSummary: "List case ids",
+      lastUserPrompt: "list case ids",
+    });
+
+    expect(prompt).toContain(
+      '- c0: Case (external_id_2 (field "external_id"))',
+    );
+  });
 });
 
 describe("buildOfflineFixSqlPrompt", () => {

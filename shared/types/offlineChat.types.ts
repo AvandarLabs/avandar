@@ -20,6 +20,8 @@ export type OfflineChatSchemaConcept = {
 };
 
 export type OfflineChatSchemaConceptAttribute = {
+  /** The field's id. Absent in an older cache, which lists the bare name. */
+  id?: string;
   concept_id: string;
   name: string;
   /** True for a field that keeps every value. Absent in an older cache. */

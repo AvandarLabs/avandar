@@ -8,6 +8,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 
 const WORKSPACE_ID = "wwwwwwww-wwww-4www-8www-wwwwwwwwwwww" as Workspace.Id;
 const CONCEPT_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+const FIELD_ID = "11111111-1111-4111-8111-111111111111";
 
 const {
   datasetsWithColumnsMock,
@@ -75,9 +76,9 @@ describe("fetchOfflineChatSchema", () => {
     expect(conceptStatusGetAllMock).not.toHaveBeenCalled();
   });
 
-  it("carries whether each field keeps every value into the offline schema", async () => {
+  it("carries each field's id and whether it keeps every value into the offline schema", async () => {
     conceptAttributeGetAllMock.mockResolvedValue([
-      { conceptId: CONCEPT_ID, name: "Symptoms", isArray: true },
+      { id: FIELD_ID, conceptId: CONCEPT_ID, name: "Symptoms", isArray: true },
     ]);
 
     const schema = await fetchOfflineChatSchema({
@@ -86,7 +87,12 @@ describe("fetchOfflineChatSchema", () => {
     });
 
     expect(schema.conceptAttributes).toEqual([
-      { concept_id: CONCEPT_ID, name: "Symptoms", is_array: true },
+      {
+        id: FIELD_ID,
+        concept_id: CONCEPT_ID,
+        name: "Symptoms",
+        is_array: true,
+      },
     ]);
   });
 });

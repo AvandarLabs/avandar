@@ -42,6 +42,7 @@ function createFakeClient(rowsByTable: Record<string, unknown[]>): {
 
 const WORKSPACE_ID = "wwwwwwww-wwww-4www-8www-wwwwwwwwwwww";
 const CONCEPT_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+const FIELD_ID = "11111111-1111-4111-8111-111111111111";
 
 describe("fetchWorkspaceSchema", () => {
   it("returns concepts when the workspace has no datasets", async () => {
@@ -110,13 +111,18 @@ describe("fetchWorkspaceSchema", () => {
     ]);
   });
 
-  it("asks for each field's list flag along with its name", async () => {
+  it("asks for each field's id and list flag along with its name", async () => {
     const fake = createFakeClient({
       datasets: [],
       dataset_columns: [],
       concepts: [{ id: CONCEPT_ID, name: "Case" }],
       concept_attributes: [
-        { concept_id: CONCEPT_ID, name: "Symptoms", is_array: true },
+        {
+          id: FIELD_ID,
+          concept_id: CONCEPT_ID,
+          name: "Symptoms",
+          is_array: true,
+        },
       ],
       concept_statuses: [],
     });
@@ -127,10 +133,15 @@ describe("fetchWorkspaceSchema", () => {
     });
 
     expect(fake.selectedColumnsByTable.concept_attributes).toBe(
-      "concept_id, name, is_array",
+      "id, concept_id, name, is_array",
     );
     expect(schema.conceptAttributes).toEqual([
-      { concept_id: CONCEPT_ID, name: "Symptoms", is_array: true },
+      {
+        id: FIELD_ID,
+        concept_id: CONCEPT_ID,
+        name: "Symptoms",
+        is_array: true,
+      },
     ]);
   });
 });

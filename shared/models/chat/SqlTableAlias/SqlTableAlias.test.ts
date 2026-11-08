@@ -22,6 +22,8 @@ const CONCEPT_B = {
   id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
   name: "Case",
 };
+const FIELD_A_ID = "11111111-1111-4111-8111-111111111111";
+const FIELD_B_ID = "22222222-2222-4222-8222-222222222222";
 
 describe("SqlTableAlias.fromDatasets", () => {
   it("assigns tN by dataset id so input order does not change aliases", () => {
@@ -141,6 +143,73 @@ describe("SqlTableAlias.formatSchemaBlock", () => {
     });
 
     expect(block).toBe("- c0: Measles case (age, Symptoms (list))");
+  });
+
+  it("lists a field named like the record key under its suffixed column", () => {
+    const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [
+        { id: FIELD_A_ID, concept_id: CONCEPT_B.id, name: "external_id" },
+        { id: FIELD_B_ID, concept_id: CONCEPT_B.id, name: "district" },
+      ],
+    });
+
+    expect(block).toBe(
+      '- c0: Case (external_id_2 (field "external_id"), district)',
+    );
+  });
+
+  it("lists two fields whose names differ only by case under distinct columns", () => {
+    const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [
+        { id: FIELD_A_ID, concept_id: CONCEPT_B.id, name: "Age" },
+        { id: FIELD_B_ID, concept_id: CONCEPT_B.id, name: "age" },
+      ],
+    });
+
+    expect(block).toBe('- c0: Case (Age_2 (field "Age"), age)');
+  });
+
+  it("keeps the list marker on a field listed under a suffixed column", () => {
+    const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [
+        {
+          id: FIELD_A_ID,
+          concept_id: CONCEPT_B.id,
+          name: "external_id",
+          is_array: true,
+        },
+        {
+          id: FIELD_B_ID,
+          concept_id: CONCEPT_B.id,
+          name: "Symptoms",
+          is_array: true,
+        },
+      ],
+    });
+
+    expect(block).toBe(
+      '- c0: Case (external_id_2 (list, field "external_id"), Symptoms (list))',
+    );
+  });
+
+  it("lists the bare name for a field cached without an id", () => {
+    const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [{ concept_id: CONCEPT_B.id, name: "external_id" }],
+    });
+
+    expect(block).toBe("- c0: Case (external_id)");
   });
 
   it("lists a case type's statuses in position order after its attributes", () => {

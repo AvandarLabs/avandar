@@ -54,6 +54,7 @@ function _mapConcepts(
     }),
     conceptAttributes: options.attributes.map((attribute) => {
       return {
+        id: attribute.id,
         concept_id: attribute.conceptId,
         name: attribute.name,
         is_array: attribute.isArray,

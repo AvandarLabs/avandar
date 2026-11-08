@@ -1,4 +1,5 @@
 import { makeBucketMap } from "@avandar/utils";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import type {
@@ -130,13 +131,69 @@ function _buildStatusFields(
   return [`status: ${names.join(" | ")}`];
 }
 
-/** How a concept field appears in the schema block; a list says so. */
+/**
+ * How a concept field appears in the schema block: the column name SQL must
+ * write, then in parentheses a `list` marker and, when the column name
+ * differs from the field's name, `field "<name>"`.
+ */
 function _formatConceptAttributeName(
   attribute: SqlTableAliasConceptAttribute,
+  columnName: string,
 ): string {
-  return attribute.is_array === true
-    ? `${attribute.name} (list)`
-    : attribute.name;
+  const notes = [
+    ...(attribute.is_array === true ? ["list"] : []),
+    ...(columnName === attribute.name ? [] : [`field "${attribute.name}"`]),
+  ];
+  return notes.length === 0
+    ? columnName
+    : `${columnName} (${notes.join(", ")})`;
+}
+
+/**
+ * The view column name of each field of one case type, by field id. Only
+ * fields with an id get one, so a field cached without an id keeps its bare
+ * name.
+ */
+function _getColumnNamesById(
+  attributes: readonly SqlTableAliasConceptAttribute[],
+): Map<string, string> {
+  const identified = attributes.flatMap((attribute) => {
+    return attribute.id === undefined
+      ? []
+      : [{ id: attribute.id as ConceptAttribute.Id, name: attribute.name }];
+  });
+  return new Map(
+    [...ConceptAttribute.getViewColumnNames(identified)].map(
+      ([attributeId, viewColumn]) => {
+        return [attributeId, viewColumn.columnName];
+      },
+    ),
+  );
+}
+
+/** Each case type's field labels for the schema block, by concept id. */
+function _formatConceptAttributeNames(
+  attributes: readonly SqlTableAliasConceptAttribute[],
+): Map<string, string[]> {
+  const attributesByConceptId = makeBucketMap(attributes, {
+    key: "concept_id",
+  });
+  return new Map(
+    [...attributesByConceptId].map(([conceptId, conceptAttributes]) => {
+      const columnNamesById = _getColumnNamesById(conceptAttributes);
+      return [
+        conceptId,
+        conceptAttributes.map((attribute) => {
+          return _formatConceptAttributeName(
+            attribute,
+            (attribute.id === undefined
+              ? undefined
+              : columnNamesById.get(attribute.id)) ?? attribute.name,
+          );
+        }),
+      ];
+    }),
+  );
 }
 
 const LIST_FIELD_NOTE = `- A field marked (list) holds every value one record has, as a DuckDB list, and is [] when it has none. Filter with list_contains("field", 'value'), count values with len("field"), and use UNNEST("field") for one row per value. Never compare a list with =, IN, or LIKE.`;
@@ -163,14 +220,8 @@ function _formatSchemaBlock(
     key: "dataset_id",
     valueKey: "name",
   });
-  const namesByConceptId = makeBucketMap(
-    (args.conceptAttributes ?? []).map((attribute) => {
-      return {
-        concept_id: attribute.concept_id,
-        name: _formatConceptAttributeName(attribute),
-      };
-    }),
-    { key: "concept_id", valueKey: "name" },
+  const namesByConceptId = _formatConceptAttributeNames(
+    args.conceptAttributes ?? [],
   );
   const statusesByConceptId = makeBucketMap(args.conceptStatuses ?? [], {
     key: "concept_id",

@@ -137,4 +137,25 @@ describe("buildSqlSystemPrompt", () => {
 
     expect(prompt).not.toContain("list_contains");
   });
+
+  it("lists a field under the column name SQL must use", () => {
+    const conceptId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    const prompt = buildSqlSystemPrompt({
+      prompt: "list case ids",
+      datasets: [],
+      columns: [],
+      concepts: [{ id: conceptId, name: "Case" }],
+      conceptAttributes: [
+        {
+          id: "11111111-1111-4111-8111-111111111111",
+          concept_id: conceptId,
+          name: "external_id",
+        },
+      ],
+    });
+
+    expect(prompt).toContain(
+      '- c0: Case (external_id_2 (field "external_id"))',
+    );
+  });
 });

@@ -8,6 +8,7 @@ type Dataset = { id: string; name: string };
 type DatasetColumn = { dataset_id: string; name: string; data_type: string };
 type Concept = { id: string; name: string };
 type ConceptAttribute = {
+  id?: string;
   concept_id: string;
   name: string;
   is_array?: boolean;

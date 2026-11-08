@@ -26,6 +26,12 @@ export type SqlTableAliasConcept = {
 
 /** Attribute name listed next to a concept alias in the schema block. */
 export type SqlTableAliasConceptAttribute = {
+  /**
+   * The field's id, which fixes the column name the case type's view gives it
+   * when two fields share a name. Optional, so a schema cached before this
+   * was kept still reads, listing the bare name.
+   */
+  id?: string;
   concept_id: string;
   name: string;
   /**
