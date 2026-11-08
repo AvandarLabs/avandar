@@ -1,11 +1,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { DataAgentDatasetCache } from "./DataAgentDatasetCache";
 import {
+  askConversationDataAgent,
   createExplorerShowQuery,
   loadDataAgentDatasets,
 } from "./dataAgentTurnHelpers";
-import type { DataAgentTurnOptions } from "./dataAgentTurnHelpers";
+import type {
+  DataAgentConversation,
+  DataAgentTurnOptions,
+} from "./dataAgentTurnHelpers";
 
 vi.mock(
   "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome",
@@ -125,5 +130,95 @@ describe("loadDataAgentDatasets", () => {
       DATASET,
     ]);
     expect(fetchDatasets).not.toHaveBeenCalled();
+  });
+});
+
+describe("askConversationDataAgent", () => {
+  function _fakeConversation(): DataAgentConversation & {
+    asked: string[];
+  } {
+    const asked: string[] = [];
+    const conversation = {
+      asked,
+      turnRef: { current: _createTurnOptions() },
+      results: [],
+      dataAgent: {
+        ask: vi.fn(async (text: string) => {
+          asked.push(text);
+          conversation.results.push(
+            AgentQueryResult.create({ sql: "SELECT 1", title: "t" }),
+          );
+          return { text: "Here it is." };
+        }),
+      },
+    } as unknown as DataAgentConversation & { asked: string[] };
+    return conversation;
+  }
+
+  function _turn(content: string): DataAgentTurnOptions {
+    return {
+      ..._createTurnOptions(),
+      apiMessages: [{ role: "user", content }],
+      chatPanelDispatch: { setPendingClarification: vi.fn() },
+    } as unknown as DataAgentTurnOptions;
+  }
+
+  it("sends the page block first, then 'unchanged' on the same page", async () => {
+    const conversation = _fakeConversation();
+    const conversations = new Map([["workspace-1:0", conversation]]);
+    const pageBlock = "<current_page>\nPage: Map\n</current_page>";
+
+    await askConversationDataAgent({
+      conversations,
+      turn: _turn("How many?"),
+      pageBlock,
+      createConversation: vi.fn(),
+    });
+    await askConversationDataAgent({
+      conversations,
+      turn: _turn("And deaths?"),
+      pageBlock,
+      createConversation: vi.fn(),
+    });
+
+    expect(conversation.asked[0]).toBe(`${pageBlock}\n\nHow many?`);
+    expect(conversation.asked[1]).toContain(
+      "Unchanged since the last message.",
+    );
+  });
+
+  it("returns the reply with this turn's results as data parts", async () => {
+    const conversation = _fakeConversation();
+    conversation.results.push(
+      AgentQueryResult.create({ sql: "SELECT 0", title: "old" }),
+    );
+
+    const reply = await askConversationDataAgent({
+      conversations: new Map([["workspace-1:0", conversation]]),
+      turn: _turn("How many?"),
+      createConversation: vi.fn(),
+    });
+
+    expect(reply.content).toEqual([
+      { type: "text", text: "Here it is." },
+      AgentQueryResult.toDataPart(
+        AgentQueryResult.create({ sql: "SELECT 1", title: "t" }),
+      ),
+    ]);
+  });
+
+  it("asks the conversation it creates on the first turn", async () => {
+    const conversation = _fakeConversation();
+    const conversations = new Map<string, DataAgentConversation>();
+    const createConversation = vi.fn(async () => {
+      return conversation;
+    });
+    const turn = _turn("How many?");
+
+    await askConversationDataAgent({ conversations, turn, createConversation });
+
+    expect(createConversation).toHaveBeenCalledWith({ current: turn });
+    expect(conversations.get("workspace-1:0")).toBe(conversation);
+    expect(conversation.asked).toEqual(["How many?"]);
   });
 });

@@ -3,24 +3,39 @@ import { createModels } from "@earendil-works/pi-ai/models";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
 import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools";
 import { DATA_AGENT_MODEL_ROSTER } from "$/agent/DataAgentModelRoster";
+import { buildAgentPageContextBlock } from "$/agent/pageContext/buildAgentPageContextBlock";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { createAgentPageNameLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/agentPageNameLoader";
+import { createAgentPageContext } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/createAgentPageContext";
+import { createConversationAgentHost } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/createConversationAgentHost";
 import {
   askConversationDataAgent,
-  createExplorerDataAgentHost,
   loadDataAgentDatasets,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
+import type { AgentConversationState } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/createConversationAgentHost";
 import type {
-  DataAgent,
-  DataAgentModelPolicy,
-} from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+  DataAgentConversation,
+  DataAgentTurnOptions,
+} from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
+import type { DataAgentModelPolicy } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 
-/** One agent per conversation, so follow-ups see earlier turns. */
-const agentsByConversation = new Map<string, DataAgent>();
+/** The page state the adapter has when a turn starts. */
+export type AgentPageInputs = {
+  pathname: string;
+  chatPageContext: ChatPageContext.T;
+  dashboardEditorState: DashboardEditorAppState;
+};
+
+/** One conversation per chat, so follow-ups see earlier turns. */
+const conversationsByChat = new Map<string, DataAgentConversation>();
 
 const models = createModels();
 models.setProvider(openrouterProvider());
@@ -54,32 +69,57 @@ function _createProxyStreamFn(workspaceId: Workspace.Id): StreamFn {
   };
 }
 
-async function _createAgent(
-  options: Readonly<DataAgentTurnOptions>,
-): Promise<DataAgent> {
-  return createDataAgent({
-    datasets: await loadDataAgentDatasets(options.workspaceId),
-    host: createExplorerDataAgentHost(options),
+/**
+ * The host must hold the same object the conversation map keeps, since
+ * `askConversationDataAgent` updates its turn and results in place.
+ */
+async function _createConversation(
+  turnRef: AgentConversationState["turnRef"],
+  datasets: readonly DataAgentDataset[],
+): Promise<DataAgentConversation> {
+  const conversation = {
+    turnRef,
+    results: [],
+  } as unknown as DataAgentConversation;
+  conversation.dataAgent = createDataAgent({
+    datasets,
+    host: createConversationAgentHost(conversation),
     policy: _createModelPolicy(),
-    streamFn: _createProxyStreamFn(options.workspaceId),
+    streamFn: _createProxyStreamFn(turnRef.current.workspaceId),
     today: new Date().toISOString().slice(0, 10),
     sessionId: crypto.randomUUID(),
   });
+  return conversation;
 }
 
 /**
- * Answers a Data Explorer chat message with the Pi-based data agent instead
- * of the `chat` edge function's single-call harness. The agent runs in the
- * browser; only model requests go to the server, through the agent proxy.
+ * Answers a chat message on any page with the Pi-based data agent. The
+ * agent runs in the browser; only model requests go to the server, through
+ * the agent proxy. The current page starts each turn's message.
  */
 export async function runDataAgentTurn(
   options: Readonly<DataAgentTurnOptions>,
+  page?: Readonly<AgentPageInputs>,
 ): Promise<ChatModelRunResult> {
+  const datasets = await loadDataAgentDatasets(options.workspaceId);
+  const pageContext = page
+    ? await createAgentPageContext({
+        ...page,
+        datasets,
+        loader: createAgentPageNameLoader(options.workspaceId),
+      })
+    : undefined;
   return askConversationDataAgent({
-    agents: agentsByConversation,
-    turn: options,
-    createAgent: () => {
-      return _createAgent(options);
+    conversations: conversationsByChat,
+    turn: { ...options, pageContext },
+    pageBlock: pageContext
+      ? buildAgentPageContextBlock({
+          context: pageContext,
+          aliases: SqlTableAlias.fromSchema({ datasets }),
+        })
+      : undefined,
+    createConversation: (turnRef) => {
+      return _createConversation(turnRef, datasets);
     },
   });
 }

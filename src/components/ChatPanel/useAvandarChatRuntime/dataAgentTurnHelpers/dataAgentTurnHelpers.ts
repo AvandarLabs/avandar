@@ -1,5 +1,7 @@
 import { where } from "@avandar/utils";
+import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { DataAgentDatasetCache } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/DataAgentDatasetCache";
 import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import {
@@ -7,7 +9,6 @@ import {
   waitForAppliedSqlOutcome,
 } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { createBrowserDataAgentHost } from "@/lib/agent/dataAgent/browser/createBrowserDataAgentHost";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
@@ -15,11 +16,9 @@ import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatDashboardVizType } from "$/types/chat.types";
 import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import type { AgentConversationState } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/createConversationAgentHost";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
-import type {
-  DataAgentHost,
-  DataAgentQueryOutcome,
-} from "@/lib/agent/dataAgent/DataAgentHost";
+import type { DataAgentQueryOutcome } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ChatModelRunResult } from "@assistant-ui/react";
@@ -139,20 +138,6 @@ export function createExplorerShowQuery(
   };
 }
 
-/** The browser host a data agent in the Data Explorer chat runs against. */
-export function createExplorerDataAgentHost(
-  options: Readonly<DataAgentTurnOptions>,
-): DataAgentHost {
-  return createBrowserDataAgentHost({
-    workspaceId: options.workspaceId,
-    userId: options.currentUser?.id,
-    showQuery: createExplorerShowQuery(options),
-    showQuestionCard: (clarification) => {
-      options.chatPanelDispatch.setPendingClarification(clarification);
-    },
-  });
-}
-
 async function _fetchDataAgentDatasets(
   workspaceId: Workspace.Id,
 ): Promise<DataAgentDataset[]> {
@@ -215,27 +200,51 @@ function _buildPromptText(
   return `Earlier in this conversation:\n${recap}\n\n${latest}`;
 }
 
+/** One conversation's agent, the turn it is answering, and its results. */
+export type DataAgentConversation = AgentConversationState & {
+  dataAgent: DataAgent;
+  /** The page block sent last, to send "unchanged" instead of repeats. */
+  lastPageBlock?: string;
+};
+
 /**
- * Asks this conversation's agent the turn's message, creating the agent on
- * the conversation's first turn, and returns its reply as chat content.
- * `agents` holds one agent per `${workspaceId}:${chatGeneration}`, so
- * follow-ups see earlier turns.
+ * Asks this conversation's agent the turn's message, creating the
+ * conversation on its first turn, and returns the reply with any results
+ * this turn added to the chat. `conversations` holds one per
+ * `${workspaceId}:${chatGeneration}`, so follow-ups see earlier turns. The
+ * page block, when given, starts the message.
  */
 export async function askConversationDataAgent(
   options: Readonly<{
-    agents: Map<string, DataAgent>;
+    conversations: Map<string, DataAgentConversation>;
     turn: Readonly<DataAgentTurnOptions>;
-    createAgent: () => Promise<DataAgent>;
+    pageBlock?: string;
+    createConversation: (
+      turnRef: AgentConversationState["turnRef"],
+    ) => Promise<DataAgentConversation>;
   }>,
 ): Promise<ChatModelRunResult> {
   const { turn } = options;
   const key = `${turn.workspaceId}:${turn.chatGeneration}`;
-  const existing = options.agents.get(key);
-  const dataAgent = existing ?? (await options.createAgent());
-  options.agents.set(key, dataAgent);
+  const existing = options.conversations.get(key);
+  const conversation =
+    existing ?? (await options.createConversation({ current: turn }));
+  options.conversations.set(key, conversation);
+  conversation.turnRef.current = turn;
+  conversation.results.length = 0;
   turn.chatPanelDispatch.setPendingClarification(undefined);
-  const reply = await dataAgent.ask(
-    _buildPromptText(turn.apiMessages, !existing),
+  const reply = await conversation.dataAgent.ask(
+    buildAgentTurnText({
+      message: _buildPromptText(turn.apiMessages, !existing),
+      pageBlock: options.pageBlock,
+      previousPageBlock: conversation.lastPageBlock,
+    }),
   );
-  return { content: [{ type: "text", text: reply.text }] };
+  conversation.lastPageBlock = options.pageBlock ?? conversation.lastPageBlock;
+  return {
+    content: [
+      { type: "text", text: reply.text },
+      ...conversation.results.map(AgentQueryResult.toDataPart),
+    ],
+  };
 }
