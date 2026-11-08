@@ -249,8 +249,8 @@ memory bound how much it can absorb:
 | A write took over 2 s | Halves, down to 64 KiB | As long as the write took, up to 30 s |
 | A request failed with `EtlTransientStoreError` | Quarters, down to 64 KiB | 2 s, doubling per failure in a row up to 60 s, ±25% |
 
-A read, a write batch, or a checkpoint read or write that fails
-transiently is retried. A failed write batch is retried from the same
+A read, a write batch, a checkpoint read or write, or the drive row a
+crawl writes before it starts that fails transiently is retried. A failed write batch is retried from the same
 listing under the smaller budget, so every listing is written once and in
 order, and a failed batch wrote nothing. The 8th transient failure in a row
 fails the crawl as any other error does, with its checkpoint still at the

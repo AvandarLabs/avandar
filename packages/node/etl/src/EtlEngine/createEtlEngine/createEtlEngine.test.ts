@@ -2091,6 +2091,27 @@ describe("createEtlEngine", () => {
       expect(_checkpointValues(flaky.checkpoints)).toEqual([["a", _at(3)]]);
     });
 
+    it("retries a drive row write that failed, so the crawl still runs", async () => {
+      const drives = createInMemoryDrivesStore();
+      const listings = createInMemoryListingsStore();
+
+      const report = await _run(
+        _config({
+          drives: [_drive("a", [[_connection("a1", 1)]])],
+          recorder: _recorder(),
+          stores: {
+            ..._stores(listings),
+            drives: { upsert: _failFirstCall(drives.upsert) },
+          },
+          clock: _noWaitClock(),
+        }),
+      );
+
+      expect(_statusesOf(report)).toEqual([["a", "ok", undefined]]);
+      expect(drives.getDrives()).toMatchObject([{ driveKey: "a" }]);
+      expect(_datasetIds(listings)).toEqual(["a1"]);
+    });
+
     it("reports each wait as progress and counts it in the crawl's metrics", async () => {
       const progress: EtlRunProgress[] = [];
 
