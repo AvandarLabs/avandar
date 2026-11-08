@@ -420,4 +420,46 @@ describe("runStructuredQueryWithMetadata", () => {
 
     expect(didAutoLimit).toBe(true);
   });
+
+  it("returns the SQL it compiled and ran for an out-of-sync query", async () => {
+    const concept = _createConcept();
+    const queryColumns = QueryColumn.makeFromConceptAttributes([
+      _createConceptAttribute(concept.id, "age"),
+    ]);
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    const run = await runStructuredQueryWithMetadata({
+      auth: "workspace",
+      workspaceId: uuid<Workspace.Id>(),
+      query: {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: concept,
+        queryColumns,
+      },
+      rawSql: undefined,
+      isStructuredQueryInSync: false,
+    });
+
+    const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
+    expect(run.executedSql).toBe(rawSql);
+  });
+
+  it("reports no SQL when there is nothing to run", async () => {
+    runQueryMock.mockClear();
+
+    const run = await runStructuredQueryWithMetadata({
+      auth: "workspace",
+      workspaceId: uuid<Workspace.Id>(),
+      query: StructuredQuery.makeEmpty(),
+      rawSql: undefined,
+    });
+
+    expect(runQueryMock).not.toHaveBeenCalled();
+    expect(run.executedSql).toBeUndefined();
+  });
 });
