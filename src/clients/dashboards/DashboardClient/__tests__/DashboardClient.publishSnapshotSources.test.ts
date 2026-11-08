@@ -8,8 +8,12 @@ import {
   SNAPSHOT_REVISION,
   WORKSPACE_ID,
 } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
-import { uploadPreparedSnapshots } from "@/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots";
+import {
+  preparePublishSnapshot,
+  uploadPreparedSnapshots,
+} from "@/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 
 /** Where a published `all_columns` snapshot's rows come from. */
@@ -41,12 +45,16 @@ const EXPECTED_ORIGIN_BY_SOURCE_TYPE: Record<
 const DATASET_ID = DATASET_IDS[0];
 
 const {
+  datasetColumnGetAllMock,
+  datasetGetAllMock,
   downloadDatasetMock,
   localDatasetGetByIdMock,
   runQueryMock,
   uploadDatasetMock,
 } = vi.hoisted(() => {
   return {
+    datasetColumnGetAllMock: vi.fn(),
+    datasetGetAllMock: vi.fn(),
     downloadDatasetMock: vi.fn(),
     localDatasetGetByIdMock: vi.fn(),
     runQueryMock: vi.fn(),
@@ -94,6 +102,14 @@ vi.mock("@/clients/datasets/source-datasets/VirtualDatasetClient", () => {
   };
 });
 
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
+  return { DatasetClient: { getAll: datasetGetAllMock } };
+});
+
+vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+  return { DatasetColumnClient: { getAll: datasetColumnGetAllMock } };
+});
+
 vi.mock("@/utils/notifications/notify", () => {
   return { notifyError: vi.fn() };
 });
@@ -115,8 +131,30 @@ function _makeDataset(sourceType: DatasetSource.SourceType): Dataset.T {
   });
 }
 
+/**
+ * A catalog row for the `population` column, stored under its original
+ * header unless `name` says the user renamed it.
+ */
+function _makeColumn(name: string): DatasetColumn.T {
+  return Model.make("DatasetColumn", {
+    columnIdx: 0,
+    createdAt: "2026-08-14T00:00:00.000Z",
+    dataType: "bigint",
+    datasetId: DATASET_ID,
+    description: undefined,
+    detectedDataType: "BIGINT",
+    id: "77777777-7777-4777-8777-777777777777" as DatasetColumn.Id,
+    name,
+    originalDataType: "BIGINT",
+    originalName: "population",
+    updatedAt: "2026-08-14T00:00:00.000Z",
+    workspaceId: WORKSPACE_ID,
+  });
+}
+
 async function _publishWholeDataset(
   sourceType: DatasetSource.SourceType,
+  datasetIdsWithColumnReplacements: ReadonlySet<Dataset.Id> = new Set(),
 ): Promise<void> {
   await uploadPreparedSnapshots({
     bucket: "published",
@@ -124,6 +162,7 @@ async function _publishWholeDataset(
     logger: createWebLogger({ loggerName: "publish", enabled: false }),
     prepared: {
       columnsByDataset: { [DATASET_ID]: ["name", "population"] },
+      datasetIdsWithColumnReplacements,
       datasets: [_makeDataset(sourceType)],
       datasetIds: [DATASET_ID],
       publishConfig: { slices: { [DATASET_ID]: { mode: "all_columns" } } },
@@ -180,4 +219,67 @@ describe("publishing a whole-dataset (all_columns) slice", () => {
       expect(downloadDatasetMock).not.toHaveBeenCalled();
     },
   );
+});
+
+describe("publishing a whole-dataset slice of a renamed or retyped dataset", () => {
+  it.each(["csv_file", "xlsx_file", "pdf_file", "open_data"] as const)(
+    "publishes a %s dataset with a renamed column through the workspace query",
+    async (sourceType) => {
+      // The stored Parquet keeps the original headers and types, while every
+      // query names the renamed, retyped columns. Copying the file would
+      // publish a table those queries cannot read.
+      await _publishWholeDataset(sourceType, new Set([DATASET_ID]));
+
+      expect(_getUploadedOrigin()).toBe("workspace-query");
+    },
+  );
+});
+
+describe("preparePublishSnapshot", () => {
+  async function _prepareWithColumn(
+    column: DatasetColumn.T,
+  ): Promise<ReadonlySet<Dataset.Id>> {
+    datasetGetAllMock.mockResolvedValue([_makeDataset("csv_file")]);
+    datasetColumnGetAllMock.mockResolvedValue([column]);
+    const prepared = await preparePublishSnapshot({
+      dashboard: {
+        ...DASHBOARD,
+        config: {
+          root: {},
+          content: [
+            {
+              type: "DataViz",
+              props: {
+                id: "tile",
+                nlQuery: { rawSql: `SELECT * FROM "${DATASET_ID}"` },
+              },
+            },
+          ],
+        },
+      },
+      incomingPublishConfig: undefined,
+    });
+    return prepared.datasetIdsWithColumnReplacements;
+  }
+
+  it("marks a dataset whose catalog renames a column", async () => {
+    const datasetIds = await _prepareWithColumn(_makeColumn("residents"));
+
+    expect([...datasetIds]).toEqual([DATASET_ID]);
+  });
+
+  it("marks a dataset whose catalog casts a column to another type", async () => {
+    const datasetIds = await _prepareWithColumn({
+      ..._makeColumn("population"),
+      dataType: "double",
+    });
+
+    expect([...datasetIds]).toEqual([DATASET_ID]);
+  });
+
+  it("does not mark a dataset whose columns keep their stored names and types", async () => {
+    const datasetIds = await _prepareWithColumn(_makeColumn("population"));
+
+    expect([...datasetIds]).toEqual([]);
+  });
 });

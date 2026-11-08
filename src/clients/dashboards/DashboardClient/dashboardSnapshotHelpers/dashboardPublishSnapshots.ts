@@ -15,6 +15,7 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
+import { getColumnReplacementsFromColumns } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { OpenDatasetParquetStorageClient } from "@/clients/storage/OpenDatasetParquetStorageClient/OpenDatasetParquetStorageClient";
@@ -23,6 +24,7 @@ import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/Publis
 import { notifyError } from "@/utils/notifications/notify";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type {
   PreparedPublishSnapshot,
   PublishDatasets,
@@ -34,6 +36,8 @@ import type { ILogger } from "@avandar/logger";
 type SnapshotDatasetOptions = {
   availableColumns: readonly string[];
   dataset: Dataset.T;
+  /** Whether the dataset's catalog renames or casts a stored column. */
+  hasColumnReplacements: boolean;
   queriedColumns: readonly string[];
   slice: PublishSliceConfig.T;
   treatAsAllColumns: boolean;
@@ -53,6 +57,7 @@ type WorkspaceSnapshotQueryOptions = Omit<SnapshotDatasetOptions, "dataset"> & {
 type UploadDashboardSnapshotsOptions = {
   bucket: SnapshotBucketName;
   columnsByDataset: Record<string, readonly string[]>;
+  datasetIdsWithColumnReplacements: ReadonlySet<Dataset.Id>;
   dashboard: Dashboard.T;
   datasets: readonly Dataset.T[];
   logger: ILogger;
@@ -121,12 +126,20 @@ async function _queryDatasetSnapshotBlob(
   });
 }
 
-/** The parquet a dataset's snapshot is published from. */
+/**
+ * The parquet a dataset's snapshot is published from.
+ *
+ * A snapshot is loaded into DuckDB as it is stored, with no renames or casts,
+ * so it must already have the column names and types the dashboard's queries
+ * use. A stored upload Parquet keeps the original headers and types, so it is
+ * copied only when the column catalog changes none of them.
+ */
 async function _getSnapshotDatasetBlob(
   options: Readonly<SnapshotDatasetOptions>,
 ): Promise<Blob> {
   const { dataset, slice } = options;
-  const isWholeDataset = slice.mode === "all_columns";
+  const canCopyStoredParquet =
+    slice.mode === "all_columns" && !options.hasColumnReplacements;
   return await match(dataset.sourceType)
     .with("virtual", () => {
       return _getVirtualDatasetSnapshotBlob(options);
@@ -137,9 +150,9 @@ async function _getSnapshotDatasetBlob(
       return _queryDatasetSnapshotBlob(options);
     })
     .with("csv_file", "xlsx_file", "pdf_file", () => {
-      // A whole-dataset slice is copied from the parquet already stored for
-      // the upload; any narrower slice is queried.
-      return isWholeDataset
+      // A whole-dataset slice with no renamed or cast column is copied from
+      // the parquet already stored for the upload; anything else is queried.
+      return canCopyStoredParquet
         ? DatasetParquetStorageClient.downloadDataset({
             workspaceId: options.workspaceId,
             datasetId: dataset.id,
@@ -148,7 +161,7 @@ async function _getSnapshotDatasetBlob(
         : _queryDatasetSnapshotBlob(options);
     })
     .with("open_data", () => {
-      return isWholeDataset
+      return canCopyStoredParquet
         ? _downloadOpenDataSnapshot(dataset)
         : _queryDatasetSnapshotBlob(options);
     })
@@ -195,6 +208,22 @@ async function _getPublishDatasets(
   return { datasets, datasetIds };
 }
 
+/**
+ * The datasets whose column catalog renames or casts a stored column, by the
+ * same rule a workspace query applies when it loads the dataset.
+ */
+function _getDatasetIdsWithColumnReplacements(
+  columns: readonly DatasetColumn.T[],
+): ReadonlySet<Dataset.Id> {
+  return new Set(
+    columns
+      .filter((column) => {
+        return getColumnReplacementsFromColumns([column]).length > 0;
+      })
+      .map(prop("datasetId")),
+  );
+}
+
 /** Collects the datasets, columns, and slice config a publish will need. */
 export async function preparePublishSnapshot(
   options: Readonly<{
@@ -224,7 +253,15 @@ export async function preparePublishSnapshot(
     key: "datasetId",
     valueKey: "name",
   });
-  return { columnsByDataset, datasets, datasetIds, publishConfig, referenced };
+  return {
+    columnsByDataset,
+    datasetIdsWithColumnReplacements:
+      _getDatasetIdsWithColumnReplacements(columns),
+    datasets,
+    datasetIds,
+    publishConfig,
+    referenced,
+  };
 }
 
 async function _uploadDashboardSnapshots(
@@ -240,6 +277,9 @@ async function _uploadDashboardSnapshots(
           bucket: options.bucket,
           dashboardId: options.dashboard.id,
           dataset,
+          hasColumnReplacements: options.datasetIdsWithColumnReplacements.has(
+            dataset.id,
+          ),
           queriedColumns: Array.from(
             options.referenced.perDataset[dataset.id] ?? new Set<string>(),
           ),
@@ -283,6 +323,8 @@ export async function uploadPreparedSnapshots(
     bucket: options.bucket,
     columnsByDataset: options.prepared.columnsByDataset,
     dashboard: options.dashboard,
+    datasetIdsWithColumnReplacements:
+      options.prepared.datasetIdsWithColumnReplacements,
     datasets: options.prepared.datasets,
     logger: options.logger,
     publishConfig: options.prepared.publishConfig,
