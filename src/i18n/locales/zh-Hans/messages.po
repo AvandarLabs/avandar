@@ -595,6 +595,7 @@ msgstr "地图上将绘制单独的位置，隐藏区域将显示其实际数量
 msgid "Aggregations"
 msgstr "聚合"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -5796,6 +5797,7 @@ msgstr "导入"
 msgid "Clear Disputed status column"
 msgstr "清除有争议状态列"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -9565,7 +9567,7 @@ msgid "Show as link"
 msgstr "显示为链接"
 
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
 msgid "No value"
 msgstr "没有值"
 

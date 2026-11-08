@@ -26,6 +26,7 @@ export function RecordDetail({ frame, caseLabel, fields }: Props) {
     return {
       id: field.name as ConceptAttribute.Id,
       name: field.name,
+      dataType: "varchar",
       value: field.value,
       sourceNames: [field.sourceName],
     };

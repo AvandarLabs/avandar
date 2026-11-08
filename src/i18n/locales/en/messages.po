@@ -610,6 +610,7 @@ msgstr "Individual locations will be drawn on the map, and suppressed areas "
 msgid "Aggregations"
 msgstr "Aggregations"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -5942,6 +5943,7 @@ msgstr "Import"
 msgid "Clear Disputed status column"
 msgstr "Clear Disputed status column"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -9808,7 +9810,7 @@ msgid "Show as link"
 msgstr "Show as link"
 
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
 msgid "No value"
 msgstr "No value"
 

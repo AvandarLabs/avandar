@@ -1,9 +1,10 @@
-import { isNullish, unknownToString } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import css from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.module.css";
 import { DetailsStatus } from "@/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus";
+import { RecordFieldValue } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ReactNode } from "react";
 
@@ -12,6 +13,8 @@ export type CaseDetailsRow = {
   /** The case type field this value belongs to. */
   id: ConceptAttribute.Id;
   name: string;
+  /** The field's `data_type`, which decides how its value reads. */
+  dataType: AvaDataType.T;
   /** The record's value, or `null` or `undefined` when it has none. */
   value: unknown;
   /** The names of the datasets the field reads, each on its own line. */
@@ -49,13 +52,10 @@ export function CaseDetailsRail({
           {attributes?.map((attribute) => {
             return (
               <AppViewRail.Fact key={attribute.id} label={attribute.name}>
-                {isNullish(attribute.value) ? (
-                  <Text span c="dimmed">
-                    <Trans>No value</Trans>
-                  </Text>
-                ) : (
-                  unknownToString(attribute.value)
-                )}
+                <RecordFieldValue
+                  dataType={attribute.dataType}
+                  value={attribute.value}
+                />
                 {attribute.sourceNames.length > 0 ? (
                   <ul aria-label={t`Sources`} className={css.sourceList}>
                     {attribute.sourceNames.map((sourceName, index) => {

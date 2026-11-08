@@ -208,7 +208,13 @@ describe("useRecordFields", () => {
     const { result } = _renderRecordFields();
 
     expect(result.current.rows).toEqual([
-      { id: AGE.id, name: "age", value: 41, sourceNames: [] },
+      {
+        id: AGE.id,
+        name: "age",
+        dataType: "bigint",
+        value: 41,
+        sourceNames: [],
+      },
     ]);
     expect(result.current.isLoadError).toBe(false);
   });
@@ -233,7 +239,13 @@ describe("useRecordFields", () => {
     const { result } = _renderRecordFields();
 
     expect(result.current.rows).toEqual([
-      { id: AGE.id, name: "age", value: 41, sourceNames: [] },
+      {
+        id: AGE.id,
+        name: "age",
+        dataType: "bigint",
+        value: 41,
+        sourceNames: [],
+      },
     ]);
     expect(result.current.isLoadError).toBe(false);
   });
@@ -302,7 +314,13 @@ describe("useRecordFields", () => {
     const { result } = _renderRecordFields();
 
     expect(result.current.rows).toEqual([
-      { id: AGE.id, name: "age", value: 41, sourceNames: [] },
+      {
+        id: AGE.id,
+        name: "age",
+        dataType: "bigint",
+        value: 41,
+        sourceNames: [],
+      },
     ]);
   });
 });

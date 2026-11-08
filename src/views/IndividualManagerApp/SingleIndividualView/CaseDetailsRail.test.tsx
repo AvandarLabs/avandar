@@ -20,12 +20,14 @@ describe("CaseDetailsRail", () => {
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Borough",
+            dataType: "varchar",
             value: "Brooklyn",
             sourceNames: ["Lab results", "Measles line list"],
           },
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "MMR status",
+            dataType: "varchar",
             value: "Unknown",
             sourceNames: [],
           },
@@ -48,6 +50,7 @@ describe("CaseDetailsRail", () => {
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Borough",
+            dataType: "varchar",
             value: "Brooklyn",
             sourceNames: ["Lab results", "Measles line list"],
           },
@@ -71,6 +74,7 @@ describe("CaseDetailsRail", () => {
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Notes",
+            dataType: "varchar",
             value: "Called twice",
             sourceNames: [],
           },
@@ -98,6 +102,24 @@ describe("CaseDetailsRail", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows a date field's value as a date", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Rash onset",
+            dataType: "date",
+            value: 1_709_596_800_000,
+            sourceNames: [],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Mar 5, 2024")).toBeInTheDocument();
+  });
+
   // A field with nothing to show must say so in words. Printing `null` reads
   // as a value.
   it("says a field has no value instead of printing null", () => {
@@ -107,6 +129,7 @@ describe("CaseDetailsRail", () => {
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Notes",
+            dataType: "varchar",
             value: null,
             sourceNames: [],
           },
@@ -124,6 +147,7 @@ describe("CaseDetailsRail", () => {
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Notes",
+            dataType: "varchar",
             value: undefined,
             sourceNames: [],
           },
@@ -145,6 +169,7 @@ describe("CaseDetailsRail", () => {
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Borough",
+            dataType: "varchar",
             value: "Brooklyn",
             sourceNames: ["Line list", "Line list"],
           },

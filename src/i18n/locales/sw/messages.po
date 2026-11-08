@@ -616,6 +616,7 @@ msgstr "Maeneo mahususi yatachorwa kwenye ramani, na maeneo yaliyofichwa "
 msgid "Aggregations"
 msgstr "Mkusanyiko"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -6013,6 +6014,7 @@ msgstr "Ingiza"
 msgid "Clear Disputed status column"
 msgstr "Futa safu ya hali ya Zinazobishaniwa"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -9900,7 +9902,7 @@ msgid "Show as link"
 msgstr "Onyesha kama kiungo"
 
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
 msgid "No value"
 msgstr "Hakuna thamani"
 

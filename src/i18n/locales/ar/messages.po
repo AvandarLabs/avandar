@@ -609,6 +609,7 @@ msgstr "سيتم رسم المواقع الفردية على الخريطة، و
 msgid "Aggregations"
 msgstr "التجميعات"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -5937,6 +5938,7 @@ msgstr "استيراد"
 msgid "Clear Disputed status column"
 msgstr "مسح عمود الحالة المتنازع عليها"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -9785,7 +9787,7 @@ msgid "Show as link"
 msgstr "عرض كرابط"
 
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
 msgid "No value"
 msgstr "لا قيمة"
 

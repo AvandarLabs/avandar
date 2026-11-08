@@ -595,6 +595,7 @@ msgstr "個別位置將繪製在地圖上，隱藏區域將顯示其實際數量
 msgid "Aggregations"
 msgstr "聚合"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -5795,6 +5796,7 @@ msgstr "匯入"
 msgid "Clear Disputed status column"
 msgstr "清除有爭議狀態欄"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -9565,7 +9567,7 @@ msgid "Show as link"
 msgstr "顯示為連結"
 
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
 msgid "No value"
 msgstr "無值"
 

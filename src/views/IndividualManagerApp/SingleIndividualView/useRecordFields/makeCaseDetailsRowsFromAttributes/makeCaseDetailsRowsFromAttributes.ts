@@ -63,6 +63,7 @@ export function makeCaseDetailsRowsFromAttributes(
       return {
         id: attribute.id,
         name: attribute.name,
+        dataType: attribute.dataType,
         value: options.valuesByAttributeId[attribute.id],
         sourceNames: _getSourceNames({
           attributeId: attribute.id,
