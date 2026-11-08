@@ -846,6 +846,10 @@ msgstr "Vichwa vya monospace"
 #~ msgstr "Inapendekezwa ikiwa una RAM ya GB 4 au unahitaji upakuaji mwepesi "
 #~ "zaidi."
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Quarter"
+msgstr "Robo mwaka"
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr "Mtu 1"
@@ -940,6 +944,10 @@ msgstr "Avandar haikuweza kuthibitisha kuwa hoja hii inasoma tu seti zako za "
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing offline models"
 msgstr ""
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Year"
+msgstr "Mwaka"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Show datasets in {topic}"
@@ -2373,6 +2381,10 @@ msgstr ""
 msgid "Radius"
 msgstr "Radius"
 
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Week of {day}"
+msgstr "Wiki ya {day}"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Panga na punguza"
@@ -2522,6 +2534,10 @@ msgstr "Jaribu tena. Ikiendelea kushindikana, pakia upya ukurasa."
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
 msgstr "Unaweza kuanza kutumia nenosiri lako jipya sasa"
+
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Q{quarter} {year}"
+msgstr "Robo {quarter} {year}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
@@ -3638,6 +3654,10 @@ msgstr "{layerName} haikurejesha safu yoyote"
 msgid "is at most"
 msgstr "ni isiyozidi"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per year"
+msgstr "Kwa mwaka"
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Use a database"
 msgstr "Tumia hifadhidata"
@@ -3763,6 +3783,10 @@ msgstr "Safu mlalo {rowIndexes}."
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
 msgstr "Futa: {openDatasetName}"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per day"
+msgstr "Kwa siku"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
@@ -4702,6 +4726,10 @@ msgstr "Data binafsi zimegunduliwa"
 msgid "Coordinate validation report"
 msgstr "Ripoti ya uthibitishaji wa viwianishi"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Day"
+msgstr "Siku"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Apply every global filter on the dashboard."
 msgstr "Tumia kila kichujio cha kimataifa kwenye dashibodi."
@@ -4713,6 +4741,10 @@ msgstr "Punguza"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "Kikomo kimefikiwa"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Month"
+msgstr "Mwezi"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Your statuses were not saved. Try again in a moment."
@@ -5640,6 +5672,10 @@ msgstr "Mwisho (mfano. 2024-12-31)"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open dashboard tile"
 msgstr "Fungua kigae cha dashibodi"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per month"
+msgstr "Kwa mwezi"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -10633,6 +10669,10 @@ msgstr "Pakia faili ya CSV, Excel au PDF, unganisha Google Sheet, au vinjari "
 msgid "The database did not respond in time. Check the address and try again."
 msgstr "Hifadhidata haikujibu kwa wakati. Kagua anwani na ujaribu tena."
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per quarter"
+msgstr "Kwa robo mwaka"
+
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "{0} (boundary)"
@@ -10944,6 +10984,10 @@ msgstr "Thamani inayojulikana zaidi ni <0>{0}</0>, katika <1>{1}</1> ya safu "
 msgid "Data key column"
 msgstr "Safu wima ya ufunguo wa data"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per week"
+msgstr "Kwa wiki"
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing, {remainingLabel} remaining"
 msgstr "Inashughulika, {remainingLabel} iliyobaki"
@@ -11060,6 +11104,10 @@ msgstr "Onyesha QR code"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
 msgstr "Mwaka uliopita"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Week"
+msgstr "Wiki"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the minimum value"

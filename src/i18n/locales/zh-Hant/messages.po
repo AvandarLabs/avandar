@@ -820,6 +820,10 @@ msgstr "等寬標題"
 #~ msgid "Recommended if you have 4 GB RAM or need the lightest download."
 #~ msgstr "如果您有 4 GB RAM，或需要最精簡的下載內容，建議使用此選項。"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Quarter"
+msgstr "季"
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr "1 人"
@@ -909,6 +913,10 @@ msgstr "Avandar 無法確認此查詢只會讀取您的資料集，因此未執�
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing offline models"
 msgstr ""
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Year"
+msgstr "年"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Show datasets in {topic}"
@@ -2282,6 +2290,10 @@ msgstr ""
 msgid "Radius"
 msgstr "半徑"
 
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Week of {day}"
+msgstr "{day}當週"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "排序與限制"
@@ -2430,6 +2442,10 @@ msgstr "請再試一次。如果持續失敗，請重新載入頁面。"
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
 msgstr "您現在可以開始使用您的新密碼"
+
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Q{quarter} {year}"
+msgstr "{year}年第{quarter}季"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
@@ -3497,6 +3513,10 @@ msgstr "{layerName} 未傳回任何資料列"
 msgid "is at most"
 msgstr "小於或等於"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per year"
+msgstr "按年"
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Use a database"
 msgstr "使用資料庫"
@@ -3614,6 +3634,10 @@ msgstr "資料列 {rowIndexes}。"
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
 msgstr "刪除：{openDatasetName}"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per day"
+msgstr "按日"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
@@ -4521,6 +4545,10 @@ msgstr "檢測到個人數據"
 msgid "Coordinate validation report"
 msgstr "座標驗證報告"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Day"
+msgstr "日"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Apply every global filter on the dashboard."
 msgstr "在儀表板上應用所有全局過濾器。"
@@ -4532,6 +4560,10 @@ msgstr "折疊"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "達到上限"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Month"
+msgstr "月"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Your statuses were not saved. Try again in a moment."
@@ -5435,6 +5467,10 @@ msgstr "結束（例如：2024-12-31）"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open dashboard tile"
 msgstr "開啟儀表板圖塊"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per month"
+msgstr "按月"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -10272,6 +10308,10 @@ msgstr "上傳 CSV、Excel 或 PDF 檔案、連結 Google Sheet，或瀏覽開�
 msgid "The database did not respond in time. Check the address and try again."
 msgstr "資料庫未及時回應。請檢查位址後再試一次。"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per quarter"
+msgstr "按季"
+
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "{0} (boundary)"
@@ -10577,6 +10617,10 @@ msgstr "最常見的值是 <0>{0}</0>，出現在 <1>{1}</1> 的資料列中。"
 msgid "Data key column"
 msgstr "資料鍵欄"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per week"
+msgstr "按週"
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing, {remainingLabel} remaining"
 msgstr "處理中，剩餘 {remainingLabel}"
@@ -10690,6 +10734,10 @@ msgstr "顯示 QR 碼"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
 msgstr "過去一年"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Week"
+msgstr "週"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the minimum value"

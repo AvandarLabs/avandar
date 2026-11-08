@@ -836,6 +836,10 @@ msgstr "عناوين أحادية المسافة"
 #~ msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 4 جيجابايت أو كنت تحتاج إلى أخف "
 #~ "تنزيل."
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Quarter"
+msgstr "الربع"
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr "شخص واحد"
@@ -929,6 +933,10 @@ msgstr "تعذّر على Avandar التأكد من أن هذا الاستعلا
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing offline models"
 msgstr ""
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Year"
+msgstr "السنة"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Show datasets in {topic}"
@@ -2343,6 +2351,10 @@ msgstr ""
 msgid "Radius"
 msgstr "نصف القطر"
 
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Week of {day}"
+msgstr "أسبوع {day}"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "الفرز والحد"
@@ -2491,6 +2503,10 @@ msgstr "حاول مرة أخرى. إذا استمر الفشل، أعد تحمي
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
 msgstr "يمكنك البدء في استخدام كلمة المرور الجديدة الآن"
+
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Q{quarter} {year}"
+msgstr "الربع {quarter} {year}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
@@ -3590,6 +3606,10 @@ msgstr "لم تُرجع {layerName} أي صفوف"
 msgid "is at most"
 msgstr "على الأكثر"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per year"
+msgstr "لكل سنة"
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Use a database"
 msgstr "استخدام قاعدة بيانات"
@@ -3712,6 +3732,10 @@ msgstr "الصفوف {rowIndexes}."
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
 msgstr "حذف: {openDatasetName}"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per day"
+msgstr "لكل يوم"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
@@ -4641,6 +4665,10 @@ msgstr "تم اكتشاف بيانات شخصية"
 msgid "Coordinate validation report"
 msgstr "تقرير التحقق من الإحداثيات"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Day"
+msgstr "اليوم"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Apply every global filter on the dashboard."
 msgstr "تطبيق كل فلتر عالمي على اللوحة."
@@ -4652,6 +4680,10 @@ msgstr "طي"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "تم الوصول إلى الحد"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Month"
+msgstr "الشهر"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Your statuses were not saved. Try again in a moment."
@@ -5572,6 +5604,10 @@ msgstr "النهاية (على سبيل المثال 2024-12-31)"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open dashboard tile"
 msgstr "فتح مربع لوحة المعلومات"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per month"
+msgstr "لكل شهر"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -10512,6 +10548,10 @@ msgid "The database did not respond in time. Check the address and try again."
 msgstr "لم تستجب قاعدة البيانات في الوقت المحدد. تحقّق من العنوان وحاول مرة "
 "أخرى."
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per quarter"
+msgstr "لكل ربع سنة"
+
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "{0} (boundary)"
@@ -10821,6 +10861,10 @@ msgstr "القيمة الأكثر شيوعًا هي <0>{0}</0>، في <1>{1}</1>
 msgid "Data key column"
 msgstr "عمود مفتاح البيانات"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per week"
+msgstr "لكل أسبوع"
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing, {remainingLabel} remaining"
 msgstr "يتم المعالجة، {remainingLabel} المتبقية"
@@ -10936,6 +10980,10 @@ msgstr "عرض رمز QR"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
 msgstr "العام الماضي"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Week"
+msgstr "الأسبوع"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the minimum value"

@@ -854,6 +854,10 @@ msgstr "Titres en monospace"
 #~ msgstr "Recommandé si vous disposez de 4 Go de RAM ou si vous avez besoin du "
 #~ "téléchargement le plus léger."
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Quarter"
+msgstr "Trimestre"
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr "1 personne"
@@ -950,6 +954,10 @@ msgstr "Avandar n’a pas pu confirmer que cette requête se limite à la lectur
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing offline models"
 msgstr ""
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Year"
+msgstr "Année"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Show datasets in {topic}"
@@ -2399,6 +2407,10 @@ msgstr ""
 msgid "Radius"
 msgstr "Rayon"
 
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Week of {day}"
+msgstr "Semaine du {day}"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Tri et limite"
@@ -2550,6 +2562,10 @@ msgstr "Réessayez. Si le problème persiste, rechargez la page."
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
 msgstr "Vous pouvez commencer à utiliser votre nouveau mot de passe maintenant"
+
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Q{quarter} {year}"
+msgstr "T{quarter} {year}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
@@ -3679,6 +3695,10 @@ msgstr "{layerName} n’a renvoyé aucune ligne"
 msgid "is at most"
 msgstr "est inférieur ou égal à"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per year"
+msgstr "Par an"
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Use a database"
 msgstr "Utiliser une base de données"
@@ -3804,6 +3824,10 @@ msgstr "Lignes {rowIndexes}."
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
 msgstr "Supprimer : {openDatasetName}"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per day"
+msgstr "Par jour"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
@@ -4757,6 +4781,10 @@ msgstr "Données personnelles détectées"
 msgid "Coordinate validation report"
 msgstr "Rapport de validation des coordonnées"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Day"
+msgstr "Jour"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Apply every global filter on the dashboard."
 msgstr "Appliquer chaque filtre global sur le tableau de bord."
@@ -4768,6 +4796,10 @@ msgstr "Réduire"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "Limite atteinte"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Month"
+msgstr "Mois"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Your statuses were not saved. Try again in a moment."
@@ -5702,6 +5734,10 @@ msgstr "Fin (par exemple, 2024-12-31)"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open dashboard tile"
 msgstr "Ouvrir la vignette du tableau de bord"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per month"
+msgstr "Par mois"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -10761,6 +10797,10 @@ msgid "The database did not respond in time. Check the address and try again."
 msgstr "La base de données n’a pas répondu à temps. Vérifiez l’adresse et "
 "réessayez."
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per quarter"
+msgstr "Par trimestre"
+
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "{0} (boundary)"
@@ -11075,6 +11115,10 @@ msgstr "La valeur la plus fréquente est <0>{0}</0>, présente dans <1>{1}</1> "
 msgid "Data key column"
 msgstr "Colonne de clé de données"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per week"
+msgstr "Par semaine"
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing, {remainingLabel} remaining"
 msgstr "Traitement, {remainingLabel} restant"
@@ -11193,6 +11237,10 @@ msgstr "Afficher le code QR"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
 msgstr "Année dernière"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Week"
+msgstr "Semaine"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the minimum value"
