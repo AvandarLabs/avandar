@@ -38,6 +38,8 @@ export function getRowNumberedViewName(tableName: string): string {
  * resolve it.
  */
 const STAGING_INDIVIDUALS_TABLE_PREFIX = "ava_staging_individuals_";
+const STAGING_INDIVIDUALS_ID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Names the table that individual generation writes its rows to before they
@@ -57,7 +59,7 @@ export function getStagingIndividualsTableName(conceptId: string): string {
 
 /**
  * Reports whether a DuckDB table name is an individual-generation staging
- * table.
+ * table: the prefix followed by a concept id.
  *
  * The SQL analyzer needs this for the same reason it needs
  * `getTableNameFromRowNumberedViewName`: it fails closed on any source name it
@@ -73,7 +75,12 @@ export function getStagingIndividualsTableName(conceptId: string): string {
  * authorized for, so it contributes no relation and needs no lease of its own.
  */
 export function isStagingIndividualsTableName(tableName: string): boolean {
-  return tableName.startsWith(STAGING_INDIVIDUALS_TABLE_PREFIX);
+  return (
+    tableName.startsWith(STAGING_INDIVIDUALS_TABLE_PREFIX) &&
+    STAGING_INDIVIDUALS_ID_REGEX.test(
+      tableName.slice(STAGING_INDIVIDUALS_TABLE_PREFIX.length),
+    )
+  );
 }
 
 /**

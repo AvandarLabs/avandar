@@ -10,7 +10,7 @@ type KeywordIndexOptions = {
 };
 
 const SQL_TOKEN_REGEX =
-  /(?<comment>--[^\n]*|\/\*[\s\S]*?\*\/)|(?<string>'(?:''|[^'])*')|(?<quoted>"(?:""|[^"])*"|`(?:``|[^`])*`)|(?<uuid>[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})|(?<word>[a-z_][a-z0-9_$]*)|(?<symbol>[(),.;])|(?<other>\S)/gi;
+  /(?<comment>--[^\n\r]*|\/\*[\s\S]*?\*\/)|(?<string>'(?:''|[^'])*')|(?<quoted>"(?:""|[^"])*"|`(?:``|[^`])*`)|(?<uuid>[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})|(?<word>[a-z_][a-z0-9_$]*)|(?<symbol>[(),.;])|(?<other>\S)/gi;
 
 function _getTokenFromMatch(match: RegExpExecArray): SqlToken | undefined {
   const groups = match.groups;

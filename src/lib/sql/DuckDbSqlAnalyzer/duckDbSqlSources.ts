@@ -63,6 +63,32 @@ const INSPECTABLE_TABLE_FUNCTIONS = new Set([
   "unnest",
   "json_each",
 ]);
+/**
+ * Words that, right before `TABLE`, make it part of a statement's own syntax
+ * (`CREATE TABLE`, `DROP TABLE`) rather than the start of a `TABLE name` query.
+ */
+const TABLE_DECLARATION_KEYWORDS = new Set([
+  "ALTER",
+  "CREATE",
+  "DROP",
+  "FOREIGN",
+  "GLOBAL",
+  "LOCAL",
+  "LOCK",
+  "ON",
+  "REPLACE",
+  "RETURNS",
+  "TEMP",
+  "TEMPORARY",
+  "TRUNCATE",
+  "UNLOGGED",
+  "VIRTUAL",
+]);
+/**
+ * Words that can come right before a query that starts with `SHOW`: the end of
+ * the previous statement, an opening parenthesis, or `AS` and `EXPLAIN`.
+ */
+const QUERY_START_KEYWORDS = new Set(["AS", "ANALYZE", "EXPLAIN"]);
 const INSPECTABLE_INTERNAL_TABLES = new Set(["reject_errors", "reject_scans"]);
 /**
  * Scalar functions whose SQL-standard syntax puts a `FROM` between their
@@ -326,20 +352,58 @@ function _getAnalysisFromCopyRelation(
     : _readSourceAnalysis([datasetId]);
 }
 
+/**
+ * Returns whether the token at `index` introduces a relation.
+ *
+ * `TABLE` and `SHOW` are also ordinary words, so they count only where a query
+ * can start. `TABLE` is a source unless a declaration such as `CREATE` owns it,
+ * which fails closed: an unknown word before it leaves it a source. `SHOW` is
+ * a source only where DuckDB takes it as a query, so a column named `show` is
+ * not.
+ */
+function _isSourceKeywordIndex(
+  options: Readonly<{
+    tokens: readonly SqlToken[];
+    index: number;
+    sourceKeywords: ReadonlySet<string>;
+  }>,
+): boolean {
+  const { index, sourceKeywords, tokens } = options;
+  const token = tokens[index];
+  const previousToken = tokens[index - 1];
+  if (isKeywordToken({ token, keywords: "TABLE" })) {
+    return !isKeywordToken({
+      token: previousToken,
+      keywords: TABLE_DECLARATION_KEYWORDS,
+    });
+  }
+  if (isKeywordToken({ token, keywords: "SHOW" })) {
+    return (
+      previousToken === undefined ||
+      previousToken.value === ";" ||
+      previousToken.value === "(" ||
+      isKeywordToken({ token: previousToken, keywords: QUERY_START_KEYWORDS })
+    );
+  }
+  return isKeywordToken({ token, keywords: sourceKeywords });
+}
+
 function _getDirectSourceIndexes(tokens: readonly SqlToken[]): number[] {
   const sourceKeywords = new Set([
     "DESCRIBE",
     "FROM",
     "JOIN",
     "PIVOT",
+    "PIVOT_LONGER",
+    "PIVOT_WIDER",
     "SUMMARIZE",
     "UNPIVOT",
   ]);
   const copyDirectionKeywordIndexes = getCopyDirectionKeywordIndexes(tokens);
   const functionArgumentFromIndexes = _getFunctionArgumentFromIndexes(tokens);
-  const directIndexes = tokens.flatMap((token, index) => {
+  const directIndexes = tokens.flatMap((_token, index) => {
     if (
-      !isKeywordToken({ token, keywords: sourceKeywords }) ||
+      !_isSourceKeywordIndex({ tokens, index, sourceKeywords }) ||
       copyDirectionKeywordIndexes.has(index) ||
       functionArgumentFromIndexes.has(index)
     ) {

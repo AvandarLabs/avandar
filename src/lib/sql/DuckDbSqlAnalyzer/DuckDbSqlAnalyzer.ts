@@ -6,11 +6,16 @@ import {
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlIdentifiers";
 import { getMutationTargetAnalysis } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlMutations";
 import { getSourceAnalyses } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlSources";
-import { hasMutation } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlStatements";
+import {
+  hasMutation,
+  hasOnlyReadStatements,
+  hasUnsupportedStatement,
+  isSinglePlainQuery,
+} from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlStatements";
+import { hasUnsupportedSqlSyntax } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlSyntax";
 import {
   getSqlTokens,
   hasInvalidTokenStructure,
-  isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
@@ -25,25 +30,6 @@ export type {
 } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 
 const MAX_NESTED_SQL_DEPTH = 16;
-const READ_STATEMENT_KEYWORDS = new Set([
-  "DESCRIBE",
-  "EXPLAIN",
-  "FROM",
-  "PIVOT",
-  "SELECT",
-  "SHOW",
-  "SUMMARIZE",
-  "UNPIVOT",
-  "VALUES",
-  "WITH",
-]);
-
-function _hasRecognizedReadStatement(tokens: readonly SqlToken[]): boolean {
-  return isKeywordToken({
-    token: tokens[0],
-    keywords: READ_STATEMENT_KEYWORDS,
-  });
-}
 
 /** Names the relation each table name refers to, dropping unknown names. */
 function _getRelations(relationTableNames: readonly string[]): RelationRef.T[] {
@@ -84,10 +70,38 @@ function _getMutationAnalysis(
   return { kind: "mutating", readDatasetIds, mutatedDatasetIds };
 }
 
+/** Builds the analysis of a statement no source marked unsafe or mutating. */
+function _getReadAnalysis(
+  options: Readonly<{
+    tokens: readonly SqlToken[];
+    sourceAnalyses: readonly SourceAnalysis[];
+    relationTableNames: string[];
+  }>,
+): DuckDbSqlAnalysis {
+  const { relationTableNames, sourceAnalyses, tokens } = options;
+  if (!hasOnlyReadStatements(tokens)) {
+    return {
+      kind: "unsafe",
+      reason: "invalid-sql",
+      datasetIds: _getDatasetIds(relationTableNames),
+    };
+  }
+  return {
+    kind: "read",
+    relations: _getRelations(relationTableNames),
+    internalTableNames: mergeUniqueNames(
+      ...sourceAnalyses.map(prop("internalTableNames")),
+    ),
+  };
+}
+
 function _getDuckDbSqlAnalysisFromSql(
   options: Readonly<{ sql: string; recursionDepth: number }>,
 ): DuckDbSqlAnalysis {
   const { recursionDepth, sql } = options;
+  if (hasUnsupportedSqlSyntax(sql)) {
+    return { kind: "unsafe", reason: "unsupported-syntax", datasetIds: [] };
+  }
   const tokens = getSqlTokens(sql);
   if (
     recursionDepth > MAX_NESTED_SQL_DEPTH ||
@@ -95,6 +109,9 @@ function _getDuckDbSqlAnalysisFromSql(
     hasInvalidTokenStructure(tokens)
   ) {
     return { kind: "unsafe", reason: "invalid-sql", datasetIds: [] };
+  }
+  if (hasUnsupportedStatement(tokens)) {
+    return { kind: "unsafe", reason: "unsupported-syntax", datasetIds: [] };
   }
   const sourceAnalyses = getSourceAnalyses({
     getNestedSqlAnalysis: _getDuckDbSqlAnalysisFromSql,
@@ -116,28 +133,19 @@ function _getDuckDbSqlAnalysisFromSql(
   }
   const isMutating =
     hasMutation(tokens) || sourceAnalyses.some(prop("isMutating"));
-  if (isMutating) {
-    return _getMutationAnalysis({ tokens, sourceAnalyses, relationTableNames });
-  }
-  if (!_hasRecognizedReadStatement(tokens)) {
-    return {
-      kind: "unsafe",
-      reason: "invalid-sql",
-      datasetIds: _getDatasetIds(relationTableNames),
-    };
-  }
-  const internalTableNames = mergeUniqueNames(
-    ...sourceAnalyses.map(prop("internalTableNames")),
-  );
-  const relations = _getRelations(relationTableNames);
-  return internalTableNames.length === 0
-    ? { kind: "read", relations }
-    : { kind: "read", relations, internalTableNames };
+  return isMutating
+    ? _getMutationAnalysis({ tokens, sourceAnalyses, relationTableNames })
+    : _getReadAnalysis({ tokens, sourceAnalyses, relationTableNames });
 }
 
 /** Returns the complete static relation effect analysis for DuckDB SQL. */
 function _getPublicDuckDbSqlAnalysisFromSql(sql: string): DuckDbSqlAnalysis {
   return _getDuckDbSqlAnalysisFromSql({ sql, recursionDepth: 0 });
+}
+
+/** Returns whether SQL is one plain query the tokenizer reads faithfully. */
+function _isSinglePlainQuerySql(sql: string): boolean {
+  return !hasUnsupportedSqlSyntax(sql) && isSinglePlainQuery(getSqlTokens(sql));
 }
 
 /** Returns read relation sources, rejecting incomplete or mutating analysis. */
@@ -191,6 +199,11 @@ export const DuckDbSqlAnalyzer = {
   getReadDatasetIdsFromSql: _getReadDatasetIdsFromSql,
   /** Returns the complete static relation effect analysis for DuckDB SQL. */
   getDuckDbSqlAnalysisFromSql: _getPublicDuckDbSqlAnalysisFromSql,
+  /**
+   * Returns whether the SQL is exactly one `SELECT`, `WITH`, `FROM`, or
+   * parenthesized query, written in syntax the analyzer can read.
+   */
+  isSinglePlainQuery: _isSinglePlainQuerySql,
   /** Returns every relation read, rejecting incomplete or mutating analysis. */
   getRelationsFromSqlTableReferences: _getRelationsFromSqlTableReferences,
 };
