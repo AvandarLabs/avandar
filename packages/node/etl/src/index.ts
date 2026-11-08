@@ -16,10 +16,20 @@ export type {
   CatalogFieldSource,
   CatalogMappableField,
   PipelineConfig,
+  PipelineDownloadConfig,
   PipelineDriveConfig,
 } from "@etl/EtlConfig/PipelineConfig.types";
 export { parsePipelineConfig } from "@etl/EtlConfig/parsePipelineConfig/parsePipelineConfig";
 export { readPipelineConfigFile } from "@etl/EtlConfig/readPipelineConfigFile/readPipelineConfigFile";
+export { loadListingDownloadScript } from "@etl/ListingDownload/loadListingDownloadScript/loadListingDownloadScript";
+export type {
+  DownloadableListing,
+  ListingDownload,
+  ListingDownloadColumn,
+  ListingDownloadScript,
+  PagedListingDownload,
+  WholeFileListingDownload,
+} from "@etl/ListingDownload/ListingDownload.types";
 export {
   ETL_RUN_FAILED_ERROR_NAME,
   EtlRunFailedError,

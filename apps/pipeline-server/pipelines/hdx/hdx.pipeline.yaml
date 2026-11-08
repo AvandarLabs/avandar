@@ -16,6 +16,12 @@ fields:
   update_frequency:
     { script: ./mappers/hdxUpdateFrequency/hdxUpdateFrequency.ts }
 
+# How the pipeline server downloads one listing for its Parquet copy. CKAN
+# serves a resource only as one file, so it does not page.
+download:
+  paging: false
+  script: ./download/hdxListingDownload.ts
+
 # HDX is one CKAN deployment, so this lists one drive. An empty list switches
 # the pipeline off.
 drives:
