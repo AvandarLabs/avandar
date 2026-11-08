@@ -204,4 +204,27 @@ describe("SqlTableAlias.applyToSql", () => {
     expect(sql).toBe(`SELECT 1 FROM "concept_${sorted[10]!.id}"`);
     expect(sql).not.toContain(`concept_${sorted[1]!.id}`);
   });
+
+  it("rewrites table names back to aliases, quoted or not", () => {
+    const aliases = SqlTableAlias.fromDatasets([
+      { id: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa", name: "a.csv" },
+      { id: "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb", name: "b.csv" },
+    ]);
+    const original = 'SELECT * FROM "t0" JOIN t1 USING ("id")';
+    const resolved = SqlTableAlias.applyToSql(original, aliases);
+
+    expect(SqlTableAlias.toAliasedSql(resolved, aliases)).toBe(
+      'SELECT * FROM "t0" JOIN "t1" USING ("id")',
+    );
+  });
+
+  it("leaves SQL that already uses aliases unchanged", () => {
+    const aliases = SqlTableAlias.fromDatasets([
+      { id: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa", name: "a.csv" },
+    ]);
+
+    expect(SqlTableAlias.toAliasedSql('SELECT 1 FROM "t0"', aliases)).toBe(
+      'SELECT 1 FROM "t0"',
+    );
+  });
 });

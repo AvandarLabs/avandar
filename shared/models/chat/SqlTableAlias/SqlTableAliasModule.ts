@@ -178,6 +178,27 @@ function _applyToSql(sql: string, aliases: readonly SqlTableAliasT[]): string {
   }, sql);
 }
 
+function _escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function _toAliasedSql(
+  sql: string,
+  aliases: readonly SqlTableAliasT[],
+): string {
+  const longestFirst = [...aliases].sort((left, right) => {
+    return right.tableName.length - left.tableName.length;
+  });
+  return longestFirst.reduce((current, entry) => {
+    const name = _escapeRegExp(entry.tableName);
+    const quoted = new RegExp(`"${name}"`, "g");
+    const unquoted = new RegExp(`(?<![\\w"])${name}(?![\\w"])`, "g");
+    return current
+      .replace(quoted, `"${entry.alias}"`)
+      .replace(unquoted, `"${entry.alias}"`);
+  }, sql);
+}
+
 /**
  * Workspace-scoped short names for model-facing SQL. Datasets are `t0`,
  * `t1`, …; concepts are `c0`, `c1`, …. DuckDB still addresses tables by
@@ -201,4 +222,6 @@ export const SqlTableAliasModule = {
   formatSchemaBlock: _formatSchemaBlock,
   /** Rewrites aliases to quoted DuckDB table names. */
   applyToSql: _applyToSql,
+  /** Rewrites DuckDB table names back to quoted aliases, for prompts. */
+  toAliasedSql: _toAliasedSql,
 };
