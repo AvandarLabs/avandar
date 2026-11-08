@@ -1418,6 +1418,10 @@ msgid "These datasets are listed in your workspace, but their source data could 
 "either re-upload the dataset or delete it from your workspace."
 msgstr "這些數據集在您的工作區中列出，但其源數據在您的本地存儲中找不到。為了繼續，您需要重新上傳數據集或將其從工作區中刪除。"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
+msgid "Show fewer"
+msgstr "顯示較少"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "元數據"
@@ -1947,6 +1951,11 @@ msgstr "(年度計費)"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Every case type already has a status. Choose another name."
 msgstr "每個案件類型都已有狀態。請選擇其他名稱。"
+
+#. placeholder {0}: values.length
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
+msgid "{0, plural, one {Show all # value} other {Show all # values}}"
+msgstr "{0, plural, one {顯示全部 # 個值} other {顯示全部 # 個值}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
@@ -4335,6 +4344,7 @@ msgid "Delete dashboard?"
 msgstr "刪除儀表板？"
 
 #: src/components/caseFields/ValueShapeControl.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Every value"
 msgstr "所有值"
 

@@ -23,6 +23,7 @@ function _makeAttribute(
     name: string;
     mappingType?: ConceptAttribute.T["mappingType"];
     dataType?: AvaDataType.T;
+    isArray?: boolean;
   }>,
 ): ConceptAttribute.T {
   return Model.make("ConceptAttribute", {
@@ -38,7 +39,7 @@ function _makeAttribute(
     isLabel: false,
     isIdentifier: false,
     allowManualEdit: false,
-    isArray: false,
+    isArray: options.isArray ?? false,
   });
 }
 
@@ -107,6 +108,30 @@ describe("makeCaseDetailsRowsFromAttributes", () => {
     });
 
     expect(row?.dataType).toBe("date");
+  });
+
+  it("gives each row its field's value shape", () => {
+    const county = _makeAttribute({ name: "county" });
+    const dailyCases = _makeAttribute({ name: "daily cases", isArray: true });
+
+    const rows = makeCaseDetailsRowsFromAttributes({
+      attributes: [county, dailyCases],
+      valuesByAttributeId: {
+        [county.id]: "Alameda",
+        [dailyCases.id]: [31, 48],
+      },
+      mappings: [],
+      datasets: [],
+    });
+
+    expect(
+      rows.map((row) => {
+        return [row.name, row.valueShape];
+      }),
+    ).toEqual([
+      ["county", "single"],
+      ["daily cases", "list"],
+    ]);
   });
 
   it("names the dataset each of a field's mappings reads, and none for a manual-entry field", () => {

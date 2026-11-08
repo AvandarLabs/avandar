@@ -1,5 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Badge, Group, Stack, Text } from "@mantine/core";
+import { match } from "ts-pattern";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import css from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.module.css";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
@@ -94,6 +96,18 @@ function AttributeChips({
           <Trans>Name</Trans>
         </Badge>
       ) : null}
+      {match(ConceptAttribute.getValueShape(attribute))
+        .with("single", () => {
+          return null;
+        })
+        .with("list", () => {
+          return (
+            <Badge variant="light" color="neutral" size="sm">
+              <Trans>Every value</Trans>
+            </Badge>
+          );
+        })
+        .exhaustive()}
       {sourceName ? (
         <Text className={css.source} lineClamp={1}>
           {sourceName}

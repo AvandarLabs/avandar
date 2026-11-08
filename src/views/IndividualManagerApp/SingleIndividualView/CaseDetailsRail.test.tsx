@@ -21,6 +21,7 @@ describe("CaseDetailsRail", () => {
             id: uuid<ConceptAttribute.Id>(),
             name: "Borough",
             dataType: "varchar",
+            valueShape: "single",
             value: "Brooklyn",
             sourceNames: ["Lab results", "Measles line list"],
           },
@@ -28,6 +29,7 @@ describe("CaseDetailsRail", () => {
             id: uuid<ConceptAttribute.Id>(),
             name: "MMR status",
             dataType: "varchar",
+            valueShape: "single",
             value: "Unknown",
             sourceNames: [],
           },
@@ -51,6 +53,7 @@ describe("CaseDetailsRail", () => {
             id: uuid<ConceptAttribute.Id>(),
             name: "Borough",
             dataType: "varchar",
+            valueShape: "single",
             value: "Brooklyn",
             sourceNames: ["Lab results", "Measles line list"],
           },
@@ -75,6 +78,7 @@ describe("CaseDetailsRail", () => {
             id: uuid<ConceptAttribute.Id>(),
             name: "Notes",
             dataType: "varchar",
+            valueShape: "single",
             value: "Called twice",
             sourceNames: [],
           },
@@ -110,6 +114,7 @@ describe("CaseDetailsRail", () => {
             id: uuid<ConceptAttribute.Id>(),
             name: "Rash onset",
             dataType: "date",
+            valueShape: "single",
             value: 1_709_596_800_000,
             sourceNames: [],
           },
@@ -130,6 +135,7 @@ describe("CaseDetailsRail", () => {
             id: uuid<ConceptAttribute.Id>(),
             name: "Notes",
             dataType: "varchar",
+            valueShape: "single",
             value: null,
             sourceNames: [],
           },
@@ -148,6 +154,7 @@ describe("CaseDetailsRail", () => {
             id: uuid<ConceptAttribute.Id>(),
             name: "Notes",
             dataType: "varchar",
+            valueShape: "single",
             value: undefined,
             sourceNames: [],
           },
@@ -170,6 +177,7 @@ describe("CaseDetailsRail", () => {
             id: uuid<ConceptAttribute.Id>(),
             name: "Borough",
             dataType: "varchar",
+            valueShape: "single",
             value: "Brooklyn",
             sourceNames: ["Line list", "Line list"],
           },
@@ -228,5 +236,31 @@ describe("CaseDetailsRail", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it("lists every value of a field that keeps every value", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Daily new cases",
+            dataType: "bigint",
+            valueShape: "list",
+            value: [31, 48],
+            sourceNames: ["County cases"],
+          },
+        ]}
+      />,
+    );
+
+    // The field's own list, not its "Sources" list.
+    expect(
+      within(screen.getByRole("list", { name: "Daily new cases" }))
+        .getAllByRole("listitem")
+        .map((item) => {
+          return item.textContent;
+        }),
+    ).toEqual(["31", "48"]);
   });
 });

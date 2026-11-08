@@ -44,6 +44,8 @@ describe("createFieldValueFormatter", () => {
     ["timestamp", Date.UTC(2026, 0, 5, 10, 30), "Jan 5, 2026, 10:30 AM"],
     ["timestamp", "2026-01-05T10:30:00.000Z", "Jan 5, 2026, 10:30 AM"],
     ["time", 52_200_000_000, "2:30 PM"],
+    ["time", "14:30:00", "2:30 PM"],
+    ["time", "14:30:00.250000", "2:30 PM"],
     ["bigint", 1_234_567, "1,234,567"],
     ["double", 38.456, "38.456"],
     ["varchar", "Alameda", "Alameda"],
@@ -57,9 +59,8 @@ describe("createFieldValueFormatter", () => {
     expect(_format("varchar", undefined)).toBe("");
   });
 
-  // A time can arrive as text from another path; it already reads well.
   it("leaves a value of the wrong kind as it is", () => {
-    expect(_format("time", "14:30:00")).toBe("14:30:00");
+    expect(_format("time", "half past two")).toBe("half past two");
     expect(_format("date", "not a date")).toBe("not a date");
   });
 
