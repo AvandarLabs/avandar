@@ -84,9 +84,12 @@ describe("loadPipelineDefinition", () => {
     expect(
       mapper.mapFields(
         {
-          organization: { title: "World Health Organization" },
+          organization: { title: "OCHA Burkina Faso" },
+          dataset_source: "World Health Organization",
           notes: "Measles cases by week.",
+          caveats: "Counts for the last two weeks are provisional.",
           license_title: "Creative Commons Attribution for IGOs (CC BY-IGO)",
+          dataset_date: "[2019-01-01T00:00:00 TO 2026-11-01T23:59:59]",
           groups: [{ title: "Burkina Faso" }, { title: "Mali" }],
           tags: [{ name: "measles" }, { name: "health" }],
           data_update_frequency: "7",
@@ -94,12 +97,20 @@ describe("loadPipelineDefinition", () => {
         "https://data.humdata.org",
       ).fields,
     ).toMatchObject({
-      organization1Name: "World Health Organization",
+      organization1Name: "OCHA Burkina Faso",
+      organization2Name: "World Health Organization",
       description: "Measles cases by week.",
+      notes: "Counts for the last two weeks are provisional.",
       license: "Creative Commons Attribution for IGOs (CC BY-IGO)",
-      domains: ["Burkina Faso", "Mali"],
-      tags: ["measles", "health"],
+      coverageStartDate: new Date("2019-01-01T00:00:00Z"),
+      coverageEndDate: new Date("2026-11-01T23:59:59Z"),
+      domains: ["Health"],
+      tags: ["measles", "health", "Burkina Faso", "Mali"],
       updateFrequency: "Every week",
+    });
+    expect(config.organizationLabels).toEqual({
+      1: "Organization",
+      2: "Data source",
     });
   });
 });
